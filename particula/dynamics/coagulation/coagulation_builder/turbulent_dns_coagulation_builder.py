@@ -1,5 +1,12 @@
 """
-CoagulationBuilder for Turbulent DNS Coagulation.
+Turbulent DNS Coagulation Builder Module.
+
+Provides a builder for creating `TurbulentDNSCoagulationStrategy`
+instances, which handle coagulation processes under Direct Numerical
+Simulation (DNS) of turbulent flows. Ensures that required parameters
+such as distribution type, turbulent dissipation, fluid density,
+reynolds_lambda (Taylor-scale Reynolds number), and relative_velocity
+are supplied.
 """
 
 from typing import Optional
@@ -33,12 +40,45 @@ class TurbulentDNSCoagulationBuilder(
     BuilderFluidDensityMixin,
 ):
     """
-    Turbulent DNS Coagulation Builder class.
+    Turbulent DNS coagulation builder class.
 
-    This class is used to create coagulation strategies for turbulent DNS
-    coagulation and ensures that the correct values (distribution_type,
-    turbulent_dissipation, fluid_density, reynolds_lambda, relative_velocity)
-    are passed.
+    Creates and configures a `TurbulentDNSCoagulationStrategy` to simulate
+    coagulation in turbulent flow fields using Direct Numerical Simulation
+    parameters. This builder enforces that the required parameters
+    (distribution_type, turbulent_dissipation, fluid_density, reynolds_lambda,
+    relative_velocity) are set prior to building the strategy.
+
+    Attributes:
+        - distribution_type : The particle distribution type
+          ("discrete", "continuous_pdf", or "particle_resolved").
+        - turbulent_dissipation : Rate of turbulent energy dissipation (m²/s³).
+        - fluid_density : Fluid density in kg/m³.
+        - reynolds_lambda : Taylor-scale Reynolds number (dimensionless).
+        - relative_velocity : Relative velocity in m/s (particle vs. airflow).
+
+    Methods:
+    - set_distribution_type : Set the distribution type.
+    - set_turbulent_dissipation : Set the turbulent dissipation rate.
+    - set_fluid_density : Set the fluid density.
+    - set_reynolds_lambda : Set the Taylor-scale Reynolds number.
+    - set_relative_velocity : Set the relative velocity.
+    - build : Validate parameters and return a
+      `TurbulentDNSCoagulationStrategy`.
+
+    Examples:
+        ```py title="Turbulent DNS Builder Example"
+        builder = TurbulentDNSCoagulationBuilder()
+        builder.set_distribution_type("discrete")
+        builder.set_turbulent_dissipation(1e-3)
+        builder.set_fluid_density(1.225)
+        builder.set_reynolds_lambda(250.)
+        builder.set_relative_velocity(0.5, "m/s")
+        strategy = builder.build()
+        # Now 'strategy' can be used to compute DNS-based coagulation rates.
+
+    References:
+        - Saffman, P. G., & Turner, J. S. (1956) "On the collision of drops
+          in turbulent clouds." Journal of Fluid Mechanics, 1(1): 16–30.
     """
 
     def __init__(self):
@@ -63,14 +103,24 @@ class TurbulentDNSCoagulationBuilder(
         reynolds_lambda_units: Optional[str] = None,
     ):
         """
-        Set the Reynolds lambda. This is a measure of the turbulence length
-        scale, of airflow, and is used in the turbulent DNS model.
-        Shorthand for the Taylor-scale Reynolds number, Reλ.
+        Set the Taylor-scale Reynolds number (Reλ).
 
-        Args:
-            - reynolds_lambda : Reynolds lambda.
-            - reynolds_lambda_units : Units of the Reynolds lambda
-                [dimensionless].
+        Represents a measure of turbulence intensity in DNS flows.
+        When specifying units, only "dimensionless" is recognized here.
+        Any other unit triggers a warning and is treated as dimensionless.
+
+        Arguments:
+            - reynolds_lambda : Numeric value for Reλ.
+            - reynolds_lambda_units : String indicating units
+              (default "dimensionless").
+
+        Returns:
+            - self : The builder instance for chaining.
+
+        Examples:
+            ```py
+            builder.set_reynolds_lambda(250.)
+            ```
         """
         if reynolds_lambda_units == "dimensionless":
             self.reynolds_lambda = reynolds_lambda
@@ -87,14 +137,18 @@ class TurbulentDNSCoagulationBuilder(
         relative_velocity_units: str,
     ):
         """
-        Set the relative vertical velocity. This is the relative
-        velocity between particles and airflow,
-        (excluding turbulence, and gravity).
+        Set the relative particle-airflow velocity for DNS coagulation.
 
-        Args:
-            - relative_velocity : Relative velocity.
-            - relative_velocity_units : Units of the relative velocity
-                [m/s].
+        This value is typically a background flow velocity or a
+        sedimentation-adjusted velocity, excluding turbulence.
+
+        Arguments:
+            - relative_velocity : Numeric value of velocity.
+            - relative_velocity_units : Units of the velocity
+              (e.g., "m/s").
+
+        Returns:
+            - self : The builder instance for chaining.
         """
         if relative_velocity_units == "m/s":
             self.relative_velocity = relative_velocity
@@ -105,6 +159,16 @@ class TurbulentDNSCoagulationBuilder(
         return self
 
     def build(self) -> CoagulationStrategyABC:
+        """
+        Construct a TurbulentDNSCoagulationStrategy.
+
+        Validates the required parameters, then instantiates a
+        `TurbulentDNSCoagulationStrategy` for DNS-based coagulation
+        calculations.
+
+        Returns:
+            - CoagulationStrategyABC : The configured DNS coagulation strategy.
+        """
         self.pre_build_check()
         return TurbulentDNSCoagulationStrategy(
             distribution_type=self.distribution_type,

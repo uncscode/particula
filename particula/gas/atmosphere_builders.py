@@ -20,24 +20,36 @@ class AtmosphereBuilder(
     BuilderTemperatureMixin,
     BuilderPressureMixin,
 ):
-    """Builder class for creating Atmosphere objects using a fluent interface.
+    """
+    Builder class for creating Atmosphere objects using a fluent interface.
 
     This class provides methods to configure and build an Atmosphere object,
     allowing for step-by-step setting of atmospheric properties and
     species composition.
 
     Attributes:
-        temperature: Temperature of the gas mixture in Kelvin.
-        total_pressure (float): Total pressure of the gas mixture in Pascals.
-        species (list[GasSpecies]): List of GasSpecies objects in the mixture.
-            Starts empty.
+        - temperature : Temperature of the gas mixture in Kelvin.
+        - total_pressure : Total pressure of the gas mixture in Pascals.
+        - species : List of GasSpecies objects in the mixture (starts empty).
 
     Methods:
-        set_temperature(temperature,temperature_units): Sets the temperature.
-        set_pressure(pressure,pressure_units): Sets the total pressure.
-        add_species(species): Adds a GasSpecies object to the gas mixture.
-        set_parameters(parameters): Sets multiple parameters from a dictionary.
-        build(): Validates the set parameters and returns an Atmosphere object.
+    - set_temperature : Set the temperature (with optional unit handling).
+    - set_pressure : Set the total pressure (with optional unit handling).
+    - add_species : Add a GasSpecies object to the gas mixture.
+    - set_parameters : Set multiple parameters from a dictionary.
+    - build : Validate parameters and return an Atmosphere object.
+
+    Example:
+        ```py title="Create an atmosphere using the builder"
+        import particula as par
+        builder = par.gas.AtmosphereBuilder()
+        atmosphere = (
+            builder.set_temperature(300, "K")
+            .set_pressure(101325, "Pa")
+            .add_species(par.gas.GasSpecies(name="O2", molar_mass=0.032))
+            .build()
+        )
+        ```
     """
 
     def __init__(self):
@@ -48,30 +60,31 @@ class AtmosphereBuilder(
         self.species: list[GasSpecies] = []
 
     def add_species(self, species: GasSpecies) -> "AtmosphereBuilder":
-        """Adds a GasSpecies object to the gas mixture.
+        """
+        Add a GasSpecies object to the gas mixture.
 
-        Args:
-            species (GasSpecies): The GasSpecies object to be added.
+        Arguments:
+            - species : The GasSpecies object to be added.
 
         Returns:
-            AtmosphereBuilder: Instance of this builder for chaining.
+            - AtmosphereBuilder : This builder, for method chaining.
         """
         self.species.append(species)
         return self
 
     def build(self) -> Atmosphere:
-        """Validates the configuration and constructs the Atmosphere object.
+        """
+        Validate the configuration and construct the Atmosphere object.
 
         This method checks that all necessary conditions are met for a valid
-        Atmosphere instance(e.g., at least one species must be present) and
+        Atmosphere instance (e.g., at least one species must be present) and
         then initializes the Atmosphere.
 
         Returns:
-            Atmosphere: The newly created Atmosphere object, configured as
-            specified.
+            - Atmosphere : The newly created Atmosphere object.
 
         Raises:
-            ValueError: If no species have been added to the mixture.
+            - ValueError : If no species have been added to the mixture.
         """
         if not self.species:  # we may remove this check
             message = "Atmosphere must contain at least one species."

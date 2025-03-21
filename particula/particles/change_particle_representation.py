@@ -21,23 +21,26 @@ def get_particle_resolved_binned_radius(
     total_bins: Optional[int] = None,
     bins_per_radius_decade: int = 10,
 ) -> NDArray[np.float64]:
-    """Get the binning for the for particle radius. Used in the kernel
-    calculation.
+    """
+    Determine binned radii for kernel calculations.
 
-    If the kernel radius is not set, it will be calculated based on the
-    particle radius.
+    If bin_radius is provided, those edges are used directly. Otherwise,
+    a log-spaced array is generated based on the particle's minimum and
+    maximum radii and either a total number of bins or bins per radius
+    decade.
 
-    Args:
-        - particle : The particle for which the radius is to be binned.
-        - bin_radius : The radii for the particle [m].
-        - total_bins : The number of kernel bins for the particle
-            [dimensionless], if set, this will be used instead of
-            bins_per_radius_decade.
-        - bins_per_radius_decade : The number of kernel bins per decade
-            [dimensionless]. Not used if total_bins is set.
+    Arguments:
+        - particle : The ParticleRepresentation instance for radius binning.
+        - bin_radius : Optional array of radius bin edges in meters.
+        - total_bins : Exact number of bins to generate, if set.
+        - bins_per_radius_decade : Number of bins per decade of radius,
+          used only if total_bins is None.
 
     Returns:
-        The kernel radius for the particle [m].
+        - NDArray[np.float64] : The bin edges (radii) in meters.
+
+    Raises:
+        - ValueError : If finite radii cannot be determined for binning.
     """
     # if the bin radius is set, return it
     if bin_radius is not None:
@@ -78,15 +81,21 @@ def get_speciated_mass_representation_from_particle_resolved(
     particle: ParticleRepresentation,
     bin_radius: NDArray[np.float64],
 ) -> ParticleRepresentation:
-    """Converts a `ParticleResolvedSpeciatedMass` to a `SpeciatedMassMovingBin`
-    by binning the mass of each species.
+    """
+    Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.
 
-    Args:
-        - particle : The particle for which the mass is to be binned.
-        - bin_radius : The radii for the particle [m].
+    This function bins the mass and charge distributions for each species
+    according to the provided bin_radius array, using median or mean
+    values in each bin. The distribution_strategy is switched to
+    SpeciatedMassMovingBin.
+
+    Arguments:
+        - particle : The ParticleRepresentation to convert.
+        - bin_radius : Array of radius bin edges in meters.
 
     Returns:
-        The particle representation with the binned mass.
+        - ParticleRepresentation : A new representation with binned
+          mass and concentration for each species.
     """
     # deep copy the particle to avoid modifying the original
     new_particle = deepcopy(particle)

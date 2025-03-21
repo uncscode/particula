@@ -1,4 +1,22 @@
-"""Builders to create vapor pressure models for gas species."""
+"""
+Builders to create vapor pressure models for gas species.
+
+This module provides builder classes for Antoine, Clausius-Clapeyron,
+constant, and WaterBuck vapor pressure strategies. Each builder follows
+the same workflow:
+
+1. Configure coefficients or parameters using dedicated methods.
+2. Validate required parameters.
+3. Return the corresponding vapor pressure strategy object.
+
+References:
+    - "Antoine Equation,"
+      [Wikipedia](https://en.wikipedia.org/wiki/Antoine_equation)
+    - "Clausius–Clapeyron Relation,"
+      [Wikipedia](https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation)
+    - "Vapor Pressure,"
+      [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure)
+"""
 
 import logging
 from typing import Optional
@@ -17,9 +35,24 @@ logger = logging.getLogger("particula")
 
 
 class AntoineBuilder(BuilderABC):
-    """Builder class for AntoineVaporPressureStrategy. It allows setting the
-    coefficients 'a', 'b', and 'c' separately and then building the strategy
-    object.
+    """
+    Builder class for AntoineVaporPressureStrategy. It allows setting
+    the coefficients 'a', 'b', and 'c' separately and then building the
+    strategy object. Follows the general form of the Antoine equation in
+    Unicode:
+
+        log₁₀(P) = a − b / (T − c)
+
+    Attributes:
+        - a : Coefficient "a" of the Antoine equation (dimensionless).
+        - b : Coefficient "b" (in Kelvin).
+        - c : Coefficient "c" (in Kelvin).
+
+    Methods:
+    - set_a : Set the coefficient "a" of the Antoine equation.
+    - set_b : Set the coefficient "b".
+    - set_c : Set the coefficient "c".
+    - build : Validate parameters and return an AntoineVaporPressureStrategy.
 
     Example:
         ``` py title="AntoineBuilder"
@@ -45,6 +78,10 @@ class AntoineBuilder(BuilderABC):
     References:
         - Equation: log10(P_mmHG) = a - b / (Temperature_K - c)
           (Reference: https://en.wikipedia.org/wiki/Antoine_equation)
+        - "Vapor Pressure,"
+          [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure)
+        - "Atmospheric Pressure Unit Conversions,"
+          [Wikipedia](https://en.wikipedia.org/wiki/Pascal_(unit))
     """
 
     def __init__(self):
@@ -84,16 +121,35 @@ class AntoineBuilder(BuilderABC):
         raise ValueError("Only K units are supported for coefficient 'c'.")
 
     def build(self) -> AntoineVaporPressureStrategy:
-        """Build the AntoineVaporPressureStrategy object with the set
-        coefficients."""
+        """
+        Validate and return an AntoineVaporPressureStrategy using the set
+        coefficients.
+
+        Returns:
+            - Configured with coefficients a, b, and c.
+        """
         self.pre_build_check()
-        return AntoineVaporPressureStrategy(self.a, self.b, self.c)  # type: ignore
+        return AntoineVaporPressureStrategy(self.a, self.b, self.c)
 
 
 class ClausiusClapeyronBuilder(BuilderABC):
     """Builder class for ClausiusClapeyronStrategy. This class facilitates
     setting the latent heat of vaporization, initial temperature, and initial
     pressure with unit handling and then builds the strategy object.
+
+    The Clausius–Clapeyron relation can be approximated as:
+
+    - dP / dT = (L / (R × T²))
+
+
+    Methods:
+    - set_latent_heat : Set latent heat in J/kg (or convertible units).
+    - set_temperature_initial : Set initial temperature in K
+        (or convertible units).
+    - set_pressure_initial : Set initial pressure in Pa
+        (or convertible units).
+    - build : Validate parameters and return a ClausiusClapeyronStrategy.
+
 
     Example:
         ``` py title="ClausiusClapeyronBuilder"
@@ -172,8 +228,12 @@ class ClausiusClapeyronBuilder(BuilderABC):
         return self
 
     def build(self) -> ClausiusClapeyronStrategy:
-        """Build and return a ClausiusClapeyronStrategy object with the set
-        parameters."""
+        """
+        Validate parameters and return a ClausiusClapeyronStrategy object.
+
+        Returns:
+            - Configured with latent heat, initial Temperature, and Pressure.
+        """
         self.pre_build_check()
         return ClausiusClapeyronStrategy(
             self.latent_heat,  # type: ignore
@@ -185,6 +245,14 @@ class ClausiusClapeyronBuilder(BuilderABC):
 class ConstantBuilder(BuilderABC):
     """Builder class for ConstantVaporPressureStrategy. This class facilitates
     setting the constant vapor pressure and then building the strategy object.
+
+    Attributes:
+        - vapor_pressure: The vapor pressure in Pa (scalar/float).
+
+    Methods:
+    - set_vapor_pressure: Set the constant vapor pressure in Pa
+      (or convertible units).
+    - build : Validate parameters and return a ConstantVaporPressureStrategy.
 
     Example:
         ``` py title="ConstantBuilder"
@@ -227,21 +295,27 @@ class ConstantBuilder(BuilderABC):
         return self
 
     def build(self) -> ConstantVaporPressureStrategy:
-        """Build and return a ConstantVaporPressureStrategy object with the set
-        parameters."""
+        """
+        Validate parameters and return a ConstantVaporPressureStrategy object.
+
+        Returns:
+            - Configured with vapor_pressure in Pa.
+        """
         self.pre_build_check()
         return ConstantVaporPressureStrategy(self.vapor_pressure)
 
 
 class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
-    """Builder class for WaterBuckStrategy. This class facilitates
-    the building of the WaterBuckStrategy object. Which as of now has no
-    additional parameters to set. But could be extended in the future for
-    ice only calculations.
+    """Builder class for WaterBuckStrategy.
+
+    This class facilitates the building of the WaterBuckStrategy object.
+    Which as of now has no additional parameters to set but could be
+    extended in the future (e.g., ice-only calculations).
 
     Example:
-        ``` py title="WaterBuckBuilder"
-        WaterBuckBuilder().build()
+        ```py title="WaterBuckBuilder"
+        import particula as par
+        strategy = par.gas.WaterBuckBuilder().build()
         ```
     """
 
@@ -249,5 +323,10 @@ class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
         super().__init__()
 
     def build(self) -> WaterBuckStrategy:
-        """Build and return a WaterBuckStrategy object."""
+        """
+        Build and return a WaterBuckStrategy object.
+
+        Returns:
+            - Configured for water-specific Buck vapor pressure.
+        """
         return WaterBuckStrategy()

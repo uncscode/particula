@@ -31,16 +31,15 @@ class SurfaceStrategyMolarBuilder(
 ):
     """Builder class for SurfaceStrategyMolar objects.
 
+    For calculating the Kelvin effect based on molar mass. Needed for
+    the effective surface tension calculation.
+
     Methods:
-        set_surface_tension(surface_tension, surface_tension_units): Set the
-            surface tension of the particle in N/m. Default units are 'N/m'.
-        set_density(density, density_units): Set the density of the particle in
-            kg/m^3. Default units are 'kg/m^3'.
-        set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
-            particle in kg/mol. Default units are 'kg/mol'.
-        set_parameters(params): Set the parameters of the SurfaceStrategyMolar
-            object from a dictionary including optional units.
-        build(): Validate and return the SurfaceStrategyMolar object.
+    - set_surface_tension : Set the surface tension in N/m.
+    - set_density : Set the density in kg/m^3.
+    - set_molar_mass : Set the molar mass in kg/mol.
+    - set_parameters : Configure multiple parameters at once.
+    - build : Validate parameters and return the strategy.
     """
 
     def __init__(self):
@@ -51,7 +50,7 @@ class SurfaceStrategyMolarBuilder(
         BuilderMolarMassMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyMolar:
-        """Validate and return the SurfaceStrategyMass object.
+        """Validate and return the SurfaceStrategyMolar object.
 
         Returns:
             SurfaceStrategyMolar: Instance of the SurfaceStrategyMolar object.
@@ -69,14 +68,14 @@ class SurfaceStrategyMassBuilder(
 ):
     """Builder class for SurfaceStrategyMass objects.
 
+    For calculating the Kelvin effect based on mass mixing. Needed for
+    the effective surface tension calculation.
+
     Methods:
-        set_surface_tension(surface_tension, surface_tension_units): Set the
-            surface tension of the particle in N/m. Default units are 'N/m'.
-        set_density(density, density_units): Set the density of the particle in
-            kg/m^3. Default units are 'kg/m^3'.
-        set_parameters(params): Set the parameters of the SurfaceStrategyMass
-            object from a dictionary including optional units.
-        build(): Validate and return the SurfaceStrategyMass object.
+    - set_surface_tension : Set the surface tension in N/m.
+    - set_density : Set the density in kg/m^3.
+    - set_parameters : Configure multiple parameters at once.
+    - build : Validate parameters and return the strategy.
     """
 
     def __init__(self):
@@ -103,14 +102,14 @@ class SurfaceStrategyVolumeBuilder(
 ):
     """Builder class for SurfaceStrategyVolume objects.
 
+    For calculating the Kelvin effect based on volume mixing. Needed for
+    the effective surface tension calculation.
+
     Methods:
-        set_surface_tension(surface_tension, surface_tension_units): Set the
-            surface tension of the particle in N/m. Default units are 'N/m'.
-        set_density(density, density_units): Set the density of the particle in
-            kg/m^3. Default units are 'kg/m^3'.
-        set_parameters(params): Set the parameters of the SurfaceStrategyVolume
-            object from a dictionary including optional units.
-        build(): Validate and return the SurfaceStrategyVolume object.
+    - set_surface_tension : Set the surface tension in N/m.
+    - set_density : Set the density in kg/m^3.
+    - set_parameters : Configure multiple parameters at once.
+    - build : Validate parameters and return the strategy.
     """
 
     def __init__(self):

@@ -32,45 +32,50 @@ class DistributionFactory(
         ],
     ]
 ):
-    """Factory class to create distribution strategy from builders.
+    """
+    Factory class to create distribution strategies from builders.
 
-    Used for calculating particle distributions based on the specified
-    representation type.
+    This factory is used to obtain particle distribution strategies
+    based on the specified representation type (mass-based, radius-based,
+    speciated, or particle-resolved).
 
     Methods:
-        get_builders(): Returns the mapping of strategy types to builder
-        instances.
-        get_strategy(strategy_type, parameters): Gets the strategy instance
-        for the specified strategy type.
-            strategy_type: Type of distribution strategy to use, can be
-            'mass_based_moving_bin', 'radii_based_moving_bin',
-            'speciated_mass_moving_bin', 'particle_resolved_speciated_mass'.
-            parameters(Dict[str, Any], optional): Parameters required for the
-            builder, dependent on the chosen strategy type.
-                mass_based_moving_bin: None
-                radii_based_moving_bin: None
-                speciated_mass_moving_bin: None
-                particle_resolved_speciated_mass: None
+        - get_builders : Return a mapping of strategy types to builder
+            instances.
+        - get_strategy : Return a strategy instance for a given strategy type.
 
     Returns:
-        DistributionStrategy: An instance of the specified
-        DistributionStrategy.
+        - DistributionStrategy : An instance configured for the chosen
+          distribution representation.
 
     Raises:
-        ValueError: If an unknown strategy type is provided.
-        ValueError: If any required key is missing during check_keys or
-        pre_build_check, or if trying to set an invalid parameter.
+        - ValueError : If an unknown strategy type is provided or if
+          required parameters are missing or invalid.
+
+    Examples:
+        ```py title="DistributionFactory Example"
+        import particula as par
+        factory = par.particles.DistributionFactory()
+        strategy = factory.get_strategy("mass_based_moving_bin")
+        # strategy -> MassBasedMovingBin()
+        ```
     """
 
     def get_builders(self):
-        """Returns the mapping of strategy types to builder instances.
+        """
+        Return a mapping of strategy types to builder instances.
 
         Returns:
-            Dict[str, BuilderABC]: Mapping of strategy types to builder
-            instances.
-                'mass_based_moving_bin': MassBasedMovingBinBuilder
-                'radii_based_moving_bin': RadiiBasedMovingBinBuilder
-                'speciated_mass_moving_bin': SpeciatedMassMovingBinBuilder
+            - A dictionary where each key is a string identifying the strategy
+                type, and each value is the corresponding builder object.
+
+        Examples:
+            ```py title="get_builders Example"
+            import particula as par
+            factory = par.particles.DistributionFactory()
+            builder_map = factory.get_builders()
+            # builder_map["mass_based_moving_bin"] -> MassBasedMovingBinBuilder
+            ```
         """
         return {
             "mass_based_moving_bin": MassBasedMovingBinBuilder(),

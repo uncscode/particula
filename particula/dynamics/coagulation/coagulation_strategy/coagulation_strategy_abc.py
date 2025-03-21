@@ -1,4 +1,9 @@
-"""Coagulation strategy module."""
+"""
+Coagulation strategy module.
+
+Defines an abstract base class and supporting methods for particle
+coagulation processes in aerosol simulations.
+"""
 
 from abc import ABC, abstractmethod
 from typing import Union, Optional
@@ -22,21 +27,39 @@ logger = logging.getLogger("particula")
 
 class CoagulationStrategyABC(ABC):
     """
-    Abstract class for defining a coagulation strategy. This class defines the
-    methods that must be implemented by any coagulation strategy.
+    Abstract base class for defining a coagulation strategy.
+
+    This class defines the methods that must be implemented by any coagulation
+    strategy (e.g., for discrete, continuous, or particle-resolved distributions).
 
     Attributes:
-        - distribution_type: The type of distribution to be used with the
-            coagulation strategy. Default is "discrete", options are
-            "discrete", "continuous_pdf", and "particle_resolved".
+        - distribution_type : The type of distribution to be used, one of
+          ("discrete", "continuous_pdf", or "particle_resolved").
 
     Methods:
-        kernel: Calculate the coagulation kernel.
-        loss_rate: Calculate the coagulation loss rate.
-        gain_rate: Calculate the coagulation gain rate.
-        net_rate: Calculate the net coagulation rate.
-        diffusive_knudsen: Calculate the diffusive Knudsen number.
-        coulomb_potential_ratio: Calculate the Coulomb potential ratio.
+    - dimensionless_kernel : Calculate the dimensionless coagulation kernel.
+    - kernel : Obtain the dimensioned coagulation kernel [m^3/s].
+    - loss_rate : Calculate the coagulation loss rate.
+    - gain_rate : Calculate the coagulation gain rate.
+    - net_rate : Get the net coagulation rate (gain - loss).
+    - step : Perform a single step of coagulation.
+    - diffusive_knudsen : Calculate the diffusive Knudsen number.
+    - coulomb_potential_ratio : Compute Coulomb potential ratio.
+    - friction_factor : Compute the effective friction factor.
+
+    Examples:
+        ```py
+        class ExampleCoagulation(CoagulationStrategyABC):
+            def dimensionless_kernel(self, diff_kn, coulomb_phi):
+                return diff_kn + coulomb_phi
+            def kernel(self, particle, temperature, pressure):
+                return 1.0
+        strategy = ExampleCoagulation("discrete")
+        ```
+
+    References:
+        - Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and Physics:
+          From Air Pollution to Climate Change (3rd ed.). Wiley.
     """
 
     def __init__(
@@ -73,19 +96,20 @@ class CoagulationStrategyABC(ABC):
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         """
-        Calculate the dimensionless coagulation kernel based on the particle
-        properties interactions, diffusive Knudsen number and Coulomb
-        potential.
+        Calculate the dimensionless coagulation kernel.
 
-        Args:
-            - diffusive_knudsen : The diffusive Knudsen number
-                for the particle [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential
-                ratio for the particle [dimensionless].
+        Arguments:
+            - diffusive_knudsen : The diffusive Knudsen number [dimensionless].
+            - coulomb_potential_ratio : The Coulomb potential ratio [dimensionless].
 
         Returns:
-            The dimensionless coagulation kernel for the particle
-                [dimensionless].
+            - NDArray[np.float64] : Dimensionless kernel for particle coagulation.
+
+        Examples:
+            ```py
+            H = strategy.dimensionless_kernel(kn_array, phi_array)
+            # H might be array([...]) representing the dimensionless kernel
+            ```
         """
 
     @abstractmethod
@@ -96,17 +120,24 @@ class CoagulationStrategyABC(ABC):
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the coagulation kernel based on the particle properties,
-        temperature, and pressure.
+        Calculate the coagulation kernel [m^3/s].
 
-        Args:
-            particle: The particle for which the coagulation
-                kernel is to be calculated.
-            temperature: The temperature of the gas phase [K].
-            pressure: The pressure of the gas phase [Pa].
+        Uses particle attributes (e.g., radius, mass) along with temperature
+        and pressure to return a dimensional kernel for coagulation.
+
+        Arguments:
+            - particle : The ParticleRepresentation object, providing radius and concentration.
+            - temperature : The temperature in Kelvin [K].
+            - pressure : The pressure in Pascals [Pa].
 
         Returns:
-            The coagulation kernel for the particle [m^3/s].
+            - float or NDArray[np.float64] : The coagulation kernel [m^3/s].
+
+        Examples:
+            ```py
+            k_val = strategy.kernel(particle, 298.15, 101325)
+            # k_val can be a scalar or array
+            ```
         """
 
     def loss_rate(
@@ -115,20 +146,22 @@ class CoagulationStrategyABC(ABC):
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the coagulation loss rate based on the particle radius,
-        distribution, and the coagulation kernel.
+        Calculate the coagulation loss rate [kg/s].
 
-        Args:
-            particle: The particle for which the coagulation
-                loss rate is to be calculated.
-            kernel: The coagulation kernel.
+        Arguments:
+            - particle : The particle representation for which the loss rate is calculated.
+            - kernel : The coagulation kernel [m^3/s].
 
         Returns:
-            The coagulation loss rate for the particle [kg/s].
+            - float or NDArray[np.float64] : The loss rate [kg/s].
 
         Raises:
-            ValueError : If the distribution type is not valid. Only
-                'discrete' and 'continuous_pdf' are valid.
+            - ValueError : If the distribution type is invalid.
+
+        Examples:
+            ```py
+            loss = strategy.loss_rate(particle, k_val)
+            ```
         """
         if self.distribution_type == "discrete":
             return coagulation_rate.get_coagulation_loss_rate_discrete(
@@ -152,21 +185,22 @@ class CoagulationStrategyABC(ABC):
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the coagulation gain rate based on the particle radius,
-        distribution, and the coagulation kernel. Used for discrete and
-        continuous PDF distributions.
+        Calculate the coagulation gain rate [kg/s].
 
-        Args:
-            particle: The particle for which the coagulation
-                gain rate is to be calculated.
-            kernel: The coagulation kernel.
+        Arguments:
+            - particle : The particle representation used in the calculation.
+            - kernel : The coagulation kernel [m^3/s].
 
         Returns:
-            The coagulation gain rate for the particle [kg/s].
+            - float or NDArray[np.float64] : The gain rate [kg/s].
 
         Raises:
-            ValueError : If the distribution type is not valid. Only
-                'discrete' and 'continuous_pdf' are valid.
+            - ValueError : If the distribution type is invalid.
+
+        Examples:
+            ```py
+            gain = strategy.gain_rate(particle, k_val)
+            ```
         """
         if self.distribution_type == "discrete":
             return coagulation_rate.get_coagulation_gain_rate_discrete(
@@ -192,18 +226,21 @@ class CoagulationStrategyABC(ABC):
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the net coagulation rate based on the particle radius,
-        distribution, and the coagulation kernel.
+        Compute the net coagulation rate = gain - loss [kg/s].
 
         Arguments:
-            - particle : The particle class for which the
-                coagulation net rate is to be calculated.
-            - temperature : The temperature of the gas phase [K].
-            - pressure : The pressure of the gas phase [Pa].
+            - particle : The particle representation.
+            - temperature : The gas-phase temperature [K].
+            - pressure : The gas-phase pressure [Pa].
 
         Returns:
-            Union[float, NDArray[np.float64]]: The net coagulation rate for the
-                particle [kg/s].
+            - float or NDArray[np.float64] : The net coagulation rate [kg/s].
+                (positive => net gain, negative => net loss).
+
+        Examples:
+            ```py
+            net = strategy.net_rate(particle, 298.15, 101325)
+            ```
         """
 
         kernel = self.kernel(
@@ -221,17 +258,27 @@ class CoagulationStrategyABC(ABC):
         time_step: float,
     ) -> ParticleRepresentation:
         """
-        Perform a single step of the coagulation process.
+        Perform a single coagulation step over a specified time interval.
 
-        Args:
-            particle: The particle for which the coagulation step
-                is to be performed.
-            temperature: The temperature of the gas phase [K].
-            pressure: The pressure of the gas phase [Pa].
-            time_step: The time step for the coagulation process [s].
+        Updates the particle distribution or representation based on the net_rate
+        calculated for the given time_step.
+
+        Arguments:
+            - particle : The particle representation to update.
+            - temperature : The gas-phase temperature [K].
+            - pressure : The gas-phase pressure [Pa].
+            - time_step : The timestep over which to integrate [s].
 
         Returns:
-            ParticleRepresentation: The particle after the coagulation step.
+            - ParticleRepresentation : Updated particle representation after this step.
+
+        Raises:
+            - ValueError : If the distribution type is invalid or unsupported.
+
+        Examples:
+            ```py
+            updated_particle = strategy.step(particle, 298.15, 101325, 1.0)
+            ```
         """
 
         if self.distribution_type in ["discrete", "continuous_pdf"]:
@@ -296,18 +343,23 @@ class CoagulationStrategyABC(ABC):
         pressure: float,
     ) -> NDArray[np.float64]:
         """
-        Calculate the diffusive Knudsen number based on the particle
-        properties, temperature, and pressure.
+        Calculate the diffusive Knudsen number for each particle.
 
-        Args:
-            particle: The particle for which the diffusive
-                Knudsen number is to be calculated.
-            temperature: The temperature of the gas phase [K].
-            pressure: The pressure of the gas phase [Pa].
+        The Knudsen number is used to characterize the relative importance of
+        diffusion-controlled processes.
+
+        Arguments:
+            - particle : The ParticleRepresentation.
+            - temperature : The gas-phase temperature [K].
+            - pressure : The gas-phase pressure [Pa].
 
         Returns:
-            NDArray[np.float64]: The diffusive Knudsen number for the particle
-                [dimensionless].
+            - NDArray[np.float64] : Diffusive Knudsen number(s) [dimensionless].
+
+        Examples:
+            ```py
+            knudsen_nums = strategy.diffusive_knudsen(particle, 298.15, 101325)
+            ```
         """
         # properties calculation for friction factor
         friction_factor = self.friction_factor(
@@ -329,17 +381,22 @@ class CoagulationStrategyABC(ABC):
         self, particle: ParticleRepresentation, temperature: float
     ) -> NDArray[np.float64]:
         """
-        Calculate the Coulomb potential ratio based on the particle properties
-        and temperature.
+        Calculate the Coulomb potential ratio for each particle.
 
-        Args:
-            particle: The particles for which the Coulomb
-                potential ratio is to be calculated.
-            temperature: The temperature of the gas phase [K].
+        This ratio characterizes the influence of electrostatic forces on
+        coagulation processes.
+
+        Arguments:
+            - particle : The ParticleRepresentation.
+            - temperature : The gas-phase temperature [K].
 
         Returns:
-            The Coulomb potential ratio for the particle
-                [dimensionless].
+            - NDArray[np.float64] : Coulomb potential ratio(s) [dimensionless].
+
+        Examples:
+            ```py
+            phi = strategy.coulomb_potential_ratio(particle, 298.15)
+            ```
         """
         return particles.get_coulomb_enhancement_ratio(
             particle_radius=particle.get_radius(),
@@ -354,17 +411,23 @@ class CoagulationStrategyABC(ABC):
         pressure: float,
     ) -> NDArray[np.float64]:
         """
-        Calculate the friction factor based on the particle properties,
-        temperature, and pressure.
+        Compute the friction factor for each particle in the aerosol.
 
-        Args:
-            particle: The particle for which the friction factor
-                is to be calculated.
-            temperature: The temperature of the gas phase [K].
-            pressure: The pressure of the gas phase [Pa].
+        Considers dynamic viscosity, mean free path, and slip correction to
+        determine the friction factor [dimensionless].
+
+        Arguments:
+            - particle : The ParticleRepresentation for which to compute friction factor.
+            - temperature : Gas temperature [K].
+            - pressure : Gas pressure [Pa].
 
         Returns:
-            The friction factor for the particle [dimensionless].
+            - NDArray[np.float64] : Friction factor(s) [dimensionless].
+
+        Examples:
+            ```py
+            fr = strategy.friction_factor(particle, 298.15, 101325)
+            ```
         """
         dynamic_viscosity = gas.get_dynamic_viscosity(
             temperature=temperature  # assume standard atmospheric composition

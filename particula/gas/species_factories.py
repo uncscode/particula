@@ -18,33 +18,34 @@ class GasSpeciesFactory(
         GasSpecies,
     ]
 ):
-    """Factory class to create species builders
+    """
+    Factory for creating species builders that produce GasSpecies objects.
 
-    Factory class to create species builders for creating gas species.
+    This class provides methods to retrieve a builder (e.g., 'gas_species'
+    or 'preset_gas_species') and instantiate a GasSpecies object from it
+    using user-specified parameters.
 
     Methods:
-        - get_builders : Returns the mapping of strategy types to builder
-        instances.
-        - get_strategy : Gets the strategy instance
-            - strategy_type : Type of species builder to use, can be
-                'gas_species' or 'preset_gas_species'.
-            - parameters : Parameters required for the
-                builder, dependent on the chosen strategy type.
+        - get_builders : Return a dictionary of builder objects.
+        - get_strategy : Construct and return a GasSpecies object with the
+          chosen builder.
 
     Returns:
-        GasSpecies : An instance of the specified GasSpecies.
+        - GasSpecies : A gas species instance from the specified builder.
 
     Raises:
-        ValueError : If an unknown strategy type is provided.
+        - ValueError : If an unknown strategy type is provided.
 
-    Example:
-        ``` py title="Create a preset gas species using the factory"
-        factory = GasSpeciesFactory()
+    Examples:
+        ```py title="Create a preset gas species using the factory"
+        import particula as par
+        factory = par.gas.GasSpeciesFactory()
         gas_object = factory.get_strategy("preset_gas_species", parameters)
         ```
 
-        ``` py title="Create a gas species using the factory"
-        factory = GasSpeciesFactory()
+        ```py title="Create a gas species using the factory"
+        import particula as par
+        factory = par.gas.GasSpeciesFactory()
         parameters = {
             "name": "Oxygen",
             "molar_mass": 0.032,
@@ -60,13 +61,24 @@ class GasSpeciesFactory(
     """
 
     def get_builders(self):
-        """Returns the mapping of strategy types to builder instances.
+        """
+        Return a mapping of strategy types to builder instances.
 
         Returns:
-            A dictionary mapping strategy types to builder instances.
-                - gas_species : GasSpeciesBuilder
-                - preset_gas_species : PresetGasSpeciesBuilder
+            - dict[str, Union[GasSpeciesBuilder, PresetGasSpeciesBuilder]] :
+              A dictionary where:
+                * "gas_species" -> GasSpeciesBuilder
+                * "preset_gas_species" -> PresetGasSpeciesBuilder
+
+        Examples:
+            ```py title="get_builders Example"
+            import particula as par
+            factory = par.gas.GasSpeciesFactory()
+            builder_map = factory.get_builders()
+            # builder_map["gas_species"] -> GasSpeciesBuilder()
+            ```
         """
+
         return {
             "gas_species": GasSpeciesBuilder(),
             "preset_gas_species": PresetGasSpeciesBuilder(),

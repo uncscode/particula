@@ -13,36 +13,57 @@ logger = logging.getLogger("particula")
 
 
 class BuilderABC(ABC):
-    """Abstract base class for builders with common methods to check keys and
+    """
+    Abstract base class for builders with common methods to check keys and
     set parameters from a dictionary.
 
-    Args:
-        - required_parameters : List of required parameters for the builder.
+    Attributes:
+        - required_parameters: List of required parameters for the builder.
 
     Raises:
-        - ValueError : If any required key is missing during check_keys or
-            pre_build_check, or if trying to set an invalid parameter.
-        - Warning : If using default units for any parameter.
+        - ValueError: If any required key is missing during check_keys or
+          pre_build_check, or if trying to set an invalid parameter.
+        - Warning: If using default units for any parameter.
+
+    Examples:
+        ```py
+        class MyBuilder(BuilderABC):
+            def set_parameter1(self, value, units=None):
+                ...
+            def set_parameter2(self, value, units=None):
+                ...
+            def build(self):
+                return SomeStrategy()
+
+        strategy = (
+            MyBuilder()
+            .set_parameters1(10, 'm')
+            .set_parameters2(20, 's')
+            .build()
+        )
+        ```
 
     References:
-        - Builder Pattern : https://refactoring.guru/design-patterns/builder
+        - "Builder Pattern,"
+        [Refactoring Guru](https://refactoring.guru/design-patterns/builder)
     """
 
     def __init__(self, required_parameters: Optional[list[str]] = None):
         self.required_parameters = required_parameters or []
 
     def check_keys(self, parameters: dict[str, Any]):
-        """Check if the keys are present and valid.
+        """
+        Check if the keys are present and valid.
 
-        Args:
-            - parameters : The parameters dictionary to check.
+        Arguments:
+            - parameters: The parameters dictionary to check.
 
         Raises:
-            - ValueError : If any required key is missing or if trying to set
-                an invalid parameter.
+            - ValueError: If any required key is missing or if trying to set
+              an invalid parameter.
 
-        Example:
-            ``` py
+        Examples:
+            ```py
             builder = Builder()
             builder.check_keys({
                 "parameter1": 1,
@@ -78,21 +99,21 @@ class BuilderABC(ABC):
             raise ValueError(error_message)
 
     def set_parameters(self, parameters: dict[str, Any]):
-        """Set parameters from a dictionary including optional suffix for
-        units as '_units'.
+        """
+        Set parameters from a dictionary, handling any '_units' suffix.
 
-        Args:
-            - parameters : The parameters dictionary to set.
+        Arguments:
+            - parameters: The parameters dictionary to set.
 
         Returns:
-            - The builder object with the set parameters.
+            BuilderABC: This builder object with the set parameters.
 
         Raises:
-            - ValueError : If any required key is missing.
-            - Warning : If using default units for any parameter.
+            - ValueError: If any required key is missing.
+            - Warning: If using default units for any parameter.
 
-        Example:
-            ``` py
+        Examples:
+            ```py
             builder = Builder().set_parameters({
                 "parameter1": 1,
                 "parameter2": 2,
@@ -115,13 +136,14 @@ class BuilderABC(ABC):
         return self
 
     def pre_build_check(self):
-        """Check if all required attribute parameters are set before building.
+        """
+        Check if all required attribute parameters are set before building.
 
         Raises:
-            - ValueError : If any required parameter is missing.
+            - ValueError: If any required parameter is missing.
 
-        Example:
-            ``` py
+        Examples:
+            ```py
             builder = Builder()
             builder.pre_build_check()
             ```
@@ -137,13 +159,14 @@ class BuilderABC(ABC):
 
     @abstractmethod
     def build(self) -> Any:
-        """Build and return the strategy object with the set parameters.
+        """
+        Build and return the strategy object with the set parameters.
 
         Returns:
-            - strategy : The built strategy object.
+            Any: The built strategy object.
 
-        Example:
-            ``` py
+        Examples:
+            ```py
             builder = Builder()
             strategy = builder.build()
             ```

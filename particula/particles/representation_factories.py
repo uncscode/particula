@@ -1,5 +1,8 @@
 """
-This module contains the representation factories for the particles.
+Particle Representation Factories
+
+Provides classes for constructing ParticleRepresentation objects
+based on various distribution, activity, and surface strategies.
 """
 
 from typing import Union
@@ -26,31 +29,44 @@ class ParticleRepresentationFactory(
         ParticleRepresentation,
     ]
 ):
-    """Factory class to create particle representation builders.
+    """
+    Factory for creating particle representation builders.
 
     Methods:
-        - get_builders : Returns the mapping of strategy types to builder
-            instances.
-        - get_strategy : Gets the strategy instance for the specified strategy.
-            - strategy_type : Type of particle representation strategy to use,
-                can be 'radius' (default) or 'mass'.
-            - parameters : Parameters required for
-                the builder
+    - get_builders : Return a dictionary of strategy builder instances.
+    - get_strategy : Obtain a ParticleRepresentation from a chosen builder.
 
+    Examples:
+        ```py title="Factory Usage Example"
+        import particula as par
+        factory = par.particles.ParticleRepresentationFactory()
+        rep = factory.get_strategy("mass")
+        # rep -> ParticleRepresentation with mass-based distribution
+        ```
+
+    References:
+        - Builder Pattern,
+          [Wikipedia](https://en.wikipedia.org/wiki/Builder_pattern).
 
     """
 
     def get_builders(self):
-        """Returns the mapping of strategy types to builder instances.
+        """
+        Return a mapping of strategy types to builder instances.
 
         Returns:
-            A dictionary with the strategy types as keys and
-            the builder instances as values.
-            - 'mass' : MassParticleRepresentationBuilder
-            - 'radius' : RadiusParticleRepresentationBuilder
-            - 'preset_radius' : LimitedRadiusParticleBuilder
-            - 'resolved_mass' : ResolvedMassParticleRepresentationBuilder
-            - 'preset_resolved_mass' : PresetResolvedMassParticleBuilder
+            - A dictionary where each key is a strategy type
+              ("mass", "radius", etc.) and each value is the
+              corresponding builder instance.
+
+        Examples:
+            ```py title="get_builders usage"
+            import particula as par
+            factory = par.particles.ParticleRepresentationFactory()
+            builders = factory.get_builders()
+            mass_builder = builders["mass"]
+            # mass_builder -> ParticleMassRepresentationBuilder()
+            ```
         """
         return {
             "mass": ParticleMassRepresentationBuilder(),

@@ -1,6 +1,7 @@
 """
 Charged dimensional kernel for coagulation calculated from system state.
 """
+
 # pylint: disable=duplicate-code
 
 from typing import Union
