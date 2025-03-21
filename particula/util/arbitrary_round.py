@@ -9,7 +9,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.converting.convert_dtypes import get_coerced_type
+from particula.util.convert_dtypes import get_coerced_type
 
 
 def get_arbitrary_round(

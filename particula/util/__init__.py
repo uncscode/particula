@@ -23,7 +23,7 @@ from particula.util.reduced_quantity import (
 from particula.util.refractive_index_mixing import (
     get_effective_refractive_index,
 )
-from particula.util.converting.convert_dtypes import (
+from particula.util.convert_dtypes import (
     get_coerced_type,
     get_dict_from_list,
     get_shape_check,
