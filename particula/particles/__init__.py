@@ -144,3 +144,26 @@ from particula.particles.properties.stokes_number import (
 from particula.particles.properties.vapor_correction_module import (
     get_vapor_transition_correction,
 )
+from particula.particles.properties.convert_kappa_volumes import (
+    get_kappa_from_volumes,
+    get_water_volume_from_kappa,
+    get_solute_volume_from_kappa,
+    get_water_volume_in_mixture,
+)
+from particula.particles.properties.convert_mass_concentration import (
+    get_volume_fraction_from_mass,
+    get_mass_fraction_from_mass,
+    get_mole_fraction_from_mass,
+)
+from particula.particles.properties.convert_mole_fraction import (
+    get_mass_fractions_from_moles,
+)
+from particula.particles.properties.convert_size_distribution import (
+    get_distribution_conversion_strategy,
+    get_distribution_in_dn,
+    get_pdf_distribution_in_pmf,
+    SameScaleConversionStrategy,
+    DNdlogDPtoPDFConversionStrategy,
+    DNdlogDPtoPMFConversionStrategy,
+    PMFtoPDFConversionStrategy,
+)

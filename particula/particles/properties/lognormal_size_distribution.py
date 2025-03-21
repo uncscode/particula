@@ -7,7 +7,7 @@ from scipy.stats import lognorm
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.converting.convert_size_distribution import (
+from particula.particles.properties.convert_size_distribution import (
     get_pdf_distribution_in_pmf,
 )
 from particula.util.validate_inputs import validate_inputs
