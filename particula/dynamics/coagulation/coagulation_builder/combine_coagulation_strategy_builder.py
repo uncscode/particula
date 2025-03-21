@@ -51,10 +51,6 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
     """
 
     def __init__(self):
-        """Initializes the builder with the required parameters."""
-        required_parameters = ["strategies"]
-        super().__init__(required_parameters)
-        self.strategies = []
         """
         Initialize the CombineCoagulationStrategyBuilder.
 
