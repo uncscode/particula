@@ -7987,7 +7987,7 @@ transported to or from a particle in a vapor. The equation is:</p>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Float input</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_first_order_mass_transport_k</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
     <span class="n">vapor_transition</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-9</span>
 <span class="p">)</span>
@@ -7995,7 +7995,7 @@ transported to or from a particle in a vapor. The equation is:</p>
 </code></pre></div>
 <div class="highlight"><span class="filename">Array input</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_first_order_mass_transport_k</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]),</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]),</span>
     <span class="n">vapor_transition</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]),</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-9</span>
 <span class="p">)</span>
