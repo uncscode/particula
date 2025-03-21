@@ -82,20 +82,14 @@ class TestAerosol(unittest.TestCase):
         gas_iterator = self.aerosol.iterate_gas()
         self.assertIsInstance(next(gas_iterator), GasSpecies)
 
-    def test_iterate_particle(self):
-        """Test the iterate_particle method of the Aerosol class."""
-        particle_iterator = self.aerosol.iterate_particle()
-        self.assertIsInstance(next(particle_iterator), ParticleRepresentation)
-
     def test_replace_atmosphere(self):
         """Test the replace_atmosphere method of the Aerosol class."""
         new_atmosphere = self.atmosphere
         self.aerosol.replace_atmosphere(new_atmosphere)
         self.assertEqual(self.aerosol.atmosphere, new_atmosphere)
 
-    def test_add_particle(self):
+    def test_replace_particles(self):
         """Test the add_particle method of the Aerosol class."""
         new_particle = self.particle
-        initial_count = len(self.aerosol.particles)
-        self.aerosol.add_particle(new_particle)
-        self.assertEqual(len(self.aerosol.particles), initial_count + 1)
+        self.aerosol.replace_particles(new_particle)
+        self.assertEqual(self.aerosol.particles, new_particle)
