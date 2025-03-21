@@ -226,7 +226,7 @@ class CondensationStrategy(ABC):
             mass_accommodation=self.accommodation_coefficient,
         )
         return get_first_order_mass_transport_k(
-            radius=radius,
+            particle_radius=radius,
             vapor_transition=vapor_transition,
             diffusion_coefficient=self.diffusion_coefficient,
         )

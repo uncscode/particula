@@ -34,11 +34,11 @@ from particula.util.validate_inputs import validate_inputs
 
 @validate_inputs(
     {
-        "radius": "nonnegative",
+        "particle_radius": "nonnegative",
     }
 )
 def get_first_order_mass_transport_k(
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     vapor_transition: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
 ) -> Union[float, NDArray[np.float64]]:
@@ -55,7 +55,7 @@ def get_first_order_mass_transport_k(
         - X : Vapor transition correction factor [unitless].
 
     Arguments:
-        - radius : The radius of the particle [m].
+        - particle_radius : The radius of the particle [m].
         - vapor_transition : The vapor transition correction factor [unitless].
         - diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
           Defaults to 2e-5 (approx. air).
@@ -94,8 +94,10 @@ def get_first_order_mass_transport_k(
         and vapor_transition.dtype == np.float64
         and vapor_transition.ndim == 2
     ):  # extent radius
-        radius = radius[:, np.newaxis]  # type: ignore
-    return 4 * np.pi * radius * diffusion_coefficient * vapor_transition  # type: ignore
+        particle_radius = particle_radius[:, np.newaxis]  # type: ignore
+    return (
+        4 * np.pi * particle_radius * diffusion_coefficient * vapor_transition
+    )
 
 
 @validate_inputs(
@@ -174,11 +176,15 @@ def get_mass_transfer_rate(
 
 
 @validate_inputs(
-    {"mass_rate": "finite", "radius": "nonnegative", "density": "positive"}
+    {
+        "mass_rate": "finite",
+        "particle_radius": "nonnegative",
+        "density": "positive",
+    }
 )
 def get_radius_transfer_rate(
     mass_rate: Union[float, NDArray[np.float64]],
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -195,7 +201,7 @@ def get_radius_transfer_rate(
 
     Arguments:
         - mass_rate : The mass transfer rate [kg/s].
-        - radius : The radius of the particle [m].
+        - particle_radius : The radius of the particle [m].
         - density : The density of the particle [kg/m³].
 
     Returns:
@@ -206,7 +212,7 @@ def get_radius_transfer_rate(
         import particula as par
         par.dynamics.radius_transfer_rate(
             mass_rate=1e-21,
-            radius=1e-6,
+            particle_radius=1e-6,
             density=1000
         )
         # Output: 7.95774715e-14
@@ -216,15 +222,15 @@ def get_radius_transfer_rate(
         import particula as par
         par.dynamics.radius_transfer_rate(
             mass_rate=np.array([1e-21, 2e-21]),
-            radius=np.array([1e-6, 2e-6]),
+            particle_radius=np.array([1e-6, 2e-6]),
             density=1000
         )
         # Output: array([7.95774715e-14, 1.98943679e-14])
         ```
     """
     if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
-        radius = radius[:, np.newaxis]  # type: ignore
-    return mass_rate / (density * 4 * np.pi * radius**2)  # type: ignore
+        particle_radius = particle_radius[:, np.newaxis]
+    return mass_rate / (density * 4 * np.pi * particle_radius**2)
 
 
 @validate_inputs(
