@@ -281,7 +281,7 @@ class SizerConverter:
         return self.strategy.convert(diameters, concentration, inverse=inverse)
 
 
-def get_conversion_strategy(
+def get_distribution_conversion_strategy(
     input_scale: str, output_scale: str
 ) -> ConversionStrategy:
     """
@@ -302,7 +302,7 @@ def get_conversion_strategy(
 
     Examples:
         ``` py title="Example Usage"
-        strategy = get_conversion_strategy('dn/dlogdp', 'pdf')
+        strategy = get_distribution_conversion_strategy('dn/dlogdp', 'pdf')
         converter = SizerConverter(strategy)
         converted_data = converter.convert(diameters, concentration)
         ```

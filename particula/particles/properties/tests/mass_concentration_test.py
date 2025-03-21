@@ -3,7 +3,9 @@
 import numpy as np
 import pytest
 
-from particula.util.converting import convert_mass_concentration
+from particula.particles.properties import (
+    convert_mass_concentration,
+)
 
 
 @pytest.mark.parametrize(
