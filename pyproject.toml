@@ -33,7 +33,7 @@ repository = "https://github.com/uncscode/particula"
 dev = [
     "pylint", "pytest", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
-    "mkdocs-material", "handsdown", "mkdocs-jupyter",
+    "mkdocs-material", "handsdown", "mkdocs-jupyter", "openai",
 ]
 extra = [
     "matplotlib", "pandas", "tqdm", "pint",
