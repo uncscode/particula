@@ -86,7 +86,7 @@ def detach_and_delete_all_files(client, vector_store_id):
         client.files.delete(
             file_id=file.id,
         )
-    print(f"All files have been detached and deleted from vector store.")
+    print("All files have been detached and deleted from vector store.")
 
 
 def upload_and_attach_files(
@@ -192,6 +192,16 @@ def get_current_commit():
 
 
 def get_changed_files(previous_commit_hash):
+    """
+    Get a list of files changed between the previous commit and the current
+    commit.
+
+    Arguments:
+        - previous_commit_hash : The hash of the previous commit.
+
+    Returns:
+        - A list of changed file paths.
+    """
     repo = git.Repo(search_parent_directories=True)
     previous_commit = repo.commit(previous_commit_hash)
     current_commit = repo.commit("HEAD")
@@ -209,6 +219,15 @@ def get_changed_files(previous_commit_hash):
 
 
 def filter_changed_files(changed_files):
+    """
+    Filter changed files to include only those in specific directories.
+
+    Arguments:
+        - changed_files : List of changed file paths.
+
+    Returns:
+        - A list of filtered file paths.
+    """
     filtered_files = []
     for file in changed_files:
         if (
