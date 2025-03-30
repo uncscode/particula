@@ -418,6 +418,7 @@ def refresh_changed_files(client, vector_store_id):
     #     client=client,
     #     vector_store_id=vector_store_id,
     # )
+    print(f"Previous commit hash: {prev_commit}")
     changed_files = get_changed_files(prev_commit)
     changed_files = filter_changed_files(changed_files)
 
@@ -425,6 +426,7 @@ def refresh_changed_files(client, vector_store_id):
         client=client,
         changed_files=changed_files,
     )
+    print(f"Files to update: {file_to_update.keys()}")
 
     # Iterate over the files to update
     for file_path, file_info in file_to_update.items():
