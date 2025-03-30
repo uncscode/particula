@@ -34,6 +34,7 @@ dev = [
     "pylint", "pytest", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
     "mkdocs-material", "handsdown", "mkdocs-jupyter", "openai",
+    "GitPython",
 ]
 extra = [
     "matplotlib", "pandas", "tqdm", "pint",

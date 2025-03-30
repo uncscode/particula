@@ -5,9 +5,13 @@
 *Source-Code*
 docs/.assets/single_page_reference*
 docs/API*
+docs/.assets/temp/*
 .cache/
 # ignore local .vscode folder
 .vscode/
+
+# ignore uv lock file
+uv.lock
 
 # ignore local development folder
 private_dev/
