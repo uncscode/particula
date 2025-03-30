@@ -305,6 +305,11 @@ def upload_new_file(client, file_to_update_dict):
             f"Markdown file for '{file_to_update_dict["full_path"]}' "
             " has been uploaded and attached to the vector store."
         )
+    else:
+        print(
+            f"Markdown file for '{file_to_update_dict["full_path"]}' "
+            "does not exist. Skipping upload."
+        )
 
 
 def update_vector_store_file(client, file_to_update_dict):
