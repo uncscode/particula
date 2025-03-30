@@ -1,7 +1,7 @@
 # %%
 """
 For vector store upload, we need to convert all notebooks and python files in
-the a directory to Markdown files.
+a directory to Markdown files.
 """
 import os
 import shutil
