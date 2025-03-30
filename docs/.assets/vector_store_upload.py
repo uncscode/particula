@@ -380,6 +380,7 @@ def set_vector_store_commit(client, vector_store_id):
             "git_commit": commit_hash,
         },
     )
+    print(f"Vector store commit hash has been set to: {commit_hash}")
 
 
 def get_vector_store_commit(client, vector_store_id):
@@ -435,6 +436,10 @@ def refresh_changed_files(client, vector_store_id):
     )
     print(f"Files to update: {file_to_update.keys()}")
 
+    # Check if there are any files to update
+    if not file_to_update:
+        print("No files to update.")
+        return
     # Iterate over the files to update
     for file_path, file_info in file_to_update.items():
         if file_info["method"] == "update":
@@ -514,5 +519,10 @@ if __name__ == "__main__":
     #     client=client,
     #     vector_store_id=VECTOR_STORE_ID,
     # )
+    set_vector_store_commit(
+        client=client,
+        vector_store_id=VECTOR_STORE_ID,
+    )
+    print("Vector store update check is finished.")
 
 # %%
