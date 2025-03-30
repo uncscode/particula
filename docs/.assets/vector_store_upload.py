@@ -131,13 +131,11 @@ def upload_and_attach_files(
     }
 
     # Attach the uploaded file to the vector store
-    vector_response = client.vector_stores.files.create(
+    return client.vector_stores.files.create(
         vector_store_id=vector_store_id,
         file_id=file_response.id,  # Use the file ID returned from upload
         attributes=attributes,  # Pass the attributes dictionary
     )
-
-    return vector_response
 
 
 def upload_all_files_in_directory(
