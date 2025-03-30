@@ -34,19 +34,12 @@ jobs:
           run: |
             pip install jupyter-book ghp-import
             pip install mkdocs mkdocs-material[imaging] handsdown mkdocs-jupyter
-            pip install nbconvert
 
         - name: Generate Source Code Documentation with Handsdown
           run: python docs/.assets/mk_generator.py
 
         - name: Build MkDocs site and Run Jupyter Books
           run: mkdocs build
-
-        - name: Build Single Page API
-          run: python docs/.assets/single_page_api_generator.py
-
-        - name: Build Single Page Reference
-          run: python docs/.assets/single_page_ref_generator.py
 
         - name: Deploy to GitHub Pages (on push or merge_group)
           if: github.event_name == 'push' || github.event_name == 'merge_group'
