@@ -14,6 +14,8 @@ import git
 API_KEY = os.environ.get("OPENAI_API_KEY")
 VECTOR_STORE_ID = os.environ.get("VECTOR_STORE_ID")
 
+REPO_PATH = Path.cwd()
+
 
 def detach_and_delete_file(client, vector_store_id, file_id):
     """
@@ -291,7 +293,7 @@ def upload_new_file(client, file_to_update_dict):
 
     """
     # Create markdown path based on the file's base name
-    markdown_path = Path("C:\\GitHub\\particula\\docs\\.assets\\temp") / (
+    markdown_path = REPO_PATH / "docs/.assets/temp" / (
         file_to_update_dict["full_path"].split(".")[0] + ".md"
     )
     # Check if the markdown file exists and upload it if it does
@@ -478,9 +480,8 @@ def refresh_all_files(
     upload_all_files_in_directory(
         client=client,
         vector_store_id=vector_store_id,
-        directory_path=Path(
-            "C:\\GitHub\\particula\\docs\\.assets\\temp"
-        ),  # Path to the directory containing files to upload
+        directory_path=(REPO_PATH / "docs/.assets/temp"),
+        # Path to the directory containing files to upload
     )
     # Set the vector store commit to the current commit
     set_vector_store_commit(
