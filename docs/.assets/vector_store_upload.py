@@ -420,11 +420,11 @@ def refresh_changed_files(client, vector_store_id):
         refresh_changed_files(client, "storeXYZ")
         ```
     """
-    prev_commit = "428ab0e02319e0254e7d7532e36fb32403293d51"  # testing
-    # prev_commit = get_vector_store_commit(  # production
-    #     client=client,
-    #     vector_store_id=vector_store_id,
-    # )
+    # prev_commit = "428ab0e02319e0254e7d7532e36fb32403293d51"  # testing
+    prev_commit = get_vector_store_commit(  # production
+        client=client,
+        vector_store_id=vector_store_id,
+    )
     print(f"Previous commit hash: {prev_commit}")
     changed_files = get_changed_files(prev_commit)
     changed_files = filter_changed_files(changed_files)
