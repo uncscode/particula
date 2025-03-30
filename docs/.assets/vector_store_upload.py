@@ -492,6 +492,10 @@ if __name__ == "__main__":
 
     client = OpenAI(api_key=API_KEY)
 
+    # print current commit hash
+    commit_hash = get_current_commit()
+    print(f"Current commit hash: {commit_hash}")
+
     refresh_changed_files(
         client=client,
         vector_store_id=VECTOR_STORE_ID,
