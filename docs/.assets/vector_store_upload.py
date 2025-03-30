@@ -453,12 +453,6 @@ def refresh_changed_files(client, vector_store_id):
                 file_to_update_dict=file_info,
             )
 
-    # Set the vector store commit to the current commit
-    set_vector_store_commit(
-        client=client,
-        vector_store_id=vector_store_id,
-    )
-
 
 def refresh_all_files(
     client,
@@ -487,11 +481,6 @@ def refresh_all_files(
         vector_store_id=vector_store_id,
         directory_path=(REPO_PATH / "docs/.assets/temp"),
         # Path to the directory containing files to upload
-    )
-    # Set the vector store commit to the current commit
-    set_vector_store_commit(
-        client=client,
-        vector_store_id=vector_store_id,
     )
 
 
