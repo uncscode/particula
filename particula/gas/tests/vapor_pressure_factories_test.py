@@ -32,7 +32,7 @@ def test_factory_with_clausius_clapeyron_strategy():
     """Test factory creates a ClausiusClapeyronStrategy correctly."""
     parameters = {
         "latent_heat": 2260,
-        "latent_heat_units": "J/kg",
+        "latent_heat_units": "J/mol",
         "temperature_initial": 300,
         "temperature_initial_units": "K",
         "pressure_initial": 101325,
