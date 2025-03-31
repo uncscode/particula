@@ -143,7 +143,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
 
     Methods:
-    - set_latent_heat : Set latent heat in J/kg (or convertible units).
+    - set_latent_heat : Set latent heat in J/mol (or convertible units).
     - set_temperature_initial : Set initial temperature in K
         (or convertible units).
     - set_pressure_initial : Set initial pressure in Pa
@@ -165,7 +165,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
         ``` py title="ClausiusClapeyronBuilder with units"
         strategy = (
             ClausiusClapeyronBuilder()
-            .set_latent_heat(2260, "J/kg")
+            .set_latent_heat(2260, "J/mol")
             .set_temperature_initial(373.15, "K")
             .set_pressure_initial(101325, "Pa")
             .build()
@@ -192,12 +192,12 @@ class ClausiusClapeyronBuilder(BuilderABC):
     def set_latent_heat(
         self, latent_heat: float, latent_heat_units: str
     ) -> "ClausiusClapeyronBuilder":
-        """Set the latent heat of vaporization: Default units J/kg."""
-        if latent_heat_units == "J/kg":
+        """Set the latent heat of vaporization: Default units J/mol."""
+        if latent_heat_units == "J/mol":
             self.latent_heat = latent_heat
             return self
         self.latent_heat = latent_heat * get_unit_conversion(
-            latent_heat_units, "J/kg"
+            latent_heat_units, "J/mol"
         )
         return self
 
