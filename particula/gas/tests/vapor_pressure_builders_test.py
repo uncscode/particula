@@ -42,7 +42,7 @@ def test_antoine_build_without_all_coefficients():
 def test_clausius_set_latent_heat_positive():
     """Test setting a positive value for the latent heat."""
     builder = ClausiusClapeyronBuilder()
-    builder.set_latent_heat(100, "J/kg")
+    builder.set_latent_heat(100, "J/mol")
     assert builder.latent_heat == 100, "Latent heat should be set correctly"
 
 
@@ -50,7 +50,7 @@ def test_clausius_set_latent_heat_negative():
     """Test setting a negative value for the latent heat."""
     builder = ClausiusClapeyronBuilder()
     with pytest.raises(ValueError):
-        builder.set_latent_heat(-100, "J/kg")
+        builder.set_latent_heat(-100, "J/mol")
 
 
 def test_clausius_set_temperature_initial_positive():
@@ -86,7 +86,7 @@ def test_clausius_set_parameters_complete():
     builder = ClausiusClapeyronBuilder()
     parameters = {
         "latent_heat": 2260,
-        "latent_heat_units": "J/kg",
+        "latent_heat_units": "J/mol",
         "temperature_initial": 373,
         "temperature_initial_units": "K",
         "pressure_initial": 101325,
@@ -102,7 +102,7 @@ def test_clausius_build_success():
     """Test building the strategy successfully."""
     builder = (
         ClausiusClapeyronBuilder()
-        .set_latent_heat(2260, "J/kg")
+        .set_latent_heat(2260, "J/mol")
         .set_temperature_initial(373, "K")
         .set_pressure_initial(101325, "Pa")
     )
@@ -112,7 +112,7 @@ def test_clausius_build_success():
 def test_clausius_build_failure():
     """Test building the strategy without all parameters set."""
     builder = ClausiusClapeyronBuilder()
-    builder.set_latent_heat(2260, "J/kg").set_temperature_initial(373, "K")
+    builder.set_latent_heat(2260, "J/mol").set_temperature_initial(373, "K")
     with pytest.raises(ValueError) as excinfo:
         builder.build()
     assert "Required parameter(s) not set: pressure_initial" in str(

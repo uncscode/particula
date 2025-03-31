@@ -23,7 +23,7 @@ class TestAerosol(unittest.TestCase):
         molar_mass_glycerol = 92.09382e-3  # kg/mol
         parameters_clausius = {
             "latent_heat": 71.5 * 1e3 * molar_mass_glycerol,
-            "latent_heat_units": "J/kg",
+            "latent_heat_units": "J/mol",
             "temperature_initial": 125.5 + 273.15,
             "temperature_initial_units": "K",
             "pressure_initial": 1e5,
