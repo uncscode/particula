@@ -537,10 +537,10 @@ if __name__ == "__main__":
     #     vector_store_id=VECTOR_STORE_ID,
     # )
 
-    # set_vector_store_commit(
-    #     client=client,
-    #     vector_store_id=VECTOR_STORE_ID,
-    # )
+    set_vector_store_commit(
+        client=client,
+        vector_store_id=VECTOR_STORE_ID,
+    )
     print("Vector store update check is finished.")
 
 # %%
