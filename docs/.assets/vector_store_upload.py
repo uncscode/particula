@@ -375,7 +375,11 @@ def update_vector_store_file(client, file_to_update_dict):
             )
 
 
-def set_vector_store_commit(client, vector_store_id):
+def set_vector_store_commit(
+    client,
+    vector_store_id,
+    commit_hash=None,
+):
     """
     Set the vector store's commit hash to the current local commit.
 
@@ -386,8 +390,9 @@ def set_vector_store_commit(client, vector_store_id):
     Returns:
         - None
     """
-    # Get the current commit hash
-    commit_hash = get_current_commit()
+    if commit_hash is None:
+        # Get the current commit hash
+        commit_hash = get_current_commit()
 
     # Update the vector store with the commit hash
     client.vector_stores.update(
@@ -510,6 +515,13 @@ if __name__ == "__main__":
 
     client = OpenAI(api_key=API_KEY)
 
+    # set commit hash to the vector store
+    # set_vector_store_commit(
+    #     client=client,
+    #     vector_store_id=VECTOR_STORE_ID,
+    #     commit_hash="4d8de48a322c9d683a34c35ec7b6897cf27945af",
+    # )
+
     # print current commit hash
     commit_hash = get_current_commit()
     print(f"Current commit hash: {commit_hash}")
@@ -524,10 +536,11 @@ if __name__ == "__main__":
     #     client=client,
     #     vector_store_id=VECTOR_STORE_ID,
     # )
-    set_vector_store_commit(
-        client=client,
-        vector_store_id=VECTOR_STORE_ID,
-    )
+
+    # set_vector_store_commit(
+    #     client=client,
+    #     vector_store_id=VECTOR_STORE_ID,
+    # )
     print("Vector store update check is finished.")
 
 # %%
