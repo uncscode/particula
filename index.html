@@ -399,6 +399,12 @@
     .md-header {
       position: initial;
     }
+    /* Add or modify these rules to stack the buttons vertically */
+    .mdx-hero__content .md-button {
+      display: block;
+      width: fit-content;
+      /* margin-right: 0; */
+    }
     /* Remove default spacing from the .md-main__inner container */
     .md-main__inner {
       margin: 0;
@@ -505,12 +511,21 @@
           </a>
           <a
           href="https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant"
-          title="ChatGPT Particula Assistant"
+          title="OpenAI GPTs Particula Assistant"
           class="md-button md-button"
           target="_blank"
           rel="noopener noreferrer"
           >
-            ChatGPT
+            Particula Assistant Chat
+          </a>
+          <a
+            href="https://particula-rag.fly.dev/closed_beta"
+            title="OpenAI Particula Reasoning Chat"
+            class="md-button md-button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Particula Reasoning Chat
           </a>
         </div>
 
