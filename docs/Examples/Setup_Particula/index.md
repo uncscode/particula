@@ -46,7 +46,7 @@ Avoid conflicts with other development projects by creating an isolated Python e
 
 - Open VSCode, then open the integrated terminal (`Terminal > New Terminal`).
   - Be sure to select `cmd` for command prompt.
-- Use the following Conda command to create an environment named `analysisV1` with Python 3.11:
+- Use the following Conda command to create an environment named `analysisV1` with Python:
 
 ```bash
 conda create --name analysisV1 python=3.12
@@ -71,6 +71,12 @@ Now, install the `Particula` using pip in your activated environment, use one of
 
 ```bash
 pip install particula
+```
+
+To include the optional dependencies, use the following command:
+
+```bash
+pip install particula[extra]
 ```
 
 ### or Install the main repository or any forked repository

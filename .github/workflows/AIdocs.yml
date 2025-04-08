@@ -12,6 +12,7 @@ on:
 
 jobs:
   blds:
+    if: ${{ github.repository == 'uncscode/particula' }}
     runs-on: ubuntu-latest
     concurrency:
       group: "aidocs"
