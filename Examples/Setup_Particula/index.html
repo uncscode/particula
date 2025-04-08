@@ -7542,7 +7542,7 @@
 <ul>
 <li>Open VSCode, then open the integrated terminal (<code>Terminal &gt; New Terminal</code>).</li>
 <li>Be sure to select <code>cmd</code> for command prompt.</li>
-<li>Use the following Conda command to create an environment named <code>analysisV1</code> with Python 3.11:</li>
+<li>Use the following Conda command to create an environment named <code>analysisV1</code> with Python:</li>
 </ul>
 <div class="highlight"><pre><span></span><code>conda<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>analysisV1<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12
 </code></pre></div>
@@ -7556,6 +7556,9 @@
 <p>Now, install the <code>Particula</code> using pip in your activated environment, use one of the following methods:</p>
 <h3 id="install-the-pip-package">Install the pip package<a class="headerlink" href="#install-the-pip-package" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>particula
+</code></pre></div>
+<p>To include the optional dependencies, use the following command:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>particula<span class="o">[</span>extra<span class="o">]</span>
 </code></pre></div>
 <h3 id="or-install-the-main-repository-or-any-forked-repository">or Install the main repository or any forked repository<a class="headerlink" href="#or-install-the-main-repository-or-any-forked-repository" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/uncscode/particula.git
