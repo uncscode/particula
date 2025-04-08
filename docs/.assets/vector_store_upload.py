@@ -82,9 +82,14 @@ def detach_and_delete_all_files(client, vector_store_id):
             # Skip to the next file if deletion fails due to
             # file not being found
             continue
-        client.files.delete(
-            file_id=file.id,
-        )
+        try:
+            client.files.delete(
+                file_id=file.id,
+            )
+        except NotFoundError:
+            # Skip to the next file if deletion fails due to
+            # file not being found
+            continue
     print("All files have been detached and deleted from vector store.")
 
 
@@ -131,11 +136,17 @@ def upload_and_attach_files(
     }
 
     # Attach the uploaded file to the vector store
-    return client.vector_stores.files.create(
-        vector_store_id=vector_store_id,
-        file_id=file_response.id,  # Use the file ID returned from upload
-        attributes=attributes,  # Pass the attributes dictionary
-    )
+    try:
+        client.vector_stores.files.create(
+            vector_store_id=vector_store_id,
+            file_id=file_response.id,  # Use the file ID returned from upload
+            attributes=attributes,  # Pass the attributes dictionary
+        )
+    except NotFoundError:
+        Warning(
+            f"Vector store '{vector_store_id}' not found. "
+            "File upload failed."
+        )
 
 
 def upload_all_files_in_directory(
@@ -526,11 +537,13 @@ if __name__ == "__main__":
     commit_hash = get_current_commit()
     print(f"Current commit hash: {commit_hash}")
 
-    refresh_changed_files(
-        client=client,
-        vector_store_id=VECTOR_STORE_ID,
-    )
-
+    try:
+        refresh_changed_files(
+            client=client,
+            vector_store_id=VECTOR_STORE_ID,
+        )
+    except NotFoundError as error:
+        print("Caught error:", error)
     # Uncomment the following line to refresh all files
     # refresh_all_files(
     #     client=client,
