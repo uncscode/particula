@@ -13,7 +13,7 @@ If your Python environment is already set up, you can install [`particula` via p
 pip install particula
 ```
 
-Alternatively, you can install Particula using conda:
+Or install via conda:
 
 ```
 conda install -c conda-forge particula
