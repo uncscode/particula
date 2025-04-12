@@ -24,7 +24,7 @@ from typing import Any
 from particula.aerosol import Aerosol
 
 
-class Runnable(ABC):
+class RunnableABC(ABC):
     """
     Abstract base class for processes modifying an Aerosol instance.
 
@@ -99,7 +99,7 @@ class Runnable(ABC):
             ```
         """
 
-    def __or__(self, other: "Runnable"):
+    def __or__(self, other: "RunnableABC"):
         """
         Chain this Runnable with another using the '|' operator.
 
@@ -151,9 +151,9 @@ class RunnableSequence:
     """
 
     def __init__(self):
-        self.processes: list[Runnable] = []
+        self.processes: list[RunnableABC] = []
 
-    def add_process(self, process: Runnable):
+    def add_process(self, process: RunnableABC):
         """
         Add a Runnable to the sequence.
 
@@ -168,16 +168,21 @@ class RunnableSequence:
         """
         self.processes.append(process)
 
-    def execute(self, aerosol: Aerosol, time_step: float) -> Aerosol:
+    def execute(
+        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+    ) -> Aerosol:
         """
         Execute all processes in the sequence on the given Aerosol.
 
         Each Runnable in the sequence modifies the Aerosol and passes
-        it to the next Runnable until all have been executed.
+        it to the next Runnable until all have been executed. A full cycle is
+        performed over each sub-step of the time step.
 
         Arguments:
             - aerosol : The Aerosol instance to be updated.
             - time_step : The time step size in seconds for each process.
+            - sub_steps : Number of sub-steps to subdivide the time step,
+                default 1.
 
         Returns:
             - Aerosol : The resulting Aerosol after all processes run.
@@ -185,15 +190,19 @@ class RunnableSequence:
         Examples:
             ```py title="Executing a RunnableSequence"
             sequence = RunnableSequence()
-            final_aerosol = sequence.execute(aerosol, time_step=1.0)
+            final_aerosol = sequence.execute(aerosol, time_step=1.0, sub_steps=4)
             ```
         """
-        result = aerosol
-        for process in self.processes:
-            result = process.execute(result, time_step)
-        return result
+        sub_step_time_step = time_step / sub_steps
+        for _ in range(sub_steps):
+            # loop over each process in the sequence
+            for process in self.processes:
+                aerosol = process.execute(
+                    aerosol, sub_step_time_step, sub_steps=1
+                )
+        return aerosol
 
-    def __or__(self, process: Runnable):
+    def __or__(self, process: RunnableABC):
         """
         Chain another Runnable into this sequence using the '|' operator.
 
