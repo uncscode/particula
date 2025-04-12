@@ -127,6 +127,9 @@ from particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulatio
 from particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder import (
     CombineCoagulationStrategyBuilder,
 )
+from particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder import (
+    SedimentationCoagulationBuilder,
+)
 
 # particula.dynamics.coagulation.particle_resolved_step
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
