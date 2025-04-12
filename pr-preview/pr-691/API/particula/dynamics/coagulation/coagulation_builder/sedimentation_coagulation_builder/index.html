@@ -1699,6 +1699,33 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7565,6 +7592,33 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7650,6 +7704,24 @@
 <p>Creates a <code>SedimentationCoagulationStrategy</code> given a distribution type
 (e.g., "discrete", "continuous_pdf", or "particle_resolved"). Ensures
 the required parameters are set before building the strategy.</p>
+<h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
+<ul>
+<li>distribution_type : Representation of the particle
+  size distribution.</li>
+</ul>
+<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
+<ul>
+<li>set_distribution_type : Set the distribution type.</li>
+<li>build : Validate parameters and return a
+  SedimentationCoagulationStrategy instance.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example of using SedimentationCoagulationBuilder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">SedimentationCoagulationBuilder</span><span class="p">()</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="c1"># strategy is now a SedimentationCoagulationStrategy instance</span>
+</code></pre></div>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SedimentationCoagulationBuilder</span><span class="p">(</span><span class="n">BuilderABC</span><span class="p">,</span> <span class="n">BuilderDistributionTypeMixin</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
@@ -7660,7 +7732,7 @@ the required parameters are set before building the strategy.</p>
 <li><a href="../coagulation_builder_mixin/#builderdistributiontypemixin">BuilderDistributionTypeMixin</a></li>
 </ul>
 <h3 id="sedimentationcoagulationbuilderbuild">SedimentationCoagulationBuilder().build<a class="headerlink" href="#sedimentationcoagulationbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/sedimentation_coagulation_builder.py#L33">Show source in sedimentation_coagulation_builder.py:33</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/sedimentation_coagulation_builder.py#L51">Show source in sedimentation_coagulation_builder.py:51</a></p>
 <p>Validate and return the SedimentationCoagulationStrategy object.</p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span> <span class="o">...</span>
