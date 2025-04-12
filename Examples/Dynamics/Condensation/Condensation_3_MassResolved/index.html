@@ -1477,6 +1477,8 @@
       
         
       
+        
+      
     
     
     
@@ -1604,6 +1606,29 @@
   
   <span class="md-ellipsis">
     CombineCoagulationStrategyBuilder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../API/particula/dynamics/coagulation/coagulation_builder/sedimentation_coagulation_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SedimentationCoagulationBuilder
     
   </span>
   
@@ -8189,7 +8214,7 @@ atmosphere = (
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8355,11 +8380,11 @@ print(aerosol_resolved)</div>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
-[0]: Particle Representation:
+Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityKappaParameter
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 2.647e-06 [kg/m^3]
+	Mass Concentration: 2.743e-06 [kg/m^3]
 	Number Concentration: 1.000e+10 [#/m^3]
 </pre>
 </div>
@@ -8384,7 +8409,7 @@ print(aerosol_resolved)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8505,12 +8530,8 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
             <span class="n">aerosol_resolved</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span>
         <span class="p">)</span>
 
-    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
-    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">number_distribution_binned</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
         <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
     <span class="p">)</span>
@@ -8532,12 +8553,8 @@ for i, t in enumerate(time):
             aerosol_resolved, time_step, sub_steps
         )
 
-    total_mass_resolved[i] = aerosol_resolved.particles[
-        0
-    ].get_mass_concentration()
-    number_distribution_resolved[i, :] = aerosol_resolved.particles[
-        0
-    ].get_radius(clone=True)
+    total_mass_resolved[i] = aerosol_resolved.particles.get_mass_concentration()
+    number_distribution_resolved[i, :] = aerosol_resolved.particles.get_radius(clone=True)
     number_distribution_binned[i, :], edges = np.histogram(
         number_distribution_resolved[i, :], bins=bins_lognormal
     )
@@ -8562,11 +8579,11 @@ print(aerosol_resolved)</div>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
-[0]: Particle Representation:
+Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityKappaParameter
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 6.029e-04 [kg/m^3]
+	Mass Concentration: 6.040e-04 [kg/m^3]
 	Number Concentration: 1.000e+10 [#/m^3]
 </pre>
 </div>

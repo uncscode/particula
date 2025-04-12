@@ -1909,6 +1909,8 @@
       
         
       
+        
+      
     
     
     
@@ -2036,6 +2038,29 @@
   
   <span class="md-ellipsis">
     CombineCoagulationStrategyBuilder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coagulation/coagulation_builder/sedimentation_coagulation_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SedimentationCoagulationBuilder
     
   </span>
   
@@ -8270,13 +8295,13 @@ the chosen physical model.</p>
 <li><code>Physics</code> - From Air Pollution to Climate Change," Wiley, 2016.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Coagulation</span><span class="p">(</span><span class="n">Runnable</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Coagulation</span><span class="p">(</span><span class="n">RunnableABC</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coagulation_strategy</span><span class="p">:</span> <span class="n">CoagulationStrategyABC</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
 <ul>
 <li><a href="../coagulation/coagulation_strategy/coagulation_strategy_abc/#coagulationstrategyabc">CoagulationStrategyABC</a></li>
-<li><a href="../../runnable/#runnable">Runnable</a></li>
+<li><a href="../../runnable/#runnableabc">RunnableABC</a></li>
 </ul>
 <h3 id="coagulationexecute">Coagulation().execute<a class="headerlink" href="#coagulationexecute" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L182">Show source in particle_process.py:182</a></p>
@@ -8360,13 +8385,13 @@ subclass.</p>
   From Air Pollution to Climate Change," Wiley, 2016.</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MassCondensation</span><span class="p">(</span><span class="n">Runnable</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MassCondensation</span><span class="p">(</span><span class="n">RunnableABC</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condensation_strategy</span><span class="p">:</span> <span class="n">CondensationStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_3">See also<a class="headerlink" href="#see-also_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li><a href="../condensation/condensation_strategies/#condensationstrategy">CondensationStrategy</a></li>
-<li><a href="../../runnable/#runnable">Runnable</a></li>
+<li><a href="../../runnable/#runnableabc">RunnableABC</a></li>
 </ul>
 <h3 id="masscondensationexecute">MassCondensation().execute<a class="headerlink" href="#masscondensationexecute" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L65">Show source in particle_process.py:65</a></p>
