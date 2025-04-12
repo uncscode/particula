@@ -72,6 +72,10 @@ Now, install the `Particula` using pip in your activated environment, use one of
 ```bash
 pip install particula
 ```
+or
+```
+conda install -c conda-forge particula
+```
 
 To include the optional dependencies, use the following command:
 
