@@ -26,7 +26,7 @@ from particula import (
     equilibria,
 )
 from particula.aerosol import Aerosol
-
+from particula.runnable import RunnableSequence
 
 from particula.logger_setup import setup
 

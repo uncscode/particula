@@ -320,8 +320,10 @@ def upload_new_file(client, file_to_update_dict):
 
     """
     # Create markdown path based on the file's base name
-    markdown_path = REPO_PATH / "docs/.assets/temp" / (
-        file_to_update_dict["full_path"].split(".")[0] + ".md"
+    markdown_path = (
+        REPO_PATH
+        / "docs/.assets/temp"
+        / (file_to_update_dict["full_path"].split(".")[0] + ".md")
     )
     # Check if the markdown file exists and upload it if it does
     if markdown_path.exists():

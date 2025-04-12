@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 
 # Particula imports
-from particula.runnable import Runnable
+from particula.runnable import RunnableABC
 from particula.aerosol import Aerosol
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationStrategy,
@@ -16,7 +16,7 @@ from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_ab
 )
 
 
-class MassCondensation(Runnable):
+class MassCondensation(RunnableABC):
     """
     Handles the mass condensation process for aerosols.
 
@@ -137,7 +137,7 @@ class MassCondensation(Runnable):
         return rates
 
 
-class Coagulation(Runnable):
+class Coagulation(RunnableABC):
     """
     Implements a coagulation process for aerosol particles.
 

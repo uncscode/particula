@@ -52,7 +52,7 @@ class TurbulentDNSCoagulationBuilder(
         - distribution_type : The particle distribution type
           ("discrete", "continuous_pdf", or "particle_resolved").
         - turbulent_dissipation : Rate of turbulent energy dissipation (m²/s³).
-        - fluid_density : Fluid density in kg/m³.
+        - fluid_density : Fluid density in kg/m³ (e.g., air density).
         - reynolds_lambda : Taylor-scale Reynolds number (dimensionless).
         - relative_velocity : Relative velocity in m/s (particle vs. airflow).
 
