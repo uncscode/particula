@@ -65,24 +65,29 @@ conda activate analysisV1
 
 **Step 7: Install the Project**
 
-Now, install the `Particula` using pip in your activated environment, use one of the following methods:
+Now, install the `Particula` in your activated environment, use one of the following methods:
 
-### Install the pip package
+### Install the package using pip or conda
 
 ```bash
 pip install particula
 ```
-or
-```
-conda install -c conda-forge particula
-```
 
-To include the optional dependencies, use the following command:
+To include the optional dependencies used in the tutorial examples, use the following command:
 
 ```bash
 pip install particula[extra]
 ```
 
+or, if using conda to install `Particula`:
+```
+conda install -c conda-forge particula
+```
+
+To include the optional dependencies used in the tutorial examples, use the following command:
+```
+conda install -c conda-forge particula matplotlib pandas tqdm pint 
+```
 ### or Install the main repository or any forked repository
 
 ```bash

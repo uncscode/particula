@@ -53,6 +53,7 @@ Alternatively, you can install Particula using conda:
 conda install -c conda-forge particula
 ```
 
+If you are new to Python or plan on going through the Examples, head to [Setup Particula](Examples/Setup_Particula/index.md) for more comprehensive installation instructions.
 ---
 
 ## Join the Community
