@@ -23,6 +23,24 @@ class SedimentationCoagulationBuilder(
     Creates a `SedimentationCoagulationStrategy` given a distribution type
     (e.g., "discrete", "continuous_pdf", or "particle_resolved"). Ensures
     the required parameters are set before building the strategy.
+
+    Attributes:
+        - distribution_type : Representation of the particle
+          size distribution.
+
+    Methods:
+    - set_distribution_type : Set the distribution type.
+    - build : Validate parameters and return a
+      SedimentationCoagulationStrategy instance.
+
+    Examples:
+        ```py title="Example of using SedimentationCoagulationBuilder"
+        import particula as par
+        builder = SedimentationCoagulationBuilder()
+        builder.set_distribution_type("discrete")
+        strategy = builder.build()
+        # strategy is now a SedimentationCoagulationStrategy instance
+        ```
     """
 
     def __init__(self):
