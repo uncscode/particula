@@ -7490,9 +7490,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-the-pip-package" class="md-nav__link">
+  <a href="#install-the-package-using-pip-or-conda" class="md-nav__link">
     <span class="md-ellipsis">
-      Install the pip package
+      Install the package using pip or conda
     </span>
   </a>
   
@@ -7578,13 +7578,19 @@
 </code></pre></div>
 <h2 id="installing-the-project">Installing the Project<a class="headerlink" href="#installing-the-project" title="Permanent link">&para;</a></h2>
 <p><strong>Step 7: Install the Project</strong></p>
-<p>Now, install the <code>Particula</code> using pip in your activated environment, use one of the following methods:</p>
-<h3 id="install-the-pip-package">Install the pip package<a class="headerlink" href="#install-the-pip-package" title="Permanent link">&para;</a></h3>
+<p>Now, install the <code>Particula</code> in your activated environment, use one of the following methods:</p>
+<h3 id="install-the-package-using-pip-or-conda">Install the package using pip or conda<a class="headerlink" href="#install-the-package-using-pip-or-conda" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>particula
 </code></pre></div>
-<p>To include the optional dependencies, use the following command:</p>
+<p>To include the optional dependencies used in the tutorial examples, use the following command:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>particula<span class="o">[</span>extra<span class="o">]</span>
 </code></pre></div>
+<p>or, if using conda to install <code>Particula</code>:
+<div class="highlight"><pre><span></span><code>conda install -c conda-forge particula
+</code></pre></div></p>
+<p>To include the optional dependencies used in the tutorial examples, use the following command:
+<div class="highlight"><pre><span></span><code>conda install -c conda-forge particula matplotlib pandas tqdm pint 
+</code></pre></div></p>
 <h3 id="or-install-the-main-repository-or-any-forked-repository">or Install the main repository or any forked repository<a class="headerlink" href="#or-install-the-main-repository-or-any-forked-repository" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/uncscode/particula.git
 </code></pre></div>
