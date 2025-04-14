@@ -306,7 +306,7 @@ class ParticleRepresentation:
         effective_density = effective_density[effective_density != 0]
         if effective_density.size == 0:
             return 0.0
-        return np.mean(self.get_effective_density())
+        return np.mean(effective_density)
 
     def get_concentration(self, clone: bool = False) -> NDArray[np.float64]:
         """
