@@ -18,7 +18,7 @@ from particula.particles.distribution_strategies import (
 logger = logging.getLogger("particula")
 
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes, too-many-public-methods
 class ParticleRepresentation:
     """Everything needed to represent a particle or a collection of particles.
 
