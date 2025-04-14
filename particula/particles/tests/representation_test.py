@@ -4,6 +4,7 @@ import numpy as np
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.distribution_strategies import (
     RadiiBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
 )
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.particles.activity_strategies import ActivityIdealMass
@@ -37,6 +38,28 @@ def setup_particle(
         density=density,
         concentration=concentration,
         charge=charge,
+    )
+
+
+def setup_particle_resolved() -> ParticleRepresentation:
+    """Setup ParticleRepresentation for testing with particle resolved."""
+    masses = np.array(
+        [
+            [1.0, 2.0, 3.0],
+            [4.0, 5.0, 6.0],
+            [7.0, 8.0, 9.0],
+            [10.0, 11.0, 12.0],
+        ]
+    )
+
+    return setup_particle(
+        strategy=ParticleResolvedSpeciatedMass(),
+        activity=ActivityIdealMass(),
+        surface=SurfaceStrategyVolume(),
+        distribution=masses,
+        density=np.array([1.0, 2.0, 3.0]),
+        concentration=np.array([1, 1, 1, 1]),
+        charge=1.0,
     )
 
 
@@ -170,3 +193,55 @@ def test_get_total_concentration():
 
     assert total_concentration == total_concentration_clone
     assert total_concentration == expected_total_concentration
+
+
+def test_get_effective_density():
+    """Test get_effective_density method."""
+    particle = setup_particle()
+    effective_density = particle.get_effective_density()
+
+    assert isinstance(effective_density, np.ndarray)
+
+    distribution = particle.get_distribution()
+    expected_density = np.ones_like(distribution) * particle.get_density()
+    np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)
+
+
+def test_get_mean_effective_density():
+    """Test get_mean_effective_density for single-species."""
+    particle = setup_particle()
+    med = particle.get_mean_effective_density()
+    effective_density = particle.get_effective_density()
+    # Filter out any zero entries before computing mean
+    effective_density_nonzero = effective_density[effective_density != 0]
+    expected_mean = 0.0
+    if effective_density_nonzero.size > 0:
+        expected_mean = np.mean(effective_density_nonzero)
+
+    assert isinstance(med, float)
+    assert np.isclose(med, expected_mean, rtol=1e-7)
+
+
+def test_get_mean_effective_density_particle_resolved():
+    """Test get_mean_effective_density for multi-species (particle-resolved)."""
+    particle = setup_particle_resolved()
+    med = particle.get_mean_effective_density()
+    expected_mean = np.float64(2.1526515151515153)
+    assert isinstance(med, float)
+    assert np.isclose(med, expected_mean, rtol=1e-7)
+
+
+def test_get_effective_density_particle_resolved():
+    """Test get_effective_density method for particle resolved."""
+    particle = setup_particle_resolved()
+    effective_density = particle.get_effective_density()
+
+    assert isinstance(effective_density, np.ndarray)
+
+    total_mass = particle.get_mass()
+    density = particle.get_density()
+    # Weighted-average density for each particle (row)
+    expected_density = (
+        np.sum(particle.get_species_mass() * density, axis=1) / total_mass
+    )
+    np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)
