@@ -125,7 +125,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         """
         return get_sedimentation_kernel_sp2016_via_system_state(
             particle_radius=particle.get_radius(),
-            particle_density=particle.get_density(),
+            particle_density=particle.get_mean_effective_density(),
             temperature=temperature,
             pressure=pressure,
             calculate_collision_efficiency=False,

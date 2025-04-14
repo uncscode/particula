@@ -235,18 +235,9 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
           [DOI](https://doi.org/10.1088/1367-2630/10/7/075016)
         """
 
-        # calculate weighted particle density
-        densities = particle.get_density()
-        mass_matrix = np.sum(particle.get_species_mass(), axis=0)
-        # mass weighted average
-        particle_density = (
-            np.sum(mass_matrix * densities)
-            / np.sum(mass_matrix, axis=0)
-        )
-
         return get_turbulent_dns_kernel_ao2008_via_system_state(
             particle_radius=particle.get_radius(),
-            particle_density=particle_density,
+            particle_density=particle.get_mean_effective_density(),
             fluid_density=self.fluid_density,
             turbulent_dissipation=self.turbulent_dissipation,
             re_lambda=self.reynolds_lambda,

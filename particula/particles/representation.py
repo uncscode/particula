@@ -254,6 +254,60 @@ class ParticleRepresentation:
             return np.copy(self.density)
         return self.density
 
+    def get_effective_density(self) -> NDArray[np.float64]:
+        """
+        Return the effective density of the particles, weighted by the
+        mass of the species.
+
+        Arguments:
+            - None
+
+        Returns:
+            - The effective density of the particles.
+
+        Example:
+            ``` py title="Get Effective Density Array"
+            effective_density = particle_representation.get_effective_density()
+            ```
+        """
+        densities = self.get_density()
+        # if only one species is used, return the density of that species
+        if isinstance(densities, float) or np.size(densities) == 1:
+            return np.ones_like(self.get_species_mass()) * densities
+        # calculate weighted particle density
+        mass_total = self.get_mass()
+        weighted_mass = np.sum(self.get_species_mass() * densities, axis=1)
+        return np.divide(
+            weighted_mass,
+            mass_total,
+            where=mass_total != 0,
+            out=np.zeros_like(weighted_mass),
+        )
+
+    def get_mean_effective_density(self) -> NDArray[np.float64]:
+        """
+        Return the mean effective density of the particles.
+
+        Arguments:
+            - None
+
+        Returns:
+            - The mean effective density of the particles.
+
+        Example:
+            ``` py title="Get Mean Effective Density Array"
+            mean_effective_density = (
+                particle_representation.get_mean_effective_density()
+            )
+            ```
+        """
+        # filter out zero densities for no mass in bin/particle
+        effective_density = self.get_effective_density()
+        effective_density = effective_density[effective_density != 0]
+        if effective_density.size == 0:
+            return 0.0
+        return np.mean(self.get_effective_density())
+
     def get_concentration(self, clone: bool = False) -> NDArray[np.float64]:
         """
         Return the volume concentration of the particles.
