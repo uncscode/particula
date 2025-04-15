@@ -214,9 +214,7 @@ def test_get_mean_effective_density():
     effective_density = particle.get_effective_density()
     # Filter out any zero entries before computing mean
     effective_density_nonzero = effective_density[effective_density != 0]
-    expected_mean = 0.0
-    if effective_density_nonzero.size > 0:
-        expected_mean = np.mean(effective_density_nonzero)
+    expected_mean = np.mean(effective_density_nonzero)
 
     assert isinstance(med, float)
     assert np.isclose(med, expected_mean, rtol=1e-7)
