@@ -284,8 +284,7 @@ class ParticleRepresentation:
             out=np.zeros_like(weighted_mass),
         )
 
-    def get_mean_effective_density(self) -> NDArray[np.float64]:
-        """
+    def get_mean_effective_density(self) -> float:
         Return the mean effective density of the particles.
 
         Arguments:
