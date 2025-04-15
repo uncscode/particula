@@ -285,6 +285,7 @@ class ParticleRepresentation:
         )
 
     def get_mean_effective_density(self) -> float:
+        """
         Return the mean effective density of the particles.
 
         Arguments:
