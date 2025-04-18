@@ -11,13 +11,13 @@ Jump in by selecting any card below and follow along in your browser or local en
 
 <div class="grid cards" markdown>
 
--  __[Aerosol-Cloud Interactions](Full_Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)__
+-  __[Aerosol-Cloud Interactions](Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)__
 
     ---
 
     End-to-End biomass burning aerosol-cloud simulation using Particula.
 
-    [:octicons-arrow-right-24: Simulation](Full_Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)
 
 </div>
 
