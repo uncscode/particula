@@ -1,4 +1,28 @@
-# How-To Guides
+# Examples
+
+Welcome to the Particula Examples Gallery! Here you’ll find a curated collection of notebooks and step‑by‑step tutorials designed to help you explore, learn, and extend the core functionality of Particula. Whether you’re looking for a full end‑to‑end simulation, a focused how‑to guide, or a deep dive into individual components, each card below links to a ready‑to‑run example with contextual explanations and code snippets.
+
+Use the **End‑to‑End Simulations** to see complete workflows in action, then explore the **How‑To Guides** for targeted recipes that tackle specific processes (e.g., chamber wall losses, thermodynamic equilibria, or nucleation events). Finally, the **Tutorials** section breaks down the building blocks of Particula’s architecture—Aerosol objects, Dynamics modules, Gas Phase definitions, and Particle Phase representations—so you can customize and combine them in your own research.
+
+Jump in by selecting any card below and follow along in your browser or local environment. Happy modeling!
+
+
+## End-to-End Simulations
+
+<div class="grid cards" markdown>
+
+-  __[Aerosol-Cloud Interactions](Full_Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)__
+
+    ---
+
+    End-to-End biomass burning aerosol-cloud simulation using Particula.
+
+    [:octicons-arrow-right-24: Simulation](Full_Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)
+
+</div>
+
+
+## How-To Guides
 
 <div class="grid cards" markdown>
 
@@ -37,7 +61,7 @@
 </div>
 
 
-# Tutorials
+## Tutorials
 
 <div class="grid cards" markdown>
 
