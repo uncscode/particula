@@ -1,8 +1,16 @@
-## Contributing to Particula (Developer Contributors)
+# Contributor Workflow
 
-Interested in contributing to the Particula project? This section explains how to set up a development environment and the workflow for contributing changes. We assume you have a GitHub account and Git installed (see the [Beginner Setup](#beginner-environment-setup-for-users-new-to-python) if not). Following these steps will allow you to run the latest development version of Particula and prepare your contributions for a pull request.
+*Developer Setup Step‑by‑Step*
+---
 
-### Fork the Repository (on GitHub)
+This guide is a ground‑up walkthrough for first‑time contributors.  
+You will fork Particula on GitHub (or GitHub Desktop), clone it locally,
+create a private Python environment, install the package in editable
+mode, and learn the branch → code → commit → PR cycle.
+
+Interested in contributing to the Particula project? This section explains how to set up a development environment and the workflow for contributing changes. We assume you have a GitHub account and Git installed (see the [Beginner Setup](New_to_Python.md) if not). Following these steps will allow you to run the latest development version of Particula and prepare your contributions for a pull request.
+
+## 1. Fork the repository on GitHub
 
 First, **fork the Particula repository** to your own GitHub account. Forking creates your personal copy of the project:
 
@@ -12,51 +20,50 @@ First, **fork the Particula repository** to your own GitHub account. Forking cre
 
 *(If you’re new to forking, see GitHub’s guide on how to fork a repository for more details.)*
 
-### Clone Your Fork Locally
+## 2. Get the code on your computer
 
-Next, clone the forked repository to your local machine so you can work on the code:
+Choose **one** of the two methods below.
 
-1. Open a terminal on your development machine and navigate to a folder where you want to place the project.
-2. Run the clone command (replace `<your-username>` with your GitHub username):  
+**A. Git (command‑line)**  
+1. Open a terminal and move to the folder where you keep projects.  
+2. Clone your fork (replace `<your-username>`):  
    ```bash
    git clone https://github.com/<your-username>/particula.git
    ```  
-   This creates a directory `particula` with the project files.
-3. Change into the project directory:  
+3. Change into the project directory:  
    ```bash
    cd particula
    ```
 
-Now you have the code locally. Before writing code, we need to set up a Python environment for development.
+**B. GitHub Desktop (GUI)**  
+1. Install GitHub Desktop from <https://desktop.github.com/>.  
+2. File → Clone repository… → URL tab → paste  
+   `https://github.com/<your-username>/particula.git`.  
+3. Click **Clone**; GitHub Desktop puts the files on disk and lets you open the
+   folder in your code editor.
 
-### Set Up a Development Environment (`.venv`)
+Either path leaves you with a `particula/` folder containing the source code.
 
-It’s good practice to use a virtual environment (named `.venv`) for development. This keeps the project’s dependencies isolated. You have two options to create a `.venv` in the project:
+## Set Up a Development Environment (`.venv`)
 
-- **Using Python’s built-in venv:**  
-  ```bash
-  python3 -m venv .venv
-  source .venv/bin/activate  # activate on Linux/Mac
-  .\.venv\Scripts\activate   # activate on Windows (PowerShell/CMD)
-  ```  
-  This creates a folder `.venv` in the project and activates it. After activation, your prompt will show `(.venv)`.
-- **Using uv:** If you prefer uv, you can create and activate the env in one step:  
-  ```bash
-  uv venv .venv
-  ```  
-  This will create `.venv` and automatically make it active for subsequent `uv` commands.
+Create an isolated Python environment so development dependencies stay separate from other projects.
+We recommend the lightning‑fast uv tool—see the [uv setup guide](Setup_UV.md) for details.
 
-With the virtual environment active (by either method), upgrade pip and install Particula in **development mode** with the required dev dependencies:
-
-```bash
-pip install -U pip setuptools wheel
-pip install -e ".[dev,extra]"
-```
+- **Using uv:** You can create and activate the env in one step:  
+   ```bash
+   uv venv .venv      # creates & auto‑activates .venv for uv commands
+   ```  
+   This will create `.venv` and automatically make it active for subsequent `uv` commands.
+- **Install Editable:** with virtual environment active, install Particula in **development mode** with the required dev dependencies:
+   ```bash
+   uv pip install -e ".[dev,extra]"
+   ```
 
 The `pip install -e ".[dev,extra]"` command tells pip to install the package in editable mode (`-e`) from the current directory (`.`) including the `[dev,extra]` optional dependencies (which include development and extra tools). This will pull in things like testing frameworks, linters, etc., as defined by Particula’s `pyproject.toml`. If using uv, run `uv pip install -e ".[dev,extra]"` equivalently.
 
-**Tip:** The `.[dev,extra]` syntax installs all standard and extra dependencies needed for development (such as documentation or additional features). You can inspect `pyproject.toml` for the exact extras defined.
+> **Tip:** The `.[dev,extra]` syntax installs all standard and extra dependencies needed for development (such as documentation or additional features). You can inspect `pyproject.toml` for the exact extras defined.
 
-### Development Workflow: Branch, Code, Commit, PR
+## Development Workflow: Branch, Code, Commit, PR
 
-You are now ready to make changes. Head over to the [contributor](/docs/contribute/index.md) page for more information on the development workflow.
+You are now ready to create a **feature branch**, write code, commit, push,
+and open a pull request.

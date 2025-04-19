@@ -1,28 +1,67 @@
-# Installing Particula with uv
+# Setup via **uv**
 
-**uv** (by Astral) is a drop‑in, Rust‑powered replacement for pip that resolves, builds, and installs packages much faster. It’s compatible with pip and can be used in any virtual environment. For more details, see the [uv documentation](https://astral.sh/uv/).
+**uv** (by Astral) is a modern, Rust‑powered replacement for *both* `pip` and
+`virtualenv`.
 
-# Create an environment & install Particula
+• Up to **10 × faster** installs & upgrades (parallel resolver + global cache)  
+• One tool for **creating environments *and* installing** packages  
+• **Drop‑in syntax** – just say `uv pip …` where you would normally use `pip`  
 
+If you have never used a Python package manager before, uv combines the jobs of Conda and pip.  See the official [uv documentation](https://docs.astral.sh/uv/) for all options.
+
+## 1. Install uv (one‑time)
+
+Install via pipx (recommended):
 ```bash
-uv venv .venv            # creates a .venv virtual environment in the current directory
-uv pip install particula # installs Particula inside the .venv
+pipx install uv
 ```
 
-`uv pip` accepts the same flags as pip, so extras work too:
+If pipx is not available, install directly with pip:
+```bash
+python -m pip install --upgrade uv
+```
+
+## 2. Create an environment & install Particula
+
+In the folder or git repo you want to work in create a new virtual environment called .venv:
+```bash
+uv venv .venv
+```
+
+Activate it on Linux / macOS:
+```bash
+source .venv/bin/activate
+```
+
+Activate it on Windows (CMD or PowerShell):
+```bash
+.\.venv\Scripts\activate
+```
+
+Install Particula into the active environment:
+```bash
+uv pip install particula
+```
+
+Need the tutorial extras (plots, progress‑bars, etc.)? Install them with:
 
 ```bash
 uv pip install "particula[extra]"
 ```
 
-## Upgrade / uninstall
+## 3. Upgrade / Uninstall
 
+Upgrade Particula:
 ```bash
 uv pip install -U particula
+```
+
+Uninstall Particula:
+```bash
 uv pip uninstall particula
 ```
 
-## Specifying a Python version
+### Use a specific Python version
 
 If you want to use a specific Python version, you can specify it with the `--python` flag:
 
@@ -30,11 +69,11 @@ If you want to use a specific Python version, you can specify it with the `--pyt
 uv venv .venv --python=python3.12
 ```
 
-## Setup for Contributing
+## 4. Install Editable with Contributing
 
 If you want to contribute to Particula, see the [Contributing to Particula](Contributor_Workflow.md) section for details on setting up a development environment and workflow.
 
-Once in your development environment, you can install Particula in editable mode with the required dev dependencies:
+Once in your forked repo, create the same `.venv` as above, then you can install Particula in editable mode with the required dev dependencies:
 
 ```bash
 uv pip install -e ".[dev,extra]"
