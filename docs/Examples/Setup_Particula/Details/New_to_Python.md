@@ -93,9 +93,8 @@ Follow their dedicated guides:
   or add `--user` when using `pip` (less reproducible),  
   or create the environment in your home folder.  
 
-### Still stuck? Ask an LLM 🤖  
+### Still stuck? Ask a 🤖  
 
-Copy the full (but scrubbed) error message into a Large‑Language‑Model chat
+Copy the error message into a Large‑Language‑Model chat
 (e.g. OpenAI ChatGPT, Claude, Gemini) and request an explanation plus possible
-fixes. Combine the response with the official documentation and open issues on
-GitHub for best results.
+fixes.
