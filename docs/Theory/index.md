@@ -11,6 +11,8 @@
 - [Cloud Droplet Coagulation Kernel Ayala 2008](Technical/Cloud_Droplet_Coagulation/index.md)
 - [Ion-Particle Coagulation](Technical/ionparticle_coagulation.ipynb)
 
-## Particula Concepts
+## Code Concepts
 
-- [Maps](Particula_Concepts/Particle_maps.md)
+- Particula Development Guide: [WARMED Principle](Code_Concepts/WARMED_principle.md)
+- Particula [Design Patterns](Code_Concepts/Design_Patterns.md)
+- General [Object Oriented Patterns](Code_Concepts/Object_Oriented_Patterns.md)
