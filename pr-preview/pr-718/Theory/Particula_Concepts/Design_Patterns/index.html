@@ -7681,8 +7681,8 @@
 </table>
 <h2 id="1-procedural-functional-core-verbphrased-helpers">1. Procedural: Functional core – “verb‑phrased” helpers<a class="headerlink" href="#1-procedural-functional-core-verbphrased-helpers" title="Permanent link">&para;</a></h2>
 <p>Pattern: <strong>Functions</strong>  </p>
-<p>These core functions are in most cases stateless and return a value based on inputs. They have no hidden side effects and are not dependent on any object. They are easy to test and can be replaced with JIT‑compiled versions (Numba/C++) in the future.
-They are the building blocks of the simulation engine. They can be used in a procedural style, making them suitable for quick calculations or teaching demos.</p>
+<p>These core functions are in most cases stateless and return a value based on inputs. They have no hidden side effects and are not dependent on any object. They are easy to test and can be replaced with JIT‑compiled versions (Numba/C++) in the future.</p>
+<p>They are the building blocks of the simulation engine. They can be used in a procedural style, making them suitable for quick calculations or teaching demos.</p>
 <p><strong><code>get_</code></strong> – prefix that signals “this function returns a value”.</p>
 <p>Example:  </p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
@@ -7695,12 +7695,14 @@ They are the building blocks of the simulation engine. They can be used in a pro
 <span class="p">)</span>
 </code></pre></div>
 <h2 id="2-objectoriented-nounphrased-abstractions">2. Object‑oriented: – “noun‑phrased” abstractions<a class="headerlink" href="#2-objectoriented-nounphrased-abstractions" title="Permanent link">&para;</a></h2>
-<p>Patterns employed
-* <strong>Strategy</strong> – e.g. <code>TurbulentShearCoagulationStrategy</code> selects which kernel to call, built of <code>get_</code> functions. These are the main building blocks of the simulation engine.
-* <strong>Builder</strong> – e.g. <code>CombineCoagulationStrategyBuilder</code> validates input and assembles strategies.
-* <strong>Factory</strong> – e.g. <code>ActivityFactory</code> creates an <code>ActivityStrategy</code> instance via an <code>ActivityBuilder</code>. These allow for more complex meta programming of simulation objects.
-* <strong>Decorator</strong> – e.g. <code>@validate_inputs</code> checks for valid inputs before running the function. These are used to enforce domain specific invariants (positive radius, non‑negative concentration, finite Coulomb potential, …).
-* <strong>Mixin</strong> – thin, single‑responsibility classes adding orthogonal capabilities (density, charge, surface …).  </p>
+<p>Patterns employed</p>
+<ul>
+<li><strong>Strategy</strong> – e.g. <code>TurbulentShearCoagulationStrategy</code> selects which kernel to call, built of <code>get_</code> functions. These are the main building blocks of the simulation engine.</li>
+<li><strong>Builder</strong> – e.g. <code>CombineCoagulationStrategyBuilder</code> validates input and assembles strategies.</li>
+<li><strong>Factory</strong> – e.g. <code>ActivityFactory</code> creates an <code>ActivityStrategy</code> instance via an <code>ActivityBuilder</code>. These allow for more complex meta programming of simulation objects.</li>
+<li><strong>Decorator</strong> – e.g. <code>@validate_inputs</code> checks for valid inputs before running the function. These are used to enforce domain specific invariants (positive radius, non‑negative concentration, finite Coulomb potential, …).</li>
+<li><strong>Mixin</strong> – thin, single‑responsibility classes adding orthogonal capabilities (density, charge, surface …).  </li>
+</ul>
 <p>For a broader overview of design patterns, see <a href="../Object_Oriented_Patterns/">Object‑Oriented Patterns</a>.</p>
 <p>Example (combining two kernels):</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
@@ -7730,9 +7732,11 @@ They are the building blocks of the simulation engine. They can be used in a pro
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">combined_strategy</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>Benefits<br />
-* Plug‑and‑play process swapping → perfect for sensitivity studies.<br />
-* Builder validation enforces <strong>Agreeing</strong> (the <em>A</em> in WARMED).</p>
+<p>Benefits</p>
+<ul>
+<li>Plug‑and‑play process swapping → perfect for sensitivity studies.  </li>
+<li>Builder validation enforces <strong>Agreeing</strong> (the <em>A</em> in WARMED).</li>
+</ul>
 <h2 id="naming-conventions">Naming conventions<a class="headerlink" href="#naming-conventions" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Functions</strong> → <code>get_&lt;quantity&gt;[_via_system_state]</code>  </li>
