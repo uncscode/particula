@@ -6815,6 +6815,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting 🛠️
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting 🛠️">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common pitfalls
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#still-stuck-ask-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      Still stuck? Ask a 🤖
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7794,6 +7827,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting 🛠️
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting 🛠️">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common pitfalls
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#still-stuck-ask-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      Still stuck? Ask a 🤖
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7907,6 +7973,39 @@ or pip will also work (guides linked).</p>
 • Want to contribute code?  See the<br />
 <a href="../Contributor_Workflow/">Contributor Workflow</a> and install Particula in
   editable <code>[dev,extra]</code> mode.  </p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting 🛠️<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="common-pitfalls">Common pitfalls<a class="headerlink" href="#common-pitfalls" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong><code>command not found</code> for <code>python</code>, <code>conda</code>, <code>uv</code>, or <code>pip</code></strong><br />
+  The tool is not on your system PATH. Close/re‑open the terminal or follow the
+  installer’s instructions to add it to your environment variables.  </p>
+</li>
+<li>
+<p><strong><code>No module named particula</code></strong><br />
+  You’re running a Python interpreter where Particula isn’t installed.<br />
+  Activate the correct environment (<code>conda activate particula</code>,
+  <code>source .venv/bin/activate</code>, etc.) or select it inside your editor.  </p>
+</li>
+<li>
+<p><strong>C / Fortran compiler missing</strong><br />
+  Some optional dependencies need a compiler.<br />
+  • Windows → “Build Tools for Visual Studio”<br />
+  • macOS → <code>xcode-select --install</code><br />
+  • Linux → <code>sudo apt install build-essential</code> (or your distro equivalent)  </p>
+</li>
+<li>
+<p><strong>“Permission denied” / read‑only file system</strong><br />
+  Work in a directory where you have write permission,
+  or add <code>--user</code> when using <code>pip</code> (less reproducible),<br />
+  or create the environment in your home folder.  </p>
+</li>
+</ul>
+<h3 id="still-stuck-ask-a">Still stuck? Ask a 🤖<a class="headerlink" href="#still-stuck-ask-a" title="Permanent link">&para;</a></h3>
+<p>Copy the error message into a Large‑Language‑Model chat
+(e.g. OpenAI ChatGPT, Claude, Gemini) and request an explanation plus possible
+fixes.</p>
 
 
 
