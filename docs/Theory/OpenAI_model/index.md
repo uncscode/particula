@@ -1,0 +1,80 @@
+# OpenAI & Particula
+
+Particula uses OpenAI models in **three functional layers**.  
+Every request—no matter which model you pick—goes through the same
+retrieval‑augmented‑generation (**RAG**) pipeline:
+
+1. Embed the user prompt and generate additional related search terms. 
+2. Pull the *k* nearest code / doc chunks from the shared vector store.  
+3. Prepend those chunks to the prompt before generating the final answer.
+
+This RAG step is therefore **universal** across all layers.
+
+| Layer | RAG‑assisted purpose | Main Models |
+|-------|----------------------|-------------|
+| [1. Chat](Chat.md) | Conversational & multimodal I/O (vector‑RAG enriched) | gpt‑4o, gpt‑4o‑mini, gpt‑4.1, gpt‑4.1‑mini/‑nano |
+| [2. Reasoning](Reasoning.md) | Tool‑calling, step‑by‑step logic (vector‑RAG enriched) | o1, o3, o3‑mini, o4‑mini |
+| [3. Agent](Agents.md) | Orchestrates Chat ＋ Reasoning with RAG. | ParticulaAgent |
+
+The following pages drill into each layer.
+
+- **[1. Chat](Chat.md)** – conversational generalists, vector‑RAG enriched.
+- **[2. Reasoning](Reasoning.md)** – tool‑calling, step‑by‑step logic, vector‑RAG enriched.
+- **[3. Agent](Agents.md)** – Self‑orchestrating agent that combines Chat ✚ Reasoning with RAG. *Note: this is a work in progress.*
+
+
+_Tip:_ Start with **Chat** for “How do I…?” questions, move to
+**Reasoning** for multi‑step workflows, and let the **Agent**
+orchestrate both in long interactive sessions.
+
+
+### Particula Assistant – OpenAI GPTs (public access)
+
+Anyone can use the public
+[Particula Assistant](https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant).
+It runs the base GPT chat models and is perfect for quick Q&A or simple
+code snippets—no special approval required.
+
+```mermaid
+graph TB
+    U["User"] -->|prompt| CHAT["OpenAI-GPTs"]
+    CHAT -->|tool call| VS[(Vector Store)]
+    VS --> |API/Examples/Theory| CHAT
+    CHAT -->|answer| U
+```
+
+### Particula Chat Beta – advanced models
+
+Access to the advanced GPT‑4.1 and o‑series models
+(both Chat **and** Reasoning) requires a one‑time access request.
+See the link in the GitHub Discussion to apply.
+
+```mermaid
+graph TB
+    U["User"] -->|prompt| REAS["Chat or Reasoning Model"]
+    REAS -->|tool call| VS[(Vector Store)]
+    VS --> |API/Examples/Theory| REAS
+    REAS -->|final answer| U
+```
+
+
+## Other model families & future support
+
+Particula will eventually add adapters for Anthropic Claude, Google Gemini,
+and leading open‑source models (Llama 3, Mixtral, etc.).  For now the docs
+focus on OpenAI because we want to **scale deep before we scale wide**:
+
+1. One provider → one API surface → fewer moving parts while we harden
+   the RAG/tool stack.
+2. Deep optimization of prompt templates, token accounting, error handling
+   and retries is possible only when the target is fixed.
+3. A single deterministic reference model keeps examples, tests and
+   benchmarks reproducible for every contributor.
+
+Once this vertical integration is rock‑solid, adding new providers is a
+matter of writing a thin adapter under the existing chat-interface facade—the
+Agent, RAG retrieval, and prompt logic remain unchanged.
+
+This “depth‑first, breadth‑later” strategy yields robust tools sooner,
+benefiting new users with stability and advanced users with a clear path to
+multi‑vendor redundancy.
