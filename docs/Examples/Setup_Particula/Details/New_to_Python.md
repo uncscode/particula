@@ -66,3 +66,36 @@ Follow their dedicated guides:
 • Want to contribute code?  See the  
   [Contributor Workflow](Contributor_Workflow.md) and install Particula in
   editable `[dev,extra]` mode.  
+
+---
+
+## Troubleshooting 🛠️  
+
+### Common pitfalls  
+
+- **`command not found` for `python`, `conda`, `uv`, or `pip`**  
+  The tool is not on your system PATH. Close/re‑open the terminal or follow the
+  installer’s instructions to add it to your environment variables.  
+
+- **`No module named particula`**  
+  You’re running a Python interpreter where Particula isn’t installed.  
+  Activate the correct environment (`conda activate particula`,
+  `source .venv/bin/activate`, etc.) or select it inside your editor.  
+
+- **C / Fortran compiler missing**  
+  Some optional dependencies need a compiler.  
+  • Windows → “Build Tools for Visual Studio”  
+  • macOS → `xcode-select --install`  
+  • Linux → `sudo apt install build-essential` (or your distro equivalent)  
+
+- **“Permission denied” / read‑only file system**  
+  Work in a directory where you have write permission,
+  or add `--user` when using `pip` (less reproducible),  
+  or create the environment in your home folder.  
+
+### Still stuck? Ask an LLM 🤖  
+
+Copy the full (but scrubbed) error message into a Large‑Language‑Model chat
+(e.g. OpenAI ChatGPT, Claude, Gemini) and request an explanation plus possible
+fixes. Combine the response with the official documentation and open issues on
+GitHub for best results.
