@@ -24,7 +24,7 @@ jobs:
           env:
             TOKEN: ${{ secrets.PUBLIC_PR_PREVIEW }}
           run: |
-            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}" | sed -e "s|$TOKEN|[REDACTED]|"
+            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}"
 
         - name: Check out code
           uses: actions/checkout@v4
