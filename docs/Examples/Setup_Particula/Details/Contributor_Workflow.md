@@ -47,7 +47,7 @@ Either path leaves you with a `particula/` folder containing the source code.
 ## Set Up a Development Environment (`.venv`)
 
 Create an isolated Python environment so development dependencies stay separate from other projects.
-We recommend the lightning‑fast uv tool—see the [uv setup guide](Examples/Setup_Particula/Details/Setup_UV.md) for details.
+We recommend the lightning‑fast uv tool—see the [uv setup guide](../Examples/Setup_Particula/Details/Setup_UV.md) for details.
 
 - **Using uv:** You can create and activate the env in one step:  
    ```bash
