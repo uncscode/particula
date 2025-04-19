@@ -8,6 +8,43 @@ and we are always looking for new ways to improve the project.
 We are also open to any feedback, however small or large,
 and in any area (from documentation to calculation to presentation).
 
+
+Follow this workflow to contribute:
+
+1. **Sync with upstream (optional):** If you want to ensure your fork is up to date with the main repository, add the upstream remote and pull latest changes:  
+   ```bash
+   git remote add upstream https://github.com/uncscode/particula.git
+   git pull upstream main
+   ```  
+   This step is especially important if your fork is older. Skip if you just forked and nothing has changed upstream.
+2. **Create a new branch:** Before making your changes, create a feature branch to isolate your work. For example:  
+   ```bash
+   git checkout -b issue123-fix-simulation
+   ```  
+   Choose a descriptive branch name. If your contribution addresses a specific GitHub issue, include its number (e.g., `issue123...` as shown).
+3. **Make your changes:** Open the project in VS Code (you can run `code .` in the project folder to launch it). Implement your feature or bugfix by editing the relevant files. Save your changes.
+4. **Run tests (optional but recommended):** If the project has tests, run them to ensure your changes don’t break anything. For example, Particula might use pytest:  
+   ```bash
+   pytest
+   ```  
+   Ensure all tests pass before committing.
+5. **Commit your changes:** Stage your modified files and commit with a clear message:  
+   ```bash
+   git add . 
+   git commit -m "Fix simulation time-step logic (Issue #123)"
+   ```  
+   Write a concise commit message that describes **what** you changed and **why**.
+6. **Push the branch to your fork:**  
+   ```bash
+   git push -u origin issue123-fix-simulation
+   ```  
+   The `-u origin <branch>` sets the upstream tracking, so future pushes can be done with just `git push`.
+7. **Open a Pull Request (PR):** Go to your fork on GitHub. You’ll see a prompt to compare & open a pull request for the branch you just pushed. Click that, add a descriptive title and commentary about your changes (mention which issue it fixes, if any), and submit the PR to the upstream repository (the `uncscode/particula` repo’s main branch).
+8. **Respond to feedback:** Maintainers will review your PR. Be prepared to answer questions or make adjustments if requested. Discuss any test failures or requested changes, and push new commits to the same branch; the PR will update automatically.
+
+Congratulations on submitting a contribution! 🎉 Once your pull request is approved and merged, your changes will become part of Particula. Don’t forget to follow our [Code of Conduct](contribute/CODE_OF_CONDUCT.md) when interacting in the community. For more detailed guidelines on contributing (coding style, commit conventions, etc.), see the full [Contributor Guidelines](contribute/CONTRIBUTING.md) in the documentation.
+
+
 ---
 
 The cycle of contribution goes something like this:
