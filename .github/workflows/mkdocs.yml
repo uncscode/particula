@@ -52,7 +52,10 @@ jobs:
           if: ${{ github.event_name == 'pull_request' }}
           uses: rossjrw/pr-preview-action@v1
           with:
+            token: ${{ secrets.PUBLIC_PR_PREVIEW }}
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
             deploy-repository: uncscode/public-pr-preview
             preview-branch: particula-preview
-            token: ${{ secrets.PUBLIC_PR_PREVIEW }}
+                  
+        - name: Debug Token
+          run: echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}" | sed -e "s|$TOKEN|[REDACTED]|"
