@@ -37,7 +37,7 @@ Thanks for thinking about contributing! Our goal is to make your first pull requ
    |------|----------|---------|
    | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](Setup_UV.md) |
    | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](Setup_Pip.md) |
-   | **conda** | `conda create -n particula-dev python=3.11`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](Setup_Conda.md) |
+   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](Setup_Conda.md) |
 
 5. **Verify installation**  
    ```bash
