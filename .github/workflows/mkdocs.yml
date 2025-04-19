@@ -53,3 +53,6 @@ jobs:
           uses: rossjrw/pr-preview-action@v1
           with:
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
+            deploy-repository: uncscode/public-pr-preview
+            preview-branch: particula-preview
+            token: ${{ secrets.PUBLIC_PR_PREVIEW }}
