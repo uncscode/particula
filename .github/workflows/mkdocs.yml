@@ -55,13 +55,6 @@ jobs:
             branch: gh-pages
             folder: site  # Assuming mkdocs build output is the default 'site' directory
 
-                  
-        - name: Debug Token
-          env:
-            TOKEN: ${{ secrets.PUBLIC_PR_PREVIEW }}
-          run: |
-            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}" | sed -e "s|$TOKEN|[REDACTED]|"
-
         - name: Preview Documentation (on PR)
           if: ${{ github.event_name == 'pull_request' }}
           uses: rossjrw/pr-preview-action@v1
