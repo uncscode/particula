@@ -120,7 +120,7 @@ Concrete subclasses must implement them or Python raises a clear error.
 
 ### 2.8 Composition > Inheritance
 
-“Favour composition over inheritance” is the golden rule that keeps Particula’s
+“Favor composition over inheritance” is the golden rule that keeps Particula’s
 class tree shallow.  
 Instead of a deep hierarchy like
 
@@ -151,7 +151,7 @@ Benefits
 
 ---
 
-### 2.9 Behaviour, abstraction & naming rules
+### 2.9 Behavior, abstraction & naming rules
 
 Particula leans on the four classic OO pillars:  
 
@@ -159,7 +159,7 @@ Particula leans on the four classic OO pillars:
 |-----------------|----------------------------------------------------------------------------------|
 | Encapsulation   | State + behaviour live together (`ParticleRepresentation.get_radius()` uses its own density). |
 | Abstraction     | Public API says *what* (“get mass”), strategies hide *how* (Brownian vs Gopalakrishnan). |
-| Inheritance     | Kept minimal—mainly `ABC` bases and tiny mixins.                                 |
+| Inheritance     | Kept minimal—mainly `ABC` bases and tiny mixins. Used for defining interfaces for strategies   |
 | Polymorphism    | Swap one `DistributionStrategy` for another without touching calling code.       |
 
 Naming quick‑ref (matches the repo‑wide conventions):  
@@ -205,10 +205,21 @@ without touching more than a single, well‑contained file.
 
 ---
 
-## 5. Further reading/watching
+## 5. Further Information
+
+### YouTube videos
+
+* Firebase's video on [Design Patterns](https://www.youtube.com/watch?v=tv-_1er1mWI) – a great introduction to the most common patterns.
+* CodeAesthetic
+  * [Abstraction](https://youtu.be/rQlMtztiAoA?si=6TDwFUwg4eW1fBGf)
+  * [Naming](https://youtu.be/-J3wNP6u5YU?si=TJhsetZA-9u6rhjK)
+  * [The Flaws of Inheritance](https://youtu.be/hxGOiiR9ZKg?si=1ylStcpG8sfMze2z)
+* ThePrimeagen's
+  * [Design Patterns](https://www.youtube.com/watch?v=ZfG8BSTX0Lw) – 8 Design Patterns | Prime Reacts.
+  * [Why Python](https://youtu.be/8D7FZoQ-z20?si=FdjNVtkhJImK9zHJ) - Why Python | ThePrimeagen Reacts.
+
+### Reading
 
 * The [WARMED principle](Warmed_principle.md) – Particula’s philosophy for writing readable, swap‑friendly scientific code.
-* Firebase's video on [Design Patterns](https://www.youtube.com/watch?v=tv-_1er1mWI) – a great introduction to the most common patterns.
-* ThePrimeagen's [Design Patterns](https://www.youtube.com/watch?v=ZfG8BSTX0Lw) – 8 Design Patterns | Prime Reacts.
 * [Object‑Oriented Patterns](https://refactoring.guru/design-patterns) – an expanded overview of design patterns in general.
 * [Design Patterns: Elements of Reusable Object‑Oriented Software](https://www.oreilly.com/library/view/design-patterns-elements/0201633612/) – the classic book by Gamma et al. (1994).
