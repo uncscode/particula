@@ -1,143 +1,187 @@
-# Contributor Guidelines
+## Contributing to **Particula**
 
-First of all, thank you for considering contributing to this project!
-While we have specific guidelines below, _we also encourage you to
-contribute to the best of your ability and not let these guidelines
-hinder your productivity and creativity_. We are open to any contribution,
-and we are always looking for new ways to improve the project.
-We are also open to any feedback, however small or large,
-and in any area (from documentation to calculation to presentation).
+Thanks for thinking about contributing! Our goal is to make your first pull request (PR) smooth—whether you are brand‑new to open‑source or a seasoned developer.
 
 ---
 
-The cycle of contribution goes something like this:
+### 1. Choose the Right Path
 
-1. See if there is an issue open that you can help with.
-If there is not one, please open one.
-
-2. Create a personal fork of this repository;
-and in it, create a branch (from `uncscode:main`)
-with the `issue000` in the name of the branch
-(e.g. `username/issue000` or `issue000`),
-where `000` is the number of the issue from step 1.
-
-3. Set up an appropriate environment:
-    - an easy option is just to use the `.devcontainer` in root
-    - another option is to either `pip install` or `conda install`
-    the packages required for development in `requirements.txt` in root.
-
-4. Write your code in the branch. This usually includes the following.
-
-    a. Code to be implemented.
-
-    b. Documentation associated with added code in a.
-
-    c. Tests associated with added code in a.
-
-    d. Ideally, you'd also add a Jupyter notebook to
-    showcase your work (if applicable).
-
-5. _Optionally_, you can run standard linting and testing calls
-on your code _locally_ to make sure it works as expected.
-This can be done in several ways,
-for example the `pylint`, `flake8`, and `pytest` calls below.
-These calls will be run once you submit your pull request.
-
-6. Submit a pull request to the `main` branch of this repository.
-Upon submission, standard automated tests will be run on your code.
-
-7. If you don't hear back from maintainers,
-feel free to mention one of us directly in the comments of the PR.
-Expect to have speedy feedback and help from us to finalize the PR.
-
-```bash
-pylint $(find particula/ -name "*.py" | xargs)
-```
-
-```bash
-flake8 particula/ --count
-```
-
-```bash
-pytest particula/
-```
+| You are… | Start here |
+|----------|-----------|
+| **Experienced with Git + Python** | Jump straight to [Github workflow](#3-github-flow) below. |
+| **New to GitHub or virtual‑envs** | Follow [setup for new contributors](#2-setup-for-new-contributors) first, then the workflow. |
+| **Planning to contribute major code or new features** | Read **Coding Standards & Review Expectations** at the end before you begin. |
 
 ---
 
-More information about contributing to this project can be found below.
-We are excited and looking forward to your contribution!
+### 2. Setup for New Contributors
+
+> _If you already have Python, Git, and a preferred editor, skim this section._
+
+1. **Install Git & VS Code**  
+   * Git: <https://git‑scm.com/downloads>  
+   * VS Code: <https://code.visualstudio.com/> (recommended extensions: _Python_, _GitHub Pull Requests & Issues_).
+
+2. **Fork the repository**  
+   Click **Fork** on <https://github.com/uncscode/particula>. This creates `yourname/particula`.
+
+3. **Clone your fork**  
+   ```bash
+   git clone https://github.com/<your‑username>/particula.git
+   cd particula
+   ```
+
+4. **Create a virtual environment** (pick **one**)
+
+   | Tool | Command | Instructions |
+   |------|----------|---------|
+   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](/Examples/Setup_Particula/Details/Setup_UV/) |
+   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](/Examples/Setup_Particula/Details/Setup_Pip/) |
+   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](/Examples/Setup_Particula/Details/Setup_Conda/) |
+
+5. **Verify installation**  
+   ```bash
+   pytest -q    # all tests should pass
+   particula --help
+   ```
 
 ---
 
-## GitHub
+### 3. GitHub Flow
 
-We use GitHub to develop `particula` completely in the open. Our repository is available here: [https://uncscode.github.io/particula/](https://uncscode.github.io/particula/).
-There are several ways to use GitHub: through the command line via `git` and/or `gh`, through the web interface and/or the GitHub web editor, or through an IDE like PyCharm or a code editor like Visual Studio Code.
-In general, we recommend that you fork our repository, that you work with VS Code, and that submit a pull request based on an issue.
-If any of these sound unfamiliar or if you need help, please see more information below and feel free to contact us directly to discuss options.
-We look forward to getting you started and up to speed on this project with us!
+| Step | What you do | Why |
+|------|-------------|-----|
+| 1 | **Fork → Clone → Set up `.venv` → `pip install -e ".[dev,extra]"`** | Gives you a local, editable checkout with all dev tools. |
+| 2 | **Sync with upstream**<br>(keeps your `main` current) | Avoids merge conflicts later. |
+| 3 | **Create a feature branch** | Isolates your work and makes the PR easy to review. |
+| 4 | **Theory → Code → Test → Examples** | Adds value without breaking existing functionality. |
+| 5 | **Commit + Push** to your fork | Publishes your branch to GitHub. |
+| 6 | **Open a Pull Request** to `uncscode/particula` | Starts the review & CI pipeline. |
+| 7 | **Discuss & Iterate** with reviewers | Polishes the contribution. |
+| 8 | **Merge** (done by maintainer) | Your code lands in `main`. |
+| 9 | **Delete branch** (optional) | Keeps your fork tidy. |
+| 10 | **Celebrate** 🎉 | You just helped improve **Particula**! |
 
-Links: [https://docs.github.com/en/get-started](https://docs.github.com/en/get-started)
+#### Expanded GitHub Flow
 
-## VS Code
-
-Visual Studio Code is a free and open-source code editor for writing code and it has a rich ecosystem of extensions that allow you to write code in a variety of languages with a lot of helpful features and tools.
-
-Links: [https://code.visualstudio.com/](https://code.visualstudio.com/)
-
-## Python code style
-
-We follow the Google's Python style guide.
-We encourage you to follow it too, but we also encourage you to contribute to the best of your ability and not let these guidelines hinder your productivity and creativity.
-
-Links: [https://google.github.io/styleguide/pyguide.html](https://google.github.io/styleguide/pyguide.html)
-
-## Running `particula` locally
-
-Once you are in the root directory, you will be able to import `particula` as a package/model and thus all documentation on website applies.
-You must be in the root directory.
-
-## Writing tests
-
-It is essential that every piece of code has an associated test.
-This is a good way to ensure that the code is working as intended.
-It also ensures that the code is not broken and that the code is not too complex.
-However small or big, a test is always required.
-
-## Running testing/linting locally
-
-We use `pytest`, `pylint`, and `flake8` to run tests and linting.
-The command below can be run in the root directory like you'd run the package above.
+**Step 1 – Fork → Clone → Environment**
 
 ```bash
-pylint $(find particula/ -name "*.py" | xargs)
+# (on GitHub) click Fork, then:
+git clone https://github.com/<your‑username>/particula.git
+cd particula
+
+# create and activate a virtual env (pick one method)
+python -m venv .venv           # or: uv venv .venv   |   conda create -n particula-dev python=3.11
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+
+# install in editable (dev) mode
+pip install -e ".[dev,extra]"
 ```
+
+**Step 2 – Sync your fork with upstream (repeat as needed)**
 
 ```bash
-flake8 particula/ --count
+git remote add upstream https://github.com/uncscode/particula.git   # one‑time
+git checkout main
+git pull upstream main
+git push origin main
 ```
+
+**Step 3 – Create a feature branch**
 
 ```bash
-pytest particula/
+git checkout -b issue123-fix-simulation
 ```
 
-## Building `particula` locally
 
-To build `particula` locally, you must be in the root directory.
-You have two options, depending on your usage case.
+**Step 4 – Theory → Code → Test → Examples**
 
-1. You can use `python -m build` to build the package wheels locally (note: you will need to install `build` too, via `pip install build`).
-2. You can build the conda recipe available at [https://github.com/conda-forge/particula-feedstock](https://github.com/conda-forge/particula-feedstock) either via `python build-locally.py` in the root of `particula-feedstock` or via `conda build recipe` (equivalently, but faster, `mamba build recipe`). For the latter, you will need to have `conda-build` installed (for `conda build` to work) or `boa` (for `mamba build` to work). In either case, you can install package with conda via, `conda install conda-build` or `mamba install boa`.
+```bash
+# run unit tests with warnings treated as errors
+pytest -Werror
+```
 
-Links: [https://packaging.python.org/en/latest/tutorials/packaging-projects/](https://packaging.python.org/en/latest/tutorials/packaging-projects/) and [https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html](https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html)
+* Add/adjust tests in `*/tests/`.  
+* Update docstrings & MkDocs pages for any behavior change.
 
-## Documentation writing
 
-We prefer that the tutorials are written in the form of Jupyter notebooks after the package is released and published.
-A convenient option is using Google's Colaboratory to write the notebooks.
+**Step 5 – Commit & push**
 
-Links: [https://colab.research.google.com/](https://colab.research.google.com/)
+```bash
+git add .
+git commit -m "FIX #123: timestep rollover in simulation"
+git push -u origin issue123-fix-simulation
+```
 
-## More information
 
-We will update this regularly with more information, but in the meanwhile, please feel free to contact us directly on GitHub.
+**Step 6 – Open a Pull Request**
+
+* Go to your fork → **Compare & pull request**.  
+* Fill in the PR template; mark as **Draft** for early feedback if desired.
+
+
+**Step 7 – Discuss & iterate**
+
+* GitHub Actions runs tests (`pytest -Werror`), linters (`flake8`, `pylint`), and docs build automatically.  
+* Push additional commits to the same branch—CI re‑runs and the PR updates.
+
+
+**Step 8 – Merge**  
+When CI is green and reviews are approved, a maintainer will merge your PR into `main`.
+
+
+**Step 9 – Delete your branch** (Optional)
+
+```bash
+# delete remote branch
+git push origin --delete issue123-fix-simulation
+# delete local branch
+git branch -d issue123-fix-simulation
+```
+
+
+**Step 10 – Celebrate!** 🎉  
+Your contribution is now part of **Particula**—thank you!
+
+---
+
+### 4. Coding Standards & Review Expectations
+
+| Topic | Rule |
+|-------|------|
+| **Style** | Black + Ruff (configured in *pyproject.toml*). No manual formatting needed—run `pre-commit`. |
+| **Docstrings** | Google‑style, one‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Example`, `References`). |
+| **Typing** | Use `typing` annotations (PEP 484). Omit types in docstrings. |
+| **Tests** | Every public function/class must have at least one `pytest` test. Aim for coverage ≥ 90 %. |
+| **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
+| **Large changes** | Open an **discussion** first and discuss design before implementation. |
+
+---
+
+### 5. Common Commands
+
+*one‑liners you can copy‑paste*
+
+| Purpose | Command |
+|---------|---------|
+| **Quick unit tests** | `pytest -q -Werror` |
+| **Run tests in parallel** | `pytest -Werror` |
+| **Static type‑checking (pytype, Mac/Linux)** | `pytype particula` |
+| **Black auto‑format (79 cols)** | `black . --line-length 79` |
+| **Flake8 lint** | `flake8 . --config .github/.flake8` |
+| **Pylint lint** | `pylint particula` |
+
+> **CI note:** Every pull request triggers **GitHub Actions** (Ubuntu / macOS / Windows).  
+> The workflow runs `pytest -n auto -Werror`, `flake8`, `pylint`, `pytype`, builds the docs, and checks coverage.  
+> Any warning promoted to an error (via `-Werror`) or other failure marks the PR ❌. Click **“Details →”** beside the failing job to view logs, fix locally, push again, and the checks will re‑run automatically.
+
+---
+
+### 6. Need Help?
+
+* **Questions:** open a “Discussion” or tag a maintainer in your PR.  
+* **Stuck on Git?** Try `git status`, `git restore`, or ask for pairing in the chat.  
+* **Broken tests on CI?** Click “Details” next to the failing job; logs usually point to the exact line.
+
+We appreciate every contribution—code, docs, tests, or ideas. Welcome to the **Particula** community! 🎉
