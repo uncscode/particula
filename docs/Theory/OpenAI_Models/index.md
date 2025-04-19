@@ -1,8 +1,9 @@
-# OpenAI & Particula
+# OpenAI Models
 
-High‑quality API docstrings, runnable examples, and deep theory notes are not mere decoration in Particula—they are the very “fuel” of the retrieval‑augmented‑generation (RAG) pipeline.  Every one of those text chunks is embedded and stored in the shared vector database; when a user asks a question the RAG step pulls them back and feeds them to the model.  The clearer and more complete those chunks are, the more precise and executable the answers and Python simulation code the model can generate.  Improving documentation therefore directly improves the intelligence of the assistant.
+High‑quality API docstrings, runnable examples, and deep theory notes are not mere decoration in Particula—they are the very “fuel” of the OpenAI models and retrieval‑augmented‑generation (RAG) pipeline. Every one of those text chunks is embedded and stored in the shared vector database; when a user asks a question the RAG step pulls them back and feeds them to the model.  The clearer and more complete those chunks are, the more precise and executable the answers and Python simulation code the model can generate.  Improving documentation therefore directly improves the context and domain intelligence of the models.
 
 Particula uses OpenAI models in **three functional layers**.  
+
 Every request—no matter which model you pick—goes through the same
 retrieval‑augmented‑generation (**RAG**) pipeline:
 
@@ -26,8 +27,7 @@ The following pages drill into each layer.
 
 
 _Tip:_ Start with **Chat** for “How do I…?” questions, move to
-**Reasoning** for multi‑step workflows, and let the **Agent**
-orchestrate both in long interactive sessions.
+**Reasoning** for multi‑step workflows.
 
 
 ### Particula Assistant – OpenAI GPTs (public access)
@@ -45,11 +45,12 @@ graph TB
     CHAT -->|answer| U
 ```
 
-### Particula Chat Beta – advanced models
+### Particula Chat Beta – advanced models (via access request)
 
 Access to the advanced GPT‑4.1 and o‑series models
 (both Chat **and** Reasoning) requires a one‑time access request.
-See the link in the GitHub Discussion to apply.
+See the link in the GitHub [Discussions](https://github.com/uncscode/particula/discussions) to apply, then login with GitHub at [Particula Chat Beta](https://particula-rag.fly.dev/closed_beta).
+
 
 ```mermaid
 graph TB
