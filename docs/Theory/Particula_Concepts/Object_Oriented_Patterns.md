@@ -1,7 +1,8 @@
 
-# Object‑Oriented Patterns in Particula
+# Object‑Oriented Patterns
 
-Particula mixes a functional “core” with a small, carefully chosen set of object‑oriented design patterns.  
+Particula mixes a functional “core” with a small, carefully chosen set of object‑oriented design patterns.
+
 The goal is to give **researchers who are new to programming** a mental map for how the library is organized and why certain classes look the way they do.
 
 ---

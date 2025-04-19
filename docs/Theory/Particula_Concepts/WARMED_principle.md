@@ -1,4 +1,4 @@
-# The WARMED Developer Principle
+# WARMED Code
 
 *A concise philosophy for building and maintaining Particula.*
 

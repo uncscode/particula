@@ -1,4 +1,4 @@
-# Design Patterns in Particula
+# Particula Design
 
 Particula purposefully sticks to **two complementary coding paradigms** so users can pick the style that fits their workflow.
 
