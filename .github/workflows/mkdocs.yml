@@ -19,6 +19,13 @@ jobs:
       group: "pages"
       cancel-in-progress: true
     steps:
+
+        - name: Debug Token
+          env:
+            TOKEN: ${{ secrets.PUBLIC_PR_PREVIEW }}
+          run: |
+            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}" | sed -e "s|$TOKEN|[REDACTED]|"
+
         - name: Check out code
           uses: actions/checkout@v4
           with: 
