@@ -1,95 +1,56 @@
-# Index: Setup Particula
+# Setup Particula
 
-## Getting Started with Python
+Welcome!  Choose the route that matches your comfort level:
 
-If you are new to Python, it's highly recommended to go through an introductory course to build a solid foundation. "Python for Everybody" is an excellent free resource that covers the basics and beyond:
+* I already use Python every day → **_Quick‑start for Experienced Users_**
+* I’m new to Python → [**_Guide for New Users_**](Details/New_to_Python.md)
+* I want to contribute to Particula → [**_Contributing to Particula_**](Details/Contributor_Workflow.md)
 
-- Access the course and materials at [Python for Everybody](https://www.py4e.com/).
+---
 
+## Quick‑start for Experienced Users
 
-## Setting Up Your Development Environment
+### Create Isolated Environment
+  
+   *See the [conda](Details/Setup_Conda.md), [pip](Details/Setup_PIP.md), or [uv](Details/Setup_UV.md) guides for exact commands.*
 
-**Step 1: Install Visual Studio Code (VSCode)**
+### Install Particula
 
-To edit and manage your code efficiently, download and install Visual Studio Code, a popular code editor that supports Python and many other languages.
+If your Python Environment is already set up, install Particula directly using one of the following methods:
 
-- Visit the [Visual Studio Code website](https://code.visualstudio.com/) to download the installer for Windows.
-- Follow the installation prompts to install VSCode on your machine.
-- Once installed, launch VSCode to configure it for Python development.
-
-**Step 2: Install Miniconda**
-
-Install Miniconda, which includes Conda, a powerful package and environment manager. This tool will help you manage different project dependencies separately and efficiently.
-
-- Download Miniconda for Windows from [Miniconda's website](https://docs.conda.io/en/latest/miniconda.html).
-- Follow the installation instructions to install Miniconda on your system.
-
-**Step 3: Install Git**
-
-Install Git to manage your code repositories effectively. Git is a version control system that lets you track changes, revert to previous stages, and collaborate on projects with others.
-
-- Download Git from [Git's official website](https://git-scm.com/download/win).
-- Run the downloaded file to start the installation.
-- During the installation, choose your preferred editor for Git, and make sure to select "Git from the command line and also from 3rd-party software" to ensure it integrates well with your system's command prompt.
-- Complete the installation by following the on-screen instructions.
-
-Once installed, you can verify the installation by opening a command prompt or terminal and typing `git --version`, which should display the installed version of Git.
-
-**Step 4: Setup Proxy**
-
-If you are behind a proxy, you may need to configure your proxy settings to allow Conda, Pip, git, and VScode to access the internet.
-
-
-**Step 5: Create a New Python Environment**  
-
-Avoid conflicts with other development projects by creating an isolated Python environment. Here’s how:
-
-- Open VSCode, then open the integrated terminal (`Terminal > New Terminal`).
-  - Be sure to select `cmd` for command prompt.
-- Use the following Conda command to create an environment named `analysisV1` with Python:
+#### :simple-uv: Fast Rust-Based Python Package Manager
 
 ```bash
-conda create --name analysisV1 python=3.12
+uv pip install particula                   # uv ≈ pip drop‑in
 ```
 
-**Step 6: Activate the Environment**  
+with optional extras:
+```bash
+uv pip install "particula[extra]"
+```
 
-Ensure you’re working within the context of your new environment:
-- In the VSCode terminal, activate your environment by running:
+#### :simple-pypi: PyPI Installation
 
 ```bash
-conda activate analysisV1
+pip install particula                   # PyPI
 ```
 
-## Installing the Project
+with optional extras:
+```bash
+pip install "particula[extra]"
+```
 
-**Step 7: Install the Project**
 
-Now, install the `Particula` in your activated environment, use one of the following methods:
-
-### Install the package using pip or conda
+#### :simple-condaforge: Conda Installation
 
 ```bash
-pip install particula
-```
-
-To include the optional dependencies used in the tutorial examples, use the following command:
-
-```bash
-pip install particula[extra]
-```
-
-or, if using conda to install `Particula`:
-```
 conda install -c conda-forge particula
 ```
 
-To include the optional dependencies used in the tutorial examples, use the following command:
-```
+Optional extras:
+```bash
 conda install -c conda-forge particula matplotlib pandas tqdm pint 
 ```
-### or Install the main repository or any forked repository
 
-```bash
-pip install git+https://github.com/uncscode/particula.git
-```
+---
+
