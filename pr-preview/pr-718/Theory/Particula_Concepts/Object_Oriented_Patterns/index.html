@@ -7065,6 +7065,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#naming-quickreference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Naming quick‑reference
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#3-how-the-patterns-cooperate" class="md-nav__link">
     <span class="md-ellipsis">
       3. How the patterns cooperate
@@ -7808,6 +7817,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#naming-quickreference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Naming quick‑reference
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#3-how-the-patterns-cooperate" class="md-nav__link">
     <span class="md-ellipsis">
       3. How the patterns cooperate
@@ -8003,7 +8021,7 @@ Instead of a deep hierarchy like</p>
 </tr>
 </tbody>
 </table>
-<p>Naming quick‑ref (matches the repo‑wide conventions):  </p>
+<h2 id="naming-quickreference">Naming quick‑reference<a class="headerlink" href="#naming-quickreference" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Functions that <em>return a value</em> → <code>get_&lt;quantity&gt;()</code>  </li>
 <li>Classes that <em>encapsulate a pattern</em> → <code>&lt;Descriptor&gt;&lt;PatternName&gt;</code><br />
@@ -8048,13 +8066,13 @@ more effective for beginners.</p>
 </tr>
 <tr>
 <td>Factory</td>
-<td><code>*Factory.create()</code></td>
+<td><code>*Factory.get_strategy()</code></td>
 <td>One‑line object creation</td>
 </tr>
 <tr>
 <td>Decorator</td>
-<td><code>@validate_inputs</code>, <code>@time_it</code></td>
-<td>Adds checks/logging around a function</td>
+<td><code>@validate_inputs</code></td>
+<td>Adds checks around a function</td>
 </tr>
 <tr>
 <td>Mixin</td>
@@ -8063,13 +8081,13 @@ more effective for beginners.</p>
 </tr>
 <tr>
 <td>ABC</td>
-<td>Classes inheriting from <code>ABC</code></td>
+<td>Classes inheriting from <code>*ABC</code></td>
 <td>Enforces required methods/interfaces</td>
 </tr>
 <tr>
 <td>Template</td>
 <td><code>RunnableSequence</code> + <code>RunnableABC</code></td>
-<td>Fixed loop, custom step</td>
+<td>Fixed loop, custom steps</td>
 </tr>
 </tbody>
 </table>
