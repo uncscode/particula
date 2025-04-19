@@ -8,7 +8,7 @@ hide:
 
 # Particula
 
-## What is Particula?
+## What is Particula anyway?
 
 Particula is an open-source, Python-based aerosol simulator that bridges experimental data with computational models. It captures gas-particle interactions, transformations, and dynamics to power **predictive aerosol science**—so you can uncover deeper insights and accelerate progress.
 
@@ -41,7 +41,9 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 ---
 
 ### :simple-pypi: PyPI Installation
+
 If your Python environment is already set up, install Particula directly from PyPI:
+
 ```shell
 pip install particula
 ```
@@ -49,6 +51,7 @@ pip install particula
 ### :simple-condaforge: Conda Installation
 
 Alternatively, you can install Particula using conda:
+
 ```shell
 conda install -c conda-forge particula
 ```

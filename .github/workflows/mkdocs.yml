@@ -19,6 +19,13 @@ jobs:
       group: "pages"
       cancel-in-progress: true
     steps:
+
+        - name: Debug Token
+          env:
+            TOKEN: ${{ secrets.PUBLIC_PR_PREVIEW }}
+          run: |
+            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}"
+
         - name: Check out code
           uses: actions/checkout@v4
           with: 
@@ -49,7 +56,10 @@ jobs:
             folder: site  # Assuming mkdocs build output is the default 'site' directory
 
         - name: Preview Documentation (on PR)
-          if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+          if: ${{ github.event_name == 'pull_request' }}
           uses: rossjrw/pr-preview-action@v1
           with:
+            token: ${{ secrets.PUBLIC_PR_PREVIEW }}
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
+            deploy-repository: uncscode/public-pr-preview
+            preview-branch: particula-preview
