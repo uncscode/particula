@@ -211,13 +211,8 @@ without touching more than a single, well‑contained file.
 ### YouTube videos
 
 - Firebase's video on [Design Patterns](https://www.youtube.com/watch?v=tv-_1er1mWI) – a great introduction to the most common patterns.
-- CodeAesthetic
-    - [Abstraction](https://youtu.be/rQlMtztiAoA?si=6TDwFUwg4eW1fBGf)
-    - [Naming](https://youtu.be/-J3wNP6u5YU?si=TJhsetZA-9u6rhjK)
-    - [The Flaws of Inheritance](https://youtu.be/hxGOiiR9ZKg?si=1ylStcpG8sfMze2z)
-- ThePrimeagen's
-    - [Design Patterns](https://www.youtube.com/watch?v=ZfG8BSTX0Lw) – 8 Design Patterns | Prime Reacts.
-    - [Why Python](https://youtu.be/8D7FZoQ-z20?si=FdjNVtkhJImK9zHJ) - Why Python | ThePrimeagen Reacts.
+- CodeAesthetic: [Abstraction](https://youtu.be/rQlMtztiAoA?si=6TDwFUwg4eW1fBGf), [Naming](https://youtu.be/-J3wNP6u5YU?si=TJhsetZA-9u6rhjK), [The Flaws of Inheritance](https://youtu.be/hxGOiiR9ZKg?si=1ylStcpG8sfMze2z).
+- ThePrimeagen's: [Design Patterns](https://www.youtube.com/watch?v=ZfG8BSTX0Lw) – 8 Design Patterns; [Why Python](https://youtu.be/8D7FZoQ-z20?si=FdjNVtkhJImK9zHJ) - Why Python.
 
 ### Reading
 
