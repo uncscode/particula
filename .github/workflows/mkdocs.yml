@@ -48,6 +48,11 @@ jobs:
             branch: gh-pages
             folder: site  # Assuming mkdocs build output is the default 'site' directory
 
+                  
+        - name: Debug Token
+          run: |
+            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}" | sed -e "s|$TOKEN|[REDACTED]|"
+      
         - name: Preview Documentation (on PR)
           if: ${{ github.event_name == 'pull_request' }}
           uses: rossjrw/pr-preview-action@v1
@@ -56,6 +61,3 @@ jobs:
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
             deploy-repository: uncscode/public-pr-preview
             preview-branch: particula-preview
-                  
-        - name: Debug Token
-          run: echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}" | sed -e "s|$TOKEN|[REDACTED]|"
