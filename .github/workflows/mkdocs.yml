@@ -55,5 +55,4 @@ jobs:
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
             deploy-repository: uncscode/public-pr-preview
             preview-branch: particula-preview
-            # secret
             token: ${{ secrets.PUBLIC_PR_PREVIEW }}
