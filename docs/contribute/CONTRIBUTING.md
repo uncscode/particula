@@ -16,7 +16,7 @@ Thanks for thinking about contributing! Our goal is to make your first pull requ
 
 ### 2. Setup for New Contributors
 
-> _If you already have Python ≥ 3.9, Git, and a preferred editor, skim this section._
+> _If you already have Python, Git, and a preferred editor, skim this section._
 
 1. **Install Git & VS Code**  
    * Git: <https://git‑scm.com/downloads>  
