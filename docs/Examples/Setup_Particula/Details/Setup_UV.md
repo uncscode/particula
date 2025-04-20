@@ -3,9 +3,9 @@
 **uv** (by Astral) is a modern, Rust‑powered replacement for *both* `pip` and
 `virtualenv`.
 
-• Up to **10 × faster** installs & upgrades (parallel resolver + global cache)  
-• One tool for **creating environments *and* installing** packages  
-• **Drop‑in syntax** – just say `uv pip …` where you would normally use `pip`  
+- Up to **10 × faster** installs & upgrades (parallel resolver + global cache)  
+- One tool for **creating environments *and* installing** packages  
+- **Drop‑in syntax** – just say `uv pip …` where you would normally use `pip`  
 
 If you have never used a Python package manager before, uv combines the jobs of Conda and pip.  See the official [uv documentation](https://docs.astral.sh/uv/) for all options.
 
