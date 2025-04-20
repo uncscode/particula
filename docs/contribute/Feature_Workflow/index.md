@@ -14,12 +14,12 @@ The overall workflow for adding a new feature to the library is as follows:
    - Add manuscripts or references to contextualize the feature and equations to implement.
    - Discuss the feature with the community to gather feedback and suggestions.
    - Get the okay from the maintainer(s) to proceed with the implementation.
-2. **Add Theory**: Write the theory behind the feature. See [Add Theory](Add_Theory.md).
-3. **Add Functions**: Write the functions that implement the feature. See [Add Functions](Add_Function.md).
-4. **Add Unit Tests for Functions**: Write unit tests to ensure the function works as intended. See [Add Unit Tests](Add_Unit_Test.md).
-5. **Add Class**: Write the class that implements the functions. See [Add Class](Add_Class.md).
-6. **Add Unit Tests for Class**: Write unit tests for the class to ensure it works as intended. See [Add Unit Tests](Add_Unit_Test.md).
-7. **Add to `__init__`**: Add the new functions/class to the `__init__.py` file to make it accessible from the package. See [Add to init](Add_to_init.md). 
-8. **Examples**: Write examples to demonstrate the feature. See [Add Examples](Add_Example.md).
+2. [Add Theory](Add_Theory.md): Write the theory behind the feature.
+3. [Add Functions](Add_Function.md): Write the functions that implement the feature.
+4. [Add Unit Tests](Add_Unit_Test.md): Write unit tests to ensure the function works as intended.
+5. [Add Class](Add_Class.md): Write the class that implements the functions.
+6. [Add Unit Tests](Add_Unit_Test.md): Write unit tests for the class to ensure it works as intended.
+7. [Add to init](Add_to_init.md): Add the new functions/class to the `__init__.py` file to make it accessible from the package.
+8. [Add Examples](Add_Example.md): Write examples to demonstrate the feature.
 
 > _Note:_ Each step would be one or more issues, e.g., one for the theory, 1+ for the functions, etc.
