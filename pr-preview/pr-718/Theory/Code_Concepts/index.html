@@ -7804,8 +7804,10 @@
 
 
 <h1 id="code-concepts">Code Concepts<a class="headerlink" href="#code-concepts" title="Permanent link">&para;</a></h1>
-<p>This section is the conceptual overview of the Particula codebase—what design ideas we
-follow, why we follow them, and where you can dig deeper.</p>
+<p>This section is the conceptual overview of the Particula codebase—what design ideas we follow, why we follow them, and where you can dig deeper.</p>
+<blockquote>
+<p>If something feels unclear, ask and contribute to an issue or PR—improving the docs is a meaningful contribution.</p>
+</blockquote>
 <h2 id="why-read-this">Why read this?<a class="headerlink" href="#why-read-this" title="Permanent link">&para;</a></h2>
 <ul>
 <li>You want to <em>extend</em> Particula without breaking existing work.  </li>
@@ -7840,13 +7842,12 @@ follow, why we follow them, and where you can dig deeper.</p>
 </tbody>
 </table>
 <h2 id="naming-rules-tldr">Naming rules (TL;DR)<a class="headerlink" href="#naming-rules-tldr" title="Permanent link">&para;</a></h2>
-<p>• Functions that <em>return a value</em> → <code>get_&lt;quantity&gt;()</code><br />
-• Classes that <em>encapsulate a pattern</em> → <code>&lt;Descriptor&gt;&lt;PatternName&gt;</code>  </p>
+<ul>
+<li>Functions that <em>return a value</em> → <code>get_&lt;quantity&gt;()</code>  </li>
+<li>Classes that <em>encapsulate a pattern</em> → <code>&lt;Descriptor&gt;&lt;PatternName&gt;</code>  </li>
+</ul>
 <p>Keeping to these names makes <code>grep</code>, IDE auto‑completion, and LLM help far more
 effective for beginners and experts alike.</p>
-<hr />
-<p>Happy hacking! If something feels unclear, ask and contribute to an issue or PR—improving the
-docs is a meaningful contribution.</p>
 
 
 
