@@ -57,3 +57,10 @@ Released alongside o3, optimized for speed & efficiency.
 99.5 % AIME‑2025 pass rate with Python interpreter, very low latency.  
 
 **Use for:** high‑volume or real‑time multimodal apps (edu tools, live autograding).
+
+---
+
+Reference:
+
+- [OpenAI Docs](https://platform.openai.com/docs/models)
+- [OpenAI o3 o4-mini press release](https://openai.com/index/introducing-o3-and-o4-mini/)

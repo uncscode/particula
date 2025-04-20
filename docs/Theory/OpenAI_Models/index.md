@@ -15,15 +15,15 @@ This RAG step is therefore **universal** across all layers.
 
 | Layer | RAG‑assisted purpose | Main Models |
 |-------|----------------------|-------------|
-| [1. Chat](Chat.md) | Conversational & multimodal I/O (vector‑RAG enriched) | gpt‑4o, gpt‑4o‑mini, gpt‑4.1, gpt‑4.1‑mini/‑nano |
-| [2. Reasoning](Reasoning.md) | Tool‑calling, step‑by‑step logic (vector‑RAG enriched) | o1, o3, o3‑mini, o4‑mini |
-| [3. Agent](Agents.md) | Orchestrates Chat ＋ Reasoning with RAG. | ParticulaAgent |
+| [1. Chat](Models/Chat.md) | Conversational & multimodal I/O (vector‑RAG enriched) | gpt‑4o, gpt‑4o‑mini, gpt‑4.1, gpt‑4.1‑mini/‑nano |
+| [2. Reasoning](Models/Reasoning.md) | Tool‑calling, step‑by‑step logic (vector‑RAG enriched) | o1, o3, o3‑mini, o4‑mini |
+| [3. Agent](Models/Agents.md) | Orchestrates Chat ＋ Reasoning with RAG. | ParticulaAgent |
 
 The following pages drill into each layer.
 
-- **[1. Chat](Chat.md)** – conversational generalists, vector‑RAG enriched.
-- **[2. Reasoning](Reasoning.md)** – tool‑calling, step‑by‑step logic, vector‑RAG enriched.
-- **[3. Agent](Agents.md)** – Self‑orchestrating agent that combines Chat ✚ Reasoning with RAG. *Note: this is a work in progress.*
+- **[1. Chat](Models/Chat.md)** – conversational generalists, vector‑RAG enriched.
+- **[2. Reasoning](Models/Reasoning.md)** – tool‑calling, step‑by‑step logic, vector‑RAG enriched.
+- **[3. Agent](Models/Agents.md)** – Self‑orchestrating agent that combines Chat ✚ Reasoning with RAG. *Note: this is a work in progress.*
 
 
 _Tip:_ Start with **Chat** for “How do I…?” questions, move to
@@ -81,3 +81,8 @@ Agent, RAG retrieval, and prompt logic remain unchanged.
 This “depth‑first, breadth‑later” strategy yields robust tools sooner,
 benefiting new users with stability and advanced users with a clear path to
 multi‑vendor redundancy.
+
+
+---
+
+Reference: [OpenAI Docs](https://platform.openai.com/docs/models)

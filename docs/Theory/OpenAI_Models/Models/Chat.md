@@ -60,4 +60,7 @@ April 2025 upgrade to 4o.
 
 ---
 
+Reference:
 
+- [OpenAI Docs](https://platform.openai.com/docs/models)
+- [OpenAI 4.1 press release](https://openai.com/index/gpt-4-1/)

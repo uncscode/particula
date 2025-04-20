@@ -38,3 +38,7 @@ Decision policy:
 - deeply nested logic or heavy planning → Reasoning (o3 or larger o‑series)
 
 >_Note:_ This Agent workflow is our goal.
+
+---
+
+Reference: [OpenAI Agents Docs](https://platform.openai.com/docs/guides/agents#page-top)
