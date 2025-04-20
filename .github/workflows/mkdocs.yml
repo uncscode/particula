@@ -48,7 +48,12 @@ jobs:
           with:
             branch: gh-pages
             folder: site  # Assuming mkdocs build output is the default 'site' directory
-
+        - name: Validate Token
+          run: |
+             if [ -z "${{ secrets.PARTICULA_PR_PREVIEW }}" ]; then
+               echo "Error: PARTICULA_PR_PREVIEW token is missing!" >&2
+               exit 1
+             fi
         - name: Preview Documentation (on PR)
           if: ${{ github.event_name == 'pull_request' }}
           uses: rossjrw/pr-preview-action@v1
