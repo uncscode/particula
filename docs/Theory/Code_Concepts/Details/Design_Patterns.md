@@ -1,4 +1,4 @@
-# Design Patterns in Particula
+# Particula Design
 
 Particula purposefully sticks to **two complementary coding paradigms** so users can pick the style that fits their workflow.
 
@@ -14,6 +14,7 @@ Particula purposefully sticks to **two complementary coding paradigms** so users
 Pattern: **Functions**  
 
 These core functions are in most cases stateless and return a value based on inputs. They have no hidden side effects and are not dependent on any object. They are easy to test and can be replaced with JIT‑compiled versions (Numba/C++) in the future.
+
 They are the building blocks of the simulation engine. They can be used in a procedural style, making them suitable for quick calculations or teaching demos.
 
 **`get_`** – prefix that signals “this function returns a value”.
@@ -34,11 +35,12 @@ kernel = par.dynamics.get_turbulent_shear_kernel_st1956_via_system_state(
 ## 2. Object‑oriented: – “noun‑phrased” abstractions
 
 Patterns employed
-* **Strategy** – e.g. `TurbulentShearCoagulationStrategy` selects which kernel to call, built of `get_` functions. These are the main building blocks of the simulation engine.
-* **Builder** – e.g. `CombineCoagulationStrategyBuilder` validates input and assembles strategies.
-* **Factory** – e.g. `ActivityFactory` creates an `ActivityStrategy` instance via an `ActivityBuilder`. These allow for more complex meta programming of simulation objects.
-* **Decorator** – e.g. `@validate_inputs` checks for valid inputs before running the function. These are used to enforce domain specific invariants (positive radius, non‑negative concentration, finite Coulomb potential, …).
-* **Mixin** – thin, single‑responsibility classes adding orthogonal capabilities (density, charge, surface …).  
+
+- **Strategy** – e.g. `TurbulentShearCoagulationStrategy` selects which kernel to call, built of `get_` functions. These are the main building blocks of the simulation engine.
+- **Builder** – e.g. `CombineCoagulationStrategyBuilder` validates input and assembles strategies.
+- **Factory** – e.g. `ActivityFactory` creates an `ActivityStrategy` instance via an `ActivityBuilder`. These allow for more complex meta programming of simulation objects.
+- **Decorator** – e.g. `@validate_inputs` checks for valid inputs before running the function. These are used to enforce domain specific invariants (positive radius, non‑negative concentration, finite Coulomb potential, …).
+- **Mixin** – thin, single‑responsibility classes adding orthogonal capabilities (density, charge, surface …).  
 
 For a broader overview of design patterns, see [Object‑Oriented Patterns](Object_Oriented_Patterns.md).
 
@@ -73,15 +75,16 @@ coagulation_process = par.dynamics.Coagulation(
 )
 ```
 
-Benefits  
-* Plug‑and‑play process swapping → perfect for sensitivity studies.  
-* Builder validation enforces **Agreeing** (the *A* in WARMED).
+Benefits
+
+- Plug‑and‑play process swapping → perfect for sensitivity studies.  
+- Builder validation enforces **Agreeing** (the *A* in WARMED).
 
 
 ## Naming conventions
 
-* **Functions** → `get_<quantity>[_via_system_state]`  
-* **Classes** → `<Descriptor><PatternName>` (`TurbulentShearCoagulationStrategy`, `PresetParticleRadiusBuilder`)  
+- **Functions** → `get_<quantity>[_via_system_state]`  
+- **Classes** → `<Descriptor><PatternName>` (`TurbulentShearCoagulationStrategy`, `PresetParticleRadiusBuilder`)  
 
 These rules make grep‑based discovery trivial and help LLMs auto‑suggest the correct object.
 
