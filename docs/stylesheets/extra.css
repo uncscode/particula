@@ -7,9 +7,9 @@
 
   /* Accent color shades */
     --md-accent-fg-color:                #99f6e4;
-    --md-accent-fg-color--transparent:   #5eead4;
+    --md-accent-fg-color--transparent:   #14b8a6;
     --md-accent-bg-color:                hsla(0, 0%, 100%, 1);
-    --md-accent-bg-color--light:         hsla(0, 0%, 100%, 0.8);
+    --md-accent-bg-color--light:         hsla(0, 0%, 100%, 1);
   }
 
   /* ------------------------------------------------------------------------- */
