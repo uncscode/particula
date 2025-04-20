@@ -1,4 +1,4 @@
-# The WARMED Developer Principle
+# WARMED Code
 
 *A concise philosophy for building and maintaining Particula.*
 
@@ -15,8 +15,7 @@ See Casey Muratori’s [Where Does Bad Code Come From?](https://youtu.be/7YpFGkG
 
 ## Why WARMED instead of CLEAN?
 
-CLEAN Code is not an effective guide. Aerosol scientists are usually **both** the developer **and** the user.  
-WARMED shifts the emphasis from enterprise‑scale maintainability toward day‑to‑day research agility:
+CLEAN Code is not an effective guide. Aerosol scientists are usually **both** the developer **and** the user. WARMED shifts the emphasis from enterprise‑scale maintainability toward day‑to‑day research agility:
 
 * Really short iterations: prototype ➔ publish ➔ archive.
 * Minimal ceremony: no “service layers” or factory jungles.

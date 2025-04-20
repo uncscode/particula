@@ -13,6 +13,6 @@
 
 ## Code Concepts
 
-- Particula Development Guide: [WARMED Principle](Particula_Concepts/WARMED_principle.md)
-- Particula [Design Patterns](Particula_Concepts/Design_Patterns.md)
-- General [Object Oriented Patterns](Particula_Concepts/Object_Oriented_Patterns.md)
+- Particula Development Guide: [WARMED Principle](Code_Concepts/WARMED_principle.md)
+- Particula [Design Patterns](Code_Concepts/Design_Patterns.md)
+- General [Object Oriented Patterns](Code_Concepts/Object_Oriented_Patterns.md)
