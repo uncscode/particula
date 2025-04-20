@@ -33,7 +33,7 @@ images, and (soon) audio & video inside **one** architecture.
 
 ## GPT‑4o‑mini
 
-Cost‑ & latency‑optimised variant of 4o.
+Cost- and latency-optimized variant of 4o.
 
 - same 128 k window 
 - up to 16 k output tokens 
