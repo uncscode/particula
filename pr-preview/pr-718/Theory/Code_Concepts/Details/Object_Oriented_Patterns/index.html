@@ -8471,7 +8471,7 @@ more effective for beginners.</p>
 </code></pre></div>
 <p>In this commented code:</p>
 <ul>
-<li>Classes like <code>SurfaceStrategyMassBuilder</code> and <code>ParticleRadiusRepresentationBuilder</code> use PascalCase as is typical for class names.</li>
+<li>Classes like <code>SurfaceStrategyMassBuilder</code> and <code>ParticleRadiusRepresentationBuilder</code> use PascalCase as is typical for class names. However, snake_case is used for methods (functions) that are called on the instances of these classes.</li>
 <li>When we call a class (like <code>par.particles.SurfaceStrategyMassBuilder()</code>), it creates an object (a builder instance) that we then use to set properties.</li>
 <li>Methods like <code>set_surface_tension</code>, <code>set_density</code>, <code>set_concentration</code>, etc., are functions defined on those builder objects – they modify the internal state (i.e., inject properties) so that when you call <code>build()</code>, their values are used to create the final product.</li>
 <li>The final built object, <code>particle_rep_mass</code>, is an instance of a <code>ParticleRepresentation</code>. It has methods (like <code>get_mass()</code>) that are injected via the class definition and allow you to retrieve data computed from the properties previously injected via the builder pattern.</li>
