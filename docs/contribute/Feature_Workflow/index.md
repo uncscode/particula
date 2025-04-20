@@ -9,11 +9,14 @@ However, depending on your situation some of the steps may be skipped, if in dou
 
 The overall workflow for adding a new feature to the library is as follows:
 
-- **Feature Proposal**: Create a new discussion in the [GitHub Discussions](https://github.com/uncscode/particula/discussions) to propose your vision and goals.  
-  - Include a description of the feature, its purpose, and how it fits into the library.
-  - Add manuscripts or references to contextualize the feature and equations to implement.
-  - Discuss the feature with the community to gather feedback and suggestions.
-  - Get the okay from the maintainer(s) to proceed with the implementation.
+**Feature Proposal**: Create a new discussion in the [GitHub Discussions](https://github.com/uncscode/particula/discussions) to propose your vision and goals.
+
+- Include a description of the feature, its purpose, and how it fits into the library.
+- Add manuscripts or references to contextualize the feature and equations to implement.
+- Discuss the feature with the community to gather feedback and suggestions.
+- Get the okay from the maintainer(s) to proceed with the implementation.
+
+---
 
 1. [Add Theory](Add_Theory.md): Write the theory behind the feature.
 2. [Add Functions](Add_Function.md): Write the functions that implement the feature.
