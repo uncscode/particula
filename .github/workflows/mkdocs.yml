@@ -20,12 +20,6 @@ jobs:
       cancel-in-progress: true
     steps:
 
-        - name: Debug Token
-          env:
-            TOKEN: ${{ secrets.PUBLIC_PR_PREVIEW }}
-          run: |
-            echo "Token is: ${{ secrets.PUBLIC_PR_PREVIEW }}"
-
         - name: Check out code
           uses: actions/checkout@v4
           with: 
@@ -59,7 +53,6 @@ jobs:
           if: ${{ github.event_name == 'pull_request' }}
           uses: rossjrw/pr-preview-action@v1
           with:
-            token: ${{ secrets.PUBLIC_PR_PREVIEW }}
+            token: ${{ secrets.PARTICULA_PR_PREVIEW }}
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
-            deploy-repository: uncscode/public-pr-preview
-            preview-branch: particula-preview
+            deploy-repository: mahf708/particula-pr-preview
