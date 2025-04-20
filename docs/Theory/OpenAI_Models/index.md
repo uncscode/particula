@@ -15,7 +15,7 @@ This RAG step is therefore **universal** across all layers.
 
 | Layer | RAG‑assisted purpose | Main Models |
 |-------|----------------------|-------------|
-| [1. Chat](Models/Chat.md) | Conversational & multimodal I/O (vector‑RAG enriched) | gpt‑4o, gpt‑4o‑mini, gpt‑4.1, gpt‑4.1‑mini/‑nano |
+| [1. Chat](Models/Chat.md) | Conversational & multimodal I/O (vector‑RAG enriched) | gpt‑4o, gpt‑4.1, gpt‑4.1‑mini/‑nano |
 | [2. Reasoning](Models/Reasoning.md) | Tool‑calling, step‑by‑step logic (vector‑RAG enriched) | o1, o3, o3‑mini, o4‑mini |
 | [3. Agent](Models/Agents.md) | Orchestrates Chat ＋ Reasoning with RAG. | ParticulaAgent |
 
