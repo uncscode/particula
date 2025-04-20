@@ -7,7 +7,7 @@ installation.  You will
 2. pick a python package manager,  
 3. create / activate an isolated environment,  
 4. install Particula, and  
-5. Explore the documentation.
+5. explore the documentation.
 
 ---
 
