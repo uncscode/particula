@@ -120,6 +120,9 @@ from particula.particles.properties.lognormal_size_distribution import (
 from particula.particles.properties.mean_thermal_speed_module import (
     get_mean_thermal_speed,
 )
+from particula.particles.properties.mixing_state_index import (
+    get_mixing_state_index,
+)
 from particula.particles.properties.partial_pressure_module import (
     get_partial_pressure_delta,
 )
