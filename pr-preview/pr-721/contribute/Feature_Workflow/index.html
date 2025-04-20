@@ -7825,6 +7825,15 @@ However, depending on your situation some of the steps may be skipped, if in dou
 <a href="https://github.com/uncscode/particula/discussions">GitHub Discussions</a>.</p>
 <h2 id="full-workflow">Full Workflow<a class="headerlink" href="#full-workflow" title="Permanent link">&para;</a></h2>
 <p>The overall workflow for adding a new feature to the library is as follows:</p>
+<pre class="mermaid"><code>graph TD
+    A[Feature Proposal] --&gt; B[Add Theory]
+    B --&gt; C[Add Functions]
+    C --&gt; E[Add Class]
+    C &lt;--&gt; D[Add Unit Tests]
+    D &lt;--&gt; E[Add Class]
+    E --&gt; F[Add to __init__]
+    F --&gt; G[Add Examples]
+    G --&gt; H((End))</code></pre>
 <p><strong>Feature Proposal</strong>: Create a new discussion in the <a href="https://github.com/uncscode/particula/discussions">GitHub Discussions</a> to propose your vision and goals.</p>
 <ul>
 <li>Include a description of the feature, its purpose, and how it fits into the library.</li>
