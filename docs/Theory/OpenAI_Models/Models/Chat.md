@@ -4,8 +4,7 @@ Chat models are **conversational generalists**.
 In Particula they are used for:
 
 - interactive tutorials & “explain‑this‑output” prompts,
-- quick JSON / YAML scaffolding,
-- translating user intent to structured simulation parameters.
+- translating user intent to build small function or class calls.
 
 Each chat request is wrapped in a **vector‑RAG layer** that pulls
 the most relevant Particula API & docs snippets before the prompt
@@ -30,16 +29,6 @@ images, and (soon) audio & video inside **one** architecture.
 - better vision & non‑English.
 
 **Use for:** integrated visual or mixed‑media reasoning (diagrams, photos, future A/V).
-
-## GPT‑4o‑mini
-
-Cost- and latency-optimized variant of 4o.
-
-- same 128 k window 
-- up to 16 k output tokens 
-- improved tokenizer for non‑English.
-
-**Use for:** budget‑sensitive multimodal chat, doc‑grounded image Q&A.
 
 ## GPT‑4.1
 
