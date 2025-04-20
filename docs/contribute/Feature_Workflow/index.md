@@ -9,6 +9,19 @@ However, depending on your situation some of the steps may be skipped, if in dou
 
 The overall workflow for adding a new feature to the library is as follows:
 
+```mermaid
+graph TD
+    A[Feature Proposal] --> B[Add Theory]
+    B --> C[Add Functions]
+    C --> E[Add Class]
+    C <--> D[Add Unit Tests]
+    D <--> E[Add Class]
+    E --> F[Add to __init__]
+    F --> G[Add Examples]
+    G --> H((End))
+```
+
+
 **Feature Proposal**: Create a new discussion in the [GitHub Discussions](https://github.com/uncscode/particula/discussions) to propose your vision and goals.
 
 - Include a description of the feature, its purpose, and how it fits into the library.
