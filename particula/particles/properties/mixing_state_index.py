@@ -25,7 +25,7 @@ def get_mixing_state_index(
     aerosol population to the bulk diversity of the aerosol population.
     It is defined as:
 
-    χ = (D̄ᵅ - 1) / (Dᵞ - 1)
+    - χ = (D̄ᵅ - 1) / (Dᵞ - 1)
         - D̄ᵅ = Σₙ (Mₙ · Dₙ) / Σₙ Mₙ
         - Dᵞ  = exp(−Σₛ Fₛ log Fₛ)
         - Dₙ  = exp(−Σₛ fₙₛ log fₙₛ)
