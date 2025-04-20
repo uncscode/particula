@@ -7861,15 +7861,19 @@ state index is a measure of the heterogeneity of the aerosol population,
 and is defined as the ratio of the mass-weighted mean diversity of the
 aerosol population to the bulk diversity of the aerosol population.
 It is defined as:</p>
-<p>χ = (D̄ᵅ - 1) / (Dᵞ - 1)
-    - D̄ᵅ = Σₙ (Mₙ · Dₙ) / Σₙ Mₙ
-    - Dᵞ  = exp(−Σₛ Fₛ log Fₛ)
-    - Dₙ  = exp(−Σₛ fₙₛ log fₙₛ)
-    - fₙₛ = Mₙₛ / Mₙ
-    - Fₛ  = Mₛ  / Σₛ Mₛ
-    - Mₙₛ is mass of species s in particle n
-    - Mₙ is total mass of particle n (Σₛ Mₙₛ)
-    - Mₛ is total mass of species s (Σₙ Mₙₛ)</p>
+<ul>
+<li>χ = (D̄ᵅ - 1) / (Dᵞ - 1)<ul>
+<li>D̄ᵅ = Σₙ (Mₙ · Dₙ) / Σₙ Mₙ</li>
+<li>Dᵞ  = exp(−Σₛ Fₛ log Fₛ)</li>
+<li>Dₙ  = exp(−Σₛ fₙₛ log fₙₛ)</li>
+<li>fₙₛ = Mₙₛ / Mₙ</li>
+<li>Fₛ  = Mₛ  / Σₛ Mₛ</li>
+<li>Mₙₛ is mass of species s in particle n</li>
+<li>Mₙ is total mass of particle n (Σₛ Mₙₛ)</li>
+<li>Mₛ is total mass of species s (Σₙ Mₙₛ)</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>species_masses : Per-particle species masses (NxS matrix).
