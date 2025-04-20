@@ -36,6 +36,17 @@ def test_external_mixture_returns_zero():
     assert pytest.approx(chi, rel=1e-12) == 0.0
 
 
+def test_mixture_identical_particles_returns_one():
+    """
+    All particles have identical composition and mass ⇒ χ should be 1.
+    """
+    masses = np.array([[1.0, 1.0],
+                       [1.0, 1.0],
+                       [1.0, 1.0]])
+    chi = get_mixing_state_index(masses)
+    assert pytest.approx(chi, rel=1e-12) == 1.0
+
+
 def test_single_particle_returns_one():
     """
     For a single particle, D̄ᵅ == Dᵞ ⇒ χ == 1.
