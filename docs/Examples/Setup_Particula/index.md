@@ -25,7 +25,7 @@ If your Python Environment is already set up, install Particula directly using o
 [**uv**](Details/Setup_UV.md) is a fast rust-based Python package manager.
 
 ```bash
-uv pip install particula                   # uv ≈ pip drop‑in
+uv pip install particula                   # uv ≈ much faster pip drop‑in 
 ```
 
 with optional extras:

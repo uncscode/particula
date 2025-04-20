@@ -4,7 +4,7 @@
 learn.  If you have Python, you have pip!  Use it inside a *virtual
 environment* to keep Particula’s dependencies isolated from other projects.
 
-If you need to install Python, us the [miniconda distribution](https://www.anaconda.com/docs/getting-started/miniconda/main) (which includes pip).  If you prefer to install Python separately, see the [Python.org](https://www.python.org/downloads/) page for instructions.
+If you need to install Python, use the [miniconda distribution](https://www.anaconda.com/docs/getting-started/miniconda/main) (which includes pip).  If you prefer to install Python separately, see the [Python.org](https://www.python.org/downloads/) page for instructions.
 
 ## 1. Ensure pip is up‑to‑date
 

@@ -155,7 +155,7 @@ Your contribution is now part of **Particula**—thank you!
 | **Typing** | Use `typing` annotations (PEP 484). Omit types in docstrings. |
 | **Tests** | Every public function/class must have at least one `pytest` test. Aim for coverage ≥ 90 %. |
 | **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
-| **Large changes** | Open an **discussion** first and discuss design before implementation. |
+| **Large changes** | Open a **discussion** first and discuss design before implementation. |
 
 ---
 
