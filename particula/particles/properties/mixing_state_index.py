@@ -49,7 +49,7 @@ def get_mixing_state_index(
           Returns NaN when the aerosol has no mass.
 
     Examples:
-        ``` py title="Example"
+        ``` py title="Mixing State Index Calculation"
         import numpy as np
         import particula as par
 
