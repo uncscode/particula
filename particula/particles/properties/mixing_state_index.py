@@ -31,6 +31,11 @@ def get_mixing_state_index(
         - Dₙ  = exp(−Σₛ fₙₛ log fₙₛ)
         - fₙₛ = Mₙₛ / Mₙ
         - Fₛ  = Mₛ  / Σₛ Mₛ
+        - D̄ᵅ is the mass-weighted mean diversity of the aerosol population
+        - Dᵞ is the bulk diversity of the aerosol population
+        - Dₙ is the diversity of particle n
+        - fₙₛ is the mass fraction of species s in particle n
+        - Fₛ is the mass fraction of species s in the aerosol population
         - Mₙₛ is mass of species s in particle n
         - Mₙ is total mass of particle n (Σₛ Mₙₛ)
         - Mₛ is total mass of species s (Σₙ Mₙₛ)
