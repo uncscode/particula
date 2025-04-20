@@ -50,7 +50,7 @@ jobs:
             folder: site  # Assuming mkdocs build output is the default 'site' directory
         - name: Validate Token
           run: |
-             if [ -z "${{ secrets.PARTICULA_PR_PREVIEW }}" ]; then
+             if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
                echo "Error: PARTICULA_PR_PREVIEW token is missing!" >&2
                exit 1
              fi
