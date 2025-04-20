@@ -1,5 +1,6 @@
 """
 Compute the aerosol mixing state index χ from an NxS matrix of per-particle
+species masses.
 """
 
 from numpy.typing import NDArray
