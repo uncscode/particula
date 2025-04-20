@@ -1,7 +1,7 @@
 # Feature Workflow
 
 The overall workflow depends on the extent of the feature being added.
-This outline covers how to add a completely new feature to the library.  
+This outline covers how to add a completely new feature to the library.
 However, depending on your situation some of the steps may be skipped, if in doubt, please start a discussion in the
 [GitHub Discussions](https://github.com/uncscode/particula/discussions).
 
