@@ -82,13 +82,14 @@ Follow their dedicated guides:
   Activate the correct environment (`conda activate particula`,
   `source .venv/bin/activate`, etc.) or select it inside your editor.  
 
-- **C / Fortran compiler missing**  
+- **C compiler missing**  
   Some optional dependencies need a compiler.  
-  • Windows → “Build Tools for Visual Studio”  
-  • macOS → `xcode-select --install`  
-  • Linux → `sudo apt install build-essential` (or your distro equivalent)  
 
-- **“Permission denied” / read‑only file system**  
+  - Windows → “Build Tools for Visual Studio”  
+  - macOS → `xcode-select --install`  
+  - Linux → `sudo apt install build-essential` (or your distro equivalent)  
+
+- **“Permission denied” / read‑only file system**
   Work in a directory where you have write permission,
   or add `--user` when using `pip` (less reproducible),  
   or create the environment in your home folder.  
