@@ -9,12 +9,16 @@ Thanks for thinking about contributing! Our goal is to make your first pull requ
 | You are… | Start here |
 |----------|-----------|
 | **Experienced with Git + Python** | Jump straight to [Github workflow](#3-github-flow) below. |
-| **New to GitHub or virtual‑envs** | Follow [setup for new contributors](#2-setup-for-new-contributors) first, then the workflow. |
-| **Planning to contribute major code or new features** | Read **Coding Standards & Review Expectations** at the end before you begin. |
+| **New to GitHub or virtual‑envs** | Follow [setup for new contributors](#2-setup-for-new-contributors) and the [Contributor Workflow guide](../Examples/Setup_Particula/Details/Contributor_Workflow.md). |
+| **Planning to contribute major code or new features** | Follow [Feature Workflow](Feature_Workflow/index.md) and [Code Specifications](Code_Specifications/index.md) before you begin. |
 
 ---
 
 ### 2. Setup for New Contributors
+
+For the complete, click‑through tutorial (fork → clone → virtual‑env →
+editable install) see the
+[Contributor Workflow guide](../Examples/Setup_Particula/Details/Contributor_Workflow.md).
 
 > _If you already have Python, Git, and a preferred editor, skim this section._
 
@@ -35,9 +39,9 @@ Thanks for thinking about contributing! Our goal is to make your first pull requ
 
    | Tool | Command | Instructions |
    |------|----------|---------|
-   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](/Examples/Setup_Particula/Details/Setup_UV/) |
-   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](/Examples/Setup_Particula/Details/Setup_Pip/) |
-   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](/Examples/Setup_Particula/Details/Setup_Conda/) |
+   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](/particula/Examples/Setup_Particula/Details/Setup_UV/) |
+   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](/particula/Examples/Setup_Particula/Details/Setup_Pip/) |
+   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](/particula/Examples/Setup_Particula/Details/Setup_Conda/) |
 
 5. **Verify installation**  
    ```bash
@@ -97,6 +101,10 @@ git checkout -b issue123-fix-simulation
 
 **Step 4 – Theory → Code → Test → Examples**
 
+For a step‑by‑step breakdown see the
+[Feature Workflow guide](Feature_Workflow/index.md) and the
+[Code Specifications](Code_Specifications/index.md).
+
 ```bash
 # run unit tests with warnings treated as errors
 pytest -Werror
@@ -150,10 +158,10 @@ Your contribution is now part of **Particula**—thank you!
 
 | Topic | Rule |
 |-------|------|
-| **Style** | Black + Ruff (configured in *pyproject.toml*). No manual formatting needed—run `pre-commit`. |
-| **Docstrings** | Google‑style, one‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Example`, `References`). |
-| **Typing** | Use `typing` annotations (PEP 484). Omit types in docstrings. |
-| **Tests** | Every public function/class must have at least one `pytest` test. Aim for coverage ≥ 90 %. |
+| **Style** | Detailed rules: [Code Specifications](Code_Specifications/index.md). |
+| **Docstrings** | Follow the templates in [Function docstring format](Code_Specifications/Function_docstring_format.md) and [Class docstring format](Code_Specifications/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
+| **Typing** | Use `typing` annotations. Omit types in docstrings. |
+| **Tests** | Every public function/class must have at least one `pytest` test. Aim for coverage ≥ 90 %.  See [Add Unit Tests](Feature_Workflow/Add_Unit_Test.md). |
 | **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
 | **Large changes** | Open a **discussion** first and discuss design before implementation. |
 
