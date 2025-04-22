@@ -68,6 +68,7 @@
           - "Article Title",
             [Wikipedia](link)
       """
+      return (param1 * param2) / CONSTANT
   ```
   
 - **Mathematical Equation Representation:**  

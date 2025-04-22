@@ -77,7 +77,7 @@ git push --force-with-lease
 
 ---
 
-## 3. Troubleshooting & quick reference
+## Troubleshooting & quick reference
 
 | Task | Command |
 |------|---------|
