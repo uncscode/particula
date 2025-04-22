@@ -45,9 +45,6 @@ git rebase main
 #   edit the files → git add <files> → git rebase --continue
 #   or git rebase --abort to cancel the rebase
 
-# To linearize history, use --force if you have already pushed the branch to GitHub
-git rebase --force main
-
 # Push the rebased branch to the PR
 git push --force-with-lease   # safer than --force
 ```
