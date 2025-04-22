@@ -8445,7 +8445,7 @@ Avoid the <em>“Update branch”</em> or <em>“Squash &amp; merge”</em> butt
 <p><strong>Rule of thumb</strong></p>
 <ol>
 <li><strong>Rebase early, rebase often</strong> – keep your PR branch current with <code>main</code>.</li>
-<li><strong>Squash before review</strong> if your PR has dozens of WIP commits.</li>
+<li><strong>Squash before review</strong> if your PR has dozens of commits.</li>
 <li><strong>Always force‑push (<code>--force-with-lease</code>)</strong> after a rebase or squash so GitHub updates the PR without adding merge commits.</li>
 </ol>
 <hr />
@@ -8495,11 +8495,6 @@ git<span class="w"> </span>rebase<span class="w"> </span>-i<span class="w"> </sp
 <span class="c1"># Push the squashed branch back to the PR</span>
 git<span class="w"> </span>push<span class="w"> </span>--force-with-lease
 </code></pre></div>
-<blockquote>
-<p><strong>Tip:</strong> Configure Git to auto‑rebase when you pull:
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>pull.rebase<span class="w"> </span><span class="nb">true</span>
-</code></pre></div></p>
-</blockquote>
 <hr />
 <h2 id="3-troubleshooting-quick-reference">3. Troubleshooting &amp; quick reference<a class="headerlink" href="#3-troubleshooting-quick-reference" title="Permanent link">&para;</a></h2>
 <table>
@@ -8533,6 +8528,12 @@ git<span class="w"> </span>push<span class="w"> </span>--force-with-lease
 </tbody>
 </table>
 <hr />
+<p>References:</p>
+<ul>
+<li><a href="https://git-scm.com/book/en/v2">Git: References</a></li>
+<li>Firebase <a href="https://www.youtube.com/watch?v=hwP7WQkmECE">Git in 100s</a>, <a href="https://www.youtube.com/watch?v=HkdAHXoRtos">Longer Video</a></li>
+<li>ArjanCodes <a href="https://www.youtube.com/watch?v=viAZQjs5lHk">Git Branches</a></li>
+</ul>
 
 
 
