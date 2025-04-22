@@ -20,7 +20,7 @@
     
     
       
-        <title>Add to init - Particula</title>
+        <title>Adding to __init__.py - Particula</title>
       
     
     
@@ -57,7 +57,7 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="Add to init - Particula" >
+        <meta  property="og:title"  content="Adding to __init__.py - Particula" >
       
         <meta  property="og:description"  content="None" >
       
@@ -73,7 +73,7 @@
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="Add to init - Particula" >
+        <meta  name="twitter:title"  content="Adding to __init__.py - Particula" >
       
         <meta  name="twitter:description"  content="None" >
       
@@ -100,7 +100,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#add-to-init" class="md-skip">
+        <a href="#adding-to-__init__py" class="md-skip">
           Skip to content
         </a>
       
@@ -135,7 +135,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Add to init
+              Adding to __init__.py
             
           </span>
         </div>
@@ -8174,7 +8174,7 @@
   
   
   <span class="md-ellipsis">
-    Add to init
+    Adding to __init__.py
     
   </span>
   
@@ -8187,7 +8187,7 @@
   
   
   <span class="md-ellipsis">
-    Add to init
+    Adding to __init__.py
     
   </span>
   
@@ -8219,9 +8219,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#procedure" class="md-nav__link">
+  <a href="#rules" class="md-nav__link">
     <span class="md-ellipsis">
-      Procedure
+      Rules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps
     </span>
   </a>
   
@@ -8295,9 +8304,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#procedure" class="md-nav__link">
+  <a href="#rules" class="md-nav__link">
     <span class="md-ellipsis">
-      Procedure
+      Rules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Steps
     </span>
   </a>
   
@@ -8322,14 +8340,24 @@
   
 
 
-<h1 id="add-to-init">Add to <strong>init</strong><a class="headerlink" href="#add-to-init" title="Permanent link">&para;</a></h1>
+<h1 id="adding-to-__init__py">Adding to <code>__init__.py</code><a class="headerlink" href="#adding-to-__init__py" title="Permanent link">&para;</a></h1>
 <h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Expose your new public symbols at the package level for easy import.</p>
-<h2 id="procedure">Procedure<a class="headerlink" href="#procedure" title="Permanent link">&para;</a></h2>
+<p>Make new public APIs available for easy imports.</p>
+<h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Only import important and relevant classes and functions.</li>
+<li>Do not import everything from a module (e.g., <code>from particula.&lt;area&gt; import *</code>).</li>
+<li>Only include public names (no leading <code>_</code>). These helpers are not intended for public use.</li>
+<li>Keep imports minimal and grouped logically.</li>
+<li>Maintain alphabetical order within groups.</li>
+</ul>
+<h2 id="steps">Steps<a class="headerlink" href="#steps" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Open particula/<area>/<strong>init</strong>.py.</li>
-<li>Add <code>from particula.&lt;area&gt; import &lt;ClassName&gt;, &lt;function_name&gt;</code> under the appropriate section.</li>
+<li>Open <code>particula/&lt;area&gt;/__init__.py</code>.</li>
+<li>Add under the right section:</li>
 </ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.</span><span class="o">&lt;</span><span class="n">area</span><span class="o">&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">ClassName</span><span class="o">,</span><span class="w"> </span><span class="nn">function_name</span>
+</code></pre></div>
 
 
 
