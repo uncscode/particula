@@ -15,7 +15,7 @@ In short, it keeps the repository **human–readable** and
 **Rule of thumb**
 
 1. **Rebase early, rebase often** – keep your PR branch current with `main`.
-2. **Squash before review** if your PR has dozens of WIP commits.
+2. **Squash before review** if your PR has dozens of commits.
 3. **Always force‑push (`--force-with-lease`)** after a rebase or squash so GitHub updates the PR without adding merge commits.
 
 ---
@@ -77,10 +77,6 @@ git rebase -i origin/main
 # Push the squashed branch back to the PR
 git push --force-with-lease
 ```
-> **Tip:** Configure Git to auto‑rebase when you pull:
-> ```bash
-> git config --global pull.rebase true
-> ```
 
 ---
 
@@ -96,3 +92,8 @@ git push --force-with-lease
 
 ---
 
+References:
+
+- [Git: References](https://git-scm.com/book/en/v2)
+- Firebase [Git in 100s](https://www.youtube.com/watch?v=hwP7WQkmECE), [Longer Video](https://www.youtube.com/watch?v=HkdAHXoRtos)
+- ArjanCodes [Git Branches](https://www.youtube.com/watch?v=viAZQjs5lHk)
