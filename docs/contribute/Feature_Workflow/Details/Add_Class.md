@@ -13,7 +13,7 @@ This is typically a wrapper around the functions you wrote in the previous step.
 
 * `__init__` with complete type hints.
 * Public interface first (getters, setters, actions).
-* NumPy‑style docstring that includes an “Examples” subsection.
+* NumPy-style docstring that includes an “Examples” subsection.
 * Follow [Code Specifications](../Code_Specifications/index.md) for formatting.
 
 ## Steps
