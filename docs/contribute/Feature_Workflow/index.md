@@ -31,12 +31,12 @@ graph TD
 
 ---
 
-1. [Add Theory](Add_Theory.md): Write the theory behind the feature.
-2. [Add Functions](Add_Function.md): Write the functions that implement the feature.
-3. [Add Unit Tests](Add_Unit_Test.md): Write unit tests to ensure the function works as intended.
-4. [Add Class](Add_Class.md): Write the class that implements the functions.
-5. [Add Unit Tests](Add_Unit_Test.md): Write unit tests for the class to ensure it works as intended.
-6. [Add to init](Add_to_init.md): Add the new functions/class to the `__init__.py` file to make it accessible from the package.
-7. [Add Examples](Add_Example.md): Write examples to demonstrate the feature.
+1. [Add Theory](Details/Add_Theory.md): Write the theory behind the feature.
+2. [Add Functions](Details/Add_Function.md): Write the functions that implement the feature.
+3. [Add Unit Tests](Details/Add_Unit_Test.md): Write unit tests to ensure the function works as intended.
+4. [Add Class](Details/Add_Class.md): Write the class that implements the functions.
+5. [Add Unit Tests](Details/Add_Unit_Test.md): Write unit tests for the class to ensure it works as intended.
+6. [Add to init](Details/Add_to_init.md): Add the new functions/class to the `__init__.py` file to make it accessible from the package.
+7. [Add Examples](Details/Add_Example.md): Write examples to demonstrate the feature.
 
 > _Note:_ Each step would be one or more issues, e.g., one for the theory, 1+ for the functions, etc.

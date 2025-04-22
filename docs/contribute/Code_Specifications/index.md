@@ -69,8 +69,8 @@ implementation.
 _Focus: **R** — rich docstrings turn code into readable, searchable documentation._
 
 - Use the templates specifications for:
-  - Function docstrings: [Function_docstring_format](Function_docstring_format.md).
-  - Class docstrings: [Class_docstring_format](Class_docstring_format.md).
+  - Function docstrings: [Function_docstring_format](Details/Function_docstring_format.md).
+  - Class docstrings: [Class_docstring_format](Details/Class_docstring_format.md).
 
 - Emphasize:
     - Unicode equations for mathematical expressions.
@@ -94,3 +94,8 @@ _Focus: **W / E** — minimal, consistent style and vector‑friendly patterns
 Why automated style?  Tools such as `flake8` and `black` eliminate “formatting
 debate” noise from reviews, keep diffs minimal, and help first‑time
 contributors pass CI without memorizing an idiosyncratic style.
+
+## Git Repository
+
+The git repository follows a linear history model. For a clear and clean history.
+See more at [Linear Git Repository](Details/Linear_Git_Repository.md)
