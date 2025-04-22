@@ -1,24 +1,33 @@
-### Linear Git Repository
+# Linear Git Repository
 
 Use a **rebase‑then‑fast‑forward** strategy to keep a linear history.  
 Avoid the *“Update branch”* or *“Squash & merge”* buttons on GitHub—those create merge commits instead of a clean rebase.
 
-A linear timeline makes it trivial to
-* read the progression of a feature from top to bottom,
-* bisect for bugs (`git bisect`), and
-* cherry‑pick or revert single commits.
+A linear timeline makes it trivial to:
+
+- read the progression of a feature from top to bottom,
+- bisect for bugs (`git bisect`), and
+- cherry‑pick or revert single commits.
 
 In short, it keeps the repository **human–readable** and
 **tool‑friendly**, so the extra rebase step pays off quickly.
 
+**Rule of thumb**
+
+1. **Rebase early, rebase often** – keep your PR branch current with `main`.
+2. **Squash before review** if your PR has dozens of WIP commits.
+3. **Always force‑push (`--force-with-lease`)** after a rebase or squash so GitHub updates the PR without adding merge commits.
+
 ---
 
-#### 1. Rebase your feature branch onto `main`
+## Rebase your feature branch onto `main`
 
-Why rebase?  
+_Why rebase?_  
+
 Rebasing re‑plays your commits on top of the current
 `main`, avoiding the merge commit that GitHub’s
 *“Update branch”* button would create.  
+
 Reviewers now see *only* the changes relevant to the feature, not a
 noisy merge diff.
 
@@ -29,22 +38,29 @@ git fetch origin
 # Switch to your feature branch
 git switch my‑feature
 
-# Rebase onto the tip of main
-git rebase origin/main
-# ‑‐rebase merges your commits one‑by‑one, giving you a chance to resolve conflicts
+# Rebase onto the tip of main with conflict checking
+git rebase main
+# ‑‐rebase merges your commits one‑by‑one
 # If conflicts appear:
 #   edit the files → git add <files> → git rebase --continue
+#   or git rebase --abort to cancel the rebase
+
+# To linearize history, use --force if you have already pushed the branch to GitHub
+git rebase --force main
 
 # Push the rebased branch to the PR
 git push --force-with-lease   # safer than --force
 ```
+
 > **Why CLI?**  
 > GitHub’s *“Update branch”* option performs a **merge**, polluting history with an extra merge commit. Rebasing in the terminal keeps history linear and bisect‑friendly.
 
 ---
 
-#### 2. Squash a long commit list (e.g., > 20 commits)
+## Squash a long commit history
+
 Why squash?  
+
 A PR that contains dozens of “fix typo” or “WIP” commits is hard to
 review and clutters the permanent history.  Squashing groups these
 micro‑commits into logical units that tell a clear story.
@@ -68,7 +84,8 @@ git push --force-with-lease
 
 ---
 
-#### 3. Troubleshooting & quick reference
+## 3. Troubleshooting & quick reference
+
 | Task | Command |
 |------|---------|
 | Soft‑reset all commits since `FIRST_COMMIT_HASH` into the index | `git reset --soft FIRST_COMMIT_HASH^` |
@@ -79,8 +96,3 @@ git push --force-with-lease
 
 ---
 
-**Rule of thumb**
-
-1. **Rebase early, rebase often** – keep your PR branch current with `main`.
-2. **Squash before review** if your PR has dozens of WIP commits.
-3. **Always force‑push (`--force-with-lease`)** after a rebase or squash so GitHub updates the PR without adding merge commits.
