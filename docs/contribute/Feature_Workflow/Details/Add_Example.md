@@ -6,7 +6,7 @@ Provide a runnable demonstration in a Jupyter notebook.
 
 ## Rules
 
-- Runtime <30 s on a typical laptop (in most cases).
+- Runtime <30 s on a typical laptop (in most cases).
 - Use only the public API – no private helpers.
   - `import particula as par`
 - End with at least one plot or printed result.
