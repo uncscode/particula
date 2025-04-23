@@ -21,7 +21,6 @@ graph TD
     G --> H((End))
 ```
 
-
 **Feature Proposal**: Create a new discussion in the [GitHub Discussions](https://github.com/uncscode/particula/discussions) to propose your vision and goals.
 
 - Include a description of the feature, its purpose, and how it fits into the library.
