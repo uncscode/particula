@@ -10,30 +10,13 @@ ti.init(arch=ti.cpu)  # or ti.cpu
 
 size = 250  # Number of kernel size bins
 
-# radius_type = ti.MatrixField(
-#     dtype=ti.f64, shape=(size,)
-# )
-# concentration_type = ti.ndarray(
-#     dtype=ti.f64, shape=(size,)
-# )
-# kernel_type = ti.ndarray(
-#     dtype=ti.f64, shape=(size, size)
-# )
-# gain_rate_type = ti.ndarray(
-#     dtype=ti.f64, shape=(size,)
-# )
-# output_type = ti.ndarray(
-#     dtype=ti.f64, shape=(size,)
-# )
-
-
 @ti.kernel
 def get_coagulation_gain_rate_continuous_taichi(
-    radius: ti.types.ndarray(),
-    concentration: ti.types.ndarray(),
-    kernel: ti.types.ndarray(),
-    gain_rate: ti.types.ndarray(),
-) -> ti.types.ndarray():
+    radius: ti.types.ndarray(dtype=ti.f32, ndim=1),
+    concentration: ti.types.ndarray(dtype=ti.f32, ndim=1),
+    kernel: ti.types.ndarray(dtype=ti.f32, ndim=2),
+    gain_rate: ti.types.ndarray(dtype=ti.f32, ndim=1),
+):
     """
     Calculate the coagulation gain rate via discrete trapezoidal integration.
 
@@ -62,7 +45,6 @@ def get_coagulation_gain_rate_continuous_taichi(
                 * dr
             )
         gain_rate[i] = acc
-    return gain_rate
 
 
 if __name__ == "__main__":
