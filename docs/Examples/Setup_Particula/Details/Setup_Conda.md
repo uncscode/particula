@@ -76,6 +76,5 @@ Install editable:
 pip install -e ".[dev,extra]"
 ```
 
-Particula is now linked to your working copy; edits take effect immediately.
-See the [Contributor Workflow](Contributor_Workflow.md) for branching & PR tips.
+If you want to contribute to Particula, see the [Contributor Setup](Contributor_Setup.md) section for details on setting up a development environment and workflow.
 
