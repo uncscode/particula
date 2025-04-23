@@ -1,4 +1,4 @@
-# Contributor Workflow
+# Contributor Setup
 
 *Developer Setup Step‑by‑Step*
 ---
@@ -10,7 +10,7 @@ mode, and learn the branch → code → commit → PR cycle.
 
 Interested in contributing to the Particula project? This section explains how to set up a development environment and the workflow for contributing changes. We assume you have a GitHub account and Git installed (see the [Beginner Setup](New_to_Python.md) if not). Following these steps will allow you to run the latest development version of Particula and prepare your contributions for a pull request.
 
-## 1. Fork the repository on GitHub
+## Fork the repository on GitHub
 
 First, **fork the Particula repository** to your own GitHub account. Forking creates your personal copy of the project:
 
@@ -20,7 +20,7 @@ First, **fork the Particula repository** to your own GitHub account. Forking cre
 
 *(If you’re new to forking, see GitHub’s guide on how to fork a repository for more details.)*
 
-## 2. Get the code on your computer
+## Get the code on your computer
 
 Choose **one** of the two methods below.
 

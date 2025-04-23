@@ -4,7 +4,7 @@ Welcome!  Choose the route that matches your comfort level:
 
 * I already use Python every day → **_Quick‑start for Experienced Users_**
 * I’m new to Python → [**_Guide for New Users_**](Details/New_to_Python.md)
-* I want to contribute to Particula → [**_Contributing to Particula_**](Details/Contributor_Workflow.md)
+* I want to contribute to Particula → [**_Contributing to Particula_**](Details/Contributor_Setup.md)
 
 ---
 

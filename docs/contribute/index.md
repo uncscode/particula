@@ -1,9 +1,10 @@
 # Contribute
 
-Here we have summary and links to the different ways you can contribute to the project.
+Welcome — we’re thrilled that you’d like to help make Particula better!
 
-## Contents
+All detailed guides, workflow diagrams, and coding standards can be found
+in the navigation menu on the left.  Use those links whenever you need
+more information about a specific step or requirement.
 
-- [Code of Conduct](./CODE_OF_CONDUCT.md)
-- [Contributing Guidelines](./CONTRIBUTING.md)
-- <a href="https://google.github.io/styleguide/pyguide.html" target="_blank">Style Guide (Google)</a>
+Start with [Contributing](Contributing.md) for a high-level overview of the process.
+Then, branch out to the specific sections for more details on each step.
