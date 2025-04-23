@@ -71,7 +71,7 @@ uv venv .venv --python=python3.12
 
 ## 4. Install Editable with Contributing
 
-If you want to contribute to Particula, see the [Contributing to Particula](Contributor_Workflow.md) section for details on setting up a development environment and workflow.
+If you want to contribute to Particula, see the [Contributor Setup](Contributor_Setup.md) section for details on setting up a development environment and workflow.
 
 Once in your forked repo, create the same `.venv` as above, then you can install Particula in editable mode with the required dev dependencies:
 

@@ -64,11 +64,7 @@ pip uninstall particula
 
 ## 6. Developing Particula from source
 
-Want to hack on the code or submit a pull request?  
-Work from your *own fork* and install Particula in **editable** mode with all
-developer extras. See the [Contributing to Particula](Contributor_Workflow.md) section for details on setting up a workflow.
-
-Once in your forked repo, create the same `.venv` as above, then you can install Particula in editable mode with the required dev dependencies:
+If you want to contribute to Particula, see the [Contributor Setup](Contributor_Setup.md) section for details on setting up a development environment and workflow.
 
 Install Particula **editable + dev extras**:
 
@@ -76,6 +72,5 @@ Install Particula **editable + dev extras**:
 pip install -e ".[dev,extra]"
 ```
 
-The package is now linked to your working copy—changes you make in the
-repository are picked up immediately.
+The package is now linked to your working copy—changes you make in the repository are picked up immediately.
 
