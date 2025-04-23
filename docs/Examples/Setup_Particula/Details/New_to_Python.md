@@ -62,10 +62,8 @@ Follow their dedicated guides:
 
 ## 5 · Next steps  
 
-• Ready to dive deeper?  Browse the documentation and example gallery.  
-• Want to contribute code?  See the  
-  [Contributor Workflow](Contributor_Workflow.md) and install Particula in
-  editable `[dev,extra]` mode.  
+- Ready to dive deeper?  Browse the documentation and example gallery.  
+- Want to contribute code?  See the [Contributor Setup](Contributor_Setup.md) and install Particula in editable `[dev,extra]` mode.  
 
 ---
 
