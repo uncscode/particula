@@ -102,8 +102,8 @@ def benchmark_timer(
     labels = [
         ("Throughput      (calls/s)", f"{throughput:,.0f}"),
         ("Cycles/call     (cycles)", f"{cycles_per_call:,.0f}"),
-        ("Est. Math Flops  (flops/call)", f"{flops_per_call:,.0f}"),
-        ("Efficiency (flops/cycle)", f"{flops_per_cycle:.3f}"),
+        ("Est. Math Flops (flops/call)", f"{flops_per_call:,.0f}"),
+        ("Efficiency      (flops/cycle)", f"{flops_per_cycle:.3f}"),
         ("Median time     (ms/call)", f"{t_med_ms:.3f} [±{t_std_ms:.3f}]"),
         ("Min time        (ms/call)", f"{t_min_ms:.3f}"),
     ]
