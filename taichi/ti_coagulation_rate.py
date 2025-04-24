@@ -48,6 +48,82 @@ def get_coagulation_gain_rate_continuous_taichi(
         gain_rate[i] = acc
 
 
+def benchmark_timer(
+    timer: timeit.Timer,
+    ops_per_call: float,
+    repeats: int = 2000,
+    calls_per_repeat: int = 50,
+) -> dict:
+    """
+    Run a Timer benchmark and return performance metrics plus a formatted report.
+    Key names now include unit suffixes.
+
+    Args:
+        timer: A timeit.Timer instance to measure.
+        ops_per_call: Estimated floating-point operations per call.
+        repeats: How many times to repeat the measurement loop.
+        calls_per_repeat: Number of calls in each timing.
+
+    Returns:
+        A dict containing:
+          throughput_calls_per_s: Calls per second (float).
+          cycles_per_call_cycles_per_call: Cycles per call (float).
+          flops_per_call_flops_per_call: Flops per call (float).
+          flops_per_cycle_flops_per_cycle: Flops per cycle (float).
+          median_time_s: Median time per call in seconds (float).
+          std_time_s: Sample standard deviation of time per call in seconds (float).
+          report: A multi-line string summarizing the results.
+    """
+    # 1) Collect raw timing results (total seconds per batch)
+    results = timer.repeat(repeat=repeats, number=calls_per_repeat)
+
+    # 2) Compute per-call times
+    per_call = np.array(results) / calls_per_repeat
+    t_med = np.median(per_call)
+    t_min = np.min(per_call)
+    t_max = np.max(per_call)
+    t_std = per_call.std(ddof=1)
+
+    # 3) Sample current CPU frequency (Hz)
+    f_hz = psutil.cpu_freq().current * 1e6
+
+    # 4) Compute derived metrics
+    cycles_per_call = t_med * f_hz
+    throughput = 1.0 / t_med
+    flops_per_call = ops_per_call
+    flops_per_cycle = ops_per_call / cycles_per_call
+
+    # 5) Build formatted report (no direct prints)
+    # convert to ms for reporting
+    t_med_ms = t_med * 1e3
+    t_min_ms = t_min * 1e3
+    t_std_ms = t_std * 1e3
+
+    labels = [
+        ("Throughput      (calls/s)", f"{throughput:,.0f}"),
+        ("Cycles/call     (cycles)", f"{cycles_per_call:,.0f}"),
+        ("Est. Math Flops  (flops/call)", f"{flops_per_call:,.0f}"),
+        ("Efficiency (flops/cycle)", f"{flops_per_cycle:.3f}"),
+        ("Median time     (ms/call)", f"{t_med_ms:.3f} [±{t_std_ms:.3f}]"),
+        ("Min time        (ms/call)", f"{t_min_ms:.3f}"),
+    ]
+    header = f"Benchmark: {repeats} runs × {calls_per_repeat} calls each"
+    lines = [header] + [f"  {label:<30}{value}" for label, value in labels]
+    report = "\n".join(lines)
+
+    return {
+        "throughput_calls_per_s": throughput,
+        "cycles_per_call": cycles_per_call,
+        "flops_per_call": flops_per_call,
+        "flops_per_cycle": flops_per_cycle,
+        "median_time_s": t_med,
+        "min_time_s": t_min,
+        "max_time_s": t_max,
+        "std_time_s": t_std,
+        "report": report,
+    }
+
+
 if __name__ == "__main__":
 
     # --- example usage ---
@@ -79,9 +155,6 @@ if __name__ == "__main__":
         alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency
     )
 
-    ops_per_call = 17 * bins_total * (bins_total - 1)  # 9 Number of operations
-    print(f"Number of operations: {ops_per_call}")
-
     out = np.zeros_like(concentration_lognormal_0, dtype=np.float64)
 
     # to taichi
@@ -91,11 +164,6 @@ if __name__ == "__main__":
     )
     kernel = np.asarray(kernel, dtype=np.float64)
     out = np.asarray(out, dtype=np.float64)
-    get_coagulation_gain_rate_continuous_taichi(
-        radius_bins,
-        concentration_lognormal_0,
-        kernel,
-        out)
     # 2) Set up the Timer
     timer = timeit.Timer(
         stmt=lambda: get_coagulation_gain_rate_continuous_taichi(
@@ -106,65 +174,31 @@ if __name__ == "__main__":
         )
     )
 
-    freq = psutil.cpu_freq()
-    print(f"Current Frequency: {freq.current:.2f} MHz")
-    print(f"Min Frequency:     {freq.min:.2f} MHz")
-    print(f"Max Frequency:     {freq.max:.2f} MHz")
+    ops_per_call = 9 * bins_total * (bins_total - 1)
+    # benchmark the Taichi kernel
+    taichi_results = benchmark_timer(
+        timer=timer,
+        ops_per_call=ops_per_call,
+        repeats=2000,
+        calls_per_repeat=50,
+    )
+    print("Taichi kernel")
+    print(taichi_results["report"])
 
-    f_hz = freq.current * 1e6   # convert MHz → Hz
-
-    # 3) Repeat the measurement
-    repeats = 2000
-    calls_per_repeat = 50
-    results = timer.repeat(repeat=repeats, number=calls_per_repeat)
-    # results is a list of `repeats` total times (in seconds)
-    freq = psutil.cpu_freq()
-    print(f"Current Frequency: {freq.current:.2f} MHz")
-    print(f"Min Frequency:     {freq.min:.2f} MHz")
-    print(f"Max Frequency:     {freq.max:.2f} MHz")
-
-    # 4) Convert to per-call times
-    per_call_times = np.array(results) / calls_per_repeat
-
-    # 5) Compute average and standard deviation
-    avg_time = per_call_times.min()
-    std_time = per_call_times.std(ddof=1)  # sample std
-
-    # calculate opperations per cpu cycle
-    # 3) compute cycles per call
-    cycles_per_call = avg_time * f_hz
-
-    # 5) finally ops per cycle
-    ops_per_cycle = ops_per_call / cycles_per_call
-
-    print(f"Taichi version:")
-    print(f"Per-call time over {repeats} runs of {calls_per_repeat} calls:")
-    print(f"  mean = {avg_time*1e3:.3f} ms")
-    print(f"  std  = {std_time*1e3:.3f} ms")
-    print(f"Cycles per call: {cycles_per_call:.1f}")
-    print(f"Operations per cycle: {ops_per_cycle:.3f}")
-
-    # # Same for standard call
-    # timer_python = timeit.Timer(
-    #     stmt=lambda: par.dynamics.get_coagulation_gain_rate_continuous(
-    #         radius_bins,
-    #         concentration_lognormal_0,
-    #         kernel,
-    #     )
-    # )
-    # results_python = timer_python.repeat(repeat=repeats, number=calls_per_repeat)
-    # per_call_times_python = np.array(results_python) / calls_per_repeat
-    # avg_time_python = per_call_times_python.mean()
-    # std_time_python = per_call_times_python.std(ddof=1)  # sample std
-
-    # print(f"Python version:")
-    # print(f"Per-call time over {repeats} runs of {calls_per_repeat} calls:")
-    # print(f"  mean = {avg_time_python*1e3:.3f} ms")
-    # print(f"  std  = {std_time_python*1e3:.3f} ms")
-
-    # speed_up = avg_time_python / avg_time
-    # print(f"Speedup: {avg_time_python/avg_time:.2f}x")
-    # percent_std = (std_time_python / avg_time_python)**2 + (
-    #     std_time / avg_time
-    # ) ** 2
-    # print(f"Relative error: {np.sqrt(percent_std):.2%}")
+    # Same for standard call
+    timer_python = timeit.Timer(
+        stmt=lambda: par.dynamics.get_coagulation_gain_rate_continuous(
+            radius_bins,
+            concentration_lognormal_0,
+            kernel,
+        )
+    )
+    # benchmark the standard call
+    python_results = benchmark_timer(
+        timer=timer_python,
+        ops_per_call=ops_per_call,
+        repeats=100,
+        calls_per_repeat=25,
+    )
+    print("Python kernel")
+    print(python_results["report"])
