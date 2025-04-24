@@ -12,10 +12,10 @@ ti.init(arch=ti.cpu)  # or ti.cpu
 
 @ti.kernel
 def get_coagulation_gain_rate_continuous_taichi(
-    radius: ti.types.ndarray(dtype=ti.f64, ndim=1),
-    concentration: ti.types.ndarray(dtype=ti.f64, ndim=1),
-    kernel: ti.types.ndarray(dtype=ti.f64, ndim=2),
-    gain_rate: ti.types.ndarray(dtype=ti.f64, ndim=1),
+    radius: ti.types.ndarray(),
+    concentration: ti.types.ndarray(),
+    kernel: ti.types.ndarray(),
+    gain_rate: ti.types.ndarray(),
 ):
     """
     Calculate the coagulation gain rate via discrete trapezoidal integration.
@@ -88,8 +88,8 @@ def benchmark_timer(
     f_hz = psutil.cpu_freq().current * 1e6
 
     # 4) Compute derived metrics
-    cycles_per_call = t_med * f_hz
-    throughput = 1.0 / t_med
+    cycles_per_call = t_min * f_hz
+    throughput = 1.0 / t_min
     flops_per_call = ops_per_call
     flops_per_cycle = ops_per_call / cycles_per_call
 
@@ -127,7 +127,7 @@ def benchmark_timer(
 if __name__ == "__main__":
 
     # --- example usage ---
-    bins_total = 200  # Number of bins for the particle size distribution
+    bins_total = 500  # Number of bins for the particle size distribution
     # Create fine scale radius bins on a logarithmic scale from 1 nm to 10 μm
     radius_bins = np.logspace(start=-9, stop=-4, num=bins_total)  # m (1 nm to 10 μm)
 
@@ -179,8 +179,8 @@ if __name__ == "__main__":
     taichi_results = benchmark_timer(
         timer=timer,
         ops_per_call=ops_per_call,
-        repeats=2000,
-        calls_per_repeat=50,
+        repeats=10000,
+        calls_per_repeat=10,
     )
     print("Taichi coagulation gain rate")
     print(taichi_results["report"])
@@ -197,8 +197,8 @@ if __name__ == "__main__":
     python_results = benchmark_timer(
         timer=timer_python,
         ops_per_call=ops_per_call,
-        repeats=100,
-        calls_per_repeat=25,
+        repeats=500,
+        calls_per_repeat=10,
     )
     print(" ")
     print("Current Python coagulation gain rate")
