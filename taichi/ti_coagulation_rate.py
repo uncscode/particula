@@ -1,5 +1,12 @@
 """
 Taichi implementation of the coagulation gain rate calculation.
+
+
+Add max time to run, and min iterations to run.
+Adapt for fast a slow running code. Increase base repeats until ms>10ms
+Use min, max and median and std. Run call calculation base on min time.
+Use psutil to cpu info on type and system info. save to csv or json file.
+
 """
 import timeit
 import taichi as ti
