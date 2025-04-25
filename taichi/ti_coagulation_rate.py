@@ -102,8 +102,8 @@ def benchmark_timer(
     labels = [
         ("Throughput      (calls/s)", f"{throughput:,.0f}"),
         ("Cycles/call     (cycles)", f"{cycles_per_call:,.0f}"),
-        ("Est. Math Flops (flops/call)", f"{flops_per_call:,.0f}"),
-        ("Efficiency      (flops/cycle)", f"{flops_per_cycle:.3f}"),
+        ("Est. Flops      (flops/call)", f"{flops_per_call:,.0f}"),
+        ("Efficiency      (flops/cycle)", f"{flops_per_cycle:.4f}"),
         ("Median time     (ms/call)", f"{t_med_ms:.3f} [±{t_std_ms:.3f}]"),
         ("Min time        (ms/call)", f"{t_min_ms:.3f}"),
     ]
@@ -182,7 +182,7 @@ if __name__ == "__main__":
         repeats=2000,
         calls_per_repeat=50,
     )
-    print("Taichi kernel")
+    print("Taichi coagulation gain rate")
     print(taichi_results["report"])
 
     # Same for standard call
@@ -200,5 +200,6 @@ if __name__ == "__main__":
         repeats=100,
         calls_per_repeat=25,
     )
-    print("Python kernel")
+    print(" ")
+    print("Current Python coagulation gain rate")
     print(python_results["report"])
