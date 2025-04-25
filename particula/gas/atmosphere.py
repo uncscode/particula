@@ -17,8 +17,12 @@ class Atmosphere:
         - temperature : Temperature of the gas mixture in Kelvin.
         - total_pressure : Total atmospheric pressure of the mixture in
           Pascals.
-        - species : List of GasSpecies objects representing the
-            various species within the gas mixture.
+        - partitioning_species : List of GasSpecies objects representing the
+          various species within the gas mixture, that can be
+          partitioned to the particle phase.
+        - nonpartitioning_species : List of GasSpecies objects representing the
+          various species within the gas mixture, that cannot be
+          partitioned to the particle phase.
 
     Methods:
     - add_species : Adds a GasSpecies object to the mixture.
@@ -27,7 +31,8 @@ class Atmosphere:
 
     temperature: float
     total_pressure: float
-    species: list[GasSpecies] = field(default_factory=list)
+    partitioning_species: list[GasSpecies] = field(default_factory=list)
+    nonpartitioning_species: list[GasSpecies] = field(default_factory=list)
 
     def add_species(self, gas_species: GasSpecies) -> None:
         """
