@@ -84,19 +84,17 @@ class MassCondensation(RunnableABC):
             # The aerosol now has reduced/increased particle/gas mass
             ```
         """
-        partitioning_species = aerosol.atmosphere.partitioning_species
-        if partitioning_species.partitioning:
-            for _ in range(sub_steps):
-                # calculate the condensation step for strategy
-                aerosol.particles, partitioning_species = (
-                    self.condensation_strategy.step(
-                        particle=aerosol.particles,
-                        gas_species=partitioning_species,
-                        temperature=aerosol.atmosphere.temperature,
-                        pressure=aerosol.atmosphere.total_pressure,
-                        time_step=time_step / sub_steps,
-                    )
+        for _ in range(sub_steps):
+            # calculate the condensation step for strategy
+            aerosol.particles, aerosol.atmosphere.partitioning_species = (
+                self.condensation_strategy.step(
+                    particle=aerosol.particles,
+                    gas_species=aerosol.atmosphere.partitioning_species,
+                    temperature=aerosol.atmosphere.temperature,
+                    pressure=aerosol.atmosphere.total_pressure,
+                    time_step=time_step / sub_steps,
                 )
+            )
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
@@ -116,19 +114,14 @@ class MassCondensation(RunnableABC):
             # rates may look like array([1.2e-12, 4.5e-12, ...])
             ```
         """
-        rates = np.array([], dtype=np.float64)
-        partitioning_species = aerosol.atmosphere.partitioning_species
-        # Check if the gas species is condensable
-        if partitioning_species:
-            # Calculate the rate of condensation
-            mass_rate = self.condensation_strategy.rate(
+        return (
+            self.condensation_strategy.rate(
                 particle=aerosol.particles,
-                gas_species=partitioning_species,
+                gas_species=aerosol.atmosphere.partitioning_species,
                 temperature=aerosol.atmosphere.temperature,
                 pressure=aerosol.atmosphere.total_pressure,
             )
-            rates = np.append(rates, mass_rate)
-        return rates
+        )
 
 
 class Coagulation(RunnableABC):
