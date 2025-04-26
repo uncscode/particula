@@ -84,17 +84,14 @@ class MassCondensation(RunnableABC):
             # The aerosol now has reduced/increased particle/gas mass
             ```
         """
-        # loop over gas species
-        for gas_species in aerosol.iterate_gas():
-            # check if gas species is condensable
-            if not gas_species.condensable:
-                continue
+        partitioning_species = aerosol.atmosphere.partitioning_species
+        if partitioning_species.partitioning:
             for _ in range(sub_steps):
                 # calculate the condensation step for strategy
-                aerosol.particles, gas_species = (
+                aerosol.particles, partitioning_species = (
                     self.condensation_strategy.step(
                         particle=aerosol.particles,
-                        gas_species=gas_species,
+                        gas_species=partitioning_species,
                         temperature=aerosol.atmosphere.temperature,
                         pressure=aerosol.atmosphere.total_pressure,
                         time_step=time_step / sub_steps,
@@ -120,16 +117,13 @@ class MassCondensation(RunnableABC):
             ```
         """
         rates = np.array([], dtype=np.float64)
-        # Loop over gas species in the aerosol
-        for gas_species in aerosol.iterate_gas():
-            # Check if the gas species is condensable
-            if not gas_species.condensable:
-                continue
-            # print(gas_species.name)
+        partitioning_species = aerosol.atmosphere.partitioning_species
+        # Check if the gas species is condensable
+        if partitioning_species:
             # Calculate the rate of condensation
             mass_rate = self.condensation_strategy.rate(
                 particle=aerosol.particles,
-                gas_species=gas_species,
+                gas_species=partitioning_species,
                 temperature=aerosol.atmosphere.temperature,
                 pressure=aerosol.atmosphere.total_pressure,
             )

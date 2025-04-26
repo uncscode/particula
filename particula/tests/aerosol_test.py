@@ -9,7 +9,6 @@ from particula.gas import (
     GasSpeciesBuilder,
 )
 from particula.aerosol import Aerosol
-from particula.gas.species import GasSpecies
 
 
 class TestAerosol(unittest.TestCase):
@@ -44,13 +43,13 @@ class TestAerosol(unittest.TestCase):
             .set_vapor_pressure_strategy(vapor_pressure_strategy)
             .set_concentration(sat_concentration * sat_factor, "kg/m^3")
             .set_name("Glycerol")
-            .set_condensable(True)
+            .set_partitioning(True)
             .build()
         )
 
         self.atmosphere = (
             AtmosphereBuilder()
-            .add_species(glycerol_gas)
+            .set_more_partitioning_species(glycerol_gas)
             .set_temperature(25 + 273.15, temperature_units="K")
             .set_pressure(1e5, pressure_units="Pa")
             .build()
@@ -75,11 +74,6 @@ class TestAerosol(unittest.TestCase):
         result = str(self.aerosol)
         self.assertIn("Gas mixture", result)
         self.assertIn("Particle Representation", result)
-
-    def test_iterate_gas(self):
-        """Test the iterate_gas method of the Aerosol class."""
-        gas_iterator = self.aerosol.iterate_gas()
-        self.assertIsInstance(next(gas_iterator), GasSpecies)
 
     def test_replace_atmosphere(self):
         """Test the replace_atmosphere method of the Aerosol class."""

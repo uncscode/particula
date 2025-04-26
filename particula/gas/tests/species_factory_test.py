@@ -34,7 +34,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
             "molar_mass": 0.032,
             "molar_mass_units": "kg/mol",
             "vapor_pressure_strategy": ConstantVaporPressureStrategy(50),
-            "condensable": False,
+            "partitioning": False,
             "concentration": 1.2,
             "concentration_units": "kg/m^3",
         }
@@ -46,7 +46,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
             gas_species.pure_vapor_pressure_strategy,
             parameters["vapor_pressure_strategy"],
         )
-        self.assertEqual(gas_species.condensable, parameters["condensable"])
+        self.assertEqual(gas_species.partitioning, parameters["partitioning"])
         self.assertEqual(
             gas_species.concentration, parameters["concentration"]
         )
@@ -64,7 +64,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
             preset_gas_species.pure_vapor_pressure_strategy,
             ConstantVaporPressureStrategy,
         )
-        self.assertEqual(preset_gas_species.condensable, False)
+        self.assertEqual(preset_gas_species.partitioning, False)
         self.assertEqual(preset_gas_species.concentration, 1.0)
 
     def test_get_strategy_invalid(self):
