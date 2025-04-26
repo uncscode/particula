@@ -43,14 +43,14 @@ class GasSpeciesBuilder(
         - molar_mass : The molar mass of the gas species in kg/mol.
         - vapor_pressure_strategy : The vapor pressure strategy for the
             gas species.
-        - condensable : Whether the gas species is condensable.
+        - partitioning : Whether the gas species can partition.
         - concentration : The concentration of the gas species in the
             mixture, in kg/m^3.
 
     Methods:
     - set_name : Set the name of the gas species.
     - set_vapor_pressure_strategy : Set the vapor pressure strategy.
-    - set_condensable : Set whether the species is condensable.
+    - set_partitioning : Set whether the species can partition.
     - set_molar_mass : From BuilderMolarMassMixin.
     - set_concentration : From BuilderConcentrationMixin.
     - build : Validate parameters and return a GasSpecies object.
@@ -65,7 +65,7 @@ class GasSpeciesBuilder(
             .set_vapor_pressure_strategy(
                 par.gas.ConstantVaporPressureStrategy(vapor_pressure=101325)
             )
-            .set_condensable(False)
+            .set_partitioning(False)
             .set_concentration(1.2, "kg/m^3")
             .build()
         )
@@ -79,7 +79,7 @@ class GasSpeciesBuilder(
             "name",
             "molar_mass",
             "vapor_pressure_strategy",
-            "condensable",
+            "partitioning",
             "concentration",
         ]
         BuilderABC.__init__(self, required_parameters)
@@ -87,7 +87,7 @@ class GasSpeciesBuilder(
         BuilderConcentrationMixin.__init__(self, default_units="kg/m^3")
         self.name = None
         self.vapor_pressure_strategy = None
-        self.condensable = None
+        self.partitioning = None
 
     def set_name(
         self, name: Union[str, NDArray[np.str_]]
@@ -120,20 +120,20 @@ class GasSpeciesBuilder(
         self.vapor_pressure_strategy = strategy
         return self
 
-    def set_condensable(
+    def set_partitioning(
         self,
-        condensable: Union[bool, NDArray[np.bool_]],
+        partitioning: bool,
     ) -> "GasSpeciesBuilder":
         """
-        Set whether the gas species is condensable.
+        Set whether the gas species can partition.
 
         Arguments:
-            - condensable : Boolean or array indicating condensability.
+            - partitioning : Boolean flag.
 
         Returns:
             - This builder instance.
         """
-        self.condensable = condensable
+        self.partitioning = partitioning
         return self
 
     def build(self) -> GasSpecies:
@@ -150,7 +150,7 @@ class GasSpeciesBuilder(
             name=self.name,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
             vapor_pressure_strategy=(self.vapor_pressure_strategy),
-            condensable=self.condensable,  # type: ignore
+            partitioning=self.partitioning,  # type: ignore
             concentration=self.concentration,  # type: ignore
         )
 
@@ -176,7 +176,7 @@ class PresetGasSpeciesBuilder(
         self.vapor_pressure_strategy = ConstantVaporPressureStrategy(
             vapor_pressure=1.0  # Pa
         )
-        self.condensable = False
+        self.partitioning = False
         self.concentration = 1.0
 
     def build(self) -> GasSpecies:
@@ -191,6 +191,6 @@ class PresetGasSpeciesBuilder(
             name=self.name,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
             vapor_pressure_strategy=(self.vapor_pressure_strategy),
-            condensable=self.condensable,  # type: ignore
+            partitioning=self.partitioning,  # type: ignore
             concentration=self.concentration,  # type: ignore
         )

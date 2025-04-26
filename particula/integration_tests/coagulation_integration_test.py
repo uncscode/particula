@@ -34,7 +34,6 @@ class TestCoagulationIntegration(unittest.TestCase):
         self.radius_bins = np.logspace(-8, -6, 250)
         self.atmosphere = (
             par.gas.AtmosphereBuilder()
-            .add_species(par.gas.PresetGasSpeciesBuilder().build())
             .set_temperature(273, temperature_units="K")
             .set_pressure(101325, pressure_units="Pa")
             .build()

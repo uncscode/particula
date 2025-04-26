@@ -1,7 +1,6 @@
 """Tests for the AtmosphereBuilder class."""
 
 import pytest
-import numpy as np
 from particula.gas.atmosphere_builders import AtmosphereBuilder
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (
@@ -11,41 +10,46 @@ from particula.gas.vapor_pressure_strategies import (
 
 def test_gas_builder_with_species():
     """Test building a Gas object with the GasBuilder."""
-    vapor_pressure_strategy_atmo = ConstantVaporPressureStrategy(
-        vapor_pressure=np.array([101325, 101325, 101325])
+    vapor_pressure_strategy = ConstantVaporPressureStrategy(101325)
+
+    oxygen = GasSpecies(
+        name="Oxygen",
+        molar_mass=0.032,
+        vapor_pressure_strategy=vapor_pressure_strategy,
+        partitioning=True,
+        concentration=0.21,
     )
-    names_atmo = np.array(["Oxygen", "Nitrogen", "Carbon Dioxide"])
-    molar_masses_atmo = np.array([0.032, 0.028, 0.044])
-    condensables_atmo = np.array([False, False, True])
-    concentrations_atmo = np.array([0.21, 0.79, 0.0])
-    gas_species_builder_test = GasSpecies(
-        name=names_atmo,
-        molar_mass=molar_masses_atmo,
-        vapor_pressure_strategy=vapor_pressure_strategy_atmo,
-        condensable=condensables_atmo,
-        concentration=concentrations_atmo,
+
+    nitrogen = GasSpecies(
+        name="Nitrogen",
+        molar_mass=0.028,
+        vapor_pressure_strategy=vapor_pressure_strategy,
+        partitioning=False,
+        concentration=0.79,
     )
+
     atmo = (
         AtmosphereBuilder()
         .set_temperature(298.15, "K")
         .set_pressure(101325, "Pa")
-        .add_species(gas_species_builder_test)
+        .set_more_partitioning_species(oxygen)
+        .set_more_gas_only_species(nitrogen)
         .build()
     )
 
     assert atmo.temperature == 298.15
     assert atmo.total_pressure == 101325
-    assert len(atmo.species) == 1
-    assert np.array_equal(atmo.species[0].name, names_atmo)
-    assert np.array_equal(atmo.species[0].molar_mass, molar_masses_atmo)
-    assert np.array_equal(atmo.species[0].condensable, condensables_atmo)
-    assert np.array_equal(atmo.species[0].concentration, concentrations_atmo)
+    assert atmo.partitioning_species.get_name() == "Oxygen"
+    assert atmo.partitioning_species.get_molar_mass() == 0.032
+    assert atmo.gas_only_species.get_name() == "Nitrogen"
+    assert atmo.gas_only_species.get_molar_mass() == 0.028
+    # total species count (1+1)
+    assert len(atmo) == 2
 
 
 def test_gas_builder_without_species_raises_error():
     """Test that building a Gas object without any species raises an error."""
-    builder = AtmosphereBuilder()
-    # Omit adding any species to trigger the validation error
-    with pytest.raises(ValueError) as e:
+    builder = AtmosphereBuilder().set_temperature(298.15, "K")
+    # No pressure added – dataclass should fail
+    with pytest.raises(ValueError):
         builder.build()
-    assert "Atmosphere must contain at least one species." in str(e.value)

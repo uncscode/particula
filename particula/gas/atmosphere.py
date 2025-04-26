@@ -20,64 +20,37 @@ class Atmosphere:
         - partitioning_species : List of GasSpecies objects representing the
           various species within the gas mixture, that can be
           partitioned to the particle phase.
-        - nonpartitioning_species : List of GasSpecies objects representing the
+        - gas_only_species : List of GasSpecies objects representing the
           various species within the gas mixture, that cannot be
           partitioned to the particle phase.
 
     Methods:
-    - add_species : Adds a GasSpecies object to the mixture.
-    - remove_species : Removes a GasSpecies object from the mixture by index.
+    - add_partitioning_species : Adds a GasSpecies object to the mixture.
+    - add_gas_only_species : Adds a GasSpecies object to the mixture.
     """
 
     temperature: float
     total_pressure: float
-    partitioning_species: list[GasSpecies] = field(default_factory=list)
-    nonpartitioning_species: list[GasSpecies] = field(default_factory=list)
+    partitioning_species: GasSpecies
+    gas_only_species: GasSpecies
 
-    def add_species(self, gas_species: GasSpecies) -> None:
+    def add_partitioning_species(self, gas_species: GasSpecies) -> None:
         """
-        Add a GasSpecies object to the mixture.
+        Add a GasSpecies object to the partitioning species list.
 
         Arguments:
             - gas_species : The gas species to be added.
         """
-        self.species.append(gas_species)
+        self.partitioning_species.append(gas_species)
 
-    def remove_species(self, index: int) -> None:
+    def add_gas_only_species(self, gas_species: GasSpecies) -> None:
         """
-        Remove a gas species from the mixture by its index.
+        Add a GasSpecies object to the gas only (nonpartitioning) species list.
 
         Arguments:
-            - index : Index of the gas species to remove. Must be in range.
-
-        Raises:
-            - IndexError : If the provided index is out of bounds.
+            - gas_species : The gas species to be added.
         """
-        if 0 <= index < len(self.species):
-            self.species.pop(index)
-        else:
-            raise IndexError("No gas species at the provided index.")
-
-    def __iter__(self):
-        """
-        Allow iteration over the species in the gas mixture.
-
-        Returns:
-            - Iterator[GasSpecies] : An iterator over the gas species objects.
-        """
-        return iter(self.species)
-
-    def __getitem__(self, index: int) -> GasSpecies:
-        """
-        Retrieve a gas species by index.
-
-        Arguments:
-            - index : The index of the gas species to retrieve.
-
-        Returns:
-            - The gas species at the specified index.
-        """
-        return self.species[index]
+        self.gas_only_species.append(gas_species)
 
     def __len__(self) -> int:
         """
@@ -86,16 +59,18 @@ class Atmosphere:
         Returns:
             - The number of gas species in the mixture.
         """
-        return len(self.species)
+        return len(self.partitioning_species) + len(self.gas_only_species)
 
     def __str__(self) -> str:
         """
         Provide a string representation of the Atmosphere object.
 
         Returns:
-            - Includes the temperature, pressure, and a list of species.
+            - Includes the temperature, pressure, and lists of partitioning and
+              gas only species.
         """
         return (
-            f"Gas mixture at {self.temperature} K and {self.total_pressure} Pa"
-            f" consisting of {[str(species) for species in self.species]}"
+            f"Gas mixture at {self.temperature} K, {self.total_pressure} Pa, "
+            f"partitioning={self.partitioning_species}, "
+            f"gas_only_species={self.gas_only_species}"
         )

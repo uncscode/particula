@@ -38,14 +38,14 @@ def test_set_vapor_pressure_strategy():
     assert builder.vapor_pressure_strategy == strategy
 
 
-def test_set_condensable():
-    """Test setting the condensable bool of the gas species."""
+def test_set_partitioning():
+    """Test setting the partitioning bool of the gas species."""
     builder = GasSpeciesBuilder()
-    builder.set_condensable(True)
-    assert builder.condensable is True
+    builder.set_partitioning(True)
+    assert builder.partitioning is True
 
-    builder.set_condensable(False)
-    assert builder.condensable is False
+    builder.set_partitioning(False)
+    assert builder.partitioning is False
 
 
 def test_set_concentration():
@@ -70,7 +70,7 @@ def test_set_parameters():
         "molar_mass": 0.032,
         "molar_mass_units": "kg/mol",
         "vapor_pressure_strategy": vapor_obj,
-        "condensable": True,
+        "partitioning": True,
         "concentration": 1.0,
         "concentration_units": "kg/m^3",
     }
@@ -78,7 +78,7 @@ def test_set_parameters():
     assert builder.name == "Oxygen"
     assert builder.molar_mass == 0.032
     assert builder.vapor_pressure_strategy == vapor_obj
-    assert builder.condensable is True
+    assert builder.partitioning is True
     assert builder.concentration == 1.0
 
 
@@ -89,7 +89,7 @@ def test_missing_required_parameter():
         "name": "Oxygen",
         "molar_mass": 0.032,
         "vapor_pressure_strategy": ConstantVaporPressureStrategy(0.0),
-        "condensable": True,
+        "partitioning": True,
     }
     with pytest.raises(ValueError):
         builder.set_parameters(parameters)
@@ -102,7 +102,7 @@ def test_invalid_parameter():
         "name": "Oxygen",
         "molar_mass": 0.032,
         "vapor_pressure_strategy": ConstantVaporPressureStrategy(0.0),
-        "condensable": True,
+        "partitioning": True,
         "concentration": 1.0,
         "invalid_param": 123,
     }
@@ -118,7 +118,7 @@ def test_build():
         "molar_mass": 0.032,
         "molar_mass_units": "kg/mol",
         "vapor_pressure_strategy": ConstantVaporPressureStrategy(0.0),
-        "condensable": True,
+        "partitioning": True,
         "concentration": 1.0,
         "concentration_units": "kg/m^3",
     }
@@ -135,5 +135,5 @@ def test_preset_builder():
     assert isinstance(gas_species, GasSpecies)
     assert gas_species.get_name() == "Preset100"
     assert gas_species.get_molar_mass() == 0.100
-    assert gas_species.get_condensable() is False
+    assert gas_species.get_partitioning() is False
     assert gas_species.get_concentration() == 1.0

@@ -7,6 +7,7 @@ pressure, and kg/m^3 for concentration.
 
 import logging
 import warnings
+import copy
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
@@ -23,14 +24,14 @@ logger = logging.getLogger("particula")
 class GasSpecies:
     """
     Represents an individual or array of gas species with properties like
-    name, molar mass, vapor pressure, and condensability.
+    name, molar mass, vapor pressure, and partitioning.
 
     Attributes:
         - name : The name of the gas species.
         - molar_mass : The molar mass of the gas species in kg/mol.
         - pure_vapor_pressure_strategy : The strategy (or list of strategies)
           for calculating the pure vapor pressure of the gas species.
-        - condensable : Indicates whether the gas species is condensable.
+        - partitioning : Indicates whether the gas species can partition.
         - concentration : The concentration of the gas species in kg/m^3.
 
     Methods:
@@ -45,6 +46,11 @@ class GasSpecies:
       given Temperature.
     - add_concentration : Add concentration to the species.
     - set_concentration : Overwrite concentration value.
+    - append : Append another GasSpecies instance to this one.
+    - __iadd__ : In-place addition of another GasSpecies instance.
+    - __add__ : Addition of two GasSpecies instances (non-mutating).
+    - __str__ : String representation of the GasSpecies object.
+    - __len__ : Number of gas species (1 if scalar; array length if ndarray).
 
     Examples:
         ```py title="GasSpecies usage example"
@@ -54,7 +60,7 @@ class GasSpecies:
             name="Water",
             molar_mass=0.018,
             vapor_pressure_strategy=constant_vapor_pressure,
-            condensable=True,
+            partitioning=True,
             concentration=1e-3,  # kg/m^3
         )
         print(species.get_name(), species.get_concentration())
@@ -70,7 +76,7 @@ class GasSpecies:
         vapor_pressure_strategy: Union[
             VaporPressureStrategy, list[VaporPressureStrategy]
         ] = ConstantVaporPressureStrategy(0.0),
-        condensable: Union[bool, NDArray[np.bool_]] = True,
+        partitioning: bool = True,
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
         """
@@ -82,7 +88,7 @@ class GasSpecies:
             - molar_mass : The molar mass in kg/mol (must be > 0).
             - vapor_pressure_strategy : A single or list of strategies for
               calculating vapor pressure.
-            - condensable : Whether the species is condensable.
+            - partitioning : Whether the species can partition.
             - concentration : The initial concentration in kg/m^3.
 
         Raises:
@@ -94,7 +100,7 @@ class GasSpecies:
 
         self.name = name
         self.pure_vapor_pressure_strategy = vapor_pressure_strategy
-        self.condensable = condensable
+        self.partitioning = partitioning
 
     def __str__(self):
         """
@@ -121,8 +127,60 @@ class GasSpecies:
         return (
             len(self.molar_mass)
             if isinstance(self.molar_mass, np.ndarray)
-            else 1.0
+            else 1
         )
+
+    def __iadd__(self, other: "GasSpecies") -> "GasSpecies":
+        """
+        In-place addition: append another GasSpecies object to this one.
+
+        Arguments:
+            - other : The GasSpecies instance whose attributes will be
+              appended to the current object.
+
+        Returns:
+            - GasSpecies : The mutated object (`self`) containing the combined
+              attributes.
+
+        Raises:
+            - TypeError : If *other* is not a GasSpecies instance.
+            - ValueError : If the two objects have different ``partitioning``
+              flags.
+
+        Examples:
+            ```py title="Using the += operator"
+            species1 += species2
+            ```
+        """
+        self.append(other)
+        return self
+
+    def __add__(self, other: "GasSpecies") -> "GasSpecies":
+        """
+        Addition of two GasSpecies objects (non-mutating).
+
+        Creates and returns a new GasSpecies instance that contains the
+        combined attributes of *self* and *other*.
+
+        Arguments:
+            - other : The GasSpecies instance to be combined with *self*.
+
+        Returns:
+            - GasSpecies : A new object with concatenated attributes.
+
+        Raises:
+            - TypeError : If *other* is not a GasSpecies instance.
+            - ValueError : If the two objects have different ``partitioning``
+              flags.
+
+        Examples:
+            ```py title="Using the + operator"
+            merged_species = species1 + species2
+            ```
+        """
+        new_species = copy.deepcopy(self)
+        new_species.append(other)
+        return new_species
 
     def get_name(self) -> Union[str, NDArray[np.str_]]:
         """
@@ -152,19 +210,11 @@ class GasSpecies:
         """
         return self.molar_mass
 
-    def get_condensable(self) -> Union[bool, NDArray[np.bool_]]:
+    def get_partitioning(self) -> bool:
         """
-        Check if the gas species is condensable.
-
-        Returns:
-            - True if condensable, else False.
-
-        Examples:
-            ``` py title="Example of get_condensable()"
-            gas_object.get_condensable()
-            ```
+        Return the partitioning flag (True if the species can partition).
         """
-        return self.condensable
+        return self.partitioning
 
     def get_concentration(self) -> Union[float, NDArray[np.float64]]:
         """
@@ -371,6 +421,70 @@ class GasSpecies:
             new_concentration
         )
         self.concentration = new_concentration
+
+    def append(self, other: "GasSpecies") -> None:
+        """
+        Append another GasSpecies instance to this one (in-place).
+
+        Arguments:
+            - other : The GasSpecies object whose attributes will be
+              concatenated with those of the current object.
+
+        Returns:
+            - None : The method mutates ``self`` and returns ``None``.
+
+        Raises:
+            - TypeError  : If *other* is not a GasSpecies instance.
+            - ValueError : If *other* has a different ``partitioning`` flag.
+
+        Examples:
+            ```py title="Appending two GasSpecies objects"
+            species1.append(species2)
+            # species1 now represents both original species
+            ```
+        """
+        if not isinstance(other, GasSpecies):
+            raise TypeError("Argument 'other' must be a GasSpecies object.")
+
+        # helper: promote scalar -> 1-D numpy array
+        def _as_array(val, dtype):
+            return (
+                val
+                if isinstance(val, np.ndarray)
+                else np.array([val], dtype=dtype)
+            )
+
+        # concatenate/extend every attribute
+        self.name = np.concatenate(
+            [_as_array(self.name, np.str_), _as_array(other.name, np.str_)]
+        )
+        self.molar_mass = np.concatenate(
+            [
+                _as_array(self.molar_mass, np.float64),
+                _as_array(other.molar_mass, np.float64),
+            ]
+        )
+        self.concentration = np.concatenate(
+            [
+                _as_array(self.concentration, np.float64),
+                _as_array(other.concentration, np.float64),
+            ]
+        )
+        if self.partitioning != other.partitioning:
+            raise ValueError(
+                "Cannot append GasSpecies with different 'partitioning' flags"
+            )
+
+        # always keep strategies in a list, then extend
+        if not isinstance(self.pure_vapor_pressure_strategy, list):
+            self.pure_vapor_pressure_strategy = [
+                self.pure_vapor_pressure_strategy
+            ]
+        if not isinstance(other.pure_vapor_pressure_strategy, list):
+            other_strategies = [other.pure_vapor_pressure_strategy]
+        else:
+            other_strategies = other.pure_vapor_pressure_strategy
+        self.pure_vapor_pressure_strategy.extend(other_strategies)
 
     def _check_if_negative_concentration(
         self, values: Union[float, NDArray[np.float64]]
