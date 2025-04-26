@@ -7,7 +7,9 @@ import pytest
 
 from particula.gas.atmosphere import Atmosphere
 from particula.gas.species import GasSpecies
-from particula.gas.vapor_pressure_strategies import ConstantVaporPressureStrategy
+from particula.gas.vapor_pressure_strategies import (
+    ConstantVaporPressureStrategy,
+)
 
 
 # ------------------------------------------------------------------------
@@ -54,11 +56,6 @@ def atmosphere(oxygen, hydrogen):
         partitioning_species=oxygen,
         gas_only_species=hydrogen,
     )
-
-
-# ------------------------------------------------------------------------
-# Tests
-# ------------------------------------------------------------------------
 
 
 def test_atmosphere_initialization_values(atmosphere):
