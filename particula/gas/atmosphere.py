@@ -1,6 +1,6 @@
 """Atmosphere module for modeling gas mixtures in a given environment."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from particula.gas.species import GasSpecies
 
 
