@@ -3,12 +3,14 @@ Taichi implementation of the coagulation gain rate calculation.
 
 
 Add max time to run, and min iterations to run.
-Adapt for fast a slow running code. Increase base repeats until ms>10ms
+Adapt for fast a slow running code. Increase calls_per_repeat until ms>10ms
 Use min, max and median and std. Run call calculation base on min time.
 Use psutil to cpu info on type and system info. save to csv or json file.
 
 """
+
 import timeit
+import platform
 import taichi as ti
 import numpy as np
 import psutil
@@ -53,6 +55,46 @@ def get_coagulation_gain_rate_continuous_taichi(
                 * dr
             )
         gain_rate[i] = acc
+
+
+def collect_system_info():
+    """
+    Gather CPU and OS information using psutil and platform.
+
+    Returns:
+        dict: mapping of info keys to values.
+    """
+    info = {}
+
+    # CPU counts
+    info["physical_cores"] = psutil.cpu_count(logical=False)
+    info["total_cores"] = psutil.cpu_count(logical=True)
+
+    # CPU frequencies
+    freq = psutil.cpu_freq()
+    info["max_frequency_mhz"] = freq.max
+    info["min_frequency_mhz"] = freq.min
+    info["current_frequency_mhz"] = freq.current
+
+    # CPU usage
+    info["cpu_usage_per_core_%"] = psutil.cpu_percent(percpu=True, interval=1)
+    info["total_cpu_usage_%"] = psutil.cpu_percent()
+
+    # OS / machine info
+    uname = platform.uname()
+    info["system"] = uname.system
+    info["node_name"] = uname.node
+    info["release"] = uname.release
+    info["version"] = uname.version
+    info["machine"] = uname.machine
+    info["processor"] = uname.processor
+
+    # Python runtime
+    info["python_version"] = platform.python_version()
+    info["python_build"] = platform.python_build()
+    info["python_compiler"] = platform.python_compiler()
+
+    return info
 
 
 def benchmark_timer(
@@ -133,6 +175,12 @@ def benchmark_timer(
 
 if __name__ == "__main__":
 
+    # 1) Collect system information
+    system_info = collect_system_info()
+    print("System Information:")
+    print(system_info)
+    print(" ")
+
     # --- example usage ---
     bins_total = 500  # Number of bins for the particle size distribution
     # Create fine scale radius bins on a logarithmic scale from 1 nm to 10 μm
@@ -192,21 +240,21 @@ if __name__ == "__main__":
     print("Taichi coagulation gain rate")
     print(taichi_results["report"])
 
-    # Same for standard call
-    timer_python = timeit.Timer(
-        stmt=lambda: par.dynamics.get_coagulation_gain_rate_continuous(
-            radius_bins,
-            concentration_lognormal_0,
-            kernel,
-        )
-    )
-    # benchmark the standard call
-    python_results = benchmark_timer(
-        timer=timer_python,
-        ops_per_call=ops_per_call,
-        repeats=500,
-        calls_per_repeat=10,
-    )
-    print(" ")
-    print("Current Python coagulation gain rate")
-    print(python_results["report"])
+    # # Same for standard call
+    # timer_python = timeit.Timer(
+    #     stmt=lambda: par.dynamics.get_coagulation_gain_rate_continuous(
+    #         radius_bins,
+    #         concentration_lognormal_0,
+    #         kernel,
+    #     )
+    # )
+    # # benchmark the standard call
+    # python_results = benchmark_timer(
+    #     timer=timer_python,
+    #     ops_per_call=ops_per_call,
+    #     repeats=500,
+    #     calls_per_repeat=10,
+    # )
+    # print(" ")
+    # print("Current Python coagulation gain rate")
+    # print(python_results["report"])
