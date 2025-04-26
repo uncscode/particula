@@ -1,14 +1,13 @@
 """Testing Atmosphere and GasSpecies interaction"""
 
-# pylint: disable=R0801
+# pylint: disable=R0801,W0621
 
 import numpy as np
+import pytest
+
 from particula.gas.atmosphere import Atmosphere
 from particula.gas.species import GasSpecies
-from particula.gas.vapor_pressure_strategies import (
-    ConstantVaporPressureStrategy,
-)
-import pytest
+from particula.gas.vapor_pressure_strategies import ConstantVaporPressureStrategy
 
 
 # ------------------------------------------------------------------------
@@ -18,12 +17,13 @@ import pytest
 
 @pytest.fixture()
 def vapor_pressure_strategy():
-    """Constant vapor pressure strategy used by all species."""
+    """Constant vapor pressure strategy fixture."""
     return ConstantVaporPressureStrategy(vapor_pressure=np.array([101325]))
 
 
 @pytest.fixture()
 def oxygen(vapor_pressure_strategy):
+    """O₂ GasSpecies fixture."""
     return GasSpecies(
         name="Oxygen",
         molar_mass=0.032,
@@ -35,6 +35,7 @@ def oxygen(vapor_pressure_strategy):
 
 @pytest.fixture()
 def hydrogen(vapor_pressure_strategy):
+    """H₂ GasSpecies fixture."""
     return GasSpecies(
         name="Hydrogen",
         molar_mass=0.002,
@@ -46,7 +47,7 @@ def hydrogen(vapor_pressure_strategy):
 
 @pytest.fixture()
 def atmosphere(oxygen, hydrogen):
-    """Return an Atmosphere object with one partitioning and one gas-only species."""
+    """Atmosphere fixture with O₂ and H₂."""
     return Atmosphere(
         temperature=298.15,
         total_pressure=101325,
