@@ -9,12 +9,14 @@ Use psutil to cpu info on type and system info. save to csv or json file.
 
 """
 
+import time
 import timeit
 import platform
 import taichi as ti
 import numpy as np
 import psutil
 import particula as par
+from typing import Optional
 
 ti.init(arch=ti.cpu)  # or ti.cpu
 
@@ -100,8 +102,11 @@ def collect_system_info():
 def benchmark_timer(
     timer: timeit.Timer,
     ops_per_call: float,
-    repeats: int = 2000,
+    *,
+    max_run_time_s: float = 2.0,
+    min_iterations: int = 5,
     calls_per_repeat: int = 50,
+    repeats: Optional[int] = None,
 ) -> dict:
     """
     Run a Timer benchmark and return performance metrics plus a formatted report.
@@ -110,8 +115,10 @@ def benchmark_timer(
     Args:
         timer: A timeit.Timer instance to measure.
         ops_per_call: Estimated floating-point operations per call.
-        repeats: How many times to repeat the measurement loop.
+        max_run_time_s: Maximum total time (seconds) to run timing loop (if repeats is None).
+        min_iterations: Minimum number of timing runs to perform (if repeats is None).
         calls_per_repeat: Number of calls in each timing.
+        repeats: If set, overrides adaptive timing and runs this many repeats.
 
     Returns:
         A dict containing:
@@ -124,7 +131,17 @@ def benchmark_timer(
           report: A multi-line string summarizing the results.
     """
     # 1) Collect raw timing results (total seconds per batch)
-    results = timer.repeat(repeat=repeats, number=calls_per_repeat)
+    results: list[float] = []
+    if repeats is None:
+        start = time.perf_counter()
+        while (len(results) < min_iterations) or (
+            time.perf_counter() - start < max_run_time_s
+        ):
+            results.append(timer.timeit(number=calls_per_repeat))
+    else:
+        for _ in range(repeats):
+            results.append(timer.timeit(number=calls_per_repeat))
+    runs = len(results)
 
     # 2) Compute per-call times
     per_call = np.array(results) / calls_per_repeat
@@ -156,7 +173,7 @@ def benchmark_timer(
         ("Median time     (ms/call)", f"{t_med_ms:.3f} [±{t_std_ms:.3f}]"),
         ("Min time        (ms/call)", f"{t_min_ms:.3f}"),
     ]
-    header = f"Benchmark: {repeats} runs × {calls_per_repeat} calls each"
+    header = f"Benchmark: {runs} runs × {calls_per_repeat} calls each"
     lines = [header] + [f"  {label:<30}{value}" for label, value in labels]
     report = "\n".join(lines)
 
