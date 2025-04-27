@@ -1,3 +1,4 @@
+# %%
 """
 Taichi implementation of the coagulation gain rate calculation.
 
@@ -9,14 +10,20 @@ Use psutil to cpu info on type and system info. save to csv or json file.
 
 """
 
+import matplotlib.pyplot as plt
 import time
 import timeit
 import platform
 import taichi as ti
 import numpy as np
 import psutil
+import math
+import statistics
+import gc
+from typing import Callable, Optional, Any, Dict
+import json
+from tqdm import tqdm  # type: ignore[import]
 import particula as par
-from typing import Optional
 
 ti.init(arch=ti.cpu)  # or ti.cpu
 
@@ -85,7 +92,6 @@ def collect_system_info():
     # OS / machine info
     uname = platform.uname()
     info["system"] = uname.system
-    info["node_name"] = uname.node
     info["release"] = uname.release
     info["version"] = uname.version
     info["machine"] = uname.machine
@@ -100,108 +106,162 @@ def collect_system_info():
 
 
 def benchmark_timer(
-    timer: timeit.Timer,
+    func: Callable[[], Any],
     ops_per_call: float,
-    *,
     max_run_time_s: float = 2.0,
     min_iterations: int = 5,
-    calls_per_repeat: int = 50,
     repeats: Optional[int] = None,
-) -> dict:
+) -> Dict[str, float]:
     """
-    Run a Timer benchmark and return performance metrics plus a formatted report.
-    Key names now include unit suffixes.
+    Benchmark a zero-arg `func()` using perf_counter_ns, with GC disabled.
 
     Args:
-        timer: A timeit.Timer instance to measure.
-        ops_per_call: Estimated floating-point operations per call.
-        max_run_time_s: Maximum total time (seconds) to run timing loop (if repeats is None).
-        min_iterations: Minimum number of timing runs to perform (if repeats is None).
-        calls_per_repeat: Number of calls in each timing.
-        repeats: If set, overrides adaptive timing and runs this many repeats.
+        func:             A no-arg callable (e.g. `lambda: work(x,y)`).
+        ops_per_call:     Estimated FLOPs in each call to func().
+        max_run_time_s:   If `repeats`=None, run until this many seconds elapse.
+        min_iterations:   If `repeats`=None, do at least this many calls.
+        repeats:          If set, run exactly this many calls.
 
     Returns:
-        A dict containing:
-          throughput_calls_per_s: Calls per second (float).
-          cycles_per_call_cycles_per_call: Cycles per call (float).
-          flops_per_call_flops_per_call: Flops per call (float).
-          flops_per_cycle_flops_per_cycle: Flops per cycle (float).
-          median_time_s: Median time per call in seconds (float).
-          std_time_s: Sample standard deviation of time per call in seconds (float).
-          report: A multi-line string summarizing the results.
+        A dict with:
+          - min_time_s
+          - max_time_s
+          - mean_time_s
+          - mode_time_s
+          - median_time_s
+          - std_time_s
+          - throughput_calls_per_s    (1 / min_time_s)
+          - cycles_per_call           (min_time_s × CPU_Hz)
+          - flops_per_call            (== ops_per_call)
+          - flops_per_cycle           (ops_per_call / cycles_per_call)
+          - report                    (human-readable summary)
     """
-    # 1) Collect raw timing results (total seconds per batch)
-    results: list[float] = []
-    if repeats is None:
-        start = time.perf_counter()
-        while (len(results) < min_iterations) or (
-            time.perf_counter() - start < max_run_time_s
-        ):
-            results.append(timer.timeit(number=calls_per_repeat))
-    else:
-        for _ in range(repeats):
-            results.append(timer.timeit(number=calls_per_repeat))
-    runs = len(results)
+    # disable GC for cleaner timing
+    gc.disable()
 
-    # 2) Compute per-call times
-    per_call = np.array(results) / calls_per_repeat
-    t_med = np.median(per_call)
-    t_min = np.min(per_call)
-    t_max = np.max(per_call)
-    t_std = per_call.std(ddof=1)
+    timings: list[float] = []
+    try:
+        if repeats is None:
+            start_global = time.perf_counter_ns()
+            while (len(timings) < min_iterations) or (
+                (time.perf_counter_ns() - start_global) / 1e9 < max_run_time_s
+            ):
+                t0 = time.perf_counter_ns()
+                func()
+                t1 = time.perf_counter_ns()
+                timings.append((t1 - t0) / 1e9)
+        else:
+            for _ in range(repeats):
+                t0 = time.perf_counter_ns()
+                func()
+                t1 = time.perf_counter_ns()
+                timings.append((t1 - t0) / 1e9)
+        cpu_hz = psutil.cpu_freq().current * 1e6  # MHz → Hz
+    finally:
+        gc.enable()
 
-    # 3) Sample current CPU frequency (Hz)
-    f_hz = psutil.cpu_freq().current * 1e6
+    runs = len(timings)
+    # core stats
+    min_time = min(timings)
+    max_time = max(timings)
+    mean_time = statistics.mean(timings)
+    try:
+        mode_time = statistics.mode(timings)
+    except statistics.StatisticsError:
+        mode_time = float("nan")
+    median_time = statistics.median(timings)
+    std_time = statistics.stdev(timings) if runs > 1 else 0.0
 
-    # 4) Compute derived metrics
-    cycles_per_call = t_min * f_hz
-    throughput = 1.0 / t_min
+    # throughput & cycle/flop estimates on best-case (min_time)
+    throughput = 1.0 / min_time
+    cycles_per_call = min_time * cpu_hz
     flops_per_call = ops_per_call
-    flops_per_cycle = ops_per_call / cycles_per_call
+    flops_per_cycle = (
+        ops_per_call / cycles_per_call if cycles_per_call else float("nan")
+    )
 
-    # 5) Build formatted report (no direct prints)
-    # convert to ms for reporting
-    t_med_ms = t_med * 1e3
-    t_min_ms = t_min * 1e3
-    t_std_ms = t_std * 1e3
-
+    # build report
     labels = [
         ("Throughput      (calls/s)", f"{throughput:,.0f}"),
-        ("Cycles/call     (cycles)", f"{cycles_per_call:,.0f}"),
+        ("CPU cycles      (cycles/call)", f"{cycles_per_call:,.0f}"),
         ("Est. Flops      (flops/call)", f"{flops_per_call:,.0f}"),
         ("Efficiency      (flops/cycle)", f"{flops_per_cycle:.4f}"),
-        ("Median time     (ms/call)", f"{t_med_ms:.3f} [±{t_std_ms:.3f}]"),
-        ("Min time        (ms/call)", f"{t_min_ms:.3f}"),
+        ("Min time        (ms/call)", f"{min_time*1e3:.3f}"),
+        ("STDV time       (ms/call)", f"±{std_time*1e3:.3f}"),
     ]
-    header = f"Benchmark: {runs} runs × {calls_per_repeat} calls each"
+    header = f"Benchmark: {runs} function calls."
     lines = [header] + [f"  {label:<30}{value}" for label, value in labels]
     report = "\n".join(lines)
 
+    array_stats = [
+        runs,
+        min_time,
+        max_time,
+        mean_time,
+        mode_time,
+        median_time,
+        std_time,
+        throughput,
+        cycles_per_call,
+        flops_per_call,
+        flops_per_cycle,
+    ]
+    array_headers = [
+        "function_calls",
+        "min_time_s",
+        "max_time_s",
+        "mean_time_s",
+        "mode_time_s",
+        "median_time_s",
+        "std_time_s",
+        "throughput_calls_per_s",
+        "cycles_per_call",
+        "flops_per_call",
+        "flops_per_cycle",
+    ]
+
     return {
+        "min_time_s": min_time,
+        "max_time_s": max_time,
+        "mean_time_s": mean_time,
+        "mode_time_s": mode_time,
+        "median_time_s": median_time,
+        "std_time_s": std_time,
         "throughput_calls_per_s": throughput,
         "cycles_per_call": cycles_per_call,
         "flops_per_call": flops_per_call,
         "flops_per_cycle": flops_per_cycle,
-        "median_time_s": t_med,
-        "min_time_s": t_min,
-        "max_time_s": t_max,
-        "std_time_s": t_std,
+        "function_calls": runs,
         "report": report,
+        "array_stats": array_stats,
+        "array_headers": array_headers,
     }
 
 
-if __name__ == "__main__":
+# %%
+# 1) Collect system information
+system_info = collect_system_info()
+print("System Information:")
+print(system_info)
+print(" ")
 
-    # 1) Collect system information
-    system_info = collect_system_info()
-    print("System Information:")
-    print(system_info)
-    print(" ")
+# --- example usage ---
+bins_total_array = np.logspace(
+    1, 3, 50, dtype=int
+)  # Number of bins for the particle size distribution
+taichi_benchmark = np.zeros((len(bins_total_array), 11), dtype=np.float64)
+python_benchmark = np.zeros((len(bins_total_array), 11), dtype=np.float64)
 
-    # --- example usage ---
-    bins_total = 500  # Number of bins for the particle size distribution
+for i, bins_total in tqdm(
+    enumerate(bins_total_array),
+    desc="Benchmarking",
+    total=len(bins_total_array),
+):
+    # bins_total = 500  # Number of bins for the particle size distribution
     # Create fine scale radius bins on a logarithmic scale from 1 nm to 10 μm
-    radius_bins = np.logspace(start=-9, stop=-4, num=bins_total)  # m (1 nm to 10 μm)
+    radius_bins = np.logspace(
+        start=-9, stop=-4, num=bins_total
+    )  # m (1 nm to 10 μm)
 
     # Calculate the mass for each particle size bin assuming a density of 1 g/cm^3 (1000 kg/m^3)
     mass_bins = 4 / 3 * np.pi * (radius_bins) ** 3 * 1e3  # kg
@@ -212,9 +272,12 @@ if __name__ == "__main__":
     concentration_lognormal_0 = par.particles.get_lognormal_pmf_distribution(
         x_values=radius_bins,
         mode=np.array(100e-9),  # Mode of the distribution (100 nm)
-        geometric_standard_deviation=np.array(1.4),  # Geometric standard deviation
+        geometric_standard_deviation=np.array(
+            1.4
+        ),  # Geometric standard deviation
         number_of_particles=np.array(
-            1e6 * 1e6  # Total concentration (10000 cm^-3 converted to m^-3)
+            1e6
+            * 1e6  # Total concentration (10000 cm^-3 converted to m^-3)
         ),
     )
 
@@ -236,42 +299,98 @@ if __name__ == "__main__":
     )
     kernel = np.asarray(kernel, dtype=np.float64)
     out = np.asarray(out, dtype=np.float64)
-    # 2) Set up the Timer
-    timer = timeit.Timer(
-        stmt=lambda: get_coagulation_gain_rate_continuous_taichi(
-            radius_bins,
-            concentration_lognormal_0,
-            kernel,
-            out,
-        )
-    )
 
     ops_per_call = 9 * bins_total * (bins_total - 1)
     # benchmark the Taichi kernel
     taichi_results = benchmark_timer(
-        timer=timer,
+        func=lambda: get_coagulation_gain_rate_continuous_taichi(
+            radius_bins,
+            concentration_lognormal_0,
+            kernel,
+            out,
+        ),
         ops_per_call=ops_per_call,
-        repeats=10000,
-        calls_per_repeat=10,
+        max_run_time_s=5.0,
     )
-    print("Taichi coagulation gain rate")
-    print(taichi_results["report"])
+    taichi_benchmark[i, :] = taichi_results["array_stats"]
 
-    # # Same for standard call
-    # timer_python = timeit.Timer(
-    #     stmt=lambda: par.dynamics.get_coagulation_gain_rate_continuous(
-    #         radius_bins,
-    #         concentration_lognormal_0,
-    #         kernel,
-    #     )
-    # )
-    # # benchmark the standard call
-    # python_results = benchmark_timer(
-    #     timer=timer_python,
-    #     ops_per_call=ops_per_call,
-    #     repeats=500,
-    #     calls_per_repeat=10,
-    # )
-    # print(" ")
-    # print("Current Python coagulation gain rate")
-    # print(python_results["report"])
+    # print("Taichi coagulation gain rate")
+    # print(taichi_results["report"])
+
+    # Same for standard call
+    python_results = benchmark_timer(
+        func=lambda: par.dynamics.get_coagulation_gain_rate_continuous(
+            radius_bins,
+            concentration_lognormal_0,
+            kernel,
+        ),
+        ops_per_call=ops_per_call,
+        max_run_time_s=5.0,
+    )
+    python_benchmark[i, :] = python_results["array_stats"]
+# %%
+# # save results to csv
+# np.savetxt(
+#     "taichi_benchmark.csv",
+#     taichi_benchmark,
+#     delimiter=",",
+#     header=",".join(taichi_results["array_headers"]),
+#     comments="",
+# )
+# np.savetxt(
+#     "python_benchmark.csv",
+#     python_benchmark,
+#     delimiter=",",
+#     header=",".join(python_results["array_headers"]),
+#     comments="",
+# )
+# # save system info to json
+# with open("system_info.json", "w") as f:
+#     json.dump(system_info, f, indent=4)
+
+print("Taichi Benchmark Results:")
+print(taichi_results["report"])
+print("Python Benchmark Results:")
+print(python_results["report"])
+
+# # figure
+x_array = bins_total_array
+
+fig, ax = plt.subplots()
+ax.plot(
+    x_array,
+    taichi_benchmark[:, -1],
+    label="Taichi",
+    marker="o",
+    color="#67e8f9",
+    markersize=5,
+)
+ax.plot(
+    x_array,
+    python_benchmark[:, -1],
+    label="Python",
+    marker="o",
+    color="#306998",
+    markersize=5,
+)
+twinx = ax.twinx()
+twinx.plot(
+    x_array,
+    taichi_benchmark[:, 7]/python_benchmark[:, 7],
+    label="Python:Taichi",
+    marker="o",
+    linestyle="--",
+    markersize=5,
+    color="gray",
+)
+twinx.set_ylabel("Through-put Ratio [Taichi:Python, calls/s]", color="gray")
+ax.set_yscale("log")
+# ax.set_xscale("log")
+ax.set_xlabel("Number of size bins")
+ax.set_ylabel("Calculation Efficiency [Flops per cycle]")
+ax.set_title("Coagulation gain rate")
+ax.legend()
+ax.grid()
+# plt.savefig("coagulation_gain_rate.png")
+
+# %%
