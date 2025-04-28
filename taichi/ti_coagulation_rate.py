@@ -1,13 +1,18 @@
 # %%
 """
-Taichi implementation of the coagulation gain rate calculation.
+Taichi utilities for coagulation-kernel benchmarks.
 
+This module provides Taichi-accelerated routines for evaluating the
+coagulation gain rate via kernel integration, as well as utilities for
+capturing system information and running micro-benchmarks. It is intended
+for performance testing and scientific analysis of particle coagulation
+kernels.
 
-Add max time to run, and min iterations to run.
-Adapt for fast a slow running code. Increase calls_per_repeat until ms>10ms
-Use min, max and median and std. Run call calculation base on min time.
-Use psutil to cpu info on type and system info. save to csv or json file.
-
+References:
+    - "Coagulation equation",
+      https://en.wikipedia.org/wiki/Smoluchowski_coagulation_equation
+    - L. G. Dyachkov, "Numerical solution of the Smoluchowski equation for
+      the coagulation of particles," Colloid Journal, 69(3), 2007.
 """
 
 import matplotlib.pyplot as plt
@@ -36,15 +41,35 @@ def get_coagulation_gain_rate_continuous_taichi(
     gain_rate: ti.types.ndarray(),
 ):
     """
-    Calculate the coagulation gain rate via discrete trapezoidal integration.
+    Compute the coagulation gain rate by discrete trapezoidal integration.
 
-    gain_rate[i] = ∑_j K[i,j] · c[i] · c[j] · Δr_j
+    The rate is evaluated as:
 
-    Args:
-        radius: Particle radius array.
-        concentration: Particle concentration array.
-        kernel: Coagulation kernel matrix.
-        gain_rate: Output array to write gain rates into.
+    - Gᵢ = ½ ∑ⱼ (Kᵢⱼ cᵢ cⱼ + Kᵢⱼ₊₁ cᵢ cⱼ₊₁) Δrⱼ
+
+        - Gᵢ is the gain rate for bin *i* (1/s),
+        - Kᵢⱼ is the coagulation kernel (m³/s),
+        - cᵢ, cⱼ are particle concentrations (#/m³),
+        - Δrⱼ is the radius interval (m).
+
+    Arguments:
+        - radius : 1-D array of particle radii in metres.
+        - concentration : 1-D array of particle number concentrations (# m⁻³).
+        - kernel : 2-D coagulation-kernel matrix (m³ s⁻¹).
+        - gain_rate : Pre-allocated output array (same length as *radius*).
+
+    Returns:
+        - None.  Results are written in-place to *gain_rate*.
+
+    Examples:
+        ```py title="Example Usage"
+        gain = np.empty_like(radius)
+        get_coagulation_gain_rate_continuous_taichi(radius, conc, K, gain)
+        ```
+
+    References:
+        - "Coagulation equation",
+          [Wikipedia](https://en.wikipedia.org/wiki/Smoluchowski_coagulation_equation)
     """
     n = radius.shape[0]
     half = ti.cast(0.5, ti.f64)  # 0.5 for trapezoidal rule
@@ -68,10 +93,19 @@ def get_coagulation_gain_rate_continuous_taichi(
 
 def collect_system_info():
     """
-    Gather CPU and OS information using psutil and platform.
+    Gather basic CPU, OS and Python-runtime information.
+
+    Arguments:
+        - None.
 
     Returns:
-        dict: mapping of info keys to values.
+        - Dictionary mapping descriptive keys to collected values.
+
+    Examples:
+        ```py
+        info = collect_system_info()
+        print(info["total_cores"])
+        ```
     """
     info = {}
 
@@ -113,28 +147,47 @@ def benchmark_timer(
     repeats: Optional[int] = None,
 ) -> Dict[str, float]:
     """
-    Benchmark a zero-arg `func()` using perf_counter_ns, with GC disabled.
+    Benchmark a zero-argument function using perf_counter_ns, with GC disabled.
 
-    Args:
-        func:             A no-arg callable (e.g. `lambda: work(x,y)`).
-        ops_per_call:     Estimated FLOPs in each call to func().
-        max_run_time_s:   If `repeats`=None, run until this many seconds elapse.
-        min_iterations:   If `repeats`=None, do at least this many calls.
-        repeats:          If set, run exactly this many calls.
+    This function times repeated calls to a no-argument callable, collecting
+    statistics on execution time and estimating throughput and efficiency.
+    It adapts the number of repeats to ensure reliable timing, and returns
+    a dictionary of timing and performance metrics.
+
+    Arguments:
+        - func : A no-argument callable (e.g. `lambda: work(x, y)`).
+        - ops_per_call : Estimated floating-point operations per call.
+        - max_run_time_s : If `repeats` is None, run until this many seconds
+          elapse.
+        - min_iterations : If `repeats` is None, do at least this many calls.
+        - repeats : If set, run exactly this many calls.
 
     Returns:
-        A dict with:
-          - min_time_s
-          - max_time_s
-          - mean_time_s
-          - mode_time_s
-          - median_time_s
-          - std_time_s
-          - throughput_calls_per_s    (1 / min_time_s)
-          - cycles_per_call           (min_time_s × CPU_Hz)
-          - flops_per_call            (== ops_per_call)
-          - flops_per_cycle           (ops_per_call / cycles_per_call)
-          - report                    (human-readable summary)
+        - Dictionary with timing and performance statistics, including:
+            - min_time_s : Minimum time per call (seconds).
+            - max_time_s : Maximum time per call (seconds).
+            - mean_time_s : Mean time per call (seconds).
+            - mode_time_s : Mode of time per call (seconds).
+            - median_time_s : Median time per call (seconds).
+            - std_time_s : Standard deviation of time per call (seconds).
+            - throughput_calls_per_s : Calls per second (1 / min_time_s).
+            - cycles_per_call : CPU cycles per call (min_time_s × CPU_Hz).
+            - flops_per_call : Floating-point operations per call.
+            - flops_per_cycle : FLOPs per CPU cycle.
+            - function_calls : Number of function calls performed.
+            - report : Human-readable summary string.
+            - array_stats : List of all statistics above.
+            - array_headers : List of corresponding header strings.
+
+    Examples:
+        ```py title="Benchmark a trivial lambda"
+        stats = benchmark_timer(lambda: sum([1, 2, 3]), ops_per_call=3)
+        print(stats["report"])
+        ```
+
+    References:
+        - "time.perf_counter_ns — Python documentation",
+          https://docs.python.org/3/library/time.html#time.perf_counter_ns
     """
     # disable GC for cleaner timing
     gc.disable()
