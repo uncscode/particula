@@ -12,6 +12,7 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
    - Write custom C++ modules (via `pybind11`, CPython C-API, or `cffi`) for maximum control and access to state-of-the-art C++ libraries.  
    - Pros: Full language power, mature toolchains, seamless integration with existing C++ code.  
    - Cons: Steeper learning curve, manual memory management, more boilerplate.
+   - Example: Not yet available.
 
 2. **Taichi**  
    - A data-oriented language that compiles Python-like kernels into optimized vectorized code for CPU/GPU.  
@@ -23,16 +24,19 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
    - A Python API for data-parallel C-style kernels, especially suited for physics and graphics simulations.  
    - Pros: Easy dispatch to multicore CPUs or CUDA GPUs, familiar C-like syntax.  
    - Cons: Niche use cases, less mature ecosystem than CUDA or Taichi.
+   - Example: Not yet available.
 
 4. **Cython (PyPy)**  
    - A superset of Python that compiles to C, enabling static type declarations and direct C-API calls.  
    - Pros: Incremental adoption via `*.pyx` files, excellent control over types and memory layout.  
    - Cons: Requires writing Cython annotations, manual build configuration.
+   - Example: Not yet available.
 
 5. **Numba**  
    - A JIT compiler that decorates Python functions for high-performance machine code (LLVM).  
    - Pros: Minimal code changes for simple numeric loops, transparent parallelization options.  
    - Cons: Limited coverage of the full NumPy API—features like `np.any` or `isinstance` checks often fail, so non-trivial functions must be rewritten from scratch, just like with other options.
+   - Example: This was explored (no example notebook) and found not to be a simple drop-in solution; due to incomplete `numpy` coverage. So if we needed to re-write the code anyway, we might as well use one of the other options.
 
 ---
 
