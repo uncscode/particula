@@ -17,12 +17,10 @@ References:
 
 import matplotlib.pyplot as plt
 import time
-import timeit
 import platform
 import taichi as ti
 import numpy as np
 import psutil
-import math
 import statistics
 import gc
 from typing import Callable, Optional, Any, Dict
@@ -66,10 +64,6 @@ def get_coagulation_gain_rate_continuous_taichi(
         gain = np.empty_like(radius)
         get_coagulation_gain_rate_continuous_taichi(radius, conc, K, gain)
         ```
-
-    References:
-        - "Coagulation equation",
-          [Wikipedia](https://en.wikipedia.org/wiki/Smoluchowski_coagulation_equation)
     """
     n = radius.shape[0]
     half = ti.cast(0.5, ti.f64)  # 0.5 for trapezoidal rule
