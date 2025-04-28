@@ -11161,11 +11161,11 @@ ax.grid(True)</div>
 <li><strong>Execution Time</strong> via <code>perf_counter_ns</code> (min/mean/std)</li>
 <li><strong>Throughput</strong> (calls/sec)</li>
 <li><strong>CPU Cycles per Call</strong></li>
-<li><strong>Estimated FLOPs per Call</strong> (fixed at 8,991,000)</li>
-<li><strong>Efficiency</strong> (FLOPs per CPU cycle)</li>
+<li><strong>Estimated FLOP per Call</strong></li>
+<li><strong>Efficiency</strong> (FLOP per CPU cycle)</li>
 </ul>
 <h3 id="3-scalability-trends">3. Scalability &amp; Trends<a class="anchor-link" href="#3-scalability-trends">¶</a></h3><ul>
-<li><strong>Taichi Efficiency</strong> rises steeply with increasing bin count, then plateaus around 3–4 FLOPs/cycle for large problems.</li>
+<li><strong>Taichi Efficiency</strong> rises steeply with increasing bin count, then plateaus around 20 FLOPs/cycle for large problems.</li>
 <li><strong>Python Efficiency</strong> gradually declines as problem size grows.</li>
 <li><strong>Speedup Ratio</strong> (Taichi:Python) increases from a few hundred at small bin counts to <strong>≈1,000×</strong> at 1,000 bins—demonstrating better amortization of Taichi’s kernel-launch overhead on larger workloads.</li>
 </ul>
