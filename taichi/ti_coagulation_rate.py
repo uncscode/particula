@@ -145,7 +145,7 @@ def benchmark_timer(
     max_run_time_s: float = 2.0,
     min_iterations: int = 5,
     repeats: Optional[int] = None,
-) -> Dict[str, float]:
+) -> dict[str, Any]:
     """
     Benchmark a zero-argument function using perf_counter_ns, with GC disabled.
 
@@ -179,6 +179,8 @@ def benchmark_timer(
             - array_stats : List of all statistics above.
             - array_headers : List of corresponding header strings.
 
+            Value types are mixed (float, int, str, list, etc).
+
     Examples:
         ```py title="Benchmark a trivial lambda"
         stats = benchmark_timer(lambda: sum([1, 2, 3]), ops_per_call=3)
@@ -190,7 +192,9 @@ def benchmark_timer(
           https://docs.python.org/3/library/time.html#time.perf_counter_ns
     """
     # disable GC for cleaner timing
-    gc.disable()
+    gc_was_enabled = gc.isenabled()
+    if gc_was_enabled:
+        gc.disable()
 
     timings: list[float] = []
     try:
@@ -209,9 +213,11 @@ def benchmark_timer(
                 func()
                 t1 = time.perf_counter_ns()
                 timings.append((t1 - t0) / 1e9)
-        cpu_hz = psutil.cpu_freq().current * 1e6  # MHz → Hz
+        freq_tup = psutil.cpu_freq()
+        cpu_hz = (freq_tup.current if freq_tup and freq_tup.current else 0.0) * 1e6
     finally:
-        gc.enable()
+        if gc_was_enabled:
+            gc.enable()
 
     runs = len(timings)
     # core stats
