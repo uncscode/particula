@@ -46,4 +46,4 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
 - **Maintainability**: Choosing the right tool lets you keep most of your code in Python, while isolating optimized kernels.  
 - **Portability**: Leveraging standard libraries ensures compatibility across platforms (Linux, Windows, macOS).  
 
-In the sections that follow, we’ll benchmark each approach on real aerosol-simulation kernels, discuss integration strategies, and surface best practices.
+In the notebooks under `Details/` on the left, we’ll benchmark each approach on real aerosol-simulation kernels, discuss integration strategies, and surface best practices.
