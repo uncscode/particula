@@ -8,31 +8,31 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
 
 ## What We’ll Explore
 
-1. **C++ Extensions**  
+### **C++ Extensions**  
    - Write custom C++ modules (via `pybind11`, CPython C-API, or `cffi`) for maximum control and access to state-of-the-art C++ libraries.  
    - Pros: Full language power, mature toolchains, seamless integration with existing C++ code.  
    - Cons: Steeper learning curve, manual memory management, more boilerplate.
    - Example: Not yet available.
 
-2. **Taichi**  
+### **Taichi**  
    - A data-oriented language that compiles Python-like kernels into optimized vectorized code for CPU/GPU.  
    - Pros: High-level syntax, automatic parallelization, built-in profiler and GPU backends.  
    - Cons: Requires learning Taichi’s data-model and kernel abstraction.
-   - Example: [Taichi_Exploration](Details/Taichi_Exploration.ipynb) notebook.
+   - Example: [Taichi Exploration](Details/Taichi_Exploration.ipynb) notebook.
 
-3. **NVIDIA Warp**  
+### **NVIDIA Warp**  
    - A Python API for data-parallel C-style kernels, especially suited for physics and graphics simulations.  
    - Pros: Easy dispatch to multicore CPUs or CUDA GPUs, familiar C-like syntax.  
    - Cons: Niche use cases, less mature ecosystem than CUDA or Taichi.
    - Example: Not yet available.
 
-4. **Cython (PyPy)**  
+### **Cython (PyPy)**  
    - A superset of Python that compiles to C, enabling static type declarations and direct C-API calls.  
    - Pros: Incremental adoption via `*.pyx` files, excellent control over types and memory layout.  
    - Cons: Requires writing Cython annotations, manual build configuration.
    - Example: Not yet available.
 
-5. **Numba**  
+### **Numba**  
    - A JIT compiler that decorates Python functions for high-performance machine code (LLVM).  
    - Pros: Minimal code changes for simple numeric loops, transparent parallelization options.  
    - Cons: Limited coverage of the full NumPy API—features like `np.any` or `isinstance` checks often fail, so non-trivial functions must be rewritten from scratch, just like with other options.
