@@ -46,36 +46,45 @@ class AerosolBuilder(BuilderABC):
     def build(self) -> Aerosol:
         self.pre_build_check()
 
-        # --- validation of partitioning species count -----------------
-        partitioning_species = self.atmosphere.partitioning_species
+        # Determine if the particle distribution strategy requires the
+        # partitioning-species / particle-species length check
+        strategy_name = self.particles.get_strategy_name()
+        _needs_species_length_check = strategy_name in (
+            "SpeciatedMassMovingBin",
+            "ParticleResolvedSpeciatedMass",
+        )
 
-        if partitioning_species is not None:
-            # count partitioning species
-            if isinstance(partitioning_species, GasSpecies):
-                n_partitioning = 1
-            else:
-                n_partitioning = len(partitioning_species)
+        if _needs_species_length_check:
+            partitioning_species = self.atmosphere.partitioning_species
 
-            # count species represented in particles
-            try:
-                species_mass = self.particles.get_species_mass(clone=False)
-                n_particle_species = (
-                    1 if species_mass.ndim == 1 else species_mass.shape[0]
-                )
-            except AttributeError:
-                density = self.particles.get_density(clone=False)
-                if isinstance(density, np.ndarray) and density.ndim > 0:
-                    n_particle_species = density.shape[0]
+            if partitioning_species is not None:
+                # --- original counting logic --------------------------------
+                if isinstance(partitioning_species, GasSpecies):
+                    n_partitioning = 1
                 else:
-                    n_particle_species = 1
+                    n_partitioning = len(partitioning_species)
 
-            if n_partitioning != n_particle_species:
-                message = (
-                    "Number of partitioning species in atmosphere "
-                    f"({n_partitioning}) must match number of species in "
-                    f"particle representation ({n_particle_species})."
-                )
-                logger.error(message)
-                raise ValueError(message)
+                try:
+                    species_mass = self.particles.get_species_mass(clone=False)
+                    n_particle_species = (
+                        1 if species_mass.ndim == 1 else species_mass.shape[0]
+                    )
+                except AttributeError:
+                    density = self.particles.get_density(clone=False)
+                    if isinstance(density, np.ndarray) and density.ndim > 0:
+                        n_particle_species = density.shape[0]
+                    else:
+                        n_particle_species = 1
+
+                if n_partitioning != n_particle_species:
+                    message = (
+                        "Number of partitioning species in atmosphere "
+                        f"({n_partitioning}) must match number of species in "
+                        f"particle representation ({n_particle_species}) when "
+                        f"using {strategy_name}."
+                    )
+                    logger.error(message)
+                    raise ValueError(message)
+                # ------------------------------------------------------------
 
         return Aerosol(atmosphere=self.atmosphere, particles=self.particles)
