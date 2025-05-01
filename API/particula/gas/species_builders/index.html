@@ -2928,13 +2928,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gasspeciesbuilderset_condensable" class="md-nav__link">
+  <a href="#gasspeciesbuilderset_name" class="md-nav__link">
     <span class="md-ellipsis">
-      GasSpeciesBuilder().set_condensable
+      GasSpeciesBuilder().set_name
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_condensable">
+    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_name">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2970,13 +2970,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gasspeciesbuilderset_name" class="md-nav__link">
+  <a href="#gasspeciesbuilderset_partitioning" class="md-nav__link">
     <span class="md-ellipsis">
-      GasSpeciesBuilder().set_name
+      GasSpeciesBuilder().set_partitioning
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_name">
+    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_partitioning">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6517,8 +6517,6 @@
       
         
       
-        
-      
     
     
     
@@ -6563,29 +6561,6 @@
   
     <li class="md-nav__item">
       <a href="../../../../Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Custom Nucleation: Single Species
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../Examples/Nucleation/Notebooks/debug_script/" class="md-nav__link">
         
   
   
@@ -8920,13 +8895,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gasspeciesbuilderset_condensable" class="md-nav__link">
+  <a href="#gasspeciesbuilderset_name" class="md-nav__link">
     <span class="md-ellipsis">
-      GasSpeciesBuilder().set_condensable
+      GasSpeciesBuilder().set_name
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_condensable">
+    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_name">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -8962,13 +8937,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gasspeciesbuilderset_name" class="md-nav__link">
+  <a href="#gasspeciesbuilderset_partitioning" class="md-nav__link">
     <span class="md-ellipsis">
-      GasSpeciesBuilder().set_name
+      GasSpeciesBuilder().set_partitioning
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_name">
+    <nav class="md-nav" aria-label="GasSpeciesBuilder().set_partitioning">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -9173,7 +9148,7 @@ values. Suitable for quick testing or examples.</p>
 <p>set_name : Set the name of the gas species.</p>
 </li>
 <li>set_vapor_pressure_strategy : Set the vapor pressure strategy.</li>
-<li>set_condensable : Set whether the species is condensable.</li>
+<li>set_partitioning : Set whether the species can partition.</li>
 <li>set_molar_mass : From BuilderMolarMassMixin.</li>
 <li>set_concentration : From BuilderConcentrationMixin.</li>
 <li>build : Validate parameters and return a GasSpecies object.</li>
@@ -9184,7 +9159,7 @@ values. Suitable for quick testing or examples.</p>
 <li>molar_mass : The molar mass of the gas species in kg/mol.</li>
 <li>vapor_pressure_strategy : The vapor pressure strategy for the
     gas species.</li>
-<li>condensable : Whether the gas species is condensable.</li>
+<li>partitioning : Whether the gas species can partition.</li>
 <li>concentration : The concentration of the gas species in the
     mixture, in kg/m^3.</li>
 </ul>
@@ -9197,7 +9172,7 @@ values. Suitable for quick testing or examples.</p>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span>
         <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
@@ -9232,35 +9207,33 @@ values. Suitable for quick testing or examples.</p>
 <ul>
 <li><a href="../species/#gasspecies">GasSpecies</a></li>
 </ul>
-<h3 id="gasspeciesbuilderset_condensable">GasSpeciesBuilder().set_condensable<a class="headerlink" href="#gasspeciesbuilderset_condensable" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L123">Show source in species_builders.py:123</a></p>
-<p>Set whether the gas species is condensable.</p>
+<h3 id="gasspeciesbuilderset_name">GasSpeciesBuilder().set_name<a class="headerlink" href="#gasspeciesbuilderset_name" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L92">Show source in species_builders.py:92</a></p>
+<p>Set the name of the gas species.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>condensable : Boolean or array indicating condensability.</li>
+<li>name : The name of the gas species.</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>This builder instance.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_condensable</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">condensable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpeciesBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpeciesBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
-<h3 id="gasspeciesbuilderset_name">GasSpeciesBuilder().set_name<a class="headerlink" href="#gasspeciesbuilderset_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L92">Show source in species_builders.py:92</a></p>
-<p>Set the name of the gas species.</p>
+<h3 id="gasspeciesbuilderset_partitioning">GasSpeciesBuilder().set_partitioning<a class="headerlink" href="#gasspeciesbuilderset_partitioning" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L123">Show source in species_builders.py:123</a></p>
+<p>Set whether the gas species can partition.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>name : The name of the gas species.</li>
+<li>partitioning : Boolean flag.</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>This builder instance.</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpeciesBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_partitioning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partitioning</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpeciesBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesbuilderset_vapor_pressure_strategy">GasSpeciesBuilder().set_vapor_pressure_strategy<a class="headerlink" href="#gasspeciesbuilderset_vapor_pressure_strategy" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L107">Show source in species_builders.py:107</a></p>
