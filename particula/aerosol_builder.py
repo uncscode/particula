@@ -21,12 +21,10 @@ aerosol = (
 
 import logging
 from typing import Optional
-import numpy as np
 
 from particula.abc_builder import BuilderABC
 from particula.aerosol import Aerosol
 from particula.gas.atmosphere import Atmosphere
-from particula.gas.species import GasSpecies
 from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")

@@ -4,7 +4,7 @@ correctly checks consistency between gas-phase and particle-phase
 species counts for different scenarios.
 """
 
-# pylint: disable=W0212
+# pylint: disable=W0212, R0801
 
 import unittest
 import copy
