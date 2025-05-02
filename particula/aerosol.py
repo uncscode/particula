@@ -22,7 +22,7 @@ class Aerosol:
 
     Methods:
     - replace_atmosphere: Replaces the current atmosphere with a new one.
-    - replace_particle: Replaces a particle in the aerosol with a new one.
+    - replace_particles: Replaces a particle in the aerosol with a new one.
 
     Examples:
         ```py title="Creating an Aerosol"

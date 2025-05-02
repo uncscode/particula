@@ -73,9 +73,10 @@ def _speciated_clone(particle, n_species: int):
 
     distribution_org = particle.get_distribution(clone=True)
     # repeat the distribution *n_species* times
-    # We tile the original distribution to simulate multiple species because directly instantiating
-    # a distribution for each species is challenging. This tiling ensures that the format conforms
-    # with SpeciatedMassMovingBin and ParticleResolvedSpeciatedMass, especially in how get_species_mass
+    # We tile the original distribution to simulate multiple species because
+    # directly instantiating a distribution for each species is challenging.
+    # This tiling ensures that the format conforms with SpeciatedMassMovingBin
+    # and ParticleResolvedSpeciatedMass, especially in how get_species_mass
     # extracts species counts from the structured (tiled) distribution.
     distribution = np.tile(distribution_org, (n_species, 1)).transpose()
     particle.distribution = distribution
