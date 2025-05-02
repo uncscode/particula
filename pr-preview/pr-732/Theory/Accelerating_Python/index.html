@@ -14,7 +14,7 @@
         <link rel="prev" href="../">
       
       
-        <link rel="next" href="Details/Taichi_Exploration/">
+        <link rel="next" href="Details/One-Line_Vision/">
       
       
       <link rel="icon" href="../../images/icon_dark.svg">
@@ -7089,6 +7089,8 @@
       
         
       
+        
+      
     
     
     
@@ -7124,6 +7126,29 @@
             Details
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Details/One-Line_Vision/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    One-line Vision
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -8739,6 +8764,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-we-envision-this-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      How We Envision This Working
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#why-this-matters" class="md-nav__link">
     <span class="md-ellipsis">
       Why This Matters
@@ -8806,6 +8840,15 @@
 <li>Cons: Limited coverage of the full NumPy API—features like <code>np.any</code> or <code>isinstance</code> checks often fail, so non-trivial functions must be rewritten from scratch, just like with other options.</li>
 <li>Example: This was explored (no example notebook) and found not to be a simple drop-in solution; due to incomplete <code>numpy</code> coverage. So if we needed to re-write the code anyway, we might as well use one of the other options.</li>
 </ul>
+<hr />
+<h2 id="how-we-envision-this-working">How We Envision This Working<a class="headerlink" href="#how-we-envision-this-working" title="Permanent link">&para;</a></h2>
+<p>Our vision is to have a simple enable statement for <code>particula</code> that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">par</span><span class="o">.</span><span class="n">use_backend</span><span class="p">(</span><span class="s2">&quot;taichi&quot;</span><span class="p">)</span>  <span class="c1"># or &quot;warp&quot;, &quot;cpp&quot;, etc.</span>
+</code></pre></div>
+<p>The rest of the builder and other function calls would remain unchanged, and the user would be able to run their code as usual. The only difference would be that the kernels would be compiled to the selected backend (e.g., Taichi, Warp, etc.) and run there instead of in Python.</p>
+<p>See one option for how this could be done in the <a href="Details/One-Line_Vision/">One-Line Vision</a> document.</p>
 <hr />
 <h2 id="why-this-matters">Why This Matters<a class="headerlink" href="#why-this-matters" title="Permanent link">&para;</a></h2>
 <ul>
