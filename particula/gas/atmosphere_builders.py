@@ -110,7 +110,7 @@ class AtmosphereBuilder(
 
         Arguments:
             - species : The GasSpecies instance to add (must have
-              ``partitioning=True``).
+              ``partitioning=False``).
 
         Returns:
             - AtmosphereBuilder : This builder (for chaining).

@@ -73,6 +73,10 @@ def _speciated_clone(particle, n_species: int):
 
     distribution_org = particle.get_distribution(clone=True)
     # repeat the distribution *n_species* times
+    # We tile the original distribution to simulate multiple species because directly instantiating
+    # a distribution for each species is challenging. This tiling ensures that the format conforms
+    # with SpeciatedMassMovingBin and ParticleResolvedSpeciatedMass, especially in how get_species_mass
+    # extracts species counts from the structured (tiled) distribution.
     distribution = np.tile(distribution_org, (n_species, 1)).transpose()
     particle.distribution = distribution
     return particle
@@ -85,6 +89,15 @@ class TestAerosolBuilderValidation(unittest.TestCase):
         """Create a reusable single-species particle for the tests."""
         # one reusable base particle
         self.base_particle = _build_particle()
+
+    # ---------- NO GAS SPECIES CASE ----------
+    def test_no_species_passes(self):
+        """Validation passes when no gas species are present."""
+        atm = _build_atmosphere(0)
+        pr = _speciated_clone(self.base_particle, 1)
+        AerosolBuilder().set_atmosphere(atm).set_particles(
+            pr
+        )._validate_species_length()
 
     # ---------- SINGLE-SPECIES CASE ----------
     def test_single_species_match_passes(self):
