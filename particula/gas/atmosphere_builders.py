@@ -77,9 +77,6 @@ class AtmosphereBuilder(
         self.partitioning_species: GasSpecies | None = None
         self.gas_only_species: GasSpecies | None = None
 
-    # ------------------------------------------------------------------
-    # Species-adding helpers
-    # ------------------------------------------------------------------
     def set_more_partitioning_species(
         self, species: GasSpecies
     ) -> "AtmosphereBuilder":
@@ -111,8 +108,15 @@ class AtmosphereBuilder(
         """
         Add a non-partitioning GasSpecies object to the mixture.
 
-        Same argument / return / raise semantics as
-        :py:meth:`add_partitioning_species`.
+        Arguments:
+            - species : The GasSpecies instance to add (must have
+              ``partitioning=True``).
+
+        Returns:
+            - AtmosphereBuilder : This builder (for chaining).
+
+        Raises:
+            - ValueError : If ``species.partitioning`` is False.
         """
         if species.get_partitioning():
             raise ValueError("Provided species has partitioning=True")
