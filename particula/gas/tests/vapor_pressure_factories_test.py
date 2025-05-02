@@ -44,7 +44,6 @@ def test_factory_with_clausius_clapeyron_strategy():
     assert isinstance(strategy, ClausiusClapeyronStrategy)
 
 
-
 def test_factory_with_water_buck_strategy():
     """Test factory creates a WaterBuckStrategy correctly without
     parameters."""

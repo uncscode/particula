@@ -14,10 +14,11 @@ from particula.gas.vapor_pressure_strategies import (
 )
 
 from particula.gas.vapor_pressure_builders import (
-    ConstantBuilder,
-    AntoineBuilder,
-    ClausiusClapeyronBuilder,
-    WaterBuckBuilder,
+    ConstantVaporPressureBuilder,
+    AntoineVaporPressureBuilder,
+    ClausiusClapeyronVaporPressureBuilder,
+    WaterBuckVaporPressureBuilder,
+    SaturationConcentrationVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.species import GasSpecies

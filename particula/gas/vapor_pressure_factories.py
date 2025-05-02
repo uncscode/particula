@@ -6,10 +6,11 @@ builders.
 from typing import Union
 from particula.abc_factory import StrategyFactoryABC
 from particula.gas.vapor_pressure_builders import (
-    ConstantBuilder,
-    AntoineBuilder,
-    ClausiusClapeyronBuilder,
-    WaterBuckBuilder,
+    ConstantVaporPressureBuilder,
+    AntoineVaporPressureBuilder,
+    ClausiusClapeyronVaporPressureBuilder,
+    SaturationConcentrationVaporPressureBuilder,
+    WaterBuckVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
@@ -22,10 +23,11 @@ from particula.gas.vapor_pressure_strategies import (
 class VaporPressureFactory(
     StrategyFactoryABC[
         Union[
-            ConstantBuilder,
-            AntoineBuilder,
-            ClausiusClapeyronBuilder,
-            WaterBuckBuilder,
+            ConstantVaporPressureBuilder,
+            AntoineVaporPressureBuilder,
+            ClausiusClapeyronVaporPressureBuilder,
+            SaturationConcentrationVaporPressureBuilder,
+            WaterBuckVaporPressureBuilder,
         ],
         Union[
             ConstantVaporPressureStrategy,
@@ -76,10 +78,12 @@ class VaporPressureFactory(
 
         Returns:
             dict:
-                - "constant": ConstantBuilder
-                - "antoine": AntoineBuilder
-                - "clausius_clapeyron": ClausiusClapeyronBuilder
-                - "water_buck": WaterBuckBuilder
+                - "constant": ConstantVaporPressureBuilder
+                - "antoine": AntoineVaporPressureBuilder
+                - "clausius_clapeyron": ClausiusClapeyronVaporPressureBuilder
+                - "saturation_concentration": SaturationConcentration
+                  VaporPressureBuilder
+                - "water_buck": WaterBuckVaporPressureBuilder
 
         Examples:
             ```py
@@ -90,8 +94,11 @@ class VaporPressureFactory(
             ```
         """
         return {
-            "constant": ConstantBuilder(),
-            "antoine": AntoineBuilder(),
-            "clausius_clapeyron": ClausiusClapeyronBuilder(),
-            "water_buck": WaterBuckBuilder(),
+            "constant": ConstantVaporPressureBuilder(),
+            "antoine": AntoineVaporPressureBuilder(),
+            "clausius_clapeyron": ClausiusClapeyronVaporPressureBuilder(),
+            "saturation_concentration": (
+                SaturationConcentrationVaporPressureBuilder()
+            ),
+            "water_buck": WaterBuckVaporPressureBuilder(),
         }
