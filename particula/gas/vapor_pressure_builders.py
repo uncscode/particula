@@ -342,30 +342,74 @@ class SaturationConcentrationVaporPressureBuilder(
         self.molar_mass = None
         self.temperature = None
 
+    @validate_inputs({"saturation_concentration": "nonnegative"})
     def set_saturation_concentration(
-        self, saturation_concentration: float, units: str = "kg/m^3"
-    )
-        """Set the saturation concentration in kg/m^3.
-        
-        
-        
+        self,
+        saturation_concentration: float,
+        units: str = "kg/m^3",
+    ) -> "SaturationConcentrationVaporPressureBuilder":
         """
-        
+        Set the saturation concentration (C*, C^sat).
+
+        Parameters
+        ----------
+        saturation_concentration : float
+            Value of the saturation concentration.
+        units : str, default ``"kg/m^3"``
+            Units of the supplied value. Any units convertible to
+            ``"kg/m^3"`` via ``get_unit_conversion`` are accepted.
+
+        Returns
+        -------
+        SaturationConcentrationVaporPressureBuilder
+            The builder itself for fluent chaining.
+
+        Raises
+        ------
+        ValueError
+            If the units cannot be converted to ``kg/m^3``.
+        """
+        if units == "kg/m^3":
+            self.saturation_concentration = saturation_concentration
+            return self
+        try:
+            factor = get_unit_conversion(units, "kg/m^3")
+        except Exception as exc:
+            logger.error("Cannot convert %s to kg/m^3", units)
+            raise ValueError(
+                f"Units '{units}' not convertible to kg/m^3."
+            ) from exc
+        self.saturation_concentration = saturation_concentration * factor
+        return self
 
 
     def build(self) -> ConstantVaporPressureStrategy:
         """
+        Validate all parameters and construct a
+        ConstantVaporPressureStrategy whose value is obtained from the
+        ideal–gas relation
 
+            P = C * R * T / M
+
+        where
+          C : saturation mass concentration (kg m⁻³)
+          M : molar mass (kg mol⁻¹)
+          T : temperature (K)
+
+        Returns
+        -------
+        ConstantVaporPressureStrategy
+            Strategy containing the calculated vapor pressure.
         """
         self.pre_build_check()
 
-        return ConstantVaporPressureStrategy(
-            vapor_pressure=get_partial_pressure(
-                self.saturation_concentration,
-                self.molar_mass,
-                self.temperature,
-            )
+        vapor_pressure = get_partial_pressure(
+            concentration=self.saturation_concentration,
+            molar_mass=self.molar_mass,
+            temperature=self.temperature,
         )
+
+        return ConstantVaporPressureStrategy(vapor_pressure)
 
 
 class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
