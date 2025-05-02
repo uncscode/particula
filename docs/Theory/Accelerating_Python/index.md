@@ -37,6 +37,21 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
    - Pros: Minimal code changes for simple numeric loops, transparent parallelization options.  
    - Cons: Limited coverage of the full NumPy API—features like `np.any` or `isinstance` checks often fail, so non-trivial functions must be rewritten from scratch, just like with other options.
    - Example: This was explored (no example notebook) and found not to be a simple drop-in solution; due to incomplete `numpy` coverage. So if we needed to re-write the code anyway, we might as well use one of the other options.
+---
+
+## How We Envision This Working
+
+Our vision is to have a simple enable statement for `particula` that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:
+
+```python
+import particula as par
+
+par.use_backend("taichi")  # or "warp", "cpp", etc.
+```
+
+The rest of the builder and other function calls would remain unchanged, and the user would be able to run their code as usual. The only difference would be that the kernels would be compiled to the selected backend (e.g., Taichi, Warp, etc.) and run there instead of in Python.
+
+See one option for how this could be done in the [One-Line Vision](Details/One-Line_Vision.md) document.
 
 ---
 
