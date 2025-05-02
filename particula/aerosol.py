@@ -1,12 +1,8 @@
-"""Aerosol class just a list of gas classes and particle classes.
+"""Aerosol class just a collection of atmosphere (gas species) and particles.
 
-There is a problem here, with matching of gases that can condense to,
-particles and getting it to work correctly. This is will be solved
-with usage as we figure out the best way to do this.
+Used to pass state information to the dynamics solvers.
 """
 
-from typing import Iterator
-from particula.gas.species import GasSpecies
 from particula.gas.atmosphere import Atmosphere
 from particula.particles.representation import ParticleRepresentation
 
@@ -25,7 +21,6 @@ class Aerosol:
         - particles : The particle Representation object.
 
     Methods:
-    - iterate_gas: Returns an iterator over the gas species in atmosphere.
     - replace_atmosphere: Replaces the current atmosphere with a new one.
     - replace_particle: Replaces a particle in the aerosol with a new one.
 
@@ -35,10 +30,9 @@ class Aerosol:
         print(aerosol_instance)
         ```
 
-        ```py title="Iterating over the Aerosol"
+        ```py title="replace a particle object"
         aerosol_instance = Aerosol(atmosphere, particles)
-        for gas in aerosol_instance.iterate_gas():
-            print(gas)
+        aerosol_instance.replace_particles(new_particle)
         ```
     """
 
@@ -72,22 +66,6 @@ class Aerosol:
         """
         message = str(self.atmosphere) + "\n" + str(self.particles)
         return message
-
-    def iterate_gas(self) -> Iterator[GasSpecies]:
-        """
-        Return an iterator over the gas species in the atmosphere.
-
-        Returns:
-        - Iterator[GasSpecies] : An iterator over gas species objects.
-
-        Examples:
-            ```py title="Iterating over aerosol gas"
-            aerosol_instance = Aerosol(atmosphere, particles)
-            for gas in aerosol_instance.iterate_gas():
-                print(gas)
-            ```
-        """
-        return iter(self.atmosphere)
 
     def replace_atmosphere(self, atmosphere: Atmosphere):
         """
