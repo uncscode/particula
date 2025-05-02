@@ -264,17 +264,17 @@ class ConstantVaporPressureBuilder(BuilderABC):
     - build : Validate parameters and return a ConstantVaporPressureStrategy.
 
     Example:
-        ``` py title="ConstatnVaporPressureBuilder"
+        ``` py title="ConstantVaporPressureBuilder"
         strategy = (
-            ConstatnVaporPressureBuilder()
+            ConstantVaporPressureBuilder()
             .set_vapor_pressure(101325)
             .build()
         )
         ```
 
-        ``` py title="ConstatnVaporPressureBuilder with units"
+        ``` py title="ConstantVaporPressureBuilder with units"
         strategy = (
-            ConstatnVaporPressureBuilder()
+            ConstantVaporPressureBuilder()
             .set_vapor_pressure(1, "atm")
             .build()
         )
