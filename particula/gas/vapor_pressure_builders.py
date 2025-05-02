@@ -22,12 +22,16 @@ import logging
 from typing import Optional
 
 from particula.abc_builder import BuilderABC
+from particula.builder_mixin import (
+    BuilderMolarMassMixin, BuilderTemperatureMixin
+)
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
     WaterBuckStrategy,
     ConstantVaporPressureStrategy,
 )
+from particula.gas.properties.pressure_function import get_partial_pressure
 from particula.util.validate_inputs import validate_inputs
 from particula.util import get_unit_conversion
 
@@ -303,6 +307,65 @@ class ConstantBuilder(BuilderABC):
         """
         self.pre_build_check()
         return ConstantVaporPressureStrategy(self.vapor_pressure)
+
+
+class SaturationConcentrationVaporPressureBuilder(
+    BuilderABC,
+    BuilderMolarMassMixin,
+    BuilderTemperatureMixin,
+    ):
+    """Builder class for SaturationConcentrationVaporPressureStrategy.
+
+    This class facilitates the building of the
+    SaturationConcentrationVaporPressureStrategy object. It allows
+    for setting the vapor pressure using the saturation concentration,
+    molar mass, and temperature. The saturation concentration is commonly
+    called C^sat or C* when in a mixture.
+
+    Example:
+        ```py title="SaturationConcentrationVaporPressureBuilder"
+        import particula as par
+        strategy = par.gas.SaturationConcentrationVaporPressureBuilder().build()
+        ```
+    """
+
+    def __init__(self):
+        required_parameters = [
+            "saturation_concentration",
+            "molar_mass",
+            "temperature"
+        ]
+        BuilderABC.__init__(self, required_parameters)
+        BuilderMolarMassMixin.__init__(self)
+        BuilderTemperatureMixin.__init__(self)
+        self.saturation_concentration = None
+        self.molar_mass = None
+        self.temperature = None
+
+    def set_saturation_concentration(
+        self, saturation_concentration: float, units: str = "kg/m^3"
+    )
+        """Set the saturation concentration in kg/m^3.
+        
+        
+        
+        """
+        
+
+
+    def build(self) -> ConstantVaporPressureStrategy:
+        """
+
+        """
+        self.pre_build_check()
+
+        return ConstantVaporPressureStrategy(
+            vapor_pressure=get_partial_pressure(
+                self.saturation_concentration,
+                self.molar_mass,
+                self.temperature,
+            )
+        )
 
 
 class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
