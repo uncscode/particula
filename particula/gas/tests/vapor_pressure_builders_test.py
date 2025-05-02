@@ -6,6 +6,7 @@ from particula.gas.vapor_pressure_builders import (
     ClausiusClapeyronBuilder,
     ConstantBuilder,
     WaterBuckBuilder,
+    SaturationConcentrationVaporPressureBuilder,
 )
 
 
@@ -163,3 +164,38 @@ def test_build_water_buck():
     """Test building the WaterBuck strategy."""
     builder = WaterBuckBuilder()
     builder.build()
+
+
+# ----------------------------------------------------------------------
+# SaturationConcentrationVaporPressureBuilder tests
+# ----------------------------------------------------------------------
+
+
+def test_saturation_set_concentration_positive():
+    """Test setting a positive saturation concentration (default units)."""
+    builder = SaturationConcentrationVaporPressureBuilder()
+    builder.set_saturation_concentration(1e-6, "kg/m^3")
+    assert builder.saturation_concentration == pytest.approx(1e-6)
+
+
+def test_saturation_build_success():
+    """Test successful build when all parameters are provided."""
+    builder = (
+        SaturationConcentrationVaporPressureBuilder()
+        .set_saturation_concentration(1e-6, "kg/m^3")
+        .set_molar_mass(0.018, "kg/mol")
+        .set_temperature(298.15, "K")
+    )
+    builder.build()  # Should not raise
+
+
+def test_saturation_build_failure_missing_param():
+    """Test build failure when temperature is missing."""
+    builder = (
+        SaturationConcentrationVaporPressureBuilder()
+        .set_saturation_concentration(1e-6, "kg/m^3")
+        .set_molar_mass(0.018, "kg/mol")
+    )
+    with pytest.raises(ValueError) as excinfo:
+        builder.build()
+    assert "Required parameter(s) not set: temperature" in str(excinfo.value)

@@ -44,11 +44,30 @@ def test_factory_with_clausius_clapeyron_strategy():
     assert isinstance(strategy, ClausiusClapeyronStrategy)
 
 
+
 def test_factory_with_water_buck_strategy():
     """Test factory creates a WaterBuckStrategy correctly without
     parameters."""
     strategy = VaporPressureFactory().get_strategy(strategy_type="water_buck")
     assert isinstance(strategy, WaterBuckStrategy)
+
+
+def test_factory_with_saturation_concentration_strategy():
+    """Test factory creates a ConstantVaporPressureStrategy from the
+    SaturationConcentrationVaporPressureBuilder."""
+    parameters = {
+        "saturation_concentration": 1e-6,
+        "saturation_concentration_units": "kg/m^3",
+        "molar_mass": 0.018,
+        "molar_mass_units": "kg/mol",
+        "temperature": 298.15,
+        "temperature_units": "K",
+    }
+    strategy = VaporPressureFactory().get_strategy(
+        strategy_type="saturation_concentration",
+        parameters=parameters,
+    )
+    assert isinstance(strategy, ConstantVaporPressureStrategy)
 
 
 def test_factory_with_unknown_strategy():
