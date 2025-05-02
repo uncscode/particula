@@ -339,8 +339,10 @@ class SaturationConcentrationVaporPressureBuilder(
         ```
 
     References:
-    - Neil Donahue, "Aerosol Science: Principles, Practice, and Measurement,"
-
+    - Donahue, N. M., Robinson, A. L., Stanier, C. O., & Pandis, S. N. (2006).
+      Coupled Partitioning, Dilution, and Chemical Aging of Semivolatile
+      Organics. Environmental Science & Technology, 40(8), 2635–2643.
+      [DOI](https://doi.org/10.1021/es052297c)
     """
 
     def __init__(self):
