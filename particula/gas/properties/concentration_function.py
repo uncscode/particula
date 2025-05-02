@@ -1,4 +1,4 @@
-"""Function for calculating the gas concentraions."""
+"""Function for calculating the gas concentrations."""
 
 from typing import Union
 from numpy.typing import NDArray
