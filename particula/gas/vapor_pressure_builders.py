@@ -23,7 +23,8 @@ from typing import Optional
 
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import (
-    BuilderMolarMassMixin, BuilderTemperatureMixin
+    BuilderMolarMassMixin,
+    BuilderTemperatureMixin,
 )
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
@@ -38,7 +39,7 @@ from particula.util import get_unit_conversion
 logger = logging.getLogger("particula")
 
 
-class AntoineBuilder(BuilderABC):
+class AntoineVaporPressureBuilder(BuilderABC):
     """
     Builder class for AntoineVaporPressureStrategy. It allows setting
     the coefficients 'a', 'b', and 'c' separately and then building the
@@ -59,9 +60,9 @@ class AntoineBuilder(BuilderABC):
     - build : Validate parameters and return an AntoineVaporPressureStrategy.
 
     Example:
-        ``` py title="AntoineBuilder"
+        ``` py title="AntoineVaporPressureBuilder"
         strategy = (
-            AntoineBuilder()
+            AntoineVaporPressureBuilder()
             .set_a(8.07131)
             .set_b(1730.63)
             .set_c(233.426)
@@ -69,9 +70,9 @@ class AntoineBuilder(BuilderABC):
         )
         ```
 
-        ``` py title="AntoineBuilder with units"
+        ``` py title="AntoineVaporPressureBuilder with units"
         strategy = (
-            AntoineBuilder()
+            AntoineVaporPressureBuilder()
             .set_a(8.07131)
             .set_b(1730.63, "K")
             .set_c(233.426, "K")
@@ -98,7 +99,7 @@ class AntoineBuilder(BuilderABC):
 
     def set_a(
         self, a: float, a_units: Optional[str] = None
-    ) -> "AntoineBuilder":
+    ) -> "AntoineVaporPressureBuilder":
         """Set the coefficient 'a' of the Antoine equation."""
         if a < 0:
             logger.error("Coefficient 'a' must be a positive value.")
@@ -109,7 +110,9 @@ class AntoineBuilder(BuilderABC):
         return self
 
     @validate_inputs({"b": "positive"})
-    def set_b(self, b: float, b_units: str = "K") -> "AntoineBuilder":
+    def set_b(
+        self, b: float, b_units: str = "K"
+    ) -> "AntoineVaporPressureBuilder":
         """Set the coefficient 'b' of the Antoine equation."""
         if b_units == "K":
             self.b = b
@@ -117,7 +120,9 @@ class AntoineBuilder(BuilderABC):
         raise ValueError("Only K units are supported for coefficient 'b'.")
 
     @validate_inputs({"c": "positive"})
-    def set_c(self, c: float, c_units: str = "K") -> "AntoineBuilder":
+    def set_c(
+        self, c: float, c_units: str = "K"
+    ) -> "AntoineVaporPressureBuilder":
         """Set the coefficient 'c' of the Antoine equation."""
         if c_units == "K":
             self.c = c
@@ -136,7 +141,7 @@ class AntoineBuilder(BuilderABC):
         return AntoineVaporPressureStrategy(self.a, self.b, self.c)
 
 
-class ClausiusClapeyronBuilder(BuilderABC):
+class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
     """Builder class for ClausiusClapeyronStrategy. This class facilitates
     setting the latent heat of vaporization, initial temperature, and initial
     pressure with unit handling and then builds the strategy object.
@@ -156,9 +161,9 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
 
     Example:
-        ``` py title="ClausiusClapeyronBuilder"
+        ``` py title="ClausiusClapeyronVaporPressureBuilder"
         strategy = (
-            ClausiusClapeyronBuilder()
+            ClausiusClapeyronVaporPressureBuilder()
             .set_latent_heat(2260)
             .set_temperature_initial(373.15)
             .set_pressure_initial(101325)
@@ -166,9 +171,9 @@ class ClausiusClapeyronBuilder(BuilderABC):
         )
         ```
 
-        ``` py title="ClausiusClapeyronBuilder with units"
+        ``` py title="ClausiusClapeyronVaporPressureBuilder with units"
         strategy = (
-            ClausiusClapeyronBuilder()
+            ClausiusClapeyronVaporPressureBuilder()
             .set_latent_heat(2260, "J/mol")
             .set_temperature_initial(373.15, "K")
             .set_pressure_initial(101325, "Pa")
@@ -195,7 +200,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
     @validate_inputs({"latent_heat": "positive"})
     def set_latent_heat(
         self, latent_heat: float, latent_heat_units: str
-    ) -> "ClausiusClapeyronBuilder":
+    ) -> "ClausiusClapeyronVaporPressureBuilder":
         """Set the latent heat of vaporization: Default units J/mol."""
         if latent_heat_units == "J/mol":
             self.latent_heat = latent_heat
@@ -208,7 +213,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
     @validate_inputs({"temperature_initial": "positive"})
     def set_temperature_initial(
         self, temperature_initial: float, temperature_initial_units: str
-    ) -> "ClausiusClapeyronBuilder":
+    ) -> "ClausiusClapeyronVaporPressureBuilder":
         """Set the initial temperature. Default units: K."""
         if temperature_initial_units == "K":
             self.temperature_initial = temperature_initial
@@ -221,7 +226,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
     @validate_inputs({"pressure_initial": "positive"})
     def set_pressure_initial(
         self, pressure_initial: float, pressure_initial_units: str
-    ) -> "ClausiusClapeyronBuilder":
+    ) -> "ClausiusClapeyronVaporPressureBuilder":
         """Set the initial pressure. Default units: Pa."""
         if pressure_initial_units == "Pa":
             self.pressure_initial = pressure_initial
@@ -246,7 +251,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
         )
 
 
-class ConstantBuilder(BuilderABC):
+class ConstantVaporPressureBuilder(BuilderABC):
     """Builder class for ConstantVaporPressureStrategy. This class facilitates
     setting the constant vapor pressure and then building the strategy object.
 
@@ -259,17 +264,17 @@ class ConstantBuilder(BuilderABC):
     - build : Validate parameters and return a ConstantVaporPressureStrategy.
 
     Example:
-        ``` py title="ConstantBuilder"
+        ``` py title="ConstatnVaporPressureBuilder"
         strategy = (
-            ConstantBuilder()
+            ConstatnVaporPressureBuilder()
             .set_vapor_pressure(101325)
             .build()
         )
         ```
 
-        ``` py title="ConstantBuilder with units"
+        ``` py title="ConstatnVaporPressureBuilder with units"
         strategy = (
-            ConstantBuilder()
+            ConstatnVaporPressureBuilder()
             .set_vapor_pressure(1, "atm")
             .build()
         )
@@ -288,7 +293,7 @@ class ConstantBuilder(BuilderABC):
     @validate_inputs({"vapor_pressure": "positive"})
     def set_vapor_pressure(
         self, vapor_pressure: float, vapor_pressure_units: str
-    ) -> "ConstantBuilder":
+    ) -> "ConstantVaporPressureBuilder":
         """Set the constant vapor pressure."""
         if vapor_pressure_units == "Pa":
             self.vapor_pressure = vapor_pressure
@@ -313,27 +318,36 @@ class SaturationConcentrationVaporPressureBuilder(
     BuilderABC,
     BuilderMolarMassMixin,
     BuilderTemperatureMixin,
-    ):
+):
     """Builder class for SaturationConcentrationVaporPressureStrategy.
 
-    This class facilitates the building of the
-    SaturationConcentrationVaporPressureStrategy object. It allows
-    for setting the vapor pressure using the saturation concentration,
-    molar mass, and temperature. The saturation concentration is commonly
-    called C^sat or C* when in a mixture.
+    This class facilitates the building of the ConstantVaporPressureStrategy.
+    It allows for setting the vapor pressure using the saturation
+    concentration, molar mass, and temperature. The saturation concentration is
+    commonly called C^sat (or C* when in a mixture) in aerosol sciences.
 
     Example:
         ```py title="SaturationConcentrationVaporPressureBuilder"
         import particula as par
-        strategy = par.gas.SaturationConcentrationVaporPressureBuilder().build()
+        strategy = (
+            par.gas.SaturationConcentrationVaporPressureBuilder()
+            .set_saturation_concentration(10e-6, "kg/m^3")
+            .set_molar_mass(0.200, "kg/mol")
+            .set_temperature(298.15, "K")
+            .build()
+        )
         ```
+
+    References:
+    - Neil Donahue, "Aerosol Science: Principles, Practice, and Measurement,"
+
     """
 
     def __init__(self):
         required_parameters = [
             "saturation_concentration",
             "molar_mass",
-            "temperature"
+            "temperature",
         ]
         BuilderABC.__init__(self, required_parameters)
         BuilderMolarMassMixin.__init__(self)
@@ -346,59 +360,44 @@ class SaturationConcentrationVaporPressureBuilder(
     def set_saturation_concentration(
         self,
         saturation_concentration: float,
-        units: str = "kg/m^3",
+        saturation_concentration_units: str,
     ) -> "SaturationConcentrationVaporPressureBuilder":
         """
         Set the saturation concentration (C*, C^sat).
 
-        Parameters
-        ----------
-        saturation_concentration : float
-            Value of the saturation concentration.
-        units : str, default ``"kg/m^3"``
-            Units of the supplied value. Any units convertible to
-            ``"kg/m^3"`` via ``get_unit_conversion`` are accepted.
+        Parameters:
+            - saturation_concentration : Value of the saturation concentration.
+            - saturation_concentration_units : Any units convertible to
+                ``"kg/m^3"`` via ``get_unit_conversion`` are accepted.
 
-        Returns
-        -------
-        SaturationConcentrationVaporPressureBuilder
-            The builder itself for fluent chaining.
+        Returns:
+           - self, The builder itself for fluent chaining.
 
-        Raises
-        ------
-        ValueError
-            If the units cannot be converted to ``kg/m^3``.
+        Example:
+            ```py title="SaturationConcentrationVaporPressureBuilder"
+            import particula as par
+            strategy = (
+                par.gas.SaturationConcentrationVaporPressureBuilder()
+                .set_saturation_concentration(10e-6, "kg/m^3")
+            )
+            ```
         """
-        if units == "kg/m^3":
+        if saturation_concentration_units == "kg/m^3":
             self.saturation_concentration = saturation_concentration
             return self
-        try:
-            factor = get_unit_conversion(units, "kg/m^3")
-        except Exception as exc:
-            logger.error("Cannot convert %s to kg/m^3", units)
-            raise ValueError(
-                f"Units '{units}' not convertible to kg/m^3."
-            ) from exc
-        self.saturation_concentration = saturation_concentration * factor
+        self.saturation_concentration = (
+            saturation_concentration
+            * get_unit_conversion(saturation_concentration_units, "kg/m^3")
+        )
         return self
-
 
     def build(self) -> ConstantVaporPressureStrategy:
         """
         Validate all parameters and construct a
         ConstantVaporPressureStrategy whose value is obtained from the
-        ideal–gas relation
+        ideal-gas relationship between concentration and partial pressure.
 
-            P = C * R * T / M
-
-        where
-          C : saturation mass concentration (kg m⁻³)
-          M : molar mass (kg mol⁻¹)
-          T : temperature (K)
-
-        Returns
-        -------
-        ConstantVaporPressureStrategy
+        Returns:
             Strategy containing the calculated vapor pressure.
         """
         self.pre_build_check()
@@ -412,7 +411,9 @@ class SaturationConcentrationVaporPressureBuilder(
         return ConstantVaporPressureStrategy(vapor_pressure)
 
 
-class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
+class WaterBuckVaporPressureBuilder(
+    BuilderABC
+):  # pylint: disable=too-few-public-methods
     """Builder class for WaterBuckStrategy.
 
     This class facilitates the building of the WaterBuckStrategy object.
@@ -420,9 +421,9 @@ class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
     extended in the future (e.g., ice-only calculations).
 
     Example:
-        ```py title="WaterBuckBuilder"
+        ```py title="WaterBuckVaporPressureBuilder"
         import particula as par
-        strategy = par.gas.WaterBuckBuilder().build()
+        strategy = par.gas.WaterBuckVaporPressureBuilder().build()
         ```
     """
 
