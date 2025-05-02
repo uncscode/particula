@@ -8714,7 +8714,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py">particula.gas.vapor_pressure_factories</a> module.</p>
 </blockquote>
 <h2 id="vaporpressurefactory">VaporPressureFactory<a class="headerlink" href="#vaporpressurefactory" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L22">Show source in vapor_pressure_factories.py:22</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L23">Show source in vapor_pressure_factories.py:23</a></p>
 <p>Factory class to create vapor pressure strategy
 builders.</p>
 <p>This class provides a way to generate multiple vapor pressure calculation
@@ -8751,7 +8751,11 @@ a flexible way to switch or extend vapor pressure calculation methods.</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VaporPressureFactory</span><span class="p">(</span>
     <span class="n">StrategyFactoryABC</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span>
-            <span class="n">ConstantBuilder</span><span class="p">,</span> <span class="n">AntoineBuilder</span><span class="p">,</span> <span class="n">ClausiusClapeyronBuilder</span><span class="p">,</span> <span class="n">WaterBuckBuilder</span>
+            <span class="n">ConstantVaporPressureBuilder</span><span class="p">,</span>
+            <span class="n">AntoineVaporPressureBuilder</span><span class="p">,</span>
+            <span class="n">ClausiusClapeyronVaporPressureBuilder</span><span class="p">,</span>
+            <span class="n">SaturationConcentrationVaporPressureBuilder</span><span class="p">,</span>
+            <span class="n">WaterBuckVaporPressureBuilder</span><span class="p">,</span>
         <span class="p">],</span>
         <span class="n">Union</span><span class="p">[</span>
             <span class="n">ConstantVaporPressureStrategy</span><span class="p">,</span>
@@ -8764,24 +8768,27 @@ a flexible way to switch or extend vapor pressure calculation methods.</p>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
 <ul>
-<li><a href="../vapor_pressure_builders/#antoinebuilder">AntoineBuilder</a></li>
+<li><a href="../vapor_pressure_builders/#antoinevaporpressurebuilder">AntoineVaporPressureBuilder</a></li>
 <li><a href="../vapor_pressure_strategies/#antoinevaporpressurestrategy">AntoineVaporPressureStrategy</a></li>
-<li><a href="../vapor_pressure_builders/#clausiusclapeyronbuilder">ClausiusClapeyronBuilder</a></li>
 <li><a href="../vapor_pressure_strategies/#clausiusclapeyronstrategy">ClausiusClapeyronStrategy</a></li>
-<li><a href="../vapor_pressure_builders/#constantbuilder">ConstantBuilder</a></li>
+<li><a href="../vapor_pressure_builders/#clausiusclapeyronvaporpressurebuilder">ClausiusClapeyronVaporPressureBuilder</a></li>
+<li><a href="../vapor_pressure_builders/#constantvaporpressurebuilder">ConstantVaporPressureBuilder</a></li>
 <li><a href="../vapor_pressure_strategies/#constantvaporpressurestrategy">ConstantVaporPressureStrategy</a></li>
-<li><a href="../vapor_pressure_builders/#waterbuckbuilder">WaterBuckBuilder</a></li>
+<li><a href="../vapor_pressure_builders/#saturationconcentrationvaporpressurebuilder">SaturationConcentrationVaporPressureBuilder</a></li>
 <li><a href="../vapor_pressure_strategies/#waterbuckstrategy">WaterBuckStrategy</a></li>
+<li><a href="../vapor_pressure_builders/#waterbuckvaporpressurebuilder">WaterBuckVaporPressureBuilder</a></li>
 </ul>
 <h3 id="vaporpressurefactoryget_builders">VaporPressureFactory().get_builders<a class="headerlink" href="#vaporpressurefactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L73">Show source in vapor_pressure_factories.py:73</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L75">Show source in vapor_pressure_factories.py:75</a></p>
 <p>Return a dictionary mapping strategy types to builder instances.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>dict:
-    - <code>-</code> <em>"constant"</em> - ConstantBuilder
-    - <code>-</code> <em>"antoine"</em> - AntoineBuilder
-    - <code>-</code> <em>"clausius_clapeyron"</em> - ClausiusClapeyronBuilder
-    - <code>-</code> <em>"water_buck"</em> - WaterBuckBuilder</p>
+    - <code>-</code> <em>"constant"</em> - ConstantVaporPressureBuilder
+    - <code>-</code> <em>"antoine"</em> - AntoineVaporPressureBuilder
+    - <code>-</code> <em>"clausius_clapeyron"</em> - ClausiusClapeyronVaporPressureBuilder
+    - <code>-</code> <em>"saturation_concentration"</em> - SaturationConcentration
+      VaporPressureBuilder
+    - <code>-</code> <em>"water_buck"</em> - WaterBuckVaporPressureBuilder</p>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">builders_dict</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
