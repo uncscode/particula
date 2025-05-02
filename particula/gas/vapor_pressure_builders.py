@@ -319,12 +319,18 @@ class SaturationConcentrationVaporPressureBuilder(
     BuilderMolarMassMixin,
     BuilderTemperatureMixin,
 ):
-    """Builder class for SaturationConcentrationVaporPressureStrategy.
+    """Builder class for ConstantVaporPressureStrategy.
 
-    This class facilitates the building of the ConstantVaporPressureStrategy.
     It allows for setting the vapor pressure using the saturation
     concentration, molar mass, and temperature. The saturation concentration is
     commonly called C^sat (or C* when in a mixture) in aerosol sciences.
+
+    Methods:
+    - set_saturation_concentration : Set the saturation concentration in
+      kg/m³ (or convertible units).
+    - set_molar_mass : Set the molar mass in kg/mol (or convertible units).
+    - set_temperature : Set the temperature in K (or convertible units).
+    - build : Validate parameters and return a ConstantVaporPressureStrategy.
 
     Example:
         ```py title="SaturationConcentrationVaporPressureBuilder"
@@ -367,13 +373,13 @@ class SaturationConcentrationVaporPressureBuilder(
         """
         Set the saturation concentration (C*, C^sat).
 
-        Parameters:
+        Arguments:
             - saturation_concentration : Value of the saturation concentration.
             - saturation_concentration_units : Any units convertible to
                 ``"kg/m^3"`` via ``get_unit_conversion`` are accepted.
 
         Returns:
-           - self, The builder itself for fluent chaining.
+           - The builder itself for fluent chaining.
 
         Example:
             ```py title="SaturationConcentrationVaporPressureBuilder"
@@ -400,7 +406,8 @@ class SaturationConcentrationVaporPressureBuilder(
         ideal-gas relationship between concentration and partial pressure.
 
         Returns:
-            Strategy containing the calculated vapor pressure.
+            ConstantVaporPressureStrategy containing the calculated vapor
+            pressure.
         """
         self.pre_build_check()
 
@@ -409,7 +416,6 @@ class SaturationConcentrationVaporPressureBuilder(
             molar_mass=self.molar_mass,
             temperature=self.temperature,
         )
-
         return ConstantVaporPressureStrategy(vapor_pressure)
 
 
