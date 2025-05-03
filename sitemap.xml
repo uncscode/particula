@@ -749,6 +749,18 @@
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
+         <loc>https://uncscode.github.io/particula/Theory/Accelerating_Python/</loc>
+         <lastmod>2025-05-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/Accelerating_Python/Details/One-Line_Vision/</loc>
+         <lastmod>2025-05-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/Accelerating_Python/Details/Taichi_Exploration/</loc>
+         <lastmod>2025-05-03</lastmod>
+    </url>
+    <url>
          <loc>https://uncscode.github.io/particula/Theory/Code_Concepts/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
@@ -781,51 +793,51 @@
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Condensation_Equations/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Droplet_Coagulation_Kernel_Ayala2008/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Condensation_Equations/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/dynamic_viscosity/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/ionparticle_coagulation/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/ionparticle_coagulation/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/mean_free_path/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/Droplet_Coagulation_Kernel_Ayala2008/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Properties/dynamic_viscosity/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Theory/Technical/Cloud_Droplet_Coagulation/Droplet_Coagulation_Kernel_Ayala2008/</loc>
+         <loc>https://uncscode.github.io/particula/Theory/Technical/Properties/mean_free_path/</loc>
          <lastmod>2025-05-03</lastmod>
     </url>
     <url>
