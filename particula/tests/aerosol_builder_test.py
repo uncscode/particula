@@ -142,12 +142,9 @@ class TestAerosolBuilderValidation(unittest.TestCase):
 
     def test_full_build_returns_aerosol(self):
         """Ensure a fully-configured builder returns an Aerosol instance."""
-        atm = _build_atmosphere(2)             # 2 partitioning species
+        atm = _build_atmosphere(2)  # 2 partitioning species
         pr = _speciated_clone(self.base_particle, 2)  # 2 particle species
         aerosol = (
-            AerosolBuilder()
-            .set_atmosphere(atm)
-            .set_particles(pr)
-            .build()
+            AerosolBuilder().set_atmosphere(atm).set_particles(pr).build()
         )
         self.assertIsInstance(aerosol, Aerosol)
