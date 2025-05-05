@@ -59,8 +59,8 @@ class AtmosphereBuilder(
         atmosphere = (
             builder.set_temperature(300, "K")
             .set_pressure(101325, "Pa")
-            .add_partitioning_species(o2)
-            .add_gas_only_species(n2)
+            .set_more_partitioning_species(o2)
+            .set_more_gas_only_species(n2)
             .build()
         )
         ```
