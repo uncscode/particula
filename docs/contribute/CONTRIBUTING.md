@@ -39,9 +39,9 @@ editable install) see the
 
    | Tool | Command | Instructions |
    |------|----------|---------|
-   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](../Examples/Setup_Particula/Details/Setup_UV/) |
-   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](.../Examples/Setup_Particula/Details/Setup_Pip/) |
-   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](../Examples/Setup_Particula/Details/Setup_Conda/) |
+   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](../Examples/Setup_Particula/Details/Setup_UV.md) |
+   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](../Examples/Setup_Particula/Details/Setup_PIP.md) |
+   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](../Examples/Setup_Particula/Details/Setup_Conda.md) |
 
 5. **Verify installation**  
    ```bash
