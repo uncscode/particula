@@ -39,9 +39,9 @@ editable install) see the
 
    | Tool | Command | Instructions |
    |------|----------|---------|
-   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](/particula/Examples/Setup_Particula/Details/Setup_UV/) |
-   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](/particula/Examples/Setup_Particula/Details/Setup_Pip/) |
-   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](/particula/Examples/Setup_Particula/Details/Setup_Conda/) |
+   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](../Examples/Setup_Particula/Details/Setup_UV/) |
+   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](.../Examples/Setup_Particula/Details/Setup_Pip/) |
+   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](../Examples/Setup_Particula/Details/Setup_Conda/) |
 
 5. **Verify installation**  
    ```bash
@@ -102,6 +102,8 @@ For a full step‑by‑step breakdown see the
 
 **Step 5 – Commit & push**
 
+For an overview of git standards we use, see [Linear Git Repository](../contribute/Code_Specifications/Details/Linear_Git_Repository.md).
+
 ```bash
 git add .
 git commit -m "FIX #123: timestep rollover in simulation"
@@ -133,7 +135,7 @@ Your contribution is now part of **Particula**—thank you!
 | Topic | Rule |
 |-------|------|
 | **Style** | Detailed rules: [Code Specifications](Code_Specifications/index.md). |
-| **Docstrings** | Follow the templates in [Function docstring format](Code_Specifications/Function_docstring_format.md) and [Class docstring format](Code_Specifications/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
+| **Docstrings** | Follow the templates in [Function docstring format](Code_Specifications/Detials/Function_docstring_format.md) and [Class docstring format](Code_Specifications/Detials/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
 | **Typing** | Use `typing` annotations. Omit types in docstrings. |
 | **Tests** | Every public function/class must have at least one `pytest` test. Aim for coverage ≥ 90 %.  See [Add Unit Tests](Feature_Workflow/Add_Unit_Test.md). |
 | **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
