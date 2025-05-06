@@ -145,6 +145,9 @@ class TestAerosolBuilderValidation(unittest.TestCase):
         atm = _build_atmosphere(2)  # 2 partitioning species
         pr = _speciated_clone(self.base_particle, 2)  # 2 particle species
         aerosol = (
-            AerosolBuilder().set_atmosphere(atm).set_particles(pr).build()
+            AerosolBuilder()
+            .set_atmosphere(atm)
+            .set_particles(pr)
+            .build()
         )
         self.assertIsInstance(aerosol, Aerosol)
