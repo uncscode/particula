@@ -9293,7 +9293,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -9338,7 +9338,7 @@ import particula as par</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -9355,7 +9355,7 @@ import particula as par</div>
 <span class="n">molar_mass_glycerol</span> <span class="o">=</span> <span class="mf">92.09382e-3</span>  <span class="c1"># kg/mol</span>
 <span class="n">parameters_clausius</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="mf">71.5</span> <span class="o">*</span> <span class="n">molar_mass_glycerol</span><span class="p">,</span>
-    <span class="s2">"latent_heat_units"</span><span class="p">:</span> <span class="s2">"kJ/kg"</span><span class="p">,</span>
+    <span class="s2">"latent_heat_units"</span><span class="p">:</span> <span class="s2">"J/mol"</span><span class="p">,</span>
     <span class="s2">"temperature_initial"</span><span class="p">:</span> <span class="mf">125.5</span><span class="p">,</span>
     <span class="s2">"temperature_initial_units"</span><span class="p">:</span> <span class="s2">"degC"</span><span class="p">,</span>
     <span class="s2">"pressure_initial"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
@@ -9377,14 +9377,14 @@ import particula as par</div>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_strategy</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">sat_concentration</span> <span class="o">*</span> <span class="n">sat_factor</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"Glycerol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
 
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -9405,7 +9405,7 @@ import particula as par</div>
 molar_mass_glycerol = 92.09382e-3  # kg/mol
 parameters_clausius = {
     "latent_heat": 71.5 * molar_mass_glycerol,
-    "latent_heat_units": "kJ/kg",
+    "latent_heat_units": "J/mol",
     "temperature_initial": 125.5,
     "temperature_initial_units": "degC",
     "pressure_initial": 1,
@@ -9427,14 +9427,14 @@ glycerol_gas = (
     .set_vapor_pressure_strategy(vapor_pressure_strategy)
     .set_concentration(sat_concentration * sat_factor, "kg/m^3")
     .set_name("Glycerol")
-    .set_condensable(True)
+    .set_partitioning(True)
     .build()
 )
 print(glycerol_gas)
 
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(glycerol_gas)
+    .set_more_partitioning_species(glycerol_gas)
     .set_temperature(25, temperature_units="degC")
     .set_pressure(1, pressure_units="atm")
     .build()
@@ -9461,12 +9461,25 @@ lognormal_rep = (
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Saturation concentration: 2.54e-03 kg/m^3
+<pre>Saturation concentration: 4.95e-03 kg/m^3
 Glycerol
-Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
+Gas mixture at 298.15 K, 101325.0 Pa, partitioning=Glycerol, gas_only_species=None
 </pre>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<blockquote>
+<p>Notice, that there are two different types of gas phase species possible. <code>partitioning</code> and <code>gas_only_spcies</code>. The <code>partitioning</code> species are the ones that will be partitioned between the gas and particle phase, while the <code>gas_only_species</code> are the ones that will only be in the gas phase.</p>
+</blockquote>
 </div>
 </div>
 </div>
@@ -9487,7 +9500,7 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -9518,8 +9531,8 @@ print(aerosol)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
-[0]: Particle Representation:
+<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=Glycerol, gas_only_species=None
+Particle Representation:
 	Strategy: RadiiBasedMovingBin
 	Activity: ActivityIdealMass
 	Surface: SurfaceStrategyVolume

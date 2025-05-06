@@ -9350,7 +9350,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -9397,7 +9397,7 @@ import particula as par</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -9441,7 +9441,7 @@ import particula as par</div>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"sulfate"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass_ammonium_sulfate</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_sulfate</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">initial_sulfate_concentration</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -9450,7 +9450,7 @@ import particula as par</div>
 <span class="c1"># Build the atmosphere with the sulfate species and environmental conditions</span>
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">gas_sulfate</span><span class="p">)</span>  <span class="c1"># Add sulfate to the atmosphere</span>
+    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">gas_sulfate</span><span class="p">)</span>  <span class="c1"># Add sulfate to the atmosphere</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atm</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -9522,7 +9522,7 @@ gas_sulfate = (
     par.gas.GasSpeciesBuilder()
     .set_name("sulfate")
     .set_molar_mass(molar_mass_ammonium_sulfate, "kg/mol")
-    .set_condensable(True)
+    .set_partitioning(True)
     .set_vapor_pressure_strategy(vapor_pressure_sulfate)
     .set_concentration(initial_sulfate_concentration, "kg/m^3")
     .build()
@@ -9531,7 +9531,7 @@ gas_sulfate = (
 # Build the atmosphere with the sulfate species and environmental conditions
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(gas_sulfate)  # Add sulfate to the atmosphere
+    .set_more_partitioning_species(gas_sulfate)  # Add sulfate to the atmosphere
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atm
     .build()
@@ -9582,12 +9582,12 @@ print(aerosol)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ['sulfate']
-[0]: Particle Representation:
+<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=sulfate, gas_only_species=None
+Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityIdealMass
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 8.240e-07 [kg/m^3]
+	Mass Concentration: 7.221e-07 [kg/m^3]
 	Number Concentration: 1.000e+09 [#/m^3]
 </pre>
 </div>
@@ -9601,7 +9601,7 @@ print(aerosol)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -9641,7 +9641,7 @@ print(aerosol)</div>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"sulfate"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass_ammonium_sulfate</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_sulfate</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">initial_sulfate_concentration</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -9650,7 +9650,7 @@ print(aerosol)</div>
 <span class="c1"># AtmosphereBuilder constructs the atmosphere with predefined species</span>
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">gas_sulfate</span><span class="p">)</span>  <span class="c1"># Add the sulfate gas species to the atmosphere</span>
+    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">gas_sulfate</span><span class="p">)</span>  <span class="c1"># Add the sulfate gas species to the atmosphere</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atmosphere</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the atmosphere object</span>
@@ -9720,7 +9720,7 @@ gas_sulfate = (
     par.gas.GasSpeciesBuilder()
     .set_name("sulfate")
     .set_molar_mass(molar_mass_ammonium_sulfate, "kg/mol")
-    .set_condensable(True)
+    .set_partitioning(True)
     .set_vapor_pressure_strategy(vapor_pressure_sulfate)
     .set_concentration(initial_sulfate_concentration, "kg/m^3")
     .build()
@@ -9729,7 +9729,7 @@ gas_sulfate = (
 # AtmosphereBuilder constructs the atmosphere with predefined species
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(gas_sulfate)  # Add the sulfate gas species to the atmosphere
+    .set_more_partitioning_species(gas_sulfate)  # Add the sulfate gas species to the atmosphere
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
     .build()  # Finalize the atmosphere object
@@ -9782,12 +9782,12 @@ print(aerosol)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ['sulfate']
-[0]: Particle Representation:
+<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=sulfate, gas_only_species=None
+Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityIdealMass
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 6.873e-07 [kg/m^3]
+	Mass Concentration: 8.956e-07 [kg/m^3]
 	Number Concentration: 1.000e+09 [#/m^3]
 </pre>
 </div>
@@ -9823,7 +9823,7 @@ print(aerosol)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -9899,7 +9899,7 @@ step_count = 0</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -9932,16 +9932,16 @@ step_count = 0</div>
 <span class="c1"># 1. Add more vapor to the gas phase (e.g., by external sources)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">"Current sulfate concentration: "</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
 <span class="p">)</span>
-<span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span><span class="n">vapor_production</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">)</span>
+<span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span><span class="n">vapor_production</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">"New sulfate concentration: "</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
 <span class="p">)</span>
 
 <span class="c1"># 2. Calculate the new saturation ratio for sulfate in the atmosphere</span>
-<span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
+<span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saturation ratio: </span><span class="si">{</span><span class="n">saturation_ratio</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -9980,7 +9980,7 @@ step_count = 0</div>
 <span class="c1"># 6. If new particles are nucleated, proceed to add them to the aerosol</span>
 <span class="k">if</span> <span class="n">number_of_new_resolved_particles</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
     <span class="c1"># Remove nucleated mass from the gas phase to conserve mass</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
         <span class="o">-</span><span class="n">number_of_new_resolved_particles</span> <span class="o">*</span> <span class="n">mass_nucleated_particle</span>
     <span class="p">)</span>
 
@@ -10011,24 +10011,18 @@ step_count = 0</div>
 <span class="n">coagulation_runnable</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 
 <span class="c1"># Print the total particle concentration and mass after running the dynamics</span>
-<span class="n">total_particle_concentration_after_process</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-    <span class="mi">0</span>
-<span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span>
+<span class="n">total_particle_concentration_after_process</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"Total particle concentration after dynamics [#/m^3]: </span><span class="si">{</span><span class="n">total_particle_concentration_after_process</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
 
-<span class="n">total_particle_mass_after_process</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-    <span class="mi">0</span>
-<span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+<span class="n">total_particle_mass_after_process</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"Total particle mass after dynamics [kg/m^3]: </span><span class="si">{</span><span class="n">total_particle_mass_after_process</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
 
 <span class="c1"># Retrieve and print the total number of resolved particles simulated</span>
-<span class="n">total_resolved_particles_in_simulation</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-    <span class="mi">0</span>
-<span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">total_resolved_particles_in_simulation</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"Total resolved particles in simulation: </span><span class="si">{</span><span class="n">total_resolved_particles_in_simulation</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
@@ -10053,16 +10047,16 @@ time_step = 1  # Time step in seconds
 # 1. Add more vapor to the gas phase (e.g., by external sources)
 print(
     "Current sulfate concentration: ",
-    aerosol.atmosphere.species[0].get_concentration(),
+    aerosol.atmosphere.partitioning_species.get_concentration(),
 )
-aerosol.atmosphere.species[0].add_concentration(vapor_production * time_step)
+aerosol.atmosphere.partitioning_species.add_concentration(vapor_production * time_step)
 print(
     "New sulfate concentration: ",
-    aerosol.atmosphere.species[0].get_concentration(),
+    aerosol.atmosphere.partitioning_species.get_concentration(),
 )
 
 # 2. Calculate the new saturation ratio for sulfate in the atmosphere
-saturation_ratio = aerosol.atmosphere.species[0].get_saturation_ratio(
+saturation_ratio = aerosol.atmosphere.partitioning_species.get_saturation_ratio(
     temperature=298.15
 )
 print(f"Saturation ratio: {saturation_ratio}")
@@ -10101,7 +10095,7 @@ print(
 # 6. If new particles are nucleated, proceed to add them to the aerosol
 if number_of_new_resolved_particles &gt; 0:
     # Remove nucleated mass from the gas phase to conserve mass
-    aerosol.atmosphere.species[0].add_concentration(
+    aerosol.atmosphere.partitioning_species.add_concentration(
         -number_of_new_resolved_particles * mass_nucleated_particle
     )
 
@@ -10132,24 +10126,18 @@ condensation_runnable.execute(aerosol, time_step)
 coagulation_runnable.execute(aerosol, time_step)
 
 # Print the total particle concentration and mass after running the dynamics
-total_particle_concentration_after_process = aerosol.particles[
-    0
-].get_total_concentration()
+total_particle_concentration_after_process = aerosol.particles.get_total_concentration()
 print(
     f"Total particle concentration after dynamics [#/m^3]: {total_particle_concentration_after_process}"
 )
 
-total_particle_mass_after_process = aerosol.particles[
-    0
-].get_mass_concentration()
+total_particle_mass_after_process = aerosol.particles.get_mass_concentration()
 print(
     f"Total particle mass after dynamics [kg/m^3]: {total_particle_mass_after_process}"
 )
 
 # Retrieve and print the total number of resolved particles simulated
-total_resolved_particles_in_simulation = aerosol.particles[
-    0
-].concentration.sum()
+total_resolved_particles_in_simulation = aerosol.particles.concentration.sum()
 print(
     f"Total resolved particles in simulation: {total_resolved_particles_in_simulation}"
 )</div>
@@ -10173,7 +10161,7 @@ Number of new particles nucleated: 0.0
 Number of new resolved particles to be created: 0
 Total particle concentration before dynamics [#/m^3]: 999999999.9999999
 Total particle concentration after dynamics [#/m^3]: 999999999.9999999
-Total particle mass after dynamics [kg/m^3]: 6.872785667890301e-07
+Total particle mass after dynamics [kg/m^3]: 8.956465989717756e-07
 Total resolved particles in simulation: 100.0
 </pre>
 </div>
@@ -10199,7 +10187,7 @@ Total resolved particles in simulation: 100.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -10217,7 +10205,7 @@ Total resolved particles in simulation: 100.0
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"sulfate"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass_ammonium_sulfate</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_sulfate</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">initial_sulfate_concentration</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -10226,7 +10214,7 @@ Total resolved particles in simulation: 100.0
 <span class="c1"># AtmosphereBuilder constructs the atmosphere with predefined species</span>
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">gas_sulfate</span><span class="p">)</span>  <span class="c1"># Add the sulfate gas species to the atmosphere</span>
+    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">gas_sulfate</span><span class="p">)</span>  <span class="c1"># Add the sulfate gas species to the atmosphere</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atmosphere</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the atmosphere object</span>
@@ -10273,7 +10261,7 @@ gas_sulfate = (
     par.gas.GasSpeciesBuilder()
     .set_name("sulfate")
     .set_molar_mass(molar_mass_ammonium_sulfate, "kg/mol")
-    .set_condensable(True)
+    .set_partitioning(True)
     .set_vapor_pressure_strategy(vapor_pressure_sulfate)
     .set_concentration(initial_sulfate_concentration, "kg/m^3")
     .build()
@@ -10282,7 +10270,7 @@ gas_sulfate = (
 # AtmosphereBuilder constructs the atmosphere with predefined species
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(gas_sulfate)  # Add the sulfate gas species to the atmosphere
+    .set_more_partitioning_species(gas_sulfate)  # Add the sulfate gas species to the atmosphere
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
     .build()  # Finalize the atmosphere object
@@ -10334,12 +10322,12 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ['sulfate']
-[0]: Particle Representation:
+<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=sulfate, gas_only_species=None
+Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityIdealMass
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 6.873e-07 [kg/m^3]
+	Mass Concentration: 8.956e-07 [kg/m^3]
 	Number Concentration: 1.000e+09 [#/m^3]
 Total iterations to do: 400
 </pre>
@@ -10354,7 +10342,7 @@ Total iterations to do: 400
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -10383,12 +10371,12 @@ Total iterations to do: 400
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># 1. Add more vapor to the gas phase (e.g., by external sources)</span>
-        <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
+        <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
             <span class="n">vapor_production</span> <span class="o">*</span> <span class="n">time_step</span>
         <span class="p">)</span>
 
         <span class="c1"># 2. Calculate the new saturation ratio for sulfate in the atmosphere</span>
-        <span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
+        <span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
             <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
         <span class="p">)</span>
 
@@ -10422,7 +10410,7 @@ Total iterations to do: 400
         <span class="c1"># 6. If new particles are nucleated, proceed to add them to the aerosol</span>
         <span class="k">if</span> <span class="n">number_of_new_resolved_particles</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># Remove nucleated mass from the gas phase to conserve mass</span>
-            <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
+            <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
                 <span class="o">-</span><span class="n">number_of_new_resolved_particles</span> <span class="o">*</span> <span class="n">mass_nucleated_particle</span>
             <span class="p">)</span>
 
@@ -10451,15 +10439,11 @@ Total iterations to do: 400
         <span class="n">number_distribution</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
     <span class="p">)</span>
     <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">saturation_ratio_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
+    <span class="n">saturation_ratio_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Retrieve and print the total number of resolved particles simulated</span>
-        <span class="n">total_resolved_particles_in_simulation</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-            <span class="mi">0</span>
-        <span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">total_resolved_particles_in_simulation</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">"Index </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: Total resolved particles in simulation: </span><span class="si">{</span><span class="n">total_resolved_particles_in_simulation</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
@@ -10483,12 +10467,12 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 for i, t in enumerate(time):
     if i &gt; 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
-        aerosol.atmosphere.species[0].add_concentration(
+        aerosol.atmosphere.partitioning_species.add_concentration(
             vapor_production * time_step
         )
 
         # 2. Calculate the new saturation ratio for sulfate in the atmosphere
-        saturation_ratio = aerosol.atmosphere.species[0].get_saturation_ratio(
+        saturation_ratio = aerosol.atmosphere.partitioning_species.get_saturation_ratio(
             temperature=298.15
         )
 
@@ -10522,7 +10506,7 @@ for i, t in enumerate(time):
         # 6. If new particles are nucleated, proceed to add them to the aerosol
         if number_of_new_resolved_particles &gt; 0:
             # Remove nucleated mass from the gas phase to conserve mass
-            aerosol.atmosphere.species[0].add_concentration(
+            aerosol.atmosphere.partitioning_species.add_concentration(
                 -number_of_new_resolved_particles * mass_nucleated_particle
             )
 
@@ -10551,15 +10535,11 @@ for i, t in enumerate(time):
         number_distribution, bins=bins_lognormal
     )
     total_number_resolved[i] = np.sum(number_distribution[i] &gt; 0)
-    saturation_ratio_output[i] = aerosol.atmosphere.species[
-        0
-    ].get_saturation_ratio(temperature=298.15)
+    saturation_ratio_output[i] = aerosol.atmosphere.partitioning_species.get_saturation_ratio(temperature=298.15)
 
     if i % 20 == 0:
         # Retrieve and print the total number of resolved particles simulated
-        total_resolved_particles_in_simulation = aerosol.particles[
-            0
-        ].concentration.sum()
+        total_resolved_particles_in_simulation = aerosol.particles.get_concentration().sum()
         print(
             f"Index {i}: Total resolved particles in simulation: {total_resolved_particles_in_simulation}"
         )
@@ -10577,16 +10557,16 @@ number_distribution_binned = number_distribution_binned / volume_sim</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Index 0: Total resolved particles in simulation: 100.0
-Index 20: Total resolved particles in simulation: 333234.0
-Index 40: Total resolved particles in simulation: 364642.0
-Index 60: Total resolved particles in simulation: 345367.0
-Index 80: Total resolved particles in simulation: 326109.0
-Index 100: Total resolved particles in simulation: 308844.0
-Index 120: Total resolved particles in simulation: 293211.0
-Index 140: Total resolved particles in simulation: 279059.0
-Index 160: Total resolved particles in simulation: 266035.0
-Index 180: Total resolved particles in simulation: 254240.0
+<pre>Index 0: Total resolved particles in simulation: 999999999.9999999
+Index 20: Total resolved particles in simulation: 2958949999999.9995
+Index 40: Total resolved particles in simulation: 3360559999999.9995
+Index 60: Total resolved particles in simulation: 3201369999999.9995
+Index 80: Total resolved particles in simulation: 3026179999999.9995
+Index 100: Total resolved particles in simulation: 2867979999999.9995
+Index 120: Total resolved particles in simulation: 2725539999999.9995
+Index 140: Total resolved particles in simulation: 2596449999999.9995
+Index 160: Total resolved particles in simulation: 2479179999999.9995
+Index 180: Total resolved particles in simulation: 2370949999999.9995
 </pre>
 </div>
 </div>
@@ -10610,7 +10590,7 @@ Index 180: Total resolved particles in simulation: 254240.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -10713,7 +10693,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">

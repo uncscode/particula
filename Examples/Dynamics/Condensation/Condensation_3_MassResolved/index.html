@@ -9419,13 +9419,13 @@ import particula as par</div>
     <span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">water_concentration</span><span class="p">,</span> <span class="mf">1e-30</span><span class="p">]),</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">([</span><span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"NH4HSO4"</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">set_condensable</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_partitioning</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">gas_phase</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_more_partitioning_species</span><span class="p">(</span><span class="n">gas_phase</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -9462,13 +9462,13 @@ gas_phase = (
     )
     .set_concentration(np.array([water_concentration, 1e-30]), "kg/m^3")
     .set_name(["H2O", "NH4HSO4"])
-    .set_condensable([True, True])
+    .set_partitioning(True)
     .build()
 )
 
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(gas_phase)
+    .set_more_partitioning_species(gas_phase)
     .set_temperature(25, temperature_units="degC")
     .set_pressure(1, pressure_units="atm")
     .build()
@@ -9661,12 +9661,12 @@ print(aerosol_resolved)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
+<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=['H2O', 'NH4HSO4'], gas_only_species=None
 Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityKappaParameter
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 2.743e-06 [kg/m^3]
+	Mass Concentration: 2.676e-06 [kg/m^3]
 	Number Concentration: 1.000e+10 [#/m^3]
 </pre>
 </div>
@@ -9791,7 +9791,7 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -9818,9 +9818,7 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
         <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
     <span class="p">)</span>
     <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">water_saturation_in_time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">water_saturation_in_time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 
 <span class="n">number_distribution_binned</span> <span class="o">=</span> <span class="n">number_distribution_binned</span> <span class="o">/</span> <span class="n">volume_sim</span>
@@ -9841,9 +9839,7 @@ for i, t in enumerate(time):
         number_distribution_resolved[i, :], bins=bins_lognormal
     )
     total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] &gt; 0)
-    water_saturation_in_time[i] = aerosol_resolved.atmosphere.species[
-        0
-    ].get_saturation_ratio(temperature=298.15)[0]
+    water_saturation_in_time[i] = aerosol_resolved.atmosphere.partitioning_species.get_saturation_ratio(temperature=298.15)[0]
 
 
 number_distribution_binned = number_distribution_binned / volume_sim
@@ -9860,12 +9856,12 @@ print(aerosol_resolved)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
+<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=['H2O', 'NH4HSO4'], gas_only_species=None
 Particle Representation:
 	Strategy: ParticleResolvedSpeciatedMass
 	Activity: ActivityKappaParameter
 	Surface: SurfaceStrategyVolume
-	Mass Concentration: 6.040e-04 [kg/m^3]
+	Mass Concentration: 6.033e-04 [kg/m^3]
 	Number Concentration: 1.000e+10 [#/m^3]
 </pre>
 </div>
@@ -9890,7 +9886,7 @@ Particle Representation:
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -10001,7 +9997,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -10104,7 +10100,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
