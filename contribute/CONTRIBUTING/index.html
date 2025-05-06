@@ -9011,17 +9011,17 @@ editable install) see the
 <tr>
 <td><strong>uv (fast, minimal)</strong></td>
 <td><code>uv venv .venv</code><br><code>source .venv/bin/activate</code><br><code>uv pip install -e ".[dev,extra]"</code></td>
-<td><a href="/particula/Examples/Setup_Particula/Details/Setup_UV/">uv setup guide</a></td>
+<td><a href="../../Examples/Setup_Particula/Details/Setup_UV/">uv setup guide</a></td>
 </tr>
 <tr>
 <td><strong>pip + venv</strong></td>
 <td><code>python -m venv .venv</code><br><code>source .venv/bin/activate</code><br><code>pip install -e ".[dev,extra]"</code></td>
-<td><a href="/particula/Examples/Setup_Particula/Details/Setup_Pip/">pip setup guide</a></td>
+<td><a href="../../Examples/Setup_Particula/Details/Setup_PIP/">pip setup guide</a></td>
 </tr>
 <tr>
 <td><strong>conda</strong></td>
 <td><code>conda create -n particula-dev</code><br><code>conda activate particula-dev</code><br><code>pip install -e ".[dev,extra]"</code></td>
-<td><a href="/particula/Examples/Setup_Particula/Details/Setup_Conda/">conda setup guide</a></td>
+<td><a href="../../Examples/Setup_Particula/Details/Setup_Conda/">conda setup guide</a></td>
 </tr>
 </tbody>
 </table>
@@ -9115,6 +9115,7 @@ Pure bug fixes or small features or new examples are usually fine to skip this s
 <li>Add/adjust docstrings &amp; markdown pages.</li>
 </ul>
 <p><strong>Step 5 – Commit &amp; push</strong></p>
+<p>For an overview of git standards we use, see <a href="../Code_Specifications/Details/Linear_Git_Repository/">Linear Git Repository</a>.</p>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>.
 git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;FIX #123: timestep rollover in simulation&quot;</span>
 git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>issue123-fix-simulation
@@ -9149,7 +9150,7 @@ Your contribution is now part of <strong>Particula</strong>—thank you!</p>
 </tr>
 <tr>
 <td><strong>Docstrings</strong></td>
-<td>Follow the templates in <a href="Code_Specifications/Function_docstring_format.md">Function docstring format</a> and <a href="Code_Specifications/Class_docstring_format.md">Class docstring format</a>. One‑line summary + details + sections (<code>Arguments</code>, <code>Returns</code>, <code>Raises</code>, <code>Examples</code>, <code>References</code>).</td>
+<td>Follow the templates in <a href="../Code_Specifications/Details/Function_docstring_format/">Function docstring format</a> and <a href="../Code_Specifications/Details/Class_docstring_format/">Class docstring format</a>. One‑line summary + details + sections (<code>Arguments</code>, <code>Returns</code>, <code>Raises</code>, <code>Examples</code>, <code>References</code>).</td>
 </tr>
 <tr>
 <td><strong>Typing</strong></td>
@@ -9157,7 +9158,7 @@ Your contribution is now part of <strong>Particula</strong>—thank you!</p>
 </tr>
 <tr>
 <td><strong>Tests</strong></td>
-<td>Every public function/class must have at least one <code>pytest</code> test. Aim for coverage ≥ 90 %.  See <a href="Feature_Workflow/Add_Unit_Test.md">Add Unit Tests</a>.</td>
+<td>Every public function/class must have at least one <code>pytest</code> test. Aim for coverage ≥ 90 %.  See <a href="../Feature_Workflow/Details/Add_Unit_Test/">Add Unit Tests</a>.</td>
 </tr>
 <tr>
 <td><strong>Commit messages</strong></td>
