@@ -420,6 +420,8 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         new_distribution = np.maximum(distribution + mass_per_particle, 0)
         return new_distribution, concentration
 
+
+
     def add_concentration(
         self,
         distribution: NDArray[np.float64],

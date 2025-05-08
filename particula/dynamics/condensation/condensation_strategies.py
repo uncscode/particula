@@ -104,6 +104,7 @@ class CondensationStrategy(ABC):
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
+        no_partitioning_index: Optional[list] = None,
     ):
         """
         Initialize the CondensationStrategy instance.
@@ -120,6 +121,7 @@ class CondensationStrategy(ABC):
         self.diffusion_coefficient = diffusion_coefficient
         self.accommodation_coefficient = accommodation_coefficient
         self.update_gases = update_gases
+        self.no_partitioning_index = no_partitioning_index
 
     def mean_free_path(
         self,
@@ -457,12 +459,14 @@ class CondensationIsothermal(CondensationStrategy):
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
+        no_partitioning_index: Optional[list] = None,
     ):
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
             accommodation_coefficient=accommodation_coefficient,
             update_gases=update_gases,
+            no_partitioning_index=no_partitioning_index,
         )
 
     def mass_transfer_rate(
@@ -518,6 +522,12 @@ class CondensationIsothermal(CondensationStrategy):
         # mass rate by particle concentration
         rates = mass_rate * concentration
 
+        # Step 4: Set the no_partitioning index to zero if specified
+        if self.no_partitioning_index is not None:
+            if mass_rate.ndim == 2:
+                rates[:, self.no_partitioning_index] = 0.0
+            else:
+                rates[self.no_partitioning_index] = 0.0
         return rates
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
