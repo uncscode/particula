@@ -33,7 +33,7 @@ density_organics_g_cm3 = organic_array(
 
 c_total_ug_per_m3 = np.array(
     [8.79, 3.98, 1.13, 4.07, 0.628, 0.919, 0.766, 1.02, 0.399, 0.313]
-)
+)*10
 
 name = np.array(
     [
@@ -123,7 +123,7 @@ sulfate_gas = (
     .set_name("Sulfate")
     .set_molar_mass(96.06, "g/mol")
     .set_vapor_pressure_strategy(sulfate_vapor_pressure)
-    .set_concentration(1e-12, "ug/m^3")
+    .set_concentration(0, "ug/m^3")
     .set_partitioning(True)
     .build()
 )
@@ -141,15 +141,16 @@ atmosphere = (
 # %% particles
 
 total_number_concentration = np.array([1e8])  # /m-3
-particle_radius = np.logspace(-8, -6, 400)  # m
+particle_radius = np.logspace(-7.8, -6, 100)  # m
 
 # create sulfate seeds
 number_concentration = par.particles.get_lognormal_pmf_distribution(
     x_values=particle_radius,
-    mode=np.array([75e-9]),
+    mode=np.array([100e-9]),
     geometric_standard_deviation=np.array([1.4]),
     number_of_particles=total_number_concentration,
 )
+# number_concentration = np.ones_like(particle_radius) * 1e6
 
 
 # calculate mass in each bin
@@ -176,7 +177,7 @@ activity_strategies = (
     .set_molar_mass(particle_molar_mass, "g/mol")
     .build()
 )
-surface_tension = np.append(0.09, np.ones(len(M_gmol)) * 0.03)  # N/m
+surface_tension = np.append(0.0001, np.ones(len(M_gmol)) * 0.03)  # N/m
 surface_strategy = (
     par.particles.SurfaceStrategyVolumeBuilder()
     .set_surface_tension(surface_tension, "N/m")
@@ -228,7 +229,6 @@ condensation_strategy = par.dynamics.CondensationIsothermal(
     molar_mass=particle_molar_mass,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1,
-    no_partitioning_index=[0],
 )
 condensation_process = par.dynamics.MassCondensation(condensation_strategy)
 # coagulation process setup
@@ -304,148 +304,24 @@ ax.set_yscale("log")
 # apply the mass change
 # particle.add_mass(added_mass=mass_transfer)
 
-# %%
-
-# Step 1: Calculate the total mass to change
-# (considering particle concentration)
-particle_concentration = aerosol.particles.get_concentration()
-particle_mass = aerosol.particles.get_species_mass()
-gas_mass = aerosol.atmosphere.partitioning_species.get_concentration()
-time_step = 100  # seconds
-
-# filter partitioning species
-mass_rate[:, 0] = 0.0  # sulfate mass transfer is not considered
-
-mass_to_change = (
-    mass_rate * time_step * particle_concentration[:, np.newaxis]
-)
-fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(
-    particle_representation.get_radius(),
-    mass_to_change,
-    label="Condensation Rate",
-)
-
-# Step 2: Total requested mass for each gas species (sum over particles)
-total_requested_mass = mass_to_change.sum(axis=0)
-
-# Step 3: Create scaling factors where requested mass exceeds available
-# gas mass
-scaling_factors = np.ones_like(mass_to_change)
-scaling_mask = total_requested_mass > gas_mass
-
-# Apply scaling where needed (scaling along the gas species axis)
-scaling_factors[:, scaling_mask] = (
-    gas_mass[scaling_mask] / total_requested_mass[scaling_mask]
-)
-
-# Step 4: Apply scaling factors to the mass_to_change
-mass_to_change *= scaling_factors
-ax.plot(
-    particle_representation.get_radius(),
-    mass_to_change,
-    label="Condensation Rate (scaled)",
-    linestyle="--",
-)
-ax.set_xscale("log")
-ax.set_yscale("log")
-
-# Step 5: Limit condensation by available gas mass
-condensible_mass_transfer = np.minimum(np.abs(mass_to_change), gas_mass*0.999)
-
-# Step 6: Limit evaporation by available particle mass
-evaporative_mass_transfer = np.maximum(
-    mass_to_change, -particle_mass * particle_concentration[:, np.newaxis] * 0.999
-)
-
-# Step 7: Determine the final transferable mass
-# (condensation or evaporation)
-transferable_mass = np.where(
-    mass_to_change > 0,  # Condensation scenario
-    condensible_mass_transfer,  # Limited by gas mass
-    evaporative_mass_transfer,  # Limited by particle mass
-)
-fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(
-    particle_representation.get_radius(),
-    mass_to_change,
-    label="Condensation Rate (scaled)",
-)
-ax.plot(
-    particle_representation.get_radius(),
-    transferable_mass,
-    label="Transferable Mass",
-    linestyle="--",
-)
-ax.set_xscale("log")
-ax.set_yscale("log")
-
-# %% add masss
-
-concentration = aerosol.particles.get_concentration()
-distribution = aerosol.particles.get_species_mass()
-added_mass = transferable_mass
-
-if distribution.ndim == 2:
-    concentration_expand = concentration[:, np.newaxis]
-else:
-    concentration_expand = concentration
-# Step 2: Calculate mass added per particle (handle zero concentration)
-mass_per_particle = np.where(
-    concentration_expand > 0, added_mass / concentration_expand, 0
-)
-# Step 3: Update the distribution by adding the mass per particle
-new_distribution = np.maximum(distribution + mass_per_particle, 0)
-
-fig, ax = plt.subplots(figsize=(7, 5))
-# ax.plot(
-#     particle_representation.get_radius(),
-#     mass_per_particle,
-#     label="Mass per Particle",
-# )
-ax.plot(
-    particle_representation.get_radius(),
-    distribution,
-    label="Mass per Particle",
-)
-ax.plot(
-    particle_representation.get_radius(),
-    new_distribution,
-    label="Mass per Particle",
-    linestyle="--",
-)
-ax.set_xscale("log")
-ax.set_yscale("log")
-
-fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(
-    particle_representation.get_radius(),
-    concentration_expand*new_distribution,
-    label="Concentration",
-    linestyle="--",
-)
-ax.plot(
-    particle_representation.get_radius(),
-    concentration_expand * distribution,
-    label="Concentration",
-)
-ax.set_xscale("log")
-ax.set_yscale("log")
 
 # %%
 # Copy aerosol and define time bins
 aerosol_initial = copy.deepcopy(aerosol)
-time_sim = 10  # total simulation time in seconds
-total_steps = 1_000  # total sub‑steps for finer resolution
-time = np.linspace(0, time_sim, time_sim)  # 1‑second resolution
+time_sim = 100  # total simulation time in seconds
+steps = 100  # number of time steps
+total_steps = 10_000  # total sub‑steps for finer resolution
+# time = np.linspace(0, time_sim, time_sim)  # 1‑second resolution
+time = np.logspace(-4, np.log10(time_sim), steps)  # logarithmic time steps
 aerosol_mass = np.zeros_like(time)
 
 # Main simulation loop
-sub_steps_per_sec = int(total_steps / time_sim)
+sub_steps_per_sec = int(total_steps / steps)
 for i, t in enumerate(tqdm(time, desc="Processing")):
+    delta_time = t - time[i - 1] if i > 0 else t
     if i > 0:
         aerosol = process_sequence.execute(
-            aerosol=aerosol, time_step=1, sub_steps=sub_steps_per_sec
+            aerosol=aerosol, time_step=delta_time, sub_steps=sub_steps_per_sec
         )
     # Record the size distribution at this time
     aerosol_mass[i] = aerosol.particles.get_mass_concentration(clone=True)
@@ -463,8 +339,11 @@ ax.plot(
     aerosol_mass,
     label="Total Mass Concentration",
 )
+
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Mass Concentration (kg/m³)")
+# ax.set_xlim(left=0, right=200)
+ax.set_xscale("log")
 
 fig, ax = plt.subplots(figsize=(7, 5))
 ax.plot(
@@ -474,37 +353,17 @@ ax.plot(
 )
 ax.plot(
     aerosol_initial.particles.get_radius(),
-    aerosol_initial.particles.get_concentration(), label="Initial Number Concentration"
+    aerosol_initial.particles.get_concentration(), label="Initial Number Concentration",
+    marker="x"
 )
+ax.legend()
 ax.set_xscale("log")
-ax.set_yscale("log")
+# ax.set_yscale("log")
+ax.set_xlim(left=1e-9)
 
+# %% calculate the change in radius
+# radius_delta = aerosol_initial.particles.get_radius() - aerosol.particles.get_radius()
+# print("Radius Change: ", radius_delta)
 
-# %% plot composition of the particles
-fig, ax = plt.subplots(figsize=(7, 5))
-ax.plot(
-    aerosol.particles.get_radius(),
-    aerosol.particles.get_mass(clone=True)*aerosol.particles.get_concentration(clone=True),
-    label="Total Mass Concentration",
-)
-ax.set_xscale("log")
-ax.set_yscale("log")
+# %%
 
-
-# %%Contour plot of log10(number concentration)
-fig, ax = plt.subplots(figsize=(7, 5))
-X, Y = np.meshgrid(time, edges[:-1])
-log_conc = np.log10(
-    concentrations,
-    where=concentrations > 0,
-    out=np.full_like(concentrations, np.nan),
-)
-cont = ax.contourf(X, Y, log_conc.T)
-
-ax.set_yscale("log")
-ax.set_ylim(1e-7, 1e-5)
-ax.set_xlabel("Time (s)")
-ax.set_ylabel("Particle Radius (m)")
-fig.colorbar(cont, label="Log₁₀ Number Concentration")
-plt.tight_layout()
-plt.show()
