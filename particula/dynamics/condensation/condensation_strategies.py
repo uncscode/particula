@@ -547,6 +547,13 @@ class CondensationIsothermal(CondensationStrategy):
             temperature=temperature,
             pressure=pressure,
         )
+        # Set the no_partitioning index to zero if specified
+        if self.no_partitioning_index is not None:
+            if mass_rate.ndim == 2:
+                mass_rate[:, self.no_partitioning_index] = 0.0
+            else:
+                mass_rate[self.no_partitioning_index] = 0.0
+
         # calculate the mass gain or loss per bin
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate,  # type: ignore

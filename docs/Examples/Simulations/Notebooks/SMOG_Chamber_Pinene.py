@@ -33,7 +33,7 @@ density_organics_g_cm3 = organic_array(
 
 c_total_ug_per_m3 = np.array(
     [8.79, 3.98, 1.13, 4.07, 0.628, 0.919, 0.766, 1.02, 0.399, 0.313]
-)*10
+)*5
 
 name = np.array(
     [
@@ -177,7 +177,7 @@ activity_strategies = (
     .set_molar_mass(particle_molar_mass, "g/mol")
     .build()
 )
-surface_tension = np.append(0.0001, np.ones(len(M_gmol)) * 0.03)  # N/m
+surface_tension = np.append(0.0001, np.ones(len(M_gmol)) * 0.013)  # N/m
 surface_strategy = (
     par.particles.SurfaceStrategyVolumeBuilder()
     .set_surface_tension(surface_tension, "N/m")
@@ -229,6 +229,8 @@ condensation_strategy = par.dynamics.CondensationIsothermal(
     molar_mass=particle_molar_mass,
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1,
+    update_gases=True,
+    no_partitioning_index=[0],  # no partitioning for sulfate
 )
 condensation_process = par.dynamics.MassCondensation(condensation_strategy)
 # coagulation process setup
@@ -308,9 +310,9 @@ ax.set_yscale("log")
 # %%
 # Copy aerosol and define time bins
 aerosol_initial = copy.deepcopy(aerosol)
-time_sim = 100  # total simulation time in seconds
+time_sim = 10  # total simulation time in seconds
 steps = 100  # number of time steps
-total_steps = 10_000  # total sub‑steps for finer resolution
+total_steps = 100_000  # total sub‑steps for finer resolution
 # time = np.linspace(0, time_sim, time_sim)  # 1‑second resolution
 time = np.logspace(-4, np.log10(time_sim), steps)  # logarithmic time steps
 aerosol_mass = np.zeros_like(time)
