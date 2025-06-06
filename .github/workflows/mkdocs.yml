@@ -53,3 +53,13 @@ jobs:
           uses: rossjrw/pr-preview-action@v1
           with:
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
+
+        - name: Preview Documentation from fork
+          if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && github.actor != 'dependabot[bot]' }}
+          uses: JamesIves/github-pages-deploy-action@v4
+          with:
+            token: ${{ secrets.PUBLIC_PR_PREVIEW }}
+            repository-name: uncscode/public-pr-preview
+            branch: particula-preview
+            folder: site
+            target-folder: pr-${{ github.event.pull_request.number }}
