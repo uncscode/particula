@@ -366,8 +366,8 @@ def get_mass_transfer_of_single_species(
     total_requested_mass = mass_to_change.sum()
 
     # 2. Condensation – keep Σ ≤ gas_mass
-    if total_requested_mass > gas_mass[0]:
-        scale = gas_mass[0] / total_requested_mass
+    if total_requested_mass > gas_mass.item():
+        scale = gas_mass.item() / total_requested_mass
         mass_to_change *= scale
 
     # 3. Evaporation – keep Σ ≤ total particle inventory
