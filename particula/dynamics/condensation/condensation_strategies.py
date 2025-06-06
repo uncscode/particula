@@ -100,6 +100,7 @@ class CondensationStrategy(ABC):
       Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
     """
 
+    # pylint: disable=R0913, R0917
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
@@ -527,6 +528,7 @@ class CondensationIsothermal(CondensationStrategy):
           Wiley, 2016.
     """
 
+    # pylint: disable=R0913, R0917
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],

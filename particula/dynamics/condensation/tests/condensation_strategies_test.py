@@ -2,9 +2,12 @@
 Test module for the condensation strategies.
 """
 
+# pylint: disable=R0801
+# pylint: disable= protected-access
+
 import unittest
-import particula as par  # new – we will build real objects
 import numpy as np
+import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
 )
