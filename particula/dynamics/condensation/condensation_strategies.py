@@ -107,7 +107,7 @@ class CondensationStrategy(ABC):
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
-        skip_partitioning_indices: Optional[list] = None,
+        skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
         """
         Initialize the CondensationStrategy instance.
