@@ -79,7 +79,8 @@ def get_dict_from_list(list_of_str: list) -> dict:
         # {'alpha': 0, 'beta': 1, 'gamma': 2}
         ```
     """
-    assert all(list_of_str), "Input list_of_str must not be empty."
+    assert list_of_str, "Input list_of_str must not be empty."
+    assert all(list_of_str), "Input list_of_str must not contain empty strings."
     assert all(
         isinstance(item, str) for item in list_of_str
     ), "Input \
