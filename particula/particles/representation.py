@@ -505,6 +505,7 @@ class ParticleRepresentation:
             self.get_density(),
             added_mass,
         )
+        self._enforce_increasing_bins()
 
     def add_concentration(
         self,
@@ -540,6 +541,7 @@ class ParticleRepresentation:
                 added_concentration=added_concentration,
             )
         )
+        self._enforce_increasing_bins()
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
         """
@@ -556,3 +558,14 @@ class ParticleRepresentation:
         (self.distribution, self.concentration) = self.strategy.collide_pairs(
             self.distribution, self.concentration, self.density, indices
         )
+
+    def _enforce_increasing_bins(self) -> None:
+        """Ensure distribution bins are sorted by increasing radius."""
+        radius = self.get_radius()
+        sort_index = np.argsort(radius)
+        if not np.array_equal(sort_index, np.arange(radius.size)):
+            self.distribution = np.take(self.distribution, sort_index, axis=0)
+            self.concentration = np.take(self.concentration, sort_index, axis=0)
+            if np.shape(self.charge) == np.shape(self.concentration):
+                self.charge = np.take(self.charge, sort_index, axis=0)
+
