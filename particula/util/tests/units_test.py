@@ -43,3 +43,13 @@ class TestUnitConversion(unittest.TestCase):
             self.assertAlmostEqual(result, 1e-9)
         else:
             self.skipTest("Pint not installed. Skipping conversion test.")
+
+    def test_temperature_conversion(self) -> None:
+        """
+        Test temperature conversion from Celsius to Fahrenheit
+        """
+        if IS_PINT_AVAILABE:
+            result = get_unit_conversion("degC", "degF", value=0)
+            self.assertEqual(result, 32.0)
+        else:
+            self.skipTest("Pint not installed. Skipping temperature conversion test.")
