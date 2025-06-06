@@ -9,9 +9,9 @@ from particula.util.convert_units import get_unit_conversion
 try:
     import pint  # pylint: disable=unused-import
 except ImportError:
-    IS_PINT_AVAILABE = False
+    IS_PINT_AVAILABLE = False
 else:
-    IS_PINT_AVAILABE = True
+    IS_PINT_AVAILABLE = True
 
 
 class TestUnitConversion(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestUnitConversion(unittest.TestCase):
         """
         Test for import warning if pint is not installed
         """
-        if not IS_PINT_AVAILABE:
+        if not IS_PINT_AVAILABLE:
             with self.assertRaises(ImportError):
                 get_unit_conversion("degC", "degF")
         else:
@@ -38,7 +38,7 @@ class TestUnitConversion(unittest.TestCase):
         """
         Test for example conversion when pint is installed
         """
-        if IS_PINT_AVAILABE:
+        if IS_PINT_AVAILABLE:
             result = get_unit_conversion("ug/m^3", "kg/m^3")
             self.assertAlmostEqual(result, 1e-9)
         else:
@@ -48,7 +48,7 @@ class TestUnitConversion(unittest.TestCase):
         """
         Test temperature conversion from Celsius to Fahrenheit
         """
-        if IS_PINT_AVAILABE:
+        if IS_PINT_AVAILABLE:
             result = get_unit_conversion("degC", "degF", value=0)
             self.assertEqual(result, 32.0)
         else:
