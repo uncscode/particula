@@ -309,9 +309,6 @@ class CondensationStrategy(ABC):
             kelvin_term=kelvin_term,
         )
 
-    # ------------------------------------------------------------------
-    # helper
-    # ------------------------------------------------------------------
     def _apply_skip_partitioning(
         self, array: NDArray[np.float64]
     ) -> NDArray[np.float64]:
@@ -319,16 +316,12 @@ class CondensationStrategy(ABC):
         Zero-out entries for species indices that are configured NOT to
         partition/condense.
 
-        Arguments
-        ---------
-        array : ndarray
-            1-D or 2-D array whose elements correspond to gas-species order
-            used by this strategy.
+        Arguments:
+            - array : 1-D or 2-D array whose elements correspond to gas-species
+              order used by this strategy.
 
-        Returns
-        -------
-        ndarray
-            Same array object with the chosen columns / elements set to zero.
+        Returns:
+            - Same array object with the chosen columns / elements set to zero.
         """
         if self.skip_partitioning_indices is None:
             return array
