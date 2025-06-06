@@ -82,9 +82,7 @@ def get_dict_from_list(list_of_str: list) -> dict:
     """
     # basic type / emptiness check
     if not isinstance(list_of_str, Sequence) or not list_of_str:
-        raise TypeError(
-            "list_of_str must be a non-empty sequence of strings."
-        )
+        raise TypeError("list_of_str must be a non-empty sequence of strings.")
 
     # one pass: ensure every element is a non-empty string
     if any(not isinstance(item, str) or item == "" for item in list_of_str):
