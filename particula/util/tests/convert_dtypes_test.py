@@ -36,9 +36,9 @@ def test_get_dict_from_list_valid():
 
 def test_get_dict_from_list_invalid():
     """Empty or non-string lists raise AssertionError."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         get_dict_from_list([])
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         get_dict_from_list(["a", 1])
 
 
