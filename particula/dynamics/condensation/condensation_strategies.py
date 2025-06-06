@@ -309,6 +309,35 @@ class CondensationStrategy(ABC):
             kelvin_term=kelvin_term,
         )
 
+    # ------------------------------------------------------------------
+    # helper
+    # ------------------------------------------------------------------
+    def _apply_skip_partitioning(
+        self, array: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """
+        Zero-out entries for species indices that are configured NOT to
+        partition/condense.
+
+        Arguments
+        ---------
+        array : ndarray
+            1-D or 2-D array whose elements correspond to gas-species order
+            used by this strategy.
+
+        Returns
+        -------
+        ndarray
+            Same array object with the chosen columns / elements set to zero.
+        """
+        if self.skip_partitioning_indices is None:
+            return array
+        if array.ndim == 2:
+            array[:, self.skip_partitioning_indices] = 0.0
+        else:
+            array[self.skip_partitioning_indices] = 0.0
+        return array
+
     @abstractmethod
     def mass_transfer_rate(
         self,
@@ -526,12 +555,8 @@ class CondensationIsothermal(CondensationStrategy):
         # mass rate by particle concentration
         rates = mass_rate * concentration
 
-        # Step 4: Set the skip_partitioning_indices to zero if specified
-        if self.skip_partitioning_indices is not None:
-            if mass_rate.ndim == 2:
-                rates[:, self.skip_partitioning_indices] = 0.0
-            else:
-                rates[self.skip_partitioning_indices] = 0.0
+        # Apply optional skipping of selected species
+        rates = self._apply_skip_partitioning(rates)
         return rates
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
@@ -551,12 +576,8 @@ class CondensationIsothermal(CondensationStrategy):
             temperature=temperature,
             pressure=pressure,
         )
-        # Set the skip_partitioning_indices to zero if specified
-        if self.skip_partitioning_indices is not None:
-            if mass_rate.ndim == 2:
-                mass_rate[:, self.skip_partitioning_indices] = 0.0
-            else:
-                mass_rate[self.skip_partitioning_indices] = 0.0
+        # Apply optional skipping of selected species
+        mass_rate = self._apply_skip_partitioning(mass_rate)
 
         # calculate the mass gain or loss per bin
         mass_transfer = get_mass_transfer(
