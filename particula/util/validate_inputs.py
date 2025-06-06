@@ -116,7 +116,9 @@ def validate_inputs(dict_args):
 
     The constraints are defined by a dictionary of argument names and their
     validation types (e.g., "positive", "negative", "nonnegative", etc.). If
-    any argument violates its constraint, a ValueError is raised.
+    any argument violates its constraint, a ValueError is raised. Arguments
+    explicitly passed as ``None`` are ignored and no validation is performed
+    on them.
 
     Arguments:
         - dict_args : Dictionary {argument_name: constraint_type}, where the
