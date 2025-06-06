@@ -36,7 +36,7 @@ Units are all Base SI units.
 """
 
 from abc import ABC, abstractmethod
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, Sequence
 import logging
 from numpy.typing import NDArray
 import numpy as np
@@ -55,6 +55,8 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_rate,
     get_mass_transfer,
 )
+from particula.util.validate_inputs import validate_inputs
+
 
 logger = logging.getLogger("particula")
 
@@ -101,6 +103,14 @@ class CondensationStrategy(ABC):
     """
 
     # pylint: disable=R0913, R0917
+    @validate_inputs(
+        {
+            "molar_mass": "positive",
+            "diffusion_coefficient": "positive",
+            "accommodation_coefficient": "nonnegative",
+            # "skip_partitioning_indices": "nonnegative",
+        }
+    )
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
@@ -285,7 +295,7 @@ class CondensationStrategy(ABC):
             filled = self._fill_zero_radius(r)
             ```
         """
-        if np.max(radius) == 0:
+        if np.max(radius) == 0.0:
             message = (
                 "All radius values are zero, radius set to 1 m for "
                 "condensation calculations. This should be ignored as the "
