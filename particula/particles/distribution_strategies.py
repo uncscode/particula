@@ -262,7 +262,7 @@ class MassBasedMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         message = (
             "Colliding pairs in MassBasedMovingBin is not physically"
-            + "meaningful, change dyanmic or particle strategy."
+            + "meaningful, change dynamic or particle strategy."
         )
         logger.warning(message)
         raise NotImplementedError(message)
@@ -362,7 +362,7 @@ class RadiiBasedMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         message = (
             "Colliding pairs in RadiiBasedMovingBin is not physically"
-            + "meaningful, change dyanmic or particle strategy."
+            + "meaningful, change dynamic or particle strategy."
         )
         logger.warning(message)
         raise NotImplementedError(message)
@@ -464,7 +464,7 @@ class SpeciatedMassMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         message = (
             "Colliding pairs in SpeciatedMassMovingBin is not physically"
-            + "meaningful, change dyanmic or particle strategy."
+            + "meaningful, change dynamic or particle strategy."
         )
         logger.warning(message)
         raise NotImplementedError(message)
