@@ -36,8 +36,9 @@ Units are all Base SI units.
 """
 
 from abc import ABC, abstractmethod
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, Sequence
 import logging
+import warnings            # NEW
 from numpy.typing import NDArray
 import numpy as np
 
@@ -55,6 +56,8 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_rate,
     get_mass_transfer,
 )
+from particula.util.validate_inputs import validate_inputs
+
 
 logger = logging.getLogger("particula")
 
@@ -100,13 +103,22 @@ class CondensationStrategy(ABC):
       Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
     """
 
+    # pylint: disable=R0913, R0917
+    @validate_inputs(
+        {
+            "molar_mass": "positive",
+            "diffusion_coefficient": "positive",
+            "accommodation_coefficient": "nonnegative",
+            "skip_partitioning_indices": "nonnegative",
+        }
+    )
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
-        skip_partitioning_indices: Optional[list] = None,
+        skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
         """
         Initialize the CondensationStrategy instance.
@@ -284,13 +296,14 @@ class CondensationStrategy(ABC):
             filled = self._fill_zero_radius(r)
             ```
         """
-        if np.max(radius) == 0:
+        if np.max(radius) == 0.0:
             message = (
                 "All radius values are zero, radius set to 1 m for "
                 "condensation calculations. This should be ignored as the "
                 "particle concentration would also be zero."
             )
             logger.warning(message)
+            warnings.warn(message, RuntimeWarning)
             radius = np.where(radius == 0, 1, radius)
         return np.where(radius == 0, np.max(radius), radius)
 
@@ -527,13 +540,14 @@ class CondensationIsothermal(CondensationStrategy):
           Wiley, 2016.
     """
 
+    # pylint: disable=R0913, R0917
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
-        skip_partitioning_indices: Optional[list] = None,
+        skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
         super().__init__(
             molar_mass=molar_mass,
