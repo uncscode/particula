@@ -10362,7 +10362,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py">particula.dynamics.condensation.condensation_strategies</a> module.</p>
 </blockquote>
 <h2 id="condensationisothermal">CondensationIsothermal<a class="headerlink" href="#condensationisothermal" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L495">Show source in condensation_strategies.py:495</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L507">Show source in condensation_strategies.py:507</a></p>
 <p>Condensation strategy under isothermal conditions.</p>
 <p>This class implements the isothermal condensation model, wherein
 temperature remains constant during mass transfer. It calculates
@@ -10411,7 +10411,7 @@ no latent heat terms.</p>
 <li><a href="#condensationstrategy">CondensationStrategy</a></li>
 </ul>
 <h3 id="condensationisothermalmass_transfer_rate">CondensationIsothermal().mass_transfer_rate<a class="headerlink" href="#condensationisothermalmass_transfer_rate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L548">Show source in condensation_strategies.py:548</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L560">Show source in condensation_strategies.py:560</a></p>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Example – Mass-transfer rate</span><pre><span></span><code><span class="n">m_rate</span> <span class="o">=</span> <span class="n">iso_cond</span><span class="o">.</span><span class="n">mass_transfer_rate</span><span class="p">(</span>
     <span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">,</span> <span class="mi">101325</span>
@@ -10433,7 +10433,7 @@ no latent heat terms.</p>
 <li><a href="../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="condensationisothermalrate">CondensationIsothermal().rate<a class="headerlink" href="#condensationisothermalrate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L582">Show source in condensation_strategies.py:582</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L594">Show source in condensation_strategies.py:594</a></p>
 <h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Example – Condensation rate array</span><pre><span></span><code><span class="n">rates</span> <span class="o">=</span> <span class="n">iso_cond</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">,</span> <span class="mi">101325</span><span class="p">)</span>
 </code></pre></div>
@@ -10452,7 +10452,7 @@ no latent heat terms.</p>
 <li><a href="../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="condensationisothermalstep">CondensationIsothermal().step<a class="headerlink" href="#condensationisothermalstep" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L619">Show source in condensation_strategies.py:619</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L631">Show source in condensation_strategies.py:631</a></p>
 <h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Example – One timestep</span><pre><span></span><code><span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span> <span class="o">=</span> <span class="n">iso_cond</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
     <span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">,</span> <span class="mi">101325</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span>
@@ -10474,7 +10474,7 @@ no latent heat terms.</p>
 <li><a href="../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h2 id="condensationstrategy">CondensationStrategy<a class="headerlink" href="#condensationstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L63">Show source in condensation_strategies.py:63</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L66">Show source in condensation_strategies.py:66</a></p>
 <p>Abstract base class for condensation strategies.</p>
 <p>This class defines the interface for various condensation models
 used in atmospheric physics. Subclasses should implement specific
@@ -10513,6 +10513,13 @@ condensation algorithms based on different physical models and equations.</p>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CondensationStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="nd">@validate_inputs</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -10523,7 +10530,7 @@ condensation algorithms based on different physical models and equations.</p>
     <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="condensationstrategy_apply_skip_partitioning">CondensationStrategy()._apply_skip_partitioning<a class="headerlink" href="#condensationstrategy_apply_skip_partitioning" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L354">Show source in condensation_strategies.py:354</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L366">Show source in condensation_strategies.py:366</a></p>
 <p>Zero-out entries for species indices that are configured NOT to
 partition/condense.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
@@ -10546,7 +10553,7 @@ partition/condense.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="condensationstrategy_fill_zero_radius">CondensationStrategy()._fill_zero_radius<a class="headerlink" href="#condensationstrategy_fill_zero_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L266">Show source in condensation_strategies.py:266</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L277">Show source in condensation_strategies.py:277</a></p>
 <p>Fill zero radius values with the maximum radius. The concentration
 value of zero will ensure that the rate of condensation is zero. The
 fill is necessary to avoid division by zero in the array operations.</p>
@@ -10570,7 +10577,7 @@ fill is necessary to avoid division by zero in the array operations.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_fill_zero_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="condensationstrategycalculate_pressure_delta">CondensationStrategy().calculate_pressure_delta<a class="headerlink" href="#condensationstrategycalculate_pressure_delta" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L298">Show source in condensation_strategies.py:298</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L310">Show source in condensation_strategies.py:310</a></p>
 <p>Calculate the difference in partial pressure between the gas and
 particle phases.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
@@ -10611,7 +10618,7 @@ particle phases.</p>
 <li><a href="../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="condensationstrategyfirst_order_mass_transport">CondensationStrategy().first_order_mass_transport<a class="headerlink" href="#condensationstrategyfirst_order_mass_transport" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L211">Show source in condensation_strategies.py:211</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L222">Show source in condensation_strategies.py:222</a></p>
 <p>First-order mass transport coefficient per particle.</p>
 <p>Calculate the first-order mass transport coefficient, K, for a given
 particle based on the diffusion coefficient, radius, and vapor
@@ -10652,7 +10659,7 @@ transition correction factor.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="condensationstrategyknudsen_number">CondensationStrategy().knudsen_number<a class="headerlink" href="#condensationstrategyknudsen_number" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L168">Show source in condensation_strategies.py:168</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L179">Show source in condensation_strategies.py:179</a></p>
 <p>The Knudsen number for a particle.</p>
 <p>Calculate the Knudsen number based on the mean free path of the gas
 molecules and the radius of the particle.</p>
@@ -10687,7 +10694,7 @@ molecules and the radius of the particle.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="condensationstrategymass_transfer_rate">CondensationStrategy().mass_transfer_rate<a class="headerlink" href="#condensationstrategymass_transfer_rate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L383">Show source in condensation_strategies.py:383</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L395">Show source in condensation_strategies.py:395</a></p>
 <p>Compute the isothermal mass transfer rate for a particle.</p>
 <p>Implements dm/dt = 4π × r × Dᵢ × Mᵢ × f(Kn, α) × Δpᵢ / (R × T),
 where:
@@ -10733,7 +10740,7 @@ where:
 <li><a href="../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="condensationstrategymean_free_path">CondensationStrategy().mean_free_path<a class="headerlink" href="#condensationstrategymean_free_path" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L131">Show source in condensation_strategies.py:131</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L142">Show source in condensation_strategies.py:142</a></p>
 <p>Calculate the mean free path of the gas molecules based on the
 temperature, pressure, and dynamic viscosity of the gas.</p>
 <h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
@@ -10761,7 +10768,7 @@ temperature, pressure, and dynamic viscosity of the gas.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="condensationstrategyrate">CondensationStrategy().rate<a class="headerlink" href="#condensationstrategyrate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L425">Show source in condensation_strategies.py:425</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L437">Show source in condensation_strategies.py:437</a></p>
 <p>Compute the net condensation rate per particle, scaled by
 concentration.</p>
 <p>Calculates the mass transfer rate and multiplies it by particle
@@ -10798,7 +10805,7 @@ concentration, yielding the total mass condensation rate per particle.</p>
 <li><a href="../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="condensationstrategystep">CondensationStrategy().step<a class="headerlink" href="#condensationstrategystep" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L458">Show source in condensation_strategies.py:458</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L470">Show source in condensation_strategies.py:470</a></p>
 <p>Perform one timestep of isothermal condensation on the particle.</p>
 <p>Calculates the mass transfer for the specified time_step and updates
 both the particle mass and the gas concentration
