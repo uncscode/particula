@@ -149,6 +149,13 @@ class CondensationStrategy(ABC):
         References:
         - Mean Free Path
             [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
+
+        Examples:
+            ```py title="Example – Mean-free-path"
+            cond = CondensationIsothermal(molar_mass=0.018)  # water vapour
+            lam = cond.mean_free_path(temperature=298.15, pressure=101325)
+            print(f"{lam:.2e} m")
+            ```
         """
         return get_molecule_mean_free_path(
             molar_mass=self.molar_mass,
@@ -182,6 +189,14 @@ class CondensationStrategy(ABC):
 
         References:
             - [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
+
+        Examples:
+            ```py title="Example – Knudsen number"
+            cond = CondensationIsothermal(molar_mass=0.018)
+            kn = cond.knudsen_number(
+                radius=1e-7, temperature=298.15, pressure=101325
+            )
+            ```
         """
         return get_knudsen_number(
             mean_free_path=self.mean_free_path(
@@ -221,6 +236,16 @@ class CondensationStrategy(ABC):
         - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
             (D. Topping & M. Bane, Eds.). Wiley.
             [DOI](https://doi.org/10.1002/9781119625728)
+
+        Examples:
+            ```py title="Example – First-order mass-transport"
+            cond = CondensationIsothermal(molar_mass=0.018)
+            k = cond.first_order_mass_transport(
+                particle_radius=1e-7,
+                temperature=298.15,
+                pressure=101325,
+            )
+            ```
         """
         vapor_transition = get_vapor_transition_correction(
             knudsen_number=self.knudsen_number(
@@ -252,6 +277,12 @@ class CondensationStrategy(ABC):
 
         Raises:
             - Warning : If all radius values are zero.
+
+        Examples:
+            ```py title="Example – Fill zero radii"
+            r = np.array([0.0, 5e-8, 1e-7])
+            filled = self._fill_zero_radius(r)
+            ```
         """
         if np.max(radius) == 0:
             message = (
@@ -285,6 +316,16 @@ class CondensationStrategy(ABC):
         Returns:
             - partial_pressure_delta : The difference in partial pressure
                 between the gas and particle phases.
+
+        Examples:
+            ```py title="Example – Δp calculation"
+            delta_p = cond.calculate_pressure_delta(
+                particle=particle,
+                gas_species=gas_species,
+                temperature=298.15,
+                radius=particle.get_radius(),
+            )
+            ```
         """
         mass_concentration_in_particle = particle.get_species_mass()
         pure_vapor_pressure = gas_species.get_pure_vapor_pressure(
@@ -322,6 +363,13 @@ class CondensationStrategy(ABC):
 
         Returns:
             - Same array object with the chosen columns / elements set to zero.
+
+        Examples:
+            ```py title="Example – Skip selected species"
+            arr = np.ones((3, 5))
+            cond.skip_partitioning_indices = [1, 3]
+            masked = cond._apply_skip_partitioning(arr.copy())
+            ```
         """
         if self.skip_partitioning_indices is None:
             return array
@@ -504,7 +552,14 @@ class CondensationIsothermal(CondensationStrategy):
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
-
+        """
+        Examples:
+            ```py title="Example – Mass-transfer rate"
+            m_rate = iso_cond.mass_transfer_rate(
+                particle, gas_species, 298.15, 101325
+            )
+            ```
+        """
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
         first_order_mass_transport = self.first_order_mass_transport(
             particle_radius=radius_with_fill,
@@ -529,6 +584,12 @@ class CondensationIsothermal(CondensationStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
+        """
+        Examples:
+            ```py title="Example – Condensation rate array"
+            rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
+            ```
+        """
 
         # Step 1: Calculate the mass transfer rate due to condensation
         mass_rate = self.mass_transfer_rate(
@@ -561,6 +622,14 @@ class CondensationIsothermal(CondensationStrategy):
         pressure: float,
         time_step: float,
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
+        """
+        Examples:
+            ```py title="Example – One timestep"
+            particle, gas_species = iso_cond.step(
+                particle, gas_species, 298.15, 101325, time_step=1.0
+            )
+            ```
+        """
 
         # Calculate the mass transfer rate
         mass_rate = self.mass_transfer_rate(
