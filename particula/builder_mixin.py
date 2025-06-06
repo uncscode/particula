@@ -3,7 +3,7 @@
 # pylint: disable=too-few-public-methods
 
 import logging
-from typing import Optional, Union
+from typing import Optional, Union, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
@@ -275,6 +275,31 @@ class BuilderChargeMixin:
         if charge_units is not None:
             logger.warning("Ignoring units for charge parameter.")
         self.charge = charge
+        return self
+
+
+class BuilderPhaseIndexMixin:
+    """Mixin class for setting a phase index array.
+
+    Attributes:
+        - phase_index : Array assigning species to phase IDs.
+
+    Methods:
+        - set_phase_index : Assign the phase index array. Units ignored.
+    """
+
+    def __init__(self):
+        self.phase_index = None
+
+    def set_phase_index(
+        self,
+        phase_index: Union[Sequence[int], NDArray[np.int_]],
+        phase_index_units: Optional[str] = None,
+    ):
+        """Set the phase index describing species phase membership."""
+        if phase_index_units is not None:
+            logger.warning("Ignoring units for phase index parameter.")
+        self.phase_index = np.array(phase_index, dtype=int)
         return self
 
 
