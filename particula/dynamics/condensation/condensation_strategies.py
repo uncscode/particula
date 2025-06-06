@@ -109,7 +109,7 @@ class CondensationStrategy(ABC):
             "molar_mass": "positive",
             "diffusion_coefficient": "positive",
             "accommodation_coefficient": "nonnegative",
-            # "skip_partitioning_indices": "nonnegative",
+            "skip_partitioning_indices": "nonnegative",
         }
     )
     def __init__(
@@ -547,7 +547,7 @@ class CondensationIsothermal(CondensationStrategy):
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
-        skip_partitioning_indices: Optional[list] = None,
+        skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
         super().__init__(
             molar_mass=molar_mass,
