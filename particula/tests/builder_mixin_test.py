@@ -14,6 +14,7 @@ from particula.builder_mixin import (
     BuilderMassMixin,
     BuilderRadiusMixin,
     BuilderChargeMixin,
+    BuilderPhaseIndexMixin,
 )
 
 
@@ -215,3 +216,11 @@ def test_charge_mixin():
     # test array of charges
     builder_mixin.set_charge(np.array([1, 2, 3]))
     np.testing.assert_allclose(builder_mixin.charge, np.array([1, 2, 3]))
+
+
+def test_phase_index_mixin():
+    """Test the BuilderPhaseIndexMixin class."""
+    builder_mixin = BuilderPhaseIndexMixin()
+    phase_index = np.array([0, 1, 0])
+    builder_mixin.set_phase_index(phase_index)
+    np.testing.assert_array_equal(builder_mixin.phase_index, phase_index)

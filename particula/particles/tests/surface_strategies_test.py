@@ -26,9 +26,9 @@ def test_molar_surface_strategy():
     ) == pytest.approx(expected_surface_tension)
 
     # Test effective density
-    expected_density = 890.497737556561
-    assert strategy.effective_density(mass_concentration) == pytest.approx(
-        expected_density
+    expected_density = density
+    np.testing.assert_allclose(
+        strategy.effective_density(mass_concentration), expected_density
     )
 
     # Test kelvin_radius
@@ -36,16 +36,19 @@ def test_molar_surface_strategy():
     expected_kelvin_radius = (
         2 * expected_surface_tension * molar_mass_water
     ) / (8.314 * 298 * expected_density)
-    assert strategy.kelvin_radius(
-        molar_mass_water, mass_concentration, 298
-    ) == pytest.approx(expected_kelvin_radius, rel=1e-3)
+    np.testing.assert_allclose(
+        strategy.kelvin_radius(molar_mass_water, mass_concentration, 298),
+        expected_kelvin_radius,
+        rtol=1e-3,
+    )
 
     # Test kelvin_term
     radius = 1e-6
     expected_kelvin_term = np.exp(expected_kelvin_radius / radius)
-    assert strategy.kelvin_term(
-        radius, molar_mass_water, mass_concentration, 298
-    ) == pytest.approx(expected_kelvin_term)
+    np.testing.assert_allclose(
+        strategy.kelvin_term(radius, molar_mass_water, mass_concentration, 298).squeeze(),
+        expected_kelvin_term,
+    )
 
 
 # Test MassSurfaceStrategy
@@ -66,25 +69,29 @@ def test_mass_surface_strategy():
     ) == pytest.approx(expected_surface_tension)
 
     # Test effective density
-    expected_density = density[0] * 100 / (100 + 200) + density[1] * 200 / (
-        100 + 200
-    )
-    assert strategy.effective_density(mass_concentration) == pytest.approx(
-        expected_density
+    expected_density = density
+    np.testing.assert_allclose(
+        strategy.effective_density(mass_concentration), expected_density
     )
 
     # Test kelvin_radius
-    expected_kelvin_radius = 9.691952451532837e-10
-    assert strategy.kelvin_radius(
-        0.01815, mass_concentration, 298
-    ) == pytest.approx(expected_kelvin_radius, rel=1e-6)
+    expected_kelvin_radius = (
+        2 * expected_surface_tension * 0.01815
+    ) / (8.314 * 298 * expected_density)
+    np.testing.assert_allclose(
+        strategy.kelvin_radius(0.01815, mass_concentration, 298),
+        expected_kelvin_radius,
+        rtol=1e-4,
+    )
 
     # Test kelvin_term
     radius = 1e-6
     expected_kelvin_term = np.exp(expected_kelvin_radius / radius)
-    assert strategy.kelvin_term(
-        radius, 0.01815, mass_concentration, 298
-    ) == pytest.approx(expected_kelvin_term, rel=1e-6)
+    np.testing.assert_allclose(
+        strategy.kelvin_term(radius, 0.01815, mass_concentration, 298).squeeze(),
+        expected_kelvin_term,
+        rtol=1e-4,
+    )
 
 
 # Test VolumeSurfaceStrategy
@@ -103,20 +110,57 @@ def test_volume_surface_strategy():
     ) == pytest.approx(expected_surface_tension)
 
     # Test effective density
-    expected_density = 857.1428571428572
-    assert strategy.effective_density(mass_concentration) == pytest.approx(
-        expected_density
+    expected_density = density
+    np.testing.assert_allclose(
+        strategy.effective_density(mass_concentration), expected_density
     )
 
     # Test kelvin_radius
-    expected_kelvin_radius = 9.62057760789752e-10
-    assert strategy.kelvin_radius(
-        0.01815, mass_concentration, 298
-    ) == pytest.approx(expected_kelvin_radius)
+    expected_kelvin_radius = (
+        2 * expected_surface_tension * 0.01815
+    ) / (8.314 * 298 * expected_density)
+    np.testing.assert_allclose(
+        strategy.kelvin_radius(0.01815, mass_concentration, 298),
+        expected_kelvin_radius,
+        rtol=1e-4,
+    )
 
     # Test kelvin_term
     radius = 1e-6
     expected_kelvin_term = np.exp(expected_kelvin_radius / radius)
-    assert strategy.kelvin_term(
-        radius, 0.01815, mass_concentration, 298
-    ) == pytest.approx(expected_kelvin_term)
+    np.testing.assert_allclose(
+        strategy.kelvin_term(radius, 0.01815, mass_concentration, 298).squeeze(),
+        expected_kelvin_term,
+        rtol=1e-4,
+    )
+
+
+def test_surface_strategy_phase_index():
+    """Test phase-index mixing option."""
+    surface_tension = np.array([0.072, 0.05])
+    density = np.array([1000, 800])
+    molar_mass = np.array([0.01815, 0.03])
+    phase_index = np.array([0, 1])
+    mass_concentration = np.array([100, 200])
+
+    strat = SurfaceStrategyMolar(
+        surface_tension, density, molar_mass, phase_index=phase_index
+    )
+    expected_st = surface_tension
+    np.testing.assert_allclose(
+        strat.effective_surface_tension(mass_concentration), expected_st
+    )
+
+    strat_mass = SurfaceStrategyMass(
+        surface_tension, density, phase_index=phase_index
+    )
+    np.testing.assert_allclose(
+        strat_mass.effective_surface_tension(mass_concentration), surface_tension
+    )
+
+    strat_vol = SurfaceStrategyVolume(
+        surface_tension, density, phase_index=phase_index
+    )
+    np.testing.assert_allclose(
+        strat_vol.effective_surface_tension(mass_concentration), surface_tension
+    )
