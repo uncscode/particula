@@ -127,6 +127,12 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertTrue(np.all(filled != 0.0))
         self.assertEqual(filled[0], np.max(radii))
 
+    def test_fill_zero_radius_all_zeros_warns(self):
+        """_fill_zero_radius with all zeros should warn."""
+        radii = np.array([0.0, 0.0, 0.0])
+        with self.assertWarns(RuntimeWarning):
+            self.strategy._fill_zero_radius(radii.copy())
+
     def test_rate_respects_skip_indices(self):
         """rate() must zero the chosen indices."""
         # Skip the condensing water (index 0) to make the effect obvious
