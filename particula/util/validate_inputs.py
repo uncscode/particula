@@ -146,17 +146,14 @@ def validate_inputs(dict_args):
         def wrapper(*args, **kwargs):
             # Map argument names to values
             sig = inspect.signature(func)
-            params = list(sig.parameters.keys())
+            bound = sig.bind_partial(*args, **kwargs)
+            bound.apply_defaults()
             for name, comp in dict_args.items():
-                value = kwargs.get(
-                    name,
-                    (
-                        args[params.index(name)]
-                        if name in params and params.index(name) < len(args)
-                        else None
-                    ),
-                )
-                value = np.asarray(value)
+                if name not in bound.arguments:
+                    raise ValueError(
+                        f"Argument '{name}' is not provided and has no default."
+                    )
+                value = np.asarray(bound.arguments[name])
                 if comp == "positive":
                     validate_positive(value, name)
                     validate_finite(value, name)
