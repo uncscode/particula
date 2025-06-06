@@ -14,6 +14,7 @@ from particula.dynamics.condensation.condensation_strategies import (
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
+from particula.dynamics.wall_loss_strategy import WallLossStrategy
 
 
 class MassCondensation(RunnableABC):
@@ -226,3 +227,30 @@ class Coagulation(RunnableABC):
         )
         rates = np.append(rates, net_rate)
         return rates
+
+class WallLoss(RunnableABC):
+    """Runnable process implementing particle wall loss."""
+
+    def __init__(self, wall_loss_strategy: WallLossStrategy) -> None:
+        self.wall_loss_strategy = wall_loss_strategy
+
+    def execute(
+        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+    ) -> Aerosol:
+        """Apply wall loss to the aerosol over the given time step."""
+        for _ in range(sub_steps):
+            aerosol.particles = self.wall_loss_strategy.step(
+                particle=aerosol.particles,
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
+                time_step=time_step / sub_steps,
+            )
+        return aerosol
+
+    def rate(self, aerosol: Aerosol):
+        """Return the wall loss rate for the aerosol particles."""
+        return self.wall_loss_strategy.rate(
+            particle=aerosol.particles,
+            temperature=aerosol.atmosphere.temperature,
+            pressure=aerosol.atmosphere.total_pressure,
+        )
