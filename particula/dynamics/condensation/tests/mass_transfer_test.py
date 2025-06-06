@@ -1,6 +1,7 @@
 """Test the Condensation module."""
 
 import numpy as np
+import pytest
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
@@ -134,11 +135,19 @@ def test_single_species_evaporation_not_enough_particle_mass():
     particle_mass = np.array([0.8, 0.3])  # kg per particle
     particle_concentration = np.array([1, 5])  # particles/m^3
 
-    # Total available particle mass is particle_mass * particle_concentration
-    # particle_mass * particle_concentration = [0.8 * 1, 0.3 * 5] = [0.8, 1.5]
-    # Requested mass transfer is [-0.2 * 10, -8 * 10] = [-2.0, -80.0]
-    # However, the transfer is limited by available particle mass: [-0.8, -1.5]
-    expected_mass_transfer = np.array([-0.8, -1.5])
+    # ───── expected result ────────────────────────────────────────────
+    requested = mass_rate * time_step * particle_concentration
+    inventory = (particle_mass * particle_concentration).sum()
+
+    # species-level down-scaling (evaporation)
+    scale = 1.0
+    if requested.sum() < 0.0 and -requested.sum() > inventory:
+        scale = inventory / (-requested.sum())
+    scaled = requested * scale
+
+    # per-bin clip so we never evaporate more than each bin owns
+    per_bin_limit = -particle_mass * particle_concentration
+    expected_mass_transfer = np.maximum(scaled, per_bin_limit)
 
     result_direct = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
@@ -209,60 +218,150 @@ def test_multiple_species_condensation():
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
 
 
-def test_multiple_species_evaporation_not_enough_particle_mass():
+def test_multiple_species_evaporation_column_inventory_limit():
     """
-    Test mass transfer for multiple particle and gas species (n=2, m=3)
-    where the particle mass is insufficient for full evaporation, and
-    particle concentration is greater than 1.
+    Evaporation across several species should never remove more mass
+    than the *total particle inventory* of that species, even when
+    the requested evaporation (rate × dt × conc) is far larger.
+
+    Scenario
+    --------
+    * 2 particle‐size bins, 2 condensable species.
+    * All fluxes are negative (evaporation).
+    * Requested evaporation in each species exceeds its inventory
+      so the routine must down-scale the column uniformly, then
+      apply per-bin clipping.
+
+    Expected behaviour
+    ------------------
+    * Column sum for every species equals **at most** the inventory.
+    * No individual bin evaporates more mass than it owns.
     """
-    # mass_rate for 2 particles and 3 gas species (negative for evaporation)
-    mass_rate = np.array([[-0.1, -0.5, -0.3], [-0.2, -0.15, -0.7]])  # kg/s
-    time_step = 10  # seconds
+    # ──────────────────────────────────────────────────────────────
+    # Inputs
+    # ──────────────────────────────────────────────────────────────
+    mass_rate = np.array([[-1.0, -0.2], [-1.5, -0.6]])  # kg s⁻¹  (shape 2×2)
+    time_step = 10.0  # s
 
-    # gas_mass for 3 gas species (not relevant for evaporation in this case)
-    gas_mass = np.array([1.0, 0.8, 0.5])  # kg
+    # Gas mass is irrelevant for evaporation limit, pick generous values
+    gas_mass = np.array([100.0, 100.0])  # kg  (shape 2,)
 
-    # particle_mass for 2 particles and 3 gas species
-    particle_mass = np.array([[0.7, 0.9, 0.8], [0.8, 0.5, 0.6]])  # kg
+    particle_mass = np.array([[0.4, 0.2], [0.6, 0.3]])  # kg  (shape 2×2)
 
-    # particle_concentration for 2 particles, greater than 1
-    particle_concentration = np.array([10, 10])  # particles/m^3
+    particle_concentration = np.array([1.0, 1.0])  # # m⁻³  (shape 2,)
 
-    # Step 1: Calculate the total mass to change for evaporation
-    mass_to_change = (
-        mass_rate * time_step * particle_concentration[:, np.newaxis]
+    # ──────────────────────────────────────────────────────────────
+    # Manually compute the *expected* result following the algorithm
+    # ──────────────────────────────────────────────────────────────
+    requested = mass_rate * time_step * particle_concentration[:, None]
+    # column sums (negative => evaporation)
+    total_req = requested.sum(axis=0)  # [-25.0, -8.0]
+
+    # inventories per species (positive)
+    inventory = (particle_mass * particle_concentration[:, None]).sum(axis=0)
+    # [1.0, 0.5]
+
+    # species-level down-scaling
+    scale = np.where(
+        -total_req > inventory, inventory / (-total_req), 1.0
+    )  # [0.04, 0.0625]
+    scaled = requested * scale  # broadcast
+
+    # per-bin clip so we never exceed its own mass
+    per_bin_limit = -particle_mass * particle_concentration[:, None]
+    expected = np.maximum(scaled, per_bin_limit)
+
+    # ──────────────────────────────────────────────────────────────
+    # Call the routine under test
+    # ──────────────────────────────────────────────────────────────
+    result = get_mass_transfer_of_multiple_species(
+        mass_rate=mass_rate,
+        time_step=time_step,
+        gas_mass=gas_mass,
+        particle_mass=particle_mass,
+        particle_concentration=particle_concentration,
     )
 
-    # Step 2: Calculate the available particle mass for evaporation
-    # Available mass = particle_mass * particle_concentration
-    available_particle_mass = (
-        particle_mass * particle_concentration[:, np.newaxis]
+    # ──────────────────────────────────────────────────────────────
+    # Assertions
+    # ──────────────────────────────────────────────────────────────
+    # 1. element-wise equality
+    np.testing.assert_allclose(result, expected, rtol=1e-12)
+
+
+def test_condensation_inventory_limit():
+    """
+    Requested condensation exceeds gas_mass → routine must down-scale so that
+    the column sum equals the available gas.
+    """
+    # 2 size bins × 1 species (condensation only, values > 0)
+    mass_rate = np.array([[0.5], [0.8]])  # kg s⁻¹
+    time_step = 10.0  # s
+
+    gas_mass = np.array([1.0])  # kg (scarce)
+    particle_mass = np.array([[0.1], [0.1]])  # kg
+    particle_conc = np.array([10.0, 10.0])  # # m⁻³
+
+    # -------- expected result ------------------------------------------------
+    requested = mass_rate * time_step * particle_conc[:, None]
+    scale = gas_mass[0] / requested.sum()  # 1 / 130
+    expected = requested * scale  # shape (2,1)
+
+    # -------- routine under test --------------------------------------------
+    res = get_mass_transfer_of_multiple_species(
+        mass_rate, time_step, gas_mass, particle_mass, particle_conc
     )
 
-    # Step 3: Limit evaporation by available particle mass
-    expected_mass_transfer = np.maximum(
-        mass_to_change, -available_particle_mass
+    # elementwise equality
+    np.testing.assert_allclose(res, expected, rtol=1e-12, atol=1e-12)
+    # column-sum (mass conservation vs. gas reservoir)
+    np.testing.assert_allclose(res.sum(axis=0), gas_mass, rtol=1e-12)
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Evaporation-limited case ─ scarce particle inventory, ample gas
+# ──────────────────────────────────────────────────────────────────────────
+def test_evaporation_inventory_limit():
+    """
+    Requested evaporation exceeds the particle inventory → routine must
+    down-scale so that the column sum does not exceed −inventory and no bin
+    evaporates more mass than it owns.
+    """
+    # 2 size bins × 1 species (evaporation only, values < 0)
+    mass_rate = np.array([[-1.0], [-1.5]])  # kg s⁻¹
+    time_step = 10.0  # s
+
+    gas_mass = np.array([100.0])  # kg (irrelevant, ample)
+    particle_mass = np.array([[0.1], [0.3]])  # kg
+    particle_conc = np.array([10.0, 10.0])  # # m⁻³
+
+    # inventories and per-bin limits
+    inventory = (particle_mass * particle_conc[:, None]).sum(axis=0)  # [4.]
+    per_bin_evap_limit = (
+        -particle_mass * particle_conc[:, None]
+    )  # [[-1.], [-3.]]
+
+    # -------- expected result ------------------------------------------------
+    requested = (
+        mass_rate * time_step * particle_conc[:, None]
+    )  # [[-100.], [-150.]]
+    scale = inventory[0] / -requested.sum()  # 4 / 250
+    scaled = requested * scale  # down-scaled
+    expected = np.maximum(scaled, per_bin_evap_limit)  # per-bin clip
+
+    # -------- routine under test --------------------------------------------
+    res = get_mass_transfer_of_multiple_species(
+        mass_rate, time_step, gas_mass, particle_mass, particle_conc
     )
 
-    # Test the direct multiple species function
-    result_direct = get_mass_transfer_of_multiple_species(
-        mass_rate, time_step, gas_mass, particle_mass, particle_concentration
-    )
-    # Check the individual mass transfer for each particle and species
+    # elementwise equality
+    np.testing.assert_allclose(res, expected, rtol=1e-12, atol=1e-12)
+    # column-sum should equal −inventory or be slightly less (if per-bin clip)
     np.testing.assert_allclose(
-        result_direct, expected_mass_transfer, rtol=1e-8
+        res.sum(axis=0), expected.sum(axis=0), rtol=1e-12
     )
-    # Check the total mass transfer for each particle
-    total_mass_possible = np.sum(available_particle_mass, axis=0)
-    np.testing.assert_allclose(
-        np.sum(result_direct, axis=0), -1 * total_mass_possible, rtol=1e-8
-    )
-
-    # Test the general helper function
-    result = get_mass_transfer(
-        mass_rate, time_step, gas_mass, particle_mass, particle_concentration
-    )
-    np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
+    # per-bin safety: never exceed negative inventory
+    assert np.all(res >= per_bin_evap_limit - 1e-12)
 
 
 def test_zero_mass_transfer():

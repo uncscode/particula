@@ -361,28 +361,29 @@ def get_mass_transfer_of_single_species(
         # Output: array([...])
         ```
     """
-    # Step 1: Calculate the total mass to be transferred
-    # (accounting for particle concentration)
+    # 1. requested mass change ( + = condensation , - = evaporation )
     mass_to_change = mass_rate * time_step * particle_concentration
-    # Step 2: Calculate the total requested mass
     total_requested_mass = mass_to_change.sum()
-    # Step 3: Scale the mass if total requested mass exceeds available gas mass
-    if total_requested_mass > gas_mass:
-        scaling_factor = gas_mass / total_requested_mass
-        mass_to_change *= scaling_factor
-    # Step 4: Limit condensation by available gas mass
-    condensible_mass_transfer = np.minimum(mass_to_change, gas_mass)
-    # Step 5: Limit evaporation by available particle mass
-    evaporative_mass_transfer = np.maximum(
-        mass_to_change, -particle_mass * particle_concentration
-    )
-    # Step 6: Determine final transferable mass (condensation or evaporation)
-    transferable_mass = np.where(
-        mass_to_change > 0,  # Condensation scenario
-        condensible_mass_transfer,  # Limited by gas mass
-        evaporative_mass_transfer,  # Limited by particle mass
-    )
-    return transferable_mass
+
+    # 2. Condensation – keep Σ ≤ gas_mass
+    if total_requested_mass > gas_mass[0]:
+        scale = gas_mass[0] / total_requested_mass
+        mass_to_change *= scale
+
+    # 3. Evaporation – keep Σ ≤ total particle inventory
+    total_particle_mass = (particle_mass * particle_concentration).sum()
+    if (
+        total_requested_mass < 0.0
+        and -total_requested_mass > total_particle_mass
+    ):
+        scale = total_particle_mass / -total_requested_mass
+        mass_to_change *= scale
+
+    # 4. Per-bin evaporation limit (no bin can evaporate more than it owns)
+    per_bin_evap_limit = -particle_mass * particle_concentration
+    mass_to_change = np.maximum(mass_to_change, per_bin_evap_limit)
+
+    return mass_to_change
 
 
 @validate_inputs(
@@ -412,6 +413,12 @@ def get_mass_transfer_of_multiple_species(
     Then it limits or scales that mass based on available gas mass and
     particle mass in each species bin.
 
+    1. Computes the mass change each particle *would* take during `time_step`.
+    2. Scales condensation so the **column sum** never exceeds `gas_mass`.
+    3. Scales evaporation so the **column sum** never exceeds the particle
+       inventory of that species.
+    4. Clips the result so no individual bin evaporates more mass than it owns.
+
     Arguments:
         - mass_rate : The mass transfer rate per particle for each gas
             species [kg/s].
@@ -437,42 +444,39 @@ def get_mass_transfer_of_multiple_species(
         # Output: array([...])
         ```
     """
-    # Step 1: Calculate the total mass to change
-    # (considering particle concentration)
+    # 1.  Requested mass transfer (positive = condensation, negative = evap.)
     mass_to_change = (
         mass_rate * time_step * particle_concentration[:, np.newaxis]
     )
-
-    # Step 2: Total requested mass for each gas species (sum over particles)
     total_requested_mass = mass_to_change.sum(axis=0)
 
-    # Step 3: Create scaling factors where requested mass exceeds available
-    # gas mass
-    scaling_factors = np.ones_like(mass_to_change)
-    scaling_mask = total_requested_mass > gas_mass
-
-    # Apply scaling where needed (scaling along the gas species axis)
-    scaling_factors[:, scaling_mask] = (
-        gas_mass[scaling_mask] / total_requested_mass[scaling_mask]
+    # 2.  Condensation: keep Σ ≤ gas_mass
+    species_scale = np.ones_like(total_requested_mass)
+    np.divide(
+        gas_mass,
+        total_requested_mass,
+        out=species_scale,
+        where=total_requested_mass > gas_mass,  # scale only when necessary
     )
+    mass_to_change *= species_scale  # broadcast along particle axis
 
-    # Step 4: Apply scaling factors to the mass_to_change
-    mass_to_change *= scaling_factors
+    # 3.  Evaporation: keep Σ ≤ total particle inventory
+    total_particle_mass = (
+        particle_mass * particle_concentration[:, np.newaxis]
+    ).sum(axis=0)
 
-    # Step 5: Limit condensation by available gas mass
-    condensible_mass_transfer = np.minimum(np.abs(mass_to_change), gas_mass)
-
-    # Step 6: Limit evaporation by available particle mass
-    evaporative_mass_transfer = np.maximum(
-        mass_to_change, -particle_mass * particle_concentration[:, np.newaxis]
+    evap_mask = total_requested_mass < 0.0
+    evap_scale = np.ones_like(total_requested_mass)
+    np.divide(
+        total_particle_mass,
+        -total_requested_mass,
+        out=evap_scale,
+        where=evap_mask & (-total_requested_mass > total_particle_mass),
     )
+    mass_to_change *= evap_scale  # broadcast along particle axis
 
-    # Step 7: Determine the final transferable mass
-    # (condensation or evaporation)
-    transferable_mass = np.where(
-        mass_to_change > 0,  # Condensation scenario
-        condensible_mass_transfer,  # Limited by gas mass
-        evaporative_mass_transfer,  # Limited by particle mass
-    )
+    # 4.  Per-bin evaporation limit (no negative particle mass)
+    per_bin_evap_limit = -particle_mass * particle_concentration[:, np.newaxis]
+    mass_to_change = np.maximum(mass_to_change, per_bin_evap_limit)
 
-    return transferable_mass
+    return mass_to_change
