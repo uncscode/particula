@@ -68,7 +68,7 @@ def get_dict_from_list(list_of_str: list) -> dict:
         - A dict where keys are the strings and values are their indices.
 
     Raises:
-        - AssertionError : If the list is empty or contains non-string items.
+        - TypeError : If the list is empty or contains non-string items.
 
     Examples:
         ``` py title="Convert list of strings to dictionary"
@@ -82,7 +82,7 @@ def get_dict_from_list(list_of_str: list) -> dict:
     """
     # basic type / emptiness check
     if not isinstance(list_of_str, Sequence) or not list_of_str:
-        raise ValueError(
+        raise TypeError(
             "list_of_str must be a non-empty sequence of strings."
         )
 
