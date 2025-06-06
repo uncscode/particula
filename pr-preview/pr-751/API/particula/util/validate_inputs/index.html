@@ -9413,7 +9413,9 @@
 <p>A decorator to validate function inputs against specified constraints.</p>
 <p>The constraints are defined by a dictionary of argument names and their
 validation types (e.g., "positive", "negative", "nonnegative", etc.). If
-any argument violates its constraint, a ValueError is raised.</p>
+any argument violates its constraint, a ValueError is raised. Arguments
+explicitly passed as <code>None</code> are ignored and no validation is performed
+on them.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>dict_args : Dictionary {argument_name: constraint_type}, where the
