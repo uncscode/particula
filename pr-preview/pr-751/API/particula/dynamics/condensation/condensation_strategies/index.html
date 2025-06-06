@@ -10403,7 +10403,7 @@ no latent heat terms.</p>
         <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-05</span><span class="p">,</span>
         <span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
@@ -10518,6 +10518,7 @@ condensation algorithms based on different physical models and equations.</p>
             <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
             <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
             <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;skip_partitioning_indices&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
