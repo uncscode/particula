@@ -3,7 +3,7 @@ Test module for the condensation strategies.
 """
 
 # pylint: disable=R0801
-# pylint: disable= protected-access
+# pylint: disable=protected-access
 
 import unittest
 import numpy as np
