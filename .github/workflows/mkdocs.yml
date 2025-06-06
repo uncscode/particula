@@ -16,7 +16,7 @@ jobs:
   blds:
     runs-on: ubuntu-latest
     concurrency:
-      group: "pages"
+      group: pages-${{ github.head_ref || github.ref_name }}
       cancel-in-progress: true
     steps:
         - name: Check out code
