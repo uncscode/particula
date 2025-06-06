@@ -33,7 +33,7 @@ density_organics_g_cm3 = organic_array(
 
 c_total_ug_per_m3 = np.array(
     [8.79, 3.98, 1.13, 4.07, 0.628, 0.919, 0.766, 1.02, 0.399, 0.313]
-)*5
+)*1
 
 name = np.array(
     [
@@ -243,7 +243,7 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 # setup runnable sequence
 process_sequence = (
     par.RunnableSequence()
-    # | coagulation_process
+    | coagulation_process
     | condensation_process
 )
 
@@ -312,7 +312,7 @@ ax.set_yscale("log")
 aerosol_initial = copy.deepcopy(aerosol)
 time_sim = 10  # total simulation time in seconds
 steps = 100  # number of time steps
-total_steps = 100_000  # total sub‑steps for finer resolution
+total_steps = 10_000  # total sub‑steps for finer resolution
 # time = np.linspace(0, time_sim, time_sim)  # 1‑second resolution
 time = np.logspace(-4, np.log10(time_sim), steps)  # logarithmic time steps
 aerosol_mass = np.zeros_like(time)
@@ -362,10 +362,5 @@ ax.legend()
 ax.set_xscale("log")
 # ax.set_yscale("log")
 ax.set_xlim(left=1e-9)
-
-# %% calculate the change in radius
-# radius_delta = aerosol_initial.particles.get_radius() - aerosol.particles.get_radius()
-# print("Radius Change: ", radius_delta)
-
 # %%
 
