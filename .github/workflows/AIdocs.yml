@@ -15,7 +15,7 @@ jobs:
     if: ${{ github.repository == 'uncscode/particula' }}
     runs-on: ubuntu-latest
     concurrency:
-      group: "aidocs"
+      group: aidocs-${{ github.head_ref || github.ref_name }}
       cancel-in-progress: true
     steps:
         - name: Check out code
