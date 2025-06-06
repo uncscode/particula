@@ -75,6 +75,8 @@ class CondensationStrategy(ABC):
           (unitless).
         - update_gases : Whether to update gas concentrations after
           condensation.
+        - skip_partitioning_indices : Optional list of indices for species
+          that should not partition during condensation (default is None).
 
     Methods:
     - mean_free_path : Calculate the mean free path of the gas molecules.
@@ -104,6 +106,7 @@ class CondensationStrategy(ABC):
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
+        skip_partitioning_indices: Optional[list] = None,
     ):
         """
         Initialize the CondensationStrategy instance.
@@ -115,11 +118,14 @@ class CondensationStrategy(ABC):
               (unitless).
             - update_gases : Flag indicating whether gas concentrations should
               be updated on condensation.
+            - skip_partitioning_indices : Optional list of indices for species
+              that should not partition during condensation (default is None).
         """
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
         self.accommodation_coefficient = accommodation_coefficient
         self.update_gases = update_gases
+        self.skip_partitioning_indices = skip_partitioning_indices
 
     def mean_free_path(
         self,
@@ -457,12 +463,14 @@ class CondensationIsothermal(CondensationStrategy):
         diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
+        skip_partitioning_indices: Optional[list] = None,
     ):
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
             accommodation_coefficient=accommodation_coefficient,
             update_gases=update_gases,
+            skip_partitioning_indices=skip_partitioning_indices,
         )
 
     def mass_transfer_rate(
@@ -518,6 +526,12 @@ class CondensationIsothermal(CondensationStrategy):
         # mass rate by particle concentration
         rates = mass_rate * concentration
 
+        # Step 4: Set the skip_partitioning_indices to zero if specified
+        if self.skip_partitioning_indices is not None:
+            if mass_rate.ndim == 2:
+                rates[:, self.skip_partitioning_indices] = 0.0
+            else:
+                rates[self.skip_partitioning_indices] = 0.0
         return rates
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
@@ -537,6 +551,13 @@ class CondensationIsothermal(CondensationStrategy):
             temperature=temperature,
             pressure=pressure,
         )
+        # Set the skip_partitioning_indices to zero if specified
+        if self.skip_partitioning_indices is not None:
+            if mass_rate.ndim == 2:
+                mass_rate[:, self.skip_partitioning_indices] = 0.0
+            else:
+                mass_rate[self.skip_partitioning_indices] = 0.0
+
         # calculate the mass gain or loss per bin
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate,  # type: ignore
