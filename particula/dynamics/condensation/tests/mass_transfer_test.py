@@ -1,7 +1,6 @@
 """Test the Condensation module."""
 
 import numpy as np
-import pytest
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
