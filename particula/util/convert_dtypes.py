@@ -79,12 +79,12 @@ def get_dict_from_list(list_of_str: list) -> dict:
         # {'alpha': 0, 'beta': 1, 'gamma': 2}
         ```
     """
-    assert list_of_str, "Input list_of_str must not be empty."
-    assert all(list_of_str), "Input list_of_str must not contain empty strings."
-    assert all(
-        isinstance(item, str) for item in list_of_str
-    ), "Input \
-        list_of_str must contain only strings."
+    if not list_of_str:
+        raise ValueError("Input list_of_str must not be empty.")
+    if not all(list_of_str):
+        raise ValueError("Input list_of_str must not contain empty strings.")
+    if not all(isinstance(item, str) for item in list_of_str):
+        raise TypeError("Input list_of_str must contain only strings.")
 
     # Create a dictionary from the list of strings using a dictionary
     # comprehension
