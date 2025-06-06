@@ -303,7 +303,7 @@ class CondensationStrategy(ABC):
                 "particle concentration would also be zero."
             )
             logger.warning(message)
-            warnings.warn(message, RuntimeWarning)      # NEW – make it an actual warning
+            warnings.warn(message, RuntimeWarning)
             radius = np.where(radius == 0, 1, radius)
         return np.where(radius == 0, np.max(radius), radius)
 
