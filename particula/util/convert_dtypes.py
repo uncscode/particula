@@ -10,8 +10,8 @@ To be removed, likely particula_beta only. -kyle
 """
 
 from typing import Any, Dict, List
-import numpy as np
 from collections.abc import Sequence
+import numpy as np
 
 
 def get_coerced_type(data, dtype):
