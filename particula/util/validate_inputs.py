@@ -142,10 +142,11 @@ def validate_inputs(dict_args):
     """
 
     def decorator(func):
+        sig = inspect.signature(func)
+
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Map argument names to values
-            sig = inspect.signature(func)
+            # Map argument names to values using cached signature
             bound = sig.bind_partial(*args, **kwargs)
             bound.apply_defaults()
             for name, comp in dict_args.items():
