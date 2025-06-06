@@ -125,12 +125,13 @@ class VaporPressureStrategy(ABC):
         temperature: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the saturation ratio of the gas at a given pressure and
-        temperature.
+        Calculate the saturation ratio of the gas from its concentration and
+        molar mass at a given temperature.
 
         Arguments:
-           - pressure : Pressure in Pascals.
-           - temperature : Temperature in Kelvin.
+            - concentration : Concentration of the gas in kg/m^3.
+            - molar_mass : Molar mass of the gas in kg/mol.
+            - temperature : Temperature in Kelvin.
 
         Returns:
             The saturation ratio of the gas.
