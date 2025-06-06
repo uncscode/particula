@@ -200,3 +200,23 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertAlmostEqual(
             final_gas_conc[skip_idx], initial_gas_conc[skip_idx]
         )
+
+    def test_apply_skip_partitioning_direct(self):
+        """_apply_skip_partitioning zeroes selected indices on 1D and 2D arrays."""
+        strategy = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            skip_partitioning_indices=[0, 2],
+        )
+
+        array_1d = np.arange(4.0)
+        returned_1d = strategy._apply_skip_partitioning(array_1d)
+        self.assertIs(returned_1d, array_1d)
+        np.testing.assert_array_equal(array_1d, np.array([0.0, 1.0, 0.0, 3.0]))
+
+        array_2d = np.tile(np.arange(4.0), (2, 1))
+        returned_2d = strategy._apply_skip_partitioning(array_2d)
+        self.assertIs(returned_2d, array_2d)
+        expected_2d = np.tile(np.array([0.0, 1.0, 0.0, 3.0]), (2, 1))
+        np.testing.assert_array_equal(array_2d, expected_2d)
