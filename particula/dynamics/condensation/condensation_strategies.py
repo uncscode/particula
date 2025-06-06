@@ -38,6 +38,7 @@ Units are all Base SI units.
 from abc import ABC, abstractmethod
 from typing import Union, Optional, Tuple, Sequence
 import logging
+import warnings            # NEW
 from numpy.typing import NDArray
 import numpy as np
 
@@ -302,6 +303,7 @@ class CondensationStrategy(ABC):
                 "particle concentration would also be zero."
             )
             logger.warning(message)
+            warnings.warn(message, RuntimeWarning)      # NEW – make it an actual warning
             radius = np.where(radius == 0, 1, radius)
         return np.where(radius == 0, np.max(radius), radius)
 
