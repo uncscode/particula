@@ -243,3 +243,24 @@ def test_get_effective_density_particle_resolved():
         np.sum(particle.get_species_mass() * density, axis=1) / total_mass
     )
     np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)
+
+
+def test_bin_order_after_add_mass():
+    """Bins should be ordered after mass addition."""
+    particle = setup_particle(
+        distribution=np.array([2.0, 1.0, 3.0]),
+        concentration=np.array([20, 10, 30]),
+        charge=np.array([2, 1, 3]),
+    )
+
+    particle.add_mass(np.zeros_like(particle.get_distribution()))
+
+    np.testing.assert_allclose(
+        particle.get_distribution(), np.array([1.0, 2.0, 3.0]), rtol=1e-12
+    )
+    np.testing.assert_array_equal(
+        particle.get_concentration(), np.array([10, 20, 30])
+    )
+    np.testing.assert_array_equal(
+        particle.get_charge(), np.array([1, 2, 3])
+    )
