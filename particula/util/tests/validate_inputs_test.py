@@ -69,3 +69,15 @@ def test_valid_finite():
 
     with pytest.raises(ValueError, match="Argument 'x' must be finite."):
         sample_function2(np.nan)
+
+
+def test_none_skips_validation():
+    """Test that None values skip validation."""
+    some_dict3 = {"x": "positive"}
+
+    @validate_inputs(some_dict3)
+    def sample_function3(x=None):
+        """Function that allows None input."""
+        return x
+
+    assert sample_function3(None) is None
