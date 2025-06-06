@@ -11,6 +11,7 @@ To be removed, likely particula_beta only. -kyle
 
 from typing import Any, Dict, List
 import numpy as np
+from collections.abc import Sequence
 
 
 def get_coerced_type(data, dtype):
@@ -79,12 +80,13 @@ def get_dict_from_list(list_of_str: list) -> dict:
         # {'alpha': 0, 'beta': 1, 'gamma': 2}
         ```
     """
-    if not list_of_str:
-        raise ValueError("Input list_of_str must not be empty.")
-    if not all(list_of_str):
-        raise ValueError("Input list_of_str must not contain empty strings.")
-    if not all(isinstance(item, str) for item in list_of_str):
-        raise TypeError("Input list_of_str must contain only strings.")
+    # basic type / emptiness check
+    if not isinstance(list_of_str, Sequence) or not list_of_str:
+        raise ValueError("list_of_str must be a non-empty sequence of strings.")
+
+    # one pass: ensure every element is a non-empty string
+    if any(not isinstance(item, str) or item == "" for item in list_of_str):
+        raise TypeError("All elements in list_of_str must be non-empty strings.")
 
     # Create a dictionary from the list of strings using a dictionary
     # comprehension
