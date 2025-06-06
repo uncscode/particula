@@ -154,6 +154,8 @@ def validate_inputs(dict_args):
                     raise TypeError(
                         f"Argument '{name}' is not provided and has no default."
                     )
+                if bound.arguments[name] is None:
+                    continue
                 value = np.asarray(bound.arguments[name])
                 if comp == "positive":
                     validate_positive(value, name)
