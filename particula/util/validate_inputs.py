@@ -150,7 +150,7 @@ def validate_inputs(dict_args):
             bound.apply_defaults()
             for name, comp in dict_args.items():
                 if name not in bound.arguments:
-                    raise ValueError(
+                    raise TypeError(
                         f"Argument '{name}' is not provided and has no default."
                     )
                 value = np.asarray(bound.arguments[name])
