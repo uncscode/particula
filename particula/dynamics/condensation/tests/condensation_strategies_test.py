@@ -3,15 +3,11 @@ Test module for the condensation strategies.
 """
 
 import unittest
-from unittest.mock import MagicMock
+import particula as par  # new – we will build real objects
+import numpy as np
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
 )
-from particula.particles.representation import ParticleRepresentation
-from particula.gas.species import GasSpecies
-
-import numpy as np                       # new
-from unittest.mock import patch          # new
 
 
 # pylint: disable=too-many-instance-attributes
@@ -30,16 +26,70 @@ class TestCondensationIsothermal(unittest.TestCase):
             accommodation_coefficient=self.accommodation_coefficient,
         )
 
-        self.particle = MagicMock(spec=ParticleRepresentation)
-        self.gas_species = MagicMock(spec=GasSpecies)
         self.temperature = 298.15  # K
         self.pressure = 101325  # Pa
         self.time_step = 1.0  # s
 
-        self.particle.concentration = 1.0        # new – scalar concentration
-        self.particle.get_radius.return_value = np.array([1e-9])  # new – default radius
-        self.particle.get_species_mass.return_value = np.array([1.0])  # new dummy mass
-        self.particle.surface.kelvin_term.return_value = np.array([1.0])  # new
+        # ---------- vapor-pressure strategies ----------
+        vp_water = par.gas.VaporPressureFactory().get_strategy("water_buck")
+        vp_constant = par.gas.VaporPressureFactory().get_strategy(
+            "constant", {"vapor_pressure": 1e-24, "vapor_pressure_units": "Pa"}
+        )
+
+        # ---------- gas species ----------
+        mm_water = 18.015e-3  # kg/mol
+        mm_core = 132.14e-3
+        water_sat = vp_water.saturation_concentration(
+            mm_water, self.temperature
+        )
+        water_conc = water_sat * 1.02  # 2 % supersaturation
+
+        self.gas_species = (
+            par.gas.GasSpeciesBuilder()
+            .set_name(["H2O", "NH4HSO4"])
+            .set_molar_mass(np.array([mm_water, mm_core]), "kg/mol")
+            .set_vapor_pressure_strategy([vp_water, vp_constant])
+            .set_concentration(np.array([water_conc, 1e-30]), "kg/m^3")
+            .set_partitioning(True)
+            .build()
+        )
+
+        # ---------- particle (one particle for speed) ----------
+        density_core = 1.77e3
+        r = np.array([100e-9])  # 100 nm core radius
+        mass_core = 4 / 3 * np.pi * r**3 * density_core
+        mass_spec = np.column_stack(
+            [mass_core * 0, mass_core]
+        )  # [water, core]
+        densities = np.array([1e3, density_core])
+
+        activity = (
+            par.particles.ActivityKappaParameterBuilder()
+            .set_density(densities, "kg/m^3")
+            .set_kappa(np.array([0.0, 0.61]))
+            .set_molar_mass(np.array([mm_water, mm_core]), "kg/mol")
+            .set_water_index(0)
+            .build()
+        )
+        surface = (
+            par.particles.SurfaceStrategyVolumeBuilder()
+            .set_density(densities, "kg/m^3")
+            .set_surface_tension(np.array([0.072, 0.092]), "N/m")
+            .build()
+        )
+        self.particle = (
+            par.particles.ResolvedParticleMassRepresentationBuilder()
+            .set_distribution_strategy(
+                par.particles.ParticleResolvedSpeciatedMass()
+            )
+            .set_activity_strategy(activity)
+            .set_surface_strategy(surface)
+            .set_mass(mass_spec, "kg")
+            .set_density(densities, "kg/m^3")
+            .set_charge(0)
+            .set_volume(1e-6, "m^3")  # 1 cm³ parcel
+            .build()
+        )
 
     def test_mean_free_path(self):
         """Test the mean free path call."""
@@ -75,48 +125,78 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertEqual(filled[0], np.max(radii))
 
     def test_rate_respects_skip_indices(self):
-        """Chosen indices must be zeroed in the returned rate."""
+        """rate() must zero the chosen indices."""
+        # Skip the condensing water (index 0) to make the effect obvious
         strategy_skip = CondensationIsothermal(
             molar_mass=self.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,
             accommodation_coefficient=self.accommodation_coefficient,
-            skip_partitioning_indices=[1],
+            skip_partitioning_indices=[0],
         )
-        # fake mass-transfer values (3 “species”)
-        strategy_skip.mass_transfer_rate = MagicMock(return_value=np.array([1.0, 2.0, 3.0]))
-        rates = strategy_skip.rate(
+
+        rates_skip = strategy_skip.rate(
             particle=self.particle,
             gas_species=self.gas_species,
             temperature=self.temperature,
             pressure=self.pressure,
         )
-        np.testing.assert_array_equal(rates, np.array([1.0, 0.0, 3.0]))
 
-    def test_step_zeroes_mass_rate_before_transfer(self):
-        """step() must pass a zeroed mass_rate to get_mass_transfer."""
+        # Without skipping we should get non-zero water condensation
+        strategy_noskip = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+        rates_noskip = strategy_noskip.rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        # Whatever the dimensionality, index 0 must be identically zero when skipped
+        self.assertTrue(np.allclose(rates_skip[..., 0], 0.0))
+
+        # For the un-skipped case the values must not be exactly zero
+        # (tiny positive/negative numbers are allowed)
+        self.assertTrue(np.any(rates_noskip[..., 0] != 0.0))
+
+    def test_step_skip_preserves_skipped_species(self):
+        """step() must not change masses/concentrations of skipped indices."""
+        skip_idx = 1  # core species
         strategy_skip = CondensationIsothermal(
             molar_mass=self.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,
             accommodation_coefficient=self.accommodation_coefficient,
-            skip_partitioning_indices=[1],
+            skip_partitioning_indices=[skip_idx],
         )
-        # return non-zero values so we can see the zeroing
-        strategy_skip.mass_transfer_rate = MagicMock(return_value=np.array([1.0, 2.0, 3.0]))
 
-        with patch(
-            "particula.dynamics.condensation.condensation_strategies.get_mass_transfer",
-            autospec=True,
-        ) as mocked_get_mass_transfer:
-            mocked_get_mass_transfer.return_value = np.array([0.1, 0.0, 0.3])
+        initial_particle_mass = self.particle.get_species_mass().copy()
+        initial_gas_conc = self.gas_species.get_concentration().copy()
 
-            strategy_skip.step(
-                particle=self.particle,
-                gas_species=self.gas_species,
-                temperature=self.temperature,
-                pressure=self.pressure,
-                time_step=self.time_step,
-            )
+        particle_new, gas_new = strategy_skip.step(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=0.2,  # short step
+        )
 
-            # extract the mass_rate argument passed into get_mass_transfer
-            passed_mass_rate = mocked_get_mass_transfer.call_args.kwargs["mass_rate"]
-            np.testing.assert_array_equal(passed_mass_rate, np.array([1.0, 0.0, 3.0]))
+        final_particle_mass = particle_new.get_species_mass()
+        final_gas_conc = gas_new.get_concentration()
+
+        # water (index 0) should have transferred mass
+        self.assertGreater(
+            final_particle_mass[..., 0].sum(),
+            initial_particle_mass[..., 0].sum(),
+        )
+        self.assertLess(final_gas_conc[0], initial_gas_conc[0])
+
+        # core (index 1) should be unchanged
+        np.testing.assert_allclose(
+            final_particle_mass[..., skip_idx],
+            initial_particle_mass[..., skip_idx],
+        )
+        self.assertAlmostEqual(
+            final_gas_conc[skip_idx], initial_gas_conc[skip_idx]
+        )
