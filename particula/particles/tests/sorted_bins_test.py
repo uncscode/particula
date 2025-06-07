@@ -62,7 +62,7 @@ def test_unsorted_matrix_zero_charge():
                        [10., 11.],
                        [20., 21.]])
     conc   = np.array([300, 100, 200])
-    charge = np.zeros_like(conc)           # all zeros
+    charge = np.array([0])           # all zeros
 
     d2, c2, q2 = get_sorted_bins_by_radius(radius, dist, conc, charge)
 
