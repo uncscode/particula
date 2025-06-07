@@ -86,6 +86,7 @@ git push --force-with-lease
 | Commit staged changes | `git commit -m "Concise, present‑tense message"` |
 | Abort an in‑progress rebase | `git rebase --abort` |
 | Continue after fixing conflicts | `git rebase --continue` |
+| Force‑push after a rebase or squash | `git push --force-with-lease` |
 
 ---
 
