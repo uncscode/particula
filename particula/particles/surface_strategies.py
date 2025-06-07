@@ -219,6 +219,9 @@ class SurfaceStrategyMass(SurfaceStrategy):
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
         - density : Density array or scalar in kg/m^3.
+        - phase_index : Optional array indicating phase indices for species.
+          Example: [0, 1, 1] → three species in two phases (first in phase 0,
+          last two in phase 1).
 
     References:
     - [Mass Fraction](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
@@ -265,6 +268,9 @@ class SurfaceStrategyVolume(SurfaceStrategy):
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
         - density : Density array or scalar in kg/m^3.
+        - phase_index : Optional array indicating phase indices for species.
+          Example: [0, 1, 1] → three species in two phases (first in phase 0,
+          last two in phase 1).
 
     References:
         - [Volume Fraction](https://en.wikipedia.org/wiki/Volume_fraction)
