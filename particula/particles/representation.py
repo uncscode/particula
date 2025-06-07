@@ -2,7 +2,7 @@
 Particle representation for a collection of particles.
 """
 
-from typing import Optional, Union
+from typing import Optional
 from copy import deepcopy
 import logging
 import numpy as np
