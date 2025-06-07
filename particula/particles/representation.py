@@ -42,12 +42,17 @@ def get_sorted_bins_by_radius(
         - charge : The sorted charge of each particle size/mass.
     """
     sort_index = np.argsort(radius)
-    if not np.array_equal(sort_index, np.arange(radius.size)):
+    sorting_is_needed = not np.array_equal(sort_index, np.arange(radius.size))
+
+    charge_is_same_shape_and_ndarray = (
+        isinstance(charge, np.ndarray)
+        and charge.shape == radius.shape
+    )
+
+    if sorting_is_needed:
         distribution = np.take(distribution, sort_index, axis=0)
         concentration = np.take(concentration, sort_index, axis=0)
-        # Re-order charge only when it is a NumPy array *and* has
-        # the same shape as the concentration array.
-        if isinstance(charge, np.ndarray) and charge.shape == concentration.shape:
+        if charge_is_same_shape_and_ndarray:
             charge = np.take(charge, sort_index, axis=0)
     return distribution, concentration, charge
 
