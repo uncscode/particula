@@ -14,47 +14,11 @@ from particula.particles.surface_strategies import SurfaceStrategy
 from particula.particles.distribution_strategies import (
     DistributionStrategy,
 )
+from particula.particles.properties.sort_bins import (
+    get_sorted_bins_by_radius,
+)
 
 logger = logging.getLogger("particula")
-
-
-def get_sorted_bins_by_radius(
-    radius: NDArray[np.float64],
-    distribution: NDArray[np.float64],
-    concentration: NDArray[np.float64],
-    charge: Union[NDArray[np.float64], float],
-) -> tuple[
-    NDArray[np.float64],
-    NDArray[np.float64],
-    Union[NDArray[np.float64], float],
-]:
-    """Ensure distribution bins are sorted by increasing radius.
-
-    Arguments:
-        - radius : The radii of the particles.
-        - distribution : The distribution of particle sizes or masses.
-        - concentration : The concentration of each particle size or mass.
-        - charge : The (optional) charge per particle; can be a scalar or NumPy array.
-
-    Returns:
-        - distribution : The sorted distribution of particle sizes or masses.
-        - concentration : The sorted concentration of each particle size/mass.
-        - charge : The sorted charge of each particle size/mass.
-    """
-    sort_index = np.argsort(radius)
-    sorting_is_needed = not np.array_equal(sort_index, np.arange(radius.size))
-
-    charge_is_same_shape_and_ndarray = (
-        isinstance(charge, np.ndarray)
-        and charge.shape == radius.shape
-    )
-
-    if sorting_is_needed:
-        distribution = np.take(distribution, sort_index, axis=0)
-        concentration = np.take(concentration, sort_index, axis=0)
-        if charge_is_same_shape_and_ndarray:
-            charge = np.take(charge, sort_index, axis=0)
-    return distribution, concentration, charge
 
 
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
@@ -571,7 +535,6 @@ class ParticleRepresentation:
             message = "Added distribution is value None."
             logger.warning(message)
             added_distribution = self.get_distribution()
-        # self.concentration += added_concentration
         (self.distribution, self.concentration) = (
             self.strategy.add_concentration(
                 distribution=self.get_distribution(),
