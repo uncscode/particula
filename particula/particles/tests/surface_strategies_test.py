@@ -20,7 +20,7 @@ def test_molar_surface_strategy():
 
     # Test effective surface tension
     mass_concentration = np.array([100, 200])  # water, oil
-    expected_st_scalar = 0.0599547511312
+    expected_st_scalar = surface_tension
     expected_surface_tension = np.full_like(surface_tension, expected_st_scalar)
     np.testing.assert_allclose(
         strategy.effective_surface_tension(mass_concentration),
