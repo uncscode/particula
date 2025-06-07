@@ -152,9 +152,10 @@ def test_molar_surface_strategy_scalar_input():
     density = 1000  # scalar
     molar_mass = 0.01815  # scalar
     mass_concentration = 150  # any positive value
-
     strat = SurfaceStrategyMolar(surface_tension, density, molar_mass)
 
+    # Assert get_density for scalar input
+    assert strat.get_density() == pytest.approx(density)
     assert strat.effective_surface_tension(
         mass_concentration
     ) == pytest.approx(surface_tension)
