@@ -14,11 +14,46 @@ import numpy as np
 from particula.particles.properties.convert_mass_concentration import (
     get_mole_fraction_from_mass,
     get_volume_fraction_from_mass,
+    get_mass_fraction_from_mass,
 )
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,
 )
+
+
+def _weighted_average_by_phase(
+    values: NDArray[np.float64],
+    weights: NDArray[np.float64],
+    phase_index: NDArray[np.int_],
+) -> NDArray[np.float64]:
+    """
+    Return an array where each element equals the phase-averaged *values*
+    using *weights* as weighting factors.
+
+    For every unique entry in `phase_index` the weighted-average is
+    computed and broadcast back onto all members of that phase.
+
+    Arguments:
+        - values : Array of values to be averaged, shape (n_species,).
+        - weights : Array of weights corresponding to each species, shape
+          (n_species,).
+        - phase_index : Array indicating the phase index for each species,
+          shape (n_species,).
+
+    Returns:
+        - averaged : Array of averaged values, shape (n_species,).
+    """
+    averaged = np.zeros_like(values, dtype=np.float64)
+    for ph in np.unique(phase_index):
+        mask = phase_index == ph
+        if weights[mask].sum() != 0:
+            phase_weights = weights[mask] / weights[mask].sum()
+        else:
+            phase_weights = weights[mask]
+        averaged_value = np.sum(values[mask] * phase_weights, dtype=np.float64)
+        averaged[mask] = averaged_value
+    return averaged
 
 
 class SurfaceStrategy(ABC):
@@ -51,17 +86,14 @@ class SurfaceStrategy(ABC):
         """
 
     @abstractmethod
-    def effective_density(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+    def get_density(
+        self
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the effective density of the species mixture.
-
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
+        Get density of the species mixture.
 
         Returns:
-            - Effective density in kg/m^3.
+            - density in kg/m^3.
         """
 
     def get_name(self) -> str:
@@ -75,7 +107,8 @@ class SurfaceStrategy(ABC):
         temperature: float,
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the Kelvin radius, which sets the curvature effect on vapor pressure.
+        Calculate the Kelvin radius, which sets the curvature effect on vapor
+        pressure.
 
         Arguments:
             - molar_mass : Molar mass of the species in kg/mol.
@@ -91,7 +124,7 @@ class SurfaceStrategy(ABC):
         """
         return get_kelvin_radius(
             self.effective_surface_tension(mass_concentration),
-            self.effective_density(mass_concentration),
+            self.get_density(),
             molar_mass,
             temperature,
         )
@@ -134,6 +167,9 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         - surface_tension : Surface tension array or scalar in N/m.
         - density : Density array or scalar in kg/m^3.
         - molar_mass : Molar mass array or scalar in kg/mol.
+        - phase_index : Optional array indicating phase indices for species.
+          For example, [0, 1, 1] for two phases, where the first species
+          belongs to phase 0 and the next two to phase 1.
 
     References:
         - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
@@ -149,34 +185,29 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         self.surface_tension = surface_tension
         self.density = density
         self.molar_mass = molar_mass
-        self.phase_index = None if phase_index is None else np.array(phase_index, dtype=int)
+        self.phase_index = (
+            None if phase_index is None else np.array(phase_index, dtype=int)
+        )
 
     def effective_surface_tension(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        if isinstance(self.surface_tension, float):
-            return self.surface_tension
+        if isinstance(self.surface_tension, float) or self.phase_index is None:
+            # If surface tension is a scalar or no phase index is provided,
+            # return it directly.
+            return np.asarray(self.surface_tension, dtype=np.float64)
+
         mole_frac = get_mole_fraction_from_mass(
             mass_concentration, self.molar_mass  # type: ignore
         )
-        if self.phase_index is None:
-            return np.sum(
-                self.surface_tension * mole_frac,
-                dtype=np.float64,
-            )
-        eff = np.zeros_like(mass_concentration, dtype=np.float64)
-        for phase in np.unique(self.phase_index):
-            mask = self.phase_index == phase
-            phase_weights = mole_frac[mask] / np.sum(mole_frac[mask])
-            eff_value = np.sum(
-                self.surface_tension[mask] * phase_weights,
-                dtype=np.float64,
-            )
-            eff[mask] = eff_value
-        return eff
+        return _weighted_average_by_phase(
+            np.asarray(self.surface_tension, dtype=np.float64),
+            mole_frac,
+            self.phase_index,
+        )
 
-    def effective_density(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+    def get_density(
+        self
     ) -> Union[float, NDArray[np.float64]]:
         return self.density
 
@@ -201,29 +232,28 @@ class SurfaceStrategyMass(SurfaceStrategy):
     ):
         self.surface_tension = surface_tension
         self.density = density
-        self.phase_index = None if phase_index is None else np.array(phase_index, dtype=int)
+        self.phase_index = (
+            None if phase_index is None else np.array(phase_index, dtype=int)
+        )
 
     def effective_surface_tension(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        if isinstance(self.surface_tension, float):
-            return self.surface_tension
-        weights = mass_concentration / np.sum(mass_concentration)
-        if self.phase_index is None:
-            return np.sum(self.surface_tension * weights, dtype=np.float64)
-        eff = np.zeros_like(mass_concentration, dtype=np.float64)
-        for phase in np.unique(self.phase_index):
-            mask = self.phase_index == phase
-            phase_weights = weights[mask] / np.sum(weights[mask])
-            eff_value = np.sum(
-                self.surface_tension[mask] * phase_weights,
-                dtype=np.float64,
-            )
-            eff[mask] = eff_value
-        return eff
+        # If a single surface-tension value is supplied **or** no phase
+        # information is given, just return the (possibly vector) value
+        # unchanged – same rule as SurfaceStrategyMolar.
+        if isinstance(self.surface_tension, float) or self.phase_index is None:
+            return np.asarray(self.surface_tension, dtype=np.float64)
 
-    def effective_density(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+        mass_fraction = get_mass_fraction_from_mass(mass_concentration)
+        return _weighted_average_by_phase(
+            np.asarray(self.surface_tension, dtype=np.float64),
+            mass_fraction,
+            self.phase_index,
+        )
+
+    def get_density(
+        self
     ) -> Union[float, NDArray[np.float64]]:
         return self.density
 
@@ -248,30 +278,26 @@ class SurfaceStrategyVolume(SurfaceStrategy):
     ):
         self.surface_tension = surface_tension
         self.density = density
-        self.phase_index = None if phase_index is None else np.array(phase_index, dtype=int)
+        self.phase_index = (
+            None if phase_index is None else np.array(phase_index, dtype=int)
+        )
 
     def effective_surface_tension(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        if isinstance(self.surface_tension, float):
-            return self.surface_tension
+        if isinstance(self.surface_tension, float) or self.phase_index is None:
+            return np.asarray(self.surface_tension, dtype=np.float64)
+
         vol_frac = get_volume_fraction_from_mass(
             mass_concentration, self.density  # type: ignore
         )
-        if self.phase_index is None:
-            return np.sum(self.surface_tension * vol_frac, dtype=np.float64)
-        eff = np.zeros_like(mass_concentration, dtype=np.float64)
-        for phase in np.unique(self.phase_index):
-            mask = self.phase_index == phase
-            phase_weights = vol_frac[mask] / np.sum(vol_frac[mask])
-            eff_value = np.sum(
-                self.surface_tension[mask] * phase_weights,
-                dtype=np.float64,
-            )
-            eff[mask] = eff_value
-        return eff
+        return _weighted_average_by_phase(
+            np.asarray(self.surface_tension, dtype=np.float64),
+            vol_frac,
+            self.phase_index,
+        )
 
-    def effective_density(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+    def get_density(
+        self
     ) -> Union[float, NDArray[np.float64]]:
         return self.density
