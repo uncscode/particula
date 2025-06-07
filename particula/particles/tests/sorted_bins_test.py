@@ -5,6 +5,7 @@ The tests cover:
 • Unsorted 1-D inputs (function must reorder accompanying arrays).
 • Unsorted inputs with a 2-D distribution matrix (rows must be reordered
   consistently with the radii).
+• Unsorted inputs with a 2-D distribution matrix and an all-zero charge array.
 """
 
 import numpy as np
@@ -52,3 +53,23 @@ def test_unsorted_matrix():
                                                  [30., 31.]]))
     np.testing.assert_array_equal(c2,  np.array([100, 200, 300]))
     np.testing.assert_array_equal(q2,  np.array([1, 2, 3]))
+
+
+def test_unsorted_matrix_zero_charge():
+    """Unsorted radii with 2-D distribution and zero-charge array."""
+    radius = np.array([3.0, 1.0, 2.0])
+    dist   = np.array([[30., 31.],
+                       [10., 11.],
+                       [20., 21.]])
+    conc   = np.array([300, 100, 200])
+    charge = np.zeros_like(conc)           # all zeros
+
+    d2, c2, q2 = get_sorted_bins_by_radius(radius, dist, conc, charge)
+
+    np.testing.assert_array_equal(
+        d2, np.array([[10., 11.],
+                      [20., 21.],
+                      [30., 31.]])
+    )
+    np.testing.assert_array_equal(c2, np.array([100, 200, 300]))
+    np.testing.assert_array_equal(q2, charge)   # still all zeros
