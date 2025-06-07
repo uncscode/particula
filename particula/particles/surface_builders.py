@@ -13,6 +13,7 @@ from particula.builder_mixin import (
     BuilderDensityMixin,
     BuilderSurfaceTensionMixin,
     BuilderMolarMassMixin,
+    BuilderPhaseIndexMixin,
 )
 from particula.particles.surface_strategies import (
     SurfaceStrategyMass,
@@ -28,6 +29,7 @@ class SurfaceStrategyMolarBuilder(
     BuilderDensityMixin,
     BuilderSurfaceTensionMixin,
     BuilderMolarMassMixin,
+    BuilderPhaseIndexMixin,
 ):
     """Builder class for SurfaceStrategyMolar objects.
 
@@ -39,6 +41,7 @@ class SurfaceStrategyMolarBuilder(
     - set_density : Set the density in kg/m^3.
     - set_molar_mass : Set the molar mass in kg/mol.
     - set_parameters : Configure multiple parameters at once.
+    - set_phase_index : Optionally assign species to phases.
     - build : Validate parameters and return the strategy.
     """
 
@@ -48,6 +51,7 @@ class SurfaceStrategyMolarBuilder(
         BuilderSurfaceTensionMixin.__init__(self)
         BuilderDensityMixin.__init__(self)
         BuilderMolarMassMixin.__init__(self)
+        BuilderPhaseIndexMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyMolar:
         """Validate and return the SurfaceStrategyMolar object.
@@ -60,11 +64,12 @@ class SurfaceStrategyMolarBuilder(
             surface_tension=self.surface_tension,  # type: ignore
             density=self.density,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
+            phase_index=self.phase_index,  # type: ignore
         )
 
 
 class SurfaceStrategyMassBuilder(
-    BuilderABC, BuilderSurfaceTensionMixin, BuilderDensityMixin
+    BuilderABC, BuilderSurfaceTensionMixin, BuilderDensityMixin, BuilderPhaseIndexMixin
 ):
     """Builder class for SurfaceStrategyMass objects.
 
@@ -75,6 +80,7 @@ class SurfaceStrategyMassBuilder(
     - set_surface_tension : Set the surface tension in N/m.
     - set_density : Set the density in kg/m^3.
     - set_parameters : Configure multiple parameters at once.
+    - set_phase_index : Optionally assign species to phases.
     - build : Validate parameters and return the strategy.
     """
 
@@ -83,6 +89,7 @@ class SurfaceStrategyMassBuilder(
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
         BuilderDensityMixin.__init__(self)
+        BuilderPhaseIndexMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyMass:
         """Validate and return the SurfaceStrategyMass object.
@@ -94,11 +101,12 @@ class SurfaceStrategyMassBuilder(
         return SurfaceStrategyMass(
             surface_tension=self.surface_tension,  # type: ignore
             density=self.density,  # type: ignore
+            phase_index=self.phase_index,  # type: ignore
         )
 
 
 class SurfaceStrategyVolumeBuilder(
-    BuilderABC, BuilderSurfaceTensionMixin, BuilderDensityMixin
+    BuilderABC, BuilderSurfaceTensionMixin, BuilderDensityMixin, BuilderPhaseIndexMixin
 ):
     """Builder class for SurfaceStrategyVolume objects.
 
@@ -109,6 +117,7 @@ class SurfaceStrategyVolumeBuilder(
     - set_surface_tension : Set the surface tension in N/m.
     - set_density : Set the density in kg/m^3.
     - set_parameters : Configure multiple parameters at once.
+    - set_phase_index : Optionally assign species to phases.
     - build : Validate parameters and return the strategy.
     """
 
@@ -117,6 +126,7 @@ class SurfaceStrategyVolumeBuilder(
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
         BuilderDensityMixin.__init__(self)
+        BuilderPhaseIndexMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyVolume:
         """Validate and return the SurfaceStrategyVolume object.
@@ -129,4 +139,5 @@ class SurfaceStrategyVolumeBuilder(
         return SurfaceStrategyVolume(
             surface_tension=self.surface_tension,  # type: ignore
             density=self.density,  # type: ignore
+            phase_index=self.phase_index,  # type: ignore
         )

@@ -5,6 +5,7 @@ BuilderMixin methods are tested in abc_builder_test.py.
 """
 
 import pytest
+import numpy as np
 from particula.particles.surface_builders import (
     SurfaceStrategyMolarBuilder,
     SurfaceStrategyMassBuilder,
@@ -98,3 +99,13 @@ def test_build_surface_strategy_volume_missing_parameters():
     assert "Required parameter(s) not set: surface_tension, density" in str(
         excinfo.value
     )
+
+
+def test_build_surface_strategy_phase_index():
+    """Test optional phase index parameter."""
+    builder = SurfaceStrategyMassBuilder()
+    builder.set_surface_tension(0.072, "N/m")
+    builder.set_density(1000, "kg/m^3")
+    builder.set_phase_index([0, 1])
+    strategy = builder.build()
+    np.testing.assert_array_equal(strategy.phase_index, np.array([0, 1]))
