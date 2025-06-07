@@ -14,6 +14,9 @@ from particula.particles.surface_strategies import SurfaceStrategy
 from particula.particles.distribution_strategies import (
     DistributionStrategy,
 )
+from particula.particles.properties.sort_bins import (
+    get_sorted_bins_by_radius,
+)
 
 logger = logging.getLogger("particula")
 
@@ -505,6 +508,7 @@ class ParticleRepresentation:
             self.get_density(),
             added_mass,
         )
+        self._enforce_increasing_bins()
 
     def add_concentration(
         self,
@@ -531,7 +535,6 @@ class ParticleRepresentation:
             message = "Added distribution is value None."
             logger.warning(message)
             added_distribution = self.get_distribution()
-        # self.concentration += added_concentration
         (self.distribution, self.concentration) = (
             self.strategy.add_concentration(
                 distribution=self.get_distribution(),
@@ -540,6 +543,7 @@ class ParticleRepresentation:
                 added_concentration=added_concentration,
             )
         )
+        self._enforce_increasing_bins()
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
         """
@@ -555,4 +559,17 @@ class ParticleRepresentation:
         """
         (self.distribution, self.concentration) = self.strategy.collide_pairs(
             self.distribution, self.concentration, self.density, indices
+        )
+
+    def _enforce_increasing_bins(self) -> None:
+        """Ensure distribution bins are sorted by increasing radius."""
+        (
+            self.distribution,
+            self.concentration,
+            self.charge,
+        ) = get_sorted_bins_by_radius(
+            radius=self.get_radius(),
+            distribution=self.distribution,
+            concentration=self.concentration,
+            charge=self.charge,
         )
