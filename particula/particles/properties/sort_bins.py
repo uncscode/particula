@@ -32,13 +32,14 @@ def get_sorted_bins_by_radius(
     sort_index = np.argsort(radius)
     sorting_is_needed = not np.array_equal(sort_index, np.arange(radius.size))
 
+    if sorting_is_needed:
+        distribution = np.take(distribution, sort_index, axis=0)
+        concentration = np.take(concentration, sort_index, axis=0)
+
         charge_is_same_shape_and_ndarray = (
             isinstance(charge, np.ndarray)
             and charge.shape == radius.shape
         )
-    if sorting_is_needed:
-        distribution = np.take(distribution, sort_index, axis=0)
-        concentration = np.take(concentration, sort_index, axis=0)
         if charge_is_same_shape_and_ndarray:
             charge = np.take(charge, sort_index, axis=0)
     return distribution, concentration, charge
