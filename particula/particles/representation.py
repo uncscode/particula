@@ -18,6 +18,34 @@ from particula.particles.distribution_strategies import (
 logger = logging.getLogger("particula")
 
 
+def get_sorted_bins_by_radius(
+    radius: NDArray[np.float64],
+    distribution: NDArray[np.float64],
+    concentration: NDArray[np.float64],
+    charge: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """Ensure distribution bins are sorted by increasing radius.
+
+    Arguments:
+        - radius : The radii of the particles.
+        - distribution : The distribution of particle sizes or masses.
+        - concentration : The concentration of each particle size or mass.
+        - charge : The charge of each particle size or mass.
+
+    Returns:
+        - distribution : The sorted distribution of particle sizes or masses.
+        - concentration : The sorted concentration of each particle size/mass.
+        - charge : The sorted charge of each particle size/mass.
+    """
+    sort_index = np.argsort(radius)
+    if not np.array_equal(sort_index, np.arange(radius.size)):
+        distribution = np.take(distribution, sort_index, axis=0)
+        concentration = np.take(concentration, sort_index, axis=0)
+        if charge.shape == concentration.shape:
+            charge = np.take(charge, sort_index, axis=0)
+    return distribution, concentration, charge
+
+
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
 class ParticleRepresentation:
     """Everything needed to represent a particle or a collection of particles.
@@ -561,11 +589,13 @@ class ParticleRepresentation:
 
     def _enforce_increasing_bins(self) -> None:
         """Ensure distribution bins are sorted by increasing radius."""
-        radius = self.get_radius()
-        sort_index = np.argsort(radius)
-        if not np.array_equal(sort_index, np.arange(radius.size)):
-            self.distribution = np.take(self.distribution, sort_index, axis=0)
-            self.concentration = np.take(self.concentration, sort_index, axis=0)
-            if np.shape(self.charge) == np.shape(self.concentration):
-                self.charge = np.take(self.charge, sort_index, axis=0)
-
+        (
+            self.distribution,
+            self.concentration,
+            self.charge,
+        ) = get_sorted_bins_by_radius(
+            radius=self.get_radius(),
+            distribution=self.distribution,
+            concentration=self.concentration,
+            charge=self.charge,
+        )
