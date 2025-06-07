@@ -20,10 +20,12 @@ def test_molar_surface_strategy():
 
     # Test effective surface tension
     mass_concentration = np.array([100, 200])  # water, oil
-    expected_surface_tension = 0.0599547511312
-    assert strategy.effective_surface_tension(
-        mass_concentration
-    ) == pytest.approx(expected_surface_tension)
+    expected_st_scalar = 0.0599547511312
+    expected_surface_tension = np.full_like(surface_tension, expected_st_scalar)
+    np.testing.assert_allclose(
+        strategy.effective_surface_tension(mass_concentration),
+        expected_surface_tension,
+    )
 
     # Test effective density
     expected_density = density
@@ -134,6 +136,18 @@ def test_volume_surface_strategy():
         rtol=1e-4,
     )
 
+
+def test_molar_surface_strategy_scalar_input():
+    surface_tension = 0.072          # scalar
+    density = 1000                   # scalar
+    molar_mass = 0.01815             # scalar
+    mass_concentration = 150         # any positive value
+
+    strat = SurfaceStrategyMolar(surface_tension, density, molar_mass)
+
+    assert strat.effective_surface_tension(mass_concentration) == pytest.approx(
+        surface_tension
+    )
 
 def test_surface_strategy_phase_index():
     """Test phase-index mixing option."""
