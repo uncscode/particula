@@ -147,6 +147,7 @@ def test_volume_surface_strategy():
 
 
 def test_molar_surface_strategy_scalar_input():
+    """Test MolarSurfaceStrategy with scalar inputs."""
     surface_tension = 0.072  # scalar
     density = 1000  # scalar
     molar_mass = 0.01815  # scalar
