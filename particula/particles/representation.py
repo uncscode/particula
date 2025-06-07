@@ -2,7 +2,7 @@
 Particle representation for a collection of particles.
 """
 
-from typing import Optional
+from typing import Optional, Union
 from copy import deepcopy
 import logging
 import numpy as np
@@ -22,15 +22,19 @@ def get_sorted_bins_by_radius(
     radius: NDArray[np.float64],
     distribution: NDArray[np.float64],
     concentration: NDArray[np.float64],
-    charge: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    charge: Union[NDArray[np.float64], float],
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    Union[NDArray[np.float64], float],
+]:
     """Ensure distribution bins are sorted by increasing radius.
 
     Arguments:
         - radius : The radii of the particles.
         - distribution : The distribution of particle sizes or masses.
         - concentration : The concentration of each particle size or mass.
-        - charge : The charge of each particle size or mass.
+        - charge : The (optional) charge per particle; can be a scalar or NumPy array.
 
     Returns:
         - distribution : The sorted distribution of particle sizes or masses.
@@ -41,7 +45,9 @@ def get_sorted_bins_by_radius(
     if not np.array_equal(sort_index, np.arange(radius.size)):
         distribution = np.take(distribution, sort_index, axis=0)
         concentration = np.take(concentration, sort_index, axis=0)
-        if charge.shape == concentration.shape:
+        # Re-order charge only when it is a NumPy array *and* has
+        # the same shape as the concentration array.
+        if isinstance(charge, np.ndarray) and charge.shape == concentration.shape:
             charge = np.take(charge, sort_index, axis=0)
     return distribution, concentration, charge
 
