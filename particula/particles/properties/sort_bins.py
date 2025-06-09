@@ -1,6 +1,7 @@
 """
 Sort bins of distribution representation
 """
+
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
@@ -33,11 +34,11 @@ def get_sorted_bins_by_radius(
     is_sorted = np.array_equal(order, np.arange(radius.size))
     if is_sorted:
         return distribution, concentration, charge
-    
+
     distribution = distribution[order]
     concentration = concentration[order]
-    
+
     if isinstance(charge, np.ndarray) and charge.shape == radius.shape:
         charge = charge[order]
-    
+
     return distribution, concentration, charge
