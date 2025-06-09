@@ -29,17 +29,15 @@ def get_sorted_bins_by_radius(
         - concentration : The sorted concentration of each particle size/mass.
         - charge : The sorted charge of each particle size/mass.
     """
-    sort_index = np.argsort(radius)
-    sorting_is_needed = not np.array_equal(sort_index, np.arange(radius.size))
-
-    if sorting_is_needed:
-        distribution = np.take(distribution, sort_index, axis=0)
-        concentration = np.take(concentration, sort_index, axis=0)
-
-        charge_is_same_shape_and_ndarray = (
-            isinstance(charge, np.ndarray)
-            and charge.shape == radius.shape
-        )
-        if charge_is_same_shape_and_ndarray:
-            charge = np.take(charge, sort_index, axis=0)
+    order = np.argsort(radius)
+    is_sorted = np.array_equal(order, np.arange(radius.size))
+    if is_sorted:
+        return distribution, concentration, charge
+    
+    distribution = distribution[order]
+    concentration = concentration[order]
+    
+    if isinstance(charge, np.ndarray) and charge.shape == radius.shape:
+        charge = charge[order]
+    
     return distribution, concentration, charge
