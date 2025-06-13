@@ -1,3 +1,5 @@
+"""Tests for the :class:`ParticleResolvedSpeciatedMass` distribution strategy."""
+
 import numpy as np
 import pytest
 

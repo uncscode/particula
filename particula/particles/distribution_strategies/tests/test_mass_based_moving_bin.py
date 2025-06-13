@@ -1,3 +1,5 @@
+"""Tests for the :class:`MassBasedMovingBin` distribution strategy."""
+
 import numpy as np
 import pytest
 
