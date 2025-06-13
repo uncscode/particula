@@ -93,8 +93,8 @@ def test_add_concentration_fill_empties():
         added_distribution,
         added_concentration,
     )
-    np.testing.assert_array_equal(new_dist[-1], added_distribution[0])
-    np.testing.assert_array_equal(new_conc, np.array([1.0, 0.0, 1.0]))
+    np.testing.assert_array_equal(new_dist, np.array([[1.0, 2.0], [7.0, 8.0]]))
+    np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
 
 
 def test_add_concentration_partial_fill():
@@ -108,9 +108,8 @@ def test_add_concentration_partial_fill():
         added_distribution,
         added_concentration,
     )
-    np.testing.assert_array_equal(new_dist[0], added_distribution[0])
-    np.testing.assert_array_equal(new_dist[-1], added_distribution[1])
-    np.testing.assert_array_equal(new_conc, np.array([np.inf, 0.0, np.inf]))
+    np.testing.assert_array_equal(new_dist, added_distribution)
+    np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
 
 
 def test_add_concentration_error():
