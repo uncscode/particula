@@ -9,10 +9,12 @@ particle_resolved_strategy = ParticleResolvedSpeciatedMass()
 
 
 def test_get_name():
+    """Test retrieving the class name."""
     assert particle_resolved_strategy.get_name() == "ParticleResolvedSpeciatedMass"
 
 
 def test_get_mass_and_species_mass():
+    """Test mass and species mass retrieval."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
     np.testing.assert_array_equal(
@@ -26,6 +28,7 @@ def test_get_mass_and_species_mass():
 
 
 def test_get_radius():
+    """Test radius calculation."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
     volumes = np.sum(distribution / densities, axis=1)
@@ -36,6 +39,7 @@ def test_get_radius():
 
 
 def test_get_total_mass():
+    """Test total mass computation."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 50], dtype=np.float64)
@@ -47,6 +51,7 @@ def test_get_total_mass():
 
 
 def test_add_mass():
+    """Test mass addition with normalization."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 30], dtype=np.float64)
@@ -70,6 +75,7 @@ def test_add_mass():
 
 
 def test_add_concentration_append():
+    """Test appending concentration."""
     distribution = np.array([[1.0, 2.0]], dtype=np.float64)
     concentration = np.array([2.0], dtype=np.float64)
     added_distribution = np.array([[3.0, 4.0]], dtype=np.float64)
@@ -85,6 +91,7 @@ def test_add_concentration_append():
 
 
 def test_add_concentration_fill_empties():
+    """Test filling empty bins."""
     distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
     concentration = np.array([2.0, 0.0], dtype=np.float64)
     added_distribution = np.array([[7.0, 8.0]], dtype=np.float64)
@@ -100,6 +107,7 @@ def test_add_concentration_fill_empties():
 
 
 def test_add_concentration_partial_fill():
+    """Test replacing all bins."""
     distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
     concentration = np.array([0.0, 0.0], dtype=np.float64)
     added_distribution = np.array([[7.0, 8.0], [9.0, 10.0]], dtype=np.float64)
@@ -115,6 +123,7 @@ def test_add_concentration_partial_fill():
 
 
 def test_add_concentration_error():
+    """Test concentration validation errors."""
     distribution = np.array([[1.0, 2.0]], dtype=np.float64)
     concentration = np.array([2.0], dtype=np.float64)
     with pytest.raises(ValueError):
@@ -127,6 +136,7 @@ def test_add_concentration_error():
 
 
 def test_collide_pairs():
+    """Test pair collisions."""
     distribution = np.array(
         [[100, 200], [300, 400], [500, 600], [700, 800]], dtype=np.float64
     )
