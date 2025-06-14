@@ -55,6 +55,42 @@ conda install -c conda-forge particula
 
 If you are new to Python or plan on going through the Examples, head to [Setup Particula](Examples/Setup_Particula/index.md) for more comprehensive installation instructions.
 
+### Quick Start Example
+
+Below is a minimal script demonstrating how to build an aerosol and run a single condensation step. Save it as `quick_start.py` and execute with `python quick_start.py`.
+
+```python
+import numpy as np
+import particula as par
+
+water = par.gas.GasSpecies(
+    name="H2O",
+    molar_mass=18.015e-3,
+    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(2330),
+    partitioning=True,
+    concentration=1e-4,
+)
+
+atm = par.gas.Atmosphere(
+    temperature=298.15,
+    total_pressure=101325,
+    partitioning_species=water,
+)
+
+particle = (
+    par.particles.PresetParticleRadiusBuilder()
+    .set_mode(np.array([100e-9]), "m")
+    .set_geometric_standard_deviation(np.array([1.2]))
+    .set_number_concentration(np.array([1e8]), "1/m^3")
+    .set_density(1e3, "kg/m^3")
+    .build()
+)
+
+aerosol = par.Aerosol(atmosphere=atm, particles=particle)
+process = par.dynamics.MassCondensation(par.dynamics.CondensationIsothermal(0.018))
+print(process.execute(aerosol, 10.0))
+```
+
 ---
 
 ## Join the Community
