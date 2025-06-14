@@ -1,7 +1,9 @@
 """Test to make sure the partitioning can run, does not test the results."""
 
 import numpy as np
-from particula.activity import species_density
+from particula.particles.properties.organic_density_module import (
+    get_organic_density_array,
+)
 from particula.equilibria import partitioning
 
 
@@ -15,7 +17,7 @@ def test_partitioning():
 
     water_activity_desired = np.array([0.8])
 
-    density = species_density.organic_array(
+    density = get_organic_density_array(
         molar_mass=molar_mass,
         oxygen2carbon=oxygen2carbon,
         hydrogen2carbon=None,

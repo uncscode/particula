@@ -170,3 +170,7 @@ from particula.particles.properties.convert_size_distribution import (
     DNdlogDPtoPMFConversionStrategy,
     PMFtoPDFConversionStrategy,
 )
+from particula.particles.properties.organic_density_module import (
+    get_organic_density_estimate,
+    get_organic_density_array,
+)
