@@ -54,8 +54,8 @@ class MassBasedMovingBin(DistributionStrategy):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        if (distribution.shape != added_distribution.shape) and (
-            np.allclose(distribution, added_distribution, rtol=1e-6)
+        if (distribution.shape != added_distribution.shape) or (
+            not np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
             message = (
                 "When adding concentration to MassBasedMovingBin, the distribution "
