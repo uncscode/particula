@@ -53,7 +53,7 @@ def _broadcast_weights(
 
     if weights.ndim == 2:
         if weights.shape == (n_species, n_bins):
-            weights = weights.T                               # transposed input
+            weights = weights.T  # transposed input
         # (a) single-bin weights → broadcast to all bins
         if weights.shape == (1, n_species) and n_bins > 1:
             weights = np.tile(weights, (n_bins, 1))
@@ -99,17 +99,17 @@ def _weighted_average_by_phase(
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
-    weights = _broadcast_weights(np.asarray(weights, dtype=np.float64),
-                                 values.shape)
+    weights = _broadcast_weights(
+        np.asarray(weights, dtype=np.float64), values.shape
+    )
 
-    n_bins, _ = values.shape
     averaged = np.empty_like(values)
 
     # --- do weight-averaging phase-by-phase -------------------------------
     for phase in np.unique(phase_index):
-        species_mask = phase_index == phase            # (n_species,)
-        w_phase = weights[:, species_mask]             # (n_bins, n_sp_phase)
-        w_sum = w_phase.sum(axis=1, keepdims=True)     # (n_bins, 1)
+        species_mask = phase_index == phase  # (n_species,)
+        w_phase = weights[:, species_mask]  # (n_bins, n_sp_phase)
+        w_sum = w_phase.sum(axis=1, keepdims=True)  # (n_bins, 1)
 
         # bins where ∑w ≠ 0  -> weighted average
         weighted_num = (values[:, species_mask] * w_phase).sum(axis=1)
@@ -117,7 +117,7 @@ def _weighted_average_by_phase(
             weighted_avg = np.where(
                 w_sum.squeeze() != 0,
                 weighted_num / w_sum.squeeze(),
-                np.nan,                                   # placeholder
+                np.nan,  # placeholder
             )
 
         # bins where ∑w == 0  -> simple (un-weighted) mean
@@ -164,9 +164,7 @@ class SurfaceStrategy(ABC):
         """
 
     @abstractmethod
-    def get_density(
-        self
-    ) -> Union[float, NDArray[np.float64]]:
+    def get_density(self) -> Union[float, NDArray[np.float64]]:
         """
         Get density of the species mixture.
 
@@ -284,9 +282,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
             self.phase_index,
         )
 
-    def get_density(
-        self
-    ) -> Union[float, NDArray[np.float64]]:
+    def get_density(self) -> Union[float, NDArray[np.float64]]:
         return self.density
 
 
@@ -333,9 +329,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
             self.phase_index,
         )
 
-    def get_density(
-        self
-    ) -> Union[float, NDArray[np.float64]]:
+    def get_density(self) -> Union[float, NDArray[np.float64]]:
         return self.density
 
 
@@ -381,7 +375,5 @@ class SurfaceStrategyVolume(SurfaceStrategy):
             self.phase_index,
         )
 
-    def get_density(
-        self
-    ) -> Union[float, NDArray[np.float64]]:
+    def get_density(self) -> Union[float, NDArray[np.float64]]:
         return self.density
