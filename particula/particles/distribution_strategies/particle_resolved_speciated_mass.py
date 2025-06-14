@@ -42,7 +42,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             volumes = np.sum(distribution / density, axis=1)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
-    def add_mass(
+    def add_mass(  # pylint: disable=R0801
         self,
         distribution: NDArray[np.float64],
         concentration: NDArray[np.float64],
@@ -76,10 +76,12 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         rescaled = False
         if np.all(added_concentration == 1):
             rescaled = True
-        if np.allclose(added_concentration, np.max(concentration), atol=1e-2) or np.all(
+        max_concentration = np.max(concentration)
+        if np.allclose(added_concentration, max_concentration, atol=1e-2) or np.all(
             concentration == 0
         ):
-            added_concentration = added_concentration / np.max(concentration)
+            if max_concentration > 0:
+                added_concentration = added_concentration / max_concentration
             rescaled = True
         if not rescaled:
             message = (
@@ -96,7 +98,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             where=concentration != 0,
         )
 
-        empty_bins = np.flatnonzero(np.all(concentration == 0))
+        empty_bins = np.flatnonzero(concentration == 0)
         empty_bins_count = len(empty_bins)
         added_bins_count = len(added_concentration)
         if empty_bins_count >= added_bins_count:
