@@ -1,0 +1,21 @@
+{% if page.nb_url %}
+  <div class="md-content__button-row" style="margin-bottom: 1rem;">
+      <a href="https://colab.research.google.com/github/uncscode/particula/blob/main/docs/{{ page.file.src_path }}"
+         title="Open in Google Colab"
+         aria-label="Open this notebook in Google Colab"
+         class="md-content__button md-icon"
+         target="_blank" rel="noopener noreferrer">
+          {% include ".icons/material/open-in-new.svg" %}
+          Colab
+      </a>
+      <a href="{{ page.nb_url }}"
+         title="Download Notebook"
+         class="md-content__button md-icon"
+         target="_blank" rel="noopener noreferrer">
+          {% include ".icons/material/download.svg" %}
+          Notebook
+      </a>
+  </div>
+{% endif %}
+
+{{ super() }}
