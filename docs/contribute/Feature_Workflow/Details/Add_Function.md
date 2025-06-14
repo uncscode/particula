@@ -7,7 +7,7 @@ Create or update a module under particula/<area>/.
 ## Checklist
 
 * Python – no I/O or global state changes.
-* Follow [Code Specifications](../Code_Specifications/index.md) for formatting.
+* Follow [Code Specifications](../../Code_Specifications/index.md) for formatting.
 * Input validation via util.validate_inputs when applicable.
 * Logging: use `logger = logging.getLogger("particula")` and log at DEBUG.
 
