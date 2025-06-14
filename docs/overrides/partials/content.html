@@ -1,0 +1,12 @@
+{# Extend the original template #}
+{% extends "material/partials/content.html" %}
+
+{# The parent template puts buttons in a “buttons” block.
+   Completely override (empty) so nothing renders at the top. #}
+{% block buttons %}{% endblock %}
+
+{# OPTIONAL: add the buttons back at the very bottom of the page #}
+{% block footer %}
+  {{ super() }}          {# keep the default footer first #}
+  {% include "partials/colab_buttons.html" %}
+{% endblock %}

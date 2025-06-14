@@ -1,0 +1,19 @@
+{# Colab / Notebook links – used from ToC and page footer #}
+{% if page.nb_url %}
+  <div class="md-content__button-row" style="margin: 0.5rem 0 1rem;">
+    <a href="https://colab.research.google.com/github/uncscode/particula/blob/main/docs/{{ page.file.src_path }}"
+       class="md-content__button md-icon"
+       title="Open in Google Colab" aria-label="Open in Google Colab"
+       target="_blank" rel="noopener noreferrer">
+      {% include ".icons/material/open-in-new.svg" %}
+      Colab
+    </a>
+    <a href="{{ page.nb_url }}"
+       class="md-content__button md-icon"
+       title="Download Notebook" aria-label="Download Notebook"
+       target="_blank" rel="noopener noreferrer">
+      {% include ".icons/material/download.svg" %}
+      Notebook
+    </a>
+  </div>
+{% endif %}
