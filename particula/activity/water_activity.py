@@ -17,7 +17,9 @@ from particula.activity.bat_coefficients import (
     INTERPOLATE_WATER_FIT,
 )
 from particula.activity.activity_coefficients import bat_activity_coefficients
-from particula.activity.species_density import organic_density_estimate
+from particula.particles.properties.organic_density_module import (
+    get_organic_density_estimate,
+)
 from particula.activity import phase_separation
 
 
@@ -58,7 +60,7 @@ def biphasic_water_activity_point(
     mole_frac = np.logspace(-6, 0, interpolate_step_numb + 1)
 
     for i, _ in enumerate(oxygen2carbon):
-        density = organic_density_estimate(
+        density = get_organic_density_estimate(
             molar_mass_ratio[i],
             oxygen2carbon[i],
             hydrogen2carbon[i],
