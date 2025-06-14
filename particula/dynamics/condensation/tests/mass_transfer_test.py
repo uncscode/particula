@@ -403,3 +403,48 @@ def test_radius_transfer_rate():
     expected_result = np.array([7.95774715e-14, 0])  # m/s
     result = get_radius_transfer_rate(mass_rate, radius, density)
     np.testing.assert_allclose(result, expected_result, atol=1e-8)
+
+
+def test_mixed_condensation_and_evaporation_inventory_limit():
+    """
+    Mixed-sign fluxes: one bin condenses while another evaporates.
+    Only the *condensation* part must be down–scaled to respect the
+    limited gas reservoir; the evaporation part must remain untouched
+    except for the usual per-bin inventory clip.
+    """
+    # ───── scenario ───────────────────────────────────────────────
+    # 2 size bins, 1 condensable species
+    mass_rate = np.array([0.3, -0.1])       # kg s⁻¹  (+ condense, − evaporate)
+    time_step = 10.0                        # s
+    gas_mass = np.array([1.0])              # kg  (scarce → scaling expected)
+    particle_mass = np.array([0.5, 0.5])    # kg per particle
+    particle_conc = np.array([1.0, 1.0])    # # m⁻³
+
+    # ───── manual expectation ────────────────────────────────────
+    requested = mass_rate * time_step * particle_conc        # [+3.0, −1.0]
+    positive_sum = requested[requested > 0.0].sum()          # 3.0
+    negative_sum = requested[requested < 0.0].sum()          # −1.0
+
+    # scale *only* the condensation so that the column net equals gas_mass
+    if positive_sum + negative_sum > gas_mass[0]:
+        cond_scale = (gas_mass[0] - negative_sum) / positive_sum
+    else:
+        cond_scale = 1.0
+
+    expected = np.where(requested > 0.0, requested * cond_scale, requested)
+
+    # per-bin evaporation cannot exceed its inventory
+    per_bin_limit = -particle_mass * particle_conc            # [−0.5, −0.5]
+    expected = np.maximum(expected, per_bin_limit)
+
+    # ───── routine under test ────────────────────────────────────
+    result = get_mass_transfer_of_single_species(
+        mass_rate=mass_rate,
+        time_step=time_step,
+        gas_mass=gas_mass,
+        particle_mass=particle_mass,
+        particle_concentration=particle_conc,
+    )
+
+    # ───── assertions ────────────────────────────────────────────
+    np.testing.assert_allclose(result, expected, rtol=1e-12, atol=1e-12)

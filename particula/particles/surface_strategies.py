@@ -22,6 +22,57 @@ from particula.particles.properties.kelvin_effect_module import (
 )
 
 
+def _as_2d(array: NDArray[np.float64]) -> tuple[NDArray[np.float64], bool]:
+    """
+    Promote *array* to 2-D (n_bins, n_species).
+
+    Returns
+    -------
+    arr2d : the reshaped array
+    was_1d : True if the original input was 1-D (hence single-bin)
+    """
+    if array.ndim == 1:
+        return array[np.newaxis, :], True
+    if array.ndim != 2:
+        raise ValueError("`values` must be 1-D or 2-D")
+    return array, False
+
+
+def _broadcast_weights(
+    weights: NDArray[np.float64], target_shape: tuple[int, int]
+) -> NDArray[np.float64]:
+    """
+    Return *weights* with shape exactly equal to *target_shape*
+    (n_bins, n_species).  Accepts 1-D (n_species,) or 2-D inputs.
+    """
+    n_bins, n_species = target_shape
+    if weights.ndim == 1:
+        if weights.size != n_species:
+            raise ValueError("weights size must equal number of species")
+        return np.tile(weights, (n_bins, 1))
+
+    if weights.ndim == 2:
+        if weights.shape == (n_species, n_bins):
+            weights = weights.T                               # transposed input
+        # (a) single-bin weights → broadcast to all bins
+        if weights.shape == (1, n_species) and n_bins > 1:
+            weights = np.tile(weights, (n_bins, 1))
+
+        # (b) multi-bin weights with single-bin target → collapse by averaging
+        elif n_bins == 1 and weights.shape[0] > 1:
+            weights = weights.mean(axis=0, keepdims=True)
+
+        # (c) after the above adjustments the shape must match
+        if weights.shape != (n_bins, n_species):
+            raise ValueError(
+                f"weights must have shape ({n_bins}, {n_species}) "
+                f"after broadcasting/collapsing, but has shape {weights.shape}"
+            )
+        return weights
+
+    raise ValueError("weights must be 1-D or 2-D")
+
+
 def _weighted_average_by_phase(
     values: NDArray[np.float64],
     weights: NDArray[np.float64],
@@ -35,25 +86,52 @@ def _weighted_average_by_phase(
     computed and broadcast back onto all members of that phase.
 
     Arguments:
-        - values : Array of values to be averaged, shape (n_species,).
+        - values : Array of values, shape (n_bins, n_species) or (n_species,)
         - weights : Array of weights corresponding to each species, shape
-          (n_species,).
+          (n_species,) **or** (n_bins, n_species).  A 1-D array is broadcast
+          across the n_bins axis.
         - phase_index : Array indicating the phase index for each species,
           shape (n_species,).
 
     Returns:
-        - averaged : Array of averaged values, shape (n_species,).
+        - averaged : Array of averaged values, same shape as *values* input.
+          If the weight sum for a bin/phase is zero the arithmetic mean is used.
     """
-    averaged = np.zeros_like(values, dtype=np.float64)
-    for ph in np.unique(phase_index):
-        mask = phase_index == ph
-        if weights[mask].sum() != 0:
-            phase_weights = weights[mask] / weights[mask].sum()
-        else:
-            phase_weights = weights[mask]
-        averaged_value = np.sum(values[mask] * phase_weights, dtype=np.float64)
-        averaged[mask] = averaged_value
-    return averaged
+    # --- normalise shapes -------------------------------------------------
+    values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
+    weights = _broadcast_weights(np.asarray(weights, dtype=np.float64),
+                                 values.shape)
+
+    n_bins, _ = values.shape
+    averaged = np.empty_like(values)
+
+    # --- do weight-averaging phase-by-phase -------------------------------
+    for phase in np.unique(phase_index):
+        species_mask = phase_index == phase            # (n_species,)
+        w_phase = weights[:, species_mask]             # (n_bins, n_sp_phase)
+        w_sum = w_phase.sum(axis=1, keepdims=True)     # (n_bins, 1)
+
+        # bins where ∑w ≠ 0  -> weighted average
+        weighted_num = (values[:, species_mask] * w_phase).sum(axis=1)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            weighted_avg = np.where(
+                w_sum.squeeze() != 0,
+                weighted_num / w_sum.squeeze(),
+                np.nan,                                   # placeholder
+            )
+
+        # bins where ∑w == 0  -> simple (un-weighted) mean
+        if np.isnan(weighted_avg).any():
+            unweighted_avg = values[:, species_mask].mean(axis=1)
+            weighted_avg = np.where(
+                np.isnan(weighted_avg), unweighted_avg, weighted_avg
+            )
+
+        # broadcast result back on all members of the current phase
+        averaged[:, species_mask] = weighted_avg[:, np.newaxis]
+
+    # --- restore caller's dimensionality ---------------------------------
+    return averaged[0] if return_1d else averaged
 
 
 class SurfaceStrategy(ABC):

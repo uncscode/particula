@@ -7,6 +7,8 @@ from particula.particles.surface_strategies import (
     SurfaceStrategyMolar,
     SurfaceStrategyVolume,
     _weighted_average_by_phase,
+    _as_2d,
+    _broadcast_weights,
 )
 
 
@@ -261,4 +263,86 @@ def test_weighted_average_by_phase_helper():
     np.testing.assert_allclose(
         _weighted_average_by_phase(vals, wts, phases),
         expected,
+    )
+
+
+def test_helper_shape_management():
+    """Validate _as_2d and _broadcast_weights helper behaviour."""
+    # ----- _as_2d ----------------------------------------------------------
+    vec = np.array([1.0, 2.0, 3.0])
+    mat, flag = _as_2d(vec)
+    assert flag is True
+    assert mat.shape == (1, 3)
+    mat2, flag2 = _as_2d(mat)
+    assert flag2 is False
+    assert mat2 is mat                       # returns the same object
+
+    # ----- _broadcast_weights ---------------------------------------------
+    target_shape = (4, 3)
+    # (a) 1-D weights  -> broadcast
+    w1 = np.array([1.0, 1.0, 1.0])
+    w1b = _broadcast_weights(w1, target_shape)
+    assert w1b.shape == target_shape
+    assert np.all(w1b == 1.0)
+
+    # (b) single-row 2-D weights -> broadcast
+    w2 = np.array([[2.0, 2.0, 2.0]])         # (1,3)
+    w2b = _broadcast_weights(w2, target_shape)
+    assert np.all(w2b == 2.0)
+
+    # (c) already-matching 2-D weights returned unchanged
+    w3 = np.arange(12, dtype=float).reshape(4, 3)
+    w3b = _broadcast_weights(w3, target_shape)
+    assert np.array_equal(w3b, w3)
+
+
+def test_weighted_average_by_phase_multi_bin():
+    """Check _weighted_average_by_phase for n_bins=4, n_species=3."""
+    # ----------------------- set up input ---------------------------------
+    values = np.array(
+        [
+            [1.0, 10.0, 2.0],
+            [3.0, 20.0, 6.0],
+            [5.0, 30.0, 10.0],
+            [7.0, 40.0, 14.0],
+        ]
+    )                                          # (4,3)
+    weights_1d = np.array([1.0, 1.0, 1.0])     # broadcast case
+    phase_idx = np.array([1, 0, 1])            # species 0&2 phase-1, species 1 phase-0
+
+    # ---------------------- expected result -------------------------------
+    # phase-0 average = value of species-1
+    # phase-1 average = mean(values[:,0], values[:,2])  (equal weights)
+    expected = np.array(
+        [
+            [1.5, 10.0, 1.5],
+            [4.5, 20.0, 4.5],
+            [7.5, 30.0, 7.5],
+            [10.5, 40.0, 10.5],
+        ]
+    )
+
+    # -------------------- execute & assertions ----------------------------
+    out1 = _weighted_average_by_phase(values, weights_1d, phase_idx)
+    np.testing.assert_allclose(out1, expected)
+
+    # also test when weights are provided already 2-D ----------------------
+    weights_2d = np.tile(weights_1d, (4, 1))   # (4,3)
+    out2 = _weighted_average_by_phase(values, weights_2d, phase_idx)
+    np.testing.assert_allclose(out2, expected)
+
+
+def test_weighted_average_by_phase_zero_weight_fallback():
+    """When all weights in a phase are zero, fall back to un-weighted mean."""
+    # single bin, two species, same phase
+    vals = np.array([2.0, 6.0])          # (n_species,)
+    wts = np.array([0.0, 0.0])           # all zeros
+    phase = np.array([0, 0])             # single phase
+
+    # expected: mean of values for every species
+    exp = np.array([4.0, 4.0])           # arithmetic mean of 2 & 6
+
+    np.testing.assert_allclose(
+        _weighted_average_by_phase(vals, wts, phase),
+        exp,
     )

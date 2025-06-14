@@ -21,6 +21,15 @@ Examples:
 from abc import ABC, abstractmethod
 from typing import Any
 
+# Check if tqdm is available for progress bars
+try:
+    from tqdm import tqdm
+except ImportError:
+    AVAILABLE_TQDM = False
+else:
+    AVAILABLE_TQDM = True
+
+
 from particula.aerosol import Aerosol
 
 
@@ -194,7 +203,17 @@ class RunnableSequence:
             ```
         """
         sub_step_time_step = time_step / sub_steps
-        for _ in range(sub_steps):
+        # If tqdm is available, wrap the process loop in a progress bar
+        loop_iterator = (
+            range(sub_steps)
+            if not AVAILABLE_TQDM
+            else tqdm(
+                range(sub_steps),
+                desc="Executing Runnable",
+                mininterval=0.5,
+                )
+        )
+        for _ in loop_iterator:
             # loop over each process in the sequence
             for process in self.processes:
                 aerosol = process.execute(
