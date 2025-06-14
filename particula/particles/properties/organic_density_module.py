@@ -32,16 +32,15 @@ def get_organic_density_estimate(
 
     The original paper proposes an empirical two-step approach:
 
-    1.  Base density (ρ₀) is obtained from  
-        ρ₀ = M / (5 · n_C · (2 + H:C + 2 · O:C + 2 · N:C)) [g cm⁻³]
+    1.  Base density (ρ₀) is obtained from
+        ρ₀ = M / (5 · n_C · (2 + H:C + 2 · O:C + 2 · N:C)) #[g cm⁻³]
 
-    2.  A polar-functional correction is applied:  
+    2.  A polar-functional correction is applied:
         ρ = ρ₀ × [1 + min(0.1 · n_C · (O:C + N:C), 0.3)]
 
-        where  
-        –  M is the molar mass [g mol⁻¹]  
-        –  n_C is the number of carbon atoms in the molecule  
-        –  H:C, O:C, N:C are atomic ratios.
+        -  M is the molar mass [g mol⁻¹]
+        -  n_C is the number of carbon atoms in the molecule
+        -  H:C, O:C, N:C are atomic ratios.
 
     Arguments:
         - molar_mass : Molar mass of the compound in g mol⁻¹. If
@@ -52,14 +51,15 @@ def get_organic_density_estimate(
           ``None``) to assume H:C = 2 − O:C as suggested by Girolami.
         - nitrogen2carbon : Atomic N:C ratio.  ``None`` defaults to 0.
         - mass_ratio_convert : If ``True`` convert ``molar_mass`` from a mass
-          ratio to molar mass using ``particula.activity.ratio.from_molar_mass_ratio``.
+          ratio to molar mass using
+          ``particula.activity.ratio.from_molar_mass_ratio``.
 
     Returns:
         - Estimated density of the compound in kg m⁻³.
 
     Examples:
         ```py title="Single compound"
-        from particula.particles.properties.organic_density_module import (
+        from particula.particles import (
             get_organic_density_estimate,
         )
 
@@ -70,9 +70,9 @@ def get_organic_density_estimate(
         ```
 
     References:
-        - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating
-          the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.
-          Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962
+    - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating
+        the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.
+        Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962
     """
     if nitrogen2carbon is None:
         nitrogen2carbon = oxygen2carbon * 0
@@ -140,7 +140,7 @@ def get_organic_density_array(
     Examples:
         ```py title="Batch calculation"
         import numpy as np
-        from particula.particles.properties.organic_density_module import (
+        from particula.particles import (
             get_organic_density_array,
         )
 
@@ -151,11 +151,24 @@ def get_organic_density_array(
         rho = get_organic_density_array(mm, oc, hc)
         print(np.round(rho, 0))  # array([1560., 1210.])
         ```
+
+    References:
+    - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating
+        the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.
+        Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962
     """
     mm = np.asarray(molar_mass, dtype=float)
     oc = np.asarray(oxygen2carbon, dtype=float)
-    hc = None if hydrogen2carbon is None else np.asarray(hydrogen2carbon, dtype=float)
-    nc = None if nitrogen2carbon is None else np.asarray(nitrogen2carbon, dtype=float)
+    hc = (
+        None
+        if hydrogen2carbon is None
+        else np.asarray(hydrogen2carbon, dtype=float)
+    )
+    nc = (
+        None
+        if nitrogen2carbon is None
+        else np.asarray(nitrogen2carbon, dtype=float)
+    )
     density = np.empty(mm.shape, dtype=float)
     for i, molar in enumerate(mm):
         hc_run = None if hc is None else hc[i]
