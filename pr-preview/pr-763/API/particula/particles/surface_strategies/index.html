@@ -10122,13 +10122,13 @@ and the Kelvin effect in particulate phases.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="surfacestrategyget_name">SurfaceStrategy().get_name<a class="headerlink" href="#surfacestrategyget_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L177">Show source in surface_strategies.py:177</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L175">Show source in surface_strategies.py:175</a></p>
 <p>Return the type of the surface strategy.</p>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="surfacestrategykelvin_radius">SurfaceStrategy().kelvin_radius<a class="headerlink" href="#surfacestrategykelvin_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L181">Show source in surface_strategies.py:181</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L179">Show source in surface_strategies.py:179</a></p>
 <p>Calculate the Kelvin radius, which sets the curvature effect on vapor
 pressure.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
@@ -10155,7 +10155,7 @@ pressure.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="surfacestrategykelvin_term">SurfaceStrategy().kelvin_term<a class="headerlink" href="#surfacestrategykelvin_term" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L210">Show source in surface_strategies.py:210</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L208">Show source in surface_strategies.py:208</a></p>
 <p>Calculate the exponential Kelvin term that adjusts vapor pressure.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -10183,7 +10183,7 @@ pressure.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="surfacestrategymass">SurfaceStrategyMass<a class="headerlink" href="#surfacestrategymass" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L293">Show source in surface_strategies.py:293</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L289">Show source in surface_strategies.py:289</a></p>
 <p>Surface tension and density based on mass-fraction weighting.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
@@ -10211,19 +10211,19 @@ pressure.</p>
 <li><a href="#surfacestrategy">SurfaceStrategy</a></li>
 </ul>
 <h3 id="surfacestrategymasseffective_surface_tension">SurfaceStrategyMass().effective_surface_tension<a class="headerlink" href="#surfacestrategymasseffective_surface_tension" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L320">Show source in surface_strategies.py:320</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L316">Show source in surface_strategies.py:316</a></p>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">effective_surface_tension</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="surfacestrategymassget_density">SurfaceStrategyMass().get_density<a class="headerlink" href="#surfacestrategymassget_density" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L336">Show source in surface_strategies.py:336</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L332">Show source in surface_strategies.py:332</a></p>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="surfacestrategymolar">SurfaceStrategyMolar<a class="headerlink" href="#surfacestrategymolar" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L240">Show source in surface_strategies.py:240</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L238">Show source in surface_strategies.py:238</a></p>
 <p>Surface tension and density based on mole-fraction weighting.</p>
 <h4 id="attributes_1">Attributes<a class="headerlink" href="#attributes_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -10253,19 +10253,19 @@ pressure.</p>
 <li><a href="#surfacestrategy">SurfaceStrategy</a></li>
 </ul>
 <h3 id="surfacestrategymolareffective_surface_tension">SurfaceStrategyMolar().effective_surface_tension<a class="headerlink" href="#surfacestrategymolareffective_surface_tension" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L270">Show source in surface_strategies.py:270</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L268">Show source in surface_strategies.py:268</a></p>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">effective_surface_tension</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="surfacestrategymolarget_density">SurfaceStrategyMolar().get_density<a class="headerlink" href="#surfacestrategymolarget_density" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L287">Show source in surface_strategies.py:287</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L285">Show source in surface_strategies.py:285</a></p>
 <h4 id="signature_11">Signature<a class="headerlink" href="#signature_11" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="surfacestrategyvolume">SurfaceStrategyVolume<a class="headerlink" href="#surfacestrategyvolume" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L342">Show source in surface_strategies.py:342</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L336">Show source in surface_strategies.py:336</a></p>
 <p>Surface tension and density based on volume-fraction weighting.</p>
 <h4 id="attributes_2">Attributes<a class="headerlink" href="#attributes_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -10293,14 +10293,14 @@ pressure.</p>
 <li><a href="#surfacestrategy">SurfaceStrategy</a></li>
 </ul>
 <h3 id="surfacestrategyvolumeeffective_surface_tension">SurfaceStrategyVolume().effective_surface_tension<a class="headerlink" href="#surfacestrategyvolumeeffective_surface_tension" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L369">Show source in surface_strategies.py:369</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L363">Show source in surface_strategies.py:363</a></p>
 <h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">effective_surface_tension</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="surfacestrategyvolumeget_density">SurfaceStrategyVolume().get_density<a class="headerlink" href="#surfacestrategyvolumeget_density" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L384">Show source in surface_strategies.py:384</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L378">Show source in surface_strategies.py:378</a></p>
 <h4 id="signature_14">Signature<a class="headerlink" href="#signature_14" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
