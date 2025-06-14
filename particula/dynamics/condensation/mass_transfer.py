@@ -363,21 +363,24 @@ def get_mass_transfer_of_single_species(
     """
     # 1. requested mass change ( + = condensation , - = evaporation )
     mass_to_change = mass_rate * time_step * particle_concentration
-    total_requested_mass = mass_to_change.sum()
 
-    # 2. Condensation – keep Σ ≤ gas_mass
-    if total_requested_mass > gas_mass.item():
-        scale = gas_mass.item() / total_requested_mass
-        mass_to_change *= scale
+    # ------------------------------------------------------------------
+    # 2.  Separate condensation (+) and evaporation (−) contributions
+    # ------------------------------------------------------------------
+    positive_sum = mass_to_change[mass_to_change > 0.0].sum()  # Σ cond
+    negative_sum = mass_to_change[mass_to_change < 0.0].sum()  # Σ evap (<0)
 
-    # 3. Evaporation – keep Σ ≤ total particle inventory
+    # ---- condensation reservoir limit (gas_mass) ---------------------
+    if positive_sum > 0.0 and positive_sum + negative_sum > gas_mass.item():
+        cond_scale = (gas_mass.item() - negative_sum) / positive_sum
+        cond_scale = max(cond_scale, 0.0)  # numerical safety
+        mass_to_change[mass_to_change > 0.0] *= cond_scale  # scale only +
+
+    # ---- evaporation inventory limit (particle mass) -----------------
     total_particle_mass = (particle_mass * particle_concentration).sum()
-    if (
-        total_requested_mass < 0.0
-        and -total_requested_mass > total_particle_mass
-    ):
-        scale = total_particle_mass / -total_requested_mass
-        mass_to_change *= scale
+    if negative_sum < 0.0 and -negative_sum > total_particle_mass:
+        evap_scale = total_particle_mass / (-negative_sum)
+        mass_to_change[mass_to_change < 0.0] *= evap_scale  # scale only −
 
     # 4. Per-bin evaporation limit (no bin can evaporate more than it owns)
     per_bin_evap_limit = -particle_mass * particle_concentration
@@ -448,32 +451,42 @@ def get_mass_transfer_of_multiple_species(
     mass_to_change = (
         mass_rate * time_step * particle_concentration[:, np.newaxis]
     )
-    total_requested_mass = mass_to_change.sum(axis=0)
 
-    # 2.  Condensation: keep Σ ≤ gas_mass
-    species_scale = np.ones_like(total_requested_mass)
-    np.divide(
-        gas_mass,
-        total_requested_mass,
-        out=species_scale,
-        where=total_requested_mass > gas_mass,  # scale only when necessary
+    # ------------------------------------------------------------------
+    # 2.  Separate condensation (+) and evaporation (−) per species
+    # ------------------------------------------------------------------
+    pos_mask = mass_to_change > 0.0
+    neg_mask = mass_to_change < 0.0
+
+    cond_sum = np.where(pos_mask, mass_to_change, 0.0).sum(
+        axis=0
+    )  # Σ cond (≥0)
+    evap_sum = np.where(neg_mask, mass_to_change, 0.0).sum(
+        axis=0
+    )  # Σ evap (≤0)
+
+    # ---- condensation reservoir limit (gas_mass) ---------------------
+    cond_scale = np.ones_like(cond_sum)
+    need_cond_scale = (cond_sum > 0.0) & (cond_sum + evap_sum > gas_mass)
+    cond_scale[need_cond_scale] = (
+        gas_mass[need_cond_scale] - evap_sum[need_cond_scale]
+    ) / cond_sum[need_cond_scale]
+    cond_scale = np.clip(cond_scale, 0.0, 1.0)  # safety
+    mass_to_change = np.where(
+        pos_mask, mass_to_change * cond_scale, mass_to_change
     )
-    mass_to_change *= species_scale  # broadcast along particle axis
 
-    # 3.  Evaporation: keep Σ ≤ total particle inventory
-    total_particle_mass = (
-        particle_mass * particle_concentration[:, np.newaxis]
-    ).sum(axis=0)
+    # ---- evaporation inventory limit (particle mass) -----------------
+    inventory = (particle_mass * particle_concentration[:, None]).sum(axis=0)
 
-    evap_mask = total_requested_mass < 0.0
-    evap_scale = np.ones_like(total_requested_mass)
-    np.divide(
-        total_particle_mass,
-        -total_requested_mass,
-        out=evap_scale,
-        where=evap_mask & (-total_requested_mass > total_particle_mass),
+    evap_scale = np.ones_like(evap_sum)
+    need_evap_scale = -evap_sum > inventory
+    evap_scale[need_evap_scale] = inventory[need_evap_scale] / (
+        -evap_sum[need_evap_scale]
     )
-    mass_to_change *= evap_scale  # broadcast along particle axis
+    mass_to_change = np.where(
+        neg_mask, mass_to_change * evap_scale, mass_to_change
+    )
 
     # 4.  Per-bin evaporation limit (no negative particle mass)
     per_bin_evap_limit = -particle_mass * particle_concentration[:, np.newaxis]
