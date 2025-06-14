@@ -65,6 +65,6 @@ def test_quick_start_runs():
     result = process.execute(aerosol, time_step=10.0)
 
     #   The result is an Aerosol instance with updated particle properties.
-    print(result)
+    # print(result)
     # 8. Confirm the result is an Aerosol instance:
     assert isinstance(result, par.Aerosol)
