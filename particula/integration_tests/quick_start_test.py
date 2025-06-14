@@ -7,6 +7,9 @@ import particula as par
 
 
 def test_quick_start_runs():
+    """
+    Test the quick start example runs without errors.
+    """
     # 1. Build the GasSpecies for an organic vapor:
     organic = (
         par.gas.GasSpeciesBuilder()
