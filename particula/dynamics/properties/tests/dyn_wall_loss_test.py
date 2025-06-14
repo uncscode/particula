@@ -1,6 +1,7 @@
 """
 Test the wall loss functions.
 """
+# pylint: disable=R0801
 
 import numpy as np
 

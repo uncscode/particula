@@ -47,7 +47,7 @@ class MassBasedMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         return distribution + added_mass, concentration
 
-    def add_concentration(
+    def add_concentration(  # pylint: disable=R0801
         self,
         distribution: NDArray[np.float64],
         concentration: NDArray[np.float64],
