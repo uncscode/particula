@@ -19,6 +19,14 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)
 
+- __[Organic Partitioning and Coagulation](Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb)__
+
+    ---
+
+    End-to-End simulation of organic partitioning on to seed particles and coagulation.
+
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb)
+
 </div>
 
 
