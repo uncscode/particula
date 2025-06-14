@@ -31,6 +31,28 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 
 ---
 
+## Join the Community
+
+We welcome contributions from scientists, developers, and students—and anyone curious about aerosol science! Whether you’re looking to ask questions, get help, or contribute fresh ideas, you’ve come to the right place.
+
+Get more by posting on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors) using `@github-handle`.
+
+- 💬 [**Ask questions** and **get help**](https://github.com/uncscode/particula/discussions/new?category=q-a).
+- 🚀 [*Share your research*](https://github.com/uncscode/particula/discussions/new?category=show-and-tell) with the community to inspire others.
+- 📣 [*Give us feedback.*](https://github.com/uncscode/particula/discussions/new?category=feedback)
+- 🌟 **Contribute** to Particula by [*submitting pull requests*](https://github.com/uncscode/particula/pulls) or [*reporting issues*](https://github.com/uncscode/particula/issues) on GitHub.
+- 🔗 Read our [**Contributing Guide**](contribute/CONTRIBUTING.md) to learn how you can make an impact.
+
+We’re excited to collaborate with you! ✨
+
+---
+
+## Cite Particula in Your Research
+
+Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.5281/zenodo.6634653)
+
+---
+
 ## Get Started with Particula
 
 [Setup Particula](Examples/Setup_Particula/index.md){ .md-button .md-button--primary }
@@ -120,25 +142,3 @@ result = process.execute(aerosol, time_step=10.0)
 #   The result is an Aerosol instance with updated particle properties.
 print(result)
 ```
-
----
-
-## Join the Community
-
-We welcome contributions from scientists, developers, and students—and anyone curious about aerosol science! Whether you’re looking to ask questions, get help, or contribute fresh ideas, you’ve come to the right place.
-
-Get more by posting on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors) using `@github-handle`.
-
-- 💬 [**Ask questions** and **get help**](https://github.com/uncscode/particula/discussions/new?category=q-a).
-- 🚀 [*Share your research*](https://github.com/uncscode/particula/discussions/new?category=show-and-tell) with the community to inspire others.
-- 📣 [*Give us feedback.*](https://github.com/uncscode/particula/discussions/new?category=feedback)
-- 🌟 **Contribute** to Particula by [*submitting pull requests*](https://github.com/uncscode/particula/pulls) or [*reporting issues*](https://github.com/uncscode/particula/issues) on GitHub.
-- 🔗 Read our [**Contributing Guide**](contribute/CONTRIBUTING.md) to learn how you can make an impact.
-
-We’re excited to collaborate with you! ✨
-
----
-
-## Cite Particula in Your Research
-
-Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.5281/zenodo.6634653)
