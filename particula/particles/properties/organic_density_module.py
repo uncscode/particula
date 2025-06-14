@@ -55,7 +55,7 @@ def get_organic_density_estimate(
           ratio to molar mass using ``particula.activity.ratio.from_molar_mass_ratio``.
 
     Returns:
-        - Estimated density of the compound in g cm⁻³.
+        - Estimated density of the compound in kg m⁻³.
 
     Examples:
         ```py title="Single compound"
@@ -66,7 +66,7 @@ def get_organic_density_estimate(
         # Succinic acid (M = 118.09, O:C = 1, H:C = 1.333)
         rho = get_organic_density_estimate(118.09, oxygen2carbon=1.0,
                                            hydrogen2carbon=1.333)
-        print(round(rho, 2))  # 1.56
+        print(round(rho, 0))  # 1560
         ```
 
     References:
@@ -100,7 +100,7 @@ def get_organic_density_estimate(
             + nitrogen2carbon * 2.0
         )
     )
-    return rho1 * (
+    density_g_per_cm3 = rho1 * (
         1.0
         + min(
             number_carbons * oxygen2carbon * 0.1
@@ -108,6 +108,7 @@ def get_organic_density_estimate(
             0.3,
         )
     )
+    return density_g_per_cm3 * 1_000.0  # kg m⁻³
 
 
 def get_organic_density_array(
@@ -133,7 +134,7 @@ def get_organic_density_array(
         - mass_ratio_convert : Propagate conversion flag to the scalar helper.
 
     Returns:
-        - NumPy array of estimated densities in g cm⁻³ having the same shape as
+        - NumPy array of estimated densities in kg m⁻³ having the same shape as
           the input arrays.
 
     Examples:
@@ -148,7 +149,7 @@ def get_organic_density_array(
         hc  = np.array([1.333, 1.714])
 
         rho = get_organic_density_array(mm, oc, hc)
-        print(np.round(rho, 2))  # array([1.56, 1.21])
+        print(np.round(rho, 0))  # array([1560., 1210.])
         ```
     """
     mm = np.asarray(molar_mass, dtype=float)
