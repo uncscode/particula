@@ -33,6 +33,12 @@ from particula.dynamics.properties.wall_loss_coefficient import (
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
 )
+from particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder import (
+    CondensationIsothermalBuilder,
+)
+from particula.dynamics.condensation.condensation_factories import (
+    CondensationFactory,
+)
 from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_rate,
     get_first_order_mass_transport_k,
