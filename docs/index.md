@@ -63,10 +63,10 @@ Below is a minimal script demonstrating how to build an aerosol and run a single
 import numpy as np
 import particula as par
 
-water = par.gas.GasSpecies(
+organic = par.gas.GasSpecies(
     name="H2O",
-    molar_mass=18.015e-3,
-    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(2330),
+    molar_mass=180e-3,
+    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e2, "Pa"),
     partitioning=True,
     concentration=1e-4,
 )
@@ -74,7 +74,7 @@ water = par.gas.GasSpecies(
 atm = par.gas.Atmosphere(
     temperature=298.15,
     total_pressure=101325,
-    partitioning_species=water,
+    partitioning_species=organic,
 )
 
 particle = (
