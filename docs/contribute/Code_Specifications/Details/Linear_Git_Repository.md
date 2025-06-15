@@ -77,15 +77,57 @@ git push --force-with-lease
 
 ---
 
-## Troubleshooting & quick reference
+## Troubleshooting & Quick Reference
 
+### Reset, Rebase & History Repair
 | Task | Command |
 |------|---------|
-| Soft‑reset all commits since `FIRST_COMMIT_HASH` into the index | `git reset --soft FIRST_COMMIT_HASH^` |
-| Stage everything after a soft reset | `git add .` |
-| Commit staged changes | `git commit -m "Concise, present‑tense message"` |
-| Abort an in‑progress rebase | `git rebase --abort` |
-| Continue after fixing conflicts | `git rebase --continue` |
+| Soft-reset all commits since `FIRST_COMMIT_HASH` into the index | `git reset --soft FIRST_COMMIT_HASH^` |
+| Abort an in-progress rebase | `git rebase --abort` |
+| Continue after fixing conflicts in a rebase | `git rebase --continue` |
+| Amend the most recent commit | `git commit --amend` |
+| Cherry-pick a specific commit onto HEAD | `git cherry-pick <commit>` |
+| Revert (invert) a specific commit | `git revert <commit>` |
+
+### Merge & Conflict Resolution
+| Task | Command |
+|------|---------|
+| Abort an in-progress merge | `git merge --abort` |
+| Continue (finish) a merge after resolving conflicts | `git commit` |
+
+### Staging & Snapshot Creation
+| Task | Command |
+|------|---------|
+| Stage everything after a reset | `git add .` |
+| Show unstaged changes | `git diff` |
+| Show staged changes | `git diff --cached` |
+| Discard local changes in a file | `git restore <file>` |
+| Commit staged changes (concise, present-tense message) | `git commit -m "message"` |
+
+### Branch Management
+| Task | Command |
+|------|---------|
+| Create a new branch and switch to it | `git switch -c <new-branch>` |
+| Switch to an existing branch | `git switch <branch>` |
+| Delete a local branch | `git branch -d <branch>` |
+| Delete a remote branch | `git push origin --delete <branch>` |
+| Pull with rebase (linear history) | `git pull --rebase` |
+| Force-push safely (checks upstream) | `git push --force-with-lease` |
+| Fetch all refs and prune deleted branches | `git fetch --all --prune` |
+
+### Stash (Shelve) Work
+| Task | Command |
+|------|---------|
+| Stash current changes | `git stash push -m "msg"` |
+| List stashes | `git stash list` |
+| Re-apply and drop latest stash | `git stash pop` |
+
+### Clean-up & Inspection
+| Task | Command |
+|------|---------|
+| Remove untracked files & dirs | `git clean -fd` |
+| Compact one-line graph of history | `git log --oneline --graph --decorate --all` |
+
 
 ---
 
