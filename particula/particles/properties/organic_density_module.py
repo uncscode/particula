@@ -75,9 +75,9 @@ def get_organic_density_estimate(
         Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962
     """
     if nitrogen2carbon is None:
-        nitrogen2carbon = oxygen2carbon * 0
+        nitrogen2carbon = 0
     if hydrogen2carbon is None:
-        hydrogen2carbon = oxygen2carbon * 0
+        hydrogen2carbon = 0
     if mass_ratio_convert:
         molar_mass = from_molar_mass_ratio(molar_mass)
 
