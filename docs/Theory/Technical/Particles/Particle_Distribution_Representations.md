@@ -1,5 +1,13 @@
 # Strategies for Particle Distribution Representations
 
+Particula uses several strategies to represent particle distributions, each with its own mathematical framework and physical interpretation. These strategies are designed to handle processes like condensation, evaporation, and particle growth while maintaining the integrity of the distribution. Below are detailed descriptions of the different strategies.
+
+> Note: The most used strategy (and therefore most tested by users) is the **Particle Resolved Speciated Mass** strategy, which is the most flexible and accurate for representing complex aerosol dynamics. The other strategies are useful in specific contexts.
+
+## Table of Variables
+| Variable | Description |
+
+
 ## Mass-Based Moving Bin Strategy
 
 The **Mass-Based Moving Bin** representation treats each bin as characterized by a **particle mass**. In this strategy, the distribution array stores a mass value $m_i$ for each bin (representing the mass of a single particle in that bin), and a corresponding number concentration $C_i$ (number of particles in the bin). Physically, this means all particles in bin *i* are assumed to have the same mass $m_i$, and their total mass is $m_i \times C_i$. This moving-bin approach adjusts the bin’s mass coordinate whenever mass is added, rather than shifting particles between bins.
