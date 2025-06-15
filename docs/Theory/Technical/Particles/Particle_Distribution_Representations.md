@@ -8,34 +8,34 @@ Particula uses several strategies to represent particle distributions, each with
 
 | Variable | Description |
 | :--: | --- |
-| $m_i$ | Mass of a single particle in bin $i$ |
-| $C_i$ | Number concentration of particles in bin $i$ (particles m$^{-3}$) |
-| $V_i$ | Volume of a single particle in bin $i$ |
-| $r_i$ | Radius of a single particle in bin $i$ |
-| $\rho$ | Bulk material density of the particles |
+| $C_i$            | Number concentration of particles in bin $i$ (particles m$^{-3}$) |
+| $C_k$            | Number concentration (weight) represented by particle $k$ |
+| $\Delta C_i$     | Increment in number concentration for bin $i$ |
+| $f(x,t)$         | Particle number distribution function with respect to $x$ |
+| $G(x,t)$         | Growth rate $dx/dt$ at coordinate $x$ and time $t$ |
 | $M_{\text{tot}}$ | Total aerosol mass ($\sum_i m_i C_i$) |
-| $\Delta m_i$ | Mass gained per particle in bin $i$ |
-| $\Delta M_i$ | Total mass added to bin $i$ (all particles combined) |
-| $\Delta C_i$ | Increment in number concentration for bin $i$ |
-| $m_{i,j}$ | Mass of species $j$ in a particle of bin $i$ |
-| $\rho_j$ | Density of species $j$ |
-| $V_{i,j}$ | Volume of species $j$ in a particle of bin $i$ |
-| $m_i^{\text{total}}$ | Total mass of a particle in bin $i$ ($\sum_j m_{i,j}$) |
-| $\mathbf{m}_i$ | Vector of species masses in a particle of bin $i$ |
+| $\Delta M_i$     | Total mass added to bin $i$ (all particles combined) |
+| $\Delta M_b$     | Total mass added to bin $b$ |
 | $\Delta \mathbf{M}_i$ | Vector of species mass added to bin $i$ |
-| $m_b$ | Characteristic mass defining fixed bin $b$ |
-| $N_b$ | Number of particles in fixed bin $b$ |
-| $\Delta M_b$ | Total mass added to bin $b$ |
-| $\Delta N_b$ | Number of new particles created in bin $b$ (grow-in-place) |
-| $x$ | Generic size coordinate (mass or radius) in continuous formulation |
-| $f(x,t)$ | Particle number distribution function with respect to $x$ |
-| $G(x,t)$ | Growth rate $dx/dt$ at coordinate $x$ and time $t$ |
-| $S$ | Number of chemical species tracked |
-| $\mathbf{m}_k$ | Vector of species masses in individual particle $k$ |
-| $m_{k,j}$ | Mass of species $j$ in particle $k$ |
-| $C_k$ | Number concentration (weight) represented by particle $k$ |
+| $m_i$            | Mass of a single particle in bin $i$ |
+| $m_{i,j}$        | Mass of species $j$ in a particle of bin $i$ |
+| $m_i^{\text{total}}$ | Total mass of a particle in bin $i$ ($\sum_j m_{i,j}$) |
+| $\mathbf{m}_i$   | Vector of species masses in a particle of bin $i$ |
+| $m_b$            | Characteristic mass defining fixed bin $b$ |
+| $m_{k,j}$        | Mass of species $j$ in particle $k$ |
+| $\mathbf{m}_k$   | Vector of species masses in individual particle $k$ |
+| $\Delta m_i$     | Mass gained per particle in bin $i$ |
+| $N_b$            | Number of particles in fixed bin $b$ |
+| $\Delta N_b$     | Number of new particles created in bin $b$ (grow-in-place) |
 | $N_{\text{tot}}$ | Total number concentration across all bins/particles |
-| $N_p$ | Number of (model) particles tracked in the particle-resolved strategy |
+| $N_p$            | Number of (model) particles tracked in the particle-resolved strategy |
+| $r_i$            | Radius of a single particle in bin $i$ |
+| $\rho$           | Bulk material density of the particles |
+| $\rho_j$         | Density of species $j$ |
+| $S$              | Number of chemical species tracked |
+| $V_i$            | Volume of a single particle in bin $i$ |
+| $V_{i,j}$        | Volume of species $j$ in a particle of bin $i$ |
+| $x$              | Generic size coordinate (mass or radius) in continuous formulation |
 
 
 ## Mass-Based Moving Bin Strategy
