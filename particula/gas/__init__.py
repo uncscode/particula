@@ -11,6 +11,8 @@ from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
     WaterBuckStrategy,
+    ArblasterLiquidVaporPressureStrategy,
+    LiquidClausiusHybridStrategy,
 )
 
 from particula.gas.vapor_pressure_builders import (

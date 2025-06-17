@@ -468,3 +468,127 @@ class WaterBuckStrategy(VaporPressureStrategy):
             - https://en.wikipedia.org/wiki/Arden_Buck_equation
         """
         return get_buck_vapor_pressure(temperature)
+
+
+class ArblasterLiquidVaporPressureStrategy(VaporPressureStrategy):
+    r"""Vapor pressure strategy using a 5-term logarithmic polynomial.
+
+    This strategy applies the Honig–Kramer/Arblaster correlation for
+    liquid metals. The relationship is expressed as:
+
+    - ln(P[bar]) = A + B ln(T) + C ∕ T + D T + E T²
+        - P is the vapor pressure in bar,
+        - T is the temperature in kelvin,
+        - A, B, C, D and E are empirical coefficients.
+
+    Methods:
+    - pure_vapor_pressure: Compute the vapor pressure using the coefficients.
+
+    Examples:
+        ```py title="Instantiate the Arblaster strategy"
+        coeffs = (7.5, 1.0, -2000.0, 0.002, -1e-6)
+        strategy = ArblasterLiquidVaporPressureStrategy(coeffs)
+        vp = strategy.pure_vapor_pressure(3000.0)
+        ```
+    """
+
+    def __init__(self, coefficients: tuple[float, float, float, float, float]):
+        """Initialize with the 5-term polynomial coefficients.
+
+        Arguments:
+            - coefficients : Tuple ``(A, B, C, D, E)`` for the correlation.
+        """
+
+        self.coefficients = coefficients
+
+    def pure_vapor_pressure(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """Calculate vapor pressure from the 5-term polynomial.
+
+        Arguments:
+            - temperature : Temperature in Kelvin.
+
+        Returns:
+            Vapor pressure in Pascals.
+
+        Examples:
+            ``` py title="Vapor pressure from polynomial"
+            vp = strategy.pure_vapor_pressure(3000.0)
+            ```
+        """
+
+        a, b, c, d, e = self.coefficients
+        ln_p_bar = (
+            a
+            + b * np.log(temperature)
+            + c / temperature
+            + d * temperature
+            + e * temperature**2
+        )
+        return np.exp(ln_p_bar) * 1e5
+
+
+class LiquidClausiusHybridStrategy(VaporPressureStrategy):
+    """Hybrid strategy blending liquid and Clausius–Clapeyron methods.
+
+    This strategy uses the 5-term liquid polynomial at low temperature and
+    gradually transitions to the Clausius–Clapeyron relation above the
+    boiling point. A logistic weight provides a smooth changeover.
+
+    Methods:
+    - pure_vapor_pressure: Compute the blended vapor pressure.
+    """
+
+    def __init__(
+        self,
+        coefficients: tuple[float, float, float, float, float],
+        latent_heat: float,
+        temperature_initial: float,
+        pressure_initial: float,
+        boiling_point: float,
+        transition_width: float = 10.0,
+    ) -> None:
+        """Initialize the hybrid vapor pressure strategy.
+
+        Arguments:
+            - coefficients : Polynomial coefficients ``(A, B, C, D, E)``.
+            - latent_heat : Latent heat of vaporization in J/mol.
+            - temperature_initial : Reference temperature in Kelvin.
+            - pressure_initial : Reference pressure in Pascals.
+            - boiling_point : Temperature where weighting is 0.5.
+            - transition_width : Width of the logistic transition in Kelvin.
+        """
+        self.liquid_strategy = ArblasterLiquidVaporPressureStrategy(
+            coefficients
+        )
+        self.clausius_strategy = ClausiusClapeyronStrategy(
+            latent_heat, temperature_initial, pressure_initial
+        )
+        self.boiling_point = boiling_point
+        self.transition_width = transition_width
+
+    def pure_vapor_pressure(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """Smoothly combine liquid and Clausius–Clapeyron approaches.
+
+        Arguments:
+            - temperature : Temperature in Kelvin.
+
+        Returns:
+            Vapor pressure in Pascals.
+
+        Examples:
+            ``` py title="Hybrid vapor pressure"
+            vp = strategy.pure_vapor_pressure(boiling_point + 50.0)
+            ```
+        """
+
+        temp = np.array(temperature, dtype=float)
+        p_liq = self.liquid_strategy.pure_vapor_pressure(temp)
+        p_claus = self.clausius_strategy.pure_vapor_pressure(temp)
+        weight = 1.0 / (
+            1.0 + np.exp(-(temp - self.boiling_point) / self.transition_width)
+        )
+        return (1.0 - weight) * p_liq + weight * p_claus
