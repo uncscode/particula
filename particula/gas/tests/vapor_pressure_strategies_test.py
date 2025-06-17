@@ -8,6 +8,8 @@ from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
     WaterBuckStrategy,
+    ArblasterLiquidVaporPressureStrategy,
+    LiquidClausiusHybridStrategy,
 )
 
 
@@ -62,3 +64,34 @@ def test_water_buck_strategy():
     assert strategy.pure_vapor_pressure(temperature) == pytest.approx(
         expected_pressure
     )
+
+
+def test_arblaster_liquid_vapor_pressure_strategy():
+    """Test the 5-term liquid polynomial strategy."""
+    coeffs = (0.0, 0.0, 0.0, 0.0, 0.0)
+    strategy = ArblasterLiquidVaporPressureStrategy(coefficients=coeffs)
+    assert strategy.pure_vapor_pressure(300.0) == pytest.approx(1e5)
+
+
+def test_liquid_clausius_hybrid_strategy():
+    """Test hybrid strategy smoothly blends above boiling."""
+    coeffs = (0.0, 0.0, 0.0, 0.0, 0.0)
+    latent_heat = 4.0e4
+    temp_init = 350.0
+    pressure_init = 1.0e5
+    strategy = LiquidClausiusHybridStrategy(
+        coefficients=coeffs,
+        latent_heat=latent_heat,
+        temperature_initial=temp_init,
+        pressure_initial=pressure_init,
+        boiling_point=temp_init,
+        transition_width=1.0,
+    )
+    test_temp = 352.0
+    p_liq = 1.0e5
+    p_claus = pressure_init * np.exp(
+        latent_heat / GAS_CONSTANT * (1 / temp_init - 1 / test_temp)
+    )
+    weight = 1 / (1 + np.exp(-(test_temp - temp_init) / 1.0))
+    expected = (1 - weight) * p_liq + weight * p_claus
+    assert strategy.pure_vapor_pressure(test_temp) == pytest.approx(expected)
