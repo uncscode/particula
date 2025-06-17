@@ -51,6 +51,7 @@ from particula.particles.surface_strategies import (
     SurfaceStrategyVolume,
     SurfaceStrategyMass,
     SurfaceStrategyMolar,
+    SurfaceStrategyTemperatureMolar,
 )
 from particula.particles.surface_builders import (
     SurfaceStrategyVolumeBuilder,

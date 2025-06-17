@@ -377,3 +377,170 @@ class SurfaceStrategyVolume(SurfaceStrategy):
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
         return self.density
+
+
+class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
+    """Temperature-dependent surface tension via DIPPR-106."""
+
+    def __init__(
+        self,
+        dippr_a: Union[float, NDArray[np.float64]],
+        critical_temperature: Union[float, NDArray[np.float64]],
+        dippr_b: Union[float, NDArray[np.float64]] = 0.0,
+        dippr_c: Union[float, NDArray[np.float64]] = 0.0,
+        dippr_d: Union[float, NDArray[np.float64]] = 0.0,
+        dippr_n: Union[float, NDArray[np.float64]] = 1.256,
+        density: Union[float, NDArray[np.float64]] = 1000,
+        molar_mass: Union[float, NDArray[np.float64]] = 0.01815,
+        temperature: float = 298.0,
+        phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
+    ):
+        """Create a temperature-aware surface strategy.
+
+        Surface tension is calculated as:
+
+        - σ(T) = A \times (1 - θ)^n \times (1 + Bθ + Cθ² + Dθ³)
+            - σ is the surface tension in newtons per metre,
+            - θ = T / T_c is the reduced temperature,
+            - A, B, C, D and n are DIPPR-106 parameters.
+
+        Arguments:
+            - dippr_a : Parameter ``A`` in newtons per metre.
+            - critical_temperature : Critical temperature ``T_c`` in kelvin.
+            - dippr_b : Parameter ``B`` of the correlation.
+            - dippr_c : Parameter ``C`` of the correlation.
+            - dippr_d : Parameter ``D`` of the correlation.
+            - dippr_n : Exponent ``n``.
+            - density : Liquid density in kg/m³.
+            - molar_mass : Molar mass in kg/mol.
+            - temperature : Reference temperature in kelvin.
+            - phase_index : Optional array mapping species to phases.
+
+        Examples:
+            ``` py title="Example"
+            strat = SurfaceStrategyTemperatureMolar(0.072, 647.1)
+            strat.effective_surface_tension(100.0, 298.0)
+            ```
+
+        References:
+            - "DIPPR Project 801", AIChE.
+        """
+
+        self.dippr_a = np.asarray(dippr_a, dtype=np.float64)
+        self.dippr_b = np.asarray(dippr_b, dtype=np.float64)
+        self.dippr_c = np.asarray(dippr_c, dtype=np.float64)
+        self.dippr_d = np.asarray(dippr_d, dtype=np.float64)
+        self.dippr_n = np.asarray(dippr_n, dtype=np.float64)
+        self.critical_temperature = np.asarray(
+            critical_temperature, dtype=np.float64
+        )
+        self.temperature = float(temperature)
+        self.density = density
+        self.molar_mass = molar_mass
+        self.phase_index = (
+            None if phase_index is None else np.array(phase_index, dtype=int)
+        )
+
+    def _surface_tension_at_temperature(
+        self, temperature: Optional[float] = None
+    ) -> NDArray[np.float64]:
+        """Return surface tension at ``temperature`` using DIPPR-106.
+
+        Arguments:
+            - temperature : Optional temperature in kelvin.
+
+        Returns:
+            - Calculated surface tension in newtons per metre.
+
+        Examples:
+            ``` py title="Example"
+            strat = SurfaceStrategyTemperatureMolar(0.072, 647.1)
+            strat._surface_tension_at_temperature(298.0)
+            ```
+        """
+
+        temp = self.temperature if temperature is None else float(temperature)
+        theta = temp / self.critical_temperature
+        return self.dippr_a * (1 - theta) ** self.dippr_n * (
+            1
+            + self.dippr_b * theta
+            + self.dippr_c * theta**2
+            + self.dippr_d * theta**3
+        )
+
+    def effective_surface_tension(
+        self,
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: Optional[float] = None,
+    ) -> Union[float, NDArray[np.float64]]:
+        """Mix surface tension using mole fractions.
+
+        Arguments:
+            - mass_concentration : Species mass concentration in kg/m³.
+            - temperature : Optional temperature in kelvin.
+
+        Returns:
+            - Effective surface tension in newtons per metre.
+        """
+        surface_tension = self._surface_tension_at_temperature(temperature)
+        if surface_tension.size == 1 or self.phase_index is None:
+            return np.asarray(surface_tension, dtype=np.float64)
+
+        mole_frac = get_mole_fraction_from_mass(
+            mass_concentration, self.molar_mass  # type: ignore
+        )
+        return _weighted_average_by_phase(
+            np.asarray(surface_tension, dtype=np.float64),
+            mole_frac,
+            self.phase_index,
+        )
+
+    def get_density(self) -> Union[float, NDArray[np.float64]]:
+        return self.density
+
+    def kelvin_radius(
+        self,
+        molar_mass: Union[float, NDArray[np.float64]],
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: float,
+    ) -> Union[float, NDArray[np.float64]]:
+        """Return the Kelvin radius for ``temperature``.
+
+        Arguments:
+            - molar_mass : Molar mass in kg/mol.
+            - mass_concentration : Species mass concentration in kg/m³.
+            - temperature : Temperature in kelvin.
+
+        Returns:
+            - Kelvin radius in metres.
+        """
+        return get_kelvin_radius(
+            self.effective_surface_tension(mass_concentration, temperature),
+            self.get_density(),
+            molar_mass,
+            temperature,
+        )
+
+    def kelvin_term(
+        self,
+        radius: Union[float, NDArray[np.float64]],
+        molar_mass: Union[float, NDArray[np.float64]],
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: float,
+    ) -> Union[float, NDArray[np.float64]]:
+        """Calculate the Kelvin term for curvature effects.
+
+        Arguments:
+            - radius : Particle radius in metres.
+            - molar_mass : Molar mass in kg/mol.
+            - mass_concentration : Species mass concentration in kg/m³.
+            - temperature : Temperature in kelvin.
+
+        Returns:
+            - Exponential Kelvin factor.
+        """
+
+        return get_kelvin_term(
+            radius,
+            self.kelvin_radius(molar_mass, mass_concentration, temperature),
+        )

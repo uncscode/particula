@@ -6,6 +6,7 @@ from particula.particles.surface_strategies import (
     SurfaceStrategyMass,
     SurfaceStrategyMolar,
     SurfaceStrategyVolume,
+    SurfaceStrategyTemperatureMolar,
     _weighted_average_by_phase,
     _as_2d,
     _broadcast_weights,
@@ -345,4 +346,36 @@ def test_weighted_average_by_phase_zero_weight_fallback():
     np.testing.assert_allclose(
         _weighted_average_by_phase(vals, wts, phase),
         exp,
+    )
+
+
+def test_temperature_dependent_surface_strategy():
+    """Validate temperature dependent surface tension via DIPPR-106."""
+    dippr_a = 0.2358
+    t_crit = 647.096
+    molar_mass = 0.01815
+    density = 1000
+    strat = SurfaceStrategyTemperatureMolar(
+        dippr_a=dippr_a,
+        critical_temperature=t_crit,
+        molar_mass=molar_mass,
+        density=density,
+    )
+
+    temp = 298.0
+    mass_conc = 100.0
+    theta = temp / t_crit
+    expected_st = dippr_a * (1 - theta) ** 1.256
+    assert np.isclose(
+        strat.effective_surface_tension(mass_conc, temp), expected_st
+    )
+
+    kelvin_r = (2 * expected_st * molar_mass) / (8.314 * temp * density)
+    np.testing.assert_allclose(
+        strat.kelvin_radius(molar_mass, mass_conc, temp), kelvin_r, rtol=1e-4
+    )
+    radius = 1e-6
+    kelvin_term = np.exp(kelvin_r / radius)
+    np.testing.assert_allclose(
+        strat.kelvin_term(radius, molar_mass, mass_conc, temp), kelvin_term, rtol=1e-4
     )
