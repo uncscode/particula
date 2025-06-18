@@ -148,6 +148,15 @@ class SurfaceStrategy(ABC):
     - kelvin_radius : Calculate the Kelvin radius for curvature effects.
     - kelvin_term : Calculate the exponential Kelvin term for vapor pressure.
     """
+    
+    def __init__(
+        self, temperature: Optional[float] = None
+    ):
+        """
+        Initialize the surface strategy.
+        This base requires optional temperature.
+        """
+        self.temperature: Optional[float] = None
 
     @abstractmethod
     def effective_surface_tension(
@@ -232,6 +241,15 @@ class SurfaceStrategy(ABC):
             radius,
             self.kelvin_radius(molar_mass, mass_concentration, temperature),
         )
+    
+    def set_temperature(self, temperature: float) -> None:
+        """
+        Set the temperature for the surface strategy.
+
+        Arguments:
+            - temperature : Temperature in Kelvin.
+        """
+        self.temperature = temperature
 
 
 # Surface mixing strategies
@@ -257,7 +275,9 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         molar_mass: Union[float, NDArray[np.float64]] = 0.01815,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
+        temperature: Optional[float] = None,
     ):
+        super().__init__(temperature=temperature)
         self.surface_tension = surface_tension
         self.density = density
         self.molar_mass = molar_mass
@@ -380,7 +400,36 @@ class SurfaceStrategyVolume(SurfaceStrategy):
 
 
 class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
-    """Temperature-dependent surface tension via DIPPR-106."""
+    """
+    Temperature-dependent surface tension via DIPPR-106.
+    Surface tension is calculated as:
+
+    - σ(T) = A \times (1 - θ)^n \times (1 + Bθ + Cθ² + Dθ³)
+        - σ is the surface tension in newtons per metre,
+        - θ = T / T_c is the reduced temperature,
+        - A, B, C, D and n are DIPPR-106 parameters.
+
+    Arguments:
+        - dippr_a : Parameter ``A`` in newtons per metre.
+        - critical_temperature : Critical temperature ``T_c`` in kelvin.
+        - dippr_b : Parameter ``B`` of the correlation.
+        - dippr_c : Parameter ``C`` of the correlation.
+        - dippr_d : Parameter ``D`` of the correlation.
+        - dippr_n : Exponent ``n``.
+        - density : Liquid density in kg/m³.
+        - molar_mass : Molar mass in kg/mol.
+        - temperature : Reference temperature in kelvin.
+        - phase_index : Optional array mapping species to phases.
+
+    Examples:
+        ``` py title="Example"
+        strat = SurfaceStrategyTemperatureMolar(0.072, 647.1)
+        strat.effective_surface_tension(100.0, 298.0)
+        ```
+
+    References:
+        - "DIPPR Project 801", AIChE.
+    """
 
     def __init__(
         self,
@@ -397,13 +446,6 @@ class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
     ):
         """Create a temperature-aware surface strategy.
 
-        Surface tension is calculated as:
-
-        - σ(T) = A \times (1 - θ)^n \times (1 + Bθ + Cθ² + Dθ³)
-            - σ is the surface tension in newtons per metre,
-            - θ = T / T_c is the reduced temperature,
-            - A, B, C, D and n are DIPPR-106 parameters.
-
         Arguments:
             - dippr_a : Parameter ``A`` in newtons per metre.
             - critical_temperature : Critical temperature ``T_c`` in kelvin.
@@ -415,15 +457,6 @@ class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
             - molar_mass : Molar mass in kg/mol.
             - temperature : Reference temperature in kelvin.
             - phase_index : Optional array mapping species to phases.
-
-        Examples:
-            ``` py title="Example"
-            strat = SurfaceStrategyTemperatureMolar(0.072, 647.1)
-            strat.effective_surface_tension(100.0, 298.0)
-            ```
-
-        References:
-            - "DIPPR Project 801", AIChE.
         """
 
         self.dippr_a = np.asarray(dippr_a, dtype=np.float64)
@@ -441,10 +474,11 @@ class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
             None if phase_index is None else np.array(phase_index, dtype=int)
         )
 
-    def _surface_tension_at_temperature(
+    def get_surface_tension_at_temperature(
         self, temperature: Optional[float] = None
     ) -> NDArray[np.float64]:
-        """Return surface tension at ``temperature`` using DIPPR-106.
+        """
+        Return surface tension at ``temperature`` using DIPPR-106.
 
         Arguments:
             - temperature : Optional temperature in kelvin.
@@ -482,7 +516,7 @@ class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
         Returns:
             - Effective surface tension in newtons per metre.
         """
-        surface_tension = self._surface_tension_at_temperature(temperature)
+        surface_tension = self.get_surface_tension_at_temperature(temperature)
         if surface_tension.size == 1 or self.phase_index is None:
             return np.asarray(surface_tension, dtype=np.float64)
 
