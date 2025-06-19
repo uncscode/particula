@@ -151,8 +151,6 @@ class SurfaceStrategy(ABC):
     
     def __init__(
         self,
-        temperature: Optional[float] = None
-
         temperature: Optional[float] = None,
     ):
         super().__init__(temperature=temperature)
