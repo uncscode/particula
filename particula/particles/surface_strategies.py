@@ -158,9 +158,7 @@ class SurfaceStrategy(ABC):
         """
         Initialize the surface strategy.
         """
-        self.surface_tension = (
-            np.asarray(surface_tension, dtype=np.float64)
-        )
+        self.surface_tension = np.asarray(surface_tension, dtype=np.float64)
         self.surface_tension_table = (
             np.asarray(surface_tension_table, dtype=np.float64)
             if surface_tension_table is not None
@@ -261,16 +259,16 @@ class SurfaceStrategy(ABC):
 
     def get_surface_tension(
         self,
-        temperature: Union[float, NDArray[np.float64]],
+        temperature: float,
     ) -> NDArray[np.float64]:
         """
         Update the surface tension based on a temperature table.
 
         Arguments:
-            - temperature : Temperature in K.
+            temperature: Temperature in K.
 
         Returns:
-            - Updated surface tension in N/m.
+            Updated surface tension in N/m, one value per species.
         """
         if (
             self.surface_tension_table is None
@@ -278,11 +276,16 @@ class SurfaceStrategy(ABC):
         ):
             return self.surface_tension
 
-        return np.interp(
-            temperature,
-            self.temperature_table,
-            self.surface_tension_table,
-        )  # type: ignore
+        return np.array(
+            [
+                np.interp(
+                    temperature,
+                    self.temperature_table,
+                    self.surface_tension_table[:, j],
+                )
+                for j in range(self.surface_tension_table.shape[1])
+            ]
+        )
 
 
 # Surface mixing strategies
