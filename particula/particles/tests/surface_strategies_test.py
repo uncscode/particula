@@ -51,17 +51,25 @@ def test_molar_strategy_update_surface_tension():
 
     mass_concentration = np.array([150.0, 150.0])  # water-like, dual-species
 
+    expected_surface_tension = np.array([0.070, 0.065])  # Expected at 293 K
+
     # Check at 293 K
     st_293 = strategy.effective_surface_tension(mass_concentration, temperature=293)
     # Expect interpolation → row 2 of st_table: [0.070, 0.065]
     np.testing.assert_allclose(st_293, [0.070, 0.065], rtol=1e-5)
+
+    molar_mass_water = np.array([0.01815, 0.03])[0]  # Molar mass of water
 
     # Check at 313 K
     st_313 = strategy.effective_surface_tension(mass_concentration, temperature=313)
     # Expect last row: [0.068, 0.058]
     np.testing.assert_allclose(st_313, [0.068, 0.058], rtol=1e-5)
 
-    # Confirm Kelvin term doesn't error and yields correct shape
+    expected_density = np.array([1000, 800])  # Expected density
+
+    expected_kelvin_radius = (
+        2 * expected_surface_tension * molar_mass_water
+    ) / (8.314 * 298 * expected_density)
     radius = 1e-7
     kelvin_val = strategy.kelvin_term(
         radius, 0.01815, mass_concentration, 293
