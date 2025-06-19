@@ -135,8 +135,7 @@ class BuilderSurfaceTensionTableMixin:
     Methods:
         - set_surface_tension_table: Assign and convert the surface tension
           table to N/m as needed.
-    References:
-        - No references available yet.
+
     Examples:
         ```py
         builder.set_surface_tension_table([0.072, 0.073], "N/m")
@@ -155,7 +154,9 @@ class BuilderSurfaceTensionTableMixin:
         """Set a table of surface tension values in N/m."""
         table = np.asarray(surface_tension_table, dtype=np.float64)
         if surface_tension_table_units != "N/m":
-            table = table * get_unit_conversion(surface_tension_table_units, "N/m")
+            table = table * get_unit_conversion(
+                surface_tension_table_units, "N/m"
+            )
         self.surface_tension_table = table
         return self
 
@@ -206,7 +207,9 @@ class BuilderMolarMassMixin:
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
             return self
-        self.molar_mass = molar_mass * get_unit_conversion(molar_mass_units, "kg/mol")
+        self.molar_mass = molar_mass * get_unit_conversion(
+            molar_mass_units, "kg/mol"
+        )
         return self
 
 
@@ -497,7 +500,9 @@ class BuilderTemperatureMixin:
         self.temperature = None
 
     @validate_inputs({"temperature": "finite"})
-    def set_temperature(self, temperature: float, temperature_units: str = "K"):
+    def set_temperature(
+        self, temperature: float, temperature_units: str = "K"
+    ):
         """
         Set the temperature of the atmosphere in Kelvin.
 
@@ -521,7 +526,9 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
             return self
-        self.temperature = get_unit_conversion(temperature_units, "K", temperature)
+        self.temperature = get_unit_conversion(
+            temperature_units, "K", temperature
+        )
         return self
 
 
@@ -539,8 +546,7 @@ class BuilderTemperatureTableMixin:
     Methods:
         - set_temperature_table: Assign and convert the temperature table
           to K as needed.
-    References:
-        - No references available yet.
+
     Examples:
         ```py
         builder.set_temperature_table([273.15, 298.15], "K")
