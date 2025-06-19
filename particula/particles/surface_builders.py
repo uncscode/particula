@@ -12,7 +12,9 @@ from particula.abc_builder import (
 from particula.builder_mixin import (
     BuilderDensityMixin,
     BuilderSurfaceTensionMixin,
+    BuilderSurfaceTensionTableMixin,
     BuilderMolarMassMixin,
+    BuilderTemperatureTableMixin,
     BuilderPhaseIndexMixin,
 )
 from particula.particles.surface_strategies import (
@@ -28,6 +30,8 @@ class SurfaceStrategyMolarBuilder(
     BuilderABC,
     BuilderDensityMixin,
     BuilderSurfaceTensionMixin,
+    BuilderSurfaceTensionTableMixin,
+    BuilderTemperatureTableMixin,
     BuilderMolarMassMixin,
     BuilderPhaseIndexMixin,
 ):
@@ -49,6 +53,8 @@ class SurfaceStrategyMolarBuilder(
         required_parameters = ["surface_tension", "density", "molar_mass"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
+        BuilderSurfaceTensionTableMixin.__init__(self)
+        BuilderTemperatureTableMixin.__init__(self)
         BuilderDensityMixin.__init__(self)
         BuilderMolarMassMixin.__init__(self)
         BuilderPhaseIndexMixin.__init__(self)
@@ -69,7 +75,12 @@ class SurfaceStrategyMolarBuilder(
 
 
 class SurfaceStrategyMassBuilder(
-    BuilderABC, BuilderSurfaceTensionMixin, BuilderDensityMixin, BuilderPhaseIndexMixin
+    BuilderABC,
+    BuilderSurfaceTensionMixin,
+    BuilderSurfaceTensionTableMixin,
+    BuilderTemperatureTableMixin,
+    BuilderDensityMixin,
+    BuilderPhaseIndexMixin,
 ):
     """Builder class for SurfaceStrategyMass objects.
 
@@ -88,6 +99,8 @@ class SurfaceStrategyMassBuilder(
         required_parameters = ["surface_tension", "density"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
+        BuilderSurfaceTensionTableMixin.__init__(self)
+        BuilderTemperatureTableMixin.__init__(self)
         BuilderDensityMixin.__init__(self)
         BuilderPhaseIndexMixin.__init__(self)
 
@@ -106,7 +119,12 @@ class SurfaceStrategyMassBuilder(
 
 
 class SurfaceStrategyVolumeBuilder(
-    BuilderABC, BuilderSurfaceTensionMixin, BuilderDensityMixin, BuilderPhaseIndexMixin
+    BuilderABC,
+    BuilderSurfaceTensionMixin,
+    BuilderSurfaceTensionTableMixin,
+    BuilderTemperatureTableMixin,
+    BuilderDensityMixin,
+    BuilderPhaseIndexMixin,
 ):
     """Builder class for SurfaceStrategyVolume objects.
 
@@ -125,6 +143,8 @@ class SurfaceStrategyVolumeBuilder(
         required_parameters = ["surface_tension", "density"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
+        BuilderSurfaceTensionTableMixin.__init__(self)
+        BuilderTemperatureTableMixin.__init__(self)
         BuilderDensityMixin.__init__(self)
         BuilderPhaseIndexMixin.__init__(self)
 
