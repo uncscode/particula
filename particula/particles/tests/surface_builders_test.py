@@ -39,9 +39,8 @@ def test_build_surface_strategy_molar_missing_parameters():
     builder = SurfaceStrategyMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert (
-        "Required parameter(s) not set: surface_tension, density, molar_mass"
-        in str(excinfo.value)
+    assert "Required parameter(s) not set: surface_tension, density, molar_mass" in str(
+        excinfo.value
     )
 
 
@@ -109,3 +108,17 @@ def test_build_surface_strategy_phase_index():
     builder.set_phase_index([0, 1])
     strategy = builder.build()
     np.testing.assert_array_equal(strategy.phase_index, np.array([0, 1]))
+
+
+def test_optional_tables_not_required():
+    """Surface builders accept surface tension and temperature tables."""
+    builder = SurfaceStrategyMolarBuilder()
+    builder.set_surface_tension(0.072, "N/m")
+    builder.set_density(1000, "kg/m^3")
+    builder.set_molar_mass(0.01815, "kg/mol")
+    builder.set_surface_tension_table(np.array([0.07, 0.08]), "N/m")
+    builder.set_temperature_table(np.array([298.0, 308.0]), "K")
+    strategy = builder.build()
+    assert strategy.get_name() == "SurfaceStrategyMolar"
+    np.testing.assert_allclose(builder.surface_tension_table, [0.07, 0.08])
+    np.testing.assert_allclose(builder.temperature_table, [298.0, 308.0])
