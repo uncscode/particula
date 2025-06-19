@@ -300,6 +300,10 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         - phase_index : Optional array indicating phase indices for species.
           For example, [0, 1, 1] for two phases, where the first species
           belongs to phase 0 and the next two to phase 1.
+        - surface_tension_table : Optional 2D array for temperature-dependent
+          surface tension values.
+        - temperature_table : Optional 1D array for temperature values
+          corresponding to the surface tension table.
 
     References:
         - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
