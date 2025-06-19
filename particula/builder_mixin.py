@@ -141,6 +141,7 @@ class BuilderSurfaceTensionTableMixin:
         ```py
         builder.set_surface_tension_table([0.072, 0.073], "N/m")
         ```
+    """
 
     def __init__(self):
         self.surface_tension_table = None
@@ -544,6 +545,7 @@ class BuilderTemperatureTableMixin:
         ```py
         builder.set_temperature_table([273.15, 298.15], "K")
         ```
+    """
 
     def __init__(self):
         self.temperature_table = None
