@@ -265,15 +265,6 @@ class SurfaceStrategyMolar(SurfaceStrategy):
     """
     Surface tension and density based on mole-fraction weighting.
 
-    Arguments:
-        temperature : Optional temperature in Kelvin.
-
-    Arguments:
-        temperature : Optional temperature in Kelvin.
-
-    Arguments:
-        temperature : Optional temperature in Kelvin.
-
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
         - density : Density array or scalar in kg/m^3.
@@ -281,6 +272,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         - phase_index : Optional array indicating phase indices for species.
           For example, [0, 1, 1] for two phases, where the first species
           belongs to phase 0 and the next two to phase 1.
+        - temperature : Optional temperature in Kelvin.
 
     References:
         - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
@@ -294,7 +286,6 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
         temperature: Optional[float] = None,
     ):
-        super().__init__(temperature=temperature)
         super().__init__(temperature=temperature)
         self.surface_tension = surface_tension
         self.density = density
