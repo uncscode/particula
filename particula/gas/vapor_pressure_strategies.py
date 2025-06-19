@@ -471,18 +471,36 @@ class WaterBuckStrategy(VaporPressureStrategy):
 
 
 class TableVaporPressureStrategy(VaporPressureStrategy):
-    """Vapor pressure strategy using interpolation of a lookup table.
+    """
+    Vapor pressure strategy using interpolation of a lookup table.
 
     This strategy accepts a set of temperatures and corresponding vapor
-    pressures and linearly interpolates between the points to determine the
-    vapor pressure at arbitrary temperatures.
+    pressures and linearly interpolates between the points to determine
+    the vapor pressure at arbitrary temperatures.
 
-    Parameters
-    ----------
-    vapor_pressures : NDArray[np.float64] | float list
-        Vapor pressure values in Pascals.
-    temperatures : NDArray[np.float64] | float list
-        Temperatures in Kelvin corresponding to the vapor pressures.
+    Attributes:
+        - vapor_pressures: NDArray[np.float64]
+          Vapor pressure values in Pascals.
+        - temperatures: NDArray[np.float64]
+          Temperatures in Kelvin corresponding to the vapor pressures.
+
+    Methods:
+        - pure_vapor_pressure: Interpolate the vapor pressure for the
+          given temperature.
+
+    Examples:
+        ```py title="Table Vapor Pressure Example"
+        import numpy as np
+        from particula.gas import TableVaporPressureStrategy
+
+        table_vp = [100.0, 200.0, 300.0, 400.0]  # Pa
+        table_t = [270.0, 280.0, 290.0, 300.0]   # K
+        strategy = TableVaporPressureStrategy(
+            vapor_pressures=table_vp,
+            temperatures=table_t
+        )
+        vp = strategy.pure_vapor_pressure(295.0)
+        ```
     """
 
     def __init__(
