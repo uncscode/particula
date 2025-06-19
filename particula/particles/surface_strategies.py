@@ -372,8 +372,14 @@ class SurfaceStrategyMass(SurfaceStrategy):
         surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
+        surface_tension_table: Optional[NDArray[np.float64]] = None,
+        temperature_table: Optional[NDArray[np.float64]] = None,
     ):
-        self.surface_tension = surface_tension
+        super().__init__(
+            surface_tension=surface_tension,
+            surface_tension_table=surface_tension_table,
+            temperature_table=temperature_table,
+        )
         self.density = density
         self.phase_index = (
             None if phase_index is None else np.array(phase_index, dtype=int)
@@ -421,8 +427,14 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
+        surface_tension_table: Optional[NDArray[np.float64]] = None,
+        temperature_table: Optional[NDArray[np.float64]] = None,
     ):
-        self.surface_tension = surface_tension
+        super().__init__(
+            surface_tension=surface_tension,
+            surface_tension_table=surface_tension_table,
+            temperature_table=temperature_table,
+        )
         self.density = density
         self.phase_index = (
             None if phase_index is None else np.array(phase_index, dtype=int)
