@@ -121,6 +121,26 @@ class BuilderSurfaceTensionMixin:
         return self
 
 
+class BuilderSurfaceTensionTableMixin:
+    """Mixin class for setting a surface tension lookup table."""
+
+    def __init__(self):
+        self.surface_tension_table = None
+
+    @validate_inputs({"surface_tension_table": "positive"})
+    def set_surface_tension_table(
+        self,
+        surface_tension_table: NDArray[np.float64],
+        surface_tension_table_units: str = "N/m",
+    ):
+        """Set a table of surface tension values in N/m."""
+        table = np.asarray(surface_tension_table, dtype=np.float64)
+        if surface_tension_table_units != "N/m":
+            table = table * get_unit_conversion(surface_tension_table_units, "N/m")
+        self.surface_tension_table = table
+        return self
+
+
 class BuilderMolarMassMixin:
     """
     Mixin class for setting molar_mass and molar_mass_units.
@@ -167,9 +187,7 @@ class BuilderMolarMassMixin:
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
             return self
-        self.molar_mass = molar_mass * get_unit_conversion(
-            molar_mass_units, "kg/mol"
-        )
+        self.molar_mass = molar_mass * get_unit_conversion(molar_mass_units, "kg/mol")
         return self
 
 
@@ -460,9 +478,7 @@ class BuilderTemperatureMixin:
         self.temperature = None
 
     @validate_inputs({"temperature": "finite"})
-    def set_temperature(
-        self, temperature: float, temperature_units: str = "K"
-    ):
+    def set_temperature(self, temperature: float, temperature_units: str = "K"):
         """
         Set the temperature of the atmosphere in Kelvin.
 
@@ -486,9 +502,33 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
             return self
-        self.temperature = get_unit_conversion(
-            temperature_units, "K", temperature
-        )
+        self.temperature = get_unit_conversion(temperature_units, "K", temperature)
+        return self
+
+
+class BuilderTemperatureTableMixin:
+    """Mixin class for setting a temperature lookup table."""
+
+    def __init__(self):
+        self.temperature_table = None
+
+    @validate_inputs({"temperature_table": "finite"})
+    def set_temperature_table(
+        self,
+        temperature_table: NDArray[np.float64],
+        temperature_table_units: str = "K",
+    ):
+        """Set a table of temperature values in Kelvin."""
+        temps = np.asarray(temperature_table, dtype=np.float64)
+        if temperature_table_units != "K":
+            temps = np.array(
+                [
+                    get_unit_conversion(temperature_table_units, "K", float(t))
+                    for t in temps
+                ],
+                dtype=np.float64,
+            )
+        self.temperature_table = temps
         return self
 
 
