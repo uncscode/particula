@@ -485,8 +485,13 @@ class TableVaporPressureStrategy(VaporPressureStrategy):
           Temperatures in Kelvin corresponding to the vapor pressures.
 
     Methods:
-        - pure_vapor_pressure: Interpolate the vapor pressure for the
-          given temperature.
+    - partial_pressure: Compute partial pressure from concentration.
+    - concentration: Compute concentration from partial pressure.
+    - saturation_ratio: Compute ratio of partial pressure to saturation
+      pressure.
+    - saturation_concentration: Compute concentration at saturation pressure.
+    - pure_vapor_pressure: Interpolate the vapor pressure for the
+      given temperature.
 
     Examples:
         ```py title="Table Vapor Pressure Example"
