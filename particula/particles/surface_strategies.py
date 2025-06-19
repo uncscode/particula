@@ -153,7 +153,9 @@ class SurfaceStrategy(ABC):
         self,
         temperature: Optional[float] = None
 
+        temperature: Optional[float] = None,
     ):
+        super().__init__(temperature=temperature)
         """
         Initialize the surface strategy.
         This base requires optional temperature.
@@ -279,6 +281,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
         temperature: Optional[float] = None,
     ):
+        super().__init__(temperature=temperature)
         super().__init__(temperature=temperature)
         self.surface_tension = surface_tension
         self.density = density
@@ -462,6 +465,7 @@ class SurfaceStrategyTemperatureMolar(SurfaceStrategy):
             - phase_index : Optional array mapping species to phases.
         """
 
+        super().__init__(temperature=temperature)
         self.dippr_a = np.asarray(dippr_a, dtype=np.float64)
         self.dippr_b = np.asarray(dippr_b, dtype=np.float64)
         self.dippr_c = np.asarray(dippr_c, dtype=np.float64)
