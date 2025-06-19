@@ -223,7 +223,7 @@ class SurfaceStrategy(ABC):
               [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
         return get_kelvin_radius(
-            self.effective_surface_tension(mass_concentration),
+            self.effective_surface_tension(mass_concentration, temperature),
             self.get_density(),
             molar_mass,
             temperature,
@@ -257,26 +257,23 @@ class SurfaceStrategy(ABC):
             self.kelvin_radius(molar_mass, mass_concentration, temperature),
         )
 
-    def get_surface_tension(
+    def update_surface_tension(
         self,
         temperature: float,
-    ) -> NDArray[np.float64]:
+    ):
         """
         Update the surface tension based on a temperature table.
 
         Arguments:
             temperature: Temperature in K.
-
-        Returns:
-            Updated surface tension in N/m, one value per species.
         """
         if (
             self.surface_tension_table is None
             or self.temperature_table is None
         ):
-            return self.surface_tension
+            return
 
-        return np.array(
+        self.surface_tension = np.array(
             [
                 np.interp(
                     temperature,
@@ -334,9 +331,11 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
+
+        if temperature is not None:
+            self.update_surface_tension(temperature)
+
         if isinstance(self.surface_tension, float) or self.phase_index is None:
-            # If surface tension is a scalar or no phase index is provided,
-            # return it directly.
             return np.asarray(self.surface_tension, dtype=np.float64)
 
         mole_frac = get_mole_fraction_from_mass(
@@ -390,9 +389,10 @@ class SurfaceStrategyMass(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        # If a single surface-tension value is supplied **or** no phase
-        # information is given, just return the (possibly vector) value
-        # unchanged – same rule as SurfaceStrategyMolar.
+
+        if temperature is not None:
+            self.update_surface_tension(temperature)
+
         if isinstance(self.surface_tension, float) or self.phase_index is None:
             return np.asarray(self.surface_tension, dtype=np.float64)
 
@@ -445,6 +445,10 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
+
+        if temperature is not None:
+            self.update_surface_tension(temperature)
+
         if isinstance(self.surface_tension, float) or self.phase_index is None:
             return np.asarray(self.surface_tension, dtype=np.float64)
 
