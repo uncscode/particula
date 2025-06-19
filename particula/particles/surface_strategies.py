@@ -138,9 +138,6 @@ class SurfaceStrategy(ABC):
     """
     Abstract base class for surface strategies.
 
-    This class now includes an optional temperature attribute for use in
-    derived strategies.
-
     Implements methods for calculating effective surface tension, density,
     and the Kelvin effect in particulate phases.
 
@@ -154,17 +151,8 @@ class SurfaceStrategy(ABC):
     
     def __init__(
         self,
-        temperature: Optional[float] = None,
     ):
-        """
-        Initialize the surface strategy.
-        
-        Arguments:
-            temperature : Optional temperature in Kelvin.
-            
-        This base requires optional temperature.
-        """
-        self.temperature: Optional[float] = None
+        """Initialize the surface strategy."""
 
     @abstractmethod
     def effective_surface_tension(
@@ -250,14 +238,6 @@ class SurfaceStrategy(ABC):
             self.kelvin_radius(molar_mass, mass_concentration, temperature),
         )
     
-    def set_temperature(self, temperature: float) -> None:
-        """
-        Set the temperature for the surface strategy.
-
-        Arguments:
-            - temperature : Temperature in Kelvin.
-        """
-        self.temperature = temperature
 
 
 # Surface mixing strategies
@@ -272,7 +252,6 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         - phase_index : Optional array indicating phase indices for species.
           For example, [0, 1, 1] for two phases, where the first species
           belongs to phase 0 and the next two to phase 1.
-        - temperature : Optional temperature in Kelvin.
 
     References:
         - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
@@ -284,9 +263,8 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         molar_mass: Union[float, NDArray[np.float64]] = 0.01815,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
-        temperature: Optional[float] = None,
     ):
-        super().__init__(temperature=temperature)
+        super().__init__()
         self.surface_tension = surface_tension
         self.density = density
         self.molar_mass = molar_mass
@@ -335,7 +313,6 @@ class SurfaceStrategyMass(SurfaceStrategy):
         surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
-        temperature: Optional[float] = None,
     ):
         self.surface_tension = surface_tension
         self.density = density
