@@ -148,21 +148,42 @@ class SurfaceStrategy(ABC):
     - kelvin_radius : Calculate the Kelvin radius for curvature effects.
     - kelvin_term : Calculate the exponential Kelvin term for vapor pressure.
     """
-    
+
     def __init__(
         self,
+        surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
+        surface_tension_table: Optional[NDArray[np.float64]] = None,
+        temperature_table: Optional[NDArray[np.float64]] = None,
     ):
-        """Initialize the surface strategy."""
+        """
+        Initialize the surface strategy.
+        """
+        self.surface_tension = (
+            np.asarray(surface_tension, dtype=np.float64)
+        )
+        self.surface_tension_table = (
+            np.asarray(surface_tension_table, dtype=np.float64)
+            if surface_tension_table is not None
+            else None
+        )
+        self.temperature_table = (
+            np.asarray(temperature_table, dtype=np.float64)
+            if temperature_table is not None
+            else None
+        )
 
     @abstractmethod
     def effective_surface_tension(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+        self,
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         """
         Calculate the effective surface tension of the species mixture.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
+            - temperature : Optional temperature dependence in K.
 
         Returns:
             - Effective surface tension in N/m.
@@ -237,7 +258,31 @@ class SurfaceStrategy(ABC):
             radius,
             self.kelvin_radius(molar_mass, mass_concentration, temperature),
         )
-    
+
+    def get_surface_tension(
+        self,
+        temperature: Union[float, NDArray[np.float64]],
+    ) -> NDArray[np.float64]:
+        """
+        Update the surface tension based on a temperature table.
+
+        Arguments:
+            - temperature : Temperature in K.
+
+        Returns:
+            - Updated surface tension in N/m.
+        """
+        if (
+            self.surface_tension_table is None
+            or self.temperature_table is None
+        ):
+            return self.surface_tension
+
+        return np.interp(
+            temperature,
+            self.temperature_table,
+            self.surface_tension_table,
+        )  # type: ignore
 
 
 # Surface mixing strategies
@@ -263,9 +308,14 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         molar_mass: Union[float, NDArray[np.float64]] = 0.01815,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
+        surface_tension_table: Optional[NDArray[np.float64]] = None,
+        temperature_table: Optional[NDArray[np.float64]] = None,
     ):
-        super().__init__()
-        self.surface_tension = surface_tension
+        super().__init__(
+            surface_tension=surface_tension,
+            surface_tension_table=surface_tension_table,
+            temperature_table=temperature_table,
+        )
         self.density = density
         self.molar_mass = molar_mass
         self.phase_index = (
@@ -273,7 +323,9 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         )
 
     def effective_surface_tension(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+        self,
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         if isinstance(self.surface_tension, float) or self.phase_index is None:
             # If surface tension is a scalar or no phase index is provided,
@@ -321,7 +373,9 @@ class SurfaceStrategyMass(SurfaceStrategy):
         )
 
     def effective_surface_tension(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+        self,
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         # If a single surface-tension value is supplied **or** no phase
         # information is given, just return the (possibly vector) value
@@ -368,7 +422,9 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         )
 
     def effective_surface_tension(
-        self, mass_concentration: Union[float, NDArray[np.float64]]
+        self,
+        mass_concentration: Union[float, NDArray[np.float64]],
+        temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         if isinstance(self.surface_tension, float) or self.phase_index is None:
             return np.asarray(self.surface_tension, dtype=np.float64)
