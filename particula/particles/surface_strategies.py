@@ -150,7 +150,9 @@ class SurfaceStrategy(ABC):
     """
     
     def __init__(
-        self, temperature: Optional[float] = None
+        self,
+        temperature: Optional[float] = None
+
     ):
         """
         Initialize the surface strategy.
@@ -326,6 +328,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
         surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
+        temperature: Optional[float] = None,
     ):
         self.surface_tension = surface_tension
         self.density = density
