@@ -122,7 +122,25 @@ class BuilderSurfaceTensionMixin:
 
 
 class BuilderSurfaceTensionTableMixin:
-    """Mixin class for setting a surface tension lookup table."""
+    """
+    Mixin class for setting a surface tension lookup table.
+
+    This class provides a method to assign and store a table of
+    surface tension values in N/m, optionally converting from
+    other units.
+
+    Attributes:
+        - surface_tension_table : An array of surface tension values in N/m.
+
+    Methods:
+        - set_surface_tension_table: Assign and convert the surface tension
+          table to N/m as needed.
+    References:
+        - No references available yet.
+    Examples:
+        ```py
+        builder.set_surface_tension_table([0.072, 0.073], "N/m")
+        ```
 
     def __init__(self):
         self.surface_tension_table = None
@@ -507,7 +525,25 @@ class BuilderTemperatureMixin:
 
 
 class BuilderTemperatureTableMixin:
-    """Mixin class for setting a temperature lookup table."""
+    """
+    Mixin class for setting a temperature lookup table.
+
+    This class provides a method to assign multiple temperature values
+    in Kelvin, optionally converting from other common temperature units
+    (e.g., degC, degF).
+
+    Attributes:
+        - temperature_table : An array of temperatures in Kelvin.
+
+    Methods:
+        - set_temperature_table: Assign and convert the temperature table
+          to K as needed.
+    References:
+        - No references available yet.
+    Examples:
+        ```py
+        builder.set_temperature_table([273.15, 298.15], "K")
+        ```
 
     def __init__(self):
         self.temperature_table = None
