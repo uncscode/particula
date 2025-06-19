@@ -153,7 +153,6 @@ class SurfaceStrategy(ABC):
         self,
         temperature: Optional[float] = None,
     ):
-        super().__init__(temperature=temperature)
         """
         Initialize the surface strategy.
         This base requires optional temperature.
