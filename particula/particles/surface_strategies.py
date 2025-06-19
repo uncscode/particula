@@ -138,6 +138,9 @@ class SurfaceStrategy(ABC):
     """
     Abstract base class for surface strategies.
 
+    This class now includes an optional temperature attribute for use in
+    derived strategies.
+
     Implements methods for calculating effective surface tension, density,
     and the Kelvin effect in particulate phases.
 
@@ -155,6 +158,10 @@ class SurfaceStrategy(ABC):
     ):
         """
         Initialize the surface strategy.
+        
+        Arguments:
+            temperature : Optional temperature in Kelvin.
+            
         This base requires optional temperature.
         """
         self.temperature: Optional[float] = None
@@ -257,6 +264,15 @@ class SurfaceStrategy(ABC):
 class SurfaceStrategyMolar(SurfaceStrategy):
     """
     Surface tension and density based on mole-fraction weighting.
+
+    Arguments:
+        temperature : Optional temperature in Kelvin.
+
+    Arguments:
+        temperature : Optional temperature in Kelvin.
+
+    Arguments:
+        temperature : Optional temperature in Kelvin.
 
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
