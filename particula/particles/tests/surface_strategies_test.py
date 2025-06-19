@@ -81,13 +81,13 @@ def test_molar_strategy_update_surface_tension():
     )
 
     # Test effective density
-    expected_density = density
+    expected_density = np.array([1000, 800])  # Expected density
     np.testing.assert_allclose(
         strategy.get_density(), expected_density
     )
 
     # Test kelvin_radius
-    molar_mass_water = molar_mass[0]
+    molar_mass_water = np.array([0.01815, 0.03])[0]  # Molar mass of water
     expected_kelvin_radius = (
         2 * expected_surface_tension * molar_mass_water
     ) / (8.314 * 298 * expected_density)
