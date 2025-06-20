@@ -8,19 +8,44 @@ def get_surface_tension(chemical_identifier: str,
                         temperature: Union[float, NDArray[np.float64]]
                         ) -> NDArray[np.float64]:
     """
-    Return surface tension [N/m] of *chemical_identifier* at the requested
-    temperature(s).
+    Calculate the surface tension of a pure chemical in N/m.
 
-    Parameters
-    ----------
-    chemical_identifier : str
-        Any string accepted by thermo.chemical.Chemical.
-    temperature : float | ndarray[float64]
-        Temperature(s) in Kelvin.
+    The calculation delegates to ``thermo.chemical.Chemical.SurfaceTension``,
+    evaluated at the requested temperature(s):
 
-    Returns
-    -------
-    ndarray[float64]  (scalar returned as 0-d array)
+    - σ = σ(T)
+        - σ is the surface tension in newtons per metre (N/m),
+        - T is the absolute temperature in kelvin (K).
+
+    Arguments:
+        - chemical_identifier : Name, CAS number, or SMILES string accepted by
+          ``thermo.chemical.Chemical``.
+        - temperature : Scalar or array of temperatures in kelvin (K).
+
+    Returns:
+        - Surface tension(s) in N/m with the same shape as ``temperature``.
+          A scalar input returns a zero-dimensional ``numpy.ndarray``.
+
+    Examples:
+        ``` py title="Scalar temperature"
+        from particula.util.materials.surface_tension import get_surface_tension
+        get_surface_tension("water", 298.15)
+        # Output: 0.072 (≈ N/m)
+        ```
+
+        ``` py title="Array temperature"
+        import numpy as np
+        from particula.util.materials.surface_tension import get_surface_tension
+        temps = np.array([280.0, 298.15, 320.0])
+        get_surface_tension("water", temps)
+        # Output: array([0.076, 0.072, 0.065])
+        ```
+
+    References:
+        - "Surface tension," [Wikipedia]
+          (https://en.wikipedia.org/wiki/Surface_tension)
+        - D. R. Lide, *CRC Handbook of Chemistry and Physics*, 90th ed.,
+          CRC Press, 2009.
     """
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
