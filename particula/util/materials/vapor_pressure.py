@@ -4,9 +4,9 @@ from numpy.typing import NDArray
 from thermo.chemical import Chemical
 
 
-def get_vapor_pressure(chemical_identifier: str,
-                       temperature: Union[float, NDArray[np.float64]]
-                       ) -> NDArray[np.float64]:
+def get_vapor_pressure(
+    chemical_identifier: str, temperature: Union[float, NDArray[np.float64]]
+) -> NDArray[np.float64]:
     """
     Retrieve the saturation-vapor pressure of a chemical at a given temperature.
 
@@ -52,5 +52,7 @@ def get_vapor_pressure(chemical_identifier: str,
     chem = Chemical(chemical_identifier)
 
     # Vectorised call to thermo correlation
-    vp = np.vectorize(lambda T: chem.VaporPressure(T=T), otypes=[np.float64])(temps)
+    vp = np.vectorize(lambda T: chem.VaporPressure(T=T), otypes=[np.float64])(
+        temps
+    )
     return vp
