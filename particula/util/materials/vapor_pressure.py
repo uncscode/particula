@@ -8,19 +8,45 @@ def get_vapor_pressure(chemical_identifier: str,
                        temperature: Union[float, NDArray[np.float64]]
                        ) -> NDArray[np.float64]:
     """
-    Return saturation-vapor pressure [Pa] of *chemical_identifier* at the
-    requested temperature(s).
+    Retrieve the saturation-vapor pressure of a chemical at a given temperature.
 
-    Parameters
-    ----------
-    chemical_identifier : str
-        Any string accepted by thermo.chemical.Chemical (name, CAS, formula…).
-    temperature : float | ndarray[float64]
-        Temperature(s) in Kelvin.
+    The saturation-vapor pressure (Pₛₐₜ) is obtained by calling the correlation
+    implemented in ``thermo.chemical.Chemical``:
 
-    Returns
-    -------
-    ndarray[float64]  (scalar returned as 0-d array)
+    - Pₛₐₜ = Chemical(chemical_identifier).VaporPressure(T)
+        - Pₛₐₜ is saturation-vapor pressure in Pascals (Pa),
+        - T is temperature in Kelvin.
+
+    Arguments:
+        - chemical_identifier : Identifier accepted by
+          ``thermo.chemical.Chemical`` (name, CAS number, or formula).
+        - temperature : Temperature(s) in Kelvin. May be a scalar or a NumPy
+          array.
+
+    Returns:
+        - Saturation-vapor pressure(s) in Pascals (Pa). For a scalar temperature,
+          a 0-d NumPy array is returned for consistency.
+
+    Examples:
+        ``` py title="Example Usage – scalar input"
+        from particula.util.materials.vapor_pressure import get_vapor_pressure
+        p_sat = get_vapor_pressure("water", 298.15)
+        # p_sat ≈ 3169.0  # Pa
+        ```
+
+        ``` py title="Example Usage – vectorised input"
+        import numpy as np
+        from particula.util.materials.vapor_pressure import get_vapor_pressure
+        temps = np.array([280.0, 290.0, 300.0])
+        p_sat = get_vapor_pressure("water", temps)
+        # p_sat → array([...])  # Pa
+        ```
+
+    References:
+        - "Vapour pressure,"
+          [Wikipedia](https://en.wikipedia.org/wiki/Vapour_pressure)
+        - R. H. Perry & D. W. Green, *Perry's Chemical Engineers' Handbook*,
+          8th ed., McGraw-Hill, 2007.
     """
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
