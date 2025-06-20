@@ -18,32 +18,34 @@ def get_surface_tension(chemical_identifier: str,
         - T is the absolute temperature in kelvin (K).
 
     Arguments:
-        - chemical_identifier : Name, CAS number, or SMILES string accepted by
-          ``thermo.chemical.Chemical``.
+        - chemical_identifier : Identifier accepted by
+          ``thermo.chemical.Chemical`` (name, CAS number, or formula).
         - temperature : Scalar or array of temperatures in kelvin (K).
 
     Returns:
         - Surface tension(s) in N/m with the same shape as ``temperature``.
-          A scalar input returns a zero-dimensional ``numpy.ndarray``.
+          A scalar input returns a 0-d ``numpy.ndarray`` for consistency.
 
     Examples:
         ``` py title="Scalar temperature"
-        from particula.util.materials.surface_tension import get_surface_tension
+        from particula.util.materials.surface_tension import \
+            get_surface_tension
         get_surface_tension("water", 298.15)
         # Output: 0.072 (≈ N/m)
         ```
 
         ``` py title="Array temperature"
         import numpy as np
-        from particula.util.materials.surface_tension import get_surface_tension
+        from particula.util.materials.surface_tension import \
+            get_surface_tension
         temps = np.array([280.0, 298.15, 320.0])
         get_surface_tension("water", temps)
         # Output: array([0.076, 0.072, 0.065])
         ```
 
     References:
-        - "Surface tension," [Wikipedia]
-          (https://en.wikipedia.org/wiki/Surface_tension)
+        - "Surface tension",
+          [Wikipedia](https://en.wikipedia.org/wiki/Surface_tension)
         - D. R. Lide, *CRC Handbook of Chemistry and Physics*, 90th ed.,
           CRC Press, 2009.
     """
