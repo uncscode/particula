@@ -4,9 +4,9 @@ from numpy.typing import NDArray
 from thermo.chemical import Chemical
 
 
-def get_surface_tension(chemical_identifier: str,
-                        temperature: Union[float, NDArray[np.float64]]
-                        ) -> NDArray[np.float64]:
+def get_surface_tension(
+    chemical_identifier: str, temperature: Union[float, NDArray[np.float64]]
+) -> NDArray[np.float64]:
     """
     Calculate the surface tension of a pure chemical in N/m.
 
@@ -52,5 +52,7 @@ def get_surface_tension(chemical_identifier: str,
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
 
-    st = np.vectorize(lambda T: chem.SurfaceTension(T=T), otypes=[np.float64])(temps)
+    st = np.vectorize(lambda T: chem.SurfaceTension(T=T), otypes=[np.float64])(
+        temps
+    )
     return st
