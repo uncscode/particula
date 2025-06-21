@@ -470,6 +470,70 @@ class WaterBuckStrategy(VaporPressureStrategy):
         return get_buck_vapor_pressure(temperature)
 
 
+class TableVaporPressureStrategy(VaporPressureStrategy):
+    """
+    Vapor pressure strategy using interpolation of a lookup table.
+
+    This strategy accepts a set of temperatures and corresponding vapor
+    pressures and linearly interpolates between the points to determine
+    the vapor pressure at arbitrary temperatures.
+
+    Attributes:
+        - vapor_pressures: NDArray[np.float64]
+          Vapor pressure values in Pascals.
+        - temperatures: NDArray[np.float64]
+          Temperatures in Kelvin corresponding to the vapor pressures.
+
+    Methods:
+    - partial_pressure: Compute partial pressure from concentration.
+    - concentration: Compute concentration from partial pressure.
+    - saturation_ratio: Compute ratio of partial pressure to saturation
+      pressure.
+    - saturation_concentration: Compute concentration at saturation pressure.
+    - pure_vapor_pressure: Interpolate the vapor pressure for the
+      given temperature.
+
+    Examples:
+        ```py title="Table Vapor Pressure Example"
+        import numpy as np
+        from particula.gas import TableVaporPressureStrategy
+
+        table_vp = [100.0, 200.0, 300.0, 400.0]  # Pa
+        table_t = [270.0, 280.0, 290.0, 300.0]   # K
+        strategy = TableVaporPressureStrategy(
+            vapor_pressures=table_vp,
+            temperatures=table_t
+        )
+        vp = strategy.pure_vapor_pressure(295.0)
+        ```
+    """
+
+    def __init__(
+        self,
+        vapor_pressures: NDArray[np.float64],
+        temperatures: NDArray[np.float64],
+    ) -> None:
+        table_pressures = np.asarray(vapor_pressures, dtype=float)
+        table_temps = np.asarray(temperatures, dtype=float)
+        if table_pressures.size != table_temps.size:
+            raise ValueError("Temperature and pressure tables must be the same length")
+        idx = np.argsort(table_temps)
+        self.vapor_pressures = table_pressures[idx]
+        self.temperatures = table_temps[idx]
+
+    def pure_vapor_pressure(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """Interpolate the vapor pressure for the given temperature."""
+        return np.interp(
+            np.asarray(temperature, dtype=float),
+            self.temperatures,
+            self.vapor_pressures,
+            left=self.vapor_pressures[0],
+            right=self.vapor_pressures[-1],
+        )
+
+
 class ArblasterLiquidVaporPressureStrategy(VaporPressureStrategy):
     r"""Vapor pressure strategy using a 5-term logarithmic polynomial.
 

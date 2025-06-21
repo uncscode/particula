@@ -1,6 +1,9 @@
 # ignore .DS_Store on macs
 .DS_Store
 
+# ignore linux python env
+.envrc
+
 # ignore local mkdocs source folder
 *Source-Code*
 docs/.assets/single_page_reference*

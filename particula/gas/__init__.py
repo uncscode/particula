@@ -13,6 +13,7 @@ from particula.gas.vapor_pressure_strategies import (
     WaterBuckStrategy,
     ArblasterLiquidVaporPressureStrategy,
     LiquidClausiusHybridStrategy,
+    TableVaporPressureStrategy,
 )
 
 from particula.gas.vapor_pressure_builders import (
@@ -21,6 +22,7 @@ from particula.gas.vapor_pressure_builders import (
     ClausiusClapeyronVaporPressureBuilder,
     WaterBuckVaporPressureBuilder,
     SaturationConcentrationVaporPressureBuilder,
+    TableVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.species import GasSpecies

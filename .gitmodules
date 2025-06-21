@@ -1,3 +1,3 @@
 [submodule "adw_tools"]
 	path = adw_tools
-	url = https://github.com/Gorkowski/adw_tools.git
+	url = git@github.com:Gorkowski/adw_tools.git

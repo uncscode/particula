@@ -11,12 +11,14 @@ from particula.gas.vapor_pressure_builders import (
     ClausiusClapeyronVaporPressureBuilder,
     SaturationConcentrationVaporPressureBuilder,
     WaterBuckVaporPressureBuilder,
+    TableVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
     WaterBuckStrategy,
+    TableVaporPressureStrategy,
 )
 
 
@@ -28,12 +30,14 @@ class VaporPressureFactory(
             ClausiusClapeyronVaporPressureBuilder,
             SaturationConcentrationVaporPressureBuilder,
             WaterBuckVaporPressureBuilder,
+            TableVaporPressureBuilder,
         ],
         Union[
             ConstantVaporPressureStrategy,
             AntoineVaporPressureStrategy,
             ClausiusClapeyronStrategy,
             WaterBuckStrategy,
+            TableVaporPressureStrategy,
         ],
     ]
 ):
@@ -101,4 +105,5 @@ class VaporPressureFactory(
                 SaturationConcentrationVaporPressureBuilder()
             ),
             "water_buck": WaterBuckVaporPressureBuilder(),
+            "table": TableVaporPressureBuilder(),
         }
