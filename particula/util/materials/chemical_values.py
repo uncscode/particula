@@ -16,9 +16,9 @@ T_silica = 2500  # K
 temp_array = np.linspace(50, 5000, 500)
 # Major mineral components found in sand and atmospheric dust
 components = {
-    "Silicon (Si)"            : "Si",
-    "Silicon dioxide (SiO₂)"  : "SiO2",
-    "Aluminium oxide (Al₂O₃)" : "Al2O3",
+    "Silicon (Si)": "Si",
+    "Silicon dioxide (SiO₂)": "SiO2",
+    "Aluminium oxide (Al₂O₃)": "Al2O3",
     "Iron(III) oxide (Fe₂O₃)": "Fe2O3",
     "Calcium carbonate (CaCO₃)": "CaCO3",
 }
@@ -35,13 +35,13 @@ for (label, formula), color in zip(components.items(), colors):
         print(f"Skipping {label}: {err}")
         continue
     ax1.plot(
-        temp_array, vp / 1e6, color=color, linestyle="-",
-        label=f"{label} $P_{{sat}}$"
+        temp_array,
+        vp / 1e6,
+        color=color,
+        linestyle="-",
+        label=f"{label} $P_{{sat}}$",
     )
-    ax2.plot(
-        temp_array, st, color=color, linestyle="--",
-        label=f"{label} σ"
-    )
+    ax2.plot(temp_array, st, color=color, linestyle="--", label=f"{label} σ")
 ax1.set_yscale("log")
 ax1.set_xlabel("Temperature (K)")
 ax1.set_ylabel("Vapor Pressure (MPa)", color="r")
@@ -51,8 +51,11 @@ ax2.tick_params(axis="y", labelcolor="b")
 handles1, labels1 = ax1.get_legend_handles_labels()
 handles2, labels2 = ax2.get_legend_handles_labels()
 ax1.legend(
-    handles1 + handles2, labels1 + labels2,
-    loc="upper center", fontsize="x-small", ncol=2
+    handles1 + handles2,
+    labels1 + labels2,
+    loc="upper center",
+    fontsize="x-small",
+    ncol=2,
 )
 ax1.set_title("Vapor Pressure and Surface Tension of Sand/Dust Components")
 ax1.grid()
