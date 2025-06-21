@@ -1,37 +1,24 @@
 # %%
-from thermo import SurfaceTension, chemical
-from chemicals import CAS_from_any
-
 import matplotlib.pyplot as plt
-
-# %%
-# Get CAS number for aluminum (liquid form)
-cas = CAS_from_any("Al")
-
-# Create surface tension object
-gamma = SurfaceTension(CASRN=cas)
-
-# gamma.stablepoly_fit_coeffs
-# Compute surface tension at a given temperature, e.g., 1000 K
-T = 1000  # K
-value = gamma.T_dependent_property(T)  # in N/m
-
-print(f"Surface tension of liquid aluminum at {T} K: {value:.5f} N/m")
-print("Temperature range:", gamma.Tmin, "to", gamma.Tmax)
-
-# %% silica mineral
-cas_silica = CAS_from_any("Si")  # or "Silica, quartz" for crystalline form
-gamma_silica = SurfaceTension(CASRN=cas_silica)
-# Compute surface tension at a given temperature, e.g., 1000 K
-print("Temperature range:", gamma_silica.Tmin, "to", gamma_silica.Tmax)
-T_silica = 2500  # K
-# value_silica = gamma_silica.T_dependent_property(T_silica)# in N/m
-# print(f"Surface tension of silica at {T_silica} K: {value_silica:.5f} N/m")
 
 # %%
 from typing import Union, Optional
 import numpy as np
 from numpy.typing import NDArray
+from particula.util.materials.surface_tension import get_surface_tension
+from particula.util.materials.vapor_pressure     import get_vapor_pressure
+
+# Aluminium example
+T = 1000  # K
+value = get_surface_tension("Al", T).item()  # in N/m
+
+print(f"Surface tension of liquid aluminum at {T} K: {value:.5f} N/m")
+# print("Temperature range:", gamma.Tmin, "to", gamma.Tmax)
+
+# %% silica mineral
+T_silica = 2500  # K
+# value_silica = get_surface_tension("Si", T_silica).item()
+# print(f"Surface tension of silica at {T_silica} K: {value_silica:.5f} N/m")
 
 
 def evaluate_surface_tension(
@@ -121,26 +108,9 @@ plt.tight_layout()
 plt.show()
 # %%
 
-from thermo.chemical import Chemical
-
-# Create a Chemical object for Silicon
-si = Chemical("water")  # Use the correct CAS number for Silicon
-
-# Check available vapor pressure data
-print(si.Psat)  # Psat at default T (298.15K)
-
-temp_vap = si.VaporPressure(T=2000)  # Psat at 2000 K
-print(f"Vapor pressure of silicon at 2000 K: {temp_vap:.2f} Pa")
-
 temp_array = np.linspace(50, 5000, 500)
-vap_pressures = np.zeros_like(temp_array)
-sigma = np.zeros_like(temp_array)
-# Calculate vapor pressure over a range of temperatures
-for i, temp in enumerate(temp_array):
-    vap_pressures[i] = si.VaporPressure(T=temp)
-    sigma[i] = si.SurfaceTension(T=temp)
-
-
+vap_pressures = get_vapor_pressure("silicon", temp_array)
+sigma         = get_surface_tension("silicon", temp_array)
 
 # %%
 fig, ax1 = plt.subplots(figsize=(8, 5))
