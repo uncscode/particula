@@ -1,7 +1,18 @@
+"""
+Module for retrieving saturation-vapor pressure of chemicals.
+"""
+
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-from thermo.chemical import Chemical
+
+try:
+    from thermo.chemical import Chemical
+except ImportError as e:
+    raise ImportError(
+        "The 'thermo' package is required for vapor pressure calculations. "
+        "Please install it using 'pip install thermo'."
+    ) from e
 
 
 def get_vapor_pressure(
@@ -52,7 +63,5 @@ def get_vapor_pressure(
     chem = Chemical(chemical_identifier)
 
     # Vectorised call to thermo correlation
-    vp = np.vectorize(lambda T: chem.VaporPressure(T=T), otypes=[np.float64])(
-        temps
-    )
+    vp = np.vectorize(lambda T: chem.VaporPressure(T=T), otypes=[np.float64])(temps)
     return vp
