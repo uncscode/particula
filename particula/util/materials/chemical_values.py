@@ -12,15 +12,16 @@ T_silica = 2500  # K
 # value_silica = get_surface_tension("Si", T_silica).item()
 # print(f"Surface tension of silica at {T_silica} K: {value_silica:.5f} N/m")
 
+# temp_array = np.linspace(300, 10000, 100)
+temp_array = np.logspace(np.log10(300), np.log10(10000), 100)
 
-temp_array = np.linspace(50, 5000, 500)
 # Major mineral components found in sand and atmospheric dust
 components = {
     "Silicon (Si)": "Si",
     "Silicon dioxide (SiO₂)": "SiO2",
     "Aluminium oxide (Al₂O₃)": "Al2O3",
-    "Iron(III) oxide (Fe₂O₃)": "Fe2O3",
-    "Calcium carbonate (CaCO₃)": "CaCO3",
+    "Iron (Fe)": "Fe",
+    "Calcium (Ca)": "Ca",
 }
 colors = plt.cm.tab10(np.linspace(0, 1, len(components)))
 
@@ -31,6 +32,9 @@ for (label, formula), color in zip(components.items(), colors):
     try:
         vp = get_vapor_pressure(formula, temp_array)
         st = get_surface_tension(formula, temp_array)
+        print(
+            f"{label} - Vapor Pressure: {vp[-1]:.2e} Pa, Surface Tension: {st[-1]:.5f} N/m"
+        )
     except Exception as err:
         print(f"Skipping {label}: {err}")
         continue
@@ -43,6 +47,8 @@ for (label, formula), color in zip(components.items(), colors):
     )
     ax2.plot(temp_array, st, color=color, linestyle="--", label=f"{label} σ")
 ax1.set_yscale("log")
+ax1.set_xscale("log")
+ax1.set_ylim(1e-20, 1e20)
 ax1.set_xlabel("Temperature (K)")
 ax1.set_ylabel("Vapor Pressure (MPa)", color="r")
 ax2.set_ylabel("Surface Tension (N/m)", color="b")
