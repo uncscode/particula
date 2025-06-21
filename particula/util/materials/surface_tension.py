@@ -6,13 +6,10 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-try:
+try:  # pragma: no cover - optional dependency
     from thermo.chemical import Chemical
-except ImportError as e:
-    raise ImportError(
-        "The 'thermo' package is required for vapor pressure calculations. "
-        "Please install it using 'pip install thermo'."
-    ) from e
+except ImportError:  # pragma: no cover - dependency missing during import
+    Chemical = None
 
 
 def get_surface_tension(
@@ -60,6 +57,12 @@ def get_surface_tension(
         - D. R. Lide, *CRC Handbook of Chemistry and Physics*, 90th ed.,
           CRC Press, 2009.
     """
+    if Chemical is None:
+        raise ImportError(
+            "The 'thermo' package is required for vapor pressure calculations. "
+            "Please install it using 'pip install thermo'."
+        )
+
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
 

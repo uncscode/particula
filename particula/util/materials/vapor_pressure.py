@@ -6,13 +6,10 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-try:
+try:  # pragma: no cover - optional dependency
     from thermo.chemical import Chemical
-except ImportError as e:
-    raise ImportError(
-        "The 'thermo' package is required for vapor pressure calculations. "
-        "Please install it using 'pip install thermo'."
-    ) from e
+except ImportError:  # pragma: no cover - dependency missing during import
+    Chemical = None
 
 
 def get_vapor_pressure(
@@ -59,6 +56,12 @@ def get_vapor_pressure(
         - R. H. Perry & D. W. Green, *Perry's Chemical Engineers' Handbook*,
           8th ed., McGraw-Hill, 2007.
     """
+    if Chemical is None:
+        raise ImportError(
+            "The 'thermo' package is required for vapor pressure calculations. "
+            "Please install it using 'pip install thermo'."
+        )
+
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
 
