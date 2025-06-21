@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from particula.util.materials.surface_tension import get_surface_tension
 from particula.util.materials.vapor_pressure import get_vapor_pressure
+from particula.util.materials.chemical_search import get_chemical_search
 
 
 # %% silica mineral
@@ -22,6 +23,7 @@ components = {
     "Aluminium oxide (Al₂O₃)": "Al2O3",
     "Iron (Fe)": "Fe",
     "Calcium (Ca)": "Ca",
+    "Iron oxide (Fe₂O₃)": "Fe2O3",
 }
 colors = plt.cm.tab10(np.linspace(0, 1, len(components)))
 

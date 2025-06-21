@@ -1,5 +1,4 @@
 """Utility functions for querying the thermo chemical database."""
-from __future__ import annotations
 
 from difflib import get_close_matches
 

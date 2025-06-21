@@ -12,7 +12,7 @@ def test_get_chemical_search_exact():
 
 
 def test_get_chemical_search_fuzzy():
-    if not THERMO_AVAILABLE:
-        pytest.skip("thermo is not installed")
+    # if not THERMO_AVAILABLE:
+    #     pytest.skip("thermo is not installed")
     suggestion = chemical_search.get_chemical_search("watr")
     assert suggestion is not None
