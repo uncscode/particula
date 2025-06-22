@@ -7215,15 +7215,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#imports-and-plot-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Imports and Plot Configuration
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#setup-for-biomassburning-organic-aerosol-bboa-in-a-cloud-environment" class="md-nav__link">
     <span class="md-ellipsis">
       Setup for Biomass‐Burning Organic Aerosol (BBOA) in a Cloud Environment
@@ -9129,15 +9120,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#imports-and-plot-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Imports and Plot Configuration
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#setup-for-biomassburning-organic-aerosol-bboa-in-a-cloud-environment" class="md-nav__link">
     <span class="md-ellipsis">
       Setup for Biomass‐Burning Organic Aerosol (BBOA) in a Cloud Environment
@@ -9751,63 +9733,13 @@ Biomass burning aerosols (soot + organics + water) play a critical role in c
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=163b6ec8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="imports-and-plot-configuration">Imports and Plot Configuration<a class="anchor-link" href="#imports-and-plot-configuration">¶</a></h2><p>In this section we:</p>
-<ol>
-<li><p><strong>Import core libraries</strong></p>
-<ul>
-<li><code>copy</code> to create deep copies of objects</li>
-<li><code>matplotlib.pyplot</code> for plotting</li>
-<li><code>numpy</code> for numerical operations</li>
-<li><code>particula</code> (aliased as <code>par</code>) as our aerosol simulation framework</li>
-<li><code>tqdm</code> for progress bars in loops</li>
-</ul>
-</li>
-<li><p><strong>Configure global plot style</strong></p>
-<ul>
-<li>Use the <strong>Tailwind</strong> color palette from Particula’s utilities</li>
-<li>Set a neutral base color (<code>gray-600</code>) for text, axes, and ticks</li>
-<li>Establish a default figure size and font size</li>
-<li>Ensure fonts are embedded correctly in PDF/PS outputs</li>
-</ul>
-</li>
-</ol>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e1f3e08c">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details> <summary>▶️ Install Particula</summary>
-try:
-    import google.colab
-except ImportError:
-    # not Colab → do nothing
-    pass
-else:
-    # in Colab → install quietly
-    get_ipython().system("pip install particula[extra] --quiet")
-</details>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c1f1dd6b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -9820,7 +9752,10 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
+<span class="c1">#!pip install particula[extra] --quiet</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
@@ -9844,7 +9779,10 @@ else:
     <span class="p">}</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import copy
+<div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
+#!pip install particula[extra] --quiet
+
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
