@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/">
       
       
-        <link rel="prev" href="../distribution_factories/">
+        <link rel="prev" href="../surface_strategies/">
       
       
-        <link rel="next" href="../representation/">
+        <link rel="next" href="base/">
       
       
       <link rel="icon" href="../../../../images/icon_dark.svg">
@@ -63,7 +63,7 @@
       
         <meta  property="og:description"  content="None" >
       
-        <meta  property="og:image"  content="https://uncscode.github.io/particula/assets/images/social/API/particula/particles/distribution_strategies.png" >
+        <meta  property="og:image"  content="https://uncscode.github.io/particula/assets/images/social/API/particula/particles/distribution_strategies/index.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -79,7 +79,7 @@
       
         <meta  name="twitter:description"  content="None" >
       
-        <meta  name="twitter:image"  content="https://uncscode.github.io/particula/assets/images/social/API/particula/particles/distribution_strategies.png" >
+        <meta  name="twitter:image"  content="https://uncscode.github.io/particula/assets/images/social/API/particula/particles/distribution_strategies/index.png" >
       
     
     
@@ -775,8 +775,6 @@
       
         
       
-        
-      
     
     
     
@@ -996,29 +994,6 @@
   
   <span class="md-ellipsis">
     Ratio
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../activity/species_density/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Species Density
     
   </span>
   
@@ -3507,1076 +3482,6 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Distribution Strategies
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    Distribution Strategies
-    
-  </span>
-  
-
-      </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#distributionstrategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategycollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_name" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_name
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_name">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_total_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_total_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_total_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#massbasedmovingbin" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_13" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_14" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmass" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmasscollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_18" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_19" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_20" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#radiibasedmovingbin" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_21" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_22" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_23" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_24" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_25" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_26" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#speciatedmassmovingbin" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_27" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_28" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_29" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_30" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_31" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_32" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-
-    
-    
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
@@ -4715,6 +3620,8 @@
                 
   
   
+    
+  
   
   
     
@@ -4722,6 +3629,199 @@
       
         
           
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_13_14" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="./" class="md-nav__link md-nav__link--active">
+              
+  
+  
+  <span class="md-ellipsis">
+    Distribution strategies
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link md-nav__link--active" for="__nav_2_2_13_14" id="__nav_2_2_13_14_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_13_14_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2_13_14">
+            <span class="md-nav__icon md-icon"></span>
+            Distribution strategies
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="mass_based_moving_bin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MassBasedMovingBin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="particle_resolved_speciated_mass/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ParticleResolvedSpeciatedMass
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="radii_based_moving_bin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RadiiBasedMovingBin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="speciated_mass_moving_bin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SpeciatedMassMovingBin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
         
       
         
@@ -5225,6 +4325,29 @@
   
   <span class="md-ellipsis">
     Mixing State Index
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../properties/organic_density_module/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Organic Density Module
     
   </span>
   
@@ -9797,1001 +8920,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#distributionstrategy" class="md-nav__link">
+  <a href="#modules" class="md-nav__link">
     <span class="md-ellipsis">
-      DistributionStrategy
+      Modules
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategycollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_name" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_name
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_name">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#distributionstrategyget_total_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      DistributionStrategy().get_total_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DistributionStrategy().get_total_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#arguments_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      Arguments
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#returns_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_8" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#massbasedmovingbin" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_9" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_10" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_12" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_13" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#massbasedmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      MassBasedMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="MassBasedMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_14" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmass" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_15" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_16" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_17" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmasscollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_18" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_19" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particleresolvedspeciatedmassget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      ParticleResolvedSpeciatedMass().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ParticleResolvedSpeciatedMass().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_20" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#radiibasedmovingbin" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_21" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_22" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_23" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_24" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_25" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_26" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#speciatedmassmovingbin" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#methods_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature_27" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      See also
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_28" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_29" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_30" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_31" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#speciatedmassmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      SpeciatedMassMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SpeciatedMassMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_32" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -10820,466 +8953,16 @@
 <h1 id="distribution-strategies">Distribution Strategies<a class="headerlink" href="#distribution-strategies" title="Permanent link">&para;</a></h1>
 <p><a href="../../../#particula-index">Particula Index</a> / <a href="../../#particula">Particula</a> / <a href="../#particles">Particles</a> / Distribution Strategies</p>
 <blockquote>
-<p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py">particula.particles.distribution_strategies</a> module.</p>
+<p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/__init__.py">particula.particles.distribution_strategies</a> module.</p>
 </blockquote>
-<h2 id="distributionstrategy">DistributionStrategy<a class="headerlink" href="#distributionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L17">Show source in distribution_strategies.py:17</a></p>
-<p>Abstract base class defining common interfaces for
-mass, radius, and total mass calculations across
-different particle distribution representations.</p>
-<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
+<h2 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h2>
 <ul>
-<li>get_name : Return the type of the distribution strategy.</li>
-<li>get_species_mass : Calculate the mass per species.</li>
-<li>get_mass : Calculate the mass of the particles or bin.</li>
-<li>get_total_mass : Calculate the total mass of particles.</li>
-<li>get_radius : Calculate the radius of particles.</li>
-<li>add_mass : Add mass to the particle distribution.</li>
-<li>add_concentration : Add concentration to the distribution.</li>
-<li>collide_pairs : Perform collision logic on specified particle pairs.</li>
+<li><a href="base/">Base</a></li>
+<li><a href="mass_based_moving_bin/">MassBasedMovingBin</a></li>
+<li><a href="particle_resolved_speciated_mass/">ParticleResolvedSpeciatedMass</a></li>
+<li><a href="radii_based_moving_bin/">RadiiBasedMovingBin</a></li>
+<li><a href="speciated_mass_moving_bin/">SpeciatedMassMovingBin</a></li>
 </ul>
-<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyadd_concentration">DistributionStrategy().add_concentration<a class="headerlink" href="#distributionstrategyadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L132">Show source in distribution_strategies.py:132</a></p>
-<p>Add concentration to the distribution of particles.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>concentration : The concentration of each particle
-  size or mass.</li>
-<li>added_distribution : The distribution to be added.</li>
-<li>added_concentration : The concentration to be added.</li>
-</ul>
-<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The updated distribution array</li>
-<li>The updated concentration array.</li>
-</ul>
-<h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyadd_mass">DistributionStrategy().add_mass<a class="headerlink" href="#distributionstrategyadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L109">Show source in distribution_strategies.py:109</a></p>
-<p>Add mass to the distribution of particles.</p>
-<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>concentration : The concentration of each particle
-  size or mass.</li>
-<li>density : The density of the particles.</li>
-<li>added_mass : The mass to be added per distribution bin.</li>
-</ul>
-<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The updated distribution array.</li>
-<li>The updated concentration array.</li>
-</ul>
-<h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategycollide_pairs">DistributionStrategy().collide_pairs<a class="headerlink" href="#distributionstrategycollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L155">Show source in distribution_strategies.py:155</a></p>
-<p>Collide index pairs in the distribution.</p>
-<h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>concentration : The concentration of each particle size or mass.</li>
-<li>density : The density of the particles.</li>
-<li>indices : The indices of the particles to collide.</li>
-</ul>
-<h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The updated distribution array</li>
-<li>The updated concentration array.</li>
-</ul>
-<h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyget_mass">DistributionStrategy().get_mass<a class="headerlink" href="#distributionstrategyget_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L53">Show source in distribution_strategies.py:53</a></p>
-<p>Calculate the mass of the particles or bin.</p>
-<h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>density : The density of the particles.</li>
-</ul>
-<h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The mass of the particles.</li>
-</ul>
-<h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyget_name">DistributionStrategy().get_name<a class="headerlink" href="#distributionstrategyget_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L34">Show source in distribution_strategies.py:34</a></p>
-<p>Return the type of the distribution strategy.</p>
-<h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyget_radius">DistributionStrategy().get_radius<a class="headerlink" href="#distributionstrategyget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L94">Show source in distribution_strategies.py:94</a></p>
-<p>Calculate the radius of the particles.</p>
-<h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>density : The density of the particles.</li>
-</ul>
-<h4 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The radius of the particles in meters.</li>
-</ul>
-<h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyget_species_mass">DistributionStrategy().get_species_mass<a class="headerlink" href="#distributionstrategyget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L38">Show source in distribution_strategies.py:38</a></p>
-<p>Return the mass per species in the distribution.</p>
-<h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>density : The density of the particles.</li>
-</ul>
-<h4 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The mass of the particles (per species).</li>
-</ul>
-<h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="distributionstrategyget_total_mass">DistributionStrategy().get_total_mass<a class="headerlink" href="#distributionstrategyget_total_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L72">Show source in distribution_strategies.py:72</a></p>
-<p>Calculate the total mass of all particles (or bin).</p>
-<h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
-<ul>
-<li>distribution : The distribution of particle sizes or masses.</li>
-<li>concentration : The concentration of each particle
-  size or mass in the distribution.</li>
-<li>density : The density of the particles.</li>
-</ul>
-<h4 id="returns_6">Returns<a class="headerlink" href="#returns_6" title="Permanent link">&para;</a></h4>
-<ul>
-<li>The total mass of the particles.</li>
-</ul>
-<h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_total_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="o">...</span>
-</code></pre></div>
-<h2 id="massbasedmovingbin">MassBasedMovingBin<a class="headerlink" href="#massbasedmovingbin" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L178">Show source in distribution_strategies.py:178</a></p>
-<p>Strategy for particles represented by their mass distribution.</p>
-<p>Calculates particle mass, radius, and total mass based on the
-particle mass, number concentration, and density. This moving-bin
-approach adjusts mass bins on mass addition events.</p>
-<h4 id="methods_1">Methods<a class="headerlink" href="#methods_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li>get_name : Return the type of the distribution strategy.</li>
-<li>get_species_mass : Calculate the mass per species.</li>
-<li>get_mass : Calculate the mass of the particles or bin.</li>
-<li>get_total_mass : Calculate the total mass of particles.</li>
-<li>get_radius : Calculate the radius of particles.</li>
-<li>add_mass : Add mass to the particle distribution.</li>
-<li>add_concentration : Add concentration to the distribution.</li>
-</ul>
-<h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MassBasedMovingBin</span><span class="p">(</span><span class="n">DistributionStrategy</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
-<ul>
-<li><a href="#distributionstrategy">DistributionStrategy</a></li>
-</ul>
-<h3 id="massbasedmovingbinadd_concentration">MassBasedMovingBin().add_concentration<a class="headerlink" href="#massbasedmovingbinadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L220">Show source in distribution_strategies.py:220</a></p>
-<h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="massbasedmovingbinadd_mass">MassBasedMovingBin().add_mass<a class="headerlink" href="#massbasedmovingbinadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L210">Show source in distribution_strategies.py:210</a></p>
-<h4 id="signature_11">Signature<a class="headerlink" href="#signature_11" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="massbasedmovingbincollide_pairs">MassBasedMovingBin().collide_pairs<a class="headerlink" href="#massbasedmovingbincollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L256">Show source in distribution_strategies.py:256</a></p>
-<h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="massbasedmovingbinget_radius">MassBasedMovingBin().get_radius<a class="headerlink" href="#massbasedmovingbinget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L202">Show source in distribution_strategies.py:202</a></p>
-<h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="massbasedmovingbinget_species_mass">MassBasedMovingBin().get_species_mass<a class="headerlink" href="#massbasedmovingbinget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L196">Show source in distribution_strategies.py:196</a></p>
-<h4 id="signature_14">Signature<a class="headerlink" href="#signature_14" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h2 id="particleresolvedspeciatedmass">ParticleResolvedSpeciatedMass<a class="headerlink" href="#particleresolvedspeciatedmass" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L473">Show source in distribution_strategies.py:473</a></p>
-<p>Strategy for particle-resolved masses with multiple species.</p>
-<p>Allows each particle to have separate masses for each species, with
-individualized densities. This strategy provides a more detailed
-approach when each particle's composition must be modeled explicitly.</p>
-<h4 id="methods_2">Methods<a class="headerlink" href="#methods_2" title="Permanent link">&para;</a></h4>
-<ul>
-<li>get_name : Return the type of the distribution strategy.</li>
-<li>get_species_mass : Calculate the mass per species.</li>
-<li>get_mass : Calculate the mass of the particles or bin.</li>
-<li>get_total_mass : Calculate the total mass of particles.</li>
-<li>get_radius : Calculate the radius of particles.</li>
-<li>add_mass : Add mass to the particle distribution.</li>
-<li>add_concentration : Add concentration to the distribution.</li>
-<li>collide_pairs : Perform collision logic on specified particle pairs.</li>
-</ul>
-<h4 id="signature_15">Signature<a class="headerlink" href="#signature_15" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParticleResolvedSpeciatedMass</span><span class="p">(</span><span class="n">DistributionStrategy</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<h4 id="see-also_1">See also<a class="headerlink" href="#see-also_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li><a href="#distributionstrategy">DistributionStrategy</a></li>
-</ul>
-<h3 id="particleresolvedspeciatedmassadd_concentration">ParticleResolvedSpeciatedMass().add_concentration<a class="headerlink" href="#particleresolvedspeciatedmassadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L535">Show source in distribution_strategies.py:535</a></p>
-<h4 id="signature_16">Signature<a class="headerlink" href="#signature_16" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="particleresolvedspeciatedmassadd_mass">ParticleResolvedSpeciatedMass().add_mass<a class="headerlink" href="#particleresolvedspeciatedmassadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L507">Show source in distribution_strategies.py:507</a></p>
-<h4 id="signature_17">Signature<a class="headerlink" href="#signature_17" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="particleresolvedspeciatedmasscollide_pairs">ParticleResolvedSpeciatedMass().collide_pairs<a class="headerlink" href="#particleresolvedspeciatedmasscollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L593">Show source in distribution_strategies.py:593</a></p>
-<h4 id="signature_18">Signature<a class="headerlink" href="#signature_18" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="particleresolvedspeciatedmassget_radius">ParticleResolvedSpeciatedMass().get_radius<a class="headerlink" href="#particleresolvedspeciatedmassget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L497">Show source in distribution_strategies.py:497</a></p>
-<h4 id="signature_19">Signature<a class="headerlink" href="#signature_19" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="particleresolvedspeciatedmassget_species_mass">ParticleResolvedSpeciatedMass().get_species_mass<a class="headerlink" href="#particleresolvedspeciatedmassget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L492">Show source in distribution_strategies.py:492</a></p>
-<h4 id="signature_20">Signature<a class="headerlink" href="#signature_20" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h2 id="radiibasedmovingbin">RadiiBasedMovingBin<a class="headerlink" href="#radiibasedmovingbin" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L271">Show source in distribution_strategies.py:271</a></p>
-<p>Strategy for particles represented by their radius distribution.</p>
-<p>Calculates particle mass, radius, and total mass based on particle
-radius, number concentration, and density. This moving-bin approach
-recalculates radii when mass is added.</p>
-<h4 id="methods_3">Methods<a class="headerlink" href="#methods_3" title="Permanent link">&para;</a></h4>
-<ul>
-<li>get_name : Return the type of the distribution strategy.</li>
-<li>get_species_mass : Calculate the mass per species.</li>
-<li>get_mass : Calculate the mass of the particles or bin.</li>
-<li>get_total_mass : Calculate the total mass of particles.</li>
-<li>get_radius : Calculate the radius of particles.</li>
-<li>add_mass : Add mass to the particle distribution.</li>
-<li>add_concentration : Add concentration to the distribution.</li>
-</ul>
-<h4 id="signature_21">Signature<a class="headerlink" href="#signature_21" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RadiiBasedMovingBin</span><span class="p">(</span><span class="n">DistributionStrategy</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<h4 id="see-also_2">See also<a class="headerlink" href="#see-also_2" title="Permanent link">&para;</a></h4>
-<ul>
-<li><a href="#distributionstrategy">DistributionStrategy</a></li>
-</ul>
-<h3 id="radiibasedmovingbinadd_concentration">RadiiBasedMovingBin().add_concentration<a class="headerlink" href="#radiibasedmovingbinadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L321">Show source in distribution_strategies.py:321</a></p>
-<h4 id="signature_22">Signature<a class="headerlink" href="#signature_22" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinadd_mass">RadiiBasedMovingBin().add_mass<a class="headerlink" href="#radiibasedmovingbinadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L303">Show source in distribution_strategies.py:303</a></p>
-<h4 id="signature_23">Signature<a class="headerlink" href="#signature_23" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbincollide_pairs">RadiiBasedMovingBin().collide_pairs<a class="headerlink" href="#radiibasedmovingbincollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L356">Show source in distribution_strategies.py:356</a></p>
-<h4 id="signature_24">Signature<a class="headerlink" href="#signature_24" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinget_radius">RadiiBasedMovingBin().get_radius<a class="headerlink" href="#radiibasedmovingbinget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L296">Show source in distribution_strategies.py:296</a></p>
-<h4 id="signature_25">Signature<a class="headerlink" href="#signature_25" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinget_species_mass">RadiiBasedMovingBin().get_species_mass<a class="headerlink" href="#radiibasedmovingbinget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L289">Show source in distribution_strategies.py:289</a></p>
-<h4 id="signature_26">Signature<a class="headerlink" href="#signature_26" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h2 id="speciatedmassmovingbin">SpeciatedMassMovingBin<a class="headerlink" href="#speciatedmassmovingbin" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L371">Show source in distribution_strategies.py:371</a></p>
-<p>Strategy for particles with speciated mass distribution.</p>
-<p>Each particle may contain multiple species, each with a unique
-density. This strategy calculates mass, radius, and total mass from
-the species-level masses and overall particle concentrations.</p>
-<h4 id="methods_4">Methods<a class="headerlink" href="#methods_4" title="Permanent link">&para;</a></h4>
-<ul>
-<li>get_name : Return the type of the distribution strategy.</li>
-<li>get_species_mass : Calculate the mass per species.</li>
-<li>get_mass : Calculate the mass of the particles or bin.</li>
-<li>get_total_mass : Calculate the total mass of particles.</li>
-<li>get_radius : Calculate the radius of particles.</li>
-<li>add_mass : Add mass to the particle distribution.</li>
-<li>add_concentration : Add concentration to the distribution.</li>
-</ul>
-<h4 id="signature_27">Signature<a class="headerlink" href="#signature_27" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SpeciatedMassMovingBin</span><span class="p">(</span><span class="n">DistributionStrategy</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<h4 id="see-also_3">See also<a class="headerlink" href="#see-also_3" title="Permanent link">&para;</a></h4>
-<ul>
-<li><a href="#distributionstrategy">DistributionStrategy</a></li>
-</ul>
-<h3 id="speciatedmassmovingbinadd_concentration">SpeciatedMassMovingBin().add_concentration<a class="headerlink" href="#speciatedmassmovingbinadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L423">Show source in distribution_strategies.py:423</a></p>
-<h4 id="signature_28">Signature<a class="headerlink" href="#signature_28" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="speciatedmassmovingbinadd_mass">SpeciatedMassMovingBin().add_mass<a class="headerlink" href="#speciatedmassmovingbinadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L401">Show source in distribution_strategies.py:401</a></p>
-<h4 id="signature_29">Signature<a class="headerlink" href="#signature_29" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="speciatedmassmovingbincollide_pairs">SpeciatedMassMovingBin().collide_pairs<a class="headerlink" href="#speciatedmassmovingbincollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L458">Show source in distribution_strategies.py:458</a></p>
-<h4 id="signature_30">Signature<a class="headerlink" href="#signature_30" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="speciatedmassmovingbinget_radius">SpeciatedMassMovingBin().get_radius<a class="headerlink" href="#speciatedmassmovingbinget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L394">Show source in distribution_strategies.py:394</a></p>
-<h4 id="signature_31">Signature<a class="headerlink" href="#signature_31" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="speciatedmassmovingbinget_species_mass">SpeciatedMassMovingBin().get_species_mass<a class="headerlink" href="#speciatedmassmovingbinget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L389">Show source in distribution_strategies.py:389</a></p>
-<h4 id="signature_32">Signature<a class="headerlink" href="#signature_32" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
 
 
 
