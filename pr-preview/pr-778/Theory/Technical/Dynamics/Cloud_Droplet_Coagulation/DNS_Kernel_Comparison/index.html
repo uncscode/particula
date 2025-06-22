@@ -9649,26 +9649,6 @@ Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). <em>Effects of turbulence on the 
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<details> <summary>▶️ Install Particula</summary>
-try:
-    import google.colab
-except ImportError:
-    # not Colab → do nothing
-    pass
-else:
-    # in Colab → install quietly
-    get_ipython().system("pip install particula[extra] --quiet")
-</details>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dd480469-811b-42ec-8b98-db1326a99e63">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -9688,7 +9668,9 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
+<span class="c1">#!pip install particula[extra] --quiet</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
@@ -9729,7 +9711,9 @@ else:
     <span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import numpy as np
+<div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
+#!pip install particula[extra] --quiet
+import numpy as np
 import matplotlib.pyplot as plt
 import particula as par
 
