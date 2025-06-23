@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-         linter: ["flake8", "pylint"]
+       matrix:
+         linter: ["flake8", "pylint", "ruff"]
 
     steps:
     - uses: actions/checkout@v4
@@ -37,8 +37,14 @@ jobs:
       run: |
         flake8 . --config .github/.flake8
 
-    -
-      if: ${{ matrix.linter == 'pylint' }}
-      name: Lint with pylint
-      run: |
-        pylint $(find particula/ -name "*.py" | xargs)
+      -
+        if: ${{ matrix.linter == 'pylint' }}
+        name: Lint with pylint
+        run: |
+          pylint $(find particula/ -name "*.py" | xargs)
+
+      -
+        if: ${{ matrix.linter == 'ruff' }}
+        name: Format with ruff
+        run: |
+          ruff format --check .
