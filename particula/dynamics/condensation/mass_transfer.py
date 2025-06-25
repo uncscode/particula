@@ -30,6 +30,12 @@ import numpy as np
 # particula imports
 from particula.util.constants import GAS_CONSTANT  # type: ignore
 from particula.util.validate_inputs import validate_inputs
+from particula.dynamics.condensation.mass_transfer_utils import (
+    calc_mass_to_change,
+    apply_condensation_limit,
+    apply_evaporation_limit,
+    apply_per_bin_limit,
+)
 
 
 @validate_inputs(
@@ -361,32 +367,22 @@ def get_mass_transfer_of_single_species(
         # Output: array([...])
         ```
     """
-    # 1. requested mass change ( + = condensation , - = evaporation )
-    mass_to_change = mass_rate * time_step * particle_concentration
-
-    # ------------------------------------------------------------------
-    # 2.  Separate condensation (+) and evaporation (−) contributions
-    # ------------------------------------------------------------------
-    positive_sum = mass_to_change[mass_to_change > 0.0].sum()  # Σ cond
-    negative_sum = mass_to_change[mass_to_change < 0.0].sum()  # Σ evap (<0)
-
-    # ---- condensation reservoir limit (gas_mass) ---------------------
-    if positive_sum > 0.0 and positive_sum + negative_sum > gas_mass.item():
-        cond_scale = (gas_mass.item() - negative_sum) / positive_sum
-        cond_scale = max(cond_scale, 0.0)  # numerical safety
-        mass_to_change[mass_to_change > 0.0] *= cond_scale  # scale only +
-
-    # ---- evaporation inventory limit (particle mass) -----------------
-    total_particle_mass = (particle_mass * particle_concentration).sum()
-    if negative_sum < 0.0 and -negative_sum > total_particle_mass:
-        evap_scale = total_particle_mass / (-negative_sum)
-        mass_to_change[mass_to_change < 0.0] *= evap_scale  # scale only −
-
-    # 4. Per-bin evaporation limit (no bin can evaporate more than it owns)
-    per_bin_evap_limit = -particle_mass * particle_concentration
-    mass_to_change = np.maximum(mass_to_change, per_bin_evap_limit)
-
-    return mass_to_change
+    mass_to_change = calc_mass_to_change(
+        mass_rate, time_step, particle_concentration
+    )
+    mass_to_change, evap_sum, neg_mask = apply_condensation_limit(
+        mass_to_change, gas_mass
+    )
+    mass_to_change = apply_evaporation_limit(
+        mass_to_change,
+        particle_mass,
+        particle_concentration,
+        evap_sum,
+        neg_mask,
+    )
+    return apply_per_bin_limit(
+        mass_to_change, particle_mass, particle_concentration
+    )
 
 
 # pylint: disable=too-many-locals
@@ -448,49 +444,19 @@ def get_mass_transfer_of_multiple_species(
         # Output: array([...])
         ```
     """
-    # 1.  Requested mass transfer (positive = condensation, negative = evap.)
-    mass_to_change = (
-        mass_rate * time_step * particle_concentration[:, np.newaxis]
+    mass_to_change = calc_mass_to_change(
+        mass_rate, time_step, particle_concentration
     )
-
-    # ------------------------------------------------------------------
-    # 2.  Separate condensation (+) and evaporation (−) per species
-    # ------------------------------------------------------------------
-    pos_mask = mass_to_change > 0.0
-    neg_mask = mass_to_change < 0.0
-
-    cond_sum = np.where(pos_mask, mass_to_change, 0.0).sum(
-        axis=0
-    )  # Σ cond (≥0)
-    evap_sum = np.where(neg_mask, mass_to_change, 0.0).sum(
-        axis=0
-    )  # Σ evap (≤0)
-
-    # ---- condensation reservoir limit (gas_mass) ---------------------
-    cond_scale = np.ones_like(cond_sum)
-    need_cond_scale = (cond_sum > 0.0) & (cond_sum + evap_sum > gas_mass)
-    cond_scale[need_cond_scale] = (
-        gas_mass[need_cond_scale] - evap_sum[need_cond_scale]
-    ) / cond_sum[need_cond_scale]
-    cond_scale = np.clip(cond_scale, 0.0, 1.0)  # safety
-    mass_to_change = np.where(
-        pos_mask, mass_to_change * cond_scale, mass_to_change
+    mass_to_change, evap_sum, neg_mask = apply_condensation_limit(
+        mass_to_change, gas_mass
     )
-
-    # ---- evaporation inventory limit (particle mass) -----------------
-    inventory = (particle_mass * particle_concentration[:, None]).sum(axis=0)
-
-    evap_scale = np.ones_like(evap_sum)
-    need_evap_scale = -evap_sum > inventory
-    evap_scale[need_evap_scale] = inventory[need_evap_scale] / (
-        -evap_sum[need_evap_scale]
+    mass_to_change = apply_evaporation_limit(
+        mass_to_change,
+        particle_mass,
+        particle_concentration,
+        evap_sum,
+        neg_mask,
     )
-    mass_to_change = np.where(
-        neg_mask, mass_to_change * evap_scale, mass_to_change
+    return apply_per_bin_limit(
+        mass_to_change, particle_mass, particle_concentration
     )
-
-    # 4.  Per-bin evaporation limit (no negative particle mass)
-    per_bin_evap_limit = -particle_mass * particle_concentration[:, np.newaxis]
-    mass_to_change = np.maximum(mass_to_change, per_bin_evap_limit)
-
-    return mass_to_change
