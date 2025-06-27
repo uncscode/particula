@@ -1,4 +1,4 @@
-"""Test for chemical_properties.py module."""
+"""Test for mass_transfer_utilsmodule."""
 
 import numpy as np
 from particula.dynamics.condensation.mass_transfer_utils import (
