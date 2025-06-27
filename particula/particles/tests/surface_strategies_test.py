@@ -9,6 +9,7 @@ from particula.particles.surface_strategies import (
     _weighted_average_by_phase,
     _as_2d,
     _broadcast_weights,
+    _interp_surface_tension,          # NEW
 )
 
 
@@ -413,3 +414,34 @@ def test_update_surface_tension_1d_table():
     # at 293 K the table gives 0.070 N/m
     out = strat.effective_surface_tension(mass_conc, temperature=293)
     assert np.allclose(out, 0.070, rtol=1e-6)
+
+
+def test_interp_surface_tension_helper():
+    """Validate _interp_surface_tension for 1-D and 2-D tables."""
+    # --- 1-D table --------------------------------------------------------
+    t_tab = np.array([270.0, 280.0, 290.0])   # K
+    st_1d = np.array([0.072, 0.071, 0.070])   # N / m
+    val_1d = _interp_surface_tension(275.0, st_1d, t_tab)
+    assert np.isclose(val_1d, np.interp(275.0, t_tab, st_1d))
+
+    # --- 2-D table --------------------------------------------------------
+    st_2d = np.array(
+        [
+            [0.072, 0.050],
+            [0.071, 0.049],
+            [0.070, 0.048],
+        ]
+    )  # shape (3 temps, 2 species)
+    val_2d = _interp_surface_tension(285.0, st_2d, t_tab)
+    expected = np.array(
+        [
+            np.interp(285.0, t_tab, st_2d[:, 0]),
+            np.interp(285.0, t_tab, st_2d[:, 1]),
+        ]
+    )
+    np.testing.assert_allclose(val_2d, expected)
+
+    # --- unsupported dimensionality should raise -------------------------
+    with pytest.raises(ValueError):
+        bad_table = st_2d[:, :, np.newaxis]  # 3-D input
+        _ = _interp_surface_tension(285.0, bad_table, t_tab)
