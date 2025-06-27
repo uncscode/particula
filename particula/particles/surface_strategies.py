@@ -131,9 +131,7 @@ def _weighted_average_by_phase(
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
-    weights = _broadcast_weights(
-        np.asarray(weights, dtype=np.float64), values.shape
-    )
+    weights = _broadcast_weights(np.asarray(weights, dtype=np.float64), values.shape)
 
     averaged = np.empty_like(values)
 
@@ -290,11 +288,17 @@ class SurfaceStrategy(ABC):
         )
 
     def update_surface_tension(self, temperature: float) -> None:
-        # no lookup tables → nothing to update
-        if (
-            self.surface_tension_table is None
-            or self.temperature_table is None
-        ):
+        """
+        Update the surface tension attribute based on the given temperature.
+
+        If a temperature-dependent surface tension table is provided,
+        it interpolates the surface tension value for the specified
+        temperature.
+
+        Arguments:
+            - temperature : Temperature in K to update the surface tension.
+        """
+        if self.surface_tension_table is None or self.temperature_table is None:
             return
 
         self.surface_tension = _interp_surface_tension(
