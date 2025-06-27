@@ -5,7 +5,7 @@ Radial relative velocity calculation module.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-from scipy.special import erf
+from scipy.special import erf  # pylint: disable=no-name-in-module
 
 from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
@@ -57,8 +57,7 @@ def get_radial_relative_velocity_dz2002(
         - Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921–2924.
     """
     tau_diff = np.abs(
-        particle_inertia_time[:, np.newaxis]
-        - particle_inertia_time[np.newaxis, :]
+        particle_inertia_time[:, np.newaxis] - particle_inertia_time[np.newaxis, :]
     )
 
     b = (STANDARD_GRAVITY * tau_diff) / (np.sqrt(2) * velocity_dispersion)
@@ -67,9 +66,7 @@ def get_radial_relative_velocity_dz2002(
     sqrt_pi = np.sqrt(np.pi)
     erf_b = erf(b)
     exp_b2 = np.exp(-(b**2))
-    f_b = (
-        0.5 * sqrt_pi * (b + 0.5 / np.maximum(b, 1e-16)) * erf_b + 0.5 * exp_b2
-    )
+    f_b = 0.5 * sqrt_pi * (b + 0.5 / np.maximum(b, 1e-16)) * erf_b + 0.5 * exp_b2
 
     return np.sqrt(2 / np.pi) * velocity_dispersion * f_b
 
