@@ -62,8 +62,6 @@ def get_chemical_vapor_pressure(
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
 
-    # Vectorised call to thermo correlation
-    vp = np.vectorize(lambda T: chem.VaporPressure(T=T), otypes=[np.float64])(
-        temps
-    )
-    return vp
+    return np.vectorize(
+        lambda T: chem.VaporPressure(T=T), otypes=[np.float64]
+    )(temps)
