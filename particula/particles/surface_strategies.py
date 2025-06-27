@@ -43,6 +43,36 @@ def _as_2d(array: NDArray[np.float64]) -> tuple[NDArray[np.float64], bool]:
 def _broadcast_weights(
     weights: NDArray[np.float64], target_shape: tuple[int, int]
 ) -> NDArray[np.float64]:
+    
+
+def _interp_surface_tension(
+    temperature: float,
+    surface_tension_table: NDArray[np.float64],
+    temperature_table: NDArray[np.float64],
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Interpolate *surface_tension_table* at *temperature*.
+    Handles 1-D (single species) and 2-D (one column per species) tables.
+
+    Returns a scalar (for 1-D) or 1-D array (for 2-D).
+    """
+    if surface_tension_table.ndim == 1:  # 1-D lookup
+        return np.interp(temperature, temperature_table, surface_tension_table)
+
+    if surface_tension_table.ndim == 2:  # 2-D lookup, per-species columns
+        return np.array(
+            [
+                np.interp(
+                    temperature,
+                    temperature_table,
+                    surface_tension_table[:, j],
+                )
+                for j in range(surface_tension_table.shape[1])
+            ],
+            dtype=np.float64,
+        )
+
+    raise ValueError("surface_tension_table must be 1-D or 2-D")
     """
     Return *weights* with shape exactly equal to *target_shape*
     (n_bins, n_species).  Accepts 1-D (n_species,) or 2-D inputs.
@@ -260,39 +290,18 @@ class SurfaceStrategy(ABC):
         )
 
     def update_surface_tension(self, temperature: float) -> None:
-        # bail-out if no lookup tables were provided -----------------------
+        # no lookup tables → nothing to update
         if (
             self.surface_tension_table is None
             or self.temperature_table is None
         ):
             return
 
-        # 1-D: single species (or already pre-mixed) -----------------------
-        if self.surface_tension_table.ndim == 1:
-            self.surface_tension = np.interp(
-                temperature,
-                self.temperature_table,
-                self.surface_tension_table,
-            )
-            return
-
-        # 2-D: separate column per species --------------------------------
-        if self.surface_tension_table.ndim == 2:
-            self.surface_tension = np.array(
-                [
-                    np.interp(
-                        temperature,
-                        self.temperature_table,
-                        self.surface_tension_table[:, j],
-                    )
-                    for j in range(self.surface_tension_table.shape[1])
-                ],
-                dtype=np.float64,
-            )
-            return
-
-        # unsupported dimensionality --------------------------------------
-        raise ValueError("surface_tension_table must be 1-D or 2-D")
+        self.surface_tension = _interp_surface_tension(
+            temperature,
+            self.surface_tension_table,
+            self.temperature_table,
+        )
 
 
 # Surface mixing strategies
