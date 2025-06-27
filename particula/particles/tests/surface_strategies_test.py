@@ -9,7 +9,7 @@ from particula.particles.surface_strategies import (
     _weighted_average_by_phase,
     _as_2d,
     _broadcast_weights,
-    _interp_surface_tension,          # NEW
+    _interp_surface_tension,  # NEW
 )
 
 
@@ -419,8 +419,8 @@ def test_update_surface_tension_1d_table():
 def test_interp_surface_tension_helper():
     """Validate _interp_surface_tension for 1-D and 2-D tables."""
     # --- 1-D table --------------------------------------------------------
-    t_tab = np.array([270.0, 280.0, 290.0])   # K
-    st_1d = np.array([0.072, 0.071, 0.070])   # N / m
+    t_tab = np.array([270.0, 280.0, 290.0])  # K
+    st_1d = np.array([0.072, 0.071, 0.070])  # N / m
     val_1d = _interp_surface_tension(275.0, st_1d, t_tab)
     assert np.isclose(val_1d, np.interp(275.0, t_tab, st_1d))
 
