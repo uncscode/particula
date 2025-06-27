@@ -20,17 +20,21 @@ References:
 
 import logging
 from typing import Optional
+from numpy.typing import NDArray
+import numpy as np
 
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import (
     BuilderMolarMassMixin,
     BuilderTemperatureMixin,
+    BuilderTemperatureTableMixin,
 )
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
     WaterBuckStrategy,
     ConstantVaporPressureStrategy,
+    TableVaporPressureStrategy,
 )
 from particula.gas.properties.pressure_function import get_partial_pressure
 from particula.util.validate_inputs import validate_inputs
@@ -446,3 +450,44 @@ class WaterBuckVaporPressureBuilder(
             - Configured for water-specific Buck vapor pressure.
         """
         return WaterBuckStrategy()
+
+
+class TableVaporPressureBuilder(
+    BuilderABC,
+    BuilderTemperatureTableMixin,
+):
+    """Builder for TableVaporPressureStrategy.
+
+    Allows setting lookup tables of vapor pressure and temperature, handling
+    optional unit conversion before constructing the strategy.
+    """
+
+    def __init__(self) -> None:
+        required_parameters = ["vapor_pressure_table", "temperature_table"]
+        BuilderABC.__init__(self, required_parameters)
+        BuilderTemperatureTableMixin.__init__(self)
+        self.vapor_pressure_table: NDArray[np.float64] | None = None
+
+    @validate_inputs({"vapor_pressure_table": "positive"})
+    def set_vapor_pressure_table(
+        self,
+        vapor_pressure_table: NDArray[np.float64],
+        vapor_pressure_table_units: str = "Pa",
+    ) -> "TableVaporPressureBuilder":
+        """Set the vapor pressure lookup table."""
+        table = np.asarray(vapor_pressure_table, dtype=np.float64)
+        if vapor_pressure_table_units != "Pa":
+            table = table * get_unit_conversion(
+                vapor_pressure_table_units,
+                "Pa",
+            )
+        self.vapor_pressure_table = table
+        return self
+
+    def build(self) -> TableVaporPressureStrategy:
+        """Validate and construct a TableVaporPressureStrategy."""
+        self.pre_build_check()
+        return TableVaporPressureStrategy(
+            vapor_pressures=self.vapor_pressure_table,  # type: ignore
+            temperatures=self.temperature_table,
+        )
