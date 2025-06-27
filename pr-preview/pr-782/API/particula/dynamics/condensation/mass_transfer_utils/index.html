@@ -9381,7 +9381,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py">particula.dynamics.condensation.mass_transfer_utils</a> module.</p>
 </blockquote>
 <h2 id="apply_condensation_limit">apply_condensation_limit<a class="headerlink" href="#apply_condensation_limit" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L37">Show source in mass_transfer_utils.py:37</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L40">Show source in mass_transfer_utils.py:40</a></p>
 <p>Scale condensation so that the column sum never exceeds the available gas mass.</p>
 <h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
 <p>mass_to_change : NDArray[np.float64]
@@ -9398,7 +9398,7 @@ gas_mass : NDArray[np.float64]
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="apply_evaporation_limit">apply_evaporation_limit<a class="headerlink" href="#apply_evaporation_limit" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L76">Show source in mass_transfer_utils.py:76</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L79">Show source in mass_transfer_utils.py:79</a></p>
 <p>Scale evaporation so the column sum never exceeds the particle inventory."</p>
 <h2 id="parameters_1">Parameters<a class="headerlink" href="#parameters_1" title="Permanent link">&para;</a></h2>
 <p>mass_to_change : NDArray[np.float64]
@@ -9424,7 +9424,7 @@ neg_mask : NDArray[np.bool_]
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="apply_per_bin_limit">apply_per_bin_limit<a class="headerlink" href="#apply_per_bin_limit" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L117">Show source in mass_transfer_utils.py:117</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L120">Show source in mass_transfer_utils.py:120</a></p>
 <p>Clip evaporation so no single bin loses more mass than it contains.</p>
 <h2 id="parameters_2">Parameters<a class="headerlink" href="#parameters_2" title="Permanent link">&para;</a></h2>
 <p>mass_to_change : NDArray[np.float64]
@@ -9444,7 +9444,7 @@ particle_concentration : NDArray[np.float64]
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="calc_mass_to_change">calc_mass_to_change<a class="headerlink" href="#calc_mass_to_change" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L10">Show source in mass_transfer_utils.py:10</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer_utils.py#L13">Show source in mass_transfer_utils.py:13</a></p>
 <p>Return the mass change each particle would experience during <code>time_step</code>.</p>
 <h2 id="parameters_3">Parameters<a class="headerlink" href="#parameters_3" title="Permanent link">&para;</a></h2>
 <p>mass_rate : NDArray[np.float64]
