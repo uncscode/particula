@@ -1,4 +1,4 @@
-
+1
 # Overview
 
 Particula is a Python-based aerosol particle simulator. Its goal is to provide a robust aerosol simulation (including both gas and particle phases) that can be used to answer scientific questions arising from experiments and research endeavors.
