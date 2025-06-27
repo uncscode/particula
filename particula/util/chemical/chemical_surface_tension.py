@@ -62,7 +62,6 @@ def get_chemical_surface_tension(
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
 
-    st = np.vectorize(lambda T: chem.SurfaceTension(T=T), otypes=[np.float64])(
-        temps
-    )
-    return st
+    return np.vectorize(
+        lambda T: chem.SurfaceTension(T=T), otypes=[np.float64]
+    )(temps)
