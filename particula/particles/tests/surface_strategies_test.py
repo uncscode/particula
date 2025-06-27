@@ -379,3 +379,19 @@ def test_weighted_average_by_phase_zero_weight_fallback():
         _weighted_average_by_phase(vals, wts, phase),
         exp,
     )
+def test_update_surface_tension_1d_table():
+    """SurfaceStrategy must cope with a 1-D lookup‐table."""
+    st_table = np.array([0.072, 0.071, 0.070, 0.069])   # N/m
+    t_table  = np.array([273, 283, 293, 303])           # K
+
+    strat = SurfaceStrategyMass(
+        surface_tension=0.072,
+        density=1000,
+        surface_tension_table=st_table,
+        temperature_table=t_table,
+    )
+
+    mass_conc = 100.0  # arbitrary, scalar
+    # at 293 K the table gives 0.070 N/m
+    out = strat.effective_surface_tension(mass_conc, temperature=293)
+    assert np.allclose(out, 0.070, rtol=1e-6)
