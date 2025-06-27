@@ -40,11 +40,6 @@ def _as_2d(array: NDArray[np.float64]) -> tuple[NDArray[np.float64], bool]:
     return array, False
 
 
-def _broadcast_weights(
-    weights: NDArray[np.float64], target_shape: tuple[int, int]
-) -> NDArray[np.float64]:
-    
-
 def _interp_surface_tension(
     temperature: float,
     surface_tension_table: NDArray[np.float64],
@@ -73,6 +68,11 @@ def _interp_surface_tension(
         )
 
     raise ValueError("surface_tension_table must be 1-D or 2-D")
+
+
+def _broadcast_weights(
+    weights: NDArray[np.float64], target_shape: tuple[int, int]
+) -> NDArray[np.float64]:
     """
     Return *weights* with shape exactly equal to *target_shape*
     (n_bins, n_species).  Accepts 1-D (n_species,) or 2-D inputs.
