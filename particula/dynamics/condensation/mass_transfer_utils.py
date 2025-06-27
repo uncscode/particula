@@ -1,9 +1,14 @@
-"""Helper routines for condensation and evaporation calculations.
+"""
+Helper routines for condensation and evaporation mass-transfer
+calculations.
 
-These functions isolate common logic from :mod:`mass_transfer` so that each
-step can be tested independently. Each helper operates on arrays of mass
-change or particle properties and enforces specific physical limitations
-such as available gas mass or particle inventory.
+These helpers isolate common logic from :pymod:`mass_transfer` so that each
+computational step can be unit-tested independently.  All functions operate
+on NumPy arrays describing either mass change or particle properties and
+enforce physical limits such as available gas mass or particle inventory.
+
+References:
+    - P. Hinds, *Aerosol Technology*, 2nd ed., Wiley-Interscience, 1999.
 """
 
 from numpy.typing import NDArray
@@ -15,22 +20,40 @@ def calc_mass_to_change(
     time_step: float,
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Return the mass change each particle would experience during `time_step`.
+    """
+    Calculate the requested mass change for every particle/species pair.
 
-    Parameters
-    ----------
-    mass_rate : NDArray[np.float64]
-        Mass transfer rate for each particle or `(particle, species)` pair
-        in units of `kg/s`.
-    time_step : float
-        Size of the time step `[s]`.
-    particle_concentration : NDArray[np.float64]
-        Number concentration of particles `[#/m^3]`.
+    The instantaneous mass-transfer rate (ṁ) is integrated over a time
+    interval (Δt) and scaled by the particle number concentration (C):
 
-    Returns
-    -------
-    NDArray[np.float64]
-        Requested mass change for every particle/species combination.
+    - Δm = ṁ × Δt × C
+        - Δm is the mass change per bin or per (bin, species) in kg,
+        - ṁ is the mass rate in kg s⁻¹,
+        - Δt is the time step in seconds,
+        - C is the particle concentration in m⁻³.
+
+    Arguments:
+        - mass_rate : Mass transfer rate (ṁ) for each particle or
+          ``(particle, species)`` pair in kg s⁻¹.
+        - time_step : Time interval Δt in seconds.
+        - particle_concentration : Number concentration C in m⁻³.
+
+    Returns:
+        - Requested mass change Δm for every particle/species combination
+          in kg.
+
+    Examples:
+        ```py title="Scalar rate"
+        import numpy as np
+        from particula.dynamics.condensation import mass_transfer_utils as mtu
+        mass_rate = np.array([1.0e-15])          # kg/s
+        dm = mtu.calc_mass_to_change(mass_rate, 10.0, np.array([1.0e6]))
+        # dm ≈ 1.0e-8 kg
+        ```
+
+    References:
+        - "Mass transfer",
+          [Wikipedia](https://en.wikipedia.org/wiki/Mass_transfer)
     """
     if mass_rate.ndim == 2:
         return mass_rate * time_step * particle_concentration[:, None]
@@ -41,20 +64,32 @@ def apply_condensation_limit(
     mass_to_change: NDArray[np.float64],
     gas_mass: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.bool_]]:
-    """Scale condensation so that the column sum never exceeds the available gas mass.
+    """
+    Limit condensation so that total uptake never exceeds available gas.
 
-    Parameters
-    ----------
-    mass_to_change : NDArray[np.float64]
-        Requested mass change for each bin and species ``[kg]``.
-    gas_mass : NDArray[np.float64]
-        Total gas mass available for condensation ``[kg]``.
+    For each chemical species the positive mass change (condensation) is
+    summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
+    (M_g), a scaling factor is applied:
 
-    Returns
-    -------
-    tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.bool_]]
-        The scaled mass change, the evaporation sum for each species, and
-        a mask identifying evaporation elements.
+    - scale = (M_g − Σ_evap) / Σ_cond   if Σ_cond > 0
+    - scale = 1                         otherwise
+
+    Arguments:
+        - mass_to_change : Requested mass change per bin and species in kg.
+        - gas_mass : Total gas mass available for condensation in kg.
+
+    Returns:
+        - mass_to_change_scaled : Mass change array after scaling.
+        - evap_sum : Column sum of evaporation (negative Δm) per species.
+        - neg_mask : Boolean mask identifying evaporation elements.
+
+    Examples:
+        ```py title="Insufficient gas example"
+        scaled_dm, evap, mask = mtu.apply_condensation_limit(
+            mass_to_change=np.array([[2.0e-9, -1.0e-9]]),
+            gas_mass=np.array([5.0e-10])
+        )
+        ```
     """
     pos_mask = mass_to_change > 0.0
     neg_mask = mass_to_change < 0.0
@@ -83,25 +118,33 @@ def apply_evaporation_limit(
     evap_sum: NDArray[np.float64],
     neg_mask: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
-    """Scale evaporation so the column sum never exceeds the particle inventory."
+    """
+    Limit evaporation so that total loss does not exceed particle inventory.
 
-    Parameters
-    ----------
-    mass_to_change : NDArray[np.float64]
-        Candidate mass change for each bin and species ``[kg]``.
-    particle_mass : NDArray[np.float64]
-        Particle mass for each bin and species ``[kg]``.
-    particle_concentration : NDArray[np.float64]
-        Concentration of particles in each bin ``[#/m^3]``.
-    evap_sum : NDArray[np.float64]
-        Sum of evaporation (negative mass change) per species ``[kg]``.
-    neg_mask : NDArray[np.bool_]
-        Boolean mask indicating evaporation entries.
+    The available inventory (I) per species is the sum of particle mass
+    multiplied by particle concentration.  If −Σ_evap > I the evaporation
+    terms are scaled:
 
-    Returns
-    -------
-    NDArray[np.float64]
-        Mass change limited by the available particle mass.
+    - scale = I / (−Σ_evap)
+
+    Arguments:
+        - mass_to_change : Candidate mass change per bin/species in kg.
+        - particle_mass : Mass of a single particle in each bin/species in
+          kg.
+        - particle_concentration : Number concentration in m⁻³.
+        - evap_sum : Column sum of evaporation in kg (negative values).
+        - neg_mask : Boolean mask indicating evaporation entries.
+
+    Returns:
+        - Mass change array after enforcing the inventory limit.
+
+    Examples:
+        ```py title="Inventory-limited evaporation"
+        limited_dm = mtu.apply_evaporation_limit(
+            mass_to_change, particle_mass, particle_conc,
+            evap_sum, neg_mask
+        )
+        ```
     """
     if particle_mass.ndim == 2:
         inventory = (particle_mass * particle_concentration[:, None]).sum(axis=0)
@@ -122,21 +165,31 @@ def apply_per_bin_limit(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Clip evaporation so no single bin loses more mass than it contains.
+    """
+    Ensure no single bin loses more mass than it contains.
 
-    Parameters
-    ----------
-    mass_to_change : NDArray[np.float64]
-        Proposed mass change for each bin and species ``[kg]``.
-    particle_mass : NDArray[np.float64]
-        Mass of each particle bin and species ``[kg]``.
-    particle_concentration : NDArray[np.float64]
-        Number concentration of particles ``[#/m^3]``.
+    For every bin the maximum allowable evaporation is the total mass
+    present in that bin:
 
-    Returns
-    -------
-    NDArray[np.float64]
-        Mass change after enforcing the per-bin evaporation limit.
+    - limit = −m_p × C
+
+    where *m_p* is the particle mass and *C* the particle concentration.
+    Any requested mass change lower than this limit is clipped.
+
+    Arguments:
+        - mass_to_change : Proposed mass change per bin/species in kg.
+        - particle_mass : Mass of one particle per bin/species in kg.
+        - particle_concentration : Number concentration in m⁻³.
+
+    Returns:
+        - Mass change array after applying the per-bin limit.
+
+    Examples:
+        ```py title="Per-bin clipping"
+        clipped_dm = mtu.apply_per_bin_limit(
+            mass_to_change, particle_mass, particle_conc
+        )
+        ```
     """
     if mass_to_change.ndim == 2:
         limit = -particle_mass * particle_concentration[:, None]
