@@ -1,3 +1,5 @@
+"""Test for chemical_properties.py module."""
+
 import numpy as np
 from particula.dynamics.condensation.mass_transfer_utils import (
     calc_mass_to_change,
@@ -8,6 +10,7 @@ from particula.dynamics.condensation.mass_transfer_utils import (
 
 
 def test_calc_mass_to_change_single():
+    """Test mass change calculation for a single particle."""
     mass_rate = np.array([0.1, 0.2])
     time_step = 10.0
     conc = np.array([5.0, 4.0])
@@ -17,6 +20,7 @@ def test_calc_mass_to_change_single():
 
 
 def test_calc_mass_to_change_multi():
+    """Test mass change calculation for multiple particles."""
     mass_rate = np.array([[0.1, 0.05, 0.02], [0.2, 0.15, 0.1]])
     time_step = 10.0
     conc = np.array([5.0, 4.0])
@@ -26,6 +30,7 @@ def test_calc_mass_to_change_multi():
 
 
 def test_apply_condensation_limit_single():
+    """Test condensation limit application for a single particle."""
     mass = np.array([2.0, -1.0])
     gas_mass = np.array([0.5])
     limited, evap_sum, neg_mask = apply_condensation_limit(mass, gas_mass)
@@ -37,6 +42,7 @@ def test_apply_condensation_limit_single():
 
 
 def test_apply_condensation_limit_multi():
+    """Test condensation limit application for multiple particles."""
     mass = np.array([[1.0, 0.2], [1.0, -0.1]])
     gas_mass = np.array([1.0, 0.4])
     limited, evap_sum, neg_mask = apply_condensation_limit(mass.copy(), gas_mass)
@@ -52,6 +58,7 @@ def test_apply_condensation_limit_multi():
 
 
 def test_apply_evaporation_limit_single():
+    """Test evaporation limit application for a single particle."""
     mass = np.array([-2.0, -1.0])
     particle_mass = np.array([0.5, 1.0])
     conc = np.array([1.0, 2.0])
@@ -65,6 +72,7 @@ def test_apply_evaporation_limit_single():
 
 
 def test_apply_evaporation_limit_multi():
+    """Test evaporation limit application for multiple particles."""
     mass = np.array([[-4.0, -1.0], [-1.0, -2.0]])
     particle_mass = np.array([[1.0, 0.5], [1.0, 0.5]])
     conc = np.array([1.0, 2.0])
@@ -78,6 +86,7 @@ def test_apply_evaporation_limit_multi():
 
 
 def test_apply_per_bin_limit_single():
+    """Test per-bin limit application for a single particle."""
     mass = np.array([-2.0, -0.5])
     particle_mass = np.array([0.3, 0.4])
     conc = np.array([1.0, 2.0])
@@ -88,6 +97,7 @@ def test_apply_per_bin_limit_single():
 
 
 def test_apply_per_bin_limit_multi():
+    """Test per-bin limit application for multiple particles."""
     mass = np.array([[-2.0, -0.2], [0.1, -0.5]])
     particle_mass = np.array([[0.3, 0.4], [0.2, 0.1]])
     conc = np.array([2.0, 1.0])
