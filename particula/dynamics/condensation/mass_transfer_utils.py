@@ -1,6 +1,9 @@
 """Helper routines for condensation and evaporation calculations.
 
-These functions isolate common logic from :mod:`mass_transfer` so that each step can be tested independently. Each helper operates on arrays of mass change or particle properties and enforces specific physical limitations such as available gas mass or particle inventory.
+These functions isolate common logic from :mod:`mass_transfer` so that each
+step can be tested independently. Each helper operates on arrays of mass
+change or particle properties and enforces specific physical limitations
+such as available gas mass or particle inventory.
 """
 
 from numpy.typing import NDArray
@@ -140,4 +143,3 @@ def apply_per_bin_limit(
     else:
         limit = -particle_mass * particle_concentration
     return np.maximum(mass_to_change, limit)
-
