@@ -7,6 +7,8 @@ the vapor pressure of a substance at a given temperature.
 All units are in base SI units (kg, m, s).
 """
 
+# pylint: disable=too-many-arguments, too-many-positional-arguments
+
 from abc import ABC, abstractmethod
 from typing import Union
 from numpy.typing import NDArray
@@ -623,9 +625,7 @@ class LiquidClausiusHybridStrategy(VaporPressureStrategy):
             - boiling_point : Temperature where weighting is 0.5.
             - transition_width : Width of the logistic transition in Kelvin.
         """
-        self.liquid_strategy = ArblasterLiquidVaporPressureStrategy(
-            coefficients
-        )
+        self.liquid_strategy = ArblasterLiquidVaporPressureStrategy(coefficients)
         self.clausius_strategy = ClausiusClapeyronStrategy(
             latent_heat, temperature_initial, pressure_initial
         )

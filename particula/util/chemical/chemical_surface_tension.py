@@ -5,11 +5,7 @@ Module for calculating the surface tension of pure chemicals.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-
-try:  # pragma: no cover - optional dependency
-    from thermo.chemical import Chemical
-except ImportError:  # pragma: no cover - dependency missing during import
-    Chemical = None
+from .thermo_import import Chemical
 
 
 def get_chemical_surface_tension(
@@ -66,5 +62,7 @@ def get_chemical_surface_tension(
     temps = np.asarray(temperature, dtype=np.float64)
     chem = Chemical(chemical_identifier)
 
-    st = np.vectorize(lambda T: chem.SurfaceTension(T=T), otypes=[np.float64])(temps)
+    st = np.vectorize(lambda T: chem.SurfaceTension(T=T), otypes=[np.float64])(
+        temps
+    )
     return st

@@ -9,23 +9,20 @@ index when that package is unavailable.
 from difflib import get_close_matches
 from typing import List
 
-# Optional dependency: chemicals
-try:
-    from chemicals.identifiers import CAS_from_any, get_pubchem_db  # type: ignore
-
-    CHEMICALS_AVAILABLE = True
-except ImportError:  # pragma: no cover
-    CHEMICALS_AVAILABLE = False
-
+from particula.util.chemical.thermo_import import (
+    CAS_from_any,
+    get_pubchem_db,
+    CHEMICALS_AVAILABLE,
+)
 
 # Single, module-level PubChem DB instance (loaded once) ------------
 _PUBCHEM_DB = None
-if CHEMICALS_AVAILABLE:  # pragma: no cover
+if CHEMICALS_AVAILABLE and get_pubchem_db is not None:  # pragma: no cover
     _PUBCHEM_DB = get_pubchem_db()
     _PUBCHEM_DB.finish_loading()
 
 
-def get_chemical_search(identifier: str) -> str | None:
+def get_chemical_search(identifier: str) -> str:
     """
     Resolve a chemical identifier to a canonical name or CAS number.
 
@@ -70,16 +67,17 @@ def get_chemical_search(identifier: str) -> str | None:
     # ---------------------------------------------------------------
 
     # 1. Exact resolution via ``chemicals`` (fast)
-    try:
-        if CAS_from_any(identifier):  # returns CAS on success
-            return identifier
-    except Exception:
-        pass
+    if CAS_from_any is not None:
+        try:
+            if CAS_from_any(identifier):
+                return identifier
+        except ValueError:
+            # CAS_from_any raises ValueError when identifier is not a valid CAS
+            pass
 
     # 2. Fuzzy match
     if _PUBCHEM_DB is not None:
         candidate_names: List[str] = list(_PUBCHEM_DB.name_index.keys())
-        matches = get_close_matches(
-            identifier, candidate_names, n=1, cutoff=0.6
-        )
-        return matches[0] if matches else None
+        matches = get_close_matches(identifier, candidate_names, n=1, cutoff=0.6)
+        return matches[0] if matches else "No Match"
+    return "No Match"

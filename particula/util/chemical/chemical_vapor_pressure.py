@@ -5,18 +5,14 @@ Module for retrieving saturation-vapor pressure of chemicals.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-
-try:  # pragma: no cover - optional dependency
-    from thermo.chemical import Chemical
-except ImportError:  # pragma: no cover - dependency missing during import
-    Chemical = None
+from .thermo_import import Chemical
 
 
 def get_chemical_vapor_pressure(
     chemical_identifier: str, temperature: Union[float, NDArray[np.float64]]
 ) -> NDArray[np.float64]:
     """
-    Retrieve the saturation-vapor pressure of a chemical at a given 
+    Retrieve the saturation-vapor pressure of a chemical at a given
     temperature.
 
     The saturation-vapor pressure (Pₛₐₜ) is obtained by calling the correlation

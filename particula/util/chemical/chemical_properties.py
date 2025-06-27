@@ -1,13 +1,9 @@
+"""
+Get selected thermodynamic properties of a chemical at STP.
+"""
+
 from typing import Dict
-
-
-# Optional dependency: chemicals
-try:
-    from thermo.chemical import Chemical
-
-    CHEMICALS_AVAILABLE = True
-except ImportError:  # pragma: no cover
-    CHEMICALS_AVAILABLE = False
+from .thermo_import import Chemical
 
 
 def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
@@ -29,7 +25,7 @@ def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
             "pure_vapor_pressure": Pa,
         }
     """
-    if not CHEMICALS_AVAILABLE:
+    if Chemical is None:
         raise ImportError(
             "The 'thermo' package is required. "
             "Please install it using 'pip install thermo'."

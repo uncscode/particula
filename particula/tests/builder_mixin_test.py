@@ -15,6 +15,8 @@ from particula.builder_mixin import (
     BuilderRadiusMixin,
     BuilderChargeMixin,
     BuilderPhaseIndexMixin,
+    BuilderTemperatureTableMixin,
+    BuilderSurfaceTensionTableMixin,
 )
 
 
@@ -55,9 +57,7 @@ def test_surface_tension_mixin():
 
     # test array of surface tensions
     builder_mixin.set_surface_tension(np.array([1, 2, 3]), "N/m")
-    np.testing.assert_allclose(
-        builder_mixin.surface_tension, np.array([1, 2, 3])
-    )
+    np.testing.assert_allclose(builder_mixin.surface_tension, np.array([1, 2, 3]))
 
     # test setting surface tension units
     builder_mixin.set_surface_tension(0.001, surface_tension_units="N/m")
@@ -102,9 +102,7 @@ def test_concentration_mixin():
     # test setting concentration
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_concentration(-1, "kg/m^3")
-    assert "Argument 'concentration' must be nonnegative." in str(
-        excinfo.value
-    )
+    assert "Argument 'concentration' must be nonnegative." in str(excinfo.value)
 
     # test positive concentration
     builder_mixin.set_concentration(1, "kg/m^3")
@@ -112,9 +110,7 @@ def test_concentration_mixin():
 
     # test array of concentrations
     builder_mixin.set_concentration(np.array([1, 2, 3]), "kg/m^3")
-    np.testing.assert_allclose(
-        builder_mixin.concentration, np.array([1, 2, 3])
-    )
+    np.testing.assert_allclose(builder_mixin.concentration, np.array([1, 2, 3]))
 
     # test setting concentration units
     builder_mixin.set_concentration(1 / 1000, concentration_units="kg/m^3")
@@ -228,7 +224,6 @@ def test_phase_index_mixin():
 
 def test_surface_tension_table_mixin():
     """Test the BuilderSurfaceTensionTableMixin class."""
-    from particula.builder_mixin import BuilderSurfaceTensionTableMixin
 
     builder_mixin = BuilderSurfaceTensionTableMixin()
 
@@ -236,7 +231,7 @@ def test_surface_tension_table_mixin():
         builder_mixin.set_surface_tension_table(np.array([-1.0, 2.0]))
 
     table = np.array([70.0, 80.0])
-    builder_mixin.set_surface_tension_table(table, "mN/m")
+    builder_mixin.set_surface_tension_table(table * 1e-3, "N/m")
     np.testing.assert_allclose(
         builder_mixin.surface_tension_table, np.array([0.07, 0.08])
     )
@@ -244,11 +239,10 @@ def test_surface_tension_table_mixin():
 
 def test_temperature_table_mixin():
     """Test the BuilderTemperatureTableMixin class."""
-    from particula.builder_mixin import BuilderTemperatureTableMixin
 
     builder_mixin = BuilderTemperatureTableMixin()
 
-    builder_mixin.set_temperature_table(np.array([25.0, 35.0]), "degC")
+    builder_mixin.set_temperature_table(np.array([25.0, 35.0]) + 273.15, "K")
     np.testing.assert_allclose(
         builder_mixin.temperature_table,
         np.array([298.15, 308.15]),
