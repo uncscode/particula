@@ -5,6 +5,7 @@ Provides classes for calculating effective surface tension and the
 Kelvin effect for species in particulate phases. Future expansions
 may include an organic film strategy.
 """
+
 # pylint: disable=too-many-arguments, too-many-positional-arguments
 
 from abc import ABC, abstractmethod
@@ -100,7 +101,9 @@ def _weighted_average_by_phase(
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
-    weights = _broadcast_weights(np.asarray(weights, dtype=np.float64), values.shape)
+    weights = _broadcast_weights(
+        np.asarray(weights, dtype=np.float64), values.shape
+    )
 
     averaged = np.empty_like(values)
 
@@ -258,7 +261,10 @@ class SurfaceStrategy(ABC):
 
     def update_surface_tension(self, temperature: float) -> None:
         # bail-out if no lookup tables were provided -----------------------
-        if self.surface_tension_table is None or self.temperature_table is None:
+        if (
+            self.surface_tension_table is None
+            or self.temperature_table is None
+        ):
             return
 
         # 1-D: single species (or already pre-mixed) -----------------------

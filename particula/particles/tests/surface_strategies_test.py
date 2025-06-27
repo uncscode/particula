@@ -24,7 +24,9 @@ def test_molar_surface_strategy():
     # Test effective surface tension
     mass_concentration = np.array([100, 200])  # water, oil
     expected_st_scalar = surface_tension
-    expected_surface_tension = np.full_like(surface_tension, expected_st_scalar)
+    expected_surface_tension = np.full_like(
+        surface_tension, expected_st_scalar
+    )
 
 
 def test_molar_strategy_update_surface_tension():
@@ -54,27 +56,31 @@ def test_molar_strategy_update_surface_tension():
     expected_surface_tension = np.array([0.070, 0.065])  # Expected at 293 K
 
     # Check at 293 K
-    st_293 = strategy.effective_surface_tension(mass_concentration, temperature=293)
+    st_293 = strategy.effective_surface_tension(
+        mass_concentration, temperature=293
+    )
     # Expect interpolation → row 2 of st_table: [0.070, 0.065]
     np.testing.assert_allclose(st_293, [0.070, 0.065], rtol=1e-5)
 
     molar_mass_water = np.array([0.01815, 0.03])[0]  # Molar mass of water
 
     # Check at 313 K
-    st_313 = strategy.effective_surface_tension(mass_concentration, temperature=313)
+    st_313 = strategy.effective_surface_tension(
+        mass_concentration, temperature=313
+    )
     # Expect last row: [0.068, 0.058]
     np.testing.assert_allclose(st_313, [0.068, 0.058], rtol=1e-5)
 
     expected_density = np.array([1000, 800])  # Expected density
 
-    expected_kelvin_radius = (2 * expected_surface_tension * molar_mass_water) / (
-        8.314 * 298 * expected_density
-    )
+    expected_kelvin_radius = (
+        2 * expected_surface_tension * molar_mass_water
+    ) / (8.314 * 298 * expected_density)
     radius = 1e-7
     kelvin_val = strategy.kelvin_term(radius, 0.01815, mass_concentration, 293)
-    assert kelvin_val.squeeze().shape == (2,), (
-        f"Expected shape (2,) got {kelvin_val.shape}"
-    )
+    assert kelvin_val.squeeze().shape == (
+        2,
+    ), f"Expected shape (2,) got {kelvin_val.shape}"
     np.testing.assert_allclose(
         strategy.effective_surface_tension(mass_concentration),
         expected_surface_tension,
@@ -86,9 +92,9 @@ def test_molar_strategy_update_surface_tension():
 
     # Test kelvin_radius
     molar_mass_water = np.array([0.01815, 0.03])[0]  # Molar mass of water
-    expected_kelvin_radius = (2 * expected_surface_tension * molar_mass_water) / (
-        8.314 * 298 * expected_density
-    )
+    expected_kelvin_radius = (
+        2 * expected_surface_tension * molar_mass_water
+    ) / (8.314 * 298 * expected_density)
     np.testing.assert_allclose(
         strategy.kelvin_radius(molar_mass_water, mass_concentration, 298),
         expected_kelvin_radius,
@@ -141,7 +147,9 @@ def test_mass_surface_strategy():
     radius = 1e-6
     expected_kelvin_term = np.exp(expected_kelvin_radius / radius)
     np.testing.assert_allclose(
-        strategy.kelvin_term(radius, 0.01815, mass_concentration, 298).squeeze(),
+        strategy.kelvin_term(
+            radius, 0.01815, mass_concentration, 298
+        ).squeeze(),
         expected_kelvin_term,
         rtol=1e-4,
     )
@@ -181,7 +189,9 @@ def test_volume_surface_strategy():
     radius = 1e-6
     expected_kelvin_term = np.exp(expected_kelvin_radius / radius)
     np.testing.assert_allclose(
-        strategy.kelvin_term(radius, 0.01815, mass_concentration, 298).squeeze(),
+        strategy.kelvin_term(
+            radius, 0.01815, mass_concentration, 298
+        ).squeeze(),
         expected_kelvin_term,
         rtol=1e-4,
     )
@@ -197,9 +207,9 @@ def test_molar_surface_strategy_scalar_input():
 
     # Assert get_density for scalar input
     assert strat.get_density() == pytest.approx(density)
-    assert strat.effective_surface_tension(mass_concentration) == pytest.approx(
-        surface_tension
-    )
+    assert strat.effective_surface_tension(
+        mass_concentration
+    ) == pytest.approx(surface_tension)
 
 
 def test_surface_strategy_phase_index():
@@ -218,13 +228,17 @@ def test_surface_strategy_phase_index():
         strat.effective_surface_tension(mass_concentration), expected_st
     )
 
-    strat_mass = SurfaceStrategyMass(surface_tension, density, phase_index=phase_index)
+    strat_mass = SurfaceStrategyMass(
+        surface_tension, density, phase_index=phase_index
+    )
     np.testing.assert_allclose(
         strat_mass.effective_surface_tension(mass_concentration),
         surface_tension,
     )
 
-    strat_vol = SurfaceStrategyVolume(surface_tension, density, phase_index=phase_index)
+    strat_vol = SurfaceStrategyVolume(
+        surface_tension, density, phase_index=phase_index
+    )
     np.testing.assert_allclose(
         strat_vol.effective_surface_tension(mass_concentration),
         surface_tension,
@@ -263,7 +277,9 @@ def test_surface_strategy_multi_phase_mixing():
     strat_molar = SurfaceStrategyMolar(
         surface_tension, density, molar_mass, phase_index=phase_index
     )
-    strat_mass = SurfaceStrategyMass(surface_tension, density, phase_index=phase_index)
+    strat_mass = SurfaceStrategyMass(
+        surface_tension, density, phase_index=phase_index
+    )
     strat_volume = SurfaceStrategyVolume(
         surface_tension, density, phase_index=phase_index
     )
@@ -379,10 +395,12 @@ def test_weighted_average_by_phase_zero_weight_fallback():
         _weighted_average_by_phase(vals, wts, phase),
         exp,
     )
+
+
 def test_update_surface_tension_1d_table():
     """SurfaceStrategy must cope with a 1-D lookup‐table."""
-    st_table = np.array([0.072, 0.071, 0.070, 0.069])   # N/m
-    t_table  = np.array([273, 283, 293, 303])           # K
+    st_table = np.array([0.072, 0.071, 0.070, 0.069])  # N/m
+    t_table = np.array([273, 283, 293, 303])  # K
 
     strat = SurfaceStrategyMass(
         surface_tension=0.072,
