@@ -10,6 +10,7 @@ from particula.gas.vapor_pressure_strategies import (
     WaterBuckStrategy,
     ArblasterLiquidVaporPressureStrategy,
     LiquidClausiusHybridStrategy,
+    TableVaporPressureStrategy,
 )
 
 
@@ -95,3 +96,17 @@ def test_liquid_clausius_hybrid_strategy():
     weight = 1 / (1 + np.exp(-(test_temp - temp_init) / 1.0))
     expected = (1 - weight) * p_liq + weight * p_claus
     assert strategy.pure_vapor_pressure(test_temp) == pytest.approx(expected)
+
+
+def test_table_vapor_pressure_strategy_scalar_and_array():
+    """Interpolate vapor pressures from tables."""
+    temps = np.array([300.0, 350.0, 400.0])
+    pressures = np.array([1000.0, 2000.0, 3000.0])
+    strategy = TableVaporPressureStrategy(
+        vapor_pressures=pressures,
+        temperatures=temps,
+    )
+    assert strategy.pure_vapor_pressure(325.0) == pytest.approx(1500.0)
+    result = strategy.pure_vapor_pressure(np.array([325.0, 375.0]))
+    assert np.allclose(result, [1500.0, 2500.0])
+

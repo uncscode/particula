@@ -7,7 +7,9 @@ from particula.gas.vapor_pressure_builders import (
     ConstantVaporPressureBuilder,
     WaterBuckVaporPressureBuilder,
     SaturationConcentrationVaporPressureBuilder,
+    TableVaporPressureBuilder,
 )
+from particula.gas.vapor_pressure_strategies import TableVaporPressureStrategy
 
 
 def test_antoine_set_positive_a():
@@ -199,3 +201,23 @@ def test_saturation_build_failure_missing_param():
     with pytest.raises(ValueError) as excinfo:
         builder.build()
     assert "Required parameter(s) not set: temperature" in str(excinfo.value)
+
+
+def test_table_builder_set_table_and_build():
+    """Test building TableVaporPressureStrategy with tables."""
+    builder = (
+        TableVaporPressureBuilder()
+        .set_vapor_pressure_table([1000.0, 2000.0], "Pa")
+        .set_temperature_table([300.0, 350.0], "K")
+    )
+    strategy = builder.build()
+    assert isinstance(strategy, TableVaporPressureStrategy)
+
+
+def test_table_builder_missing_temperature_table():
+    """Ensure error raised when temperature table not set."""
+    builder = TableVaporPressureBuilder().set_vapor_pressure_table(
+        [1000.0, 2000.0], "Pa"
+    )
+    with pytest.raises(ValueError):
+        builder.build()

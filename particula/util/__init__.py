@@ -35,3 +35,9 @@ from particula.util.convert_units import (
 from particula.util.colors import (
     TAILWIND,
 )
+from particula.util.chemical import (
+    get_chemical_search,
+    get_chemical_surface_tension,
+    get_chemical_vapor_pressure,
+    get_chemical_stp_properties,
+)
