@@ -9,7 +9,7 @@ index when that package is unavailable.
 from difflib import get_close_matches
 from typing import List
 
-# Optional dependency: chemicals ------------------------------------------------
+# Optional dependency: chemicals
 try:
     from chemicals.identifiers import CAS_from_any, get_pubchem_db  # type: ignore
 
@@ -79,5 +79,7 @@ def get_chemical_search(identifier: str) -> str | None:
     # 2. Fuzzy match
     if _PUBCHEM_DB is not None:
         candidate_names: List[str] = list(_PUBCHEM_DB.name_index.keys())
-        matches = get_close_matches(identifier, candidate_names, n=1, cutoff=0.6)
+        matches = get_close_matches(
+            identifier, candidate_names, n=1, cutoff=0.6
+        )
         return matches[0] if matches else None

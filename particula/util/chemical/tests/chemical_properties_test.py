@@ -1,7 +1,7 @@
 import pytest
 
 from particula.util.chemical.chemical_properties import (
-    get_chemical_stp_properties,
+    get_chemical_stp_properties, 
 )
 
 
