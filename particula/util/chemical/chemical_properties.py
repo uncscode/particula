@@ -31,8 +31,7 @@ def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
             "Please install it using 'pip install thermo'."
         )
 
-    chem = Chemical(identifier)  # default T=298.15 K, P=1 atm
-    # Ensure the state is STP in case caller changed defaults somewhere else
+    chem = Chemical(identifier, T=298.15, P=101325)  # Explicitly set STP: T=298.15 K, P=101325 Pa
 
     return {
         "molar_mass": chem.MW / 1e3,  # kg/mol
