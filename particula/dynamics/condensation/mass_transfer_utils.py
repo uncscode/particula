@@ -107,7 +107,9 @@ def apply_condensation_limit(
             gas_mass[need_scale] - evap_sum[need_scale]
         ) / cond_sum[need_scale]
     cond_scale = np.clip(cond_scale, 0.0, 1.0)
-    mass_to_change = np.where(pos_mask, mass_to_change * cond_scale, mass_to_change)
+    mass_to_change = np.where(
+        pos_mask, mass_to_change * cond_scale, mass_to_change
+    )
     return mass_to_change, evap_sum, neg_mask
 
 
@@ -147,7 +149,9 @@ def apply_evaporation_limit(
         ```
     """
     if particle_mass.ndim == 2:
-        inventory = (particle_mass * particle_concentration[:, None]).sum(axis=0)
+        inventory = (particle_mass * particle_concentration[:, None]).sum(
+            axis=0
+        )
     else:
         inventory = (particle_mass * particle_concentration).sum()
     evap_scale = np.ones_like(np.atleast_1d(evap_sum))
@@ -156,7 +160,9 @@ def apply_evaporation_limit(
         if need_scale:
             evap_scale = np.array([inventory / (-evap_sum)])
     else:
-        evap_scale[need_scale] = inventory[need_scale] / (-evap_sum[need_scale])
+        evap_scale[need_scale] = inventory[need_scale] / (
+            -evap_sum[need_scale]
+        )
     return np.where(neg_mask, mass_to_change * evap_scale, mass_to_change)
 
 
