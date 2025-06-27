@@ -1,6 +1,13 @@
 from typing import Dict
 
-from thermo.chemical import Chemical
+
+# Optional dependency: chemicals
+try:
+    from thermo.chemical import Chemical
+
+    CHEMICALS_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    CHEMICALS_AVAILABLE = False
 
 
 def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
@@ -22,6 +29,12 @@ def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
             "pure_vapor_pressure": Pa,
         }
     """
+    if not CHEMICALS_AVAILABLE:
+        raise ImportError(
+            "The 'thermo' package is required. "
+            "Please install it using 'pip install thermo'."
+        )
+
     chem = Chemical(identifier)  # default T=298.15 K, P=1 atm
     # Ensure the state is STP in case caller changed defaults somewhere else
 

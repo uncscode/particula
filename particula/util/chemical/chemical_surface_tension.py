@@ -59,7 +59,7 @@ def get_chemical_surface_tension(
     """
     if Chemical is None:
         raise ImportError(
-            "The 'thermo' package is required for vapor pressure calculations. "
+            "The 'thermo' package is required for vapor pressure calculations."
             "Please install it using 'pip install thermo'."
         )
 
