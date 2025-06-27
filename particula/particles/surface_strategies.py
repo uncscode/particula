@@ -256,29 +256,37 @@ class SurfaceStrategy(ABC):
             self.kelvin_radius(molar_mass, mass_concentration, temperature),
         )
 
-    def update_surface_tension(
-        self,
-        temperature: float,
-    ):
-        """
-        Update the surface tension based on a temperature table.
-
-        Arguments:
-            temperature: Temperature in K.
-        """
+    def update_surface_tension(self, temperature: float) -> None:
+        # bail-out if no lookup tables were provided -----------------------
         if self.surface_tension_table is None or self.temperature_table is None:
             return
 
-        self.surface_tension = np.array(
-            [
-                np.interp(
-                    temperature,
-                    self.temperature_table,
-                    self.surface_tension_table[:, j],
-                )
-                for j in range(self.surface_tension_table.shape[1])
-            ]
-        )
+        # 1-D: single species (or already pre-mixed) -----------------------
+        if self.surface_tension_table.ndim == 1:
+            self.surface_tension = np.interp(
+                temperature,
+                self.temperature_table,
+                self.surface_tension_table,
+            )
+            return
+
+        # 2-D: separate column per species --------------------------------
+        if self.surface_tension_table.ndim == 2:
+            self.surface_tension = np.array(
+                [
+                    np.interp(
+                        temperature,
+                        self.temperature_table,
+                        self.surface_tension_table[:, j],
+                    )
+                    for j in range(self.surface_tension_table.shape[1])
+                ],
+                dtype=np.float64,
+            )
+            return
+
+        # unsupported dimensionality --------------------------------------
+        raise ValueError("surface_tension_table must be 1-D or 2-D")
 
 
 # Surface mixing strategies
