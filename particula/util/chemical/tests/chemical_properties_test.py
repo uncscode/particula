@@ -1,11 +1,15 @@
+"""Test for chemical_properties.py module."""
+
 import pytest
+from particula.util.chemical.thermo_import import CHEMICALS_AVAILABLE
 
 from particula.util.chemical.chemical_properties import (
-    get_chemical_stp_properties, 
+    get_chemical_stp_properties,
 )
 
 
 # identifiers chosen so thermo/chemicals always resolve them
+@pytest.mark.skipif(not CHEMICALS_AVAILABLE, reason="thermo not installed")
 @pytest.mark.parametrize(
     ("identifier", "expected_mw"),
     [
@@ -14,6 +18,9 @@ from particula.util.chemical.chemical_properties import (
     ],
 )
 def test_get_chemical_stp_properties(identifier, expected_mw):
+    """
+    Test getting standard temperature and pressure properties for a chemical.
+    """
     props = get_chemical_stp_properties(identifier)
 
     # dictionary must have the four required keys
@@ -32,3 +39,10 @@ def test_get_chemical_stp_properties(identifier, expected_mw):
     # molar mass should agree with reference value within 5 %
     rel_err = abs(props["molar_mass"] - expected_mw) / expected_mw
     assert rel_err < 0.05, f"Molar mass off by {rel_err:.1%}"
+
+
+@pytest.mark.skipif(CHEMICALS_AVAILABLE, reason="thermo installed")
+def test_get_chemical_stp_properties_importerror():
+    """Test that ImportError is raised when thermo is not installed."""
+    with pytest.raises(ImportError):
+        get_chemical_stp_properties("water")

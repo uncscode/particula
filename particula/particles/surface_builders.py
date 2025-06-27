@@ -4,6 +4,7 @@ surface tension in the calculation of the Kelvin effect.
 This builds the strategy and checks that the required parameters are set,
 and converts the units of the parameters if necessary.
 """
+# pylint: disable=too-many-ancestors
 
 import logging
 from particula.abc_builder import (

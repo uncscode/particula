@@ -5,6 +5,7 @@ Provides classes for calculating effective surface tension and the
 Kelvin effect for species in particulate phases. Future expansions
 may include an organic film strategy.
 """
+# pylint: disable=too-many-arguments, too-many-positional-arguments
 
 from abc import ABC, abstractmethod
 from typing import Union, Sequence, Optional
@@ -99,9 +100,7 @@ def _weighted_average_by_phase(
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
-    weights = _broadcast_weights(
-        np.asarray(weights, dtype=np.float64), values.shape
-    )
+    weights = _broadcast_weights(np.asarray(weights, dtype=np.float64), values.shape)
 
     averaged = np.empty_like(values)
 
@@ -267,10 +266,7 @@ class SurfaceStrategy(ABC):
         Arguments:
             temperature: Temperature in K.
         """
-        if (
-            self.surface_tension_table is None
-            or self.temperature_table is None
-        ):
+        if self.surface_tension_table is None or self.temperature_table is None:
             return
 
         self.surface_tension = np.array(
@@ -331,7 +327,6 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-
         if temperature is not None:
             self.update_surface_tension(temperature)
 
@@ -339,7 +334,8 @@ class SurfaceStrategyMolar(SurfaceStrategy):
             return np.asarray(self.surface_tension, dtype=np.float64)
 
         mole_frac = get_mole_fraction_from_mass(
-            mass_concentration, self.molar_mass  # type: ignore
+            mass_concentration,
+            self.molar_mass,  # type: ignore
         )
         return _weighted_average_by_phase(
             np.asarray(self.surface_tension, dtype=np.float64),
@@ -389,7 +385,6 @@ class SurfaceStrategyMass(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-
         if temperature is not None:
             self.update_surface_tension(temperature)
 
@@ -445,7 +440,6 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-
         if temperature is not None:
             self.update_surface_tension(temperature)
 
@@ -453,7 +447,8 @@ class SurfaceStrategyVolume(SurfaceStrategy):
             return np.asarray(self.surface_tension, dtype=np.float64)
 
         vol_frac = get_volume_fraction_from_mass(
-            mass_concentration, self.density  # type: ignore
+            mass_concentration,
+            self.density,  # type: ignore
         )
         return _weighted_average_by_phase(
             np.asarray(self.surface_tension, dtype=np.float64),
