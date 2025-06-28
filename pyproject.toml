@@ -48,6 +48,9 @@ build-backend = "flit_core.buildapi"
 [tool.ruff]
 line-length = 80
 fix = true
+extend-exclude = [
+  "**/*.ipynb",    # ignore every .ipynb anywhere in the project
+]
 
 [tool.ruff.format]
 docstring-code-line-length = 80
