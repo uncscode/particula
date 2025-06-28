@@ -1,5 +1,4 @@
-"""
-Runnable process utilities for modifying Aerosol instances.
+"""Runnable process utilities for modifying Aerosol instances.
 
 This module provides abstract and concrete classes for processes
 that can modify or transform an Aerosol object over a simulation
@@ -34,8 +33,7 @@ from particula.aerosol import Aerosol
 
 
 class RunnableABC(ABC):
-    """
-    Abstract base class for processes modifying an Aerosol instance.
+    """Abstract base class for processes modifying an Aerosol instance.
 
     This class enforces the implementation of a process rate calculation
     and an execution method that modifies the Aerosol in-place. Subclasses
@@ -65,8 +63,7 @@ class RunnableABC(ABC):
 
     @abstractmethod
     def rate(self, aerosol: Aerosol) -> Any:
-        """
-        Calculate and return the rate of this process for the given Aerosol.
+        """Calculate and return the rate of this process for the given Aerosol.
 
         Arguments:
             - aerosol : The Aerosol instance on which to calculate the rate.
@@ -89,8 +86,7 @@ class RunnableABC(ABC):
         time_step: float,
         sub_steps: int = 1,
     ) -> Aerosol:
-        """
-        Execute the process, modifying the Aerosol in-place over a time step.
+        """Execute the process, modifying the Aerosol in-place over a time step.
 
         Arguments:
             - aerosol : The Aerosol instance to be updated.
@@ -109,8 +105,7 @@ class RunnableABC(ABC):
         """
 
     def __or__(self, other: "RunnableABC"):
-        """
-        Chain this Runnable with another using the '|' operator.
+        """Chain this Runnable with another using the '|' operator.
 
         This method enables an easy way to sequence processes, so they
         can be executed in a defined order.
@@ -127,7 +122,6 @@ class RunnableABC(ABC):
             final_aerosol = combined_process.execute(aerosol, time_step=1.0)
             ```
         """
-
         sequence = RunnableSequence()
         sequence.add_process(self)
         sequence.add_process(other)
@@ -135,8 +129,7 @@ class RunnableABC(ABC):
 
 
 class RunnableSequence:
-    """
-    A sequence of Runnable processes executed in order.
+    """A sequence of Runnable processes executed in order.
 
     This class maintains a list of processes to be applied sequentially
     to an Aerosol. Each process modifies the Aerosol and passes it along
@@ -163,8 +156,7 @@ class RunnableSequence:
         self.processes: list[RunnableABC] = []
 
     def add_process(self, process: RunnableABC):
-        """
-        Add a Runnable to the sequence.
+        """Add a Runnable to the sequence.
 
         Arguments:
             - process : The Runnable to add.
@@ -180,8 +172,7 @@ class RunnableSequence:
     def execute(
         self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
     ) -> Aerosol:
-        """
-        Execute all processes in the sequence on the given Aerosol.
+        """Execute all processes in the sequence on the given Aerosol.
 
         Each Runnable in the sequence modifies the Aerosol and passes
         it to the next Runnable until all have been executed. A full cycle is
@@ -222,8 +213,7 @@ class RunnableSequence:
         return aerosol
 
     def __or__(self, process: RunnableABC):
-        """
-        Chain another Runnable into this sequence using the '|' operator.
+        """Chain another Runnable into this sequence using the '|' operator.
 
         Arguments:
             - process : The Runnable to add.

@@ -1,7 +1,9 @@
 """Test of overflow and underflow safe functions."""
 
 import warnings
+
 import numpy as np
+
 from particula.util.machine_limit import (
     get_safe_exp,
     get_safe_log,
@@ -11,7 +13,7 @@ from particula.util.machine_limit import (
 
 
 def test_safe_exp():
-    """test safe_exp function."""
+    """Test safe_exp function."""
     # Test with positive values
     assert np.allclose(get_safe_exp([1, 2, 3]), np.exp([1, 2, 3]))
 
@@ -28,7 +30,7 @@ def test_safe_exp():
 
 
 def test_safe_log():
-    """test safe_log function."""
+    """Test safe_log function."""
     # Test with positive values
     assert np.allclose(get_safe_log([1, 2, 3]), np.log([1, 2, 3]))
 
@@ -48,7 +50,7 @@ def test_safe_log():
 
 
 def test_safe_log10():
-    """test safe_log10 function."""
+    """Test safe_log10 function."""
     # Test with positive values
     assert np.allclose(get_safe_log10([1, 2, 3]), np.log10([1, 2, 3]))
 
@@ -69,7 +71,6 @@ def test_safe_log10():
 
 def test_safe_power():
     """Test get_safe_power function."""
-
     # Test with typical positive values:
     base = np.array([2, 3, 10])
     exponent = np.array([3, 2, 1])
@@ -102,7 +103,6 @@ def test_safe_power():
 
 def test_safe_log_edge_cases():
     """Edge cases for get_safe_log."""
-
     # Extremely small positive values should return accurate logs.
     small_values = np.array([np.nextafter(0, 1), 1e-300, 1e-40])
     assert np.allclose(get_safe_log(small_values), np.log(small_values))
@@ -118,7 +118,6 @@ def test_safe_log_edge_cases():
 
 def test_safe_log10_edge_cases():
     """Edge cases for get_safe_log10."""
-
     # Extremely small positive values should return accurate base-10 logs.
     small_values = np.array([np.nextafter(0, 1), 1e-300, 1e-40])
     assert np.allclose(get_safe_log10(small_values), np.log10(small_values))
@@ -134,7 +133,6 @@ def test_safe_log10_edge_cases():
 
 def test_safe_power_edge_cases():
     """Edge cases for get_safe_power."""
-
     # Very large exponent should clip to machine max
     result_large = get_safe_power(2, 1e308)
     assert np.allclose(result_large, np.array(np.finfo(np.float64).max))

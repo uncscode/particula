@@ -1,10 +1,10 @@
-"""
-Dimensionless coagulation for several approximations of the transition regime.
+"""Dimensionless coagulation for several approximations of the transition regime.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.particles.properties import coulomb_enhancement
 from particula.util.machine_limit import get_safe_exp
@@ -17,8 +17,7 @@ def get_dimensional_kernel(
     reduced_mass: NDArray[np.float64],
     reduced_friction_factor: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Calculate the dimensioned coagulation kernel for each particle pair.
+    """Calculate the dimensioned coagulation kernel for each particle pair.
 
     This function computes the dimensioned coagulation kernel from the
     dimensionless coagulation kernel and the reduced quantities. All inputs
@@ -61,8 +60,7 @@ def get_dimensional_kernel(
 def get_hard_sphere_kernel(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Hard sphere approximation for the dimensionless coagulation kernel.
+    """Hard sphere approximation for the dimensionless coagulation kernel.
 
     This function provides a hard sphere approximation for the dimensionless
     coagulation kernel based on the diffusive Knudsen number.
@@ -113,8 +111,7 @@ def get_coulomb_kernel_dyachkov2007(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Dyachkov et al. (2007) approximation for the dimensionless coagulation
+    """Dyachkov et al. (2007) approximation for the dimensionless coagulation
     kernel.
 
     This function accounts for the Coulomb potential between particles using
@@ -135,7 +132,6 @@ def get_coulomb_kernel_dyachkov2007(
       Journal of Chemical Physics, 126(12).
       https://doi.org/10.1063/1.2713719
     """
-
     coulomb_potential_ratio = np.maximum(
         coulomb_potential_ratio, 1e-16
     )  # Avoid division by zero
@@ -174,8 +170,7 @@ def get_coulomb_kernel_gatti2008(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Gatti et al. (2008) approximation for the dimensionless coagulation
+    """Gatti et al. (2008) approximation for the dimensionless coagulation
     kernel.
 
     This function accounts for the Coulomb potential between particles using
@@ -244,8 +239,7 @@ def get_coulomb_kernel_gopalakrishnan2012(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Gopalakrishnan and Hogan (2012) approximation for the dimensionless
+    """Gopalakrishnan and Hogan (2012) approximation for the dimensionless
     coagulation kernel.
 
     This function accounts for the Coulomb potential between particles using
@@ -292,8 +286,7 @@ def get_coulomb_kernel_chahl2019(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Chahl and Gopalakrishnan (2019) approximation for the dimensionless
+    """Chahl and Gopalakrishnan (2019) approximation for the dimensionless
     coagulation kernel.
 
     This function accounts for the Coulomb potential between particles using

@@ -1,28 +1,26 @@
-"""
-Charged particle coagulation strategy.
+"""Charged particle coagulation strategy.
 """
 
-from typing import Union
 import logging
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from particula.particles.representation import ParticleRepresentation
+from particula.util.reduced_quantity import get_reduced_self_broadcast
 
 logger = logging.getLogger("particula")
 
 
 class ChargedCoagulationStrategy(CoagulationStrategyABC):
-    """
-    Charged Brownian coagulation strategy using a dimensionless kernel.
+    """Charged Brownian coagulation strategy using a dimensionless kernel.
 
     This class implements the methods defined in the CoagulationStrategyABC
     abstract class. A ChargedKernelStrategyABC instance is passed to define
@@ -66,8 +64,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     def __init__(
         self, distribution_type: str, kernel_strategy: ChargedKernelStrategyABC
     ):
-        """
-        Initialize the ChargedCoagulationStrategy.
+        """Initialize the ChargedCoagulationStrategy.
 
         Arguments:
             - distribution_type : The distribution type representing how
@@ -90,8 +87,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Compute the dimensionless kernel for charged coagulation.
+        """Compute the dimensionless kernel for charged coagulation.
 
         This method delegates computation to the provided kernel strategy. It
         returns the dimensionless kernel (H) as a function of the diffusive
@@ -125,8 +121,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Compute the dimensioned coagulation kernel for charged particles.
+        """Compute the dimensioned coagulation kernel for charged particles.
 
         This method converts the dimensionless kernel into a dimensioned
         coagulation kernel by combining Coulomb parameters, the pairwise

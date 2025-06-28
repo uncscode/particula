@@ -1,7 +1,7 @@
 """Equilibrium calculations for the particula thermodynamic model."""
 
-from scipy.optimize import minimize, Bounds
 import numpy as np
+from scipy.optimize import Bounds, minimize
 
 from particula.activity.water_activity import fixed_water_activity
 
@@ -166,8 +166,8 @@ def liquid_vapor_partitioning(
 ):  # pylint: disable=too-many-arguments, too-many-positional-arguments
     # pylint: disable=too-many-locals
     """Thermodynamic equilibrium between liquid and vapor phase.
-    with activity coefficients,"""
-
+    with activity coefficients,
+    """
     # clean up nan values
     gamma_organic_ab = np.nan_to_num(gamma_organic_ab)
     mass_fraction_water_ab = np.nan_to_num(mass_fraction_water_ab)

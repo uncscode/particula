@@ -1,5 +1,4 @@
-"""
-Helper routines for condensation and evaporation mass-transfer
+"""Helper routines for condensation and evaporation mass-transfer
 calculations.
 
 These helpers isolate common logic from :pymod:`mass_transfer` so that each
@@ -11,8 +10,8 @@ References:
     - P. Hinds, *Aerosol Technology*, 2nd ed., Wiley-Interscience, 1999.
 """
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 
 def calc_mass_to_change(
@@ -20,8 +19,7 @@ def calc_mass_to_change(
     time_step: float,
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Calculate the requested mass change for every particle/species pair.
+    """Calculate the requested mass change for every particle/species pair.
 
     The instantaneous mass-transfer rate (ṁ) is integrated over a time
     interval (Δt) and scaled by the particle number concentration (C):
@@ -64,8 +62,7 @@ def apply_condensation_limit(
     mass_to_change: NDArray[np.float64],
     gas_mass: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.bool_]]:
-    """
-    Limit condensation so that total uptake never exceeds available gas.
+    """Limit condensation so that total uptake never exceeds available gas.
 
     For each chemical species the positive mass change (condensation) is
     summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
@@ -120,8 +117,7 @@ def apply_evaporation_limit(
     evap_sum: NDArray[np.float64],
     neg_mask: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
-    """
-    Limit evaporation so that total loss does not exceed particle inventory.
+    """Limit evaporation so that total loss does not exceed particle inventory.
 
     The available inventory (I) per species is the sum of particle mass
     multiplied by particle concentration.  If −Σ_evap > I the evaporation
@@ -171,8 +167,7 @@ def apply_per_bin_limit(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Ensure no single bin loses more mass than it contains.
+    """Ensure no single bin loses more mass than it contains.
 
     For every bin the maximum allowable evaporation is the total mass
     present in that bin:

@@ -5,8 +5,9 @@ the knudsen number goes like:
     inf for smaller particles
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
 )
@@ -38,7 +39,8 @@ def test_array_in_both_inputs():
 
 def test_zero_particle_radius():
     """Test when the particle radius is zero,
-    which should raise an exception"""
+    which should raise an exception
+    """
     with pytest.raises(ZeroDivisionError):
         get_knudsen_number(0.1, 0.0)
 

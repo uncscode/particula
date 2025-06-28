@@ -1,5 +1,4 @@
-"""
-Convert between different size distribution formats using a composition-based
+"""Convert between different size distribution formats using a composition-based
 converter.
 
 This module defines conversion strategies as classes that implement
@@ -37,8 +36,7 @@ import numpy as np
 
 
 class ConversionStrategy:
-    """
-    Methods:
+    """Methods:
         - convert: Convert distribution data between input and output scales.
     Defines an interface for conversion strategies between particle size
     distribution formats.
@@ -61,8 +59,7 @@ class ConversionStrategy:
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """
-        Convert distribution data from one scale to another.
+        """Convert distribution data from one scale to another.
 
         Arguments:
             - diameters : Array of particle diameters.
@@ -82,8 +79,7 @@ class ConversionStrategy:
 
 
 class SameScaleConversionStrategy(ConversionStrategy):
-    """
-    Conversion strategy that returns the input concentration unchanged.
+    """Conversion strategy that returns the input concentration unchanged.
 
     No conversion is performed because the input and output scales are the
     same.
@@ -102,8 +98,7 @@ class SameScaleConversionStrategy(ConversionStrategy):
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """
-        Return the concentration unchanged, since no conversion is needed.
+        """Return the concentration unchanged, since no conversion is needed.
 
         Arguments:
             - diameters : Array of particle diameters (unused).
@@ -117,8 +112,7 @@ class SameScaleConversionStrategy(ConversionStrategy):
 
 
 class DNdlogDPtoPMFConversionStrategy(ConversionStrategy):
-    """
-    Conversion strategy for converting between dn/dlogdp and PMF formats.
+    """Conversion strategy for converting between dn/dlogdp and PMF formats.
 
     Examples:
         ``` py title="Example Usage"
@@ -134,8 +128,7 @@ class DNdlogDPtoPMFConversionStrategy(ConversionStrategy):
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """
-        Perform the conversion between dn/dlogdp and PMF formats.
+        """Perform the conversion between dn/dlogdp and PMF formats.
 
         Arguments:
             - diameters : Array of particle diameters.
@@ -152,8 +145,7 @@ class DNdlogDPtoPMFConversionStrategy(ConversionStrategy):
 
 
 class PMFtoPDFConversionStrategy(ConversionStrategy):
-    """
-    Conversion strategy for converting between PMF and PDF formats.
+    """Conversion strategy for converting between PMF and PDF formats.
 
     Examples:
         ``` py title="Example Usage"
@@ -169,8 +161,7 @@ class PMFtoPDFConversionStrategy(ConversionStrategy):
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """
-        Perform the conversion between PMF and PDF formats.
+        """Perform the conversion between PMF and PDF formats.
 
         Arguments:
             - diameters : Array of particle diameters.
@@ -187,8 +178,7 @@ class PMFtoPDFConversionStrategy(ConversionStrategy):
 
 
 class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
-    """
-    Conversion strategy for converting between dn/dlogdp and PDF formats,
+    """Conversion strategy for converting between dn/dlogdp and PDF formats,
     possibly through an intermediate PMF conversion.
 
     Examples:
@@ -205,8 +195,7 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """
-        Convert between dn/dlogdp and PDF formats through an intermediate
+        """Convert between dn/dlogdp and PDF formats through an intermediate
         PMF step.
 
         Arguments:
@@ -235,8 +224,7 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
 
 
 class SizerConverter:
-    """
-    A converter that composes a ConversionStrategy to transform
+    """A converter that composes a ConversionStrategy to transform
     particle size distribution data between formats.
     [might not be needed or used, -kyle]
 
@@ -265,8 +253,7 @@ class SizerConverter:
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """
-        Convert the particle size distribution data using the assigned
+        """Convert the particle size distribution data using the assigned
         strategy.
 
         Arguments:
@@ -284,8 +271,7 @@ class SizerConverter:
 def get_distribution_conversion_strategy(
     input_scale: str, output_scale: str
 ) -> ConversionStrategy:
-    """
-    Factory function to obtain a conversion strategy based on the input and
+    """Factory function to obtain a conversion strategy based on the input and
     output scales.
 
     Arguments:
@@ -346,8 +332,7 @@ def get_distribution_conversion_strategy(
 def get_distribution_in_dn(
     diameter: np.ndarray, dn_dlogdp: np.ndarray, inverse: bool = False
 ) -> np.ndarray:
-    """
-    Convert the sizer data between dn/dlogdp and d_num formats.
+    """Convert the sizer data between dn/dlogdp and d_num formats.
 
     If inverse=False, this function applies:
     - d_num = dn_dlogdp × (log10(upper / lower))
@@ -404,8 +389,7 @@ def get_distribution_in_dn(
 def get_pdf_distribution_in_pmf(
     x_array: np.ndarray, distribution: np.ndarray, to_pdf: bool = True
 ) -> np.ndarray:
-    """
-    Convert the distribution data between a probability density function (PDF)
+    """Convert the distribution data between a probability density function (PDF)
     and a probability mass spectrum (PMF).
 
     The conversion uses:

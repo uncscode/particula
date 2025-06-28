@@ -1,24 +1,24 @@
-"""
-Factory module to create a concrete VaporPressureStrategy object using
+"""Factory module to create a concrete VaporPressureStrategy object using
 builders.
 """
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
 from particula.gas.vapor_pressure_builders import (
-    ConstantVaporPressureBuilder,
     AntoineVaporPressureBuilder,
     ClausiusClapeyronVaporPressureBuilder,
+    ConstantVaporPressureBuilder,
     SaturationConcentrationVaporPressureBuilder,
-    WaterBuckVaporPressureBuilder,
     TableVaporPressureBuilder,
+    WaterBuckVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_strategies import (
-    ConstantVaporPressureStrategy,
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
-    WaterBuckStrategy,
+    ConstantVaporPressureStrategy,
     TableVaporPressureStrategy,
+    WaterBuckStrategy,
 )
 
 
@@ -41,8 +41,7 @@ class VaporPressureFactory(
         ],
     ]
 ):
-    """
-    Factory class to create vapor pressure strategy
+    """Factory class to create vapor pressure strategy
     builders.
 
     This class provides a way to generate multiple vapor pressure calculation
@@ -77,8 +76,7 @@ class VaporPressureFactory(
     """
 
     def get_builders(self):
-        """
-        Return a dictionary mapping strategy types to builder instances.
+        """Return a dictionary mapping strategy types to builder instances.
 
         Returns:
             dict:

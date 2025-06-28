@@ -1,6 +1,7 @@
 """Radii-based moving bin strategy."""
 
 import logging
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,8 +11,7 @@ logger = logging.getLogger("particula")
 
 
 class RadiiBasedMovingBin(DistributionStrategy):
-    """
-    Strategy for particles represented by their radius distribution.
+    """Strategy for particles represented by their radius distribution.
 
     Calculates particle mass, radius, and total mass based on particle
     radius, number concentration, and density. This moving-bin approach

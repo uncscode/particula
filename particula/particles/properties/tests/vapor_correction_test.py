@@ -1,6 +1,7 @@
 """Test the vapor transition correction properties."""
 
 import numpy as np
+
 from particula.particles.properties.vapor_correction_module import (
     get_vapor_transition_correction,
 )
@@ -36,7 +37,8 @@ def test_vapor_transition_correction_array():
 
 def test_vapor_transition_correction_zero_knudsen():
     """Test the vapor_transition_correction function with
-    zero Knudsen number."""
+    zero Knudsen number.
+    """
     knudsen_number = 0
     mass_accommodation = 0.2
     result = get_vapor_transition_correction(
@@ -50,7 +52,8 @@ def test_vapor_transition_correction_zero_knudsen():
 
 def test_vapor_transition_correction_zero_accommodation():
     """Test the vapor_transition_correction function with
-    zero mass accommodation."""
+    zero mass accommodation.
+    """
     knudsen_number = 1
     mass_accommodation = 0
     result = get_vapor_transition_correction(

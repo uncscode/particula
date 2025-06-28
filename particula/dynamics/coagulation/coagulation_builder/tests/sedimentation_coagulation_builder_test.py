@@ -1,8 +1,8 @@
-"""
-Tests for the SedimentationCoagulationBuilder class.
+"""Tests for the SedimentationCoagulationBuilder class.
 """
 
 import pytest
+
 from particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder import (
     SedimentationCoagulationBuilder,
 )
@@ -12,8 +12,7 @@ from particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulati
 
 
 def test_build_with_valid_parameters():
-    """
-    Check that building with a valid distribution type
+    """Check that building with a valid distribution type
     returns a SedimentationCoagulationStrategy instance.
     """
     builder = SedimentationCoagulationBuilder()
@@ -23,8 +22,7 @@ def test_build_with_valid_parameters():
 
 
 def test_build_missing_required_parameters():
-    """
-    Ensure that missing required parameters or an invalid
+    """Ensure that missing required parameters or an invalid
     distribution type raises a ValueError.
     """
     builder = SedimentationCoagulationBuilder()

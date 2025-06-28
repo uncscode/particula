@@ -1,16 +1,17 @@
 """Tests for the aerodynamic_mobility module."""
 
 from contextlib import nullcontext
+
 import numpy as np
 import pytest
+
 from particula.particles.properties.aerodynamic_mobility_module import (
     get_aerodynamic_mobility,
 )
 
 
 def test_particle_aerodynamic_mobility_single_value():
-    """
-    Verify that the particle_aerodynamic_mobility function calculates the
+    """Verify that the particle_aerodynamic_mobility function calculates the
     correct aerodynamic mobility value for a single particle.
     """
     radius = 0.00005  # 50 micrometers
@@ -28,8 +29,7 @@ def test_particle_aerodynamic_mobility_single_value():
 
 
 def test_particle_aerodynamic_mobility_array_input():
-    """
-    Test that the particle_aerodynamic_mobility function handles numpy array
+    """Test that the particle_aerodynamic_mobility function handles numpy array
     inputs correctly.
     """
     radius = np.array([0.00005, 0.00007])  # Array of radii
@@ -45,8 +45,7 @@ def test_particle_aerodynamic_mobility_array_input():
 
 
 def test_particle_aerodynamic_mobility_type_error():
-    """
-    Test that the particle_aerodynamic_mobility function raises a TypeError
+    """Test that the particle_aerodynamic_mobility function raises a TypeError
     with incorrect input types.
     """
     with pytest.raises(TypeError):
@@ -59,8 +58,7 @@ def test_particle_aerodynamic_mobility_type_error():
     "radius", [0, -1e-6, 1e-12, 1e-3, float("inf"), float("nan")]
 )
 def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
-    """
-    Verify that the particle_aerodynamic_mobility function handles extreme
+    """Verify that the particle_aerodynamic_mobility function handles extreme
     values correctly.
     - radius : The radius of the particle
     """

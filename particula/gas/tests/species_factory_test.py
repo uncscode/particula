@@ -1,12 +1,13 @@
 """Test the species factory module, does build the gas species object."""
 
 import unittest
-from particula.gas.species_factories import GasSpeciesFactory
+
+from particula.gas.species import GasSpecies
 from particula.gas.species_builders import (
     GasSpeciesBuilder,
     PresetGasSpeciesBuilder,
 )
-from particula.gas.species import GasSpecies
+from particula.gas.species_factories import GasSpeciesFactory
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
 )

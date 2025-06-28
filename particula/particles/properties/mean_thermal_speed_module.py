@@ -1,14 +1,14 @@
-"""
-Module contains the function for calculating the mean thermal speed
+"""Module contains the function for calculating the mean thermal speed
 of particles in a fluid.
 """
 
 from typing import Union
-from numpy.typing import NDArray
-import numpy as np
 
-from particula.util.validate_inputs import validate_inputs
+import numpy as np
+from numpy.typing import NDArray
+
 from particula.util.constants import BOLTZMANN_CONSTANT
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -21,8 +21,7 @@ def get_mean_thermal_speed(
     particle_mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the mean thermal speed of a particle in a fluid.
+    """Calculate the mean thermal speed of a particle in a fluid.
 
     The mean thermal speed (v) is derived from kinetic theory and is given by:
 

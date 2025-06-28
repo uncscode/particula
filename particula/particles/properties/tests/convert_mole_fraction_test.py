@@ -1,12 +1,10 @@
-"""
-Test the function that converts mole fractions to mass fractions.
+"""Test the function that converts mole fractions to mass fractions.
 """
 
 from math import isclose
 
-import pytest
 import numpy as np
-
+import pytest
 
 # Import the function you want to test
 from particula.particles.properties.convert_mole_fraction import (
@@ -40,13 +38,11 @@ from particula.particles.properties.convert_mole_fraction import (
 def test_get_mass_fractions_from_moles_1d(
     mole_fractions, molecular_weights, expected
 ):
+    """Test 1D inputs with:
+    - typical valid data
+    - all zeros
+    - approximate numeric check
     """
-    Test 1D inputs with:
-      - typical valid data
-      - all zeros
-      - approximate numeric check
-    """
-
     result = get_mass_fractions_from_moles(mole_fractions, molecular_weights)
 
     assert (
@@ -86,8 +82,7 @@ def test_get_mass_fractions_from_moles_1d(
 
 
 def test_get_mass_fractions_from_moles_2d():
-    """
-    Test 2D inputs where each row of mole fractions is converted row-by-row.
+    """Test 2D inputs where each row of mole fractions is converted row-by-row.
     """
     # Example 2D input: each row has 3 components
     x_2d = np.array(

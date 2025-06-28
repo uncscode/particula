@@ -1,10 +1,10 @@
-"""
-Calculate the particle Reynolds number.
+"""Calculate the particle Reynolds number.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -21,8 +21,7 @@ def get_particle_reynolds_number(
     particle_velocity: Union[float, NDArray[np.float64]],
     kinematic_viscosity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Reynolds number (Reₚ) of a particle in a fluid.
+    """Calculate the Reynolds number (Reₚ) of a particle in a fluid.
 
     This dimensionless quantity characterizes the flow regime:
 

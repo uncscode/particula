@@ -9,7 +9,9 @@ The tests cover:
 """
 
 import numpy as np
+
 from particula.particles.representation import get_sorted_bins_by_radius
+
 
 def test_sorted_vector():
     """Already-sorted 1-D input should remain unchanged."""

@@ -1,5 +1,4 @@
-"""
-Fit coefficients for the Binary Activity Coefficient
+"""Fit coefficients for the Binary Activity Coefficient
 model for organic-water mixtures.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
@@ -9,14 +8,14 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Union, List, NamedTuple
+from typing import List, NamedTuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
 
 
 class FitValues(NamedTuple):
-    """
-    Named tuple for the fit values for the activity model.
+    """Named tuple for the fit values for the activity model.
     """
 
     a1: List[float]
@@ -48,8 +47,7 @@ def coefficients_c(
     oxygen2carbon: Union[float, NDArray[np.float64]],
     fit_values: List[float],
 ) -> NDArray[np.float64]:
-    """
-    Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
+    """Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
     Args:
         - molar_mass_ratio : The molar mass ratio of water to organic

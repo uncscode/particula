@@ -1,18 +1,18 @@
-"""
-Simple tests for CoagulationFactory, verifying that known strategy types
+"""Simple tests for CoagulationFactory, verifying that known strategy types
 produce the expected strategy classes, and that invalid types raise
 the appropriate ValueError.
 """
 
 import pytest
+
 from particula.dynamics import (
-    CoagulationFactory,
     BrownianCoagulationStrategy,
     ChargedCoagulationStrategy,
-    TurbulentShearCoagulationStrategy,
-    TurbulentDNSCoagulationStrategy,
+    CoagulationFactory,
     CombineCoagulationStrategy,
     HardSphereKernelStrategy,
+    TurbulentDNSCoagulationStrategy,
+    TurbulentShearCoagulationStrategy,
 )
 
 

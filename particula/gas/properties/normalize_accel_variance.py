@@ -1,10 +1,10 @@
-"""
-Calculates the normalized acceleration variance in isotropic turbulence.
+"""Calculates the normalized acceleration variance in isotropic turbulence.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -14,8 +14,7 @@ def get_normalized_accel_variance_ao2008(
     re_lambda: Union[float, NDArray[np.float64]],
     numerical_stability_epsilon: float = 1e-14,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the normalized acceleration variance in isotropic turbulence.
+    """Calculate the normalized acceleration variance in isotropic turbulence.
 
     This coefficient describes the statistical behavior of acceleration
     fluctuations in turbulent flows.

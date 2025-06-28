@@ -5,14 +5,16 @@ Change to MixinMolar classes, after PR integration.
 
 import logging
 from typing import Optional, Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
+
 from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
-    BuilderMolarMassMixin,
     BuilderDensityMixin,
+    BuilderMolarMassMixin,
 )
 from particula.particles.activity_strategies import (
     ActivityIdealMass,
@@ -25,8 +27,7 @@ logger = logging.getLogger("particula")
 
 
 class ActivityIdealMassBuilder(BuilderABC):
-    """
-    Builds an ActivityIdealMass object for calculating activity based on
+    """Builds an ActivityIdealMass object for calculating activity based on
     ideal mass fractions.
 
     A concise builder for ActivityIdealMass. This class requires no extra
@@ -55,8 +56,7 @@ class ActivityIdealMassBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> ActivityStrategy:
-        """
-        Validate and return an ActivityIdealMass strategy instance.
+        """Validate and return an ActivityIdealMass strategy instance.
 
         Returns:
             - ActivityIdealMass : The validated strategy for
@@ -73,8 +73,7 @@ class ActivityIdealMassBuilder(BuilderABC):
 
 
 class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
-    """
-    Builds an ActivityIdealMolar object for calculating activity from
+    """Builds an ActivityIdealMolar object for calculating activity from
     ideal mole fractions.
 
     This builder sets up any required parameters (e.g., molar mass) and
@@ -113,8 +112,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
         BuilderMolarMassMixin.__init__(self)
 
     def build(self) -> ActivityStrategy:
-        """
-        Validate parameters and create an ActivityIdealMolar strategy.
+        """Validate parameters and create an ActivityIdealMolar strategy.
 
         Ensures molar_mass is properly configured before building.
 
@@ -138,8 +136,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
 class ActivityKappaParameterBuilder(
     BuilderABC, BuilderDensityMixin, BuilderMolarMassMixin
 ):
-    """
-    Builds an ActivityKappaParameter object for non-ideal activity
+    """Builds an ActivityKappaParameter object for non-ideal activity
     calculations.
 
     This builder requires kappa, density, molar_mass, and water_index.
@@ -233,8 +230,7 @@ class ActivityKappaParameterBuilder(
         return self
 
     def build(self) -> ActivityStrategy:
-        """
-        Validate parameters and instantiate an ActivityKappaParameter strategy.
+        """Validate parameters and instantiate an ActivityKappaParameter strategy.
 
         Returns:
             - ActivityKappaParameter : The non-ideal activity strategy

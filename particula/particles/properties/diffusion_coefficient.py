@@ -1,22 +1,23 @@
 """Particle diffusion coefficient calculation."""
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
 from particula.particles.properties.aerodynamic_mobility_module import (
     get_aerodynamic_mobility,
 )
-from particula.particles.properties.slip_correction_module import (
-    get_cunningham_slip_correction,
-)
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
 )
+from particula.particles.properties.slip_correction_module import (
+    get_cunningham_slip_correction,
+)
 from particula.util.constants import BOLTZMANN_CONSTANT
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -30,8 +31,7 @@ def get_diffusion_coefficient(
     aerodynamic_mobility: Union[float, NDArray[np.float64]],
     boltzmann_constant: float = BOLTZMANN_CONSTANT,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the diffusion coefficient of a particle based on temperature
+    """Calculate the diffusion coefficient of a particle based on temperature
     and aerodynamic mobility.
 
     The diffusion coefficient (D) can be computed using:
@@ -74,8 +74,7 @@ def get_diffusion_coefficient_via_system_state(
     temperature: float,
     pressure: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the diffusion coefficient from system state parameters.
+    """Calculate the diffusion coefficient from system state parameters.
 
     This function determines the diffusion coefficient (D) of a particle by:
     1. Computing gas properties (dynamic viscosity, mean free path),
@@ -107,7 +106,6 @@ def get_diffusion_coefficient_via_system_state(
         - "Mass Diffusion," Wikipedia,
           https://en.wikipedia.org/wiki/Diffusion#Mass_diffusion
     """
-
     # Step 1: Calculate gas properties
     _dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
     _mean_free_path = get_molecule_mean_free_path(

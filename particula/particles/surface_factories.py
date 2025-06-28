@@ -1,16 +1,17 @@
 """ "Surface tension strategies factory."""
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
 from particula.particles.surface_builders import (
-    SurfaceStrategyMolarBuilder,
     SurfaceStrategyMassBuilder,
+    SurfaceStrategyMolarBuilder,
     SurfaceStrategyVolumeBuilder,
 )
 from particula.particles.surface_strategies import (
-    SurfaceStrategyVolume,
     SurfaceStrategyMass,
     SurfaceStrategyMolar,
+    SurfaceStrategyVolume,
 )
 
 
@@ -47,8 +48,7 @@ class SurfaceFactory(
     """
 
     def get_builders(self):
-        """
-        Return a mapping of strategy types to builder instances.
+        """Return a mapping of strategy types to builder instances.
 
         Returns:
             - Keys are 'volume', 'mass', or 'molar', each

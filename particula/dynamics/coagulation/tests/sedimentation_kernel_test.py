@@ -1,11 +1,11 @@
-"""
-Test the sedimentation kernel functions.
+"""Test the sedimentation kernel functions.
 """
 
 # pylint: disable=duplicate-code
 
 
 import numpy as np
+
 from particula.dynamics.coagulation.sedimentation_kernel import (
     get_sedimentation_kernel_sp2016,
     get_sedimentation_kernel_sp2016_via_system_state,

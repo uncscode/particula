@@ -1,6 +1,7 @@
 """Mass-based moving bin strategy."""
 
 import logging
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,8 +11,7 @@ logger = logging.getLogger("particula")
 
 
 class MassBasedMovingBin(DistributionStrategy):
-    """
-    Strategy for particles represented by their mass distribution.
+    """Strategy for particles represented by their mass distribution.
 
     Calculates particle mass, radius, and total mass based on the
     particle mass, number concentration, and density. This moving-bin

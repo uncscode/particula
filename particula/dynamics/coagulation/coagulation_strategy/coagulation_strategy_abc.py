@@ -1,33 +1,32 @@
-"""
-Coagulation strategy module.
+"""Coagulation strategy module.
 
 Defines an abstract base class and supporting methods for particle
 coagulation processes in aerosol simulations.
 """
 
-from abc import ABC, abstractmethod
-from typing import Union, Optional
 import logging
-from numpy.typing import NDArray
-import numpy as np
+from abc import ABC, abstractmethod
+from typing import Optional, Union
 
-from particula.particles.representation import ParticleRepresentation
+import numpy as np
+from numpy.typing import NDArray
+
+from particula import gas, particles
 from particula.dynamics.coagulation import coagulation_rate
+from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
+    get_particle_resolved_coagulation_step,
+)
 from particula.particles.change_particle_representation import (
     get_particle_resolved_binned_radius,
     get_speciated_mass_representation_from_particle_resolved,
 )
-from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
-    get_particle_resolved_coagulation_step,
-)
-from particula import particles, gas
+from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
 class CoagulationStrategyABC(ABC):
-    """
-    Abstract base class for defining a coagulation strategy.
+    """Abstract base class for defining a coagulation strategy.
 
     This class defines the methods that must be implemented by any coagulation
     strategy (e.g., for discrete, continuous, or particle-resolved distributions).
@@ -95,8 +94,7 @@ class CoagulationStrategyABC(ABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Calculate the dimensionless coagulation kernel.
+        """Calculate the dimensionless coagulation kernel.
 
         Arguments:
             - diffusive_knudsen : The diffusive Knudsen number [dimensionless].
@@ -119,8 +117,7 @@ class CoagulationStrategyABC(ABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the coagulation kernel [m^3/s].
+        """Calculate the coagulation kernel [m^3/s].
 
         Uses particle attributes (e.g., radius, mass) along with temperature
         and pressure to return a dimensional kernel for coagulation.
@@ -145,8 +142,7 @@ class CoagulationStrategyABC(ABC):
         particle: ParticleRepresentation,
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the coagulation loss rate [kg/s].
+        """Calculate the coagulation loss rate [kg/s].
 
         Arguments:
             - particle : The particle representation for which the loss rate is calculated.
@@ -184,8 +180,7 @@ class CoagulationStrategyABC(ABC):
         particle: ParticleRepresentation,
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the coagulation gain rate [kg/s].
+        """Calculate the coagulation gain rate [kg/s].
 
         Arguments:
             - particle : The particle representation used in the calculation.
@@ -225,8 +220,7 @@ class CoagulationStrategyABC(ABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Compute the net coagulation rate = gain - loss [kg/s].
+        """Compute the net coagulation rate = gain - loss [kg/s].
 
         Arguments:
             - particle : The particle representation.
@@ -242,7 +236,6 @@ class CoagulationStrategyABC(ABC):
             net = strategy.net_rate(particle, 298.15, 101325)
             ```
         """
-
         kernel = self.kernel(
             particle=particle, temperature=temperature, pressure=pressure
         )
@@ -257,8 +250,7 @@ class CoagulationStrategyABC(ABC):
         pressure: float,
         time_step: float,
     ) -> ParticleRepresentation:
-        """
-        Perform a single coagulation step over a specified time interval.
+        """Perform a single coagulation step over a specified time interval.
 
         Updates the particle distribution or representation based on the net_rate
         calculated for the given time_step.
@@ -280,7 +272,6 @@ class CoagulationStrategyABC(ABC):
             updated_particle = strategy.step(particle, 298.15, 101325, 1.0)
             ```
         """
-
         if self.distribution_type in ["discrete", "continuous_pdf"]:
             particle.add_concentration(
                 self.net_rate(
@@ -342,8 +333,7 @@ class CoagulationStrategyABC(ABC):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
-        """
-        Calculate the diffusive Knudsen number for each particle.
+        """Calculate the diffusive Knudsen number for each particle.
 
         The Knudsen number is used to characterize the relative importance of
         diffusion-controlled processes.
@@ -380,8 +370,7 @@ class CoagulationStrategyABC(ABC):
     def coulomb_potential_ratio(
         self, particle: ParticleRepresentation, temperature: float
     ) -> NDArray[np.float64]:
-        """
-        Calculate the Coulomb potential ratio for each particle.
+        """Calculate the Coulomb potential ratio for each particle.
 
         This ratio characterizes the influence of electrostatic forces on
         coagulation processes.
@@ -410,8 +399,7 @@ class CoagulationStrategyABC(ABC):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
-        """
-        Compute the friction factor for each particle in the aerosol.
+        """Compute the friction factor for each particle in the aerosol.
 
         Considers dynamic viscosity, mean free path, and slip correction to
         determine the friction factor [dimensionless].

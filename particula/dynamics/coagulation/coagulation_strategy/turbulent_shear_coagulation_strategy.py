@@ -1,5 +1,4 @@
-"""
-Turbulent Shear coagulation strategies and calculations.
+"""Turbulent Shear coagulation strategies and calculations.
 
 Provides turbulence-based coagulation kernels following Saffman & Turner
 (1956). This module contains classes and functions for computing the
@@ -10,25 +9,25 @@ Classes:
       class for coagulation using a turbulent shear kernel.
 """
 
-from typing import Union
 import logging
+from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
     get_turbulent_shear_kernel_st1956_via_system_state,
 )
+from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
 class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
-    """
-    Turbulent shear coagulation strategy for aerosol particles.
+    """Turbulent shear coagulation strategy for aerosol particles.
 
     Implements the Saffman & Turner (1956) turbulent shear coagulation kernel,
     extending the base `CoagulationStrategyABC` class to provide a physically
@@ -78,8 +77,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         turbulent_dissipation: float,
         fluid_density: float,
     ):
-        """
-        Initialize the turbulent shear coagulation strategy.
+        """Initialize the turbulent shear coagulation strategy.
 
         Arguments:
             - distribution_type : The distribution type ("discrete",
@@ -98,8 +96,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         self.fluid_density = fluid_density
 
     def set_turbulent_dissipation(self, turbulent_dissipation: float):
-        """
-        Set the turbulent kinetic energy dissipation rate.
+        """Set the turbulent kinetic energy dissipation rate.
 
         Arguments:
             - turbulent_dissipation : Turbulent kinetic energy dissipation
@@ -121,8 +118,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Compute a dimensionless kernel (H).
+        """Compute a dimensionless kernel (H).
 
         Not implemented for turbulent shear; raises NotImplementedError.
 
@@ -160,8 +156,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Compute the dimensioned turbulent shear coagulation kernel [m^3/s].
+        """Compute the dimensioned turbulent shear coagulation kernel [m^3/s].
 
         Uses the system state to calculate the Saffman-Turner (1956) kernel,
         which depends on the dissipation rate of turbulent kinetic energy,

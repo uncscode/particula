@@ -1,5 +1,4 @@
-"""
-Blending weights for the BAT model.
+"""Blending weights for the BAT model.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics
@@ -10,11 +9,11 @@ https://doi.org/10.5194/acp-19-13383-2019
 
 from typing import Union
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.activity import phase_separation
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -27,8 +26,7 @@ def bat_blending_weights(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
 ) -> NDArray[np.float64]:
-    """
-    Function to estimate the blending weights for the BAT model.
+    """Function to estimate the blending weights for the BAT model.
 
     Args:
         - molar_mass_ratio : The molar mass ratio of water to organic
@@ -62,8 +60,7 @@ def bat_blending_weights(
 def _calculate_blending_weights(
     oxygen2carbon: float, oxygen2carbon_ml: float
 ) -> NDArray[np.float64]:
-    """
-    Helper function to calculate blending weights for a single value of
+    """Helper function to calculate blending weights for a single value of
     oxygen2carbon.
 
     Args:

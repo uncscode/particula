@@ -1,7 +1,8 @@
 """Tests for the mean_thermal_speed function."""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.properties.mean_thermal_speed_module import (
     get_mean_thermal_speed,
 )
@@ -9,8 +10,7 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 
 
 def test_mean_thermal_speed_single_value():
-    """
-    Test mean_thermal_speed with single float inputs for mass and temperature.
+    """Test mean_thermal_speed with single float inputs for mass and temperature.
     """
     mass = 4.188790204786391e-12  # Example mass in kg
     temperature = 300  # Temperature in Kelvin
@@ -23,8 +23,7 @@ def test_mean_thermal_speed_single_value():
 
 
 def test_mean_thermal_speed_array_input():
-    """
-    Test mean_thermal_speed with numpy array inputs for mass and temperature.
+    """Test mean_thermal_speed with numpy array inputs for mass and temperature.
     """
     mass = np.array([2.18e-25, 2.18e-25])
     temperature = np.array([300, 350])
@@ -37,8 +36,7 @@ def test_mean_thermal_speed_array_input():
 
 
 def test_mean_thermal_speed_input_validation():
-    """
-    Ensure that providing incorrect input types to mean_thermal_speed raises
+    """Ensure that providing incorrect input types to mean_thermal_speed raises
     a TypeError.
     """
     with pytest.raises(TypeError):

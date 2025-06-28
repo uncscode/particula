@@ -1,5 +1,4 @@
-"""
-Particle Vapor Equilibrium, condensation, and evaporation based on partial
+"""Particle Vapor Equilibrium, condensation, and evaporation based on partial
 pressures to calculate dm/dt or other forms of particle growth and decay.
 
 Equation:
@@ -24,18 +23,20 @@ References:
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
+
+from particula.dynamics.condensation.mass_transfer_utils import (
+    apply_condensation_limit,
+    apply_evaporation_limit,
+    apply_per_bin_limit,
+    calc_mass_to_change,
+)
 
 # particula imports
 from particula.util.constants import GAS_CONSTANT  # type: ignore
 from particula.util.validate_inputs import validate_inputs
-from particula.dynamics.condensation.mass_transfer_utils import (
-    calc_mass_to_change,
-    apply_condensation_limit,
-    apply_evaporation_limit,
-    apply_per_bin_limit,
-)
 
 
 @validate_inputs(
@@ -48,8 +49,7 @@ def get_first_order_mass_transport_k(
     vapor_transition: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the first-order mass transport coefficient per particle.
+    """Calculate the first-order mass transport coefficient per particle.
 
     This function computes the coefficient K that governs how fast mass is
     transported to or from a particle in a vapor. The equation is:
@@ -120,8 +120,7 @@ def get_mass_transfer_rate(
     temperature: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the mass transfer rate for a particle.
+    """Calculate the mass transfer rate for a particle.
 
     This function calculates the mass transfer rate dm/dt, leveraging the
     difference in partial pressure (pressure_delta) and the first-order
@@ -193,8 +192,7 @@ def get_radius_transfer_rate(
     particle_radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Convert mass rate to radius growth/evaporation rate.
+    """Convert mass rate to radius growth/evaporation rate.
 
     This function converts the mass transfer rate (dm/dt) into a radius
     change rate (dr/dt). The equation is:
@@ -255,8 +253,7 @@ def get_mass_transfer(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Route mass transfer calculation to single or multiple-species routines.
+    """Route mass transfer calculation to single or multiple-species routines.
 
     Depending on whether gas_mass represents one or multiple species, this
     function calls either calculate_mass_transfer_single_species or
@@ -332,8 +329,7 @@ def get_mass_transfer_of_single_species(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Calculate mass transfer for a single gas species.
+    """Calculate mass transfer for a single gas species.
 
     This function assumes gas_mass has a size of 1 (single species).
     It first computes the total mass_to_change per particle:
@@ -402,8 +398,7 @@ def get_mass_transfer_of_multiple_species(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Calculate mass transfer for multiple gas species.
+    """Calculate mass transfer for multiple gas species.
 
     Here, gas_mass has multiple elements (each species). For each species,
     this function calculates mass_to_change for all particle bins:

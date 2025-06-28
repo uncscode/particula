@@ -11,7 +11,6 @@ from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
 )
 
-
 # ------------------------------------------------------------------------
 # Fixtures
 # ------------------------------------------------------------------------

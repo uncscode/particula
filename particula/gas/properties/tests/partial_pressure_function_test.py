@@ -2,11 +2,11 @@
 
 import numpy as np
 import pytest
-from particula.util.constants import GAS_CONSTANT
 
 from particula.gas.properties.pressure_function import (
     get_partial_pressure,
 )
+from particula.util.constants import GAS_CONSTANT
 
 
 def test_calculate_partial_pressure_scalar():

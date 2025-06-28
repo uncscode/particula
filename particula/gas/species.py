@@ -1,29 +1,28 @@
-"""
-Gas Species module.
+"""Gas Species module.
 
 Units are in kg/mol for molar mass, Kelvin for temperature, Pascals for
 pressure, and kg/m^3 for concentration.
 """
 
+import copy
 import logging
 import warnings
-import copy
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
+
 from particula.gas.vapor_pressure_strategies import (
-    VaporPressureStrategy,
     ConstantVaporPressureStrategy,
+    VaporPressureStrategy,
 )
 from particula.util.validate_inputs import validate_inputs
-
 
 logger = logging.getLogger("particula")
 
 
 class GasSpecies:
-    """
-    Represents an individual or array of gas species with properties like
+    """Represents an individual or array of gas species with properties like
     name, molar mass, vapor pressure, and partitioning.
 
     Attributes:
@@ -79,8 +78,7 @@ class GasSpecies:
         partitioning: bool = True,
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
-        """
-        Initialize the GasSpecies with name, molar mass, and vapor pressure
+        """Initialize the GasSpecies with name, molar mass, and vapor pressure
         strategy.
 
         Arguments:
@@ -103,8 +101,7 @@ class GasSpecies:
         self.partitioning = partitioning
 
     def __str__(self):
-        """
-        Return a string representation of the GasSpecies object.
+        """Return a string representation of the GasSpecies object.
 
         Returns:
             - str : The string name of the gas species.
@@ -112,8 +109,7 @@ class GasSpecies:
         return str(self.name)
 
     def __len__(self):
-        """
-        Return the number of gas species (1 if scalar; array length if
+        """Return the number of gas species (1 if scalar; array length if
         ndarray).
 
         Returns:
@@ -131,8 +127,7 @@ class GasSpecies:
         )
 
     def __iadd__(self, other: "GasSpecies") -> "GasSpecies":
-        """
-        In-place addition: append another GasSpecies object to this one.
+        """In-place addition: append another GasSpecies object to this one.
 
         Arguments:
             - other : The GasSpecies instance whose attributes will be
@@ -156,8 +151,7 @@ class GasSpecies:
         return self
 
     def __add__(self, other: "GasSpecies") -> "GasSpecies":
-        """
-        Addition of two GasSpecies objects (non-mutating).
+        """Addition of two GasSpecies objects (non-mutating).
 
         Creates and returns a new GasSpecies instance that contains the
         combined attributes of *self* and *other*.
@@ -183,8 +177,7 @@ class GasSpecies:
         return new_species
 
     def get_name(self) -> Union[str, NDArray[np.str_]]:
-        """
-        Return the name of the gas species.
+        """Return the name of the gas species.
 
         Returns:
             - Name of the gas species.
@@ -197,8 +190,7 @@ class GasSpecies:
         return self.name
 
     def get_molar_mass(self) -> Union[float, NDArray[np.float64]]:
-        """
-        Return the molar mass of the gas species in kg/mol.
+        """Return the molar mass of the gas species in kg/mol.
 
         Returns:
             - Molar mass in kg/mol.
@@ -211,14 +203,12 @@ class GasSpecies:
         return self.molar_mass
 
     def get_partitioning(self) -> bool:
-        """
-        Return the partitioning flag (True if the species can partition).
+        """Return the partitioning flag (True if the species can partition).
         """
         return self.partitioning
 
     def get_concentration(self) -> Union[float, NDArray[np.float64]]:
-        """
-        Return the concentration of the gas species in kg/m^3.
+        """Return the concentration of the gas species in kg/m^3.
 
         Returns:
             - Species concentration.
@@ -228,8 +218,7 @@ class GasSpecies:
     def get_pure_vapor_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the pure vapor pressure at a given temperature (K).
+        """Calculate the pure vapor pressure at a given temperature (K).
 
         Arguments:
             - temperature : The temperature in Kelvin.
@@ -264,8 +253,7 @@ class GasSpecies:
     def get_partial_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the partial pressure of the gas at a given temperature (K).
+        """Calculate the partial pressure of the gas at a given temperature (K).
 
         Arguments:
             - temperature : The temperature in Kelvin.
@@ -307,8 +295,7 @@ class GasSpecies:
     def get_saturation_ratio(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the saturation ratio of the gas at a given temperature (K).
+        """Calculate the saturation ratio of the gas at a given temperature (K).
 
         Arguments:
             - temperature : The temperature in Kelvin.
@@ -350,8 +337,7 @@ class GasSpecies:
     def get_saturation_concentration(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the saturation concentration at a given temperature (K).
+        """Calculate the saturation concentration at a given temperature (K).
 
         Arguments:
             - temperature : The temperature in Kelvin.
@@ -390,8 +376,7 @@ class GasSpecies:
     def add_concentration(
         self, added_concentration: Union[float, NDArray[np.float64]]
     ) -> None:
-        """
-        Add concentration (kg/m^3) to the gas species.
+        """Add concentration (kg/m^3) to the gas species.
 
         Arguments:
             - added_concentration : The amount to add in kg/m^3.
@@ -406,8 +391,7 @@ class GasSpecies:
     def set_concentration(
         self, new_concentration: Union[float, NDArray[np.float64]]
     ) -> None:
-        """
-        Overwrite the concentration of the gas species in kg/m^3.
+        """Overwrite the concentration of the gas species in kg/m^3.
 
         Arguments:
             - new_concentration : The new concentration value in kg/m^3.
@@ -423,8 +407,7 @@ class GasSpecies:
         self.concentration = new_concentration
 
     def append(self, other: "GasSpecies") -> None:
-        """
-        Append another GasSpecies instance to this one (in-place).
+        """Append another GasSpecies instance to this one (in-place).
 
         Arguments:
             - other : The GasSpecies object whose attributes will be
@@ -489,8 +472,7 @@ class GasSpecies:
     def _check_if_negative_concentration(
         self, values: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Ensure concentration is not negative. Log a warning if it is and set
+        """Ensure concentration is not negative. Log a warning if it is and set
         to 0.
 
         Arguments:
@@ -510,8 +492,7 @@ class GasSpecies:
     def _check_non_positive_value(
         self, value: Union[float, NDArray[np.float64]], name: str
     ) -> None:
-        """
-        Raise an error if any value is non-positive.
+        """Raise an error if any value is non-positive.
 
         Arguments:
             - value : The numeric value(s) to check.

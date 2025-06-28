@@ -1,11 +1,11 @@
-"""
-Taylor microscale module, for both the Lagrangian Taylor microscale time and
+"""Taylor microscale module, for both the Lagrangian Taylor microscale time and
 the Taylor microscale.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -22,8 +22,7 @@ def get_lagrangian_taylor_microscale_time(
     re_lambda: Union[float, NDArray[np.float64]],
     accel_variance: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Lagrangian Taylor microscale time.
+    """Calculate the Lagrangian Taylor microscale time.
 
     The Lagrangian Taylor microscale time (τ_T) represents the characteristic
     time for the decay of turbulent velocity correlations. It provides insight
@@ -68,8 +67,7 @@ def get_taylor_microscale(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Taylor microscale.
+    """Calculate the Taylor microscale.
 
     The Taylor microscale (λ) represents an intermediate length scale in
     turbulence, linking the dissipative and energy-containing ranges of
@@ -119,8 +117,7 @@ def get_taylor_microscale_reynolds_number(
     taylor_microscale: Union[float, NDArray[np.float64]],
     kinematic_viscosity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the Taylor-microscale Reynolds number (Re_λ).
+    """Compute the Taylor-microscale Reynolds number (Re_λ).
 
     The Taylor-scale micro Reynolds number is a dimensionless quantity used in
     turbulence studies to characterize the relative importance of inertial and

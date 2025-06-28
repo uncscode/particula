@@ -1,5 +1,4 @@
-"""
-Builders to create vapor pressure models for gas species.
+"""Builders to create vapor pressure models for gas species.
 
 This module provides builder classes for Antoine, Clausius-Clapeyron,
 constant, and WaterBuck vapor pressure strategies. Each builder follows
@@ -20,8 +19,9 @@ References:
 
 import logging
 from typing import Optional
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import (
@@ -29,23 +29,22 @@ from particula.builder_mixin import (
     BuilderTemperatureMixin,
     BuilderTemperatureTableMixin,
 )
+from particula.gas.properties.pressure_function import get_partial_pressure
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
-    WaterBuckStrategy,
     ConstantVaporPressureStrategy,
     TableVaporPressureStrategy,
+    WaterBuckStrategy,
 )
-from particula.gas.properties.pressure_function import get_partial_pressure
-from particula.util.validate_inputs import validate_inputs
 from particula.util import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
 
 class AntoineVaporPressureBuilder(BuilderABC):
-    """
-    Builder class for AntoineVaporPressureStrategy. It allows setting
+    """Builder class for AntoineVaporPressureStrategy. It allows setting
     the coefficients 'a', 'b', and 'c' separately and then building the
     strategy object. Follows the general form of the Antoine equation in
     Unicode:
@@ -134,8 +133,7 @@ class AntoineVaporPressureBuilder(BuilderABC):
         raise ValueError("Only K units are supported for coefficient 'c'.")
 
     def build(self) -> AntoineVaporPressureStrategy:
-        """
-        Validate and return an AntoineVaporPressureStrategy using the set
+        """Validate and return an AntoineVaporPressureStrategy using the set
         coefficients.
 
         Returns:
@@ -241,8 +239,7 @@ class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
         return self
 
     def build(self) -> ClausiusClapeyronStrategy:
-        """
-        Validate parameters and return a ClausiusClapeyronStrategy object.
+        """Validate parameters and return a ClausiusClapeyronStrategy object.
 
         Returns:
             - Configured with latent heat, initial Temperature, and Pressure.
@@ -308,8 +305,7 @@ class ConstantVaporPressureBuilder(BuilderABC):
         return self
 
     def build(self) -> ConstantVaporPressureStrategy:
-        """
-        Validate parameters and return a ConstantVaporPressureStrategy object.
+        """Validate parameters and return a ConstantVaporPressureStrategy object.
 
         Returns:
             - Configured with vapor_pressure in Pa.
@@ -374,8 +370,7 @@ class SaturationConcentrationVaporPressureBuilder(
         saturation_concentration: float,
         saturation_concentration_units: str,
     ) -> "SaturationConcentrationVaporPressureBuilder":
-        """
-        Set the saturation concentration (C*, C^sat).
+        """Set the saturation concentration (C*, C^sat).
 
         Arguments:
             - saturation_concentration : Value of the saturation concentration.
@@ -404,8 +399,7 @@ class SaturationConcentrationVaporPressureBuilder(
         return self
 
     def build(self) -> ConstantVaporPressureStrategy:
-        """
-        Validate all parameters and construct a
+        """Validate all parameters and construct a
         ConstantVaporPressureStrategy whose value is obtained from the
         ideal-gas relationship between concentration and partial pressure.
 
@@ -443,8 +437,7 @@ class WaterBuckVaporPressureBuilder(
         super().__init__()
 
     def build(self) -> WaterBuckStrategy:
-        """
-        Build and return a WaterBuckStrategy object.
+        """Build and return a WaterBuckStrategy object.
 
         Returns:
             - Configured for water-specific Buck vapor pressure.

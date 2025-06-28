@@ -7,14 +7,15 @@ The Strategy is tested independently.
 """
 
 import pytest
+
 from particula.particles.distribution_factories import (
     DistributionFactory,
 )
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
     RadiiBasedMovingBin,
     SpeciatedMassMovingBin,
-    ParticleResolvedSpeciatedMass,
 )
 
 

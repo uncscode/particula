@@ -8,15 +8,15 @@ The Strategy is tested independently.
 
 from particula.particles.distribution_builders import (
     MassBasedMovingBinBuilder,
+    ParticleResolvedSpeciatedMassBuilder,
     RadiiBasedMovingBinBuilder,
     SpeciatedMassMovingBinBuilder,
-    ParticleResolvedSpeciatedMassBuilder,
 )
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
     RadiiBasedMovingBin,
     SpeciatedMassMovingBin,
-    ParticleResolvedSpeciatedMass,
 )
 
 

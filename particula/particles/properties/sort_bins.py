@@ -1,8 +1,8 @@
-"""
-Sort bins of distribution representation
+"""Sort bins of distribution representation
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 

@@ -3,20 +3,19 @@
 # pylint: disable=too-few-public-methods
 
 import logging
-from typing import Optional, Union, Sequence
+from typing import Optional, Sequence, Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.util.convert_units import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
 
 class BuilderDensityMixin:
-    """
-    Mixin class for setting density and density_units.
+    """Mixin class for setting density and density_units.
 
     This class provides a method to assign a particle's density in kg/m^3,
     optionally converting from other units.
@@ -45,8 +44,7 @@ class BuilderDensityMixin:
         density: Union[float, NDArray[np.float64]],
         density_units: str,
     ):
-        """
-        Set the density of the particle in kg/m^3.
+        """Set the density of the particle in kg/m^3.
 
         Arguments:
             - density : Density value.
@@ -70,8 +68,7 @@ class BuilderDensityMixin:
 
 
 class BuilderSurfaceTensionMixin:
-    """
-    Mixin class for setting surface_tension.
+    """Mixin class for setting surface_tension.
 
     This class provides a method to assign a particle's surface tension,
     in N/m units, optionally converting from other units.
@@ -96,8 +93,7 @@ class BuilderSurfaceTensionMixin:
         surface_tension: Union[float, NDArray[np.float64]],
         surface_tension_units: str,
     ):
-        """
-        Set the surface tension of the particle in N/m.
+        """Set the surface tension of the particle in N/m.
 
         Arguments:
             - surface_tension : Surface tension value.
@@ -122,8 +118,7 @@ class BuilderSurfaceTensionMixin:
 
 
 class BuilderSurfaceTensionTableMixin:
-    """
-    Mixin class for setting a surface tension lookup table.
+    """Mixin class for setting a surface tension lookup table.
 
     This class provides a method to assign and store a table of
     surface tension values in N/m, optionally converting from
@@ -162,8 +157,7 @@ class BuilderSurfaceTensionTableMixin:
 
 
 class BuilderMolarMassMixin:
-    """
-    Mixin class for setting molar_mass and molar_mass_units.
+    """Mixin class for setting molar_mass and molar_mass_units.
 
     This class provides a method to assign a particle's molar mass in kg/mol,
     optionally converting from other units.
@@ -187,8 +181,7 @@ class BuilderMolarMassMixin:
         molar_mass: Union[float, NDArray[np.float64]],
         molar_mass_units: str,
     ):
-        """
-        Set the molar mass of the particle in kg/mol.
+        """Set the molar mass of the particle in kg/mol.
 
         Arguments:
             - molar_mass : Molar mass value.
@@ -214,8 +207,7 @@ class BuilderMolarMassMixin:
 
 
 class BuilderConcentrationMixin:
-    """
-    Mixin class for setting concentration in a mixture.
+    """Mixin class for setting concentration in a mixture.
 
     This class provides a method to assign a particle or species concentration
     in kg/m^3 by default, optionally converting from other units.
@@ -245,8 +237,7 @@ class BuilderConcentrationMixin:
         concentration: Union[float, NDArray[np.float64]],
         concentration_units: str,
     ):
-        """
-        Set the concentration in the mixture.
+        """Set the concentration in the mixture.
 
         Arguments:
             - concentration : Concentration value.
@@ -271,8 +262,7 @@ class BuilderConcentrationMixin:
 
 
 class BuilderChargeMixin:
-    """
-    Mixin class for setting a particle's charge.
+    """Mixin class for setting a particle's charge.
 
     This class provides a method to assign charge in terms of number of
     elemental charges (dimensionless), ignoring units.
@@ -295,8 +285,7 @@ class BuilderChargeMixin:
         charge: Union[float, NDArray[np.float64]],
         charge_units: Optional[str] = None,
     ):
-        """
-        Set the number of elemental charges on the particle.
+        """Set the number of elemental charges on the particle.
 
         Arguments:
             - charge : Numeric value of the charge.
@@ -344,8 +333,7 @@ class BuilderPhaseIndexMixin:
 
 
 class BuilderMassMixin:
-    """
-    Mixin class for setting particle mass in kg.
+    """Mixin class for setting particle mass in kg.
 
     This class provides a method to assign mass in kg, optionally converting
     from other units.
@@ -366,8 +354,7 @@ class BuilderMassMixin:
         mass: Union[float, NDArray[np.float64]],
         mass_units: str,
     ):
-        """
-        Set the mass of the particle in kg.
+        """Set the mass of the particle in kg.
 
         Arguments:
             - mass : Numeric mass value.
@@ -390,8 +377,7 @@ class BuilderMassMixin:
 
 
 class BuilderVolumeMixin:
-    """
-    Mixin class for setting volume in m^3.
+    """Mixin class for setting volume in m^3.
 
     This class provides a method to assign volume in m^3,
     optionally converting from other units.
@@ -412,8 +398,7 @@ class BuilderVolumeMixin:
         volume: Union[float, NDArray[np.float64]],
         volume_units: str,
     ):
-        """
-        Set the volume in m^3.
+        """Set the volume in m^3.
 
         Arguments:
             - volume : Volume value.
@@ -436,8 +421,7 @@ class BuilderVolumeMixin:
 
 
 class BuilderRadiusMixin:
-    """
-    Mixin class for setting a particle's radius in meters.
+    """Mixin class for setting a particle's radius in meters.
 
     This class provides a method to assign radius in meters,
     optionally converting from other units.
@@ -458,8 +442,7 @@ class BuilderRadiusMixin:
         radius: Union[float, NDArray[np.float64]],
         radius_units: str,
     ):
-        """
-        Set the radius of the particle in meters.
+        """Set the radius of the particle in meters.
 
         Arguments:
             - radius : Numeric radius value.
@@ -482,8 +465,7 @@ class BuilderRadiusMixin:
 
 
 class BuilderTemperatureMixin:
-    """
-    Mixin class for setting temperature in Kelvin.
+    """Mixin class for setting temperature in Kelvin.
 
     This class provides a method to assign temperature in Kelvin,
     optionally converting from specified units such as 'degC', 'degF',
@@ -503,8 +485,7 @@ class BuilderTemperatureMixin:
     def set_temperature(
         self, temperature: float, temperature_units: str = "K"
     ):
-        """
-        Set the temperature of the atmosphere in Kelvin.
+        """Set the temperature of the atmosphere in Kelvin.
 
         Arguments:
             - temperature : Numeric temperature value.
@@ -533,8 +514,7 @@ class BuilderTemperatureMixin:
 
 
 class BuilderTemperatureTableMixin:
-    """
-    Mixin class for setting a temperature lookup table.
+    """Mixin class for setting a temperature lookup table.
 
     This class provides a method to assign multiple temperature values
     in Kelvin, optionally converting from other common temperature units
@@ -577,8 +557,7 @@ class BuilderTemperatureTableMixin:
 
 
 class BuilderPressureMixin:
-    """
-    Mixin class for setting total pressure in Pa.
+    """Mixin class for setting total pressure in Pa.
 
     This class provides a method to assign the total gas mixture pressure
     in pascals, optionally converting from units like 'kPa', 'MPa', 'psi',
@@ -600,8 +579,7 @@ class BuilderPressureMixin:
         pressure: Union[float, NDArray[np.float64]],
         pressure_units: str,
     ):
-        """
-        Set the total pressure of the atmosphere.
+        """Set the total pressure of the atmosphere.
 
         Arguments:
             - pressure : Numeric pressure value.
@@ -624,8 +602,7 @@ class BuilderPressureMixin:
 
 
 class BuilderLognormalMixin:
-    """
-    Mixin class for setting lognormal distribution parameters.
+    """Mixin class for setting lognormal distribution parameters.
 
     This class provides methods to assign and manage lognormal distribution
     parameters for particle radius, including the mode, geometric standard
@@ -654,8 +631,7 @@ class BuilderLognormalMixin:
         mode: NDArray[np.float64],
         mode_units: str,
     ):
-        """
-        Set the mode for the lognormal distribution in meters.
+        """Set the mode for the lognormal distribution in meters.
 
         Arguments:
             - mode : Array of modal radius values.
@@ -682,8 +658,7 @@ class BuilderLognormalMixin:
         geometric_standard_deviation: NDArray[np.float64],
         geometric_standard_deviation_units: Optional[str] = None,
     ):
-        """
-        Set the geometric standard deviation for the lognormal distribution.
+        """Set the geometric standard deviation for the lognormal distribution.
 
         Arguments:
             - geometric_standard_deviation : Dimensionless geometric std. dev.
@@ -710,8 +685,7 @@ class BuilderLognormalMixin:
         number_concentration: NDArray[np.float64],
         number_concentration_units: str,
     ):
-        """
-        Set the number concentration for the lognormal distribution in 1/m^3.
+        """Set the number concentration for the lognormal distribution in 1/m^3.
 
         Arguments:
             - number_concentration : Array of number concentration values.
@@ -737,8 +711,7 @@ class BuilderLognormalMixin:
 
 
 class BuilderParticleResolvedCountMixin:
-    """
-    Mixin class for setting a particle-resolved count.
+    """Mixin class for setting a particle-resolved count.
 
     This class provides a method to define how many individual particles
     should be resolved in a simulation or model.
@@ -759,8 +732,7 @@ class BuilderParticleResolvedCountMixin:
         particle_resolved_count: int,
         particle_resolved_count_units: Optional[str] = None,
     ):
-        """
-        Set the number of particles to resolve.
+        """Set the number of particles to resolve.
 
         Arguments:
             - particle_resolved_count : Positive integer count of particles.

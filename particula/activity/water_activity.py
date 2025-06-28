@@ -1,5 +1,4 @@
-"""
-This module contains functions to calculates the activity coefficients
+"""This module contains functions to calculates the activity coefficients
 at a fixed water activity or the water activity cross point.
 
 Gorkowski, K., Preston, T. C., Zuend, A. (2019).
@@ -9,18 +8,20 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Union, Optional, Tuple
+from typing import Optional, Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
-from particula.activity.bat_coefficients import (
-    LOWEST_ORGANIC_MOLE_FRACTION,
-    INTERPOLATE_WATER_FIT,
-)
+
+from particula.activity import phase_separation
 from particula.activity.activity_coefficients import bat_activity_coefficients
+from particula.activity.bat_coefficients import (
+    INTERPOLATE_WATER_FIT,
+    LOWEST_ORGANIC_MOLE_FRACTION,
+)
 from particula.particles.properties.organic_density_module import (
     get_organic_density_estimate,
 )
-from particula.activity import phase_separation
 
 
 def biphasic_water_activity_point(
@@ -29,8 +30,7 @@ def biphasic_water_activity_point(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
 ) -> np.ndarray:
-    """
-    This function computes the biphasic to single phase
+    """This function computes the biphasic to single phase
     water activity (RH*100).
 
     Args:
@@ -102,8 +102,7 @@ def fixed_water_activity(
     Union[float, NDArray[np.float64]],
     Union[float, NDArray[np.float64]],
 ]:
-    """
-    Calculate the activity coefficients of water and organic matter in
+    """Calculate the activity coefficients of water and organic matter in
     organic-water mixtures.
 
     This function assumes a fixed water activity value (e.g., RH = 75%

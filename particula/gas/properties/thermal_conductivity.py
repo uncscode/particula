@@ -2,8 +2,9 @@
 
 import logging
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -14,8 +15,7 @@ logger = logging.getLogger("particula")  # get instance of logger
 def get_thermal_conductivity(
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Thermal conductivity of air as a function of temperature.
+    """Thermal conductivity of air as a function of temperature.
 
     Calculate the thermal conductivity of air as a function of temperature.
     Based on a simplified linear relation from atmospheric science literature.

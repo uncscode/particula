@@ -2,20 +2,20 @@
 
 import numpy as np
 
+from particula.particles.activity_strategies import ActivityIdealMass
+from particula.particles.distribution_strategies import (
+    ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
+)
+from particula.particles.representation import ParticleRepresentation
 from particula.particles.representation_builders import (
     ParticleMassRepresentationBuilder,
     ParticleRadiusRepresentationBuilder,
     PresetParticleRadiusBuilder,
-    ResolvedParticleMassRepresentationBuilder,
     PresetResolvedParticleMassBuilder,
-)
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.distribution_strategies import (
-    RadiiBasedMovingBin,
-    ParticleResolvedSpeciatedMass,
+    ResolvedParticleMassRepresentationBuilder,
 )
 from particula.particles.surface_strategies import SurfaceStrategyVolume
-from particula.particles.activity_strategies import ActivityIdealMass
 
 
 def test_mass_particle_representation_builder():

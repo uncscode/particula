@@ -1,12 +1,13 @@
 """Factory module to create a concrete Species object using builders."""
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
+from particula.gas.species import GasSpecies
 from particula.gas.species_builders import (
     GasSpeciesBuilder,
     PresetGasSpeciesBuilder,
 )
-from particula.gas.species import GasSpecies
 
 
 class GasSpeciesFactory(
@@ -18,8 +19,7 @@ class GasSpeciesFactory(
         GasSpecies,
     ]
 ):
-    """
-    Factory for creating species builders that produce GasSpecies objects.
+    """Factory for creating species builders that produce GasSpecies objects.
 
     This class provides methods to retrieve a builder (e.g., 'gas_species'
     or 'preset_gas_species') and instantiate a GasSpecies object from it
@@ -61,8 +61,7 @@ class GasSpeciesFactory(
     """
 
     def get_builders(self):
-        """
-        Return a mapping of strategy types to builder instances.
+        """Return a mapping of strategy types to builder instances.
 
         Returns:
             - dict[str, Union[GasSpeciesBuilder, PresetGasSpeciesBuilder]] :
@@ -78,7 +77,6 @@ class GasSpeciesFactory(
             # builder_map["gas_species"] -> GasSpeciesBuilder()
             ```
         """
-
         return {
             "gas_species": GasSpeciesBuilder(),
             "preset_gas_species": PresetGasSpeciesBuilder(),

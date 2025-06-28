@@ -1,5 +1,4 @@
-"""
-Turbulent DNS coagulation strategies for particles above 1 µm.
+"""Turbulent DNS coagulation strategies for particles above 1 µm.
 
 Implements the DNS-based coagulation kernel from Ayala et al. (2008) and
 adjusted for typical atmospheric or industrial conditions.
@@ -7,25 +6,25 @@ Provides classes and methods to compute collision rates under turbulent
 dissipation using direct numerical simulation (DNS) approaches.
 """
 
-from typing import Union
 import logging
+from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
     get_turbulent_dns_kernel_ao2008_via_system_state,
 )
+from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
 class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
-    """
-    Turbulent DNS coagulation strategy for aerosols.
+    """Turbulent DNS coagulation strategy for aerosols.
 
     Implements methods from `CoagulationStrategyABC`, applying the
     turbulent DNS kernel following Ayala et al. (2008). Suitable for
@@ -84,8 +83,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         relative_velocity: float,
     ):
         # pylint: disable=too-many-arguments, too-many-positional-arguments
-        """
-        Initialize the TurbulentDNSCoagulationStrategy.
+        """Initialize the TurbulentDNSCoagulationStrategy.
 
         Arguments:
             - distribution_type : The distribution type ("discrete",
@@ -109,8 +107,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         self.relative_velocity = relative_velocity
 
     def set_turbulent_dissipation(self, turbulent_dissipation: float):
-        """
-        Set the turbulent kinetic energy dissipation rate.
+        """Set the turbulent kinetic energy dissipation rate.
 
         Arguments:
             - turbulent_dissipation : Turbulent dissipation [m^2/s^3].
@@ -127,8 +124,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         return self
 
     def set_reynolds_lambda(self, reynolds_lambda: float):
-        """
-        Set the Reynolds lambda value.
+        """Set the Reynolds lambda value.
 
         Arguments:
             - reynolds_lambda : Reynolds lambda [dimensionless].
@@ -145,8 +141,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         return self
 
     def set_relative_velocity(self, relative_velocity: float):
-        """
-        Set the relative velocity of the flow [m/s].
+        """Set the relative velocity of the flow [m/s].
 
         Arguments:
             - relative_velocity : Relative velocity in [m/s].
@@ -167,8 +162,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Compute or return the dimensionless kernel (H).
+        """Compute or return the dimensionless kernel (H).
 
         Not implemented for DNS-based approaches, so raises
         NotImplementedError.
@@ -199,8 +193,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Compute the DNS-based coagulation kernel [m^3/s].
+        """Compute the DNS-based coagulation kernel [m^3/s].
 
         Uses the `get_turbulent_dns_kernel_ao2008_via_system_state` function to
         calculate collision rates following Ayala et al. (2008). This approach
@@ -234,7 +227,6 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
           New Journal of Physics, 10.
           [DOI](https://doi.org/10.1088/1367-2630/10/7/075016)
         """
-
         return get_turbulent_dns_kernel_ao2008_via_system_state(
             particle_radius=particle.get_radius(),
             particle_density=particle.get_mean_effective_density(),

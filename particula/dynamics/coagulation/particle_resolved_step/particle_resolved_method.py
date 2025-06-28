@@ -1,6 +1,7 @@
 """Particle resolved method for coagulation."""
 
 from typing import Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import RegularGridInterpolator  # type: ignore
@@ -18,8 +19,7 @@ def get_particle_resolved_update_step(
     small_index: NDArray[np.int64],
     large_index: NDArray[np.int64],
 ) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """
-    Update particle radii and track lost/gained particles after coagulation
+    """Update particle radii and track lost/gained particles after coagulation
     events.
 
     This function simulates the immediate effect of coagulation on particle
@@ -93,8 +93,7 @@ def get_particle_resolved_coagulation_step(
     time_step: float,
     random_generator: np.random.Generator,
 ) -> NDArray[np.int64]:
-    """
-    Perform a single step of particle coagulation, updating particle radii
+    """Perform a single step of particle coagulation, updating particle radii
     with a stochastic approach.
 
     This function models collisions between particles based on a given
@@ -151,7 +150,6 @@ def get_particle_resolved_coagulation_step(
         - Seinfeld, J. H., & Pandis, S. N. *Atmospheric Chemistry and Physics*,
           Wiley, 2016.
     """
-
     # Step 1: Bin the particles based on their radii into corresponding kernel
     # bins
     _, bin_indices = _bin_particles(particle_radius, kernel_radius)
@@ -268,8 +266,7 @@ def _interpolate_kernel(
     kernel: NDArray[np.float64],
     kernel_radius: NDArray[np.float64],
 ) -> RegularGridInterpolator:
-    """
-    Create an interpolation function for the coagulation kernel with
+    """Create an interpolation function for the coagulation kernel with
     out-of-bounds handling.
 
     This function returns a RegularGridInterpolator that performs linear
@@ -316,8 +313,7 @@ def _calculate_probabilities(
     tests: int,
     volume: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate coagulation probabilities based on kernel values and system
+    """Calculate coagulation probabilities based on kernel values and system
     parameters.
 
     This function multiplies the kernel values by the time step and a factor
@@ -350,8 +346,7 @@ def _final_coagulation_state(
     large_indices: NDArray[np.int64],
     particle_radius: NDArray[np.float64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Resolve the final state of particles that have undergone multiple
+    """Resolve the final state of particles that have undergone multiple
     coagulation events.
 
     This function ensures that each small particle index merges correctly to

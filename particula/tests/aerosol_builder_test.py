@@ -1,30 +1,31 @@
-"""
-Unit tests verifying that `AerosolBuilder._validate_species_length`
+"""Unit tests verifying that `AerosolBuilder._validate_species_length`
 correctly checks consistency between gas-phase and particle-phase
 species counts for different scenarios.
 """
 
 # pylint: disable=W0212, R0801
 
-import unittest
 import copy
+import unittest
+
 import numpy as np
 
+from particula.aerosol import Aerosol
 from particula.aerosol_builder import AerosolBuilder
+from particula.gas import (
+    AtmosphereBuilder,
+    GasSpeciesBuilder,
+    VaporPressureFactory,
+)
 from particula.particles import (
     PresetResolvedParticleMassBuilder,
 )
-from particula.gas import (
-    AtmosphereBuilder,
-    VaporPressureFactory,
-    GasSpeciesBuilder,
-)
-from particula.aerosol import Aerosol
 
 
 def _build_atmosphere(n_species: int):
     """Return an Atmosphere containing *n_species* identical
-    partitioning vapours for use in the validation tests."""
+    partitioning vapours for use in the validation tests.
+    """
     molar_mass = 92.09382e-3  # kg/mol (glycerol)
     params = {
         "latent_heat": 71.5e3 * molar_mass,
@@ -61,14 +62,16 @@ def _build_atmosphere(n_species: int):
 
 def _build_particle():
     """Return a minimal single-species particle representation
-    built with `PresetResolvedParticleMassBuilder`."""
+    built with `PresetResolvedParticleMassBuilder`.
+    """
     return PresetResolvedParticleMassBuilder().build()
 
 
 def _speciated_clone(particle, n_species: int):
     """Deep-copy *particle* and tile its distribution to mimic a
     `SpeciatedMassMovingBin` object with *n_species* particle-phase
-    species."""
+    species.
+    """
     particle = copy.deepcopy(particle)
 
     distribution_org = particle.get_distribution(clone=True)
@@ -103,7 +106,8 @@ class TestAerosolBuilderValidation(unittest.TestCase):
     # ---------- SINGLE-SPECIES CASE ----------
     def test_single_species_match_passes(self):
         """Validation passes when one gas species matches one particle
-        species."""
+        species.
+        """
         atm = _build_atmosphere(1)
         pr = _speciated_clone(self.base_particle, 1)
         AerosolBuilder().set_atmosphere(atm).set_particles(
@@ -112,7 +116,8 @@ class TestAerosolBuilderValidation(unittest.TestCase):
 
     def test_single_species_mismatch_raises(self):
         """Validation fails when one gas species does NOT match two particle
-        species."""
+        species.
+        """
         atm = _build_atmosphere(1)
         pr = _speciated_clone(self.base_particle, 2)
         with self.assertRaises(ValueError):
@@ -123,7 +128,8 @@ class TestAerosolBuilderValidation(unittest.TestCase):
     # ---------- THREE-SPECIES CASE ----------
     def test_three_species_match_passes(self):
         """Validation passes when three gas species match three particle
-        species."""
+        species.
+        """
         atm = _build_atmosphere(3)
         pr = _speciated_clone(self.base_particle, 3)
         AerosolBuilder().set_atmosphere(atm).set_particles(
@@ -132,7 +138,8 @@ class TestAerosolBuilderValidation(unittest.TestCase):
 
     def test_three_species_mismatch_raises(self):
         """Validation fails when three gas species do NOT match two particle
-        species."""
+        species.
+        """
         atm = _build_atmosphere(3)
         pr = _speciated_clone(self.base_particle, 2)
         with self.assertRaises(ValueError):

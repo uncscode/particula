@@ -1,5 +1,4 @@
-"""
-Utilities for coercing data types, converting lists to dictionaries,
+"""Utilities for coercing data types, converting lists to dictionaries,
 retrieving dictionary values by keys, and validating or reshaping data
 arrays with matching time steps and headers.
 
@@ -9,14 +8,14 @@ References:
 To be removed, likely particula_beta only. -kyle
 """
 
-from typing import Any, Dict, List
 from collections.abc import Sequence
+from typing import Any, Dict, List
+
 import numpy as np
 
 
 def get_coerced_type(data, dtype):
-    """
-    Coerce the given data to the specified dtype if it is not already of that
+    """Coerce the given data to the specified dtype if it is not already of that
     type.
 
     Arguments:
@@ -57,8 +56,7 @@ def get_coerced_type(data, dtype):
 
 
 def get_dict_from_list(list_of_str: list) -> dict:
-    """
-    Convert a list of strings into a dictionary mapping each string to its
+    """Convert a list of strings into a dictionary mapping each string to its
     index.
 
     Arguments:
@@ -98,8 +96,7 @@ def get_dict_from_list(list_of_str: list) -> dict:
 def get_values_of_dict(
     key_list: List[str], dict_to_check: Dict[str, Any]
 ) -> List[Any]:
-    """
-    Retrieve a list of index values from a dictionary for the specified keys.
+    """Retrieve a list of index values from a dictionary for the specified keys.
 
     Arguments:
         - key_list : The keys to look up in the dictionary.
@@ -137,8 +134,7 @@ def get_shape_check(
     data: np.ndarray,
     header: list,
 ) -> np.ndarray:
-    """
-    Validate or reshape a data array to ensure compatibility with a time array
+    """Validate or reshape a data array to ensure compatibility with a time array
     and header list.
 
     If data is 2D, the function attempts to align the time dimension with one
@@ -169,7 +165,6 @@ def get_shape_check(
         # Should be (10, 5)
         ```
     """
-
     # Check if data_new is 2D or 1D
     if len(data.shape) == 2:
         # Check if time matches the dimensions of data

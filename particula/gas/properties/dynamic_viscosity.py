@@ -30,8 +30,7 @@ def get_dynamic_viscosity(
     reference_viscosity: float = REF_VISCOSITY_AIR_STP,
     reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
-    """
-    Calculate the dynamic viscosity of air using Sutherland's formula.
+    """Calculate the dynamic viscosity of air using Sutherland's formula.
 
     - μ(T) = μ₀ × (T / T₀)^(3/2) × (T₀ + S) / (T + S)
         - μ(T) is the dynamic viscosity at temperature T (Pa·s).

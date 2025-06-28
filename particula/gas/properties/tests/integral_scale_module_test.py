@@ -1,18 +1,17 @@
-"""
-Test the integral scale functions in the integral_scale_module.py file.
+"""Test the integral scale functions in the integral_scale_module.py file.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.gas.properties.integral_scale_module import (
-    get_lagrangian_integral_time,
     get_eulerian_integral_length,
+    get_lagrangian_integral_time,
 )
 
 
 def test_get_lagrangian_integral_scale_scalar():
-    """
-    Test get_lagrangian_integral_scale with scalar inputs.
+    """Test get_lagrangian_integral_scale with scalar inputs.
     """
     rms_velocity = 0.5  # m/s
     turbulent_dissipation = 1e-3  # m²/s³
@@ -24,8 +23,7 @@ def test_get_lagrangian_integral_scale_scalar():
 
 
 def test_get_lagrangian_integral_scale_array():
-    """
-    Test get_lagrangian_integral_scale with NumPy array inputs.
+    """Test get_lagrangian_integral_scale with NumPy array inputs.
     """
     rms_velocity = np.array([0.5, 0.8])
     turbulent_dissipation = np.array([1e-3, 2e-3])
@@ -37,8 +35,7 @@ def test_get_lagrangian_integral_scale_array():
 
 
 def test_get_lagrangian_integral_scale_invalid_values():
-    """
-    Test that get_lagrangian_integral_scale raises errors for invalid inputs.
+    """Test that get_lagrangian_integral_scale raises errors for invalid inputs.
     """
     with pytest.raises(ValueError):
         get_lagrangian_integral_time(-0.5, 1e-3)
@@ -48,8 +45,7 @@ def test_get_lagrangian_integral_scale_invalid_values():
 
 
 def test_get_eulerian_integral_scale_scalar():
-    """
-    Test get_eulerian_integral_scale with scalar inputs.
+    """Test get_eulerian_integral_scale with scalar inputs.
     """
     rms_velocity = 0.5  # m/s
     turbulent_dissipation = 1e-3  # m²/s³
@@ -61,8 +57,7 @@ def test_get_eulerian_integral_scale_scalar():
 
 
 def test_get_eulerian_integral_scale_array():
-    """
-    Test get_eulerian_integral_scale with NumPy array inputs.
+    """Test get_eulerian_integral_scale with NumPy array inputs.
     """
     rms_velocity = np.array([0.5, 0.8])
     turbulent_dissipation = np.array([1e-3, 2e-3])
@@ -74,8 +69,7 @@ def test_get_eulerian_integral_scale_array():
 
 
 def test_get_eulerian_integral_scale_invalid_values():
-    """
-    Test that get_eulerian_integral_scale raises errors for invalid inputs.
+    """Test that get_eulerian_integral_scale raises errors for invalid inputs.
     """
     with pytest.raises(ValueError):
         get_eulerian_integral_length(-0.5, 1e-3)
@@ -85,8 +79,7 @@ def test_get_eulerian_integral_scale_invalid_values():
 
 
 def test_integral_scales_edge_case():
-    """
-    Test both integral scale functions with very small values near machine precision.
+    """Test both integral scale functions with very small values near machine precision.
     """
     rms_velocity = 1e-10
     turbulent_dissipation = 1e-10

@@ -1,10 +1,10 @@
-"""
-Stokes number calculation.
+"""Stokes number calculation.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -19,8 +19,7 @@ def get_stokes_number(
     particle_inertia_time: Union[float, NDArray[np.float64]],
     kolmogorov_time: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the Stokes number (St) to measure particle inertia relative to
+    """Compute the Stokes number (St) to measure particle inertia relative to
     fluid flow.
 
     The Stokes number is a dimensionless parameter reflecting how much a

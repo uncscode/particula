@@ -1,17 +1,16 @@
-"""
-Velocity correlation f2 test module.
+"""Velocity correlation f2 test module.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008 import (
     get_f2_longitudinal_velocity_correlation,
 )
 
 
 def test_compute_f2_longitudinal_velocity_correlation_scalar():
-    """
-    Test compute_f2_longitudinal_velocity_correlation with scalar inputs.
+    """Test compute_f2_longitudinal_velocity_correlation with scalar inputs.
     """
     collisional_radius = 0.1  # [m]
     taylor_microscale = 0.05  # [m]
@@ -47,8 +46,7 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
 
 
 def test_compute_f2_longitudinal_velocity_correlation_array():
-    """
-    Test compute_f2_longitudinal_velocity_correlation with NumPy array inputs.
+    """Test compute_f2_longitudinal_velocity_correlation with NumPy array inputs.
     """
     collisional_radius = np.array([0.1, 0.5, 1.0])  # [m]
     taylor_microscale = 0.05  # [m]
@@ -78,8 +76,7 @@ def test_compute_f2_longitudinal_velocity_correlation_array():
 
 
 def test_invalid_inputs():
-    """
-    Ensure validation errors are raised for invalid inputs.
+    """Ensure validation errors are raised for invalid inputs.
     """
     with pytest.raises(ValueError):
         get_f2_longitudinal_velocity_correlation(
@@ -98,8 +95,7 @@ def test_invalid_inputs():
 
 
 def test_edge_cases():
-    """
-    Test compute_f2_longitudinal_velocity_correlation with extreme values.
+    """Test compute_f2_longitudinal_velocity_correlation with extreme values.
     """
     collisional_radius = np.array(
         [1e-6, 1e-3, 10.0]

@@ -3,16 +3,18 @@ Is the factory function working as expected, creating the right surface
 strategy based on the input parameters, and raising the right exceptions
 when needed.
 
-The Builder is tested independently."""
+The Builder is tested independently.
+"""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.surface_factories import (
     SurfaceFactory,
 )
 from particula.particles.surface_strategies import (
-    SurfaceStrategyMolar,
     SurfaceStrategyMass,
+    SurfaceStrategyMolar,
     SurfaceStrategyVolume,
 )
 

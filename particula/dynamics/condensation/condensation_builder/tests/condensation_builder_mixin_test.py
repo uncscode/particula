@@ -3,8 +3,8 @@
 import pytest
 
 from particula.dynamics.condensation.condensation_builder.condensation_builder_mixin import (
-    BuilderDiffusionCoefficientMixin,
     BuilderAccommodationCoefficientMixin,
+    BuilderDiffusionCoefficientMixin,
     BuilderUpdateGasesMixin,
 )
 

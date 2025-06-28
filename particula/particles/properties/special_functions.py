@@ -1,8 +1,8 @@
-"""
-Special non-standard functions for aerosol properties
+"""Special non-standard functions for aerosol properties
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -20,8 +20,7 @@ def get_debye_function(
     integration_points: int = 1000,
     n: int = 1,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the generalized Debye function for a given input.
+    """Calculate the generalized Debye function for a given input.
 
     The Debye function can be expressed as follows:
 

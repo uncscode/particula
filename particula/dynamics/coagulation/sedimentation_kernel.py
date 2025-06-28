@@ -1,5 +1,4 @@
-"""
-Sedimentation kernel for aerosol particles.
+"""Sedimentation kernel for aerosol particles.
 
 Used for calculating collisions due to gravitational settling, where heavier
 particles fall faster and may collide with slower ones. The kernel follows
@@ -17,8 +16,8 @@ References:
       and physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.4.
 """
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.particles.properties.settling_velocity import (
     get_particle_settling_velocity_via_system_state,
@@ -29,8 +28,7 @@ from particula.util.validate_inputs import validate_inputs
 def calculate_collision_efficiency_function(
     radius1: float, radius2: float
 ) -> float:
-    """
-    Calculate the collision efficiency between two particles (placeholder).
+    """Calculate the collision efficiency between two particles (placeholder).
 
     This function calculates the collision efficiency E for two particles
     of radii radius1 and radius2, which can depend on additional factors
@@ -65,8 +63,7 @@ def get_sedimentation_kernel_sp2016(
     settling_velocities: NDArray[np.float64],
     calculate_collision_efficiency: bool = True,
 ) -> NDArray[np.float64]:
-    """
-    Calculate the sedimentation kernel for aerosol particles (Equation 13A.4).
+    """Calculate the sedimentation kernel for aerosol particles (Equation 13A.4).
 
     This function computes the coagulation kernel due to gravitational
     settling, where larger particles settle faster and overtake smaller
@@ -133,8 +130,7 @@ def get_sedimentation_kernel_sp2016_via_system_state(
     pressure: float,
     calculate_collision_efficiency: bool = True,
 ) -> NDArray[np.float64]:
-    """
-    Calculate the sedimentation kernel (Equation 13A.4) via system state.
+    """Calculate the sedimentation kernel (Equation 13A.4) via system state.
 
     This function first derives settling velocities using the system state
     (particle radius, density, temperature, pressure), then calls

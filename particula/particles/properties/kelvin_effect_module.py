@@ -1,8 +1,9 @@
 """Module to calculate the Kelvin effect on vapor pressure."""
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.constants import GAS_CONSTANT
 from particula.util.machine_limit import get_safe_exp
@@ -23,8 +24,7 @@ def get_kelvin_radius(
     molar_mass: Union[float, NDArray[np.float64]],
     temperature: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the Kelvin radius (rₖ) to account for curvature effects on vapor
+    """Compute the Kelvin radius (rₖ) to account for curvature effects on vapor
     pressure.
 
     The Kelvin radius is defined by:
@@ -78,8 +78,7 @@ def get_kelvin_term(
     particle_radius: Union[float, NDArray[np.float64]],
     kelvin_radius_value: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the Kelvin exponential term to account for curvature effects.
+    """Compute the Kelvin exponential term to account for curvature effects.
 
     The Kelvin term (K) is given by:
 

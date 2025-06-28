@@ -1,58 +1,57 @@
-"""
-Particle Representation Builders
+"""Particle Representation Builders
 
 Provides builder classes for creating ParticleRepresentation objects
 with specialized distribution, activity, and surface strategies for
 mass-based, radius-based, discrete, or lognormal representations.
 """
 
-from typing import Optional
 import logging
-from numpy.typing import NDArray
-import numpy as np
+from typing import Optional
 
-from particula.util.validate_inputs import validate_inputs
-from particula.util.convert_units import get_unit_conversion
+import numpy as np
+from numpy.typing import NDArray
+
 from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
-    BuilderRadiusMixin,
-    BuilderConcentrationMixin,
-    BuilderMassMixin,
-    BuilderDensityMixin,
     BuilderChargeMixin,
-    BuilderVolumeMixin,
+    BuilderConcentrationMixin,
+    BuilderDensityMixin,
     BuilderLognormalMixin,
+    BuilderMassMixin,
     BuilderParticleResolvedCountMixin,
+    BuilderRadiusMixin,
+    BuilderVolumeMixin,
+)
+from particula.particles.activity_strategies import (
+    ActivityIdealMass,
+    ActivityStrategy,
 )
 from particula.particles.distribution_strategies import (
     DistributionStrategy,
-    RadiiBasedMovingBin,
     ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
 )
-from particula.particles.activity_strategies import (
-    ActivityStrategy,
-    ActivityIdealMass,
-)
-from particula.particles.surface_strategies import (
-    SurfaceStrategy,
-    SurfaceStrategyVolume,
-)
-from particula.particles.representation import ParticleRepresentation
 from particula.particles.properties.lognormal_size_distribution import (
     get_lognormal_pdf_distribution,
     get_lognormal_pmf_distribution,
     get_lognormal_sample_distribution,
 )
+from particula.particles.representation import ParticleRepresentation
+from particula.particles.surface_strategies import (
+    SurfaceStrategy,
+    SurfaceStrategyVolume,
+)
+from particula.util.convert_units import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
 
 # pylint: disable=too-few-public-methods
 class BuilderSurfaceStrategyMixin:
-    """
-    Mixin class for setting the surface_strategy attribute.
+    """Mixin class for setting the surface_strategy attribute.
 
     Methods:
     - set_surface_strategy : Assign the surface strategy controlling
@@ -67,8 +66,7 @@ class BuilderSurfaceStrategyMixin:
         surface_strategy: SurfaceStrategy,
         surface_strategy_units: Optional[str] = None,
     ):
-        """
-        Assign the surface strategy for the particle representation.
+        """Assign the surface strategy for the particle representation.
 
         Arguments:
             - surface_strategy : A SurfaceStrategy instance defining surface
@@ -86,8 +84,7 @@ class BuilderSurfaceStrategyMixin:
 
 # pylint: disable=too-few-public-methods
 class BuilderDistributionStrategyMixin:
-    """
-    Mixin class for setting the distribution_strategy attribute.
+    """Mixin class for setting the distribution_strategy attribute.
 
     Methods:
     - set_distribution_strategy : Assign the distribution strategy
@@ -102,8 +99,7 @@ class BuilderDistributionStrategyMixin:
         distribution_strategy: DistributionStrategy,
         distribution_strategy_units: Optional[str] = None,
     ):
-        """
-        Assign the distribution strategy for the particle representation.
+        """Assign the distribution strategy for the particle representation.
 
         Arguments:
             - distribution_strategy : A DistributionStrategy instance
@@ -124,8 +120,7 @@ class BuilderDistributionStrategyMixin:
 
 # pylint: disable=too-few-public-methods
 class BuilderActivityStrategyMixin:
-    """
-    Mixin class for setting the activity_strategy attribute.
+    """Mixin class for setting the activity_strategy attribute.
 
     Methods:
     - set_activity_strategy : Assign the activity strategy (e.g., ideal mass,
@@ -140,8 +135,7 @@ class BuilderActivityStrategyMixin:
         activity_strategy: ActivityStrategy,
         activity_strategy_units: Optional[str] = None,
     ):
-        """
-        Assign the activity strategy for the particle representation.
+        """Assign the activity strategy for the particle representation.
 
         Arguments:
             - activity_strategy : An ActivityStrategy instance (e.g.,
@@ -167,8 +161,7 @@ class ParticleMassRepresentationBuilder(
     BuilderConcentrationMixin,
     BuilderChargeMixin,
 ):  # pylint: disable=too-many-ancestors
-    """
-    Builder for ParticleRepresentation objects using mass-based distributions.
+    """Builder for ParticleRepresentation objects using mass-based distributions.
 
     Attributes:
         - distribution_strategy : The DistributionStrategy
@@ -213,8 +206,7 @@ class ParticleMassRepresentationBuilder(
         BuilderChargeMixin.__init__(self)
 
     def build(self) -> ParticleRepresentation:
-        """
-        Validate all required parameters and return a ParticleRepresentation.
+        """Validate all required parameters and return a ParticleRepresentation.
 
         Returns:
             - ParticleRepresentation : An object configured to represent
@@ -243,8 +235,7 @@ class ParticleRadiusRepresentationBuilder(
     BuilderConcentrationMixin,
     BuilderChargeMixin,
 ):  # pylint: disable=too-many-ancestors
-    """
-    Builder for ParticleRepresentation objects using radius-based
+    """Builder for ParticleRepresentation objects using radius-based
     distributions.
 
     Attributes:
@@ -290,8 +281,7 @@ class ParticleRadiusRepresentationBuilder(
         BuilderChargeMixin.__init__(self)
 
     def build(self) -> ParticleRepresentation:
-        """
-        Validate all required parameters and return a ParticleRepresentation.
+        """Validate all required parameters and return a ParticleRepresentation.
 
         Returns:
             - ParticleRepresentation : An object configured to represent
@@ -320,8 +310,7 @@ class PresetParticleRadiusBuilder(
     BuilderChargeMixin,
     BuilderLognormalMixin,
 ):  # pylint: disable=too-many-ancestors
-    """
-    Builder for ParticleRepresentation objects with radius-based bins
+    """Builder for ParticleRepresentation objects with radius-based bins
     generated from a lognormal size distribution.
 
     Attributes:
@@ -378,8 +367,7 @@ class PresetParticleRadiusBuilder(
         radius_bins: NDArray[np.float64],
         radius_bins_units: str = "m",
     ):
-        """
-        Assign an array of radius bin edges.
+        """Assign an array of radius bin edges.
 
         Arguments:
             - radius_bins : The radius bin edges in meters.
@@ -405,8 +393,7 @@ class PresetParticleRadiusBuilder(
         distribution_type: str,
         distribution_type_units: Optional[str] = None,
     ):
-        """
-        Choose between "pdf" (probability density function) or "pmf"
+        """Choose between "pdf" (probability density function) or "pmf"
         (probability mass function) for the distribution.
 
         Arguments:
@@ -426,8 +413,7 @@ class PresetParticleRadiusBuilder(
         return self
 
     def build(self) -> ParticleRepresentation:
-        """
-        Generate a lognormal distribution (PDF or PMF) based on
+        """Generate a lognormal distribution (PDF or PMF) based on
         current parameters and return a ParticleRepresentation.
 
         Returns:
@@ -475,8 +461,7 @@ class ResolvedParticleMassRepresentationBuilder(
     BuilderVolumeMixin,
     BuilderMassMixin,
 ):  # pylint: disable=too-many-ancestors
-    """
-    Builder for ParticleRepresentation objects with fully resolved
+    """Builder for ParticleRepresentation objects with fully resolved
     particle masses (array-based).
 
     Allows setting distribution strategy, mass, density, charge,
@@ -523,8 +508,7 @@ class ResolvedParticleMassRepresentationBuilder(
         BuilderVolumeMixin.__init__(self)
 
     def build(self) -> ParticleRepresentation:
-        """
-        Validate attributes and construct a ParticleRepresentation
+        """Validate attributes and construct a ParticleRepresentation
         with array-based, resolved masses.
 
         Returns:
@@ -559,8 +543,7 @@ class PresetResolvedParticleMassBuilder(
     BuilderVolumeMixin,
     BuilderParticleResolvedCountMixin,
 ):  # pylint: disable=too-many-ancestors
-    """
-    Builder for ParticleRepresentation objects with preset parameters
+    """Builder for ParticleRepresentation objects with preset parameters
     for particle-resolved masses derived from a lognormal size distribution.
 
     Generates random samples of particle radii (lognormal) and converts
@@ -612,8 +595,7 @@ class PresetResolvedParticleMassBuilder(
         self.set_volume(1, "m^3")
 
     def build(self) -> ParticleRepresentation:
-        """
-        Sample particle radii from a lognormal distribution, convert
+        """Sample particle radii from a lognormal distribution, convert
         to mass, and return a ParticleRepresentation with resolved
         per-particle masses.
 
@@ -621,7 +603,6 @@ class PresetResolvedParticleMassBuilder(
             - ParticleRepresentation : Configured for particle-resolved
               masses with the specified distribution, activity, and surface.
         """
-
         resolved_radii = get_lognormal_sample_distribution(
             mode=self.mode,
             geometric_standard_deviation=self.geometric_standard_deviation,

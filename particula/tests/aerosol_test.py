@@ -1,14 +1,16 @@
 """Tests for the Aerosol class."""
 
 import unittest
+
 import numpy as np
-from particula.particles import PresetParticleRadiusBuilder
+
+from particula.aerosol import Aerosol
 from particula.gas import (
     AtmosphereBuilder,
-    VaporPressureFactory,
     GasSpeciesBuilder,
+    VaporPressureFactory,
 )
-from particula.aerosol import Aerosol
+from particula.particles import PresetParticleRadiusBuilder
 
 
 class TestAerosol(unittest.TestCase):

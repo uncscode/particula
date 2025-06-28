@@ -1,5 +1,4 @@
-"""
-Unit tests for the CombineCoagulationStrategy class.
+"""Unit tests for the CombineCoagulationStrategy class.
 
 This module contains tests for the CombineCoagulationStrategy class,
 which combines multiple coagulation strategies into one. The tests cover
@@ -9,7 +8,12 @@ both discrete and continuous_pdf distribution types.
 # pylint: disable=duplicate-code
 
 import unittest
+
 import numpy as np
+
+from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
+    BrownianCoagulationStrategy,
+)
 from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy import (
     CombineCoagulationStrategy,
 )
@@ -18,21 +22,16 @@ from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_str
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
-    BrownianCoagulationStrategy,
-)
 from particula.particles import PresetParticleRadiusBuilder
 
 
 # pylint: disable=too-many-instance-attributes
 class TestCombineCoagulationStrategy(unittest.TestCase):
-    """
-    Test suite for the CombineCoagulationStrategy class.
+    """Test suite for the CombineCoagulationStrategy class.
     """
 
     def setUp(self):
-        """
-        Set up the test environment.
+        """Set up the test environment.
 
         Initializes a particle representation and creates instances of
         CombineCoagulationStrategy for both discrete and continuous_pdf
@@ -60,8 +59,7 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_combination(self):
-        """
-        Test the kernel combination.
+        """Test the kernel combination.
 
         Verifies that the combined kernel is the sum of the individual kernels.
         """
@@ -86,8 +84,7 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
         )
 
     def test_step_combination(self):
-        """
-        Test the step method for combined strategy.
+        """Test the step method for combined strategy.
 
         Ensures that the step method updates the particle concentration.
         """

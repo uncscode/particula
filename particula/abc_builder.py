@@ -5,16 +5,15 @@ References:
 
 """
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Optional
-import logging
 
 logger = logging.getLogger("particula")
 
 
 class BuilderABC(ABC):
-    """
-    Abstract base class for builders with common methods to check keys and
+    """Abstract base class for builders with common methods to check keys and
     set parameters from a dictionary.
 
     Attributes:
@@ -52,8 +51,7 @@ class BuilderABC(ABC):
         self.required_parameters = required_parameters or []
 
     def check_keys(self, parameters: dict[str, Any]):
-        """
-        Check if the keys are present and valid.
+        """Check if the keys are present and valid.
 
         Arguments:
             - parameters: The parameters dictionary to check.
@@ -71,7 +69,6 @@ class BuilderABC(ABC):
             })
             ```
         """
-
         # Check if all required keys are present
         if missing := [
             p for p in self.required_parameters if p not in parameters
@@ -99,8 +96,7 @@ class BuilderABC(ABC):
             raise ValueError(error_message)
 
     def set_parameters(self, parameters: dict[str, Any]):
-        """
-        Set parameters from a dictionary, handling any '_units' suffix.
+        """Set parameters from a dictionary, handling any '_units' suffix.
 
         Arguments:
             - parameters: The parameters dictionary to set.
@@ -136,8 +132,7 @@ class BuilderABC(ABC):
         return self
 
     def pre_build_check(self):
-        """
-        Check if all required attribute parameters are set before building.
+        """Check if all required attribute parameters are set before building.
 
         Raises:
             - ValueError: If any required parameter is missing.
@@ -159,8 +154,7 @@ class BuilderABC(ABC):
 
     @abstractmethod
     def build(self) -> Any:
-        """
-        Build and return the strategy object with the set parameters.
+        """Build and return the strategy object with the set parameters.
 
         Returns:
             Any: The built strategy object.

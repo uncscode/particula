@@ -1,13 +1,14 @@
 """Tests for the VaporPressureBuilder class."""
 
 import pytest
+
 from particula.gas.vapor_pressure_builders import (
     AntoineVaporPressureBuilder,
     ClausiusClapeyronVaporPressureBuilder,
     ConstantVaporPressureBuilder,
-    WaterBuckVaporPressureBuilder,
     SaturationConcentrationVaporPressureBuilder,
     TableVaporPressureBuilder,
+    WaterBuckVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_strategies import TableVaporPressureStrategy
 

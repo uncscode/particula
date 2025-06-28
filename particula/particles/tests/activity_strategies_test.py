@@ -1,7 +1,9 @@
 """Tests for the particle activity module.
-Replace with real values in the future."""
+Replace with real values in the future.
+"""
 
 import numpy as np
+
 from particula.particles.activity_strategies import (
     ActivityIdealMass,
     ActivityIdealMolar,

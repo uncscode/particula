@@ -1,12 +1,13 @@
-"""
-Tests for BrownianCoagulationStrategy.
+"""Tests for BrownianCoagulationStrategy.
 """
 
 # pylint: disable=duplicate-code, too-many-instance-attributes
 
 
 import unittest
+
 import numpy as np
+
 from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
     BrownianCoagulationStrategy,
 )
