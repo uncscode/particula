@@ -70,5 +70,5 @@ class BuilderUpdateGasesMixin:
         """Set the flag controlling gas-phase updates."""
         if update_gases_units is not None:
             logger.warning("Ignoring units for update_gases parameter.")
-        self.update_gases = bool(update_gases)
+        self.update_gases = update_gases
         return self
