@@ -10512,8 +10512,7 @@ of [m³/s] for each particle-particle interaction.</p>
 </code></pre></div>
 <h2 id="coulombdyachkov2007kernelstrategy">CoulombDyachkov2007KernelStrategy<a class="headerlink" href="#coulombdyachkov2007kernelstrategy" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L170">Show source in charged_kernel_strategy.py:170</a></p>
-<p>Dyachkov et al. (2007) approximation for the dimensionless coagulation
-kernel.</p>
+<p>Dyachkov et al. (2007) dimensionless coagulation kernel.</p>
 <p>Accounts for Coulomb potential between particles, suitable for
 transition regime calculations.</p>
 <h4 id="methods_1">Methods<a class="headerlink" href="#methods_1" title="Permanent link">&para;</a></h4>
@@ -10541,7 +10540,7 @@ transition regime calculations.</p>
 <li><a href="#chargedkernelstrategyabc">ChargedKernelStrategyABC</a></li>
 </ul>
 <h3 id="coulombdyachkov2007kernelstrategydimensionless">CoulombDyachkov2007KernelStrategy().dimensionless<a class="headerlink" href="#coulombdyachkov2007kernelstrategydimensionless" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L195">Show source in charged_kernel_strategy.py:195</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L194">Show source in charged_kernel_strategy.py:194</a></p>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
@@ -10550,9 +10549,8 @@ transition regime calculations.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="coulombgatti2008kernelstrategy">CoulombGatti2008KernelStrategy<a class="headerlink" href="#coulombgatti2008kernelstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L205">Show source in charged_kernel_strategy.py:205</a></p>
-<p>Gatti &amp; Kortshagen (2008) approximation for the dimensionless coagulation
-kernel.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L204">Show source in charged_kernel_strategy.py:204</a></p>
+<p>Gatti &amp; Kortshagen (2008) dimensionless coagulation kernel.</p>
 <p>Captures Coulomb potential effects for a broad range of charge and
 collisionality conditions.</p>
 <h4 id="methods_2">Methods<a class="headerlink" href="#methods_2" title="Permanent link">&para;</a></h4>
@@ -10580,7 +10578,7 @@ collisionality conditions.</p>
 <li><a href="#chargedkernelstrategyabc">ChargedKernelStrategyABC</a></li>
 </ul>
 <h3 id="coulombgatti2008kernelstrategydimensionless">CoulombGatti2008KernelStrategy().dimensionless<a class="headerlink" href="#coulombgatti2008kernelstrategydimensionless" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L230">Show source in charged_kernel_strategy.py:230</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L228">Show source in charged_kernel_strategy.py:228</a></p>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
@@ -10589,9 +10587,8 @@ collisionality conditions.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="coulombgopalakrishnan2012kernelstrategy">CoulombGopalakrishnan2012KernelStrategy<a class="headerlink" href="#coulombgopalakrishnan2012kernelstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L240">Show source in charged_kernel_strategy.py:240</a></p>
-<p>Gopalakrishnan &amp; Hogan (2012) approximation for the dimensionless
-coagulation kernel.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L238">Show source in charged_kernel_strategy.py:238</a></p>
+<p>Gopalakrishnan &amp; Hogan (2012) dimensionless coagulation kernel.</p>
 <p>Incorporates Coulomb-influenced collisions in aerosol and dusty plasma
 environments.</p>
 <h4 id="methods_3">Methods<a class="headerlink" href="#methods_3" title="Permanent link">&para;</a></h4>
@@ -10618,7 +10615,7 @@ environments.</p>
 <li><a href="#chargedkernelstrategyabc">ChargedKernelStrategyABC</a></li>
 </ul>
 <h3 id="coulombgopalakrishnan2012kernelstrategydimensionless">CoulombGopalakrishnan2012KernelStrategy().dimensionless<a class="headerlink" href="#coulombgopalakrishnan2012kernelstrategydimensionless" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L264">Show source in charged_kernel_strategy.py:264</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L261">Show source in charged_kernel_strategy.py:261</a></p>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
@@ -10627,9 +10624,8 @@ environments.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="coulumbchahl2019kernelstrategy">CoulumbChahl2019KernelStrategy<a class="headerlink" href="#coulumbchahl2019kernelstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L276">Show source in charged_kernel_strategy.py:276</a></p>
-<p>Chahl &amp; Gopalakrishnan (2019) approximation for the dimensionless
-coagulation kernel.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L273">Show source in charged_kernel_strategy.py:273</a></p>
+<p>Chahl &amp; Gopalakrishnan (2019) dimensionless coagulation kernel.</p>
 <p>Focuses on high-potential, near-free molecular regime Coulombic collisions
 in aerosols and dusty plasmas.</p>
 <h4 id="methods_4">Methods<a class="headerlink" href="#methods_4" title="Permanent link">&para;</a></h4>
@@ -10657,7 +10653,7 @@ in aerosols and dusty plasmas.</p>
 <li><a href="#chargedkernelstrategyabc">ChargedKernelStrategyABC</a></li>
 </ul>
 <h3 id="coulumbchahl2019kernelstrategydimensionless">CoulumbChahl2019KernelStrategy().dimensionless<a class="headerlink" href="#coulumbchahl2019kernelstrategydimensionless" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L301">Show source in charged_kernel_strategy.py:301</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L297">Show source in charged_kernel_strategy.py:297</a></p>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
