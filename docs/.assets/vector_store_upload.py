@@ -1,6 +1,5 @@
 # %%
-"""This script uploads the API, Examples, and Docs to the vector store.
-"""
+"""Upload API, examples, and docs to the vector store."""
 
 import os
 from pathlib import Path
@@ -193,8 +192,7 @@ def get_current_commit():
 
 
 def get_changed_files(previous_commit_hash):
-    """Get a list of files changed between the previous commit and the current
-    commit.
+    """Get files changed between the previous commit and the current commit.
 
     Arguments:
         - previous_commit_hash : The hash of the previous commit.
@@ -460,7 +458,7 @@ def refresh_changed_files(client, vector_store_id):
         print("No files to update.")
         return
     # Iterate over the files to update
-    for file_path, file_info in file_to_update.items():
+    for _file_path, file_info in file_to_update.items():
         if file_info["method"] == "update":
             update_vector_store_file(
                 client=client,
@@ -477,7 +475,7 @@ def refresh_all_files(
     client,
     vector_store_id=VECTOR_STORE_ID,
 ):
-    """Delete all files from the vector store and re-upload everything from temp.
+    """Delete all files from the vector store and re-upload from temp.
 
     Arguments:
         - client : The OpenAI client instance.

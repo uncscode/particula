@@ -1,5 +1,4 @@
-"""Handsdown to generate documentation for the project.
-"""
+"""Generate documentation using Handsdown."""
 
 import os
 from pathlib import Path

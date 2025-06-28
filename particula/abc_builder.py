@@ -13,8 +13,7 @@ logger = logging.getLogger("particula")
 
 
 class BuilderABC(ABC):
-    """Abstract base class for builders with common methods to check keys and
-    set parameters from a dictionary.
+    """Abstract base class for builders to check keys and set parameters.
 
     Attributes:
         - required_parameters: List of required parameters for the builder.
@@ -48,6 +47,7 @@ class BuilderABC(ABC):
     """
 
     def __init__(self, required_parameters: Optional[list[str]] = None):
+        """Initialize builder with required parameters."""
         self.required_parameters = required_parameters or []
 
     def check_keys(self, parameters: dict[str, Any]):

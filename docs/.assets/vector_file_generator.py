@@ -1,7 +1,5 @@
 # %%
-"""For vector store upload, we need to convert all notebooks and python files in
-a directory to Markdown files.
-"""
+"""Convert notebooks and Python files in a directory to Markdown."""
 import os
 import shutil
 from pathlib import Path
@@ -14,9 +12,7 @@ from nbconvert import MarkdownExporter
 
 
 def convert_notebooks_to_markdown(notebook_paths, output_dir):
-    """Convert a list of notebooks (.ipynb) and markdown files (.md) to Markdown
-    files, writing the results into the specified output directory.
-    """
+    """Convert notebooks and Markdown files to Markdown."""
     exporter = MarkdownExporter()
     exporter.template_name = "classic"
 
