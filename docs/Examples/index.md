@@ -15,7 +15,7 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    End-to-End biomass burning aerosol-cloud simulation using Particula.
+    Biomass burning aerosols that activate into cloud droplets, simulating the interactions between aerosols and clouds.
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)
 
@@ -23,9 +23,17 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    End-to-End simulation of organic partitioning on to seed particles and coagulation.
+    Simulation of organic partitioning on to seed particles and coagulation.
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb)
+
+- __[Cough Droplets Partitioning](Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb)__
+
+    ---
+
+    Simulates the evaporation of cough droplets, tracking size distribution and composition changes over time.
+
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb)
 
 </div>
 
