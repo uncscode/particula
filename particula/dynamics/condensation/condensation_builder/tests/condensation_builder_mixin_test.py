@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 
 from particula.dynamics.condensation.condensation_builder.condensation_builder_mixin import (
@@ -18,8 +17,8 @@ class MixinTester(
 
 def test_set_diffusion_coefficient_units():
     tester = MixinTester()
-    tester.set_diffusion_coefficient(1.0, "cm^2/s")
-    assert pytest.approx(tester.diffusion_coefficient) == 1.0e-4
+    tester.set_diffusion_coefficient(1.0, "m^2/s")
+    assert pytest.approx(tester.diffusion_coefficient) == 1.0
 
 
 def test_set_accommodation_coefficient():
