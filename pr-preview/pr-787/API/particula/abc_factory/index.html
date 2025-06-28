@@ -9659,7 +9659,7 @@
 <li><code>BuilderT</code> - Define a generic type variable for the strategy type, to get good type hints: TypeVar('BuilderT')</li>
 </ul>
 <h2 id="strategyfactoryabc">StrategyFactoryABC<a class="headerlink" href="#strategyfactoryabc" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L16">Show source in abc_factory.py:16</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L14">Show source in abc_factory.py:14</a></p>
 <p>Abstract base class for strategy factories.</p>
 <p>This class provides a generic interface for creating strategy objects
 using builder objects.</p>
@@ -9691,7 +9691,7 @@ using builder objects.</p>
 <li><a href="#strategyt">StrategyT</a></li>
 </ul>
 <h3 id="strategyfactoryabcget_builders">StrategyFactoryABC().get_builders<a class="headerlink" href="#strategyfactoryabcget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L42">Show source in abc_factory.py:42</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L40">Show source in abc_factory.py:40</a></p>
 <p>Retrieve a mapping of strategy types to builder instances.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
@@ -9727,9 +9727,8 @@ def get_builders(self) -&gt; Dict[str, BuilderT]: ...
 <li><a href="#buildert">BuilderT</a></li>
 </ul>
 <h3 id="strategyfactoryabcget_strategy">StrategyFactoryABC().get_strategy<a class="headerlink" href="#strategyfactoryabcget_strategy" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L71">Show source in abc_factory.py:71</a></p>
-<p>Create a strategy instance for the specified type using its
-corresponding builder.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L69">Show source in abc_factory.py:69</a></p>
+<p>Create a strategy instance using its corresponding builder.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>strategy_type (str): Name of the strategy to build.</li>
