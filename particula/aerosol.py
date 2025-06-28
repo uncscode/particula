@@ -8,8 +8,7 @@ from particula.particles.representation import ParticleRepresentation
 
 
 class Aerosol:
-    """
-    Represents a collection of Gas and Particle objects forming an aerosol
+    """Represents a collection of Gas and Particle objects forming an aerosol
     environment.
 
     This class allows for the representation and manipulation of an aerosol,
@@ -41,8 +40,7 @@ class Aerosol:
         atmosphere: Atmosphere,
         particles: ParticleRepresentation,
     ):
-        """
-        Initialize the Aerosol object with an Atmosphere and one or more
+        """Initialize the Aerosol object with an Atmosphere and one or more
         particles.
 
         Arguments:
@@ -53,8 +51,7 @@ class Aerosol:
         self.particles = particles
 
     def __str__(self) -> str:
-        """
-        Provide a string representation of the aerosol.
+        """Provide a string representation of the aerosol.
 
         Returns:
             - str : A string summarizing the atmosphere and each particle.
@@ -68,8 +65,7 @@ class Aerosol:
         return message
 
     def replace_atmosphere(self, atmosphere: Atmosphere):
-        """
-        Replace the current atmosphere with a new Atmosphere instance.
+        """Replace the current atmosphere with a new Atmosphere instance.
 
         Arguments:
             - atmosphere : The new Atmosphere to assign.
@@ -87,8 +83,7 @@ class Aerosol:
         self,
         particles: ParticleRepresentation,
     ):
-        """
-        Replace a particles in the aerosol with a new ParticleRepresentation.
+        """Replace a particles in the aerosol with a new ParticleRepresentation.
 
         Arguments:
             - particle : The new ParticleRepresentation to assign.

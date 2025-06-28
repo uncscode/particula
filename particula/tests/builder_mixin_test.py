@@ -2,21 +2,22 @@
 
 # pylint: disable=redefined-outer-name
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.builder_mixin import (
-    BuilderDensityMixin,
-    BuilderSurfaceTensionMixin,
-    BuilderMolarMassMixin,
-    BuilderConcentrationMixin,
-    BuilderTemperatureMixin,
-    BuilderPressureMixin,
-    BuilderMassMixin,
-    BuilderRadiusMixin,
     BuilderChargeMixin,
+    BuilderConcentrationMixin,
+    BuilderDensityMixin,
+    BuilderMassMixin,
+    BuilderMolarMassMixin,
     BuilderPhaseIndexMixin,
-    BuilderTemperatureTableMixin,
+    BuilderPressureMixin,
+    BuilderRadiusMixin,
+    BuilderSurfaceTensionMixin,
     BuilderSurfaceTensionTableMixin,
+    BuilderTemperatureMixin,
+    BuilderTemperatureTableMixin,
 )
 
 
@@ -224,7 +225,6 @@ def test_phase_index_mixin():
 
 def test_surface_tension_table_mixin():
     """Test the BuilderSurfaceTensionTableMixin class."""
-
     builder_mixin = BuilderSurfaceTensionTableMixin()
 
     with pytest.raises(ValueError):
@@ -239,7 +239,6 @@ def test_surface_tension_table_mixin():
 
 def test_temperature_table_mixin():
     """Test the BuilderTemperatureTableMixin class."""
-
     builder_mixin = BuilderTemperatureTableMixin()
 
     builder_mixin.set_temperature_table(np.array([25.0, 35.0]) + 273.15, "K")

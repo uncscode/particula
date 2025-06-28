@@ -2,10 +2,12 @@
 creating the right activity strategy based on the input parameters,
 and raising the right exceptions when needed.
 
-The Builder is tested independently."""
+The Builder is tested independently.
+"""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.activity_factories import (
     ActivityFactory,
 )
@@ -36,8 +38,7 @@ def test_molar_ideal_strategy_with_parameters():
 
 
 def test_kappa_parameter_strategy_with_parameters():
-    """
-    Test factory function for kappa_parameter strategy with full parameters.
+    """Test factory function for kappa_parameter strategy with full parameters.
     """
     parameters = {
         "kappa": np.array([0.1, 0.2, 0.3]),

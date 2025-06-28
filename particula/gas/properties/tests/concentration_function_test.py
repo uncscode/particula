@@ -2,11 +2,11 @@
 
 import numpy as np
 import pytest
-from particula.util.constants import GAS_CONSTANT
 
 from particula.gas.properties.concentration_function import (
     get_concentration_from_pressure,
 )
+from particula.util.constants import GAS_CONSTANT
 
 
 def test_calculate_concentration_scalar():

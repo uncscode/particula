@@ -1,21 +1,20 @@
-"""
-Get selected thermodynamic properties of a chemical at STP.
+"""Get selected thermodynamic properties of a chemical at STP.
 """
 
 from typing import Dict
+
 from .thermo_import import Chemical
 
 
 def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
-    """
-    Return selected thermodynamic properties of *identifier* at STP.
+    """Return selected thermodynamic properties of *identifier* at STP.
 
     Parameters
     ----------
     identifier
         Any string accepted by ``thermo.Chemical`` (name, formula, CAS).
 
-    Returns
+    Returns:
     -------
     dict
         {

@@ -5,15 +5,24 @@ velocity and the cross-correlation of the fluctuating velocities for colliding
 droplets, based on the theory of turbulent DNS kernels.
 """
 
-from typing import Union, NamedTuple
+from typing import NamedTuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
+from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
+    get_phi_ao2008,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
+    get_psi_ao2008,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008 import (
+    get_f2_longitudinal_velocity_correlation,
+)
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
     compute_b1,
     compute_b2,
+    compute_beta,
     compute_c1,
     compute_c2,
     compute_d1,
@@ -21,17 +30,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
     compute_e1,
     compute_e2,
     compute_z,
-    compute_beta,
 )
-from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
-    get_psi_ao2008,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
-    get_phi_ao2008,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008 import (
-    get_f2_longitudinal_velocity_correlation,
-)
+from particula.util.validate_inputs import validate_inputs
 
 
 class VelocityCorrelationTerms(NamedTuple):
@@ -110,7 +110,6 @@ def get_relative_velocity_variance(
           parameterization. New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
     """
-
     z = compute_z(lagrangian_taylor_microscale_time, lagrangian_integral_time)
     beta = compute_beta(taylor_microscale, eulerian_integral_length)
 

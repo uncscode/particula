@@ -3,9 +3,9 @@
 # pylint: disable=line-too-long
 
 # from typing import Union
-from scipy.stats import lognorm
 import numpy as np
 from numpy.typing import NDArray
+from scipy.stats import lognorm
 
 from particula.particles.properties.convert_size_distribution import (
     get_pdf_distribution_in_pmf,
@@ -27,8 +27,7 @@ def get_lognormal_pdf_distribution(
     geometric_standard_deviation: NDArray[np.float64],
     number_of_particles: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Compute a lognormal probability density function (PDF) for given modes.
+    """Compute a lognormal probability density function (PDF) for given modes.
 
     This function superimposes multiple lognormal PDFs, each with its own mode,
     geometric standard deviation, and particle count. It then returns their sum
@@ -105,8 +104,7 @@ def get_lognormal_pmf_distribution(
     geometric_standard_deviation: NDArray[np.float64],
     number_of_particles: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Compute a lognormal probability mass function (PMF) for given modes.
+    """Compute a lognormal probability mass function (PMF) for given modes.
 
     This function first calculates the lognormal PDF using
     get_lognormal_pdf_distribution(), then converts it to a PMF by
@@ -182,8 +180,7 @@ def get_lognormal_sample_distribution(
     lower_bound: float = 0,
 ) -> NDArray[np.float64]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """
-    Generate random samples from a lognormal distribution for given modes.
+    """Generate random samples from a lognormal distribution for given modes.
 
     This function uses scipy.stats.lognorm.rvs() to draw samples for each mode,
     with a specified scale (mode) and shape (GSD). The total samples are then
@@ -216,7 +213,6 @@ def get_lognormal_sample_distribution(
         - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)
         - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)
     """
-
     # Calculate PDF for each set of parameters
     distribution = lognorm.rvs(
         s=np.log(geometric_standard_deviation),

@@ -1,5 +1,4 @@
-"""
-Calculating the mean free path of air
+"""Calculating the mean free path of air
 
 Long Description:
     The mean free path is the average distance traveled by a molecule
@@ -13,16 +12,18 @@ References:
 """
 
 import logging
-from typing import Union, Optional
-from numpy.typing import NDArray
+from typing import Optional, Union
+
 import numpy as np
+from numpy.typing import NDArray
+
+from particula.gas.properties.dynamic_viscosity import (
+    get_dynamic_viscosity,
+)
 from particula.util.constants import (
     GAS_CONSTANT,
     MOLECULAR_WEIGHT_AIR,
 )  # type: ignore
-from particula.gas.properties.dynamic_viscosity import (
-    get_dynamic_viscosity,
-)
 
 logger = logging.getLogger("particula")  # get instance of logger
 
@@ -35,8 +36,7 @@ def get_molecule_mean_free_path(
     pressure: float = 101325,
     dynamic_viscosity: Optional[float] = None,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the mean free path of a gas molecule in air.
+    """Calculate the mean free path of a gas molecule in air.
 
     This function calculates λ based on the input conditions. If
     dynamic_viscosity is not provided, it is computed via

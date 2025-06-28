@@ -1,13 +1,13 @@
 """testing the mean free path calculation"""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.gas import get_molecule_mean_free_path
 
 
 def test_molecule_mean_free_path():
     """Testing the mean free path of a molecule compare with mfp"""
-
     a_mfp = 6.52805868e-08  # at stp
     b_molecule_mfp = get_molecule_mean_free_path(
         temperature=298, pressure=101325, molar_mass=0.03
@@ -24,7 +24,8 @@ def test_dynamic_viscosity_provided():
 
 def test_array_input():
     """Test when array inputs are provided for temperature, pressure,
-    and molar mass"""
+    and molar mass
+    """
     molar_masses = np.array([0.028, 0.044])
     results = get_molecule_mean_free_path(molar_mass=molar_masses)
     # All calculated mean free paths should be positive

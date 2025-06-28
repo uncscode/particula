@@ -1,7 +1,9 @@
 """Activity strategy factories for calculating activity and partial pressure
-of species in a mixture of liquids."""
+of species in a mixture of liquids.
+"""
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
 from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
@@ -27,8 +29,7 @@ class ActivityFactory(
         Union[ActivityIdealMass, ActivityIdealMolar, ActivityKappaParameter],
     ]
 ):
-    """
-    Factory for creating activity strategy builders for liquid mixtures.
+    """Factory for creating activity strategy builders for liquid mixtures.
 
     This class supports various strategies (e.g., mass-ideal, molar-ideal,
     kappa-parameter) to compute activity and partial pressures of species
@@ -65,8 +66,7 @@ class ActivityFactory(
     """
 
     def get_builders(self):
-        """
-        Return a mapping of strategy types to their corresponding builders.
+        """Return a mapping of strategy types to their corresponding builders.
 
         Returns:
             dict[str, Any]: A dictionary mapping the activity strategy type

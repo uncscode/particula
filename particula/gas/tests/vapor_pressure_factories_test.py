@@ -1,13 +1,14 @@
 """Tests for the vapor pressure factories."""
 
 import pytest
+
+from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.vapor_pressure_strategies import (
-    ConstantVaporPressureStrategy,
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
+    ConstantVaporPressureStrategy,
     WaterBuckStrategy,
 )
-from particula.gas.vapor_pressure_factories import VaporPressureFactory
 
 
 def test_factory_with_constant_strategy():
@@ -46,14 +47,16 @@ def test_factory_with_clausius_clapeyron_strategy():
 
 def test_factory_with_water_buck_strategy():
     """Test factory creates a WaterBuckStrategy correctly without
-    parameters."""
+    parameters.
+    """
     strategy = VaporPressureFactory().get_strategy(strategy_type="water_buck")
     assert isinstance(strategy, WaterBuckStrategy)
 
 
 def test_factory_with_saturation_concentration_strategy():
     """Test factory creates a ConstantVaporPressureStrategy from the
-    SaturationConcentrationVaporPressureBuilder."""
+    SaturationConcentrationVaporPressureBuilder.
+    """
     parameters = {
         "saturation_concentration": 1e-6,
         "saturation_concentration_units": "kg/m^3",
@@ -78,7 +81,8 @@ def test_factory_with_unknown_strategy():
 
 def test_factory_with_incomplete_parameters():
     """Test factory raises an error when parameters are incomplete for a
-    strategy."""
+    strategy.
+    """
     parameters = {"a": 10.0, "b": 2000.0}  # Missing 'c'
     with pytest.raises(ValueError) as excinfo:
         VaporPressureFactory().get_strategy(

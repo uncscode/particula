@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+
 from particula.particles.properties.aerodynamic_size import (
     get_aerodynamic_length,
     get_aerodynamic_shape_factor,
@@ -9,8 +10,7 @@ from particula.particles.properties.aerodynamic_size import (
 
 
 def test_particle_aerodynamic_length_single_value():
-    """
-    Verify that the particle_aerodynamic_length function calculates the
+    """Verify that the particle_aerodynamic_length function calculates the
     correct aerodynamic length for a single particle.
     """
     physical_length = 0.00005  # 50 micrometers
@@ -33,8 +33,7 @@ def test_particle_aerodynamic_length_single_value():
 
 
 def test_particle_aerodynamic_length_array_input():
-    """
-    Test that the particle_aerodynamic_length function handles numpy array
+    """Test that the particle_aerodynamic_length function handles numpy array
     inputs correctly.
     """
     physical_length = np.array([0.00005, 0.00007])  # Array of lengths
@@ -77,8 +76,7 @@ def test_get_aerodynamic_shape_factor(shape_key, expected_factor):
 
 
 def test_get_aerodynamic_shape_factor_invalid():
-    """
-    Test that the get_aerodynamic_shape_factor function raises a ValueError
+    """Test that the get_aerodynamic_shape_factor function raises a ValueError
     for unknown shapes.
     """
     with pytest.raises(ValueError):

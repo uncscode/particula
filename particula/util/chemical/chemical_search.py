@@ -1,5 +1,4 @@
-"""
-Helper utilities to resolve chemical identifiers to a canonical form.
+"""Helper utilities to resolve chemical identifiers to a canonical form.
 
 The functions rely on the optional ``chemicals.identifiers`` back-end for
 fast, exact look-ups and fall back to fuzzy matching the PubChem name
@@ -10,9 +9,9 @@ from difflib import get_close_matches
 from typing import List
 
 from particula.util.chemical.thermo_import import (
+    CHEMICALS_AVAILABLE,
     CAS_from_any,
     get_pubchem_db,
-    CHEMICALS_AVAILABLE,
 )
 
 # Single, module-level PubChem DB instance (loaded once) ------------
@@ -23,8 +22,7 @@ if CHEMICALS_AVAILABLE and get_pubchem_db is not None:  # pragma: no cover
 
 
 def get_chemical_search(identifier: str) -> str:
-    """
-    Resolve a chemical identifier to a canonical name or CAS number.
+    """Resolve a chemical identifier to a canonical name or CAS number.
 
     The resolution proceeds in two stages:
 

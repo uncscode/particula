@@ -1,11 +1,12 @@
 """Module for the diffusive knudsen number"""
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
-from particula.util.constants import BOLTZMANN_CONSTANT
+from numpy.typing import NDArray
 
 from particula.particles.properties import coulomb_enhancement
+from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.util.validate_inputs import validate_inputs
 
@@ -24,8 +25,7 @@ def get_diffusive_knudsen_number(
     coulomb_potential_ratio: Union[float, NDArray[np.float64]] = 0.0,
     temperature: float = 298.15,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the diffusive Knudsen number for particle-particle interactions.
+    """Compute the diffusive Knudsen number for particle-particle interactions.
 
     The *diffusive* Knudsen number (Kn_d) differs from the standard Knudsen
     number. It represents the ratio of the mean particle persistence

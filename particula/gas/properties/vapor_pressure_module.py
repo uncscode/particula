@@ -1,8 +1,8 @@
-"""
-Vapor pressure modules for calculating the vapor pressure of a gas.
+"""Vapor pressure modules for calculating the vapor pressure of a gas.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -24,8 +24,7 @@ def get_antoine_vapor_pressure(
     c: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate vapor pressure using the Antoine equation.
+    """Calculate vapor pressure using the Antoine equation.
 
     The Antoine equation relates the logarithm of vapor pressure to
     temperature for a pure substance.
@@ -78,8 +77,7 @@ def get_clausius_clapeyron_vapor_pressure(
     temperature: Union[float, NDArray[np.float64]],
     gas_constant: float = GAS_CONSTANT,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate vapor pressure using Clausius-Clapeyron equation.
+    """Calculate vapor pressure using Clausius-Clapeyron equation.
 
     This function calculates the final vapor pressure based on an initial
     temperature/pressure pair and the latent heat of vaporization,
@@ -129,8 +127,7 @@ def get_clausius_clapeyron_vapor_pressure(
 def get_buck_vapor_pressure(
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate vapor pressure using the Buck equation for water vapor.
+    """Calculate vapor pressure using the Buck equation for water vapor.
 
     Uses separate empirical formulas below 0 °C and above 0 °C to compute
     water vapor pressure.

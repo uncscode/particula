@@ -1,18 +1,18 @@
-"""
-Module for calculating the surface tension of pure chemicals.
+"""Module for calculating the surface tension of pure chemicals.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
+
 from .thermo_import import Chemical
 
 
 def get_chemical_surface_tension(
     chemical_identifier: str, temperature: Union[float, NDArray[np.float64]]
 ) -> NDArray[np.float64]:
-    """
-    Calculate the surface tension of a pure chemical in N/m.
+    """Calculate the surface tension of a pure chemical in N/m.
 
     The calculation delegates to ``thermo.chemical.Chemical.SurfaceTension``,
     evaluated at the requested temperature(s):

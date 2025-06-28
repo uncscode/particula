@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+
 from particula.particles.properties.slip_correction_module import (
     get_cunningham_slip_correction,
 )
@@ -48,7 +49,8 @@ def test_cunningham_slip_correction_low_value():
 
 def test_cunningham_slip_correction_negative_value():
     """Test with a negative Knudsen number to see if the function handles it,
-    remove once value error handling is implemented in the function"""
+    remove once value error handling is implemented in the function
+    """
     knudsen_number = -0.5
     with pytest.raises(ValueError):
         get_cunningham_slip_correction(knudsen_number)

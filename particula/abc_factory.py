@@ -2,9 +2,9 @@
 strategy objects.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, Optional, Generic, TypeVar, Any
 import logging
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Generic, Optional, TypeVar
 
 logger = logging.getLogger("particula")
 
@@ -14,8 +14,7 @@ StrategyT = TypeVar("StrategyT")
 
 
 class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
-    """
-    Abstract base class for strategy factories.
+    """Abstract base class for strategy factories.
 
     This class provides a generic interface for creating strategy objects
     using builder objects.
@@ -42,8 +41,7 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
 
     @abstractmethod
     def get_builders(self) -> Dict[str, BuilderT]:
-        """
-        Retrieve a mapping of strategy types to builder instances.
+        """Retrieve a mapping of strategy types to builder instances.
 
         Returns:
             dict: A dictionary that maps strategy type names (str) to
@@ -73,8 +71,7 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
     def get_strategy(
         self, strategy_type: str, parameters: Optional[Dict[str, Any]] = None
     ) -> StrategyT:
-        """
-        Create a strategy instance for the specified type using its
+        """Create a strategy instance for the specified type using its
         corresponding builder.
 
         Arguments:

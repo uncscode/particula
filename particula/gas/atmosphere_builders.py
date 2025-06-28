@@ -1,8 +1,10 @@
 """A builder class for creating Atmosphere objects with validation,
-unit conversion, and a fluent interface."""
+unit conversion, and a fluent interface.
+"""
 
-import logging
 import copy
+import logging
+
 from particula.abc_builder import (
     BuilderABC,
 )
@@ -10,8 +12,8 @@ from particula.builder_mixin import (
     BuilderPressureMixin,
     BuilderTemperatureMixin,
 )
-from particula.gas.species import GasSpecies
 from particula.gas.atmosphere import Atmosphere
+from particula.gas.species import GasSpecies
 
 logger = logging.getLogger("particula")
 
@@ -21,8 +23,7 @@ class AtmosphereBuilder(
     BuilderTemperatureMixin,
     BuilderPressureMixin,
 ):
-    """
-    Builder class for creating Atmosphere objects using a fluent interface.
+    """Builder class for creating Atmosphere objects using a fluent interface.
 
     This class provides methods to configure and build an Atmosphere object,
     allowing for step-by-step setting of atmospheric properties and
@@ -80,8 +81,7 @@ class AtmosphereBuilder(
     def set_more_partitioning_species(
         self, species: GasSpecies
     ) -> "AtmosphereBuilder":
-        """
-        Add a partitioning GasSpecies object to the mixture.
+        """Add a partitioning GasSpecies object to the mixture.
 
         Arguments:
             - species : The GasSpecies instance to add (must have
@@ -105,8 +105,7 @@ class AtmosphereBuilder(
     def set_more_gas_only_species(
         self, species: GasSpecies
     ) -> "AtmosphereBuilder":
-        """
-        Add a non-partitioning GasSpecies object to the mixture.
+        """Add a non-partitioning GasSpecies object to the mixture.
 
         Arguments:
             - species : The GasSpecies instance to add (must have
@@ -127,8 +126,7 @@ class AtmosphereBuilder(
         return self
 
     def build(self) -> Atmosphere:
-        """
-        Validate the configuration and construct the Atmosphere object.
+        """Validate the configuration and construct the Atmosphere object.
 
         This method checks that all necessary conditions are met for a valid
         Atmosphere instance (e.g., at least one partitioning and one gas-only

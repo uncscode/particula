@@ -1,7 +1,7 @@
 """Machine max or min overflow protection."""
 
-from numpy.typing import ArrayLike
 import numpy as np
+from numpy.typing import ArrayLike
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -11,8 +11,7 @@ MAX_NEGATIVE_VALUE = np.finfo(np.float64).min
 
 
 def get_safe_exp(value: ArrayLike) -> np.ndarray:
-    """
-    Compute the exponential of each element in the input array, with overflow
+    """Compute the exponential of each element in the input array, with overflow
     protection.
 
     The exponential is calculated using:
@@ -43,8 +42,7 @@ def get_safe_exp(value: ArrayLike) -> np.ndarray:
 
 
 def get_safe_log(value: ArrayLike) -> np.ndarray:
-    """
-    Compute the natural logarithm of each element in the input array, with
+    """Compute the natural logarithm of each element in the input array, with
     underflow protection.
 
     The natural log is calculated using:
@@ -75,8 +73,7 @@ def get_safe_log(value: ArrayLike) -> np.ndarray:
 
 
 def get_safe_log10(value: ArrayLike) -> np.ndarray:
-    """
-    Compute the base-10 logarithm of each element in the input array, with
+    """Compute the base-10 logarithm of each element in the input array, with
     underflow protection.
 
     The base-10 log is calculated using:
@@ -112,8 +109,7 @@ def get_safe_log10(value: ArrayLike) -> np.ndarray:
     }
 )
 def get_safe_power(base: ArrayLike, exponent: ArrayLike) -> np.ndarray:
-    """
-    Compute the power (base ** exponent) with overflow protection.
+    """Compute the power (base ** exponent) with overflow protection.
 
     The power is computed as: result = exp(exponent * log(base))
     where the intermediate value is clipped to avoid overflow beyond the

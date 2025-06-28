@@ -1,9 +1,12 @@
-"""
-Turbulent Shear Coagulation Builder Module.
+"""Turbulent Shear Coagulation Builder Module.
 """
 
 from particula.abc_builder import BuilderABC
-
+from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
+    BuilderFluidDensityMixin,
+    BuilderTurbulentDissipationMixin,
+)
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
@@ -11,11 +14,6 @@ from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_ab
 # pylint: disable=line-too-long
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
-)
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
-    BuilderTurbulentDissipationMixin,
-    BuilderFluidDensityMixin,
 )
 
 
@@ -26,8 +24,7 @@ class TurbulentShearCoagulationBuilder(
     BuilderTurbulentDissipationMixin,
     BuilderFluidDensityMixin,
 ):
-    """
-    Turbulent shear coagulation builder.
+    """Turbulent shear coagulation builder.
 
     Creates a TurbulentShearCoagulationStrategy that calculates coagulation
     rates under turbulent flow conditions. Ensures the correct distribution
@@ -64,8 +61,7 @@ class TurbulentShearCoagulationBuilder(
     """
 
     def __init__(self):
-        """
-        Initialize the TurbulentShearCoagulationBuilder.
+        """Initialize the TurbulentShearCoagulationBuilder.
 
         Returns:
             - None
@@ -85,8 +81,7 @@ class TurbulentShearCoagulationBuilder(
         BuilderFluidDensityMixin.__init__(self)
 
     def build(self) -> CoagulationStrategyABC:
-        """
-        Construct a TurbulentShearCoagulationStrategy.
+        """Construct a TurbulentShearCoagulationStrategy.
 
         This method performs a final check to ensure all required parameters
         have been set. It then creates and returns an instance of

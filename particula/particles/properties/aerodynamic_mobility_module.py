@@ -1,7 +1,8 @@
 """Module for aerodynamic mobility of a particle in a fluid."""
 
-from typing import Union
 import logging
+from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -22,8 +23,7 @@ def get_aerodynamic_mobility(
     slip_correction_factor: Union[float, NDArray[np.float64]],
     dynamic_viscosity: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the aerodynamic mobility of a particle using classical fluid
+    """Calculate the aerodynamic mobility of a particle using classical fluid
     mechanics.
 
     The aerodynamic mobility (B) can be determined by:

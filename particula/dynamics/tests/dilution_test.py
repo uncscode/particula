@@ -1,10 +1,11 @@
 """Test dilution input types and values."""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.dynamics.dilution import (
-    get_volume_dilution_coefficient,
     get_dilution_rate,
+    get_volume_dilution_coefficient,
 )
 
 

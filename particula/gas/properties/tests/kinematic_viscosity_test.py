@@ -1,8 +1,8 @@
-"""
-Test module for the kinematic_viscosity module.
+"""Test module for the kinematic_viscosity module.
 """
 
 import pytest
+
 from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity,
     get_kinematic_viscosity_via_system_state,

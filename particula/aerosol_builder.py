@@ -1,5 +1,4 @@
-"""
-AerosolBuilder Module
+"""AerosolBuilder Module
 =====================
 
 Provides a fluent interface to create an `Aerosol` instance from an
@@ -31,8 +30,7 @@ logger = logging.getLogger("particula")
 
 
 class AerosolBuilder(BuilderABC):
-    """
-    Fluent builder for `Aerosol` objects.
+    """Fluent builder for `Aerosol` objects.
 
     The builder collects the required components—`Atmosphere` and
     `ParticleRepresentation`—and validates that they are mutually
@@ -55,8 +53,7 @@ class AerosolBuilder(BuilderABC):
         ```
     """
     def __init__(self):
-        """
-        Initialize an empty builder.
+        """Initialize an empty builder.
 
         Returns:
         - None
@@ -69,8 +66,7 @@ class AerosolBuilder(BuilderABC):
     def set_atmosphere(
         self, atmosphere: Atmosphere, atmosphere_units: Optional[str] = None
     ) -> "AerosolBuilder":
-        """
-        Attach an `Atmosphere` to the builder.
+        """Attach an `Atmosphere` to the builder.
 
         Arguments:
             - atmosphere : Atmosphere to embed in the aerosol.
@@ -94,8 +90,7 @@ class AerosolBuilder(BuilderABC):
         particles: ParticleRepresentation,
         particles_units: Optional[str] = None,
     ) -> "AerosolBuilder":
-        """
-        Attach a `ParticleRepresentation` to the builder.
+        """Attach a `ParticleRepresentation` to the builder.
 
         Arguments:
             - particles : Particle representation to embed in the aerosol.
@@ -110,8 +105,7 @@ class AerosolBuilder(BuilderABC):
         return self
 
     def _validate_species_length(self) -> None:
-        """
-        Validate species-count consistency between atmosphere and particles.
+        """Validate species-count consistency between atmosphere and particles.
 
         When the particle distribution strategy is either
         `SpeciatedMassMovingBin` or `ParticleResolvedSpeciatedMass`, the number
@@ -156,8 +150,7 @@ class AerosolBuilder(BuilderABC):
             raise ValueError(msg)
 
     def build(self) -> Aerosol:
-        """
-        Finalize and construct an `Aerosol` object.
+        """Finalize and construct an `Aerosol` object.
 
         Raises:
             - ValueError : If either component is missing or validation fails.

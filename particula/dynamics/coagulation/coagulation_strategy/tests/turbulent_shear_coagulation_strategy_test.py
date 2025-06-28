@@ -1,5 +1,4 @@
-"""
-Unit tests for the TurbulentShearCoagulationStrategy class.
+"""Unit tests for the TurbulentShearCoagulationStrategy class.
 
 This module contains tests for the TurbulentShearCoagulationStrategy class,
 which implements the turbulent shear coagulation strategy. The tests cover
@@ -9,6 +8,7 @@ both discrete and continuous_pdf distribution types.
 # pylint: disable=duplicate-code, too-many-instance-attributes
 
 import unittest
+
 import numpy as np
 
 # pylint: disable=line-too-long
@@ -22,13 +22,11 @@ from particula.particles import (
 
 
 class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
-    """
-    Test suite for the TurbulentShearCoagulationStrategy class.
+    """Test suite for the TurbulentShearCoagulationStrategy class.
     """
 
     def setUp(self):
-        """
-        Set up the test environment.
+        """Set up the test environment.
 
         Initializes a particle representation and creates instances of
         TurbulentShearCoagulationStrategy for discrete, continuous_pdf, and
@@ -62,8 +60,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_discrete(self):
-        """
-        Test the kernel calculation for discrete distribution.
+        """Test the kernel calculation for discrete distribution.
 
         Verifies that the kernel method returns an ndarray for the discrete
         distribution type.
@@ -76,8 +73,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_discrete(self):
-        """
-        Test the step method for discrete distribution.
+        """Test the step method for discrete distribution.
 
         Ensures that the step method updates the particle concentration for
         the discrete distribution type.
@@ -95,8 +91,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_continuous_pdf(self):
-        """
-        Test the kernel calculation for continuous_pdf distribution.
+        """Test the kernel calculation for continuous_pdf distribution.
 
         Verifies that the kernel method returns an ndarray for the
         continuous_pdf distribution type.
@@ -109,8 +104,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_continuous_pdf(self):
-        """
-        Test the step method for continuous_pdf distribution.
+        """Test the step method for continuous_pdf distribution.
 
         Ensures that the step method updates the particle concentration for
         the continuous_pdf distribution type.

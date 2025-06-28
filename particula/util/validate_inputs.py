@@ -1,5 +1,4 @@
-"""
-Tools to validate function inputs, ensuring they meet various constraints.
+"""Tools to validate function inputs, ensuring they meet various constraints.
 
 This module provides decorators and helper functions to check if
 arguments are positive, negative, nonzero, finite, etc.
@@ -21,8 +20,7 @@ import numpy as np
 
 
 def validate_positive(value, name):
-    """
-    Validate that a numeric array or scalar is strictly positive.
+    """Validate that a numeric array or scalar is strictly positive.
 
     Arguments:
         - value : Array-like numeric values to check.
@@ -36,8 +34,7 @@ def validate_positive(value, name):
 
 
 def validate_negative(value, name):
-    """
-    Validate that a numeric array or scalar is strictly negative.
+    """Validate that a numeric array or scalar is strictly negative.
 
     Arguments:
         - value : Array-like numeric values to check.
@@ -51,8 +48,7 @@ def validate_negative(value, name):
 
 
 def validate_nonpositive(value, name):
-    """
-    Validate that a numeric array or scalar is nonpositive (<= 0).
+    """Validate that a numeric array or scalar is nonpositive (<= 0).
 
     Arguments:
         - value : Array-like numeric values to check.
@@ -66,8 +62,7 @@ def validate_nonpositive(value, name):
 
 
 def validate_nonnegative(value, name):
-    """
-    Validate that a numeric array or scalar is nonnegative (>= 0).
+    """Validate that a numeric array or scalar is nonnegative (>= 0).
 
     Arguments:
         - value : Array-like numeric values to check.
@@ -81,8 +76,7 @@ def validate_nonnegative(value, name):
 
 
 def validate_nonzero(value, name):
-    """
-    Validate that a numeric array or scalar is nonzero.
+    """Validate that a numeric array or scalar is nonzero.
 
     Arguments:
         - value : Array-like numeric values to check.
@@ -96,8 +90,7 @@ def validate_nonzero(value, name):
 
 
 def validate_finite(value, name):
-    """
-    Validate that a numeric array or scalar has no infinities or NaNs.
+    """Validate that a numeric array or scalar has no infinities or NaNs.
 
     Arguments:
         - value : Array-like numeric values to check.
@@ -111,8 +104,7 @@ def validate_finite(value, name):
 
 
 def validate_inputs(dict_args):
-    """
-    A decorator to validate function inputs against specified constraints.
+    """A decorator to validate function inputs against specified constraints.
 
     The constraints are defined by a dictionary of argument names and their
     validation types (e.g., "positive", "negative", "nonnegative", etc.). If

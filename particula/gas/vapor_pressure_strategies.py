@@ -11,8 +11,9 @@ All units are in base SI units (kg, m, s).
 
 from abc import ABC, abstractmethod
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.gas.properties.concentration_function import (
     get_concentration_from_pressure,
@@ -28,8 +29,7 @@ from particula.gas.properties.vapor_pressure_module import (
 
 
 class VaporPressureStrategy(ABC):
-    """
-    Base class for vapor pressure calculations.
+    """Base class for vapor pressure calculations.
 
     This abstract class defines standard methods for partial pressure,
     concentration, saturation ratio, saturation concentration, and pure vapor
@@ -66,8 +66,7 @@ class VaporPressureStrategy(ABC):
         molar_mass: Union[float, NDArray[np.float64]],
         temperature: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the partial pressure of the gas from its concentration, molar
+        """Calculate the partial pressure of the gas from its concentration, molar
         mass, and temperature.
 
         Arguments:
@@ -95,8 +94,7 @@ class VaporPressureStrategy(ABC):
         molar_mass: Union[float, NDArray[np.float64]],
         temperature: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the concentration of the gas at a given pressure and
+        """Calculate the concentration of the gas at a given pressure and
         temperature.
 
         Arguments:
@@ -126,8 +124,7 @@ class VaporPressureStrategy(ABC):
         molar_mass: Union[float, NDArray[np.float64]],
         temperature: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the saturation ratio of the gas from its concentration and
+        """Calculate the saturation ratio of the gas from its concentration and
         molar mass at a given temperature.
 
         Arguments:
@@ -156,8 +153,7 @@ class VaporPressureStrategy(ABC):
         molar_mass: Union[float, NDArray[np.float64]],
         temperature: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the saturation concentration of the gas at a given
+        """Calculate the saturation concentration of the gas at a given
         temperature.
 
         Arguments:
@@ -175,7 +171,6 @@ class VaporPressureStrategy(ABC):
             )
             ```
         """
-
         return self.concentration(
             self.pure_vapor_pressure(temperature), molar_mass, temperature
         )
@@ -193,8 +188,7 @@ class VaporPressureStrategy(ABC):
 
 
 class ConstantVaporPressureStrategy(VaporPressureStrategy):
-    """
-    Vapor pressure strategy with a constant value.
+    """Vapor pressure strategy with a constant value.
 
     This class returns a single, unchanging vapor pressure value regardless of
     the temperature. It is useful for scenarios that require a simplified
@@ -229,8 +223,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
     def pure_vapor_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Return the constant vapor pressure value.
+        """Return the constant vapor pressure value.
 
         Arguments:
             - temperature : Not used.
@@ -250,8 +243,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
 
 
 class AntoineVaporPressureStrategy(VaporPressureStrategy):
-    """
-    Vapor pressure strategy using the Antoine equation.
+    """Vapor pressure strategy using the Antoine equation.
 
     This class calculates vapor pressure by applying the Antoine equation,
     which relates temperature in Kelvin to the logarithm of vapor pressure.
@@ -301,8 +293,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
     def pure_vapor_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate vapor pressure using the Antoine equation.
+        """Calculate vapor pressure using the Antoine equation.
 
         Arguments:
             - temperature : Temperature in Kelvin.
@@ -329,8 +320,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
 
 
 class ClausiusClapeyronStrategy(VaporPressureStrategy):
-    """
-    Vapor pressure strategy using the Clausius-Clapeyron equation.
+    """Vapor pressure strategy using the Clausius-Clapeyron equation.
 
     This class calculates vapor pressure by applying the Clausius-Clapeyron
     relation, which relates how the vapor pressure of a substance changes
@@ -371,8 +361,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         temperature_initial: Union[float, NDArray[np.float64]],
         pressure_initial: Union[float, NDArray[np.float64]],
     ):
-        """
-        Initializes the Clausius-Clapeyron strategy with the specific latent
+        """Initializes the Clausius-Clapeyron strategy with the specific latent
         heat of vaporization and the specific gas constant of the substance.
 
         Arguments:
@@ -387,8 +376,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
     def pure_vapor_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate vapor pressure using Clausius-Clapeyron equation.
+        """Calculate vapor pressure using Clausius-Clapeyron equation.
 
         Arguments:
             - temperature : Final temperature in Kelvin.
@@ -415,8 +403,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
 
 
 class WaterBuckStrategy(VaporPressureStrategy):
-    """
-    Vapor pressure strategy using the Buck equation for water.
+    """Vapor pressure strategy using the Buck equation for water.
 
     This class computes water vapor pressure using the Buck equation, an
     empirically derived correlation often applied in meteorology to determine
@@ -447,8 +434,7 @@ class WaterBuckStrategy(VaporPressureStrategy):
     def pure_vapor_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate vapor pressure using the Buck equation for water vapor.
+        """Calculate vapor pressure using the Buck equation for water vapor.
 
         Arguments:
             - temperature: Temperature in Kelvin.
@@ -473,8 +459,7 @@ class WaterBuckStrategy(VaporPressureStrategy):
 
 
 class TableVaporPressureStrategy(VaporPressureStrategy):
-    """
-    Vapor pressure strategy using interpolation of a lookup table.
+    """Vapor pressure strategy using interpolation of a lookup table.
 
     This strategy accepts a set of temperatures and corresponding vapor
     pressures and linearly interpolates between the points to determine
@@ -564,7 +549,6 @@ class ArblasterLiquidVaporPressureStrategy(VaporPressureStrategy):
         Arguments:
             - coefficients : Tuple ``(A, B, C, D, E)`` for the correlation.
         """
-
         self.coefficients = coefficients
 
     def pure_vapor_pressure(
@@ -583,7 +567,6 @@ class ArblasterLiquidVaporPressureStrategy(VaporPressureStrategy):
             vp = strategy.pure_vapor_pressure(3000.0)
             ```
         """
-
         a, b, c, d, e = self.coefficients
         ln_p_bar = (
             a
@@ -648,7 +631,6 @@ class LiquidClausiusHybridStrategy(VaporPressureStrategy):
             vp = strategy.pure_vapor_pressure(boiling_point + 50.0)
             ```
         """
-
         temp = np.array(temperature, dtype=float)
         p_liq = self.liquid_strategy.pure_vapor_pressure(temp)
         p_claus = self.clausius_strategy.pure_vapor_pressure(temp)

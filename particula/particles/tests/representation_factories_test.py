@@ -3,18 +3,19 @@
 The Strategy is tested independently.
 """
 
-import pytest
 import numpy as np
+import pytest
+
+from particula.particles.activity_strategies import ActivityIdealMass
+from particula.particles.distribution_strategies import (
+    MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
+)
+from particula.particles.representation import ParticleRepresentation
 from particula.particles.representation_factories import (
     ParticleRepresentationFactory,
 )
-from particula.particles.distribution_strategies import (
-    MassBasedMovingBin,
-    RadiiBasedMovingBin,
-    ParticleResolvedSpeciatedMass,
-)
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 

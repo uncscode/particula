@@ -1,11 +1,11 @@
 """Test for chemical_properties.py module."""
 
 import pytest
-from particula.util.chemical.thermo_import import CHEMICALS_AVAILABLE
 
 from particula.util.chemical.chemical_properties import (
     get_chemical_stp_properties,
 )
+from particula.util.chemical.thermo_import import CHEMICALS_AVAILABLE
 
 
 # identifiers chosen so thermo/chemicals always resolve them
@@ -18,8 +18,7 @@ from particula.util.chemical.chemical_properties import (
     ],
 )
 def test_get_chemical_stp_properties(identifier, expected_mw):
-    """
-    Test getting standard temperature and pressure properties for a chemical.
+    """Test getting standard temperature and pressure properties for a chemical.
     """
     props = get_chemical_stp_properties(identifier)
 

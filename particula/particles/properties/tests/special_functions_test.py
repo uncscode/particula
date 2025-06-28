@@ -1,8 +1,8 @@
-"""
-Test Special Functions
+"""Test Special Functions
 """
 
 import numpy as np
+
 from particula.particles.properties.special_functions import (
     get_debye_function,
 )

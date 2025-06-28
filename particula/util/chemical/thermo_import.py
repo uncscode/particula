@@ -5,7 +5,6 @@ try:  # optional ‑– thermo, chemicals
         CAS_from_any,
         get_pubchem_db,
     )
-
     from thermo.chemical import Chemical  # type: ignore
 
     CHEMICALS_AVAILABLE = True

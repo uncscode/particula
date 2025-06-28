@@ -2,14 +2,15 @@
 
 import numpy as np
 import pytest
+
 from particula.particles.surface_strategies import (
     SurfaceStrategyMass,
     SurfaceStrategyMolar,
     SurfaceStrategyVolume,
-    _weighted_average_by_phase,
     _as_2d,
     _broadcast_weights,
     _interp_surface_tension,  # NEW
+    _weighted_average_by_phase,
 )
 
 
@@ -32,7 +33,6 @@ def test_molar_surface_strategy():
 
 def test_molar_strategy_update_surface_tension():
     """Test updating surface tension via temperature tables in Molar strategy."""
-
     st_table = np.array(
         [
             [0.072, 0.07],

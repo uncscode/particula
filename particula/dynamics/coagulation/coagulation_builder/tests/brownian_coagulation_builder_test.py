@@ -1,17 +1,16 @@
-"""
-Tests for the BrownianCoagulationBuilder class.
+"""Tests for the BrownianCoagulationBuilder class.
 """
 
 import pytest
+
 from particula.dynamics import (
-    BrownianCoagulationStrategy,
     BrownianCoagulationBuilder,
+    BrownianCoagulationStrategy,
 )
 
 
 def test_build_with_valid_parameters():
-    """
-    Test that building with valid parameters returns a
+    """Test that building with valid parameters returns a
     BrownianCoagulationStrategy.
     """
     builder = BrownianCoagulationBuilder()
@@ -21,8 +20,7 @@ def test_build_with_valid_parameters():
 
 
 def test_build_missing_required_parameters():
-    """
-    Test that building without required parameters raises a
+    """Test that building without required parameters raises a
     ValueError.
     """
     builder = BrownianCoagulationBuilder()

@@ -8,16 +8,17 @@ https://doi.org/10.1103/PhysRevE.85.026410
 """
 
 from typing import Union
-from numpy.typing import NDArray
-import numpy as np
 
-from particula.util.machine_limit import get_safe_exp
-from particula.util.validate_inputs import validate_inputs
+import numpy as np
+from numpy.typing import NDArray
+
 from particula.util.constants import (
     BOLTZMANN_CONSTANT,
     ELECTRIC_PERMITTIVITY,
     ELEMENTARY_CHARGE_VALUE,
 )
+from particula.util.machine_limit import get_safe_exp
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -29,8 +30,7 @@ def get_coulomb_enhancement_ratio(
     temperature: float = 298.15,
     ratio_lower_limit: float = -200,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Coulomb potential ratio, ϕ_E, for particle-particle
+    """Calculate the Coulomb potential ratio, ϕ_E, for particle-particle
     interactions.
 
     The potential ratio is computed using:
@@ -103,8 +103,7 @@ def get_coulomb_enhancement_ratio(
 def get_coulomb_kinetic_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the kinetic-limit Coulomb enhancement factor, Γₖᵢₙ.
+    """Calculate the kinetic-limit Coulomb enhancement factor, Γₖᵢₙ.
 
     The kinetic-limit factor is computed by:
 
@@ -147,8 +146,7 @@ def get_coulomb_kinetic_limit(
 def get_coulomb_continuum_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the continuum-limit Coulomb enhancement factor, Γ_c.
+    """Calculate the continuum-limit Coulomb enhancement factor, Γ_c.
 
     The continuum-limit factor is computed by:
 

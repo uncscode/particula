@@ -1,25 +1,26 @@
-"""
-This module contains the GasSpeciesBuilder class, which is a builder class
+"""This module contains the GasSpeciesBuilder class, which is a builder class
 for GasSpecies objects. The GasSpeciesBuilder class allows for a more fluent
 and readable creation of GasSpecies as this class provides validation and
 unit conversion for the parameters of the GasSpecies object.
 """
 
-from typing import Union
 import logging
-from numpy.typing import NDArray
+from typing import Union
+
 import numpy as np
+from numpy.typing import NDArray
+
 from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
-    BuilderMolarMassMixin,
     BuilderConcentrationMixin,
+    BuilderMolarMassMixin,
 )
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (
-    VaporPressureStrategy,
     ConstantVaporPressureStrategy,
+    VaporPressureStrategy,
 )
 
 logger = logging.getLogger("particula")
@@ -28,8 +29,7 @@ logger = logging.getLogger("particula")
 class GasSpeciesBuilder(
     BuilderABC, BuilderMolarMassMixin, BuilderConcentrationMixin
 ):
-    """
-    Builder class for GasSpecies objects with preset default parameters.
+    """Builder class for GasSpecies objects with preset default parameters.
 
     This subclass of GasSpeciesBuilder initializes certain parameters
     (e.g., name, molar_mass, vapor_pressure_strategy, etc.) to predefined
@@ -92,8 +92,7 @@ class GasSpeciesBuilder(
     def set_name(
         self, name: Union[str, NDArray[np.str_]]
     ) -> "GasSpeciesBuilder":
-        """
-        Set the name of the gas species.
+        """Set the name of the gas species.
 
         Arguments:
             - name : The name of the gas species.
@@ -108,8 +107,7 @@ class GasSpeciesBuilder(
         self,
         strategy: Union[VaporPressureStrategy, list[VaporPressureStrategy]],
     ) -> "GasSpeciesBuilder":
-        """
-        Set the vapor pressure strategy for the gas species.
+        """Set the vapor pressure strategy for the gas species.
 
         Arguments:
             - strategy : The vapor pressure strategy (or list of strategies).
@@ -124,8 +122,7 @@ class GasSpeciesBuilder(
         self,
         partitioning: bool,
     ) -> "GasSpeciesBuilder":
-        """
-        Set whether the gas species can partition.
+        """Set whether the gas species can partition.
 
         Arguments:
             - partitioning : Boolean flag.
@@ -137,8 +134,7 @@ class GasSpeciesBuilder(
         return self
 
     def build(self) -> GasSpecies:
-        """
-        Validate parameters and return a GasSpecies object.
+        """Validate parameters and return a GasSpecies object.
 
         Returns:
             - The constructed GasSpecies instance.
@@ -180,8 +176,7 @@ class PresetGasSpeciesBuilder(
         self.concentration = 1.0
 
     def build(self) -> GasSpecies:
-        """
-        Validate parameters and return a GasSpecies object with preset
+        """Validate parameters and return a GasSpecies object with preset
         defaults.
 
         Returns:

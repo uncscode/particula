@@ -1,5 +1,4 @@
-"""
-Coagulation Builder Mixin Classes
+"""Coagulation Builder Mixin Classes
 
 Provides reusable mixin classes for building coagulation strategies
 with validated inputs (e.g., distribution type, turbulent dissipation,
@@ -10,14 +9,14 @@ the final coagulation strategy.
 
 # pylint: disable=too-few-public-methods
 
-from typing import Union
 import logging
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.util.convert_units import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 

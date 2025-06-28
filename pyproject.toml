@@ -46,7 +46,6 @@ build-backend = "flit_core.buildapi"
 
 # Configuration for ruff, a fast Python linter and formatter #
 [tool.ruff]
-# keep your global/runtime options here
 line-length = 80
 fix = true
 
@@ -72,7 +71,7 @@ extend-ignore = [
 # Ignore assert‐usage (S101) in any file ending with _test.py
 "*_test.py" = ["S101", "E721", "B008"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 # enforce Google-style sections and disable incompatible rules
 convention = "google"          # accepts "google", "numpy", or "pep257"
 

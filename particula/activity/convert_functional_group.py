@@ -1,5 +1,4 @@
-"""
-Convert the oxygen to carbon ratio and molar mass ratio
+"""Convert the oxygen to carbon ratio and molar mass ratio
 to OH equivalent.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
@@ -9,7 +8,8 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -19,8 +19,7 @@ def convert_to_oh_equivalent(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Just a pass through now, but will
+    """Just a pass through now, but will
     add the oh equivalent conversion.
 
     Args:
@@ -34,7 +33,6 @@ def convert_to_oh_equivalent(
         - A tuple containing the converted oxygen to carbon ratio and
           molar mass ratio.
     """
-
     if functional_group is None:
         return oxygen2carbon, molar_mass_ratio
     if functional_group == "alcohol":

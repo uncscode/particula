@@ -1,5 +1,4 @@
-"""
-Particle Vapor Equilibrium, condensation and evaporation
+"""Particle Vapor Equilibrium, condensation and evaporation
 based on partial pressures to get dm/dt or other forms of
 particle growth and decay.
 
@@ -35,37 +34,37 @@ Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
 Units are all Base SI units.
 """
 
-from abc import ABC, abstractmethod
-from typing import Union, Optional, Tuple, Sequence
 import logging
-import warnings            # NEW
-from numpy.typing import NDArray
-import numpy as np
+import warnings  # NEW
+from abc import ABC, abstractmethod
+from typing import Optional, Sequence, Tuple, Union
 
-# particula imports
-from particula.particles.representation import ParticleRepresentation
+import numpy as np
+from numpy.typing import NDArray
+
+from particula.dynamics.condensation.mass_transfer import (
+    get_first_order_mass_transport_k,
+    get_mass_transfer,
+    get_mass_transfer_rate,
+)
+from particula.gas import get_molecule_mean_free_path
 from particula.gas.species import GasSpecies
 from particula.particles import (
     get_knudsen_number,
-    get_vapor_transition_correction,
     get_partial_pressure_delta,
+    get_vapor_transition_correction,
 )
-from particula.gas import get_molecule_mean_free_path
-from particula.dynamics.condensation.mass_transfer import (
-    get_first_order_mass_transport_k,
-    get_mass_transfer_rate,
-    get_mass_transfer,
-)
-from particula.util.validate_inputs import validate_inputs
 
+# particula imports
+from particula.particles.representation import ParticleRepresentation
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
 
 # mass transfer abstract class
 class CondensationStrategy(ABC):
-    """
-    Abstract base class for condensation strategies.
+    """Abstract base class for condensation strategies.
 
     This class defines the interface for various condensation models
     used in atmospheric physics. Subclasses should implement specific
@@ -120,8 +119,7 @@ class CondensationStrategy(ABC):
         update_gases: bool = True,
         skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
-        """
-        Initialize the CondensationStrategy instance.
+        """Initialize the CondensationStrategy instance.
 
         Arguments:
             - molar_mass : Molar mass of the species [kg/mol].
@@ -145,8 +143,7 @@ class CondensationStrategy(ABC):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the mean free path of the gas molecules based on the
+        """Calculate the mean free path of the gas molecules based on the
         temperature, pressure, and dynamic viscosity of the gas.
 
         Arguments:
@@ -366,8 +363,7 @@ class CondensationStrategy(ABC):
     def _apply_skip_partitioning(
         self, array: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """
-        Zero-out entries for species indices that are configured NOT to
+        """Zero-out entries for species indices that are configured NOT to
         partition/condense.
 
         Arguments:
@@ -402,8 +398,7 @@ class CondensationStrategy(ABC):
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
-        """
-        Compute the isothermal mass transfer rate for a particle.
+        """Compute the isothermal mass transfer rate for a particle.
 
         Implements dm/dt = 4π × r × Dᵢ × Mᵢ × f(Kn, α) × Δpᵢ / (R × T),
         where:
@@ -442,8 +437,7 @@ class CondensationStrategy(ABC):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
-        """
-        Compute the net condensation rate per particle, scaled by
+        """Compute the net condensation rate per particle, scaled by
         concentration.
 
         Calculates the mass transfer rate and multiplies it by particle
@@ -476,8 +470,7 @@ class CondensationStrategy(ABC):
         pressure: float,
         time_step: float,
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
-        """
-        Perform one timestep of isothermal condensation on the particle.
+        """Perform one timestep of isothermal condensation on the particle.
 
         Calculates the mass transfer for the specified time_step and updates
         both the particle mass and the gas concentration
@@ -505,8 +498,7 @@ class CondensationStrategy(ABC):
 
 # Define a condensation strategy with no latent heat of vaporization effect
 class CondensationIsothermal(CondensationStrategy):
-    """
-    Condensation strategy under isothermal conditions.
+    """Condensation strategy under isothermal conditions.
 
     This class implements the isothermal condensation model, wherein
     temperature remains constant during mass transfer. It calculates
@@ -566,13 +558,12 @@ class CondensationIsothermal(CondensationStrategy):
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
-        """
-        Examples:
-            ```py title="Example – Mass-transfer rate"
-            m_rate = iso_cond.mass_transfer_rate(
-                particle, gas_species, 298.15, 101325
-            )
-            ```
+        """Examples:
+        ```py title="Example – Mass-transfer rate"
+        m_rate = iso_cond.mass_transfer_rate(
+            particle, gas_species, 298.15, 101325
+        )
+        ```
         """
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
         first_order_mass_transport = self.first_order_mass_transport(
@@ -598,13 +589,11 @@ class CondensationIsothermal(CondensationStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
+        """Examples:
+        ```py title="Example – Condensation rate array"
+        rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
+        ```
         """
-        Examples:
-            ```py title="Example – Condensation rate array"
-            rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
-            ```
-        """
-
         # Step 1: Calculate the mass transfer rate due to condensation
         mass_rate = self.mass_transfer_rate(
             particle=particle,
@@ -636,15 +625,13 @@ class CondensationIsothermal(CondensationStrategy):
         pressure: float,
         time_step: float,
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
+        """Examples:
+        ```py title="Example – One timestep"
+        particle, gas_species = iso_cond.step(
+            particle, gas_species, 298.15, 101325, time_step=1.0
+        )
+        ```
         """
-        Examples:
-            ```py title="Example – One timestep"
-            particle, gas_species = iso_cond.step(
-                particle, gas_species, 298.15, 101325, time_step=1.0
-            )
-            ```
-        """
-
         # Calculate the mass transfer rate
         mass_rate = self.mass_transfer_rate(
             particle=particle,

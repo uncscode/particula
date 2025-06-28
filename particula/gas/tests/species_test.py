@@ -4,6 +4,7 @@
 
 import numpy as np
 import pytest
+
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
@@ -276,7 +277,7 @@ def test_gas_species_add():
 
 
 def test_gas_species_partitioning_mismatch_errors():
-    """append / += / + must raise if partitioning flags differ."""
+    """Append / += / + must raise if partitioning flags differ."""
     s_true = _simple_species("A", partitioning=True)
     s_false = _simple_species("B", partitioning=False)
 

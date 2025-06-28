@@ -1,18 +1,18 @@
-"""
-Change the particle-resolved representation to a binned representation.
+"""Change the particle-resolved representation to a binned representation.
 A binning approach is used to calculate the kernel.
 This creates a simple particle representation to pass to the kernel function.
 """
 
-from typing import Optional
 from copy import deepcopy
+from typing import Optional
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
 from particula.particles.distribution_strategies import (
     SpeciatedMassMovingBin,
 )
+from particula.particles.representation import ParticleRepresentation
 
 
 def get_particle_resolved_binned_radius(
@@ -21,8 +21,7 @@ def get_particle_resolved_binned_radius(
     total_bins: Optional[int] = None,
     bins_per_radius_decade: int = 10,
 ) -> NDArray[np.float64]:
-    """
-    Determine binned radii for kernel calculations.
+    """Determine binned radii for kernel calculations.
 
     If bin_radius is provided, those edges are used directly. Otherwise,
     a log-spaced array is generated based on the particle's minimum and
@@ -81,8 +80,7 @@ def get_speciated_mass_representation_from_particle_resolved(
     particle: ParticleRepresentation,
     bin_radius: NDArray[np.float64],
 ) -> ParticleRepresentation:
-    """
-    Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.
+    """Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.
 
     This function bins the mass and charge distributions for each species
     according to the provided bin_radius array, using median or mean

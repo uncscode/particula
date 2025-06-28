@@ -1,10 +1,10 @@
-"""
-Calculates the wall loss rate of a particle in a chamber with a given geometry.
+"""Calculates the wall loss rate of a particle in a chamber with a given geometry.
 """
 
-from typing import Union, Tuple
-from numpy.typing import NDArray
+from typing import Tuple, Union
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.dynamics.properties.wall_loss_coefficient import (
     get_rectangle_wall_loss_coefficient_via_system_state,
@@ -22,8 +22,7 @@ def get_spherical_wall_loss_rate(
     pressure: float,
     chamber_radius: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the wall loss rate of particles in a spherical chamber.
+    """Calculate the wall loss rate of particles in a spherical chamber.
 
     This function calculates the rate at which particles deposit onto the
     walls of a spherical chamber. The calculation is based on the wall eddy
@@ -68,7 +67,6 @@ def get_spherical_wall_loss_rate(
         - Wikipedia contributors, "Aerosol dynamics," Wikipedia,
           https://en.wikipedia.org/wiki/Aerosol.
     """
-
     # Step 1: Calculate the wall loss coefficient
     loss_coefficient = get_spherical_wall_loss_coefficient_via_system_state(
         wall_eddy_diffusivity=wall_eddy_diffusivity,
@@ -93,8 +91,7 @@ def get_rectangle_wall_loss_rate(
     pressure: float,
     chamber_dimensions: Tuple[float, float, float],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the wall loss rate of particles in a rectangular chamber.
+    """Calculate the wall loss rate of particles in a rectangular chamber.
 
     This function calculates the rate of particle deposition onto the walls
     of a rectangular chamber, given the wall eddy diffusivity, particle
@@ -139,7 +136,6 @@ def get_rectangle_wall_loss_rate(
         - J. Hinds, "Aerosol Technology," 2nd ed., John Wiley & Sons, 1999.
         [check]
     """
-
     # Step 1: Calculate the wall loss coefficient
     loss_coefficient = get_rectangle_wall_loss_coefficient_via_system_state(
         wall_eddy_diffusivity=wall_eddy_diffusivity,

@@ -1,12 +1,11 @@
-"""
-Compute the aerosol mixing state index χ from an NxS matrix of per-particle
+"""Compute the aerosol mixing state index χ from an NxS matrix of per-particle
 species masses.
 """
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
-from particula.util.machine_limit import get_safe_log10, get_safe_exp
+from particula.util.machine_limit import get_safe_exp, get_safe_log10
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -14,8 +13,7 @@ from particula.util.validate_inputs import validate_inputs
 def get_mixing_state_index(
     species_masses: NDArray[np.float64],
 ) -> float:
-    """
-    Calculate the aerosol mixing-state index (χ).
+    """Calculate the aerosol mixing-state index (χ).
 
     The index quantifies how internally or externally mixed an aerosol
     population is. Fully internally mixed aerosols

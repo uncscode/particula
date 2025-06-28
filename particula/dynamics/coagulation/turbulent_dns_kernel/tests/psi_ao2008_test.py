@@ -1,17 +1,16 @@
-"""
-Test psi function from Ayala et al. (2008).
+"""Test psi function from Ayala et al. (2008).
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
     get_psi_ao2008,
 )
 
 
 def test_get_psi_ao2008_scalar():
-    """
-    Test get_psi_ao2008 with scalar inputs.
+    """Test get_psi_ao2008 with scalar inputs.
     """
     alpha = 2.0  # Turbulence parameter [-]
     phi = 1.0  # Characteristic velocity [m/s]
@@ -44,8 +43,7 @@ def test_get_psi_ao2008_scalar():
 
 
 def test_get_psi_ao2008_array():
-    """
-    Test get_psi_ao2008 with NumPy array inputs.
+    """Test get_psi_ao2008 with NumPy array inputs.
     """
     alpha = 2.0  # Turbulence parameter [-]
     phi = 1.0  # Characteristic velocity [m/s]
@@ -72,8 +70,7 @@ def test_get_psi_ao2008_array():
 
 
 def test_get_psi_ao2008_invalid_inputs():
-    """
-    Test that get_psi_ao2008 raises validation errors for invalid inputs.
+    """Test that get_psi_ao2008 raises validation errors for invalid inputs.
     """
     alpha = 2.0  # [-]
     phi = 1.0  # [m/s]
@@ -102,8 +99,7 @@ def test_get_psi_ao2008_invalid_inputs():
 
 
 def test_get_psi_ao2008_edge_cases():
-    """
-    Test get_psi_ao2008 with extreme values such as very small or very large
+    """Test get_psi_ao2008 with extreme values such as very small or very large
     values.
     """
     alpha = 2.0  # [-]

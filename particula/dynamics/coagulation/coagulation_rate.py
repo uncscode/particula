@@ -1,5 +1,4 @@
-"""
-Coagulation rate calculations for particle populations.
+"""Coagulation rate calculations for particle populations.
 
 This module defines discrete and continuous ways (via summation or
 integration) to compute the gain and loss terms in coagulation
@@ -12,8 +11,9 @@ References:
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline  # type: ignore
 
 
@@ -21,8 +21,7 @@ def get_coagulation_loss_rate_discrete(
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the coagulation loss rate via a discrete summation approach.
+    """Calculate the coagulation loss rate via a discrete summation approach.
 
     This function computes the loss rate of particles from collisions by
     summing over all size classes. The equation is:
@@ -60,8 +59,7 @@ def get_coagulation_gain_rate_discrete(
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the coagulation gain rate (using a quasi-continuous approach).
+    """Calculate the coagulation gain rate (using a quasi-continuous approach).
 
     Though named "discrete," this function converts the discrete distribution
     to a PDF and uses interpolation (RectBivariateSpline) to approximate the
@@ -130,8 +128,7 @@ def get_coagulation_loss_rate_continuous(
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the coagulation loss rate via continuous integration.
+    """Calculate the coagulation loss rate via continuous integration.
 
     This method integrates the product of kernel and concentration over
     the radius grid. The equation is:
@@ -174,8 +171,7 @@ def get_coagulation_gain_rate_continuous(
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the coagulation gain rate via continuous integration.
+    """Calculate the coagulation gain rate via continuous integration.
 
     This function converts the distribution to a continuous form, then
     uses RectBivariateSpline to interpolate and integrate:

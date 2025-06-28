@@ -6,19 +6,14 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.optimize import fminbound
 
-from particula.util.constants import STANDARD_GRAVITY
-from particula.util.validate_inputs import validate_inputs
 from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
-)
-from particula.gas.properties.mean_free_path import (
-    get_molecule_mean_free_path,
 )
 from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity,
 )
-from particula.particles.properties.slip_correction_module import (
-    get_cunningham_slip_correction,
+from particula.gas.properties.mean_free_path import (
+    get_molecule_mean_free_path,
 )
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
@@ -26,6 +21,11 @@ from particula.particles.properties.knudsen_number_module import (
 from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
 )
+from particula.particles.properties.slip_correction_module import (
+    get_cunningham_slip_correction,
+)
+from particula.util.constants import STANDARD_GRAVITY
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -45,8 +45,7 @@ def get_particle_settling_velocity(
     fluid_density: float = 0.0,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """
-    Calculate the settling velocity of a particle in a fluid using Stokes' law.
+    """Calculate the settling velocity of a particle in a fluid using Stokes' law.
 
     The settling velocity (vₛ) is given by the equation:
 
@@ -88,7 +87,6 @@ def get_particle_settling_velocity(
         - "Stokes' Law," Wikipedia,
           https://en.wikipedia.org/wiki/Stokes%27_law
     """
-
     # Calculate the settling velocity using the given formula
     settling_velocity = (
         (2 * particle_radius) ** 2
@@ -117,8 +115,7 @@ def get_particle_settling_velocity_via_inertia(
     kinematic_viscosity: float,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """
-    Calculate gravitational settling velocity using particle inertia time.
+    """Calculate gravitational settling velocity using particle inertia time.
 
     The settling velocity (vₛ) is determined by:
 
@@ -163,7 +160,6 @@ def get_particle_settling_velocity_via_inertia(
           simulation." New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075015
     """
-
     re_p = get_particle_reynolds_number(
         particle_radius=particle_radius,
         particle_velocity=relative_velocity,
@@ -184,8 +180,7 @@ def get_particle_settling_velocity_via_system_state(
     temperature: float,
     pressure: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the particle settling velocity based on system state parameters.
+    """Compute the particle settling velocity based on system state parameters.
 
     This function calculates the dynamic viscosity from temperature, the mean
     free path from the same system state, and the Knudsen number of the
@@ -220,7 +215,6 @@ def get_particle_settling_velocity_via_system_state(
           Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric
           Chemistry and Physics. Wiley-Interscience.
     """
-
     # Step 1: Calculate the dynamic viscosity of the gas
     dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
 
@@ -270,8 +264,7 @@ def get_particle_settling_velocity_with_drag(
     max_iter: int = 100,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments
-    """
-    Calculate the particle's terminal settling velocity with a full drag model.
+    """Calculate the particle's terminal settling velocity with a full drag model.
 
     For low Reynolds numbers (Re < re_threshold), the Stokes settling velocity
     (with slip correction) is used:
@@ -325,7 +318,6 @@ def get_particle_settling_velocity_with_drag(
         - Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry
           and Physics*, 3rd ed., John Wiley & Sons.
     """
-
     # --- Step 1: Broadcast inputs to matching shapes if arrays are passed. ---
     (particle_radius_arr, particle_density_arr, slip_corr_arr) = (
         np.broadcast_arrays(
@@ -405,8 +397,7 @@ def get_particle_settling_velocity_with_drag(
 
 
 def _drag_coefficient(reynolds_number: float) -> float:
-    """
-    Return drag coefficient c_d given a Reynolds number Re.
+    """Return drag coefficient c_d given a Reynolds number Re.
 
     Parameters:
         - reynolds_number : Reynolds number [-].
@@ -433,8 +424,7 @@ def _velocity_mismatch(
     kinematic_viscosity: float,
     gravitational_acceleration: float,
 ) -> float:
-    """
-    Calculate the mismatch between predicted and actual velocities.
+    """Calculate the mismatch between predicted and actual velocities.
 
     Parameters:
         - velocity : Current estimate of particle velocity [m/s].

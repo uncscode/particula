@@ -1,8 +1,10 @@
 """Test rate calculations for coagulation dynamics.
 
-tested for evaluation not accuracy of the calculations."""
+tested for evaluation not accuracy of the calculations.
+"""
 
 import numpy as np
+
 from particula.dynamics.coagulation import coagulation_rate
 
 # Define constants for test data
@@ -23,8 +25,7 @@ RADIUS = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7])
 
 
 def test_discrete_loss():
-    """
-    Test the discrete_loss function with predefined concentration and kernel
+    """Test the discrete_loss function with predefined concentration and kernel
     values.
     """
     result = coagulation_rate.get_coagulation_loss_rate_discrete(
@@ -35,8 +36,7 @@ def test_discrete_loss():
 
 
 def test_discrete_gain():
-    """
-    Test the discrete_gain function with predefined concentration and kernel
+    """Test the discrete_gain function with predefined concentration and kernel
     values.
     """
     result = coagulation_rate.get_coagulation_gain_rate_discrete(
@@ -57,8 +57,7 @@ def test_discrete_gain():
 
 
 def test_continuous_loss():
-    """
-    Test the continuous_loss function with predefined radius, concentration,
+    """Test the continuous_loss function with predefined radius, concentration,
     and kernel values.
     """
     result = coagulation_rate.get_coagulation_loss_rate_continuous(
@@ -69,8 +68,7 @@ def test_continuous_loss():
 
 
 def test_continuous_gain():
-    """
-    Test the continuous_gain function with predefined radius, concentration,
+    """Test the continuous_gain function with predefined radius, concentration,
     and kernel values.
     """
     result = coagulation_rate.get_coagulation_gain_rate_continuous(

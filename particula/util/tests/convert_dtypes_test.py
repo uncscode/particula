@@ -1,5 +1,4 @@
-"""
-Unit tests for the convert_dtypes module.
+"""Unit tests for the convert_dtypes module.
 """
 
 import numpy as np
@@ -8,8 +7,8 @@ import pytest
 from particula.util.convert_dtypes import (
     get_coerced_type,
     get_dict_from_list,
-    get_values_of_dict,
     get_shape_check,
+    get_values_of_dict,
 )
 
 

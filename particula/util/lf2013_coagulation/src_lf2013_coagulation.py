@@ -4,7 +4,6 @@ import os
 
 import numpy as np
 
-
 # flake8: noqa: C901
 # pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-locals, too-many-branches
 # pylint: disable=possibly-used-before-assignment, too-many-positional-arguments
@@ -18,8 +17,7 @@ def lf2013_coag_full(
     charge_vals=None,
     radius_vals=None,
 ):
-    """calculate ion--particle coagulation according to lf2013"""
-
+    """Calculate ion--particle coagulation according to lf2013"""
     if charge_vals is not None and (
         max(charge_vals) > 100 or min(charge_vals) < -100
     ):

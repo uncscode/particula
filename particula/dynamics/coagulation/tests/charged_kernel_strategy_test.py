@@ -1,6 +1,7 @@
 """Test Kernel class and its methods."""
 
 import numpy as np
+
 from particula.dynamics.coagulation import charged_kernel_strategy
 
 # Define constants for common test data
@@ -34,8 +35,7 @@ def test_kernel_call():
 
 
 def test_hard_sphere():
-    """
-    Test the hard_sphere function with a single value and
+    """Test the hard_sphere function with a single value and
     array of diffusive_knudsen values.
     """
     # dimensionless
@@ -52,8 +52,7 @@ def test_hard_sphere():
 
 
 def test_coulomb_dyachkov2007():
-    """
-    Test the coulomb_dyachkov2007 function with a single value and
+    """Test the coulomb_dyachkov2007 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
@@ -72,8 +71,7 @@ def test_coulomb_dyachkov2007():
 
 
 def test_coulomb_gatti2008():
-    """
-    Test the coulomb_gatti2008 function with a single value and
+    """Test the coulomb_gatti2008 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
@@ -90,8 +88,7 @@ def test_coulomb_gatti2008():
 
 
 def test_coulomb_gopalakrishnan2012():
-    """
-    Test the coulomb_gopalakrishnan2012 function with a single value and
+    """Test the coulomb_gopalakrishnan2012 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
@@ -110,8 +107,7 @@ def test_coulomb_gopalakrishnan2012():
 
 
 def test_coulomb_chahl2019():
-    """
-    Test the coulomb_chahl2019 function with a single value and
+    """Test the coulomb_chahl2019 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless

@@ -1,5 +1,4 @@
-"""
-The basic Brownian coagulation kernel for aerosol particles.
+"""The basic Brownian coagulation kernel for aerosol particles.
 
 This module provides functions to calculate the Brownian coagulation
 kernel for aerosol particles, based on Fuchs' theory as described by
@@ -7,11 +6,12 @@ Seinfeld and Pandis (2016), Chapter 13, Table 13.1.
 """
 
 from typing import Union
-from numpy.typing import NDArray
-import numpy as np
 
+import numpy as np
+from numpy.typing import NDArray
+
+from particula import gas, particles
 from particula.util.constants import BOLTZMANN_CONSTANT
-from particula import particles, gas
 
 
 def get_brownian_kernel(
@@ -21,8 +21,7 @@ def get_brownian_kernel(
     mean_thermal_speed_particle: Union[float, NDArray[np.float64]],
     alpha_collision_efficiency: Union[float, NDArray[np.float64]] = 1.0,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Brownian coagulation kernel for aerosol particles.
+    """Calculate the Brownian coagulation kernel for aerosol particles.
 
     This function computes the Brownian coagulation kernel, which is
     defined as the product of the diffusivity of the particles, the
@@ -102,8 +101,7 @@ def get_brownian_kernel_via_system_state(
     pressure: float,
     alpha_collision_efficiency: Union[float, NDArray[np.float64]] = 1.0,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Brownian coagulation kernel using system state parameters.
+    """Calculate the Brownian coagulation kernel using system state parameters.
 
     This function calculates the Brownian coagulation kernel for aerosol
     particles by determining the necessary intermediate properties such as
@@ -182,8 +180,7 @@ def _mean_free_path_l(
     diffusivity_particle: Union[float, NDArray[np.float64]],
     mean_thermal_speed_particle: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the mean free path of particles for coagulation.
+    """Calculate the mean free path of particles for coagulation.
 
     Calculate the mean free path of particles for coagulation.
 
@@ -217,8 +214,7 @@ def _g_collection_term(
     mean_free_path_particle: Union[float, NDArray[np.float64]],
     particle_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the `g` collection term for Brownian coagulation.
+    """Calculate the `g` collection term for Brownian coagulation.
 
     This function calculates the `g` collection term for Brownian
     coagulation, defined as the ratio of the mean free path of the particles
@@ -256,8 +252,7 @@ def _brownian_diffusivity(
     temperature: Union[float, NDArray[np.float64]],
     aerodynamic_mobility: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the diffusivity of particles due to Brownian motion.
+    """Calculate the diffusivity of particles due to Brownian motion.
 
     This function calculates the diffusivity of particles due to Brownian
     motion, which is essentially the scaled aerodynamic mobility of the

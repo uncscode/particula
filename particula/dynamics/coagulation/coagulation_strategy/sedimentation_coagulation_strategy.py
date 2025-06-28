@@ -1,30 +1,29 @@
-"""
-Sedimentation coagulation strategies for aerosols.
+"""Sedimentation coagulation strategies for aerosols.
 
 Provides a sedimentation-based collision kernel following Seinfeld & Pandis
 (2016). Implements a strategy class for gravitational-settling-driven
 particle collisions.
 """
 
-from typing import Union
 import logging
+from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.sedimentation_kernel import (
     get_sedimentation_kernel_sp2016_via_system_state,
 )
+from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
 class SedimentationCoagulationStrategy(CoagulationStrategyABC):
-    """
-    Sedimentation coagulation strategy for aerosol particles.
+    """Sedimentation coagulation strategy for aerosol particles.
 
     Implements the Seinfeld & Pandis (2016) sedimentation kernel as part of
     the CoagulationStrategyABC. This approach models collisions driven by
@@ -73,8 +72,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Raise NotImplementedError for dimensionless kernel in sedimentation
+        """Raise NotImplementedError for dimensionless kernel in sedimentation
         strategy.
 
         This method is not applicable to sedimentation-based collisions.
@@ -100,8 +98,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Compute the sedimentation coagulation kernel [m^3/s].
+        """Compute the sedimentation coagulation kernel [m^3/s].
 
         Uses the Seinfeld & Pandis (2016) sedimentation kernel via
         `get_sedimentation_kernel_sp2016_via_system_state`.

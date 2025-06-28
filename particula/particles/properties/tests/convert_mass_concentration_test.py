@@ -106,7 +106,8 @@ def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
 )
 def test_error_handling_mass_to_volume(mass_concentrations, densities):
     """Test error handling for mass_concentration_to_volume_fraction
-    function"""
+    function
+    """
     with pytest.raises(Exception):
         convert_mass_concentration.get_volume_fraction_from_mass(
             mass_concentrations, densities

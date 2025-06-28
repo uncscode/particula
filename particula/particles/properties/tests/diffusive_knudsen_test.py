@@ -1,7 +1,8 @@
 """Test Diffusive Knudsen number calculation."""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.properties.diffusive_knudsen_module import (
     get_diffusive_knudsen_number,
 )
@@ -51,7 +52,8 @@ def test_diffusive_knudsen_number_array():
 
 def test_with_zero_coulomb_potential_ratio():
     """Test the diffusive Knudsen number calculation with zero Coulomb
-    potential ratio."""
+    potential ratio.
+    """
     radius = 0.1
     particle_mass = 1e-18
     friction_factor = 1.0

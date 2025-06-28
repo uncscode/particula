@@ -3,8 +3,8 @@
 import pytest
 
 from particula.dynamics import (
-    CondensationIsothermalBuilder,
     CondensationIsothermal,
+    CondensationIsothermalBuilder,
 )
 
 

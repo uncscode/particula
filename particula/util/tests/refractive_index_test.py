@@ -7,7 +7,6 @@ from particula.util.refractive_index_mixing import (
 
 def test_effective_refractive_index():
     """Test the effective_refractive_index function."""
-
     assert get_effective_refractive_index(
         m_zero=1.5 + 0.5j,
         m_one=1.33,

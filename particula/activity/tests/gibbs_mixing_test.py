@@ -1,17 +1,18 @@
-"""
-Gibbs mixing test
+"""Gibbs mixing test
 """
 
 import unittest
+
 import numpy as np
-from particula.activity.gibbs_mixing import (
-    gibbs_of_mixing,
-    gibbs_mix_weight,
-)
+
 from particula.activity.bat_coefficients import (
     G19_FIT_HIGH,
     G19_FIT_LOW,
     G19_FIT_MID,
+)
+from particula.activity.gibbs_mixing import (
+    gibbs_mix_weight,
+    gibbs_of_mixing,
 )
 
 

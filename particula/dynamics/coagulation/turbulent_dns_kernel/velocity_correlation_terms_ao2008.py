@@ -1,5 +1,4 @@
-"""
-Velocity correlation terms for the DNS kernel of the turbulent coagulation
+"""Velocity correlation terms for the DNS kernel of the turbulent coagulation
 model by Ayala 2008.
 
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -9,6 +8,7 @@ model by Ayala 2008.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 

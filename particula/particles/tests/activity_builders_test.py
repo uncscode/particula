@@ -4,11 +4,12 @@ for error and validation handling.
 Correctness is tested by activity_strategies_test.py.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.activity_builders import (
-    ActivityIdealMolarBuilder,
     ActivityIdealMassBuilder,
+    ActivityIdealMolarBuilder,
     ActivityKappaParameterBuilder,
 )
 

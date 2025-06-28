@@ -1,6 +1,7 @@
 """Tests for the AtmosphereBuilder class."""
 
 import pytest
+
 from particula.gas.atmosphere_builders import AtmosphereBuilder
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (

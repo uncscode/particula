@@ -1,20 +1,19 @@
-"""
-Test the wall loss functions.
+"""Test the wall loss functions.
 """
 # pylint: disable=R0801
 
 import numpy as np
 
 from particula.dynamics.properties.wall_loss_coefficient import (
-    get_spherical_wall_loss_coefficient,
     get_rectangle_wall_loss_coefficient,
     get_rectangle_wall_loss_coefficient_via_system_state,
+    get_spherical_wall_loss_coefficient,
     get_spherical_wall_loss_coefficient_via_system_state,
 )
 
 
 def test_spherical_wall_loss_coefficient():
-    """test the spherical wall loss coefficient function"""
+    """Test the spherical wall loss coefficient function"""
     # Test case with hypothetical values
     _ktp_value = 1.5  # Example value
     _diffusion_coefficient_value = 0.01  # Example value
@@ -36,7 +35,7 @@ def test_spherical_wall_loss_coefficient():
 
 
 def test_rectangle_wall_loss():
-    """test the rectangular wall loss coefficient function"""
+    """Test the rectangular wall loss coefficient function"""
     # Test case with hypothetical values
     ktp_value = 1.5  # Example value
     diffusion_coefficient_value = 0.01  # Example value

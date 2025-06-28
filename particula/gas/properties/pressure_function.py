@@ -1,8 +1,9 @@
 """Functions for calculating the partial pressure of a gas."""
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.constants import GAS_CONSTANT
 from particula.util.validate_inputs import validate_inputs
@@ -20,8 +21,7 @@ def get_partial_pressure(
     molar_mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the partial pressure of a gas from its concentration, molar mass,
+    """Calculate the partial pressure of a gas from its concentration, molar mass,
     and temperature.
 
     - p = (c × R × T) / M
@@ -64,8 +64,7 @@ def get_saturation_ratio_from_pressure(
     partial_pressure: Union[float, NDArray[np.float64]],
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the saturation ratio of the gas at a given partial pressure and
+    """Calculate the saturation ratio of the gas at a given partial pressure and
     pure vapor pressure.
 
     The saturation ratio is defined as the ratio of partial pressure to the

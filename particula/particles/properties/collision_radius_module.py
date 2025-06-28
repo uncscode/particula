@@ -8,6 +8,7 @@ https://doi.org/10.1016/j.jaerosci.2021.10586
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -22,8 +23,7 @@ from particula.util.validate_inputs import validate_inputs
 def get_collision_radius_mg1988(
     gyration_radius: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the mg1988 model.
+    """Calculate the collision radius using the mg1988 model.
 
     The collision radius (R_c) is set equal to the radius of gyration (R_g):
 
@@ -60,8 +60,7 @@ def get_collision_radius_sr1992(
     gyration_radius: Union[NDArray[np.float64], float],
     fractal_dimension: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the sr1992 model.
+    """Calculate the collision radius using the sr1992 model.
 
     This model includes the fractal dimension (d_f). The collision radius
     (R_c) is:
@@ -105,8 +104,7 @@ def get_collision_radius_mzg2002(
     gyration_radius: Union[NDArray[np.float64], float],
     fractal_prefactor: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the mzg2002 model.
+    """Calculate the collision radius using the mzg2002 model.
 
     The collision radius (R_c) is given by the empirical relation:
 
@@ -153,8 +151,7 @@ def get_collision_radius_tt2012(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the tt2012 model.
+    """Calculate the collision radius using the tt2012 model.
 
     This function uses fitting parameters α₁, α₂ based on the fractal
     dimension (d_f) and number of monomers (N). The collision radius
@@ -206,8 +203,7 @@ def get_collision_radius_wq2022_rg(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg model.
+    """Calculate the collision radius using the wq2022_rg model.
 
     This function uses a fitted model based on the ratio (R_g / rₘ).
     The collision radius (R_c) is:
@@ -256,8 +252,7 @@ def get_collision_radius_wq2022_rg_df(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg_df model.
+    """Calculate the collision radius using the wq2022_rg_df model.
 
     This function uses a fitted model based on fractal dimension (d_f), ratio
     (R_g / rₘ), and empirical coefficients. The collision radius (R_c) is:
@@ -313,8 +308,7 @@ def get_collision_radius_wq2022_rg_df_k0(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg_df_k0 model.
+    """Calculate the collision radius using the wq2022_rg_df_k0 model.
 
     This function uses a fitted expression depending on fractal dimension
     (d_f), fractal prefactor (k₀), and ratio (R_g / rₘ). The collision
@@ -377,8 +371,7 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg_df_k0_a13 model.
+    """Calculate the collision radius using the wq2022_rg_df_k0_a13 model.
 
     This function uses a fitted expression depending on fractal dimension
     (d_f), fractal prefactor (k₀), shape anisotropy (A₁₃), and ratio

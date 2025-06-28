@@ -1,10 +1,9 @@
 """This module contains tests for the validate_inputs decorator."""
 
-import pytest
 import numpy as np
+import pytest
 
 from particula.util.validate_inputs import validate_inputs
-
 
 # Define a sample function to test the decorator
 some_dict = {
@@ -59,7 +58,8 @@ def test_valid_inputs():
 
 def test_valid_finite():
     """Test that the decorator raises an error when a finite argument is
-    infinite"""
+    infinite
+    """
     some_dict2 = {"x": "finite"}
 
     @validate_inputs(some_dict2)

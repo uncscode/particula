@@ -1,5 +1,4 @@
-"""
-Integration tests for the coagulation processes in Particula.
+"""Integration tests for the coagulation processes in Particula.
 This module uses unittest to verify correct creation of particle
 distributions (PMF, PDF, resolved) and their evolution with a
 Brownian coagulation strategy.
@@ -8,6 +7,7 @@ Brownian coagulation strategy.
 # pylint: disable=too-many-instance-attributes, too-many-locals
 
 import unittest
+
 import numpy as np
 
 import particula as par

@@ -1,5 +1,4 @@
-"""
-Module for friction factor of a particle in a fluid.
+"""Module for friction factor of a particle in a fluid.
 
 Zhang, C., Thajudeen, T., Larriba, C., Schwartzentruber, T. E., &
 Hogan, C. J. (2012). Determination of the Scalar Friction Factor for
@@ -9,8 +8,9 @@ by Direct Simulation Monte Carlo (DSMC). Aerosol Science and Technology,
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -27,8 +27,7 @@ def get_friction_factor(
     dynamic_viscosity: float,
     slip_correction: Union[float, NDArray[np.float64]],
 ):
-    """
-    Calculate the friction factor for a particle in a fluid.
+    """Calculate the friction factor for a particle in a fluid.
 
     This friction factor (f) is the proportionality constant between
     the fluid velocity and the resulting drag force on the particle.

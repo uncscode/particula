@@ -7,16 +7,17 @@ and converts the units of the parameters if necessary.
 # pylint: disable=too-many-ancestors
 
 import logging
+
 from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
     BuilderDensityMixin,
+    BuilderMolarMassMixin,
+    BuilderPhaseIndexMixin,
     BuilderSurfaceTensionMixin,
     BuilderSurfaceTensionTableMixin,
-    BuilderMolarMassMixin,
     BuilderTemperatureTableMixin,
-    BuilderPhaseIndexMixin,
 )
 from particula.particles.surface_strategies import (
     SurfaceStrategyMass,

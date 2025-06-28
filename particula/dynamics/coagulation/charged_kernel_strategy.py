@@ -1,5 +1,4 @@
-"""
-Dimensionless coagulation strategies and builders.
+"""Dimensionless coagulation strategies and builders.
 
 This module provides classes for calculating dimensionless (and
 optionally dimensioned) coagulation kernels in the transition regime,
@@ -19,15 +18,15 @@ Classes:
 """
 
 from abc import ABC, abstractmethod
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.dynamics.coagulation import charged_dimensionless_kernel
 
 
 class ChargedKernelStrategyABC(ABC):
-    """
-    Abstract base class for dimensionless coagulation strategies.
+    """Abstract base class for dimensionless coagulation strategies.
 
     This class defines the dimensionless kernel (H) method, which must be
     implemented by subclasses, and the `kernel` method that converts the
@@ -65,8 +64,7 @@ class ChargedKernelStrategyABC(ABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Return the dimensionless coagulation kernel (H).
+        """Return the dimensionless coagulation kernel (H).
 
         Arguments:
             - diffusive_knudsen : The diffusive Knudsen number (KₙD)
@@ -93,8 +91,7 @@ class ChargedKernelStrategyABC(ABC):
         reduced_friction_factor: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
-        """
-        Convert a dimensionless kernel into a dimensioned coagulation kernel.
+        """Convert a dimensionless kernel into a dimensioned coagulation kernel.
 
         Uses reduced mass, friction factors, and particle radii to obtain units
         of [m³/s] for each particle-particle interaction.
@@ -135,8 +132,7 @@ class ChargedKernelStrategyABC(ABC):
 
 # define strategies
 class HardSphereKernelStrategy(ChargedKernelStrategyABC):
-    """
-    Hard sphere dimensionless coagulation strategy.
+    """Hard sphere dimensionless coagulation strategy.
 
     Idealized Coulomb interactions and assumes particles interact as
     perfectly charged spheres.
@@ -172,8 +168,7 @@ class HardSphereKernelStrategy(ChargedKernelStrategyABC):
 
 
 class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC):
-    """
-    Dyachkov et al. (2007) approximation for the dimensionless coagulation
+    """Dyachkov et al. (2007) approximation for the dimensionless coagulation
     kernel.
 
     Accounts for Coulomb potential between particles, suitable for
@@ -208,8 +203,7 @@ class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC):
 
 
 class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC):
-    """
-    Gatti & Kortshagen (2008) approximation for the dimensionless coagulation
+    """Gatti & Kortshagen (2008) approximation for the dimensionless coagulation
     kernel.
 
     Captures Coulomb potential effects for a broad range of charge and
@@ -244,8 +238,7 @@ class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC):
 
 
 class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
-    """
-    Gopalakrishnan & Hogan (2012) approximation for the dimensionless
+    """Gopalakrishnan & Hogan (2012) approximation for the dimensionless
     coagulation kernel.
 
     Incorporates Coulomb-influenced collisions in aerosol and dusty plasma
@@ -281,8 +274,7 @@ class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
 
 
 class CoulumbChahl2019KernelStrategy(ChargedKernelStrategyABC):
-    """
-    Chahl & Gopalakrishnan (2019) approximation for the dimensionless
+    """Chahl & Gopalakrishnan (2019) approximation for the dimensionless
     coagulation kernel.
 
     Focuses on high-potential, near-free molecular regime Coulombic collisions

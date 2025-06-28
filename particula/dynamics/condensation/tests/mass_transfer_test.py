@@ -1,12 +1,13 @@
 """Test the Condensation module."""
 
 import numpy as np
+
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
-    get_mass_transfer_rate,
     get_mass_transfer,
-    get_mass_transfer_of_single_species,
     get_mass_transfer_of_multiple_species,
+    get_mass_transfer_of_single_species,
+    get_mass_transfer_rate,
     get_radius_transfer_rate,  # Import the function to be tested
 )
 
@@ -81,7 +82,8 @@ def test_multi_species_mass_transfer_rate():
 
 def test_single_species_condensation_not_enough_gas_mass():
     """Test mass transfer for a single particle species where there is not
-    enough gas mass for full condensation."""
+    enough gas mass for full condensation.
+    """
     mass_rate = np.array([0.1, 0.5])  # kg/s (mass transfer rate per particle)
     time_step = 10  # seconds
     gas_mass = np.array([0.5])  # kg (not enough to satisfy both requests)
@@ -127,7 +129,8 @@ def test_single_species_condensation_not_enough_gas_mass():
 
 def test_single_species_evaporation_not_enough_particle_mass():
     """Test mass transfer for a single particle species where there is not
-    enough particle mass for full evaporation."""
+    enough particle mass for full evaporation.
+    """
     mass_rate = np.array([-0.2, -8])  # kg/s (negative for evaporation)
     time_step = 10  # seconds
     gas_mass = np.array([1.0])  # kg
@@ -162,8 +165,7 @@ def test_single_species_evaporation_not_enough_particle_mass():
 
 
 def test_multiple_species_condensation():
-    """
-    Test mass transfer for multiple particle and gas species (n=2, m=3)
+    """Test mass transfer for multiple particle and gas species (n=2, m=3)
     where there is not enough gas mass for full condensation, and particle
     concentration is greater than 1.
     """
@@ -218,8 +220,7 @@ def test_multiple_species_condensation():
 
 
 def test_multiple_species_evaporation_column_inventory_limit():
-    """
-    Evaporation across several species should never remove more mass
+    """Evaporation across several species should never remove more mass
     than the *total particle inventory* of that species, even when
     the requested evaporation (rate × dt × conc) is far larger.
 
@@ -289,8 +290,7 @@ def test_multiple_species_evaporation_column_inventory_limit():
 
 
 def test_condensation_inventory_limit():
-    """
-    Requested condensation exceeds gas_mass → routine must down-scale so that
+    """Requested condensation exceeds gas_mass → routine must down-scale so that
     the column sum equals the available gas.
     """
     # 2 size bins × 1 species (condensation only, values > 0)
@@ -321,8 +321,7 @@ def test_condensation_inventory_limit():
 # Evaporation-limited case ─ scarce particle inventory, ample gas
 # ──────────────────────────────────────────────────────────────────────────
 def test_evaporation_inventory_limit():
-    """
-    Requested evaporation exceeds the particle inventory → routine must
+    """Requested evaporation exceeds the particle inventory → routine must
     down-scale so that the column sum does not exceed −inventory and no bin
     evaporates more mass than it owns.
     """
@@ -406,8 +405,7 @@ def test_radius_transfer_rate():
 
 
 def test_mixed_condensation_and_evaporation_inventory_limit():
-    """
-    Mixed-sign fluxes: one bin condenses while another evaporates.
+    """Mixed-sign fluxes: one bin condenses while another evaporates.
     Only the *condensation* part must be down–scaled to respect the
     limited gas reservoir; the evaporation part must remain untouched
     except for the usual per-bin inventory clip.

@@ -7,7 +7,7 @@ from particula.util.lf2013_coagulation import lf2013_coag_full
 
 
 def test_approx_coag_less():
-    """testing"""
+    """Testing"""
     ret = np.nan_to_num(
         lf2013_coag_full(
             ion_type="air",

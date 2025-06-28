@@ -1,16 +1,17 @@
 """Test the Process class.
 
 Build tests when we get default setups for Aerosol, Gas, Particle,
-and Process"""
+and Process
+"""
 
 from unittest.mock import MagicMock
+
 from particula.aerosol import Aerosol
-from particula.runnable import RunnableSequence, RunnableABC
+from particula.runnable import RunnableABC, RunnableSequence
 
 
 class MockRunnable(RunnableABC):
-    """
-    A mock Runnable for testing that tracks how many times it is executed.
+    """A mock Runnable for testing that tracks how many times it is executed.
     """
 
     def __init__(self):
@@ -25,11 +26,9 @@ class MockRunnable(RunnableABC):
 
 
 def test_runnable_sequence_execute():
-    """
-    Verify that each Runnable in the sequence executes the expected
+    """Verify that each Runnable in the sequence executes the expected
     number of times.
     """
-
     seq = RunnableSequence()
     r1 = MockRunnable()
     r2 = MockRunnable()

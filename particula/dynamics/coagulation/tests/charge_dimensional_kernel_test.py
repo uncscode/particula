@@ -1,16 +1,16 @@
-"""
-Test the coagulation kernels for charged particles with calls
+"""Test the coagulation kernels for charged particles with calls
 via system state.
 """
 
 import numpy as np
 import pytest
+
 from particula.dynamics.coagulation.charged_dimensional_kernel import (
-    get_hard_sphere_kernel_via_system_state,
+    get_coulomb_kernel_chahl2019_via_system_state,
     get_coulomb_kernel_dyachkov2007_via_system_state,
     get_coulomb_kernel_gatti2008_via_system_state,
     get_coulomb_kernel_gopalakrishnan2012_via_system_state,
-    get_coulomb_kernel_chahl2019_via_system_state,
+    get_hard_sphere_kernel_via_system_state,
 )
 
 
@@ -25,8 +25,7 @@ from particula.dynamics.coagulation.charged_dimensional_kernel import (
     ],
 )
 def test_dimensioned_coagulation_kernels_array(kernel_function):
-    """
-    Test the coagulation kernels for charged particles with
+    """Test the coagulation kernels for charged particles with
     calls via system state.
     """
     radii = np.array([1e-9, 2e-9, 5e-9]) * 10

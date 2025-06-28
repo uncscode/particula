@@ -4,11 +4,12 @@ Correctness is tested by surface_strategies_test.py.
 BuilderMixin methods are tested in abc_builder_test.py.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.particles.surface_builders import (
-    SurfaceStrategyMolarBuilder,
     SurfaceStrategyMassBuilder,
+    SurfaceStrategyMolarBuilder,
     SurfaceStrategyVolumeBuilder,
 )
 

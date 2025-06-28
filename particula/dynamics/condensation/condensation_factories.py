@@ -1,6 +1,6 @@
 """Factory for building condensation strategies."""
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 from particula.abc_factory import StrategyFactoryABC
 from particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder import (

@@ -1,18 +1,17 @@
-"""
-General dilution rate for closed systems.
+"""General dilution rate for closed systems.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 
 def get_volume_dilution_coefficient(
     volume: Union[float, NDArray[np.float64]],
     input_flow_rate: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the volume dilution coefficient.
+    """Calculate the volume dilution coefficient.
 
     This coefficient represents how quickly a substance is diluted within
     a system of a given volume when a known input flow rate is supplied.
@@ -56,8 +55,7 @@ def get_dilution_rate(
     coefficient: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the dilution rate of a substance in a system.
+    """Calculate the dilution rate of a substance in a system.
 
     The dilution rate describes how quickly the concentration of a
     substance decreases due to the volume dilution coefficient and

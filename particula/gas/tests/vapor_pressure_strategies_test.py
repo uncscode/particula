@@ -2,16 +2,17 @@
 
 import numpy as np
 import pytest
-from particula.util.constants import GAS_CONSTANT
+
 from particula.gas.vapor_pressure_strategies import (
-    ConstantVaporPressureStrategy,
     AntoineVaporPressureStrategy,
-    ClausiusClapeyronStrategy,
-    WaterBuckStrategy,
     ArblasterLiquidVaporPressureStrategy,
+    ClausiusClapeyronStrategy,
+    ConstantVaporPressureStrategy,
     LiquidClausiusHybridStrategy,
     TableVaporPressureStrategy,
+    WaterBuckStrategy,
 )
+from particula.util.constants import GAS_CONSTANT
 
 
 def test_constant_vapor_pressure_strategy():

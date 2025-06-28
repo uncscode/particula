@@ -1,22 +1,22 @@
-"""
-Particle representation for a collection of particles.
+"""Particle representation for a collection of particles.
 """
 
-from typing import Optional
-from copy import deepcopy
 import logging
+from copy import deepcopy
+from typing import Optional
+
 import numpy as np
 from numpy.typing import NDArray
 
 # From Particula
 from particula.particles.activity_strategies import ActivityStrategy
-from particula.particles.surface_strategies import SurfaceStrategy
 from particula.particles.distribution_strategies import (
     DistributionStrategy,
 )
 from particula.particles.properties.sort_bins import (
     get_sorted_bins_by_radius,
 )
+from particula.particles.surface_strategies import SurfaceStrategy
 
 logger = logging.getLogger("particula")
 
@@ -111,8 +111,7 @@ class ParticleRepresentation:
         )
 
     def get_strategy(self, clone: bool = False) -> DistributionStrategy:
-        """
-        Return the strategy used for particle representation.
+        """Return the strategy used for particle representation.
 
         Arguments:
             - clone : If True, then return a deepcopy of the strategy.
@@ -131,8 +130,7 @@ class ParticleRepresentation:
         return self.strategy
 
     def get_strategy_name(self) -> str:
-        """
-        Return the name of the strategy used for particle representation.
+        """Return the name of the strategy used for particle representation.
 
         Returns:
             - The name of the strategy used for particle representation.
@@ -146,8 +144,7 @@ class ParticleRepresentation:
         return self.strategy.get_name()
 
     def get_activity(self, clone: bool = False) -> ActivityStrategy:
-        """
-        Return the activity strategy used for partial pressure calculations.
+        """Return the activity strategy used for partial pressure calculations.
 
         Arguments:
             - clone : If True, then return a deepcopy of the activity strategy.
@@ -166,8 +163,7 @@ class ParticleRepresentation:
         return self.activity
 
     def get_activity_name(self) -> str:
-        """
-        Return the name of the activity strategy used for partial pressure
+        """Return the name of the activity strategy used for partial pressure
         calculations.
 
         Returns:
@@ -183,8 +179,7 @@ class ParticleRepresentation:
         return self.activity.get_name()
 
     def get_surface(self, clone: bool = False) -> SurfaceStrategy:
-        """
-        Return the surface strategy used for surface tension and Kelvin effect.
+        """Return the surface strategy used for surface tension and Kelvin effect.
 
         Arguments:
             - clone : If True, then return a deepcopy of the surface strategy.
@@ -203,8 +198,7 @@ class ParticleRepresentation:
         return self.surface
 
     def get_surface_name(self) -> str:
-        """
-        Return the name of the surface strategy used for surface tension and
+        """Return the name of the surface strategy used for surface tension and
         Kelvin effect.
 
         Returns:
@@ -220,8 +214,7 @@ class ParticleRepresentation:
         return self.surface.get_name()
 
     def get_distribution(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the distribution of the particles.
+        """Return the distribution of the particles.
 
         Arguments:
             - clone : If True, then return a copy of the distribution array.
@@ -239,8 +232,7 @@ class ParticleRepresentation:
         return self.distribution
 
     def get_density(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the density of the particles.
+        """Return the density of the particles.
 
         Arguments:
             - clone : If True, then return a copy of the density array.
@@ -258,8 +250,7 @@ class ParticleRepresentation:
         return self.density
 
     def get_effective_density(self) -> NDArray[np.float64]:
-        """
-        Return the effective density of the particles, weighted by the
+        """Return the effective density of the particles, weighted by the
         mass of the species.
 
         Arguments:
@@ -288,8 +279,7 @@ class ParticleRepresentation:
         )
 
     def get_mean_effective_density(self) -> float:
-        """
-        Return the mean effective density of the particles.
+        """Return the mean effective density of the particles.
 
         Arguments:
             - None
@@ -312,8 +302,7 @@ class ParticleRepresentation:
         return np.mean(effective_density)
 
     def get_concentration(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the volume concentration of the particles.
+        """Return the volume concentration of the particles.
 
         For ParticleResolved Strategies, this is the number of
         particles per self.volume. Otherwise, it's per 1/m^3.
@@ -334,8 +323,7 @@ class ParticleRepresentation:
         return self.concentration / self.volume
 
     def get_total_concentration(self, clone: bool = False) -> np.float64:
-        """
-        Return the total concentration of the particles.
+        """Return the total concentration of the particles.
 
         Arguments:
             - clone : If True, then return a copy of the concentration array.
@@ -354,8 +342,7 @@ class ParticleRepresentation:
         return np.sum(self.get_concentration(clone=clone))
 
     def get_charge(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the charge per particle.
+        """Return the charge per particle.
 
         Arguments:
             - clone : If True, then return a copy of the charge array.
@@ -373,8 +360,7 @@ class ParticleRepresentation:
         return self.charge
 
     def get_volume(self, clone: bool = False) -> float:
-        """
-        Return the volume used for the particle representation.
+        """Return the volume used for the particle representation.
 
         Arguments:
             - clone : If True, then return a copy of the volume value.
@@ -392,8 +378,7 @@ class ParticleRepresentation:
         return self.volume
 
     def get_species_mass(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the masses per species in the particles.
+        """Return the masses per species in the particles.
 
         Arguments:
             - clone : If True, then return a copy of the computed mass array.
@@ -413,8 +398,7 @@ class ParticleRepresentation:
         return self.strategy.get_species_mass(self.distribution, self.density)
 
     def get_mass(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the mass of the particles as calculated by the strategy.
+        """Return the mass of the particles as calculated by the strategy.
 
         Arguments:
             - clone : If True, then return a copy of the mass array.
@@ -434,8 +418,7 @@ class ParticleRepresentation:
         return self.strategy.get_mass(self.distribution, self.density)
 
     def get_mass_concentration(self, clone: bool = False) -> np.float64:
-        """
-        Return the total mass per volume of the simulated particles.
+        """Return the total mass per volume of the simulated particles.
 
         The mass concentration is calculated from the distribution
         and concentration arrays.
@@ -470,8 +453,7 @@ class ParticleRepresentation:
         )
 
     def get_radius(self, clone: bool = False) -> NDArray[np.float64]:
-        """
-        Return the radius of the particles as calculated by the strategy.
+        """Return the radius of the particles as calculated by the strategy.
 
         Arguments:
             - clone : If True, then return a copy of the radius array.
@@ -491,8 +473,7 @@ class ParticleRepresentation:
         return self.strategy.get_radius(self.distribution, self.density)
 
     def add_mass(self, added_mass: NDArray[np.float64]) -> None:
-        """
-        Add mass to the particle distribution and update parameters.
+        """Add mass to the particle distribution and update parameters.
 
         Arguments:
             - added_mass : The mass to be added per distribution bin, in kg.
@@ -515,8 +496,7 @@ class ParticleRepresentation:
         added_concentration: NDArray[np.float64],
         added_distribution: Optional[NDArray[np.float64]] = None,
     ) -> None:
-        """
-        Add concentration to the particle distribution.
+        """Add concentration to the particle distribution.
 
         Arguments:
             - added_concentration : The concentration to be added per bin
@@ -546,8 +526,7 @@ class ParticleRepresentation:
         self._enforce_increasing_bins()
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
-        """
-        Collide pairs of particles, used for ParticleResolved Strategies.
+        """Collide pairs of particles, used for ParticleResolved Strategies.
 
         Arguments:
             - indices : The indices of the particles to collide.
