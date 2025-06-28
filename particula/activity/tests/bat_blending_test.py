@@ -1,5 +1,4 @@
-"""Blending weights for the BAT model.
-"""
+"""Blending weights for the BAT model."""
 
 import numpy as np
 import pytest

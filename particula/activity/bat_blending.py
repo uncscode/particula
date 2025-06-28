@@ -60,8 +60,7 @@ def bat_blending_weights(
 def _calculate_blending_weights(
     oxygen2carbon: float, oxygen2carbon_ml: float
 ) -> NDArray[np.float64]:
-    """Helper function to calculate blending weights for a single value of
-    oxygen2carbon.
+    """Helper function to calculate blending weights for oxygen2carbon.
 
     Args:
         - oxygen2carbon : The oxygen to carbon ratio.

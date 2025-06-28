@@ -1,4 +1,4 @@
-"""Test cases for CondensationIsothermalBuilder in particula.dynamics"""
+"""Test cases for CondensationIsothermalBuilder in particula.dynamics."""
 
 import pytest
 

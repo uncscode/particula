@@ -21,12 +21,12 @@ def test_molar_surface_strategy():
     density = np.array([1000, 800])  # water, oil
     molar_mass = np.array([0.01815, 0.03])  # water, oil
 
-    strategy = SurfaceStrategyMolar(surface_tension, density, molar_mass)
+    SurfaceStrategyMolar(surface_tension, density, molar_mass)
 
     # Test effective surface tension
-    mass_concentration = np.array([100, 200])  # water, oil
+    np.array([100, 200])  # water, oil
     expected_st_scalar = surface_tension
-    expected_surface_tension = np.full_like(
+    np.full_like(
         surface_tension, expected_st_scalar
     )
 

@@ -1,5 +1,4 @@
-"""Test for activity_coefficients function.
-"""
+"""Test for activity_coefficients function."""
 
 import numpy as np
 

@@ -31,7 +31,7 @@ def test_builder_init(builder_fix):
 
 
 def test_check_keys_valid(builder_fix):
-    """Check if the keys you want to set are present in the parameters"""
+    """Check if the keys you want to set are present in the parameters."""
     parameters = {"param1": 10, "param2": 20, "param1_units": "meters"}
     try:
         builder_fix.check_keys(parameters)
@@ -40,7 +40,7 @@ def test_check_keys_valid(builder_fix):
 
 
 def test_check_keys_missing_required(builder_fix):
-    """Check if the keys you want to set are present in the parameters"""
+    """Check if the keys you want to set are present in the parameters."""
     parameters = {"param1": 10}  # missing 'param2'
     with pytest.raises(ValueError) as excinfo:
         builder_fix.check_keys(parameters)

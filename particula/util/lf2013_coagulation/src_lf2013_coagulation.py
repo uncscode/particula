@@ -1,4 +1,4 @@
-"""calculate ion--particle coagulation according to lf2013"""
+"""calculate ion--particle coagulation according to lf2013."""
 
 import os
 
@@ -17,7 +17,7 @@ def lf2013_coag_full(
     charge_vals=None,
     radius_vals=None,
 ):
-    """Calculate ion--particle coagulation according to lf2013"""
+    """Calculate ion--particle coagulation according to lf2013."""
     if charge_vals is not None and (
         max(charge_vals) > 100 or min(charge_vals) < -100
     ):

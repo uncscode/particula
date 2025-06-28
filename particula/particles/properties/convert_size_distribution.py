@@ -1,5 +1,4 @@
-"""Convert between different size distribution formats using a composition-based
-converter.
+"""Convert between different size distribution formats.
 
 This module defines conversion strategies as classes that implement
 the ConversionStrategy interface. The SizerConverter composes a
@@ -31,12 +30,13 @@ To be moved to particle.properties. -kyle
 
 # pylint: disable=too-few-public-methods
 
-
 import numpy as np
 
 
 class ConversionStrategy:
-    """Methods:
+    """Conversion strategy interface for particle size distribution data.
+
+    Methods:
         - convert: Convert distribution data between input and output scales.
     Defines an interface for conversion strategies between particle size
     distribution formats.
@@ -139,9 +139,7 @@ class DNdlogDPtoPMFConversionStrategy(ConversionStrategy):
         Returns:
             - np.ndarray of the distribution in the target format.
         """
-        return get_distribution_in_dn(
-            diameters, concentration, inverse=inverse
-        )
+        return get_distribution_in_dn(diameters, concentration, inverse=inverse)
 
 
 class PMFtoPDFConversionStrategy(ConversionStrategy):
@@ -178,8 +176,10 @@ class PMFtoPDFConversionStrategy(ConversionStrategy):
 
 
 class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
-    """Conversion strategy for converting between dn/dlogdp and PDF formats,
-    possibly through an intermediate PMF conversion.
+    """Conversion strategy for converting between dn/dlogdp and PDF formats.
+
+    This strategy first converts dn/dlogdp to PMF, then to PDF, or the
+    reverse if inverse is True.
 
     Examples:
         ``` py title="Example Usage"
@@ -195,8 +195,10 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """Convert between dn/dlogdp and PDF formats through an intermediate
-        PMF step.
+        """Convert between dn/dlogdp and PDF formats.
+
+        This method first converts dn/dlogdp to PMF, then to PDF, or the
+        reverse if inverse is True.
 
         Arguments:
             - diameters : Array of particle diameters.
@@ -224,9 +226,12 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
 
 
 class SizerConverter:
-    """A converter that composes a ConversionStrategy to transform
-    particle size distribution data between formats.
-    [might not be needed or used, -kyle]
+    """A converter that composes a ConversionStrategy.
+
+    This class allows converting particle size distribution data between
+    different formats using a specified conversion strategy.
+    It provides a flexible interface to convert data without needing to
+    know the details of the conversion logic.
 
     Examples:
         ``` py title="Example Usage"
@@ -253,8 +258,7 @@ class SizerConverter:
         concentration: np.ndarray,
         inverse: bool = False,
     ) -> np.ndarray:
-        """Convert the particle size distribution data using the assigned
-        strategy.
+        """Convert the particle size distribution data.
 
         Arguments:
             - diameters : Array of particle diameters.
@@ -271,8 +275,7 @@ class SizerConverter:
 def get_distribution_conversion_strategy(
     input_scale: str, output_scale: str
 ) -> ConversionStrategy:
-    """Factory function to obtain a conversion strategy based on the input and
-    output scales.
+    """Factory function to obtain a conversion strategy.
 
     Arguments:
         - input_scale : Scale of the input distribution, e.g.
@@ -369,7 +372,10 @@ def get_distribution_in_dn(
             https://tsi.com/getmedia/1621329b-f410-4dce-992b-e21e1584481a/
             PR-001-RevA_Aerosol-Statistics-AppNote?ext=.pd)
     """
-    assert len(diameter) > 0, "Inputs must be non-empty arrays."
+    # Validate inputs are non-empty arrays
+    if len(diameter) == 0 or len(dn_dlogdp) == 0:
+        raise TypeError("Both diameter and dn_dlogdp must be numpy arrays.")
+
     # Compute the bin widths
     delta = np.zeros_like(diameter)
     delta[:-1] = np.diff(diameter)
@@ -389,8 +395,7 @@ def get_distribution_in_dn(
 def get_pdf_distribution_in_pmf(
     x_array: np.ndarray, distribution: np.ndarray, to_pdf: bool = True
 ) -> np.ndarray:
-    """Convert the distribution data between a probability density function (PDF)
-    and a probability mass spectrum (PMF).
+    """Convert from PMF to PDF or vice versa.
 
     The conversion uses:
     - y_pdf = y_PMF / Δx
@@ -431,7 +436,5 @@ def get_pdf_distribution_in_pmf(
     # Converting PMF to PDF by dividing the PMF values by the bin widths. or
     # Converting PDF to PMF by multiplying the PDF values by the bin widths.
     return (
-        distribution / delta_x_array
-        if to_pdf
-        else distribution * delta_x_array
+        distribution / delta_x_array if to_pdf else distribution * delta_x_array
     )

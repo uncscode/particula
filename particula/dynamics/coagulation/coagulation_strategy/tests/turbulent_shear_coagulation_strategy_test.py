@@ -22,8 +22,7 @@ from particula.particles import (
 
 
 class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
-    """Test suite for the TurbulentShearCoagulationStrategy class.
-    """
+    """Test suite for the TurbulentShearCoagulationStrategy class."""
 
     def setUp(self):
         """Set up the test environment.

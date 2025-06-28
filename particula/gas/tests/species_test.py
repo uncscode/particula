@@ -1,4 +1,4 @@
-"""Test the gas species builder"""
+"""Test the gas species builder."""
 
 # pylint: disable=##R0801
 

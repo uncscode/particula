@@ -1,5 +1,4 @@
-"""Test cases for the CondensationFactory and CondensationIsothermal classes.
-"""
+"""Test cases for the CondensationFactory and CondensationIsothermal classes."""
 
 import pytest
 
@@ -10,8 +9,7 @@ from particula.dynamics import (
 
 
 def test_isothermal_condensation():
-    """Test the creation of an isothermal condensation strategy.
-    """
+    """Test the creation of an isothermal condensation strategy."""
     factory = CondensationFactory()
     strategy = factory.get_strategy(
         "isothermal",
@@ -27,8 +25,7 @@ def test_isothermal_condensation():
 
 
 def test_invalid_condensation_strategy():
-    """Test that an invalid condensation strategy raises a ValueError.
-    """
+    """Test that an invalid condensation strategy raises a ValueError."""
     factory = CondensationFactory()
     with pytest.raises(ValueError):
         factory.get_strategy("nonexistent", {})

@@ -1,5 +1,4 @@
-"""Tests for the CombineCoagulationStrategyBuilder class.
-"""
+"""Tests for the CombineCoagulationStrategyBuilder class."""
 
 import pytest
 
@@ -13,9 +12,7 @@ from particula.dynamics import (
 
 
 def test_build_with_valid_strategies():
-    """Test that CombineCoagulationStrategyBuilder with valid sub-strategies
-    returns a CombineCoagulationStrategy.
-    """
+    """Test that CombineCoagulationStrategyBuilder with sub-strategies."""
     # Example sub-strategies:
     brownian_strategy = (
         BrownianCoagulationBuilder()
@@ -42,9 +39,7 @@ def test_build_with_valid_strategies():
 
 
 def test_build_missing_strategies():
-    """Test that CombineCoagulationStrategyBuilder without required 'strategies'
-    raises a ValueError.
-    """
+    """Test that CombineCoagulationStrategyBuilder without 'strategies'."""
     builder = CombineCoagulationStrategyBuilder()
     with pytest.raises(ValueError):
         builder.build()

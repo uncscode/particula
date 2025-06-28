@@ -166,7 +166,7 @@ def liquid_vapor_partitioning(
 ):  # pylint: disable=too-many-arguments, too-many-positional-arguments
     # pylint: disable=too-many-locals
     """Thermodynamic equilibrium between liquid and vapor phase.
-    with activity coefficients,
+    with activity coefficients,.
     """
     # clean up nan values
     gamma_organic_ab = np.nan_to_num(gamma_organic_ab)

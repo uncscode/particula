@@ -27,8 +27,7 @@ from particula.particles import PresetParticleRadiusBuilder
 
 # pylint: disable=too-many-instance-attributes
 class TestCombineCoagulationStrategy(unittest.TestCase):
-    """Test suite for the CombineCoagulationStrategy class.
-    """
+    """Test suite for the CombineCoagulationStrategy class."""
 
     def setUp(self):
         """Set up the test environment.

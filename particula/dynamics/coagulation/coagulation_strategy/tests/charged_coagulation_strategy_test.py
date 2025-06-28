@@ -25,8 +25,7 @@ from particula.particles import (
 
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
-    """Test suite for the ChargedCoagulationStrategy class.
-    """
+    """Test suite for the ChargedCoagulationStrategy class."""
 
     def setUp(self):
         """Set up the test environment.

@@ -1,5 +1,4 @@
-"""Test for convert_functional_group.py
-"""
+"""Test for convert_functional_group.py."""
 
 from particula.activity.convert_functional_group import (
     convert_to_oh_equivalent,

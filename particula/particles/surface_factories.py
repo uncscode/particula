@@ -1,4 +1,4 @@
-""" "Surface tension strategies factory."""
+"""Surface tension strategies factory."""
 
 from typing import Union
 
@@ -22,9 +22,7 @@ class SurfaceFactory(
             SurfaceStrategyMassBuilder,
             SurfaceStrategyMolarBuilder,
         ],
-        Union[
-            SurfaceStrategyVolume, SurfaceStrategyMass, SurfaceStrategyMolar
-        ],
+        Union[SurfaceStrategyVolume, SurfaceStrategyMass, SurfaceStrategyMolar],
     ]
 ):
     """Factory for creating surface tension strategy builders.

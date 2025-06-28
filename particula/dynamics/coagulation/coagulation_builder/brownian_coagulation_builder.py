@@ -1,4 +1,4 @@
-"""Brownian Coagulation Builder Module
+"""Brownian Coagulation Builder Module.
 
 Provides a builder for creating `BrownianCoagulationStrategy` objects
 based on a chosen particle distribution type (e.g., "discrete",

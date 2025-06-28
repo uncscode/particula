@@ -1,5 +1,4 @@
-"""Test the sedimentation kernel functions.
-"""
+"""Test the sedimentation kernel functions."""
 
 # pylint: disable=duplicate-code
 

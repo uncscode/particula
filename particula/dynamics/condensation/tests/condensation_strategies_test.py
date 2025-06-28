@@ -1,5 +1,4 @@
-"""Test module for the condensation strategies.
-"""
+"""Test module for the condensation strategies."""
 
 # pylint: disable=R0801
 # pylint: disable=protected-access
@@ -16,8 +15,7 @@ from particula.dynamics.condensation.condensation_strategies import (
 
 # pylint: disable=too-many-instance-attributes
 class TestCondensationIsothermal(unittest.TestCase):
-    """Test class for the CondensationIsothermal strategy.
-    """
+    """Test class for the CondensationIsothermal strategy."""
 
     def setUp(self):
         self.molar_mass = 0.018  # kg/mol for water
@@ -102,7 +100,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertIsNotNone(result)
 
     def test_knudsen_number(self):
-        """Test the Knudsen number call"""
+        """Test the Knudsen number call."""
         radius = 1e-9  # m
         result = self.strategy.knudsen_number(
             radius=radius, temperature=self.temperature, pressure=self.pressure

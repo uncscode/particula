@@ -1,4 +1,6 @@
-"""Class strategies for activities and vapor pressure over mixture of liquids
+"""Common interface for activity calculations.
+
+Class strategies for activities and vapor pressure over mixture of liquids
 surface Using Raoult's Law, and strategies ideal, non-ideal, kappa hygroscopic
 parameterizations.
 """

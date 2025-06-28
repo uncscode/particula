@@ -1,5 +1,4 @@
-"""Get selected thermodynamic properties of a chemical at STP.
-"""
+"""Get selected thermodynamic properties of a chemical at STP."""
 
 from typing import Dict
 

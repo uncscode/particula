@@ -1,4 +1,4 @@
-"""Module for calculate slip correction"""
+"""Module for calculate slip correction."""
 
 from typing import Union
 

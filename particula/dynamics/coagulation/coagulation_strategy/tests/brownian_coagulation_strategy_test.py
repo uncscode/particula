@@ -1,5 +1,4 @@
-"""Tests for BrownianCoagulationStrategy.
-"""
+"""Tests for BrownianCoagulationStrategy."""
 
 # pylint: disable=duplicate-code, too-many-instance-attributes
 

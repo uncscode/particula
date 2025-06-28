@@ -1,4 +1,4 @@
-"""Combine Coagulation Strategy Builder Module
+"""Combine Coagulation Strategy Builder Module.
 
 Provides a builder for creating `CombineCoagulationStrategy` objects,
 which can merge multiple sub-strategies (e.g., Brownian, Turbulent)

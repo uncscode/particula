@@ -1,5 +1,4 @@
-"""Charged dimensional kernel for coagulation calculated from system state.
-"""
+"""Charged dimensional kernel for coagulation calculated from system state."""
 
 # pylint: disable=duplicate-code
 
@@ -88,7 +87,7 @@ def _system_state_properties(
     # get coulomb potential ratio
     coulomb_potential_ratio = get_coulomb_enhancement_ratio(
         particle_radius=particle_radius,
-        charge=particle_charge,
+        charge=particle_charge,  # type: ignore
         temperature=temperature,
     )
 
@@ -196,7 +195,7 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """The dimensioned coagulation kernel via system state using Dyachkov (2007).
+    """The dimensioned coagulation kernel via Dyachkov (2007).
 
     Arguments:
         - particle_radius : The radius of the particles [m].
@@ -322,8 +321,7 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """The dimensioned coagulation kernel via system state
-    using Gopalakrishnan (2012).
+    """Gopalakrishnan (2012) dimensioned coagulation kernel via system state.
 
     Arguments:
         - particle_radius : The radius of the particles [m].
@@ -386,8 +384,7 @@ def get_coulomb_kernel_chahl2019_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """The dimensioned coagulation kernel via system state
-    using Chahl (2019).
+    """Chahl (2019) dimensioned coagulation kernel via system state.
 
     Arguments:
         - particle_radius : The radius of the particles [m].

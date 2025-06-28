@@ -1,5 +1,4 @@
-"""Test the change of particle representation
-"""
+"""Test the change of particle representation."""
 
 import unittest
 
@@ -14,8 +13,7 @@ from particula.particles.representation import ParticleRepresentation
 
 
 class TestChangeParticleRepresentation(unittest.TestCase):
-    """Test suite for the change_particle_representation module.
-    """
+    """Test suite for the change_particle_representation module."""
 
     def setUp(self):
         """Set up the test environment.

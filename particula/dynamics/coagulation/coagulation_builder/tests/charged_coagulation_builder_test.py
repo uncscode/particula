@@ -1,5 +1,4 @@
-"""Tests for the ChargedCoagulationBuilder class.
-"""
+"""Tests for the ChargedCoagulationBuilder class."""
 
 import pytest
 
@@ -11,9 +10,7 @@ from particula.dynamics import (
 
 
 def test_build_with_valid_parameters():
-    """Test that building with valid parameters returns a
-    ChargedCoagulationStrategy.
-    """
+    """Test that building ChargedCoagulationStrategy."""
     builder = ChargedCoagulationBuilder()
     builder.set_distribution_type(
         "discrete", distribution_type_units="dimensionless"
@@ -24,8 +21,7 @@ def test_build_with_valid_parameters():
 
 
 def test_build_missing_required_parameters():
-    """Test that building without required parameters raises a ValueError.
-    """
+    """Test that building without required parameters raises a ValueError."""
     builder = ChargedCoagulationBuilder()
 
     # Missing distribution_type and charged_kernel_strategy

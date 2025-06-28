@@ -1,5 +1,4 @@
-"""Tests for the SedimentationCoagulationBuilder class.
-"""
+"""Tests for the SedimentationCoagulationBuilder class."""
 
 import pytest
 

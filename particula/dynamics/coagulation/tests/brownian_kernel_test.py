@@ -130,8 +130,7 @@ def test_brownian_diffusivity_array_input():
 
 
 def test_brownian_coagulation_kernel_basic():
-    """Test brownian_coagulation_kernel with basic input values.
-    """
+    """Test brownian_coagulation_kernel with basic input values."""
     particle_radius = np.array([1e-9, 2e-9])  # radii in meters
     diffusivity_particle = np.array([1e-12, 1e-12])  # diffusivity in m^2/s
     g_collection_term_particle = np.array([0.5, 0.5])  # dimensionless
@@ -155,8 +154,7 @@ def test_brownian_coagulation_kernel_basic():
 
 
 def test_brownian_coagulation_kernel_with_defaults():
-    """Test that default parameters are handled correctly.
-    """
+    """Test that default parameters are handled correctly."""
     particle_radius = np.array([1e-9])  # single radius
     diffusivity_particle = np.array([1e-12])  # single diffusivity
     g_collection_term_particle = np.array([0.5])  # single collection term
@@ -175,8 +173,7 @@ def test_brownian_coagulation_kernel_with_defaults():
 
 
 def test_brownian_coagulation_kernel_input_validation():
-    """Ensure that providing incorrect input types raises a TypeError.
-    """
+    """Ensure that providing incorrect input types raises a TypeError."""
     with pytest.raises(TypeError):
         brownian_kernel.get_brownian_kernel(
             "not a number", "not a number", "not a number", "not a number"
@@ -184,8 +181,7 @@ def test_brownian_coagulation_kernel_input_validation():
 
 
 def test_brownian_coagulation_kernel_via_system_state_basic():
-    """Test the complete system function with basic input values.
-    """
+    """Test the complete system function with basic input values."""
     # diameters, 2 nm, 1 um, 20 um
     particle_radius = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
     particle_mass = 4 / 3 * np.pi * particle_radius**3 * 1000  # mass in kg

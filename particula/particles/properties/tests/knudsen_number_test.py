@@ -1,4 +1,4 @@
-"""test knudsen number utility
+"""test knudsen number utility.
 
 the knudsen number goes like:
     0   for larger  particles
@@ -14,13 +14,13 @@ from particula.particles.properties.knudsen_number_module import (
 
 
 def test_basic_calculation():
-    """Test the basic calculation of the Knudsen number"""
+    """Test the basic calculation of the Knudsen number."""
     kn = get_knudsen_number(0.1, 0.05)
     assert kn == 2.0
 
 
 def test_numpy_array_input():
-    """Test when numpy arrays are provided for radius"""
+    """Test when numpy arrays are provided for radius."""
     mfp = np.array([0.1])
     radius = np.array([0.05, 0.1])
     expected_results = np.array([2.0, 1.0])
@@ -29,7 +29,7 @@ def test_numpy_array_input():
 
 
 def test_array_in_both_inputs():
-    """Test when numpy arrays are provided for both radius and mfp"""
+    """Test when numpy arrays are provided for both radius and mfp."""
     mfp = np.array([0.1, 0.2])
     radius = np.array([0.05, 0.1, 0.8, 3])
     expected_results = mfp[np.newaxis, :] / radius[:, np.newaxis]
@@ -39,20 +39,20 @@ def test_array_in_both_inputs():
 
 def test_zero_particle_radius():
     """Test when the particle radius is zero,
-    which should raise an exception
+    which should raise an exception.
     """
     with pytest.raises(ZeroDivisionError):
         get_knudsen_number(0.1, 0.0)
 
 
 def test_negative_inputs():
-    """Test when negative inputs are provided to the function"""
+    """Test when negative inputs are provided to the function."""
     with pytest.raises(ValueError):
         get_knudsen_number(-0.1, 0.05)
 
 
 def test_invalid_type_inputs():
-    """Test when invalid input types are provided to the function"""
+    """Test when invalid input types are provided to the function."""
     with pytest.raises(TypeError):
         get_knudsen_number("0.1", 0.05)  # Invalid string input
 

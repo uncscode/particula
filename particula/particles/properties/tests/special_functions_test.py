@@ -1,5 +1,4 @@
-"""Test Special Functions
-"""
+"""Test Special Functions."""
 
 import numpy as np
 

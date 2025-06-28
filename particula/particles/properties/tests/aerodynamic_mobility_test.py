@@ -60,7 +60,7 @@ def test_particle_aerodynamic_mobility_type_error():
 def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
     """Verify that the particle_aerodynamic_mobility function handles extreme
     values correctly.
-    - radius : The radius of the particle
+    - radius : The radius of the particle.
     """
     slip_correction_factor = 1.1
     dynamic_viscosity = 0.0000181  # Pa.s for air at room temperature

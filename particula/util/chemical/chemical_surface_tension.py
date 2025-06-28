@@ -1,5 +1,4 @@
-"""Module for calculating the surface tension of pure chemicals.
-"""
+"""Module for calculating the surface tension of pure chemicals."""
 
 from typing import Union
 
@@ -63,5 +62,6 @@ def get_chemical_surface_tension(
     chem = Chemical(chemical_identifier)
 
     return np.vectorize(
-        lambda T: chem.SurfaceTension(T=T), otypes=[np.float64]
+        lambda T: chem.SurfaceTension(T=T),  # noqa: N803
+        otypes=[np.float64],
     )(temps)

@@ -1,5 +1,4 @@
-"""Turbulent Shear Coagulation Builder Module.
-"""
+"""Turbulent Shear Coagulation Builder Module."""
 
 from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (

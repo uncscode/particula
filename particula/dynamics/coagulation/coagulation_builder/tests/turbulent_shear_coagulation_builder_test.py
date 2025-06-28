@@ -1,5 +1,4 @@
-"""Tests for the TurbulentShearCoagulationBuilder class.
-"""
+"""Tests for the TurbulentShearCoagulationBuilder class."""
 
 # pylint: disable=duplicate-code
 
@@ -27,8 +26,7 @@ def test_build_with_valid_parameters():
 
 
 def test_build_missing_required_parameters():
-    """Test that building without required parameters raises a ValueError.
-    """
+    """Test that building without required parameters raises a ValueError."""
     builder = TurbulentShearCoagulationBuilder()
 
     with pytest.raises(ValueError):

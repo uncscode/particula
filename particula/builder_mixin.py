@@ -36,6 +36,7 @@ class BuilderDensityMixin:
     """
 
     def __init__(self):
+        """Initialize density mixin."""
         self.density = None
 
     @validate_inputs({"density": "positive"})
@@ -85,6 +86,7 @@ class BuilderSurfaceTensionMixin:
     """
 
     def __init__(self):
+        """Initialize surface tension mixin."""
         self.surface_tension = None
 
     @validate_inputs({"surface_tension": "positive"})
@@ -138,6 +140,7 @@ class BuilderSurfaceTensionTableMixin:
     """
 
     def __init__(self):
+        """Initialize surface tension table mixin."""
         self.surface_tension_table = None
 
     @validate_inputs({"surface_tension_table": "positive"})
@@ -173,6 +176,7 @@ class BuilderMolarMassMixin:
     """
 
     def __init__(self):
+        """Initialize molar mass mixin."""
         self.molar_mass = None
 
     @validate_inputs({"molar_mass": "positive"})
@@ -228,6 +232,7 @@ class BuilderConcentrationMixin:
     """
 
     def __init__(self, default_units: str = "kg/m^3"):
+        """Initialize concentration mixin."""
         self.concentration = None
         self.default_units = default_units if default_units else "kg/m^3"
 
@@ -278,6 +283,7 @@ class BuilderChargeMixin:
     """
 
     def __init__(self):
+        """Initialize charge mixin."""
         self.charge = None
 
     def set_charge(
@@ -318,6 +324,7 @@ class BuilderPhaseIndexMixin:
     """
 
     def __init__(self):
+        """Initialize phase index mixin."""
         self.phase_index = None
 
     def set_phase_index(
@@ -346,6 +353,7 @@ class BuilderMassMixin:
     """
 
     def __init__(self):
+        """Initialize mass mixin."""
         self.mass = None
 
     @validate_inputs({"mass": "nonnegative"})
@@ -390,6 +398,7 @@ class BuilderVolumeMixin:
     """
 
     def __init__(self):
+        """Initialize volume mixin."""
         self.volume = None
 
     @validate_inputs({"volume": "nonnegative"})
@@ -434,6 +443,7 @@ class BuilderRadiusMixin:
     """
 
     def __init__(self):
+        """Initialize radius mixin."""
         self.radius = None
 
     @validate_inputs({"radius": "nonnegative"})
@@ -479,6 +489,7 @@ class BuilderTemperatureMixin:
     """
 
     def __init__(self):
+        """Initialize temperature mixin."""
         self.temperature = None
 
     @validate_inputs({"temperature": "finite"})
@@ -534,6 +545,7 @@ class BuilderTemperatureTableMixin:
     """
 
     def __init__(self):
+        """Initialize temperature table mixin."""
         self.temperature_table = None
 
     @validate_inputs({"temperature_table": "finite"})
@@ -571,6 +583,7 @@ class BuilderPressureMixin:
     """
 
     def __init__(self):
+        """Initialize pressure mixin."""
         self.pressure = None
 
     @validate_inputs({"pressure": "nonnegative"})
@@ -621,6 +634,7 @@ class BuilderLognormalMixin:
     """
 
     def __init__(self):
+        """Initialize lognormal distribution mixin."""
         self.mode = None
         self.number_concentration = None
         self.geometric_standard_deviation = None
@@ -724,6 +738,7 @@ class BuilderParticleResolvedCountMixin:
     """
 
     def __init__(self):
+        """Initialize particle-resolved count mixin."""
         self.particle_resolved_count = None
 
     @validate_inputs({"particle_resolved_count": "positive"})

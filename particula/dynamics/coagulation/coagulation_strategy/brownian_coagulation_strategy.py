@@ -1,5 +1,4 @@
-"""Brownian coagulation strategy class.
-"""
+"""Brownian coagulation strategy class."""
 
 import logging
 from typing import Union

@@ -103,7 +103,7 @@ def validate_finite(value, name):
         raise ValueError(f"Argument '{name}' must be finite (no inf or NaN).")
 
 
-def validate_inputs(dict_args):
+def validate_inputs(dict_args):  # noqa: C901
     """A decorator to validate function inputs against specified constraints.
 
     The constraints are defined by a dictionary of argument names and their
@@ -135,7 +135,7 @@ def validate_inputs(dict_args):
         ```
     """
 
-    def decorator(func):
+    def decorator(func):  # noqa: C901
         sig = inspect.signature(func)
 
         @wraps(func)

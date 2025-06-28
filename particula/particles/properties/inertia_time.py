@@ -1,5 +1,4 @@
-"""Particle inertia time calculation.
-"""
+"""Particle inertia time calculation."""
 
 from typing import Union
 

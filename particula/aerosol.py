@@ -8,8 +8,7 @@ from particula.particles.representation import ParticleRepresentation
 
 
 class Aerosol:
-    """Represents a collection of Gas and Particle objects forming an aerosol
-    environment.
+    """Aerosol is a collection of Gas and Particle objects.
 
     This class allows for the representation and manipulation of an aerosol,
     which consists of various gases in an Atmosphere object and one
@@ -40,8 +39,7 @@ class Aerosol:
         atmosphere: Atmosphere,
         particles: ParticleRepresentation,
     ):
-        """Initialize the Aerosol object with an Atmosphere and one or more
-        particles.
+        """Initialize the Aerosol object with an Atmosphere and Particles.
 
         Arguments:
             - atmosphere : Atmosphere containing one or more gas species.

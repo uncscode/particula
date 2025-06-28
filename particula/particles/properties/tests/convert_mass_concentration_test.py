@@ -1,4 +1,4 @@
-"""Tests for mass_concentration.py module"""
+"""Tests for mass_concentration.py module."""
 
 import numpy as np
 import pytest
@@ -24,9 +24,7 @@ from particula.particles.properties import (
         (
             np.array([1, 1]),
             np.array([1, 1]),
-            np.array(
-                [0.5, 0.5]
-            ),  # 1D input with equal masses and molar masses
+            np.array([0.5, 0.5]),  # 1D input with equal masses and molar masses
         ),
         (
             np.array([[100, 200], [50, 150]]),  # 2D input
@@ -38,7 +36,7 @@ from particula.particles.properties import (
 def test_mass_concentration_to_mole_fraction(
     mass_concentrations, molar_masses, expected
 ):
-    """Test mass_concentration_to_mole_fraction function"""
+    """Test mass_concentration_to_mole_fraction function."""
     mole_fractions = convert_mass_concentration.get_mole_fraction_from_mass(
         mass_concentrations, molar_masses
     )
@@ -65,11 +63,9 @@ def test_mass_concentration_to_mole_fraction(
 def test_mass_concentration_to_volume_fraction(
     mass_concentrations, densities, expected
 ):
-    """Test mass_concentration_to_volume_fraction function"""
-    volume_fractions = (
-        convert_mass_concentration.get_volume_fraction_from_mass(
-            mass_concentrations, densities
-        )
+    """Test mass_concentration_to_volume_fraction function."""
+    volume_fractions = convert_mass_concentration.get_volume_fraction_from_mass(
+        mass_concentrations, densities
     )
     np.testing.assert_allclose(volume_fractions, expected, rtol=1e-5)
 
@@ -86,8 +82,8 @@ def test_mass_concentration_to_volume_fraction(
     ],
 )
 def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
-    """Test error handling for mass_concentration_to_mole_fraction function"""
-    with pytest.raises(Exception):
+    """Test error handling for mass_concentration_to_mole_fraction function."""
+    with pytest.raises(Exception):  # noqa: B017
         convert_mass_concentration.get_mole_fraction_from_mass(
             mass_concentrations, molar_masses
         )
@@ -105,10 +101,8 @@ def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
     ],
 )
 def test_error_handling_mass_to_volume(mass_concentrations, densities):
-    """Test error handling for mass_concentration_to_volume_fraction
-    function
-    """
-    with pytest.raises(Exception):
+    """Test error handling for mass_concentration_to_volume_fraction."""
+    with pytest.raises(Exception):  # noqa: B017
         convert_mass_concentration.get_volume_fraction_from_mass(
             mass_concentrations, densities
         )

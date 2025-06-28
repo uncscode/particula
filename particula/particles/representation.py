@@ -1,5 +1,4 @@
-"""Particle representation for a collection of particles.
-"""
+"""Particle representation for a collection of particles."""
 
 import logging
 from copy import deepcopy

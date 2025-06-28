@@ -44,10 +44,11 @@ logger = logging.getLogger("particula")
 
 
 class AntoineVaporPressureBuilder(BuilderABC):
-    """Builder class for AntoineVaporPressureStrategy. It allows setting
-    the coefficients 'a', 'b', and 'c' separately and then building the
-    strategy object. Follows the general form of the Antoine equation in
-    Unicode:
+    """Builder class for AntoineVaporPressureStrategy.
+
+    It allows setting the coefficients 'a', 'b', and 'c' separately and then
+    building the strategy object.
+    Follows the general form of the Antoine equation in
 
         log₁₀(P) = a − b / (T − c)
 
@@ -417,9 +418,7 @@ class SaturationConcentrationVaporPressureBuilder(
         return ConstantVaporPressureStrategy(vapor_pressure)
 
 
-class WaterBuckVaporPressureBuilder(
-    BuilderABC
-):  # pylint: disable=too-few-public-methods
+class WaterBuckVaporPressureBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
     """Builder class for WaterBuckStrategy.
 
     This class facilitates the building of the WaterBuckStrategy object.

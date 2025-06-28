@@ -1,5 +1,4 @@
-"""AerosolBuilder Module
-=====================
+"""AerosolBuilder Module.
 
 Provides a fluent interface to create an `Aerosol` instance from an
 `Atmosphere` and a `ParticleRepresentation`.  The builder validates
@@ -52,6 +51,7 @@ class AerosolBuilder(BuilderABC):
         aerosol = builder.build()
         ```
     """
+
     def __init__(self):
         """Initialize an empty builder.
 
@@ -118,7 +118,7 @@ class AerosolBuilder(BuilderABC):
         if self.atmosphere is None or self.particles is None:
             raise ValueError(
                 "Atmosphere and particles must be set before validation."
-                )
+            )
         strategy_name = self.particles.get_strategy_name()
         if strategy_name not in (
             "SpeciatedMassMovingBin",
@@ -170,4 +170,4 @@ class AerosolBuilder(BuilderABC):
         """
         self.pre_build_check()
         self._validate_species_length()
-        return Aerosol(atmosphere=self.atmosphere, particles=self.particles)
+        return Aerosol(atmosphere=self.atmosphere, particles=self.particles)  # type: ignore

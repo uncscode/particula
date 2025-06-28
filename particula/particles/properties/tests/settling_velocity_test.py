@@ -1,5 +1,4 @@
-"""Tests for the settling velocity property calculation.
-"""
+"""Tests for the settling velocity property calculation."""
 
 import numpy as np
 import pytest
@@ -83,8 +82,7 @@ def test_calculate_settling_velocity_with_invalid_inputs():
 
 
 def test_get_particle_settling_velocity_via_inertia_scalar():
-    """Test get_particle_settling_velocity_via_inertia with scalar inputs.
-    """
+    """Test get_particle_settling_velocity_via_inertia with scalar inputs."""
     particle_inertia_time = 0.02  # s
     particle_radius = 0.001  # m
     relative_velocity = 0.05  # m/s
@@ -114,8 +112,7 @@ def test_get_particle_settling_velocity_via_inertia_scalar():
 
 
 def test_get_particle_settling_velocity_via_inertia_array():
-    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs.
-    """
+    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs."""
     particle_inertia_time = np.array([0.02, 0.03])
     particle_radius = np.array([0.001, 0.002])
     relative_velocity = np.array([0.05, 0.06])

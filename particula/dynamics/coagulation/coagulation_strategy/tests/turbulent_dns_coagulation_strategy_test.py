@@ -23,8 +23,7 @@ from particula.particles import (
 
 # pylint: disable=too-many-instance-attributes
 class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
-    """Test suite for the TurbulentDNSCoagulationStrategy class.
-    """
+    """Test suite for the TurbulentDNSCoagulationStrategy class."""
 
     def setUp(self):
         """Set up the test environment.

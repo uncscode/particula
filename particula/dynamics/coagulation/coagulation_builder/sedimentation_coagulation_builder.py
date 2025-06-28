@@ -1,5 +1,4 @@
-"""Sedimentation Coagulation builder class.
-"""
+"""Sedimentation Coagulation builder class."""
 
 from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
@@ -47,8 +46,7 @@ class SedimentationCoagulationBuilder(
         BuilderDistributionTypeMixin.__init__(self)
 
     def build(self) -> CoagulationStrategyABC:
-        """Validate and return the SedimentationCoagulationStrategy object.
-        """
+        """Validate and return the SedimentationCoagulationStrategy object."""
         self.pre_build_check()
         return SedimentationCoagulationStrategy(
             distribution_type=self.distribution_type,
