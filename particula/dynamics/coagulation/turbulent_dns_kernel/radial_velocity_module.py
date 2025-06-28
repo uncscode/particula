@@ -5,7 +5,7 @@ Radial relative velocity calculation module.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-from scipy.special import erf
+from scipy.special import erf  # pylint: disable=no-name-in-module
 
 from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
