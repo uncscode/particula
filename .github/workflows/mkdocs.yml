@@ -42,7 +42,11 @@ jobs:
           run: mkdocs build
 
         - name: Deploy to GitHub Pages (on push or merge_group)
-          if: github.event_name == 'push' || github.event_name == 'merge_group'
+          if: ${{
+            github.event_name == 'merge_group'
+            || (github.event_name == 'pull_request' && github.event.pull_request.merged)
+            || (github.event_name == 'push')
+            }}
           uses: JamesIves/github-pages-deploy-action@v4
           with:
             branch: gh-pages
