@@ -1,5 +1,4 @@
-"""
-Organic density estimation utilities.
+"""Organic density estimation utilities.
 
 Provides helper functions that implement the Girolami (1994) “back-of-the-
 envelope” method for estimating the density of organic compounds from their
@@ -27,8 +26,7 @@ def get_organic_density_estimate(
     nitrogen2carbon: Optional[float] = None,
     mass_ratio_convert: bool = False,
 ) -> float:
-    """
-    Estimate the density of an organic molecule via the Girolami method.
+    """Estimate the density of an organic molecule via the Girolami method.
 
     The original paper proposes an empirical two-step approach:
 
@@ -73,6 +71,7 @@ def get_organic_density_estimate(
     - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating
         the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.
         Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962
+
     """
     if nitrogen2carbon is None:
         nitrogen2carbon = 0
@@ -118,8 +117,7 @@ def get_organic_density_array(
     nitrogen2carbon: Optional[Union[list[float], NDArray[np.float64]]] = None,
     mass_ratio_convert: bool = False,
 ) -> NDArray[np.float64]:
-    """
-    Vectorised wrapper around ``get_organic_density_estimate``.
+    """Vectorised wrapper around ``get_organic_density_estimate``.
 
     Applies the Girolami density estimate element-wise to one-dimensional NumPy
     arrays or lists of molecular properties.
@@ -156,6 +154,7 @@ def get_organic_density_array(
     - G. S. Girolami, “A Simple ‘Back of the Envelope’ Method for Estimating
         the Densities and Molecular Volumes of Liquids and Solids,” *J. Chem.
         Educ.*, 71 (11), 962 (1994).  DOI:10.1021/ed071p962
+
     """
     mm = np.asarray(molar_mass, dtype=float)
     oc = np.asarray(oxygen2carbon, dtype=float)

@@ -1,13 +1,13 @@
-"""
-This module provides functions to calculate a reduced quantity between
+"""This module provides functions to calculate a reduced quantity between
 parameters or across an array, useful in multi-body or multi-parameter
 problems.
 """
 
 import logging
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 logger = logging.getLogger("particula")  # get instance of logger
 
@@ -16,8 +16,7 @@ def get_reduced_value(
     alpha: Union[float, NDArray[np.float64]],
     beta: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Return the reduced value of two parameters.
+    """Return the reduced value of two parameters.
 
     The reduced value is computed using:
     - r = (α × β) / (α + β),
@@ -50,6 +49,7 @@ def get_reduced_value(
 
     References:
         - [Reduced Mass, Wikipedia](https://en.wikipedia.org/wiki/Reduced_mass)
+
     """
     # Ensure input compatibility, especially when both are arrays
     if (
@@ -71,8 +71,7 @@ def get_reduced_value(
 def get_reduced_self_broadcast(
     alpha_array: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Return a square matrix of pairwise reduced values using a single array.
+    """Return a square matrix of pairwise reduced values using a single array.
 
     Each element is calculated by broadcasting the array with its transpose:
     - r_ij = (α_i × α_j) / (α_i + α_j),
@@ -98,6 +97,7 @@ def get_reduced_self_broadcast(
 
     References:
         - [Reduced Mass, Wikipedia](https://en.wikipedia.org/wiki/Reduced_mass)
+
     """
     # Use broadcasting to create matrix and its transpose
     alpha_matrix = alpha_array[:, np.newaxis]

@@ -1,5 +1,4 @@
-"""
-Coagulation Builder Mixin Classes
+"""Coagulation Builder Mixin Classes
 
 Provides reusable mixin classes for building coagulation strategies
 with validated inputs (e.g., distribution type, turbulent dissipation,
@@ -10,14 +9,14 @@ the final coagulation strategy.
 
 # pylint: disable=too-few-public-methods
 
-from typing import Union
 import logging
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.util.convert_units import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
@@ -41,6 +40,7 @@ class BuilderDistributionTypeMixin:
         builder.set_distribution_type("discrete")
         # builder.distribution_type -> "discrete"
         ```
+
     """
 
     def __init__(self):
@@ -71,6 +71,7 @@ class BuilderDistributionTypeMixin:
             builder.set_distribution_type("discrete")
             # builder.distribution_type -> "discrete"
             ```
+
         """
         valid_distribution_types = [
             "discrete",
@@ -112,6 +113,7 @@ class BuilderTurbulentDissipationMixin:
         ```py title="Example of using BuilderTurbulentDissipationMixin"
         builder.set_turbulent_dissipation(1e-3, "m^2/s^3")
         ```
+
     """
 
     def __init__(self):
@@ -143,6 +145,7 @@ class BuilderTurbulentDissipationMixin:
             builder.set_turbulent_dissipation(1e-3, "m^2/s^3")
             # builder.turbulent_dissipation -> 1e-3
             ```
+
         """
         if turbulent_dissipation_units == "m^2/s^3":
             self.turbulent_dissipation = turbulent_dissipation
@@ -171,6 +174,7 @@ class BuilderFluidDensityMixin:
         ```py title="Example of using BuilderFluidDensityMixin"
         builder.set_fluid_density(1.225, "kg/m^3")
         ```
+
     """
 
     def __init__(self):
@@ -201,6 +205,7 @@ class BuilderFluidDensityMixin:
             builder.set_fluid_density(1.225, "kg/m^3")
             # builder.fluid_density -> 1.225
             ```
+
         """
         if fluid_density_units == "kg/m^3":
             self.fluid_density = fluid_density

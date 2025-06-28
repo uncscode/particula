@@ -2,9 +2,10 @@
 
 import numpy as np
 import pytest
+
 from particula.util.reduced_quantity import (
-    get_reduced_value,
     get_reduced_self_broadcast,
+    get_reduced_value,
 )
 
 

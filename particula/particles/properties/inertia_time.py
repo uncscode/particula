@@ -1,10 +1,10 @@
-"""
-Particle inertia time calculation.
+"""Particle inertia time calculation.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -23,8 +23,7 @@ def get_particle_inertia_time(
     fluid_density: Union[float, NDArray[np.float64]],
     kinematic_viscosity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the particle inertia time (τ_p).
+    """Compute the particle inertia time (τ_p).
 
     The particle inertia time represents the response time of a particle to
     changes in fluid velocity, given by:
@@ -63,6 +62,7 @@ def get_particle_inertia_time(
           the geometric collision rate of sedimenting droplets. Part 2. Theory
           and parameterization." New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return (
         (2 / 9)

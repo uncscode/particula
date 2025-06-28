@@ -1,9 +1,10 @@
 """Module for calculating Knudsen number"""
 
-from typing import Union
 import logging
-from numpy.typing import NDArray
+from typing import Union
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -20,8 +21,7 @@ def get_knudsen_number(
     mean_free_path: Union[float, NDArray[np.float64]],
     particle_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Knudsen number (Kn) from the gas mean free path and particle
+    """Calculate the Knudsen number (Kn) from the gas mean free path and particle
     radius.
 
     The Knudsen number (Kn) indicates whether a flow is in the continuum
@@ -50,6 +50,7 @@ def get_knudsen_number(
     References:
         - Knudsen number, Wikipedia,
           https://en.wikipedia.org/wiki/Knudsen_number
+
     """
     if not isinstance(mean_free_path, (float, np.ndarray)) or not isinstance(
         particle_radius, (float, np.ndarray)

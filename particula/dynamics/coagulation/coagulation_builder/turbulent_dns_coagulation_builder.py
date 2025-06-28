@@ -1,5 +1,4 @@
-"""
-Turbulent DNS Coagulation Builder Module.
+"""Turbulent DNS Coagulation Builder Module.
 
 Provides a builder for creating `TurbulentDNSCoagulationStrategy`
 instances, which handle coagulation processes under Direct Numerical
@@ -9,25 +8,23 @@ reynolds_lambda (Taylor-scale Reynolds number), and relative_velocity
 are supplied.
 """
 
-from typing import Optional
 import logging
+from typing import Optional
 
 from particula.abc_builder import BuilderABC
-
-from particula.util.validate_inputs import validate_inputs
-from particula.util.convert_units import get_unit_conversion
-
+from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
+    BuilderFluidDensityMixin,
+    BuilderTurbulentDissipationMixin,
+)
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy import (
     TurbulentDNSCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
-    BuilderTurbulentDissipationMixin,
-    BuilderFluidDensityMixin,
-)
+from particula.util.convert_units import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
@@ -39,8 +36,7 @@ class TurbulentDNSCoagulationBuilder(
     BuilderTurbulentDissipationMixin,
     BuilderFluidDensityMixin,
 ):
-    """
-    Turbulent DNS coagulation builder class.
+    """Turbulent DNS coagulation builder class.
 
     Creates and configures a `TurbulentDNSCoagulationStrategy` to simulate
     coagulation in turbulent flow fields using Direct Numerical Simulation
@@ -79,6 +75,7 @@ class TurbulentDNSCoagulationBuilder(
     References:
         - Saffman, P. G., & Turner, J. S. (1956) "On the collision of drops
           in turbulent clouds." Journal of Fluid Mechanics, 1(1): 16–30.
+
     """
 
     def __init__(self):
@@ -102,8 +99,7 @@ class TurbulentDNSCoagulationBuilder(
         reynolds_lambda: float,
         reynolds_lambda_units: Optional[str] = None,
     ):
-        """
-        Set the Taylor-scale Reynolds number (Reλ).
+        """Set the Taylor-scale Reynolds number (Reλ).
 
         Represents a measure of turbulence intensity in DNS flows.
         When specifying units, only "dimensionless" is recognized here.
@@ -121,6 +117,7 @@ class TurbulentDNSCoagulationBuilder(
             ```py
             builder.set_reynolds_lambda(250.)
             ```
+
         """
         if reynolds_lambda_units == "dimensionless":
             self.reynolds_lambda = reynolds_lambda
@@ -136,8 +133,7 @@ class TurbulentDNSCoagulationBuilder(
         relative_velocity: float,
         relative_velocity_units: str,
     ):
-        """
-        Set the relative particle-airflow velocity for DNS coagulation.
+        """Set the relative particle-airflow velocity for DNS coagulation.
 
         This value is typically a background flow velocity or a
         sedimentation-adjusted velocity, excluding turbulence.
@@ -149,6 +145,7 @@ class TurbulentDNSCoagulationBuilder(
 
         Returns:
             - self : The builder instance for chaining.
+
         """
         if relative_velocity_units == "m/s":
             self.relative_velocity = relative_velocity
@@ -159,8 +156,7 @@ class TurbulentDNSCoagulationBuilder(
         return self
 
     def build(self) -> CoagulationStrategyABC:
-        """
-        Construct a TurbulentDNSCoagulationStrategy.
+        """Construct a TurbulentDNSCoagulationStrategy.
 
         Validates the required parameters, then instantiates a
         `TurbulentDNSCoagulationStrategy` for DNS-based coagulation
@@ -168,6 +164,7 @@ class TurbulentDNSCoagulationBuilder(
 
         Returns:
             - CoagulationStrategyABC : The configured DNS coagulation strategy.
+
         """
         self.pre_build_check()
         return TurbulentDNSCoagulationStrategy(

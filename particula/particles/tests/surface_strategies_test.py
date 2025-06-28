@@ -2,13 +2,14 @@
 
 import numpy as np
 import pytest
+
 from particula.particles.surface_strategies import (
     SurfaceStrategyMass,
     SurfaceStrategyMolar,
     SurfaceStrategyVolume,
-    _weighted_average_by_phase,
     _as_2d,
     _broadcast_weights,
+    _weighted_average_by_phase,
 )
 
 

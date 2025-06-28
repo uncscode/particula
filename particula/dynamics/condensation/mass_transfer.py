@@ -1,5 +1,4 @@
-"""
-Particle Vapor Equilibrium, condensation, and evaporation based on partial
+"""Particle Vapor Equilibrium, condensation, and evaporation based on partial
 pressures to calculate dm/dt or other forms of particle growth and decay.
 
 Equation:
@@ -21,11 +20,13 @@ References:
     - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
       (D. Topping & M. Bane, Eds.). Wiley. https://doi.org/10.1002/9781119625728
     - Aerosol Modeling: Chapter 2, Equation 2.40
+
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 # particula imports
 from particula.util.constants import GAS_CONSTANT  # type: ignore
@@ -42,8 +43,7 @@ def get_first_order_mass_transport_k(
     vapor_transition: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the first-order mass transport coefficient per particle.
+    """Calculate the first-order mass transport coefficient per particle.
 
     This function computes the coefficient K that governs how fast mass is
     transported to or from a particle in a vapor. The equation is:
@@ -88,6 +88,7 @@ def get_first_order_mass_transport_k(
         - Aerosol Modeling: Chapter 2, Equation 2.49
         - Wikipedia contributors, "Mass diffusivity,"
           https://en.wikipedia.org/wiki/Mass_diffusivity
+
     """
     if (
         isinstance(vapor_transition, np.ndarray)
@@ -114,8 +115,7 @@ def get_mass_transfer_rate(
     temperature: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the mass transfer rate for a particle.
+    """Calculate the mass transfer rate for a particle.
 
     This function calculates the mass transfer rate dm/dt, leveraging the
     difference in partial pressure (pressure_delta) and the first-order
@@ -165,6 +165,7 @@ def get_mass_transfer_rate(
         - Aerosol Modeling: Chapter 2, Equation 2.41
         - Seinfeld and Pandis, "Atmospheric Chemistry and Physics,"
             Equation 13.3
+
     """
     return np.array(
         first_order_mass_transport
@@ -187,8 +188,7 @@ def get_radius_transfer_rate(
     particle_radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Convert mass rate to radius growth/evaporation rate.
+    """Convert mass rate to radius growth/evaporation rate.
 
     This function converts the mass transfer rate (dm/dt) into a radius
     change rate (dr/dt). The equation is:
@@ -227,6 +227,7 @@ def get_radius_transfer_rate(
         )
         # Output: array([7.95774715e-14, 1.98943679e-14])
         ```
+
     """
     if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
         particle_radius = particle_radius[:, np.newaxis]
@@ -249,8 +250,7 @@ def get_mass_transfer(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Route mass transfer calculation to single or multiple-species routines.
+    """Route mass transfer calculation to single or multiple-species routines.
 
     Depending on whether gas_mass represents one or multiple species, this
     function calls either calculate_mass_transfer_single_species or
@@ -291,6 +291,7 @@ def get_mass_transfer(
             particle_concentration=np.array([5, 4])
         )
         ```
+
     """
     if gas_mass.size == 1:  # Single species case
         return get_mass_transfer_of_single_species(
@@ -326,8 +327,7 @@ def get_mass_transfer_of_single_species(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Calculate mass transfer for a single gas species.
+    """Calculate mass transfer for a single gas species.
 
     This function assumes gas_mass has a size of 1 (single species).
     It first computes the total mass_to_change per particle:
@@ -360,6 +360,7 @@ def get_mass_transfer_of_single_species(
         )
         # Output: array([...])
         ```
+
     """
     # 1. requested mass change ( + = condensation , - = evaporation )
     mass_to_change = mass_rate * time_step * particle_concentration
@@ -406,8 +407,7 @@ def get_mass_transfer_of_multiple_species(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Calculate mass transfer for multiple gas species.
+    """Calculate mass transfer for multiple gas species.
 
     Here, gas_mass has multiple elements (each species). For each species,
     this function calculates mass_to_change for all particle bins:
@@ -447,6 +447,7 @@ def get_mass_transfer_of_multiple_species(
         )
         # Output: array([...])
         ```
+
     """
     # 1.  Requested mass transfer (positive = condensation, negative = evap.)
     mass_to_change = (

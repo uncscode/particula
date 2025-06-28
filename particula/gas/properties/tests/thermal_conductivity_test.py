@@ -1,13 +1,15 @@
 """Test thermal conductivity property functions."""
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.gas import get_thermal_conductivity
 
 
 def test_thermal_conductivity_normal():
     """Test the thermal_conductivity function with a
-    normal temperature value."""
+    normal temperature value.
+    """
     temperature = 300  # in Kelvin
     expected = 1e-3 * (4.39 + 0.071 * 300)
     assert (

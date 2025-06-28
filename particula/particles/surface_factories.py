@@ -1,16 +1,17 @@
 """ "Surface tension strategies factory."""
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
 from particula.particles.surface_builders import (
-    SurfaceStrategyMolarBuilder,
     SurfaceStrategyMassBuilder,
+    SurfaceStrategyMolarBuilder,
     SurfaceStrategyVolumeBuilder,
 )
 from particula.particles.surface_strategies import (
-    SurfaceStrategyVolume,
     SurfaceStrategyMass,
     SurfaceStrategyMolar,
+    SurfaceStrategyVolume,
 )
 
 
@@ -44,11 +45,11 @@ class SurfaceFactory(
     Raises:
         - ValueError : If an unknown strategy type is provided or if
           required parameters are missing during check_keys/pre_build_check.
+
     """
 
     def get_builders(self):
-        """
-        Return a mapping of strategy types to builder instances.
+        """Return a mapping of strategy types to builder instances.
 
         Returns:
             - Keys are 'volume', 'mass', or 'molar', each
@@ -63,6 +64,7 @@ class SurfaceFactory(
             mass_builder = builders["mass"]
             molar_builder = builders["molar"]
             ```
+
         """
         return {
             "volume": SurfaceStrategyVolumeBuilder(),

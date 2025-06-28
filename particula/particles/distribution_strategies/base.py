@@ -6,6 +6,7 @@ mass, radius, total mass, and concentration updates differently.
 """
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -24,6 +25,7 @@ class DistributionStrategy(ABC):
     - add_mass : Add mass to the particle distribution.
     - add_concentration : Add concentration to the distribution.
     - collide_pairs : Perform collision logic on specified particle pairs.
+
     """
 
     def get_name(self) -> str:
@@ -34,8 +36,7 @@ class DistributionStrategy(ABC):
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """
-        Return the mass per species in the distribution.
+        """Return the mass per species in the distribution.
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -43,13 +44,13 @@ class DistributionStrategy(ABC):
 
         Returns:
             - The mass of the particles (per species).
+
         """
 
     def get_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """
-        Calculate the mass of the particles or bin.
+        """Calculate the mass of the particles or bin.
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -57,6 +58,7 @@ class DistributionStrategy(ABC):
 
         Returns:
             - The mass of the particles.
+
         """
         if distribution.ndim == 1:
             return self.get_species_mass(distribution, density)
@@ -68,8 +70,7 @@ class DistributionStrategy(ABC):
         concentration: NDArray[np.float64],
         density: NDArray[np.float64],
     ) -> np.float64:
-        """
-        Calculate the total mass of all particles (or bin).
+        """Calculate the total mass of all particles (or bin).
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -79,6 +80,7 @@ class DistributionStrategy(ABC):
 
         Returns:
             - The total mass of the particles.
+
         """
         masses = self.get_mass(distribution, density)
         return np.sum(masses * concentration)
@@ -87,8 +89,7 @@ class DistributionStrategy(ABC):
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """
-        Calculate the radius of the particles.
+        """Calculate the radius of the particles.
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -96,6 +97,7 @@ class DistributionStrategy(ABC):
 
         Returns:
             - The radius of the particles in meters.
+
         """
 
     @abstractmethod
@@ -106,8 +108,7 @@ class DistributionStrategy(ABC):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """
-        Add mass to the distribution of particles.
+        """Add mass to the distribution of particles.
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -119,6 +120,7 @@ class DistributionStrategy(ABC):
         Returns:
             - The updated distribution array.
             - The updated concentration array.
+
         """
 
     @abstractmethod
@@ -129,8 +131,7 @@ class DistributionStrategy(ABC):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """
-        Add concentration to the distribution of particles.
+        """Add concentration to the distribution of particles.
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -142,6 +143,7 @@ class DistributionStrategy(ABC):
         Returns:
             - The updated distribution array
             - The updated concentration array.
+
         """
 
     @abstractmethod
@@ -152,8 +154,7 @@ class DistributionStrategy(ABC):
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """
-        Collide index pairs in the distribution.
+        """Collide index pairs in the distribution.
 
         Arguments:
             - distribution : The distribution of particle sizes or masses.
@@ -164,4 +165,5 @@ class DistributionStrategy(ABC):
         Returns:
             - The updated distribution array
             - The updated concentration array.
+
         """

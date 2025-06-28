@@ -1,13 +1,14 @@
 """Activity Functions Module."""
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.particles.properties.convert_mass_concentration import (
-    get_volume_fraction_from_mass,
     get_mass_fraction_from_mass,
     get_mole_fraction_from_mass,
+    get_volume_fraction_from_mass,
 )
 from particula.util.validate_inputs import validate_inputs
 
@@ -22,8 +23,7 @@ def get_ideal_activity_molar(
     mass_concentration: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the ideal activity based on mole fractions.
+    """Compute the ideal activity based on mole fractions.
 
     This function calculates the activity of a species using its mole fraction,
     which follows Raoult's Law. The ideal activity (aᵢ) is determined using:
@@ -51,6 +51,7 @@ def get_ideal_activity_molar(
     References:
         - Raoult's Law, "Raoult's law," Wikipedia,
           https://en.wikipedia.org/wiki/Raoult%27s_law.
+
     """
     if isinstance(mass_concentration, float):
         return 1.0
@@ -70,8 +71,7 @@ def get_ideal_activity_volume(
     mass_concentration: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the ideal activity based on volume fractions.
+    """Compute the ideal activity based on volume fractions.
 
     This function calculates the activity of a species using its volume
     fraction. In an ideal mixture, the activity (aᵢ) can be expressed as:
@@ -99,6 +99,7 @@ def get_ideal_activity_volume(
     References:
         - Raoult's Law, "Raoult's law," Wikipedia,
           https://en.wikipedia.org/wiki/Raoult%27s_law.
+
     """
     if isinstance(mass_concentration, float):
         return 1.0
@@ -116,8 +117,7 @@ def get_ideal_activity_volume(
 def get_ideal_activity_mass(
     mass_concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the ideal activity based on mass fractions.
+    """Compute the ideal activity based on mass fractions.
 
     This function calculates the activity of a species using its mass fraction.
     In an ideal mixture, the activity (aᵢ) can be expressed as:
@@ -141,6 +141,7 @@ def get_ideal_activity_mass(
     References:
         - Raoult's Law, "Raoult's law," Wikipedia,
           https://en.wikipedia.org/wiki/Raoult%27s_law.
+
     """
     if isinstance(mass_concentration, float):
         return 1.0
@@ -165,8 +166,7 @@ def get_kappa_activity(
     water_index: int,
 ) -> NDArray[np.float64]:
     # pylint: disable=too-many-locals
-    """
-    Compute species activity using the κ (kappa) hygroscopic growth parameter.
+    """Compute species activity using the κ (kappa) hygroscopic growth parameter.
 
     This function calculates the activity of a mixture by combining
     volume-fraction weighted κ-values. The water activity (aₘ) is
@@ -205,8 +205,8 @@ def get_kappa_activity(
           representation of hygroscopic growth and cloud condensation nucleus
           activity," Atmospheric Chemistry and Physics, 7(8), 1961-1971.
           DOI: https://doi.org/10.5194/acp-7-1961-2007.
-    """
 
+    """
     volume_fractions = get_volume_fraction_from_mass(
         mass_concentrations=mass_concentration, densities=density
     )
@@ -272,8 +272,7 @@ def get_surface_partial_pressure(
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
     activity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the partial pressure from activity and pure vapor pressure.
+    """Compute the partial pressure from activity and pure vapor pressure.
 
     This function calculates the partial pressure (pᵢ) of a species, given its
     activity (aᵢ) and pure vapor pressure (pᵢ*). It follows:
@@ -293,5 +292,6 @@ def get_surface_partial_pressure(
         par.particles.get_surface_partial_pressure(1000.0, 0.95)
         # Output: 950.0
         ```
+
     """
     return pure_vapor_pressure * activity

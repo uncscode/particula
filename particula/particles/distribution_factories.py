@@ -1,18 +1,19 @@
 """Factory Classes for selecting the distribution strategy."""
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
-from particula.particles.distribution_strategies import (
-    MassBasedMovingBin,
-    RadiiBasedMovingBin,
-    SpeciatedMassMovingBin,
-    ParticleResolvedSpeciatedMass,
-)
 from particula.particles.distribution_builders import (
     MassBasedMovingBinBuilder,
+    ParticleResolvedSpeciatedMassBuilder,
     RadiiBasedMovingBinBuilder,
     SpeciatedMassMovingBinBuilder,
-    ParticleResolvedSpeciatedMassBuilder,
+)
+from particula.particles.distribution_strategies import (
+    MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
+    SpeciatedMassMovingBin,
 )
 
 
@@ -32,8 +33,7 @@ class DistributionFactory(
         ],
     ]
 ):
-    """
-    Factory class to create distribution strategies from builders.
+    """Factory class to create distribution strategies from builders.
 
     This factory is used to obtain particle distribution strategies
     based on the specified representation type (mass-based, radius-based,
@@ -59,11 +59,11 @@ class DistributionFactory(
         strategy = factory.get_strategy("mass_based_moving_bin")
         # strategy -> MassBasedMovingBin()
         ```
+
     """
 
     def get_builders(self):
-        """
-        Return a mapping of strategy types to builder instances.
+        """Return a mapping of strategy types to builder instances.
 
         Returns:
             - A dictionary where each key is a string identifying the strategy
@@ -76,6 +76,7 @@ class DistributionFactory(
             builder_map = factory.get_builders()
             # builder_map["mass_based_moving_bin"] -> MassBasedMovingBinBuilder
             ```
+
         """
         return {
             "mass_based_moving_bin": MassBasedMovingBinBuilder(),

@@ -1,13 +1,13 @@
-"""
-Fluid RMS fluctuation velocity calculation module.
+"""Fluid RMS fluctuation velocity calculation module.
 """
 
 from typing import Union
-from numpy.typing import NDArray
-import numpy as np
 
-from particula.util.validate_inputs import validate_inputs
+import numpy as np
+from numpy.typing import NDArray
+
 from particula.gas.properties.kolmogorov_module import get_kolmogorov_velocity
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -22,8 +22,7 @@ def get_fluid_rms_velocity(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the fluid RMS fluctuation velocity.
+    """Calculate the fluid RMS fluctuation velocity.
 
     The fluid root-mean-square (RMS) velocity fluctuation quantifies
     turbulence intensity in a fluid flow. It is calculated as:
@@ -63,6 +62,7 @@ def get_fluid_rms_velocity(
     References:
         - H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"
           MIT Press, 1972. [check this]
+
     """
     kolmogorov_velocity = get_kolmogorov_velocity(
         kinematic_viscosity, turbulent_dissipation

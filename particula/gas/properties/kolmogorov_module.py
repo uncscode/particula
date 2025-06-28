@@ -5,11 +5,13 @@ References:
     geometric collision rate of sedimenting droplets. Part 2. Theory and
     parameterization. New Journal of Physics, 10.
     https://doi.org/10.1088/1367-2630/10/7/075016
+
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -52,6 +54,7 @@ def get_kolmogorov_time(
         the geometric collision rate of sedimenting droplets. Part 2. Theory
         and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return np.sqrt(kinematic_viscosity / turbulent_dissipation)
 
@@ -98,6 +101,7 @@ def get_kolmogorov_length(
         the geometric collision rate of sedimenting droplets. Part 2. Theory
         and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return np.sqrt(np.sqrt(kinematic_viscosity**3 / turbulent_dissipation))
 
@@ -139,5 +143,6 @@ def get_kolmogorov_velocity(
         the geometric collision rate of sedimenting droplets. Part 2. Theory
         and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return (kinematic_viscosity * turbulent_dissipation) ** 0.25

@@ -1,6 +1,7 @@
 """Particle resolved speciated mass strategy."""
 
 import logging
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,8 +11,7 @@ logger = logging.getLogger("particula")
 
 
 class ParticleResolvedSpeciatedMass(DistributionStrategy):
-    """
-    Strategy for particle-resolved masses with multiple species.
+    """Strategy for particle-resolved masses with multiple species.
 
     Allows each particle to have separate masses for each species, with
     individualized densities. This strategy provides a more detailed
@@ -26,6 +26,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     - add_mass : Add mass to the particle distribution.
     - add_concentration : Add concentration to the distribution.
     - collide_pairs : Perform collision logic on specified particle pairs.
+
     """
 
     def get_species_mass(

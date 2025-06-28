@@ -1,8 +1,8 @@
-"""
-Compute the function Φ(α, φ) for the given particle properties.
+"""Compute the function Φ(α, φ) for the given particle properties.
 """
 
-from typing import Union, NamedTuple
+from typing import NamedTuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -34,8 +34,7 @@ def get_phi_ao2008(
     particle_inertia_time: Union[float, NDArray[np.float64]],
     particle_velocity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the function Φ(α, φ) for the given particle properties using
+    """Compute the function Φ(α, φ) for the given particle properties using
     Ayala et al. (2008).
 
     This function calculates Φ(α, φ) when vₚ₁ > vₚ₂ by considering the
@@ -91,6 +90,7 @@ def get_phi_ao2008(
           the geometric collision rate of sedimenting droplets. Part 2.
           Theory and parameterization. New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     # valid for v1 > v2, in pairwise comparison
     v1 = np.maximum(

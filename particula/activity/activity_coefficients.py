@@ -1,5 +1,4 @@
-"""
-Activity coefficients for organic-water mixtures.
+"""Activity coefficients for organic-water mixtures.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics
@@ -8,16 +7,17 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Optional, Union, Tuple, List
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
-from particula.util.machine_limit import get_safe_exp
-from particula.util.validate_inputs import validate_inputs
 
-from particula.activity.gibbs_mixing import gibbs_mix_weight
 from particula.activity.convert_functional_group import (
     convert_to_oh_equivalent,
 )
+from particula.activity.gibbs_mixing import gibbs_mix_weight
+from particula.util.machine_limit import get_safe_exp
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -41,8 +41,7 @@ def bat_activity_coefficients(
     Union[float, NDArray[np.float64]],
     Union[float, NDArray[np.float64]],
 ]:
-    """
-    Calculate the activity coefficients for water and organic matter in
+    """Calculate the activity coefficients for water and organic matter in
     organic-water mixtures.
 
     Args:
@@ -60,6 +59,7 @@ def bat_activity_coefficients(
           of organic matter, mass fraction of water, and mass
           fraction of organic matter, gamma_water (activity coefficient),
           and gamma_organic (activity coefficient).
+
     """
     oxygen2carbon, molar_mass_ratio = convert_to_oh_equivalent(
         oxygen2carbon=oxygen2carbon,

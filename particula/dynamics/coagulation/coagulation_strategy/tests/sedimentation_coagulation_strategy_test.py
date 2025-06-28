@@ -1,5 +1,4 @@
-"""
-Unit tests for the SedimentationCoagulationStrategy class.
+"""Unit tests for the SedimentationCoagulationStrategy class.
 
 This module contains tests for the SedimentationCoagulationStrategy class,
 which implements the sedimentation coagulation strategy. The tests cover
@@ -9,7 +8,9 @@ both discrete and continuous_pdf distribution types.
 # pylint: disable=duplicate-code
 
 import unittest
+
 import numpy as np
+
 from particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy import (
     SedimentationCoagulationStrategy,
 )
@@ -20,13 +21,11 @@ from particula.particles import (
 
 
 class TestSedimentationCoagulationStrategy(unittest.TestCase):
-    """
-    Test suite for the SedimentationCoagulationStrategy class.
+    """Test suite for the SedimentationCoagulationStrategy class.
     """
 
     def setUp(self):
-        """
-        Set up the test environment.
+        """Set up the test environment.
 
         Initializes a particle representation and creates instances of
         SedimentationCoagulationStrategy for discrete, continuous_pdf, and
@@ -52,8 +51,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_discrete(self):
-        """
-        Test the kernel calculation for discrete distribution.
+        """Test the kernel calculation for discrete distribution.
 
         Verifies that the kernel method returns an ndarray for the discrete
         distribution type.
@@ -66,8 +64,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_discrete(self):
-        """
-        Test the step method for discrete distribution.
+        """Test the step method for discrete distribution.
 
         Ensures that the step method updates the particle concentration for
         the discrete distribution type.
@@ -85,8 +82,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_continuous_pdf(self):
-        """
-        Test the kernel calculation for continuous_pdf distribution.
+        """Test the kernel calculation for continuous_pdf distribution.
 
         Verifies that the kernel method returns an ndarray for the
         continuous_pdf distribution type.
@@ -99,8 +95,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_continuous_pdf(self):
-        """
-        Test the step method for continuous_pdf distribution.
+        """Test the step method for continuous_pdf distribution.
 
         Ensures that the step method updates the particle concentration for
         the continuous_pdf distribution type.

@@ -1,8 +1,9 @@
 """Module for aerodynamic size and shape factor of a particle in a fluid."""
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -38,8 +39,7 @@ def get_aerodynamic_length(
     aerodynamic_shape_factor: float = 1.0,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-positional-arguments, too-many-arguments
-    """
-    Calculate the aerodynamic length scale of a particle for a given shape.
+    """Calculate the aerodynamic length scale of a particle for a given shape.
 
     The aerodynamic length (d_a) is determined by:
 
@@ -87,6 +87,7 @@ def get_aerodynamic_length(
         - Hinds, W.C. (1998). Aerosol Technology: Properties, behavior, and
           measurement of airborne particles (2nd ed.). Wiley-Interscience.
           (pp. 51–53, Section 3.6).
+
     """
     return physical_length * np.sqrt(
         (physical_slip_correction_factor / aerodynamic_slip_correction_factor)
@@ -95,8 +96,7 @@ def get_aerodynamic_length(
 
 
 def get_aerodynamic_shape_factor(shape_key: str) -> float:
-    """
-    Retrieve the aerodynamic shape factor for a given particle shape.
+    """Retrieve the aerodynamic shape factor for a given particle shape.
 
     The shape factor (χ) accounts for non-sphericity in aerodynamic
     calculations. For spheres, χ=1.0. Larger values indicate more deviation
@@ -122,6 +122,7 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
     References:
         - Hinds, W.C. (1998). Aerosol Technology: Properties, behavior, and
           measurement of airborne particles (2nd ed.). Wiley-Interscience.
+
     """
     shape_key = shape_key.strip().lower()  # Clean up the input
 

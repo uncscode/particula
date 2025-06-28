@@ -1,5 +1,4 @@
-"""
-Builders to create vapor pressure models for gas species.
+"""Builders to create vapor pressure models for gas species.
 
 This module provides builder classes for Antoine, Clausius-Clapeyron,
 constant, and WaterBuck vapor pressure strategies. Each builder follows
@@ -16,6 +15,7 @@ References:
       [Wikipedia](https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation)
     - "Vapor Pressure,"
       [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure)
+
 """
 
 import logging
@@ -26,22 +26,21 @@ from particula.builder_mixin import (
     BuilderMolarMassMixin,
     BuilderTemperatureMixin,
 )
+from particula.gas.properties.pressure_function import get_partial_pressure
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
-    WaterBuckStrategy,
     ConstantVaporPressureStrategy,
+    WaterBuckStrategy,
 )
-from particula.gas.properties.pressure_function import get_partial_pressure
-from particula.util.validate_inputs import validate_inputs
 from particula.util import get_unit_conversion
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
 
 class AntoineVaporPressureBuilder(BuilderABC):
-    """
-    Builder class for AntoineVaporPressureStrategy. It allows setting
+    """Builder class for AntoineVaporPressureStrategy. It allows setting
     the coefficients 'a', 'b', and 'c' separately and then building the
     strategy object. Follows the general form of the Antoine equation in
     Unicode:
@@ -87,6 +86,7 @@ class AntoineVaporPressureBuilder(BuilderABC):
           [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure)
         - "Atmospheric Pressure Unit Conversions,"
           [Wikipedia](https://en.wikipedia.org/wiki/Pascal_(unit))
+
     """
 
     def __init__(self):
@@ -130,12 +130,12 @@ class AntoineVaporPressureBuilder(BuilderABC):
         raise ValueError("Only K units are supported for coefficient 'c'.")
 
     def build(self) -> AntoineVaporPressureStrategy:
-        """
-        Validate and return an AntoineVaporPressureStrategy using the set
+        """Validate and return an AntoineVaporPressureStrategy using the set
         coefficients.
 
         Returns:
             - Configured with coefficients a, b, and c.
+
         """
         self.pre_build_check()
         return AntoineVaporPressureStrategy(self.a, self.b, self.c)
@@ -184,6 +184,7 @@ class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
     References:
         - Equation: dP/dT = L / (R * T^2)
           https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
+
     """
 
     def __init__(self):
@@ -237,11 +238,11 @@ class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
         return self
 
     def build(self) -> ClausiusClapeyronStrategy:
-        """
-        Validate parameters and return a ClausiusClapeyronStrategy object.
+        """Validate parameters and return a ClausiusClapeyronStrategy object.
 
         Returns:
             - Configured with latent heat, initial Temperature, and Pressure.
+
         """
         self.pre_build_check()
         return ClausiusClapeyronStrategy(
@@ -283,6 +284,7 @@ class ConstantVaporPressureBuilder(BuilderABC):
     References:
         - Equation: P = vapor_pressure
           https://en.wikipedia.org/wiki/Vapor_pressure
+
     """
 
     def __init__(self):
@@ -304,11 +306,11 @@ class ConstantVaporPressureBuilder(BuilderABC):
         return self
 
     def build(self) -> ConstantVaporPressureStrategy:
-        """
-        Validate parameters and return a ConstantVaporPressureStrategy object.
+        """Validate parameters and return a ConstantVaporPressureStrategy object.
 
         Returns:
             - Configured with vapor_pressure in Pa.
+
         """
         self.pre_build_check()
         return ConstantVaporPressureStrategy(self.vapor_pressure)
@@ -349,6 +351,7 @@ class SaturationConcentrationVaporPressureBuilder(
       Coupled Partitioning, Dilution, and Chemical Aging of Semivolatile
       Organics. Environmental Science & Technology, 40(8), 2635–2643.
       [DOI](https://doi.org/10.1021/es052297c)
+
     """
 
     def __init__(self):
@@ -370,8 +373,7 @@ class SaturationConcentrationVaporPressureBuilder(
         saturation_concentration: float,
         saturation_concentration_units: str,
     ) -> "SaturationConcentrationVaporPressureBuilder":
-        """
-        Set the saturation concentration (C*, C^sat).
+        """Set the saturation concentration (C*, C^sat).
 
         Arguments:
             - saturation_concentration : Value of the saturation concentration.
@@ -389,6 +391,7 @@ class SaturationConcentrationVaporPressureBuilder(
                 .set_saturation_concentration(10e-6, "kg/m^3")
             )
             ```
+
         """
         if saturation_concentration_units == "kg/m^3":
             self.saturation_concentration = saturation_concentration
@@ -400,14 +403,14 @@ class SaturationConcentrationVaporPressureBuilder(
         return self
 
     def build(self) -> ConstantVaporPressureStrategy:
-        """
-        Validate all parameters and construct a
+        """Validate all parameters and construct a
         ConstantVaporPressureStrategy whose value is obtained from the
         ideal-gas relationship between concentration and partial pressure.
 
         Returns:
             ConstantVaporPressureStrategy containing the calculated vapor
             pressure.
+
         """
         self.pre_build_check()
 
@@ -433,16 +436,17 @@ class WaterBuckVaporPressureBuilder(
         import particula as par
         strategy = par.gas.WaterBuckVaporPressureBuilder().build()
         ```
+
     """
 
     def __init__(self):
         super().__init__()
 
     def build(self) -> WaterBuckStrategy:
-        """
-        Build and return a WaterBuckStrategy object.
+        """Build and return a WaterBuckStrategy object.
 
         Returns:
             - Configured for water-specific Buck vapor pressure.
+
         """
         return WaterBuckStrategy()

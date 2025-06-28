@@ -1,10 +1,10 @@
-"""
-Calculate a fluids integral scale.
+"""Calculate a fluids integral scale.
 """
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -16,8 +16,7 @@ def get_lagrangian_integral_time(
     fluid_rms_velocity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Lagrangian integral timescale.
+    """Calculate the Lagrangian integral timescale.
 
     The Lagrangian integral timescale is a measure of the time it takes for
     a fluid particle to travel a distance equal to the integral length scale.
@@ -47,6 +46,7 @@ def get_lagrangian_integral_time(
         - Townsend, A. A., "The Structure of Turbulent Shear Flow," 2nd ed.,
           Cambridge University Press, 1976. [Check this reference]
         - Wikipedia contributors, "Turbulence," Wikipedia.
+
     """
     return (fluid_rms_velocity**2) / turbulent_dissipation
 
@@ -58,8 +58,7 @@ def get_eulerian_integral_length(
     fluid_rms_velocity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Eulerian integral length scale.
+    """Calculate the Eulerian integral length scale.
 
     The Eulerian integral length scale is a measure of the size of the largest
     turbulent eddies in a fluid flow.
@@ -88,5 +87,6 @@ def get_eulerian_integral_length(
     References:
         - Hinze, J. O., "Turbulence," McGraw-Hill, 1975. [Check this reference]
         - Wikipedia contributors, "Turbulence," Wikipedia.
+
     """
     return 0.5 * (fluid_rms_velocity**3) / turbulent_dissipation

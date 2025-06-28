@@ -1,5 +1,4 @@
-"""
-Velocity correlation terms for the DNS kernel of the turbulent coagulation
+"""Velocity correlation terms for the DNS kernel of the turbulent coagulation
 model by Ayala 2008.
 
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -9,6 +8,7 @@ model by Ayala 2008.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -53,6 +53,7 @@ def compute_z(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return lagrangian_taylor_microscale_time / lagrangian_integral_scale
 
@@ -91,6 +92,7 @@ def compute_beta(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return (np.sqrt(2) * taylor_microscale) / eulerian_integral_length
 
@@ -121,6 +123,7 @@ def compute_b1(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     sqrt_term = np.sqrt(1 - 2 * z**2)
     return (1 + sqrt_term) / (2 * sqrt_term)
@@ -152,6 +155,7 @@ def compute_b2(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     sqrt_term = np.sqrt(1 - 2 * z**2)
     return (1 - sqrt_term) / (2 * sqrt_term)
@@ -186,6 +190,7 @@ def compute_c1(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return ((1 + np.sqrt(1 - 2 * z**2)) * lagrangian_integral_scale) / 2
 
@@ -219,6 +224,7 @@ def compute_c2(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return ((1 - np.sqrt(1 - 2 * z**2)) * lagrangian_integral_scale) / 2
 
@@ -249,6 +255,7 @@ def compute_d1(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     sqrt_term = np.sqrt(1 - 2 * beta**2)
     return (1 + sqrt_term) / (2 * sqrt_term)
@@ -280,6 +287,7 @@ def compute_d2(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     sqrt_term = np.sqrt(1 - 2 * beta**2)
     return (1 - sqrt_term) / (2 * sqrt_term)
@@ -314,6 +322,7 @@ def compute_e1(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return ((1 + np.sqrt(1 - 2 * beta**2)) * eulerian_integral_length) / 2
 
@@ -347,5 +356,6 @@ def compute_e2(
             the geometric collision rate of sedimenting droplets. Part 2.
             Theory and parameterization. New Journal of Physics, 10.
             https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     return ((1 - np.sqrt(1 - 2 * beta**2)) * eulerian_integral_length) / 2

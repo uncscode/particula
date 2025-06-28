@@ -2,15 +2,15 @@
 
 # pylint: disable=protected-access
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.dynamics.coagulation import brownian_kernel
 from particula.util.constants import BOLTZMANN_CONSTANT
 
 
 def test_mean_free_path_l_single_value():
-    """
-    Test mean_free_path_l with single float inputs for diffusivity and mean
+    """Test mean_free_path_l with single float inputs for diffusivity and mean
     thermal speed.
     """
     diffusivity_particle = 1.0e-5  # example diffusivity [m^2/s]
@@ -25,8 +25,7 @@ def test_mean_free_path_l_single_value():
 
 
 def test_mean_free_path_l_array_input():
-    """
-    Test mean_free_path_l with numpy array inputs for diffusivity and mean
+    """Test mean_free_path_l with numpy array inputs for diffusivity and mean
     thermal speed.
     """
     diffusivity_particle = np.array([1.0e-5, 1.0e-4])
@@ -41,8 +40,7 @@ def test_mean_free_path_l_array_input():
 
 
 def test_mean_free_path_l_input_validation():
-    """
-    Ensure that providing incorrect input types to mean_free_path_l raises a
+    """Ensure that providing incorrect input types to mean_free_path_l raises a
     TypeError.
     """
     with pytest.raises(TypeError):
@@ -50,8 +48,7 @@ def test_mean_free_path_l_input_validation():
 
 
 def test_g_collection_term_single_value():
-    """
-    Test g_collection_term with single float inputs for mean free path and
+    """Test g_collection_term with single float inputs for mean free path and
     radius of particles.
     """
     mean_free_path_particle = 6.085302617379366e-08  # mean free path in meters
@@ -67,8 +64,7 @@ def test_g_collection_term_single_value():
 
 
 def test_g_collection_term_array_input():
-    """
-    Test g_collection_term with numpy array inputs for mean free path and
+    """Test g_collection_term with numpy array inputs for mean free path and
     radius of particles.
     """
     mean_free_path_particle = np.array([0.0005, 0.0005])
@@ -84,8 +80,7 @@ def test_g_collection_term_array_input():
 
 
 def test_g_collection_term_input_validation():
-    """
-    Ensure that providing incorrect input types to g_collection_term raises
+    """Ensure that providing incorrect input types to g_collection_term raises
     a TypeError.
     """
     with pytest.raises(TypeError):
@@ -93,8 +88,7 @@ def test_g_collection_term_input_validation():
 
 
 def test_g_collection_term_zero_radius():
-    """
-    Test that g_collection_term handles a case where the radius is zero
+    """Test that g_collection_term handles a case where the radius is zero
     without crashing.
     """
     mean_free_path_particle = 0.0005
@@ -106,8 +100,7 @@ def test_g_collection_term_zero_radius():
 
 
 def test_brownian_diffusivity_single_value():
-    """
-    Test brownian_diffusivity with single float inputs for temperature and
+    """Test brownian_diffusivity with single float inputs for temperature and
     aerodynamic mobility.
     """
     temperature = 298  # example temperature in Kelvin
@@ -122,8 +115,7 @@ def test_brownian_diffusivity_single_value():
 
 
 def test_brownian_diffusivity_array_input():
-    """
-    Test brownian_diffusivity with numpy array inputs for temperature and
+    """Test brownian_diffusivity with numpy array inputs for temperature and
     aerodynamic mobility.
     """
     temperature = np.array([298, 300])
@@ -138,8 +130,7 @@ def test_brownian_diffusivity_array_input():
 
 
 def test_brownian_coagulation_kernel_basic():
-    """
-    Test brownian_coagulation_kernel with basic input values.
+    """Test brownian_coagulation_kernel with basic input values.
     """
     particle_radius = np.array([1e-9, 2e-9])  # radii in meters
     diffusivity_particle = np.array([1e-12, 1e-12])  # diffusivity in m^2/s
@@ -164,8 +155,7 @@ def test_brownian_coagulation_kernel_basic():
 
 
 def test_brownian_coagulation_kernel_with_defaults():
-    """
-    Test that default parameters are handled correctly.
+    """Test that default parameters are handled correctly.
     """
     particle_radius = np.array([1e-9])  # single radius
     diffusivity_particle = np.array([1e-12])  # single diffusivity
@@ -185,8 +175,7 @@ def test_brownian_coagulation_kernel_with_defaults():
 
 
 def test_brownian_coagulation_kernel_input_validation():
-    """
-    Ensure that providing incorrect input types raises a TypeError.
+    """Ensure that providing incorrect input types raises a TypeError.
     """
     with pytest.raises(TypeError):
         brownian_kernel.get_brownian_kernel(
@@ -195,8 +184,7 @@ def test_brownian_coagulation_kernel_input_validation():
 
 
 def test_brownian_coagulation_kernel_via_system_state_basic():
-    """
-    Test the complete system function with basic input values.
+    """Test the complete system function with basic input values.
     """
     # diameters, 2 nm, 1 um, 20 um
     particle_radius = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
@@ -232,8 +220,7 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
 
 
 def test_brownian_coagulation_kernel_via_system_state_input_validation():
-    """
-    Ensure that providing incorrect input types or sizes raises appropriate
+    """Ensure that providing incorrect input types or sizes raises appropriate
     errors.
     """
     with pytest.raises(TypeError):

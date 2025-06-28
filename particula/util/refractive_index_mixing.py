@@ -1,5 +1,4 @@
-"""
-Calculate the effective refractive index of a two-solute mixture, using
+"""Calculate the effective refractive index of a two-solute mixture, using
 volume-weighted molar refraction.
 
 To be removed, likely particula_beta only. -kyle
@@ -14,8 +13,7 @@ def get_effective_refractive_index(
     volume_zero: float,
     volume_one: float,
 ) -> Union[float, complex]:
-    """
-    Calculate the effective refractive index of a two-solute mixture.
+    """Calculate the effective refractive index of a two-solute mixture.
 
     The calculation uses volume-weighted molar refraction, described by:
     - r_eff = (v0 / (v0 + v1)) * ((m0 - 1) / (m0 + 2)) +
@@ -51,6 +49,7 @@ def get_effective_refractive_index(
           vol. 39(11), pp. 974–986, 2008.
           DOI: 10.1016/j.jaerosci.2008.06.006
         - Wikipedia contributors, "Refractive index," Wikipedia.
+
     """
     volume_total = volume_zero + volume_one
     r_effective = volume_zero / volume_total * (m_zero - 1) / (

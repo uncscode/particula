@@ -1,13 +1,12 @@
-"""
-Rounding function that allows for arbitrary bases and rounding modes.
+"""Rounding function that allows for arbitrary bases and rounding modes.
 
 To be removed, likely particula_beta only. -kyle
 """
 
 from typing import Union
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.convert_dtypes import get_coerced_type
 
@@ -18,8 +17,7 @@ def get_arbitrary_round(
     mode: str = "round",
     nonzero_edge: bool = False,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Round values to the nearest multiple of a specified base.
+    """Round values to the nearest multiple of a specified base.
 
     The function supports "round", "floor", or "ceil" modes, and can retain
     original nonzero values if rounding returns zero.
@@ -53,6 +51,7 @@ def get_arbitrary_round(
     References:
         - "Rounding," Python Documentation, docs.python.org.
         - "NumPy Rounding," NumPy Documentation, NumPy.org.
+
     """
     # Check if values is a NumPy array
     working_values = get_coerced_type(values, np.ndarray)

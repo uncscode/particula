@@ -1,16 +1,16 @@
-"""
-Velocity correlation terms for the two-point velocity correlation function
+"""Velocity correlation terms for the two-point velocity correlation function
 f₂(R) from Ayala et al. (2008).
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
     compute_beta,
 )
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -68,6 +68,7 @@ def get_f2_longitudinal_velocity_correlation(
       the geometric collision rate of sedimenting droplets. Part 2. Theory
       and parameterization. New Journal of Physics, 10.
       https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     beta = compute_beta(taylor_microscale, eulerian_integral_length)
 

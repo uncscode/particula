@@ -1,27 +1,25 @@
-"""
-Brownian coagulation strategy class.
+"""Brownian coagulation strategy class.
 """
 
-from typing import Union
 import logging
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
 from particula.dynamics.coagulation.brownian_kernel import (
     get_brownian_kernel_via_system_state,
 )
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
 class BrownianCoagulationStrategy(CoagulationStrategyABC):
-    """
-    Discrete Brownian coagulation strategy class for aerosol simulations.
+    """Discrete Brownian coagulation strategy class for aerosol simulations.
 
     This class implements methods defined in CoagulationStrategyABC
     to simulate Brownian coagulation in particle populations. It calculates
@@ -60,15 +58,16 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         - `get_brownian_kernel_via_system_state`
         - Seinfeld, J. H., & Pandis, S. N. (2016). "Atmospheric chemistry
           and physics," Section 13, Table 13.1.
+
     """
 
     def __init__(self, distribution_type: str):
-        """
-        Initialize the BrownianCoagulationStrategy.
+        """Initialize the BrownianCoagulationStrategy.
 
         Arguments:
             - distribution_type : String specifying the distribution type
               (e.g., "discrete", "continuous_pdf", "particle_resolved").
+
         """
         CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
@@ -79,8 +78,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Not implemented for BrownianCoagulationStrategy.
+        """Not implemented for BrownianCoagulationStrategy.
 
         This method raises NotImplementedError since dimensionless
         Brownian kernels are not defined here.
@@ -92,6 +90,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         Raises:
             - NotImplementedError : Always, as no dimensionless kernel is
             provided.
+
         """
         message = (
             "Dimensionless kernel not implemented in simple "
@@ -106,8 +105,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the dimensioned Brownian coagulation kernel.
+        """Calculate the dimensioned Brownian coagulation kernel.
 
         Leverages the `get_brownian_kernel_via_system_state` function to
         compute the kernel, which accounts for particle size, temperature,
@@ -127,6 +125,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
             ```py
             kernel_matrix = brownian_strat.kernel(particle_rep, 300, 101325)
             ```
+
         """
         return get_brownian_kernel_via_system_state(
             particle_radius=particle.get_radius(),

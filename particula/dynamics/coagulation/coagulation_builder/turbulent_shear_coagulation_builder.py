@@ -1,9 +1,12 @@
-"""
-Turbulent Shear Coagulation Builder Module.
+"""Turbulent Shear Coagulation Builder Module.
 """
 
 from particula.abc_builder import BuilderABC
-
+from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
+    BuilderFluidDensityMixin,
+    BuilderTurbulentDissipationMixin,
+)
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
@@ -11,11 +14,6 @@ from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_ab
 # pylint: disable=line-too-long
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
-)
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
-    BuilderTurbulentDissipationMixin,
-    BuilderFluidDensityMixin,
 )
 
 
@@ -26,8 +24,7 @@ class TurbulentShearCoagulationBuilder(
     BuilderTurbulentDissipationMixin,
     BuilderFluidDensityMixin,
 ):
-    """
-    Turbulent shear coagulation builder.
+    """Turbulent shear coagulation builder.
 
     Creates a TurbulentShearCoagulationStrategy that calculates coagulation
     rates under turbulent flow conditions. Ensures the correct distribution
@@ -61,11 +58,11 @@ class TurbulentShearCoagulationBuilder(
     References:
         - Saffman, P. G., & Turner, J. S. (1956). "On the collision of drops
           in turbulent clouds." J. Fluid Mech., 1, 16-30.
+
     """
 
     def __init__(self):
-        """
-        Initialize the TurbulentShearCoagulationBuilder.
+        """Initialize the TurbulentShearCoagulationBuilder.
 
         Returns:
             - None
@@ -73,6 +70,7 @@ class TurbulentShearCoagulationBuilder(
         Note:
             Some default values may be set by the mixins to guide the user
             toward valid operation.
+
         """
         required_parameters = [
             "distribution_type",
@@ -85,8 +83,7 @@ class TurbulentShearCoagulationBuilder(
         BuilderFluidDensityMixin.__init__(self)
 
     def build(self) -> CoagulationStrategyABC:
-        """
-        Construct a TurbulentShearCoagulationStrategy.
+        """Construct a TurbulentShearCoagulationStrategy.
 
         This method performs a final check to ensure all required parameters
         have been set. It then creates and returns an instance of
@@ -94,6 +91,7 @@ class TurbulentShearCoagulationBuilder(
 
         Returns:
             - The resulting turbulent shear coagulation strategy object.
+
         """
         self.pre_build_check()
         return TurbulentShearCoagulationStrategy(

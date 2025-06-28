@@ -4,7 +4,9 @@
 import numpy as np
 import pytest
 
-from particula.particles.distribution_strategies import ParticleResolvedSpeciatedMass
+from particula.particles.distribution_strategies import (
+    ParticleResolvedSpeciatedMass,
+)
 
 particle_resolved_strategy = ParticleResolvedSpeciatedMass()
 

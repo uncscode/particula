@@ -1,5 +1,4 @@
-"""
-Gibbs free energy of mixing for a binary mixture.
+"""Gibbs free energy of mixing for a binary mixture.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics
@@ -8,20 +7,22 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Union, List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
-from particula.util.validate_inputs import validate_inputs
+
+from particula.activity.bat_blending import bat_blending_weights
 from particula.activity.bat_coefficients import (
+    G19_FIT_HIGH,
     G19_FIT_LOW,
     G19_FIT_MID,
-    G19_FIT_HIGH,
     coefficients_c,
 )
-from particula.activity.bat_blending import bat_blending_weights
 from particula.activity.convert_functional_group import (
     convert_to_oh_equivalent,
 )
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -41,8 +42,7 @@ def gibbs_of_mixing(
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
-    """
-    Calculate the Gibbs free energy of mixing for a binary mixture.
+    """Calculate the Gibbs free energy of mixing for a binary mixture.
 
     Args:
         - molar_mass_ratio : The molar mass ratio of water to organic
@@ -56,6 +56,7 @@ def gibbs_of_mixing(
     Returns:
         - A tuple containing the Gibbs free energy of mixing and its
           derivative.
+
     """
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
     organic_mole_fraction = np.asarray(organic_mole_fraction, dtype=np.float64)
@@ -103,8 +104,7 @@ def gibbs_mix_weight(
     density: Union[float, NDArray[np.float64]],
     functional_group: Optional[str] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Gibbs free energy of mixing, see Gorkowski (2019), with weighted
+    """Gibbs free energy of mixing, see Gorkowski (2019), with weighted
     oxygen2carbon regions. Only can run one compound at a time.
 
     Args:
@@ -120,6 +120,7 @@ def gibbs_mix_weight(
         - gibbs_mix : Gibbs energy of mixing (including 1/RT)
         - derivative_gibbs : derivative of Gibbs energy with respect to
           mole fraction of organics (includes 1/RT)
+
     """
     density = np.asarray(density, dtype=np.float64)
 
@@ -164,8 +165,7 @@ def _calculate_gibbs_mix_single(
     density: float,
     weights: NDArray[np.float64],
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Calculate Gibbs free energy of mixing for a single set of inputs.
+    """Calculate Gibbs free energy of mixing for a single set of inputs.
 
     Args:
         - molar_mass_ratio : The molar mass ratio of water to organic
@@ -179,6 +179,7 @@ def _calculate_gibbs_mix_single(
         - gibbs_mix : Gibbs energy of mixing (including 1/RT)
         - derivative_gibbs : derivative of Gibbs energy with respect to
           mole fraction of organics (includes 1/RT)
+
     """
     if weights[1] > 0:  # if mid region is used
         gibbs_mix_mid, derivative_gibbs_mid = gibbs_of_mixing(

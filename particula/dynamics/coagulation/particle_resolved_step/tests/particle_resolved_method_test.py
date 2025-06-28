@@ -1,14 +1,16 @@
 """pytest tests for particle_resolved_method.py"""
 
 import time
+
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
+
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
-    _interpolate_kernel,
     _calculate_probabilities,
     _final_coagulation_state,
-    get_particle_resolved_update_step,
+    _interpolate_kernel,
     get_particle_resolved_coagulation_step,
+    get_particle_resolved_update_step,
 )
 
 
@@ -51,7 +53,8 @@ def test_resolve_final_coagulation_state():
 
 def test_resolve_final_coagulation_state_large():
     """Test the resolve_final_coagulation_state function with a
-    large number of particles."""
+    large number of particles.
+    """
     num_particles = 100_000
     small_indices = np.random.randint(
         0, num_particles, size=num_particles // 2, dtype=np.int64

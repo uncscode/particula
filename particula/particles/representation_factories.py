@@ -1,20 +1,20 @@
-"""
-Particle Representation Factories
+"""Particle Representation Factories
 
 Provides classes for constructing ParticleRepresentation objects
 based on various distribution, activity, and surface strategies.
 """
 
 from typing import Union
+
 from particula.abc_factory import StrategyFactoryABC
+from particula.particles.representation import ParticleRepresentation
 from particula.particles.representation_builders import (
     ParticleMassRepresentationBuilder,
     ParticleRadiusRepresentationBuilder,
     PresetParticleRadiusBuilder,
-    ResolvedParticleMassRepresentationBuilder,
     PresetResolvedParticleMassBuilder,
+    ResolvedParticleMassRepresentationBuilder,
 )
-from particula.particles.representation import ParticleRepresentation
 
 
 class ParticleRepresentationFactory(
@@ -29,8 +29,7 @@ class ParticleRepresentationFactory(
         ParticleRepresentation,
     ]
 ):
-    """
-    Factory for creating particle representation builders.
+    """Factory for creating particle representation builders.
 
     Methods:
     - get_builders : Return a dictionary of strategy builder instances.
@@ -51,8 +50,7 @@ class ParticleRepresentationFactory(
     """
 
     def get_builders(self):
-        """
-        Return a mapping of strategy types to builder instances.
+        """Return a mapping of strategy types to builder instances.
 
         Returns:
             - A dictionary where each key is a strategy type
@@ -67,6 +65,7 @@ class ParticleRepresentationFactory(
             mass_builder = builders["mass"]
             # mass_builder -> ParticleMassRepresentationBuilder()
             ```
+
         """
         return {
             "mass": ParticleMassRepresentationBuilder(),

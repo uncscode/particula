@@ -1,5 +1,4 @@
-"""
-Wall loss coefficient calculations for particles in chambers.
+"""Wall loss coefficient calculations for particles in chambers.
 
 This module provides functions to calculate the wall loss coefficients
 for particles in a chamber, either spherical or rectangular. These
@@ -19,16 +18,18 @@ References:
     - McMurry, P. H., & Rader, D. J. (1985). Aerosol Wall Losses in
       Electrically Charged Chambers. Aerosol Science and Technology, 4(3),
       249-268. https://doi.org/10.1080/02786828508959054
+
 """
 
-from typing import Union, Tuple
+from typing import Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.particles import (
+    get_debye_function,
     get_diffusion_coefficient_via_system_state,
     get_particle_settling_velocity_via_system_state,
-    get_debye_function,
 )
 
 
@@ -38,8 +39,7 @@ def get_spherical_wall_loss_coefficient(
     settling_velocity: Union[float, NDArray[np.float64]],
     chamber_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the particle wall loss coefficient in a spherical chamber.
+    """Calculate the particle wall loss coefficient in a spherical chamber.
 
     This function computes the wall loss coefficient based on a spherical
     chamber approximation. It uses the wall eddy diffusivity, particle
@@ -85,6 +85,7 @@ def get_spherical_wall_loss_coefficient(
     - Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982). Particle wall
       loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.
       https://doi.org/10.1080/02786828308958636
+
     """
     debye_variable = (
         np.pi
@@ -104,8 +105,7 @@ def get_rectangle_wall_loss_coefficient(
     settling_velocity: Union[float, NDArray[np.float64]],
     chamber_dimensions: Tuple[float, float, float],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the particle wall loss coefficient in a rectangular chamber.
+    """Calculate the particle wall loss coefficient in a rectangular chamber.
 
     This function computes the wall loss coefficient (β₀) for a rectangular
     chamber of length (L), width (W), and height (H). It uses the wall eddy
@@ -145,6 +145,7 @@ def get_rectangle_wall_loss_coefficient(
       GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY
       SHAPE. J Aerosol Sci, 12(5).
       https://doi.org/10.1016/0021-8502(81)90036-7
+
     """
     length, width, height = chamber_dimensions  # Unpack the dimensions tuple
 
@@ -174,8 +175,7 @@ def get_spherical_wall_loss_coefficient_via_system_state(
     pressure: float,
     chamber_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the spherical chamber wall loss coefficient via system state.
+    """Calculate the spherical chamber wall loss coefficient via system state.
 
     This version uses the system's physical conditions (particle radius, density,
     temperature, pressure) to compute the needed diffusion and settling velocity
@@ -222,6 +222,7 @@ def get_spherical_wall_loss_coefficient_via_system_state(
     - Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982). Particle wall
       loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.
       https://doi.org/10.1080/02786828308958636
+
     """
     # Step 1: Get particle diffusion coefficient
     diffusion_coefficient = get_diffusion_coefficient_via_system_state(
@@ -256,8 +257,7 @@ def get_rectangle_wall_loss_coefficient_via_system_state(
     pressure: float,
     chamber_dimensions: Tuple[float, float, float],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the wall loss coefficient for a rectangular chamber based on
+    """Calculate the wall loss coefficient for a rectangular chamber based on
     the system state.
 
     This function computes the wall loss coefficient for a rectangular chamber
@@ -285,6 +285,7 @@ def get_rectangle_wall_loss_coefficient_via_system_state(
             GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY
             SHAPE. In J Aerosol Sct (Vol. 12, Issue 5).
             https://doi.org/10.1016/0021-8502(81)90036-7
+
     """
     # Step 1: Get particle settling velocity
     settling_velocity = get_particle_settling_velocity_via_system_state(

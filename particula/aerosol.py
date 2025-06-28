@@ -8,8 +8,7 @@ from particula.particles.representation import ParticleRepresentation
 
 
 class Aerosol:
-    """
-    Represents a collection of Gas and Particle objects forming an aerosol
+    """Represents a collection of Gas and Particle objects forming an aerosol
     environment.
 
     This class allows for the representation and manipulation of an aerosol,
@@ -34,6 +33,7 @@ class Aerosol:
         aerosol_instance = Aerosol(atmosphere, particles)
         aerosol_instance.replace_particles(new_particle)
         ```
+
     """
 
     def __init__(
@@ -41,20 +41,19 @@ class Aerosol:
         atmosphere: Atmosphere,
         particles: ParticleRepresentation,
     ):
-        """
-        Initialize the Aerosol object with an Atmosphere and one or more
+        """Initialize the Aerosol object with an Atmosphere and one or more
         particles.
 
         Arguments:
             - atmosphere : Atmosphere containing one or more gas species.
             - particles : A single ParticleRepresentation object.
+
         """
         self.atmosphere = atmosphere
         self.particles = particles
 
     def __str__(self) -> str:
-        """
-        Provide a string representation of the aerosol.
+        """Provide a string representation of the aerosol.
 
         Returns:
             - str : A string summarizing the atmosphere and each particle.
@@ -63,13 +62,13 @@ class Aerosol:
             aerosol_instance = Aerosol(atmosphere, particles)
             print(aerosol_instance)
             ```
+
         """
         message = str(self.atmosphere) + "\n" + str(self.particles)
         return message
 
     def replace_atmosphere(self, atmosphere: Atmosphere):
-        """
-        Replace the current atmosphere with a new Atmosphere instance.
+        """Replace the current atmosphere with a new Atmosphere instance.
 
         Arguments:
             - atmosphere : The new Atmosphere to assign.
@@ -80,6 +79,7 @@ class Aerosol:
             new_atmosphere = Atmosphere()
             aerosol_instance.replace_atmosphere(new_atmosphere)
             ```
+
         """
         self.atmosphere = atmosphere
 
@@ -87,8 +87,7 @@ class Aerosol:
         self,
         particles: ParticleRepresentation,
     ):
-        """
-        Replace a particles in the aerosol with a new ParticleRepresentation.
+        """Replace a particles in the aerosol with a new ParticleRepresentation.
 
         Arguments:
             - particle : The new ParticleRepresentation to assign.
@@ -99,5 +98,6 @@ class Aerosol:
             new_particle = ParticleRepresentation()
             aerosol_instance.replace_particles(new_particle)
             ```
+
         """
         self.particles = particles

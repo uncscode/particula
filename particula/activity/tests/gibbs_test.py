@@ -1,6 +1,7 @@
 """Test the gibbs_free_engery function."""
 
 import numpy as np
+
 from particula.activity.gibbs import gibbs_free_engery
 
 

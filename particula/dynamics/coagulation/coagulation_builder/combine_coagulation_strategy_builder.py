@@ -1,5 +1,4 @@
-"""
-Combine Coagulation Strategy Builder Module
+"""Combine Coagulation Strategy Builder Module
 
 Provides a builder for creating `CombineCoagulationStrategy` objects,
 which can merge multiple sub-strategies (e.g., Brownian, Turbulent)
@@ -12,21 +11,20 @@ This builder follows standard usage:
     builder.set_strategies([...]).build()
 """
 
-from typing import List, Optional
 import logging
+from typing import List, Optional
 
 from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy import (
-    CombineCoagulationStrategy,
     CoagulationStrategyABC,
+    CombineCoagulationStrategy,
 )
 
 logger = logging.getLogger("particula")
 
 
 class CombineCoagulationStrategyBuilder(BuilderABC):
-    """
-    Builder for a combined coagulation strategy.
+    """Builder for a combined coagulation strategy.
 
     This class constructs a `CombineCoagulationStrategy` from multiple
     sub-strategies (instances of `CoagulationStrategyABC`), enabling
@@ -48,11 +46,11 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
         builder.set_strategies([brownian_strategy, turbulent_strategy])
         combined_strategy = builder.build()
         ```
+
     """
 
     def __init__(self):
-        """
-        Initialize the CombineCoagulationStrategyBuilder.
+        """Initialize the CombineCoagulationStrategyBuilder.
 
         Returns:
             - None
@@ -61,6 +59,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
             The only required parameter is 'strategies'. Attempting to
             build without setting it triggers an error. Use `set_strategies`
             before calling `build`.
+
         """
         required_parameters = ["strategies"]
         super().__init__(required_parameters)
@@ -86,6 +85,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
         Returns:
             CombineCoagulationStrategyBuilder:
                 The builder instance, for fluent chaining.
+
         """
         if strategies_units is not None:
             logger.warning(
@@ -109,6 +109,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
             # Now you can use `combined_strategy.kernel(...)` to calculate
             # combined coagulation effects from each sub-strategy.
             ```
+
         """
         self.pre_build_check()
         return CombineCoagulationStrategy(strategies=self.strategies)

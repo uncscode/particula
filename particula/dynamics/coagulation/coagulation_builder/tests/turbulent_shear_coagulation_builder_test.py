@@ -1,5 +1,4 @@
-"""
-Tests for the TurbulentShearCoagulationBuilder class.
+"""Tests for the TurbulentShearCoagulationBuilder class.
 """
 
 # pylint: disable=duplicate-code
@@ -14,8 +13,7 @@ from particula.dynamics import (
 
 
 def test_build_with_valid_parameters():
-    """
-    Test that building with valid parameters returns a
+    """Test that building with valid parameters returns a
     TurbulentShearCoagulationStrategy.
     """
     builder = TurbulentShearCoagulationBuilder()
@@ -29,8 +27,7 @@ def test_build_with_valid_parameters():
 
 
 def test_build_missing_required_parameters():
-    """
-    Test that building without required parameters raises a ValueError.
+    """Test that building without required parameters raises a ValueError.
     """
     builder = TurbulentShearCoagulationBuilder()
 

@@ -5,19 +5,21 @@ Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
 in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
 and Soft Matter Physics, 85(2).
 https://doi.org/10.1103/PhysRevE.85.026410
+
 """
 
 from typing import Union
-from numpy.typing import NDArray
-import numpy as np
 
-from particula.util.machine_limit import get_safe_exp
-from particula.util.validate_inputs import validate_inputs
+import numpy as np
+from numpy.typing import NDArray
+
 from particula.util.constants import (
     BOLTZMANN_CONSTANT,
     ELECTRIC_PERMITTIVITY,
     ELEMENTARY_CHARGE_VALUE,
 )
+from particula.util.machine_limit import get_safe_exp
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -29,8 +31,7 @@ def get_coulomb_enhancement_ratio(
     temperature: float = 298.15,
     ratio_lower_limit: float = -200,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Coulomb potential ratio, ϕ_E, for particle-particle
+    """Calculate the Coulomb potential ratio, ϕ_E, for particle-particle
     interactions.
 
     The potential ratio is computed using:
@@ -71,6 +72,7 @@ def get_coulomb_enhancement_ratio(
         - Equation (7): Gopalakrishnan, R., & Hogan, C. J. (2012).
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
+
     """
     if isinstance(particle_radius, np.ndarray):
         # square matrix of radius
@@ -103,8 +105,7 @@ def get_coulomb_enhancement_ratio(
 def get_coulomb_kinetic_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the kinetic-limit Coulomb enhancement factor, Γₖᵢₙ.
+    """Calculate the kinetic-limit Coulomb enhancement factor, Γₖᵢₙ.
 
     The kinetic-limit factor is computed by:
 
@@ -133,6 +134,7 @@ def get_coulomb_kinetic_limit(
         - Equations (6d) and (6e): Gopalakrishnan, R., & Hogan, C. J. (2012).
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
+
     """
     return np.where(
         coulomb_potential >= 0,
@@ -147,8 +149,7 @@ def get_coulomb_kinetic_limit(
 def get_coulomb_continuum_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the continuum-limit Coulomb enhancement factor, Γ_c.
+    """Calculate the continuum-limit Coulomb enhancement factor, Γ_c.
 
     The continuum-limit factor is computed by:
 
@@ -178,6 +179,7 @@ def get_coulomb_continuum_limit(
         - Equation (6b): Gopalakrishnan, R., & Hogan, C. J. (2012).
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
+
     """
     denominator = 1 - get_safe_exp(-1 * coulomb_potential)
     return np.divide(

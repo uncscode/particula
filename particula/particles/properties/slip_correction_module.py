@@ -2,8 +2,8 @@
 
 from typing import Union
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -12,8 +12,7 @@ from particula.util.validate_inputs import validate_inputs
 def get_cunningham_slip_correction(
     knudsen_number: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Cunningham slip correction factor for small particles in a
+    """Calculate the Cunningham slip correction factor for small particles in a
     fluid.
 
     The slip correction factor (C_c) accounts for non-continuum effects on
@@ -39,5 +38,6 @@ def get_cunningham_slip_correction(
     References:
         - "Cunningham correction factor," Wikipedia,
           https://en.wikipedia.org/wiki/Cunningham_correction_factor
+
     """
     return 1 + knudsen_number * (1.257 + 0.4 * np.exp(-1.1 / knudsen_number))

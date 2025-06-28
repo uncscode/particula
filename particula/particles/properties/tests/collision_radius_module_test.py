@@ -1,10 +1,11 @@
 """Test for collision_radius_module.py module."""
 
 import numpy as np
+
 from particula.particles.properties.collision_radius_module import (
     get_collision_radius_mg1988,
-    get_collision_radius_sr1992,
     get_collision_radius_mzg2002,
+    get_collision_radius_sr1992,
     get_collision_radius_tt2012,
     get_collision_radius_wq2022_rg,
     get_collision_radius_wq2022_rg_df,

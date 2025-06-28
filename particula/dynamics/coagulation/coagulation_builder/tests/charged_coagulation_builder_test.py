@@ -1,8 +1,8 @@
-"""
-Tests for the ChargedCoagulationBuilder class.
+"""Tests for the ChargedCoagulationBuilder class.
 """
 
 import pytest
+
 from particula.dynamics import (
     ChargedCoagulationBuilder,
     ChargedCoagulationStrategy,
@@ -11,8 +11,7 @@ from particula.dynamics import (
 
 
 def test_build_with_valid_parameters():
-    """
-    Test that building with valid parameters returns a
+    """Test that building with valid parameters returns a
     ChargedCoagulationStrategy.
     """
     builder = ChargedCoagulationBuilder()
@@ -25,8 +24,7 @@ def test_build_with_valid_parameters():
 
 
 def test_build_missing_required_parameters():
-    """
-    Test that building without required parameters raises a ValueError.
+    """Test that building without required parameters raises a ValueError.
     """
     builder = ChargedCoagulationBuilder()
 

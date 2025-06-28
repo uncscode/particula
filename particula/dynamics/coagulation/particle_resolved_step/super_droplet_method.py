@@ -1,12 +1,12 @@
-"""
-Super droplet method for coagulation dynamics.
+"""Super droplet method for coagulation dynamics.
 
 This module implements a Super Droplet Method for coagulation
 dynamics, used to simulate how particles grow through collisions.
 """
 
 from itertools import combinations_with_replacement
-from typing import Tuple, Union, Optional
+from typing import Optional, Tuple, Union
+
 import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline  # type: ignore
@@ -19,8 +19,7 @@ def _super_droplet_update_step(
     small_index: NDArray[np.int64],
     large_index: NDArray[np.int64],
 ) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.int64]]:
-    """
-    Update particle radii and concentrations when two particles coagulate.
+    """Update particle radii and concentrations when two particles coagulate.
 
     This function merges smaller and larger particles by combining their
     volumes and redistributing particle concentrations. The resulting
@@ -53,8 +52,8 @@ def _super_droplet_update_step(
             r, conc, events, s_idx, l_idx)
         # out_r[0] is updated via volume combination with out_r[2].
         ```
-    """
 
+    """
     # Step 1: Calculate the summed volumes of the smaller and larger particles
     # The volumes are obtained by cubing the radii of the particles.
     sum_radii_cubed = np.power(
@@ -122,8 +121,7 @@ def _event_pairs(
     kernel_max: Union[float, NDArray[np.float64]],
     number_in_bins: Union[NDArray[np.float64], NDArray[np.int64]],
 ) -> float:
-    """
-    Calculate an approximate count of particle-pair interactions.
+    """Calculate an approximate count of particle-pair interactions.
 
     This function estimates the number of collisions or interactions
     that might occur between two bins of particles, given a maximum
@@ -149,6 +147,7 @@ def _event_pairs(
         events_est = _event_pairs(0, 1, max_kernel, n_bins)
         # events_est is ~ 1.0e-9 * 100 * 150
         ```
+
     """
     # Calculate the number of particle pairs based on the kernel value
     if lower_bin != upper_bin:
@@ -169,8 +168,7 @@ def _sample_events(
     time_step: float,
     generator: np.random.Generator,
 ) -> int:
-    """
-    Determine how many collisions actually occur using a Poisson draw.
+    """Determine how many collisions actually occur using a Poisson draw.
 
     This function uses the expected collision count (`events`) and normalizes
     by system `volume` to compute an effective collision rate. It then
@@ -197,6 +195,7 @@ def _sample_events(
             generator=rng)
         # collisions might be ~ Poisson( 5e3 / 0.1 * 0.01 ) => Poisson(5)
         ```
+
     """
     # Calculate the expected number of events
     events_exact = events / volume
@@ -214,8 +213,7 @@ def random_choice_indices(
     bin_indices: NDArray[np.int64],
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Select valid particle indices in two bins for coagulation events.
+    """Select valid particle indices in two bins for coagulation events.
 
     This function tries to choose `events` valid indices from
     `lower_bin` and `upper_bin`, discarding any particles with radius ≤ 0.
@@ -245,6 +243,7 @@ def random_choice_indices(
         # lw_bin -> array of valid picks from bin 0
         # up_bin -> array of valid picks from bin 1
         ```
+
     """
     try:
         # Directly find the indices where the condition is True
@@ -271,8 +270,7 @@ def _select_random_indices(
     number_in_bins: NDArray[np.int64],
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Randomly choose indices within each bin to represent collision partners.
+    """Randomly choose indices within each bin to represent collision partners.
 
     This function picks `events` indices from the population of the
     `lower_bin` and `upper_bin`, ignoring any radius or event-limit checks
@@ -304,6 +302,7 @@ def _select_random_indices(
         )
         # i_lw -> random indices in [0..4]
         # i_up -> random indices in [0..6]
+
     """
     # Select random indices for particles in the lower_bin
     lower_indices = generator.integers(  # type: ignore
@@ -331,8 +330,7 @@ def _bin_to_particle_indices(
     upper_bin: int,
     bin_indices: NDArray[np.int64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Map bin-relative indices back to absolute positions in the particle array.
+    """Map bin-relative indices back to absolute positions in the particle array.
 
     This function adjusts the offsets for each bin so that the pairwise
     indices used for collision are mapped onto the actual sorted particle
@@ -364,6 +362,7 @@ def _bin_to_particle_indices(
         s_idx, l_idx = _bin_to_particle_indices(lw_rel, up_rel, 1, 2, bins)
         # s_idx -> [10, 11]
         # l_idx -> [22, 23]
+
     """
     # Get the start index in the particle array for the lower_bin
     start_index_lower_bin = np.searchsorted(bin_indices, lower_bin)
@@ -383,8 +382,7 @@ def _filter_valid_indices(
     particle_radius: NDArray[np.float64],
     single_event_counter: Optional[NDArray[np.int64]] = None,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Remove invalid pairs of particles based on radius and optional event limit.
+    """Remove invalid pairs of particles based on radius and optional event limit.
 
     This function checks each pair of `(small_index, large_index)` to ensure
     both have radius > 0. If `single_event_counter` is provided, it further
@@ -415,6 +413,7 @@ def _filter_valid_indices(
         )
         # Indices with r>0 remain in s_valid, l_valid
         ```
+
     """
     if single_event_counter is not None:
         # Both particle radius and event counter are used to determine
@@ -442,8 +441,7 @@ def _coagulation_events(
     kernel_max: float,
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Stochastically pick which collisions (among possible pairs) actually happen.
+    """Stochastically pick which collisions (among possible pairs) actually happen.
 
     This function computes a collision probability for each `(small_index,
     large_index)` pair by taking the ratio of `kernel_values / kernel_max`.
@@ -472,6 +470,7 @@ def _coagulation_events(
         # Each pair has probability kv/kmax => [0.5, 1.0, 0.1]
         # The final s_new, l_new depends on random draws
         ```
+
     """
     # Calculate the coagulation probabilities for each particle pair
     coagulation_probabilities = kernel_values / kernel_max
@@ -494,8 +493,7 @@ def _sort_particles(
 ) -> Tuple[
     NDArray[np.int64], NDArray[np.float64], Optional[NDArray[np.float64]]
 ]:
-    """
-    Sort particle radii (and optionally concentrations) in ascending order.
+    """Sort particle radii (and optionally concentrations) in ascending order.
 
     The function returns an array of `unsort_indices` that can be used
     to restore the particles to their original order after manipulations.
@@ -521,6 +519,7 @@ def _sort_particles(
         # s_c -> [30, 10, 20]
         # u_idx can be used to get them back in [0.3, 0.1, 0.5] order
         ```
+
     """
     # Sort the particle radii and get the sorted indices
     sorted_indices = np.argsort(particle_radius)
@@ -542,8 +541,7 @@ def _bin_particles(
     particle_radius: NDArray[np.float64],
     radius_bins: NDArray[np.float64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Divide the sorted particle radii into bins and count how many fall into
+    """Divide the sorted particle radii into bins and count how many fall into
     each bin.
 
     This function uses `radius_bins` as edges and assigns each particle
@@ -568,6 +566,7 @@ def _bin_particles(
         # n_in_bins -> [1, 2, 1]
         # bin_idx might be [0, 1, 1, 2]
         ```
+
     """
     number_in_bins, bins = np.histogram(particle_radius, bins=radius_bins)
     bin_indices = np.digitize(particle_radius, bins, right=True)
@@ -583,8 +582,7 @@ def _bin_particles(
 def _get_bin_pairs(
     bin_indices: NDArray[np.int64],
 ) -> list[Tuple[int, int]]:
-    """
-    Produce the list of all unique (binA, binB) pairs using combinations
+    """Produce the list of all unique (binA, binB) pairs using combinations
     with replacement.
 
     This function is useful when we want to iterate over all bin pairs
@@ -605,6 +603,7 @@ def _get_bin_pairs(
         pairs = _get_bin_pairs(bins)
         # pairs -> [(0, 0), (0, 1), (0, 2), (1, 1), (1, 2), (2, 2)]
         ```
+
     """
     unique_bins = np.unique(bin_indices)
     return list(combinations_with_replacement(unique_bins, 2))
@@ -615,8 +614,7 @@ def _calculate_concentration_in_bins(
     particle_concentration: NDArray[np.float64],
     number_in_bins: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Sum the particle concentrations in each bin.
+    """Sum the particle concentrations in each bin.
 
     Given per-particle `bin_indices` and `particle_concentration`, this
     function accumulates the total concentration of all particles that
@@ -642,6 +640,7 @@ def _calculate_concentration_in_bins(
         bin_c = _calculate_concentration_in_bins(b_idx, conc, n_in_bins)
         # bin_c -> [15., 5., 4.]
         ```
+
     """
     concentration_in_bins = np.zeros_like(number_in_bins, dtype=np.float64)
     unique_bins = np.unique(bin_indices)
@@ -664,8 +663,7 @@ def get_super_droplet_coagulation_step(
     time_step: float,
     random_generator: np.random.Generator,
 ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """
-    Carry out one time-step of super-droplet-based coagulation.
+    """Carry out one time-step of super-droplet-based coagulation.
 
     This function sorts particles by radius, bins them, and then stochastically
     computes collision events according to the coagulation kernel. It updates
@@ -705,6 +703,7 @@ def get_super_droplet_coagulation_step(
           in cloud microphysics simulations," J. Atmos. Sci., 2020.
         - Seinfeld, J. H., & Pandis, S. N. *Atmospheric Chemistry and Physics*,
           Wiley, 2016.
+
     """
     # Step 1: Sort particles by size and obtain indices to revert sorting later
     unsort_indices, sorted_radius, sorted_concentration = _sort_particles(

@@ -1,13 +1,14 @@
 """Test Building ParticleRepresentation properties."""
 
 import numpy as np
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.distribution_strategies import (
-    RadiiBasedMovingBin,
-    ParticleResolvedSpeciatedMass,
-)
-from particula.particles.surface_strategies import SurfaceStrategyVolume
+
 from particula.particles.activity_strategies import ActivityIdealMass
+from particula.particles.distribution_strategies import (
+    ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
+)
+from particula.particles.representation import ParticleRepresentation
+from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
 # pylint: disable=too-many-arguments, too-many-positional-arguments

@@ -1,21 +1,19 @@
-"""
-Tests for the CombineCoagulationStrategyBuilder class.
+"""Tests for the CombineCoagulationStrategyBuilder class.
 """
 
 import pytest
 
 from particula.dynamics import (
-    CombineCoagulationStrategyBuilder,
-    CombineCoagulationStrategy,
     BrownianCoagulationBuilder,
     ChargedCoagulationBuilder,
+    CombineCoagulationStrategy,
+    CombineCoagulationStrategyBuilder,
     HardSphereKernelStrategy,
 )
 
 
 def test_build_with_valid_strategies():
-    """
-    Test that CombineCoagulationStrategyBuilder with valid sub-strategies
+    """Test that CombineCoagulationStrategyBuilder with valid sub-strategies
     returns a CombineCoagulationStrategy.
     """
     # Example sub-strategies:
@@ -44,8 +42,7 @@ def test_build_with_valid_strategies():
 
 
 def test_build_missing_strategies():
-    """
-    Test that CombineCoagulationStrategyBuilder without required 'strategies'
+    """Test that CombineCoagulationStrategyBuilder without required 'strategies'
     raises a ValueError.
     """
     builder = CombineCoagulationStrategyBuilder()

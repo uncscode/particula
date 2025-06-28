@@ -1,5 +1,4 @@
-"""
-Brownian Coagulation Builder Module
+"""Brownian Coagulation Builder Module
 
 Provides a builder for creating `BrownianCoagulationStrategy` objects
 based on a chosen particle distribution type (e.g., "discrete",
@@ -9,18 +8,18 @@ parameters are set before returning the final strategy.
 References:
     - Seinfeld, J. H., & Pandis, S. N. (2016). "Atmospheric Chemistry
       and Physics." Wiley.
+
 """
 
 from particula.abc_builder import BuilderABC
-
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
+from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
 )
 from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
     BrownianCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
 )
 
 
@@ -28,8 +27,7 @@ class BrownianCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
 ):
-    """
-    Brownian Coagulation builder class.
+    """Brownian Coagulation builder class.
 
     Creates a `BrownianCoagulationStrategy` given a distribution type
     (e.g., "discrete", "continuous_pdf", or "particle_resolved"). Ensures
@@ -53,6 +51,7 @@ class BrownianCoagulationBuilder(
         strategy = builder.build()
         # strategy is now a BrownianCoagulationStrategy instance
         ```
+
     """
 
     def __init__(self):
@@ -61,8 +60,7 @@ class BrownianCoagulationBuilder(
         BuilderDistributionTypeMixin.__init__(self)
 
     def build(self) -> CoagulationStrategyABC:
-        """
-        Validate and return the BrownianCoagulationStrategy object.
+        """Validate and return the BrownianCoagulationStrategy object.
 
         Checks that all required parameters (e.g., distribution_type) are set
         before creating and returning a `BrownianCoagulationStrategy`.
@@ -70,6 +68,7 @@ class BrownianCoagulationBuilder(
         Returns:
             BrownianCoagulationStrategy : The newly created
             Brownian coagulation strategy.
+
         """
         self.pre_build_check()
 

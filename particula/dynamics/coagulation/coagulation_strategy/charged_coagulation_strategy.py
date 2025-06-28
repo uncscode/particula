@@ -1,28 +1,26 @@
-"""
-Charged particle coagulation strategy.
+"""Charged particle coagulation strategy.
 """
 
-from typing import Union
 import logging
+from typing import Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from particula.particles.representation import ParticleRepresentation
+from particula.util.reduced_quantity import get_reduced_self_broadcast
 
 logger = logging.getLogger("particula")
 
 
 class ChargedCoagulationStrategy(CoagulationStrategyABC):
-    """
-    Charged Brownian coagulation strategy using a dimensionless kernel.
+    """Charged Brownian coagulation strategy using a dimensionless kernel.
 
     This class implements the methods defined in the CoagulationStrategyABC
     abstract class. A ChargedKernelStrategyABC instance is passed to define
@@ -61,13 +59,13 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     References:
         - Seinfeld, J. H., & Pandis, S. N. "Atmospheric Chemistry and
           Physics: From Air Pollution to Climate Change." Wiley, 2016.
+
     """
 
     def __init__(
         self, distribution_type: str, kernel_strategy: ChargedKernelStrategyABC
     ):
-        """
-        Initialize the ChargedCoagulationStrategy.
+        """Initialize the ChargedCoagulationStrategy.
 
         Arguments:
             - distribution_type : The distribution type representing how
@@ -79,6 +77,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
 
         Returns:
             - None
+
         """
         CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
@@ -90,8 +89,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """
-        Compute the dimensionless kernel for charged coagulation.
+        """Compute the dimensionless kernel for charged coagulation.
 
         This method delegates computation to the provided kernel strategy. It
         returns the dimensionless kernel (H) as a function of the diffusive
@@ -113,6 +111,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
             dim_kernel = charged_coag.dimensionless_kernel(kn, phi)
             # dim_kernel -> array of dimensionless kernel values
             ```
+
         """
         return self.kernel_strategy.dimensionless(
             diffusive_knudsen=diffusive_knudsen,
@@ -125,8 +124,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Compute the dimensioned coagulation kernel for charged particles.
+        """Compute the dimensioned coagulation kernel for charged particles.
 
         This method converts the dimensionless kernel into a dimensioned
         coagulation kernel by combining Coulomb parameters, the pairwise
@@ -154,6 +152,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         - Gopalakrishnan, R. & Hogan, C. J. "Determination of the Transition
           Regime Collision Kernel from Mean First Passage Times." Aerosol
           Science and Technology, 46: 887-899, 2012.
+
         """
         diffusive_knudsen = self.diffusive_knudsen(
             particle=particle, temperature=temperature, pressure=pressure

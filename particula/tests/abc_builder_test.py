@@ -3,6 +3,7 @@
 # pylint: disable=redefined-outer-name
 
 import pytest
+
 from particula.abc_builder import BuilderABC
 
 

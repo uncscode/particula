@@ -2,19 +2,20 @@
 
 # pylint: disable=redefined-outer-name
 
-import pytest
 import numpy as np
+import pytest
+
 from particula.builder_mixin import (
-    BuilderDensityMixin,
-    BuilderSurfaceTensionMixin,
-    BuilderMolarMassMixin,
-    BuilderConcentrationMixin,
-    BuilderTemperatureMixin,
-    BuilderPressureMixin,
-    BuilderMassMixin,
-    BuilderRadiusMixin,
     BuilderChargeMixin,
+    BuilderConcentrationMixin,
+    BuilderDensityMixin,
+    BuilderMassMixin,
+    BuilderMolarMassMixin,
     BuilderPhaseIndexMixin,
+    BuilderPressureMixin,
+    BuilderRadiusMixin,
+    BuilderSurfaceTensionMixin,
+    BuilderTemperatureMixin,
 )
 
 

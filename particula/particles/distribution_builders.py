@@ -4,18 +4,17 @@ Currently, there are no parameters to set, but this is used for consistency
 with other builder patterns in the codebase.
 """
 
+from particula.abc_builder import BuilderABC
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
     RadiiBasedMovingBin,
     SpeciatedMassMovingBin,
-    ParticleResolvedSpeciatedMass,
 )
-from particula.abc_builder import BuilderABC
 
 
 class MassBasedMovingBinBuilder(BuilderABC):
-    """
-    Builds and configures a MassBasedMovingBin instance for mass-based
+    """Builds and configures a MassBasedMovingBin instance for mass-based
     distributions.
 
     This builder requires no parameters, but is kept for consistency with
@@ -33,6 +32,7 @@ class MassBasedMovingBinBuilder(BuilderABC):
         strategy = builder.build()
         # strategy -> MassBasedMovingBin()
         ```
+
     """
 
     def __init__(self) -> None:
@@ -40,8 +40,7 @@ class MassBasedMovingBinBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> MassBasedMovingBin:
-        """
-        Build and return a MassBasedMovingBin instance.
+        """Build and return a MassBasedMovingBin instance.
 
         Returns:
             - MassBasedMovingBin : A strategy for mass-based particle
@@ -53,13 +52,13 @@ class MassBasedMovingBinBuilder(BuilderABC):
             builder = par.particles.MassBasedMovingBinBuilder()
             strategy = builder.build()
             ```
+
         """
         return MassBasedMovingBin()
 
 
 class RadiiBasedMovingBinBuilder(BuilderABC):
-    """
-    Builds and configures a RadiiBasedMovingBin instance for radius-based
+    """Builds and configures a RadiiBasedMovingBin instance for radius-based
     distributions.
 
     This builder requires no parameters, but is provided for consistency
@@ -76,6 +75,7 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
         strategy = builder.build()
         # strategy -> RadiiBasedMovingBin()
         ```
+
     """
 
     def __init__(self) -> None:
@@ -83,8 +83,7 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> RadiiBasedMovingBin:
-        """
-        Build and return a RadiiBasedMovingBin instance.
+        """Build and return a RadiiBasedMovingBin instance.
 
         Returns:
             - RadiiBasedMovingBin : A strategy for radius-based particle
@@ -96,13 +95,13 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
             builder = par.particles.RadiiBasedMovingBinBuilder()
             strategy = builder.build()
             ```
+
         """
         return RadiiBasedMovingBin()
 
 
 class SpeciatedMassMovingBinBuilder(BuilderABC):
-    """
-    Builds and configures a SpeciatedMassMovingBin instance for speciated
+    """Builds and configures a SpeciatedMassMovingBin instance for speciated
     mass distributions.
 
     This builder requires no parameters, but provides consistency with
@@ -119,6 +118,7 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
         strategy = builder.build()
         # strategy -> SpeciatedMassMovingBin()
         ```
+
     """
 
     def __init__(self) -> None:
@@ -126,8 +126,7 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> SpeciatedMassMovingBin:
-        """
-        Build and return a SpeciatedMassMovingBin instance.
+        """Build and return a SpeciatedMassMovingBin instance.
 
         Returns:
             - SpeciatedMassMovingBin : A strategy for speciated mass
@@ -138,13 +137,13 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
             builder = SpeciatedMassMovingBinBuilder()
             strategy = builder.build()
             ```
+
         """
         return SpeciatedMassMovingBin()
 
 
 class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
-    """
-    Builds and configures a ParticleResolvedSpeciatedMass instance.
+    """Builds and configures a ParticleResolvedSpeciatedMass instance.
 
     This builder requires no parameters, but follows the same pattern
     to ensure uniform usage. ParticleResolvedSpeciatedMass is useful for
@@ -161,6 +160,7 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
         strategy = builder.build()
         # strategy -> ParticleResolvedSpeciatedMass()
         ```
+
     """
 
     def __init__(self) -> None:
@@ -168,8 +168,7 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> ParticleResolvedSpeciatedMass:
-        """
-        Build and return a ParticleResolvedSpeciatedMass instance.
+        """Build and return a ParticleResolvedSpeciatedMass instance.
 
         Returns:
             - ParticleResolvedSpeciatedMass : A strategy that resolves
@@ -181,5 +180,6 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
             builder = par.particles.ParticleResolvedSpeciatedMassBuilder()
             strategy = builder.build()
             ```
+
         """
         return ParticleResolvedSpeciatedMass()

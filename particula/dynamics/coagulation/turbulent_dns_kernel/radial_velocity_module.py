@@ -1,14 +1,14 @@
-"""
-Radial relative velocity calculation module.
+"""Radial relative velocity calculation module.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 from scipy.special import erf
 
-from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -21,8 +21,7 @@ def get_radial_relative_velocity_dz2002(
     velocity_dispersion: Union[float, NDArray[np.float64]],
     particle_inertia_time: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the radial relative velocity based on Dodin and Elperin (2002).
+    """Compute the radial relative velocity based on Dodin and Elperin (2002).
 
     This function calculates the radial relative velocity between pairs of
     particles under turbulent conditions, capturing the effects of different
@@ -55,6 +54,7 @@ def get_radial_relative_velocity_dz2002(
 
     References:
         - Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921–2924.
+
     """
     tau_diff = np.abs(
         particle_inertia_time[:, np.newaxis]
@@ -84,8 +84,7 @@ def get_radial_relative_velocity_ao2008(
     velocity_dispersion: Union[float, NDArray[np.float64]],
     particle_inertia_time: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the radial relative velocity based on Ayala et al. (2008).
+    """Compute the radial relative velocity based on Ayala et al. (2008).
 
     This function estimates the radial relative velocity between pairs of
     particles considering both turbulent velocity dispersion and gravitational
@@ -122,6 +121,7 @@ def get_radial_relative_velocity_ao2008(
         - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
           the geometric collision rate of sedimenting droplets. Part 2. Theory
           and parameterization. New Journal of Physics, 10.
+
     """
     # tau_delta = (
     #     particle_inertia_time[:, np.newaxis]

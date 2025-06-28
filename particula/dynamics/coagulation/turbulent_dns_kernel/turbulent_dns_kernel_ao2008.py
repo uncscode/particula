@@ -1,5 +1,4 @@
-"""
-Calculate the geometric collision kernel Γ₁₂ (or K₁₂) based on turbulent
+"""Calculate the geometric collision kernel Γ₁₂ (or K₁₂) based on turbulent
 DNS simulations.
 
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -9,20 +8,21 @@ DNS simulations.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
-from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
-    get_radial_relative_velocity_dz2002,
-)
+from particula import gas, particles
 from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
     get_g12_radial_distribution_ao2008,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
+    get_radial_relative_velocity_dz2002,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
 )
-from particula import particles, gas
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -75,6 +75,7 @@ def get_turbulent_dns_kernel_ao2008(
         the geometric collision rate of sedimenting droplets. Part 2.
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     collision_radius = (
         particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
@@ -155,6 +156,7 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
           the geometric collision rate of sedimenting droplets. Part 2.
           Theory and parameterization. New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     # 1. Basic fluid properties
     dynamic_viscosity = gas.get_dynamic_viscosity(temperature)

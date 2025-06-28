@@ -1,5 +1,4 @@
-"""
-Strategies for surface effects on particles.
+"""Strategies for surface effects on particles.
 
 Provides classes for calculating effective surface tension and the
 Kelvin effect for species in particulate phases. Future expansions
@@ -7,14 +6,15 @@ may include an organic film strategy.
 """
 
 from abc import ABC, abstractmethod
-from typing import Union, Sequence, Optional
-from numpy.typing import NDArray
+from typing import Optional, Sequence, Union
+
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.particles.properties.convert_mass_concentration import (
+    get_mass_fraction_from_mass,
     get_mole_fraction_from_mass,
     get_volume_fraction_from_mass,
-    get_mass_fraction_from_mass,
 )
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
@@ -23,13 +23,13 @@ from particula.particles.properties.kelvin_effect_module import (
 
 
 def _as_2d(array: NDArray[np.float64]) -> tuple[NDArray[np.float64], bool]:
-    """
-    Promote *array* to 2-D (n_bins, n_species).
+    """Promote *array* to 2-D (n_bins, n_species).
 
     Returns
     -------
     arr2d : the reshaped array
     was_1d : True if the original input was 1-D (hence single-bin)
+
     """
     if array.ndim == 1:
         return array[np.newaxis, :], True
@@ -41,8 +41,7 @@ def _as_2d(array: NDArray[np.float64]) -> tuple[NDArray[np.float64], bool]:
 def _broadcast_weights(
     weights: NDArray[np.float64], target_shape: tuple[int, int]
 ) -> NDArray[np.float64]:
-    """
-    Return *weights* with shape exactly equal to *target_shape*
+    """Return *weights* with shape exactly equal to *target_shape*
     (n_bins, n_species).  Accepts 1-D (n_species,) or 2-D inputs.
     """
     n_bins, n_species = target_shape
@@ -78,8 +77,7 @@ def _weighted_average_by_phase(
     weights: NDArray[np.float64],
     phase_index: NDArray[np.int_],
 ) -> NDArray[np.float64]:
-    """
-    Return an array where each element equals the phase-averaged *values*
+    """Return an array where each element equals the phase-averaged *values*
     using *weights* as weighting factors.
 
     For every unique entry in `phase_index` the weighted-average is
@@ -96,6 +94,7 @@ def _weighted_average_by_phase(
     Returns:
         - averaged : Array of averaged values, same shape as *values* input.
           If the weight sum for a bin/phase is zero the arithmetic mean is used.
+
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
@@ -135,8 +134,7 @@ def _weighted_average_by_phase(
 
 
 class SurfaceStrategy(ABC):
-    """
-    Abstract base class for surface strategies.
+    """Abstract base class for surface strategies.
 
     Implements methods for calculating effective surface tension, density,
     and the Kelvin effect in particulate phases.
@@ -147,29 +145,30 @@ class SurfaceStrategy(ABC):
     - get_name : Return the type of the surface strategy.
     - kelvin_radius : Calculate the Kelvin radius for curvature effects.
     - kelvin_term : Calculate the exponential Kelvin term for vapor pressure.
+
     """
 
     @abstractmethod
     def effective_surface_tension(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the effective surface tension of the species mixture.
+        """Calculate the effective surface tension of the species mixture.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
 
         Returns:
             - Effective surface tension in N/m.
+
         """
 
     @abstractmethod
     def get_density(self) -> Union[float, NDArray[np.float64]]:
-        """
-        Get density of the species mixture.
+        """Get density of the species mixture.
 
         Returns:
             - density in kg/m^3.
+
         """
 
     def get_name(self) -> str:
@@ -182,8 +181,7 @@ class SurfaceStrategy(ABC):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the Kelvin radius, which sets the curvature effect on vapor
+        """Calculate the Kelvin radius, which sets the curvature effect on vapor
         pressure.
 
         Arguments:
@@ -197,6 +195,7 @@ class SurfaceStrategy(ABC):
         References:
             - r = 2 × surface_tension × molar_mass / (R × T × density)
               [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
+
         """
         return get_kelvin_radius(
             self.effective_surface_tension(mass_concentration),
@@ -212,8 +211,7 @@ class SurfaceStrategy(ABC):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the exponential Kelvin term that adjusts vapor pressure.
+        """Calculate the exponential Kelvin term that adjusts vapor pressure.
 
         Arguments:
             - radius : Particle radius in meters.
@@ -227,6 +225,7 @@ class SurfaceStrategy(ABC):
         References:
             - P_eff = P_sat × exp(kelvin_radius / particle_radius)
               [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
+
         """
         return get_kelvin_term(
             radius,
@@ -236,8 +235,7 @@ class SurfaceStrategy(ABC):
 
 # Surface mixing strategies
 class SurfaceStrategyMolar(SurfaceStrategy):
-    """
-    Surface tension and density based on mole-fraction weighting.
+    """Surface tension and density based on mole-fraction weighting.
 
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
@@ -249,6 +247,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
 
     References:
         - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
+
     """
 
     def __init__(
@@ -287,8 +286,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
 
 
 class SurfaceStrategyMass(SurfaceStrategy):
-    """
-    Surface tension and density based on mass-fraction weighting.
+    """Surface tension and density based on mass-fraction weighting.
 
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
@@ -299,6 +297,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
 
     References:
     - [Mass Fraction](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
+
     """
 
     def __init__(
@@ -334,8 +333,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
 
 
 class SurfaceStrategyVolume(SurfaceStrategy):
-    """
-    Surface tension and density based on volume-fraction weighting.
+    """Surface tension and density based on volume-fraction weighting.
 
     Attributes:
         - surface_tension : Surface tension array or scalar in N/m.
@@ -346,6 +344,7 @@ class SurfaceStrategyVolume(SurfaceStrategy):
 
     References:
         - [Volume Fraction](https://en.wikipedia.org/wiki/Volume_fraction)
+
     """
 
     def __init__(

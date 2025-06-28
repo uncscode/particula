@@ -1,5 +1,4 @@
-"""
-AerosolBuilder Module
+"""AerosolBuilder Module
 =====================
 
 Provides a fluent interface to create an `Aerosol` instance from an
@@ -17,6 +16,7 @@ aerosol = (
     .build()
 )
 ```
+
 """
 
 import logging
@@ -31,8 +31,7 @@ logger = logging.getLogger("particula")
 
 
 class AerosolBuilder(BuilderABC):
-    """
-    Fluent builder for `Aerosol` objects.
+    """Fluent builder for `Aerosol` objects.
 
     The builder collects the required components—`Atmosphere` and
     `ParticleRepresentation`—and validates that they are mutually
@@ -53,13 +52,15 @@ class AerosolBuilder(BuilderABC):
         builder.set_atmosphere(atm).set_particles(prt)
         aerosol = builder.build()
         ```
+
     """
+
     def __init__(self):
-        """
-        Initialize an empty builder.
+        """Initialize an empty builder.
 
         Returns:
         - None
+
         """
         required_parameters = ["atmosphere", "particles"]
         BuilderABC.__init__(self, required_parameters)
@@ -69,8 +70,7 @@ class AerosolBuilder(BuilderABC):
     def set_atmosphere(
         self, atmosphere: Atmosphere, atmosphere_units: Optional[str] = None
     ) -> "AerosolBuilder":
-        """
-        Attach an `Atmosphere` to the builder.
+        """Attach an `Atmosphere` to the builder.
 
         Arguments:
             - atmosphere : Atmosphere to embed in the aerosol.
@@ -83,6 +83,7 @@ class AerosolBuilder(BuilderABC):
             ```py
             builder = AerosolBuilder().set_atmosphere(atm)
             ```
+
         """
         if atmosphere_units is not None:
             logger.warning("Ignoring units for atmosphere parameter.")
@@ -94,8 +95,7 @@ class AerosolBuilder(BuilderABC):
         particles: ParticleRepresentation,
         particles_units: Optional[str] = None,
     ) -> "AerosolBuilder":
-        """
-        Attach a `ParticleRepresentation` to the builder.
+        """Attach a `ParticleRepresentation` to the builder.
 
         Arguments:
             - particles : Particle representation to embed in the aerosol.
@@ -103,6 +103,7 @@ class AerosolBuilder(BuilderABC):
 
         Returns:
             - The builder instance (for chaining).
+
         """
         if particles_units is not None:
             logger.warning("Ignoring units for particles parameter.")
@@ -110,8 +111,7 @@ class AerosolBuilder(BuilderABC):
         return self
 
     def _validate_species_length(self) -> None:
-        """
-        Validate species-count consistency between atmosphere and particles.
+        """Validate species-count consistency between atmosphere and particles.
 
         When the particle distribution strategy is either
         `SpeciatedMassMovingBin` or `ParticleResolvedSpeciatedMass`, the number
@@ -120,6 +120,7 @@ class AerosolBuilder(BuilderABC):
 
         Raises:
             - ValueError : If the species counts are inconsistent.
+
         """
         if self.atmosphere is None or self.particles is None:
             raise ValueError(
@@ -156,8 +157,7 @@ class AerosolBuilder(BuilderABC):
             raise ValueError(msg)
 
     def build(self) -> Aerosol:
-        """
-        Finalize and construct an `Aerosol` object.
+        """Finalize and construct an `Aerosol` object.
 
         Raises:
             - ValueError : If either component is missing or validation fails.
@@ -174,6 +174,7 @@ class AerosolBuilder(BuilderABC):
             .build()
         )
         ```
+
         """
         self.pre_build_check()
         self._validate_species_length()

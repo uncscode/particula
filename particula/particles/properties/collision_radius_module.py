@@ -8,6 +8,7 @@ https://doi.org/10.1016/j.jaerosci.2021.10586
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -22,8 +23,7 @@ from particula.util.validate_inputs import validate_inputs
 def get_collision_radius_mg1988(
     gyration_radius: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the mg1988 model.
+    """Calculate the collision radius using the mg1988 model.
 
     The collision radius (R_c) is set equal to the radius of gyration (R_g):
 
@@ -46,6 +46,7 @@ def get_collision_radius_mg1988(
         - Mulholland, G. W., Mountain, R. D., Samson, R. J., & Ernst, M. H.
         (1988). "Cluster Size Distribution for Free Molecular Agglomeration."
           Energy and Fuels, 2(4). https://doi.org/10.1021/ef00010a014
+
     """
     return gyration_radius
 
@@ -60,8 +61,7 @@ def get_collision_radius_sr1992(
     gyration_radius: Union[NDArray[np.float64], float],
     fractal_dimension: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the sr1992 model.
+    """Calculate the collision radius using the sr1992 model.
 
     This model includes the fractal dimension (d_f). The collision radius
     (R_c) is:
@@ -91,6 +91,7 @@ def get_collision_radius_sr1992(
           agglomerates in the transition regime." Journal of Colloid and
           Interface Science, 151(1), 203-224.
           https://doi.org/10.1016/0021-9797(92)90252-H
+
     """
     return np.sqrt((fractal_dimension + 2) / 3) * gyration_radius
 
@@ -105,8 +106,7 @@ def get_collision_radius_mzg2002(
     gyration_radius: Union[NDArray[np.float64], float],
     fractal_prefactor: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the mzg2002 model.
+    """Calculate the collision radius using the mzg2002 model.
 
     The collision radius (R_c) is given by the empirical relation:
 
@@ -135,6 +135,7 @@ def get_collision_radius_mzg2002(
           aerosol coagulation frequency predictions." Journal of Colloid and
           Interface Science, 255(1).
           https://doi.org/10.1006/jcis.2002.8634
+
     """
     return 1.037 * (fractal_prefactor**0.077) * gyration_radius
 
@@ -153,8 +154,7 @@ def get_collision_radius_tt2012(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the tt2012 model.
+    """Calculate the collision radius using the tt2012 model.
 
     This function uses fitting parameters α₁, α₂ based on the fractal
     dimension (d_f) and number of monomers (N). The collision radius
@@ -183,6 +183,7 @@ def get_collision_radius_tt2012(
           collision rate of nonspherical particles and aggregates for all
           diffusive knudsen numbers." Aerosol Science and Technology, 46(11).
           https://doi.org/10.1080/02786826.2012.701353
+
     """
     alpha1 = 0.253 * fractal_dimension**2 - 1.209 * fractal_dimension + 1.433
     alpha2 = -0.218 * fractal_dimension**2 + 0.964 * fractal_dimension - 0.180
@@ -206,8 +207,7 @@ def get_collision_radius_wq2022_rg(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg model.
+    """Calculate the collision radius using the wq2022_rg model.
 
     This function uses a fitted model based on the ratio (R_g / rₘ).
     The collision radius (R_c) is:
@@ -237,6 +237,7 @@ def get_collision_radius_wq2022_rg(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
+
     """
     coefficient = (0.973, 0.441)
     return (
@@ -256,8 +257,7 @@ def get_collision_radius_wq2022_rg_df(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg_df model.
+    """Calculate the collision radius using the wq2022_rg_df model.
 
     This function uses a fitted model based on fractal dimension (d_f), ratio
     (R_g / rₘ), and empirical coefficients. The collision radius (R_c) is:
@@ -289,6 +289,7 @@ def get_collision_radius_wq2022_rg_df(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
+
     """
     coefficient = (0.882, 0.223, 0.387)
     return (
@@ -313,8 +314,7 @@ def get_collision_radius_wq2022_rg_df_k0(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg_df_k0 model.
+    """Calculate the collision radius using the wq2022_rg_df_k0 model.
 
     This function uses a fitted expression depending on fractal dimension
     (d_f), fractal prefactor (k₀), and ratio (R_g / rₘ). The collision
@@ -349,6 +349,7 @@ def get_collision_radius_wq2022_rg_df_k0(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
+
     """
     coefficient = (0.777, 0.479, 0.000970, 0.267, -0.0790)
     return (
@@ -377,8 +378,7 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
     gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
-    """
-    Calculate the collision radius using the wq2022_rg_df_k0_a13 model.
+    """Calculate the collision radius using the wq2022_rg_df_k0_a13 model.
 
     This function uses a fitted expression depending on fractal dimension
     (d_f), fractal prefactor (k₀), shape anisotropy (A₁₃), and ratio
@@ -417,6 +417,7 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
+
     """
     coefficient = (0.876, 0.363, -0.105, 0.421, -0.0360, -0.227)
     return (

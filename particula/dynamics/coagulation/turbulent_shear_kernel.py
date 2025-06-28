@@ -1,5 +1,4 @@
-"""
-Turbulent shear kernel for coagulation (Saffman & Turner, 1956).
+"""Turbulent shear kernel for coagulation (Saffman & Turner, 1956).
 
 This module computes the collision kernel attributed to turbulent shear
 in a fluid. The formula stems from Equation 13A.2 in Seinfeld & Pandis (2016),
@@ -18,10 +17,11 @@ References:
       https://doi.org/10.1017/S0022112056000020
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
       physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.2.
+
 """
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity_via_system_state,
@@ -33,8 +33,7 @@ def get_turbulent_shear_kernel_st1956(
     turbulent_dissipation: float,
     kinematic_viscosity: float,
 ) -> NDArray[np.float64]:
-    """
-    Calculate the turbulent shear kernel (Equation 13A.2, Saffman & Turner,
+    """Calculate the turbulent shear kernel (Equation 13A.2, Saffman & Turner,
     1956).
 
     This function implements the formula for collisions induced by turbulent
@@ -73,6 +72,7 @@ def get_turbulent_shear_kernel_st1956(
           in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
           physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.2.
+
     """
     diameter_sum_matrix = (
         particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
@@ -89,8 +89,7 @@ def get_turbulent_shear_kernel_st1956_via_system_state(
     temperature: float,
     fluid_density: float,
 ) -> NDArray[np.float64]:
-    """
-    Calculate the turbulent shear kernel using system state data.
+    """Calculate the turbulent shear kernel using system state data.
 
     This version derives the kinematic viscosity from the temperature and
     fluid density, then uses get_turbulent_shear_kernel_st1956 for the
@@ -130,6 +129,7 @@ def get_turbulent_shear_kernel_st1956_via_system_state(
           in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
           physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.2.
+
     """
     kinematic_viscosity = get_kinematic_viscosity_via_system_state(
         temperature=temperature, fluid_density=fluid_density

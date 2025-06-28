@@ -5,9 +5,9 @@ https://youtu.be/9L77QExPmI0?si=pSKsVyVh2dE8QxFA
 https://github.com/mCodingLLC/VideosSampleCode/tree/master/videos/135_modern_logging
 """
 
-import os
 import logging
 import logging.config
+import os
 
 logger = logging.getLogger("particula")  # define the parent logger
 

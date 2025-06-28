@@ -1,14 +1,13 @@
-"""
-Calculate the radial distribution function g_{12} for particles in a
+"""Calculate the radial distribution function g_{12} for particles in a
 turbulent flow.
 """
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
-from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
 from particula.util.machine_limit import get_safe_exp, get_safe_power
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -32,8 +31,7 @@ def get_g12_radial_distribution_ao2008(
     kolmogorov_time: float,
 ) -> NDArray[np.float64]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """
-    Compute the radial distribution function g₁₂ for particles in a
+    """Compute the radial distribution function g₁₂ for particles in a
     turbulent flow.
 
     This function describes the clustering of particles in a turbulent flow.
@@ -87,6 +85,7 @@ def get_g12_radial_distribution_ao2008(
           the geometric collision rate of sedimenting droplets. Part 2.
           Theory and parameterization. New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     collision_radius = (
         particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
@@ -125,8 +124,7 @@ def _calculate_c1(
     kolmogorov_velocity: float,
     kolmogorov_time: float,
 ) -> NDArray[np.float64]:
-    """
-    Compute C_1 based on Stokes number and turbulence properties.
+    """Compute C_1 based on Stokes number and turbulence properties.
 
     C_1 is given by:
 
@@ -150,8 +148,7 @@ def _calculate_c1(
 def _compute_y_stokes(
     stokes_number: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Compute y(St), ensuring values remain non-negative.
+    """Compute y(St), ensuring values remain non-negative.
 
     y(St) = -0.1988 St^4 + 1.5275 St^3 - 4.2942 St^2 + 5.3406 St
 
@@ -180,8 +177,7 @@ def _calculate_rc(
     kolmogorov_time: float,
 ) -> NDArray[np.float64]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """
-    Compute r_c, the turbulence-driven correction to the collision kernel.
+    """Compute r_c, the turbulence-driven correction to the collision kernel.
 
     The equation is:
 
@@ -203,8 +199,7 @@ def _compute_a_og(
     kolmogorov_velocity: float,
     kolmogorov_time: float,
 ) -> float:
-    """
-    Compute aOg, which accounts for the effect of gravity on
+    """Compute aOg, which accounts for the effect of gravity on
     turbulence-driven clustering.
 
     - a_Og = a_o + (π / 8) * (|g| / (v_k / τ_k))^2
@@ -219,8 +214,7 @@ def _compute_f(
     a_og: float,
     reynolds_lambda: float,
 ) -> float:
-    """
-    Compute F(aOg, R_lambda), an empirical scaling factor for
+    """Compute F(aOg, R_lambda), an empirical scaling factor for
     turbulence effects.
 
     - F(a_Og, R_λ) = 20.115 * (a_Og / R_λ)^0.5

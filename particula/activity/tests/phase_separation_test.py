@@ -1,10 +1,11 @@
 """test for phase_separation.py"""
 
 import numpy as np
+
 from particula.activity.phase_separation import (
-    organic_water_single_phase,
     find_phase_sep_index,
     find_phase_separation,
+    organic_water_single_phase,
     q_alpha,
 )
 

@@ -1,6 +1,7 @@
 """Speciated mass moving bin strategy."""
 
 import logging
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,8 +11,7 @@ logger = logging.getLogger("particula")
 
 
 class SpeciatedMassMovingBin(DistributionStrategy):
-    """
-    Strategy for particles with speciated mass distribution.
+    """Strategy for particles with speciated mass distribution.
 
     Each particle may contain multiple species, each with a unique
     density. This strategy calculates mass, radius, and total mass from
@@ -25,6 +25,7 @@ class SpeciatedMassMovingBin(DistributionStrategy):
     - get_radius : Calculate the radius of particles.
     - add_mass : Add mass to the particle distribution.
     - add_concentration : Add concentration to the distribution.
+
     """
 
     def get_species_mass(

@@ -1,6 +1,5 @@
 # pylint: disable=duplicate-code
-"""
-Test the radial distribution of the coagulation kernel g12 using the
+"""Test the radial distribution of the coagulation kernel g12 using the
 AO2008 DNS model.
 
 By calling the get_g12_radial_distribution_ao2008 function, we also
@@ -8,8 +7,8 @@ test the private functions used in the calculation of the radial
 distribution function.
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
     get_g12_radial_distribution_ao2008,
@@ -17,8 +16,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution
 
 
 def test_get_g12_radial_distribution_ao2008_scalar():
-    """
-    Test get_g12_radial_distribution_ao2008 with a small array input.
+    """Test get_g12_radial_distribution_ao2008 with a small array input.
     """
     particle_radius = np.array(
         [10e-6, 20e-6, 30e-6]
@@ -52,8 +50,7 @@ def test_get_g12_radial_distribution_ao2008_scalar():
 
 
 def test_get_g12_radial_distribution_ao2008_invalid_inputs():
-    """
-    Test that get_g12_radial_distribution_ao2008 raises validation errors
+    """Test that get_g12_radial_distribution_ao2008 raises validation errors
     for invalid inputs.
     """
     particle_radius = np.array([10e-6, 20e-6, 30e-6])
@@ -110,8 +107,7 @@ def test_get_g12_radial_distribution_ao2008_invalid_inputs():
 
 
 def test_get_g12_radial_distribution_ao2008_edge_cases():
-    """
-    Test get_g12_radial_distribution_ao2008 with edge cases, such as
+    """Test get_g12_radial_distribution_ao2008 with edge cases, such as
     very small or very large Stokes numbers.
     """
     particle_radius = np.array([10e-6, 20e-6, 30e-6])

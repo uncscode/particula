@@ -1,5 +1,4 @@
-"""
-Class strategies for activities and vapor pressure over mixture of liquids
+"""Class strategies for activities and vapor pressure over mixture of liquids
 surface Using Raoult's Law, and strategies ideal, non-ideal, kappa hygroscopic
 parameterizations.
 """
@@ -8,20 +7,21 @@ parameterizations.
 
 from abc import ABC, abstractmethod
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
+
 from particula.particles.properties.activity_module import (
+    get_ideal_activity_mass,
     get_ideal_activity_molar,
     get_ideal_activity_volume,
-    get_ideal_activity_mass,
     get_kappa_activity,
     get_surface_partial_pressure,
 )
 
 
 class ActivityStrategy(ABC):
-    """
-    Abstract base class for vapor pressure and activity calculations.
+    """Abstract base class for vapor pressure and activity calculations.
 
     This interface is used by subclasses for computing particle activity
     and partial pressures. General methods include activity() and
@@ -50,20 +50,21 @@ class ActivityStrategy(ABC):
     References:
     - "Vapor Pressure,"
         [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
+
     """
 
     @abstractmethod
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the activity of a species based on its mass concentration.
+        """Calculate the activity of a species based on its mass concentration.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
 
         Returns:
             - Activity of the species, unitless.
+
         """
 
     def get_name(self) -> str:
@@ -75,8 +76,7 @@ class ActivityStrategy(ABC):
         pure_vapor_pressure: Union[float, NDArray[np.float64]],
         mass_concentration: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the vapor pressure of species in the particle phase.
+        """Calculate the vapor pressure of species in the particle phase.
 
         Arguments:
             - pure_vapor_pressure : Pure vapor pressure of the species in Pa.
@@ -84,6 +84,7 @@ class ActivityStrategy(ABC):
 
         Returns:
             - Vapor pressure of the particle in Pa.
+
         """
         return get_surface_partial_pressure(
             pure_vapor_pressure=pure_vapor_pressure,
@@ -92,8 +93,7 @@ class ActivityStrategy(ABC):
 
 
 class ActivityIdealMolar(ActivityStrategy):
-    """
-    Calculate ideal activity based on mole fractions (Raoult's Law).
+    """Calculate ideal activity based on mole fractions (Raoult's Law).
 
     Attributes:
         - molar_mass : Molar mass of the species in kg/mol.
@@ -114,28 +114,29 @@ class ActivityIdealMolar(ActivityStrategy):
     References:
         - "Raoult's Law,"
         [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
+
     """
 
     def __init__(self, molar_mass: Union[float, NDArray[np.float64]] = 0.0):
-        """
-        Initialize the ActivityIdealMolar strategy.
+        """Initialize the ActivityIdealMolar strategy.
 
         Arguments:
             - molar_mass : Molar mass in kg/mol.
+
         """
         self.molar_mass = molar_mass
 
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the activity of a species based on mass concentration.
+        """Calculate the activity of a species based on mass concentration.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
 
         Returns:
             - Activity of the species, unitless.
+
         """
         return get_ideal_activity_molar(
             mass_concentration=mass_concentration, molar_mass=self.molar_mass
@@ -143,8 +144,7 @@ class ActivityIdealMolar(ActivityStrategy):
 
 
 class ActivityIdealMass(ActivityStrategy):
-    """
-    Calculate ideal activity based on mass fractions (Raoult's Law).
+    """Calculate ideal activity based on mass fractions (Raoult's Law).
 
     Attributes:
         - None
@@ -164,26 +164,26 @@ class ActivityIdealMass(ActivityStrategy):
     References:
     - "Raoult's Law,"
         [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
+
     """
 
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the activity of a species based on mass concentration.
+        """Calculate the activity of a species based on mass concentration.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
 
         Returns:
             - Activity of the species, unitless.
+
         """
         return get_ideal_activity_mass(mass_concentration=mass_concentration)
 
 
 class ActivityIdealVolume(ActivityStrategy):
-    """
-    Calculate ideal activity based on volume fractions (Raoult's Law).
+    """Calculate ideal activity based on volume fractions (Raoult's Law).
 
     Attributes:
         - density : The density of the species in kg/m^3, used to
@@ -202,22 +202,22 @@ class ActivityIdealVolume(ActivityStrategy):
     References:
     - "Raoult's Law,"
         [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
+
     """
 
     def __init__(self, density: Union[float, NDArray[np.float64]] = 0.0):
-        """
-        Initialize the ActivityIdealVolume strategy.
+        """Initialize the ActivityIdealVolume strategy.
 
         Arguments:
             - density : Density of the species in kg/m^3.
+
         """
         self.density = density
 
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the activity of a species based on mass concentration.
+        """Calculate the activity of a species based on mass concentration.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
@@ -225,6 +225,7 @@ class ActivityIdealVolume(ActivityStrategy):
 
         Returns:
             - Activity of the species, unitless.
+
         """
         return get_ideal_activity_volume(
             mass_concentration=mass_concentration, density=self.density
@@ -233,8 +234,7 @@ class ActivityIdealVolume(ActivityStrategy):
 
 # Non-ideal activity strategies
 class ActivityKappaParameter(ActivityStrategy):
-    """
-    Non-ideal activity strategy using the kappa hygroscopic parameter.
+    """Non-ideal activity strategy using the kappa hygroscopic parameter.
 
     Attributes:
         - kappa : Kappa hygroscopic parameters (array or scalar).
@@ -265,6 +265,7 @@ class ActivityKappaParameter(ActivityStrategy):
           representation of hygroscopic growth and cloud condensation
           nucleus activity. Atmospheric Chemistry and Physics, 7(8),
           1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
+
     """
 
     def __init__(
@@ -274,14 +275,14 @@ class ActivityKappaParameter(ActivityStrategy):
         molar_mass: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
         water_index: int = 0,
     ):
-        """
-        Initialize the ActivityKappaParameter strategy.
+        """Initialize the ActivityKappaParameter strategy.
 
         Arguments:
             - kappa : Kappa hygroscopic parameters (array or scalar).
             - density : Densities in kg/m^3 (array or scalar).
             - molar_mass : Molar masses in kg/mol (array or scalar).
             - water_index : Index of the water species.
+
         """
         self.kappa = kappa
         self.density = density
@@ -291,8 +292,7 @@ class ActivityKappaParameter(ActivityStrategy):
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the activity of a species based on mass concentration.
+        """Calculate the activity of a species based on mass concentration.
 
         Arguments:
             - mass_concentration : Concentration of the species in kg/m^3.
@@ -305,6 +305,7 @@ class ActivityKappaParameter(ActivityStrategy):
               representation of hygroscopic growth and cloud condensation
               nucleus activity. Atmospheric Chemistry and Physics, 7(8),
               1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
+
         """
         return get_kappa_activity(
             mass_concentration=mass_concentration,

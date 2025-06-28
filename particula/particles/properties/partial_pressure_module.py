@@ -1,9 +1,11 @@
 """Module for calculating the partial pressure of a species in a
-gas over particle phase."""
+gas over particle phase.
+"""
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
 
 def get_partial_pressure_delta(
@@ -11,8 +13,7 @@ def get_partial_pressure_delta(
     partial_pressure_particle: Union[float, NDArray[np.float64]],
     kelvin_term: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the difference in partial pressure between gas and particle
+    """Calculate the difference in partial pressure between gas and particle
     phase, considering the Kelvin effect.
 
     - Δp = p_gas − (p_particle × K)
@@ -46,5 +47,6 @@ def get_partial_pressure_delta(
     References:
         - [Kelvin effect, Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
         - [Partial pressure, Wikipedia](https://en.wikipedia.org/wiki/Partial_pressure)
+
     """
     return partial_pressure_gas - partial_pressure_particle * kelvin_term

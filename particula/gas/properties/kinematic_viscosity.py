@@ -20,12 +20,12 @@ References:
 
 """
 
-from particula.util.validate_inputs import validate_inputs
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.util.constants import (
     REF_TEMPERATURE_STP,
     REF_VISCOSITY_AIR_STP,
 )
+from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
@@ -35,8 +35,7 @@ def get_kinematic_viscosity(
     dynamic_viscosity: float,
     fluid_density: float,
 ) -> float:
-    """
-    Calculate the kinematic viscosity of a fluid.
+    """Calculate the kinematic viscosity of a fluid.
 
     The function calculates ν by dividing the dynamic viscosity (μ)
     by the fluid density (ρ).
@@ -63,6 +62,7 @@ def get_kinematic_viscosity(
     References:
         - "Viscosity Conversion Formula," Wolfram Formula Repository.
           https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
+
     """
     return dynamic_viscosity / fluid_density
 
@@ -74,8 +74,7 @@ def get_kinematic_viscosity_via_system_state(
     reference_viscosity: float = REF_VISCOSITY_AIR_STP,
     reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
-    """
-    Calculate the kinematic viscosity of air by first computing its dynamic
+    """Calculate the kinematic viscosity of air by first computing its dynamic
     viscosity.
 
     This function uses get_dynamic_viscosity(...) and divides by the given
@@ -110,6 +109,7 @@ def get_kinematic_viscosity_via_system_state(
     References:
         - "Sutherland's Formula," Wolfram Formula Repository,
           https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+
     """
     dynamic_viscosity = get_dynamic_viscosity(
         temperature=temperature,

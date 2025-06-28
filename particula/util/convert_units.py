@@ -1,5 +1,4 @@
-"""
-This module provides a Pint-based wrapper to convert values between different
+"""This module provides a Pint-based wrapper to convert values between different
 units. The Pint library must be installed to use all features.
 
 Examples:
@@ -14,6 +13,7 @@ Examples:
 
 References:
     - Pint documentation: https://pint.readthedocs.io/
+
 """
 
 from typing import Optional
@@ -31,8 +31,7 @@ def get_unit_conversion(
     new: str,
     value: Optional[float] = None,
 ) -> float:
-    """
-    Convert a numeric value or unit expression from one unit to another using
+    """Convert a numeric value or unit expression from one unit to another using
     Pint.
 
     For simple multiplicative units, if no value is provided, this function
@@ -71,6 +70,7 @@ def get_unit_conversion(
 
     References:
         - Pint documentation: https://pint.readthedocs.io/
+
     """
     if UNIT_REGISTRY is None:
         raise ImportError(

@@ -15,8 +15,7 @@ COULOMB_POTENTIAL_RATIO_ARRAY = np.array([0.7, 0.9, 1.0, 1.1])
 
 
 def test_hard_sphere():
-    """
-    Test the hard_sphere function with a single value and
+    """Test the hard_sphere function with a single value and
     array of diffusive_knudsen values.
     """
     # single value
@@ -34,8 +33,7 @@ def test_hard_sphere():
 
 
 def test_coulomb_dyachkov2007():
-    """
-    Test the coulomb_dyachkov2007 function with a single value and
+    """Test the coulomb_dyachkov2007 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # single value
@@ -55,8 +53,7 @@ def test_coulomb_dyachkov2007():
 
 
 def test_coulomb_gatti2008():
-    """
-    Test the coulomb_gatti2008 function with a single value and
+    """Test the coulomb_gatti2008 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # single value
@@ -74,8 +71,7 @@ def test_coulomb_gatti2008():
 
 
 def test_coulomb_gopalakrishnan2012():
-    """
-    Test the coulomb_gopalakrishnan2012 function with a single value and
+    """Test the coulomb_gopalakrishnan2012 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # single value
@@ -97,8 +93,7 @@ def test_coulomb_gopalakrishnan2012():
 
 
 def test_coulomb_chahl2019():
-    """
-    Test the coulomb_chahl2019 function with a single value and
+    """Test the coulomb_chahl2019 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # single value
@@ -116,8 +111,7 @@ def test_coulomb_chahl2019():
 
 
 def test_transition_regime_coagulation_edge_cases():
-    """
-    Test the transition_regime_coagulation function with edge case values.
+    """Test the transition_regime_coagulation function with edge case values.
 
     Edge cases tested:
     - Zero values: Should handle zero particle sizes correctly

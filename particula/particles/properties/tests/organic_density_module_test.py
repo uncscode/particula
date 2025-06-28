@@ -1,9 +1,10 @@
 """Tests for the organic density module."""
 
 import numpy as np
+
 from particula.particles.properties.organic_density_module import (
-    get_organic_density_estimate,
     get_organic_density_array,
+    get_organic_density_estimate,
 )
 
 
@@ -65,7 +66,7 @@ def test_organic_density_estimate():
 
 
 def test_organic_array():
-    """test the organic_array function."""
+    """Test the organic_array function."""
     molar_mass_array = [180.16, 200.0, 150.0]
     oxygen2carbon_array = [0.5, 0.4, 0.6]
     hydrogen2carbon_array = [1.0, 1.0, 0.8]

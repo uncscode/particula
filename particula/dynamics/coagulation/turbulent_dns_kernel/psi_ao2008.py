@@ -1,8 +1,8 @@
-"""
-Psi function for the droplet collision kernel in the turbulent DNS model.
+"""Psi function for the droplet collision kernel in the turbulent DNS model.
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -23,8 +23,7 @@ def get_psi_ao2008(
     particle_inertia_time: Union[float, NDArray[np.float64]],
     particle_velocity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Compute the function Ψ(α, φ) for the k-th droplet.
+    """Compute the function Ψ(α, φ) for the k-th droplet.
 
     This function calculates Ψ(α, φ) for the droplet collision kernel in the
     turbulent DNS model. The equation is:
@@ -66,6 +65,7 @@ def get_psi_ao2008(
           the geometric collision rate of sedimenting droplets. Part 2.
           Theory and parameterization. New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
+
     """
     denominator = (
         (1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi)

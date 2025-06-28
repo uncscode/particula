@@ -1,9 +1,8 @@
-"""
-Convert from mole fractions
+"""Convert from mole fractions
 """
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -18,8 +17,7 @@ def get_mass_fractions_from_moles(
     mole_fractions: NDArray[np.float64],
     molecular_weights: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Convert mole fractions to mass fractions for N components.
+    """Convert mole fractions to mass fractions for N components.
 
     The relationship between mass fraction (wᵢ) and mole fraction (xᵢ) is:
 
@@ -64,6 +62,7 @@ def get_mass_fractions_from_moles(
     References:
         - Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
           https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
+
     """
     # Multiply component-wise: xᵢ × Mᵢ
     # (Broadcasting handles 2D vs. 1D shapes automatically)

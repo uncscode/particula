@@ -5,14 +5,16 @@ Change to MixinMolar classes, after PR integration.
 
 import logging
 from typing import Optional, Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
+
 from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
-    BuilderMolarMassMixin,
     BuilderDensityMixin,
+    BuilderMolarMassMixin,
 )
 from particula.particles.activity_strategies import (
     ActivityIdealMass,
@@ -25,8 +27,7 @@ logger = logging.getLogger("particula")
 
 
 class ActivityIdealMassBuilder(BuilderABC):
-    """
-    Builds an ActivityIdealMass object for calculating activity based on
+    """Builds an ActivityIdealMass object for calculating activity based on
     ideal mass fractions.
 
     A concise builder for ActivityIdealMass. This class requires no extra
@@ -48,6 +49,7 @@ class ActivityIdealMassBuilder(BuilderABC):
     References:
     - "Raoult's Law,"
         [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
+
     """
 
     def __init__(self):
@@ -55,8 +57,7 @@ class ActivityIdealMassBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> ActivityStrategy:
-        """
-        Validate and return an ActivityIdealMass strategy instance.
+        """Validate and return an ActivityIdealMass strategy instance.
 
         Returns:
             - ActivityIdealMass : The validated strategy for
@@ -68,13 +69,13 @@ class ActivityIdealMassBuilder(BuilderABC):
             mass_activity_strategy = builder.build()
             # Use mass_activity_strategy.activity(...)
             ```
+
         """
         return ActivityIdealMass()
 
 
 class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
-    """
-    Builds an ActivityIdealMolar object for calculating activity from
+    """Builds an ActivityIdealMolar object for calculating activity from
     ideal mole fractions.
 
     This builder sets up any required parameters (e.g., molar mass) and
@@ -105,6 +106,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
     References:
         - "Raoult's Law,"
         [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
+
     """
 
     def __init__(self):
@@ -113,8 +115,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
         BuilderMolarMassMixin.__init__(self)
 
     def build(self) -> ActivityStrategy:
-        """
-        Validate parameters and create an ActivityIdealMolar strategy.
+        """Validate parameters and create an ActivityIdealMolar strategy.
 
         Ensures molar_mass is properly configured before building.
 
@@ -130,6 +131,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
             molar_activity_strategy = builder.build()
             # molar_activity_strategy.activity(...)
             ```
+
         """
         self.pre_build_check()
         return ActivityIdealMolar(molar_mass=self.molar_mass)
@@ -138,8 +140,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
 class ActivityKappaParameterBuilder(
     BuilderABC, BuilderDensityMixin, BuilderMolarMassMixin
 ):
-    """
-    Builds an ActivityKappaParameter object for non-ideal activity
+    """Builds an ActivityKappaParameter object for non-ideal activity
     calculations.
 
     This builder requires kappa, density, molar_mass, and water_index.
@@ -184,6 +185,7 @@ class ActivityKappaParameterBuilder(
            cloud condensation nucleus activity," Atmospheric Chemistry
            and Physics, 7(8), 1961–1971.
            [DOI](https://doi.org/10.5194/acp-7-1961-2007)
+
     """
 
     def __init__(self):
@@ -204,6 +206,7 @@ class ActivityKappaParameterBuilder(
         Args:
             kappa: The kappa parameter for the activity calculation.
             kappa_units: Not used. (for interface consistency)
+
         """
         if np.any(kappa < 0):
             error_message = "Kappa parameter must be a positive value."
@@ -222,6 +225,7 @@ class ActivityKappaParameterBuilder(
         Args:
             water_index: The array index of the species.
             water_index_units: Not used. (for interface consistency)
+
         """
         if not isinstance(water_index, int):  # type: ignore
             error_message = "Water index must be an integer."
@@ -233,8 +237,7 @@ class ActivityKappaParameterBuilder(
         return self
 
     def build(self) -> ActivityStrategy:
-        """
-        Validate parameters and instantiate an ActivityKappaParameter strategy.
+        """Validate parameters and instantiate an ActivityKappaParameter strategy.
 
         Returns:
             - ActivityKappaParameter : The non-ideal activity strategy
@@ -252,6 +255,7 @@ class ActivityKappaParameterBuilder(
             )
             # kappa_activity_strategy ...
             ```
+
         """
         self.pre_build_check()
         return ActivityKappaParameter(

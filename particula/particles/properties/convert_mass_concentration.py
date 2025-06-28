@@ -1,7 +1,7 @@
 """Functions to convert mass concentrations to other concentration units."""
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 
@@ -15,8 +15,7 @@ from particula.util.validate_inputs import validate_inputs
 def get_mole_fraction_from_mass(
     mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """
-    Convert mass concentrations to mole fractions for N components.
+    """Convert mass concentrations to mole fractions for N components.
 
     The mole fraction is computed using:
 
@@ -47,8 +46,8 @@ def get_mole_fraction_from_mass(
     References:
         - Wikipedia contributors, "Mole fraction," Wikipedia,
           https://en.wikipedia.org/wiki/Mole_fraction.
-    """
 
+    """
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
 
@@ -90,8 +89,7 @@ def get_mole_fraction_from_mass(
 def get_volume_fraction_from_mass(
     mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """
-    Convert mass concentrations to volume fractions for N components.
+    """Convert mass concentrations to volume fractions for N components.
 
     The volume fraction is determined by:
 
@@ -128,6 +126,7 @@ def get_volume_fraction_from_mass(
     References:
         - Wikipedia contributors, "Volume fraction," Wikipedia,
           https://en.wikipedia.org/wiki/Volume_fraction.
+
     """
     # Calculate per-component volumes
     volumes = mass_concentrations / densities
@@ -170,8 +169,7 @@ def get_volume_fraction_from_mass(
 def get_mass_fraction_from_mass(
     mass_concentrations: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """
-    Convert mass concentrations to mass fractions for N components.
+    """Convert mass concentrations to mass fractions for N components.
 
     The mass fraction is computed by:
 
@@ -200,6 +198,7 @@ def get_mass_fraction_from_mass(
     References:
         - Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
           https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
+
     """
     # Handle 1D arrays
     if mass_concentrations.ndim == 1:

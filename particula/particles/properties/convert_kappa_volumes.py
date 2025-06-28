@@ -1,5 +1,4 @@
-"""
-Convert between volumes of solute, water, and total solution using the κ-Köhler
+"""Convert between volumes of solute, water, and total solution using the κ-Köhler
 relation. These functions help compute how water activity and kappa parameter
 influence volume partitioning between solute and water.
 
@@ -8,12 +7,13 @@ References:
       hygroscopic growth of aerosol particles." Journal of Aerosol Science,
       2016.
     - Wikipedia contributors, "Köhler theory," Wikipedia.
+
 """
 
 from typing import Union
 
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 
 def get_solute_volume_from_kappa(
@@ -21,8 +21,7 @@ def get_solute_volume_from_kappa(
     kappa: Union[float, np.ndarray],
     water_activity: Union[float, np.ndarray],
 ) -> Union[float, np.ndarray]:
-    """
-    Calculate the solute volume from the total solution volume using κ-Köhler
+    """Calculate the solute volume from the total solution volume using κ-Köhler
     theory.
 
     The relation for κ-Köhler can be written as:
@@ -50,8 +49,8 @@ def get_solute_volume_from_kappa(
         - Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
           representation of hygroscopic growth and cloud condensation nucleus
           activity." Atmos. Chem. Phys.
-    """
 
+    """
     kappa = max(kappa, 1e-16)  # Avoid division by zero
     if water_activity <= 1e-16:  # early return for low water activity
         return volume_total
@@ -67,8 +66,7 @@ def get_water_volume_from_kappa(
     kappa: Union[float, NDArray[np.float64]],
     water_activity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the water volume from the solute volume, κ parameter, and water
+    """Calculate the water volume from the solute volume, κ parameter, and water
     activity.
 
     This uses κ-Köhler-type relations where:
@@ -95,6 +93,7 @@ def get_water_volume_from_kappa(
         - Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
           representation of hygroscopic growth and cloud condensation nucleus
           activity." Atmos. Chem. Phys.
+
     """
     # Avoid division by zero
     water_activity = min(water_activity, 1 - 1e-16)
@@ -110,8 +109,7 @@ def get_kappa_from_volumes(
     volume_water: Union[float, np.ndarray],
     water_activity: Union[float, np.ndarray],
 ) -> Union[float, np.ndarray]:
-    """
-    Compute the κ parameter from known volumes of solute and water, given
+    """Compute the κ parameter from known volumes of solute and water, given
     water activity.
 
     Rearranging κ-Köhler-based relationships, we have:
@@ -137,6 +135,7 @@ def get_kappa_from_volumes(
         - Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
           representation of hygroscopic growth and cloud condensation nucleus
           activity." Atmos. Chem. Phys.
+
     """
     # Avoid division by zero
     water_activity = np.where(
@@ -150,8 +149,7 @@ def get_water_volume_in_mixture(
     volume_solute_dry: Union[float, np.ndarray],
     volume_fraction_water: Union[float, np.ndarray],
 ) -> float:
-    """
-    Calculate the water volume in a solute-water mixture from a specified water
+    """Calculate the water volume in a solute-water mixture from a specified water
     volume fraction.
 
     The relationship is:
@@ -177,6 +175,7 @@ def get_water_volume_in_mixture(
 
     References:
         - "Volume Fractions in Mixture Calculations," Standard Chemistry Texts.
+
     """
     return (
         volume_fraction_water * volume_solute_dry / (1 - volume_fraction_water)

@@ -1,9 +1,10 @@
-"""
-Integration test for isothermal condensation on particle-resolved aerosol.
+"""Integration test for isothermal condensation on particle-resolved aerosol.
 """
 
 import unittest
+
 import numpy as np
+
 import particula as par
 
 

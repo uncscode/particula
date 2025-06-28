@@ -1,5 +1,4 @@
-"""
-Unit tests for the ChargedCoagulationStrategy class.
+"""Unit tests for the ChargedCoagulationStrategy class.
 
 This module contains tests for the ChargedCoagulationStrategy class, which
 implements the charged particle coagulation strategy. The tests cover both
@@ -10,12 +9,14 @@ discrete and continuous_pdf distribution types.
 
 
 import unittest
+
 import numpy as np
-from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (
-    ChargedCoagulationStrategy,
-)
+
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
+)
+from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (
+    ChargedCoagulationStrategy,
 )
 from particula.particles import (
     PresetParticleRadiusBuilder,
@@ -24,13 +25,11 @@ from particula.particles import (
 
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
-    """
-    Test suite for the ChargedCoagulationStrategy class.
+    """Test suite for the ChargedCoagulationStrategy class.
     """
 
     def setUp(self):
-        """
-        Set up the test environment.
+        """Set up the test environment.
 
         Initializes a particle representation and creates instances of
         ChargedCoagulationStrategy for discrete, continuous_pdf, and
@@ -61,8 +60,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_discrete(self):
-        """
-        Test the kernel calculation for discrete distribution.
+        """Test the kernel calculation for discrete distribution.
 
         Verifies that the kernel method returns an ndarray for the discrete
         distribution type.
@@ -76,8 +74,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_discrete(self):
-        """
-        Test the step method for discrete distribution.
+        """Test the step method for discrete distribution.
 
         Ensures that the step method updates the particle concentration for
         the discrete distribution type.
@@ -97,7 +94,6 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
 
     def test_step_particle_resolved(self):
         """Test the kernel calculation for particle_resolved distribution."""
-
         # Test the kernel calculation for particle_resolved distribution
         old_concentration = self.particle_resolved.get_total_concentration()
         self.strategy_particle_resolved.step(
@@ -110,8 +106,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         self.assertNotEqual(old_concentration, new_concentration)
 
     def test_kernel_continuous_pdf(self):
-        """
-        Test the kernel calculation for continuous_pdf distribution.
+        """Test the kernel calculation for continuous_pdf distribution.
 
         Verifies that the kernel method returns an ndarray for the
         continuous_pdf distribution type.
@@ -125,8 +120,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_continuous_pdf(self):
-        """
-        Test the step method for continuous_pdf distribution.
+        """Test the step method for continuous_pdf distribution.
 
         Ensures that the step method updates the particle concentration for
         the continuous_pdf distribution type.

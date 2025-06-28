@@ -1,5 +1,4 @@
-"""
-Charged Coagulation Builder Module
+"""Charged Coagulation Builder Module
 
 Provides a builder for creating `ChargedCoagulationStrategy` objects,
 allowing electrostatic interactions in coagulation processes. Combines a
@@ -11,18 +10,17 @@ valid, flexible modeling of charged aerosol aggregation.
 from typing import Optional
 
 from particula.abc_builder import BuilderABC
-
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (
-    ChargedCoagulationStrategy,
+from particula.dynamics.coagulation.charged_kernel_strategy import (
+    ChargedKernelStrategyABC,
 )
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
     BuilderDistributionTypeMixin,
 )
-from particula.dynamics.coagulation.charged_kernel_strategy import (
-    ChargedKernelStrategyABC,
+from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (
+    ChargedCoagulationStrategy,
+)
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
 )
 
 
@@ -30,8 +28,7 @@ class ChargedCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
 ):
-    """
-    Charged Coagulation builder class.
+    """Charged Coagulation builder class.
 
     Creates a `ChargedCoagulationStrategy` based on a specified distribution
     type and a `ChargedKernelStrategyABC` instance, enforcing the correct
@@ -61,6 +58,7 @@ class ChargedCoagulationBuilder(
     References:
         - Seinfeld, J. H., & Pandis, S. N. (2016). "Atmospheric Chemistry
           and Physics." Wiley.
+
     """
 
     def __init__(self):
@@ -74,8 +72,7 @@ class ChargedCoagulationBuilder(
         charged_kernel_strategy: ChargedKernelStrategyABC,
         charged_kernel_strategy_units: Optional[str] = None,
     ):
-        """
-        Set the charged kernel strategy for electrostatic coagulation.
+        """Set the charged kernel strategy for electrostatic coagulation.
 
         Arguments:
             - charged_kernel_strategy : An instance of
@@ -86,6 +83,7 @@ class ChargedCoagulationBuilder(
         Raises:
             - ValueError : If the kernel strategy is invalid or units passed
               are unsupported.
+
         """
         # check type
         if not isinstance(charged_kernel_strategy, ChargedKernelStrategyABC):
@@ -123,6 +121,7 @@ class ChargedCoagulationBuilder(
             builder.set_charged_kernel_strategy(charged_kernel_strategy)
             charged_strategy = builder.build()
             ```
+
         """
         self.pre_build_check()
 

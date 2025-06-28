@@ -6,14 +6,15 @@ and converts the units of the parameters if necessary.
 """
 
 import logging
+
 from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
     BuilderDensityMixin,
-    BuilderSurfaceTensionMixin,
     BuilderMolarMassMixin,
     BuilderPhaseIndexMixin,
+    BuilderSurfaceTensionMixin,
 )
 from particula.particles.surface_strategies import (
     SurfaceStrategyMass,
@@ -43,6 +44,7 @@ class SurfaceStrategyMolarBuilder(
     - set_parameters : Configure multiple parameters at once.
     - set_phase_index : Optionally assign species to phases.
     - build : Validate parameters and return the strategy.
+
     """
 
     def __init__(self):
@@ -58,6 +60,7 @@ class SurfaceStrategyMolarBuilder(
 
         Returns:
             SurfaceStrategyMolar: Instance of the SurfaceStrategyMolar object.
+
         """
         self.pre_build_check()
         return SurfaceStrategyMolar(
@@ -82,6 +85,7 @@ class SurfaceStrategyMassBuilder(
     - set_parameters : Configure multiple parameters at once.
     - set_phase_index : Optionally assign species to phases.
     - build : Validate parameters and return the strategy.
+
     """
 
     def __init__(self):
@@ -96,6 +100,7 @@ class SurfaceStrategyMassBuilder(
 
         Returns:
             SurfaceStrategyMass: Instance of the SurfaceStrategyMass object.
+
         """
         self.pre_build_check()
         return SurfaceStrategyMass(
@@ -119,6 +124,7 @@ class SurfaceStrategyVolumeBuilder(
     - set_parameters : Configure multiple parameters at once.
     - set_phase_index : Optionally assign species to phases.
     - build : Validate parameters and return the strategy.
+
     """
 
     def __init__(self):
@@ -134,6 +140,7 @@ class SurfaceStrategyVolumeBuilder(
         Returns:
             SurfaceStrategyVolume: Instance of the SurfaceStrategyVolume
                 object.
+
         """
         self.pre_build_check()
         return SurfaceStrategyVolume(

@@ -1,34 +1,33 @@
-"""
-Charged dimensional kernel for coagulation calculated from system state.
+"""Charged dimensional kernel for coagulation calculated from system state.
 """
 
 # pylint: disable=duplicate-code
 
 from typing import Union
-from numpy.typing import NDArray
+
 import numpy as np
+from numpy.typing import NDArray
 
-
+from particula.dynamics.coagulation.charged_dimensionless_kernel import (
+    get_coulomb_kernel_chahl2019,
+    get_coulomb_kernel_dyachkov2007,
+    get_coulomb_kernel_gatti2008,
+    get_coulomb_kernel_gopalakrishnan2012,
+    get_dimensional_kernel,
+    get_hard_sphere_kernel,
+)
 from particula.gas import (
     get_dynamic_viscosity,
     get_molecule_mean_free_path,
 )
 from particula.particles import (
-    get_knudsen_number,
-    get_friction_factor,
-    get_cunningham_slip_correction,
     get_coulomb_enhancement_ratio,
+    get_cunningham_slip_correction,
     get_diffusive_knudsen_number,
+    get_friction_factor,
+    get_knudsen_number,
 )
 from particula.util import get_reduced_self_broadcast
-from particula.dynamics.coagulation.charged_dimensionless_kernel import (
-    get_dimensional_kernel,
-    get_hard_sphere_kernel,
-    get_coulomb_kernel_dyachkov2007,
-    get_coulomb_kernel_gatti2008,
-    get_coulomb_kernel_gopalakrishnan2012,
-    get_coulomb_kernel_chahl2019,
-)
 
 
 def _system_state_properties(
@@ -44,8 +43,7 @@ def _system_state_properties(
     NDArray[np.float64],
     NDArray[np.float64],
 ]:
-    """
-    Get the system state properties for charged particles.
+    """Get the system state properties for charged particles.
 
     Arguments:
         - particle_radius : The radius of the particles [m].
@@ -64,8 +62,8 @@ def _system_state_properties(
             particles [dimensionless].
 
     Examples: (This is an internal helper and typically not called directly.)
-    """
 
+    """
     # get properties
     dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
 
@@ -126,8 +124,7 @@ def get_hard_sphere_kernel_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """
-    The hard sphere dimensioned coagulation kernel via system state.
+    """The hard sphere dimensioned coagulation kernel via system state.
 
     For the hard sphere kernel, the dimensionless kernel is computed
     internally based on the diffusive Knudsen number, then converted
@@ -162,6 +159,7 @@ def get_hard_sphere_kernel_via_system_state(
       particles in the transition regime: The effect of the Coulomb potential.
       Journal of Chemical Physics, 126(12).
       https://doi.org/10.1063/1.2713719
+
     """
     # get system state properties
     (
@@ -200,8 +198,7 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """
-    The dimensioned coagulation kernel via system state using Dyachkov (2007).
+    """The dimensioned coagulation kernel via system state using Dyachkov (2007).
 
     Arguments:
         - particle_radius : The radius of the particles [m].
@@ -230,6 +227,7 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
       particles in the transition regime: The effect of the Coulomb potential.
       Journal of Chemical Physics, 126(12).
       https://doi.org/10.1063/1.2713719
+
     """
     (
         coulomb_potential_ratio,
@@ -264,8 +262,7 @@ def get_coulomb_kernel_gatti2008_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """
-    The dimensioned coagulation kernel via system state using Gatti (2008).
+    """The dimensioned coagulation kernel via system state using Gatti (2008).
 
     Arguments:
         - particle_radius : The radius of the particles [m].
@@ -294,6 +291,7 @@ def get_coulomb_kernel_gatti2008_via_system_state(
       charging in plasmas over a wide range of collisionality. Physical Review
       E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
       https://doi.org/10.1103/PhysRevE.78.046402
+
     """
     (
         coulomb_potential_ratio,
@@ -328,8 +326,7 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """
-    The dimensioned coagulation kernel via system state
+    """The dimensioned coagulation kernel via system state
     using Gopalakrishnan (2012).
 
     Arguments:
@@ -359,6 +356,7 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
       in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear
       and Soft Matter Physics, 85(2).
       https://doi.org/10.1103/PhysRevE.85.026410
+
     """
     (
         coulomb_potential_ratio,
@@ -393,8 +391,7 @@ def get_coulomb_kernel_chahl2019_via_system_state(
     temperature: float,
     pressure: float,
 ) -> NDArray[np.float64]:
-    """
-    The dimensioned coagulation kernel via system state
+    """The dimensioned coagulation kernel via system state
     using Chahl (2019).
 
     Arguments:
@@ -424,6 +421,7 @@ def get_coulomb_kernel_chahl2019_via_system_state(
         molecular regime Coulombic collisions in aerosols and dusty plasmas.
         Aerosol Science and Technology, 53(8), 933-957.
         https://doi.org/10.1080/02786826.2019.1614522
+
     """
     (
         coulomb_potential_ratio,

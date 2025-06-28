@@ -1,9 +1,8 @@
-"""
-Tests for the Reynolds number calculation.
+"""Tests for the Reynolds number calculation.
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
@@ -11,8 +10,7 @@ from particula.particles.properties.reynolds_number import (
 
 
 def test_get_particle_reynolds_number_scalar():
-    """
-    Test get_particle_reynolds_number with scalar inputs.
+    """Test get_particle_reynolds_number with scalar inputs.
     """
     particle_radius = 50e-6  # 50 microns
     particle_velocity = 0.1  # m/s
@@ -27,8 +25,7 @@ def test_get_particle_reynolds_number_scalar():
 
 
 def test_get_particle_reynolds_number_array():
-    """
-    Test get_particle_reynolds_number with NumPy array inputs.
+    """Test get_particle_reynolds_number with NumPy array inputs.
     """
     particle_radius = np.array([50e-6, 100e-6])
     particle_velocity = np.array([0.1, 0.2])
@@ -43,8 +40,7 @@ def test_get_particle_reynolds_number_array():
 
 
 def test_get_particle_reynolds_number_invalid():
-    """
-    Test that get_particle_reynolds_number raises errors for invalid inputs.
+    """Test that get_particle_reynolds_number raises errors for invalid inputs.
     """
     with pytest.raises(ValueError):
         get_particle_reynolds_number(-50e-6, 0.1, 1.5e-5)  # Negative radius
@@ -57,8 +53,7 @@ def test_get_particle_reynolds_number_invalid():
 
 
 def test_get_particle_reynolds_number_regime_classification():
-    """
-    Test Reynolds number classification into flow regimes.
+    """Test Reynolds number classification into flow regimes.
     """
     re_p_stokes = get_particle_reynolds_number(
         10e-6, 0.001, 1.5e-5

@@ -1,5 +1,4 @@
-"""
-This module contains functions to calculate the phase separation of organic
+"""This module contains functions to calculate the phase separation of organic
 compounds in water. The functions are based on the BAT model.
 
 Gorkowski, K., Preston, T. C., Zuend, A. (2019).
@@ -10,6 +9,7 @@ https://doi.org/10.5194/acp-19-13383-2019
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -22,8 +22,7 @@ Q_ALPHA_AT_1PHASE_AW = 0.99
 def organic_water_single_phase(
     molar_mass_ratio: Union[int, float, list, np.ndarray],
 ) -> np.ndarray:
-    """
-    Convert the given molar mass ratio (MW water / MW organic) to a
+    """Convert the given molar mass ratio (MW water / MW organic) to a
     and oxygen2carbon value were above is a single phase with water and below
     phase separation is possible.
 
@@ -39,6 +38,7 @@ def organic_water_single_phase(
           Via an efficient reduced-complexity model.
           Atmospheric Chemistry and Physics
           https://doi.org/10.5194/acp-19-13383-2019
+
     """
     # check inputs
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
@@ -51,8 +51,7 @@ def organic_water_single_phase(
 
 # pylint: disable=too-many-locals
 def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
-    """
-    This function finds phase separation using activity>1 and
+    """This function finds phase separation using activity>1 and
     inflections in the activity curve data.
     In physical systems activity can not be above one and
     curve should be monotonic. Or else there will be phase separation.
@@ -68,6 +67,7 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
             (1 if there is phase separation, 0 otherwise)
         - 'index_phase_sep_starts': Index where phase separation starts
         - 'index_phase_sep_end': Index where phase separation ends
+
     """
     # check inputs
     activity_data = np.asarray(activity_data, dtype=np.float64)
@@ -143,8 +143,7 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
 def find_phase_separation(
     activity_water: NDArray[np.float64], activity_org: NDArray[np.float64]
 ) -> dict:
-    """
-    This function checks for phase separation in each activity curve.
+    """This function checks for phase separation in each activity curve.
 
     Args:
     - activity_water (np.array): A numpy array of water activity values.
@@ -166,8 +165,8 @@ def find_phase_separation(
                 separation point.
         - 'matching_upper_seperation': The value of water activity at the
                 matching upper separation point.
-    """
 
+    """
     # check for phase separation in each activity curve
     water_sep = find_phase_sep_index(activity_water)
     organic_sep = find_phase_sep_index(activity_org)
@@ -241,8 +240,7 @@ def q_alpha(
     seperation_activity: NDArray[np.float64],
     activities: NDArray[np.float64],
 ) -> np.ndarray:
-    """
-    This function calculates the q_alpha value using a squeezed logistic
+    """This function calculates the q_alpha value using a squeezed logistic
         function.
 
     Args:
@@ -258,6 +256,7 @@ def q_alpha(
             q_alpha ~0 to q_alpha ~1.
         - The function uses a sigmoid curve parameter to calculate the
             q_alpha value.
+
     """
     # check inputs
     if seperation_activity == 0:

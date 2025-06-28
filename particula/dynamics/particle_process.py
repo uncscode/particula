@@ -3,22 +3,23 @@ Includes, condensation (and evaporation), coagulation, and deposition.
 """
 
 from typing import Any
+
 import numpy as np
 
-# Particula imports
-from particula.runnable import RunnableABC
 from particula.aerosol import Aerosol
-from particula.dynamics.condensation.condensation_strategies import (
-    CondensationStrategy,
-)
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
+from particula.dynamics.condensation.condensation_strategies import (
+    CondensationStrategy,
+)
+
+# Particula imports
+from particula.runnable import RunnableABC
 
 
 class MassCondensation(RunnableABC):
-    """
-    Handles the mass condensation process for aerosols.
+    """Handles the mass condensation process for aerosols.
 
     This class applies a specified condensation strategy to each particle
     in an Aerosol, updating particle mass and reducing gas concentration
@@ -47,11 +48,11 @@ class MassCondensation(RunnableABC):
     - [Aerosol Wikipedia](https://en.wikipedia.org/wiki/Aerosol)
     - Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and Physics:
       From Air Pollution to Climate Change," Wiley, 2016.
+
     """
 
     def __init__(self, condensation_strategy: CondensationStrategy):
-        """
-        Initialize the MassCondensation process.
+        """Initialize the MassCondensation process.
 
         Arguments:
             - condensation_strategy : The condensation strategy to use,
@@ -59,14 +60,14 @@ class MassCondensation(RunnableABC):
 
         Returns:
             - None
+
         """
         self.condensation_strategy = condensation_strategy
 
     def execute(
         self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
     ) -> Aerosol:
-        """
-        Perform the mass condensation process over a given time step.
+        """Perform the mass condensation process over a given time step.
 
         Arguments:
             - aerosol : The Aerosol instance to modify.
@@ -83,6 +84,7 @@ class MassCondensation(RunnableABC):
             )
             # The aerosol now has reduced/increased particle/gas mass
             ```
+
         """
         for _ in range(sub_steps):
             # calculate the condensation step for strategy
@@ -98,8 +100,7 @@ class MassCondensation(RunnableABC):
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
-        """
-        Compute mass condensation rates for each particle.
+        """Compute mass condensation rates for each particle.
 
         Arguments:
             - aerosol : The Aerosol instance containing particles and gases.
@@ -113,6 +114,7 @@ class MassCondensation(RunnableABC):
             rates = condensation.rate(aerosol)
             # rates may look like array([1.2e-12, 4.5e-12, ...])
             ```
+
         """
         return (
             self.condensation_strategy.rate(
@@ -125,8 +127,7 @@ class MassCondensation(RunnableABC):
 
 
 class Coagulation(RunnableABC):
-    """
-    Implements a coagulation process for aerosol particles.
+    """Implements a coagulation process for aerosol particles.
 
     This class applies a specified coagulation strategy to each particle
     in an Aerosol, merging or aggregating particles as needed, based on
@@ -154,23 +155,23 @@ class Coagulation(RunnableABC):
         - [Aerosol Wikipedia](https://en.wikipedia.org/wiki/Aerosol)
         - Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and
           Physics: From Air Pollution to Climate Change," Wiley, 2016.
+
     """
 
     def __init__(self, coagulation_strategy: CoagulationStrategyABC):
-        """
-        Initialize the Coagulation process.
+        """Initialize the Coagulation process.
 
         Arguments:
             - coagulation_strategy : The coagulation strategy to use,
               describing how particles collide and combine.
+
         """
         self.coagulation_strategy = coagulation_strategy
 
     def execute(
         self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
     ) -> Aerosol:
-        """
-        Perform the coagulation process over a given time step.
+        """Perform the coagulation process over a given time step.
 
         Arguments:
             - aerosol : The Aerosol instance to modify.
@@ -188,6 +189,7 @@ class Coagulation(RunnableABC):
             )
             # The aerosol now reflects changes from particle collisions
             ```
+
         """
         # Loop over particles
         for _ in range(sub_steps):
@@ -201,8 +203,7 @@ class Coagulation(RunnableABC):
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
-        """
-        Compute the coagulation rate for each particle in the aerosol.
+        """Compute the coagulation rate for each particle in the aerosol.
 
         Arguments:
             - aerosol : The Aerosol instance containing particles.
@@ -216,6 +217,7 @@ class Coagulation(RunnableABC):
             rates = coagulation.rate(aerosol)
             # rates might look like array([0.1, 0.05, ...])
             ```
+
         """
         rates = np.array([], dtype=np.float64)
         # Calculate the net coagulation rate for the particle

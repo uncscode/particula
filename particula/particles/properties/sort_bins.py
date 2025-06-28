@@ -1,8 +1,8 @@
-"""
-Sort bins of distribution representation
+"""Sort bins of distribution representation
 """
 
 from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -29,6 +29,7 @@ def get_sorted_bins_by_radius(
         - distribution : The sorted distribution of particle sizes or masses.
         - concentration : The sorted concentration of each particle size/mass.
         - charge : The sorted charge of each particle size/mass.
+
     """
     order = np.argsort(radius)
     is_sorted = np.array_equal(order, np.arange(radius.size))
