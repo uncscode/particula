@@ -1,5 +1,4 @@
-"""Calculate a fluids integral scale.
-"""
+"""Calculate a fluids integral scale."""
 
 from typing import Union
 

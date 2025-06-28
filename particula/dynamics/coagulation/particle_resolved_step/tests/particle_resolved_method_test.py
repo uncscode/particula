@@ -1,4 +1,4 @@
-"""pytest tests for particle_resolved_method.py"""
+"""pytest tests for particle_resolved_method.py."""
 
 import time
 

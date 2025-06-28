@@ -1,5 +1,4 @@
-"""Convert the oxygen to carbon ratio and molar mass ratio
-to OH equivalent.
+"""OH equivalent for the oxygen to carbon ratio and molar mass ratio.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics
@@ -19,8 +18,7 @@ def convert_to_oh_equivalent(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Just a pass through now, but will
-    add the oh equivalent conversion.
+    """Just a pass through now, but will add the oh equivalent conversion.
 
     Args:
         - oxygen2carbon : The oxygen to carbon ratio.

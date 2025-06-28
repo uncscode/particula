@@ -1,5 +1,4 @@
-"""Fit coefficients for the Binary Activity Coefficient
-model for organic-water mixtures.
+"""Fit coefficients for the Binary Activity Coefficient.
 
 Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics
@@ -15,8 +14,7 @@ from numpy.typing import NDArray
 
 
 class FitValues(NamedTuple):
-    """Named tuple for the fit values for the activity model.
-    """
+    """Named tuple for the fit values for the activity model."""
 
     a1: List[float]
     a2: List[float]

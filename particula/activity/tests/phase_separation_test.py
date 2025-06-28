@@ -1,4 +1,4 @@
-"""test for phase_separation.py"""
+"""test for phase_separation.py."""
 
 import numpy as np
 

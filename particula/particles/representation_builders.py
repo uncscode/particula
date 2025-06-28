@@ -1,4 +1,4 @@
-"""Particle Representation Builders
+"""Particle Representation Builders.
 
 Provides builder classes for creating ParticleRepresentation objects
 with specialized distribution, activity, and surface strategies for

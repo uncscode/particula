@@ -157,19 +157,18 @@ class HardSphereKernelStrategy(ChargedKernelStrategyABC):
       [DOI](https://doi.org/10.1103/PhysRevE.85.026410)
     """
 
-    def dimensionless(
+    def dimensionless(  # noqa: D102
         self,
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],  # type: ignore
     ) -> NDArray[np.float64]:
         return charged_dimensionless_kernel.get_hard_sphere_kernel(
-            diffusive_knudsen
+            diffusive_knudsen  # type: ignore
         )
 
 
 class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC):
-    """Dyachkov et al. (2007) approximation for the dimensionless coagulation
-    kernel.
+    """Dyachkov et al. (2007) dimensionless coagulation kernel.
 
     Accounts for Coulomb potential between particles, suitable for
     transition regime calculations.
@@ -192,19 +191,18 @@ class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC):
       [DOI](https://doi.org/10.1063/1.2713719)
     """
 
-    def dimensionless(
+    def dimensionless(  # noqa: D102
         self,
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         return charged_dimensionless_kernel.get_coulomb_kernel_dyachkov2007(
             diffusive_knudsen, coulomb_potential_ratio
-        )
+        )  # type: ignore
 
 
 class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC):
-    """Gatti & Kortshagen (2008) approximation for the dimensionless coagulation
-    kernel.
+    """Gatti & Kortshagen (2008) dimensionless coagulation kernel.
 
     Captures Coulomb potential effects for a broad range of charge and
     collisionality conditions.
@@ -227,7 +225,7 @@ class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC):
       [DOI](https://doi.org/10.1103/PhysRevE.78.046402)
     """
 
-    def dimensionless(
+    def dimensionless(  # noqa: D102
         self,
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
@@ -238,8 +236,7 @@ class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC):
 
 
 class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
-    """Gopalakrishnan & Hogan (2012) approximation for the dimensionless
-    coagulation kernel.
+    """Gopalakrishnan & Hogan (2012) dimensionless coagulation kernel.
 
     Incorporates Coulomb-influenced collisions in aerosol and dusty plasma
     environments.
@@ -261,12 +258,12 @@ class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
       [DOI](https://doi.org/10.1103/PhysRevE.85.026410)
     """
 
-    def dimensionless(
+    def dimensionless(  # noqa: D102
         self,
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return (
+        return (  # type: ignore
             charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
                 diffusive_knudsen, coulomb_potential_ratio
             )
@@ -274,8 +271,7 @@ class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
 
 
 class CoulumbChahl2019KernelStrategy(ChargedKernelStrategyABC):
-    """Chahl & Gopalakrishnan (2019) approximation for the dimensionless
-    coagulation kernel.
+    """Chahl & Gopalakrishnan (2019) dimensionless coagulation kernel.
 
     Focuses on high-potential, near-free molecular regime Coulombic collisions
     in aerosols and dusty plasmas.
@@ -298,11 +294,11 @@ class CoulumbChahl2019KernelStrategy(ChargedKernelStrategyABC):
       [DOI](https://doi.org/10.1080/02786826.2019.1614522)
     """
 
-    def dimensionless(
+    def dimensionless(  # noqa: D102
         self,
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         return charged_dimensionless_kernel.get_coulomb_kernel_chahl2019(
             diffusive_knudsen, coulomb_potential_ratio
-        )
+        )  # type: ignore

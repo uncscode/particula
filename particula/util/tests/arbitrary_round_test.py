@@ -45,4 +45,4 @@ def test_round_arbitrary():
     except ValueError:
         pass
     else:
-        assert False, "Expected ValueError"
+        raise AssertionError("Expected ValueError")

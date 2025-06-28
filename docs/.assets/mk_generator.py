@@ -1,13 +1,11 @@
-"""
-Handsdown to generate documentation for the project.
-"""
+"""Generate documentation using Handsdown."""
 
 import os
 from pathlib import Path
+
 from handsdown.generators.material import MaterialGenerator
 from handsdown.processors.pep257 import PEP257DocstringProcessor
 from handsdown.utils.path_finder import PathFinder
-
 
 repo_path = Path.cwd()
 

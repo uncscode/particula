@@ -1,0 +1,1 @@
+"""Particle property utilities."""

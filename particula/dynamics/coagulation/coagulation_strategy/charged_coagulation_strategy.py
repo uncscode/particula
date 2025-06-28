@@ -1,5 +1,4 @@
-"""Charged particle coagulation strategy.
-"""
+"""Charged particle coagulation strategy."""
 
 import logging
 from typing import Union

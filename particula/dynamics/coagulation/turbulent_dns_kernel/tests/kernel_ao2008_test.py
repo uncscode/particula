@@ -1,5 +1,4 @@
-"""Tests that the collision kernel function can be evaluated get_kernel_ao2008.
-"""
+"""Tests that the collision kernel function can be evaluated get_kernel_ao2008."""
 
 import unittest
 

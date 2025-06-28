@@ -10,8 +10,7 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 
 
 def test_mean_thermal_speed_single_value():
-    """Test mean_thermal_speed with single float inputs for mass and temperature.
-    """
+    """Test mean_thermal_speed with single float inputs for mass and temperature."""
     mass = 4.188790204786391e-12  # Example mass in kg
     temperature = 300  # Temperature in Kelvin
     expected_speed = np.sqrt(
@@ -23,8 +22,7 @@ def test_mean_thermal_speed_single_value():
 
 
 def test_mean_thermal_speed_array_input():
-    """Test mean_thermal_speed with numpy array inputs for mass and temperature.
-    """
+    """Test mean_thermal_speed with numpy array inputs for mass and temperature."""
     mass = np.array([2.18e-25, 2.18e-25])
     temperature = np.array([300, 350])
     expected_speed = np.sqrt(

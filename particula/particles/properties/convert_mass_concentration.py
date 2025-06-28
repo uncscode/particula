@@ -17,35 +17,35 @@ def get_mole_fraction_from_mass(
 ) -> NDArray[np.float64]:
     """Convert mass concentrations to mole fractions for N components.
 
-    The mole fraction is computed using:
+     The mole fraction is computed using:
 
-    - xᵢ = (mᵢ / Mᵢ) / Σⱼ(mⱼ / Mⱼ)
-        - xᵢ is the mole fraction of component i,
-        - mᵢ is the mass concentration of component i (kg/m³),
-        - Mᵢ is the molar mass of component i (kg/mol).
+     - xᵢ = (mᵢ / Mᵢ) / Σⱼ(mⱼ / Mⱼ)
+         - xᵢ is the mole fraction of component i,
+         - mᵢ is the mass concentration of component i (kg/m³),
+         - Mᵢ is the molar mass of component i (kg/mol).
 
     Arguments:
-        - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
-        - molar_masses : Molar masses (kg/mol). Must match dimensions of
-          mass_concentrations.
+         - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+         - molar_masses : Molar masses (kg/mol). Must match dimensions of
+           mass_concentrations.
 
     Returns:
-        - Mole fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-          mole fractions if input is 1D.
+         - Mole fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+           mole fractions if input is 1D.
 
     Examples:
-        ```py
-        import numpy as np
-        import particula as par
-        mass_conc = np.array([0.2, 0.8])  # kg/m³
-        mol_masses = np.array([0.018, 0.032])  # kg/mol
-        get_mole_fraction_from_mass(mass_conc, mol_masses))
-        # Output might be array([0.379..., 0.620...])
-        ```
+         ```py
+         import numpy as np
+         import particula as par
+         mass_conc = np.array([0.2, 0.8])  # kg/m³
+         mol_masses = np.array([0.018, 0.032])  # kg/mol
+         get_mole_fraction_from_mass(mass_conc, mol_masses))
+         # Output might be array([0.379..., 0.620...])
+         ```
 
     References:
-        - Wikipedia contributors, "Mole fraction," Wikipedia,
-          https://en.wikipedia.org/wiki/Mole_fraction.
+         - Wikipedia contributors, "Mole fraction," Wikipedia,
+           https://en.wikipedia.org/wiki/Mole_fraction.
     """
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses

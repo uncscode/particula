@@ -1,5 +1,4 @@
-"""Test module for the Taylor microscale functions.
-"""
+"""Test module for the Taylor microscale functions."""
 
 import unittest
 
@@ -14,8 +13,7 @@ from particula.gas.properties.taylor_microscale_module import (
 
 
 def test_get_lagrangian_taylor_microscale_time_scalar():
-    """Test get_lagrangian_taylor_microscale_time with scalar inputs.
-    """
+    """Test get_lagrangian_taylor_microscale_time with scalar inputs."""
     kolmogorov_time = 0.01  # s
     re_lambda = 100  # Reynolds number
     ao = 11  # Normalized acceleration variance
@@ -29,8 +27,7 @@ def test_get_lagrangian_taylor_microscale_time_scalar():
 
 
 def test_get_lagrangian_taylor_microscale_time_array():
-    """Test get_lagrangian_taylor_microscale_time with NumPy array inputs.
-    """
+    """Test get_lagrangian_taylor_microscale_time with NumPy array inputs."""
     kolmogorov_time = np.array([0.01, 0.02])
     re_lambda = np.array([100, 200])
     ao = np.array([11, 12])
@@ -58,8 +55,7 @@ def test_get_lagrangian_taylor_microscale_time_invalid():
 
 
 def test_get_taylor_microscale_scalar():
-    """Test get_taylor_microscale with scalar inputs.
-    """
+    """Test get_taylor_microscale with scalar inputs."""
     rms_velocity = 0.5  # m/s
     kinematic_viscosity = 1.5e-5  # m²/s
     turbulent_dissipation = 1e-3  # m²/s³
@@ -75,8 +71,7 @@ def test_get_taylor_microscale_scalar():
 
 
 def test_get_taylor_microscale_array():
-    """Test get_taylor_microscale with NumPy array inputs.
-    """
+    """Test get_taylor_microscale with NumPy array inputs."""
     rms_velocity = np.array([0.5, 0.8])
     kinematic_viscosity = np.array([1.5e-5, 1.2e-5])
     turbulent_dissipation = np.array([1e-3, 2e-3])
@@ -92,8 +87,7 @@ def test_get_taylor_microscale_array():
 
 
 def test_get_taylor_microscale_invalid():
-    """Test that get_taylor_microscale raises errors for invalid inputs.
-    """
+    """Test that get_taylor_microscale raises errors for invalid inputs."""
     with pytest.raises(ValueError):
         get_taylor_microscale(-0.5, 1.5e-5, 1e-3)
 

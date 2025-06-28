@@ -1,4 +1,4 @@
-"""testing getting constants from the get_constants.py file"""
+"""testing getting constants from the get_constants.py file."""
 
 from particula.util.constants import (
     AVOGADRO_NUMBER,
@@ -8,7 +8,7 @@ from particula.util.constants import (
 
 
 def test_constants():
-    """Simple tests are conducted as follows:
+    """Simple tests are conducted.
 
     * see if GAS_CONSTANT maniuplation is good
     """

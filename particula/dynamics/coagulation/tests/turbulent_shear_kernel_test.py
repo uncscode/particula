@@ -1,5 +1,4 @@
-"""Test the turbulent shear kernel functions.
-"""
+"""Test the turbulent shear kernel functions."""
 
 # pylint: disable=duplicate-code
 
@@ -36,8 +35,7 @@ def test_turbulent_shear_kernel_single_value():
 
 
 def test_turbulent_shear_kernel_via_system_state():
-    """Test turbulent_shear_kernel_via_system_state with system state inputs.
-    """
+    """Test turbulent_shear_kernel_via_system_state with system state inputs."""
     particle_radius = np.array([1e-6, 2e-6])  # example diameters [m]
     turbulent_dissipation = (
         1.0e-4  # example turbulent kinetic energy [m^2/s^2]

@@ -16,8 +16,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution
 
 
 def test_get_g12_radial_distribution_ao2008_scalar():
-    """Test get_g12_radial_distribution_ao2008 with a small array input.
-    """
+    """Test get_g12_radial_distribution_ao2008 with a small array input."""
     particle_radius = np.array(
         [10e-6, 20e-6, 30e-6]
     )  # Particle radii in meters

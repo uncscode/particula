@@ -89,12 +89,12 @@ def test_get_conversion_strategy():
 
     try:
         strategy = get_distribution_conversion_strategy("invalid", "pmf")
-        assert False  # Should raise a ValueError
+        raise AssertionError()  # Should raise a ValueError
     except ValueError:
         assert True
 
     try:
         strategy = get_distribution_conversion_strategy("dn/dlogdp", "invalid")
-        assert False  # Should raise a ValueError
+        raise AssertionError()  # Should raise a ValueError
     except ValueError:
         assert True

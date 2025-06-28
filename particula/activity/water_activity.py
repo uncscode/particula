@@ -1,4 +1,6 @@
-"""This module contains functions to calculates the activity coefficients
+"""Calculate the activity coefficients at fixed water activity.
+
+This module contains functions to calculates the activity coefficients
 at a fixed water activity or the water activity cross point.
 
 Gorkowski, K., Preston, T. C., Zuend, A. (2019).
@@ -30,8 +32,7 @@ def biphasic_water_activity_point(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
 ) -> np.ndarray:
-    """This function computes the biphasic to single phase
-    water activity (RH*100).
+    """Computes the biphasic to single phase water activity (RH*100).
 
     Args:
         - oxygen2carbon : The oxygen to carbon ratio.
@@ -102,8 +103,7 @@ def fixed_water_activity(
     Union[float, NDArray[np.float64]],
     Union[float, NDArray[np.float64]],
 ]:
-    """Calculate the activity coefficients of water and organic matter in
-    organic-water mixtures.
+    """Activity coefficients in organic-water mixtures.
 
     This function assumes a fixed water activity value (e.g., RH = 75%
     corresponds to 0.75 water activity in equilibrium).

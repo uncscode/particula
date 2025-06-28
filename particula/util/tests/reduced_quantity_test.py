@@ -1,4 +1,4 @@
-"""testing the utility calculating reduced quantities"""
+"""testing the utility calculating reduced quantities."""
 
 import numpy as np
 import pytest
@@ -53,7 +53,7 @@ def test_reduced_value_negative_values():
 
 
 def test_reduced_value_one_element():
-    """Test with one element in array"""
+    """Test with one element in array."""
     alpha = np.array([5])
     beta = np.array([10])
     expected = alpha * beta / (alpha + beta)
@@ -78,14 +78,14 @@ def test_reduced_self_broadcast_typical():
 
 
 def test_reduced_self_broadcast_empty():
-    """Test with empty input"""
+    """Test with empty input."""
     alpha_array = np.array([])
     result = get_reduced_self_broadcast(alpha_array)
     assert result.shape == (0, 0), "Test failed for empty input"
 
 
 def test_reduced_self_broadcast_zero_elements():
-    """Test with zero elements"""
+    """Test with zero elements."""
     alpha_array = np.array([0, 0, 0])
     expected_result = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     result = get_reduced_self_broadcast(alpha_array)
@@ -95,7 +95,7 @@ def test_reduced_self_broadcast_zero_elements():
 
 
 def test_reduced_self_broadcast_one_element():
-    """Test with a single element array"""
+    """Test with a single element array."""
     alpha_array = np.array([4])
     expected_result = np.array([[4 * 4 / (4 + 4)]])
     result = get_reduced_self_broadcast(alpha_array)
@@ -105,7 +105,7 @@ def test_reduced_self_broadcast_one_element():
 
 
 def test_reduced_self_broadcast_negative_elements():
-    """Test with negative elements"""
+    """Test with negative elements."""
     alpha_array = np.array([-1, -2, -3])
     expected_result = np.array(
         [

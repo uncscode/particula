@@ -1,6 +1,4 @@
-"""Abstract Base Class for Factory classes, that use builders to create
-strategy objects.
-"""
+"""Abstract base class for factories that use builders to create strategies."""
 
 import logging
 from abc import ABC, abstractmethod
@@ -71,8 +69,7 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
     def get_strategy(
         self, strategy_type: str, parameters: Optional[Dict[str, Any]] = None
     ) -> StrategyT:
-        """Create a strategy instance for the specified type using its
-        corresponding builder.
+        """Create a strategy instance using its corresponding builder.
 
         Arguments:
             - strategy_type (str): Name of the strategy to build.

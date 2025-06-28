@@ -22,8 +22,7 @@ logger = logging.getLogger("particula")
 
 
 class GasSpecies:
-    """Represents an individual or array of gas species with properties like
-    name, molar mass, vapor pressure, and partitioning.
+    """Represents an individual or array of gas species with properties.
 
     Attributes:
         - name : The name of the gas species.
@@ -74,12 +73,11 @@ class GasSpecies:
         molar_mass: Union[float, NDArray[np.float64]],
         vapor_pressure_strategy: Union[
             VaporPressureStrategy, list[VaporPressureStrategy]
-        ] = ConstantVaporPressureStrategy(0.0),
+        ] = ConstantVaporPressureStrategy(0.0),  # noqa: B008
         partitioning: bool = True,
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
-        """Initialize the GasSpecies with name, molar mass, and vapor pressure
-        strategy.
+        """Initialize the with name, molar mass, and vapor pressure strategy.
 
         Arguments:
             - name : The name of the gas species.
@@ -109,8 +107,7 @@ class GasSpecies:
         return str(self.name)
 
     def __len__(self):
-        """Return the number of gas species (1 if scalar; array length if
-        ndarray).
+        """Return the number of gas species.
 
         Returns:
             - float or int : Number of species (array length or 1).
@@ -203,8 +200,7 @@ class GasSpecies:
         return self.molar_mass
 
     def get_partitioning(self) -> bool:
-        """Return the partitioning flag (True if the species can partition).
-        """
+        """Return the partitioning flag (True if the species can partition)."""
         return self.partitioning
 
     def get_concentration(self) -> Union[float, NDArray[np.float64]]:
@@ -472,8 +468,7 @@ class GasSpecies:
     def _check_if_negative_concentration(
         self, values: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """Ensure concentration is not negative. Log a warning if it is and set
-        to 0.
+        """Ensure concentration is not negative.
 
         Arguments:
             - values : Concentration values to check.
@@ -484,7 +479,7 @@ class GasSpecies:
         if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
             logger.warning(message)
-            warnings.warn(message, UserWarning)
+            warnings.warn(message, UserWarning, stacklevel=2)
             # Set negative concentrations to 0
             values = np.maximum(values, 0.0)
         return values

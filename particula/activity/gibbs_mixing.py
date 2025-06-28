@@ -103,8 +103,10 @@ def gibbs_mix_weight(
     density: Union[float, NDArray[np.float64]],
     functional_group: Optional[str] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Gibbs free energy of mixing, see Gorkowski (2019), with weighted
-    oxygen2carbon regions. Only can run one compound at a time.
+    """Gibbs free energy of mixing.
+
+    See Gorkowski (2019), with weighted oxygen2carbon regions.
+    Only can run one compound at a time.
 
     Args:
         - molar_mass_ratio : The molar mass ratio of water to organic
@@ -208,9 +210,7 @@ def _calculate_gibbs_mix_single(
                 density=density,
                 fit_dict=G19_FIT_HIGH,
             )
-            gibbs_mix = (
-                weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
-            )
+            gibbs_mix = weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
             derivative_gibbs = (
                 weights[2] * derivative_gibbs_high
                 + weights[1] * derivative_gibbs_mid

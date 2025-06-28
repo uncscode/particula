@@ -1,5 +1,4 @@
-"""Test for water activity calculation
-"""
+"""Test for water activity calculation."""
 
 import numpy as np
 

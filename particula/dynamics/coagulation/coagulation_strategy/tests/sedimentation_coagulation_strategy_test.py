@@ -21,8 +21,7 @@ from particula.particles import (
 
 
 class TestSedimentationCoagulationStrategy(unittest.TestCase):
-    """Test suite for the SedimentationCoagulationStrategy class.
-    """
+    """Test suite for the SedimentationCoagulationStrategy class."""
 
     def setUp(self):
         """Set up the test environment.

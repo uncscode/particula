@@ -1,5 +1,4 @@
-"""Calculate the particle Reynolds number.
-"""
+"""Calculate the particle Reynolds number."""
 
 from typing import Union
 

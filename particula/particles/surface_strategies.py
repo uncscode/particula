@@ -180,8 +180,7 @@ class SurfaceStrategy(ABC):
         surface_tension_table: Optional[NDArray[np.float64]] = None,
         temperature_table: Optional[NDArray[np.float64]] = None,
     ):
-        """Initialize the surface strategy.
-        """
+        """Initialize the surface strategy."""
         self.surface_tension = np.asarray(surface_tension, dtype=np.float64)
         self.surface_tension_table = (
             np.asarray(surface_tension_table, dtype=np.float64)

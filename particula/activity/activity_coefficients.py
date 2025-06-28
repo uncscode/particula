@@ -41,8 +41,7 @@ def bat_activity_coefficients(
     Union[float, NDArray[np.float64]],
     Union[float, NDArray[np.float64]],
 ]:
-    """Calculate the activity coefficients for water and organic matter in
-    organic-water mixtures.
+    """Calculate the activity coefficients for water-organic mixtures.
 
     Args:
         - molar_mass_ratio : Ratio of the molecular weight of water to the

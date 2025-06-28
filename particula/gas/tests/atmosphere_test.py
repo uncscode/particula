@@ -1,4 +1,4 @@
-"""Testing Atmosphere and GasSpecies interaction"""
+"""Testing Atmosphere and GasSpecies interaction."""
 
 # pylint: disable=R0801,W0621
 

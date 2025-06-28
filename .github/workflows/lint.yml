@@ -45,6 +45,6 @@ jobs:
 
     -
       if: ${{ matrix.linter == 'ruff' }}
-      name: Format with ruff
+      name: Ruff Check
       run: |
-        ruff format --check .
+        ruff check particula

@@ -1,5 +1,6 @@
-"""This module contains functions to calculate the phase separation of organic
-compounds in water. The functions are based on the BAT model.
+"""Calculate the phase separation of organic compounds in water.
+
+The functions are based on the BAT model.
 
 Gorkowski, K., Preston, T. C., Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics
@@ -22,7 +23,9 @@ Q_ALPHA_AT_1PHASE_AW = 0.99
 def organic_water_single_phase(
     molar_mass_ratio: Union[int, float, list, np.ndarray],
 ) -> np.ndarray:
-    """Convert the given molar mass ratio (MW water / MW organic) to a
+    """Solubility limit of organic compounds in water.
+
+    Convert the given molar mass ratio (MW water / MW organic) to a
     and oxygen2carbon value were above is a single phase with water and below
     phase separation is possible.
 
@@ -50,7 +53,9 @@ def organic_water_single_phase(
 
 # pylint: disable=too-many-locals
 def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
-    """This function finds phase separation using activity>1 and
+    """Find phase separation in activity data.
+
+    This function finds phase separation using activity>1 and
     inflections in the activity curve data.
     In physical systems activity can not be above one and
     curve should be monotonic. Or else there will be phase separation.
@@ -237,8 +242,7 @@ def q_alpha(
     seperation_activity: NDArray[np.float64],
     activities: NDArray[np.float64],
 ) -> np.ndarray:
-    """This function calculates the q_alpha value using a squeezed logistic
-        function.
+    """Calculates the q_alpha value using a squeezed logistic function.
 
     Args:
         - seperation_activity (np.array): A numpy array of values representing

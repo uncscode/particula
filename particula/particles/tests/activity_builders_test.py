@@ -127,7 +127,7 @@ def test_build_kappa_parameter_activity_set_molar_mass():
 
 
 def test_build_kappa_parameter_activity_set_water_index():
-    """Testing setting water index"""
+    """Testing setting water index."""
     builder = ActivityKappaParameterBuilder()
     builder.set_water_index(1)
     assert builder.water_index == 1

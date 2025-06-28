@@ -1,5 +1,4 @@
-"""Test the function that converts mole fractions to mass fractions.
-"""
+"""Test the function that converts mole fractions to mass fractions."""
 
 from math import isclose
 
@@ -41,7 +40,7 @@ def test_get_mass_fractions_from_moles_1d(
     """Test 1D inputs with:
     - typical valid data
     - all zeros
-    - approximate numeric check
+    - approximate numeric check.
     """
     result = get_mass_fractions_from_moles(mole_fractions, molecular_weights)
 
@@ -82,8 +81,7 @@ def test_get_mass_fractions_from_moles_1d(
 
 
 def test_get_mass_fractions_from_moles_2d():
-    """Test 2D inputs where each row of mole fractions is converted row-by-row.
-    """
+    """Test 2D inputs where each row of mole fractions is converted row-by-row."""
     # Example 2D input: each row has 3 components
     x_2d = np.array(
         [

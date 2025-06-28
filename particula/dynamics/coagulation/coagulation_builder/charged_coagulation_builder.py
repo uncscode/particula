@@ -1,4 +1,4 @@
-"""Charged Coagulation Builder Module
+"""Charged Coagulation Builder Module.
 
 Provides a builder for creating `ChargedCoagulationStrategy` objects,
 allowing electrostatic interactions in coagulation processes. Combines a

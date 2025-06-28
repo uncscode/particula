@@ -1,5 +1,4 @@
-"""Fluid RMS fluctuation velocity calculation module.
-"""
+"""Fluid RMS fluctuation velocity calculation module."""
 
 from typing import Union
 

@@ -1,4 +1,4 @@
-"""Module for coulomb-related enhancements
+"""Module for coulomb-related enhancements.
 
 References:
 Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions

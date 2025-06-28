@@ -1,4 +1,4 @@
-"""Coagulation Builder Mixin Classes
+"""Coagulation Builder Mixin Classes.
 
 Provides reusable mixin classes for building coagulation strategies
 with validated inputs (e.g., distribution type, turbulent dissipation,

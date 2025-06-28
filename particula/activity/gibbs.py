@@ -1,5 +1,4 @@
-"""Calculates the Gibbs free energy of mixing for a binary solution.
-"""
+"""Calculates the Gibbs free energy of mixing for a binary solution."""
 
 from typing import Tuple
 

@@ -1,4 +1,4 @@
-"""Particle Distribution Strategies
+"""Particle Distribution Strategies.
 
 Defines various distribution strategies (mass-based, radii-based, etc.)
 for representing particles in a distribution. Each strategy handles

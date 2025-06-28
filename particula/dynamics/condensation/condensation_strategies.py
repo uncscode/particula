@@ -300,7 +300,7 @@ class CondensationStrategy(ABC):
                 "particle concentration would also be zero."
             )
             logger.warning(message)
-            warnings.warn(message, RuntimeWarning)
+            warnings.warn(message, RuntimeWarning, stacklevel=2)
             radius = np.where(radius == 0, 1, radius)
         return np.where(radius == 0, np.max(radius), radius)
 
@@ -563,7 +563,7 @@ class CondensationIsothermal(CondensationStrategy):
         m_rate = iso_cond.mass_transfer_rate(
             particle, gas_species, 298.15, 101325
         )
-        ```
+        ```.
         """
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
         first_order_mass_transport = self.first_order_mass_transport(
@@ -592,7 +592,7 @@ class CondensationIsothermal(CondensationStrategy):
         """Examples:
         ```py title="Example – Condensation rate array"
         rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
-        ```
+        ```.
         """
         # Step 1: Calculate the mass transfer rate due to condensation
         mass_rate = self.mass_transfer_rate(
@@ -630,7 +630,7 @@ class CondensationIsothermal(CondensationStrategy):
         particle, gas_species = iso_cond.step(
             particle, gas_species, 298.15, 101325, time_step=1.0
         )
-        ```
+        ```.
         """
         # Calculate the mass transfer rate
         mass_rate = self.mass_transfer_rate(

@@ -1,5 +1,4 @@
-"""Tests for the phi_function module.
-"""
+"""Tests for the phi_function module."""
 
 import numpy as np
 import pytest
@@ -10,8 +9,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
 
 
 def test_get_phi_ao2008_scalar():
-    """Test get_phi_ao2008 with scalar inputs.
-    """
+    """Test get_phi_ao2008 with scalar inputs."""
     alpha = 2.0  # Turbulence parameter [-]
     phi = 1.0  # Characteristic velocity [m/s]
     particle_inertia_time = np.array([0.05, 0.02])  # [s]
@@ -29,8 +27,7 @@ def test_get_phi_ao2008_scalar():
 
 
 def test_get_phi_ao2008_array():
-    """Test get_phi_ao2008 with NumPy array inputs.
-    """
+    """Test get_phi_ao2008 with NumPy array inputs."""
     alpha = 2.0  # Turbulence parameter [-]
     phi = 1.0  # Characteristic velocity [m/s]
     particle_inertia_time = np.array([0.05, 0.1, 0.2])  # [s]
@@ -48,8 +45,7 @@ def test_get_phi_ao2008_array():
 
 
 def test_get_phi_ao2008_invalid_inputs():
-    """Test that get_phi_ao2008 raises validation errors for invalid inputs.
-    """
+    """Test that get_phi_ao2008 raises validation errors for invalid inputs."""
     alpha = 2.0  # [-]
     phi = 1.0  # [m/s]
     particle_inertia_time = np.array([0.05, 0.1, 0.5])  # [s]

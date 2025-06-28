@@ -1,5 +1,4 @@
-"""Test module for the kinematic_viscosity module.
-"""
+"""Test module for the kinematic_viscosity module."""
 
 import pytest
 

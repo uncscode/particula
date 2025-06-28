@@ -1,5 +1,4 @@
-"""Test the normalize_accel_variance function.
-"""
+"""Test the normalize_accel_variance function."""
 
 import numpy as np
 import pytest
@@ -10,8 +9,7 @@ from particula.gas.properties.normalize_accel_variance import (
 
 
 def test_get_normalized_accel_variance_scalar():
-    """Test get_normalized_accel_variance with scalar inputs.
-    """
+    """Test get_normalized_accel_variance with scalar inputs."""
     re_lambda = 100  # Taylor-microscale Reynolds number
 
     expected = (11 + 7 * re_lambda) / (205 + re_lambda)
@@ -21,8 +19,7 @@ def test_get_normalized_accel_variance_scalar():
 
 
 def test_get_normalized_accel_variance_array():
-    """Test get_normalized_accel_variance with NumPy array inputs.
-    """
+    """Test get_normalized_accel_variance with NumPy array inputs."""
     re_lambda = np.array([50, 150, 300])
 
     expected = (11 + 7 * re_lambda) / (205 + re_lambda)
@@ -32,8 +29,7 @@ def test_get_normalized_accel_variance_array():
 
 
 def test_get_normalized_accel_variance_invalid():
-    """Test that get_normalized_accel_variance raises errors for invalid inputs.
-    """
+    """Test that get_normalized_accel_variance raises errors for invalid inputs."""
     with pytest.raises(ValueError):
         get_normalized_accel_variance_ao2008(-10)  # Negative Reynolds number
 
@@ -49,8 +45,7 @@ def test_get_normalized_accel_variance_invalid():
 
 
 def test_get_normalized_accel_variance_edge_case():
-    """Test get_normalized_accel_variance with very small values near machine precision.
-    """
+    """Test get_normalized_accel_variance with very small values near machine precision."""
     re_lambda = 1e-10
 
     expected = (11 + 7 * re_lambda) / (205 + re_lambda)

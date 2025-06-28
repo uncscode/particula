@@ -1,4 +1,4 @@
-"""Color Hex Codes
+"""Color Hex Codes.
 
 to be removed, likely particula_beta only. -kyle
 """
