@@ -1,13 +1,12 @@
 # %%
-"""
-This script uploads the API, Examples, and Docs to the vector store.
+"""This script uploads the API, Examples, and Docs to the vector store.
 """
 
 import os
 from pathlib import Path
-from openai import OpenAI
-from openai import NotFoundError
+
 import git
+from openai import NotFoundError, OpenAI
 
 # get keys
 API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -17,8 +16,7 @@ REPO_PATH = Path.cwd()
 
 
 def detach_and_delete_file(client, vector_store_id, file_id):
-    """
-    Detach a file from the specified vector store and delete it.
+    """Detach a file from the specified vector store and delete it.
 
     This function first removes the file from the given vector store,
     then deletes it from the OpenAI account.
@@ -50,8 +48,7 @@ def detach_and_delete_file(client, vector_store_id, file_id):
 
 
 def detach_and_delete_all_files(client, vector_store_id):
-    """
-    Detach and delete every file in the specified vector store.
+    """Detach and delete every file in the specified vector store.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -98,8 +95,7 @@ def upload_and_attach_files(
     vector_store_id,
     file_path,
 ):
-    """
-    Upload a file to the vector store and attach it.
+    """Upload a file to the vector store and attach it.
 
     This function creates the file in OpenAI, then links
     it to the vector store with relevant metadata.
@@ -154,8 +150,7 @@ def upload_all_files_in_directory(
     vector_store_id,
     directory_path,
 ):
-    """
-    Upload and attach all files in a directory to the vector store.
+    """Upload and attach all files in a directory to the vector store.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -170,7 +165,6 @@ def upload_all_files_in_directory(
         upload_all_files_in_directory(client, "store123", "C:/temp/docs")
         ```
     """
-
     folder_dir = Path(directory_path)
     files_list = list(folder_dir.rglob("*.*"))
     # Iterate over all files in the directory
@@ -183,8 +177,7 @@ def upload_all_files_in_directory(
 
 
 def get_current_commit():
-    """
-    Retrieve the current commit hash from the local Git repository.
+    """Retrieve the current commit hash from the local Git repository.
 
     Returns:
         - A string with the commit hash.
@@ -200,8 +193,7 @@ def get_current_commit():
 
 
 def get_changed_files(previous_commit_hash):
-    """
-    Get a list of files changed between the previous commit and the current
+    """Get a list of files changed between the previous commit and the current
     commit.
 
     Arguments:
@@ -227,8 +219,7 @@ def get_changed_files(previous_commit_hash):
 
 
 def filter_changed_files(changed_files):
-    """
-    Filter changed files to include only those in specific directories.
+    """Filter changed files to include only those in specific directories.
 
     Arguments:
         - changed_files : List of changed file paths.
@@ -248,8 +239,7 @@ def filter_changed_files(changed_files):
 
 
 def collect_files_to_update(client, changed_files):
-    """
-    Collect files to update based on remote files and changed files.
+    """Collect files to update based on remote files and changed files.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -302,8 +292,7 @@ def collect_files_to_update(client, changed_files):
 
 
 def upload_new_file(client, file_to_update_dict):
-    """
-    Upload a new file to the vector store based on the provided info.
+    """Upload a new file to the vector store based on the provided info.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -344,8 +333,7 @@ def upload_new_file(client, file_to_update_dict):
 
 
 def update_vector_store_file(client, file_to_update_dict):
-    """
-    Update a file in the vector store based on its existing ID.
+    """Update a file in the vector store based on its existing ID.
 
     Arguments:
         - client : The OpenAI client.
@@ -393,8 +381,7 @@ def set_vector_store_commit(
     vector_store_id,
     commit_hash=None,
 ):
-    """
-    Set the vector store's commit hash to the current local commit.
+    """Set the vector store's commit hash to the current local commit.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -418,8 +405,7 @@ def set_vector_store_commit(
 
 
 def get_vector_store_commit(client, vector_store_id):
-    """
-    Retrieve the commit hash stored in the vector store's metadata.
+    """Retrieve the commit hash stored in the vector store's metadata.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -440,8 +426,7 @@ def get_vector_store_commit(client, vector_store_id):
 
 
 def refresh_changed_files(client, vector_store_id):
-    """
-    Refresh changed files in the vector store based on local Git diffs.
+    """Refresh changed files in the vector store based on local Git diffs.
 
     Arguments:
         - client : The OpenAI client instance.
@@ -492,8 +477,7 @@ def refresh_all_files(
     client,
     vector_store_id=VECTOR_STORE_ID,
 ):
-    """
-    Delete all files from the vector store and re-upload everything from temp.
+    """Delete all files from the vector store and re-upload everything from temp.
 
     Arguments:
         - client : The OpenAI client instance.

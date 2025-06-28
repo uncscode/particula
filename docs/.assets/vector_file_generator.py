@@ -1,21 +1,20 @@
 # %%
-"""
-For vector store upload, we need to convert all notebooks and python files in
+"""For vector store upload, we need to convert all notebooks and python files in
 a directory to Markdown files.
 """
 import os
 import shutil
 from pathlib import Path
+
 import nbformat
-from nbconvert import MarkdownExporter
-from handsdown.utils.path_finder import PathFinder
 from handsdown.generators.material import MaterialGenerator
 from handsdown.processors.pep257 import PEP257DocstringProcessor
+from handsdown.utils.path_finder import PathFinder
+from nbconvert import MarkdownExporter
 
 
 def convert_notebooks_to_markdown(notebook_paths, output_dir):
-    """
-    Convert a list of notebooks (.ipynb) and markdown files (.md) to Markdown
+    """Convert a list of notebooks (.ipynb) and markdown files (.md) to Markdown
     files, writing the results into the specified output directory.
     """
     exporter = MarkdownExporter()
