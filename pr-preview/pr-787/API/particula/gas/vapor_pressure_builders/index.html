@@ -10900,10 +10900,10 @@
 </blockquote>
 <h2 id="antoinevaporpressurebuilder">AntoineVaporPressureBuilder<a class="headerlink" href="#antoinevaporpressurebuilder" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L46">Show source in vapor_pressure_builders.py:46</a></p>
-<p>Builder class for AntoineVaporPressureStrategy. It allows setting
-the coefficients 'a', 'b', and 'c' separately and then building the
-strategy object. Follows the general form of the Antoine equation in
-Unicode:</p>
+<p>Builder class for AntoineVaporPressureStrategy.</p>
+<p>It allows setting the coefficients 'a', 'b', and 'c' separately and then
+building the strategy object.
+Follows the general form of the Antoine equation in</p>
 <p>log₁₀(P) = a − b / (T − c)</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
@@ -10953,7 +10953,7 @@ Unicode:</p>
 <li><a href="../../abc_builder/#builderabc">BuilderABC</a></li>
 </ul>
 <h3 id="antoinevaporpressurebuilderbuild">AntoineVaporPressureBuilder().build<a class="headerlink" href="#antoinevaporpressurebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L135">Show source in vapor_pressure_builders.py:135</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L136">Show source in vapor_pressure_builders.py:136</a></p>
 <p>Validate and return an AntoineVaporPressureStrategy using the set
 coefficients.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
@@ -10968,7 +10968,7 @@ coefficients.</p>
 <li><a href="../vapor_pressure_strategies/#antoinevaporpressurestrategy">AntoineVaporPressureStrategy</a></li>
 </ul>
 <h3 id="antoinevaporpressurebuilderset_a">AntoineVaporPressureBuilder().set_a<a class="headerlink" href="#antoinevaporpressurebuilderset_a" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L103">Show source in vapor_pressure_builders.py:103</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L104">Show source in vapor_pressure_builders.py:104</a></p>
 <p>Set the coefficient 'a' of the Antoine equation.</p>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_a</span><span class="p">(</span>
@@ -10976,21 +10976,21 @@ coefficients.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AntoineVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="antoinevaporpressurebuilderset_b">AntoineVaporPressureBuilder().set_b<a class="headerlink" href="#antoinevaporpressurebuilderset_b" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L115">Show source in vapor_pressure_builders.py:115</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L116">Show source in vapor_pressure_builders.py:116</a></p>
 <p>Set the coefficient 'b' of the Antoine equation.</p>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AntoineVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="antoinevaporpressurebuilderset_c">AntoineVaporPressureBuilder().set_c<a class="headerlink" href="#antoinevaporpressurebuilderset_c" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L125">Show source in vapor_pressure_builders.py:125</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L126">Show source in vapor_pressure_builders.py:126</a></p>
 <p>Set the coefficient 'c' of the Antoine equation.</p>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AntoineVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="clausiusclapeyronvaporpressurebuilder">ClausiusClapeyronVaporPressureBuilder<a class="headerlink" href="#clausiusclapeyronvaporpressurebuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L146">Show source in vapor_pressure_builders.py:146</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L147">Show source in vapor_pressure_builders.py:147</a></p>
 <p>Builder class for ClausiusClapeyronStrategy. This class facilitates
 setting the latent heat of vaporization, initial temperature, and initial
 pressure with unit handling and then builds the strategy object.</p>
@@ -11038,7 +11038,7 @@ pressure with unit handling and then builds the strategy object.</p>
 <li><a href="../../abc_builder/#builderabc">BuilderABC</a></li>
 </ul>
 <h3 id="clausiusclapeyronvaporpressurebuilderbuild">ClausiusClapeyronVaporPressureBuilder().build<a class="headerlink" href="#clausiusclapeyronvaporpressurebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L241">Show source in vapor_pressure_builders.py:241</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L242">Show source in vapor_pressure_builders.py:242</a></p>
 <p>Validate parameters and return a ClausiusClapeyronStrategy object.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11052,7 +11052,7 @@ pressure with unit handling and then builds the strategy object.</p>
 <li><a href="../vapor_pressure_strategies/#clausiusclapeyronstrategy">ClausiusClapeyronStrategy</a></li>
 </ul>
 <h3 id="clausiusclapeyronvaporpressurebuilderset_latent_heat">ClausiusClapeyronVaporPressureBuilder().set_latent_heat<a class="headerlink" href="#clausiusclapeyronvaporpressurebuilderset_latent_heat" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L202">Show source in vapor_pressure_builders.py:202</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L203">Show source in vapor_pressure_builders.py:203</a></p>
 <p>Set the latent heat of vaporization: Default units J/mol.</p>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
@@ -11061,7 +11061,7 @@ pressure with unit handling and then builds the strategy object.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="clausiusclapeyronvaporpressurebuilderset_pressure_initial">ClausiusClapeyronVaporPressureBuilder().set_pressure_initial<a class="headerlink" href="#clausiusclapeyronvaporpressurebuilderset_pressure_initial" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L228">Show source in vapor_pressure_builders.py:228</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L229">Show source in vapor_pressure_builders.py:229</a></p>
 <p>Set the initial pressure. Default units: Pa.</p>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;pressure_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
@@ -11070,7 +11070,7 @@ pressure with unit handling and then builds the strategy object.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="clausiusclapeyronvaporpressurebuilderset_temperature_initial">ClausiusClapeyronVaporPressureBuilder().set_temperature_initial<a class="headerlink" href="#clausiusclapeyronvaporpressurebuilderset_temperature_initial" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L215">Show source in vapor_pressure_builders.py:215</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L216">Show source in vapor_pressure_builders.py:216</a></p>
 <p>Set the initial temperature. Default units: K.</p>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
@@ -11079,7 +11079,7 @@ pressure with unit handling and then builds the strategy object.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="constantvaporpressurebuilder">ConstantVaporPressureBuilder<a class="headerlink" href="#constantvaporpressurebuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L255">Show source in vapor_pressure_builders.py:255</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L256">Show source in vapor_pressure_builders.py:256</a></p>
 <p>Builder class for ConstantVaporPressureStrategy. This class facilitates
 setting the constant vapor pressure and then building the strategy object.</p>
 <h4 id="attributes_1">Attributes<a class="headerlink" href="#attributes_1" title="Permanent link">&para;</a></h4>
@@ -11119,7 +11119,7 @@ setting the constant vapor pressure and then building the strategy object.</p>
 <li><a href="../../abc_builder/#builderabc">BuilderABC</a></li>
 </ul>
 <h3 id="constantvaporpressurebuilderbuild">ConstantVaporPressureBuilder().build<a class="headerlink" href="#constantvaporpressurebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L307">Show source in vapor_pressure_builders.py:307</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L308">Show source in vapor_pressure_builders.py:308</a></p>
 <p>Validate parameters and return a ConstantVaporPressureStrategy object.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11133,7 +11133,7 @@ setting the constant vapor pressure and then building the strategy object.</p>
 <li><a href="../vapor_pressure_strategies/#constantvaporpressurestrategy">ConstantVaporPressureStrategy</a></li>
 </ul>
 <h3 id="constantvaporpressurebuilderset_vapor_pressure">ConstantVaporPressureBuilder().set_vapor_pressure<a class="headerlink" href="#constantvaporpressurebuilderset_vapor_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L294">Show source in vapor_pressure_builders.py:294</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L295">Show source in vapor_pressure_builders.py:295</a></p>
 <p>Set the constant vapor pressure.</p>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;vapor_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
@@ -11142,7 +11142,7 @@ setting the constant vapor pressure and then building the strategy object.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConstantVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="saturationconcentrationvaporpressurebuilder">SaturationConcentrationVaporPressureBuilder<a class="headerlink" href="#saturationconcentrationvaporpressurebuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L317">Show source in vapor_pressure_builders.py:317</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L318">Show source in vapor_pressure_builders.py:318</a></p>
 <p>Builder class for ConstantVaporPressureStrategy.</p>
 <p>It allows for setting the vapor pressure using the saturation
 concentration, molar mass, and temperature. The saturation concentration is
@@ -11185,7 +11185,7 @@ commonly called C^sat (or C* when in a mixture) in aerosol sciences.</p>
 <li><a href="../../builder_mixin/#buildertemperaturemixin">BuilderTemperatureMixin</a></li>
 </ul>
 <h3 id="saturationconcentrationvaporpressurebuilderbuild">SaturationConcentrationVaporPressureBuilder().build<a class="headerlink" href="#saturationconcentrationvaporpressurebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L401">Show source in vapor_pressure_builders.py:401</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L402">Show source in vapor_pressure_builders.py:402</a></p>
 <p>Validate all parameters and construct a
 ConstantVaporPressureStrategy whose value is obtained from the
 ideal-gas relationship between concentration and partial pressure.</p>
@@ -11200,7 +11200,7 @@ pressure.</p>
 <li><a href="../vapor_pressure_strategies/#constantvaporpressurestrategy">ConstantVaporPressureStrategy</a></li>
 </ul>
 <h3 id="saturationconcentrationvaporpressurebuilderset_saturation_concentration">SaturationConcentrationVaporPressureBuilder().set_saturation_concentration<a class="headerlink" href="#saturationconcentrationvaporpressurebuilderset_saturation_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L367">Show source in vapor_pressure_builders.py:367</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L368">Show source in vapor_pressure_builders.py:368</a></p>
 <p>Set the saturation concentration (C*, C^sat).</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11226,7 +11226,7 @@ pressure.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SaturationConcentrationVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="tablevaporpressurebuilder">TableVaporPressureBuilder<a class="headerlink" href="#tablevaporpressurebuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L448">Show source in vapor_pressure_builders.py:448</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L447">Show source in vapor_pressure_builders.py:447</a></p>
 <p>Builder for TableVaporPressureStrategy.</p>
 <p>Allows setting lookup tables of vapor pressure and temperature, handling
 optional unit conversion before constructing the strategy.</p>
@@ -11240,7 +11240,7 @@ optional unit conversion before constructing the strategy.</p>
 <li><a href="../../builder_mixin/#buildertemperaturetablemixin">BuilderTemperatureTableMixin</a></li>
 </ul>
 <h3 id="tablevaporpressurebuilderbuild">TableVaporPressureBuilder().build<a class="headerlink" href="#tablevaporpressurebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L480">Show source in vapor_pressure_builders.py:480</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L479">Show source in vapor_pressure_builders.py:479</a></p>
 <p>Validate and construct a TableVaporPressureStrategy.</p>
 <h4 id="signature_17">Signature<a class="headerlink" href="#signature_17" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TableVaporPressureStrategy</span><span class="p">:</span> <span class="o">...</span>
@@ -11250,7 +11250,7 @@ optional unit conversion before constructing the strategy.</p>
 <li><a href="../vapor_pressure_strategies/#tablevaporpressurestrategy">TableVaporPressureStrategy</a></li>
 </ul>
 <h3 id="tablevaporpressurebuilderset_vapor_pressure_table">TableVaporPressureBuilder().set_vapor_pressure_table<a class="headerlink" href="#tablevaporpressurebuilderset_vapor_pressure_table" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L464">Show source in vapor_pressure_builders.py:464</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L463">Show source in vapor_pressure_builders.py:463</a></p>
 <p>Set the vapor pressure lookup table.</p>
 <h4 id="signature_18">Signature<a class="headerlink" href="#signature_18" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;vapor_pressure_table&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
@@ -11261,7 +11261,7 @@ optional unit conversion before constructing the strategy.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TableVaporPressureBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="waterbuckvaporpressurebuilder">WaterBuckVaporPressureBuilder<a class="headerlink" href="#waterbuckvaporpressurebuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L420">Show source in vapor_pressure_builders.py:420</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L421">Show source in vapor_pressure_builders.py:421</a></p>
 <p>Builder class for WaterBuckStrategy.</p>
 <p>This class facilitates the building of the WaterBuckStrategy object.
 Which as of now has no additional parameters to set but could be
@@ -11279,7 +11279,7 @@ extended in the future (e.g., ice-only calculations).</p>
 <li><a href="../../abc_builder/#builderabc">BuilderABC</a></li>
 </ul>
 <h3 id="waterbuckvaporpressurebuilderbuild">WaterBuckVaporPressureBuilder().build<a class="headerlink" href="#waterbuckvaporpressurebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L439">Show source in vapor_pressure_builders.py:439</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L438">Show source in vapor_pressure_builders.py:438</a></p>
 <p>Build and return a WaterBuckStrategy object.</p>
 <h4 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h4>
 <ul>

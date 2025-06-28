@@ -10990,8 +10990,7 @@
 </blockquote>
 <h2 id="gasspecies">GasSpecies<a class="headerlink" href="#gasspecies" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L24">Show source in species.py:24</a></p>
-<p>Represents an individual or array of gas species with properties like
-name, molar mass, vapor pressure, and partitioning.</p>
+<p>Represents an individual or array of gas species with properties.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
 <li>name : The name of the gas species.</li>
@@ -11051,7 +11050,7 @@ name, molar mass, vapor pressure, and partitioning.</p>
 <li><a href="../vapor_pressure_strategies/#vaporpressurestrategy">VaporPressureStrategy</a></li>
 </ul>
 <h3 id="gasspeciesadd">GasSpecies().<strong>add</strong><a class="headerlink" href="#gasspeciesadd" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L153">Show source in species.py:153</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L150">Show source in species.py:150</a></p>
 <p>Addition of two GasSpecies objects (non-mutating).</p>
 <p>Creates and returns a new GasSpecies instance that contains the
 combined attributes of <em>self</em> and <em>other</em>.</p>
@@ -11076,7 +11075,7 @@ combined attributes of <em>self</em> and <em>other</em>.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesiadd">GasSpecies().<strong>iadd</strong><a class="headerlink" href="#gasspeciesiadd" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L129">Show source in species.py:129</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L126">Show source in species.py:126</a></p>
 <p>In-place addition: append another GasSpecies object to this one.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11101,9 +11100,8 @@ combined attributes of <em>self</em> and <em>other</em>.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspecieslen">GasSpecies().<strong>len</strong><a class="headerlink" href="#gasspecieslen" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L111">Show source in species.py:111</a></p>
-<p>Return the number of gas species (1 if scalar; array length if
-ndarray).</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L109">Show source in species.py:109</a></p>
+<p>Return the number of gas species.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>float or int : Number of species (array length or 1).</li>
@@ -11115,7 +11113,7 @@ ndarray).</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesstr">GasSpecies().<strong>str</strong><a class="headerlink" href="#gasspeciesstr" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L103">Show source in species.py:103</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L101">Show source in species.py:101</a></p>
 <p>Return a string representation of the GasSpecies object.</p>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11125,9 +11123,8 @@ ndarray).</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspecies_check_if_negative_concentration">GasSpecies()._check_if_negative_concentration<a class="headerlink" href="#gasspecies_check_if_negative_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L471">Show source in species.py:471</a></p>
-<p>Ensure concentration is not negative. Log a warning if it is and set
-to 0.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L468">Show source in species.py:468</a></p>
+<p>Ensure concentration is not negative.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>values : Concentration values to check.</li>
@@ -11142,7 +11139,7 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspecies_check_non_positive_value">GasSpecies()._check_non_positive_value<a class="headerlink" href="#gasspecies_check_non_positive_value" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L491">Show source in species.py:491</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L487">Show source in species.py:487</a></p>
 <p>Raise an error if any value is non-positive.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11159,7 +11156,7 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesadd_concentration">GasSpecies().add_concentration<a class="headerlink" href="#gasspeciesadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L375">Show source in species.py:375</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L372">Show source in species.py:372</a></p>
 <p>Add concentration (kg/m^3) to the gas species.</p>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11174,7 +11171,7 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesappend">GasSpecies().append<a class="headerlink" href="#gasspeciesappend" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L408">Show source in species.py:408</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L405">Show source in species.py:405</a></p>
 <p>Append another GasSpecies instance to this one (in-place).</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11198,7 +11195,7 @@ to 0.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_concentration">GasSpecies().get_concentration<a class="headerlink" href="#gasspeciesget_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L209">Show source in species.py:209</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L206">Show source in species.py:206</a></p>
 <p>Return the concentration of the gas species in kg/m^3.</p>
 <h4 id="returns_6">Returns<a class="headerlink" href="#returns_6" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11208,7 +11205,7 @@ to 0.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_molar_mass">GasSpecies().get_molar_mass<a class="headerlink" href="#gasspeciesget_molar_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L192">Show source in species.py:192</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L189">Show source in species.py:189</a></p>
 <p>Return the molar mass of the gas species in kg/mol.</p>
 <h4 id="returns_7">Returns<a class="headerlink" href="#returns_7" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11221,7 +11218,7 @@ to 0.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_molar_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_name">GasSpecies().get_name<a class="headerlink" href="#gasspeciesget_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L179">Show source in species.py:179</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L176">Show source in species.py:176</a></p>
 <p>Return the name of the gas species.</p>
 <h4 id="returns_8">Returns<a class="headerlink" href="#returns_8" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11234,7 +11231,7 @@ to 0.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_partial_pressure">GasSpecies().get_partial_pressure<a class="headerlink" href="#gasspeciesget_partial_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L252">Show source in species.py:252</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L249">Show source in species.py:249</a></p>
 <p>Calculate the partial pressure of the gas at a given temperature (K).</p>
 <h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11257,13 +11254,13 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_partitioning">GasSpecies().get_partitioning<a class="headerlink" href="#gasspeciesget_partitioning" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L205">Show source in species.py:205</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L202">Show source in species.py:202</a></p>
 <p>Return the partitioning flag (True if the species can partition).</p>
 <h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_partitioning</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_pure_vapor_pressure">GasSpecies().get_pure_vapor_pressure<a class="headerlink" href="#gasspeciesget_pure_vapor_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L217">Show source in species.py:217</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L214">Show source in species.py:214</a></p>
 <p>Calculate the pure vapor pressure at a given temperature (K).</p>
 <h4 id="arguments_7">Arguments<a class="headerlink" href="#arguments_7" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11286,7 +11283,7 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_saturation_concentration">GasSpecies().get_saturation_concentration<a class="headerlink" href="#gasspeciesget_saturation_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L336">Show source in species.py:336</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L333">Show source in species.py:333</a></p>
 <p>Calculate the saturation concentration at a given temperature (K).</p>
 <h4 id="arguments_8">Arguments<a class="headerlink" href="#arguments_8" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11309,7 +11306,7 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_saturation_ratio">GasSpecies().get_saturation_ratio<a class="headerlink" href="#gasspeciesget_saturation_ratio" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L294">Show source in species.py:294</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L291">Show source in species.py:291</a></p>
 <p>Calculate the saturation ratio of the gas at a given temperature (K).</p>
 <h4 id="arguments_9">Arguments<a class="headerlink" href="#arguments_9" title="Permanent link">&para;</a></h4>
 <ul>
@@ -11332,7 +11329,7 @@ to 0.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesset_concentration">GasSpecies().set_concentration<a class="headerlink" href="#gasspeciesset_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L390">Show source in species.py:390</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L387">Show source in species.py:387</a></p>
 <p>Overwrite the concentration of the gas species in kg/m^3.</p>
 <h4 id="arguments_10">Arguments<a class="headerlink" href="#arguments_10" title="Permanent link">&para;</a></h4>
 <ul>
