@@ -34,7 +34,7 @@ dev = [
     "pylint", "pytest", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
     "mkdocs-material", "handsdown", "mkdocs-jupyter", "openai",
-    "GitPython",
+    "GitPython", "ruff",
 ]
 extra = [
     "matplotlib", "pandas", "tqdm", "pint",
@@ -43,3 +43,36 @@ extra = [
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
+
+# Configuration for ruff, a fast Python linter and formatter #
+[tool.ruff]
+# keep your global/runtime options here
+line-length = 80
+fix = true
+
+[tool.ruff.format]
+docstring-code-line-length = 80
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W", "C90", "D", "ANN", "B", "S", "N", "I"
+]
+ignore = [
+  # choose one of the conflicting class-blank-line rules:
+  "D203",  # or drop this and keep D211 instead
+  # choose one of the conflicting multi-line-summary rules:
+  "D213",  # or drop this and keep D212 instead
+  "D417",  # Missing argument descriptions in the docstring :contentReference[oaicite:0]{index=0}
+]
+extend-ignore = [
+  "ANN",    # ignore all missing-type-*/missing-return-type checks :contentReference[oaicite:1]{index=1}
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore assert‐usage (S101) in any file ending with _test.py
+"*_test.py" = ["S101", "E721", "B008"]
+
+[tool.ruff.pydocstyle]
+# enforce Google-style sections and disable incompatible rules
+convention = "google"          # accepts "google", "numpy", or "pep257"
+
