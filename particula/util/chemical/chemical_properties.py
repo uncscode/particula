@@ -36,4 +36,9 @@ def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
         "density": chem.rho,  # kg/m³
         "surface_tension": chem.sigma,  # N/m
         "pure_vapor_pressure": chem.Psat,  # Pa
+        "cas_name": chem.CAS,  # CAS number
+        "name": chem.name,  # Chemical name
+        "smiles": chem.smiles,  # SMILES representation
+        "formula": chem.formula,  # Chemical formula
+        "PubChemID": chem.PubChem,  # PubChem ID
     }  # type: ignore
