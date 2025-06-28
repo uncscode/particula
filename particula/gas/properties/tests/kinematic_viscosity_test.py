@@ -1,5 +1,4 @@
-"""Test module for the kinematic_viscosity module.
-"""
+"""Test module for the kinematic_viscosity module."""
 
 import pytest
 
@@ -9,7 +8,7 @@ from particula.gas.properties.kinematic_viscosity import (
 )
 
 
-def test_kinematic_viscosity():
+def test_kinematic_viscosity() -> None:
     """Test kinematic viscosity calculation."""
     dynamic_viscosity = 1.85e-5  # Pa*s
     fluid_density = 1.2  # kg/m^3
@@ -22,7 +21,7 @@ def test_kinematic_viscosity():
     )
 
 
-def test_kinematic_viscosity_via_system_state():
+def test_kinematic_viscosity_via_system_state() -> None:
     """Test kinematic viscosity calculation via system state."""
     temperature = 300  # K
     fluid_density = 1.2  # kg/m^3
@@ -35,13 +34,13 @@ def test_kinematic_viscosity_via_system_state():
     )
 
 
-def test_kinematic_viscosity_zero_temperature():
+def test_kinematic_viscosity_zero_temperature() -> None:
     """Test for error handling with zero temperature."""
     with pytest.raises(ValueError):
         get_kinematic_viscosity_via_system_state(0, 1.2)
 
 
-def test_kinematic_viscosity_negative_temperature():
+def test_kinematic_viscosity_negative_temperature() -> None:
     """Test for error handling with negative temperature."""
     with pytest.raises(ValueError):
         get_kinematic_viscosity_via_system_state(-10, 1.2)

@@ -1,5 +1,4 @@
-"""Test psi function from Ayala et al. (2008).
-"""
+"""Test psi function from Ayala et al. (2008)."""
 
 import numpy as np
 import pytest
@@ -9,9 +8,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
 )
 
 
-def test_get_psi_ao2008_scalar():
-    """Test get_psi_ao2008 with scalar inputs.
-    """
+def test_get_psi_ao2008_scalar() -> None:
+    """Test get_psi_ao2008 with scalar inputs."""
     alpha = 2.0  # Turbulence parameter [-]
     phi = 1.0  # Characteristic velocity [m/s]
     particle_inertia_time = 0.05  # [s]
@@ -42,9 +40,8 @@ def test_get_psi_ao2008_scalar():
     ), f"Expected {expected}, but got {result}"
 
 
-def test_get_psi_ao2008_array():
-    """Test get_psi_ao2008 with NumPy array inputs.
-    """
+def test_get_psi_ao2008_array() -> None:
+    """Test get_psi_ao2008 with NumPy array inputs."""
     alpha = 2.0  # Turbulence parameter [-]
     phi = 1.0  # Characteristic velocity [m/s]
     particle_inertia_time = np.array([0.05, 0.1, 0.2])  # [s]
@@ -69,9 +66,8 @@ def test_get_psi_ao2008_array():
     ), f"Expected {expected}, but got {result}"
 
 
-def test_get_psi_ao2008_invalid_inputs():
-    """Test that get_psi_ao2008 raises validation errors for invalid inputs.
-    """
+def test_get_psi_ao2008_invalid_inputs() -> None:
+    """Test that get_psi_ao2008 raises validation errors for invalid inputs."""
     alpha = 2.0  # [-]
     phi = 1.0  # [m/s]
     particle_inertia_time = np.array([0.05, 0.1, 0.2])  # [s]
@@ -98,7 +94,7 @@ def test_get_psi_ao2008_invalid_inputs():
         )  # Negative velocity
 
 
-def test_get_psi_ao2008_edge_cases():
+def test_get_psi_ao2008_edge_cases() -> None:
     """Test get_psi_ao2008 with extreme values such as very small or very large
     values.
     """

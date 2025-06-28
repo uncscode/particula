@@ -222,7 +222,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
 
     """
 
-    def __init__(self, vapor_pressure: Union[float, NDArray[np.float64]]):
+    def __init__(self, vapor_pressure: Union[float, NDArray[np.float64]]) -> None:
         self.vapor_pressure = vapor_pressure
 
     def pure_vapor_pressure(
@@ -292,7 +292,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
         a: Union[float, NDArray[np.float64]] = 0.0,
         b: Union[float, NDArray[np.float64]] = 0.0,
         c: Union[float, NDArray[np.float64]] = 0.0,
-    ):
+    ) -> None:
         self.a = a
         self.b = b
         self.c = c
@@ -369,7 +369,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         latent_heat: Union[float, NDArray[np.float64]],
         temperature_initial: Union[float, NDArray[np.float64]],
         pressure_initial: Union[float, NDArray[np.float64]],
-    ):
+    ) -> None:
         """Initializes the Clausius-Clapeyron strategy with the specific latent
         heat of vaporization and the specific gas constant of the substance.
 

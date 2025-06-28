@@ -14,14 +14,14 @@ from particula.particles.activity_builders import (
 )
 
 
-def test_build_ideal_activity_mass():
+def test_build_ideal_activity_mass() -> None:
     """Test building an IdealActivityMass object."""
     builder = ActivityIdealMassBuilder()
     activity = builder.build()
     assert activity.get_name() == "ActivityIdealMass"
 
 
-def test_build_ideal_activity_molar_parameter():
+def test_build_ideal_activity_molar_parameter() -> None:
     """Test that providing a negative molar mass raises a ValueError."""
     builder = ActivityIdealMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -37,7 +37,7 @@ def test_build_ideal_activity_molar_parameter():
     np.testing.assert_array_equal(builder.molar_mass, np.array([1, 2, 3]))
 
 
-def test_build_ideal_activity_molar_dict():
+def test_build_ideal_activity_molar_dict() -> None:
     """Test building an IdealActivityMolar object."""
     builder_dict = ActivityIdealMolarBuilder()
     parameters = {"molar_mass": 1, "molar_mass_units": "kg/mol"}
@@ -49,7 +49,7 @@ def test_build_ideal_activity_molar_dict():
     assert activity.__class__.__name__ == "ActivityIdealMolar"
 
 
-def test_build_ideal_activity_molar_missing_parameters():
+def test_build_ideal_activity_molar_missing_parameters() -> None:
     """Test building an IdealActivityMolar object with missing parameters."""
     builder_missing = ActivityIdealMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -57,7 +57,7 @@ def test_build_ideal_activity_molar_missing_parameters():
     assert "Required parameter(s) not set: molar_mass" in str(excinfo.value)
 
 
-def test_build_kappa_parameter_activity_set_kappa():
+def test_build_kappa_parameter_activity_set_kappa() -> None:
     """Testing setting kappa parameter."""
     builder = ActivityKappaParameterBuilder()
     builder.set_kappa(1)
@@ -81,7 +81,7 @@ def test_build_kappa_parameter_activity_set_kappa():
     assert "Kappa parameter must be a positive value." in str(excinfo.value)
 
 
-def test_build_kappa_parameter_activity_set_density():
+def test_build_kappa_parameter_activity_set_density() -> None:
     """Testing setting density parameter."""
     builder = ActivityKappaParameterBuilder()
     builder.set_density(1, "kg/m^3")
@@ -103,7 +103,7 @@ def test_build_kappa_parameter_activity_set_density():
     assert "Argument 'density' must be positive." in str(excinfo.value)
 
 
-def test_build_kappa_parameter_activity_set_molar_mass():
+def test_build_kappa_parameter_activity_set_molar_mass() -> None:
     """Testing setting molar mass parameter."""
     builder = ActivityKappaParameterBuilder()
     builder.set_molar_mass(1, "kg/mol")
@@ -126,8 +126,8 @@ def test_build_kappa_parameter_activity_set_molar_mass():
         builder.set_molar_mass(-1, "kg/mol")
 
 
-def test_build_kappa_parameter_activity_set_water_index():
-    """Testing setting water index"""
+def test_build_kappa_parameter_activity_set_water_index() -> None:
+    """Testing setting water index."""
     builder = ActivityKappaParameterBuilder()
     builder.set_water_index(1)
     assert builder.water_index == 1
@@ -137,7 +137,7 @@ def test_build_kappa_parameter_activity_set_water_index():
     assert builder.water_index == 1
 
 
-def test_build_kappa_parameter_activity_dict():
+def test_build_kappa_parameter_activity_dict() -> None:
     """Test building a KappaParameterActivity object."""
     builder_dict = ActivityKappaParameterBuilder()
     parameters = {

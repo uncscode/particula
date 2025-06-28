@@ -1,5 +1,4 @@
-"""Gibbs mixing test
-"""
+"""Gibbs mixing test."""
 
 import unittest
 

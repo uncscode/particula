@@ -8,7 +8,7 @@ from particula.particles.properties.organic_density_module import (
 )
 
 
-def test_partitioning():
+def test_partitioning() -> None:
     """Evaluation of the partitioning function."""
     c_star_j_dry = [1e-6, 1e-4, 1e-1, 1e2, 1e4]  # ug/m3
     concentration_organic_matter = [1, 5, 10, 15, 10]  # ug/m3

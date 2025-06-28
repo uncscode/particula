@@ -1,4 +1,4 @@
-"""Charged Coagulation Builder Module
+"""Charged Coagulation Builder Module.
 
 Provides a builder for creating `ChargedCoagulationStrategy` objects,
 allowing electrostatic interactions in coagulation processes. Combines a
@@ -61,7 +61,7 @@ class ChargedCoagulationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = ["distribution_type", "charged_kernel_strategy"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)

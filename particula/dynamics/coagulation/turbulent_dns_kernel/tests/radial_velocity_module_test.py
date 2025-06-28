@@ -1,5 +1,4 @@
-"""Test the radial relative velocity formulations.
-"""
+"""Test the radial relative velocity formulations."""
 
 import numpy as np
 import pytest
@@ -10,9 +9,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module 
 )
 
 
-def test_get_radial_relative_velocity_dz2002():
-    """Test get_radial_relative_velocity_dz2002 with a small array input.
-    """
+def test_get_radial_relative_velocity_dz2002() -> None:
+    """Test get_radial_relative_velocity_dz2002 with a small array input."""
     velocity_dispersion = 0.1  # m/s
     particle_inertia_time = np.array([0.02, 0.03, 0.05])  # s
 
@@ -27,9 +25,8 @@ def test_get_radial_relative_velocity_dz2002():
     assert np.all(result >= 0), "Expected all values to be non-negative"
 
 
-def test_get_radial_relative_velocity_ao2008():
-    """Now expect NotImplementedError for valid inputs.
-    """
+def test_get_radial_relative_velocity_ao2008() -> None:
+    """Now expect NotImplementedError for valid inputs."""
     velocity_dispersion = 0.1  # m/s
     particle_inertia_time = np.array([0.02, 0.03, 0.05])  # s
 
@@ -39,9 +36,8 @@ def test_get_radial_relative_velocity_ao2008():
         )
 
 
-def test_invalid_inputs():
-    """Ensure validation errors are raised for invalid inputs.
-    """
+def test_invalid_inputs() -> None:
+    """Ensure validation errors are raised for invalid inputs."""
     velocity_dispersion = 0.1  # m/s
     particle_inertia_time = np.array([0.02, 0.03, 0.05])  # s
 
@@ -66,7 +62,7 @@ def test_invalid_inputs():
         )  # Negative inertia
 
 
-def test_edge_cases():
+def test_edge_cases() -> None:
     """Test the function with extreme values such as zero inertia and very large
     inertia.
     """

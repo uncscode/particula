@@ -1,5 +1,4 @@
-"""Test module for the Taylor microscale functions.
-"""
+"""Test module for the Taylor microscale functions."""
 
 import unittest
 
@@ -13,9 +12,8 @@ from particula.gas.properties.taylor_microscale_module import (
 )
 
 
-def test_get_lagrangian_taylor_microscale_time_scalar():
-    """Test get_lagrangian_taylor_microscale_time with scalar inputs.
-    """
+def test_get_lagrangian_taylor_microscale_time_scalar() -> None:
+    """Test get_lagrangian_taylor_microscale_time with scalar inputs."""
     kolmogorov_time = 0.01  # s
     re_lambda = 100  # Reynolds number
     ao = 11  # Normalized acceleration variance
@@ -28,9 +26,8 @@ def test_get_lagrangian_taylor_microscale_time_scalar():
     assert np.isclose(result, expected, atol=1e-10)
 
 
-def test_get_lagrangian_taylor_microscale_time_array():
-    """Test get_lagrangian_taylor_microscale_time with NumPy array inputs.
-    """
+def test_get_lagrangian_taylor_microscale_time_array() -> None:
+    """Test get_lagrangian_taylor_microscale_time with NumPy array inputs."""
     kolmogorov_time = np.array([0.01, 0.02])
     re_lambda = np.array([100, 200])
     ao = np.array([11, 12])
@@ -43,7 +40,7 @@ def test_get_lagrangian_taylor_microscale_time_array():
     assert np.allclose(result, expected, atol=1e-10)
 
 
-def test_get_lagrangian_taylor_microscale_time_invalid():
+def test_get_lagrangian_taylor_microscale_time_invalid() -> None:
     """Test that get_lagrangian_taylor_microscale_time raises errors for invalid
     inputs.
     """
@@ -57,9 +54,8 @@ def test_get_lagrangian_taylor_microscale_time_invalid():
         get_lagrangian_taylor_microscale_time(0.01, 100, -11)
 
 
-def test_get_taylor_microscale_scalar():
-    """Test get_taylor_microscale with scalar inputs.
-    """
+def test_get_taylor_microscale_scalar() -> None:
+    """Test get_taylor_microscale with scalar inputs."""
     rms_velocity = 0.5  # m/s
     kinematic_viscosity = 1.5e-5  # m²/s
     turbulent_dissipation = 1e-3  # m²/s³
@@ -74,9 +70,8 @@ def test_get_taylor_microscale_scalar():
     assert np.isclose(result, expected, atol=1e-10)
 
 
-def test_get_taylor_microscale_array():
-    """Test get_taylor_microscale with NumPy array inputs.
-    """
+def test_get_taylor_microscale_array() -> None:
+    """Test get_taylor_microscale with NumPy array inputs."""
     rms_velocity = np.array([0.5, 0.8])
     kinematic_viscosity = np.array([1.5e-5, 1.2e-5])
     turbulent_dissipation = np.array([1e-3, 2e-3])
@@ -91,9 +86,8 @@ def test_get_taylor_microscale_array():
     assert np.allclose(result, expected, atol=1e-10)
 
 
-def test_get_taylor_microscale_invalid():
-    """Test that get_taylor_microscale raises errors for invalid inputs.
-    """
+def test_get_taylor_microscale_invalid() -> None:
+    """Test that get_taylor_microscale raises errors for invalid inputs."""
     with pytest.raises(ValueError):
         get_taylor_microscale(-0.5, 1.5e-5, 1e-3)
 
@@ -104,7 +98,7 @@ def test_get_taylor_microscale_invalid():
         get_taylor_microscale(0.5, 1.5e-5, -1e-3)
 
 
-def test_taylor_scales_edge_case():
+def test_taylor_scales_edge_case() -> None:
     """Test both Taylor scale functions with very small values near machine
     precision.
     """
@@ -136,7 +130,7 @@ def test_taylor_scales_edge_case():
 class TestTaylorMicroscaleReynolds(unittest.TestCase):
     """Unit tests for the Taylor-microscale Reynolds number function."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up common test parameters."""
         self.fluid_rms_velocity_scalar = 0.5  # [m/s]
         self.taylor_microscale_scalar = 0.05  # [m]
@@ -148,7 +142,7 @@ class TestTaylorMicroscaleReynolds(unittest.TestCase):
             [1.5e-5, 1.2e-5, 1.0e-5]
         )  # [m²/s]
 
-    def test_get_taylor_microscale_reynolds_number_scalar(self):
+    def test_get_taylor_microscale_reynolds_number_scalar(self) -> None:
         """Test with scalar inputs."""
         expected = (
             self.fluid_rms_velocity_scalar
@@ -164,7 +158,7 @@ class TestTaylorMicroscaleReynolds(unittest.TestCase):
 
         self.assertAlmostEqual(result, expected, places=10)
 
-    def test_get_taylor_microscale_reynolds_number_array(self):
+    def test_get_taylor_microscale_reynolds_number_array(self) -> None:
         """Test with NumPy array inputs."""
         expected = (
             self.fluid_rms_velocity_array
@@ -180,7 +174,7 @@ class TestTaylorMicroscaleReynolds(unittest.TestCase):
 
         np.testing.assert_allclose(result, expected, atol=1e-10)
 
-    def test_invalid_inputs(self):
+    def test_invalid_inputs(self) -> None:
         """Ensure validation errors are raised for invalid inputs."""
         with self.assertRaises(ValueError):
             get_taylor_microscale_reynolds_number(
@@ -197,7 +191,7 @@ class TestTaylorMicroscaleReynolds(unittest.TestCase):
                 0.5, 0.05, -1.5e-5
             )  # Negative kinematic viscosity
 
-    def test_edge_cases(self):
+    def test_edge_cases(self) -> None:
         """Test with extreme values (very small and very large)."""
         fluid_rms_velocity = np.array([1e-6, 1e-3, 10.0])  # [m/s]
         taylor_microscale = np.array([1e-6, 1e-3, 10.0])  # [m]
@@ -209,7 +203,7 @@ class TestTaylorMicroscaleReynolds(unittest.TestCase):
 
         self.assertTrue(np.all(np.isfinite(result)))
 
-    def test_consistency(self):
+    def test_consistency(self) -> None:
         """Ensure function produces consistent results for repeated inputs."""
         result1 = get_taylor_microscale_reynolds_number(
             self.fluid_rms_velocity_array,

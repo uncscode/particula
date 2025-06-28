@@ -1,5 +1,4 @@
-"""Brownian coagulation strategy class.
-"""
+"""Brownian coagulation strategy class."""
 
 import logging
 from typing import Union
@@ -61,7 +60,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
 
     """
 
-    def __init__(self, distribution_type: str):
+    def __init__(self, distribution_type: str) -> None:
         """Initialize the BrownianCoagulationStrategy.
 
         Arguments:

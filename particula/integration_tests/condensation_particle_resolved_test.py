@@ -1,5 +1,4 @@
-"""Integration test for isothermal condensation on particle-resolved aerosol.
-"""
+"""Integration test for isothermal condensation on particle-resolved aerosol."""
 
 import unittest
 
@@ -11,7 +10,7 @@ import particula as par
 class TestCondensationParticleResolved(unittest.TestCase):
     """Verify that mass is transferred from gas to particles."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         # ---------- vapor-pressure strategies ----------
         self.vp_water = par.gas.VaporPressureFactory().get_strategy(
             "water_buck"
@@ -119,7 +118,7 @@ class TestCondensationParticleResolved(unittest.TestCase):
     # actual tests
     # ------------------------------------------------------------------
 
-    def test_condensation_transfers_mass(self):
+    def test_condensation_transfers_mass(self) -> None:
         """Particle mass should increase while gas-phase water decreases."""
         initial_particle_mass = self.aerosol.particles.get_mass_concentration()
         initial_gas_water = (

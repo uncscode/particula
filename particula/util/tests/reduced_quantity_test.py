@@ -1,4 +1,4 @@
-"""testing the utility calculating reduced quantities"""
+"""testing the utility calculating reduced quantities."""
 
 import numpy as np
 import pytest
@@ -9,14 +9,14 @@ from particula.util.reduced_quantity import (
 )
 
 
-def test_reduced_value_scalar():
+def test_reduced_value_scalar() -> None:
     """Test that the reduced value is calculated correctly."""
     assert get_reduced_value(4, 2) == 4 * 2 / (
         4 + 2
     ), "Failed for scalar inputs"
 
 
-def test_reduced_value_array():
+def test_reduced_value_array() -> None:
     """Test that the reduced value is calculated correctly."""
     alpha = np.array([2, 4, 6])
     beta = np.array([3, 6, 9])
@@ -25,7 +25,7 @@ def test_reduced_value_array():
     assert np.allclose(result, expected), "Failed for array inputs"
 
 
-def test_reduced_value_zero_division():
+def test_reduced_value_zero_division() -> None:
     """Test division by zero handling."""
     alpha = np.array([0, 2, 0])
     beta = np.array([0, 0, 2])
@@ -35,7 +35,7 @@ def test_reduced_value_zero_division():
     assert np.array_equal(result, expected), "Failed handling division by zero"
 
 
-def test_reduced_value_shape_mismatch():
+def test_reduced_value_shape_mismatch() -> None:
     """Test error handling for shape mismatch."""
     alpha = np.array([1, 2])
     beta = np.array([1, 2, 3])
@@ -43,7 +43,7 @@ def test_reduced_value_shape_mismatch():
         get_reduced_value(alpha, beta)
 
 
-def test_reduced_value_negative_values():
+def test_reduced_value_negative_values() -> None:
     """Test that the reduced value is calculated correctly."""
     alpha = np.array([-1, -2])
     beta = np.array([-3, -4])
@@ -52,8 +52,8 @@ def test_reduced_value_negative_values():
     assert np.allclose(result, expected), "Failed for negative values"
 
 
-def test_reduced_value_one_element():
-    """Test with one element in array"""
+def test_reduced_value_one_element() -> None:
+    """Test with one element in array."""
     alpha = np.array([5])
     beta = np.array([10])
     expected = alpha * beta / (alpha + beta)
@@ -61,7 +61,7 @@ def test_reduced_value_one_element():
     assert np.allclose(result, expected), "Failed for single element arrays"
 
 
-def test_reduced_self_broadcast_typical():
+def test_reduced_self_broadcast_typical() -> None:
     """Test that the reduced self broadcast is calculated correctly."""
     alpha_array = np.array([1, 2, 3])
     expected_result = np.array(
@@ -77,15 +77,15 @@ def test_reduced_self_broadcast_typical():
     ), "Test failed for typical input"
 
 
-def test_reduced_self_broadcast_empty():
-    """Test with empty input"""
+def test_reduced_self_broadcast_empty() -> None:
+    """Test with empty input."""
     alpha_array = np.array([])
     result = get_reduced_self_broadcast(alpha_array)
     assert result.shape == (0, 0), "Test failed for empty input"
 
 
-def test_reduced_self_broadcast_zero_elements():
-    """Test with zero elements"""
+def test_reduced_self_broadcast_zero_elements() -> None:
+    """Test with zero elements."""
     alpha_array = np.array([0, 0, 0])
     expected_result = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     result = get_reduced_self_broadcast(alpha_array)
@@ -94,8 +94,8 @@ def test_reduced_self_broadcast_zero_elements():
     ), "Test failed for zero elements input"
 
 
-def test_reduced_self_broadcast_one_element():
-    """Test with a single element array"""
+def test_reduced_self_broadcast_one_element() -> None:
+    """Test with a single element array."""
     alpha_array = np.array([4])
     expected_result = np.array([[4 * 4 / (4 + 4)]])
     result = get_reduced_self_broadcast(alpha_array)
@@ -104,8 +104,8 @@ def test_reduced_self_broadcast_one_element():
     ), "Test failed for one element input"
 
 
-def test_reduced_self_broadcast_negative_elements():
-    """Test with negative elements"""
+def test_reduced_self_broadcast_negative_elements() -> None:
+    """Test with negative elements."""
     alpha_array = np.array([-1, -2, -3])
     expected_result = np.array(
         [

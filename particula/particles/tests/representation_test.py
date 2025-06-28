@@ -64,7 +64,7 @@ def setup_particle_resolved() -> ParticleRepresentation:
     )
 
 
-def test_get_mass():
+def test_get_mass() -> None:
     """Test get_mass method."""
     particle = setup_particle()
     mass = particle.get_mass()
@@ -75,7 +75,7 @@ def test_get_mass():
     np.testing.assert_array_equal(mass, mass_clone)
 
 
-def test_get_radius():
+def test_get_radius() -> None:
     """Test get_radius method."""
     particle = setup_particle()
     radius = particle.get_radius()
@@ -86,7 +86,7 @@ def test_get_radius():
     np.testing.assert_array_equal(radius, radius_clone)
 
 
-def test_get_mass_concentration():
+def test_get_mass_concentration() -> None:
     """Test get_mass_concentration method."""
     particle = setup_particle()
     mass = particle.get_mass()
@@ -100,7 +100,7 @@ def test_get_mass_concentration():
     assert total_mass == expected_mass_concentration
 
 
-def test_get_strategy():
+def test_get_strategy() -> None:
     """Test get_strategy method."""
     particle = setup_particle()
     strategy = particle.get_strategy()
@@ -110,7 +110,7 @@ def test_get_strategy():
     assert isinstance(strategy_clone, RadiiBasedMovingBin)
 
 
-def test_get_activity():
+def test_get_activity() -> None:
     """Test get_activity method."""
     particle = setup_particle()
     activity = particle.get_activity()
@@ -120,7 +120,7 @@ def test_get_activity():
     assert isinstance(activity_clone, ActivityIdealMass)
 
 
-def test_get_surface():
+def test_get_surface() -> None:
     """Test get_surface method."""
     particle = setup_particle()
     surface = particle.get_surface()
@@ -130,7 +130,7 @@ def test_get_surface():
     assert isinstance(surface_clone, SurfaceStrategyVolume)
 
 
-def test_get_distribution():
+def test_get_distribution() -> None:
     """Test get_distribution method."""
     particle = setup_particle()
     distribution = particle.get_distribution()
@@ -139,7 +139,7 @@ def test_get_distribution():
     np.testing.assert_array_equal(distribution, distribution_clone)
 
 
-def test_get_density():
+def test_get_density() -> None:
     """Test get_density method."""
     particle = setup_particle()
     density = particle.get_density()
@@ -148,7 +148,7 @@ def test_get_density():
     np.testing.assert_array_equal(density, density_clone)
 
 
-def test_get_concentration():
+def test_get_concentration() -> None:
     """Test get_concentration method."""
     particle = setup_particle()
     concentration = particle.get_concentration()
@@ -157,7 +157,7 @@ def test_get_concentration():
     np.testing.assert_array_equal(concentration, concentration_clone)
 
 
-def test_get_charge():
+def test_get_charge() -> None:
     """Test get_charge method."""
     particle = setup_particle()
     charge = particle.get_charge()
@@ -166,7 +166,7 @@ def test_get_charge():
     np.testing.assert_array_equal(charge, charge_clone)
 
 
-def test_get_volume():
+def test_get_volume() -> None:
     """Test get_volume method."""
     particle = setup_particle()
     volume = particle.get_volume()
@@ -175,7 +175,7 @@ def test_get_volume():
     assert volume == volume_clone
 
 
-def test_get_species_mass():
+def test_get_species_mass() -> None:
     """Test get_species_mass method."""
     particle = setup_particle()
     species_mass = particle.get_species_mass()
@@ -184,7 +184,7 @@ def test_get_species_mass():
     np.testing.assert_array_equal(species_mass, species_mass_clone)
 
 
-def test_get_total_concentration():
+def test_get_total_concentration() -> None:
     """Test get_total_concentration method."""
     particle = setup_particle()
     conc = particle.get_concentration()
@@ -196,7 +196,7 @@ def test_get_total_concentration():
     assert total_concentration == expected_total_concentration
 
 
-def test_get_effective_density():
+def test_get_effective_density() -> None:
     """Test get_effective_density method."""
     particle = setup_particle()
     effective_density = particle.get_effective_density()
@@ -208,7 +208,7 @@ def test_get_effective_density():
     np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)
 
 
-def test_get_mean_effective_density():
+def test_get_mean_effective_density() -> None:
     """Test get_mean_effective_density for single-species."""
     particle = setup_particle()
     med = particle.get_mean_effective_density()
@@ -221,7 +221,7 @@ def test_get_mean_effective_density():
     assert np.isclose(med, expected_mean, rtol=1e-7)
 
 
-def test_get_mean_effective_density_particle_resolved():
+def test_get_mean_effective_density_particle_resolved() -> None:
     """Test get_mean_effective_density for multi-species (particle-resolved)."""
     particle = setup_particle_resolved()
     med = particle.get_mean_effective_density()
@@ -230,7 +230,7 @@ def test_get_mean_effective_density_particle_resolved():
     assert np.isclose(med, expected_mean, rtol=1e-7)
 
 
-def test_get_effective_density_particle_resolved():
+def test_get_effective_density_particle_resolved() -> None:
     """Test get_effective_density method for particle resolved."""
     particle = setup_particle_resolved()
     effective_density = particle.get_effective_density()
@@ -246,7 +246,7 @@ def test_get_effective_density_particle_resolved():
     np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)
 
 
-def test_bin_order_after_add_mass():
+def test_bin_order_after_add_mass() -> None:
     """Bins should be ordered after mass addition."""
     particle = setup_particle(
         distribution=np.array([2.0, 1.0, 3.0]),

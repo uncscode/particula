@@ -1,5 +1,4 @@
-"""Particle representation for a collection of particles.
-"""
+"""Particle representation for a collection of particles."""
 
 import logging
 from copy import deepcopy
@@ -78,7 +77,7 @@ class ParticleRepresentation:
         concentration: NDArray[np.float64],
         charge: NDArray[np.float64],
         volume: float = 1,
-    ):  # pylint: disable=too-many-positional-arguments, too-many-arguments
+    ) -> None:  # pylint: disable=too-many-positional-arguments, too-many-arguments
         self.strategy = strategy
         self.activity = activity
         self.surface = surface

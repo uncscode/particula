@@ -237,7 +237,7 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
 class SizerConverter:
     """A converter that composes a ConversionStrategy to transform
     particle size distribution data between formats.
-    [might not be needed or used, -kyle]
+    [might not be needed or used, -kyle].
 
     Examples:
         ``` py title="Example Usage"
@@ -251,7 +251,7 @@ class SizerConverter:
 
     """
 
-    def __init__(self, strategy: ConversionStrategy):
+    def __init__(self, strategy: ConversionStrategy) -> None:
         """Initializes the converter with a conversion strategy.
 
         Args:

@@ -15,8 +15,7 @@ from numpy.typing import NDArray
 
 
 class FitValues(NamedTuple):
-    """Named tuple for the fit values for the activity model.
-    """
+    """Named tuple for the fit values for the activity model."""
 
     a1: List[float]
     a2: List[float]

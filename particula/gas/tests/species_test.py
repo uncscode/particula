@@ -1,4 +1,4 @@
-"""Test the gas species builder"""
+"""Test the gas species builder."""
 
 # pylint: disable=##R0801
 
@@ -11,7 +11,7 @@ from particula.gas.vapor_pressure_strategies import (
 )
 
 
-def test_gas_species_builder_single_species():
+def test_gas_species_builder_single_species() -> None:
     """Test building a single gas species with the GasSpeciesBuilder."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(
         vapor_pressure=101325
@@ -36,7 +36,7 @@ def test_gas_species_builder_single_species():
     assert gas_species.get_pure_vapor_pressure(298) == 101325
 
 
-def test_gas_species_builder_array_species():
+def test_gas_species_builder_array_species() -> None:
     """Test building an array of gas species with the GasSpeciesBuilder."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(
         vapor_pressure=np.array([101325, 101325])
@@ -68,7 +68,7 @@ def test_gas_species_builder_array_species():
     )
 
 
-def test_gas_species_negative_molar_mass():
+def test_gas_species_negative_molar_mass() -> None:
     """Test gas species with negative molar mass."""
     with pytest.raises(ValueError):
         GasSpecies(
@@ -88,7 +88,7 @@ def test_gas_species_negative_molar_mass():
         )
 
 
-def test_gas_species_zero_molar_mass():
+def test_gas_species_zero_molar_mass() -> None:
     """Test gas species with zero molar mass."""
     with pytest.raises(ValueError):
         GasSpecies(
@@ -108,7 +108,7 @@ def test_gas_species_zero_molar_mass():
         )
 
 
-def test_gas_species_negative_concentration():
+def test_gas_species_negative_concentration() -> None:
     """Test gas species with negative concentration."""
     with pytest.warns(UserWarning):
         gas_species = GasSpecies(
@@ -130,7 +130,7 @@ def test_gas_species_negative_concentration():
         assert np.array_equal(gas_species.get_concentration(), [0.0, 1.0])
 
 
-def test_gas_species_zero_concentration():
+def test_gas_species_zero_concentration() -> None:
     """Test gas species with zero concentration."""
     zero_concentration_species = GasSpecies(
         name="ZeroConcentration",
@@ -156,7 +156,7 @@ def test_gas_species_zero_concentration():
     )
 
 
-def test_gas_species_get_methods():
+def test_gas_species_get_methods() -> None:
     """Test the get methods of GasSpecies."""
     gas_species = GasSpecies(
         name="TestSpecies",
@@ -171,7 +171,7 @@ def test_gas_species_get_methods():
     assert gas_species.get_concentration() == 0.5
 
 
-def test_gas_species_set_concentration():
+def test_gas_species_set_concentration() -> None:
     """Test the set_concentration method of GasSpecies."""
     gas_species = GasSpecies(
         name="TestSpecies",
@@ -187,7 +187,7 @@ def test_gas_species_set_concentration():
     assert gas_species.get_concentration() == 0.0
 
 
-def test_gas_species_add_concentration():
+def test_gas_species_add_concentration() -> None:
     """Test the add_concentration method of GasSpecies."""
     gas_species = GasSpecies(
         name="TestSpecies",
@@ -203,7 +203,7 @@ def test_gas_species_add_concentration():
     assert gas_species.get_concentration() == 0.0
 
 
-def test_gas_species_array_operations():
+def test_gas_species_array_operations() -> None:
     """Test array operations for concentration in GasSpecies."""
     gas_species = GasSpecies(
         name="TestSpecies",
@@ -233,7 +233,7 @@ def _simple_species(name: str, partitioning: bool = True) -> GasSpecies:
     )
 
 
-def test_gas_species_append():
+def test_gas_species_append() -> None:
     """The append method should mutate *self* and concatenate attributes."""
     s1 = _simple_species("A")
     s2 = _simple_species("B")
@@ -247,7 +247,7 @@ def test_gas_species_append():
     assert s1.get_molar_mass().shape == (2,)
 
 
-def test_gas_species_iadd():
+def test_gas_species_iadd() -> None:
     """Using += should call append and mutate self."""
     s1 = _simple_species("A")
     s2 = _simple_species("B")
@@ -258,7 +258,7 @@ def test_gas_species_iadd():
     assert len(s1) == 2
 
 
-def test_gas_species_add():
+def test_gas_species_add() -> None:
     """Using + should return a NEW object and keep the originals unchanged."""
     s1 = _simple_species("A")
     s2 = _simple_species("B")
@@ -276,7 +276,7 @@ def test_gas_species_add():
     assert merged is not s1 and merged is not s2
 
 
-def test_gas_species_partitioning_mismatch_errors():
+def test_gas_species_partitioning_mismatch_errors() -> None:
     """Append / += / + must raise if partitioning flags differ."""
     s_true = _simple_species("A", partitioning=True)
     s_false = _simple_species("B", partitioning=False)

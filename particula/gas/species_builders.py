@@ -75,7 +75,7 @@ class GasSpeciesBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "name",
             "molar_mass",
@@ -171,7 +171,7 @@ class PresetGasSpeciesBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         GasSpeciesBuilder.__init__(self)
         self.name = "Preset100"
         self.molar_mass = 0.100  # kg/mol

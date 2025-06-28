@@ -14,7 +14,7 @@ from particula.particles.surface_builders import (
 )
 
 
-def test_build_surface_strategy_molar_dict():
+def test_build_surface_strategy_molar_dict() -> None:
     """Test building with a dictionary."""
     builder = SurfaceStrategyMolarBuilder()
     parameters = {
@@ -35,7 +35,7 @@ def test_build_surface_strategy_molar_dict():
     assert strategy.get_name() == "SurfaceStrategyMolar"
 
 
-def test_build_surface_strategy_molar_missing_parameters():
+def test_build_surface_strategy_molar_missing_parameters() -> None:
     """Test building with missing parameters."""
     builder = SurfaceStrategyMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -46,7 +46,7 @@ def test_build_surface_strategy_molar_missing_parameters():
     )
 
 
-def test_build_surface_strategy_mass_dict():
+def test_build_surface_strategy_mass_dict() -> None:
     """Test building with a dictionary."""
     builder = SurfaceStrategyMassBuilder()
     parameters = {
@@ -64,7 +64,7 @@ def test_build_surface_strategy_mass_dict():
     assert strategy.get_name() == "SurfaceStrategyMass"
 
 
-def test_build_surface_strategy_mass_missing_parameters():
+def test_build_surface_strategy_mass_missing_parameters() -> None:
     """Test building with missing parameters."""
     builder = SurfaceStrategyMassBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -74,7 +74,7 @@ def test_build_surface_strategy_mass_missing_parameters():
     )
 
 
-def test_build_surface_strategy_volume_dict():
+def test_build_surface_strategy_volume_dict() -> None:
     """Test building with a dictionary."""
     builder = SurfaceStrategyVolumeBuilder()
     parameters = {
@@ -92,7 +92,7 @@ def test_build_surface_strategy_volume_dict():
     assert strategy.__class__.__name__ == "SurfaceStrategyVolume"
 
 
-def test_build_surface_strategy_volume_missing_parameters():
+def test_build_surface_strategy_volume_missing_parameters() -> None:
     """Test building with missing parameters."""
     builder = SurfaceStrategyVolumeBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -102,7 +102,7 @@ def test_build_surface_strategy_volume_missing_parameters():
     )
 
 
-def test_build_surface_strategy_phase_index():
+def test_build_surface_strategy_phase_index() -> None:
     """Test optional phase index parameter."""
     builder = SurfaceStrategyMassBuilder()
     builder.set_surface_tension(0.072, "N/m")

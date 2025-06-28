@@ -16,11 +16,11 @@ from particula.gas.vapor_pressure_strategies import (
 class TestGasSpeciesFactory(unittest.TestCase):
     """Test the GasSpeciesFactory class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test case."""
         self.factory = GasSpeciesFactory()
 
-    def test_get_builders(self):
+    def test_get_builders(self) -> None:
         """Test getting the builders."""
         builders = self.factory.get_builders()
         self.assertIsInstance(builders["gas_species"], GasSpeciesBuilder)
@@ -28,7 +28,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
             builders["preset_gas_species"], PresetGasSpeciesBuilder
         )
 
-    def test_get_strategy_gas_species(self):
+    def test_get_strategy_gas_species(self) -> None:
         """Test getting a gas species strategy."""
         parameters = {
             "name": "Oxygen",
@@ -53,7 +53,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
         )
         self.assertIsInstance(gas_species, GasSpecies)
 
-    def test_get_strategy_preset_gas_species(self):
+    def test_get_strategy_preset_gas_species(self) -> None:
         """Test getting a preset gas species strategy."""
         parameters = {}
         preset_gas_species = self.factory.get_strategy(
@@ -68,7 +68,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
         self.assertEqual(preset_gas_species.partitioning, False)
         self.assertEqual(preset_gas_species.concentration, 1.0)
 
-    def test_get_strategy_invalid(self):
+    def test_get_strategy_invalid(self) -> None:
         """Test getting an invalid strategy."""
         with self.assertRaises(ValueError):
             self.factory.get_strategy("invalid_type", {})

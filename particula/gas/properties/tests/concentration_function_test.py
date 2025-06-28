@@ -9,7 +9,7 @@ from particula.gas.properties.concentration_function import (
 from particula.util.constants import GAS_CONSTANT
 
 
-def test_calculate_concentration_scalar():
+def test_calculate_concentration_scalar() -> None:
     """Test the calculate_concentration function with scalar values."""
     # Test the function with scalar values
     partial_pressure = 101325  # Pa
@@ -23,7 +23,7 @@ def test_calculate_concentration_scalar():
     ) == pytest.approx(expected_concentration)
 
 
-def test_calculate_concentration_array():
+def test_calculate_concentration_array() -> None:
     """Test the calculate_concentration function with NumPy arrays."""
     # Test the function with NumPy arrays
     partial_pressure = np.array([101325, 202650])  # Pa

@@ -12,7 +12,7 @@ from particula.dynamics.condensation.mass_transfer import (
 )
 
 
-def test_first_order_mass_transport_k():
+def test_first_order_mass_transport_k() -> None:
     """Test the first_order_mass_transport_k function."""
     radius = 1e-6
     vapor_transition = 0.6
@@ -24,7 +24,7 @@ def test_first_order_mass_transport_k():
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
 
 
-def test_multi_radius_first_order_mass_transport_k():
+def test_multi_radius_first_order_mass_transport_k() -> None:
     """Test the first_order_mass_transport_k function for multiple radii."""
     radius = np.array([1e-6, 2e-6, 3e-6])
     vapor_transition = 0.6
@@ -38,7 +38,7 @@ def test_multi_radius_first_order_mass_transport_k():
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
 
 
-def test_mass_transfer_rate():
+def test_mass_transfer_rate() -> None:
     """Test the mass_transfer_rate function."""
     pressure_delta = 10.0
     first_order_mass_transport = 1e-17
@@ -54,7 +54,7 @@ def test_mass_transfer_rate():
     )
 
 
-def test_mass_transfer_mulit_particle_rate():
+def test_mass_transfer_mulit_particle_rate() -> None:
     """Test the mass_transfer_rate multi radii function."""
     pressure_delta = np.array([10.0, 15.0])
     first_order_mass_transport = np.array([1e-17, 2e-17])
@@ -67,7 +67,7 @@ def test_mass_transfer_mulit_particle_rate():
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
 
 
-def test_multi_species_mass_transfer_rate():
+def test_multi_species_mass_transfer_rate() -> None:
     """Test the mass_transfer_rate function for multiple species."""
     pressure_delta = np.array([10.0, 15.0])
     first_order_mass_transport = np.array([1e-17, 2e-17])
@@ -80,7 +80,7 @@ def test_multi_species_mass_transfer_rate():
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
 
 
-def test_single_species_condensation_not_enough_gas_mass():
+def test_single_species_condensation_not_enough_gas_mass() -> None:
     """Test mass transfer for a single particle species where there is not
     enough gas mass for full condensation.
     """
@@ -127,7 +127,7 @@ def test_single_species_condensation_not_enough_gas_mass():
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
 
 
-def test_single_species_evaporation_not_enough_particle_mass():
+def test_single_species_evaporation_not_enough_particle_mass() -> None:
     """Test mass transfer for a single particle species where there is not
     enough particle mass for full evaporation.
     """
@@ -164,7 +164,7 @@ def test_single_species_evaporation_not_enough_particle_mass():
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
 
 
-def test_multiple_species_condensation():
+def test_multiple_species_condensation() -> None:
     """Test mass transfer for multiple particle and gas species (n=2, m=3)
     where there is not enough gas mass for full condensation, and particle
     concentration is greater than 1.
@@ -219,7 +219,7 @@ def test_multiple_species_condensation():
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
 
 
-def test_multiple_species_evaporation_column_inventory_limit():
+def test_multiple_species_evaporation_column_inventory_limit() -> None:
     """Evaporation across several species should never remove more mass
     than the *total particle inventory* of that species, even when
     the requested evaporation (rate × dt × conc) is far larger.
@@ -289,7 +289,7 @@ def test_multiple_species_evaporation_column_inventory_limit():
     np.testing.assert_allclose(result, expected, rtol=1e-12)
 
 
-def test_condensation_inventory_limit():
+def test_condensation_inventory_limit() -> None:
     """Requested condensation exceeds gas_mass → routine must down-scale so that
     the column sum equals the available gas.
     """
@@ -320,7 +320,7 @@ def test_condensation_inventory_limit():
 # ──────────────────────────────────────────────────────────────────────────
 # Evaporation-limited case ─ scarce particle inventory, ample gas
 # ──────────────────────────────────────────────────────────────────────────
-def test_evaporation_inventory_limit():
+def test_evaporation_inventory_limit() -> None:
     """Requested evaporation exceeds the particle inventory → routine must
     down-scale so that the column sum does not exceed −inventory and no bin
     evaporates more mass than it owns.
@@ -362,7 +362,7 @@ def test_evaporation_inventory_limit():
     assert np.all(res >= per_bin_evap_limit - 1e-12)
 
 
-def test_zero_mass_transfer():
+def test_zero_mass_transfer() -> None:
     """Test mass transfer when there is no mass transfer."""
     mass_rate = np.array([0.0])  # No mass transfer
     time_step = 10  # seconds
@@ -378,7 +378,7 @@ def test_zero_mass_transfer():
     np.testing.assert_array_almost_equal(result, expected_mass_transfer)
 
 
-def test_radius_transfer_rate():
+def test_radius_transfer_rate() -> None:
     """Test the radius_transfer_rate function."""
     # Test normal case
     result = get_radius_transfer_rate(1e-21, 1e-6, 1000)
@@ -404,7 +404,7 @@ def test_radius_transfer_rate():
     np.testing.assert_allclose(result, expected_result, atol=1e-8)
 
 
-def test_mixed_condensation_and_evaporation_inventory_limit():
+def test_mixed_condensation_and_evaporation_inventory_limit() -> None:
     """Mixed-sign fluxes: one bin condenses while another evaporates.
     Only the *condensation* part must be down–scaled to respect the
     limited gas reservoir; the evaporation part must remain untouched

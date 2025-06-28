@@ -12,14 +12,14 @@ from particula.gas.vapor_pressure_strategies import (
 from particula.util.constants import GAS_CONSTANT
 
 
-def test_constant_vapor_pressure_strategy():
+def test_constant_vapor_pressure_strategy() -> None:
     """Test the constant vapor pressure strategy."""
     constant_pressure = 101325  # Pa, standard atmospheric pressure
     strategy = ConstantVaporPressureStrategy(vapor_pressure=constant_pressure)
     assert strategy.pure_vapor_pressure(298) == constant_pressure
 
 
-def test_antoine_vapor_pressure_strategy():
+def test_antoine_vapor_pressure_strategy() -> None:
     """Test the Antoine vapor pressure strategy."""
     # Example coefficients for water
     a, b, c = 8.07131, 1730.63, 233.426
@@ -33,7 +33,7 @@ def test_antoine_vapor_pressure_strategy():
     )
 
 
-def test_clausius_clapeyron_strategy():
+def test_clausius_clapeyron_strategy() -> None:
     """Test the Clausius-Clapeyron vapor pressure strategy."""
     latent_heat = 2260000  # J/kg for water
     temp_initial = 373.15  # K, boiling point of water
@@ -53,7 +53,7 @@ def test_clausius_clapeyron_strategy():
     )
 
 
-def test_water_buck_strategy():
+def test_water_buck_strategy() -> None:
     """Test the Buck equation for water vapor pressure."""
     strategy = WaterBuckStrategy()
     temperature = 25 + 273.15  # 25°C to Kelvin

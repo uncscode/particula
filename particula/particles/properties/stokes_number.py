@@ -1,5 +1,4 @@
-"""Stokes number calculation.
-"""
+"""Stokes number calculation."""
 
 from typing import Union
 

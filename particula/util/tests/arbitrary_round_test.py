@@ -5,7 +5,7 @@ import numpy as np
 from particula.util.arbitrary_round import get_arbitrary_round
 
 
-def test_round_arbitrary():
+def test_round_arbitrary() -> None:
     """Test the round function."""
     # Test single float value
     assert get_arbitrary_round(3.14, base=0.5, mode="round") == 3.0
@@ -45,4 +45,4 @@ def test_round_arbitrary():
     except ValueError:
         pass
     else:
-        assert False, "Expected ValueError"
+        raise AssertionError("Expected ValueError")

@@ -68,7 +68,7 @@ class AtmosphereBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "temperature",
             "pressure",

@@ -63,7 +63,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     def __init__(
         self,
         distribution_type: str,
-    ):
+    ) -> None:
         CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
         )

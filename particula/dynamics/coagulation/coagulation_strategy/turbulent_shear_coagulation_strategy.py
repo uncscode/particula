@@ -77,7 +77,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         distribution_type: str,
         turbulent_dissipation: float,
         fluid_density: float,
-    ):
+    ) -> None:
         """Initialize the turbulent shear coagulation strategy.
 
         Arguments:

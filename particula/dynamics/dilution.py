@@ -1,5 +1,4 @@
-"""General dilution rate for closed systems.
-"""
+"""General dilution rate for closed systems."""
 
 from typing import Union
 

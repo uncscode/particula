@@ -1,5 +1,4 @@
-"""Tests that the collision kernel function can be evaluated get_kernel_ao2008.
-"""
+"""Tests that the collision kernel function can be evaluated get_kernel_ao2008."""
 
 import unittest
 
@@ -14,7 +13,7 @@ class TestKernelAO2008(unittest.TestCase):
     # pylint: disable=too-many-instance-attributes
     """Unit tests for the collision kernel function get_kernel_ao2008."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up common test parameters."""
         self.stokes_number_scalar = 0.5  # [-]
         self.kolmogorov_length_scale = 1e-6  # [m]
@@ -29,7 +28,7 @@ class TestKernelAO2008(unittest.TestCase):
         self.stokes_number_array = np.array([0.5, 0.6, 0.7])  # [-]
         self.velocity_dispersion_scalar = 0.1  # [m/s]
 
-    def test_get_kernel_ao2008_array(self):
+    def test_get_kernel_ao2008_array(self) -> None:
         """Test get_kernel_ao2008 with NumPy array inputs."""
         result = get_turbulent_dns_kernel_ao2008(
             self.particle_radius_array,
@@ -49,7 +48,7 @@ class TestKernelAO2008(unittest.TestCase):
             f"Expected shape (3, 3), but got {result.shape}",
         )
 
-    def test_invalid_inputs(self):
+    def test_invalid_inputs(self) -> None:
         """Ensure validation errors are raised for invalid inputs."""
         with self.assertRaises(ValueError):
             get_turbulent_dns_kernel_ao2008(

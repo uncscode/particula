@@ -24,7 +24,7 @@ from particula.dynamics.coagulation.charged_dimensional_kernel import (
         get_coulomb_kernel_chahl2019_via_system_state,
     ],
 )
-def test_dimensioned_coagulation_kernels_array(kernel_function):
+def test_dimensioned_coagulation_kernels_array(kernel_function) -> None:
     """Test the coagulation kernels for charged particles with
     calls via system state.
     """

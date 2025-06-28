@@ -1,5 +1,4 @@
-"""Tests for BrownianCoagulationStrategy.
-"""
+"""Tests for BrownianCoagulationStrategy."""
 
 # pylint: disable=duplicate-code, too-many-instance-attributes
 
@@ -20,7 +19,7 @@ from particula.particles import (
 class TestBrownianCoagulationStrategy(unittest.TestCase):
     """Test suite for the BrownianCoagulationStrategy class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Setup a particle representation for testing
         self.particle = PresetParticleRadiusBuilder().build()
         # Create strategies for both distribution types
@@ -39,7 +38,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
 
-    def test_kernel_discrete(self):
+    def test_kernel_discrete(self) -> None:
         """Test the kernel calculation for discrete distribution."""
         # Test the kernel calculation for discrete distribution
         kernel = self.strategy_discrete.kernel(
@@ -49,7 +48,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         )
         self.assertIsInstance(kernel, np.ndarray)
 
-    def test_step_discrete(self):
+    def test_step_discrete(self) -> None:
         """Test the step method for discrete distribution."""
         # Test the step method for discrete distribution
         initial_concentration = self.particle.get_concentration().copy()
@@ -64,7 +63,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-    def test_step_particle_resolved(self):
+    def test_step_particle_resolved(self) -> None:
         """Test the kernel calculation for particle_resolved distribution."""
         # Test the kernel calculation for particle_resolved distribution
         old_concentration = self.particle_resolved.get_total_concentration()
@@ -77,7 +76,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         new_concentration = self.particle_resolved.get_total_concentration()
         self.assertNotEqual(old_concentration, new_concentration)
 
-    def test_kernel_continuous_pdf(self):
+    def test_kernel_continuous_pdf(self) -> None:
         """Test the kernel calculation for continuous_pdf distribution."""
         # Test the kernel calculation for continuous_pdf distribution
         kernel = self.strategy_continuous_pdf.kernel(
@@ -87,7 +86,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         )
         self.assertIsInstance(kernel, np.ndarray)
 
-    def test_step_continuous_pdf(self):
+    def test_step_continuous_pdf(self) -> None:
         """Test the step method for continuous_pdf distribution."""
         # Test the step method for continuous_pdf distribution
         initial_concentration = self.particle.get_concentration().copy()

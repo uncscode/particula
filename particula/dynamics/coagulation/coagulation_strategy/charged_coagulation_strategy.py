@@ -1,5 +1,4 @@
-"""Charged particle coagulation strategy.
-"""
+"""Charged particle coagulation strategy."""
 
 import logging
 from typing import Union
@@ -64,7 +63,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
 
     def __init__(
         self, distribution_type: str, kernel_strategy: ChargedKernelStrategyABC
-    ):
+    ) -> None:
         """Initialize the ChargedCoagulationStrategy.
 
         Arguments:

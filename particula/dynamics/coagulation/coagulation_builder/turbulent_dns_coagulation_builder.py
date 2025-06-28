@@ -78,7 +78,7 @@ class TurbulentDNSCoagulationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "distribution_type",
             "turbulent_dissipation",

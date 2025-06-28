@@ -48,10 +48,10 @@ class BuilderABC(ABC):
 
     """
 
-    def __init__(self, required_parameters: Optional[list[str]] = None):
+    def __init__(self, required_parameters: Optional[list[str]] = None) -> None:
         self.required_parameters = required_parameters or []
 
-    def check_keys(self, parameters: dict[str, Any]):
+    def check_keys(self, parameters: dict[str, Any]) -> None:
         """Check if the keys are present and valid.
 
         Arguments:
@@ -134,7 +134,7 @@ class BuilderABC(ABC):
                 getattr(self, f"set_{key}")(parameters[key])
         return self
 
-    def pre_build_check(self):
+    def pre_build_check(self) -> None:
         """Check if all required attribute parameters are set before building.
 
         Raises:

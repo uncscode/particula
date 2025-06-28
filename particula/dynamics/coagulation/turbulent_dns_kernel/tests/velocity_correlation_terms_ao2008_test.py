@@ -1,5 +1,4 @@
-"""Tests for the velocity_correlation_terms module.
-"""
+"""Tests for the velocity_correlation_terms module."""
 
 import numpy as np
 import pytest
@@ -18,9 +17,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
 )
 
 
-def test_compute_z():
-    """Test compute_z with scalar and array inputs.
-    """
+def test_compute_z() -> None:
+    """Test compute_z with scalar and array inputs."""
     lagrangian_integral_time = np.array([1.0, 2.0, 3.0])  # [s]
     eulerian_integral_length = np.array([10.0, 20.0, 30.0])  # [m]
 
@@ -30,9 +28,8 @@ def test_compute_z():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_beta():
-    """Test compute_beta with scalar and array inputs.
-    """
+def test_compute_beta() -> None:
+    """Test compute_beta with scalar and array inputs."""
     taylor_microscale = np.array([1.0, 2.0, 3.0])  # [m]
     eulerian_integral_length = np.array([10.0, 20.0, 30.0])  # [m]
 
@@ -42,9 +39,8 @@ def test_compute_beta():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_b1():
-    """Test compute_b1 with valid inputs.
-    """
+def test_compute_b1() -> None:
+    """Test compute_b1 with valid inputs."""
     z = np.array([0.1, 0.2, 0.3])  # [-]
     expected = (1 + np.sqrt(1 - 2 * z**2)) / (2 * np.sqrt(1 - 2 * z**2))
     result = compute_b1(z)
@@ -52,9 +48,8 @@ def test_compute_b1():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_b2():
-    """Test compute_b2 with valid inputs.
-    """
+def test_compute_b2() -> None:
+    """Test compute_b2 with valid inputs."""
     z = np.array([0.1, 0.2, 0.3])  # [-]
     expected = (1 - np.sqrt(1 - 2 * z**2)) / (2 * np.sqrt(1 - 2 * z**2))
     result = compute_b2(z)
@@ -62,9 +57,8 @@ def test_compute_b2():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_c1():
-    """Test compute_c1 with valid inputs.
-    """
+def test_compute_c1() -> None:
+    """Test compute_c1 with valid inputs."""
     z = np.array([0.1, 0.2, 0.3])  # [-]
     lagrangian_integral_time = np.array([10.0, 20.0, 30.0])  # [s]
 
@@ -74,9 +68,8 @@ def test_compute_c1():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_c2():
-    """Test compute_c2 with valid inputs.
-    """
+def test_compute_c2() -> None:
+    """Test compute_c2 with valid inputs."""
     z = np.array([0.1, 0.2, 0.3])  # [-]
     lagrangian_integral_time = np.array([10.0, 20.0, 30.0])  # [s]
 
@@ -86,9 +79,8 @@ def test_compute_c2():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_d1():
-    """Test compute_d1 with valid inputs.
-    """
+def test_compute_d1() -> None:
+    """Test compute_d1 with valid inputs."""
     beta = np.array([0.1, 0.2, 0.3])  # [-]
 
     expected = (1 + np.sqrt(1 - 2 * beta**2)) / (2 * np.sqrt(1 - 2 * beta**2))
@@ -97,9 +89,8 @@ def test_compute_d1():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_d2():
-    """Test compute_d2 with valid inputs.
-    """
+def test_compute_d2() -> None:
+    """Test compute_d2 with valid inputs."""
     beta = np.array([0.1, 0.2, 0.3])  # [-]
 
     expected = (1 - np.sqrt(1 - 2 * beta**2)) / (2 * np.sqrt(1 - 2 * beta**2))
@@ -108,9 +99,8 @@ def test_compute_d2():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_e1():
-    """Test compute_e1 with valid inputs.
-    """
+def test_compute_e1() -> None:
+    """Test compute_e1 with valid inputs."""
     beta = np.array([0.1, 0.2, 0.3])  # [-]
     eulerian_integral_length = np.array([10.0, 20.0, 30.0])  # [m]
 
@@ -120,9 +110,8 @@ def test_compute_e1():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_compute_e2():
-    """Test compute_e2 with valid inputs.
-    """
+def test_compute_e2() -> None:
+    """Test compute_e2 with valid inputs."""
     beta = np.array([0.1, 0.2, 0.3])  # [-]
     eulerian_integral_length = np.array([10.0, 20.0, 30.0])  # [m]
 
@@ -132,9 +121,8 @@ def test_compute_e2():
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
 
-def test_invalid_inputs():
-    """Ensure validation errors are raised for invalid inputs.
-    """
+def test_invalid_inputs() -> None:
+    """Ensure validation errors are raised for invalid inputs."""
     with pytest.raises(ValueError):
         compute_z(-1, 10)  # Negative lagrangian_integral_time
 
@@ -151,9 +139,8 @@ def test_invalid_inputs():
         compute_e1(0.5, -10)  # Negative length scale
 
 
-def test_edge_cases():
-    """Test edge cases such as very small and very large values.
-    """
+def test_edge_cases() -> None:
+    """Test edge cases such as very small and very large values."""
     lagrangian_integral_time = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large inertia values

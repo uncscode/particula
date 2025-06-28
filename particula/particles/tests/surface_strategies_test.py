@@ -14,7 +14,7 @@ from particula.particles.surface_strategies import (
 
 
 # Test MolarSurfaceStrategy
-def test_molar_surface_strategy():
+def test_molar_surface_strategy() -> None:
     """Test MolarSurfaceStrategy class."""
     surface_tension = np.array([0.072, 0.05])  # water, oil
     density = np.array([1000, 800])  # water, oil
@@ -62,7 +62,7 @@ def test_molar_surface_strategy():
 
 
 # Test MassSurfaceStrategy
-def test_mass_surface_strategy():
+def test_mass_surface_strategy() -> None:
     """Test MassSurfaceStrategy class."""
     surface_tension = np.array([0.072, 0.05])  # water, oil
     density = np.array([1000, 800])  # water, oil
@@ -106,7 +106,7 @@ def test_mass_surface_strategy():
 
 
 # Test VolumeSurfaceStrategy
-def test_volume_surface_strategy():
+def test_volume_surface_strategy() -> None:
     """Test VolumeSurfaceStrategy class."""
     surface_tension = np.array([0.072, 0.05])  # water, oil
     density = np.array([1000, 800])  # water, oil
@@ -149,7 +149,7 @@ def test_volume_surface_strategy():
     )
 
 
-def test_molar_surface_strategy_scalar_input():
+def test_molar_surface_strategy_scalar_input() -> None:
     """Test MolarSurfaceStrategy with scalar inputs."""
     surface_tension = 0.072  # scalar
     density = 1000  # scalar
@@ -164,7 +164,7 @@ def test_molar_surface_strategy_scalar_input():
     ) == pytest.approx(surface_tension)
 
 
-def test_surface_strategy_phase_index():
+def test_surface_strategy_phase_index() -> None:
     """Test phase-index mixing option."""
     surface_tension = np.array([0.072, 0.05])
     density = np.array([1000, 800])
@@ -197,7 +197,7 @@ def test_surface_strategy_phase_index():
     )
 
 
-def test_surface_strategy_multi_phase_mixing():
+def test_surface_strategy_multi_phase_mixing() -> None:
     """Validate mixing when phases contain more than one species."""
     # ---- input data --------------------------------------------------------
     surface_tension = np.array([0.072, 0.050, 0.060, 0.055])
@@ -247,7 +247,7 @@ def test_surface_strategy_multi_phase_mixing():
     )
 
 
-def test_weighted_average_by_phase_helper():
+def test_weighted_average_by_phase_helper() -> None:
     """Ensure helper returns correct phase-weighted averages."""
     vals = np.array([0.072, 0.050, 0.060])
     wts = np.array([1.0, 1.0, 2.0])
@@ -267,7 +267,7 @@ def test_weighted_average_by_phase_helper():
     )
 
 
-def test_helper_shape_management():
+def test_helper_shape_management() -> None:
     """Validate _as_2d and _broadcast_weights helper behaviour."""
     # ----- _as_2d ----------------------------------------------------------
     vec = np.array([1.0, 2.0, 3.0])
@@ -297,7 +297,7 @@ def test_helper_shape_management():
     assert np.array_equal(w3b, w3)
 
 
-def test_weighted_average_by_phase_multi_bin():
+def test_weighted_average_by_phase_multi_bin() -> None:
     """Check _weighted_average_by_phase for n_bins=4, n_species=3."""
     # ----------------------- set up input ---------------------------------
     values = np.array(
@@ -333,7 +333,7 @@ def test_weighted_average_by_phase_multi_bin():
     np.testing.assert_allclose(out2, expected)
 
 
-def test_weighted_average_by_phase_zero_weight_fallback():
+def test_weighted_average_by_phase_zero_weight_fallback() -> None:
     """When all weights in a phase are zero, fall back to un-weighted mean."""
     # single bin, two species, same phase
     vals = np.array([2.0, 6.0])          # (n_species,)

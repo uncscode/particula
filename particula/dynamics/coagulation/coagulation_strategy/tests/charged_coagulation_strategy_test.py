@@ -25,10 +25,9 @@ from particula.particles import (
 
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
-    """Test suite for the ChargedCoagulationStrategy class.
-    """
+    """Test suite for the ChargedCoagulationStrategy class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test environment.
 
         Initializes a particle representation and creates instances of
@@ -59,7 +58,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             kernel_strategy=self.kernel_strategy,
         )
 
-    def test_kernel_discrete(self):
+    def test_kernel_discrete(self) -> None:
         """Test the kernel calculation for discrete distribution.
 
         Verifies that the kernel method returns an ndarray for the discrete
@@ -73,7 +72,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         )
         self.assertIsInstance(kernel, np.ndarray)
 
-    def test_step_discrete(self):
+    def test_step_discrete(self) -> None:
         """Test the step method for discrete distribution.
 
         Ensures that the step method updates the particle concentration for
@@ -92,7 +91,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-    def test_step_particle_resolved(self):
+    def test_step_particle_resolved(self) -> None:
         """Test the kernel calculation for particle_resolved distribution."""
         # Test the kernel calculation for particle_resolved distribution
         old_concentration = self.particle_resolved.get_total_concentration()
@@ -105,7 +104,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         new_concentration = self.particle_resolved.get_total_concentration()
         self.assertNotEqual(old_concentration, new_concentration)
 
-    def test_kernel_continuous_pdf(self):
+    def test_kernel_continuous_pdf(self) -> None:
         """Test the kernel calculation for continuous_pdf distribution.
 
         Verifies that the kernel method returns an ndarray for the
@@ -119,7 +118,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         )
         self.assertIsInstance(kernel, np.ndarray)
 
-    def test_step_continuous_pdf(self):
+    def test_step_continuous_pdf(self) -> None:
         """Test the step method for continuous_pdf distribution.
 
         Ensures that the step method updates the particle concentration for

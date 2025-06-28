@@ -102,7 +102,7 @@ class GasSpecies:
         self.pure_vapor_pressure_strategy = vapor_pressure_strategy
         self.partitioning = partitioning
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the GasSpecies object.
 
         Returns:
@@ -111,7 +111,7 @@ class GasSpecies:
         """
         return str(self.name)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of gas species (1 if scalar; array length if
         ndarray).
 
@@ -211,8 +211,7 @@ class GasSpecies:
         return self.molar_mass
 
     def get_partitioning(self) -> bool:
-        """Return the partitioning flag (True if the species can partition).
-        """
+        """Return the partitioning flag (True if the species can partition)."""
         return self.partitioning
 
     def get_concentration(self) -> Union[float, NDArray[np.float64]]:
@@ -501,7 +500,7 @@ class GasSpecies:
         if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
             logger.warning(message)
-            warnings.warn(message, UserWarning)
+            warnings.warn(message, UserWarning, stacklevel=2)
             # Set negative concentrations to 0
             values = np.maximum(values, 0.0)
         return values

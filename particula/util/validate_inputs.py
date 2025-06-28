@@ -20,7 +20,7 @@ from functools import wraps
 import numpy as np
 
 
-def validate_positive(value, name):
+def validate_positive(value, name) -> None:
     """Validate that a numeric array or scalar is strictly positive.
 
     Arguments:
@@ -35,7 +35,7 @@ def validate_positive(value, name):
         raise ValueError(f"Argument '{name}' must be positive.")
 
 
-def validate_negative(value, name):
+def validate_negative(value, name) -> None:
     """Validate that a numeric array or scalar is strictly negative.
 
     Arguments:
@@ -50,7 +50,7 @@ def validate_negative(value, name):
         raise ValueError(f"Argument '{name}' must be negative.")
 
 
-def validate_nonpositive(value, name):
+def validate_nonpositive(value, name) -> None:
     """Validate that a numeric array or scalar is nonpositive (<= 0).
 
     Arguments:
@@ -65,7 +65,7 @@ def validate_nonpositive(value, name):
         raise ValueError(f"Argument '{name}' must be nonpositive.")
 
 
-def validate_nonnegative(value, name):
+def validate_nonnegative(value, name) -> None:
     """Validate that a numeric array or scalar is nonnegative (>= 0).
 
     Arguments:
@@ -80,7 +80,7 @@ def validate_nonnegative(value, name):
         raise ValueError(f"Argument '{name}' must be nonnegative.")
 
 
-def validate_nonzero(value, name):
+def validate_nonzero(value, name) -> None:
     """Validate that a numeric array or scalar is nonzero.
 
     Arguments:
@@ -95,7 +95,7 @@ def validate_nonzero(value, name):
         raise ValueError(f"Argument '{name}' must be nonzero.")
 
 
-def validate_finite(value, name):
+def validate_finite(value, name) -> None:
     """Validate that a numeric array or scalar has no infinities or NaNs.
 
     Arguments:

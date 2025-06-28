@@ -10,7 +10,7 @@ from particula.particles.properties.aerodynamic_mobility_module import (
 )
 
 
-def test_particle_aerodynamic_mobility_single_value():
+def test_particle_aerodynamic_mobility_single_value() -> None:
     """Verify that the particle_aerodynamic_mobility function calculates the
     correct aerodynamic mobility value for a single particle.
     """
@@ -28,7 +28,7 @@ def test_particle_aerodynamic_mobility_single_value():
     ), "The value does not match."
 
 
-def test_particle_aerodynamic_mobility_array_input():
+def test_particle_aerodynamic_mobility_array_input() -> None:
     """Test that the particle_aerodynamic_mobility function handles numpy array
     inputs correctly.
     """
@@ -44,7 +44,7 @@ def test_particle_aerodynamic_mobility_array_input():
     assert np.allclose(actual_mobility, expected_mobility)
 
 
-def test_particle_aerodynamic_mobility_type_error():
+def test_particle_aerodynamic_mobility_type_error() -> None:
     """Test that the particle_aerodynamic_mobility function raises a TypeError
     with incorrect input types.
     """
@@ -60,7 +60,7 @@ def test_particle_aerodynamic_mobility_type_error():
 def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
     """Verify that the particle_aerodynamic_mobility function handles extreme
     values correctly.
-    - radius : The radius of the particle
+    - radius : The radius of the particle.
     """
     slip_correction_factor = 1.1
     dynamic_viscosity = 0.0000181  # Pa.s for air at room temperature

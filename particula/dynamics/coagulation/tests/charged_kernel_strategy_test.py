@@ -10,7 +10,7 @@ DIFFUSIVE_KNUDSEN = np.array([0.5, 1.0, 5.0, 10.0])
 COULOMB_POTENTIAL_RATIO_ARRAY = np.array([0.7, 0.9, 1.0, 1.1])
 
 
-def test_kernel_call():
+def test_kernel_call() -> None:
     """Test calling the kernel method, common for all kernel strategies."""
     dimensionless_kernel_in = np.array([[1.0, 2.0], [3.0, 4.0]])
     coulomb_potential_ratio_in = np.array([[0.5, 0.6], [0.7, 0.8]])
@@ -34,7 +34,7 @@ def test_kernel_call():
     )
 
 
-def test_hard_sphere():
+def test_hard_sphere() -> None:
     """Test the hard_sphere function with a single value and
     array of diffusive_knudsen values.
     """
@@ -51,7 +51,7 @@ def test_hard_sphere():
     )
 
 
-def test_coulomb_dyachkov2007():
+def test_coulomb_dyachkov2007() -> None:
     """Test the coulomb_dyachkov2007 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -70,7 +70,7 @@ def test_coulomb_dyachkov2007():
     )
 
 
-def test_coulomb_gatti2008():
+def test_coulomb_gatti2008() -> None:
     """Test the coulomb_gatti2008 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -87,7 +87,7 @@ def test_coulomb_gatti2008():
     )
 
 
-def test_coulomb_gopalakrishnan2012():
+def test_coulomb_gopalakrishnan2012() -> None:
     """Test the coulomb_gopalakrishnan2012 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -106,7 +106,7 @@ def test_coulomb_gopalakrishnan2012():
     )
 
 
-def test_coulomb_chahl2019():
+def test_coulomb_chahl2019() -> None:
     """Test the coulomb_chahl2019 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """

@@ -1,5 +1,4 @@
-"""Test the change of particle representation
-"""
+"""Test the change of particle representation."""
 
 import unittest
 
@@ -14,10 +13,9 @@ from particula.particles.representation import ParticleRepresentation
 
 
 class TestChangeParticleRepresentation(unittest.TestCase):
-    """Test suite for the change_particle_representation module.
-    """
+    """Test suite for the change_particle_representation module."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test environment.
 
         Initializes a particle representation using the
@@ -25,7 +23,7 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         """
         self.particle = PresetResolvedParticleMassBuilder().build()
 
-    def test_get_particle_resolved_binned_radius(self):
+    def test_get_particle_resolved_binned_radius(self) -> None:
         """Test the get_particle_resolved_binned_radius function.
 
         Verifies that the function returns the correct binned radii.
@@ -36,7 +34,7 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         self.assertEqual(len(bin_radius), 10)
         self.assertTrue(np.all(bin_radius > 0))
 
-    def test_get_speciated_mass_representation_single(self):
+    def test_get_speciated_mass_representation_single(self) -> None:
         """Test the get_speciated_mass_representation_from_particle_resolved
         function.
 
@@ -54,7 +52,7 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         self.assertIsInstance(new_particle, ParticleRepresentation)
         self.assertTrue(np.all(new_particle.get_distribution() >= 0))
 
-    def test_get_speciated_mass_representation_double(self):
+    def test_get_speciated_mass_representation_double(self) -> None:
         """Test the get_speciated_mass_representation_from_particle_resolved
         function.
 

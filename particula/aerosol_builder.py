@@ -1,5 +1,4 @@
-"""AerosolBuilder Module
-=====================
+"""AerosolBuilder Module.
 
 Provides a fluent interface to create an `Aerosol` instance from an
 `Atmosphere` and a `ParticleRepresentation`.  The builder validates
@@ -55,7 +54,7 @@ class AerosolBuilder(BuilderABC):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize an empty builder.
 
         Returns:
@@ -73,8 +72,8 @@ class AerosolBuilder(BuilderABC):
         """Attach an `Atmosphere` to the builder.
 
         Arguments:
-            - atmosphere : Atmosphere to embed in the aerosol.
-            - atmosphere_units : Ignored; included for signature uniformity.
+            atmosphere: Atmosphere to embed in the aerosol.
+            atmosphere_units: Ignored; included for signature uniformity.
 
         Returns:
             AerosolBuilder : The builder instance (for chaining).
@@ -125,7 +124,7 @@ class AerosolBuilder(BuilderABC):
         if self.atmosphere is None or self.particles is None:
             raise ValueError(
                 "Atmosphere and particles must be set before validation."
-                )
+            )
         strategy_name = self.particles.get_strategy_name()
         if strategy_name not in (
             "SpeciatedMassMovingBin",

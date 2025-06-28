@@ -20,28 +20,28 @@ from particula.particles.distribution_strategies import (
 )
 
 
-def test_mass_based_moving_bin_builder():
+def test_mass_based_moving_bin_builder() -> None:
     """Test returning the MassBasedMovingBin."""
     builder = MassBasedMovingBinBuilder()
     distribution = builder.build()
     assert isinstance(distribution, MassBasedMovingBin)
 
 
-def test_radii_based_moving_bin_builder():
+def test_radii_based_moving_bin_builder() -> None:
     """Test returning the RadiiBasedMovingBin."""
     builder = RadiiBasedMovingBinBuilder()
     distribution = builder.build()
     assert isinstance(distribution, RadiiBasedMovingBin)
 
 
-def test_speciated_mass_moving_bin_builder():
+def test_speciated_mass_moving_bin_builder() -> None:
     """Test returning the SpeciatedMassMovingBin."""
     builder = SpeciatedMassMovingBinBuilder()
     distribution = builder.build()
     assert isinstance(distribution, SpeciatedMassMovingBin)
 
 
-def test_particle_resolved_speciated_mass_builder():
+def test_particle_resolved_speciated_mass_builder() -> None:
     """Test returning the ParticleResolvedSpeciatedMass."""
     builder = ParticleResolvedSpeciatedMassBuilder()
     distribution = builder.build()

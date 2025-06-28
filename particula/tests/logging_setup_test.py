@@ -11,7 +11,7 @@ import logging.handlers
 logger = logging.getLogger("particula")
 
 
-def test_setup_configures_logger():
+def test_setup_configures_logger() -> None:
     """Test that the logger name is set to 'particula'."""
     # Arrange
     expected_logger_name = "particula"

@@ -1,5 +1,4 @@
-"""Calculates the wall loss rate of a particle in a chamber with a given geometry.
-"""
+"""Calculates the wall loss rate of a particle in a chamber with a given geometry."""
 
 from typing import Tuple, Union
 

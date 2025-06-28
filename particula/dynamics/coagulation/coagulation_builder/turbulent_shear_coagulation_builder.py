@@ -1,5 +1,4 @@
-"""Turbulent Shear Coagulation Builder Module.
-"""
+"""Turbulent Shear Coagulation Builder Module."""
 
 from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
@@ -61,7 +60,7 @@ class TurbulentShearCoagulationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the TurbulentShearCoagulationBuilder.
 
         Returns:

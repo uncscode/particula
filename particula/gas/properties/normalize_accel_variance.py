@@ -1,5 +1,4 @@
-"""Calculates the normalized acceleration variance in isotropic turbulence.
-"""
+"""Calculates the normalized acceleration variance in isotropic turbulence."""
 
 from typing import Union
 

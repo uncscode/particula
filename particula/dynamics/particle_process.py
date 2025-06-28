@@ -51,7 +51,7 @@ class MassCondensation(RunnableABC):
 
     """
 
-    def __init__(self, condensation_strategy: CondensationStrategy):
+    def __init__(self, condensation_strategy: CondensationStrategy) -> None:
         """Initialize the MassCondensation process.
 
         Arguments:
@@ -158,7 +158,7 @@ class Coagulation(RunnableABC):
 
     """
 
-    def __init__(self, coagulation_strategy: CoagulationStrategyABC):
+    def __init__(self, coagulation_strategy: CoagulationStrategyABC) -> None:
         """Initialize the Coagulation process.
 
         Arguments:

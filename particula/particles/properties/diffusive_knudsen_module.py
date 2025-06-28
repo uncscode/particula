@@ -1,4 +1,4 @@
-"""Module for the diffusive knudsen number"""
+"""Module for the diffusive knudsen number."""
 
 from typing import Union
 

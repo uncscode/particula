@@ -18,7 +18,7 @@ from particula.particles.representation_builders import (
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
-def test_mass_particle_representation_builder():
+def test_mass_particle_representation_builder() -> None:
     """Test MassParticleRepresentationBuilder Builds."""
     builder = ParticleMassRepresentationBuilder()
     builder.set_distribution_strategy(RadiiBasedMovingBin())
@@ -32,7 +32,7 @@ def test_mass_particle_representation_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_particle_radius_representation_builder():
+def test_particle_radius_representation_builder() -> None:
     """Test RadiusParticleRepresentationBuilder Builds."""
     builder = ParticleRadiusRepresentationBuilder()
     builder.set_distribution_strategy(RadiiBasedMovingBin())
@@ -46,7 +46,7 @@ def test_particle_radius_representation_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_limited_particle_radius_builder():
+def test_limited_particle_radius_builder() -> None:
     """Test LimitedRadiusParticleBuilder Builds."""
     # default values
     builder = PresetParticleRadiusBuilder()
@@ -62,7 +62,7 @@ def test_limited_particle_radius_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_resolved_mass_particle_representation_builder():
+def test_resolved_mass_particle_representation_builder() -> None:
     """Test ResolvedMassParticleRepresentationBuilder Builds."""
     builder = ResolvedParticleMassRepresentationBuilder()
     builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())
@@ -76,7 +76,7 @@ def test_resolved_mass_particle_representation_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_preset_resolved_mass_particle_builder():
+def test_preset_resolved_mass_particle_builder() -> None:
     """Test PresetResolvedMassParticleBuilder Builds."""
     # default values
     builder = PresetResolvedParticleMassBuilder()

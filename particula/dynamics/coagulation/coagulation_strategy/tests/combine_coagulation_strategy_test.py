@@ -27,10 +27,9 @@ from particula.particles import PresetParticleRadiusBuilder
 
 # pylint: disable=too-many-instance-attributes
 class TestCombineCoagulationStrategy(unittest.TestCase):
-    """Test suite for the CombineCoagulationStrategy class.
-    """
+    """Test suite for the CombineCoagulationStrategy class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test environment.
 
         Initializes a particle representation and creates instances of
@@ -58,7 +57,7 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
             strategies=[self.turbulent_shear_strategy, self.brownian_strategy]
         )
 
-    def test_kernel_combination(self):
+    def test_kernel_combination(self) -> None:
         """Test the kernel combination.
 
         Verifies that the combined kernel is the sum of the individual kernels.
@@ -83,7 +82,7 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
             kernel_combined, kernel_turbulent_shear + kernel_brownian
         )
 
-    def test_step_combination(self):
+    def test_step_combination(self) -> None:
         """Test the step method for combined strategy.
 
         Ensures that the step method updates the particle concentration.

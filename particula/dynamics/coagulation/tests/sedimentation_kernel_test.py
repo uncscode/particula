@@ -1,5 +1,4 @@
-"""Test the sedimentation kernel functions.
-"""
+"""Test the sedimentation kernel functions."""
 
 # pylint: disable=duplicate-code
 
@@ -12,7 +11,7 @@ from particula.dynamics.coagulation.sedimentation_kernel import (
 )
 
 
-def test_sedimentation_kernel():
+def test_sedimentation_kernel() -> None:
     """Test just the sedimentation kernel."""
     particle_raidus = np.array([1e-6, 2e-6, 3e-6, 4e-6])
     settling_velocities = np.array([0.01, 0.02, 0.03, 0.04])
@@ -34,7 +33,7 @@ def test_sedimentation_kernel():
     assert np.allclose(kernel, expected_kernel, rtol=1e-6)
 
 
-def test_sedimentation_kernel_via_system_state():
+def test_sedimentation_kernel_via_system_state() -> None:
     """Test the sedimentation kernel via system state."""
     particle_radius = np.array([1e-6, 2e-6, 3e-6, 4e-6])
     particle_density = np.array([1000, 1000, 1000, 1000])

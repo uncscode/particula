@@ -1,5 +1,4 @@
-"""Velocity correlation f2 test module.
-"""
+"""Velocity correlation f2 test module."""
 
 import numpy as np
 import pytest
@@ -9,9 +8,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2
 )
 
 
-def test_compute_f2_longitudinal_velocity_correlation_scalar():
-    """Test compute_f2_longitudinal_velocity_correlation with scalar inputs.
-    """
+def test_compute_f2_longitudinal_velocity_correlation_scalar() -> None:
+    """Test compute_f2_longitudinal_velocity_correlation with scalar inputs."""
     collisional_radius = 0.1  # [m]
     taylor_microscale = 0.05  # [m]
     eulerian_integral_length = 1.0  # [m]
@@ -45,9 +43,8 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
     ), f"Expected {expected}, but got {result}"
 
 
-def test_compute_f2_longitudinal_velocity_correlation_array():
-    """Test compute_f2_longitudinal_velocity_correlation with NumPy array inputs.
-    """
+def test_compute_f2_longitudinal_velocity_correlation_array() -> None:
+    """Test compute_f2_longitudinal_velocity_correlation with NumPy array inputs."""
     collisional_radius = np.array([0.1, 0.5, 1.0])  # [m]
     taylor_microscale = 0.05  # [m]
     eulerian_integral_length = 1.0  # [m]
@@ -75,9 +72,8 @@ def test_compute_f2_longitudinal_velocity_correlation_array():
     assert np.allclose(result, expected, atol=1e-10)
 
 
-def test_invalid_inputs():
-    """Ensure validation errors are raised for invalid inputs.
-    """
+def test_invalid_inputs() -> None:
+    """Ensure validation errors are raised for invalid inputs."""
     with pytest.raises(ValueError):
         get_f2_longitudinal_velocity_correlation(
             -0.1, 0.05, 1.0
@@ -94,9 +90,8 @@ def test_invalid_inputs():
         )  # Negative eulerian_integral_length
 
 
-def test_edge_cases():
-    """Test compute_f2_longitudinal_velocity_correlation with extreme values.
-    """
+def test_edge_cases() -> None:
+    """Test compute_f2_longitudinal_velocity_correlation with extreme values."""
     collisional_radius = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large values

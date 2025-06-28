@@ -1,5 +1,4 @@
-"""Test the wall loss functions.
-"""
+"""Test the wall loss functions."""
 # pylint: disable=R0801
 
 import numpy as np
@@ -12,8 +11,8 @@ from particula.dynamics.properties.wall_loss_coefficient import (
 )
 
 
-def test_spherical_wall_loss_coefficient():
-    """Test the spherical wall loss coefficient function"""
+def test_spherical_wall_loss_coefficient() -> None:
+    """Test the spherical wall loss coefficient function."""
     # Test case with hypothetical values
     _ktp_value = 1.5  # Example value
     _diffusion_coefficient_value = 0.01  # Example value
@@ -34,8 +33,8 @@ def test_spherical_wall_loss_coefficient():
     assert np.isclose(calculated_output, expected_output, rtol=1e-4)
 
 
-def test_rectangle_wall_loss():
-    """Test the rectangular wall loss coefficient function"""
+def test_rectangle_wall_loss() -> None:
+    """Test the rectangular wall loss coefficient function."""
     # Test case with hypothetical values
     ktp_value = 1.5  # Example value
     diffusion_coefficient_value = 0.01  # Example value
@@ -56,8 +55,8 @@ def test_rectangle_wall_loss():
     assert np.isclose(calculated_output, expected_output, rtol=1e-4)
 
 
-def test_spherical_system_state():
-    """Test the spherical wall loss coefficient function via system state"""
+def test_spherical_system_state() -> None:
+    """Test the spherical wall loss coefficient function via system state."""
     # inpust
     wall_eddy = 1.5  # Example value
     radii1 = np.array([1e-9, 1e-6, 1e-3])  # Example value
@@ -79,8 +78,8 @@ def test_spherical_system_state():
     assert np.allclose(result, expected_output, rtol=1e-4)
 
 
-def test_rectangle_system_state():
-    """Test the rectangular wall loss coefficient function via system state"""
+def test_rectangle_system_state() -> None:
+    """Test the rectangular wall loss coefficient function via system state."""
     # inpust
     wall_eddy = 1.5  # Example value
     radii2 = np.array([1e-9, 1e-6, 1e-3])  # Example value

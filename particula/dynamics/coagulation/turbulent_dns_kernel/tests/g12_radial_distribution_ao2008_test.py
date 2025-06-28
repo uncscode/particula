@@ -15,9 +15,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution
 )
 
 
-def test_get_g12_radial_distribution_ao2008_scalar():
-    """Test get_g12_radial_distribution_ao2008 with a small array input.
-    """
+def test_get_g12_radial_distribution_ao2008_scalar() -> None:
+    """Test get_g12_radial_distribution_ao2008 with a small array input."""
     particle_radius = np.array(
         [10e-6, 20e-6, 30e-6]
     )  # Particle radii in meters
@@ -49,7 +48,7 @@ def test_get_g12_radial_distribution_ao2008_scalar():
     assert np.all(g12_matrix >= 0), "Expected all values to be non-negative"
 
 
-def test_get_g12_radial_distribution_ao2008_invalid_inputs():
+def test_get_g12_radial_distribution_ao2008_invalid_inputs() -> None:
     """Test that get_g12_radial_distribution_ao2008 raises validation errors
     for invalid inputs.
     """
@@ -106,7 +105,7 @@ def test_get_g12_radial_distribution_ao2008_invalid_inputs():
         )
 
 
-def test_get_g12_radial_distribution_ao2008_edge_cases():
+def test_get_g12_radial_distribution_ao2008_edge_cases() -> None:
     """Test get_g12_radial_distribution_ao2008 with edge cases, such as
     very small or very large Stokes numbers.
     """

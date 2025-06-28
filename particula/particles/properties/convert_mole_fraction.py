@@ -1,5 +1,4 @@
-"""Convert from mole fractions
-"""
+"""Convert from mole fractions."""
 
 import numpy as np
 from numpy.typing import NDArray

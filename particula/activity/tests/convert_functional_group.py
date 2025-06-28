@@ -1,12 +1,11 @@
-"""Test for convert_functional_group.py
-"""
+"""Test for convert_functional_group.py."""
 
 from particula.activity.convert_functional_group import (
     convert_to_oh_equivalent,
 )
 
 
-def test_convert_to_oh_eqivalent():
+def test_convert_to_oh_eqivalent() -> None:
     """Test for convert_to_oh_equivalent function."""
     molar_mass_ratio = 18.016 / 250
     oxygen2carbon = 0.3

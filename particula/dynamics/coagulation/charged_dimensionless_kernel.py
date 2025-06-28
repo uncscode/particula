@@ -1,5 +1,4 @@
-"""Dimensionless coagulation for several approximations of the transition regime.
-"""
+"""Dimensionless coagulation for several approximations."""
 
 from typing import Union
 
@@ -152,9 +151,7 @@ def get_coulomb_kernel_dyachkov2007(
 
     # collected terms
     exponential_decay = np.exp(-coulomb_potential_ratio / adjustment_factor)
-    term1 = (
-        np.sqrt(2 * np.pi) * diffusive_knudsen * kinetic * exponential_decay
-    )
+    term1 = np.sqrt(2 * np.pi) * diffusive_knudsen * kinetic * exponential_decay
 
     term2 = adjustment_factor**2 - (
         2 + diffusive_knudsen * ratio_k_c
@@ -330,16 +327,12 @@ def get_coulomb_kernel_chahl2019(
         ** (-1 / correction3 - 1)
         * np.exp(
             -1
-            * (
-                1
-                + correction3 * (diff_knudsen_log - correction1) / correction0
-            )
+            * (1 + correction3 * (diff_knudsen_log - correction1) / correction0)
             ** (-1 / correction3)
         )
     )
     return np.where(
         bool_mask,
-        get_safe_exp(correction_mu)
-        * get_hard_sphere_kernel(diffusive_knudsen),
+        get_safe_exp(correction_mu) * get_hard_sphere_kernel(diffusive_knudsen),
         get_hard_sphere_kernel(diffusive_knudsen),
     )

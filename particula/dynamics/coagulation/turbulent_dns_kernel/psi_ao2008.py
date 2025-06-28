@@ -1,5 +1,4 @@
-"""Psi function for the droplet collision kernel in the turbulent DNS model.
-"""
+"""Psi function for the droplet collision kernel in the turbulent DNS model."""
 
 from typing import Union
 

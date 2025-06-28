@@ -14,14 +14,14 @@ from particula.gas.vapor_pressure_strategies import (
 )
 
 
-def test_set_name():
+def test_set_name() -> None:
     """Test setting the name of the gas species."""
     builder = GasSpeciesBuilder()
     builder.set_name("Oxygen")
     assert builder.name == "Oxygen"
 
 
-def test_set_molar_mass():
+def test_set_molar_mass() -> None:
     """Test setting the molar mass of the gas species."""
     builder = GasSpeciesBuilder()
     builder.set_molar_mass(0.032, "kg/mol")
@@ -31,7 +31,7 @@ def test_set_molar_mass():
         builder.set_molar_mass(-0.032, "kg/mol")
 
 
-def test_set_vapor_pressure_strategy():
+def test_set_vapor_pressure_strategy() -> None:
     """Test setting the vapor pressure strategy of the gas species."""
     builder = GasSpeciesBuilder()
     strategy = ConstantVaporPressureStrategy(0.0)
@@ -39,7 +39,7 @@ def test_set_vapor_pressure_strategy():
     assert builder.vapor_pressure_strategy == strategy
 
 
-def test_set_partitioning():
+def test_set_partitioning() -> None:
     """Test setting the partitioning bool of the gas species."""
     builder = GasSpeciesBuilder()
     builder.set_partitioning(True)
@@ -49,7 +49,7 @@ def test_set_partitioning():
     assert builder.partitioning is False
 
 
-def test_set_concentration():
+def test_set_concentration() -> None:
     """Test setting the concentration of the gas species."""
     builder = GasSpeciesBuilder()
     builder.set_concentration(1.0, "kg/m^3")
@@ -62,7 +62,7 @@ def test_set_concentration():
     assert builder.concentration == 1.0e-3
 
 
-def test_set_parameters():
+def test_set_parameters() -> None:
     """Test setting all parameters at once."""
     builder = GasSpeciesBuilder()
     vapor_obj = ConstantVaporPressureStrategy(0.0)
@@ -83,7 +83,7 @@ def test_set_parameters():
     assert builder.concentration == 1.0
 
 
-def test_missing_required_parameter():
+def test_missing_required_parameter() -> None:
     """Test missing a required parameter in the parameters dict."""
     builder = GasSpeciesBuilder()
     parameters = {
@@ -96,7 +96,7 @@ def test_missing_required_parameter():
         builder.set_parameters(parameters)
 
 
-def test_invalid_parameter():
+def test_invalid_parameter() -> None:
     """Test an invalid parameter in the parameters dict."""
     builder = GasSpeciesBuilder()
     parameters = {
@@ -111,7 +111,7 @@ def test_invalid_parameter():
         builder.set_parameters(parameters)
 
 
-def test_build():
+def test_build() -> None:
     """Test building the gas species object."""
     builder = GasSpeciesBuilder()
     parameters = {
@@ -129,7 +129,7 @@ def test_build():
     assert gas_species.get_name() == "Oxygen"
 
 
-def test_preset_builder():
+def test_preset_builder() -> None:
     """Test the preset gas species builder."""
     builder = PresetGasSpeciesBuilder()
     gas_species = builder.build()

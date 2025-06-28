@@ -1,4 +1,4 @@
-"""test the coag approx utility for lf2013"""
+"""test the coag approx utility for lf2013."""
 
 # import pytest
 import numpy as np
@@ -6,8 +6,8 @@ import numpy as np
 from particula.util.lf2013_coagulation import lf2013_coag_full
 
 
-def test_approx_coag_less():
-    """Testing"""
+def test_approx_coag_less() -> None:
+    """Testing."""
     ret = np.nan_to_num(
         lf2013_coag_full(
             ion_type="air",

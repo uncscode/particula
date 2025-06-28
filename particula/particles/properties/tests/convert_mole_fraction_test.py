@@ -1,5 +1,4 @@
-"""Test the function that converts mole fractions to mass fractions.
-"""
+"""Test the function that converts mole fractions to mass fractions."""
 
 from math import isclose
 
@@ -37,11 +36,11 @@ from particula.particles.properties.convert_mole_fraction import (
 )
 def test_get_mass_fractions_from_moles_1d(
     mole_fractions, molecular_weights, expected
-):
+) -> None:
     """Test 1D inputs with:
     - typical valid data
     - all zeros
-    - approximate numeric check
+    - approximate numeric check.
     """
     result = get_mass_fractions_from_moles(mole_fractions, molecular_weights)
 
@@ -81,9 +80,8 @@ def test_get_mass_fractions_from_moles_1d(
         ), f"Second component mismatch, expected ~0.2059, got {result[1]}"
 
 
-def test_get_mass_fractions_from_moles_2d():
-    """Test 2D inputs where each row of mole fractions is converted row-by-row.
-    """
+def test_get_mass_fractions_from_moles_2d() -> None:
+    """Test 2D inputs where each row of mole fractions is converted row-by-row."""
     # Example 2D input: each row has 3 components
     x_2d = np.array(
         [
@@ -116,7 +114,7 @@ def test_get_mass_fractions_from_moles_2d():
     ), f"Row 3 should all be zeros, got {result[2]}"
 
 
-def test_dimension_mismatch():
+def test_dimension_mismatch() -> None:
     """Test that the function raises an error when shapes are incompatible."""
     x_1d = np.array([0.2, 0.3, 0.5])
     mw_1d_wrong_length = np.array([18.0, 44.0])  # only 2 elements
@@ -130,7 +128,7 @@ def test_dimension_mismatch():
     ), "Expected shape/dimension mismatch error."
 
 
-def test_3d_input_raises():
+def test_3d_input_raises() -> None:
     """Test that passing a 3D array raises an error."""
     x_3d = np.zeros((2, 2, 2))
     mw_1d = np.array([1.0, 2.0])

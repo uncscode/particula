@@ -8,7 +8,7 @@ from particula.particles.properties.kelvin_effect_module import (
 )
 
 
-def test_prop_kelvin_radius_scalar():
+def test_prop_kelvin_radius_scalar() -> None:
     """Test kelvin_radius function with scalar inputs."""
     effective_surface_tension = 0.072  # N/m
     effective_density = 1000  # kg/m^3
@@ -28,7 +28,7 @@ def test_prop_kelvin_radius_scalar():
     )
 
 
-def test_prop_kelvin_radius_array():
+def test_prop_kelvin_radius_array() -> None:
     """Test kelvin_radius function with array inputs."""
     effective_surface_tension = np.array([0.072, 0.072])
     effective_density = np.array([1000, 1500])
@@ -49,7 +49,7 @@ def test_prop_kelvin_radius_array():
     )
 
 
-def test_prop_kelvin_term_scalar():
+def test_prop_kelvin_term_scalar() -> None:
     """Test kelvin_term function with scalar inputs."""
     radius = 0.5  # m
     kelvin_radius_value = 0.1  # m
@@ -59,7 +59,7 @@ def test_prop_kelvin_term_scalar():
     )
 
 
-def test_prop_kelvin_term_broadcast():
+def test_prop_kelvin_term_broadcast() -> None:
     """Test kelvin_term function with broadcasting."""
     radius = np.array([0.5, 1.0, 5.0, 8.0])
     kelvin_radius_value = np.array([0.1, 0.2])
@@ -71,7 +71,7 @@ def test_prop_kelvin_term_broadcast():
     )
 
 
-def test_prop_kelvin_term_broadcast_single():
+def test_prop_kelvin_term_broadcast_single() -> None:
     """Test kelvin_term function with broadcasting."""
     radius = np.array([0.5, 1.0, 5.0, 8.0])
     kelvin_radius_value = np.array([0.1])

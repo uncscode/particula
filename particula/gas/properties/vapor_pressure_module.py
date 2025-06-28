@@ -1,5 +1,4 @@
-"""Vapor pressure modules for calculating the vapor pressure of a gas.
-"""
+"""Vapor pressure modules for calculating the vapor pressure of a gas."""
 
 from typing import Union
 

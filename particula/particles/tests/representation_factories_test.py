@@ -19,7 +19,7 @@ from particula.particles.representation_factories import (
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
-def test_mass_based_build():
+def test_mass_based_build() -> None:
     """Test Factory and Build MassParticleRepresentation."""
     parameters = {
         "distribution_strategy": MassBasedMovingBin(),
@@ -45,7 +45,7 @@ def test_mass_based_build():
     assert particle_rep.get_charge() == parameters["charge"]
 
 
-def test_radii_based_build():
+def test_radii_based_build() -> None:
     """Test factory and build for RadiusParticleRepresentationBuilder."""
     parameters = {
         "distribution_strategy": RadiiBasedMovingBin(),
@@ -71,7 +71,7 @@ def test_radii_based_build():
     assert np.array_equal(strategy.get_charge(), parameters["charge"])
 
 
-def test_limited_radius_build():
+def test_limited_radius_build() -> None:
     """Test factory and build for LimitedRadiusParticleBuilder."""
     # default values
     particle_rep = ParticleRepresentationFactory().get_strategy(
@@ -93,7 +93,7 @@ def test_limited_radius_build():
     assert isinstance(particle_rep, ParticleRepresentation)
 
 
-def test_resolved_mass_build():
+def test_resolved_mass_build() -> None:
     """Test factory and build for ResolvedMassParticleRepresentationBuilder."""
     parameters = {
         "distribution_strategy": ParticleResolvedSpeciatedMass(),
@@ -117,7 +117,7 @@ def test_resolved_mass_build():
     assert particle_rep.get_volume() == parameters["volume"]
 
 
-def test_preset_resolved_mass_build():
+def test_preset_resolved_mass_build() -> None:
     """Test factory and build for PresetResolvedMassParticleBuilder."""
     # default values
     particle_rep = ParticleRepresentationFactory().get_strategy(
@@ -142,7 +142,7 @@ def test_preset_resolved_mass_build():
     assert particle_rep.get_volume() == parameters["volume"]
 
 
-def test_invalid_strategy():
+def test_invalid_strategy() -> None:
     """Test factory function for invalid type."""
     with pytest.raises(ValueError) as excinfo:
         ParticleRepresentationFactory().get_strategy("invalid_type")

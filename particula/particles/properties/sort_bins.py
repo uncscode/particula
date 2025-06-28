@@ -1,5 +1,4 @@
-"""Sort bins of distribution representation
-"""
+"""Sort bins of distribution representation."""
 
 from typing import Union
 

@@ -8,7 +8,7 @@ from particula.particles.properties.diffusive_knudsen_module import (
 )
 
 
-def test_diffusive_knudsen_number_scalar():
+def test_diffusive_knudsen_number_scalar() -> None:
     """Test the diffusive Knudsen number calculation with scalar inputs."""
     radius = 100e-9  # meters
     particle_mass = 1e-24  # kg
@@ -28,7 +28,7 @@ def test_diffusive_knudsen_number_scalar():
     assert np.isclose(result, expected_result), "Test failed for scalar inputs"
 
 
-def test_diffusive_knudsen_number_array():
+def test_diffusive_knudsen_number_array() -> None:
     """Test the diffusive Knudsen number calculation with array inputs."""
     radius = np.array([100e-9, 1e-6])
     particle_mass = np.array([1e-24, 2e-20])
@@ -50,7 +50,7 @@ def test_diffusive_knudsen_number_array():
     assert np.allclose(result, expected_result), "Test failed for array inputs"
 
 
-def test_with_zero_coulomb_potential_ratio():
+def test_with_zero_coulomb_potential_ratio() -> None:
     """Test the diffusive Knudsen number calculation with zero Coulomb
     potential ratio.
     """
@@ -71,7 +71,7 @@ def test_with_zero_coulomb_potential_ratio():
     assert np.isclose(result, expected_result)
 
 
-def test_invalid_inputs():
+def test_invalid_inputs() -> None:
     """Test the diffusive Knudsen number calculation with invalid inputs."""
     with pytest.raises(TypeError):
         get_diffusive_knudsen_number(

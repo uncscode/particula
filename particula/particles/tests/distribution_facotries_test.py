@@ -19,25 +19,25 @@ from particula.particles.distribution_strategies import (
 )
 
 
-def test_mass_based_moving_bin():
+def test_mass_based_moving_bin() -> None:
     """Test factory function for mass-based moving bin strategy."""
     strategy = DistributionFactory().get_strategy("mass_based_moving_bin")
     assert isinstance(strategy, MassBasedMovingBin)
 
 
-def test_radii_based_moving_bin():
+def test_radii_based_moving_bin() -> None:
     """Test factory function for radii-based moving bin strategy."""
     strategy = DistributionFactory().get_strategy("radii_based_moving_bin")
     assert isinstance(strategy, RadiiBasedMovingBin)
 
 
-def test_speciated_mass_moving_bin():
+def test_speciated_mass_moving_bin() -> None:
     """Test factory function for speciated mass moving bin strategy."""
     strategy = DistributionFactory().get_strategy("speciated_mass_moving_bin")
     assert isinstance(strategy, SpeciatedMassMovingBin)
 
 
-def test_particle_resolved_speciated_mass():
+def test_particle_resolved_speciated_mass() -> None:
     """Test factory function for particle resolved speciated mass strategy."""
     strategy = DistributionFactory().get_strategy(
         "particle_resolved_speciated_mass"
@@ -45,7 +45,7 @@ def test_particle_resolved_speciated_mass():
     assert isinstance(strategy, ParticleResolvedSpeciatedMass)
 
 
-def test_invalid_strategy():
+def test_invalid_strategy() -> None:
     """Test factory function for invalid type."""
     with pytest.raises(ValueError) as excinfo:
         DistributionFactory().get_strategy("invalid_type")

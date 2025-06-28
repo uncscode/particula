@@ -1,5 +1,4 @@
-"""Charged dimensional kernel for coagulation calculated from system state.
-"""
+"""Charged dimensional kernel for coagulation calculated from system state."""
 
 # pylint: disable=duplicate-code
 

@@ -3,7 +3,7 @@
 from particula.activity.ratio import from_molar_mass_ratio, to_molar_mass_ratio
 
 
-def test_to_molar_mass_ratio():
+def test_to_molar_mass_ratio() -> None:
     """Test the to_molar_mass_ratio function."""
     # Test case 1: Single molar mass
     molar_mass = 30.0
@@ -16,7 +16,7 @@ def test_to_molar_mass_ratio():
     assert to_molar_mass_ratio(molar_masses) == expected_ratios
 
 
-def test_from_molar_mass_ratio():
+def test_from_molar_mass_ratio() -> None:
     """Test the from_molar_mass_ratio function."""
     # Test case 1: Single molar mass ratio
     molar_mass_ratio = 0.5

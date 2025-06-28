@@ -1,4 +1,4 @@
-"""Brownian Coagulation Builder Module
+"""Brownian Coagulation Builder Module.
 
 Provides a builder for creating `BrownianCoagulationStrategy` objects
 based on a chosen particle distribution type (e.g., "discrete",
@@ -54,7 +54,7 @@ class BrownianCoagulationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = ["distribution_type"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)

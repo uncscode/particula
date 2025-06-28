@@ -11,7 +11,7 @@ from particula.gas.vapor_pressure_strategies import (
 )
 
 
-def test_factory_with_constant_strategy():
+def test_factory_with_constant_strategy() -> None:
     """Test factory creates a ConstantVaporPressureStrategy correctly."""
     strategy = VaporPressureFactory().get_strategy(
         strategy_type="constant",
@@ -20,7 +20,7 @@ def test_factory_with_constant_strategy():
     assert isinstance(strategy, ConstantVaporPressureStrategy)
 
 
-def test_factory_with_antoine_strategy():
+def test_factory_with_antoine_strategy() -> None:
     """Test factory creates an AntoineVaporPressureStrategy correctly."""
     parameters = {"a": 10.0, "b": 2000.0, "c": 100.0}
     strategy = VaporPressureFactory().get_strategy(
@@ -29,7 +29,7 @@ def test_factory_with_antoine_strategy():
     assert isinstance(strategy, AntoineVaporPressureStrategy)
 
 
-def test_factory_with_clausius_clapeyron_strategy():
+def test_factory_with_clausius_clapeyron_strategy() -> None:
     """Test factory creates a ClausiusClapeyronStrategy correctly."""
     parameters = {
         "latent_heat": 2260,
@@ -45,7 +45,7 @@ def test_factory_with_clausius_clapeyron_strategy():
     assert isinstance(strategy, ClausiusClapeyronStrategy)
 
 
-def test_factory_with_water_buck_strategy():
+def test_factory_with_water_buck_strategy() -> None:
     """Test factory creates a WaterBuckStrategy correctly without
     parameters.
     """
@@ -53,7 +53,7 @@ def test_factory_with_water_buck_strategy():
     assert isinstance(strategy, WaterBuckStrategy)
 
 
-def test_factory_with_saturation_concentration_strategy():
+def test_factory_with_saturation_concentration_strategy() -> None:
     """Test factory creates a ConstantVaporPressureStrategy from the
     SaturationConcentrationVaporPressureBuilder.
     """
@@ -72,14 +72,14 @@ def test_factory_with_saturation_concentration_strategy():
     assert isinstance(strategy, ConstantVaporPressureStrategy)
 
 
-def test_factory_with_unknown_strategy():
+def test_factory_with_unknown_strategy() -> None:
     """Test factory raises an error for an unknown strategy."""
     with pytest.raises(ValueError) as excinfo:
         VaporPressureFactory().get_strategy(strategy_type="unknown")
     assert "Unknown strategy type: unknown" in str(excinfo.value)
 
 
-def test_factory_with_incomplete_parameters():
+def test_factory_with_incomplete_parameters() -> None:
     """Test factory raises an error when parameters are incomplete for a
     strategy.
     """

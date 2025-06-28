@@ -8,7 +8,7 @@ from particula.particles.properties.organic_density_module import (
 )
 
 
-def test_organic_density_estimate():
+def test_organic_density_estimate() -> None:
     """Test the organic_density_estimate function."""
     # Test case 1: Known values
     molar_mass = 180.16
@@ -65,7 +65,7 @@ def test_organic_density_estimate():
     )
 
 
-def test_organic_array():
+def test_organic_array() -> None:
     """Test the organic_array function."""
     molar_mass_array = [180.16, 200.0, 150.0]
     oxygen2carbon_array = [0.5, 0.4, 0.6]

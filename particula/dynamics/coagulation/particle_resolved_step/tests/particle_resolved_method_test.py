@@ -1,4 +1,4 @@
-"""pytest tests for particle_resolved_method.py"""
+"""pytest tests for particle_resolved_method.py."""
 
 import time
 
@@ -14,7 +14,7 @@ from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_met
 )
 
 
-def test_interpolate_kernel():
+def test_interpolate_kernel() -> None:
     """Test the interpolate_kernel function."""
     kernel = np.random.rand(10, 10)
     kernel_radius = np.linspace(0, 1, 10)
@@ -22,7 +22,7 @@ def test_interpolate_kernel():
     assert isinstance(interp_func, RegularGridInterpolator)
 
 
-def test_calculate_probabilities():
+def test_calculate_probabilities() -> None:
     """Test the calculate_probabilities function."""
     kernel_values = np.array([1.0, 2.0], dtype=np.float64)
     time_step = 1.0
@@ -38,7 +38,7 @@ def test_calculate_probabilities():
     np.testing.assert_array_almost_equal(probabilities, expected_probabilities)
 
 
-def test_resolve_final_coagulation_state():
+def test_resolve_final_coagulation_state() -> None:
     """Test the resolve_final_coagulation_state function."""
     small_indices = np.array([0, 1, 2], dtype=np.int64)
     large_indices = np.array([2, 3, 4], dtype=np.int64)
@@ -51,7 +51,7 @@ def test_resolve_final_coagulation_state():
     assert np.all(updated_large_indices >= updated_small_indices)
 
 
-def test_resolve_final_coagulation_state_large():
+def test_resolve_final_coagulation_state_large() -> None:
     """Test the resolve_final_coagulation_state function with a
     large number of particles.
     """
@@ -86,7 +86,7 @@ def test_resolve_final_coagulation_state_large():
     assert len(updated_large_indices) == len(large_indices)
 
 
-def test_particle_resolved_update_step():
+def test_particle_resolved_update_step() -> None:
     """Test the particle_resolved_update_step function."""
     particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)
     loss = np.zeros_like(particle_radius)
@@ -104,7 +104,7 @@ def test_particle_resolved_update_step():
     assert updated_gain[1] == 2.0
 
 
-def test_particle_resolved_coagulation_step():
+def test_particle_resolved_coagulation_step() -> None:
     """Test the particle_resolved_coagulation_step function."""
     particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)
     kernel = np.random.rand(10, 10)
@@ -124,7 +124,7 @@ def test_particle_resolved_coagulation_step():
     assert np.all(loss_gain_index[:, 0] < loss_gain_index[:, 1])
 
 
-def test_particle_resolved_coagulation_step_empty_array():
+def test_particle_resolved_coagulation_step_empty_array() -> None:
     """Test the particle_resolved_coagulation_step function with an empty array."""
     particle_radius = np.array([], dtype=np.float64)
     kernel = np.random.rand(10, 10)
@@ -143,7 +143,7 @@ def test_particle_resolved_coagulation_step_empty_array():
     assert loss_gain_index.size == 0
 
 
-def test_particle_resolved_coagulation_step_duplicate_collisions():
+def test_particle_resolved_coagulation_step_duplicate_collisions() -> None:
     """Test the particle_resolved_coagulation_step function with all duplicate collisions."""
     particle_radius = np.array([1.0, 1.0, 1.0], dtype=np.float64)
     kernel = np.random.rand(10, 10)

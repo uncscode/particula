@@ -1,4 +1,4 @@
-"""Testing Atmosphere and GasSpecies interaction"""
+"""Testing Atmosphere and GasSpecies interaction."""
 
 # pylint: disable=R0801,W0621
 
@@ -57,20 +57,20 @@ def atmosphere(oxygen, hydrogen):
     )
 
 
-def test_atmosphere_initialization_values(atmosphere):
+def test_atmosphere_initialization_values(atmosphere) -> None:
     """Check stored temperature and pressure values."""
     assert atmosphere.temperature == 298.15
     assert atmosphere.total_pressure == 101325
 
 
-def test_partitioning_species_initial_length(atmosphere):
+def test_partitioning_species_initial_length(atmosphere) -> None:
     """Initially one partitioning species is present."""
     assert len(atmosphere) == 2
 
 
 def test_add_partitioning_species_updates_length(
     atmosphere, vapor_pressure_strategy
-):
+) -> None:
     """Adding another partitioning species increases the length."""
     nitrogen = GasSpecies(
         name="Nitrogen",
@@ -83,7 +83,7 @@ def test_add_partitioning_species_updates_length(
     assert len(atmosphere.partitioning_species) == 2
 
 
-def test_total_species_count(atmosphere, vapor_pressure_strategy):
+def test_total_species_count(atmosphere, vapor_pressure_strategy) -> None:
     """Total species count equals partitioning + gas-only."""
     nitrogen = GasSpecies(
         name="Nitrogen",

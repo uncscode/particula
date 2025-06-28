@@ -19,7 +19,7 @@ from particula.particles.surface_strategies import (
 )
 
 
-def test_surface_molar_with_parameters():
+def test_surface_molar_with_parameters() -> None:
     """Test factory function for surface molar strategy with parameters."""
     parameters = {
         "molar_mass": np.array([100.0, 200.0, 300.0]),
@@ -42,7 +42,7 @@ def test_surface_molar_with_parameters():
     )
 
 
-def test_surface_mass_with_parameters():
+def test_surface_mass_with_parameters() -> None:
     """Test factory function for surface mass strategy with parameters."""
     parameters = {
         "density": np.array([1000.0, 2000.0, 3000.0]),
@@ -60,7 +60,7 @@ def test_surface_mass_with_parameters():
     )
 
 
-def test_surface_volume_with_parameters():
+def test_surface_volume_with_parameters() -> None:
     """Test factory function for surface volume strategy with parameters."""
     parameters = {
         "density": np.array([1000.0, 2000.0, 3000.0]),
@@ -78,7 +78,7 @@ def test_surface_volume_with_parameters():
     )
 
 
-def test_invalid_strategy_type():
+def test_invalid_strategy_type() -> None:
     """Test factory function with an invalid strategy type."""
     with pytest.raises(ValueError) as excinfo:
         SurfaceFactory().get_strategy("invalid_type")

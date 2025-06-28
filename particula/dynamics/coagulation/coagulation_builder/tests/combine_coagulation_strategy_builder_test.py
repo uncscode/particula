@@ -1,5 +1,4 @@
-"""Tests for the CombineCoagulationStrategyBuilder class.
-"""
+"""Tests for the CombineCoagulationStrategyBuilder class."""
 
 import pytest
 
@@ -12,7 +11,7 @@ from particula.dynamics import (
 )
 
 
-def test_build_with_valid_strategies():
+def test_build_with_valid_strategies() -> None:
     """Test that CombineCoagulationStrategyBuilder with valid sub-strategies
     returns a CombineCoagulationStrategy.
     """
@@ -41,7 +40,7 @@ def test_build_with_valid_strategies():
     assert len(combined.strategies) == 2
 
 
-def test_build_missing_strategies():
+def test_build_missing_strategies() -> None:
     """Test that CombineCoagulationStrategyBuilder without required 'strategies'
     raises a ValueError.
     """

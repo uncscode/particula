@@ -3,7 +3,7 @@
 
 def to_molar_mass_ratio(molar_mass, other_molar_mass=18.01528):
     """Convert the given molar mass to a molar mass ratio with respect to water.
-    (MW water / MW organic)
+    (MW water / MW organic).
 
     Args:
     molar_mass (np.array): The molar mass of the organic compound.

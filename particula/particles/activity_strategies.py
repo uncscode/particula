@@ -117,7 +117,7 @@ class ActivityIdealMolar(ActivityStrategy):
 
     """
 
-    def __init__(self, molar_mass: Union[float, NDArray[np.float64]] = 0.0):
+    def __init__(self, molar_mass: Union[float, NDArray[np.float64]] = 0.0) -> None:
         """Initialize the ActivityIdealMolar strategy.
 
         Arguments:
@@ -205,7 +205,7 @@ class ActivityIdealVolume(ActivityStrategy):
 
     """
 
-    def __init__(self, density: Union[float, NDArray[np.float64]] = 0.0):
+    def __init__(self, density: Union[float, NDArray[np.float64]] = 0.0) -> None:
         """Initialize the ActivityIdealVolume strategy.
 
         Arguments:
@@ -274,7 +274,7 @@ class ActivityKappaParameter(ActivityStrategy):
         density: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
         molar_mass: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
         water_index: int = 0,
-    ):
+    ) -> None:
         """Initialize the ActivityKappaParameter strategy.
 
         Arguments:

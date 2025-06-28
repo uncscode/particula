@@ -16,7 +16,7 @@ from particula.particles import PresetParticleRadiusBuilder
 class TestAerosol(unittest.TestCase):
     """Test class for the Aerosol class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test case with an real Atmosphere
         and ParticleRepresentation.
         """
@@ -71,19 +71,19 @@ class TestAerosol(unittest.TestCase):
             atmosphere=self.atmosphere, particles=self.particle
         )
 
-    def test_str(self):
+    def test_str(self) -> None:
         """Test the __str__ method of the Aerosol class."""
         result = str(self.aerosol)
         self.assertIn("Gas mixture", result)
         self.assertIn("Particle Representation", result)
 
-    def test_replace_atmosphere(self):
+    def test_replace_atmosphere(self) -> None:
         """Test the replace_atmosphere method of the Aerosol class."""
         new_atmosphere = self.atmosphere
         self.aerosol.replace_atmosphere(new_atmosphere)
         self.assertEqual(self.aerosol.atmosphere, new_atmosphere)
 
-    def test_replace_particles(self):
+    def test_replace_particles(self) -> None:
         """Test the add_particle method of the Aerosol class."""
         new_particle = self.particle
         self.aerosol.replace_particles(new_particle)

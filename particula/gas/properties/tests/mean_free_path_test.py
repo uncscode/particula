@@ -1,4 +1,4 @@
-"""testing the mean free path calculation"""
+"""testing the mean free path calculation."""
 
 import numpy as np
 import pytest
@@ -6,8 +6,8 @@ import pytest
 from particula.gas import get_molecule_mean_free_path
 
 
-def test_molecule_mean_free_path():
-    """Testing the mean free path of a molecule compare with mfp"""
+def test_molecule_mean_free_path() -> None:
+    """Testing the mean free path of a molecule compare with mfp."""
     a_mfp = 6.52805868e-08  # at stp
     b_molecule_mfp = get_molecule_mean_free_path(
         temperature=298, pressure=101325, molar_mass=0.03
@@ -15,16 +15,16 @@ def test_molecule_mean_free_path():
     assert pytest.approx(a_mfp, rel=1e-6) == b_molecule_mfp
 
 
-def test_dynamic_viscosity_provided():
-    """Test when dynamic viscosity is explicitly provided"""
+def test_dynamic_viscosity_provided() -> None:
+    """Test when dynamic viscosity is explicitly provided."""
     dynamic_viscosity = 5 * 1.78e-5  # 5x Value for air at stp
     result = get_molecule_mean_free_path(dynamic_viscosity=dynamic_viscosity)
     assert result > 0
 
 
-def test_array_input():
+def test_array_input() -> None:
     """Test when array inputs are provided for temperature, pressure,
-    and molar mass
+    and molar mass.
     """
     molar_masses = np.array([0.028, 0.044])
     results = get_molecule_mean_free_path(molar_mass=molar_masses)
@@ -33,15 +33,15 @@ def test_array_input():
 
 
 @pytest.mark.parametrize("temperature", [None, -1, "a"])
-def test_invalid_temperature(temperature):
-    """Test when invalid temperature values are provided to the function"""
+def test_invalid_temperature(temperature) -> None:
+    """Test when invalid temperature values are provided to the function."""
     with pytest.raises((TypeError, ValueError)):
         get_molecule_mean_free_path(temperature=temperature)
 
 
 @pytest.mark.parametrize("pressure", [None, -1, "a"])
-def test_invalid_pressure(pressure):
-    """Test when invalid pressure values are provided to the function"""
+def test_invalid_pressure(pressure) -> None:
+    """Test when invalid pressure values are provided to the function."""
     with pytest.raises((TypeError, ValueError)):
         get_molecule_mean_free_path(pressure=pressure)
 
@@ -49,7 +49,7 @@ def test_invalid_pressure(pressure):
 @pytest.mark.parametrize(
     "molar_mass", [None, -1, "a", np.array([0.028, -0.044])]
 )
-def test_invalid_molar_mass(molar_mass):
-    """Test when invalid molar mass values are provided to the function"""
+def test_invalid_molar_mass(molar_mass) -> None:
+    """Test when invalid molar mass values are provided to the function."""
     with pytest.raises((TypeError, ValueError)):
         get_molecule_mean_free_path(molar_mass=molar_mass)

@@ -1,4 +1,4 @@
-"""test for phase_separation.py"""
+"""test for phase_separation.py."""
 
 import numpy as np
 
@@ -10,7 +10,7 @@ from particula.activity.phase_separation import (
 )
 
 
-def test_organic_water_single_phase():
+def test_organic_water_single_phase() -> None:
     """Test for organic_water_single_phase function."""
     # Test with positive values
     assert np.all(organic_water_single_phase([1, 2, 3]) >= 0)
@@ -19,7 +19,7 @@ def test_organic_water_single_phase():
     assert np.all(organic_water_single_phase([1000, 2000, 3000]) >= 0)
 
 
-def test_find_phase_sep_index():
+def test_find_phase_sep_index() -> None:
     """Test for find_phase_sep_index function."""
     # Test with positive values
     activity = [0.2, 0.3, 0.4, 0.35, 0.5, 0.6, 0.9]
@@ -43,7 +43,7 @@ def test_find_phase_sep_index():
     }
 
 
-def test_find_phase_separation():
+def test_find_phase_separation() -> None:
     """Test for find_phase_separation function."""
     # Test with positive values
 
@@ -64,7 +64,7 @@ def test_find_phase_separation():
     }
 
 
-def test_q_alpha():
+def test_q_alpha() -> None:
     """Test for q_alpha function."""
     # Test with positive values
     assert np.all(

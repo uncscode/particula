@@ -23,10 +23,9 @@ from particula.particles import (
 
 # pylint: disable=too-many-instance-attributes
 class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
-    """Test suite for the TurbulentDNSCoagulationStrategy class.
-    """
+    """Test suite for the TurbulentDNSCoagulationStrategy class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test environment.
 
         Initializes a particle representation and creates instances of
@@ -68,7 +67,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
             relative_velocity=self.relative_velocity,
         )
 
-    def test_kernel_discrete(self):
+    def test_kernel_discrete(self) -> None:
         """Test the kernel calculation for discrete distribution.
 
         Verifies that the kernel method returns an ndarray for the discrete
@@ -81,7 +80,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         )
         self.assertIsInstance(kernel, np.ndarray)
 
-    def test_step_discrete(self):
+    def test_step_discrete(self) -> None:
         """Test the step method for discrete distribution.
 
         Ensures that the step method updates the particle concentration for
@@ -99,7 +98,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-    def test_kernel_continuous_pdf(self):
+    def test_kernel_continuous_pdf(self) -> None:
         """Test the kernel calculation for continuous_pdf distribution.
 
         Verifies that the kernel method returns an ndarray for the
@@ -112,7 +111,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         )
         self.assertIsInstance(kernel, np.ndarray)
 
-    def test_step_continuous_pdf(self):
+    def test_step_continuous_pdf(self) -> None:
         """Test the step method for continuous_pdf distribution.
 
         Ensures that the step method updates the particle concentration for
@@ -130,7 +129,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-    def test_step_particle_resolved(self):
+    def test_step_particle_resolved(self) -> None:
         """Test the step method for particle_resolved distribution."""
         old_concentration = self.particle_resolved.get_total_concentration()
         self.strategy_particle_resolved.step(

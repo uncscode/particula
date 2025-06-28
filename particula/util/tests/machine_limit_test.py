@@ -12,7 +12,7 @@ from particula.util.machine_limit import (
 )
 
 
-def test_safe_exp():
+def test_safe_exp() -> None:
     """Test safe_exp function."""
     # Test with positive values
     assert np.allclose(get_safe_exp([1, 2, 3]), np.exp([1, 2, 3]))
@@ -29,7 +29,7 @@ def test_safe_exp():
         assert any(item.category == RuntimeWarning for item in w)
 
 
-def test_safe_log():
+def test_safe_log() -> None:
     """Test safe_log function."""
     # Test with positive values
     assert np.allclose(get_safe_log([1, 2, 3]), np.log([1, 2, 3]))
@@ -49,7 +49,7 @@ def test_safe_log():
         assert any(item.category == RuntimeWarning for item in w)
 
 
-def test_safe_log10():
+def test_safe_log10() -> None:
     """Test safe_log10 function."""
     # Test with positive values
     assert np.allclose(get_safe_log10([1, 2, 3]), np.log10([1, 2, 3]))
@@ -69,7 +69,7 @@ def test_safe_log10():
         assert any(item.category == RuntimeWarning for item in w)
 
 
-def test_safe_power():
+def test_safe_power() -> None:
     """Test get_safe_power function."""
     # Test with typical positive values:
     base = np.array([2, 3, 10])
@@ -101,7 +101,7 @@ def test_safe_power():
         get_safe_power(-1, 0.5)
 
 
-def test_safe_log_edge_cases():
+def test_safe_log_edge_cases() -> None:
     """Edge cases for get_safe_log."""
     # Extremely small positive values should return accurate logs.
     small_values = np.array([np.nextafter(0, 1), 1e-300, 1e-40])
@@ -116,7 +116,7 @@ def test_safe_log_edge_cases():
     assert np.allclose(result, np.full(2, expected))
 
 
-def test_safe_log10_edge_cases():
+def test_safe_log10_edge_cases() -> None:
     """Edge cases for get_safe_log10."""
     # Extremely small positive values should return accurate base-10 logs.
     small_values = np.array([np.nextafter(0, 1), 1e-300, 1e-40])
@@ -131,7 +131,7 @@ def test_safe_log10_edge_cases():
     assert np.allclose(result, np.full(2, expected))
 
 
-def test_safe_power_edge_cases():
+def test_safe_power_edge_cases() -> None:
     """Edge cases for get_safe_power."""
     # Very large exponent should clip to machine max
     result_large = get_safe_power(2, 1e308)

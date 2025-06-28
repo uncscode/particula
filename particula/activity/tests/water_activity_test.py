@@ -1,5 +1,4 @@
-"""Test for water activity calculation
-"""
+"""Test for water activity calculation."""
 
 import numpy as np
 
@@ -9,7 +8,7 @@ from particula.activity.water_activity import (
 )
 
 
-def test_fixed_water_activity():
+def test_fixed_water_activity() -> None:
     """Test for fixed_water_activity function."""
     molar_mass_ratio = 18.016 / 250
     water_activity_desired = np.linspace(0.1, 0.9999, 1000)
@@ -27,7 +26,7 @@ def test_fixed_water_activity():
     assert len(result) == 3
 
 
-def test_biphasic_water_activity_point():
+def test_biphasic_water_activity_point() -> None:
     """Test for biphasic_water_activity_point function."""
     oxygen2carbon = 0.3
     hydrogen2carbon = 0.3

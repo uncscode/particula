@@ -19,7 +19,7 @@ from particula.builder_mixin import (
 )
 
 
-def test_density_mixin():
+def test_density_mixin() -> None:
     """Test the BuilderDensityMixin class."""
     builder_mixin = BuilderDensityMixin()
 
@@ -41,7 +41,7 @@ def test_density_mixin():
     assert builder_mixin.density == pytest.approx(1e3, 1e-6)
 
 
-def test_surface_tension_mixin():
+def test_surface_tension_mixin() -> None:
     """Test the BuilderSurfaceTensionMixin class."""
     builder_mixin = BuilderSurfaceTensionMixin()
 
@@ -73,7 +73,7 @@ def test_surface_tension_mixin():
     )
 
 
-def test_molar_mass_mixin():
+def test_molar_mass_mixin() -> None:
     """Test the BuilderMolarMassMixin class."""
     builder_mixin = BuilderMolarMassMixin()
 
@@ -96,7 +96,7 @@ def test_molar_mass_mixin():
     )
 
 
-def test_concentration_mixin():
+def test_concentration_mixin() -> None:
     """Test the BuilderConcentrationMixin class."""
     builder_mixin = BuilderConcentrationMixin()
 
@@ -130,7 +130,7 @@ def test_concentration_mixin():
     )
 
 
-def test_temperature_mixin():
+def test_temperature_mixin() -> None:
     """Test the BuilderTemperatureMixin class."""
     builder_mixin = BuilderTemperatureMixin()
 
@@ -146,7 +146,7 @@ def test_temperature_mixin():
     assert builder_mixin.temperature == 300
 
 
-def test_pressure_mixin():
+def test_pressure_mixin() -> None:
     """Test the BuilderPressureMixin class."""
     builder_mixin = BuilderPressureMixin()
 
@@ -170,7 +170,7 @@ def test_pressure_mixin():
     )
 
 
-def test_mass_mixin():
+def test_mass_mixin() -> None:
     """Test the BuilderMassMixin class."""
     builder_mixin = BuilderMassMixin()
 
@@ -188,7 +188,7 @@ def test_mass_mixin():
     np.testing.assert_allclose(builder_mixin.mass, np.array([1, 2, 3]))
 
 
-def test_radius_mixin():
+def test_radius_mixin() -> None:
     """Test the BuilderRadiusMixin class."""
     builder_mixin = BuilderRadiusMixin()
 
@@ -206,7 +206,7 @@ def test_radius_mixin():
     np.testing.assert_allclose(builder_mixin.radius, np.array([1, 2, 3]))
 
 
-def test_charge_mixin():
+def test_charge_mixin() -> None:
     """Test the BuilderChargeMixin class."""
     builder_mixin = BuilderChargeMixin()
 
@@ -219,7 +219,7 @@ def test_charge_mixin():
     np.testing.assert_allclose(builder_mixin.charge, np.array([1, 2, 3]))
 
 
-def test_phase_index_mixin():
+def test_phase_index_mixin() -> None:
     """Test the BuilderPhaseIndexMixin class."""
     builder_mixin = BuilderPhaseIndexMixin()
     phase_index = np.array([0, 1, 0])

@@ -1,5 +1,4 @@
-"""Unit tests for the convert_dtypes module.
-"""
+"""Unit tests for the convert_dtypes module."""
 
 import numpy as np
 import pytest
@@ -12,7 +11,7 @@ from particula.util.convert_dtypes import (
 )
 
 
-def test_get_coerced_type_success():
+def test_get_coerced_type_success() -> None:
     """Scalar and array coercion succeed."""
     assert get_coerced_type(1, float) == 1.0
     array = get_coerced_type([1, 2, 3], np.ndarray)
@@ -23,18 +22,18 @@ def test_get_coerced_type_success():
     assert get_coerced_type(arr, np.ndarray) is arr
 
 
-def test_get_coerced_type_failure():
+def test_get_coerced_type_failure() -> None:
     """Invalid coercion raises ValueError."""
     with pytest.raises(ValueError):
         get_coerced_type("abc", int)
 
 
-def test_get_dict_from_list_valid():
+def test_get_dict_from_list_valid() -> None:
     """List of strings converted to expected dict."""
     assert get_dict_from_list(["a", "b", "c"]) == {"a": 0, "b": 1, "c": 2}
 
 
-def test_get_dict_from_list_invalid():
+def test_get_dict_from_list_invalid() -> None:
     """Empty or non-string lists raise AssertionError."""
     with pytest.raises(TypeError):
         get_dict_from_list([])
@@ -42,7 +41,7 @@ def test_get_dict_from_list_invalid():
         get_dict_from_list(["a", 1])
 
 
-def test_get_values_of_dict_success_and_failure():
+def test_get_values_of_dict_success_and_failure() -> None:
     """Extract values by keys or raise for missing key."""
     mapping = {"a": 1, "b": 2, "c": 3}
     assert get_values_of_dict(["b", "a"], mapping) == [2, 1]
@@ -50,7 +49,7 @@ def test_get_values_of_dict_success_and_failure():
         get_values_of_dict(["d"], mapping)
 
 
-def test_get_shape_check_1d():
+def test_get_shape_check_1d() -> None:
     """1-D data are expanded to 2-D when header has one item."""
     time = np.arange(3)
     data = np.array([1, 2, 3])
@@ -61,7 +60,7 @@ def test_get_shape_check_1d():
         get_shape_check(time, data, ["x", "y"])
 
 
-def test_get_shape_check_2d_and_header():
+def test_get_shape_check_2d_and_header() -> None:
     """2-D data reshaping and header validation."""
     time = np.arange(3)
     data = np.array([[1, 2, 3], [4, 5, 6]])  # shape (2, 3)

@@ -82,7 +82,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         fluid_density: float,
         reynolds_lambda: float,
         relative_velocity: float,
-    ):
+    ) -> None:
         # pylint: disable=too-many-arguments, too-many-positional-arguments
         """Initialize the TurbulentDNSCoagulationStrategy.
 

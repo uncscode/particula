@@ -14,7 +14,7 @@ DIFFUSIVE_KNUDSEN_ARRAY = np.array([0.5, 1.0, 5.0, 10.0])
 COULOMB_POTENTIAL_RATIO_ARRAY = np.array([0.7, 0.9, 1.0, 1.1])
 
 
-def test_hard_sphere():
+def test_hard_sphere() -> None:
     """Test the hard_sphere function with a single value and
     array of diffusive_knudsen values.
     """
@@ -32,7 +32,7 @@ def test_hard_sphere():
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
 
-def test_coulomb_dyachkov2007():
+def test_coulomb_dyachkov2007() -> None:
     """Test the coulomb_dyachkov2007 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -52,7 +52,7 @@ def test_coulomb_dyachkov2007():
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
 
-def test_coulomb_gatti2008():
+def test_coulomb_gatti2008() -> None:
     """Test the coulomb_gatti2008 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -70,7 +70,7 @@ def test_coulomb_gatti2008():
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
 
-def test_coulomb_gopalakrishnan2012():
+def test_coulomb_gopalakrishnan2012() -> None:
     """Test the coulomb_gopalakrishnan2012 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -92,7 +92,7 @@ def test_coulomb_gopalakrishnan2012():
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
 
-def test_coulomb_chahl2019():
+def test_coulomb_chahl2019() -> None:
     """Test the coulomb_chahl2019 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
@@ -110,7 +110,7 @@ def test_coulomb_chahl2019():
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
 
-def test_transition_regime_coagulation_edge_cases():
+def test_transition_regime_coagulation_edge_cases() -> None:
     """Test the transition_regime_coagulation function with edge case values.
 
     Edge cases tested:

@@ -1,4 +1,4 @@
-"""Combine Coagulation Strategy Builder Module
+"""Combine Coagulation Strategy Builder Module.
 
 Provides a builder for creating `CombineCoagulationStrategy` objects,
 which can merge multiple sub-strategies (e.g., Brownian, Turbulent)
@@ -49,7 +49,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the CombineCoagulationStrategyBuilder.
 
         Returns:

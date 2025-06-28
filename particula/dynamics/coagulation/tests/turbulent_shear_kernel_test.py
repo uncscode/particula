@@ -1,5 +1,4 @@
-"""Test the turbulent shear kernel functions.
-"""
+"""Test the turbulent shear kernel functions."""
 
 # pylint: disable=duplicate-code
 
@@ -15,7 +14,7 @@ from particula.gas.properties.kinematic_viscosity import (
 )
 
 
-def test_turbulent_shear_kernel_single_value():
+def test_turbulent_shear_kernel_single_value() -> None:
     """Test turbulent_shear_kernel with single float inputs for particle
     diameters, turbulent kinetic energy, and kinematic viscosity.
     """
@@ -35,9 +34,8 @@ def test_turbulent_shear_kernel_single_value():
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
 
 
-def test_turbulent_shear_kernel_via_system_state():
-    """Test turbulent_shear_kernel_via_system_state with system state inputs.
-    """
+def test_turbulent_shear_kernel_via_system_state() -> None:
+    """Test turbulent_shear_kernel_via_system_state with system state inputs."""
     particle_radius = np.array([1e-6, 2e-6])  # example diameters [m]
     turbulent_dissipation = (
         1.0e-4  # example turbulent kinetic energy [m^2/s^2]
@@ -56,7 +54,7 @@ def test_turbulent_shear_kernel_via_system_state():
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
 
 
-def test_turbulent_shear_kernel_input_validation():
+def test_turbulent_shear_kernel_input_validation() -> None:
     """Ensure that providing incorrect input types to turbulent_shear_kernel
     raises a TypeError.
     """
@@ -66,7 +64,7 @@ def test_turbulent_shear_kernel_input_validation():
         )
 
 
-def test_turbulent_shear_kernel_via_system_state_input_validation():
+def test_turbulent_shear_kernel_via_system_state_input_validation() -> None:
     """Ensure that providing incorrect input types to
     turbulent_shear_kernel_via_system_state raises a TypeError.
     """

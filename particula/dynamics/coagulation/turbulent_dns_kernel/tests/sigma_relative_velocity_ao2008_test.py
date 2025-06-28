@@ -1,5 +1,4 @@
-"""Tests for the sigma_relative_velocity_variance module.
-"""
+"""Tests for the sigma_relative_velocity_variance module."""
 
 import numpy as np
 import pytest
@@ -9,9 +8,8 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity
 )
 
 
-def test_get_relative_velocity_variance_array():
-    """Test get_relative_velocity_variance with NumPy array inputs.
-    """
+def test_get_relative_velocity_variance_array() -> None:
+    """Test get_relative_velocity_variance with NumPy array inputs."""
     expected_shape = (3, 3)
     result = get_relative_velocity_variance(
         fluid_rms_velocity=0.05,
@@ -27,9 +25,8 @@ def test_get_relative_velocity_variance_array():
     assert result.shape == expected_shape
 
 
-def test_invalid_inputs():
-    """Ensure validation errors are raised for invalid inputs.
-    """
+def test_invalid_inputs() -> None:
+    """Ensure validation errors are raised for invalid inputs."""
     with pytest.raises(ValueError):
         get_relative_velocity_variance(
             -0.5,
@@ -79,9 +76,8 @@ def test_invalid_inputs():
         )  # Negative particle_velocity
 
 
-def test_edge_cases():
-    """Test compute_relative_velocity_variance with extreme values.
-    """
+def test_edge_cases() -> None:
+    """Test compute_relative_velocity_variance with extreme values."""
     fluid_rms_velocity = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large values

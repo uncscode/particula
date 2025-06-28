@@ -1,4 +1,4 @@
-"""Particle Representation Factories
+"""Particle Representation Factories.
 
 Provides classes for constructing ParticleRepresentation objects
 based on various distribution, activity, and surface strategies.

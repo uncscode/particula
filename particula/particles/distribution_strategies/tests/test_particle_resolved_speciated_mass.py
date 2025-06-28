@@ -11,12 +11,12 @@ from particula.particles.distribution_strategies import (
 particle_resolved_strategy = ParticleResolvedSpeciatedMass()
 
 
-def test_get_name():
+def test_get_name() -> None:
     """Test retrieving the class name."""
     assert particle_resolved_strategy.get_name() == "ParticleResolvedSpeciatedMass"
 
 
-def test_get_mass_and_species_mass():
+def test_get_mass_and_species_mass() -> None:
     """Test mass and species mass retrieval."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
@@ -30,7 +30,7 @@ def test_get_mass_and_species_mass():
     )
 
 
-def test_get_radius():
+def test_get_radius() -> None:
     """Test radius calculation."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
@@ -41,7 +41,7 @@ def test_get_radius():
     )
 
 
-def test_get_total_mass():
+def test_get_total_mass() -> None:
     """Test total mass computation."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
@@ -53,7 +53,7 @@ def test_get_total_mass():
     ) == pytest.approx(expected_total)
 
 
-def test_add_mass():
+def test_add_mass() -> None:
     """Test mass addition with normalization."""
     distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     densities = np.array([2, 3], dtype=np.float64)
@@ -77,7 +77,7 @@ def test_add_mass():
     np.testing.assert_allclose(new_conc, expected_conc)
 
 
-def test_add_concentration_append():
+def test_add_concentration_append() -> None:
     """Test appending concentration."""
     distribution = np.array([[1.0, 2.0]], dtype=np.float64)
     concentration = np.array([2.0], dtype=np.float64)
@@ -93,7 +93,7 @@ def test_add_concentration_append():
     np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
 
 
-def test_add_concentration_fill_empties():
+def test_add_concentration_fill_empties() -> None:
     """Test filling empty bins."""
     distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
     concentration = np.array([2.0, 0.0], dtype=np.float64)
@@ -109,7 +109,7 @@ def test_add_concentration_fill_empties():
     np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
 
 
-def test_add_concentration_partial_fill():
+def test_add_concentration_partial_fill() -> None:
     """Test replacing all bins."""
     distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
     concentration = np.array([0.0, 0.0], dtype=np.float64)
@@ -125,7 +125,7 @@ def test_add_concentration_partial_fill():
     np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
 
 
-def test_add_concentration_error():
+def test_add_concentration_error() -> None:
     """Test concentration validation errors."""
     distribution = np.array([[1.0, 2.0]], dtype=np.float64)
     concentration = np.array([2.0], dtype=np.float64)
@@ -138,7 +138,7 @@ def test_add_concentration_error():
         )
 
 
-def test_collide_pairs():
+def test_collide_pairs() -> None:
     """Test pair collisions."""
     distribution = np.array(
         [[100, 200], [300, 400], [500, 600], [700, 800]], dtype=np.float64

@@ -1,4 +1,4 @@
-"""Particle Representation Builders
+"""Particle Representation Builders.
 
 Provides builder classes for creating ParticleRepresentation objects
 with specialized distribution, activity, and surface strategies for
@@ -59,7 +59,7 @@ class BuilderSurfaceStrategyMixin:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.surface_strategy = None
 
     def set_surface_strategy(
@@ -94,7 +94,7 @@ class BuilderDistributionStrategyMixin:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.distribution_strategy = None
 
     def set_distribution_strategy(
@@ -132,7 +132,7 @@ class BuilderActivityStrategyMixin:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.activity_strategy = None
 
     def set_activity_strategy(
@@ -193,7 +193,7 @@ class ParticleMassRepresentationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -270,7 +270,7 @@ class ParticleRadiusRepresentationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -342,7 +342,7 @@ class PresetParticleRadiusBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "mode",
             "geometric_standard_deviation",
@@ -503,7 +503,7 @@ class ResolvedParticleMassRepresentationBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -579,7 +579,7 @@ class PresetResolvedParticleMassBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "mode",
             "geometric_standard_deviation",

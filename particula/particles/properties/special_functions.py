@@ -1,5 +1,4 @@
-"""Special non-standard functions for aerosol properties
-"""
+"""Special non-standard functions for aerosol properties."""
 
 from typing import Union
 

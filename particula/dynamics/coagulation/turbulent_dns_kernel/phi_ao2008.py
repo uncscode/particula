@@ -1,5 +1,4 @@
-"""Compute the function Φ(α, φ) for the given particle properties.
-"""
+"""Compute the function Φ(α, φ) for the given particle properties."""
 
 from typing import NamedTuple, Union
 

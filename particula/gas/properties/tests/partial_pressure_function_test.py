@@ -9,7 +9,7 @@ from particula.gas.properties.pressure_function import (
 from particula.util.constants import GAS_CONSTANT
 
 
-def test_calculate_partial_pressure_scalar():
+def test_calculate_partial_pressure_scalar() -> None:
     """Test the calculate_partial_pressure function with scalar values."""
     # Test the function with scalar values
     concentration = 1.0  # kg/m^3
@@ -23,7 +23,7 @@ def test_calculate_partial_pressure_scalar():
     ) == pytest.approx(expected_pressure)
 
 
-def test_calculate_partial_pressure_array():
+def test_calculate_partial_pressure_array() -> None:
     """Test the calculate_partial_pressure function with NumPy arrays."""
     # Test the function with NumPy arrays
     concentration = np.array([1.0, 2.0])  # kg/m^3
@@ -38,7 +38,7 @@ def test_calculate_partial_pressure_array():
     )
 
 
-def test_calculate_partial_pressure_edge_cases():
+def test_calculate_partial_pressure_edge_cases() -> None:
     """Test the calculate_partial_pressure function with edge case values."""
     test_cases = [
         (1e-6, 0.029, 298),  # Very low concentration

@@ -24,7 +24,7 @@ KERNEL = np.array(
 RADIUS = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7])
 
 
-def test_discrete_loss():
+def test_discrete_loss() -> None:
     """Test the discrete_loss function with predefined concentration and kernel
     values.
     """
@@ -35,7 +35,7 @@ def test_discrete_loss():
     np.testing.assert_almost_equal(result, expected, decimal=6)
 
 
-def test_discrete_gain():
+def test_discrete_gain() -> None:
     """Test the discrete_gain function with predefined concentration and kernel
     values.
     """
@@ -56,7 +56,7 @@ def test_discrete_gain():
     np.testing.assert_almost_equal(result, expected, decimal=6)
 
 
-def test_continuous_loss():
+def test_continuous_loss() -> None:
     """Test the continuous_loss function with predefined radius, concentration,
     and kernel values.
     """
@@ -67,7 +67,7 @@ def test_continuous_loss():
     np.testing.assert_almost_equal(result, expected, decimal=6)
 
 
-def test_continuous_gain():
+def test_continuous_gain() -> None:
     """Test the continuous_gain function with predefined radius, concentration,
     and kernel values.
     """

@@ -89,13 +89,13 @@ def _speciated_clone(particle, n_species: int):
 class TestAerosolBuilderValidation(unittest.TestCase):
     """Test suite for `AerosolBuilder` species-count validation."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create a reusable single-species particle for the tests."""
         # one reusable base particle
         self.base_particle = _build_particle()
 
     # ---------- NO GAS SPECIES CASE ----------
-    def test_no_species_passes(self):
+    def test_no_species_passes(self) -> None:
         """Validation passes when no gas species are present."""
         atm = _build_atmosphere(0)
         pr = _speciated_clone(self.base_particle, 1)
@@ -104,7 +104,7 @@ class TestAerosolBuilderValidation(unittest.TestCase):
         )._validate_species_length()
 
     # ---------- SINGLE-SPECIES CASE ----------
-    def test_single_species_match_passes(self):
+    def test_single_species_match_passes(self) -> None:
         """Validation passes when one gas species matches one particle
         species.
         """
@@ -114,7 +114,7 @@ class TestAerosolBuilderValidation(unittest.TestCase):
             pr
         )._validate_species_length()
 
-    def test_single_species_mismatch_raises(self):
+    def test_single_species_mismatch_raises(self) -> None:
         """Validation fails when one gas species does NOT match two particle
         species.
         """
@@ -126,7 +126,7 @@ class TestAerosolBuilderValidation(unittest.TestCase):
             )._validate_species_length()
 
     # ---------- THREE-SPECIES CASE ----------
-    def test_three_species_match_passes(self):
+    def test_three_species_match_passes(self) -> None:
         """Validation passes when three gas species match three particle
         species.
         """
@@ -136,7 +136,7 @@ class TestAerosolBuilderValidation(unittest.TestCase):
             pr
         )._validate_species_length()
 
-    def test_three_species_mismatch_raises(self):
+    def test_three_species_mismatch_raises(self) -> None:
         """Validation fails when three gas species do NOT match two particle
         species.
         """
@@ -147,7 +147,7 @@ class TestAerosolBuilderValidation(unittest.TestCase):
                 pr
             )._validate_species_length()
 
-    def test_full_build_returns_aerosol(self):
+    def test_full_build_returns_aerosol(self) -> None:
         """Ensure a fully-configured builder returns an Aerosol instance."""
         atm = _build_atmosphere(2)  # 2 partitioning species
         pr = _speciated_clone(self.base_particle, 2)  # 2 particle species

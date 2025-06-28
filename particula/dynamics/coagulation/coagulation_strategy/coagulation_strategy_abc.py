@@ -68,7 +68,7 @@ class CoagulationStrategyABC(ABC):
         particle_resolved_kernel_radius: Optional[NDArray[np.float64]] = None,
         particle_resolved_kernel_bins_number: Optional[int] = None,
         particle_resolved_kernel_bins_per_decade: int = 10,
-    ):
+    ) -> None:
         if distribution_type not in [
             "discrete",
             "continuous_pdf",

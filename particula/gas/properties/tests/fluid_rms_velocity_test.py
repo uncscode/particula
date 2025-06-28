@@ -1,5 +1,4 @@
-"""Test file for fluid_rms_velocity.py.
-"""
+"""Test file for fluid_rms_velocity.py."""
 
 import numpy as np
 import pytest
@@ -9,9 +8,8 @@ from particula.gas.properties.fluid_rms_velocity import (
 )  # Update 'your_module' with the actual module name
 
 
-def test_get_fluid_rms_velocity_scalar():
-    """Test get_fluid_rms_velocity with scalar inputs.
-    """
+def test_get_fluid_rms_velocity_scalar() -> None:
+    """Test get_fluid_rms_velocity with scalar inputs."""
     re_lambda = 100.0
     kinematic_viscosity = 1.5e-5  # m²/s
     turbulent_dissipation = 1e-3  # m²/s³
@@ -28,9 +26,8 @@ def test_get_fluid_rms_velocity_scalar():
     ), f"Expected {expected}, got {result}"
 
 
-def test_get_fluid_rms_velocity_array():
-    """Test get_fluid_rms_velocity with NumPy array inputs.
-    """
+def test_get_fluid_rms_velocity_array() -> None:
+    """Test get_fluid_rms_velocity with NumPy array inputs."""
     re_lambda = np.array([100.0, 200.0])
     kinematic_viscosity = np.array([1.5e-5, 1.2e-5])
     turbulent_dissipation = np.array([1e-3, 2e-3])
@@ -47,9 +44,8 @@ def test_get_fluid_rms_velocity_array():
     ), f"Expected {expected}, got {result}"
 
 
-def test_get_fluid_rms_velocity_invalid_values():
-    """Test that get_fluid_rms_velocity raises errors for invalid inputs.
-    """
+def test_get_fluid_rms_velocity_invalid_values() -> None:
+    """Test that get_fluid_rms_velocity raises errors for invalid inputs."""
     with pytest.raises(ValueError):
         get_fluid_rms_velocity(-10.0, 1.5e-5, 1e-3)  # Negative Reynolds number
 
@@ -64,7 +60,7 @@ def test_get_fluid_rms_velocity_invalid_values():
         )  # Negative turbulent dissipation
 
 
-def test_get_fluid_rms_velocity_edge_case():
+def test_get_fluid_rms_velocity_edge_case() -> None:
     """Test get_fluid_rms_velocity with very small values close to machine
     precision.
     """

@@ -25,7 +25,7 @@ from particula.particles.properties.kelvin_effect_module import (
 def _as_2d(array: NDArray[np.float64]) -> tuple[NDArray[np.float64], bool]:
     """Promote *array* to 2-D (n_bins, n_species).
 
-    Returns
+    Returns:
     -------
     arr2d : the reshaped array
     was_1d : True if the original input was 1-D (hence single-bin)
@@ -256,7 +256,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         molar_mass: Union[float, NDArray[np.float64]] = 0.01815,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
-    ):
+    ) -> None:
         self.surface_tension = surface_tension
         self.density = density
         self.molar_mass = molar_mass
@@ -305,7 +305,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
         surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
-    ):
+    ) -> None:
         self.surface_tension = surface_tension
         self.density = density
         self.phase_index = (
@@ -352,7 +352,7 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         surface_tension: Union[float, NDArray[np.float64]] = 0.072,  # water
         density: Union[float, NDArray[np.float64]] = 1000,  # water
         phase_index: Optional[Union[Sequence[int], NDArray[np.int_]]] = None,
-    ):
+    ) -> None:
         self.surface_tension = surface_tension
         self.density = density
         self.phase_index = (

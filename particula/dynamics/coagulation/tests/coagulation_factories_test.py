@@ -16,7 +16,7 @@ from particula.dynamics import (
 )
 
 
-def test_brownian_coagulation():
+def test_brownian_coagulation() -> None:
     """Test that the BrownianCoagulationStrategy is created correctly."""
     factory = CoagulationFactory()
     strategy = factory.get_strategy(
@@ -25,7 +25,7 @@ def test_brownian_coagulation():
     assert isinstance(strategy, BrownianCoagulationStrategy)
 
 
-def test_charged_coagulation():
+def test_charged_coagulation() -> None:
     """Test that the ChargedCoagulationStrategy is created correctly."""
     factory = CoagulationFactory()
     strategy = factory.get_strategy(
@@ -38,7 +38,7 @@ def test_charged_coagulation():
     assert isinstance(strategy, ChargedCoagulationStrategy)
 
 
-def test_turbulent_shear_coagulation():
+def test_turbulent_shear_coagulation() -> None:
     """Test that the TurbulentShearCoagulationStrategy is created correctly."""
     factory = CoagulationFactory()
     strategy = factory.get_strategy(
@@ -54,7 +54,7 @@ def test_turbulent_shear_coagulation():
     assert isinstance(strategy, TurbulentShearCoagulationStrategy)
 
 
-def test_turbulent_dns_coagulation():
+def test_turbulent_dns_coagulation() -> None:
     """Test that the TurbulentDNSCoagulationStrategy is created correctly."""
     factory = CoagulationFactory()
     strategy = factory.get_strategy(
@@ -74,7 +74,7 @@ def test_turbulent_dns_coagulation():
     assert isinstance(strategy, TurbulentDNSCoagulationStrategy)
 
 
-def test_combine_coagulation():
+def test_combine_coagulation() -> None:
     """Test that the CombineCoagulationStrategy is created correctly."""
     factory = CoagulationFactory()
 
@@ -94,7 +94,7 @@ def test_combine_coagulation():
     assert isinstance(strategy, CombineCoagulationStrategy)
 
 
-def test_invalid_coagulation():
+def test_invalid_coagulation() -> None:
     """Test that an invalid coagulation strategy raises a ValueError."""
     factory = CoagulationFactory()
     with pytest.raises(ValueError):

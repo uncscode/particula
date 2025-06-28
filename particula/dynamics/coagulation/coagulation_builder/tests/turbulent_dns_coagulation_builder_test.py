@@ -1,5 +1,4 @@
-"""Tests for the TurbulentDNSCoagulationBuilder class.
-"""
+"""Tests for the TurbulentDNSCoagulationBuilder class."""
 
 # pylint: disable=duplicate-code
 
@@ -11,7 +10,7 @@ from particula.dynamics import (
 )
 
 
-def test_build_with_valid_parameters():
+def test_build_with_valid_parameters() -> None:
     """Test that building with valid parameters returns a
     TurbulentDNSCoagulationStrategy.
     """
@@ -29,9 +28,8 @@ def test_build_with_valid_parameters():
     assert isinstance(strategy, TurbulentDNSCoagulationStrategy)
 
 
-def test_build_missing_required_parameters():
-    """Test that building without required parameters raises a ValueError.
-    """
+def test_build_missing_required_parameters() -> None:
+    """Test that building without required parameters raises a ValueError."""
     builder = TurbulentDNSCoagulationBuilder()
 
     with pytest.raises(ValueError):

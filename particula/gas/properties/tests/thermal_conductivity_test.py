@@ -6,7 +6,7 @@ import pytest
 from particula.gas import get_thermal_conductivity
 
 
-def test_thermal_conductivity_normal():
+def test_thermal_conductivity_normal() -> None:
     """Test the thermal_conductivity function with a
     normal temperature value.
     """
@@ -17,7 +17,7 @@ def test_thermal_conductivity_normal():
     ), "Failed at normal temperature"
 
 
-def test_thermal_conductivity_array():
+def test_thermal_conductivity_array() -> None:
     """Test the thermal_conductivity function with an array of temperatures."""
     temperatures = np.array([250, 300, 350])
     expected = 1e-3 * (4.39 + 0.071 * temperatures)
@@ -25,13 +25,13 @@ def test_thermal_conductivity_array():
     assert np.allclose(result, expected), "Failed with temperature array"
 
 
-def test_thermal_conductivity_below_absolute_zero():
+def test_thermal_conductivity_below_absolute_zero() -> None:
     """Test for error handling with temperature below absolute zero."""
     with pytest.raises(ValueError):
         get_thermal_conductivity(-1)
 
 
-def test_thermal_conductivity_edge_case_zero():
+def test_thermal_conductivity_edge_case_zero() -> None:
     """Test the thermal_conductivity function at absolute zero."""
     temperature = 0
     expected = 1e-3 * (4.39 + 0.071 * 0)

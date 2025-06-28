@@ -9,7 +9,7 @@ from particula.particles.properties.aerodynamic_size import (
 )
 
 
-def test_particle_aerodynamic_length_single_value():
+def test_particle_aerodynamic_length_single_value() -> None:
     """Verify that the particle_aerodynamic_length function calculates the
     correct aerodynamic length for a single particle.
     """
@@ -32,7 +32,7 @@ def test_particle_aerodynamic_length_single_value():
     ), "The value does not match."
 
 
-def test_particle_aerodynamic_length_array_input():
+def test_particle_aerodynamic_length_array_input() -> None:
     """Test that the particle_aerodynamic_length function handles numpy array
     inputs correctly.
     """
@@ -69,13 +69,13 @@ def test_particle_aerodynamic_length_array_input():
         ("talc", 1.88),
     ],
 )
-def test_get_aerodynamic_shape_factor(shape_key, expected_factor):
+def test_get_aerodynamic_shape_factor(shape_key, expected_factor) -> None:
     """Test the get_aerodynamic_shape_factor function."""
     actual_factor = get_aerodynamic_shape_factor(shape_key)
     assert actual_factor == expected_factor, "The shape factor does not match."
 
 
-def test_get_aerodynamic_shape_factor_invalid():
+def test_get_aerodynamic_shape_factor_invalid() -> None:
     """Test that the get_aerodynamic_shape_factor function raises a ValueError
     for unknown shapes.
     """

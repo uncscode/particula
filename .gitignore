@@ -4,6 +4,9 @@
 # ignore linux python env
 .envrc
 
+# ignore ruff foler
+.ruff_cache
+
 # ignore local mkdocs source folder
 *Source-Code*
 docs/.assets/single_page_reference*

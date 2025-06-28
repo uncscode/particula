@@ -1,5 +1,4 @@
-"""Radial relative velocity calculation module.
-"""
+"""Radial relative velocity calculation module."""
 
 from typing import Union
 

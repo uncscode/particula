@@ -9,7 +9,7 @@ from particula.gas.vapor_pressure_strategies import (
 )
 
 
-def test_gas_builder_with_species():
+def test_gas_builder_with_species() -> None:
     """Test building a Gas object with the GasBuilder."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(101325)
 
@@ -48,7 +48,7 @@ def test_gas_builder_with_species():
     assert len(atmo) == 2
 
 
-def test_gas_builder_without_species_raises_error():
+def test_gas_builder_without_species_raises_error() -> None:
     """Test that building a Gas object without any species raises an error."""
     builder = AtmosphereBuilder().set_temperature(298.15, "K")
     # No pressure added – dataclass should fail

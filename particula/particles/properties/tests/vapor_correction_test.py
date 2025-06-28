@@ -7,7 +7,7 @@ from particula.particles.properties.vapor_correction_module import (
 )
 
 
-def test_vapor_transition_correction_scalar():
+def test_vapor_transition_correction_scalar() -> None:
     """Test the vapor_transition_correction function with scalar values."""
     knudsen_number = 0.5
     mass_accommodation = 0.1
@@ -20,7 +20,7 @@ def test_vapor_transition_correction_scalar():
     assert np.isclose(result, expected), "Failed for scalar inputs"
 
 
-def test_vapor_transition_correction_array():
+def test_vapor_transition_correction_array() -> None:
     """Test the vapor_transition_correction function with NumPy arrays."""
     knudsen_number = np.array([0.5, 1.0, 2.0])
     mass_accommodation = np.array([0.1, 0.2, 0.3])
@@ -35,7 +35,7 @@ def test_vapor_transition_correction_array():
     assert np.allclose(result, expected), "Failed for array inputs"
 
 
-def test_vapor_transition_correction_zero_knudsen():
+def test_vapor_transition_correction_zero_knudsen() -> None:
     """Test the vapor_transition_correction function with
     zero Knudsen number.
     """
@@ -50,7 +50,7 @@ def test_vapor_transition_correction_zero_knudsen():
     assert np.isclose(result, expected), "Failed for zero Knudsen number"
 
 
-def test_vapor_transition_correction_zero_accommodation():
+def test_vapor_transition_correction_zero_accommodation() -> None:
     """Test the vapor_transition_correction function with
     zero mass accommodation.
     """
@@ -63,7 +63,7 @@ def test_vapor_transition_correction_zero_accommodation():
     assert np.isclose(result, expected), "Failed for zero mass accommodation"
 
 
-def test_vapor_transition_correction_high_values():
+def test_vapor_transition_correction_high_values() -> None:
     """Test the vapor_transition_correction function with high values."""
     knudsen_number = 100
     mass_accommodation = 1

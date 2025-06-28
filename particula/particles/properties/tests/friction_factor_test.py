@@ -5,7 +5,7 @@ import numpy as np
 from particula.particles import get_friction_factor
 
 
-def test_friction_factor_scalar():
+def test_friction_factor_scalar() -> None:
     """Test the friction_factor function with scalar inputs."""
     radius = 0.1  # meters
     dynamic_viscosity = 1.81e-5  # Pascal-second, typical air at room temp
@@ -17,7 +17,7 @@ def test_friction_factor_scalar():
     assert np.isclose(result, expected_result), "Test failed for scalar inputs"
 
 
-def test_friction_factor_array():
+def test_friction_factor_array() -> None:
     """Test the friction_factor function with array inputs."""
     radius = np.array([0.1, 0.2])
     dynamic_viscosity = 1.81e-5  # Pascal-second, typical air at room temp
@@ -29,7 +29,7 @@ def test_friction_factor_array():
     assert np.allclose(result, expected_result), "Test failed for array inputs"
 
 
-def test_with_zero_radius():
+def test_with_zero_radius() -> None:
     """Test the friction_factor function with zero radius."""
     radius = 0.0
     dynamic_viscosity = 1.81e-5
@@ -40,7 +40,7 @@ def test_with_zero_radius():
     assert result == 0, "Test failed with zero radius"
 
 
-def test_continuum_limit():
+def test_continuum_limit() -> None:
     """Test the friction_factor function in the continuum limit."""
     # Continuum limit where slip correction factor approaches 1
     radius = 0.1  # meters
@@ -55,7 +55,7 @@ def test_continuum_limit():
     ), "Test failed for continuum limit"
 
 
-def test_kinetic_limit():
+def test_kinetic_limit() -> None:
     """Test the friction_factor function in the kinetic limit."""
     # Kinetic limit where slip correction factor is significantly higher
     radius = 10e-9  # meters

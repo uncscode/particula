@@ -16,7 +16,7 @@ import particula as par
 class TestCoagulationIntegration(unittest.TestCase):
     """Integration tests for the coagulation processes in Particula."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up common test parameters for various coagulation tests.
 
         This includes defining:
@@ -39,7 +39,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .build()
         )
 
-    def test_pmf_initial_distribution(self):
+    def test_pmf_initial_distribution(self) -> None:
         """Test creation of a Particulate Mass Function (PMF) distribution.
 
         Verifies that the PMF-based particle builder:
@@ -71,7 +71,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             self.radius_bins.shape,
         )
 
-    def test_pdf_initial_distribution(self):
+    def test_pdf_initial_distribution(self) -> None:
         """Test creation of a Probability Density Function (PDF) distribution.
 
         Verifies that the PDF-based particle builder:
@@ -104,7 +104,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             self.radius_bins.shape,
         )
 
-    def test_resolved_initial_distribution(self):
+    def test_resolved_initial_distribution(self) -> None:
         """Test creation of a particle-resolved distribution (no binning).
 
         Uses lognormal-sampled radii to create resolved particle masses:
@@ -141,7 +141,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             delta=1e-6,
         )
 
-    def test_coagulation_process_pmf(self):
+    def test_coagulation_process_pmf(self) -> None:
         """Test Brownian coagulation for a PMF-based distribution."""
         coagulation_process_pmf = par.dynamics.Coagulation(
             coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
@@ -177,7 +177,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             delta=1e-4,
         )
 
-    def test_coagulation_process_pdf(self):
+    def test_coagulation_process_pdf(self) -> None:
         """Test Brownian coagulation for a PDF-based distribution."""
         coagulation_process_pdf = par.dynamics.Coagulation(
             coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
@@ -214,7 +214,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             delta=5,
         )
 
-    def test_coagulation_process_resolved(self):
+    def test_coagulation_process_resolved(self) -> None:
         """Test Brownian coagulation for a particle-resolved distribution."""
         coagulation_process_resolved = par.dynamics.Coagulation(
             coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
@@ -260,7 +260,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             delta=1e-6,
         )
 
-    def test_final_properties(self):
+    def test_final_properties(self) -> None:
         """Test final aerosol properties at the end of simulation.
 
         Verifies:

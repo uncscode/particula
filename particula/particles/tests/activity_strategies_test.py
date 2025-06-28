@@ -12,7 +12,7 @@ from particula.particles.activity_strategies import (
 
 
 # Test MolarIdealActivity
-def test_molar_ideal_activity_single_species():
+def test_molar_ideal_activity_single_species() -> None:
     """Test activity calculation for a single species."""
     activity_strategy = ActivityIdealMolar(molar_mass=50.0)
     mass_concentration = 100.0
@@ -20,7 +20,7 @@ def test_molar_ideal_activity_single_species():
     assert activity_strategy.activity(mass_concentration) == expected_activity
 
 
-def test_molar_ideal_activity_multiple_species():
+def test_molar_ideal_activity_multiple_species() -> None:
     """Test activity calculation for multiple species."""
     activity_strategy = ActivityIdealMolar(
         molar_mass=np.array([1.0, 2.0, 3.0])
@@ -35,7 +35,7 @@ def test_molar_ideal_activity_multiple_species():
 
 
 # Test MassIdealActivity
-def test_mass_ideal_activity_single_species():
+def test_mass_ideal_activity_single_species() -> None:
     """Test activity calculation for a single species."""
     activity_strategy = ActivityIdealMass()
     mass_concentration = 100.0
@@ -43,7 +43,7 @@ def test_mass_ideal_activity_single_species():
     assert activity_strategy.activity(mass_concentration) == expected_activity
 
 
-def test_mass_ideal_activity_multiple_species():
+def test_mass_ideal_activity_multiple_species() -> None:
     """Test activity calculation for multiple species."""
     activity_strategy = ActivityIdealMass()
     mass_concentration = np.array([100.0, 200.0, 300.0])
@@ -55,7 +55,7 @@ def test_mass_ideal_activity_multiple_species():
     )
 
 
-def test_kappa_parameter_activity_multiple_species():
+def test_kappa_parameter_activity_multiple_species() -> None:
     """Test activity calculation for multiple species."""
     activity_strategy = ActivityKappaParameter(
         kappa=np.array([0.1, 0.2, 0.3]),
@@ -69,7 +69,7 @@ def test_kappa_parameter_activity_multiple_species():
     np.testing.assert_allclose(result, expected_activity, rtol=1e-6)
 
 
-def test_kappa_parameter_activity_multi_particles():
+def test_kappa_parameter_activity_multi_particles() -> None:
     """Test activity calculation for multiple particles."""
     activity_strategy = ActivityKappaParameter(
         kappa=np.array([0.0, 0.5]),

@@ -11,7 +11,7 @@ from particula.particles.properties.convert_size_distribution import (
 )
 
 
-def test_dndlogdp_to_pms_conversion_strategy():
+def test_dndlogdp_to_pms_conversion_strategy() -> None:
     """Test the conversion from dn/dlogdp to PMS format."""
     strategy = DNdlogDPtoPMFConversionStrategy()
     diameters = np.array([1, 2, 3])
@@ -27,7 +27,7 @@ def test_dndlogdp_to_pms_conversion_strategy():
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
-def test_pms_to_pdf_conversion_strategy():
+def test_pms_to_pdf_conversion_strategy() -> None:
     """Test the conversion from PMS to PDF format."""
     strategy = PMFtoPDFConversionStrategy()
     diameters = np.array([1, 10, 30])
@@ -43,7 +43,7 @@ def test_pms_to_pdf_conversion_strategy():
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
-def test_dndlogdp_to_pdf_conversion_strategy():
+def test_dndlogdp_to_pdf_conversion_strategy() -> None:
     """Test the conversion from dn/dlogdp to PDF format."""
     strategy = DNdlogDPtoPDFConversionStrategy()
     diameters = np.array([1, 2, 3])
@@ -59,7 +59,7 @@ def test_dndlogdp_to_pdf_conversion_strategy():
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
-def test_converter():
+def test_converter() -> None:
     """Test the Converter class."""
     strategy = DNdlogDPtoPMFConversionStrategy()
     converter = SizerConverter(strategy)
@@ -76,7 +76,7 @@ def test_converter():
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
-def test_get_conversion_strategy():
+def test_get_conversion_strategy() -> None:
     """Test the get_conversion_strategy function."""
     strategy = get_distribution_conversion_strategy("dn/dlogdp", "pmf")
     assert isinstance(strategy, DNdlogDPtoPMFConversionStrategy)
@@ -89,12 +89,12 @@ def test_get_conversion_strategy():
 
     try:
         strategy = get_distribution_conversion_strategy("invalid", "pmf")
-        assert False  # Should raise a ValueError
+        raise AssertionError()  # Should raise a ValueError
     except ValueError:
         assert True
 
     try:
         strategy = get_distribution_conversion_strategy("dn/dlogdp", "invalid")
-        assert False  # Should raise a ValueError
+        raise AssertionError()  # Should raise a ValueError
     except ValueError:
         assert True

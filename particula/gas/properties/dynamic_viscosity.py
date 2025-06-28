@@ -1,4 +1,4 @@
-"""Module for calculating the dynamic viscosity
+"""Module for calculating the dynamic viscosity.
 
 The dynamic viscosity is calculated using the Sutherland formula,
 assuming ideal gas behavior, as a function of temperature.

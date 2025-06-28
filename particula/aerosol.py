@@ -40,7 +40,7 @@ class Aerosol:
         self,
         atmosphere: Atmosphere,
         particles: ParticleRepresentation,
-    ):
+    ) -> None:
         """Initialize the Aerosol object with an Atmosphere and one or more
         particles.
 
@@ -67,7 +67,7 @@ class Aerosol:
         message = str(self.atmosphere) + "\n" + str(self.particles)
         return message
 
-    def replace_atmosphere(self, atmosphere: Atmosphere):
+    def replace_atmosphere(self, atmosphere: Atmosphere) -> None:
         """Replace the current atmosphere with a new Atmosphere instance.
 
         Arguments:
@@ -86,7 +86,7 @@ class Aerosol:
     def replace_particles(
         self,
         particles: ParticleRepresentation,
-    ):
+    ) -> None:
         """Replace a particles in the aerosol with a new ParticleRepresentation.
 
         Arguments:

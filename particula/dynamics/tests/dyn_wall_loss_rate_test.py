@@ -8,7 +8,7 @@ from particula.dynamics.wall_loss import (
 )
 
 
-def test_spherical_wall_loss_rate():
+def test_spherical_wall_loss_rate() -> None:
     """Test the spherical wall loss rate function."""
     # Test case 1
     wall_eddy_diffusivity = 0.1
@@ -56,7 +56,7 @@ def test_spherical_wall_loss_rate():
     assert np.allclose(result, expected_loss_rate)
 
 
-def test_rectangle_wall_loss_rate():
+def test_rectangle_wall_loss_rate() -> None:
     """Test the rectangle wall loss rate function."""
     # Test single float input
     results = get_rectangle_wall_loss_rate(

@@ -9,7 +9,7 @@ from particula.particles.properties.convert_kappa_volumes import (
 )
 
 
-def test_kappa_volume_solute():
+def test_kappa_volume_solute() -> None:
     """Test the kappa_volume_solute function."""
     # Test with water_activity = 0.95 and kappa = 0.4
     assert np.allclose(
@@ -22,7 +22,7 @@ def test_kappa_volume_solute():
     )
 
 
-def test_kappa_volume_water():
+def test_kappa_volume_water() -> None:
     """Test the kappa_volume_water function."""
     # Test with water_activity = 0.95 and kappa = 0.4
     assert np.allclose(
@@ -30,7 +30,7 @@ def test_kappa_volume_water():
     )
 
 
-def test_kappa_volume_solute_zero_correction():
+def test_kappa_volume_solute_zero_correction() -> None:
     """Test the kappa_volume_solute_zero_correction function."""
     # Test with water_activity = 1 and kappa = 0.0 (zero correction)
     assert np.allclose(
@@ -38,7 +38,7 @@ def test_kappa_volume_solute_zero_correction():
     )
 
 
-def test_kappa_from_volume():
+def test_kappa_from_volume() -> None:
     """Test the kappa_from_volume function."""
     # Test with water_activity = 0.95 and kappa = 0.4
     assert np.allclose(get_kappa_from_volumes(100, 200, 0.5), 2.0, rtol=1e-2)

@@ -407,7 +407,7 @@ def _drag_coefficient(reynolds_number: float) -> float:
     ----------
         - reynolds_number : Reynolds number [-].
 
-    Returns
+    Returns:
     -------
         - Drag coefficient c_d [-].
 
@@ -442,7 +442,7 @@ def _velocity_mismatch(
         - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
         - gravitational_acceleration : Gravitational acceleration [m/s²].
 
-    Returns
+    Returns:
     -------
         - Squared difference between predicted and actual velocities.
 

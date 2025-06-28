@@ -63,7 +63,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
 
     """
 
-    def __init__(self, strategies: List[CoagulationStrategyABC]):
+    def __init__(self, strategies: List[CoagulationStrategyABC]) -> None:
         """Initialize the combined coagulation strategy.
 
         Arguments:

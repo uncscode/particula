@@ -5,7 +5,7 @@ import numpy as np
 from particula.activity.gibbs import gibbs_free_engery
 
 
-def test_gibbs_free_engery():
+def test_gibbs_free_engery() -> None:
     """Test the gibbs_free_engery function."""
     # Test case 1: Known values
     organic_mole_fraction = np.array([0.2, 0.4, 0.6, 0.8])

@@ -119,7 +119,7 @@ class CondensationStrategy(ABC):
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
         skip_partitioning_indices: Optional[Sequence[int]] = None,
-    ):
+    ) -> None:
         """Initialize the CondensationStrategy instance.
 
         Arguments:
@@ -306,7 +306,7 @@ class CondensationStrategy(ABC):
                 "particle concentration would also be zero."
             )
             logger.warning(message)
-            warnings.warn(message, RuntimeWarning)
+            warnings.warn(message, RuntimeWarning, stacklevel=2)
             radius = np.where(radius == 0, 1, radius)
         return np.where(radius == 0, np.max(radius), radius)
 
@@ -552,7 +552,7 @@ class CondensationIsothermal(CondensationStrategy):
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
         skip_partitioning_indices: Optional[Sequence[int]] = None,
-    ):
+    ) -> None:
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
@@ -575,7 +575,7 @@ class CondensationIsothermal(CondensationStrategy):
         m_rate = iso_cond.mass_transfer_rate(
             particle, gas_species, 298.15, 101325
         )
-        ```
+        ```.
 
         """
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
@@ -605,7 +605,7 @@ class CondensationIsothermal(CondensationStrategy):
         """Examples:
         ```py title="Example – Condensation rate array"
         rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
-        ```
+        ```.
 
         """
         # Step 1: Calculate the mass transfer rate due to condensation
@@ -644,7 +644,7 @@ class CondensationIsothermal(CondensationStrategy):
         particle, gas_species = iso_cond.step(
             particle, gas_species, 298.15, 101325, time_step=1.0
         )
-        ```
+        ```.
 
         """
         # Calculate the mass transfer rate

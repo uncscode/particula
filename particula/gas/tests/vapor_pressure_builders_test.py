@@ -11,13 +11,13 @@ from particula.gas.vapor_pressure_builders import (
 )
 
 
-def test_antoine_set_positive_a():
+def test_antoine_set_positive_a() -> None:
     """Test setting a positive value for the coefficient 'a'."""
     builder = AntoineVaporPressureBuilder()
     assert builder.set_a(10).a == 10
 
 
-def test_antoine_set_negative_a():
+def test_antoine_set_negative_a() -> None:
     """Test setting a negative value for the coefficient 'a'."""
     builder = AntoineVaporPressureBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -25,7 +25,7 @@ def test_antoine_set_negative_a():
     assert "Coefficient 'a' must be a positive value." in str(excinfo.value)
 
 
-def test_antoine_set_parameters_with_missing_key():
+def test_antoine_set_parameters_with_missing_key() -> None:
     """Test setting parameters with a missing key in the dictionary."""
     builder = AntoineVaporPressureBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -33,7 +33,7 @@ def test_antoine_set_parameters_with_missing_key():
     assert "Missing required parameter(s): c" in str(excinfo.value)
 
 
-def test_antoine_build_without_all_coefficients():
+def test_antoine_build_without_all_coefficients() -> None:
     """Test building the strategy without all coefficients set."""
     builder = AntoineVaporPressureBuilder().set_a(10).set_b(2000)
     with pytest.raises(ValueError) as excinfo:
@@ -41,49 +41,49 @@ def test_antoine_build_without_all_coefficients():
     assert "Required parameter(s) not set: c" in str(excinfo.value)
 
 
-def test_clausius_set_latent_heat_positive():
+def test_clausius_set_latent_heat_positive() -> None:
     """Test setting a positive value for the latent heat."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     builder.set_latent_heat(100, "J/mol")
     assert builder.latent_heat == 100, "Latent heat should be set correctly"
 
 
-def test_clausius_set_latent_heat_negative():
+def test_clausius_set_latent_heat_negative() -> None:
     """Test setting a negative value for the latent heat."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     with pytest.raises(ValueError):
         builder.set_latent_heat(-100, "J/mol")
 
 
-def test_clausius_set_temperature_initial_positive():
+def test_clausius_set_temperature_initial_positive() -> None:
     """Test setting a positive value for the initial temperature."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     builder.set_temperature_initial(300, "K")
     assert builder.temperature_initial == 300
 
 
-def test_clausius_set_temperature_initial_negative():
+def test_clausius_set_temperature_initial_negative() -> None:
     """Test setting a negative value for the initial temperature."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     with pytest.raises(ValueError):
         builder.set_temperature_initial(-5, "K")
 
 
-def test_clausius_set_pressure_initial_positive():
+def test_clausius_set_pressure_initial_positive() -> None:
     """Test setting a positive value for the initial pressure."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     builder.set_pressure_initial(101325, "Pa")
     assert builder.pressure_initial == 101325
 
 
-def test_clausius_set_pressure_initial_negative():
+def test_clausius_set_pressure_initial_negative() -> None:
     """Test setting a negative value for the initial pressure."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     with pytest.raises(ValueError):
         builder.set_pressure_initial(-101325, "Pa")
 
 
-def test_clausius_set_parameters_complete():
+def test_clausius_set_parameters_complete() -> None:
     """Test setting all parameters at once, with different pressure units."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     parameters = {
@@ -100,7 +100,7 @@ def test_clausius_set_parameters_complete():
     assert builder.pressure_initial == 101325
 
 
-def test_clausius_build_success():
+def test_clausius_build_success() -> None:
     """Test building the strategy successfully."""
     builder = (
         ClausiusClapeyronVaporPressureBuilder()
@@ -111,7 +111,7 @@ def test_clausius_build_success():
     builder.build()
 
 
-def test_clausius_build_failure():
+def test_clausius_build_failure() -> None:
     """Test building the strategy without all parameters set."""
     builder = ClausiusClapeyronVaporPressureBuilder()
     builder.set_latent_heat(2260, "J/mol").set_temperature_initial(373, "K")
@@ -122,21 +122,21 @@ def test_clausius_build_failure():
     )
 
 
-def test_constant_set_vapor_pressure_positive():
+def test_constant_set_vapor_pressure_positive() -> None:
     """Test setting a positive value for the constant vapor pressure."""
     builder = ConstantVaporPressureBuilder()
     builder.set_vapor_pressure(101325, "Pa")
     assert builder.vapor_pressure == 101325
 
 
-def test_constant_set_vapor_pressure_negative():
+def test_constant_set_vapor_pressure_negative() -> None:
     """Test setting a negative value for the constant vapor pressure."""
     builder = ConstantVaporPressureBuilder()
     with pytest.raises(ValueError):
         builder.set_vapor_pressure(-101325, "Pa")
 
 
-def test_constant_set_parameters_complete():
+def test_constant_set_parameters_complete() -> None:
     """Test setting all parameters at once. With different pressure units."""
     builder = ConstantVaporPressureBuilder()
     parameters = {"vapor_pressure": 101325, "vapor_pressure_units": "Pa"}
@@ -144,14 +144,14 @@ def test_constant_set_parameters_complete():
     assert builder.vapor_pressure == 101325
 
 
-def test_constant_build_success():
+def test_constant_build_success() -> None:
     """Test building the strategy successfully."""
     builder = ConstantVaporPressureBuilder()
     builder.set_vapor_pressure(101325, "Pa")
     builder.build()
 
 
-def test_constant_build_failure():
+def test_constant_build_failure() -> None:
     """Test building the strategy without setting the vapor pressure."""
     builder = ConstantVaporPressureBuilder()
     with pytest.raises(ValueError) as excinfo:
@@ -161,7 +161,7 @@ def test_constant_build_failure():
     )
 
 
-def test_build_water_buck():
+def test_build_water_buck() -> None:
     """Test building the WaterBuck strategy."""
     builder = WaterBuckVaporPressureBuilder()
     builder.build()
@@ -172,14 +172,14 @@ def test_build_water_buck():
 # ----------------------------------------------------------------------
 
 
-def test_saturation_set_concentration_positive():
+def test_saturation_set_concentration_positive() -> None:
     """Test setting a positive saturation concentration (default units)."""
     builder = SaturationConcentrationVaporPressureBuilder()
     builder.set_saturation_concentration(1e-6, "kg/m^3")
     assert builder.saturation_concentration == pytest.approx(1e-6)
 
 
-def test_saturation_build_success():
+def test_saturation_build_success() -> None:
     """Test successful build when all parameters are provided."""
     builder = (
         SaturationConcentrationVaporPressureBuilder()
@@ -190,7 +190,7 @@ def test_saturation_build_success():
     builder.build()  # Should not raise
 
 
-def test_saturation_build_failure_missing_param():
+def test_saturation_build_failure_missing_param() -> None:
     """Test build failure when temperature is missing."""
     builder = (
         SaturationConcentrationVaporPressureBuilder()

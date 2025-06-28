@@ -9,12 +9,12 @@ from particula.particles.distribution_strategies import RadiiBasedMovingBin
 radii_based_strategy = RadiiBasedMovingBin()
 
 
-def test_get_name():
+def test_get_name() -> None:
     """Test retrieving the class name."""
     assert radii_based_strategy.get_name() == "RadiiBasedMovingBin"
 
 
-def test_get_mass():
+def test_get_mass() -> None:
     """Test mass calculation."""
     distribution = np.array([1, 2, 3], dtype=np.float64)
     density = np.float64(5)
@@ -24,7 +24,7 @@ def test_get_mass():
     )
 
 
-def test_get_radius():
+def test_get_radius() -> None:
     """Test radius retrieval."""
     distribution = np.array([1, 2, 3], dtype=np.float64)
     density = np.float64(5)
@@ -33,7 +33,7 @@ def test_get_radius():
     )
 
 
-def test_get_total_mass():
+def test_get_total_mass() -> None:
     """Test total mass computation."""
     distribution = np.array([1, 2, 3], dtype=np.float64)
     density = np.float64(5)
@@ -45,7 +45,7 @@ def test_get_total_mass():
     ) == pytest.approx(expected_total)
 
 
-def test_add_mass():
+def test_add_mass() -> None:
     """Test mass addition updates radii."""
     distribution = np.array([1, 2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 30], dtype=np.float64)
@@ -62,7 +62,7 @@ def test_add_mass():
     np.testing.assert_array_equal(new_conc, concentration)
 
 
-def test_add_concentration():
+def test_add_concentration() -> None:
     """Test concentration addition."""
     distribution = np.array([1.0, 2.0], dtype=np.float64)
     concentration = np.array([1.0, 2.0], dtype=np.float64)
@@ -78,7 +78,7 @@ def test_add_concentration():
     np.testing.assert_array_equal(new_conc, expected)
 
 
-def test_add_concentration_distribution_error():
+def test_add_concentration_distribution_error() -> None:
     """Test distribution shape validation."""
     distribution = np.array([1.0, 2.0], dtype=np.float64)
     concentration = np.array([1.0, 2.0], dtype=np.float64)
@@ -91,7 +91,7 @@ def test_add_concentration_distribution_error():
         )
 
 
-def test_add_concentration_shape_error():
+def test_add_concentration_shape_error() -> None:
     """Test concentration shape validation."""
     distribution = np.array([1.0, 2.0], dtype=np.float64)
     concentration = np.array([1.0, 2.0], dtype=np.float64)
@@ -104,7 +104,7 @@ def test_add_concentration_shape_error():
         )
 
 
-def test_collide_pairs():
+def test_collide_pairs() -> None:
     """Test collide_pairs not implemented."""
     with pytest.raises(NotImplementedError):
         radii_based_strategy.collide_pairs(

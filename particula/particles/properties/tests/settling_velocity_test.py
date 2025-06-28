@@ -1,5 +1,4 @@
-"""Tests for the settling velocity property calculation.
-"""
+"""Tests for the settling velocity property calculation."""
 
 import numpy as np
 import pytest
@@ -11,7 +10,7 @@ from particula.particles.properties.settling_velocity import (
 )
 
 
-def test_calculate_settling_velocity_with_floats():
+def test_calculate_settling_velocity_with_floats() -> None:
     """Test the settling velocity calculation for a single float value."""
     radius = 0.001
     density = 1000.0
@@ -36,7 +35,7 @@ def test_calculate_settling_velocity_with_floats():
     ) == pytest.approx(expected_settling_velocity)
 
 
-def test_calculate_settling_velocity_with_np_array():
+def test_calculate_settling_velocity_with_np_array() -> None:
     """Test the settling velocity calculation for a numpy array."""
     radii_array = np.array([1e-9, 1e-6, 1e-3])
     density_array = np.array([1000.0, 2000.0, 3000.0])
@@ -64,7 +63,7 @@ def test_calculate_settling_velocity_with_np_array():
     )
 
 
-def test_calculate_settling_velocity_with_invalid_inputs():
+def test_calculate_settling_velocity_with_invalid_inputs() -> None:
     """Test the settling velocity calculation with invalid inputs."""
     radius_invalid = "invalid"
     particle_density = 1000.0
@@ -82,9 +81,8 @@ def test_calculate_settling_velocity_with_invalid_inputs():
         )
 
 
-def test_get_particle_settling_velocity_via_inertia_scalar():
-    """Test get_particle_settling_velocity_via_inertia with scalar inputs.
-    """
+def test_get_particle_settling_velocity_via_inertia_scalar() -> None:
+    """Test get_particle_settling_velocity_via_inertia with scalar inputs."""
     particle_inertia_time = 0.02  # s
     particle_radius = 0.001  # m
     relative_velocity = 0.05  # m/s
@@ -113,9 +111,8 @@ def test_get_particle_settling_velocity_via_inertia_scalar():
     assert np.isclose(result, expected, atol=1e-10)
 
 
-def test_get_particle_settling_velocity_via_inertia_array():
-    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs.
-    """
+def test_get_particle_settling_velocity_via_inertia_array() -> None:
+    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs."""
     particle_inertia_time = np.array([0.02, 0.03])
     particle_radius = np.array([0.001, 0.002])
     relative_velocity = np.array([0.05, 0.06])
@@ -143,7 +140,7 @@ def test_get_particle_settling_velocity_via_inertia_array():
     assert np.allclose(result, expected, atol=1e-10)
 
 
-def test_get_particle_settling_velocity_via_inertia_invalid():
+def test_get_particle_settling_velocity_via_inertia_invalid() -> None:
     """Test that get_particle_settling_velocity_via_inertia raises errors for
     invalid inputs.
     """
@@ -171,7 +168,7 @@ def test_get_particle_settling_velocity_via_inertia_invalid():
         )
 
 
-def test_get_particle_settling_velocity_with_drag_scalar_stokes():
+def test_get_particle_settling_velocity_with_drag_scalar_stokes() -> None:
     """Test with scalar inputs within the Stokes regime."""
     particle_radius = 1e-6  # m
     particle_density = 1000.0  # kg/m³
@@ -203,7 +200,7 @@ def test_get_particle_settling_velocity_with_drag_scalar_stokes():
     assert np.isclose(calculated_velocity, expected_velocity, atol=1e-4)
 
 
-def test_get_particle_settling_velocity_with_drag_array_stokes():
+def test_get_particle_settling_velocity_with_drag_array_stokes() -> None:
     """Test with array inputs within the Stokes regime."""
     particle_radius = np.array([1e-7, 5e-7, 1e-6])  # m
     particle_density = np.array([1000.0, 1100.0, 1200.0])  # kg/m³
@@ -235,7 +232,7 @@ def test_get_particle_settling_velocity_with_drag_array_stokes():
     assert np.allclose(calculated_velocity, expected_velocity, atol=1e-4)
 
 
-def test_get_particle_settling_velocity_with_drag_scalar_non_stokes():
+def test_get_particle_settling_velocity_with_drag_scalar_non_stokes() -> None:
     """Test with scalar inputs in the non-Stokes regime."""
     particle_radius = 1e-3  # m (larger particle)
     particle_density = 2500.0  # kg/m³
@@ -265,7 +262,7 @@ def test_get_particle_settling_velocity_with_drag_scalar_non_stokes():
     # assert np.isclose(calculated_velocity, expected_velocity, rtol=0.1)
 
 
-def test_get_particle_settling_velocity_with_drag_array_non_stokes():
+def test_get_particle_settling_velocity_with_drag_array_non_stokes() -> None:
     """Test with array inputs in the non-Stokes regime."""
     particle_radius = np.array([5e-4, 1e-3, 2e-3])  # m
     particle_density = np.array([2600.0, 2700.0, 2800.0])  # kg/m³
@@ -287,7 +284,7 @@ def test_get_particle_settling_velocity_with_drag_array_non_stokes():
     assert np.all(calculated_velocity > 0.0)
 
 
-def test_get_particle_settling_velocity_with_drag_transition():
+def test_get_particle_settling_velocity_with_drag_transition() -> None:
     """Test the transition between Stokes and non-Stokes regimes."""
     # Define a radius that is close to the transition point
     particle_radius = 1e-5  # m
@@ -334,7 +331,7 @@ def test_get_particle_settling_velocity_with_drag_transition():
     assert calculated_velocity > 0.0
 
 
-def test_get_particle_settling_velocity_with_drag_invalid_inputs():
+def test_get_particle_settling_velocity_with_drag_invalid_inputs() -> None:
     """Test handling of invalid inputs."""
     # Negative particle radius
     with pytest.raises(ValueError):
@@ -367,7 +364,7 @@ def test_get_particle_settling_velocity_with_drag_invalid_inputs():
         )
 
 
-def test_get_particle_settling_velocity_with_drag_extreme_values():
+def test_get_particle_settling_velocity_with_drag_extreme_values() -> None:
     """Test the function with extreme input values."""
     # Extremely small particle radius
     particle_radius = 1e-9  # m

@@ -9,7 +9,7 @@ from particula.dynamics.coagulation import brownian_kernel
 from particula.util.constants import BOLTZMANN_CONSTANT
 
 
-def test_mean_free_path_l_single_value():
+def test_mean_free_path_l_single_value() -> None:
     """Test mean_free_path_l with single float inputs for diffusivity and mean
     thermal speed.
     """
@@ -24,7 +24,7 @@ def test_mean_free_path_l_single_value():
     assert np.isclose(value, expected_path)
 
 
-def test_mean_free_path_l_array_input():
+def test_mean_free_path_l_array_input() -> None:
     """Test mean_free_path_l with numpy array inputs for diffusivity and mean
     thermal speed.
     """
@@ -39,7 +39,7 @@ def test_mean_free_path_l_array_input():
     np.testing.assert_allclose(value, expected_path, rtol=1e-6)
 
 
-def test_mean_free_path_l_input_validation():
+def test_mean_free_path_l_input_validation() -> None:
     """Ensure that providing incorrect input types to mean_free_path_l raises a
     TypeError.
     """
@@ -47,7 +47,7 @@ def test_mean_free_path_l_input_validation():
         brownian_kernel._mean_free_path_l("not a number", "also not a number")
 
 
-def test_g_collection_term_single_value():
+def test_g_collection_term_single_value() -> None:
     """Test g_collection_term with single float inputs for mean free path and
     radius of particles.
     """
@@ -63,7 +63,7 @@ def test_g_collection_term_single_value():
     assert np.isclose(value, expected_value)
 
 
-def test_g_collection_term_array_input():
+def test_g_collection_term_array_input() -> None:
     """Test g_collection_term with numpy array inputs for mean free path and
     radius of particles.
     """
@@ -79,7 +79,7 @@ def test_g_collection_term_array_input():
     np.testing.assert_allclose(value, expected_value, rtol=1e-6)
 
 
-def test_g_collection_term_input_validation():
+def test_g_collection_term_input_validation() -> None:
     """Ensure that providing incorrect input types to g_collection_term raises
     a TypeError.
     """
@@ -87,7 +87,7 @@ def test_g_collection_term_input_validation():
         brownian_kernel._g_collection_term("not a number", "also not a number")
 
 
-def test_g_collection_term_zero_radius():
+def test_g_collection_term_zero_radius() -> None:
     """Test that g_collection_term handles a case where the radius is zero
     without crashing.
     """
@@ -99,7 +99,7 @@ def test_g_collection_term_zero_radius():
         )
 
 
-def test_brownian_diffusivity_single_value():
+def test_brownian_diffusivity_single_value() -> None:
     """Test brownian_diffusivity with single float inputs for temperature and
     aerodynamic mobility.
     """
@@ -114,7 +114,7 @@ def test_brownian_diffusivity_single_value():
     assert np.isclose(value, expected_diffusivity)
 
 
-def test_brownian_diffusivity_array_input():
+def test_brownian_diffusivity_array_input() -> None:
     """Test brownian_diffusivity with numpy array inputs for temperature and
     aerodynamic mobility.
     """
@@ -129,9 +129,8 @@ def test_brownian_diffusivity_array_input():
     np.testing.assert_allclose(value, expected_diffusivity, rtol=1e-6)
 
 
-def test_brownian_coagulation_kernel_basic():
-    """Test brownian_coagulation_kernel with basic input values.
-    """
+def test_brownian_coagulation_kernel_basic() -> None:
+    """Test brownian_coagulation_kernel with basic input values."""
     particle_radius = np.array([1e-9, 2e-9])  # radii in meters
     diffusivity_particle = np.array([1e-12, 1e-12])  # diffusivity in m^2/s
     g_collection_term_particle = np.array([0.5, 0.5])  # dimensionless
@@ -154,9 +153,8 @@ def test_brownian_coagulation_kernel_basic():
     np.testing.assert_allclose(result_kernel, expected_kernel, rtol=1e-6)
 
 
-def test_brownian_coagulation_kernel_with_defaults():
-    """Test that default parameters are handled correctly.
-    """
+def test_brownian_coagulation_kernel_with_defaults() -> None:
+    """Test that default parameters are handled correctly."""
     particle_radius = np.array([1e-9])  # single radius
     diffusivity_particle = np.array([1e-12])  # single diffusivity
     g_collection_term_particle = np.array([0.5])  # single collection term
@@ -174,18 +172,16 @@ def test_brownian_coagulation_kernel_with_defaults():
     assert np.isclose(result_kernel, expected_kernel)
 
 
-def test_brownian_coagulation_kernel_input_validation():
-    """Ensure that providing incorrect input types raises a TypeError.
-    """
+def test_brownian_coagulation_kernel_input_validation() -> None:
+    """Ensure that providing incorrect input types raises a TypeError."""
     with pytest.raises(TypeError):
         brownian_kernel.get_brownian_kernel(
             "not a number", "not a number", "not a number", "not a number"
         )
 
 
-def test_brownian_coagulation_kernel_via_system_state_basic():
-    """Test the complete system function with basic input values.
-    """
+def test_brownian_coagulation_kernel_via_system_state_basic() -> None:
+    """Test the complete system function with basic input values."""
     # diameters, 2 nm, 1 um, 20 um
     particle_radius = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
     particle_mass = 4 / 3 * np.pi * particle_radius**3 * 1000  # mass in kg
@@ -219,7 +215,7 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
     np.testing.assert_allclose(result, expected_output, rtol=1e-6)
 
 
-def test_brownian_coagulation_kernel_via_system_state_input_validation():
+def test_brownian_coagulation_kernel_via_system_state_input_validation() -> None:
     """Ensure that providing incorrect input types or sizes raises appropriate
     errors.
     """

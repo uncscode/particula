@@ -18,13 +18,13 @@ from particula.particles.activity_strategies import (
 )
 
 
-def test_mass_ideal_strategy_no_parameters():
+def test_mass_ideal_strategy_no_parameters() -> None:
     """Test factory function for mass_ideal strategy without parameters."""
     strategy = ActivityFactory().get_strategy("mass_ideal")
     assert isinstance(strategy, ActivityIdealMass)
 
 
-def test_molar_ideal_strategy_with_parameters():
+def test_molar_ideal_strategy_with_parameters() -> None:
     """Test factory function for molar_ideal strategy with parameters."""
     parameters = {
         "molar_mass": np.array([100.0, 200.0, 300.0]),
@@ -37,9 +37,8 @@ def test_molar_ideal_strategy_with_parameters():
     )
 
 
-def test_kappa_parameter_strategy_with_parameters():
-    """Test factory function for kappa_parameter strategy with full parameters.
-    """
+def test_kappa_parameter_strategy_with_parameters() -> None:
+    """Test factory function for kappa_parameter strategy with full parameters."""
     parameters = {
         "kappa": np.array([0.1, 0.2, 0.3]),
         "density": np.array([1000.0, 2000.0, 3000.0]),
@@ -60,7 +59,7 @@ def test_kappa_parameter_strategy_with_parameters():
     assert strategy.water_index == parameters["water_index"]
 
 
-def test_invalid_strategy_type():
+def test_invalid_strategy_type() -> None:
     """Test factory function with an invalid strategy type."""
     with pytest.raises(ValueError) as excinfo:
         ActivityFactory().get_strategy("invalid_type")

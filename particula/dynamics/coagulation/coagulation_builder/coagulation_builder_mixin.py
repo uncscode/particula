@@ -1,4 +1,4 @@
-"""Coagulation Builder Mixin Classes
+"""Coagulation Builder Mixin Classes.
 
 Provides reusable mixin classes for building coagulation strategies
 with validated inputs (e.g., distribution type, turbulent dissipation,
@@ -43,7 +43,7 @@ class BuilderDistributionTypeMixin:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.distribution_type = None
 
     def set_distribution_type(
@@ -116,7 +116,7 @@ class BuilderTurbulentDissipationMixin:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.turbulent_dissipation = None
 
     @validate_inputs({"turbulent_dissipation": "nonnegative"})
@@ -177,7 +177,7 @@ class BuilderFluidDensityMixin:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.fluid_density = None
 
     @validate_inputs({"fluid_density": "positive"})

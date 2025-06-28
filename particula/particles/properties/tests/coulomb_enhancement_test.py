@@ -5,7 +5,7 @@ import numpy as np
 from particula.particles.properties import coulomb_enhancement
 
 
-def test_ratio_lower_limit():
+def test_ratio_lower_limit() -> None:
     """Test the ratio function for ratio_lower_limit functionality."""
     # Test case where the calculated ratio is below the lower limit
     radius = 1e-9  # Very small radius to increase the Coulomb potential
@@ -27,7 +27,7 @@ def test_ratio_lower_limit():
     assert np.isclose(value_custom, expected_custom_result)
 
 
-def test_ratio():
+def test_ratio() -> None:
     """Test the ratio function in the coulomb_enhancement module."""
     # Test case 1: Single radius and charge
     radius = 1.0
@@ -58,7 +58,7 @@ def test_ratio():
     assert np.allclose(value, expected_result)
 
 
-def test_kinetic():
+def test_kinetic() -> None:
     """Test the kinetic function in the coulomb_enhancement module."""
     # Test case 1: Positive coulomb potential
     coulomb_potential = 0.5
@@ -73,7 +73,7 @@ def test_kinetic():
     assert np.isclose(value, expected_result)
 
 
-def test_continuum():
+def test_continuum() -> None:
     """Test the continuum function in the coulomb_enhancement module."""
     # Test case 1: Non-zero coulomb potential
     coulomb_potential = 0.5

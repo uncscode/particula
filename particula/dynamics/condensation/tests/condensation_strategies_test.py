@@ -1,5 +1,4 @@
-"""Test module for the condensation strategies.
-"""
+"""Test module for the condensation strategies."""
 
 # pylint: disable=R0801
 # pylint: disable=protected-access
@@ -16,10 +15,9 @@ from particula.dynamics.condensation.condensation_strategies import (
 
 # pylint: disable=too-many-instance-attributes
 class TestCondensationIsothermal(unittest.TestCase):
-    """Test class for the CondensationIsothermal strategy.
-    """
+    """Test class for the CondensationIsothermal strategy."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.molar_mass = 0.018  # kg/mol for water
         self.diffusion_coefficient = 2e-5  # m^2/s
         self.accommodation_coefficient = 1.0
@@ -94,22 +92,22 @@ class TestCondensationIsothermal(unittest.TestCase):
             .build()
         )
 
-    def test_mean_free_path(self):
+    def test_mean_free_path(self) -> None:
         """Test the mean free path call."""
         result = self.strategy.mean_free_path(
             temperature=self.temperature, pressure=self.pressure
         )
         self.assertIsNotNone(result)
 
-    def test_knudsen_number(self):
-        """Test the Knudsen number call"""
+    def test_knudsen_number(self) -> None:
+        """Test the Knudsen number call."""
         radius = 1e-9  # m
         result = self.strategy.knudsen_number(
             radius=radius, temperature=self.temperature, pressure=self.pressure
         )
         self.assertIsNotNone(result)
 
-    def test_first_order_mass_transport(self):
+    def test_first_order_mass_transport(self) -> None:
         """Test the first order mass transport call."""
         radius = 1e-9  # m
         result = self.strategy.first_order_mass_transport(
@@ -119,7 +117,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         )
         self.assertIsNotNone(result)
 
-    def test_fill_zero_radius(self):
+    def test_fill_zero_radius(self) -> None:
         """_fill_zero_radius changes zeros to max radius."""
         radii = np.array([0.0, 1e-9, 2e-9])
         filled = self.strategy._fill_zero_radius(radii.copy())
@@ -127,13 +125,13 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertTrue(np.all(filled != 0.0))
         self.assertEqual(filled[0], np.max(radii))
 
-    def test_fill_zero_radius_all_zeros_warns(self):
+    def test_fill_zero_radius_all_zeros_warns(self) -> None:
         """_fill_zero_radius with all zeros should warn."""
         radii = np.array([0.0, 0.0, 0.0])
         with self.assertWarns(RuntimeWarning):
             self.strategy._fill_zero_radius(radii.copy())
 
-    def test_rate_respects_skip_indices(self):
+    def test_rate_respects_skip_indices(self) -> None:
         """rate() must zero the chosen indices."""
         # Skip the condensing water (index 0) to make the effect obvious
         strategy_skip = CondensationIsothermal(
@@ -170,7 +168,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         # (tiny positive/negative numbers are allowed)
         self.assertTrue(np.any(rates_noskip[..., 0] != 0.0))
 
-    def test_step_skip_preserves_skipped_species(self):
+    def test_step_skip_preserves_skipped_species(self) -> None:
         """step() must not change masses/concentrations of skipped indices."""
         skip_idx = 1  # core species
         strategy_skip = CondensationIsothermal(
@@ -210,7 +208,7 @@ class TestCondensationIsothermal(unittest.TestCase):
             final_gas_conc[skip_idx], initial_gas_conc[skip_idx]
         )
 
-    def test_apply_skip_partitioning_direct(self):
+    def test_apply_skip_partitioning_direct(self) -> None:
         """_apply_skip_partitioning zeroes selected indices on 1D and 2D arrays."""
         strategy = CondensationIsothermal(
             molar_mass=self.molar_mass,

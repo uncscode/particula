@@ -89,7 +89,7 @@ class AntoineVaporPressureBuilder(BuilderABC):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = ["a", "b", "c"]
         # Call the base class's __init__ method
         super().__init__(required_parameters)
@@ -187,7 +187,7 @@ class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_keys = [
             "latent_heat",
             "temperature_initial",
@@ -287,7 +287,7 @@ class ConstantVaporPressureBuilder(BuilderABC):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_keys = ["vapor_pressure"]
         super().__init__(required_keys)
         self.vapor_pressure = None
@@ -354,7 +354,7 @@ class SaturationConcentrationVaporPressureBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = [
             "saturation_concentration",
             "molar_mass",
@@ -439,7 +439,7 @@ class WaterBuckVaporPressureBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     def build(self) -> WaterBuckStrategy:

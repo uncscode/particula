@@ -1,5 +1,4 @@
-"""Tests for mixins in coagulation_builder_mixin.py
-"""
+"""Tests for mixins in coagulation_builder_mixin.py."""
 
 import numpy as np
 import pytest
@@ -16,27 +15,24 @@ class MixinTester(
     BuilderTurbulentDissipationMixin,
     BuilderFluidDensityMixin,
 ):
-    """Simple class to inherit and test the mixins directly.
-    """
+    """Simple class to inherit and test the mixins directly."""
 
 
-def test_distribution_type_valid():
-    """Test setting a valid distribution type.
-    """
+def test_distribution_type_valid() -> None:
+    """Test setting a valid distribution type."""
     tester = MixinTester()
     tester.set_distribution_type("discrete")
     assert tester.distribution_type == "discrete"
 
 
-def test_distribution_type_invalid():
-    """Test that an invalid distribution type raises ValueError.
-    """
+def test_distribution_type_invalid() -> None:
+    """Test that an invalid distribution type raises ValueError."""
     tester = MixinTester()
     with pytest.raises(ValueError):
         tester.set_distribution_type("invalid_type")
 
 
-def test_distribution_type_units():
+def test_distribution_type_units() -> None:
     """Test that providing distribution_type_units
     doesn't raise an error (only logs a warning).
     """
@@ -47,41 +43,36 @@ def test_distribution_type_units():
     assert tester.distribution_type == "discrete"
 
 
-def test_turbulent_dissipation_negative():
-    """Test that negative turbulent dissipation raises ValueError.
-    """
+def test_turbulent_dissipation_negative() -> None:
+    """Test that negative turbulent dissipation raises ValueError."""
     tester = MixinTester()
     with pytest.raises(ValueError):
         tester.set_turbulent_dissipation(-1, "m^2/s^3")
 
 
-def test_turbulent_dissipation_positive():
-    """Test that a positive turbulent dissipation is set correctly.
-    """
+def test_turbulent_dissipation_positive() -> None:
+    """Test that a positive turbulent dissipation is set correctly."""
     tester = MixinTester()
     tester.set_turbulent_dissipation(1.0, "m^2/s^3")
     assert tester.turbulent_dissipation == pytest.approx(1.0)
 
 
-def test_fluid_density_negative():
-    """Test that negative fluid density raises ValueError.
-    """
+def test_fluid_density_negative() -> None:
+    """Test that negative fluid density raises ValueError."""
     tester = MixinTester()
     with pytest.raises(ValueError):
         tester.set_fluid_density(-1, "kg/m^3")
 
 
-def test_fluid_density_positive():
-    """Test that a valid fluid density is stored correctly.
-    """
+def test_fluid_density_positive() -> None:
+    """Test that a valid fluid density is stored correctly."""
     tester = MixinTester()
     tester.set_fluid_density(1.2, "kg/m^3")
     assert tester.fluid_density == pytest.approx(1.2)
 
 
-def test_fluid_density_array():
-    """Test that an array of fluid densities is set correctly.
-    """
+def test_fluid_density_array() -> None:
+    """Test that an array of fluid densities is set correctly."""
     tester = MixinTester()
     density_array = np.array([1.2, 1.0, 0.9])
     tester.set_fluid_density(density_array, "kg/m^3")

@@ -1,4 +1,4 @@
-"""Tests for mass_concentration.py module"""
+"""Tests for mass_concentration.py module."""
 
 import numpy as np
 import pytest
@@ -37,8 +37,8 @@ from particula.particles.properties import (
 )
 def test_mass_concentration_to_mole_fraction(
     mass_concentrations, molar_masses, expected
-):
-    """Test mass_concentration_to_mole_fraction function"""
+) -> None:
+    """Test mass_concentration_to_mole_fraction function."""
     mole_fractions = convert_mass_concentration.get_mole_fraction_from_mass(
         mass_concentrations, molar_masses
     )
@@ -64,8 +64,8 @@ def test_mass_concentration_to_mole_fraction(
 )
 def test_mass_concentration_to_volume_fraction(
     mass_concentrations, densities, expected
-):
-    """Test mass_concentration_to_volume_fraction function"""
+) -> None:
+    """Test mass_concentration_to_volume_fraction function."""
     volume_fractions = (
         convert_mass_concentration.get_volume_fraction_from_mass(
             mass_concentrations, densities
@@ -85,8 +85,8 @@ def test_mass_concentration_to_volume_fraction(
         (np.array([100, 200]), np.array([np.nan, 20])),  # Negative molar mass
     ],
 )
-def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
-    """Test error handling for mass_concentration_to_mole_fraction function"""
+def test_error_handling_mass_to_mole(mass_concentrations, molar_masses) -> None:
+    """Test error handling for mass_concentration_to_mole_fraction function."""
     with pytest.raises(Exception):
         convert_mass_concentration.get_mole_fraction_from_mass(
             mass_concentrations, molar_masses
@@ -104,9 +104,9 @@ def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
         (np.array([100, 200]), np.array([10, -20])),  # Negative density
     ],
 )
-def test_error_handling_mass_to_volume(mass_concentrations, densities):
+def test_error_handling_mass_to_volume(mass_concentrations, densities) -> None:
     """Test error handling for mass_concentration_to_volume_fraction
-    function
+    function.
     """
     with pytest.raises(Exception):
         convert_mass_concentration.get_volume_fraction_from_mass(

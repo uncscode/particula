@@ -1,4 +1,4 @@
-"""Calculating the mean free path of air
+"""Calculating the mean free path of air.
 
 Long Description:
     The mean free path is the average distance traveled by a molecule

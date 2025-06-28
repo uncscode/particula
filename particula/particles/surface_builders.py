@@ -47,7 +47,7 @@ class SurfaceStrategyMolarBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = ["surface_tension", "density", "molar_mass"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
@@ -88,7 +88,7 @@ class SurfaceStrategyMassBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = ["surface_tension", "density"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
@@ -127,7 +127,7 @@ class SurfaceStrategyVolumeBuilder(
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         required_parameters = ["surface_tension", "density"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)

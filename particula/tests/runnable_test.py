@@ -11,13 +11,12 @@ from particula.runnable import RunnableABC, RunnableSequence
 
 
 class MockRunnable(RunnableABC):
-    """A mock Runnable for testing that tracks how many times it is executed.
-    """
+    """A mock Runnable for testing that tracks how many times it is executed."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.times_executed = 0
 
-    def rate(self, aerosol):
+    def rate(self, aerosol) -> int:
         return 0
 
     def execute(self, aerosol, time_step, sub_steps=1):
@@ -25,7 +24,7 @@ class MockRunnable(RunnableABC):
         return aerosol
 
 
-def test_runnable_sequence_execute():
+def test_runnable_sequence_execute() -> None:
     """Verify that each Runnable in the sequence executes the expected
     number of times.
     """

@@ -23,7 +23,7 @@ from particula.dynamics.dilution import (
         (10.0, 0.0, 0.0),  # Case with zero flow rate
     ],
 )
-def test_volume_dilution_coefficient(volume, flow_rate, expected):
+def test_volume_dilution_coefficient(volume, flow_rate, expected) -> None:
     """Test the volume dilution coefficient function."""
     result = get_volume_dilution_coefficient(volume, flow_rate)
     np.testing.assert_array_almost_equal(result, expected)
@@ -38,7 +38,7 @@ def test_volume_dilution_coefficient(volume, flow_rate, expected):
         (np.array([1.0, 2.0]), "5"),  # Mismatched types (array vs scalar)
     ],
 )
-def test_volume_dilution_coefficient_invalid_input(volume, flow_rate):
+def test_volume_dilution_coefficient_invalid_input(volume, flow_rate) -> None:
     """Test the volume dilution coefficient function with invalid inputs."""
     with pytest.raises(TypeError):
         get_volume_dilution_coefficient(volume, flow_rate)
@@ -58,7 +58,7 @@ def test_volume_dilution_coefficient_invalid_input(volume, flow_rate):
         (1.0, 0.0, 0.0),  # Case with zero concentration
     ],
 )
-def test_dilution_rate(coefficient, concentration, expected):
+def test_dilution_rate(coefficient, concentration, expected) -> None:
     """Test the dilution rate function."""
     result = get_dilution_rate(coefficient, concentration)
     np.testing.assert_array_almost_equal(result, expected)
@@ -73,7 +73,7 @@ def test_dilution_rate(coefficient, concentration, expected):
         (np.array([1.0, 2.0]), "5"),  # Mismatched types (array vs scalar)
     ],
 )
-def test_dilution_rate_invalid_input(coefficient, concentration):
+def test_dilution_rate_invalid_input(coefficient, concentration) -> None:
     """Test the dilution rate function with invalid inputs."""
     with pytest.raises(TypeError):
         get_dilution_rate(coefficient, concentration)

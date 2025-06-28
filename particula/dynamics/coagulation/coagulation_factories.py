@@ -1,5 +1,4 @@
-"""Coagulation Factory Module
-"""
+"""Coagulation Factory Module."""
 
 from typing import Any, Dict, Union
 
@@ -44,7 +43,7 @@ class CoagulationFactory(
         - 'charged'
         - 'turbulent_shear'
         - 'turbulent_dns'
-        - 'combine'
+        - 'combine'.
 
     Methods:
     - get_builders() : Returns the mapping of strategy types to builder
