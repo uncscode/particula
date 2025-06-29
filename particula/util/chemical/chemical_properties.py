@@ -29,16 +29,18 @@ def get_chemical_stp_properties(identifier: str) -> Dict[str, float]:
             "Please install it using 'pip install thermo'."
         )
 
-    chem = Chemical(identifier, T=298.15, P=101325)  # Explicitly set STP: T=298.15 K, P=101325 Pa
+    chem = Chemical(
+        identifier, T=298.15, P=101325
+    )  # Explicitly set STP: T=298.15 K, P=101325 Pa
 
     return {
         "molar_mass": chem.MW / 1e3,  # kg/mol
         "density": chem.rho,  # kg/m³
         "surface_tension": chem.sigma,  # N/m
         "pure_vapor_pressure": chem.Psat,  # Pa
-        "cas_name": chem.CAS,  # CAS number
+        "cas_number": chem.CAS,  # CAS number
         "name": chem.name,  # Chemical name
         "smiles": chem.smiles,  # SMILES representation
         "formula": chem.formula,  # Chemical formula
-        "PubChemID": chem.PubChem,  # PubChem ID
+        "pubchem_id": chem.PubChem,  # PubChem ID
     }  # type: ignore
