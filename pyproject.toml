@@ -37,7 +37,7 @@ dev = [
     "GitPython", "ruff",
 ]
 extra = [
-    "matplotlib", "pandas", "tqdm", "pint", "thermo",
+    "matplotlib", "pandas", "pint", "thermo", "tqdm",
 ]
 
 [build-system]
