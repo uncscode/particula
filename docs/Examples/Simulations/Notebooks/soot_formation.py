@@ -128,7 +128,7 @@ number_of_samples = 10_000  # number of particles to sample
 simulation_volume = 1e-8  # 1/m^3
 temperature = 298.15  # K
 temperature_range_table = np.linspace(
-    200, 1200, 200
+    200, 1500, 200
 )  # temperature range for properties
 vapor_pressure_strategy_list = []
 surface_tension_table = np.zeros(
