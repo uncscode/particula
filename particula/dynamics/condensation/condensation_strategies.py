@@ -575,10 +575,8 @@ class CondensationIsothermal(CondensationStrategy):
         pressure_delta = self.calculate_pressure_delta(
             particle, gas_species, temperature, radius_with_fill
         )
-        # Replace -inf with 0.0 to avoid NaN in the mass transfer rate
-        pressure_delta = np.where(
-            np.isneginf(pressure_delta), 0.0, pressure_delta
-        )
+        # Replace -inf and NaN with 0.0 to avoid issues in the mass transfer rate
+        pressure_delta = np.nan_to_num(pressure_delta, neginf=0.0, nan=0.0)
 
         return get_mass_transfer_rate(
             pressure_delta=pressure_delta,
