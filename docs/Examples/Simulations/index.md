@@ -12,3 +12,6 @@ This directory hosts end‑to‑end aerosol simulation notebooks built with Part
 
 - **[Cough Droplets Partitioning](Notebooks/Cough_Droplets_Partitioning.ipynb)**  
   Simulates the evaporation of cough droplets in a well-mixed air environment, tracking size distribution and composition changes over time.
+
+- **[Soot Formation in Flames](Notebooks/Soot_Formation_in_Flames.ipynb)**  
+  Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
