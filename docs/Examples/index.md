@@ -35,6 +35,13 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb)
 
+- __[Soot Formation in Flames](Simulations/Notebooks/Soot_Formation_in_Flames.ipynb)__
+ 
+   ---
+
+    Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
+
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Soot_Formation_in_Flames.ipynb)
 </div>
 
 
