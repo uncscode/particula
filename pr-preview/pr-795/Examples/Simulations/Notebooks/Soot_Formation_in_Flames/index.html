@@ -10104,14 +10104,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <li><strong>Define a realistic suite of aromatic and polyaromatic hydrocarbons (PAHs)</strong> from combustion</li>
 <li><strong>Set up temperature-dependent vapor pressure and partitioning</strong></li>
 <li><strong>Simulate a two-stage cooling profile</strong> of a flame parcel</li>
-<li><strong>Track gas-to-particle conversion</strong> and soot-forming growth</li>
+<li><strong>Track gas-to-particle conversion and coagulation</strong> for soot growth</li>
 <li><strong>Visualize mass transfer and particle-phase evolution</strong></li>
 </ol>
 <h3 id="why-it-matters">💡 Why It Matters<a class="anchor-link" href="#why-it-matters">¶</a></h3><p>Understanding soot formation is critical for:</p>
 <ul>
-<li>Assessing <strong>air pollution and climate impacts</strong></li>
+<li>Assessing <strong>air pollution and climate impacts</strong> of combustion emissions</li>
 <li>Evaluating <strong>combustion efficiency and emissions</strong></li>
-<li>Studying <strong>indoor and ambient air quality</strong></li>
 <li>Connecting with <strong>health exposure</strong> and regulatory metrics</li>
 </ul>
 <h3 id="getting-started">🚀 Getting Started<a class="anchor-link" href="#getting-started">¶</a></h3><p>This example is beginner-friendly. It walks through every step of simulating a <strong>cooling and condensing parcel</strong> from a flame. No prior experience with <strong>Particula</strong> or advanced aerosol thermodynamics is required.</p>
@@ -10307,7 +10306,7 @@ color_list = (
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="defining-the-chemical-inventory-and-properties">🧪 Defining the Chemical Inventory and Properties<a class="anchor-link" href="#defining-the-chemical-inventory-and-properties">¶</a></h2><p>To model soot formation from combustion emissions, we start by specifying a <strong>realistic chemical inventory</strong> of aromatic hydrocarbons. These include both <strong>gas-phase precursors</strong> and <strong>low-volatility polycyclic aromatic hydrocarbons (PAHs)</strong> responsible for early-stage particle growth and soot inception.</p>
-<p>We also assign <strong>mass fractions</strong> that approximate real-world emission ratios, based on literature estimates for primary combustion aerosols.</p>
+<p>We also assign <strong>mass fractions</strong> that approximate real-world emission ratios, for primary combustion aerosols.</p>
 <p><strong>📋 Chemical List</strong></p>
 <p>Our inventory includes:</p>
 <ul>
@@ -10322,7 +10321,7 @@ color_list = (
 <p>Note: 65% is distributed among volatile aromatics and 35% among PAHs.</p>
 </blockquote>
 <p><strong>Fetching Thermophysical Properties</strong></p>
-<p>For each chemical, we use <code>particula.util.get_chemical_search()</code> to retrieve the <strong>CAS number</strong>, then fetch properties at standard temperature and pressure using <code>get_chemical_stp_properties()</code>.</p>
+<p>For each chemical, we use <code>particula.util.get_chemical_search()</code> to retrieve the database entry, then fetch properties at standard temperature and pressure using <code>get_chemical_stp_properties()</code>.</p>
 <p>This builds the core property arrays required for simulation, including <strong>molar mass</strong>, <strong>density</strong>, and <strong>surface tension</strong> — key inputs for modeling <strong>evaporation</strong>, <strong>condensation</strong>, and <strong>partitioning</strong>.</p>
 </div>
 </div>
@@ -10748,7 +10747,7 @@ Fullerene:
 <li><strong>Total particle number</strong>: 10⁷ particles/cm³</li>
 <li><strong>Sampled particles</strong>: 25,000</li>
 <li><strong>Simulation volume</strong>: adjusted to match real concentration</li>
-<li><strong>Initial gas temperature</strong>: 1200 K</li>
+<li><strong>Initial gas temperature</strong>: 1200 K     <em># we override this later with a cooling profile</em></li>
 <li><strong>Temperature sweep</strong>: 200–1500 K for vapor pressure and surface tension</li>
 </ul>
 <p><strong>📈 Build Property Tables Over Temperature</strong></p>
@@ -11328,7 +11327,7 @@ Particle Representation:
 <li><strong>Excluded indices</strong>: we <strong>skip partitioning</strong> to the seed species (index <code>23</code> = "Fullerene")</li>
 </ul>
 <blockquote>
-<p>This reflects a system where <strong>Fullerene acts only as a passive core</strong>, not an absorbing medium.</p>
+<p>This reflects a system where <strong>Fullerene acts only as a passive core</strong>, with no vapor partitioning.</p>
 </blockquote>
 <p><strong>⚫ Coagulation Strategy</strong></p>
 <p>Coagulation is handled via <code>BrownianCoagulationBuilder</code>, applied to a <strong>particle-resolved distribution</strong> — matching our earlier setup.</p>
@@ -11770,7 +11769,7 @@ Particle Representation:
 <h2 id="running-the-simulation-condensation-coagulation">🧪 Running the Simulation: Condensation + Coagulation<a class="anchor-link" href="#running-the-simulation-condensation-coagulation">¶</a></h2><p>Now we execute the full simulation loop over time, updating the <strong>atmosphere's temperature</strong> at each step and applying the previously defined physical processes:</p>
 <ul>
 <li><strong>Condensation</strong> (temperature- and species-dependent mass uptake)</li>
-<li><strong>Coagulation</strong> (Brownian merging of particles)</li>
+<li><strong>Coagulation</strong> (Brownian coagulation of particles)</li>
 </ul>
 <p><strong>🔢 What the Loop Tracks</strong></p>
 <p>At each time step, we record:</p>
@@ -11989,8 +11988,8 @@ Particle Representation:
 <blockquote>
 <p>🔍 You can reduce wiggle artifacts by:</p>
 <ul>
-<li>Increasing <code>sub_steps</code> for condensation</li>
-<li>Switching to adaptive integrators in future Particula versions</li>
+<li>Increasing <code>total_steps</code></li>
+<li>Switching to adaptive integrators in future Particula versions (or add your own!)</li>
 </ul>
 </blockquote>
 <p><strong>📊 Plot 1: Total Mass Concentration</strong></p>
