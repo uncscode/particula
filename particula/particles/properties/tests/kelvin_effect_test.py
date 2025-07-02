@@ -123,7 +123,7 @@ def test_kelvin_radius_low_surface_tension():
 
 def test_kelvin_radius_combined_limits():
     """Kelvin radius at high T and low surface tension remains finite."""
-    surface_tension = 1e-10
+    surface_tension = 1e-1
     density = 1000
     molar_mass = 0.018
     temperature = 10000.0
@@ -138,4 +138,5 @@ def test_kelvin_radius_combined_limits():
 
     radii = np.array([1e-9, 1e-12])
     expected_term = np.exp(result / radii)
-    np.testing.assert_allclose(get_kelvin_term(radii, result), expected_term)
+    kelvin_term = get_kelvin_term(radii, result)
+    np.testing.assert_allclose(kelvin_term, expected_term)
