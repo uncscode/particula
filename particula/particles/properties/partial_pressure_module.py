@@ -7,7 +7,16 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.util.validate_inputs import validate_inputs
 
+
+@validate_inputs(
+    {
+        "partial_pressure_gas": "nonnegative",
+        "partial_pressure_particle": "nonnegative",
+        "kelvin_term": "positive",
+    }
+)
 def get_partial_pressure_delta(
     partial_pressure_gas: Union[float, NDArray[np.float64]],
     partial_pressure_particle: Union[float, NDArray[np.float64]],
