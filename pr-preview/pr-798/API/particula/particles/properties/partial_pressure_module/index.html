@@ -9433,7 +9433,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/partial_pressure_module.py">particula.particles.properties.partial_pressure_module</a> module.</p>
 </blockquote>
 <h2 id="get_partial_pressure_delta">get_partial_pressure_delta<a class="headerlink" href="#get_partial_pressure_delta" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/partial_pressure_module.py#L11">Show source in partial_pressure_module.py:11</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/partial_pressure_module.py#L13">Show source in partial_pressure_module.py:13</a></p>
 <p>Calculate the difference in partial pressure between gas and particle
 phase, considering the Kelvin effect.</p>
 <ul>
@@ -9473,7 +9473,14 @@ phase, considering the Kelvin effect.</p>
 <li><a href="https://en.wikipedia.org/wiki/Partial_pressure">Partial pressure, Wikipedia</a></li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_partial_pressure_delta</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;partial_pressure_gas&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;partial_pressure_particle&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kelvin_term&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_partial_pressure_delta</span><span class="p">(</span>
     <span class="n">partial_pressure_gas</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">partial_pressure_particle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kelvin_term</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
