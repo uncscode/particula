@@ -57,7 +57,7 @@ The term ⟨(v′^(2))²⟩ is the square of the RMS fluctuation velocity of dro
 
 The square of the RMS fluctuation velocity is given by, for k-th droplet:
 
-⟨(v′^(k))²⟩ = [u′² ⁄ τₚₖ] [b₁ d₁ Ψ(c₁, e₁) − b₁ d₂ Ψ(c₁, e₂) − b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)],
+⟨(v′^(k))²⟩ = [u′² ⁄ τₚₖ] × [b₁ d₁ Ψ(c₁, e₁) − b₁ d₂ Ψ(c₁, e₂) − b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)],
 
 Cross term is defined as:
 
@@ -222,7 +222,7 @@ Length scale linked to fluid flow:
 
 Adjusts droplet inertia:
 
-τ_p = [2⁄9] [ρ_w⁄ρ] [a²⁄(ν f(Re_p))]
+τ_p = [2⁄9] ×[ρ_w⁄ρ]×[a²⁄(ν f(Re_p))]
 
 with:
 

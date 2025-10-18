@@ -56,7 +56,7 @@ Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.
 ## Get Started with Particula
 
 [Setup Particula](Examples/Setup_Particula/index.md){ .md-button .md-button--primary }
-[API Reference](API/README.md){ .md-button }
+[API Reference](API/index.md){ .md-button }
 [Examples](Examples/index.md){ .md-button }
 [Theory](Theory/index.md){ .md-button }
 

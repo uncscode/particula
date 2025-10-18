@@ -7,7 +7,7 @@ This directory hosts end‑to‑end aerosol simulation notebooks built with Part
 - **[Biomass Burning Cloud Interactions](Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)**  
   End‑to‑end biomass burning aerosol‑cloud simulation using Particula.
 
-- **[Organic Partitioning and Coagulation](Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb)**  
+- **[Organic Partitioning and Coagulation](Notebooks/Organic_Partitioning_and_Coagulation.ipynb)**
   End‑to‑end organic aerosol partitioning and coagulation simulation using Particula.
 
 - **[Cough Droplets Partitioning](Notebooks/Cough_Droplets_Partitioning.ipynb)**  

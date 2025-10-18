@@ -113,7 +113,7 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     [:octicons-arrow-right-24: Tutorial](Gas_Phase/index.md)
 
--   __[Particle Phase](Particle_Phase)__
+-   __[Particle Phase](Particle_Phase/index.md)__
 
     ---
 
