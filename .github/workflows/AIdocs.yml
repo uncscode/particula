@@ -32,7 +32,7 @@ jobs:
 
         - name: Install dependencies
           run: |
-            pip install handsdown nbconvert openai GitPython
+            pip install griffe nbconvert openai GitPython
 
         - name: Markdown Files for vector store on OpenAI
           run: python docs/.assets/vector_file_generator.py
