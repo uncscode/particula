@@ -15,10 +15,10 @@ from particula.util.chemical.thermo_import import (
 )
 
 # Single, module-level PubChem DB instance (loaded once) ------------
-_PUBCHEM_DB = None
+_pubchem_db = None
 if CHEMICALS_AVAILABLE and get_pubchem_db is not None:  # pragma: no cover
-    _PUBCHEM_DB = get_pubchem_db()
-    _PUBCHEM_DB.finish_loading()
+    _pubchem_db = get_pubchem_db()
+    _pubchem_db.finish_loading()
 
 
 def get_chemical_search(identifier: str) -> str:
@@ -74,8 +74,8 @@ def get_chemical_search(identifier: str) -> str:
             pass
 
     # 2. Fuzzy match
-    if _PUBCHEM_DB is not None:
-        candidate_names: List[str] = list(_PUBCHEM_DB.name_index.keys())
+    if _pubchem_db is not None:
+        candidate_names: List[str] = list(_pubchem_db.name_index.keys())
         matches = get_close_matches(identifier, candidate_names, n=1, cutoff=0.6)
         return matches[0] if matches else "No Match"
     return "No Match"
