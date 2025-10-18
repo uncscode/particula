@@ -6,6 +6,7 @@ from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,
 )
+from particula.util.constants import GAS_CONSTANT
 
 
 def test_prop_kelvin_radius_scalar():
@@ -15,7 +16,7 @@ def test_prop_kelvin_radius_scalar():
     molar_mass = 0.018  # kg/mol
     temperature = 298  # K
     expected_radius = (2 * effective_surface_tension * molar_mass) / (
-        8.314 * temperature * effective_density
+        float(GAS_CONSTANT) * temperature * effective_density
     )
     assert np.isclose(
         get_kelvin_radius(
@@ -35,7 +36,7 @@ def test_prop_kelvin_radius_array():
     molar_mass = np.array([0.018, 0.018])
     temperature = 298
     expected_radius = (2 * effective_surface_tension * molar_mass) / (
-        8.314 * temperature * effective_density
+        float(GAS_CONSTANT) * temperature * effective_density
     )
     np.testing.assert_allclose(
         get_kelvin_radius(
@@ -79,3 +80,63 @@ def test_prop_kelvin_term_broadcast_single():
     np.testing.assert_allclose(
         get_kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-8
     )
+
+
+def test_kelvin_radius_high_temperature_limit():
+    """Kelvin radius should shrink at high temperature."""
+    surface_tension = 0.072
+    density = 1000
+    molar_mass = 0.018
+    temperature = 10000.0
+    expected = (2 * surface_tension * molar_mass) / (
+        float(GAS_CONSTANT) * temperature * density
+    )
+    result = get_kelvin_radius(
+        surface_tension, density, molar_mass, temperature
+    )
+    assert np.isclose(result, expected)
+    assert result < 1e-10
+
+    radii = np.array([1e-9, 1e-12])
+    expected_term = np.exp(result / radii)
+    np.testing.assert_allclose(get_kelvin_term(radii, result), expected_term)
+
+
+def test_kelvin_radius_low_surface_tension():
+    """Kelvin radius should shrink with small surface tension."""
+    surface_tension = 1e-10
+    density = 1000
+    molar_mass = 0.018
+    temperature = 298.0
+    expected = (2 * surface_tension * molar_mass) / (
+        float(GAS_CONSTANT) * temperature * density
+    )
+    result = get_kelvin_radius(
+        surface_tension, density, molar_mass, temperature
+    )
+    assert np.isclose(result, expected)
+    assert result > 0
+
+    radii = np.array([1e-9, 1e-12])
+    expected_term = np.exp(result / radii)
+    np.testing.assert_allclose(get_kelvin_term(radii, result), expected_term)
+
+
+def test_kelvin_radius_combined_limits():
+    """Kelvin radius at high T and low surface tension remains finite."""
+    surface_tension = 1e-10
+    density = 1000
+    molar_mass = 0.018
+    temperature = 10000.0
+    expected = (2 * surface_tension * molar_mass) / (
+        float(GAS_CONSTANT) * temperature * density
+    )
+    result = get_kelvin_radius(
+        surface_tension, density, molar_mass, temperature
+    )
+    assert np.isclose(result, expected)
+    assert 0 < result < 1e-10
+
+    radii = np.array([1e-9, 1e-12])
+    expected_term = np.exp(result / radii)
+    np.testing.assert_allclose(get_kelvin_term(radii, result), expected_term)
