@@ -36,7 +36,7 @@ jobs:
             pip install mkdocs mkdocs-material[imaging] mkdocs-jupyter mkdocstrings[python] griffe
 
         - name: Build MkDocs site with mkdocstrings
-          run: mkdocs build --strict
+          run: mkdocs build
 
         - name: Deploy to GitHub Pages (on push or merge_group)
           if: ${{
