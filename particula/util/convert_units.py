@@ -20,9 +20,9 @@ from typing import Optional
 try:
     import pint
 
-    UNIT_REGISTRY = pint.UnitRegistry()
+    unit_registry = pint.UnitRegistry()
 except ImportError:
-    UNIT_REGISTRY = None
+    unit_registry = None
 
 
 def get_unit_conversion(
@@ -70,7 +70,7 @@ def get_unit_conversion(
     References:
         - Pint documentation: https://pint.readthedocs.io/
     """
-    if UNIT_REGISTRY is None:
+    if unit_registry is None:
         raise ImportError(
             "Install pint to use unit conversion features: pip install pint"
         )
@@ -78,10 +78,10 @@ def get_unit_conversion(
     offset_units = ["degC", "degF", "degR", "degK"]
     if old in offset_units or value is not None:
         value = value if value is not None else 0
-        old = UNIT_REGISTRY.Quantity(value, old)
+        old = unit_registry.Quantity(value, old)
     else:
-        old = UNIT_REGISTRY.Quantity(old)  # multiplicative shift
+        old = unit_registry.Quantity(old)  # multiplicative shift
 
-    new = UNIT_REGISTRY.Quantity(new)
+    new = unit_registry.Quantity(new)
     result = old.to(new).magnitude  # get the new value without units
     return float(result)
