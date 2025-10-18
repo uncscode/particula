@@ -33,13 +33,10 @@ jobs:
         - name: Install dependencies
           run: |
             pip install jupyter-book ghp-import
-            pip install mkdocs mkdocs-material[imaging] handsdown mkdocs-jupyter
+            pip install mkdocs mkdocs-material[imaging] mkdocs-jupyter mkdocstrings[python] griffe
 
-        - name: Generate Source Code Documentation with Handsdown
-          run: python docs/.assets/mk_generator.py
-
-        - name: Build MkDocs site and Run Jupyter Books
-          run: mkdocs build
+        - name: Build MkDocs site with mkdocstrings
+          run: mkdocs build --strict
 
         - name: Deploy to GitHub Pages (on push or merge_group)
           if: ${{

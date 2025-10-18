@@ -5,10 +5,13 @@ import shutil
 from pathlib import Path
 
 import nbformat
-from handsdown.generators.material import MaterialGenerator
-from handsdown.processors.pep257 import PEP257DocstringProcessor
-from handsdown.utils.path_finder import PathFinder
 from nbconvert import MarkdownExporter
+
+try:
+    from griffe import load
+except ImportError:
+    load = None
+    print("Warning: griffe not installed, API docs will not be generated")
 
 
 def convert_notebooks_to_markdown(notebook_paths, output_dir):
@@ -43,17 +46,12 @@ def convert_notebooks_to_markdown(notebook_paths, output_dir):
             f_out.write(body)
 
 
-# Set repository path and initialize the path finder (with exclusions)
+# Set repository path
 repo_path = Path.cwd()
-path_finder = PathFinder(repo_path)
-path_finder.exclude(
-    "tests/*",
-    "build/*, docs/*, .venv/**, private_dev/**, .git/*, .vscode/*, .github/*",
-)
 
-# Find all .ipynb and .md files
-source_paths_ipynb = list(path_finder.glob("**/*.ipynb"))
-source_paths_md = list(path_finder.glob("**/*.md"))
+# Find all .ipynb and .md files in docs directory
+source_paths_ipynb = list(repo_path.glob("docs/**/*.ipynb"))
+source_paths_md = list(repo_path.glob("docs/**/*.md"))
 source_paths = source_paths_ipynb + source_paths_md
 source_paths_list = list(source_paths)
 
@@ -78,30 +76,90 @@ os.makedirs(output_theory, exist_ok=True)
 convert_notebooks_to_markdown(filtered_theory, output_theory)
 
 # ----------------------------------------
-# Process API python files using Handsdown
+# Process API python files using griffe
 # ----------------------------------------
 
-source_paths = path_finder.glob("**/*.py")
-source_paths_list = list(source_paths)
-filtered_paths = [
-    p for p in source_paths_list if "particula/particula" in p.as_posix()
-]
+
+def generate_module_markdown(obj, depth=0):
+    """Generate markdown documentation for a module/class/function."""
+    lines = []
+
+    # Add heading
+    if obj.kind.value == "module":
+        lines.append(f"{'#' * (depth + 1)} Module: {obj.name}\n")
+    elif obj.kind.value == "class":
+        lines.append(f"{'#' * (depth + 2)} Class: {obj.name}\n")
+    elif obj.kind.value == "function":
+        lines.append(f"{'#' * (depth + 3)} Function: {obj.name}\n")
+    elif obj.kind.value == "attribute":
+        lines.append(f"{'#' * (depth + 3)} Attribute: {obj.name}\n")
+
+    # Add signature for functions/methods
+    if hasattr(obj, "parameters") and obj.parameters:
+        params = ", ".join([p.name for p in obj.parameters])
+        lines.append(f"\n**Signature:** `{obj.name}({params})`\n")
+
+    # Add docstring
+    if obj.docstring and obj.docstring.value:
+        lines.append(f"\n{obj.docstring.value}\n")
+
+    # Add source file path
+    if hasattr(obj, "filepath"):
+        lines.append(f"\n*Source: {obj.filepath}*\n")
+
+    lines.append("\n---\n")
+    return "\n".join(lines)
+
+
+def generate_api_markdown(package_name, output_folder):
+    """Generate markdown files for all modules in a package."""
+    if load is None:
+        print("Skipping API documentation: griffe not installed")
+        return
+
+    try:
+        # Load the package
+        package = load(package_name, docstring_parser="google")
+
+        # Create output directory
+        api_output = Path(output_folder) / "api"
+        api_output.mkdir(parents=True, exist_ok=True)
+
+        # Generate markdown for each top-level module
+        for module_name, module_obj in package.modules.items():
+            if module_obj.is_alias:
+                continue
+
+            md_content = []
+            md_content.append(f"# API Reference: {module_name}\n\n")
+
+            # Document the module
+            if module_obj.docstring and module_obj.docstring.value:
+                md_content.append(f"{module_obj.docstring.value}\n\n")
+
+            # Document classes
+            for obj in module_obj.classes.values():
+                md_content.append(generate_module_markdown(obj, depth=1))
+
+            # Document functions
+            for obj in module_obj.functions.values():
+                md_content.append(generate_module_markdown(obj, depth=1))
+
+            # Write to file
+            safe_name = module_name.replace(".", "_")
+            output_file = api_output / f"{safe_name}.md"
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.writelines(md_content)
+
+            print(f"Generated API docs: {output_file}")
+
+    except Exception as e:
+        print(f"Error generating API markdown: {e}")
+
 
 # Define an output folder for markdown files
 output_folder = repo_path / "docs/.assets/temp/"
 os.makedirs(output_folder, exist_ok=True)
 
-# Initialize Handsdown generator with the flat output folder as output_path
-handsdown = MaterialGenerator(
-    input_path=repo_path,
-    output_path=output_folder,
-    source_paths=filtered_paths,
-    source_code_url="https://github.com/uncscode/particula/blob/main/",
-    docstring_processor=PEP257DocstringProcessor(),
-)
-
-# 1. Generate the multi-file docs.
-handsdown.generate_docs()
-
-# 2. Generate index.md.
-handsdown.generate_index()
+# Generate API documentation as markdown
+generate_api_markdown("particula", output_folder)
