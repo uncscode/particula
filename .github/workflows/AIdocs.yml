@@ -38,7 +38,7 @@ jobs:
           run: python docs/.assets/vector_file_generator.py
         
         - name: Refresh Changed Files on OpenAI
-          run: python docs/.assets/vector_store_upload.py
+          # run: python docs/.assets/vector_store_upload.py
           env:
             OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
             VECTOR_STORE_ID: ${{ secrets.VECTOR_STORE_ID }}
