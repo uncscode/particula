@@ -65,8 +65,8 @@ class RunnableABC(ABC):
     def rate(self, aerosol: Aerosol) -> Any:
         """Calculate and return the rate of this process for the given Aerosol.
 
-        Arguments:
-            - aerosol : The Aerosol instance on which to calculate the rate.
+        Args:
+            aerosol: The Aerosol instance on which to calculate the rate.
 
         Returns:
             - Any : The computed rate of this process.
@@ -88,10 +88,10 @@ class RunnableABC(ABC):
     ) -> Aerosol:
         """Execute the process, modifying the Aerosol in-place over a time step.
 
-        Arguments:
-            - aerosol : The Aerosol instance to be updated.
-            - time_step : The time step size in seconds.
-            - sub_steps : Number of sub-steps to subdivide the time step,
+        Args:
+            aerosol: The Aerosol instance to be updated.
+            time_step: The time step size in seconds.
+            sub_steps: Number of sub-steps to subdivide the time step,
                 default 1.
 
         Returns:
@@ -104,17 +104,17 @@ class RunnableABC(ABC):
             ```
         """
 
-    def __or__(self, other: "RunnableABC"):
+    def __or__(self, other: "RunnableABC") -> "RunnableSequence":
         """Chain this Runnable with another using the '|' operator.
 
         This method enables an easy way to sequence processes, so they
         can be executed in a defined order.
 
-        Arguments:
-            - other : Another Runnable to append after this one.
+        Args:
+            other: Another Runnable to append after this one.
 
         Returns:
-            - RunnableSequence : A sequence containing both processes.
+            A sequence containing both processes.
 
         Examples:
             ```py title="Chaining two processes"
@@ -158,8 +158,8 @@ class RunnableSequence:
     def add_process(self, process: RunnableABC):
         """Add a Runnable to the sequence.
 
-        Arguments:
-            - process : The Runnable to add.
+        Args:
+            process: The Runnable to add.
 
         Examples:
             ```py
@@ -178,10 +178,10 @@ class RunnableSequence:
         it to the next Runnable until all have been executed. A full cycle is
         performed over each sub-step of the time step.
 
-        Arguments:
-            - aerosol : The Aerosol instance to be updated.
-            - time_step : The time step size in seconds for each process.
-            - sub_steps : Number of sub-steps to subdivide the time step,
+        Args:
+            aerosol: The Aerosol instance to be updated.
+            time_step: The time step size in seconds for each process.
+            sub_steps: Number of sub-steps to subdivide the time step,
                 default 1.
 
         Returns:
@@ -212,14 +212,14 @@ class RunnableSequence:
                 )
         return aerosol
 
-    def __or__(self, process: RunnableABC):
+    def __or__(self, process: RunnableABC) -> "RunnableSequence":
         """Chain another Runnable into this sequence using the '|' operator.
 
-        Arguments:
-            - process : The Runnable to add.
+        Args:
+            process: The Runnable to add.
 
         Returns:
-            - RunnableSequence : This sequence with the new Runnable appended.
+            This sequence with the new Runnable appended.
 
         Examples:
             ```py

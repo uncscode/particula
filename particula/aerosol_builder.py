@@ -68,12 +68,12 @@ class AerosolBuilder(BuilderABC):
     ) -> "AerosolBuilder":
         """Attach an `Atmosphere` to the builder.
 
-        Arguments:
-            - atmosphere : Atmosphere to embed in the aerosol.
-            - atmosphere_units : Ignored; included for signature uniformity.
+        Args:
+            atmosphere: Atmosphere to embed in the aerosol.
+            atmosphere_units: Ignored; included for signature uniformity.
 
         Returns:
-            AerosolBuilder : The builder instance (for chaining).
+            AerosolBuilder: The builder instance (for chaining).
 
         Examples:
             ```py
@@ -92,12 +92,12 @@ class AerosolBuilder(BuilderABC):
     ) -> "AerosolBuilder":
         """Attach a `ParticleRepresentation` to the builder.
 
-        Arguments:
-            - particles : Particle representation to embed in the aerosol.
-            - particles_units : Ignored; included for signature uniformity.
+        Args:
+            particles: Particle representation to embed in the aerosol.
+            particles_units: Ignored; included for signature uniformity.
 
         Returns:
-            - The builder instance (for chaining).
+            The builder instance (for chaining).
         """
         if particles_units is not None:
             logger.warning("Ignoring units for particles parameter.")

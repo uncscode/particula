@@ -293,6 +293,6 @@ This clear separation of classes (blueprints), objects (instances created via co
 
 ### Reading
 
-- The [WARMED principle](Warmed_principle.md) – Particula’s philosophy for writing readable, swap‑friendly scientific code.
+- The [WARMED principle](WARMED_principle.md) – Particula's philosophy for writing readable, swap‑friendly scientific code.
 - [Object‑Oriented Patterns](https://refactoring.guru/design-patterns) – an expanded overview of design patterns in general.
 - [Design Patterns: Elements of Reusable Object‑Oriented Software](https://www.oreilly.com/library/view/design-patterns-elements/0201633612/) – the classic book by Gamma et al. (1994).

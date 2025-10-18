@@ -41,9 +41,9 @@ class Aerosol:
     ):
         """Initialize the Aerosol object with an Atmosphere and Particles.
 
-        Arguments:
-            - atmosphere : Atmosphere containing one or more gas species.
-            - particles : A single ParticleRepresentation object.
+        Args:
+            atmosphere: Atmosphere containing one or more gas species.
+            particles: A single ParticleRepresentation object.
         """
         self.atmosphere = atmosphere
         self.particles = particles
@@ -65,8 +65,8 @@ class Aerosol:
     def replace_atmosphere(self, atmosphere: Atmosphere):
         """Replace the current atmosphere with a new Atmosphere instance.
 
-        Arguments:
-            - atmosphere : The new Atmosphere to assign.
+        Args:
+            atmosphere: The new Atmosphere to assign.
 
         Examples:
             ```py title="Replacing the Atmosphere in the Aerosol"
@@ -83,8 +83,8 @@ class Aerosol:
     ):
         """Replace a particles in the aerosol with a new ParticleRepresentation.
 
-        Arguments:
-            - particle : The new ParticleRepresentation to assign.
+        Args:
+            particles: The new ParticleRepresentation to assign.
 
         Examples:
             ```py title="Replacing a Particle in the Aerosol"
