@@ -225,22 +225,22 @@ def main() -> None:
             pass
 
     # Create organized index page
-    # index_path = out_dir / "index.md"
-    # organized = organize_modules(all_modules)
+    index_path = out_dir / "index.md"
+    organized = organize_modules(all_modules)
 
-    # with mkdocs_gen_files.open(index_path, "w") as f:
-    #     f.write("# API Reference\n\n")
+    with mkdocs_gen_files.open(index_path, "w") as f:
+        f.write("# API Reference\n\n")
 
-    #     for category, modules in organized.items():
-    #         # Write category header
-    #         f.write(f"## {category.title()}\n\n")
+        for category, modules in organized.items():
+            # Write category header
+            f.write(f"## {category.title()}\n\n")
 
-    #         for modname in sorted(modules):
-    #             display = get_display_name(modname, category)
-    #             link = modname.replace(".", "/") + ".md"
-    #             f.write(f"- [{display}]({link})\n")
+            for modname in sorted(modules):
+                display = get_display_name(modname, category)
+                link = modname.replace(".", "/") + ".md"
+                f.write(f"- [{display}]({link})\n")
 
-    #         f.write("\n")
+            f.write("\n")
 
     # Create SUMMARY.md for literate-nav navigation
     # summary_path = out_dir / "SUMMARY.md"

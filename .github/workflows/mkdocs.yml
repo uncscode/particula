@@ -35,6 +35,9 @@ jobs:
             pip install jupyter-book ghp-import
             pip install mkdocs mkdocs-material[imaging] mkdocs-jupyter mkdocstrings[python] griffe mkdocs-gen-files mkdocs-literate-nav
 
+        - name: Install particula package
+          run: pip install -e .
+
         - name: Build MkDocs site with mkdocstrings
           run: mkdocs build
 
