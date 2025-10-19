@@ -5,14 +5,16 @@ import time
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
-from particula.dynamics.coagulation.\
-    particle_resolved_step.particle_resolved_method import (
+# fmt: off
+from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (  # noqa: E501  # pylint: disable=line-too-long
     _calculate_probabilities,
     _final_coagulation_state,
     _interpolate_kernel,
     get_particle_resolved_coagulation_step,
     get_particle_resolved_update_step,
 )
+
+# fmt: on
 
 
 def test_interpolate_kernel():
