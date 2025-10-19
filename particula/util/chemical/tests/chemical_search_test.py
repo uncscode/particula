@@ -21,8 +21,7 @@ def test_get_chemical_search_exact_when_thermo_present():
 
 @pytest.mark.skipif(not CHEMICALS_AVAILABLE, reason="thermo not installed")
 def test_get_chemical_search_fuzzy_when_thermo_present():
-    """Fuzzy query should resolve to the closest name when thermo is available.
-    """
+    """Fuzzy query resolves to closest name when thermo is available."""
     suggestion = get_chemical_search("watr")
     assert suggestion and suggestion.lower() == "water"
 

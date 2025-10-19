@@ -209,8 +209,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         )
 
     def test_apply_skip_partitioning_direct(self):
-        """_apply_skip_partitioning zeroes selected indices on 1D and 2D arrays.
-        """
+        """_apply_skip_partitioning zeroes selected indices on arrays."""
         strategy = CondensationIsothermal(
             molar_mass=self.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,

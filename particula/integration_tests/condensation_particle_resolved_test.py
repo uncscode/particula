@@ -1,5 +1,4 @@
-"""Integration test for isothermal condensation on particle-resolved aerosol.
-"""
+"""Integration test for isothermal condensation on particle-resolved aerosol."""
 
 import unittest
 

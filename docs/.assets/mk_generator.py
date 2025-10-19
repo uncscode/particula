@@ -9,6 +9,7 @@ Mirrors the old Handsdown layout:
       API/particula.md
       API/particula/<subpkg>/.../<module>.md
 """
+# ruff: noqa: D103, C901, S108
 
 from __future__ import annotations
 

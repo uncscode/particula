@@ -10,16 +10,10 @@ from typing import NamedTuple, Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
-    get_phi_ao2008,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
-    get_psi_ao2008,
-)
 from particula.dynamics.coagulation.turbulent_dns_kernel.\
     velocity_correlation_f2_ao2008 import (
-        get_f2_longitudinal_velocity_correlation,
-    )
+    get_f2_longitudinal_velocity_correlation,
+)
 from particula.dynamics.coagulation.turbulent_dns_kernel.\
     velocity_correlation_terms_ao2008 import (
     compute_b1,
@@ -32,6 +26,12 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.\
     compute_e1,
     compute_e2,
     compute_z,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
+    get_phi_ao2008,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
+    get_psi_ao2008,
 )
 from particula.util.validate_inputs import validate_inputs
 

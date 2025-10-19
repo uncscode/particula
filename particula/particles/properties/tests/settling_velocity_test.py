@@ -112,8 +112,7 @@ def test_get_particle_settling_velocity_via_inertia_scalar():
 
 
 def test_get_particle_settling_velocity_via_inertia_array():
-    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs.
-    """
+    """Test get_particle_settling_velocity_via_inertia with NumPy arrays."""
     particle_inertia_time = np.array([0.02, 0.03])
     particle_radius = np.array([0.001, 0.002])
     relative_velocity = np.array([0.05, 0.06])

@@ -1,14 +1,12 @@
-"""Tests that the collision kernel function can be evaluated get_kernel_ao2008.
-"""
+"""Tests that collision kernel function get_kernel_ao2008 can be evaluated."""
 
 import unittest
 
 import numpy as np
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.\
     turbulent_dns_kernel_ao2008 import (
-        get_turbulent_dns_kernel_ao2008,
-    )
+    get_turbulent_dns_kernel_ao2008,
+)
 
 
 class TestKernelAO2008(unittest.TestCase):

@@ -11,14 +11,14 @@ discrete and continuous_pdf distribution types.
 import unittest
 
 import numpy as np
+from particula.dynamics.coagulation.\
+    coagulation_strategy.charged_coagulation_strategy import (
+    ChargedCoagulationStrategy,
+)
 
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.charged_coagulation_strategy import (
-        ChargedCoagulationStrategy,
-    )
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,

@@ -2,11 +2,10 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.\
     velocity_correlation_f2_ao2008 import (
-        get_f2_longitudinal_velocity_correlation,
-    )
+    get_f2_longitudinal_velocity_correlation,
+)
 
 
 def test_compute_f2_longitudinal_velocity_correlation_scalar():
@@ -45,8 +44,7 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
 
 
 def test_compute_f2_longitudinal_velocity_correlation_array():
-    """Test compute_f2_longitudinal_velocity_correlation with arrays.
-    """
+    """Test compute_f2_longitudinal_velocity_correlation with arrays."""
     collisional_radius = np.array([0.1, 0.5, 1.0])  # [m]
     taylor_microscale = 0.05  # [m]
     eulerian_integral_length = 1.0  # [m]
@@ -93,8 +91,7 @@ def test_invalid_inputs():
 
 
 def test_edge_cases():
-    """Test compute_f2_longitudinal_velocity_correlation with extreme values.
-    """
+    """Test compute_f2_longitudinal_velocity_correlation with extremes."""
     collisional_radius = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large values

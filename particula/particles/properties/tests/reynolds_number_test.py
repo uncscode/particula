@@ -37,8 +37,7 @@ def test_get_particle_reynolds_number_array():
 
 
 def test_get_particle_reynolds_number_invalid():
-    """Test that get_particle_reynolds_number raises errors for invalid inputs.
-    """
+    """Test get_particle_reynolds_number raises errors for invalid inputs."""
     with pytest.raises(ValueError):
         get_particle_reynolds_number(-50e-6, 0.1, 1.5e-5)  # Negative radius
 

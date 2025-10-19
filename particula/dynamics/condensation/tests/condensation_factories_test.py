@@ -1,5 +1,4 @@
-"""Test cases for the CondensationFactory and CondensationIsothermal classes.
-"""
+"""Test cases for CondensationFactory and CondensationIsothermal classes."""
 
 import pytest
 

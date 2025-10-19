@@ -222,8 +222,7 @@ def test_get_mean_effective_density():
 
 
 def test_get_mean_effective_density_particle_resolved():
-    """Test get_mean_effective_density for multi-species (particle-resolved).
-    """
+    """Test get_mean_effective_density for multi-species (particle-resolved)."""
     particle = setup_particle_resolved()
     med = particle.get_mean_effective_density()
     expected_mean = np.float64(2.1526515151515153)
