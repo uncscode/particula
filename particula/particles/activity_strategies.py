@@ -260,9 +260,9 @@ class ActivityKappaParameter(ActivityStrategy):
 
     def __init__(
         self,
-        kappa: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
-        density: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
-        molar_mass: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
+        kappa: NDArray[np.float64] | None = None,
+        density: NDArray[np.float64] | None = None,
+        molar_mass: NDArray[np.float64] | None = None,
         water_index: int = 0,
     ):
         """Initialize the ActivityKappaParameter strategy.
@@ -273,9 +273,18 @@ class ActivityKappaParameter(ActivityStrategy):
             - molar_mass : Molar masses in kg/mol (array or scalar).
             - water_index : Index of the water species.
         """
-        self.kappa = kappa
-        self.density = density
-        self.molar_mass = molar_mass
+        self.kappa = (
+            kappa if kappa is not None
+            else np.array([0.0], dtype=np.float64)
+        )
+        self.density = (
+            density if density is not None
+            else np.array([0.0], dtype=np.float64)
+        )
+        self.molar_mass = (
+            molar_mass if molar_mass is not None
+            else np.array([0.0], dtype=np.float64)
+        )
         self.water_index = water_index
 
     def activity(
