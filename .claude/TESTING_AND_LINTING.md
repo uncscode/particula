@@ -275,7 +275,7 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 Tests run automatically via `.github/workflows/test.yml`:
 ```yaml
 - name: Test with pytest
-  run: pytest
+  run: uv run pytest
 ```
 
 ### Automated Linting
