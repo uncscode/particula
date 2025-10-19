@@ -87,12 +87,20 @@ def get_kelvin_term(
         - rₖ is the Kelvin radius (m).
         - rₚ is the particle radius (m).
 
+    For very small particles (< 1 nm), the ratio rₖ / rₚ can become
+    extremely large, leading to numerical overflow. To prevent this, the
+    ratio is clipped to a maximum value of 100, corresponding to a Kelvin
+    term of ~2.7e43. This is physically unrealistic but ensures numerical
+    stability. Below ~1 nm, continuum mechanics breaks down anyway, so
+    the condensation equations become questionable.
+
     Arguments:
         - particle_radius : Radius of the particle (m).
         - kelvin_radius_value : Precomputed Kelvin radius (m).
 
     Returns:
         - Dimensionless exponential factor adjusting vapor pressure.
+          For extreme cases, the value is clipped to prevent overflow.
 
     Examples:
         ``` py title="Example"
@@ -110,6 +118,10 @@ def get_kelvin_term(
           new-particle formation?" Faraday Discussions, 165, 91–104.
           https://doi.org/10.1039/C3FD00046J. [check]
     """
+    # Maximum Kelvin ratio to prevent overflow
+    # exp(100) ≈ 2.7e43 is extremely large but numerically stable
+    max_kelvin_ratio = 100.0
+
     kelvin_expand = False
     # Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)
     if isinstance(kelvin_radius_value, np.ndarray) and (
@@ -117,12 +129,22 @@ def get_kelvin_term(
     ):
         kelvin_expand = True
         kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
+
     if isinstance(particle_radius, np.ndarray) and not kelvin_expand:
-        return get_safe_exp(kelvin_radius_value / particle_radius)
+        kelvin_ratio = kelvin_radius_value / particle_radius
+        kelvin_ratio = np.clip(kelvin_ratio, None, max_kelvin_ratio)
+        return get_safe_exp(kelvin_ratio)
     if (
         isinstance(particle_radius, np.ndarray)
         and (particle_radius.size > 1)
         and kelvin_expand
     ):
         particle_radius = particle_radius[:, np.newaxis]
-    return get_safe_exp(kelvin_radius_value / particle_radius)
+        kelvin_ratio = kelvin_radius_value / particle_radius
+        kelvin_ratio = np.clip(kelvin_ratio, None, max_kelvin_ratio)
+        return get_safe_exp(kelvin_ratio)
+
+    # Scalar case
+    kelvin_ratio = kelvin_radius_value / particle_radius
+    kelvin_ratio = np.clip(kelvin_ratio, None, max_kelvin_ratio)
+    return get_safe_exp(kelvin_ratio)

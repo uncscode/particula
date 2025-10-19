@@ -574,7 +574,16 @@ class CondensationIsothermal(CondensationStrategy):
         )
         ```.
         """
+        # Minimum particle radius (0.1 nm) below which continuum
+        # mechanics breaks down
+        min_radius = 1e-10  # m
+
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
+
+        # Clip radii to minimum physical size
+        # Below ~0.1 nm, condensation equations are not valid
+        radius_with_fill = np.maximum(radius_with_fill, min_radius)
+
         first_order_mass_transport = self.first_order_mass_transport(
             particle_radius=radius_with_fill,
             temperature=temperature,
@@ -584,9 +593,15 @@ class CondensationIsothermal(CondensationStrategy):
         pressure_delta = self.calculate_pressure_delta(
             particle, gas_species, temperature, radius_with_fill
         )
-        # Replace -inf and NaN with 0.0 to avoid mass transfer issues
+
+        # Replace all non-finite values (±inf, NaN) with 0.0
+        # Infinite pressure_delta indicates numerical instability for
+        # very small particles where Kelvin effect dominates.
+        # Setting to 0 effectively treats condensation as negligible
+        # for these extreme cases, which is physically reasonable since
+        # continuum mechanics breaks down below ~1 nm anyway.
         pressure_delta = np.nan_to_num(
-            pressure_delta, neginf=0.0, nan=0.0
+            pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
         )
 
         return get_mass_transfer_rate(
