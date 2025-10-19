@@ -1,19 +1,18 @@
 """Sedimentation Coagulation builder class."""
 
 from particula.abc_builder import BuilderABC
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
+from particula.dynamics.coagulation.coagulation_builder import (
+    coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-from particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy import (
-    SedimentationCoagulationStrategy,
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc,
+    sedimentation_coagulation_strategy,
 )
 
 
 class SedimentationCoagulationBuilder(
-    BuilderABC, BuilderDistributionTypeMixin
+    BuilderABC,
+    coagulation_builder_mixin.BuilderDistributionTypeMixin,
 ):
     """Sedimentation Coagulation builder class.
 
@@ -43,11 +42,17 @@ class SedimentationCoagulationBuilder(
     def __init__(self):
         required_parameters = ["distribution_type"]
         BuilderABC.__init__(self, required_parameters)
-        BuilderDistributionTypeMixin.__init__(self)
+        coagulation_builder_mixin.BuilderDistributionTypeMixin.__init__(
+            self
+        )
 
-    def build(self) -> CoagulationStrategyABC:
-        """Validate and return the SedimentationCoagulationStrategy object."""
+    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
+        """Validate and return SedimentationCoagulationStrategy object."""
         self.pre_build_check()
-        return SedimentationCoagulationStrategy(
+        strategy_class = (
+            sedimentation_coagulation_strategy
+            .SedimentationCoagulationStrategy
+        )
+        return strategy_class(
             distribution_type=self.distribution_type,
         )

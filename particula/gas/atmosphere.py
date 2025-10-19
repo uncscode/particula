@@ -43,7 +43,7 @@ class Atmosphere:
         self.partitioning_species.append(gas_species)
 
     def add_gas_only_species(self, gas_species: GasSpecies) -> None:
-        """Add a GasSpecies object to the gas only (nonpartitioning) species list.
+        """Add a GasSpecies to gas only (nonpartitioning) species list.
 
         Arguments:
             - gas_species : The gas species to be added.

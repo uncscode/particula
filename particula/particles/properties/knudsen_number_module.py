@@ -21,8 +21,7 @@ def get_knudsen_number(
     mean_free_path: Union[float, NDArray[np.float64]],
     particle_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Calculate the Knudsen number (Kn) from the gas mean free path and particle
-    radius.
+    """Calculate Knudsen number (Kn) from mean free path and radius.
 
     The Knudsen number (Kn) indicates whether a flow is in the continuum
     regime or the free molecular regime. It is computed by:

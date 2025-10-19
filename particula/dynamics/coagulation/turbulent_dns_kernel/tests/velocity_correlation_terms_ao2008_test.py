@@ -3,18 +3,19 @@
 import numpy as np
 import pytest
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
-    compute_b1,
-    compute_b2,
-    compute_beta,
-    compute_c1,
-    compute_c2,
-    compute_d1,
-    compute_d2,
-    compute_e1,
-    compute_e2,
-    compute_z,
-)
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    velocity_correlation_terms_ao2008 import (
+        compute_b1,
+        compute_b2,
+        compute_beta,
+        compute_c1,
+        compute_c2,
+        compute_d1,
+        compute_d2,
+        compute_e1,
+        compute_e2,
+        compute_z,
+    )
 
 
 def test_compute_z():

@@ -12,9 +12,6 @@ import unittest
 import numpy as np
 
 # pylint: disable=line-too-long
-from particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy import (
-    TurbulentDNSCoagulationStrategy,
-)
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,

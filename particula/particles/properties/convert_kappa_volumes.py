@@ -1,6 +1,7 @@
-"""Convert between volumes of solute, water, and total solution using the κ-Köhler
-relation. These functions help compute how water activity and kappa parameter
-influence volume partitioning between solute and water.
+"""Convert between volumes using κ-Köhler relation.
+
+These functions compute water activity and kappa parameter influence on
+volume partitioning between solute and water.
 
 References:
     - P. Väisänen et al., "Kappa-Köhler theory for water activity and
@@ -145,8 +146,7 @@ def get_water_volume_in_mixture(
     volume_solute_dry: Union[float, np.ndarray],
     volume_fraction_water: Union[float, np.ndarray],
 ) -> float:
-    """Calculate the water volume in a solute-water mixture from a specified water
-    volume fraction.
+    """Calculate water volume in mixture from specified water fraction.
 
     The relationship is:
 

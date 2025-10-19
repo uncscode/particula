@@ -325,7 +325,8 @@ def _bin_to_particle_indices(
     upper_bin: int,
     bin_indices: NDArray[np.int64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """Map bin-relative indices back to absolute positions in the particle array.
+    """Map bin-relative indices back to absolute positions in the particle
+    array.
 
     This function adjusts the offsets for each bin so that the pairwise
     indices used for collision are mapped onto the actual sorted particle
@@ -376,7 +377,8 @@ def _filter_valid_indices(
     particle_radius: NDArray[np.float64],
     single_event_counter: Optional[NDArray[np.int64]] = None,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """Remove invalid pairs of particles based on radius and optional event limit.
+    """Remove invalid pairs of particles based on radius and optional event
+    limit.
 
     This function checks each pair of `(small_index, large_index)` to ensure
     both have radius > 0. If `single_event_counter` is provided, it further
@@ -434,7 +436,8 @@ def _coagulation_events(
     kernel_max: float,
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """Stochastically pick which collisions (among possible pairs) actually happen.
+    """Stochastically pick which collisions (among possible pairs) actually
+    happen.
 
     This function computes a collision probability for each `(small_index,
     large_index)` pair by taking the ratio of `kernel_values / kernel_max`.

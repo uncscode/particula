@@ -6,11 +6,9 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.charged_kernel_strategy import (
-    ChargedKernelStrategyABC,
-)
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
+from particula.dynamics.coagulation import charged_kernel_strategy
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc,
 )
 from particula.particles.representation import ParticleRepresentation
 from particula.util.reduced_quantity import get_reduced_self_broadcast
@@ -18,7 +16,9 @@ from particula.util.reduced_quantity import get_reduced_self_broadcast
 logger = logging.getLogger("particula")
 
 
-class ChargedCoagulationStrategy(CoagulationStrategyABC):
+class ChargedCoagulationStrategy(
+    coagulation_strategy_abc.CoagulationStrategyABC
+):
     """Charged Brownian coagulation strategy using a dimensionless kernel.
 
     This class implements the methods defined in the CoagulationStrategyABC
@@ -27,8 +27,8 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     handling of Coulomb interactions under various regimes.
 
     Attributes:
-        - kernel_strategy : Instance of ChargedKernelStrategyABC used to
-          calculate dimensionless and dimensioned kernels.
+        kernel_strategy : Instance of ChargedKernelStrategyABC used to
+        calculate dimensionless and dimensioned kernels.
 
     Methods:
     - dimensionless_kernel : Compute dimensionless kernel values for
@@ -61,22 +61,26 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     """
 
     def __init__(
-        self, distribution_type: str, kernel_strategy: ChargedKernelStrategyABC
+        self,
+        distribution_type: str,
+        kernel_strategy: (
+            charged_kernel_strategy.ChargedKernelStrategyABC
+        ),
     ):
         """Initialize the ChargedCoagulationStrategy.
 
         Arguments:
-            - distribution_type : The distribution type representing how
-              particles are tracked (e.g., "discrete", "continuous_pdf",
-              or "particle_resolved").
-            - kernel_strategy : A ChargedKernelStrategyABC instance used to
-              calculate dimensionless/dimensioned kernels for charged
-              coagulation.
+            distribution_type : The distribution type representing how
+            particles are tracked (e.g., "discrete", "continuous_pdf",
+            or "particle_resolved").
+            kernel_strategy : A ChargedKernelStrategyABC instance used to
+            calculate dimensionless/dimensioned kernels for charged
+            coagulation.
 
         Returns:
-            - None
+            None
         """
-        CoagulationStrategyABC.__init__(
+        coagulation_strategy_abc.CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
         )
         self.kernel_strategy = kernel_strategy

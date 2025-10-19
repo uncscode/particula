@@ -81,7 +81,8 @@ def test_get_mass_fractions_from_moles_1d(
 
 
 def test_get_mass_fractions_from_moles_2d():
-    """Test 2D inputs where each row of mole fractions is converted row-by-row."""
+    """Test 2D inputs where each row of mole fractions is converted row-by-row.
+    """
     # Example 2D input: each row has 3 components
     x_2d = np.array(
         [

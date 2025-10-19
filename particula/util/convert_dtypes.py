@@ -134,7 +134,7 @@ def get_shape_check(
     data: np.ndarray,
     header: list,
 ) -> np.ndarray:
-    """Validate or reshape a data array to ensure compatibility with a time array
+    """Validate or reshape data array for compatibility with time array
     and header list.
 
     If data is 2D, the function attempts to align the time dimension with one

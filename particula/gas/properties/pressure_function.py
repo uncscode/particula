@@ -21,8 +21,7 @@ def get_partial_pressure(
     molar_mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Calculate the partial pressure of a gas from its concentration, molar mass,
-    and temperature.
+    """Calculate partial pressure from concentration, molar mass, T.
 
     - p = (c × R × T) / M
         - p is Partial pressure [Pa].

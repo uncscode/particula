@@ -12,16 +12,12 @@ import logging
 from typing import Optional
 
 from particula.abc_builder import BuilderABC
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
-    BuilderFluidDensityMixin,
-    BuilderTurbulentDissipationMixin,
+from particula.dynamics.coagulation.coagulation_builder import (
+    coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-from particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy import (
-    TurbulentDNSCoagulationStrategy,
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc,
+    turbulent_dns_coagulation_strategy,
 )
 from particula.util.convert_units import get_unit_conversion
 from particula.util.validate_inputs import validate_inputs
@@ -32,9 +28,9 @@ logger = logging.getLogger("particula")
 # pylint: disable=duplicate-code
 class TurbulentDNSCoagulationBuilder(
     BuilderABC,
-    BuilderDistributionTypeMixin,
-    BuilderTurbulentDissipationMixin,
-    BuilderFluidDensityMixin,
+    coagulation_builder_mixin.BuilderDistributionTypeMixin,
+    coagulation_builder_mixin.BuilderTurbulentDissipationMixin,
+    coagulation_builder_mixin.BuilderFluidDensityMixin,
 ):
     """Turbulent DNS coagulation builder class.
 
@@ -86,9 +82,14 @@ class TurbulentDNSCoagulationBuilder(
             "relative_velocity",
         ]
         BuilderABC.__init__(self, required_parameters)
-        BuilderDistributionTypeMixin.__init__(self)
-        BuilderTurbulentDissipationMixin.__init__(self)
-        BuilderFluidDensityMixin.__init__(self)
+        coagulation_builder_mixin.BuilderDistributionTypeMixin.__init__(
+            self
+        )
+        mixin_class = (
+            coagulation_builder_mixin.BuilderTurbulentDissipationMixin
+        )
+        mixin_class.__init__(self)
+        coagulation_builder_mixin.BuilderFluidDensityMixin.__init__(self)
         self.reynolds_lambda = None
         self.relative_velocity = None
 
@@ -152,7 +153,7 @@ class TurbulentDNSCoagulationBuilder(
         )
         return self
 
-    def build(self) -> CoagulationStrategyABC:
+    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
         """Construct a TurbulentDNSCoagulationStrategy.
 
         Validates the required parameters, then instantiates a
@@ -160,10 +161,15 @@ class TurbulentDNSCoagulationBuilder(
         calculations.
 
         Returns:
-            - CoagulationStrategyABC : The configured DNS coagulation strategy.
+            CoagulationStrategyABC: The configured DNS coagulation
+            strategy.
         """
         self.pre_build_check()
-        return TurbulentDNSCoagulationStrategy(
+        strategy_class = (
+            turbulent_dns_coagulation_strategy
+            .TurbulentDNSCoagulationStrategy
+        )
+        return strategy_class(
             distribution_type=self.distribution_type,
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,

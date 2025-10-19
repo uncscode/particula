@@ -46,7 +46,9 @@ def test_apply_condensation_limit_multi():
     """Test condensation limit application for multiple particles."""
     mass = np.array([[1.0, 0.2], [1.0, -0.1]])
     gas_mass = np.array([1.0, 0.4])
-    limited, evap_sum, neg_mask = apply_condensation_limit(mass.copy(), gas_mass)
+    limited, evap_sum, neg_mask = apply_condensation_limit(
+        mass.copy(), gas_mass
+    )
     pos_sum = np.where(mass > 0.0, mass, 0.0).sum(axis=0)
     evap = np.where(mass < 0.0, mass, 0.0).sum(axis=0)
     scale = np.ones_like(gas_mass)
@@ -65,7 +67,9 @@ def test_apply_evaporation_limit_single():
     conc = np.array([1.0, 2.0])
     evap_sum = mass.sum()
     neg_mask = mass < 0.0
-    limited = apply_evaporation_limit(mass, particle_mass, conc, evap_sum, neg_mask)
+    limited = apply_evaporation_limit(
+        mass, particle_mass, conc, evap_sum, neg_mask
+    )
     inventory = (particle_mass * conc).sum()
     scale = inventory / (-evap_sum)
     expected = mass * scale
@@ -79,7 +83,9 @@ def test_apply_evaporation_limit_multi():
     conc = np.array([1.0, 2.0])
     evap_sum = mass.sum(axis=0)
     neg_mask = mass < 0.0
-    limited = apply_evaporation_limit(mass, particle_mass, conc, evap_sum, neg_mask)
+    limited = apply_evaporation_limit(
+        mass, particle_mass, conc, evap_sum, neg_mask
+    )
     inventory = (particle_mass * conc[:, None]).sum(axis=0)
     scale = inventory / (-evap_sum)
     expected = mass * scale

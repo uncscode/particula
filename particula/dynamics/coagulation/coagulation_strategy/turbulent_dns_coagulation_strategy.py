@@ -12,13 +12,18 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc as coag_abc,
 )
-from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
-    get_turbulent_dns_kernel_ao2008_via_system_state,
+from particula.dynamics.coagulation.turbulent_dns_kernel import (
+    turbulent_dns_kernel_ao2008 as dns_kernel,
 )
 from particula.particles.representation import ParticleRepresentation
+
+CoagulationStrategyABC = coag_abc.CoagulationStrategyABC
+get_turbulent_dns_kernel_ao2008_via_system_state = (
+    dns_kernel.get_turbulent_dns_kernel_ao2008_via_system_state
+)
 
 logger = logging.getLogger("particula")
 

@@ -77,7 +77,7 @@ def get_safe_log10(value: ArrayLike) -> np.ndarray:
     underflow protection.
 
     The base-10 log is calculated using:
-        - y = log10(x), where x is clipped away from zero to maintain positivity.
+        - y = log10(x), x clipped from zero to maintain positivity.
 
     Arguments:
         - value : Array-like of values for base-10 logarithm calculation.

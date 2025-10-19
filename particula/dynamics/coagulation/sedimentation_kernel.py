@@ -63,7 +63,7 @@ def get_sedimentation_kernel_sp2016(
     settling_velocities: NDArray[np.float64],
     calculate_collision_efficiency: bool = True,
 ) -> NDArray[np.float64]:
-    """Calculate the sedimentation kernel for aerosol particles (Equation 13A.4).
+    """Calculate sedimentation kernel for aerosol particles (Eq 13A.4).
 
     This function computes the coagulation kernel due to gravitational
     settling, where larger particles settle faster and overtake smaller

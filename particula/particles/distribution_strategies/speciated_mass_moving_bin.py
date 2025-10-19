@@ -66,15 +66,15 @@ class SpeciatedMassMovingBin(DistributionStrategy):
             np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
             message = (
-                "When adding concentration to SpeciatedMassMovingBin, the distribution "
-                "and added distribution should match."
+                "When adding concentration to SpeciatedMassMovingBin, "
+                "distribution and added distribution should match."
             )
             logger.error(message)
             raise ValueError(message)
         if concentration.shape != added_concentration.shape:
             message = (
-                "When adding concentration to SpeciatedMassMovingBin, the arrays "
-                "should have the same shape."
+                "When adding concentration to SpeciatedMassMovingBin, "
+                "arrays should have the same shape."
             )
             logger.error(message)
             raise ValueError(message)
@@ -89,7 +89,7 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         message = (
-            "Colliding pairs in SpeciatedMassMovingBin is not physically meaningful"
+            "Colliding pairs in SpeciatedMassMovingBin not physically valid"
         )
         logger.warning(message)
         raise NotImplementedError(message)

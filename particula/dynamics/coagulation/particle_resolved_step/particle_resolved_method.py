@@ -6,10 +6,12 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import RegularGridInterpolator  # type: ignore
 
-from particula.dynamics.coagulation.particle_resolved_step.super_droplet_method import (
-    _bin_particles,
-    _get_bin_pairs,
+from particula.dynamics.coagulation.particle_resolved_step import (
+    super_droplet_method,
 )
+
+_bin_particles = super_droplet_method._bin_particles
+_get_bin_pairs = super_droplet_method._get_bin_pairs
 
 
 def get_particle_resolved_update_step(

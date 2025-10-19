@@ -190,7 +190,9 @@ class RunnableSequence:
         Examples:
             ```py title="Executing a RunnableSequence"
             sequence = RunnableSequence()
-            final_aerosol = sequence.execute(aerosol, time_step=1.0, sub_steps=4)
+            final_aerosol = sequence.execute(
+                aerosol, time_step=1.0, sub_steps=4
+            )
             ```
         """
         sub_step_time_step = time_step / sub_steps

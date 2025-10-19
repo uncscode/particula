@@ -58,8 +58,8 @@ class MassBasedMovingBin(DistributionStrategy):
             not np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
             message = (
-                "When adding concentration to MassBasedMovingBin, the distribution "
-                "and added distribution should match."
+                "When adding concentration to MassBasedMovingBin, "
+                "distribution and added distribution should match."
             )
             logger.error(message)
             raise ValueError(message)

@@ -172,9 +172,9 @@ def get_spherical_wall_loss_coefficient_via_system_state(
     pressure: float,
     chamber_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Calculate the spherical chamber wall loss coefficient via system state.
+    """Calculate spherical wall loss coefficient via system state.
 
-    This version uses the system's physical conditions (particle radius, density,
+    Uses the system's physical conditions (particle radius, density,
     temperature, pressure) to compute the needed diffusion and settling velocity
     before calculating the spherical wall loss coefficient:
 

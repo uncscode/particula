@@ -30,7 +30,9 @@ def test_get_species_mass_and_mass():
 
 def test_get_radius():
     """Test radius computation."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     volumes = np.sum(distribution / densities, axis=1)
     expected = (3 * volumes / (4 * np.pi)) ** (1 / 3)
@@ -41,7 +43,9 @@ def test_get_radius():
 
 def test_get_total_mass():
     """Test total mass computation."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 50], dtype=np.float64)
     mass_per_particle = np.sum(distribution, axis=1)
@@ -53,10 +57,14 @@ def test_get_total_mass():
 
 def test_add_mass():
     """Test mass addition per species."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 30], dtype=np.float64)
-    added_mass = np.array([[10, 20], [30, 40], [50, 60]], dtype=np.float64)
+    added_mass = np.array(
+        [[10, 20], [30, 40], [50, 60]], dtype=np.float64
+    )
     conc_expand = concentration[:, np.newaxis]
     mass_per_particle = np.where(conc_expand > 0, added_mass / conc_expand, 0)
     expected_dist = np.maximum(distribution + mass_per_particle, 0)

@@ -1,27 +1,21 @@
 """Turbulent Shear Coagulation Builder Module."""
 
 from particula.abc_builder import BuilderABC
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
-    BuilderFluidDensityMixin,
-    BuilderTurbulentDissipationMixin,
+from particula.dynamics.coagulation.coagulation_builder import (
+    coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-
-# pylint: disable=line-too-long
-from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
-    TurbulentShearCoagulationStrategy,
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc,
+    turbulent_shear_coagulation_strategy,
 )
 
 
 # pylint: disable=duplicate-code
 class TurbulentShearCoagulationBuilder(
     BuilderABC,
-    BuilderDistributionTypeMixin,
-    BuilderTurbulentDissipationMixin,
-    BuilderFluidDensityMixin,
+    coagulation_builder_mixin.BuilderDistributionTypeMixin,
+    coagulation_builder_mixin.BuilderTurbulentDissipationMixin,
+    coagulation_builder_mixin.BuilderFluidDensityMixin,
 ):
     """Turbulent shear coagulation builder.
 
@@ -75,11 +69,16 @@ class TurbulentShearCoagulationBuilder(
             "fluid_density",
         ]
         BuilderABC.__init__(self, required_parameters)
-        BuilderDistributionTypeMixin.__init__(self)
-        BuilderTurbulentDissipationMixin.__init__(self)
-        BuilderFluidDensityMixin.__init__(self)
+        coagulation_builder_mixin.BuilderDistributionTypeMixin.__init__(
+            self
+        )
+        mixin_class = (
+            coagulation_builder_mixin.BuilderTurbulentDissipationMixin
+        )
+        mixin_class.__init__(self)
+        coagulation_builder_mixin.BuilderFluidDensityMixin.__init__(self)
 
-    def build(self) -> CoagulationStrategyABC:
+    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
         """Construct a TurbulentShearCoagulationStrategy.
 
         This method performs a final check to ensure all required parameters
@@ -90,7 +89,11 @@ class TurbulentShearCoagulationBuilder(
             - The resulting turbulent shear coagulation strategy object.
         """
         self.pre_build_check()
-        return TurbulentShearCoagulationStrategy(
+        strategy_class = (
+            turbulent_shear_coagulation_strategy
+            .TurbulentShearCoagulationStrategy
+        )
+        return strategy_class(
             distribution_type=self.distribution_type,
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,

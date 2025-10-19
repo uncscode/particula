@@ -66,8 +66,7 @@ class VaporPressureStrategy(ABC):
         molar_mass: Union[float, NDArray[np.float64]],
         temperature: Union[float, NDArray[np.float64]],
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the partial pressure of the gas from its concentration, molar
-        mass, and temperature.
+        """Calculate partial pressure from concentration, molar mass, T.
 
         Arguments:
             - concentration : Concentration of the gas in kg/m^3.
@@ -503,7 +502,9 @@ class TableVaporPressureStrategy(VaporPressureStrategy):
         table_pressures = np.asarray(vapor_pressures, dtype=float)
         table_temps = np.asarray(temperatures, dtype=float)
         if table_pressures.size != table_temps.size:
-            raise ValueError("Temperature and pressure tables must be the same length")
+            raise ValueError(
+                "Temperature and pressure tables must be the same length"
+            )
         idx = np.argsort(table_temps)
         self.vapor_pressures = table_pressures[idx]
         self.temperatures = table_temps[idx]
@@ -608,7 +609,9 @@ class LiquidClausiusHybridStrategy(VaporPressureStrategy):
             - boiling_point : Temperature where weighting is 0.5.
             - transition_width : Width of the logistic transition in Kelvin.
         """
-        self.liquid_strategy = ArblasterLiquidVaporPressureStrategy(coefficients)
+        self.liquid_strategy = ArblasterLiquidVaporPressureStrategy(
+            coefficients
+        )
         self.clausius_strategy = ClausiusClapeyronStrategy(
             latent_heat, temperature_initial, pressure_initial
         )

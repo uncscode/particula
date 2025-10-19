@@ -58,7 +58,8 @@ def test_surface_tension_mixin():
 
     # test array of surface tensions
     builder_mixin.set_surface_tension(np.array([1, 2, 3]), "N/m")
-    np.testing.assert_allclose(builder_mixin.surface_tension, np.array([1, 2, 3]))
+    result = builder_mixin.surface_tension
+    np.testing.assert_allclose(result, np.array([1, 2, 3]))
 
     # test setting surface tension units
     builder_mixin.set_surface_tension(0.001, surface_tension_units="N/m")

@@ -28,8 +28,12 @@ def test_antoine_vapor_pressure_strategy():
     a, b, c = 8.07131, 1730.63, 233.426
     strategy = AntoineVaporPressureStrategy(a=a, b=b, c=c)
     temperature = 100 + 273.15  # Convert 100°C to Kelvin
-    expected_pressure = 10 ** (a - (b / (temperature - c))) * 133.32238741499998
-    assert strategy.pure_vapor_pressure(temperature) == pytest.approx(expected_pressure)
+    expected_pressure = (
+        10 ** (a - (b / (temperature - c))) * 133.32238741499998
+    )
+    assert strategy.pure_vapor_pressure(temperature) == pytest.approx(
+        expected_pressure
+    )
 
 
 def test_clausius_clapeyron_strategy():
@@ -56,10 +60,11 @@ def test_water_buck_strategy():
     """Test the Buck equation for water vapor pressure."""
     strategy = WaterBuckStrategy()
     temperature = 25 + 273.15  # 25°C to Kelvin
-    # Use Buck equation directly for expected value calculation or reference a
-    # known value
+    # Use Buck equation directly for expected value or reference value
     expected_pressure = 3168.531  # Example expected result in Pa
-    assert strategy.pure_vapor_pressure(temperature) == pytest.approx(expected_pressure)
+    assert strategy.pure_vapor_pressure(temperature) == pytest.approx(
+        expected_pressure
+    )
 
 
 def test_arblaster_liquid_vapor_pressure_strategy():

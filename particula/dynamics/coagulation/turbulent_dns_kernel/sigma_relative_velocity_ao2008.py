@@ -1,4 +1,4 @@
-"""Compute RMS fluctuation velocities and cross-correlation for colliding droplets.
+"""Compute RMS fluctuation velocities and cross-correlations.
 
 This module provides functions to compute the square of the RMS fluctuation
 velocity and the cross-correlation of the fluctuating velocities for colliding
@@ -16,10 +16,12 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
 from particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008 import (
     get_psi_ao2008,
 )
-from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008 import (
-    get_f2_longitudinal_velocity_correlation,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    velocity_correlation_f2_ao2008 import (
+        get_f2_longitudinal_velocity_correlation,
+    )
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    velocity_correlation_terms_ao2008 import (
     compute_b1,
     compute_b2,
     compute_beta,

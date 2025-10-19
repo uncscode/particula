@@ -45,7 +45,7 @@ def get_particle_settling_velocity(
     fluid_density: float = 0.0,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """Calculate the settling velocity of a particle in a fluid using Stokes' law.
+    """Calculate particle settling velocity using Stokes' law.
 
     The settling velocity (vₛ) is given by the equation:
 
@@ -264,7 +264,7 @@ def get_particle_settling_velocity_with_drag(
     max_iter: int = 100,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments
-    """Calculate the particle's terminal settling velocity with a full drag model.
+    """Calculate terminal settling velocity with full drag model.
 
     For low Reynolds numbers (Re < re_threshold), the Stokes settling velocity
     (with slip correction) is used:

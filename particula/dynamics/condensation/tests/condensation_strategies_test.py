@@ -161,7 +161,7 @@ class TestCondensationIsothermal(unittest.TestCase):
             pressure=self.pressure,
         )
 
-        # Whatever the dimensionality, index 0 must be identically zero when skipped
+        # Dimensionality: index 0 must be zero when skipped
         self.assertTrue(np.allclose(rates_skip[..., 0], 0.0))
 
         # For the un-skipped case the values must not be exactly zero
@@ -209,7 +209,8 @@ class TestCondensationIsothermal(unittest.TestCase):
         )
 
     def test_apply_skip_partitioning_direct(self):
-        """_apply_skip_partitioning zeroes selected indices on 1D and 2D arrays."""
+        """_apply_skip_partitioning zeroes selected indices on 1D and 2D arrays.
+        """
         strategy = CondensationIsothermal(
             molar_mass=self.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,

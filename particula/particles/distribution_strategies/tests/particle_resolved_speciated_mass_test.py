@@ -1,4 +1,5 @@
-"""Tests for the :class:`ParticleResolvedSpeciatedMass` distribution strategy."""
+"""Tests for the :class:`ParticleResolvedSpeciatedMass` distribution strategy.
+"""
 # pylint: disable=R0801
 
 import numpy as np
@@ -13,26 +14,30 @@ particle_resolved_strategy = ParticleResolvedSpeciatedMass()
 
 def test_get_name():
     """Test retrieving the class name."""
-    assert particle_resolved_strategy.get_name() == "ParticleResolvedSpeciatedMass"
+    expected = "ParticleResolvedSpeciatedMass"
+    assert particle_resolved_strategy.get_name() == expected
 
 
 def test_get_mass_and_species_mass():
     """Test mass and species mass retrieval."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     np.testing.assert_array_equal(
         particle_resolved_strategy.get_species_mass(distribution, densities),
         distribution,
     )
     expected_mass = np.sum(distribution, axis=1)
-    np.testing.assert_allclose(
-        particle_resolved_strategy.get_mass(distribution, densities), expected_mass
-    )
+    result = particle_resolved_strategy.get_mass(distribution, densities)
+    np.testing.assert_allclose(result, expected_mass)
 
 
 def test_get_radius():
     """Test radius calculation."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     volumes = np.sum(distribution / densities, axis=1)
     expected = (3 * volumes / (4 * np.pi)) ** (1 / 3)
@@ -43,7 +48,9 @@ def test_get_radius():
 
 def test_get_total_mass():
     """Test total mass computation."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 50], dtype=np.float64)
     mass_per_particle = np.sum(distribution, axis=1)
@@ -55,10 +62,14 @@ def test_get_total_mass():
 
 def test_add_mass():
     """Test mass addition with normalization."""
-    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
+    )
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 30], dtype=np.float64)
-    added_mass = np.array([[10, 20], [30, 40], [50, 60]], dtype=np.float64)
+    added_mass = np.array(
+        [[10, 20], [30, 40], [50, 60]], dtype=np.float64
+    )
 
     conc_expand = concentration[:, np.newaxis]
     new_mass = np.divide(
@@ -113,7 +124,9 @@ def test_add_concentration_partial_fill():
     """Test replacing all bins."""
     distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
     concentration = np.array([0.0, 0.0], dtype=np.float64)
-    added_distribution = np.array([[7.0, 8.0], [9.0, 10.0]], dtype=np.float64)
+    added_distribution = np.array(
+        [[7.0, 8.0], [9.0, 10.0]], dtype=np.float64
+    )
     added_concentration = np.array([1.0, 1.0], dtype=np.float64)
     new_dist, new_conc = particle_resolved_strategy.add_concentration(
         distribution,

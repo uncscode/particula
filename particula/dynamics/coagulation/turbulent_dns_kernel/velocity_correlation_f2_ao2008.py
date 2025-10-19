@@ -7,9 +7,10 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
-    compute_beta,
-)
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    velocity_correlation_terms_ao2008 import (
+        compute_beta,
+    )
 from particula.util.validate_inputs import validate_inputs
 
 

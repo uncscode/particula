@@ -24,7 +24,10 @@ config = {
             "format": "[%(levelname)s|%(module)s|L%(lineno)d]: %(message)s"
         },
         "detailed": {
-            "format": "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
+            "format": (
+                "[%(levelname)s|%(module)s|L%(lineno)d] "
+                "%(asctime)s: %(message)s"
+            ),
             "datefmt": "%Y-%m-%dT%H:%M:%S%z",
         },
     },
