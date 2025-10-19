@@ -18,4 +18,9 @@ class CondensationFactory(
     """Factory class for condensation strategies."""
 
     def get_builders(self) -> Dict[str, Any]:
+        """Return the mapping of strategy types to builder instances.
+
+        Returns:
+            Dictionary mapping condensation strategy names to builders.
+        """
         return {"isothermal": CondensationIsothermalBuilder()}

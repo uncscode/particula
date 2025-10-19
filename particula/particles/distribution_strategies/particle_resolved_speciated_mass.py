@@ -31,11 +31,21 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate the mass per species for each particle.
+
+        Returns:
+            Mass per species array for each particle.
+        """
         return distribution
 
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate particle radius from multi-species mass and density.
+
+        Returns:
+            Particle radius in meters for each particle.
+        """
         if distribution.ndim == 1:
             volumes = distribution / density
         else:
@@ -49,6 +59,11 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add mass to individual particles in the distribution.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         if distribution.ndim == 2:
             concentration_expand = concentration[:, np.newaxis]
         else:
@@ -73,6 +88,11 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add new particles to the distribution.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         rescaled = False
         if np.all(added_concentration == 1):
             rescaled = True
@@ -124,6 +144,11 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Collide specified particle pairs by merging mass.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         small_index = indices[:, 0]
         large_index = indices[:, 1]
         if distribution.ndim == 1:

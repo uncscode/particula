@@ -11,6 +11,7 @@ class TestCondensationParticleResolved(unittest.TestCase):
     """Verify that mass is transferred from gas to particles."""
 
     def setUp(self):
+        """Set up aerosol system with gas and particles for testing."""
         # ---------- vapor-pressure strategies ----------
         self.vp_water = par.gas.VaporPressureFactory().get_strategy(
             "water_buck"

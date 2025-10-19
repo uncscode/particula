@@ -30,11 +30,21 @@ class MassBasedMovingBin(DistributionStrategy):
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate the mass per species for the distribution.
+
+        Returns:
+            Mass per species array.
+        """
         return distribution
 
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate particle radius from mass and density.
+
+        Returns:
+            Particle radius in meters.
+        """
         volumes = distribution / density
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
@@ -45,6 +55,11 @@ class MassBasedMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add mass to the particle distribution.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         return distribution + added_mass, concentration
 
     def add_concentration(  # pylint: disable=R0801
@@ -54,6 +69,11 @@ class MassBasedMovingBin(DistributionStrategy):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add concentration to the distribution.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         if (distribution.shape != added_distribution.shape) or (
             not np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
@@ -81,6 +101,11 @@ class MassBasedMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Collide particle pairs (not implemented for this strategy).
+
+        Raises:
+            NotImplementedError: Method is not physically meaningful.
+        """
         message = (
             "Colliding pairs in MassBasedMovingBin is not physically meaningful"
         )
