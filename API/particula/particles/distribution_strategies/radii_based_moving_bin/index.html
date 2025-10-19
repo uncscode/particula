@@ -18,15 +18,15 @@
       
       
       <link rel="icon" href="../../../../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
     
     
       
-        <title>RadiiBasedMovingBin - Particula</title>
+        <title>particula.particles.distribution_strategies.radii_based_moving_bin - Particula</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.2a3383ac.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.84d31ad4.min.css">
       
         
         <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -48,6 +48,8 @@
       
     
     
+      <link rel="stylesheet" href="../../../../../assets/_mkdocstrings.css">
+    
       <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
     
     <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
@@ -59,7 +61,7 @@
       
         <meta  property="og:type"  content="website" >
       
-        <meta  property="og:title"  content="RadiiBasedMovingBin - Particula" >
+        <meta  property="og:title"  content="particula.particles.distribution_strategies.radii_based_moving_bin - Particula" >
       
         <meta  property="og:description"  content="None" >
       
@@ -75,7 +77,7 @@
       
         <meta  name="twitter:card"  content="summary_large_image" >
       
-        <meta  name="twitter:title"  content="RadiiBasedMovingBin - Particula" >
+        <meta  name="twitter:title"  content="particula.particles.distribution_strategies.radii_based_moving_bin - Particula" >
       
         <meta  name="twitter:description"  content="None" >
       
@@ -102,7 +104,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#radiibasedmovingbin" class="md-skip">
+        <a href="#particulaparticlesdistribution_strategiesradii_based_moving_bin" class="md-skip">
           Skip to content
         </a>
       
@@ -137,7 +139,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              RadiiBasedMovingBin
+              particula.particles.distribution_strategies.radii_based_moving_bin
             
           </span>
         </div>
@@ -232,7 +234,7 @@
         <a href="https://github.com/uncscode/particula" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     particula
@@ -397,7 +399,7 @@
       <a href="https://github.com/uncscode/particula" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     particula
@@ -442,6 +444,8 @@
       
         
           
+        
+      
         
       
         
@@ -498,6 +502,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -506,7 +533,15 @@
     
       
         
-          
+      
+        
+      
+        
+      
+        
+      
+        
+      
         
       
         
@@ -551,12 +586,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -565,23 +599,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             Particula
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -595,7 +621,7 @@
   
   
   <span class="md-ellipsis">
-    Abc Builder
+    particula.abc_builder
     
   </span>
   
@@ -618,7 +644,30 @@
   
   
   <span class="md-ellipsis">
-    Abc Factory
+    particula.abc_factory
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../activity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.activity
     
   </span>
   
@@ -641,7 +690,7 @@
   
   
   <span class="md-ellipsis">
-    Aerosol
+    particula.aerosol
     
   </span>
   
@@ -664,7 +713,7 @@
   
   
   <span class="md-ellipsis">
-    AerosolBuilder
+    particula.aerosol_builder
     
   </span>
   
@@ -687,7 +736,76 @@
   
   
   <span class="md-ellipsis">
-    Builder Mixin
+    particula.builder_mixin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../equilibria/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.equilibria
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../gas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.gas
     
   </span>
   
@@ -710,7 +828,30 @@
   
   
   <span class="md-ellipsis">
-    Logger Setup
+    particula.logger_setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.particles
     
   </span>
   
@@ -733,7 +874,30 @@
   
   
   <span class="md-ellipsis">
-    Runnable
+    particula.runnable
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.util
     
   </span>
   
@@ -752,10 +916,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -788,12 +948,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_14" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../activity/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_14" id="__nav_2_3_14_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -802,23 +961,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_9" id="__nav_2_2_9_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_9">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_14">
             <span class="md-nav__icon md-icon"></span>
             Activity
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -832,7 +983,7 @@
   
   
   <span class="md-ellipsis">
-    Activity Coefficients
+    particula.activity.activity_coefficients
     
   </span>
   
@@ -855,7 +1006,7 @@
   
   
   <span class="md-ellipsis">
-    Bat Blending
+    particula.activity.bat_blending
     
   </span>
   
@@ -878,7 +1029,7 @@
   
   
   <span class="md-ellipsis">
-    Bat Coefficients
+    particula.activity.bat_coefficients
     
   </span>
   
@@ -901,7 +1052,7 @@
   
   
   <span class="md-ellipsis">
-    Convert Functional Group
+    particula.activity.convert_functional_group
     
   </span>
   
@@ -924,7 +1075,7 @@
   
   
   <span class="md-ellipsis">
-    Gibbs
+    particula.activity.gibbs
     
   </span>
   
@@ -947,7 +1098,7 @@
   
   
   <span class="md-ellipsis">
-    Gibbs Mixing
+    particula.activity.gibbs_mixing
     
   </span>
   
@@ -970,7 +1121,7 @@
   
   
   <span class="md-ellipsis">
-    Phase Separation
+    particula.activity.phase_separation
     
   </span>
   
@@ -993,7 +1144,7 @@
   
   
   <span class="md-ellipsis">
-    Ratio
+    particula.activity.ratio
     
   </span>
   
@@ -1016,7 +1167,7 @@
   
   
   <span class="md-ellipsis">
-    Water Activity
+    particula.activity.water_activity
     
   </span>
   
@@ -1045,7 +1196,9 @@
     
       
         
-          
+      
+        
+      
         
       
         
@@ -1073,12 +1226,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15" id="__nav_2_3_15_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1087,22 +1239,60 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10" id="__nav_2_2_10_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15">
             <span class="md-nav__icon md-icon"></span>
             Dynamics
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.coagulation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/condensation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.condensation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -1117,7 +1307,7 @@
   
   
   <span class="md-ellipsis">
-    Dilution
+    particula.dynamics.dilution
     
   </span>
   
@@ -1140,7 +1330,30 @@
   
   
   <span class="md-ellipsis">
-    Particle Process
+    particula.dynamics.particle_process
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/properties/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.properties
     
   </span>
   
@@ -1163,7 +1376,7 @@
   
   
   <span class="md-ellipsis">
-    Wall Loss
+    particula.dynamics.wall_loss
     
   </span>
   
@@ -1184,7 +1397,11 @@
     
       
         
-          
+      
+        
+      
+        
+      
         
       
         
@@ -1224,12 +1441,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_7" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/coagulation/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_7" id="__nav_2_3_15_7_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1238,23 +1454,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_5" id="__nav_2_2_10_5_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_10_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_15_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_7">
             <span class="md-nav__icon md-icon"></span>
             Coagulation
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -1268,7 +1476,7 @@
   
   
   <span class="md-ellipsis">
-    Brownian Kernel
+    particula.dynamics.coagulation.brownian_kernel
     
   </span>
   
@@ -1291,7 +1499,7 @@
   
   
   <span class="md-ellipsis">
-    Charged Dimensional Kernel
+    particula.dynamics.coagulation.charged_dimensional_kernel
     
   </span>
   
@@ -1314,7 +1522,7 @@
   
   
   <span class="md-ellipsis">
-    Charged Dimensionless Kernel
+    particula.dynamics.coagulation.charged_dimensionless_kernel
     
   </span>
   
@@ -1337,7 +1545,30 @@
   
   
   <span class="md-ellipsis">
-    Charged Kernel Strategy
+    particula.dynamics.coagulation.charged_kernel_strategy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/coagulation/coagulation_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.coagulation.coagulation_builder
     
   </span>
   
@@ -1360,7 +1591,7 @@
   
   
   <span class="md-ellipsis">
-    Coagulation Factories
+    particula.dynamics.coagulation.coagulation_factories
     
   </span>
   
@@ -1383,7 +1614,53 @@
   
   
   <span class="md-ellipsis">
-    Coagulation Rate
+    particula.dynamics.coagulation.coagulation_rate
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/coagulation/coagulation_strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.coagulation.coagulation_strategy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/coagulation/particle_resolved_step/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.coagulation.particle_resolved_step
     
   </span>
   
@@ -1406,7 +1683,30 @@
   
   
   <span class="md-ellipsis">
-    Sedimentation Kernel
+    particula.dynamics.coagulation.sedimentation_kernel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/coagulation/turbulent_dns_kernel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.coagulation.turbulent_dns_kernel
     
   </span>
   
@@ -1429,7 +1729,7 @@
   
   
   <span class="md-ellipsis">
-    Turbulent Shear Kernel
+    particula.dynamics.coagulation.turbulent_shear_kernel
     
   </span>
   
@@ -1448,10 +1748,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -1480,12 +1776,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_5_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_7_13" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/coagulation/coagulation_builder/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_7_13" id="__nav_2_3_15_7_13_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1494,23 +1789,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_5_10" id="__nav_2_2_10_5_10_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_10_5_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_5_10">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_3_15_7_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_7_13">
             <span class="md-nav__icon md-icon"></span>
             Coagulation builder
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -1524,7 +1811,7 @@
   
   
   <span class="md-ellipsis">
-    BrownianCoagulationBuilder
+    particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder
     
   </span>
   
@@ -1547,7 +1834,7 @@
   
   
   <span class="md-ellipsis">
-    ChargedCoagulationBuilder
+    particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder
     
   </span>
   
@@ -1570,7 +1857,7 @@
   
   
   <span class="md-ellipsis">
-    Coagulation Builder Mixin
+    particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin
     
   </span>
   
@@ -1593,7 +1880,7 @@
   
   
   <span class="md-ellipsis">
-    CombineCoagulationStrategyBuilder
+    particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder
     
   </span>
   
@@ -1616,7 +1903,7 @@
   
   
   <span class="md-ellipsis">
-    SedimentationCoagulationBuilder
+    particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder
     
   </span>
   
@@ -1639,7 +1926,7 @@
   
   
   <span class="md-ellipsis">
-    TurbulentDNSCoagulationBuilder
+    particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder
     
   </span>
   
@@ -1662,7 +1949,7 @@
   
   
   <span class="md-ellipsis">
-    TurbulentShearCoagulationBuilder
+    particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder
     
   </span>
   
@@ -1691,10 +1978,6 @@
     
       
         
-          
-        
-      
-        
       
         
       
@@ -1721,12 +2004,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_5_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_7_14" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/coagulation/coagulation_strategy/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_7_14" id="__nav_2_3_15_7_14_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1735,23 +2017,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_5_11" id="__nav_2_2_10_5_11_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_10_5_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_5_11">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_3_15_7_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_7_14">
             <span class="md-nav__icon md-icon"></span>
             Coagulation strategy
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -1765,7 +2039,7 @@
   
   
   <span class="md-ellipsis">
-    BrownianCoagulationStrategy
+    particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy
     
   </span>
   
@@ -1788,7 +2062,7 @@
   
   
   <span class="md-ellipsis">
-    ChargedCoagulationStrategy
+    particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy
     
   </span>
   
@@ -1811,7 +2085,7 @@
   
   
   <span class="md-ellipsis">
-    CoagulationStrategyABC
+    particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc
     
   </span>
   
@@ -1834,7 +2108,7 @@
   
   
   <span class="md-ellipsis">
-    CombineCoagulationStrategy
+    particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy
     
   </span>
   
@@ -1857,7 +2131,7 @@
   
   
   <span class="md-ellipsis">
-    SedimentationCoagulationStrategy
+    particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy
     
   </span>
   
@@ -1880,7 +2154,7 @@
   
   
   <span class="md-ellipsis">
-    TurbulentDNSCoagulationStrategy
+    particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy
     
   </span>
   
@@ -1903,7 +2177,7 @@
   
   
   <span class="md-ellipsis">
-    TurbulentShearCoagulationStrategy
+    particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy
     
   </span>
   
@@ -1932,10 +2206,6 @@
     
       
         
-          
-        
-      
-        
       
         
       
@@ -1952,12 +2222,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_5_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_7_15" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/coagulation/particle_resolved_step/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_7_15" id="__nav_2_3_15_7_15_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1966,23 +2235,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_5_12" id="__nav_2_2_10_5_12_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_10_5_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_5_12">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_3_15_7_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_7_15">
             <span class="md-nav__icon md-icon"></span>
             Particle resolved step
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -1996,7 +2257,7 @@
   
   
   <span class="md-ellipsis">
-    Particle Resolved Method
+    particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method
     
   </span>
   
@@ -2019,7 +2280,7 @@
   
   
   <span class="md-ellipsis">
-    Super Droplet Method
+    particula.dynamics.coagulation.particle_resolved_step.super_droplet_method
     
   </span>
   
@@ -2046,10 +2307,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -2080,12 +2337,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_5_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_7_16" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/coagulation/turbulent_dns_kernel/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_7_16" id="__nav_2_3_15_7_16_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -2094,23 +2350,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_5_13" id="__nav_2_2_10_5_13_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_10_5_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_5_13">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_3_15_7_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_7_16">
             <span class="md-nav__icon md-icon"></span>
             Turbulent dns kernel
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -2124,7 +2372,7 @@
   
   
   <span class="md-ellipsis">
-    G12 Radial Distribution Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008
     
   </span>
   
@@ -2147,7 +2395,7 @@
   
   
   <span class="md-ellipsis">
-    Phi Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008
     
   </span>
   
@@ -2170,7 +2418,7 @@
   
   
   <span class="md-ellipsis">
-    Psi Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008
     
   </span>
   
@@ -2193,7 +2441,7 @@
   
   
   <span class="md-ellipsis">
-    Radial Velocity Module
+    particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module
     
   </span>
   
@@ -2216,7 +2464,7 @@
   
   
   <span class="md-ellipsis">
-    Sigma Relative Velocity Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008
     
   </span>
   
@@ -2239,7 +2487,7 @@
   
   
   <span class="md-ellipsis">
-    Turbulent Dns Kernel Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008
     
   </span>
   
@@ -2262,7 +2510,7 @@
   
   
   <span class="md-ellipsis">
-    Velocity Correlation F2 Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008
     
   </span>
   
@@ -2285,7 +2533,7 @@
   
   
   <span class="md-ellipsis">
-    Velocity Correlation Terms Ao2008
+    particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008
     
   </span>
   
@@ -2322,7 +2570,7 @@
     
       
         
-          
+      
         
       
         
@@ -2346,12 +2594,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_8" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/condensation/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_8" id="__nav_2_3_15_8_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -2360,22 +2607,37 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_6" id="__nav_2_2_10_6_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_10_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_6">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_15_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_8">
             <span class="md-nav__icon md-icon"></span>
             Condensation
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/condensation/condensation_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.condensation.condensation_builder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -2390,7 +2652,7 @@
   
   
   <span class="md-ellipsis">
-    Condensation Factories
+    particula.dynamics.condensation.condensation_factories
     
   </span>
   
@@ -2413,7 +2675,7 @@
   
   
   <span class="md-ellipsis">
-    Condensation Strategies
+    particula.dynamics.condensation.condensation_strategies
     
   </span>
   
@@ -2436,7 +2698,7 @@
   
   
   <span class="md-ellipsis">
-    Mass Transfer
+    particula.dynamics.condensation.mass_transfer
     
   </span>
   
@@ -2459,12 +2721,115 @@
   
   
   <span class="md-ellipsis">
-    Mass Transfer Utils
+    particula.dynamics.condensation.mass_transfer_utils
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_8_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_15_8_6" id="__nav_2_3_15_8_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Condensation builder
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_3_15_8_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_8_6">
+            <span class="md-nav__icon md-icon"></span>
+            Condensation builder
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/condensation/condensation_builder/condensation_builder_mixin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.condensation.condensation_builder.condensation_builder_mixin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dynamics/condensation/condensation_builder/condensation_isothermal_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2488,10 +2853,6 @@
     
       
         
-          
-        
-      
-        
       
     
     
@@ -2506,12 +2867,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_15_9" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../dynamics/properties/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_15_9" id="__nav_2_3_15_9_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -2520,23 +2880,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_10_7" id="__nav_2_2_10_7_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_10_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_10_7">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_15_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_15_9">
             <span class="md-nav__icon md-icon"></span>
             Properties
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -2550,7 +2902,7 @@
   
   
   <span class="md-ellipsis">
-    Wall Loss Coefficient
+    particula.dynamics.properties.wall_loss_coefficient
     
   </span>
   
@@ -2587,10 +2939,6 @@
     
       
         
-          
-        
-      
-        
       
     
     
@@ -2605,12 +2953,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_16" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../equilibria/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_16" id="__nav_2_3_16_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -2619,23 +2966,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_11" id="__nav_2_2_11_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_11">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_16">
             <span class="md-nav__icon md-icon"></span>
             Equilibria
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -2649,7 +2988,7 @@
   
   
   <span class="md-ellipsis">
-    Partitioning
+    particula.equilibria.partitioning
     
   </span>
   
@@ -2677,8 +3016,6 @@
     
     
       
-        
-          
         
       
         
@@ -2712,12 +3049,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_17" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../gas/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_17" id="__nav_2_3_17_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -2726,23 +3062,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_12" id="__nav_2_2_12_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_12">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_17">
             <span class="md-nav__icon md-icon"></span>
             Gas
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -2756,7 +3084,7 @@
   
   
   <span class="md-ellipsis">
-    Atmosphere
+    particula.gas.atmosphere
     
   </span>
   
@@ -2779,7 +3107,30 @@
   
   
   <span class="md-ellipsis">
-    Atmosphere Builders
+    particula.gas.atmosphere_builders
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../gas/properties/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.gas.properties
     
   </span>
   
@@ -2802,7 +3153,7 @@
   
   
   <span class="md-ellipsis">
-    Species
+    particula.gas.species
     
   </span>
   
@@ -2825,7 +3176,7 @@
   
   
   <span class="md-ellipsis">
-    Species Builders
+    particula.gas.species_builders
     
   </span>
   
@@ -2848,7 +3199,7 @@
   
   
   <span class="md-ellipsis">
-    Species Factories
+    particula.gas.species_factories
     
   </span>
   
@@ -2871,7 +3222,7 @@
   
   
   <span class="md-ellipsis">
-    Vapor Pressure Builders
+    particula.gas.vapor_pressure_builders
     
   </span>
   
@@ -2894,7 +3245,7 @@
   
   
   <span class="md-ellipsis">
-    Vapor Pressure Factories
+    particula.gas.vapor_pressure_factories
     
   </span>
   
@@ -2917,7 +3268,7 @@
   
   
   <span class="md-ellipsis">
-    Vapor Pressure Strategies
+    particula.gas.vapor_pressure_strategies
     
   </span>
   
@@ -2936,10 +3287,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -2978,12 +3325,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_12_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_17_10" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../gas/properties/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_17_10" id="__nav_2_3_17_10_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -2992,23 +3338,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_12_10" id="__nav_2_2_12_10_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_12_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_12_10">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_17_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_17_10">
             <span class="md-nav__icon md-icon"></span>
             Properties
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -3022,7 +3360,7 @@
   
   
   <span class="md-ellipsis">
-    Concentration Function
+    particula.gas.properties.concentration_function
     
   </span>
   
@@ -3045,7 +3383,7 @@
   
   
   <span class="md-ellipsis">
-    Dynamic Viscosity
+    particula.gas.properties.dynamic_viscosity
     
   </span>
   
@@ -3068,7 +3406,7 @@
   
   
   <span class="md-ellipsis">
-    Fluid Rms Velocity
+    particula.gas.properties.fluid_rms_velocity
     
   </span>
   
@@ -3091,7 +3429,7 @@
   
   
   <span class="md-ellipsis">
-    Integral Scale Module
+    particula.gas.properties.integral_scale_module
     
   </span>
   
@@ -3114,7 +3452,7 @@
   
   
   <span class="md-ellipsis">
-    Kinematic Viscosity
+    particula.gas.properties.kinematic_viscosity
     
   </span>
   
@@ -3137,7 +3475,7 @@
   
   
   <span class="md-ellipsis">
-    Kolmogorov Module
+    particula.gas.properties.kolmogorov_module
     
   </span>
   
@@ -3160,7 +3498,7 @@
   
   
   <span class="md-ellipsis">
-    Mean Free Path
+    particula.gas.properties.mean_free_path
     
   </span>
   
@@ -3183,7 +3521,7 @@
   
   
   <span class="md-ellipsis">
-    Normalize Accel Variance
+    particula.gas.properties.normalize_accel_variance
     
   </span>
   
@@ -3206,7 +3544,7 @@
   
   
   <span class="md-ellipsis">
-    Pressure Function
+    particula.gas.properties.pressure_function
     
   </span>
   
@@ -3229,7 +3567,7 @@
   
   
   <span class="md-ellipsis">
-    Taylor Microscale Module
+    particula.gas.properties.taylor_microscale_module
     
   </span>
   
@@ -3252,7 +3590,7 @@
   
   
   <span class="md-ellipsis">
-    Thermal Conductivity
+    particula.gas.properties.thermal_conductivity
     
   </span>
   
@@ -3275,7 +3613,7 @@
   
   
   <span class="md-ellipsis">
-    Vapor Pressure Module
+    particula.gas.properties.vapor_pressure_module
     
   </span>
   
@@ -3314,7 +3652,7 @@
     
       
         
-          
+      
         
       
         
@@ -3358,12 +3696,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_13" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18" checked>
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_18" id="__nav_2_3_18_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -3372,23 +3709,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_13" id="__nav_2_2_13_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_13_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_2_13">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_18_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3_18">
             <span class="md-nav__icon md-icon"></span>
             Particles
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -3402,7 +3731,7 @@
   
   
   <span class="md-ellipsis">
-    Activity Builders
+    particula.particles.activity_builders
     
   </span>
   
@@ -3425,7 +3754,7 @@
   
   
   <span class="md-ellipsis">
-    Activity Factories
+    particula.particles.activity_factories
     
   </span>
   
@@ -3448,7 +3777,7 @@
   
   
   <span class="md-ellipsis">
-    Activity Strategies
+    particula.particles.activity_strategies
     
   </span>
   
@@ -3471,7 +3800,7 @@
   
   
   <span class="md-ellipsis">
-    Change Particle Representation
+    particula.particles.change_particle_representation
     
   </span>
   
@@ -3494,7 +3823,7 @@
   
   
   <span class="md-ellipsis">
-    Distribution Builders
+    particula.particles.distribution_builders
     
   </span>
   
@@ -3517,7 +3846,53 @@
   
   
   <span class="md-ellipsis">
-    Distribution Factories
+    particula.particles.distribution_factories
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.particles.distribution_strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../properties/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.particles.properties
     
   </span>
   
@@ -3540,7 +3915,7 @@
   
   
   <span class="md-ellipsis">
-    Representation
+    particula.particles.representation
     
   </span>
   
@@ -3563,7 +3938,7 @@
   
   
   <span class="md-ellipsis">
-    Representation Builders
+    particula.particles.representation_builders
     
   </span>
   
@@ -3586,7 +3961,7 @@
   
   
   <span class="md-ellipsis">
-    Representation Factories
+    particula.particles.representation_factories
     
   </span>
   
@@ -3609,7 +3984,7 @@
   
   
   <span class="md-ellipsis">
-    Surface Builders
+    particula.particles.surface_builders
     
   </span>
   
@@ -3632,7 +4007,7 @@
   
   
   <span class="md-ellipsis">
-    Surface Factories
+    particula.particles.surface_factories
     
   </span>
   
@@ -3655,7 +4030,7 @@
   
   
   <span class="md-ellipsis">
-    Surface Strategies
+    particula.particles.surface_strategies
     
   </span>
   
@@ -3676,10 +4051,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -3704,12 +4075,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_13_14" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18_15" checked>
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_18_15" id="__nav_2_3_18_15_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -3718,23 +4088,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_13_14" id="__nav_2_2_13_14_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_13_14_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_2_13_14">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_18_15_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3_18_15">
             <span class="md-nav__icon md-icon"></span>
             Distribution strategies
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -3748,7 +4110,7 @@
   
   
   <span class="md-ellipsis">
-    Base
+    particula.particles.distribution_strategies.base
     
   </span>
   
@@ -3771,7 +4133,7 @@
   
   
   <span class="md-ellipsis">
-    MassBasedMovingBin
+    particula.particles.distribution_strategies.mass_based_moving_bin
     
   </span>
   
@@ -3794,7 +4156,7 @@
   
   
   <span class="md-ellipsis">
-    ParticleResolvedSpeciatedMass
+    particula.particles.distribution_strategies.particle_resolved_speciated_mass
     
   </span>
   
@@ -3826,7 +4188,7 @@
   
   
   <span class="md-ellipsis">
-    RadiiBasedMovingBin
+    particula.particles.distribution_strategies.radii_based_moving_bin
     
   </span>
   
@@ -3839,7 +4201,7 @@
   
   
   <span class="md-ellipsis">
-    RadiiBasedMovingBin
+    particula.particles.distribution_strategies.radii_based_moving_bin
     
   </span>
   
@@ -3865,150 +4227,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#radiibasedmovingbin_1" class="md-nav__link">
+  <a href="#particula.particles.distribution_strategies.radii_based_moving_bin" class="md-nav__link">
     <span class="md-ellipsis">
-      RadiiBasedMovingBin
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;radii_based_moving_bin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin">
+    <nav class="md-nav" aria-label=" radii_based_moving_bin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
+  <a href="#particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin" class="md-nav__link">
     <span class="md-ellipsis">
-      Methods
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;RadiiBasedMovingBin
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -4041,7 +4274,7 @@
   
   
   <span class="md-ellipsis">
-    SpeciatedMassMovingBin
+    particula.particles.distribution_strategies.speciated_mass_moving_bin
     
   </span>
   
@@ -4068,10 +4301,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -4140,12 +4369,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_13_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18_16" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../properties/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_18_16" id="__nav_2_3_18_16_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -4154,23 +4382,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_13_15" id="__nav_2_2_13_15_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_13_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_13_15">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_18_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_18_16">
             <span class="md-nav__icon md-icon"></span>
             Properties
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -4184,7 +4404,7 @@
   
   
   <span class="md-ellipsis">
-    Activity Module
+    particula.particles.properties.activity_module
     
   </span>
   
@@ -4207,7 +4427,7 @@
   
   
   <span class="md-ellipsis">
-    Aerodynamic Mobility Module
+    particula.particles.properties.aerodynamic_mobility_module
     
   </span>
   
@@ -4230,7 +4450,7 @@
   
   
   <span class="md-ellipsis">
-    Aerodynamic Size
+    particula.particles.properties.aerodynamic_size
     
   </span>
   
@@ -4253,7 +4473,7 @@
   
   
   <span class="md-ellipsis">
-    Collision Radius Module
+    particula.particles.properties.collision_radius_module
     
   </span>
   
@@ -4276,7 +4496,7 @@
   
   
   <span class="md-ellipsis">
-    Convert Kappa Volumes
+    particula.particles.properties.convert_kappa_volumes
     
   </span>
   
@@ -4299,7 +4519,7 @@
   
   
   <span class="md-ellipsis">
-    Convert Mass Concentration
+    particula.particles.properties.convert_mass_concentration
     
   </span>
   
@@ -4322,7 +4542,7 @@
   
   
   <span class="md-ellipsis">
-    Convert Mole Fraction
+    particula.particles.properties.convert_mole_fraction
     
   </span>
   
@@ -4345,7 +4565,7 @@
   
   
   <span class="md-ellipsis">
-    Convert Size Distribution
+    particula.particles.properties.convert_size_distribution
     
   </span>
   
@@ -4368,7 +4588,7 @@
   
   
   <span class="md-ellipsis">
-    Coulomb Enhancement
+    particula.particles.properties.coulomb_enhancement
     
   </span>
   
@@ -4391,7 +4611,7 @@
   
   
   <span class="md-ellipsis">
-    Diffusion Coefficient
+    particula.particles.properties.diffusion_coefficient
     
   </span>
   
@@ -4414,7 +4634,7 @@
   
   
   <span class="md-ellipsis">
-    Diffusive Knudsen Module
+    particula.particles.properties.diffusive_knudsen_module
     
   </span>
   
@@ -4437,7 +4657,7 @@
   
   
   <span class="md-ellipsis">
-    Friction Factor Module
+    particula.particles.properties.friction_factor_module
     
   </span>
   
@@ -4460,7 +4680,7 @@
   
   
   <span class="md-ellipsis">
-    Inertia Time
+    particula.particles.properties.inertia_time
     
   </span>
   
@@ -4483,7 +4703,7 @@
   
   
   <span class="md-ellipsis">
-    Kelvin Effect Module
+    particula.particles.properties.kelvin_effect_module
     
   </span>
   
@@ -4506,7 +4726,7 @@
   
   
   <span class="md-ellipsis">
-    Knudsen Number Module
+    particula.particles.properties.knudsen_number_module
     
   </span>
   
@@ -4529,7 +4749,7 @@
   
   
   <span class="md-ellipsis">
-    Lognormal Size Distribution
+    particula.particles.properties.lognormal_size_distribution
     
   </span>
   
@@ -4552,7 +4772,7 @@
   
   
   <span class="md-ellipsis">
-    Mean Thermal Speed Module
+    particula.particles.properties.mean_thermal_speed_module
     
   </span>
   
@@ -4575,7 +4795,7 @@
   
   
   <span class="md-ellipsis">
-    Mixing State Index
+    particula.particles.properties.mixing_state_index
     
   </span>
   
@@ -4598,7 +4818,7 @@
   
   
   <span class="md-ellipsis">
-    Organic Density Module
+    particula.particles.properties.organic_density_module
     
   </span>
   
@@ -4621,7 +4841,7 @@
   
   
   <span class="md-ellipsis">
-    Partial Pressure Module
+    particula.particles.properties.partial_pressure_module
     
   </span>
   
@@ -4644,7 +4864,7 @@
   
   
   <span class="md-ellipsis">
-    Reynolds Number
+    particula.particles.properties.reynolds_number
     
   </span>
   
@@ -4667,7 +4887,7 @@
   
   
   <span class="md-ellipsis">
-    Settling Velocity
+    particula.particles.properties.settling_velocity
     
   </span>
   
@@ -4690,7 +4910,7 @@
   
   
   <span class="md-ellipsis">
-    Slip Correction Module
+    particula.particles.properties.slip_correction_module
     
   </span>
   
@@ -4713,7 +4933,7 @@
   
   
   <span class="md-ellipsis">
-    Sort Bins
+    particula.particles.properties.sort_bins
     
   </span>
   
@@ -4736,7 +4956,7 @@
   
   
   <span class="md-ellipsis">
-    Special Functions
+    particula.particles.properties.special_functions
     
   </span>
   
@@ -4759,7 +4979,7 @@
   
   
   <span class="md-ellipsis">
-    Stokes Number
+    particula.particles.properties.stokes_number
     
   </span>
   
@@ -4782,7 +5002,7 @@
   
   
   <span class="md-ellipsis">
-    Vapor Correction Module
+    particula.particles.properties.vapor_correction_module
     
   </span>
   
@@ -4819,7 +5039,7 @@
     
       
         
-          
+      
         
       
         
@@ -4857,12 +5077,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../util/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_19" id="__nav_2_3_19_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -4871,23 +5090,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_14" id="__nav_2_2_14_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_14">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19">
             <span class="md-nav__icon md-icon"></span>
             Util
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -4901,7 +5112,30 @@
   
   
   <span class="md-ellipsis">
-    Arbitrary Round
+    particula.util.arbitrary_round
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../util/chemical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.util.chemical
     
   </span>
   
@@ -4924,7 +5158,7 @@
   
   
   <span class="md-ellipsis">
-    Colors
+    particula.util.colors
     
   </span>
   
@@ -4947,7 +5181,7 @@
   
   
   <span class="md-ellipsis">
-    Constants
+    particula.util.constants
     
   </span>
   
@@ -4970,7 +5204,7 @@
   
   
   <span class="md-ellipsis">
-    Convert Dtypes
+    particula.util.convert_dtypes
     
   </span>
   
@@ -4993,7 +5227,30 @@
   
   
   <span class="md-ellipsis">
-    Convert Units
+    particula.util.convert_units
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../util/lf2013_coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    particula.util.lf2013_coagulation
     
   </span>
   
@@ -5016,7 +5273,7 @@
   
   
   <span class="md-ellipsis">
-    Machine Limit
+    particula.util.machine_limit
     
   </span>
   
@@ -5039,7 +5296,7 @@
   
   
   <span class="md-ellipsis">
-    Reduced Quantity
+    particula.util.reduced_quantity
     
   </span>
   
@@ -5062,7 +5319,7 @@
   
   
   <span class="md-ellipsis">
-    Refractive Index Mixing
+    particula.util.refractive_index_mixing
     
   </span>
   
@@ -5085,7 +5342,7 @@
   
   
   <span class="md-ellipsis">
-    Validate Inputs
+    particula.util.validate_inputs
     
   </span>
   
@@ -5104,10 +5361,6 @@
   
     
     
-      
-        
-          
-        
       
         
       
@@ -5132,12 +5385,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_14_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_12" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../util/chemical/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_19_12" id="__nav_2_3_19_12_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -5146,23 +5398,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_14_11" id="__nav_2_2_14_11_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_14_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_14_11">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_12">
             <span class="md-nav__icon md-icon"></span>
             Chemical
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -5176,7 +5420,7 @@
   
   
   <span class="md-ellipsis">
-    Chemical Properties
+    particula.util.chemical.chemical_properties
     
   </span>
   
@@ -5199,7 +5443,7 @@
   
   
   <span class="md-ellipsis">
-    Chemical Search
+    particula.util.chemical.chemical_search
     
   </span>
   
@@ -5222,7 +5466,7 @@
   
   
   <span class="md-ellipsis">
-    Chemical Surface Tension
+    particula.util.chemical.chemical_surface_tension
     
   </span>
   
@@ -5245,7 +5489,7 @@
   
   
   <span class="md-ellipsis">
-    Chemical Vapor Pressure
+    particula.util.chemical.chemical_vapor_pressure
     
   </span>
   
@@ -5268,7 +5512,7 @@
   
   
   <span class="md-ellipsis">
-    Thermo Import
+    particula.util.chemical.thermo_import
     
   </span>
   
@@ -5297,10 +5541,6 @@
     
       
         
-          
-        
-      
-        
       
     
     
@@ -5315,12 +5555,11 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_14_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_13" >
         
           
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../util/lf2013_coagulation/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2_3_19_13" id="__nav_2_3_19_13_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -5329,23 +5568,15 @@
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_2_14_12" id="__nav_2_2_14_12_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_14_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_14_12">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_13">
             <span class="md-nav__icon md-icon"></span>
             Lf2013 coagulation
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -5359,7 +5590,7 @@
   
   
   <span class="md-ellipsis">
-    Src Lf2013 Coagulation
+    particula.util.lf2013_coagulation.src_lf2013_coagulation
     
   </span>
   
@@ -9439,150 +9670,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#radiibasedmovingbin_1" class="md-nav__link">
+  <a href="#particula.particles.distribution_strategies.radii_based_moving_bin" class="md-nav__link">
     <span class="md-ellipsis">
-      RadiiBasedMovingBin
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;radii_based_moving_bin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin">
+    <nav class="md-nav" aria-label=" radii_based_moving_bin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
+  <a href="#particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin" class="md-nav__link">
     <span class="md-ellipsis">
-      Methods
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;RadiiBasedMovingBin
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_concentration" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_concentration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_concentration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinadd_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().add_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().add_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbincollide_pairs" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().collide_pairs
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().collide_pairs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_radius" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_radius
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_radius">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#radiibasedmovingbinget_species_mass" class="md-nav__link">
-    <span class="md-ellipsis">
-      RadiiBasedMovingBin().get_species_mass
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RadiiBasedMovingBin().get_species_mass">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#signature_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -9613,77 +9715,108 @@
   
 
 
-<h1 id="radiibasedmovingbin">RadiiBasedMovingBin<a class="headerlink" href="#radiibasedmovingbin" title="Permanent link">&para;</a></h1>
-<p><a href="../../../../#particula-index">Particula Index</a> / <a href="../../../#particula">Particula</a> / <a href="../../#particles">Particles</a> / <a href="../#distribution-strategies">Distribution Strategies</a> / RadiiBasedMovingBin</p>
-<blockquote>
-<p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py">particula.particles.distribution_strategies.radii_based_moving_bin</a> module.</p>
-</blockquote>
-<h2 id="radiibasedmovingbin_1">RadiiBasedMovingBin<a class="headerlink" href="#radiibasedmovingbin_1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py#L13">Show source in radii_based_moving_bin.py:13</a></p>
-<p>Strategy for particles represented by their radius distribution.</p>
+<h1 id="particulaparticlesdistribution_strategiesradii_based_moving_bin"><code>particula.particles.distribution_strategies.radii_based_moving_bin</code><a class="headerlink" href="#particulaparticlesdistribution_strategiesradii_based_moving_bin" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="particula.particles.distribution_strategies.radii_based_moving_bin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">radii_based_moving_bin</span>
+
+
+<a href="#particula.particles.distribution_strategies.radii_based_moving_bin" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Radii-based moving bin strategy.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RadiiBasedMovingBin</span>
+
+
+<a href="#particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            DistributionStrategy (particula.particles.distribution_strategies.base.DistributionStrategy)" href="../base/#particula.particles.distribution_strategies.base.DistributionStrategy">DistributionStrategy</a></code></p>
+
+
+        <p>Strategy for particles represented by their radius distribution.</p>
 <p>Calculates particle mass, radius, and total mass based on particle
 radius, number concentration, and density. This moving-bin approach
 recalculates radii when mass is added.</p>
-<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
-<ul>
-<li>get_name : Return the type of the distribution strategy.</li>
-<li>get_species_mass : Calculate the mass per species.</li>
-<li>get_mass : Calculate the mass of the particles or bin.</li>
-<li>get_total_mass : Calculate the total mass of particles.</li>
-<li>get_radius : Calculate the radius of particles.</li>
-<li>add_mass : Add mass to the particle distribution.</li>
-<li>add_concentration : Add concentration to the distribution.</li>
-</ul>
-<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RadiiBasedMovingBin</span><span class="p">(</span><span class="n">DistributionStrategy</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinadd_concentration">RadiiBasedMovingBin().add_concentration<a class="headerlink" href="#radiibasedmovingbinadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py#L54">Show source in radii_based_moving_bin.py:54</a></p>
-<h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinadd_mass">RadiiBasedMovingBin().add_mass<a class="headerlink" href="#radiibasedmovingbinadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py#L41">Show source in radii_based_moving_bin.py:41</a></p>
-<h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbincollide_pairs">RadiiBasedMovingBin().collide_pairs<a class="headerlink" href="#radiibasedmovingbincollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py#L80">Show source in radii_based_moving_bin.py:80</a></p>
-<h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinget_radius">RadiiBasedMovingBin().get_radius<a class="headerlink" href="#radiibasedmovingbinget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py#L36">Show source in radii_based_moving_bin.py:36</a></p>
-<h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_radius</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
-<h3 id="radiibasedmovingbinget_species_mass">RadiiBasedMovingBin().get_species_mass<a class="headerlink" href="#radiibasedmovingbinget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies/radii_based_moving_bin.py#L30">Show source in radii_based_moving_bin.py:30</a></p>
-<h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_species_mass</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">density</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
-</code></pre></div>
+<p>Methods:
+- get_name : Return the type of the distribution strategy.
+- get_species_mass : Calculate the mass per species.
+- get_mass : Calculate the mass of the particles or bin.
+- get_total_mass : Calculate the total mass of particles.
+- get_radius : Calculate the radius of particles.
+- add_mass : Add mass to the particle distribution.
+- add_concentration : Add concentration to the distribution.</p>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
