@@ -61,6 +61,10 @@ from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
+# Minimum particle radius (0.1 nm) below which continuum mechanics breaks down
+# and condensation equations are no longer physically valid
+MIN_PARTICLE_RADIUS_M = 1e-10  # meters
+
 
 # mass transfer abstract class
 class CondensationStrategy(ABC):
@@ -574,15 +578,11 @@ class CondensationIsothermal(CondensationStrategy):
         )
         ```.
         """
-        # Minimum particle radius (0.1 nm) below which continuum
-        # mechanics breaks down
-        min_radius = 1e-10  # m
-
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
 
         # Clip radii to minimum physical size
-        # Below ~0.1 nm, condensation equations are not valid
-        radius_with_fill = np.maximum(radius_with_fill, min_radius)
+        # Below MIN_PARTICLE_RADIUS_M, condensation equations are not valid
+        radius_with_fill = np.maximum(radius_with_fill, MIN_PARTICLE_RADIUS_M)
 
         first_order_mass_transport = self.first_order_mass_transport(
             particle_radius=radius_with_fill,
