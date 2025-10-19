@@ -94,19 +94,37 @@ def module_name_from_file(py_file: Path) -> str | None:
     return ".".join([PACKAGE] + mod_parts)
 
 
-def get_display_name(modname: str) -> str:
+def get_display_name(modname: str, category: str = None) -> str:
     """
-    Get a cleaner display name for the TOC.
-    Strips 'particula.' prefix and converts underscores to spaces for
-    readability.
+    Get a cleaner display name for the TOC with parent folder context.
+    Returns the module name with one level of parent folder for clarity.
+
+    E.g., 'particula.activity.gibbs' -> 'gibbs' (top-level in category)
+    E.g., 'particula.particles.properties.activity_module' ->
+          'properties/activity_module'
     """
     # Remove the package prefix
     if modname.startswith(f"{PACKAGE}."):
-        display = modname[len(PACKAGE) + 1:]
+        rel_path = modname[len(PACKAGE) + 1:]
     else:
-        display = modname
+        rel_path = modname
 
-    return display
+    parts = rel_path.split(".")
+
+    # If it's a top-level module or has only one level, return just the name
+    if len(parts) <= 1:
+        return parts[-1]
+
+    # If category is provided and module is directly under category,
+    # just return the module name
+    if category and len(parts) == 2 and parts[0] == category.lower():
+        return parts[-1]
+
+    # For deeper modules, show parent/module_name
+    if len(parts) >= 2:
+        return f"{parts[-2]}/{parts[-1]}"
+
+    return parts[-1]
 
 
 def organize_modules(modules: list[str]) -> dict[str, list[str]]:
@@ -207,22 +225,37 @@ def main() -> None:
             pass
 
     # Create organized index page
-    index_path = out_dir / "index.md"
-    organized = organize_modules(all_modules)
+    # index_path = out_dir / "index.md"
+    # organized = organize_modules(all_modules)
 
-    with mkdocs_gen_files.open(index_path, "w") as f:
-        f.write("# API Reference\n\n")
+    # with mkdocs_gen_files.open(index_path, "w") as f:
+    #     f.write("# API Reference\n\n")
 
-        for category, modules in organized.items():
-            # Write category header
-            f.write(f"## {category.title()}\n\n")
+    #     for category, modules in organized.items():
+    #         # Write category header
+    #         f.write(f"## {category.title()}\n\n")
 
-            for modname in sorted(modules):
-                display = get_display_name(modname)
-                link = modname.replace(".", "/") + ".md"
-                f.write(f"- [{display}]({link})\n")
+    #         for modname in sorted(modules):
+    #             display = get_display_name(modname, category)
+    #             link = modname.replace(".", "/") + ".md"
+    #             f.write(f"- [{display}]({link})\n")
 
-            f.write("\n")
+    #         f.write("\n")
+
+    # Create SUMMARY.md for literate-nav navigation
+    # summary_path = out_dir / "SUMMARY.md"
+    # with mkdocs_gen_files.open(summary_path, "w") as f:
+    #     f.write("# API Reference\n\n")
+
+    #     for category, modules in organized.items():
+    #         # Write category as expandable section
+    #         f.write(f"* {category}\n")
+
+    #         for modname in sorted(modules):
+    #             display = get_display_name(modname, category)
+    #             link = modname.replace(".", "/") + ".md"
+    #             # Use indentation for literate-nav hierarchy
+    #             f.write(f"    * [{display}]({link})\n")
 
 
 # Always run main() when imported by mkdocs-gen-files

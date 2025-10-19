@@ -33,7 +33,7 @@ jobs:
         - name: Install dependencies
           run: |
             pip install jupyter-book ghp-import
-            pip install mkdocs mkdocs-material[imaging] mkdocs-jupyter mkdocstrings[python] griffe
+            pip install mkdocs mkdocs-material[imaging] mkdocs-jupyter mkdocstrings[python] griffe mkdocs-gen-files mkdocs-literate-nav
 
         - name: Build MkDocs site with mkdocstrings
           run: mkdocs build
