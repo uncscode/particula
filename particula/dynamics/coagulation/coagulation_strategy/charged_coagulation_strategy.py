@@ -6,13 +6,13 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
 from particula.particles.representation import ParticleRepresentation
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 

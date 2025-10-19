@@ -32,8 +32,7 @@ def test_molar_surface_strategy():
 
 
 def test_molar_strategy_update_surface_tension():
-    """Test updating surface tension via temperature tables in Molar strategy.
-    """
+    """Test updating surface tension via temperature tables for Molar."""
     st_table = np.array(
         [
             [0.072, 0.07],

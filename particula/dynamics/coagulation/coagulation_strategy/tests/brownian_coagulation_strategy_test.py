@@ -6,11 +6,11 @@
 import unittest
 
 import numpy as np
-
 from particula.dynamics.coagulation.\
     coagulation_strategy.brownian_coagulation_strategy import (
-        BrownianCoagulationStrategy,
-    )
+    BrownianCoagulationStrategy,
+)
+
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,

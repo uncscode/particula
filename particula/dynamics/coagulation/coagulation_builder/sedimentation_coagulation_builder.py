@@ -1,17 +1,17 @@
 """Sedimentation Coagulation builder class."""
 
 from particula.abc_builder import BuilderABC
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.sedimentation_coagulation_strategy import (
+    SedimentationCoagulationStrategy,
+)
 from particula.dynamics.coagulation.coagulation_builder import (
     coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.sedimentation_coagulation_strategy import (
-        SedimentationCoagulationStrategy,
-    )
 
 
 class SedimentationCoagulationBuilder(

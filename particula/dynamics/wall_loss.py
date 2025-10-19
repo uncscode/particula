@@ -1,5 +1,4 @@
-"""Calculates wall loss rate for particles in various geometries.
-"""
+"""Calculates wall loss rate for particles in various geometries."""
 
 from typing import Tuple, Union
 

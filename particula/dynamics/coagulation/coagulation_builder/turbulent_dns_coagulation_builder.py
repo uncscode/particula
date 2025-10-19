@@ -12,17 +12,17 @@ import logging
 from typing import Optional
 
 from particula.abc_builder import BuilderABC
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.turbulent_dns_coagulation_strategy import (
+    TurbulentDNSCoagulationStrategy,
+)
 from particula.dynamics.coagulation.coagulation_builder import (
     coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.turbulent_dns_coagulation_strategy import (
-        TurbulentDNSCoagulationStrategy,
-    )
 from particula.util.convert_units import get_unit_conversion
 from particula.util.validate_inputs import validate_inputs
 

@@ -1,5 +1,4 @@
-"""Tests for the :class:`ParticleResolvedSpeciatedMass` distribution strategy.
-"""
+"""Tests for ParticleResolvedSpeciatedMass distribution strategy."""
 # pylint: disable=R0801
 
 import numpy as np

@@ -10,21 +10,21 @@ valid, flexible modeling of charged aerosol aggregation.
 from typing import Optional
 
 from particula.abc_builder import BuilderABC
+from particula.dynamics.coagulation.\
+    coagulation_builder.coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
+)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.charged_coagulation_strategy import (
+    ChargedCoagulationStrategy,
+)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
-from particula.dynamics.coagulation.\
-    coagulation_builder.coagulation_builder_mixin import (
-        BuilderDistributionTypeMixin,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.charged_coagulation_strategy import (
-        ChargedCoagulationStrategy,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
 
 
 class ChargedCoagulationBuilder(

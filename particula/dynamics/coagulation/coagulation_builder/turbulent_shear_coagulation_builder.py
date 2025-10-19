@@ -1,17 +1,17 @@
 """Turbulent Shear Coagulation Builder Module."""
 
 from particula.abc_builder import BuilderABC
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.turbulent_shear_coagulation_strategy import (
+    TurbulentShearCoagulationStrategy,
+)
 from particula.dynamics.coagulation.coagulation_builder import (
     coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.turbulent_shear_coagulation_strategy import (
-        TurbulentShearCoagulationStrategy,
-    )
 
 
 # pylint: disable=duplicate-code

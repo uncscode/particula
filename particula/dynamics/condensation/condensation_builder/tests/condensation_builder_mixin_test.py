@@ -1,13 +1,12 @@
 """Test cases for CondensationIsothermalBuilder in particula.dynamics."""
 
 import pytest
-
 from particula.dynamics.condensation.condensation_builder.\
     condensation_builder_mixin import (
-        BuilderAccommodationCoefficientMixin,
-        BuilderDiffusionCoefficientMixin,
-        BuilderUpdateGasesMixin,
-    )
+    BuilderAccommodationCoefficientMixin,
+    BuilderDiffusionCoefficientMixin,
+    BuilderUpdateGasesMixin,
+)
 
 
 class MixinTester(

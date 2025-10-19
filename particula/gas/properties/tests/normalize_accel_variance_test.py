@@ -29,8 +29,7 @@ def test_get_normalized_accel_variance_array():
 
 
 def test_get_normalized_accel_variance_invalid():
-    """Test that get_normalized_accel_variance raises errors for invalid inputs.
-    """
+    """Test get_normalized_accel_variance raises errors for invalid inputs."""
     with pytest.raises(ValueError):
         get_normalized_accel_variance_ao2008(-10)  # Negative Reynolds number
 
@@ -46,8 +45,7 @@ def test_get_normalized_accel_variance_invalid():
 
 
 def test_get_normalized_accel_variance_edge_case():
-    """Test get_normalized_accel_variance with small near-precision values.
-    """
+    """Test get_normalized_accel_variance with small near-precision values."""
     re_lambda = 1e-10
 
     expected = (11 + 7 * re_lambda) / (205 + re_lambda)
