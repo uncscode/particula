@@ -168,9 +168,10 @@ def organize_modules(modules: list[str]) -> dict[str, list[str]]:
 def main() -> None:
     print(f"mk_generator.py starting - SOURCE_ROOT: {SOURCE_ROOT}",
           flush=True)
-    with open("/tmp/mkgen_debug.txt", "w") as f:
-        f.write(f"Script ran! SOURCE_ROOT: {SOURCE_ROOT}\n")
-        f.write(f"SOURCE_ROOT exists: {SOURCE_ROOT.exists()}\n")
+    if os.environ.get("MKGEN_DEBUG") == "1":
+        with open("/tmp/mkgen_debug.txt", "w") as f:
+            f.write(f"Script ran! SOURCE_ROOT: {SOURCE_ROOT}\n")
+            f.write(f"SOURCE_ROOT exists: {SOURCE_ROOT.exists()}\n")
 
     out_dir = Path("API")  # keep same top-level directory name
 
