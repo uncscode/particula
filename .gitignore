@@ -154,3 +154,6 @@ dmypy.json
 .pyre/
 .aider*
 architect
+
+# Specs and planning documents
+specs/
