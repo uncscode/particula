@@ -599,7 +599,7 @@ class CondensationIsothermal(CondensationStrategy):
         # very small particles where Kelvin effect dominates.
         # Setting to 0 effectively treats condensation as negligible
         # for these extreme cases, which is physically reasonable since
-        # continuum mechanics breaks down below ~1 nm anyway.
+        # continuum mechanics breaks down below 0.1 nm anyway.
         pressure_delta = np.nan_to_num(
             pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
         )
