@@ -3,8 +3,6 @@
 import time
 
 import numpy as np
-from scipy.interpolate import RegularGridInterpolator
-
 from particula.dynamics.coagulation.\
     particle_resolved_step.particle_resolved_method import (
     _calculate_probabilities,
@@ -13,6 +11,7 @@ from particula.dynamics.coagulation.\
     get_particle_resolved_coagulation_step,
     get_particle_resolved_update_step,
 )
+from scipy.interpolate import RegularGridInterpolator
 
 
 def test_interpolate_kernel():
