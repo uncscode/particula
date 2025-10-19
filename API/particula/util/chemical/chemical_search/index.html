@@ -9884,7 +9884,9 @@ registry number.</p>
 <span class="normal">78</span>
 <span class="normal">79</span>
 <span class="normal">80</span>
-<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_search</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_chemical_search</span><span class="p">(</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a chemical identifier to a canonical name or CAS number.</span>
 
 <span class="sd">    The resolution proceeds in two stages:</span>
@@ -9939,7 +9941,9 @@ registry number.</p>
     <span class="c1"># 2. Fuzzy match</span>
     <span class="k">if</span> <span class="n">_pubchem_db</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">candidate_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_pubchem_db</span><span class="o">.</span><span class="n">name_index</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="n">matches</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">candidate_names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">get_close_matches</span><span class="p">(</span>
+                <span class="n">identifier</span><span class="p">,</span> <span class="n">candidate_names</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.6</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">matches</span> <span class="k">else</span> <span class="s2">&quot;No Match&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;No Match&quot;</span>
 </code></pre></div></td></tr></table></div>

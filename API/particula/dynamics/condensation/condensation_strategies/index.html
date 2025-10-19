@@ -10083,6 +10083,61 @@ concentration.</p>
   Wiley, 2016.</li>
 </ul>
 </details>
+        <p>Initialize the CondensationIsothermal strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>molar_mass</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Molar mass of the species [kg/mol].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>diffusion_coefficient</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>, default:
+                  <code>2e-05</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Diffusion coefficient [m^2/s].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>accommodation_coefficient</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>, default:
+                  <code>1.0</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Mass accommodation coefficient.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>update_gases</code></b>
+              (<code><span title="bool">bool</span></code>, default:
+                  <code>True</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Whether to update gas concentrations.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>skip_partitioning_indices</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Sequence">Sequence</span>[<span title="int">int</span>]]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Species indices to skip.</p>
+          </div>
+        </li>
+    </ul>
+
 
 
 
@@ -10106,7 +10161,16 @@ concentration.</p>
 <span class="normal">547</span>
 <span class="normal">548</span>
 <span class="normal">549</span>
-<span class="normal">550</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-5</span><span class="p">,</span>
@@ -10114,6 +10178,15 @@ concentration.</p>
     <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the CondensationIsothermal strategy.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        molar_mass: Molar mass of the species [kg/mol].</span>
+<span class="sd">        diffusion_coefficient: Diffusion coefficient [m^2/s].</span>
+<span class="sd">        accommodation_coefficient: Mass accommodation coefficient.</span>
+<span class="sd">        update_gases: Whether to update gas concentrations.</span>
+<span class="sd">        skip_partitioning_indices: Species indices to skip.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="n">diffusion_coefficient</span><span class="p">,</span>
@@ -10159,16 +10232,7 @@ m_rate = iso_cond.mass_transfer_rate(
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">561</span>
 <span class="normal">562</span>
 <span class="normal">563</span>
 <span class="normal">564</span>
@@ -10193,7 +10257,18 @@ m_rate = iso_cond.mass_transfer_rate(
 <span class="normal">583</span>
 <span class="normal">584</span>
 <span class="normal">585</span>
-<span class="normal">586</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">,</span>
@@ -10219,8 +10294,10 @@ m_rate = iso_cond.mass_transfer_rate(
     <span class="n">pressure_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_pressure_delta</span><span class="p">(</span>
         <span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">radius_with_fill</span>
     <span class="p">)</span>
-    <span class="c1"># Replace -inf and NaN with 0.0 to avoid issues in the mass transfer rate</span>
-    <span class="n">pressure_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">pressure_delta</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># Replace -inf and NaN with 0.0 to avoid mass transfer issues</span>
+    <span class="n">pressure_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
+        <span class="n">pressure_delta</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">get_mass_transfer_rate</span><span class="p">(</span>
         <span class="n">pressure_delta</span><span class="o">=</span><span class="n">pressure_delta</span><span class="p">,</span>
@@ -10254,18 +10331,7 @@ rates = iso_cond.rate(particle, gas_species, 298.15, 101325)</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span>
-<span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">599</span>
 <span class="normal">600</span>
 <span class="normal">601</span>
 <span class="normal">602</span>
@@ -10286,7 +10352,18 @@ rates = iso_cond.rate(particle, gas_species, 298.15, 101325)</code>.</p>
 <span class="normal">617</span>
 <span class="normal">618</span>
 <span class="normal">619</span>
-<span class="normal">620</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">,</span>
@@ -10347,18 +10424,7 @@ particle, gas_species = iso_cond.step(
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
-<span class="normal">628</span>
-<span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">634</span>
 <span class="normal">635</span>
 <span class="normal">636</span>
 <span class="normal">637</span>
@@ -10387,7 +10453,18 @@ particle, gas_species = iso_cond.step(
 <span class="normal">660</span>
 <span class="normal">661</span>
 <span class="normal">662</span>
-<span class="normal">663</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">,</span>

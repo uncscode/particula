@@ -9974,8 +9974,7 @@ rate [m<sup>2/s</sup>3].</p>
 
                   <details class="quote">
                     <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
-<span class="normal">75</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
@@ -9995,8 +9994,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="normal">92</span>
 <span class="normal">93</span>
 <span class="normal">94</span>
-<span class="normal">95</span>
-<span class="normal">96</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -10014,9 +10012,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        - None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">CoagulationStrategyABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span>
-    <span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="n">fluid_density</span>
 </code></pre></div></td></tr></table></div>
@@ -10105,7 +10101,8 @@ rate [m<sup>2/s</sup>3].</p>
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
+<span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
@@ -10139,8 +10136,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless_kernel</span><span class="p">(</span>
+<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless_kernel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -10264,7 +10260,8 @@ particle radii.</p>
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
+<span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
@@ -10305,8 +10302,7 @@ particle radii.</p>
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
+<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -10404,7 +10400,8 @@ rate [m<sup>2/s</sup>3].</p>
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
+<span class="normal"> 98</span>
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
@@ -10419,8 +10416,7 @@ rate [m<sup>2/s</sup>3].</p>
 <span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_turbulent_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_turbulent_dissipation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turbulent_dissipation</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the turbulent kinetic energy dissipation rate.</span>
 
 <span class="sd">    Arguments:</span>

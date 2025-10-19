@@ -9830,12 +9830,10 @@ gravitational settling.</p>
 <p><span class="doc-section-title">Attributes:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-          <b><code><span title="particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy.SedimentationCoagulationStrategy.-">-</span></code></b>
-              (<code><span title="distribution_type">distribution_type</span></code>)
+          <b><code><span title="particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy.SedimentationCoagulationStrategy.distribution_type">distribution_type</span></code></b>
           –
           <div class="doc-md-description">
-            <p>The particle distribution type ("discrete",
-"continuous_pdf", or "particle_resolved").</p>
+            <p>The particle distribution type ("discrete",</p>
           </div>
         </li>
     </ul>
@@ -9868,6 +9866,22 @@ gravitational settling.</p>
   Physics, Chapter 13, Equation 13A.4, Wiley.</li>
 </ul>
 </details>
+        <p>Initialize the sedimentation coagulation strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>distribution_type</code></b>
+              (<code><span title="str">str</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Type of particle distribution ("discrete",
+"continuous_pdf", or "particle_resolved").</p>
+          </div>
+        </li>
+    </ul>
+
 
 
 
@@ -9877,19 +9891,21 @@ gravitational settling.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+<span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">CoagulationStrategyABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span>
-    <span class="p">)</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the sedimentation coagulation strategy.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        distribution_type: Type of particle distribution (&quot;discrete&quot;,</span>
+<span class="sd">            &quot;continuous_pdf&quot;, or &quot;particle_resolved&quot;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -10114,7 +10130,11 @@ and density.</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
-<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -10142,7 +10162,11 @@ and density.</p>
 <span class="sd">        # k_values may be a single float or an array</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">get_sedimentation_kernel_sp2016_via_system_state</span><span class="p">(</span>
+    <span class="n">kernel_func</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">sedimentation_kernel</span>
+        <span class="o">.</span><span class="n">get_sedimentation_kernel_sp2016_via_system_state</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">kernel_func</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_mean_effective_density</span><span class="p">(),</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>

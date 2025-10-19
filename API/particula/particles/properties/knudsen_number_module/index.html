@@ -9765,8 +9765,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>Calculate the Knudsen number (Kn) from the gas mean free path and particle
-radius.</p>
+        <p>Calculate Knudsen number (Kn) from mean free path and radius.</p>
 <p>The Knudsen number (Kn) indicates whether a flow is in the continuum
 regime or the free molecular regime. It is computed by:</p>
 <ul>
@@ -9904,8 +9903,7 @@ particle radius.</li>
 <span class="normal">85</span>
 <span class="normal">86</span>
 <span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;mean_free_path&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
         <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
@@ -9915,8 +9913,7 @@ particle radius.</li>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Knudsen number (Kn) from the gas mean free path and particle</span>
-<span class="sd">    radius.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Knudsen number (Kn) from mean free path and radius.</span>
 
 <span class="sd">    The Knudsen number (Kn) indicates whether a flow is in the continuum</span>
 <span class="sd">    regime or the free molecular regime. It is computed by:</span>

@@ -10522,8 +10522,8 @@ in m²/s.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Calculate the spherical chamber wall loss coefficient via system state.</p>
-<p>This version uses the system's physical conditions (particle radius, density,
+        <p>Calculate spherical wall loss coefficient via system state.</p>
+<p>Uses the system's physical conditions (particle radius, density,
 temperature, pressure) to compute the needed diffusion and settling velocity
 before calculating the spherical wall loss coefficient:</p>
 <ul>
@@ -10705,9 +10705,9 @@ in s⁻¹.</li>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the spherical chamber wall loss coefficient via system state.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate spherical wall loss coefficient via system state.</span>
 
-<span class="sd">    This version uses the system&#39;s physical conditions (particle radius, density,</span>
+<span class="sd">    Uses the system&#39;s physical conditions (particle radius, density,</span>
 <span class="sd">    temperature, pressure) to compute the needed diffusion and settling velocity</span>
 <span class="sd">    before calculating the spherical wall loss coefficient:</span>
 

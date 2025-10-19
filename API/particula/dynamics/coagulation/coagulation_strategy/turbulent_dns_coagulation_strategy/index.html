@@ -10027,9 +10027,7 @@ number.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 79</span>
 <span class="normal"> 80</span>
 <span class="normal"> 81</span>
 <span class="normal"> 82</span>
@@ -10081,9 +10079,7 @@ number.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        - None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">CoagulationStrategyABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span>
-    <span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="n">distribution_type</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">turbulent_dissipation</span> <span class="o">=</span> <span class="n">turbulent_dissipation</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fluid_density</span> <span class="o">=</span> <span class="n">fluid_density</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">reynolds_lambda</span> <span class="o">=</span> <span class="n">reynolds_lambda</span>

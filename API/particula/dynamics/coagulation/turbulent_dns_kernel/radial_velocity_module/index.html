@@ -9813,7 +9813,7 @@ acceleration. The conceptual form is:</p>
             <b><code>- particle_inertia_time </code></b>
           –
           <div class="doc-md-description">
-            <p>Inertia timescale(s) of the particle(s) in seconds.</p>
+            <p>Inertia timescale(s) of particles [s].</p>
           </div>
         </li>
     </ul>
@@ -9858,11 +9858,7 @@ acceleration. The conceptual form is:</p>
 
             <details class="quote">
               <summary>Source code in <code>particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
 <span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
@@ -9915,7 +9911,11 @@ acceleration. The conceptual form is:</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
-<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;velocity_dispersion&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
@@ -9939,7 +9939,7 @@ acceleration. The conceptual form is:</p>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.</span>
-<span class="sd">        - particle_inertia_time : Inertia timescale(s) of the particle(s) in seconds.</span>
+<span class="sd">        - particle_inertia_time : Inertia timescale(s) of particles [s].</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - The radial relative velocity ⟨|wᵣ|⟩ in m/s.</span>
@@ -10117,7 +10117,11 @@ inertia timescales. The equation is:</p>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;velocity_dispersion&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
@@ -10162,7 +10166,8 @@ inertia timescales. The equation is:</p>
 <span class="sd">        - Dodin, Z., &amp; Elperin, T. (2002). Phys. Fluids, 14, 2921–2924.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tau_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
-        <span class="n">particle_inertia_time</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">particle_inertia_time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">particle_inertia_time</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="o">-</span> <span class="n">particle_inertia_time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
     <span class="p">)</span>
 
     <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">STANDARD_GRAVITY</span> <span class="o">*</span> <span class="n">tau_diff</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">velocity_dispersion</span><span class="p">)</span>
@@ -10171,7 +10176,10 @@ inertia timescales. The equation is:</p>
     <span class="n">sqrt_pi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
     <span class="n">erf_b</span> <span class="o">=</span> <span class="n">erf</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="n">exp_b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-    <span class="n">f_b</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sqrt_pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mf">1e-16</span><span class="p">))</span> <span class="o">*</span> <span class="n">erf_b</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">exp_b2</span>
+    <span class="n">f_b</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sqrt_pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mf">1e-16</span><span class="p">))</span> <span class="o">*</span> <span class="n">erf_b</span>
+        <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">exp_b2</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">velocity_dispersion</span> <span class="o">*</span> <span class="n">f_b</span>
 </code></pre></div></td></tr></table></div>

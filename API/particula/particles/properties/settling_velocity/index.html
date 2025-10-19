@@ -9819,7 +9819,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>Calculate the settling velocity of a particle in a fluid using Stokes' law.</p>
+        <p>Calculate particle settling velocity using Stokes' law.</p>
 <p>The settling velocity (vₛ) is given by the equation:</p>
 <ul>
 <li>vₛ = (2 × r² × (ρₚ − ρ_f) × g × C_c) / (9 × μ)<ul>
@@ -10005,7 +10005,7 @@
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the settling velocity of a particle in a fluid using Stokes&#39; law.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate particle settling velocity using Stokes&#39; law.</span>
 
 <span class="sd">    The settling velocity (vₛ) is given by the equation:</span>
 
@@ -10577,7 +10577,7 @@ the settling velocity from Stokes' law with slip correction.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Calculate the particle's terminal settling velocity with a full drag model.</p>
+        <p>Calculate terminal settling velocity with full drag model.</p>
 <p>For low Reynolds numbers (Re &lt; re_threshold), the Stokes settling velocity
 (with slip correction) is used:</p>
 <ul>
@@ -10877,7 +10877,7 @@ default is 100.</p>
     <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
     <span class="c1"># pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the particle&#39;s terminal settling velocity with a full drag model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate terminal settling velocity with full drag model.</span>
 
 <span class="sd">    For low Reynolds numbers (Re &lt; re_threshold), the Stokes settling velocity</span>
 <span class="sd">    (with slip correction) is used:</span>
