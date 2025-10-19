@@ -77,6 +77,12 @@ class ParticleRepresentation:
         charge: NDArray[np.float64],
         volume: float = 1,
     ):  # pylint: disable=too-many-positional-arguments, too-many-arguments
+        """Initialize the ParticleRepresentation.
+
+        Sets up the particle representation with required strategies and
+        properties including distribution, density, concentration, charge,
+        and volume for particle calculations.
+        """
         self.strategy = strategy
         self.activity = activity
         self.surface = surface

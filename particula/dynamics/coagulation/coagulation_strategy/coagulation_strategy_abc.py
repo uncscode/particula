@@ -66,6 +66,21 @@ class CoagulationStrategyABC(ABC):
         particle_resolved_kernel_bins_number: Optional[int] = None,
         particle_resolved_kernel_bins_per_decade: int = 10,
     ):
+        """Initialize the coagulation strategy.
+
+        Arguments:
+            distribution_type: Type of distribution ("discrete",
+                "continuous_pdf", or "particle_resolved").
+            particle_resolved_kernel_radius: Kernel radius for
+                particle-resolved simulations.
+            particle_resolved_kernel_bins_number: Number of bins for
+                particle-resolved kernel.
+            particle_resolved_kernel_bins_per_decade: Bins per decade for
+                particle-resolved kernel (default 10).
+
+        Raises:
+            ValueError: If distribution_type is not valid.
+        """
         if distribution_type not in [
             "discrete",
             "continuous_pdf",

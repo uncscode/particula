@@ -217,6 +217,11 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
     """
 
     def __init__(self, vapor_pressure: Union[float, NDArray[np.float64]]):
+        """Initialize the Constant Vapor Pressure strategy.
+
+        Arguments:
+            vapor_pressure: The constant vapor pressure value in Pascals.
+        """
         self.vapor_pressure = vapor_pressure
 
     def pure_vapor_pressure(
@@ -285,6 +290,13 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
         b: Union[float, NDArray[np.float64]] = 0.0,
         c: Union[float, NDArray[np.float64]] = 0.0,
     ):
+        """Initialize the Antoine Vapor Pressure strategy.
+
+        Arguments:
+            a: Coefficient 'a' in the Antoine equation.
+            b: Coefficient 'b' in the Antoine equation (K).
+            c: Coefficient 'c' in the Antoine equation (K).
+        """
         self.a = a
         self.b = b
         self.c = c
@@ -499,6 +511,15 @@ class TableVaporPressureStrategy(VaporPressureStrategy):
         vapor_pressures: NDArray[np.float64],
         temperatures: NDArray[np.float64],
     ) -> None:
+        """Initialize the Table Vapor Pressure strategy.
+
+        Arguments:
+            vapor_pressures: Array of vapor pressure values in Pascals.
+            temperatures: Array of corresponding temperatures in Kelvin.
+
+        Raises:
+            ValueError: If temperature and pressure tables differ in length.
+        """
         table_pressures = np.asarray(vapor_pressures, dtype=float)
         table_temps = np.asarray(temperatures, dtype=float)
         if table_pressures.size != table_temps.size:

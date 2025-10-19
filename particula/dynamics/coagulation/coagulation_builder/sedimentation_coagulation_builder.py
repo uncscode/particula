@@ -44,6 +44,11 @@ class SedimentationCoagulationBuilder(
     """
 
     def __init__(self):
+        """Initialize the Sedimentation coagulation builder.
+
+        Sets up the builder with required parameters for creating a
+        SedimentationCoagulationStrategy.
+        """
         required_parameters = ["distribution_type"]
         BuilderABC.__init__(self, required_parameters)
         coagulation_builder_mixin.BuilderDistributionTypeMixin.__init__(

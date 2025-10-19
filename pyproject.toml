@@ -66,7 +66,6 @@ ignore = [
   "B008", # add back later
   "D205", # add back later
   "D102", # add back later
-  "D107", # add back later
   # choose one of the conflicting multi-line-summary rules:
   "D213",  # or drop this and keep D212 instead
   "D417",  # Missing argument descriptions in the docstring :contentReference[oaicite:0]{index=0}

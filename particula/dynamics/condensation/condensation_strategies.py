@@ -541,6 +541,15 @@ class CondensationIsothermal(CondensationStrategy):
         update_gases: bool = True,
         skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
+        """Initialize the CondensationIsothermal strategy.
+
+        Arguments:
+            molar_mass: Molar mass of the species [kg/mol].
+            diffusion_coefficient: Diffusion coefficient [m^2/s].
+            accommodation_coefficient: Mass accommodation coefficient.
+            update_gases: Whether to update gas concentrations.
+            skip_partitioning_indices: Species indices to skip.
+        """
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,

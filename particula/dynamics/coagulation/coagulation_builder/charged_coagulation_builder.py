@@ -64,6 +64,12 @@ class ChargedCoagulationBuilder(
     """
 
     def __init__(self):
+        """Initialize the Charged coagulation builder.
+
+        Sets up the builder with required parameters for creating a
+        ChargedCoagulationStrategy, including distribution type and
+        charged kernel strategy.
+        """
         required_parameters = [
             "distribution_type",
             "charged_kernel_strategy",

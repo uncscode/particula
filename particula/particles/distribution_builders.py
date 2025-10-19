@@ -35,6 +35,11 @@ class MassBasedMovingBinBuilder(BuilderABC):
     """
 
     def __init__(self) -> None:
+        """Initialize the MassBasedMovingBinBuilder.
+
+        Sets up the builder with no required parameters for creating a
+        MassBasedMovingBin strategy instance.
+        """
         required_parameters = None
         BuilderABC.__init__(self, required_parameters)
 
@@ -76,6 +81,11 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
     """
 
     def __init__(self) -> None:
+        """Initialize the RadiiBasedMovingBinBuilder.
+
+        Sets up the builder with no required parameters for creating a
+        RadiiBasedMovingBin strategy instance.
+        """
         required_parameters = None
         BuilderABC.__init__(self, required_parameters)
 
@@ -117,6 +127,11 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
     """
 
     def __init__(self) -> None:
+        """Initialize the SpeciatedMassMovingBinBuilder.
+
+        Sets up the builder with no required parameters for creating a
+        SpeciatedMassMovingBin strategy instance.
+        """
         required_parameters = None
         BuilderABC.__init__(self, required_parameters)
 
@@ -157,6 +172,11 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
     """
 
     def __init__(self) -> None:
+        """Initialize the ParticleResolvedSpeciatedMassBuilder.
+
+        Sets up the builder with no required parameters for creating a
+        ParticleResolvedSpeciatedMass strategy instance.
+        """
         required_parameters = None
         BuilderABC.__init__(self, required_parameters)
 

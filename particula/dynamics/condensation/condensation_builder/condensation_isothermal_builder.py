@@ -24,6 +24,12 @@ class CondensationIsothermalBuilder(
     """Fluent builder for :class:`CondensationIsothermal`."""
 
     def __init__(self) -> None:
+        """Initialize the Condensation Isothermal builder.
+
+        Sets up the builder with required parameters for creating a
+        CondensationIsothermal strategy, including molar mass,
+        diffusion coefficient, and accommodation coefficient.
+        """
         required_parameters = [
             "molar_mass",
             "diffusion_coefficient",

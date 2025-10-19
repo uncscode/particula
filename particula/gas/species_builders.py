@@ -75,6 +75,12 @@ class GasSpeciesBuilder(
     """
 
     def __init__(self):
+        """Initialize the Gas Species builder.
+
+        Sets up the builder with required parameters for creating a
+        GasSpecies object, including name, molar mass, vapor pressure
+        strategy, partitioning flag, and concentration.
+        """
         required_parameters = [
             "name",
             "molar_mass",
@@ -166,6 +172,11 @@ class PresetGasSpeciesBuilder(
     """
 
     def __init__(self):
+        """Initialize the Preset Gas Species builder.
+
+        Sets up the builder with preset default parameters for quick
+        testing or examples.
+        """
         GasSpeciesBuilder.__init__(self)
         self.name = "Preset100"
         self.molar_mass = 0.100  # kg/mol

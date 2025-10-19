@@ -56,6 +56,11 @@ class BrownianCoagulationBuilder(
     """
 
     def __init__(self):
+        """Initialize the Brownian coagulation builder.
+
+        Sets up the builder with required parameters for creating a
+        BrownianCoagulationStrategy.
+        """
         required_parameters = ["distribution_type"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)

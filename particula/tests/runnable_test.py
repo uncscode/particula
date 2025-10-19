@@ -14,6 +14,10 @@ class MockRunnable(RunnableABC):
     """A mock Runnable for testing that tracks how many times it is executed."""
 
     def __init__(self):
+        """Initialize the MockRunnable.
+
+        Sets up a counter to track execution times for testing.
+        """
         self.times_executed = 0
 
     def rate(self, aerosol):

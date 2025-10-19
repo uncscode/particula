@@ -59,6 +59,11 @@ class BuilderSurfaceStrategyMixin:
     """
 
     def __init__(self):
+        """Initialize the BuilderSurfaceStrategyMixin.
+
+        Sets up the mixin with surface_strategy attribute initialized to
+        None, ready for assignment via set_surface_strategy method.
+        """
         self.surface_strategy = None
 
     def set_surface_strategy(
@@ -92,6 +97,11 @@ class BuilderDistributionStrategyMixin:
     """
 
     def __init__(self):
+        """Initialize the BuilderDistributionStrategyMixin.
+
+        Sets up the mixin with distribution_strategy attribute initialized
+        to None, ready for assignment via set_distribution_strategy method.
+        """
         self.distribution_strategy = None
 
     def set_distribution_strategy(
@@ -128,6 +138,11 @@ class BuilderActivityStrategyMixin:
     """
 
     def __init__(self):
+        """Initialize the BuilderActivityStrategyMixin.
+
+        Sets up the mixin with activity_strategy attribute initialized to
+        None, ready for assignment via set_activity_strategy method.
+        """
         self.activity_strategy = None
 
     def set_activity_strategy(
@@ -187,6 +202,11 @@ class ParticleMassRepresentationBuilder(
     """
 
     def __init__(self):
+        """Initialize the ParticleMassRepresentationBuilder.
+
+        Sets up the builder with required parameters for creating a
+        ParticleRepresentation using mass-based distributions.
+        """
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -262,6 +282,11 @@ class ParticleRadiusRepresentationBuilder(
     """
 
     def __init__(self):
+        """Initialize the ParticleRadiusRepresentationBuilder.
+
+        Sets up the builder with required parameters for creating a
+        ParticleRepresentation using radius-based distributions.
+        """
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -332,6 +357,12 @@ class PresetParticleRadiusBuilder(
     """
 
     def __init__(self):
+        """Initialize the PresetParticleRadiusBuilder.
+
+        Sets up the builder with default lognormal distribution parameters
+        and default strategies for creating radius-based particle
+        representations.
+        """
         required_parameters = [
             "mode",
             "geometric_standard_deviation",
@@ -489,6 +520,11 @@ class ResolvedParticleMassRepresentationBuilder(
     """
 
     def __init__(self):
+        """Initialize the ResolvedParticleMassRepresentationBuilder.
+
+        Sets up the builder with required parameters for creating a
+        ParticleRepresentation with fully resolved particle masses.
+        """
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -563,6 +599,12 @@ class PresetResolvedParticleMassBuilder(
     """
 
     def __init__(self):
+        """Initialize the PresetResolvedParticleMassBuilder.
+
+        Sets up the builder with default lognormal parameters and strategies
+        for creating particle-resolved mass representations from sampled
+        distributions.
+        """
         required_parameters = [
             "mode",
             "geometric_standard_deviation",
