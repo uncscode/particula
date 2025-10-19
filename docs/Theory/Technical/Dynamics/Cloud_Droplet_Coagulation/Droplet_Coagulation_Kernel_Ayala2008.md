@@ -222,7 +222,7 @@ Length scale linked to fluid flow:
 
 Adjusts droplet inertia:
 
-τ_p = [2⁄9] ×[ρ_w⁄ρ]×[a²⁄(ν f(Re_p))]
+τ_p = [2⁄9] × [ρ_w⁄ρ] × [a²⁄(ν f(Re_p))]
 
 with:
 
