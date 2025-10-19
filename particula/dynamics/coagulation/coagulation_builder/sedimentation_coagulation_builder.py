@@ -4,10 +4,14 @@ from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_builder import (
     coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
-    sedimentation_coagulation_strategy,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.sedimentation_coagulation_strategy import (
+        SedimentationCoagulationStrategy,
+    )
 
 
 class SedimentationCoagulationBuilder(
@@ -46,13 +50,9 @@ class SedimentationCoagulationBuilder(
             self
         )
 
-    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
+    def build(self) -> CoagulationStrategyABC:
         """Validate and return SedimentationCoagulationStrategy object."""
         self.pre_build_check()
-        strategy_class = (
-            sedimentation_coagulation_strategy
-            .SedimentationCoagulationStrategy
-        )
-        return strategy_class(
+        return SedimentationCoagulationStrategy(
             distribution_type=self.distribution_type,
         )

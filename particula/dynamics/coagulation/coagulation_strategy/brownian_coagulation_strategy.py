@@ -6,18 +6,19 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation import brownian_kernel
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
+from particula.dynamics.coagulation.brownian_kernel import (
+    get_brownian_kernel_via_system_state,
 )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
-class BrownianCoagulationStrategy(
-    coagulation_strategy_abc.CoagulationStrategyABC
-):
+class BrownianCoagulationStrategy(CoagulationStrategyABC):
     """Discrete Brownian coagulation strategy class for aerosol simulations.
 
     This class implements methods defined in CoagulationStrategyABC
@@ -66,9 +67,7 @@ class BrownianCoagulationStrategy(
             - distribution_type : String specifying the distribution type
               (e.g., "discrete", "continuous_pdf", "particle_resolved").
         """
-        coagulation_strategy_abc.CoagulationStrategyABC.__init__(
-            self, distribution_type=distribution_type
-        )
+        super().__init__(distribution_type=distribution_type)
 
     def dimensionless_kernel(
         self,
@@ -122,7 +121,7 @@ class BrownianCoagulationStrategy(
             kernel_matrix = brownian_strat.kernel(particle_rep, 300, 101325)
             ```
         """
-        return brownian_kernel.get_brownian_kernel_via_system_state(
+        return get_brownian_kernel_via_system_state(
             particle_radius=particle.get_radius(),
             particle_mass=particle.get_mass(),
             temperature=temperature,

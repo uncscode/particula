@@ -15,9 +15,10 @@ import numpy as np
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy import (
-    charged_coagulation_strategy,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.charged_coagulation_strategy import (
+        ChargedCoagulationStrategy,
+    )
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
@@ -43,20 +44,17 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         self.kernel_strategy = HardSphereKernelStrategy()
 
         # Create strategies for all distribution types
-        strategy_class = (
-            charged_coagulation_strategy.ChargedCoagulationStrategy
-        )
-        self.strategy_discrete = strategy_class(
+        self.strategy_discrete = ChargedCoagulationStrategy(
             distribution_type="discrete",
             kernel_strategy=self.kernel_strategy,
         )
-        self.strategy_continuous_pdf = strategy_class(
+        self.strategy_continuous_pdf = ChargedCoagulationStrategy(
             distribution_type="continuous_pdf",
             kernel_strategy=self.kernel_strategy,
         )
         builder = PresetResolvedParticleMassBuilder()
         self.particle_resolved = builder.set_volume(1e-6, "m^3").build()
-        self.strategy_particle_resolved = strategy_class(
+        self.strategy_particle_resolved = ChargedCoagulationStrategy(
             distribution_type="particle_resolved",
             kernel_strategy=self.kernel_strategy,
         )

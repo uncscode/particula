@@ -11,6 +11,10 @@ import unittest
 
 import numpy as np
 
+from particula.dynamics.coagulation.\
+    coagulation_strategy.sedimentation_coagulation_strategy import (
+        SedimentationCoagulationStrategy,
+    )
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,

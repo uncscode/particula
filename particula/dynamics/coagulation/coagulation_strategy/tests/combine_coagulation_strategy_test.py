@@ -11,6 +11,18 @@ import unittest
 
 import numpy as np
 
+from particula.dynamics.coagulation.\
+    coagulation_strategy.brownian_coagulation_strategy import (
+        BrownianCoagulationStrategy,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.combine_coagulation_strategy import (
+        CombineCoagulationStrategy,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.turbulent_shear_coagulation_strategy import (
+        TurbulentShearCoagulationStrategy,
+    )
 # pylint: disable=line-too-long
 from particula.particles import PresetParticleRadiusBuilder
 

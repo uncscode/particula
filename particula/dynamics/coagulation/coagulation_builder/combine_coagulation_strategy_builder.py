@@ -15,9 +15,14 @@ import logging
 from typing import List, Optional
 
 from particula.abc_builder import BuilderABC
-from particula.dynamics.coagulation.coagulation_strategy import (
-    combine_coagulation_strategy,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.combine_coagulation_strategy import (
+        CombineCoagulationStrategy,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 
 logger = logging.getLogger("particula")
 
@@ -64,9 +69,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
 
     def set_strategies(
         self,
-        strategies: List[
-            combine_coagulation_strategy.CoagulationStrategyABC
-        ],
+        strategies: List[CoagulationStrategyABC],
         strategies_units: Optional[str] = None,
     ):
         """Sets a list of CoagulationStrategyABC objects to be combined.
@@ -93,9 +96,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
         self.strategies = strategies
         return self
 
-    def build(
-        self,
-    ) -> combine_coagulation_strategy.CombineCoagulationStrategy:
+    def build(self) -> CombineCoagulationStrategy:
         """Builds and returns the combined coagulation strategy.
 
         Returns:
@@ -111,7 +112,4 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
             ```
         """
         self.pre_build_check()
-        strategy_class = (
-            combine_coagulation_strategy.CombineCoagulationStrategy
-        )
-        return strategy_class(strategies=self.strategies)
+        return CombineCoagulationStrategy(strategies=self.strategies)
