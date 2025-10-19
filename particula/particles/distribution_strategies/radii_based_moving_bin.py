@@ -30,12 +30,22 @@ class RadiiBasedMovingBin(DistributionStrategy):
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate the mass per species from radius and density.
+
+        Returns:
+            Mass per species array.
+        """
         volumes = 4 / 3 * np.pi * distribution**3
         return volumes * density
 
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Return particle radius from the distribution.
+
+        Returns:
+            Particle radius in meters.
+        """
         return distribution
 
     def add_mass(
@@ -45,6 +55,11 @@ class RadiiBasedMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add mass to the particle distribution and update radii.
+
+        Returns:
+            Updated distribution (radii) and concentration arrays.
+        """
         mass_per_particle = np.where(
             concentration > 0, added_mass / concentration, 0
         )
@@ -60,6 +75,11 @@ class RadiiBasedMovingBin(DistributionStrategy):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add concentration to the distribution.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         if (distribution.shape != added_distribution.shape) or (
             not np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
@@ -86,6 +106,11 @@ class RadiiBasedMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Collide particle pairs (not implemented for this strategy).
+
+        Raises:
+            NotImplementedError: Method is not physically valid.
+        """
         message = (
             "Colliding pairs in RadiiBasedMovingBin not physically valid"
         )

@@ -349,6 +349,11 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
+        """Calculate effective surface tension using mole-fraction weighting.
+
+        Returns:
+            Effective surface tension in N/m.
+        """
         if temperature is not None:
             self.update_surface_tension(temperature)
 
@@ -366,6 +371,11 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         )
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
+        """Get density of the species mixture.
+
+        Returns:
+            Density in kg/m^3.
+        """
         return self.density
 
 
@@ -412,6 +422,11 @@ class SurfaceStrategyMass(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
+        """Calculate effective surface tension using mass-fraction weighting.
+
+        Returns:
+            Effective surface tension in N/m.
+        """
         if temperature is not None:
             self.update_surface_tension(temperature)
 
@@ -426,6 +441,11 @@ class SurfaceStrategyMass(SurfaceStrategy):
         )
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
+        """Get density of the species mixture.
+
+        Returns:
+            Density in kg/m^3.
+        """
         return self.density
 
 
@@ -472,6 +492,11 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
+        """Calculate effective surface tension using volume-fraction weighting.
+
+        Returns:
+            Effective surface tension in N/m.
+        """
         if temperature is not None:
             self.update_surface_tension(temperature)
 
@@ -489,4 +514,9 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         )
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
+        """Get density of the species mixture.
+
+        Returns:
+            Density in kg/m^3.
+        """
         return self.density

@@ -21,9 +21,11 @@ class MockRunnable(RunnableABC):
         self.times_executed = 0
 
     def rate(self, aerosol):
+        """Return zero rate for testing."""
         return 0
 
     def execute(self, aerosol, time_step, sub_steps=1):
+        """Execute the runnable and increment counter."""
         self.times_executed += 1
         return aerosol
 

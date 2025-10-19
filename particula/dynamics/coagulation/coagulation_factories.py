@@ -60,6 +60,11 @@ class CoagulationFactory(
     """
 
     def get_builders(self) -> Dict[str, Any]:
+        """Return the mapping of strategy types to builder instances.
+
+        Returns:
+            Dictionary mapping strategy names to their corresponding builders.
+        """
         return {
             "brownian": BrownianCoagulationBuilder(),
             "charged": ChargedCoagulationBuilder(),

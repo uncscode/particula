@@ -18,6 +18,7 @@ class TestCondensationIsothermal(unittest.TestCase):
     """Test class for the CondensationIsothermal strategy."""
 
     def setUp(self):
+        """Set up condensation strategy and test aerosol system."""
         self.molar_mass = 0.018  # kg/mol for water
         self.diffusion_coefficient = 2e-5  # m^2/s
         self.accommodation_coefficient = 1.0

@@ -21,6 +21,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     """Test suite for the BrownianCoagulationStrategy class."""
 
     def setUp(self):
+        """Set up particle representations and strategies for testing."""
         # Setup a particle representation for testing
         self.particle = PresetParticleRadiusBuilder().build()
         # Create strategies for both distribution types

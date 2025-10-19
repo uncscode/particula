@@ -30,11 +30,21 @@ class SpeciatedMassMovingBin(DistributionStrategy):
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate the mass per species for each bin.
+
+        Returns:
+            Mass per species array.
+        """
         return distribution
 
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
+        """Calculate particle radius from multi-species mass and density.
+
+        Returns:
+            Particle radius in meters.
+        """
         volumes = np.sum(distribution / density, axis=1)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
@@ -45,6 +55,11 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add mass to the particle distribution per species.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         if distribution.ndim == 2:
             concentration_expand = concentration[:, np.newaxis]
         else:
@@ -62,6 +77,11 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Add concentration to the distribution.
+
+        Returns:
+            Updated distribution and concentration arrays.
+        """
         if (distribution.shape != added_distribution.shape) and (
             np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
@@ -88,6 +108,11 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Collide particle pairs (not implemented for this strategy).
+
+        Raises:
+            NotImplementedError: Method is not physically valid.
+        """
         message = (
             "Colliding pairs in SpeciatedMassMovingBin not physically valid"
         )

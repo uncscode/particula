@@ -12,6 +12,7 @@ class ConcreteBuilder(BuilderABC):
     """Concrete class extending BuilderABC for testing purposes."""
 
     def build(self):
+        """Build method implementation for testing."""
         return "Build successful!"
 
 
