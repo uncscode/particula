@@ -8,6 +8,7 @@ This directory contains configuration and documentation for using Claude Code wi
 - **ARCHITECTURE_SUMMARY.txt** - High-level architecture summary and key patterns
 - **DOCUMENTATION_INDEX.md** - Index of all documentation files and their purposes
 - **README_ARCHITECTURE_DOCS.md** - Guide to the architecture documentation structure
+- **TESTING_AND_LINTING.md** - Complete guide for pytest testing and ruff linting/formatting
 - **README.md** - This file, containing setup instructions
 
 ## Setting up Claude Code
@@ -54,6 +55,34 @@ If the project structure changes significantly, update the `CLAUDE.md` file to r
 2. **Follow patterns**: Claude will suggest code that follows the patterns documented in CLAUDE.md
 3. **Ask about structure**: You can ask Claude about the codebase architecture and it will reference CLAUDE.md
 4. **Keep it updated**: As the project evolves, update CLAUDE.md so Claude stays in sync
+5. **Testing and linting**: See TESTING_AND_LINTING.md for complete pytest and ruff usage
+
+## Development Workflow
+
+### Quick Start
+```bash
+# 1. Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 2. Install dependencies
+uv sync
+
+# 3. Make your changes
+
+# 4. Run tests and linting
+uv run ruff format . && uv run ruff check --fix . && uv run pytest
+
+# 5. Commit changes
+git add .
+git commit -m "Your commit message"
+```
+
+See **TESTING_AND_LINTING.md** for detailed instructions on:
+- Running pytest tests with various options
+- Using ruff for linting and formatting
+- Test writing conventions and best practices
+- Code style rules and configuration
+- CI/CD integration
 
 ## Documentation Build Setup
 
@@ -74,10 +103,14 @@ The project uses MkDocs with several plugins for documentation:
 
 ### Building docs locally
 ```bash
-pip install mkdocs mkdocs-material[imaging] mkdocs-jupyter mkdocstrings[python] griffe mkdocs-gen-files mkdocs-literate-nav
-pip install -e .  # Install particula package
-mkdocs serve  # Live preview
-mkdocs build  # Build static site
+# Install dependencies
+uv sync
+
+# Live preview
+uv run mkdocs serve
+
+# Build static site
+uv run mkdocs build
 ```
 
 ## Project Structure Reference
