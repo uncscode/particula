@@ -356,7 +356,7 @@ uv run pytest --cov=particula --cov-report=term-missing
 ## Troubleshooting
 
 **Tests failing locally but pass in CI:**
-- Check Python version (CI uses 3.13+)
+- Check Python version (CI runs on Python 3.10–3.14)
 - Ensure all dependencies installed: `uv sync`
 - Check for platform-specific issues
 
