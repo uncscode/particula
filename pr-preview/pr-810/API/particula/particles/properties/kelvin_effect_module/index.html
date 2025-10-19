@@ -9869,12 +9869,7 @@ pressure.</p>
 
             <details class="quote">
               <summary>Source code in <code>particula/particles/properties/kelvin_effect_module.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
@@ -9924,7 +9919,12 @@ pressure.</p>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;effective_surface_tension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;effective_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
@@ -10013,7 +10013,7 @@ pressure.</p>
 extremely large, leading to numerical overflow. To prevent this, the
 ratio is clipped to a maximum value of 100, corresponding to a Kelvin
 term of ~2.7e43. This is physically unrealistic but ensures numerical
-stability. Below ~1 nm, continuum mechanics breaks down anyway, so
+stability. Below ~0.1 nm, continuum mechanics breaks down anyway, so
 the condensation equations become questionable.</p>
 
 
@@ -10073,12 +10073,7 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 
             <details class="quote">
               <summary>Source code in <code>particula/particles/properties/kelvin_effect_module.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
 <span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
@@ -10152,7 +10147,10 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
         <span class="s2">&quot;kelvin_radius_value&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
@@ -10175,7 +10173,7 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 <span class="sd">    extremely large, leading to numerical overflow. To prevent this, the</span>
 <span class="sd">    ratio is clipped to a maximum value of 100, corresponding to a Kelvin</span>
 <span class="sd">    term of ~2.7e43. This is physically unrealistic but ensures numerical</span>
-<span class="sd">    stability. Below ~1 nm, continuum mechanics breaks down anyway, so</span>
+<span class="sd">    stability. Below ~0.1 nm, continuum mechanics breaks down anyway, so</span>
 <span class="sd">    the condensation equations become questionable.</span>
 
 <span class="sd">    Arguments:</span>
@@ -10202,10 +10200,6 @@ For extreme cases, the value is clipped to prevent overflow.</li>
 <span class="sd">          new-particle formation?&quot; Faraday Discussions, 165, 91–104.</span>
 <span class="sd">          https://doi.org/10.1039/C3FD00046J. [check]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Maximum Kelvin ratio to prevent overflow</span>
-    <span class="c1"># exp(100) ≈ 2.7e43 is extremely large but numerically stable</span>
-    <span class="n">max_kelvin_ratio</span> <span class="o">=</span> <span class="mf">100.0</span>
-
     <span class="n">kelvin_expand</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="c1"># Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kelvin_radius_value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
@@ -10214,24 +10208,26 @@ For extreme cases, the value is clipped to prevent overflow.</li>
         <span class="n">kelvin_expand</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">kelvin_radius_value</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kelvin_expand</span><span class="p">:</span>
-        <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
-        <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_kelvin_ratio</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="p">(</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">kelvin_expand</span>
-    <span class="p">):</span>
-        <span class="n">particle_radius</span> <span class="o">=</span> <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
-        <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
-        <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_kelvin_ratio</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">)</span>
+    <span class="c1"># Suppress divide-by-zero warnings - zero radius is handled by clipping</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kelvin_expand</span><span class="p">:</span>
+            <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
+            <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">MAX_KELVIN_RATIO</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">kelvin_expand</span>
+        <span class="p">):</span>
+            <span class="n">particle_radius</span> <span class="o">=</span> <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
+            <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">MAX_KELVIN_RATIO</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">)</span>
 
-    <span class="c1"># Scalar case</span>
-    <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
-    <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_kelvin_ratio</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">)</span>
+        <span class="c1"># Scalar case</span>
+        <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
+        <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">MAX_KELVIN_RATIO</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_safe_exp</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
