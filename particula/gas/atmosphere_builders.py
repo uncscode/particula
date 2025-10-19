@@ -68,6 +68,11 @@ class AtmosphereBuilder(
     """
 
     def __init__(self):
+        """Initialize the Atmosphere builder.
+
+        Sets up the builder with required parameters for creating an
+        Atmosphere object, including temperature and pressure.
+        """
         required_parameters = [
             "temperature",
             "pressure",

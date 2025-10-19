@@ -43,6 +43,10 @@ class BuilderDistributionTypeMixin:
     """
 
     def __init__(self):
+        """Initialize the distribution type mixin.
+
+        Sets the distribution_type attribute to None, to be configured later.
+        """
         self.distribution_type = None
 
     def set_distribution_type(
@@ -114,6 +118,10 @@ class BuilderTurbulentDissipationMixin:
     """
 
     def __init__(self):
+        """Initialize the turbulent dissipation mixin.
+
+        Sets the turbulent_dissipation attribute to None.
+        """
         self.turbulent_dissipation = None
 
     @validate_inputs({"turbulent_dissipation": "nonnegative"})
@@ -173,6 +181,10 @@ class BuilderFluidDensityMixin:
     """
 
     def __init__(self):
+        """Initialize the fluid density mixin.
+
+        Sets the fluid_density attribute to None, to be configured later.
+        """
         self.fluid_density = None
 
     @validate_inputs({"fluid_density": "positive"})

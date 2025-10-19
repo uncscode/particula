@@ -52,6 +52,11 @@ class ActivityIdealMassBuilder(BuilderABC):
     """
 
     def __init__(self):
+        """Initialize the ActivityIdealMass builder.
+
+        Sets up the builder with no required parameters for creating
+        an ActivityIdealMass strategy.
+        """
         required_parameters = None
         BuilderABC.__init__(self, required_parameters)
 
@@ -107,6 +112,11 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
     """
 
     def __init__(self):
+        """Initialize the ActivityIdealMolar builder.
+
+        Sets up the builder with required molar_mass parameter for
+        creating an ActivityIdealMolar strategy.
+        """
         required_parameters = ["molar_mass"]
         BuilderABC.__init__(self, required_parameters)
         BuilderMolarMassMixin.__init__(self)
@@ -184,6 +194,12 @@ class ActivityKappaParameterBuilder(
     """
 
     def __init__(self):
+        """Initialize the ActivityKappaParameter builder.
+
+        Sets up the builder with required parameters for creating an
+        ActivityKappaParameter strategy, including kappa, density,
+        molar mass, and water index.
+        """
         required_parameters = ["kappa", "density", "molar_mass", "water_index"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDensityMixin.__init__(self)

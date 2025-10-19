@@ -52,6 +52,12 @@ class SurfaceStrategyMolarBuilder(
     """
 
     def __init__(self):
+        """Initialize the SurfaceStrategyMolarBuilder.
+
+        Sets up the builder with required parameters for creating a
+        SurfaceStrategyMolar instance including surface tension, density,
+        and molar mass.
+        """
         required_parameters = ["surface_tension", "density", "molar_mass"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
@@ -100,6 +106,11 @@ class SurfaceStrategyMassBuilder(
     """
 
     def __init__(self):
+        """Initialize the SurfaceStrategyMassBuilder.
+
+        Sets up the builder with required parameters for creating a
+        SurfaceStrategyMass instance including surface tension and density.
+        """
         required_parameters = ["surface_tension", "density"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)
@@ -146,6 +157,11 @@ class SurfaceStrategyVolumeBuilder(
     """
 
     def __init__(self):
+        """Initialize the SurfaceStrategyVolumeBuilder.
+
+        Sets up the builder with required parameters for creating a
+        SurfaceStrategyVolume instance including surface tension and density.
+        """
         required_parameters = ["surface_tension", "density"]
         BuilderABC.__init__(self, required_parameters)
         BuilderSurfaceTensionMixin.__init__(self)

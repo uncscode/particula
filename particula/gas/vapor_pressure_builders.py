@@ -94,6 +94,11 @@ class AntoineVaporPressureBuilder(BuilderABC):
     """
 
     def __init__(self):
+        """Initialize the Antoine vapor pressure builder.
+
+        Sets up the builder with required parameters (a, b, c) for
+        creating an AntoineVaporPressureStrategy.
+        """
         required_parameters = ["a", "b", "c"]
         # Call the base class's __init__ method
         super().__init__(required_parameters)
@@ -190,6 +195,12 @@ class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
     """
 
     def __init__(self):
+        """Initialize the Clausius-Clapeyron vapor pressure builder.
+
+        Sets up the builder with required parameters for creating a
+        ClausiusClapeyronStrategy, including latent heat, initial
+        temperature, and initial pressure.
+        """
         required_keys = [
             "latent_heat",
             "temperature_initial",
@@ -288,6 +299,10 @@ class ConstantVaporPressureBuilder(BuilderABC):
     """
 
     def __init__(self):
+        """Initialize the Constant vapor pressure builder.
+
+        Sets up the builder with the required vapor_pressure parameter.
+        """
         required_keys = ["vapor_pressure"]
         super().__init__(required_keys)
         self.vapor_pressure = None
@@ -353,6 +368,12 @@ class SaturationConcentrationVaporPressureBuilder(
     """
 
     def __init__(self):
+        """Initialize the Saturation Concentration vapor pressure builder.
+
+        Sets up the builder with required parameters for creating a
+        ConstantVaporPressureStrategy from saturation concentration,
+        molar mass, and temperature.
+        """
         required_parameters = [
             "saturation_concentration",
             "molar_mass",
@@ -433,6 +454,10 @@ class WaterBuckVaporPressureBuilder(BuilderABC):  # pylint: disable=too-few-publ
     """
 
     def __init__(self):
+        """Initialize the Water Buck vapor pressure builder.
+
+        Sets up the builder for creating a WaterBuckStrategy.
+        """
         super().__init__()
 
     def build(self) -> WaterBuckStrategy:
@@ -455,6 +480,12 @@ class TableVaporPressureBuilder(
     """
 
     def __init__(self) -> None:
+        """Initialize the Table vapor pressure builder.
+
+        Sets up the builder with required parameters for creating a
+        TableVaporPressureStrategy from lookup tables of vapor pressure
+        and temperature.
+        """
         required_parameters = ["vapor_pressure_table", "temperature_table"]
         BuilderABC.__init__(self, required_parameters)
         BuilderTemperatureTableMixin.__init__(self)

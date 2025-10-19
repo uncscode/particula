@@ -78,6 +78,13 @@ class TurbulentDNSCoagulationBuilder(
     """
 
     def __init__(self):
+        """Initialize the Turbulent DNS coagulation builder.
+
+        Sets up the builder with required parameters for creating a
+        TurbulentDNSCoagulationStrategy, including distribution type,
+        turbulent dissipation, fluid density, Reynolds lambda, and
+        relative velocity.
+        """
         required_parameters = [
             "distribution_type",
             "turbulent_dissipation",

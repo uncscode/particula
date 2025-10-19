@@ -59,6 +59,12 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     """
 
     def __init__(self, distribution_type: str):
+        """Initialize the sedimentation coagulation strategy.
+
+        Arguments:
+            distribution_type: Type of particle distribution ("discrete",
+                "continuous_pdf", or "particle_resolved").
+        """
         super().__init__(distribution_type=distribution_type)
 
     def dimensionless_kernel(

@@ -327,6 +327,12 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         surface_tension_table: Optional[NDArray[np.float64]] = None,
         temperature_table: Optional[NDArray[np.float64]] = None,
     ):
+        """Initialize the SurfaceStrategyMolar.
+
+        Sets up the molar-fraction-based surface strategy with surface
+        tension, density, and molar mass parameters for calculating
+        effective surface properties.
+        """
         super().__init__(
             surface_tension=surface_tension,
             surface_tension_table=surface_tension_table,
@@ -385,6 +391,12 @@ class SurfaceStrategyMass(SurfaceStrategy):
         surface_tension_table: Optional[NDArray[np.float64]] = None,
         temperature_table: Optional[NDArray[np.float64]] = None,
     ):
+        """Initialize the SurfaceStrategyMass.
+
+        Sets up the mass-fraction-based surface strategy with surface
+        tension and density parameters for calculating effective surface
+        properties.
+        """
         super().__init__(
             surface_tension=surface_tension,
             surface_tension_table=surface_tension_table,
@@ -439,6 +451,12 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         surface_tension_table: Optional[NDArray[np.float64]] = None,
         temperature_table: Optional[NDArray[np.float64]] = None,
     ):
+        """Initialize the SurfaceStrategyVolume.
+
+        Sets up the volume-fraction-based surface strategy with surface
+        tension and density parameters for calculating effective surface
+        properties.
+        """
         super().__init__(
             surface_tension=surface_tension,
             surface_tension_table=surface_tension_table,
