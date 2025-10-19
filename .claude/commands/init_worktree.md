@@ -30,7 +30,7 @@ Execute these steps in order:
 
 3. **Create the git worktree without checkout**:
    ```bash
-   git worktree add --no-checkout trees/<worktree_name> -b <worktree_name>
+   git worktree add --no-checkout trees/<worktree_name> -b <worktree_name> main
    ```
 
 4. **Configure sparse checkout for the target directory**:
