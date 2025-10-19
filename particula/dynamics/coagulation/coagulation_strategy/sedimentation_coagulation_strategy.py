@@ -12,17 +12,16 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.dynamics.coagulation import sedimentation_kernel
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
-class SedimentationCoagulationStrategy(
-    coagulation_strategy_abc.CoagulationStrategyABC
-):
+class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     """Sedimentation coagulation strategy for aerosol particles.
 
     Implements the Seinfeld & Pandis (2016) sedimentation kernel as part of
@@ -59,13 +58,8 @@ class SedimentationCoagulationStrategy(
           Physics, Chapter 13, Equation 13A.4, Wiley.
     """
 
-    def __init__(
-        self,
-        distribution_type: str,
-    ):
-        coagulation_strategy_abc.CoagulationStrategyABC.__init__(
-            self, distribution_type=distribution_type
-        )
+    def __init__(self, distribution_type: str):
+        super().__init__(distribution_type=distribution_type)
 
     def dimensionless_kernel(
         self,

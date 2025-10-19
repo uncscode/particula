@@ -6,19 +6,20 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation import charged_kernel_strategy
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
+from particula.dynamics.coagulation.charged_kernel_strategy import (
+    ChargedKernelStrategyABC,
 )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 from particula.particles.representation import ParticleRepresentation
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 
 logger = logging.getLogger("particula")
 
 
-class ChargedCoagulationStrategy(
-    coagulation_strategy_abc.CoagulationStrategyABC
-):
+class ChargedCoagulationStrategy(CoagulationStrategyABC):
     """Charged Brownian coagulation strategy using a dimensionless kernel.
 
     This class implements the methods defined in the CoagulationStrategyABC
@@ -63,9 +64,7 @@ class ChargedCoagulationStrategy(
     def __init__(
         self,
         distribution_type: str,
-        kernel_strategy: (
-            charged_kernel_strategy.ChargedKernelStrategyABC
-        ),
+        kernel_strategy: ChargedKernelStrategyABC,
     ):
         """Initialize the ChargedCoagulationStrategy.
 
@@ -80,9 +79,7 @@ class ChargedCoagulationStrategy(
         Returns:
             None
         """
-        coagulation_strategy_abc.CoagulationStrategyABC.__init__(
-            self, distribution_type=distribution_type
-        )
+        super().__init__(distribution_type=distribution_type)
         self.kernel_strategy = kernel_strategy
 
     def dimensionless_kernel(

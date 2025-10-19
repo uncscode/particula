@@ -3,31 +3,42 @@
 from typing import Any, Dict, Union
 
 from particula.abc_factory import StrategyFactoryABC
-from particula.dynamics.coagulation.coagulation_builder import (
-    brownian_coagulation_builder,
-    charged_coagulation_builder,
-    combine_coagulation_strategy_builder,
-    turbulent_dns_coagulation_builder,
-    turbulent_shear_coagulation_builder,
-)
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
-)
+from particula.dynamics.coagulation.\
+    coagulation_builder.brownian_coagulation_builder import (
+        BrownianCoagulationBuilder,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_builder.charged_coagulation_builder import (
+        ChargedCoagulationBuilder,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_builder.combine_coagulation_strategy_builder import (
+        CombineCoagulationStrategyBuilder,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_builder.turbulent_dns_coagulation_builder import (
+        TurbulentDNSCoagulationBuilder,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_builder.turbulent_shear_coagulation_builder import (
+        TurbulentShearCoagulationBuilder,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 
 
 class CoagulationFactory(
     StrategyFactoryABC[
         Union[
-            brownian_coagulation_builder.BrownianCoagulationBuilder,
-            charged_coagulation_builder.ChargedCoagulationBuilder,
-            turbulent_shear_coagulation_builder
-            .TurbulentShearCoagulationBuilder,
-            turbulent_dns_coagulation_builder
-            .TurbulentDNSCoagulationBuilder,
-            combine_coagulation_strategy_builder
-            .CombineCoagulationStrategyBuilder,
+            BrownianCoagulationBuilder,
+            ChargedCoagulationBuilder,
+            TurbulentShearCoagulationBuilder,
+            TurbulentDNSCoagulationBuilder,
+            CombineCoagulationStrategyBuilder,
         ],
-        coagulation_strategy_abc.CoagulationStrategyABC,
+        CoagulationStrategyABC,
     ]
 ):
     """Factory class for creating coagulation strategy instances
@@ -50,22 +61,9 @@ class CoagulationFactory(
 
     def get_builders(self) -> Dict[str, Any]:
         return {
-            "brownian": (
-                brownian_coagulation_builder.BrownianCoagulationBuilder()
-            ),
-            "charged": (
-                charged_coagulation_builder.ChargedCoagulationBuilder()
-            ),
-            "turbulent_shear": (
-                turbulent_shear_coagulation_builder
-                .TurbulentShearCoagulationBuilder()
-            ),
-            "turbulent_dns": (
-                turbulent_dns_coagulation_builder
-                .TurbulentDNSCoagulationBuilder()
-            ),
-            "combine": (
-                combine_coagulation_strategy_builder
-                .CombineCoagulationStrategyBuilder()
-            ),
+            "brownian": BrownianCoagulationBuilder(),
+            "charged": ChargedCoagulationBuilder(),
+            "turbulent_shear": TurbulentShearCoagulationBuilder(),
+            "turbulent_dns": TurbulentDNSCoagulationBuilder(),
+            "combine": CombineCoagulationStrategyBuilder(),
         }

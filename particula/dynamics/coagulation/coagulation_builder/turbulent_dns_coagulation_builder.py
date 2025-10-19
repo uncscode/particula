@@ -15,10 +15,14 @@ from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_builder import (
     coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
-    turbulent_dns_coagulation_strategy,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.turbulent_dns_coagulation_strategy import (
+        TurbulentDNSCoagulationStrategy,
+    )
 from particula.util.convert_units import get_unit_conversion
 from particula.util.validate_inputs import validate_inputs
 
@@ -153,7 +157,7 @@ class TurbulentDNSCoagulationBuilder(
         )
         return self
 
-    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
+    def build(self) -> CoagulationStrategyABC:
         """Construct a TurbulentDNSCoagulationStrategy.
 
         Validates the required parameters, then instantiates a
@@ -165,11 +169,7 @@ class TurbulentDNSCoagulationBuilder(
             strategy.
         """
         self.pre_build_check()
-        strategy_class = (
-            turbulent_dns_coagulation_strategy
-            .TurbulentDNSCoagulationStrategy
-        )
-        return strategy_class(
+        return TurbulentDNSCoagulationStrategy(
             distribution_type=self.distribution_type,
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,

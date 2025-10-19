@@ -15,10 +15,14 @@ from particula.dynamics.coagulation.\
     coagulation_builder.coagulation_builder_mixin import (
         BuilderDistributionTypeMixin,
     )
-from particula.dynamics.coagulation.coagulation_strategy import (
-    brownian_coagulation_strategy,
-    coagulation_strategy_abc,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.brownian_coagulation_strategy import (
+        BrownianCoagulationStrategy,
+    )
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 
 
 class BrownianCoagulationBuilder(
@@ -54,11 +58,9 @@ class BrownianCoagulationBuilder(
     def __init__(self):
         required_parameters = ["distribution_type"]
         BuilderABC.__init__(self, required_parameters)
-        coagulation_builder_mixin.BuilderDistributionTypeMixin.__init__(
-            self
-        )
+        BuilderDistributionTypeMixin.__init__(self)
 
-    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
+    def build(self) -> CoagulationStrategyABC:
         """Validate and return the BrownianCoagulationStrategy object.
 
         Checks that all required parameters (e.g., distribution_type) are set
@@ -70,9 +72,6 @@ class BrownianCoagulationBuilder(
         """
         self.pre_build_check()
 
-        strategy_class = (
-            brownian_coagulation_strategy.BrownianCoagulationStrategy
-        )
-        return strategy_class(
+        return BrownianCoagulationStrategy(
             distribution_type=self.distribution_type,
         )

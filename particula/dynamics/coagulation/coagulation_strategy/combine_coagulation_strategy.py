@@ -15,17 +15,16 @@ from typing import List, Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.coagulation_strategy import (
-    coagulation_strategy_abc,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
-class CombineCoagulationStrategy(
-    coagulation_strategy_abc.CoagulationStrategyABC
-):
+class CombineCoagulationStrategy(CoagulationStrategyABC):
     """Combine multiple coagulation strategies into one.
 
     This class takes a list of coagulation strategies and merges their
@@ -65,12 +64,7 @@ class CombineCoagulationStrategy(
         - No specific references. Summation approach is straightforward.
     """
 
-    def __init__(
-        self,
-        strategies: List[
-            coagulation_strategy_abc.CoagulationStrategyABC
-        ],
-    ):
+    def __init__(self, strategies: List[CoagulationStrategyABC]):
         """Initialize the combined coagulation strategy.
 
         Arguments:
