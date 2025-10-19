@@ -163,7 +163,7 @@ def get_kappa_activity(
     water_index: int,
 ) -> NDArray[np.float64]:
     # pylint: disable=too-many-locals
-    """Compute species activity using the κ (kappa) hygroscopic growth parameter.
+    """Compute species activity using κ hygroscopic growth parameter.
 
     This function calculates the activity of a mixture by combining
     volume-fraction weighted κ-values. The water activity (aₘ) is

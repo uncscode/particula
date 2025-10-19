@@ -2,11 +2,12 @@
 
 import pytest
 
-from particula.dynamics.condensation.condensation_builder.condensation_builder_mixin import (
-    BuilderAccommodationCoefficientMixin,
-    BuilderDiffusionCoefficientMixin,
-    BuilderUpdateGasesMixin,
-)
+from particula.dynamics.condensation.condensation_builder.\
+    condensation_builder_mixin import (
+        BuilderAccommodationCoefficientMixin,
+        BuilderDiffusionCoefficientMixin,
+        BuilderUpdateGasesMixin,
+    )
 
 
 class MixinTester(

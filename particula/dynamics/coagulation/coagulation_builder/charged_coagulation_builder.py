@@ -13,20 +13,18 @@ from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
-from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
-    BuilderDistributionTypeMixin,
+from particula.dynamics.coagulation.coagulation_builder import (
+    coagulation_builder_mixin,
 )
-from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (
-    ChargedCoagulationStrategy,
-)
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
+from particula.dynamics.coagulation.coagulation_strategy import (
+    charged_coagulation_strategy,
+    coagulation_strategy_abc,
 )
 
 
 class ChargedCoagulationBuilder(
     BuilderABC,
-    BuilderDistributionTypeMixin,
+    coagulation_builder_mixin.BuilderDistributionTypeMixin,
 ):
     """Charged Coagulation builder class.
 
@@ -61,9 +59,14 @@ class ChargedCoagulationBuilder(
     """
 
     def __init__(self):
-        required_parameters = ["distribution_type", "charged_kernel_strategy"]
+        required_parameters = [
+            "distribution_type",
+            "charged_kernel_strategy",
+        ]
         BuilderABC.__init__(self, required_parameters)
-        BuilderDistributionTypeMixin.__init__(self)
+        coagulation_builder_mixin.BuilderDistributionTypeMixin.__init__(
+            self
+        )
         self.charged_kernel_strategy = None
 
     def set_charged_kernel_strategy(
@@ -100,7 +103,7 @@ class ChargedCoagulationBuilder(
         self.charged_kernel_strategy = charged_kernel_strategy
         return self
 
-    def build(self) -> CoagulationStrategyABC:
+    def build(self) -> coagulation_strategy_abc.CoagulationStrategyABC:
         """Validate and return the ChargedCoagulationStrategy object.
 
         This method checks whether all required parameters have been
@@ -122,7 +125,10 @@ class ChargedCoagulationBuilder(
         """
         self.pre_build_check()
 
-        return ChargedCoagulationStrategy(
+        strategy_class = (
+            charged_coagulation_strategy.ChargedCoagulationStrategy
+        )
+        return strategy_class(
             distribution_type=self.distribution_type,
             kernel_strategy=self.charged_kernel_strategy,
         )

@@ -45,7 +45,9 @@ class RadiiBasedMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        mass_per_particle = np.where(concentration > 0, added_mass / concentration, 0)
+        mass_per_particle = np.where(
+            concentration > 0, added_mass / concentration, 0
+        )
         initial_volumes = (4 / 3) * np.pi * np.power(distribution, 3)
         new_volumes = initial_volumes + mass_per_particle / density
         new_radii = np.power(3 * new_volumes / (4 * np.pi), 1 / 3)
@@ -62,8 +64,8 @@ class RadiiBasedMovingBin(DistributionStrategy):
             not np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
             message = (
-                "When adding concentration to RadiiBasedMovingBin, the distribution "
-                "and added distribution should match."
+                "When adding concentration to RadiiBasedMovingBin, "
+                "distribution and added distribution should match."
             )
             logger.error(message)
             raise ValueError(message)
@@ -85,7 +87,7 @@ class RadiiBasedMovingBin(DistributionStrategy):
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         message = (
-            "Colliding pairs in RadiiBasedMovingBin is not physically meaningful"
+            "Colliding pairs in RadiiBasedMovingBin not physically valid"
         )
         logger.warning(message)
         raise NotImplementedError(message)

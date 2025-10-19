@@ -77,16 +77,17 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         if np.all(added_concentration == 1):
             rescaled = True
         max_concentration = np.max(concentration)
-        if np.allclose(added_concentration, max_concentration, atol=1e-2) or np.all(
-            concentration == 0
+        if (
+            np.allclose(added_concentration, max_concentration, atol=1e-2)
+            or np.all(concentration == 0)
         ):
             if max_concentration > 0:
                 added_concentration = added_concentration / max_concentration
             rescaled = True
         if not rescaled:
             message = (
-                "When adding concentration to ParticleResolvedSpeciatedMass, the added "
-                "concentration should be all ones or all the same value."
+                "When adding concentration to ParticleResolvedSpeciatedMass, "
+                "added concentration should be all ones or all the same."
             )
             logger.error(message)
             raise ValueError(message)

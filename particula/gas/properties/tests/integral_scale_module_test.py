@@ -32,7 +32,8 @@ def test_get_lagrangian_integral_scale_array():
 
 
 def test_get_lagrangian_integral_scale_invalid_values():
-    """Test that get_lagrangian_integral_scale raises errors for invalid inputs."""
+    """Test that get_lagrangian_integral_scale raises errors for invalid inputs.
+    """
     with pytest.raises(ValueError):
         get_lagrangian_integral_time(-0.5, 1e-3)
 
@@ -63,7 +64,8 @@ def test_get_eulerian_integral_scale_array():
 
 
 def test_get_eulerian_integral_scale_invalid_values():
-    """Test that get_eulerian_integral_scale raises errors for invalid inputs."""
+    """Test that get_eulerian_integral_scale raises errors for invalid inputs.
+    """
     with pytest.raises(ValueError):
         get_eulerian_integral_length(-0.5, 1e-3)
 
@@ -72,7 +74,8 @@ def test_get_eulerian_integral_scale_invalid_values():
 
 
 def test_integral_scales_edge_case():
-    """Test both integral scale functions with very small values near machine precision."""
+    """Test integral scale functions with small values near precision.
+    """
     rms_velocity = 1e-10
     turbulent_dissipation = 1e-10
 

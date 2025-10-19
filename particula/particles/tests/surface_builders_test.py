@@ -40,9 +40,9 @@ def test_build_surface_strategy_molar_missing_parameters():
     builder = SurfaceStrategyMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: surface_tension, density, molar_mass" in str(
-        excinfo.value
-    )
+    expected_msg = "Required parameter(s) not set: "
+    expected_msg += "surface_tension, density, molar_mass"
+    assert expected_msg in str(excinfo.value)
 
 
 def test_build_surface_strategy_mass_dict():

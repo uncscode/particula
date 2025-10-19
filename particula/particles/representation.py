@@ -178,7 +178,7 @@ class ParticleRepresentation:
         return self.activity.get_name()
 
     def get_surface(self, clone: bool = False) -> SurfaceStrategy:
-        """Return the surface strategy used for surface tension and Kelvin effect.
+        """Return surface strategy for surface tension and Kelvin effect.
 
         Arguments:
             - clone : If True, then return a deepcopy of the surface strategy.

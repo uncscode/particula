@@ -13,13 +13,10 @@ from numpy.typing import NDArray
 
 from particula import gas, particles
 from particula.dynamics.coagulation import coagulation_rate
-from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
-    get_particle_resolved_coagulation_step,
+from particula.dynamics.coagulation.particle_resolved_step import (
+    particle_resolved_method,
 )
-from particula.particles.change_particle_representation import (
-    get_particle_resolved_binned_radius,
-    get_speciated_mass_representation_from_particle_resolved,
-)
+from particula.particles import change_particle_representation
 from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
@@ -28,8 +25,9 @@ logger = logging.getLogger("particula")
 class CoagulationStrategyABC(ABC):
     """Abstract base class for defining a coagulation strategy.
 
-    This class defines the methods that must be implemented by any coagulation
-    strategy (e.g., for discrete, continuous, or particle-resolved distributions).
+    This class defines the methods that must be implemented by any
+    coagulation strategy (e.g., for discrete, continuous, or
+    particle-resolved distributions).
 
     Attributes:
         - distribution_type : The type of distribution to be used, one of
@@ -57,8 +55,8 @@ class CoagulationStrategyABC(ABC):
         ```
 
     References:
-        - Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and Physics:
-          From Air Pollution to Climate Change (3rd ed.). Wiley.
+        Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and
+        Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
     """
 
     def __init__(
@@ -97,11 +95,14 @@ class CoagulationStrategyABC(ABC):
         """Calculate the dimensionless coagulation kernel.
 
         Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio [dimensionless].
+            - diffusive_knudsen : The diffusive Knudsen number
+              [dimensionless].
+            - coulomb_potential_ratio : The Coulomb potential ratio
+              [dimensionless].
 
         Returns:
-            - NDArray[np.float64] : Dimensionless kernel for particle coagulation.
+            - NDArray[np.float64] : Dimensionless kernel for particle
+              coagulation.
 
         Examples:
             ```py
@@ -123,7 +124,8 @@ class CoagulationStrategyABC(ABC):
         and pressure to return a dimensional kernel for coagulation.
 
         Arguments:
-            - particle : The ParticleRepresentation object, providing radius and concentration.
+            particle : The ParticleRepresentation object, providing radius
+            and concentration.
             - temperature : The temperature in Kelvin [K].
             - pressure : The pressure in Pascals [Pa].
 
@@ -145,7 +147,8 @@ class CoagulationStrategyABC(ABC):
         """Calculate the coagulation loss rate [kg/s].
 
         Arguments:
-            - particle : The particle representation for which the loss rate is calculated.
+            particle : The particle representation for which the loss rate
+            is calculated.
             - kernel : The coagulation kernel [m^3/s].
 
         Returns:
@@ -183,7 +186,8 @@ class CoagulationStrategyABC(ABC):
         """Calculate the coagulation gain rate [kg/s].
 
         Arguments:
-            - particle : The particle representation used in the calculation.
+            particle : The particle representation used in the
+            calculation.
             - kernel : The coagulation kernel [m^3/s].
 
         Returns:
@@ -228,8 +232,8 @@ class CoagulationStrategyABC(ABC):
             - pressure : The gas-phase pressure [Pa].
 
         Returns:
-            - float or NDArray[np.float64] : The net coagulation rate [kg/s].
-                (positive => net gain, negative => net loss).
+            float or NDArray[np.float64] : The net coagulation rate
+            [kg/s]. (positive => net gain, negative => net loss).
 
         Examples:
             ```py
@@ -252,8 +256,8 @@ class CoagulationStrategyABC(ABC):
     ) -> ParticleRepresentation:
         """Perform a single coagulation step over a specified time interval.
 
-        Updates the particle distribution or representation based on the net_rate
-        calculated for the given time_step.
+        Updates the particle distribution or representation based on the
+        net_rate calculated for the given time_step.
 
         Arguments:
             - particle : The particle representation to update.
@@ -262,7 +266,8 @@ class CoagulationStrategyABC(ABC):
             - time_step : The timestep over which to integrate [s].
 
         Returns:
-            - ParticleRepresentation : Updated particle representation after this step.
+            ParticleRepresentation : Updated particle representation after
+            this step.
 
         Raises:
             - ValueError : If the distribution type is invalid or unsupported.
@@ -285,18 +290,24 @@ class CoagulationStrategyABC(ABC):
 
         if self.distribution_type == "particle_resolved":
             # get the kernel radius
-            kernel_radius = get_particle_resolved_binned_radius(
+            func = (
+                change_particle_representation
+                .get_particle_resolved_binned_radius
+            )
+            kernel_radius = func(
                 particle=particle,
                 bin_radius=self.particle_resolved_radius,
                 total_bins=self.particle_resolved_bins_number,
                 bins_per_radius_decade=self.particle_resolved_bins_per_decade,
             )
             # convert particle representation to calculate kernel
-            kernel_particle = (
-                get_speciated_mass_representation_from_particle_resolved(
-                    particle=particle,
-                    bin_radius=kernel_radius,
-                )
+            func2 = (
+                change_particle_representation
+                .get_speciated_mass_representation_from_particle_resolved
+            )
+            kernel_particle = func2(
+                particle=particle,
+                bin_radius=kernel_radius,
             )
             kernel_radius = kernel_particle.get_radius()
             if np.any(kernel_radius) == 0:
@@ -310,7 +321,11 @@ class CoagulationStrategyABC(ABC):
                 pressure=pressure,
             )
             # calculate step
-            loss_gain_indices = get_particle_resolved_coagulation_step(
+            step_func = (
+                particle_resolved_method
+                .get_particle_resolved_coagulation_step
+            )
+            loss_gain_indices = step_func(
                 particle_radius=particle.get_radius(),
                 kernel=kernel,
                 kernel_radius=kernel_radius,
@@ -405,7 +420,8 @@ class CoagulationStrategyABC(ABC):
         determine the friction factor [dimensionless].
 
         Arguments:
-            - particle : The ParticleRepresentation for which to compute friction factor.
+            particle : The ParticleRepresentation for which to compute
+            friction factor.
             - temperature : Gas temperature [K].
             - pressure : Gas pressure [Pa].
 
@@ -417,8 +433,9 @@ class CoagulationStrategyABC(ABC):
             fr = strategy.friction_factor(particle, 298.15, 101325)
             ```
         """
+        # assume standard atmospheric composition
         dynamic_viscosity = gas.get_dynamic_viscosity(
-            temperature=temperature  # assume standard atmospheric composition
+            temperature=temperature
         )
         mean_free_path = gas.get_molecule_mean_free_path(
             temperature=temperature,

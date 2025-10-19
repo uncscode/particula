@@ -306,7 +306,7 @@ class ConstantVaporPressureBuilder(BuilderABC):
         return self
 
     def build(self) -> ConstantVaporPressureStrategy:
-        """Validate parameters and return a ConstantVaporPressureStrategy object.
+        """Validate parameters and return ConstantVaporPressureStrategy.
 
         Returns:
             - Configured with vapor_pressure in Pa.

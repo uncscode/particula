@@ -18,7 +18,8 @@ from particula.util.chemical.thermo_import import CHEMICALS_AVAILABLE
     ],
 )
 def test_get_chemical_stp_properties(identifier, expected_mw):
-    """Test getting standard temperature and pressure properties for a chemical."""
+    """Test getting standard temperature and pressure properties for a chemical.
+    """
     props = get_chemical_stp_properties(identifier)
 
     # dictionary must have the four required keys

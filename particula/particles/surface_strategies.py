@@ -127,7 +127,9 @@ def _weighted_average_by_phase(
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
-    weights = _broadcast_weights(np.asarray(weights, dtype=np.float64), values.shape)
+    weights = _broadcast_weights(
+        np.asarray(weights, dtype=np.float64), values.shape
+    )
 
     averaged = np.empty_like(values)
 

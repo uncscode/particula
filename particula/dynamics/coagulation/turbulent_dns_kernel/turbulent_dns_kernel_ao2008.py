@@ -13,15 +13,18 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula import gas, particles
-from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
-    get_g12_radial_distribution_ao2008,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
-    get_radial_relative_velocity_dz2002,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
-    get_relative_velocity_variance,
-)
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    g12_radial_distribution_ao2008 import (
+        get_g12_radial_distribution_ao2008,
+    )
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    radial_velocity_module import (
+        get_radial_relative_velocity_dz2002,
+    )
+from particula.dynamics.coagulation.turbulent_dns_kernel.\
+    sigma_relative_velocity_ao2008 import (
+        get_relative_velocity_variance,
+    )
 from particula.util.validate_inputs import validate_inputs
 
 

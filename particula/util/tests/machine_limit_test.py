@@ -107,7 +107,7 @@ def test_safe_log_edge_cases():
     small_values = np.array([np.nextafter(0, 1), 1e-300, 1e-40])
     assert np.allclose(get_safe_log(small_values), np.log(small_values))
 
-    # Negative inputs should clip to the smallest positive value without warnings.
+    # Negative inputs clip to smallest positive without warnings.
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         result = get_safe_log([-1, -10])
@@ -122,7 +122,7 @@ def test_safe_log10_edge_cases():
     small_values = np.array([np.nextafter(0, 1), 1e-300, 1e-40])
     assert np.allclose(get_safe_log10(small_values), np.log10(small_values))
 
-    # Negative inputs should clip to the smallest positive value without warnings.
+    # Negative inputs clip to smallest positive without warnings.
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         result = get_safe_log10([-1, -10])

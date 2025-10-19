@@ -22,7 +22,7 @@ def get_sorted_bins_by_radius(
         - radius : The radii of the particles.
         - distribution : The distribution of particle sizes or masses.
         - concentration : The concentration of each particle size or mass.
-        - charge : The (optional) charge per particle; can be a scalar or NumPy array.
+        - charge : (Optional) charge per particle; scalar or NumPy array.
 
     Returns:
         - distribution : The sorted distribution of particle sizes or masses.

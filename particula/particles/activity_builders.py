@@ -230,7 +230,7 @@ class ActivityKappaParameterBuilder(
         return self
 
     def build(self) -> ActivityStrategy:
-        """Validate parameters and instantiate an ActivityKappaParameter strategy.
+        """Validate parameters and build ActivityKappaParameter strategy.
 
         Returns:
             - ActivityKappaParameter : The non-ideal activity strategy

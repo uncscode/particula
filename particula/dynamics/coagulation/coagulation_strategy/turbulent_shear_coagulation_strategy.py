@@ -15,13 +15,18 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
+from particula.dynamics.coagulation import (
+    turbulent_shear_kernel as shear_kernel,
 )
-from particula.dynamics.coagulation.turbulent_shear_kernel import (
-    get_turbulent_shear_kernel_st1956_via_system_state,
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc as coag_abc,
 )
 from particula.particles.representation import ParticleRepresentation
+
+CoagulationStrategyABC = coag_abc.CoagulationStrategyABC
+get_turbulent_shear_kernel_st1956_via_system_state = (
+    shear_kernel.get_turbulent_shear_kernel_st1956_via_system_state
+)
 
 logger = logging.getLogger("particula")
 

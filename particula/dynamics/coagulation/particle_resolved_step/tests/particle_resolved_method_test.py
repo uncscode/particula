@@ -5,13 +5,14 @@ import time
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
-from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
-    _calculate_probabilities,
-    _final_coagulation_state,
-    _interpolate_kernel,
-    get_particle_resolved_coagulation_step,
-    get_particle_resolved_update_step,
-)
+from particula.dynamics.coagulation.\
+    particle_resolved_step.particle_resolved_method import (
+        _calculate_probabilities,
+        _final_coagulation_state,
+        _interpolate_kernel,
+        get_particle_resolved_coagulation_step,
+        get_particle_resolved_update_step,
+    )
 
 
 def test_interpolate_kernel():
@@ -125,7 +126,8 @@ def test_particle_resolved_coagulation_step():
 
 
 def test_particle_resolved_coagulation_step_empty_array():
-    """Test the particle_resolved_coagulation_step function with an empty array."""
+    """Test the particle_resolved_coagulation_step function with an empty array.
+    """
     particle_radius = np.array([], dtype=np.float64)
     kernel = np.random.rand(10, 10)
     kernel_radius = np.linspace(0, 1, 10)
@@ -144,7 +146,8 @@ def test_particle_resolved_coagulation_step_empty_array():
 
 
 def test_particle_resolved_coagulation_step_duplicate_collisions():
-    """Test the particle_resolved_coagulation_step function with all duplicate collisions."""
+    """Test particle_resolved_coagulation_step with duplicate collisions.
+    """
     particle_radius = np.array([1.0, 1.0, 1.0], dtype=np.float64)
     kernel = np.random.rand(10, 10)
     kernel_radius = np.linspace(0, 1, 10)

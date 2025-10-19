@@ -161,7 +161,7 @@ class ParticleMassRepresentationBuilder(
     BuilderConcentrationMixin,
     BuilderChargeMixin,
 ):  # pylint: disable=too-many-ancestors
-    """Builder for ParticleRepresentation objects using mass-based distributions.
+    """Builder for ParticleRepresentation using mass distributions.
 
     Attributes:
         - distribution_strategy : The DistributionStrategy
@@ -285,7 +285,7 @@ class ParticleRadiusRepresentationBuilder(
 
         Returns:
             - ParticleRepresentation : An object configured to represent
-              radius-based particle distributions, activity, and surface properties.
+              radius-based distributions, activity, and surface properties.
         """
         self.pre_build_check()
         return ParticleRepresentation(

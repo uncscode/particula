@@ -112,7 +112,8 @@ def test_get_particle_settling_velocity_via_inertia_scalar():
 
 
 def test_get_particle_settling_velocity_via_inertia_array():
-    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs."""
+    """Test get_particle_settling_velocity_via_inertia with NumPy array inputs.
+    """
     particle_inertia_time = np.array([0.02, 0.03])
     particle_radius = np.array([0.001, 0.002])
     relative_velocity = np.array([0.05, 0.06])
@@ -241,9 +242,9 @@ def test_get_particle_settling_velocity_with_drag_scalar_non_stokes():
     slip_correction_factor = 1.0  # Dimensionless
     gravitational_acceleration = 9.80665  # m/s²
 
-    # Since the Stokes formula is not valid here, we use an empirical or known value
-    # For demonstration, assume an expected velocity (e.g., based on empirical data)
-    # For simplicity, we'll just ensure that the function returns a positive value
+    # Stokes formula not valid here, use empirical or known value
+    # For demonstration, assume expected velocity (empirical data)
+    # For simplicity, ensure function returns positive value
 
     calculated_velocity = get_particle_settling_velocity_with_drag(
         particle_radius,

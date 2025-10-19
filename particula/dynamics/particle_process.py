@@ -7,9 +7,10 @@ from typing import Any
 import numpy as np
 
 from particula.aerosol import Aerosol
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
+from particula.dynamics.coagulation.\
+    coagulation_strategy.coagulation_strategy_abc import (
+        CoagulationStrategyABC,
+    )
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationStrategy,
 )

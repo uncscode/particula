@@ -11,18 +11,18 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
-from particula.dynamics.coagulation.sedimentation_kernel import (
-    get_sedimentation_kernel_sp2016_via_system_state,
+from particula.dynamics.coagulation import sedimentation_kernel
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc,
 )
 from particula.particles.representation import ParticleRepresentation
 
 logger = logging.getLogger("particula")
 
 
-class SedimentationCoagulationStrategy(CoagulationStrategyABC):
+class SedimentationCoagulationStrategy(
+    coagulation_strategy_abc.CoagulationStrategyABC
+):
     """Sedimentation coagulation strategy for aerosol particles.
 
     Implements the Seinfeld & Pandis (2016) sedimentation kernel as part of
@@ -30,8 +30,8 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     gravitational settling.
 
     Attributes:
-        - distribution_type : The particle distribution type ("discrete",
-          "continuous_pdf", or "particle_resolved").
+        distribution_type : The particle distribution type ("discrete",
+        "continuous_pdf", or "particle_resolved").
 
     Methods:
     - dimensionless_kernel : Raises NotImplementedError for this strategy.
@@ -63,7 +63,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         self,
         distribution_type: str,
     ):
-        CoagulationStrategyABC.__init__(
+        coagulation_strategy_abc.CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
         )
 
@@ -120,7 +120,11 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
             # k_values may be a single float or an array
             ```
         """
-        return get_sedimentation_kernel_sp2016_via_system_state(
+        kernel_func = (
+            sedimentation_kernel
+            .get_sedimentation_kernel_sp2016_via_system_state
+        )
+        return kernel_func(
             particle_radius=particle.get_radius(),
             particle_density=particle.get_mean_effective_density(),
             temperature=temperature,

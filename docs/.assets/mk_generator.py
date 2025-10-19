@@ -1,5 +1,4 @@
-"""
-Generate API reference stub pages for mkdocstrings using mkdocs-gen-files.
+"""Generate API reference stub pages for mkdocstrings using mkdocs-gen-files.
 
 Mirrors the old Handsdown layout:
   - Writes to API/...
@@ -12,14 +11,17 @@ Mirrors the old Handsdown layout:
 """
 
 from __future__ import annotations
+
+import logging
 import os
 from pathlib import Path
+
 import mkdocs_gen_files
-import logging
 
 logger = logging.getLogger("mkdocs")
 
-# Get the repository root - when running under mkdocs, cwd should be the docs root
+# Get the repository root - when running under mkdocs, cwd should be
+# the docs root
 REPO_PATH = Path.cwd()
 PACKAGE = "particula"
 
@@ -41,7 +43,8 @@ INCLUDE_SUFFIX = ".py"
 
 
 def is_excluded(path: Path) -> bool:
-    # Exclude if any parent directory matches EXCLUDE_DIR_NAMES or contains "test"
+    # Exclude if any parent directory matches EXCLUDE_DIR_NAMES or
+    # contains "test"
     for part in path.parts:
         if part in EXCLUDE_DIR_NAMES or "test" in part.lower():
             return True
@@ -55,7 +58,7 @@ def is_excluded(path: Path) -> bool:
 
 
 def is_in_package(py_file: Path) -> bool:
-    """Check if a Python file is in a proper package (has __init__.py in all parent dirs)."""
+    """Check if file is in proper package (has __init__.py in parents)."""
     # Check all parent directories up to SOURCE_ROOT
     current = py_file.parent
     while current != SOURCE_ROOT and current.is_relative_to(SOURCE_ROOT):
@@ -66,8 +69,7 @@ def is_in_package(py_file: Path) -> bool:
 
 
 def module_name_from_file(py_file: Path) -> str | None:
-    """
-    Convert a file path like:
+    """Convert a file path like:
         particula/a/b/c.py
     into a module name:
         particula.a.b.c
@@ -95,8 +97,7 @@ def module_name_from_file(py_file: Path) -> str | None:
 
 
 def get_display_name(modname: str, category: str = None) -> str:
-    """
-    Get a cleaner display name for the TOC with parent folder context.
+    """Get a cleaner display name for the TOC with parent folder context.
     Returns the module name with one level of parent folder for clarity.
 
     E.g., 'particula.activity.gibbs' -> 'gibbs' (top-level in category)
@@ -128,8 +129,7 @@ def get_display_name(modname: str, category: str = None) -> str:
 
 
 def organize_modules(modules: list[str]) -> dict[str, list[str]]:
-    """
-    Organize modules into a hierarchical structure.
+    """Organize modules into a hierarchical structure.
     Returns a dict with top-level categories as keys and module lists as
     values.
     """

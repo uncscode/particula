@@ -53,7 +53,8 @@ def test_add_mass():
     added_mass = np.array([10, 20, 30], dtype=np.float64)
 
     mass_per_particle = added_mass / concentration
-    new_volumes = (4 / 3) * np.pi * distribution**3 + mass_per_particle / density
+    initial_volumes = (4 / 3) * np.pi * distribution**3
+    new_volumes = initial_volumes + mass_per_particle / density
     expected_radii = (3 * new_volumes / (4 * np.pi)) ** (1 / 3)
     new_dist, new_conc = radii_based_strategy.add_mass(
         distribution, concentration, density, added_mass
