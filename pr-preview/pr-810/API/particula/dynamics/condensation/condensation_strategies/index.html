@@ -10324,7 +10324,7 @@ m_rate = iso_cond.mass_transfer_rate(
     <span class="c1"># very small particles where Kelvin effect dominates.</span>
     <span class="c1"># Setting to 0 effectively treats condensation as negligible</span>
     <span class="c1"># for these extreme cases, which is physically reasonable since</span>
-    <span class="c1"># continuum mechanics breaks down below ~1 nm anyway.</span>
+    <span class="c1"># continuum mechanics breaks down below 0.1 nm anyway.</span>
     <span class="n">pressure_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
         <span class="n">pressure_delta</span><span class="p">,</span> <span class="n">posinf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span>
     <span class="p">)</span>
