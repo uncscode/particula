@@ -19,6 +19,7 @@ docs/.assets/temp/*
 # ignore uv lock file
 uv.lock
 
+
 # ignore local development folder
 private_dev/
 
