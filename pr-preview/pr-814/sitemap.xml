@@ -645,10 +645,6 @@
          <lastmod>2025-12-01</lastmod>
     </url>
     <url>
-         <loc>https://uncscode.github.io/particula/Agent/agent_fallback_system/</loc>
-         <lastmod>2025-12-01</lastmod>
-    </url>
-    <url>
          <loc>https://uncscode.github.io/particula/Agent/architecture_reference/</loc>
          <lastmod>2025-12-01</lastmod>
     </url>
@@ -690,14 +686,6 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Agent/linting_guide/</loc>
-         <lastmod>2025-12-01</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Agent/migration-to-direct-opencode/</loc>
-         <lastmod>2025-12-01</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Agent/opencode-advanced-features/</loc>
          <lastmod>2025-12-01</lastmod>
     </url>
     <url>
