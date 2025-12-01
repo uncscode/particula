@@ -157,3 +157,6 @@ architect
 
 # Specs and planning documents
 specs/
+
+logs/*
+agents/*
