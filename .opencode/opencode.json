@@ -7,8 +7,8 @@
   "permission": {
     "edit": "allow",
     "webfetch": "allow",
-    "read": ["allow", "/home/kyle/Code/Agent/agents/**"],
-    "write": ["allow", "/home/kyle/Code/Agent/agents/**"],
+    "read": ["allow"],
+    "write": ["allow"],
     "bash": {
       "ruff check *": "allow",
       "ruff format *": "allow",

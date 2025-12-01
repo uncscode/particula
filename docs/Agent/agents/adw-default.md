@@ -198,7 +198,7 @@ Implementation Plan for Workflow `a1b2c3d4`:
 
 **Current Progress**: Tasks 1-2 complete, working on task 3
 
-**Worktree**: `/home/kyle/Code/Agent/trees/a1b2c3d4`
+**Worktree**: `/home/Code/Agent/trees/a1b2c3d4`
 **Branch**: `feature-123-a1b2c3d4-user-authentication`
 ```
 
@@ -416,8 +416,8 @@ ls -la trees/abc12345/
 ## See Also
 
 ### Documentation
-- **ADW System README**: `/home/kyle/Code/Agent/README.md` - Complete system guide
-- **Agent Documentation Index**: `/home/kyle/Code/Agent/docs/Agent/README.md` - All guides
+- **ADW System README**: `/home/Code/Agent/README.md` - Complete system guide
+- **Agent Documentation Index**: `/home/Code/Agent/docs/Agent/README.md` - All guides
 - **Architecture Reference**: `docs/Agent/architecture_reference.md` - System design
 - **Code Style Guide**: `docs/Agent/code_style.md` - Python conventions
 - **Testing Guide**: `docs/Agent/testing_guide.md` - Test framework and patterns
