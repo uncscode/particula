@@ -144,7 +144,7 @@ If this is a sub-issue or has dependencies, add reference links to the body:
 Construct the `adw create-issue` command with proper escaping:
 
 ```bash
-cd /home/kyle/Code/Agent && uv run adw create-issue \
+cd /home/Code/Agent && uv run adw create-issue \
   --title "<TITLE>" \
   --body "$(cat <<'EOF'
 <BODY_WITH_DEPENDENCIES>
@@ -163,7 +163,7 @@ EOF
 
 **Example Command:**
 ```bash
-cd /home/kyle/Code/Agent && uv run adw create-issue \
+cd /home/Code/Agent && uv run adw create-issue \
   --title "Implement workflow executor engine core" \
   --body "$(cat <<'EOF'
 ## Description
@@ -188,7 +188,7 @@ Execute the built command and capture output:
 
 ```bash
 # Execute command
-output=$(cd /home/kyle/Code/Agent && uv run adw create-issue ...)
+output=$(cd /home/Code/Agent && uv run adw create-issue ...)
 
 # Check exit code
 if [ $? -eq 0 ]; then
@@ -280,7 +280,7 @@ Report back to the primary agent with clear status:
 **Recommendation:** Check repository labels and use valid ones only.
 
 **Command Attempted:**
-cd /home/kyle/Code/Agent && uv run adw create-issue \
+cd /home/Code/Agent && uv run adw create-issue \
   --title "Issue title" \
   --body "..." \
   --label "agent"

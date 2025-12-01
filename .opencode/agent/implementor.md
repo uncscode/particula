@@ -57,7 +57,7 @@ When invoked as part of an ADW (Agent Development Workflow), you operate within 
 
 ## Git Worktree Environment
 - **Working Directory**: You execute in an isolated git worktree at `/trees/{adw_id}/`
-  - Example: `/home/kyle/Code/Agent/trees/af477c67/`
+  - Example: `/home/Agent/trees/af477c67/`
   - This is a separate working tree for the feature branch
   - All file paths are relative to this worktree root
 
