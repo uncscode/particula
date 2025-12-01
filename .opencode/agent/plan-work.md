@@ -48,7 +48,7 @@ The `adw_spec` tool provides commands to read and write workflow state in `adw_s
 - `branch_name` - Git branch name
 - `worktree_path` - Worktree directory path
 - `workflow_type` - Workflow type (complete, patch, etc.)
-- `pr_url` / `pr_number` - Pull request details (after ship phase)
+- `pr_url`, `pr_number` - Pull request details (after ship phase)
 
 **Reading Fields:**
 ```python
