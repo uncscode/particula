@@ -1,0 +1,23 @@
+{
+  "name": "document",
+  "version": "1.1.0",
+  "description": "Document workflow: plan \u2192 document \u2192 ship",
+  "workflow_type": "document",
+  "steps": [
+    {
+      "type": "workflow",
+      "name": "Plan",
+      "workflow_name": "plan-work"
+    },
+    {
+      "type": "workflow",
+      "name": "Document",
+      "workflow_name": "documentation-update"
+    },
+    {
+      "type": "workflow",
+      "name": "Ship",
+      "workflow_name": "ship"
+    }
+  ]
+}

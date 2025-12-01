@@ -1,0 +1,22 @@
+{
+  "name": "test",
+  "version": "2.0.0",
+  "description": "Test workflow - Run comprehensive tests using the tester agent",
+  "description_long": "Executes comprehensive test suite by directly invoking the tester agent",
+  "workflow_type": "complete",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Run Tests",
+      "agent": "tester",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 2,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "patch",
+  "version": "1.0.0",
+  "description": "Patch workflow: quick fixes (plan → execute → test → ship)",
+  "workflow_type": "patch",
+  "steps": [
+    {
+      "type": "workflow",
+      "name": "Plan",
+      "workflow_name": "plan-work"
+    },
+    {
+      "type": "workflow",
+      "name": "Execute",
+      "workflow_name": "execute-plan"
+    },
+    {
+      "type": "workflow",
+      "name": "Test",
+      "workflow_name": "test"
+    },
+    {
+      "type": "workflow",
+      "name": "Ship",
+      "workflow_name": "ship"
+    }
+  ]
+}
