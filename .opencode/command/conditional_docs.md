@@ -41,7 +41,7 @@ This guide helps you determine which repository-specific documentation to read b
 
 - docs/Agent/conditional_docs.md
   - Conditions:
-    - When and overview of the code repo is needed.
+    - When an overview of the code repo is needed.
     - Use when adding code to the core repo, or needing to write new code.
     - Use when first exploring the repository.
 

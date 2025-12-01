@@ -7,8 +7,8 @@
   "permission": {
     "edit": "allow",
     "webfetch": "allow",
-    "read": ["allow"],
-    "write": ["allow"],
+    "read": ["allow", "./**"],
+    "write": ["allow", "./**"],
     "bash": {
       "ruff check *": "allow",
       "ruff format *": "allow",
