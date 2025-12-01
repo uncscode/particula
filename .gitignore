@@ -160,3 +160,4 @@ specs/
 
 logs/*
 agents/*
+*.adw/
