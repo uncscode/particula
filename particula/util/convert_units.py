@@ -20,9 +20,9 @@ from typing import Optional
 try:
     import pint
 
-    unit_registry = pint.UnitRegistry()
+    unit_registry = pint.UnitRegistry()  # pylint: disable=invalid-name
 except ImportError:
-    unit_registry = None
+    unit_registry = None  # pylint: disable=invalid-name
 
 
 def get_unit_conversion(

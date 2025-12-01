@@ -277,6 +277,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2025-11-30  
+**Last Updated:** 2025-12-01  
 **For questions about ADW:** See `docs/Agent/README.md`  
 **For questions about particula:** See main `readme.md`
