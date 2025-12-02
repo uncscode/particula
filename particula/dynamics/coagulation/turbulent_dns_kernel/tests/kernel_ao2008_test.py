@@ -4,7 +4,9 @@ import unittest
 
 import numpy as np
 
-from ..turbulent_dns_kernel_ao2008 import get_turbulent_dns_kernel_ao2008
+from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (  # noqa: E501
+    get_turbulent_dns_kernel_ao2008,
+)
 
 
 class TestKernelAO2008(unittest.TestCase):

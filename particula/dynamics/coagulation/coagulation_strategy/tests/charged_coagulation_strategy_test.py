@@ -14,12 +14,13 @@ import numpy as np
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
+from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (  # noqa: E501
+    ChargedCoagulationStrategy,
+)
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
 )
-
-from ..charged_coagulation_strategy import ChargedCoagulationStrategy
 
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
