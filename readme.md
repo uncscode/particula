@@ -14,6 +14,6 @@ pip install particula
 
 Or install via conda:
 
-```
+``` bash
 conda install -c conda-forge particula
 ```
