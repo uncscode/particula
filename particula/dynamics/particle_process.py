@@ -7,16 +7,16 @@ from typing import Any
 import numpy as np
 
 from particula.aerosol import Aerosol
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
-from particula.dynamics.condensation.condensation_strategies import (
-    CondensationStrategy,
-)
 
 # Particula imports
 from particula.runnable import RunnableABC
+
+from .coagulation.coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from .condensation.condensation_strategies import (
+    CondensationStrategy,
+)
 
 
 class MassCondensation(RunnableABC):
@@ -113,13 +113,11 @@ class MassCondensation(RunnableABC):
             # rates may look like array([1.2e-12, 4.5e-12, ...])
             ```
         """
-        return (
-            self.condensation_strategy.rate(
-                particle=aerosol.particles,
-                gas_species=aerosol.atmosphere.partitioning_species,
-                temperature=aerosol.atmosphere.temperature,
-                pressure=aerosol.atmosphere.total_pressure,
-            )
+        return self.condensation_strategy.rate(
+            particle=aerosol.particles,
+            gas_species=aerosol.atmosphere.partitioning_species,
+            temperature=aerosol.atmosphere.temperature,
+            pressure=aerosol.atmosphere.total_pressure,
         )
 
 

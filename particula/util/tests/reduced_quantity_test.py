@@ -11,9 +11,9 @@ from particula.util.reduced_quantity import (
 
 def test_reduced_value_scalar():
     """Test that the reduced value is calculated correctly."""
-    assert get_reduced_value(4, 2) == 4 * 2 / (
-        4 + 2
-    ), "Failed for scalar inputs"
+    assert get_reduced_value(4, 2) == 4 * 2 / (4 + 2), (
+        "Failed for scalar inputs"
+    )
 
 
 def test_reduced_value_array():
@@ -72,9 +72,7 @@ def test_reduced_self_broadcast_typical():
         ]
     )
     result = get_reduced_self_broadcast(alpha_array)
-    assert np.allclose(
-        result, expected_result
-    ), "Test failed for typical input"
+    assert np.allclose(result, expected_result), "Test failed for typical input"
 
 
 def test_reduced_self_broadcast_empty():
@@ -89,9 +87,9 @@ def test_reduced_self_broadcast_zero_elements():
     alpha_array = np.array([0, 0, 0])
     expected_result = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     result = get_reduced_self_broadcast(alpha_array)
-    assert np.allclose(
-        result, expected_result
-    ), "Test failed for zero elements input"
+    assert np.allclose(result, expected_result), (
+        "Test failed for zero elements input"
+    )
 
 
 def test_reduced_self_broadcast_one_element():
@@ -99,9 +97,9 @@ def test_reduced_self_broadcast_one_element():
     alpha_array = np.array([4])
     expected_result = np.array([[4 * 4 / (4 + 4)]])
     result = get_reduced_self_broadcast(alpha_array)
-    assert np.allclose(
-        result, expected_result
-    ), "Test failed for one element input"
+    assert np.allclose(result, expected_result), (
+        "Test failed for one element input"
+    )
 
 
 def test_reduced_self_broadcast_negative_elements():
@@ -115,6 +113,6 @@ def test_reduced_self_broadcast_negative_elements():
         ]
     )
     result = get_reduced_self_broadcast(alpha_array)
-    assert np.allclose(
-        result, expected_result
-    ), "Test failed for negative elements input"
+    assert np.allclose(result, expected_result), (
+        "Test failed for negative elements input"
+    )

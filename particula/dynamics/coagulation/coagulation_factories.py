@@ -3,30 +3,25 @@
 from typing import Any, Dict, Union
 
 from particula.abc_factory import StrategyFactoryABC
-from particula.dynamics.coagulation.\
-    coagulation_builder.brownian_coagulation_builder import (
-        BrownianCoagulationBuilder,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_builder.charged_coagulation_builder import (
-        ChargedCoagulationBuilder,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_builder.combine_coagulation_strategy_builder import (
-        CombineCoagulationStrategyBuilder,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_builder.turbulent_dns_coagulation_builder import (
-        TurbulentDNSCoagulationBuilder,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_builder.turbulent_shear_coagulation_builder import (
-        TurbulentShearCoagulationBuilder,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
+
+from .coagulation_builder.brownian_coagulation_builder import (
+    BrownianCoagulationBuilder,
+)
+from .coagulation_builder.charged_coagulation_builder import (
+    ChargedCoagulationBuilder,
+)
+from .coagulation_builder.combine_coagulation_strategy_builder import (
+    CombineCoagulationStrategyBuilder,
+)
+from .coagulation_builder.turbulent_dns_coagulation_builder import (
+    TurbulentDNSCoagulationBuilder,
+)
+from .coagulation_builder.turbulent_shear_coagulation_builder import (
+    TurbulentShearCoagulationBuilder,
+)
+from .coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
 
 
 class CoagulationFactory(

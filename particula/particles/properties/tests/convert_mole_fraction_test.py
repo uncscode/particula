@@ -44,40 +44,40 @@ def test_get_mass_fractions_from_moles_1d(
     """
     result = get_mass_fractions_from_moles(mole_fractions, molecular_weights)
 
-    assert (
-        result.shape == mole_fractions.shape
-    ), "Result shape must match input shape."
+    assert result.shape == mole_fractions.shape, (
+        "Result shape must match input shape."
+    )
 
     # Handle special expected-value cases
     if isinstance(expected, np.ndarray):
         # Direct numeric comparison
-        assert np.allclose(
-            result, expected
-        ), f"Expected {expected}, got {result}"
+        assert np.allclose(result, expected), (
+            f"Expected {expected}, got {result}"
+        )
     elif expected == "check_sums_to_one":
         # Check sum to ~1
-        assert isclose(
-            result.sum(), 1.0, rel_tol=1e-7
-        ), f"Sum of mass fractions should be 1, got {result.sum()}"
+        assert isclose(result.sum(), 1.0, rel_tol=1e-7), (
+            f"Sum of mass fractions should be 1, got {result.sum()}"
+        )
         # Also ensure nonnegative
-        assert np.all(
-            result >= 0
-        ), f"Mass fractions must be nonnegative: got {result}"
+        assert np.all(result >= 0), (
+            f"Mass fractions must be nonnegative: got {result}"
+        )
     elif expected == "manual_check":
         # We can do a quick approximate check
         # For x = [0.3, 0.7], M = [18, 2],
         # total_mass = 0.3*18 + 0.7*2 = 5.4 + 1.4 = 6.8
         # w1 = (0.3*18)/6.8 = 5.4/6.8 = 0.7941..., w2 = 0.2059...
         # They should sum to ~1
-        assert np.allclose(
-            result.sum(), 1.0
-        ), f"Sum of mass fractions should be 1, got {result.sum()}"
-        assert np.allclose(
-            result[0], 5.4 / 6.8, rtol=1e-5
-        ), f"First component mismatch, expected ~0.7941, got {result[0]}"
-        assert np.allclose(
-            result[1], 1 - (5.4 / 6.8), rtol=1e-5
-        ), f"Second component mismatch, expected ~0.2059, got {result[1]}"
+        assert np.allclose(result.sum(), 1.0), (
+            f"Sum of mass fractions should be 1, got {result.sum()}"
+        )
+        assert np.allclose(result[0], 5.4 / 6.8, rtol=1e-5), (
+            f"First component mismatch, expected ~0.7941, got {result[0]}"
+        )
+        assert np.allclose(result[1], 1 - (5.4 / 6.8), rtol=1e-5), (
+            f"Second component mismatch, expected ~0.2059, got {result[1]}"
+        )
 
 
 def test_get_mass_fractions_from_moles_2d():
@@ -94,24 +94,24 @@ def test_get_mass_fractions_from_moles_2d():
 
     result = get_mass_fractions_from_moles(x_2d, mw_2d)
 
-    assert (
-        result.shape == x_2d.shape
-    ), "Output shape must match the input shape."
+    assert result.shape == x_2d.shape, (
+        "Output shape must match the input shape."
+    )
 
     # Row 1 (nonzero): sum should be ~1
-    assert np.isclose(
-        result[0].sum(), 1.0, rtol=1e-7
-    ), f"Row 1 sum != 1, got {result[0].sum()}"
+    assert np.isclose(result[0].sum(), 1.0, rtol=1e-7), (
+        f"Row 1 sum != 1, got {result[0].sum()}"
+    )
 
     # Row 2 (nonzero): sum should be ~1
-    assert np.isclose(
-        result[1].sum(), 1.0, rtol=1e-7
-    ), f"Row 2 sum != 1, got {result[1].sum()}"
+    assert np.isclose(result[1].sum(), 1.0, rtol=1e-7), (
+        f"Row 2 sum != 1, got {result[1].sum()}"
+    )
 
     # Row 3 (all zeros input): should be all zeros
-    assert np.allclose(
-        result[2], [0.0, 0.0, 0.0]
-    ), f"Row 3 should all be zeros, got {result[2]}"
+    assert np.allclose(result[2], [0.0, 0.0, 0.0]), (
+        f"Row 3 should all be zeros, got {result[2]}"
+    )
 
 
 def test_dimension_mismatch():

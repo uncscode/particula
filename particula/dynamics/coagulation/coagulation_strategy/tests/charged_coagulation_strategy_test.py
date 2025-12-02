@@ -7,14 +7,9 @@ discrete and continuous_pdf distribution types.
 
 # pylint: disable=duplicate-code, too-many-instance-attributes
 
-
 import unittest
 
 import numpy as np
-from particula.dynamics.coagulation.\
-    coagulation_strategy.charged_coagulation_strategy import (
-    ChargedCoagulationStrategy,
-)
 
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
@@ -23,6 +18,8 @@ from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
 )
+
+from ..charged_coagulation_strategy import ChargedCoagulationStrategy
 
 
 class TestChargedCoagulationStrategy(unittest.TestCase):

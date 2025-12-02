@@ -2,8 +2,8 @@
 
 import numpy as np
 import pytest
-from particula.dynamics.coagulation.turbulent_dns_kernel.\
-    velocity_correlation_f2_ao2008 import (
+
+from ..velocity_correlation_f2_ao2008 import (
     get_f2_longitudinal_velocity_correlation,
 )
 
@@ -20,14 +20,10 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
     denominator = 2 * sqrt_term_t
 
     exp_term_1 = np.exp(
-        -2
-        * collisional_radius
-        / ((1 + sqrt_term_t) * eulerian_integral_length)
+        -2 * collisional_radius / ((1 + sqrt_term_t) * eulerian_integral_length)
     )
     exp_term_2 = np.exp(
-        -2
-        * collisional_radius
-        / ((1 - sqrt_term_t) * eulerian_integral_length)
+        -2 * collisional_radius / ((1 - sqrt_term_t) * eulerian_integral_length)
     )
 
     expected = (1 / denominator) * (
@@ -38,9 +34,9 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
         collisional_radius, taylor_microscale, eulerian_integral_length
     )
 
-    assert np.isclose(
-        result, expected, atol=1e-10
-    ), f"Expected {expected}, but got {result}"
+    assert np.isclose(result, expected, atol=1e-10), (
+        f"Expected {expected}, but got {result}"
+    )
 
 
 def test_compute_f2_longitudinal_velocity_correlation_array():

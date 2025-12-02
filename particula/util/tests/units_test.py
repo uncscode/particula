@@ -52,4 +52,6 @@ class TestUnitConversion(unittest.TestCase):
             result = get_unit_conversion("degC", "degF", value=0)
             self.assertAlmostEqual(result, 32.0, places=6)
         else:
-            self.skipTest("Pint not installed. Skipping temperature conversion test.")
+            self.skipTest(
+                "Pint not installed. Skipping temperature conversion test."
+            )

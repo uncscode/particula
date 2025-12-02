@@ -11,12 +11,12 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation import sedimentation_kernel
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
 from particula.particles.representation import ParticleRepresentation
+
+from ..sedimentation_kernel import (
+    get_sedimentation_kernel_sp2016_via_system_state as get_kernel_sp2016,
+)
+from .coagulation_strategy_abc import CoagulationStrategyABC
 
 logger = logging.getLogger("particula")
 
@@ -120,11 +120,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
             # k_values may be a single float or an array
             ```
         """
-        kernel_func = (
-            sedimentation_kernel
-            .get_sedimentation_kernel_sp2016_via_system_state
-        )
-        return kernel_func(
+        return get_kernel_sp2016(
             particle_radius=particle.get_radius(),
             particle_density=particle.get_mean_effective_density(),
             temperature=temperature,

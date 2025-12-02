@@ -222,6 +222,7 @@ def test_gas_species_array_operations():
 # Operator add and iadd tests
 # ---------------------------------------------------------------------------
 
+
 def _simple_species(name: str, partitioning: bool = True) -> GasSpecies:
     """Utility constructor to avoid repetition."""
     return GasSpecies(

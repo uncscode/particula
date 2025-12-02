@@ -60,9 +60,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         density_core = 1.77e3
         r = np.array([100e-9])  # 100 nm core radius
         mass_core = 4 / 3 * np.pi * r**3 * density_core
-        mass_spec = np.column_stack(
-            [mass_core * 0, mass_core]
-        )  # [water, core]
+        mass_spec = np.column_stack([mass_core * 0, mass_core])  # [water, core]
         densities = np.array([1e3, density_core])
 
         activity = (

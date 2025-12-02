@@ -16,9 +16,7 @@ def test_mean_thermal_speed_single_value():
     expected_speed = np.sqrt(
         (8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass)
     )
-    assert np.isclose(
-        get_mean_thermal_speed(mass, temperature), expected_speed
-    )
+    assert np.isclose(get_mean_thermal_speed(mass, temperature), expected_speed)
 
 
 def test_mean_thermal_speed_array_input():

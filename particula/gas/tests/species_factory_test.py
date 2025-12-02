@@ -48,9 +48,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
             parameters["vapor_pressure_strategy"],
         )
         self.assertEqual(gas_species.partitioning, parameters["partitioning"])
-        self.assertEqual(
-            gas_species.concentration, parameters["concentration"]
-        )
+        self.assertEqual(gas_species.concentration, parameters["concentration"])
         self.assertIsInstance(gas_species, GasSpecies)
 
     def test_get_strategy_preset_gas_species(self):

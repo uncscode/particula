@@ -262,6 +262,4 @@ def test_bin_order_after_add_mass():
     np.testing.assert_array_equal(
         particle.get_concentration(), np.array([10, 20, 30])
     )
-    np.testing.assert_array_equal(
-        particle.get_charge(), np.array([1, 2, 3])
-    )
+    np.testing.assert_array_equal(particle.get_charge(), np.array([1, 2, 3]))

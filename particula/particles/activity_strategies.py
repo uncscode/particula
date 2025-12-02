@@ -274,15 +274,16 @@ class ActivityKappaParameter(ActivityStrategy):
             - water_index : Index of the water species.
         """
         self.kappa = (
-            kappa if kappa is not None
-            else np.array([0.0], dtype=np.float64)
+            kappa if kappa is not None else np.array([0.0], dtype=np.float64)
         )
         self.density = (
-            density if density is not None
+            density
+            if density is not None
             else np.array([0.0], dtype=np.float64)
         )
         self.molar_mass = (
-            molar_mass if molar_mass is not None
+            molar_mass
+            if molar_mass is not None
             else np.array([0.0], dtype=np.float64)
         )
         self.water_index = water_index

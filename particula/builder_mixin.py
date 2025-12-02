@@ -493,9 +493,7 @@ class BuilderTemperatureMixin:
         self.temperature = None
 
     @validate_inputs({"temperature": "finite"})
-    def set_temperature(
-        self, temperature: float, temperature_units: str = "K"
-    ):
+    def set_temperature(self, temperature: float, temperature_units: str = "K"):
         """Set the temperature of the atmosphere in Kelvin.
 
         Arguments:

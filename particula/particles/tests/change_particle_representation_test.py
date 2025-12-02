@@ -44,10 +44,8 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         bin_radius = get_particle_resolved_binned_radius(
             self.particle, total_bins=10
         )
-        new_particle = (
-            get_speciated_mass_representation_from_particle_resolved(
-                self.particle, bin_radius
-            )
+        new_particle = get_speciated_mass_representation_from_particle_resolved(
+            self.particle, bin_radius
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
         self.assertTrue(np.all(new_particle.get_distribution() >= 0))
@@ -68,10 +66,8 @@ class TestChangeParticleRepresentation(unittest.TestCase):
                 self.particle.distribution,
             )
         )
-        new_particle = (
-            get_speciated_mass_representation_from_particle_resolved(
-                self.particle, bin_radius
-            )
+        new_particle = get_speciated_mass_representation_from_particle_resolved(
+            self.particle, bin_radius
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
         self.assertTrue(np.all(new_particle.get_distribution() >= 0))

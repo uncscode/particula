@@ -29,9 +29,7 @@ def test_organic_density_estimate():
     nitrogen2carbon = 0.2
 
     assert (
-        get_organic_density_estimate(
-            molar_mass, oxygen2carbon, nitrogen2carbon
-        )
+        get_organic_density_estimate(molar_mass, oxygen2carbon, nitrogen2carbon)
         > 0.0
     )
 
@@ -41,9 +39,7 @@ def test_organic_density_estimate():
     hydrogen2carbon = 0.8
 
     assert (
-        get_organic_density_estimate(
-            molar_mass, oxygen2carbon, hydrogen2carbon
-        )
+        get_organic_density_estimate(molar_mass, oxygen2carbon, hydrogen2carbon)
         > 0.0
     )
 

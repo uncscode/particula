@@ -8,8 +8,7 @@ from particula.gas import get_dynamic_viscosity
 def test_dynamic_viscosity_normal_conditions():
     """Test dynamic viscosity under normal conditions."""
     assert (
-        pytest.approx(get_dynamic_viscosity(300), 1e-5)
-        == 1.8459162511975804e-5
+        pytest.approx(get_dynamic_viscosity(300), 1e-5) == 1.8459162511975804e-5
     ), "Failed under normal conditions"
 
 
@@ -23,16 +22,15 @@ def test_dynamic_viscosity_high_temperature():
 
 def test_dynamic_viscosity_low_temperature():
     """Test dynamic viscosity at low temperature."""
-    assert (
-        pytest.approx(get_dynamic_viscosity(250), 1e-5) == 1.599052394e-5
-    ), "Failed at low temperature"
+    assert pytest.approx(get_dynamic_viscosity(250), 1e-5) == 1.599052394e-5, (
+        "Failed at low temperature"
+    )
 
 
 def test_dynamic_viscosity_reference_values():
     """Test dynamic viscosity with reference values."""
     assert (
-        pytest.approx(get_dynamic_viscosity(300, 1.85e-5, 300), 1e-5)
-        == 1.85e-5
+        pytest.approx(get_dynamic_viscosity(300, 1.85e-5, 300), 1e-5) == 1.85e-5
     ), "Failed with reference values"
 
 

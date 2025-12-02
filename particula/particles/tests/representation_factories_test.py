@@ -74,9 +74,7 @@ def test_radii_based_build():
 def test_limited_radius_build():
     """Test factory and build for LimitedRadiusParticleBuilder."""
     # default values
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "preset_radius"
-    )
+    particle_rep = ParticleRepresentationFactory().get_strategy("preset_radius")
     assert isinstance(particle_rep, ParticleRepresentation)
 
     # set values

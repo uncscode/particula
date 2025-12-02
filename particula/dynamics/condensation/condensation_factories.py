@@ -3,13 +3,11 @@
 from typing import Any, Dict
 
 from particula.abc_factory import StrategyFactoryABC
-from particula.dynamics.condensation.condensation_builder.\
-    condensation_isothermal_builder import (
-        CondensationIsothermalBuilder,
-    )
-from particula.dynamics.condensation.condensation_strategies import (
-    CondensationStrategy,
+
+from .condensation_builder.condensation_isothermal_builder import (
+    CondensationIsothermalBuilder,
 )
+from .condensation_strategies import CondensationStrategy
 
 
 class CondensationFactory(

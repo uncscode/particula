@@ -9,8 +9,8 @@ distribution function.
 
 import numpy as np
 import pytest
-from particula.dynamics.coagulation.turbulent_dns_kernel.\
-    g12_radial_distribution_ao2008 import (
+
+from ..g12_radial_distribution_ao2008 import (
     get_g12_radial_distribution_ao2008,
 )
 

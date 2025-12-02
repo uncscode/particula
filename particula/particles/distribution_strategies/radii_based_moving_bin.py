@@ -111,8 +111,6 @@ class RadiiBasedMovingBin(DistributionStrategy):
         Raises:
             NotImplementedError: Method is not physically valid.
         """
-        message = (
-            "Colliding pairs in RadiiBasedMovingBin not physically valid"
-        )
+        message = "Colliding pairs in RadiiBasedMovingBin not physically valid"
         logger.warning(message)
         raise NotImplementedError(message)

@@ -28,9 +28,7 @@ from particula.util.constants import (
 from particula.util.validate_inputs import validate_inputs
 
 
-@validate_inputs(
-    {"dynamic_viscosity": "positive", "fluid_density": "positive"}
-)
+@validate_inputs({"dynamic_viscosity": "positive", "fluid_density": "positive"})
 def get_kinematic_viscosity(
     dynamic_viscosity: float,
     fluid_density: float,

@@ -43,9 +43,7 @@ def test_safe_log():
     # Test with negative values
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        assert not np.allclose(
-            get_safe_log([-1, -2, -3]), np.log([-1, -2, -3])
-        )
+        assert not np.allclose(get_safe_log([-1, -2, -3]), np.log([-1, -2, -3]))
         assert any(item.category == RuntimeWarning for item in w)
 
 
@@ -75,9 +73,7 @@ def test_safe_power():
     base = np.array([2, 3, 10])
     exponent = np.array([3, 2, 1])
     # For valid positive inputs, get_safe_power should match np.power.
-    assert np.allclose(
-        get_safe_power(base, exponent), np.power(base, exponent)
-    )
+    assert np.allclose(get_safe_power(base, exponent), np.power(base, exponent))
 
     # Test for overflow protection:
     # Compute the safe exponent limit for base 10.

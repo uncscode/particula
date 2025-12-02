@@ -40,6 +40,4 @@ def get_concentration_from_pressure(
     Returns:
         Concentration of the gas in kg/m³.
     """
-    return (partial_pressure * molar_mass) / (
-        float(GAS_CONSTANT) * temperature
-    )
+    return (partial_pressure * molar_mass) / (float(GAS_CONSTANT) * temperature)

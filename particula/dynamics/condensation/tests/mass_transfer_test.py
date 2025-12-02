@@ -29,9 +29,7 @@ def test_multi_radius_first_order_mass_transport_k():
     radius = np.array([1e-6, 2e-6, 3e-6])
     vapor_transition = 0.6
     diffusion_coefficient = 2e-9
-    expected_result = np.array(
-        [1.50796447e-14, 3.01592895e-14, 4.52389342e-14]
-    )
+    expected_result = np.array([1.50796447e-14, 3.01592895e-14, 4.52389342e-14])
     result = get_first_order_mass_transport_k(
         radius, vapor_transition, diffusion_coefficient
     )
@@ -109,9 +107,7 @@ def test_single_species_condensation_not_enough_gas_mass():
     result_direct = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
-    np.testing.assert_allclose(
-        result_direct, expected_mass_transfer, rtol=1e-8
-    )
+    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
     # second calc
     result_direct2 = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
@@ -154,9 +150,7 @@ def test_single_species_evaporation_not_enough_particle_mass():
     result_direct = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
-    np.testing.assert_allclose(
-        result_direct, expected_mass_transfer, rtol=1e-8
-    )
+    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
 
     result = get_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
@@ -208,9 +202,7 @@ def test_multiple_species_condensation():
     # total mass transfer for the gas phase
     np.testing.assert_allclose(result_direct.sum(axis=0), gas_mass, rtol=1e-8)
     # Check for each individual particle and species
-    np.testing.assert_allclose(
-        result_direct, expected_mass_transfer, rtol=1e-8
-    )
+    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
 
     # Test the general helper function
     result = get_mass_transfer(
@@ -412,16 +404,16 @@ def test_mixed_condensation_and_evaporation_inventory_limit():
     """
     # ───── scenario ───────────────────────────────────────────────
     # 2 size bins, 1 condensable species
-    mass_rate = np.array([0.3, -0.1])       # kg s⁻¹  (+ condense, − evaporate)
-    time_step = 10.0                        # s
-    gas_mass = np.array([1.0])              # kg  (scarce → scaling expected)
-    particle_mass = np.array([0.5, 0.5])    # kg per particle
-    particle_conc = np.array([1.0, 1.0])    # # m⁻³
+    mass_rate = np.array([0.3, -0.1])  # kg s⁻¹  (+ condense, − evaporate)
+    time_step = 10.0  # s
+    gas_mass = np.array([1.0])  # kg  (scarce → scaling expected)
+    particle_mass = np.array([0.5, 0.5])  # kg per particle
+    particle_conc = np.array([1.0, 1.0])  # # m⁻³
 
     # ───── manual expectation ────────────────────────────────────
-    requested = mass_rate * time_step * particle_conc        # [+3.0, −1.0]
-    positive_sum = requested[requested > 0.0].sum()          # 3.0
-    negative_sum = requested[requested < 0.0].sum()          # −1.0
+    requested = mass_rate * time_step * particle_conc  # [+3.0, −1.0]
+    positive_sum = requested[requested > 0.0].sum()  # 3.0
+    negative_sum = requested[requested < 0.0].sum()  # −1.0
 
     # scale *only* the condensation so that the column net equals gas_mass
     if positive_sum + negative_sum > gas_mass[0]:
@@ -432,7 +424,7 @@ def test_mixed_condensation_and_evaporation_inventory_limit():
     expected = np.where(requested > 0.0, requested * cond_scale, requested)
 
     # per-bin evaporation cannot exceed its inventory
-    per_bin_limit = -particle_mass * particle_conc            # [−0.5, −0.5]
+    per_bin_limit = -particle_mass * particle_conc  # [−0.5, −0.5]
     expected = np.maximum(expected, per_bin_limit)
 
     # ───── routine under test ────────────────────────────────────

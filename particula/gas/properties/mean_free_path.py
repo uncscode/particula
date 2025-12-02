@@ -29,9 +29,7 @@ logger = logging.getLogger("particula")  # get instance of logger
 
 
 def get_molecule_mean_free_path(
-    molar_mass: Union[
-        float, NDArray[np.float64]
-    ] = MOLECULAR_WEIGHT_AIR,  # type: ignore
+    molar_mass: Union[float, NDArray[np.float64]] = MOLECULAR_WEIGHT_AIR,  # type: ignore
     temperature: float = 298.15,
     pressure: float = 101325,
     dynamic_viscosity: Optional[float] = None,

@@ -21,9 +21,9 @@ def test_get_fluid_rms_velocity_scalar():
         re_lambda, kinematic_viscosity, turbulent_dissipation
     )
 
-    assert np.isclose(
-        result, expected, atol=1e-10
-    ), f"Expected {expected}, got {result}"
+    assert np.isclose(result, expected, atol=1e-10), (
+        f"Expected {expected}, got {result}"
+    )
 
 
 def test_get_fluid_rms_velocity_array():
@@ -39,9 +39,9 @@ def test_get_fluid_rms_velocity_array():
         re_lambda, kinematic_viscosity, turbulent_dissipation
     )
 
-    assert np.allclose(
-        result, expected, atol=1e-10
-    ), f"Expected {expected}, got {result}"
+    assert np.allclose(result, expected, atol=1e-10), (
+        f"Expected {expected}, got {result}"
+    )
 
 
 def test_get_fluid_rms_velocity_invalid_values():
@@ -75,6 +75,6 @@ def test_get_fluid_rms_velocity_edge_case():
         re_lambda, kinematic_viscosity, turbulent_dissipation
     )
 
-    assert np.isclose(
-        result, expected, atol=1e-10
-    ), f"Expected {expected}, got {result}"
+    assert np.isclose(result, expected, atol=1e-10), (
+        f"Expected {expected}, got {result}"
+    )

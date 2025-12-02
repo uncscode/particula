@@ -35,9 +35,9 @@ def test_get_psi_ao2008_scalar():
         alpha, phi, particle_inertia_time, particle_velocity
     )
 
-    assert np.isclose(
-        result, expected, atol=1e-10
-    ), f"Expected {expected}, but got {result}"
+    assert np.isclose(result, expected, atol=1e-10), (
+        f"Expected {expected}, but got {result}"
+    )
 
 
 def test_get_psi_ao2008_array():
@@ -58,12 +58,12 @@ def test_get_psi_ao2008_array():
         alpha, phi, particle_inertia_time, particle_velocity
     )
 
-    assert (
-        result.shape == expected.shape
-    ), f"Expected shape {expected.shape}, but got {result.shape}"
-    assert np.allclose(
-        result, expected, atol=1e-10
-    ), f"Expected {expected}, but got {result}"
+    assert result.shape == expected.shape, (
+        f"Expected shape {expected.shape}, but got {result.shape}"
+    )
+    assert np.allclose(result, expected, atol=1e-10), (
+        f"Expected {expected}, but got {result}"
+    )
 
 
 def test_get_psi_ao2008_invalid_inputs():

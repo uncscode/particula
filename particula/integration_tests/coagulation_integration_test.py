@@ -53,9 +53,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_pmf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
@@ -85,9 +83,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_pdf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
@@ -154,9 +150,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_pmf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
@@ -190,9 +184,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_pdf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
@@ -281,9 +273,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_pmf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
@@ -308,9 +298,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_pdf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")

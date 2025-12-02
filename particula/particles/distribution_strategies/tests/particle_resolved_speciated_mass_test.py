@@ -66,9 +66,7 @@ def test_add_mass():
     )
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 30], dtype=np.float64)
-    added_mass = np.array(
-        [[10, 20], [30, 40], [50, 60]], dtype=np.float64
-    )
+    added_mass = np.array([[10, 20], [30, 40], [50, 60]], dtype=np.float64)
 
     conc_expand = concentration[:, np.newaxis]
     new_mass = np.divide(
@@ -123,9 +121,7 @@ def test_add_concentration_partial_fill():
     """Test replacing all bins."""
     distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
     concentration = np.array([0.0, 0.0], dtype=np.float64)
-    added_distribution = np.array(
-        [[7.0, 8.0], [9.0, 10.0]], dtype=np.float64
-    )
+    added_distribution = np.array([[7.0, 8.0], [9.0, 10.0]], dtype=np.float64)
     added_concentration = np.array([1.0, 1.0], dtype=np.float64)
     new_dist, new_conc = particle_resolved_strategy.add_concentration(
         distribution,

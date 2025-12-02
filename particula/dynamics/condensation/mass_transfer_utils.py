@@ -156,9 +156,7 @@ def apply_evaporation_limit(
         if need_scale:
             evap_scale = np.array([inventory / (-evap_sum)])
     else:
-        evap_scale[need_scale] = inventory[need_scale] / (
-            -evap_sum[need_scale]
-        )
+        evap_scale[need_scale] = inventory[need_scale] / (-evap_sum[need_scale])
     return np.where(neg_mask, mass_to_change * evap_scale, mass_to_change)
 
 

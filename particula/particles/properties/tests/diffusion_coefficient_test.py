@@ -38,5 +38,6 @@ def test_particle_diffusion_coefficient_invalid():
     particle_aerodynamic_mobility = 1e-9
     with pytest.raises(TypeError):
         get_diffusion_coefficient(
-            temperature, particle_aerodynamic_mobility  # type: ignore
+            temperature,
+            particle_aerodynamic_mobility,  # type: ignore
         )

@@ -2,8 +2,8 @@
 
 import numpy as np
 import pytest
-from particula.dynamics.coagulation.turbulent_dns_kernel.\
-    velocity_correlation_terms_ao2008 import (
+
+from ..velocity_correlation_terms_ao2008 import (
     compute_b1,
     compute_b2,
     compute_beta,
@@ -154,6 +154,6 @@ def test_edge_cases():
     )
 
     assert np.all(np.isfinite(z_values)), "Expected all z values to be finite"
-    assert np.all(
-        np.isfinite(beta_values)
-    ), "Expected all beta values to be finite"
+    assert np.all(np.isfinite(beta_values)), (
+        "Expected all beta values to be finite"
+    )
