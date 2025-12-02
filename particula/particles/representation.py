@@ -541,8 +541,14 @@ class ParticleRepresentation:
             particle_representation.collide_pairs(indices)
             ```
         """
-        (self.distribution, self.concentration) = self.strategy.collide_pairs(
-            self.distribution, self.concentration, self.density, indices
+        (self.distribution, self.concentration, self.charge) = (
+            self.strategy.collide_pairs(
+                self.distribution,
+                self.concentration,
+                self.density,
+                indices,
+                self.charge,
+            )
         )
 
     def _enforce_increasing_bins(self) -> None:

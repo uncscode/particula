@@ -6,6 +6,7 @@ mass, radius, total mass, and concentration updates differently.
 """
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -146,7 +147,10 @@ class DistributionStrategy(ABC):
         concentration: NDArray[np.float64],
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        charge: Optional[NDArray[np.float64]] = None,
+    ) -> tuple[
+        NDArray[np.float64], NDArray[np.float64], Optional[NDArray[np.float64]]
+    ]:
         """Collide index pairs in the distribution.
 
         Arguments:
@@ -154,8 +158,12 @@ class DistributionStrategy(ABC):
             - concentration : The concentration of each particle size or mass.
             - density : The density of the particles.
             - indices : The indices of the particles to collide.
+            - charge : Optional charge array. If provided and contains non-zero
+                values in colliding pairs, charges will be summed during
+                collisions.
 
         Returns:
-            - The updated distribution array
+            - The updated distribution array.
             - The updated concentration array.
+            - The updated charge array (None if input was None).
         """
