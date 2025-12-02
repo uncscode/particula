@@ -82,3 +82,33 @@ convention = "google"          # accepts "google", "numpy", or "pep257"
 [tool.pytest.ini_options]
 testpaths = ["particula"]
 norecursedirs = ["trees", ".git", "dist", "build"]
+
+# Configuration for pylint
+[tool.pylint.main]
+# Use multiple processes to speed up Pylint
+jobs = 0
+
+[tool.pylint.messages_control]
+# Disable import-related warnings and other checks handled by ruff
+disable = [
+    "line-too-long",          # Line length handled by ruff
+    "import-error",           # Don't check if imports can be resolved
+    "no-name-in-module",      # Don't check module members (handled by mypy)
+    "wrong-import-order",     # Import order handled by ruff (I rule)
+    "ungrouped-imports",      # Import grouping handled by ruff
+    "wrong-import-position",  # Import position handled by ruff
+    "cyclic-import",          # Cyclic imports (can be overly strict)
+    "duplicate-code",         # Duplicate code detection (too noisy)
+    "fixme",                  # Allow TODO/FIXME comments
+    "missing-module-docstring",  # Module docstrings (handled by ruff D rules)
+    "missing-class-docstring",   # Class docstrings (handled by ruff D rules)
+    "missing-function-docstring", # Function docstrings (handled by ruff D rules)
+]
+
+[tool.pylint.basic]
+# Allow short variable names common in scientific computing
+good-names = ["i", "j", "k", "n", "m", "x", "y", "z", "t", "p", "T", "P", "df", "ax"]
+
+[tool.pylint.design]
+# Maximum number of arguments for function/method (scientific functions can have many)
+max-args = 10
