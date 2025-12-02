@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from ..velocity_correlation_f2_ao2008 import (
+from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008 import (  # noqa: E501
     get_f2_longitudinal_velocity_correlation,
 )
 

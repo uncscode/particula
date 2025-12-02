@@ -11,14 +11,14 @@ import unittest
 
 import numpy as np
 
+from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (  # noqa: E501
+    TurbulentShearCoagulationStrategy,
+)
+
 # pylint: disable=line-too-long
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
-)
-
-from ..turbulent_shear_coagulation_strategy import (
-    TurbulentShearCoagulationStrategy,
 )
 
 
