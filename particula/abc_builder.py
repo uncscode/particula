@@ -85,9 +85,7 @@ class BuilderABC(ABC):
             + [f"{key}_units" for key in self.required_parameters]
         )
         # Check for any invalid keys and handle them within the if condition
-        if invalid_keys := [
-            key for key in parameters if key not in valid_keys
-        ]:
+        if invalid_keys := [key for key in parameters if key not in valid_keys]:
             error_message = (
                 f"Trying to set an invalid parameter(s) '{invalid_keys}'. "
                 f"The valid parameter(s) '{valid_keys}'."

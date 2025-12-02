@@ -77,7 +77,7 @@ def get_chemical_search(identifier: str) -> str:
     if _pubchem_db is not None:
         candidate_names: List[str] = list(_pubchem_db.name_index.keys())
         matches = get_close_matches(
-                identifier, candidate_names, n=1, cutoff=0.6
-            )
+            identifier, candidate_names, n=1, cutoff=0.6
+        )
         return matches[0] if matches else "No Match"
     return "No Match"

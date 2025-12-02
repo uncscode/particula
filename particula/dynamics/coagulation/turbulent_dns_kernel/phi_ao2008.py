@@ -190,12 +190,8 @@ def _compute_phi_term3(
     }
         ×  1 / ( 2φ ( (vₚ₁ - vₚ₂/φ ) + (1 / τₚ₁) + (1 / τₚ₂) ) )
     """
-    denominator1 = (
-        (terms.v1 / terms.phi) + (1 / terms.tau1) + (1 / terms.alpha)
-    )
-    denominator2 = (
-        (terms.v2 / terms.phi) - (1 / terms.tau2) - (1 / terms.alpha)
-    )
+    denominator1 = (terms.v1 / terms.phi) + (1 / terms.tau1) + (1 / terms.alpha)
+    denominator2 = (terms.v2 / terms.phi) - (1 / terms.tau2) - (1 / terms.alpha)
 
     first_component = (2 * terms.phi / denominator1) - (
         2 * terms.phi / denominator2

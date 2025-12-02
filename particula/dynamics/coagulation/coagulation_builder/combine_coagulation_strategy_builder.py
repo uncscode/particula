@@ -15,12 +15,11 @@ import logging
 from typing import List, Optional
 
 from particula.abc_builder import BuilderABC
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
+
+from ..coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.combine_coagulation_strategy import (
+from ..coagulation_strategy.combine_coagulation_strategy import (
     CombineCoagulationStrategy,
 )
 

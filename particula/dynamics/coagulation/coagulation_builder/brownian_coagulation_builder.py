@@ -11,18 +11,16 @@ References:
 """
 
 from particula.abc_builder import BuilderABC
-from particula.dynamics.coagulation.\
-    coagulation_builder.coagulation_builder_mixin import (
-        BuilderDistributionTypeMixin,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.brownian_coagulation_strategy import (
-        BrownianCoagulationStrategy,
-    )
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-        CoagulationStrategyABC,
-    )
+
+from ..coagulation_strategy.brownian_coagulation_strategy import (
+    BrownianCoagulationStrategy,
+)
+from ..coagulation_strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+)
+from .coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
+)
 
 
 class BrownianCoagulationBuilder(

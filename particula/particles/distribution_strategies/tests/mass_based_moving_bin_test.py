@@ -2,7 +2,6 @@
 
 # pylint: disable=R0801
 
-
 import numpy as np
 import pytest
 

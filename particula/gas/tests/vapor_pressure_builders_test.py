@@ -158,9 +158,7 @@ def test_constant_build_failure():
     builder = ConstantVaporPressureBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: vapor_pressure" in str(
-        excinfo.value
-    )
+    assert "Required parameter(s) not set: vapor_pressure" in str(excinfo.value)
 
 
 def test_build_water_buck():

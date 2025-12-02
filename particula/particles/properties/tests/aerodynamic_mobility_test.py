@@ -23,9 +23,9 @@ def test_particle_aerodynamic_mobility_single_value():
     actual_mobility = get_aerodynamic_mobility(
         radius, slip_correction_factor, dynamic_viscosity
     )
-    assert np.isclose(
-        actual_mobility, expected_mobility
-    ), "The value does not match."
+    assert np.isclose(actual_mobility, expected_mobility), (
+        "The value does not match."
+    )
 
 
 def test_particle_aerodynamic_mobility_array_input():
@@ -76,6 +76,6 @@ def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
             expected_mobility = slip_correction_factor / (
                 6 * np.pi * dynamic_viscosity * radius
             )
-            assert np.isclose(
-                actual_mobility, expected_mobility
-            ), f"The value does not match for radius {radius}."
+            assert np.isclose(actual_mobility, expected_mobility), (
+                f"The value does not match for radius {radius}."
+            )

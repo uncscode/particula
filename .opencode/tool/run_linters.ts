@@ -25,7 +25,7 @@ export default tool({
     targetDir: tool.schema
       .string()
       .optional()
-      .describe("Target directory to lint (default: 'adw')"),
+      .describe("Target directory to lint (default: 'particula')"),
     ruffTimeout: tool.schema
       .number()
       .optional()
@@ -39,7 +39,7 @@ export default tool({
     const outputMode = args.outputMode || "summary";
     const autoFix = args.autoFix !== false; // Default to true
     const linters = args.linters || ["ruff", "mypy"]; // Match CI workflow
-    const targetDir = args.targetDir || "adw";
+    const targetDir = args.targetDir || "particula";
     const ruffTimeout = args.ruffTimeout || 120;
     const mypyTimeout = args.mypyTimeout || 180;
 

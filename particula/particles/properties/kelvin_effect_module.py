@@ -132,7 +132,7 @@ def get_kelvin_term(
         kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
 
     # Suppress divide-by-zero warnings - zero radius is handled by clipping
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         if isinstance(particle_radius, np.ndarray) and not kelvin_expand:
             kelvin_ratio = kelvin_radius_value / particle_radius
             kelvin_ratio = np.clip(kelvin_ratio, None, MAX_KELVIN_RATIO)

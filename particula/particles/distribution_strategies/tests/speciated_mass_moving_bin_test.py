@@ -62,9 +62,7 @@ def test_add_mass():
     )
     densities = np.array([2, 3], dtype=np.float64)
     concentration = np.array([10, 20, 30], dtype=np.float64)
-    added_mass = np.array(
-        [[10, 20], [30, 40], [50, 60]], dtype=np.float64
-    )
+    added_mass = np.array([[10, 20], [30, 40], [50, 60]], dtype=np.float64)
     conc_expand = concentration[:, np.newaxis]
     mass_per_particle = np.where(conc_expand > 0, added_mass / conc_expand, 0)
     expected_dist = np.maximum(distribution + mass_per_particle, 0)

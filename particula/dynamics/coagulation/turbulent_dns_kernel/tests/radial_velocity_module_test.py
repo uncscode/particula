@@ -2,8 +2,8 @@
 
 import numpy as np
 import pytest
-from particula.dynamics.coagulation.turbulent_dns_kernel.\
-    radial_velocity_module import (
+
+from ..radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
     get_radial_relative_velocity_dz2002,
 )
@@ -19,9 +19,9 @@ def test_get_radial_relative_velocity_dz2002():
         velocity_dispersion, particle_inertia_time
     )
 
-    assert (
-        result.shape == expected_shape
-    ), f"Expected shape {expected_shape}, but got {result.shape}"
+    assert result.shape == expected_shape, (
+        f"Expected shape {expected_shape}, but got {result.shape}"
+    )
     assert np.all(result >= 0), "Expected all values to be non-negative"
 
 

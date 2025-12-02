@@ -12,9 +12,9 @@ def test_thermal_conductivity_normal():
     """
     temperature = 300  # in Kelvin
     expected = 1e-3 * (4.39 + 0.071 * 300)
-    assert (
-        pytest.approx(get_thermal_conductivity(temperature)) == expected
-    ), "Failed at normal temperature"
+    assert pytest.approx(get_thermal_conductivity(temperature)) == expected, (
+        "Failed at normal temperature"
+    )
 
 
 def test_thermal_conductivity_array():
@@ -35,6 +35,6 @@ def test_thermal_conductivity_edge_case_zero():
     """Test the thermal_conductivity function at absolute zero."""
     temperature = 0
     expected = 1e-3 * (4.39 + 0.071 * 0)
-    assert (
-        pytest.approx(get_thermal_conductivity(temperature)) == expected
-    ), "Failed at absolute zero"
+    assert pytest.approx(get_thermal_conductivity(temperature)) == expected, (
+        "Failed at absolute zero"
+    )

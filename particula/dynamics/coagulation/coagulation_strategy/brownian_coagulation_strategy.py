@@ -6,14 +6,12 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.dynamics.coagulation.\
-    coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
-)
 from particula.dynamics.coagulation.brownian_kernel import (
     get_brownian_kernel_via_system_state,
 )
 from particula.particles.representation import ParticleRepresentation
+
+from .coagulation_strategy_abc import CoagulationStrategyABC
 
 logger = logging.getLogger("particula")
 

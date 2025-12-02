@@ -208,7 +208,7 @@ class RunnableSequence:
                 range(sub_steps),
                 desc="Executing Runnable",
                 mininterval=0.5,
-                )
+            )
         )
         for _ in loop_iterator:
             # loop over each process in the sequence

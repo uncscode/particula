@@ -2,15 +2,15 @@
 
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import BuilderMolarMassMixin
-from particula.dynamics.condensation.condensation_builder.\
-    condensation_builder_mixin import (
-        BuilderAccommodationCoefficientMixin,
-        BuilderDiffusionCoefficientMixin,
-        BuilderUpdateGasesMixin,
-    )
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationStrategy,
+)
+
+from .condensation_builder_mixin import (
+    BuilderAccommodationCoefficientMixin,
+    BuilderDiffusionCoefficientMixin,
+    BuilderUpdateGasesMixin,
 )
 
 

@@ -228,7 +228,6 @@ def get_properties_for_liquid_vapor_partitioning(
     molar_mass_ratio = 18.015 / np.array(molar_mass)
 
     for i, oxy in enumerate(oxygen2carbon):
-
         alpha, beta, q_alpha = fixed_water_activity(
             water_activity=water_activity_desired,
             molar_mass_ratio=molar_mass_ratio[i],

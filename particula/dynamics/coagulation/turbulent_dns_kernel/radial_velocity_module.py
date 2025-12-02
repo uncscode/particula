@@ -66,8 +66,7 @@ def get_radial_relative_velocity_dz2002(
     erf_b = erf(b)
     exp_b2 = np.exp(-(b**2))
     f_b = (
-        0.5 * sqrt_pi * (b + 0.5 / np.maximum(b, 1e-16)) * erf_b
-        + 0.5 * exp_b2
+        0.5 * sqrt_pi * (b + 0.5 / np.maximum(b, 1e-16)) * erf_b + 0.5 * exp_b2
     )
 
     return np.sqrt(2 / np.pi) * velocity_dispersion * f_b

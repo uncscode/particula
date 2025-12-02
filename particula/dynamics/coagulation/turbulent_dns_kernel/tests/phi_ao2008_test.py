@@ -20,9 +20,9 @@ def test_get_phi_ao2008_scalar():
         alpha, phi, particle_inertia_time, particle_velocity
     )
 
-    assert (
-        result.shape == expected_shape
-    ), f"Expected shape {expected_shape}, but got {result.shape}"
+    assert result.shape == expected_shape, (
+        f"Expected shape {expected_shape}, but got {result.shape}"
+    )
     assert np.all(result >= 0), "Expected all values to be non-negative"
 
 
@@ -38,9 +38,9 @@ def test_get_phi_ao2008_array():
         alpha, phi, particle_inertia_time, particle_velocity
     )
 
-    assert (
-        result.shape == expected_shape
-    ), f"Expected shape {expected_shape}, but got {result.shape}"
+    assert result.shape == expected_shape, (
+        f"Expected shape {expected_shape}, but got {result.shape}"
+    )
     assert np.all(result >= 0), "Expected all values to be non-negative"
 
 

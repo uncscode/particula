@@ -6,11 +6,10 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import RegularGridInterpolator  # type: ignore
 
-from particula.dynamics.coagulation.particle_resolved_step.\
-    super_droplet_method import (
-        _bin_particles,
-        _get_bin_pairs,
-    )
+from .super_droplet_method import (
+    _bin_particles,
+    _get_bin_pairs,
+)
 
 
 def get_particle_resolved_update_step(
@@ -200,9 +199,7 @@ def get_particle_resolved_coagulation_step(
 
         # Step 7: Determine the number of coagulation tests to run based
         # on kernel value and system parameters
-        tests = int(
-            np.ceil(kernel_values.item() * time_step * events / volume)
-        )
+        tests = int(np.ceil(kernel_values.item() * time_step * events / volume))
         if tests == 0 or events == 0:
             continue
 

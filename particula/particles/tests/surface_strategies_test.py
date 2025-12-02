@@ -26,9 +26,7 @@ def test_molar_surface_strategy():
     # Test effective surface tension
     np.array([100, 200])  # water, oil
     expected_st_scalar = surface_tension
-    np.full_like(
-        surface_tension, expected_st_scalar
-    )
+    np.full_like(surface_tension, expected_st_scalar)
 
 
 def test_molar_strategy_update_surface_tension():
@@ -79,9 +77,9 @@ def test_molar_strategy_update_surface_tension():
     ) / (8.314 * 298 * expected_density)
     radius = 1e-7
     kelvin_val = strategy.kelvin_term(radius, 0.01815, mass_concentration, 293)
-    assert kelvin_val.squeeze().shape == (
-        2,
-    ), f"Expected shape (2,) got {kelvin_val.shape}"
+    assert kelvin_val.squeeze().shape == (2,), (
+        f"Expected shape (2,) got {kelvin_val.shape}"
+    )
     np.testing.assert_allclose(
         strategy.effective_surface_tension(mass_concentration),
         expected_surface_tension,
@@ -208,9 +206,9 @@ def test_molar_surface_strategy_scalar_input():
 
     # Assert get_density for scalar input
     assert strat.get_density() == pytest.approx(density)
-    assert strat.effective_surface_tension(
-        mass_concentration
-    ) == pytest.approx(surface_tension)
+    assert strat.effective_surface_tension(mass_concentration) == pytest.approx(
+        surface_tension
+    )
 
 
 def test_surface_strategy_phase_index():

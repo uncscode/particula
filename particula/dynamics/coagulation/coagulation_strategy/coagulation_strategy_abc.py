@@ -305,21 +305,17 @@ class CoagulationStrategyABC(ABC):
 
         if self.distribution_type == "particle_resolved":
             # get the kernel radius
-            func = (
-                change_particle_representation
-                .get_particle_resolved_binned_radius
+            func = (  # noqa: E501
+                change_particle_representation.get_particle_resolved_binned_radius
             )
             kernel_radius = func(
                 particle=particle,
                 bin_radius=self.particle_resolved_radius,
                 total_bins=self.particle_resolved_bins_number,
-                bins_per_radius_decade=self.particle_resolved_bins_per_decade,
+                bins_per_radius_decade=self.particle_resolved_bins_per_decade,  # noqa: E501
             )
             # convert particle representation to calculate kernel
-            func2 = (
-                change_particle_representation
-                .get_speciated_mass_representation_from_particle_resolved
-            )
+            func2 = change_particle_representation.get_speciated_mass_representation_from_particle_resolved  # noqa: E501
             kernel_particle = func2(
                 particle=particle,
                 bin_radius=kernel_radius,
@@ -337,8 +333,7 @@ class CoagulationStrategyABC(ABC):
             )
             # calculate step
             step_func = (
-                particle_resolved_method
-                .get_particle_resolved_coagulation_step
+                particle_resolved_method.get_particle_resolved_coagulation_step
             )
             loss_gain_indices = step_func(
                 particle_radius=particle.get_radius(),
@@ -449,9 +444,7 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         # assume standard atmospheric composition
-        dynamic_viscosity = gas.get_dynamic_viscosity(
-            temperature=temperature
-        )
+        dynamic_viscosity = gas.get_dynamic_viscosity(temperature=temperature)
         mean_free_path = gas.get_molecule_mean_free_path(
             temperature=temperature,
             pressure=pressure,

@@ -35,7 +35,7 @@ dev = [
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
-    "griffe", "openai", "GitPython", "ruff"
+    "griffe", "openai", "GitPython", "ruff", "mypy"
 ]
 extra = [
     "matplotlib", "pandas", "pint", "thermo", "tqdm",

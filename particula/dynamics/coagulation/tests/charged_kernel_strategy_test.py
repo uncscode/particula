@@ -29,9 +29,7 @@ def test_kernel_call():
     expected_result = np.array(
         [[1.77061203e-09, 2.31008442e-08], [1.12232711e-07, 3.56834831e-07]]
     )
-    np.testing.assert_almost_equal(
-        dimension_result, expected_result, decimal=4
-    )
+    np.testing.assert_almost_equal(dimension_result, expected_result, decimal=4)
 
 
 def test_hard_sphere():

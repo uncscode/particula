@@ -115,9 +115,7 @@ def get_coagulation_gain_rate_discrete(
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
     # Compute gain using numerical integration
-    gain = radius**2 * np.trapezoid(
-        interp.ev(dpd, dpi) / dpi**2, dpd, axis=0
-    )  # type: ignore
+    gain = radius**2 * np.trapezoid(interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)  # type: ignore
 
     # Convert back to original scale (from PDF to PMF)
     return gain * delta_x_array
