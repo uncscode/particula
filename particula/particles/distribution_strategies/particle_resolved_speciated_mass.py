@@ -188,14 +188,11 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             distribution[small_index, :] = 0
         concentration[small_index] = 0
 
-        # Handle charge if present as an array and non-zero in colliding pairs
-        # charge can be None, 0 (int), or an array - only process if array
+        # Handle charge if present as a numpy array and non-zero in colliding pairs
+        # charge can be None or a numpy array - only process if array
         if charge is not None and isinstance(charge, np.ndarray):
             # Check only colliding pairs for non-zero charges (performance opt)
-            colliding_charges = np.concatenate(
-                [charge[small_index], charge[large_index]]
-            )
-            if np.any(colliding_charges != 0):
+            if np.any(charge[small_index] != 0) or np.any(charge[large_index] != 0):
                 charge[large_index] += charge[small_index]
                 charge[small_index] = 0
 
