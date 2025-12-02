@@ -161,3 +161,6 @@ specs/
 logs/*
 agents/*
 *.adw
+
+# ADW worktrees
+trees/
