@@ -1,6 +1,17 @@
 # Feature Tracking
 
-This directory contains tracking documents for features being developed or planned for {{PACKAGE_NAME}}.
+This directory contains tracking documents for features being developed or planned for particula.
+
+## Current Features
+
+### Completed
+- [P2-charge-conservation-coagulation.md](P2-charge-conservation-coagulation.md) - Charge conservation in particle-resolved coagulation
+
+### In Progress
+(None currently)
+
+### Backlog
+(None currently)
 
 ## Organization
 
@@ -84,7 +95,7 @@ If a large feature has multiple sub-features that can be developed independently
 Copy `template.md` to create a new feature tracking file:
 
 ```bash
-cp {{ARCHITECTURE_GUIDE_PATH}}/../feature/template.md {{ARCHITECTURE_GUIDE_PATH}}/../feature/P1-my-feature.md
+cp docs/Agent/feature/template.md docs/Agent/feature/P1-my-feature.md
 ```
 
 Then fill in:
@@ -99,10 +110,10 @@ Then fill in:
 ## Cross-References
 
 Features often reference:
-- **Architecture decisions:** `{{DESIGN_DECISIONS_PATH}}`
-- **Maintenance items:** `{{ARCHITECTURE_GUIDE_PATH}}/../maintenance/`
-- **GitHub issues:** Link to issue tracker
-- **Pull requests:** Link to implementation PRs
+- **Architecture decisions:** `docs/Agent/architecture/decisions/`
+- **Maintenance items:** `docs/Agent/maintenance/`
+- **GitHub issues:** https://github.com/Gorkowski/particula/issues
+- **Pull requests:** https://github.com/Gorkowski/particula/pulls
 
 ## Examples
 

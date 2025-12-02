@@ -149,20 +149,32 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     ]:
         """Collide specified particle pairs by merging mass and charge.
 
+        Performs coagulation between particle pairs for particle-resolved
+        simulations. The smaller particle's mass is added to the larger
+        particle, and the smaller particle's concentration is set to zero.
+        If a charge array is provided, charges are conserved by summing the
+        charges of the colliding pair.
+
+        The charge handling is optimized: charges are only processed when the
+        charge array is provided as a numpy array AND at least one of the
+        colliding particles has a non-zero charge.
+
         Arguments:
-            - distribution : The mass distribution array.
-            - concentration : The concentration array.
-            - density : The density array.
-            - indices : Collision pair indices (N, 2) with
-                [small_idx, large_idx].
-            - charge : Optional charge array. If provided and contains non-zero
-                values in colliding pairs, charges will be summed during
-                collisions.
+            - distribution : The mass distribution array. Shape is (N,) for
+                single species or (N, M) for M species per particle.
+            - concentration : The concentration array of shape (N,).
+            - density : The density array of shape (M,) for species densities.
+            - indices : Collision pair indices array of shape (K, 2) where
+                each row is [small_index, large_index].
+            - charge : Optional charge array of shape (N,). If provided and
+                contains non-zero values in colliding pairs, charges will be
+                summed during collisions. If None, charge handling is skipped.
 
         Returns:
-            - Updated distribution array.
-            - Updated concentration array.
-            - Updated charge array (None if input was None).
+            A tuple containing:
+                - Updated distribution array with merged masses.
+                - Updated concentration array with zeroed small particles.
+                - Updated charge array (None if input was None).
         """
         small_index = indices[:, 0]
         large_index = indices[:, 1]
