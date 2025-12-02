@@ -1,6 +1,7 @@
 """Mass-based moving bin strategy."""
 
 import logging
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -100,7 +101,10 @@ class MassBasedMovingBin(DistributionStrategy):
         concentration: NDArray[np.float64],
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        charge: Optional[NDArray[np.float64]] = None,
+    ) -> tuple[
+        NDArray[np.float64], NDArray[np.float64], Optional[NDArray[np.float64]]
+    ]:
         """Collide particle pairs (not implemented for this strategy).
 
         Raises:

@@ -1,6 +1,7 @@
 """Particle resolved speciated mass strategy."""
 
 import logging
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -142,20 +143,48 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         concentration: NDArray[np.float64],
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Collide specified particle pairs by merging mass.
+        charge: Optional[NDArray[np.float64]] = None,
+    ) -> tuple[
+        NDArray[np.float64], NDArray[np.float64], Optional[NDArray[np.float64]]
+    ]:
+        """Collide specified particle pairs by merging mass and charge.
+
+        Arguments:
+            - distribution : The mass distribution array.
+            - concentration : The concentration array.
+            - density : The density array.
+            - indices : Collision pair indices (N, 2) with
+                [small_idx, large_idx].
+            - charge : Optional charge array. If provided and contains non-zero
+                values in colliding pairs, charges will be summed during
+                collisions.
 
         Returns:
-            Updated distribution and concentration arrays.
+            - Updated distribution array.
+            - Updated concentration array.
+            - Updated charge array (None if input was None).
         """
         small_index = indices[:, 0]
         large_index = indices[:, 1]
+
+        # Handle mass (existing logic)
         if distribution.ndim == 1:
             distribution[large_index] += distribution[small_index]
             distribution[small_index] = 0
-            concentration[small_index] = 0
-            return distribution, concentration
-        distribution[large_index, :] += distribution[small_index, :]
-        distribution[small_index, :] = 0
+        else:
+            distribution[large_index, :] += distribution[small_index, :]
+            distribution[small_index, :] = 0
         concentration[small_index] = 0
-        return distribution, concentration
+
+        # Handle charge if present as an array and non-zero in colliding pairs
+        # charge can be None, 0 (int), or an array - only process if array
+        if charge is not None and isinstance(charge, np.ndarray):
+            # Check only colliding pairs for non-zero charges (performance opt)
+            colliding_charges = np.concatenate(
+                [charge[small_index], charge[large_index]]
+            )
+            if np.any(colliding_charges != 0):
+                charge[large_index] += charge[small_index]
+                charge[small_index] = 0
+
+        return distribution, concentration, charge

@@ -163,8 +163,103 @@ def test_collide_pairs():
     expected_conc = concentration.copy()
     expected_conc[small_idx] = 0
 
-    result_mass, result_conc = particle_resolved_strategy.collide_pairs(
-        distribution, concentration, densities, pairs
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs
+        )
     )
     np.testing.assert_allclose(result_mass, expected_mass)
     np.testing.assert_allclose(result_conc, expected_conc)
+    assert result_charge is None
+
+
+def test_collide_pairs_with_charge():
+    """Test pair collisions conserve charge."""
+    distribution = np.array(
+        [[100, 200], [300, 400], [500, 600], [700, 800]], dtype=np.float64
+    )
+    densities = np.array([2, 3], dtype=np.float64)
+    concentration = np.array([1, 1, 1, 1], dtype=np.float64)
+    charge = np.array([1.0, -2.0, 3.0, 0.0], dtype=np.float64)
+    pairs = np.array([[0, 1], [2, 3]], dtype=np.int64)
+
+    # Expected: charge[1] = 1.0 + (-2.0) = -1.0, charge[3] = 3.0 + 0.0 = 3.0
+    # charge[0] = 0, charge[2] = 0
+    expected_charge = np.array([0.0, -1.0, 0.0, 3.0], dtype=np.float64)
+
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+    np.testing.assert_allclose(result_charge, expected_charge)
+
+
+def test_collide_pairs_charge_one_zero():
+    """Test pair collisions when one particle has zero charge."""
+    distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
+    densities = np.array([2, 3], dtype=np.float64)
+    concentration = np.array([1, 1], dtype=np.float64)
+    charge = np.array([5.0, 0.0], dtype=np.float64)
+    pairs = np.array([[0, 1]], dtype=np.int64)
+
+    # Expected: charge[1] = 5.0 + 0.0 = 5.0, charge[0] = 0
+    expected_charge = np.array([0.0, 5.0], dtype=np.float64)
+
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+    np.testing.assert_allclose(result_charge, expected_charge)
+
+
+def test_collide_pairs_no_charge():
+    """Test pair collisions work when charge is None."""
+    distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
+    densities = np.array([2, 3], dtype=np.float64)
+    concentration = np.array([1, 1], dtype=np.float64)
+    pairs = np.array([[0, 1]], dtype=np.int64)
+
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge=None
+        )
+    )
+    assert result_charge is None
+
+
+def test_collide_pairs_zero_charge_optimization():
+    """Test that all-zero charges in colliding pairs are a no-op."""
+    distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
+    densities = np.array([2, 3], dtype=np.float64)
+    concentration = np.array([1, 1], dtype=np.float64)
+    charge = np.array([0.0, 0.0], dtype=np.float64)
+    pairs = np.array([[0, 1]], dtype=np.int64)
+
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+    # Charge should be unchanged (still all zeros)
+    np.testing.assert_array_equal(result_charge, np.array([0.0, 0.0]))
+
+
+def test_collide_pairs_1d_distribution_with_charge():
+    """Test pair collisions with 1D distribution and charge."""
+    distribution = np.array([100, 200, 300, 400], dtype=np.float64)
+    densities = np.array([2], dtype=np.float64)
+    concentration = np.array([1, 1, 1, 1], dtype=np.float64)
+    charge = np.array([2.0, -1.0, 0.5, 1.5], dtype=np.float64)
+    pairs = np.array([[0, 1], [2, 3]], dtype=np.int64)
+
+    # Expected: charge[1] = 2.0 + (-1.0) = 1.0, charge[3] = 0.5 + 1.5 = 2.0
+    expected_charge = np.array([0.0, 1.0, 0.0, 2.0], dtype=np.float64)
+
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+    np.testing.assert_allclose(result_charge, expected_charge)
