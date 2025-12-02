@@ -112,8 +112,20 @@ class RadiiBasedMovingBin(DistributionStrategy):
     ]:
         """Collide particle pairs (not implemented for this strategy).
 
+        This method is not implemented for RadiiBasedMovingBin because particle
+        pair collisions are not physically valid for bin-based strategies
+        where particles are represented by fixed radius bins with
+        concentrations.
+
+        Arguments:
+            - distribution : The radius distribution array.
+            - concentration : The concentration array.
+            - density : The density array.
+            - indices : Collision pair indices array of shape (K, 2).
+            - charge : Optional charge array (unused in this strategy).
+
         Raises:
-            NotImplementedError: Method is not physically valid.
+            NotImplementedError: Always raised as method is not applicable.
         """
         message = "Colliding pairs in RadiiBasedMovingBin not physically valid"
         logger.warning(message)

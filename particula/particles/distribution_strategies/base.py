@@ -153,17 +153,24 @@ class DistributionStrategy(ABC):
     ]:
         """Collide index pairs in the distribution.
 
+        Performs collision between particle pairs specified by indices. The
+        smaller particle (first index in each pair) is merged into the larger
+        particle (second index), with mass being summed and concentration of
+        the smaller particle set to zero.
+
         Arguments:
             - distribution : The distribution of particle sizes or masses.
             - concentration : The concentration of each particle size or mass.
             - density : The density of the particles.
-            - indices : The indices of the particles to collide.
+            - indices : The indices of the particle pairs to collide, shape
+                (N, 2) where each row is [small_index, large_index].
             - charge : Optional charge array. If provided and contains non-zero
                 values in colliding pairs, charges will be summed during
-                collisions.
+                collisions. If None, charge handling is skipped.
 
         Returns:
-            - The updated distribution array.
-            - The updated concentration array.
-            - The updated charge array (None if input was None).
+            A tuple containing:
+                - Updated distribution array with merged masses.
+                - Updated concentration array with zeroed small particles.
+                - Updated charge array (None if input was None).
         """

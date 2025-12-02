@@ -107,8 +107,19 @@ class MassBasedMovingBin(DistributionStrategy):
     ]:
         """Collide particle pairs (not implemented for this strategy).
 
+        This method is not implemented for MassBasedMovingBin because particle
+        pair collisions are not physically meaningful for bin-based strategies
+        where particles are represented by fixed mass bins with concentrations.
+
+        Arguments:
+            - distribution : The mass distribution array.
+            - concentration : The concentration array.
+            - density : The density array.
+            - indices : Collision pair indices array of shape (K, 2).
+            - charge : Optional charge array (unused in this strategy).
+
         Raises:
-            NotImplementedError: Method is not physically meaningful.
+            NotImplementedError: Always raised as method is not applicable.
         """
         message = (
             "Colliding pairs in MassBasedMovingBin is not physically meaningful"

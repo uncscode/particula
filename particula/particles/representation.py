@@ -533,8 +533,19 @@ class ParticleRepresentation:
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
         """Collide pairs of particles, used for ParticleResolved Strategies.
 
+        Performs coagulation between particle pairs by delegating to the
+        distribution strategy's collide_pairs method. The smaller particle
+        (first index in each pair) is merged into the larger particle (second
+        index). Mass, concentration, and charge are all updated accordingly.
+
+        Charge conservation is handled automatically: if the particles have
+        non-zero charges, they are summed during collisions. This enables
+        physically accurate charge conservation in particle-resolved
+        coagulation simulations.
+
         Arguments:
-            - indices : The indices of the particles to collide.
+            - indices : Array of particle pair indices to collide, shape
+                (K, 2) where each row is [small_index, large_index].
 
         Example:
             ``` py title="Collide Pairs"
