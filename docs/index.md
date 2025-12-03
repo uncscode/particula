@@ -142,3 +142,63 @@ result = process.execute(aerosol, time_step=10.0)
 #   The result is an Aerosol instance with updated particle properties.
 print(result)
 ```
+
+### Wall loss strategies
+
+In addition to condensation and coagulation, Particula models particle loss to
+chamber walls. The wall loss API lives in `particula.dynamics.wall_loss` and is
+exposed through the `particula.dynamics` namespace.
+
+The strategy-based wall loss API is built around two classes:
+
+- `particula.dynamics.WallLossStrategy` – abstract base class for wall loss
+  models.
+- `particula.dynamics.SphericalWallLossStrategy` – spherical chamber wall loss
+  strategy that uses existing wall loss coefficient utilities.
+
+Strategies operate on
+`particula.particles.representation.ParticleRepresentation` instances and
+support `"discrete"`, `"continuous_pdf"`, and `"particle_resolved"`
+distribution types.
+
+```python
+import numpy as np
+import particula as par
+
+# Build a simple particle distribution (as in the quick start above)
+particle = (
+    par.particles.PresetParticleRadiusBuilder()
+    .set_mode(np.array([100e-9]), "m")
+    .set_geometric_standard_deviation(np.array([1.2]))
+    .set_number_concentration(np.array([1e8]), "1/m^3")
+    .set_density(1e3, "kg/m^3")
+    .build()
+)
+
+wall_loss = par.dynamics.SphericalWallLossStrategy(
+    wall_eddy_diffusivity=0.001,  # m^2/s
+    chamber_radius=0.5,  # m
+    distribution_type="discrete",
+)
+
+# Instantaneous wall loss rate
+rate = wall_loss.rate(
+    particle=particle,
+    temperature=298.15,
+    pressure=101325.0,
+)
+
+# Apply wall loss for 10 seconds
+for _ in range(10):
+    particle = wall_loss.step(
+        particle=particle,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+    )
+```
+
+The legacy function-based API (`get_spherical_wall_loss_rate`,
+`get_rectangle_wall_loss_rate`) remains available for lower-level
+calculations; the strategy classes provide a more consistent interface
+alongside condensation and coagulation strategies.

@@ -2,7 +2,7 @@
 
 **Project:** particula
 **Version:** 0.2.6
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-02
 
 ## Purpose
 
@@ -83,6 +83,7 @@ The system is built on **NumPy** for high-performance vectorized operations and 
 **Key Interfaces:**
 - `MassCondensation`: Vapor condensation onto particles
 - `Coagulation`: Particle-particle collisions
+- `WallLossStrategy`, `SphericalWallLossStrategy`: Strategy-based wall loss for chamber geometries, provided by the `particula.dynamics.wall_loss` package
 - `RunnableABC`: Abstract base for chainable processes
 - `RunnableSequence`: Chain multiple processes with `|` operator
 
@@ -197,7 +198,10 @@ particula/
 │   ├── properties/         # Wall loss coefficients, etc.
 │   ├── tests/              # Test coverage
 │   ├── particle_process.py # MassCondensation, Coagulation classes
-│   ├── wall_loss.py        # Chamber wall loss
+│   ├── wall_loss/          # Chamber wall loss (package)
+│   │   ├── wall_loss_strategies.py  # Strategy-based wall loss models
+│   │   ├── rate.py                 # Legacy wall loss rate functions
+│   │   └── tests/                  # Test coverage for wall loss strategies
 │   └── dilution.py         # Chamber dilution
 ├── activity/               # Activity coefficients, phase separation
 │   ├── tests/              # Test coverage

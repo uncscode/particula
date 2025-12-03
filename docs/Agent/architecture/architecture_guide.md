@@ -2,7 +2,7 @@
 
 **Project:** particula
 **Version:** 0.2.6
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-02
 
 ## Overview
 
@@ -183,7 +183,8 @@ particula/
 - `MassCondensation`: Vapor condensation onto particles
 - `Coagulation`: Particle-particle collisions
 - `Coagulation strategies`: Brownian, charged, turbulent, sedimentation
-- `wall_loss`, `dilution`: Chamber-specific processes
+- `wall_loss` package: Chamber wall loss coefficients and strategy-based wall loss models (`WallLossStrategy`, `SphericalWallLossStrategy`)
+- `dilution`: Chamber dilution process
 
 **Dependencies:** gas, particles, util, NumPy, SciPy
 
@@ -275,6 +276,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
 - Coagulation strategies: `BrownianCoagulationStrategy`, `ChargedCoagulationStrategy`, `TurbulentDNSCoagulationStrategy`
 - Activity strategies: `ActivityIdealMass`, `ActivityIdealMolar`, `ActivityKappaParameter`
 - Surface strategies: `SurfaceStrategyVolume`, `SurfaceStrategyMass`, `SurfaceStrategyMolar`
+- Wall loss strategies: `WallLossStrategy`, `SphericalWallLossStrategy`
 
 ### Factory Pattern
 
@@ -555,9 +557,10 @@ Development → Testing → PyPI Release → User Installation
 
 Major architectural decisions will be documented in [Architecture Decision Records (ADRs)](decisions/).
 
-Currently, particula does not have formal ADRs, but future significant decisions should be documented using the [ADR template](decisions/template.md).
+Current ADRs include:
+- [ADR-001: Strategy-based wall loss subsystem and `wall_loss` package refactor](decisions/ADR-001-strategy-based-wall-loss-subsystem.md)
 
-Examples of decisions that would warrant ADRs:
+Examples of decisions that would warrant additional ADRs:
 - Adopting a new design pattern
 - Choosing between competing algorithm approaches
 - Major refactoring of module structure

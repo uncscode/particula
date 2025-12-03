@@ -193,6 +193,41 @@ def function(arg1: float, arg2: str) -> bool:
     pass
 ```
 
+### Wall loss strategies
+
+```python
+import particula as par
+
+strategy = par.dynamics.SphericalWallLossStrategy(
+    wall_eddy_diffusivity=0.001,
+    chamber_radius=0.5,
+    distribution_type="discrete",
+)
+
+rate = strategy.rate(
+    particle=particle,
+    temperature=298.0,
+    pressure=101325.0,
+)
+
+particle = strategy.step(
+    particle=particle,
+    temperature=298.0,
+    pressure=101325.0,
+    time_step=1.0,
+)
+```
+
+**Key points:**
+
+- Strategies live in `particula.dynamics.wall_loss` and are exported through
+  `particula.dynamics`.
+- `WallLossStrategy` is the abstract base class for wall loss models.
+- `SphericalWallLossStrategy` provides a spherical chamber implementation
+  using existing wall loss coefficient utilities.
+- Supported `distribution_type` values are `"discrete"`, `"continuous_pdf"`,
+  and `"particle_resolved"`.
+
 ## ADW Workflows
 
 **Available workflows:**
@@ -277,6 +312,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2025-12-01  
+**Last Updated:** 2025-12-03  
 **For questions about ADW:** See `docs/Agent/README.md`  
 **For questions about particula:** See main `readme.md`

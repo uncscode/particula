@@ -70,7 +70,10 @@ Replace all `{{PLACEHOLDERS}}` with actual content:
 
 ### Active Decisions
 
-Currently, particula does not have formal ADRs. Future significant architectural decisions should be documented here using the [template](template.md).
+| ADR | Title | Status | Date | Description |
+| --- | ----- | ------ | ---- | ----------- |
+| ADR-001 | Strategy-based wall loss subsystem and `wall_loss` package refactor | Accepted | 2025-12-02 | Introduce wall loss strategies and refactor `wall_loss` into a package |
+
 
 Examples of decisions that should be documented:
 - Choosing between different particle distribution representations

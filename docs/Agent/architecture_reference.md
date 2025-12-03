@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Version:** 0.2.6
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-02
 
 ## Overview
 

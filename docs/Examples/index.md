@@ -62,7 +62,9 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    How to simulate experiments for the loss of particles to the chamber walls.
+    How to simulate experiments for the loss of particles to the chamber walls,
+    including the new strategy-based wall loss API
+    (`WallLossStrategy` and `SphericalWallLossStrategy`).
 
     [:octicons-arrow-right-24: Tutorial](Chamber_Wall_Loss/index.md)
 
