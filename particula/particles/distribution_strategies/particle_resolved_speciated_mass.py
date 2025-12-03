@@ -137,7 +137,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         )
         return distribution, concentration
 
-    def collide_pairs(
+    def collide_pairs(  # pylint: disable=too-many-positional-arguments
         self,
         distribution: NDArray[np.float64],
         concentration: NDArray[np.float64],
@@ -188,11 +188,13 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             distribution[small_index, :] = 0
         concentration[small_index] = 0
 
-        # Handle charge if present as a numpy array and non-zero in colliding pairs
-        # charge can be None or a numpy array - only process if array
+        # Handle charge if present as numpy array and non-zero
+        # charge can be None or array - only process if array
         if charge is not None and isinstance(charge, np.ndarray):
             # Check only colliding pairs for non-zero charges (performance opt)
-            if np.any(charge[small_index] != 0) or np.any(charge[large_index] != 0):
+            if np.any(charge[small_index] != 0) or np.any(
+                charge[large_index] != 0
+            ):
                 charge[large_index] += charge[small_index]
                 charge[small_index] = 0
 
