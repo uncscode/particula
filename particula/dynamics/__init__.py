@@ -14,6 +14,8 @@ from particula.dynamics.dilution import (
 from particula.dynamics.wall_loss import (
     get_rectangle_wall_loss_rate,
     get_spherical_wall_loss_rate,
+    SphericalWallLossStrategy,
+    WallLossStrategy,
 )
 
 from particula.dynamics.particle_process import (

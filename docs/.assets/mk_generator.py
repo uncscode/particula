@@ -107,7 +107,7 @@ def get_display_name(modname: str, category: str = None) -> str:
     """
     # Remove the package prefix
     if modname.startswith(f"{PACKAGE}."):
-        rel_path = modname[len(PACKAGE) + 1:]
+        rel_path = modname[len(PACKAGE) + 1 :]
     else:
         rel_path = modname
 
@@ -146,7 +146,7 @@ def organize_modules(modules: list[str]) -> dict[str, list[str]]:
         if not mod.startswith(f"{PACKAGE}."):
             continue
 
-        rel_mod = mod[len(PACKAGE) + 1:]
+        rel_mod = mod[len(PACKAGE) + 1 :]
         parts = rel_mod.split(".")
 
         if len(parts) == 1:
@@ -167,8 +167,7 @@ def organize_modules(modules: list[str]) -> dict[str, list[str]]:
 
 
 def main() -> None:
-    print(f"mk_generator.py starting - SOURCE_ROOT: {SOURCE_ROOT}",
-          flush=True)
+    print(f"mk_generator.py starting - SOURCE_ROOT: {SOURCE_ROOT}", flush=True)
     if os.environ.get("MKGEN_DEBUG") == "1":
         with open("/tmp/mkgen_debug.txt", "w") as f:
             f.write(f"Script ran! SOURCE_ROOT: {SOURCE_ROOT}\n")
