@@ -100,7 +100,7 @@ class RadiiBasedMovingBin(DistributionStrategy):
         concentration += added_concentration
         return distribution, concentration
 
-    def collide_pairs(
+    def collide_pairs(  # pylint: disable=too-many-positional-arguments
         self,
         distribution: NDArray[np.float64],
         concentration: NDArray[np.float64],
