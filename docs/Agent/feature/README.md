@@ -8,7 +8,7 @@ This directory contains tracking documents for features being developed or plann
 - [P2-charge-conservation-coagulation.md](P2-charge-conservation-coagulation.md) - Charge conservation in particle-resolved coagulation
 
 ### In Progress
-(None currently)
+- [P2-wall-loss-strategy-system.md](P2-wall-loss-strategy-system.md) - Wall loss strategy system (WallLossStrategy & SphericalWallLossStrategy)
 
 ### Backlog
 (None currently)
