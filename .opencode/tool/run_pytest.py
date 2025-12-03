@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Pytest Runner Tool with Coverage
+"""Pytest Runner Tool with Coverage
 
 Runs pytest with coverage and returns either full output or a summary.
 This tool validates test results to prevent false positives.
@@ -16,8 +15,7 @@ from typing import Dict, List, Optional, Tuple
 
 
 def parse_pytest_output(output: str) -> Dict:
-    """
-    Parse pytest output to extract key metrics.
+    """Parse pytest output to extract key metrics.
 
     Args:
         output: The full pytest output text
@@ -104,8 +102,7 @@ def parse_pytest_output(output: str) -> Dict:
 
 
 def format_summary(metrics: Dict, validation_errors: List[str]) -> str:
-    """
-    Format a human-readable summary of test results.
+    """Format a human-readable summary of test results.
 
     Args:
         metrics: Parsed metrics from pytest output
@@ -169,8 +166,7 @@ def format_summary(metrics: Dict, validation_errors: List[str]) -> str:
 
 
 def validate_results(metrics: Dict, min_test_count: int = 500) -> List[str]:
-    """
-    Validate pytest results against expected criteria.
+    """Validate pytest results against expected criteria.
 
     Args:
         metrics: Parsed metrics from pytest output
@@ -209,8 +205,7 @@ def run_pytest(
     cwd: Optional[str] = None,
     timeout: int = 600,
 ) -> Tuple[int, str]:
-    """
-    Run pytest with the specified arguments.
+    """Run pytest with the specified arguments.
 
     Args:
         args: Additional pytest arguments

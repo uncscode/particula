@@ -139,8 +139,7 @@ def upload_and_attach_files(
         )
     except NotFoundError:
         Warning(
-            f"Vector store '{vector_store_id}' not found. "
-            "File upload failed."
+            f"Vector store '{vector_store_id}' not found. File upload failed."
         )
 
 
@@ -327,8 +326,7 @@ def upload_new_file(client, file_to_update_dict):
     else:
         full_path = file_to_update_dict["full_path"]
         print(
-            f"Markdown file for '{full_path}' "
-            "does not exist. Skipping upload."
+            f"Markdown file for '{full_path}' does not exist. Skipping upload."
         )
 
 
@@ -509,7 +507,6 @@ def refresh_all_files(
 
 
 if __name__ == "__main__":
-
     client = OpenAI(api_key=API_KEY)
 
     # set commit hash to the vector store

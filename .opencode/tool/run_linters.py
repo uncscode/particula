@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Linter Runner Tool
+"""Linter Runner Tool
 
 Runs configured linters (ruff, mypy) for the Agent repository.
 Automatically fixes issues where possible and reports remaining problems.
@@ -12,7 +11,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 
 class LinterResult:
@@ -32,8 +31,7 @@ class LinterResult:
 def run_ruff_check(
     target_dir: str, auto_fix: bool = True, timeout: int = 120
 ) -> LinterResult:
-    """
-    Run ruff check with optional auto-fixing.
+    """Run ruff check with optional auto-fixing.
 
     Follows .github/workflows/lint.yml workflow:
     1. ruff check --fix (apply fixes, don't fail)
@@ -102,8 +100,7 @@ def run_ruff_check(
 
 
 def run_ruff_format(target_dir: str, timeout: int = 120) -> LinterResult:
-    """
-    Run ruff format to auto-format code.
+    """Run ruff format to auto-format code.
 
     Note: This is now called as part of run_ruff_check() workflow,
     but kept separate for individual linter testing.
@@ -150,8 +147,7 @@ def run_ruff_format(target_dir: str, timeout: int = 120) -> LinterResult:
 
 
 def run_mypy(target_dir: str, timeout: int = 180) -> LinterResult:
-    """
-    Run mypy for type checking.
+    """Run mypy for type checking.
 
     Args:
         target_dir: Directory to type check
@@ -195,8 +191,7 @@ def run_mypy(target_dir: str, timeout: int = 180) -> LinterResult:
 
 
 def format_summary(results: List[LinterResult], all_passed: bool) -> str:
-    """
-    Format a human-readable summary of linting results.
+    """Format a human-readable summary of linting results.
 
     Args:
         results: List of LinterResult objects
@@ -252,8 +247,7 @@ def format_summary(results: List[LinterResult], all_passed: bool) -> str:
 
 
 def format_full_output(results: List[LinterResult], all_passed: bool) -> str:
-    """
-    Format full linter output with all details.
+    """Format full linter output with all details.
 
     Args:
         results: List of LinterResult objects
@@ -295,8 +289,7 @@ def run_linters(
     ruff_timeout: int = 120,
     mypy_timeout: int = 180,
 ) -> Tuple[int, str]:
-    """
-    Run configured linters.
+    """Run configured linters.
 
     Args:
         target_dir: Directory to lint

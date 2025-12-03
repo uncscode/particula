@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Workspace Creator Tool
+"""Workspace Creator Tool
 
 Creates isolated ADW workspace with all pre-LLM setup steps:
 - Fetches GitHub issue
@@ -15,7 +14,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict
 
 
 def find_project_root() -> Path:
@@ -35,8 +33,7 @@ def create_workspace_cli(
     triggered_by: str,
     output_mode: str,
 ) -> tuple[int, str]:
-    """
-    Create ADW workspace via CLI.
+    """Create ADW workspace via CLI.
 
     Args:
         issue_number: GitHub issue number (e.g., "123")
@@ -121,18 +118,26 @@ def create_workspace_cli(
             lines.append("WORKSPACE CREATED SUCCESSFULLY")
             lines.append("=" * 60)
             lines.append(f"\n✅ ADW ID: {result_adw_id}")
-            lines.append(f"\nWorkspace Details:")
+            lines.append("\nWorkspace Details:")
             lines.append(f"  Issue: #{issue_number}")
             lines.append(f"  Workflow Type: {workflow_type}")
             lines.append(f"  Branch: {state.get('branch_name')}")
             lines.append(f"  Worktree: {state.get('worktree_path')}")
             if state.get("parent_issue_number"):
-                lines.append(f"  Parent Issue: #{state.get('parent_issue_number')}")
+                lines.append(
+                    f"  Parent Issue: #{state.get('parent_issue_number')}"
+                )
             lines.append(f"  Triggered By: {triggered_by}")
-            lines.append(f"\nNext Steps:")
-            lines.append(f"  1. Generate implementation plan using /plan or build_plan()")
-            lines.append(f"  2. The workspace is ready at: {state.get('worktree_path')}")
-            lines.append(f"  3. State file: agents/{result_adw_id}/adw_state.json")
+            lines.append("\nNext Steps:")
+            lines.append(
+                "  1. Generate implementation plan using /plan or build_plan()"
+            )
+            lines.append(
+                f"  2. The workspace is ready at: {state.get('worktree_path')}"
+            )
+            lines.append(
+                f"  3. State file: agents/{result_adw_id}/adw_state.json"
+            )
             lines.append("\n" + "=" * 60)
             lines.append("COMPLETE STATE")
             lines.append("=" * 60)
@@ -145,27 +150,33 @@ def create_workspace_cli(
             lines.append("WORKSPACE CREATED SUCCESSFULLY")
             lines.append("=" * 60)
             lines.append(f"\n✅ ADW ID: {result_adw_id}")
-            lines.append(f"\nWorkspace Details:")
+            lines.append("\nWorkspace Details:")
             lines.append(f"  Issue: #{issue_number}")
             lines.append(f"  Workflow Type: {workflow_type}")
             lines.append(f"  Branch: {state.get('branch_name')}")
             lines.append(f"  Worktree: {state.get('worktree_path')}")
             if state.get("parent_issue_number"):
-                lines.append(f"  Parent Issue: #{state.get('parent_issue_number')}")
-            lines.append(f"\nNext Steps:")
-            lines.append(f"  1. Generate implementation plan using /plan or build_plan()")
-            lines.append(f"  2. The workspace is ready at: {state.get('worktree_path')}")
+                lines.append(
+                    f"  Parent Issue: #{state.get('parent_issue_number')}"
+                )
+            lines.append("\nNext Steps:")
+            lines.append(
+                "  1. Generate implementation plan using /plan or build_plan()"
+            )
+            lines.append(
+                f"  2. The workspace is ready at: {state.get('worktree_path')}"
+            )
             lines.append("\n" + "=" * 60)
             output = "\n".join(lines)
 
         return 0, output
 
     except ImportError as e:
-        error_msg = (
-            f"Failed to import adw module: {e}\nMake sure you're running from the project root."
-        )
+        error_msg = f"Failed to import adw module: {e}\nMake sure you're running from the project root."
         if output_mode == "json":
-            output = json.dumps({"success": False, "error": error_msg}, indent=2)
+            output = json.dumps(
+                {"success": False, "error": error_msg}, indent=2
+            )
         else:
             output = f"ERROR: {error_msg}"
         return 1, output
@@ -173,7 +184,9 @@ def create_workspace_cli(
     except Exception as e:
         error_msg = f"Unexpected error: {e}"
         if output_mode == "json":
-            output = json.dumps({"success": False, "error": error_msg}, indent=2)
+            output = json.dumps(
+                {"success": False, "error": error_msg}, indent=2
+            )
         else:
             output = f"ERROR: {error_msg}"
         return 1, output
@@ -181,7 +194,9 @@ def create_workspace_cli(
 
 def main():
     """Main entry point for CLI usage."""
-    parser = argparse.ArgumentParser(description="Create isolated ADW workspace with pre-LLM setup")
+    parser = argparse.ArgumentParser(
+        description="Create isolated ADW workspace with pre-LLM setup"
+    )
 
     # Required arguments
     parser.add_argument(
