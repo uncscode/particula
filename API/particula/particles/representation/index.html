@@ -8193,6 +8193,8 @@
       
         
       
+        
+      
     
     
     
@@ -8245,6 +8247,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../Agent/feature/P2-charge-conservation-coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature: Charge Conservation in Coagulation Pairs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -13934,6 +13964,14 @@ is reused.</p>
     <div class="doc doc-contents ">
 
         <p>Collide pairs of particles, used for ParticleResolved Strategies.</p>
+<p>Performs coagulation between particle pairs by delegating to the
+distribution strategy's collide_pairs method. The smaller particle
+(first index in each pair) is merged into the larger particle (second
+index). Mass, concentration, and charge are all updated accordingly.</p>
+<p>Charge conservation is handled automatically: if the particles have
+non-zero charges, they are summed during collisions. This enables
+physically accurate charge conservation in particle-resolved
+coagulation simulations.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -13942,7 +13980,8 @@ is reused.</p>
             <b><code>- indices </code></b>
           –
           <div class="doc-md-description">
-            <p>The indices of the particles to collide.</p>
+            <p>Array of particle pair indices to collide, shape
+(K, 2) where each row is [small_index, large_index].</p>
           </div>
         </li>
     </ul>
@@ -13969,19 +14008,53 @@ is reused.</p>
 <span class="normal">543</span>
 <span class="normal">544</span>
 <span class="normal">545</span>
-<span class="normal">546</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collide pairs of particles, used for ParticleResolved Strategies.</span>
 
+<span class="sd">    Performs coagulation between particle pairs by delegating to the</span>
+<span class="sd">    distribution strategy&#39;s collide_pairs method. The smaller particle</span>
+<span class="sd">    (first index in each pair) is merged into the larger particle (second</span>
+<span class="sd">    index). Mass, concentration, and charge are all updated accordingly.</span>
+
+<span class="sd">    Charge conservation is handled automatically: if the particles have</span>
+<span class="sd">    non-zero charges, they are summed during collisions. This enables</span>
+<span class="sd">    physically accurate charge conservation in particle-resolved</span>
+<span class="sd">    coagulation simulations.</span>
+
 <span class="sd">    Arguments:</span>
-<span class="sd">        - indices : The indices of the particles to collide.</span>
+<span class="sd">        - indices : Array of particle pair indices to collide, shape</span>
+<span class="sd">            (K, 2) where each row is [small_index, large_index].</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        ``` py title=&quot;Collide Pairs&quot;</span>
 <span class="sd">        particle_representation.collide_pairs(indices)</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">collide_pairs</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span> <span class="n">indices</span>
+    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">collide_pairs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+            <span class="n">indices</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

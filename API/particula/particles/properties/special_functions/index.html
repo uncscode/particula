@@ -7947,6 +7947,8 @@
       
         
       
+        
+      
     
     
     
@@ -7999,6 +8001,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Agent/feature/P2-charge-conservation-coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature: Charge Conservation in Coagulation Pairs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -13100,9 +13130,7 @@ If the input is an array, returns an array of the same shape.</li>
 <span class="normal">68</span>
 <span class="normal">69</span>
 <span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
     <span class="p">}</span>
@@ -13160,9 +13188,7 @@ If the input is an array, returns an array of the same shape.</li>
         <span class="n">integral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="p">(</span><span class="n">exp_array</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">integral</span> <span class="o">/</span> <span class="n">variable</span>
 
-    <span class="n">integral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span>
-        <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">**</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">exp_array</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
-    <span class="p">)</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">**</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">exp_array</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">variable</span><span class="o">**</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">integral</span>
 </code></pre></div></td></tr></table></div>
             </details>

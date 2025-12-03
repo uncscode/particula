@@ -14,7 +14,7 @@
         <link rel="prev" href="../architecture/decisions/template/">
       
       
-        <link rel="next" href="template/">
+        <link rel="next" href="P2-charge-conservation-coagulation/">
       
       
         
@@ -7865,6 +7865,8 @@
       
         
       
+        
+      
     
     
     
@@ -7920,6 +7922,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="P2-charge-conservation-coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature: Charge Conservation in Coagulation Pairs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -12787,6 +12817,56 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#current-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Current Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#completed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Completed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In Progress
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backlog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backlog
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#organization" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -12915,7 +12995,16 @@
 
 
 <h1 id="feature-tracking">Feature Tracking<a class="headerlink" href="#feature-tracking" title="Permanent link">&para;</a></h1>
-<p>This directory contains tracking documents for features being developed or planned for {{PACKAGE_NAME}}.</p>
+<p>This directory contains tracking documents for features being developed or planned for particula.</p>
+<h2 id="current-features">Current Features<a class="headerlink" href="#current-features" title="Permanent link">&para;</a></h2>
+<h3 id="completed">Completed<a class="headerlink" href="#completed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="P2-charge-conservation-coagulation/">P2-charge-conservation-coagulation.md</a> - Charge conservation in particle-resolved coagulation</li>
+</ul>
+<h3 id="in-progress">In Progress<a class="headerlink" href="#in-progress" title="Permanent link">&para;</a></h3>
+<p>(None currently)</p>
+<h3 id="backlog">Backlog<a class="headerlink" href="#backlog" title="Permanent link">&para;</a></h3>
+<p>(None currently)</p>
 <h2 id="organization">Organization<a class="headerlink" href="#organization" title="Permanent link">&para;</a></h2>
 <p>Each feature gets its own tracking file in this directory. The file naming convention is:</p>
 <div class="highlight"><pre><span></span><code>&lt;priority&gt;-&lt;feature-name&gt;.md
@@ -12980,7 +13069,7 @@
 </ol>
 <h2 id="using-the-template">Using the Template<a class="headerlink" href="#using-the-template" title="Permanent link">&para;</a></h2>
 <p>Copy <code>template.md</code> to create a new feature tracking file:</p>
-<div class="highlight"><pre><span></span><code>cp<span class="w"> </span><span class="o">{{</span>ARCHITECTURE_GUIDE_PATH<span class="o">}}</span>/../feature/template.md<span class="w"> </span><span class="o">{{</span>ARCHITECTURE_GUIDE_PATH<span class="o">}}</span>/../feature/P1-my-feature.md
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>docs/Agent/feature/template.md<span class="w"> </span>docs/Agent/feature/P1-my-feature.md
 </code></pre></div>
 <p>Then fill in:
 - Feature overview and description
@@ -12992,10 +13081,10 @@
 - Success criteria</p>
 <h2 id="cross-references">Cross-References<a class="headerlink" href="#cross-references" title="Permanent link">&para;</a></h2>
 <p>Features often reference:
-- <strong>Architecture decisions:</strong> <code>{{DESIGN_DECISIONS_PATH}}</code>
-- <strong>Maintenance items:</strong> <code>{{ARCHITECTURE_GUIDE_PATH}}/../maintenance/</code>
-- <strong>GitHub issues:</strong> Link to issue tracker
-- <strong>Pull requests:</strong> Link to implementation PRs</p>
+- <strong>Architecture decisions:</strong> <code>docs/Agent/architecture/decisions/</code>
+- <strong>Maintenance items:</strong> <code>docs/Agent/maintenance/</code>
+- <strong>GitHub issues:</strong> https://github.com/Gorkowski/particula/issues
+- <strong>Pull requests:</strong> https://github.com/Gorkowski/particula/pulls</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <p>See these example feature tracking files:
 - <code>example-single-phase.md</code> - Simple feature with one implementation phase

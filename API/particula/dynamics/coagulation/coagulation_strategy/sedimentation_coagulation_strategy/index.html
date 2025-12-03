@@ -7977,6 +7977,8 @@
       
         
       
+        
+      
     
     
     
@@ -8029,6 +8031,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../Agent/feature/P2-charge-conservation-coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature: Charge Conservation in Coagulation Pairs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -13337,11 +13367,7 @@ and density.</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -13369,11 +13395,7 @@ and density.</p>
 <span class="sd">        # k_values may be a single float or an array</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">kernel_func</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">sedimentation_kernel</span>
-        <span class="o">.</span><span class="n">get_sedimentation_kernel_sp2016_via_system_state</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">kernel_func</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">get_kernel_sp2016</span><span class="p">(</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_mean_effective_density</span><span class="p">(),</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>

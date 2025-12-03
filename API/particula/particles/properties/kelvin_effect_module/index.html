@@ -7958,6 +7958,8 @@
       
         
       
+        
+      
     
     
     
@@ -8010,6 +8012,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Agent/feature/P2-charge-conservation-coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature: Charge Conservation in Coagulation Pairs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -13411,7 +13441,7 @@ For extreme cases, the value is clipped to prevent overflow.</li>
         <span class="n">kelvin_radius_value</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 
     <span class="c1"># Suppress divide-by-zero warnings - zero radius is handled by clipping</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kelvin_expand</span><span class="p">:</span>
             <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">kelvin_radius_value</span> <span class="o">/</span> <span class="n">particle_radius</span>
             <span class="n">kelvin_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">kelvin_ratio</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">MAX_KELVIN_RATIO</span><span class="p">)</span>

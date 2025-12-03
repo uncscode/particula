@@ -8054,6 +8054,8 @@
       
         
       
+        
+      
     
     
     
@@ -8106,6 +8108,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../Agent/feature/P2-charge-conservation-coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature: Charge Conservation in Coagulation Pairs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -13451,7 +13481,12 @@ coagulation processes.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">400</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
 <span class="normal">401</span>
 <span class="normal">402</span>
 <span class="normal">403</span>
@@ -13470,12 +13505,7 @@ coagulation processes.</p>
 <span class="normal">416</span>
 <span class="normal">417</span>
 <span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coulomb_potential_ratio</span><span class="p">(</span>
+<span class="normal">419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coulomb_potential_ratio</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Coulomb potential ratio for each particle.</span>
@@ -13571,7 +13601,12 @@ diffusion-controlled processes.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">360</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
 <span class="normal">361</span>
 <span class="normal">362</span>
 <span class="normal">363</span>
@@ -13604,12 +13639,7 @@ diffusion-controlled processes.</p>
 <span class="normal">390</span>
 <span class="normal">391</span>
 <span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">diffusive_knudsen</span><span class="p">(</span>
+<span class="normal">393</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">diffusive_knudsen</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -13836,7 +13866,12 @@ determine the friction factor [dimensionless].</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">426</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
 <span class="normal">429</span>
@@ -13874,14 +13909,7 @@ determine the friction factor [dimensionless].</p>
 <span class="normal">461</span>
 <span class="normal">462</span>
 <span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span>
-<span class="normal">469</span>
-<span class="normal">470</span>
-<span class="normal">471</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">friction_factor</span><span class="p">(</span>
+<span class="normal">464</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">friction_factor</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -13907,9 +13935,7 @@ determine the friction factor [dimensionless].</p>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># assume standard atmospheric composition</span>
-    <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
-    <span class="p">)</span>
+    <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
     <span class="n">mean_free_path</span> <span class="o">=</span> <span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
         <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
@@ -14668,12 +14694,7 @@ net_rate calculated for the given time_step.</p>
 <span class="normal">350</span>
 <span class="normal">351</span>
 <span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
+<span class="normal">353</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -14716,21 +14737,17 @@ net_rate calculated for the given time_step.</p>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">==</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
         <span class="c1"># get the kernel radius</span>
-        <span class="n">func</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">change_particle_representation</span>
-            <span class="o">.</span><span class="n">get_particle_resolved_binned_radius</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># noqa: E501</span>
+            <span class="n">change_particle_representation</span><span class="o">.</span><span class="n">get_particle_resolved_binned_radius</span>
         <span class="p">)</span>
         <span class="n">kernel_radius</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
             <span class="n">bin_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_radius</span><span class="p">,</span>
             <span class="n">total_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_bins_number</span><span class="p">,</span>
-            <span class="n">bins_per_radius_decade</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_bins_per_decade</span><span class="p">,</span>
+            <span class="n">bins_per_radius_decade</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_bins_per_decade</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
         <span class="p">)</span>
         <span class="c1"># convert particle representation to calculate kernel</span>
-        <span class="n">func2</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">change_particle_representation</span>
-            <span class="o">.</span><span class="n">get_speciated_mass_representation_from_particle_resolved</span>
-        <span class="p">)</span>
+        <span class="n">func2</span> <span class="o">=</span> <span class="n">change_particle_representation</span><span class="o">.</span><span class="n">get_speciated_mass_representation_from_particle_resolved</span>  <span class="c1"># noqa: E501</span>
         <span class="n">kernel_particle</span> <span class="o">=</span> <span class="n">func2</span><span class="p">(</span>
             <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
             <span class="n">bin_radius</span><span class="o">=</span><span class="n">kernel_radius</span><span class="p">,</span>
@@ -14748,8 +14765,7 @@ net_rate calculated for the given time_step.</p>
         <span class="p">)</span>
         <span class="c1"># calculate step</span>
         <span class="n">step_func</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">particle_resolved_method</span>
-            <span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span>
+            <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span>
         <span class="p">)</span>
         <span class="n">loss_gain_indices</span> <span class="o">=</span> <span class="n">step_func</span><span class="p">(</span>
             <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span>
