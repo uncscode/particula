@@ -232,11 +232,6 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    reynolds_lambda = particles.get_particle_reynolds_number(
-        particle_radius=particle_radius,
-        particle_velocity=particle_settling_velocity,
-        kinematic_viscosity=kinematic_viscosity,
-    )
     normalized_accel_variance = gas.get_normalized_accel_variance_ao2008(
         re_lambda=re_lambda,
     )
