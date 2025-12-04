@@ -271,7 +271,7 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
         particle_inertia_time=particle_inertia_time,
         stokes_number=stokes_number,
         kolmogorov_length_scale=kolmogorov_length_scale,
-        reynolds_lambda=reynolds_lambda,
+        reynolds_lambda=re_lambda,
         normalized_accel_variance=normalized_accel_variance,
         kolmogorov_velocity=kolmogorov_velocity,
         kolmogorov_time=kolmogorov_time,
