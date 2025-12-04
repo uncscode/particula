@@ -137,9 +137,17 @@ def get_relative_velocity_variance(
         eulerian_integral_length,
         vel_corr_terms,
     )
+
+    # Type narrowing: ensure array for indexing operations
+    rms_array = (
+        rms_velocity
+        if isinstance(rms_velocity, np.ndarray)
+        else np.array([rms_velocity])
+    )
+
     return (
-        rms_velocity[:, np.newaxis]
-        + rms_velocity[np.newaxis, :]
+        rms_array[:, np.newaxis]
+        + rms_array[np.newaxis, :]
         - 2 * cross_correlation
     )
 
@@ -348,9 +356,15 @@ def _compute_cross_correlation_velocity(
         particle_velocity,
     )
 
+    # Type narrowing: ensure array for indexing operations
+    inertia_array = (
+        particle_inertia_time
+        if isinstance(particle_inertia_time, np.ndarray)
+        else np.array([particle_inertia_time])
+    )
+
     particle_inertia_time_pairwise_product = (
-        particle_inertia_time[:, np.newaxis]
-        * particle_inertia_time[np.newaxis, :]
+        inertia_array[:, np.newaxis] * inertia_array[np.newaxis, :]
     )
 
     return (

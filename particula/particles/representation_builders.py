@@ -240,7 +240,7 @@ class ParticleMassRepresentationBuilder(
             surface=self.surface_strategy,
             distribution=self.mass,
             density=self.density,
-            concentration=self.concentration,
+            concentration=self.concentration,  # type: ignore[arg-type]
             charge=self.charge,
         )
 
@@ -319,7 +319,7 @@ class ParticleRadiusRepresentationBuilder(
             surface=self.surface_strategy,
             distribution=self.radius,
             density=self.density,
-            concentration=self.concentration,
+            concentration=self.concentration,  # type: ignore[arg-type]
             charge=self.charge,
         )
 
@@ -652,9 +652,8 @@ class PresetResolvedParticleMassBuilder(
             number_of_samples=self.particle_resolved_count,
         )
         # convert radii to masses
-        resolved_masses = np.float64(
-            4 / 3 * np.pi * resolved_radii**3 * self.density
-        )
+        resolved_masses_calc = 4 / 3 * np.pi * resolved_radii**3 * self.density
+        resolved_masses = np.asarray(resolved_masses_calc, dtype=np.float64)
         number_concentration = np.ones_like(resolved_masses, dtype=np.float64)
 
         self.pre_build_check()

@@ -145,7 +145,7 @@ def get_kappa_from_volumes(
 def get_water_volume_in_mixture(
     volume_solute_dry: Union[float, np.ndarray],
     volume_fraction_water: Union[float, np.ndarray],
-) -> float:
+) -> Union[float, np.ndarray]:
     """Calculate water volume in mixture from specified water fraction.
 
     The relationship is:

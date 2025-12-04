@@ -1,5 +1,7 @@
 """Test Building ParticleRepresentation properties."""
 
+from typing import Any
+
 import numpy as np
 
 from particula.particles.activity_strategies import ActivityIdealMass
@@ -13,11 +15,11 @@ from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 # pylint: disable=too-many-arguments, too-many-positional-arguments
 def setup_particle(
-    strategy: RadiiBasedMovingBin = RadiiBasedMovingBin(),
+    strategy: Any = RadiiBasedMovingBin(),
     activity: ActivityIdealMass = ActivityIdealMass(),
     surface: SurfaceStrategyVolume = SurfaceStrategyVolume(),
     distribution: np.ndarray = np.array([1.0, 2.0, 3.0]),
-    density: float = 1.0,
+    density: Any = 1.0,
     concentration: np.ndarray = np.array([10, 20, 30]),
     charge: float = 1.0,
 ) -> ParticleRepresentation:
@@ -36,9 +38,9 @@ def setup_particle(
         activity=activity,
         surface=surface,
         distribution=distribution,
-        density=density,
+        density=np.atleast_1d(np.asarray(density, dtype=np.float64)),
         concentration=concentration,
-        charge=charge,
+        charge=np.atleast_1d(np.asarray(charge, dtype=np.float64)),
     )
 
 

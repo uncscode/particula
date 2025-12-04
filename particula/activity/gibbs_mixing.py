@@ -7,7 +7,7 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -17,6 +17,7 @@ from particula.activity.bat_coefficients import (
     G19_FIT_HIGH,
     G19_FIT_LOW,
     G19_FIT_MID,
+    FitValues,
     coefficients_c,
 )
 from particula.activity.convert_functional_group import (
@@ -38,7 +39,7 @@ def gibbs_of_mixing(
     organic_mole_fraction: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
-    fit_dict: Tuple[str, List[float]],
+    fit_dict: FitValues,
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
@@ -102,7 +103,9 @@ def gibbs_mix_weight(
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
     functional_group: Optional[str] = None,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[
+    Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
+]:
     """Gibbs free energy of mixing.
 
     See Gorkowski (2019), with weighted oxygen2carbon regions.
@@ -135,23 +138,32 @@ def gibbs_mix_weight(
     )
 
     if np.size(oxygen2carbon) == 1:
+        # Cast scalar arrays to float for single value case
         return _calculate_gibbs_mix_single(
-            molar_mass_ratio,
-            organic_mole_fraction,
-            oxygen2carbon,
-            density,
+            float(np.asarray(molar_mass_ratio).flat[0]),
+            float(np.asarray(organic_mole_fraction).flat[0]),
+            float(np.asarray(oxygen2carbon).flat[0]),
+            float(density.flat[0]),
             weights,
         )
 
-    gibbs_mix = np.zeros((len(oxygen2carbon)))
-    derivative_gibbs = np.zeros((len(oxygen2carbon)))
+    # Cast to arrays for iteration
+    oxygen2carbon_arr = np.asarray(oxygen2carbon, dtype=np.float64)
+    molar_mass_ratio_arr = np.asarray(molar_mass_ratio, dtype=np.float64)
+    organic_mole_fraction_arr = np.asarray(
+        organic_mole_fraction, dtype=np.float64
+    )
+    density_arr = np.asarray(density, dtype=np.float64)
 
-    for i, o2c in enumerate(oxygen2carbon):
+    gibbs_mix = np.zeros((len(oxygen2carbon_arr)))
+    derivative_gibbs = np.zeros((len(oxygen2carbon_arr)))
+
+    for i, o2c in enumerate(oxygen2carbon_arr):
         gibbs_mix[i], derivative_gibbs[i] = _calculate_gibbs_mix_single(
-            molar_mass_ratio=molar_mass_ratio[i],
-            organic_mole_fraction=organic_mole_fraction[i],
-            oxygen2carbon=o2c,
-            density=density[i],
+            molar_mass_ratio=float(molar_mass_ratio_arr[i]),
+            organic_mole_fraction=float(organic_mole_fraction_arr[i]),
+            oxygen2carbon=float(o2c),
+            density=float(density_arr[i]),
             weights=weights[i],
         )
 
@@ -164,11 +176,13 @@ def _calculate_gibbs_mix_single(
     oxygen2carbon: float,
     density: float,
     weights: NDArray[np.float64],
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[
+    Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
+]:
     """Calculate Gibbs free energy of mixing for a single set of inputs.
 
     Args:
-        - molar_mass_ratio : The molar mass ratio of water to organic
+        - molar_mass_ratio : The molar_mass ratio of water to organic
           matter.
         - organic_mole_fraction : The fraction of organic matter.
         - oxygen2carbon : The oxygen to carbon ratio.

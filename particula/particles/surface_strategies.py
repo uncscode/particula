@@ -291,10 +291,13 @@ class SurfaceStrategy(ABC):
         if self.surface_tension_table is None or self.temperature_table is None:
             return
 
-        self.surface_tension = _interp_surface_tension(
-            temperature,
-            self.surface_tension_table,
-            self.temperature_table,
+        self.surface_tension = np.asarray(
+            _interp_surface_tension(
+                temperature,
+                self.surface_tension_table,
+                self.temperature_table,
+            ),
+            dtype=np.float64,
         )
 
 

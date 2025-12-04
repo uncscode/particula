@@ -358,11 +358,16 @@ class CondensationStrategy(ABC):
             temperature=temperature,
         )
 
-        return get_partial_pressure_delta(
+        pressure_delta = get_partial_pressure_delta(
             partial_pressure_gas=partial_pressure_gas,
             partial_pressure_particle=partial_pressure_particle,
             kelvin_term=kelvin_term,
         )
+
+        # Ensure return is always an array
+        if isinstance(pressure_delta, (int, float)):
+            return np.array([pressure_delta])
+        return pressure_delta
 
     def _apply_skip_partitioning(
         self, array: NDArray[np.float64]
@@ -632,14 +637,21 @@ class CondensationIsothermal(CondensationStrategy):
         )
 
         # Step 2: Reshape the particle concentration if necessary
-        if mass_rate.ndim == 2:  # Multiple gas species  # type: ignore
+        # Type guard: ensure mass_rate is an array before checking ndim
+        if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
             concentration = particle.concentration[:, np.newaxis]
         else:
             concentration = particle.concentration
 
         # Step 3: Calculate the overall condensation rate by scaling
         # mass rate by particle concentration
-        rates = mass_rate * concentration
+        rates_raw = mass_rate * concentration
+
+        # Ensure rates is an array (scalar * array or array * array -> array)
+        if not isinstance(rates_raw, np.ndarray):
+            rates = np.asarray(rates_raw)
+        else:
+            rates = rates_raw
 
         # Apply optional skipping of selected species
         rates = self._apply_skip_partitioning(rates)
@@ -668,12 +680,19 @@ class CondensationIsothermal(CondensationStrategy):
             temperature=temperature,
             pressure=pressure,
         )
+
+        # Type guard: ensure mass_rate is an array
+        if isinstance(mass_rate, (int, float)):
+            mass_rate_array = np.array([mass_rate])
+        else:
+            mass_rate_array = mass_rate
+
         # Apply optional skipping of selected species
-        mass_rate = self._apply_skip_partitioning(mass_rate)
+        mass_rate_array = self._apply_skip_partitioning(mass_rate_array)
 
         # calculate the mass gain or loss per bin
         mass_transfer = get_mass_transfer(
-            mass_rate=mass_rate,  # type: ignore
+            mass_rate=mass_rate_array,
             time_step=time_step,
             gas_mass=gas_species.get_concentration(),  # type: ignore
             particle_mass=particle.get_species_mass(),

@@ -174,6 +174,6 @@ def get_sedimentation_kernel_sp2016_via_system_state(
 
     return get_sedimentation_kernel_sp2016(
         particle_radius=particle_radius,
-        settling_velocities=settling_velocities,
+        settling_velocities=np.asarray(settling_velocities, dtype=np.float64),
         calculate_collision_efficiency=calculate_collision_efficiency,
     )

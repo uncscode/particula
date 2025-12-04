@@ -10,7 +10,7 @@ the final coagulation strategy.
 # pylint: disable=too-few-public-methods
 
 import logging
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -52,7 +52,7 @@ class BuilderDistributionTypeMixin:
     def set_distribution_type(
         self,
         distribution_type: str,
-        distribution_type_units: str = None,
+        distribution_type_units: Optional[str] = None,
     ):
         """Set the distribution type.
 

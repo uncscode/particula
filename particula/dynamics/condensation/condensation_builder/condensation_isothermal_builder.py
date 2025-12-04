@@ -44,6 +44,13 @@ class CondensationIsothermalBuilder(
     def build(self) -> CondensationStrategy:
         """Validate parameters and create a condensation strategy."""
         self.pre_build_check()
+
+        # Type guards: pre_build_check ensures these are not None
+        if self.diffusion_coefficient is None:
+            raise ValueError("diffusion_coefficient must be set")
+        if self.accommodation_coefficient is None:
+            raise ValueError("accommodation_coefficient must be set")
+
         return CondensationIsothermal(
             molar_mass=self.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,

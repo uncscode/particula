@@ -164,7 +164,8 @@ def _compute_y_stokes(
 
 def _compute_f3_lambda(reynolds_lambda: float) -> float:
     """Compute f_3(R_lambda), an empirical turbulence factor."""
-    return 0.1886 * get_safe_exp(20.306 / reynolds_lambda)
+    # Cast to float since get_safe_exp returns ndarray
+    return float(0.1886 * get_safe_exp(20.306 / reynolds_lambda))
 
 
 def _calculate_rc(

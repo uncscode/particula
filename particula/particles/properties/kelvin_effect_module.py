@@ -148,6 +148,6 @@ def get_kelvin_term(
             return get_safe_exp(kelvin_ratio)
 
         # Scalar case
-        kelvin_ratio = kelvin_radius_value / particle_radius
+        kelvin_ratio = kelvin_radius_value / particle_radius  # type: ignore[assignment]
         kelvin_ratio = np.clip(kelvin_ratio, None, MAX_KELVIN_RATIO)
         return get_safe_exp(kelvin_ratio)

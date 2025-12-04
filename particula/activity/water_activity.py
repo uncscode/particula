@@ -100,7 +100,7 @@ def fixed_water_activity(
     density: Union[float, NDArray[np.float64]],
 ) -> Tuple[
     Union[float, NDArray[np.float64]],
-    Union[float, NDArray[np.float64]],
+    Optional[Union[float, NDArray[np.float64]]],
     Union[float, NDArray[np.float64]],
 ]:
     """Activity coefficients in organic-water mixtures.

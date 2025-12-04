@@ -20,7 +20,7 @@ from typing import Optional
 try:
     import pint
 
-    unit_registry = pint.UnitRegistry()  # pylint: disable=invalid-name
+    unit_registry: Optional[pint.UnitRegistry] = pint.UnitRegistry()  # pylint: disable=invalid-name
 except ImportError:
     unit_registry = None  # pylint: disable=invalid-name
 
@@ -78,10 +78,12 @@ def get_unit_conversion(
     offset_units = ["degC", "degF", "degR", "degK"]
     if old in offset_units or value is not None:
         value = value if value is not None else 0
-        old = unit_registry.Quantity(value, old)
+        old_quantity = unit_registry.Quantity(value, old)
     else:
-        old = unit_registry.Quantity(old)  # multiplicative shift
+        old_quantity = unit_registry.Quantity(old)  # multiplicative shift
 
-    new = unit_registry.Quantity(new)
-    result = old.to(new).magnitude  # get the new value without units
+    new_quantity = unit_registry.Quantity(new)
+    result = old_quantity.to(
+        new_quantity
+    ).magnitude  # get the new value without units
     return float(result)

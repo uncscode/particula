@@ -47,11 +47,13 @@ def bat_blending_weights(
     )
 
     if np.size(oxygen2carbon) == 1:
-        return _calculate_blending_weights(oxygen2carbon, oxygen2carbon_ml)
+        return _calculate_blending_weights(
+            float(oxygen2carbon.flat[0]), float(oxygen2carbon_ml.flat[0])
+        )
 
     return np.array(
         [
-            _calculate_blending_weights(oc, oxygen2carbon_ml[i])
+            _calculate_blending_weights(float(oc), float(oxygen2carbon_ml[i]))
             for i, oc in enumerate(oxygen2carbon)
         ]
     )

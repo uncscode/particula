@@ -59,8 +59,10 @@ def coefficients_c(
     # force to array
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
-    fit_values = np.asarray(fit_values, dtype=np.float64)
+    fit_values_array: NDArray[np.float64] = np.asarray(
+        fit_values, dtype=np.float64
+    )
 
-    return fit_values[0] * np.exp(fit_values[1] * oxygen2carbon) + fit_values[
-        2
-    ] * np.exp(fit_values[3] * molar_mass_ratio)
+    return fit_values_array[0] * np.exp(
+        fit_values_array[1] * oxygen2carbon
+    ) + fit_values_array[2] * np.exp(fit_values_array[3] * molar_mass_ratio)

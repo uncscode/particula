@@ -147,7 +147,8 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
             # combined_strategy
             ```
         """
-        combined_kernel = 0
+        # Type narrowing: initialize as Union type to match return signature
+        combined_kernel: Union[float, NDArray[np.float64]] = 0.0
         for strategy in self.strategies:
             combined_kernel += strategy.kernel(
                 particle=particle, temperature=temperature, pressure=pressure

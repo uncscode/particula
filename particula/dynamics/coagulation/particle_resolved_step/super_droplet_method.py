@@ -711,8 +711,8 @@ def get_super_droplet_coagulation_step(
     # Step 4: Calculate the total concentration of particles within each bin
     concentration_in_bins = _calculate_concentration_in_bins(
         bin_indices=bin_indices,
-        particle_concentration=sorted_concentration,  # type: ignore
-        number_in_bins=number_in_bins,
+        particle_concentration=sorted_concentration,  # type: ignore[arg-type]
+        number_in_bins=number_in_bins,  # type: ignore[arg-type]
     )
 
     # Step 5: Initialize a bivariate spline for interpolating kernel values

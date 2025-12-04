@@ -79,6 +79,11 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
     activity_diff = np.diff(activity_data)
     data_length = len(activity_data)
 
+    # Declare variables with Union types for type checking
+    index_phase_sep_starts: Union[int, float]
+    index_phase_sep_end: Union[int, float]
+    phase_sep_activity: int
+
     # Check if the data length is more than 3
     if data_length > 3:
         min_value = np.min(activity_diff)
@@ -89,7 +94,7 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
             # If so, no phase separation via activity curvature
             phase_sep_curve = 0
             # find the index where the activity is closest to 1
-            index_phase_sep_starts = np.argmin(np.abs(activity_data - 1))
+            index_phase_sep_starts = int(np.argmin(np.abs(activity_data - 1)))
             index_phase_sep_end = index_phase_sep_starts
         else:
             # If signs differ, phase separation via activity curvature occurs
@@ -99,13 +104,13 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
 
             # The first index where a sign change occurs
             inflection_index = np.where(sign_changes)[0]  # all indices
-            index_start = (
+            index_start = int(
                 inflection_index[0]
                 if len(inflection_index) > 0
                 else data_length
             )
             # The last index where a sign change occurs
-            back_index = (
+            back_index = int(
                 inflection_index[-1]
                 if len(inflection_index) > 0
                 else data_length
@@ -113,25 +118,24 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
 
             # Check if first section of activity data is greater than 1
             if np.any(activity_data[:index_start] > 1):
-                index_phase_sep_starts = np.argmin(
-                    np.abs(activity_data[:index_start] - 1)
+                index_phase_sep_starts = int(
+                    np.argmin(np.abs(activity_data[:index_start] - 1))
                 )
             else:
                 index_phase_sep_starts = index_start
 
             # Check if second section of activity data is greater than 1
             if np.any(activity_data[back_index:] > 1):
-                index_phase_sep_end = (
+                index_phase_sep_end = int(
                     np.argmin(np.abs(activity_data[back_index:] - 1))
                     + back_index
                 )
             else:
                 index_phase_sep_end = back_index
     else:
-        phase_sep_activity = activity_data
         phase_sep_curve = 0
-        index_phase_sep_starts = np.nan
-        index_phase_sep_end = np.nan
+        index_phase_sep_starts = float(data_length)
+        index_phase_sep_end = float(data_length)
 
     # Assign phase separation via activity based on data being greater than 1
     phase_sep_activity = 1 if sum(activity_data > 1) else 0
@@ -188,8 +192,8 @@ def find_phase_separation(
         # Check for the direction of the curve (increasing or decreasing)
         if activity_water[0] < activity_water[-1]:  # increasing a_w with index
             # find the min and max indexes
-            lower_seperation_index = min(indexes)
-            upper_seperation_index = max(indexes)
+            lower_seperation_index: int = int(min(indexes))
+            upper_seperation_index: int = int(max(indexes))
             match_a_w = activity_water[upper_seperation_index]
 
             # start from the lower_seperation_index and find the index where
@@ -197,17 +201,17 @@ def find_phase_separation(
             match_slice = np.sign(
                 match_a_w - activity_water[lower_seperation_index:]
             )
-            match_index_prime = np.where(match_slice == -1)
-            if len(match_index_prime[0]) == 0:
-                match_index_prime = lower_seperation_index
+            match_index_prime_arr = np.where(match_slice == -1)
+            if len(match_index_prime_arr[0]) == 0:
+                match_index_prime: int = lower_seperation_index
             else:
-                match_index_prime = (
-                    match_index_prime[0][0] + lower_seperation_index
+                match_index_prime = int(
+                    match_index_prime_arr[0][0] + lower_seperation_index
                 )
         else:  # decreasing a_w with index
             # find the min and max indexes
-            lower_seperation_index = max(indexes)
-            upper_seperation_index = min(indexes)
+            lower_seperation_index = int(max(indexes))
+            upper_seperation_index = int(min(indexes))
             match_a_w = activity_water[upper_seperation_index]
 
             # start from the lower_seperation_index and find the index where
@@ -215,11 +219,11 @@ def find_phase_separation(
             match_slice = np.sign(
                 activity_water[:lower_seperation_index] - match_a_w
             )
-            match_index_prime = np.where(match_slice == -1)
-            if len(match_index_prime[0]) == 0:
+            match_index_prime_arr = np.where(match_slice == -1)
+            if len(match_index_prime_arr[0]) == 0:
                 match_index_prime = lower_seperation_index
             else:
-                match_index_prime = match_index_prime[0][0]
+                match_index_prime = int(match_index_prime_arr[0][0])
 
     else:
         upper_seperation_index = 2
@@ -232,9 +236,9 @@ def find_phase_separation(
         "lower_seperation_index": lower_seperation_index,
         "upper_seperation_index": upper_seperation_index,
         "matching_upper_seperation_index": match_index_prime,
-        "lower_seperation": activity_water[lower_seperation_index],
-        "upper_seperation": activity_water[upper_seperation_index],
-        "matching_upper_seperation": activity_water[match_index_prime],
+        "lower_seperation": activity_water[int(lower_seperation_index)],
+        "upper_seperation": activity_water[int(upper_seperation_index)],
+        "matching_upper_seperation": activity_water[int(match_index_prime)],
     }
 
 

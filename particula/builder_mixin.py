@@ -233,7 +233,7 @@ class BuilderConcentrationMixin:
 
     def __init__(self, default_units: str = "kg/m^3"):
         """Initialize concentration mixin."""
-        self.concentration = None
+        self.concentration: Optional[Union[float, NDArray[np.float64]]] = None
         self.default_units = default_units if default_units else "kg/m^3"
 
     @validate_inputs({"concentration": "nonnegative"})

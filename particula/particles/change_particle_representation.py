@@ -54,7 +54,7 @@ def get_particle_resolved_binned_radius(
             "they may all be zero and the kernel cannot be calculated."
         )
     if min_radius == 0:
-        min_radius = 1e-10
+        min_radius = np.float64(1e-10)
     if total_bins is not None:
         return np.logspace(
             np.log10(min_radius),
@@ -97,7 +97,7 @@ def get_speciated_mass_representation_from_particle_resolved(
     """
     # deep copy the particle to avoid modifying the original
     new_particle = deepcopy(particle)
-    new_particle.distribution_strategy = SpeciatedMassMovingBin()
+    new_particle.strategy = SpeciatedMassMovingBin()
 
     # add the concentration by bin_indexes
     new_concentration = np.zeros_like(bin_radius)
