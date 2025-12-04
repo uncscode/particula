@@ -16,3 +16,6 @@ from .wall_loss_strategies import (
 from .wall_loss_strategies import (
     WallLossStrategy as WallLossStrategy,
 )
+from .wall_loss_strategies import (
+    get_particle_resolved_wall_loss_step as get_particle_resolved_wall_loss_step,  # noqa: E501
+)
