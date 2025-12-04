@@ -327,9 +327,8 @@ def run_linters(
     elif "ruff_format" in linters:
         results.append(run_ruff_format(target_dir, ruff_timeout))
 
-    # Mypy temporarily disabled due to type hint issues
-    # if "mypy" in linters:
-    #     results.append(run_mypy(target_dir, mypy_timeout))
+    if "mypy" in linters:
+        results.append(run_mypy(target_dir, mypy_timeout))
 
     # Determine overall success
     all_passed = all(result.success for result in results)
@@ -392,8 +391,8 @@ def main():
     parser.add_argument(
         "--linters",
         type=str,
-        default="ruff",
-        help="Comma-separated list of linters to run (default: ruff matching CI)",
+        default="ruff,mypy",
+        help="Comma-separated list of linters to run (default: ruff,mypy)",
     )
     parser.add_argument(
         "--cwd",
