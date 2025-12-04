@@ -17,7 +17,9 @@ def convert_to_oh_equivalent(
     oxygen2carbon: Union[float, NDArray[np.float64]],
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[
+    Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
+]:
     """Just a pass through now, but will add the oh equivalent conversion.
 
     Args:

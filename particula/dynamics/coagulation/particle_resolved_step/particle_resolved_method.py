@@ -192,10 +192,10 @@ def get_particle_resolved_coagulation_step(
 
         # Step 6: Calculate the number of possible coagulation events
         # between small and large particles
-        events = len(small_indices) * len(large_indices)
+        events_count: float = float(len(small_indices) * len(large_indices))
         if lower_bin == upper_bin:
-            events = len(small_indices) * (len(large_indices) - 1) / 2
-        events = int(np.ceil(events))
+            events_count = len(small_indices) * (len(large_indices) - 1) / 2
+        events = int(np.ceil(events_count))
 
         # Step 7: Determine the number of coagulation tests to run based
         # on kernel value and system parameters
@@ -293,14 +293,14 @@ def _interpolate_kernel(
         ```
     """
     grid = (kernel_radius, kernel_radius)
-    # Using 'linear' interpolation inside the domain and 'nearest' method for
+    # Using linear interpolation inside domain; clamp to boundary
     # out-of-bound points.
     return RegularGridInterpolator(
         points=grid,
         values=kernel,
         method="linear",
         bounds_error=False,
-        fill_value=None,  # None uses nearest for out-of-bound if desired
+        fill_value=None,  # type: ignore  # None uses nearest neighbor
     )
 
 

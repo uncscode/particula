@@ -56,21 +56,23 @@ def get_brownian_kernel(
           Coefficient K12 (with alpha collision efficiency term 13.56).
     """
     # Convert 1D arrays to 2D square matrices
-    diffusivity_matrix = np.tile(
-        diffusivity_particle, (len(diffusivity_particle), 1)
+    # Type narrowing: convert scalar to array if needed for len() compatibility
+    diffusivity_arr: NDArray[np.float64] = np.atleast_1d(diffusivity_particle)
+    radius_arr: NDArray[np.float64] = np.atleast_1d(particle_radius)
+    g_collection_arr: NDArray[np.float64] = np.atleast_1d(
+        g_collection_term_particle
     )
-    radius_matrix = np.tile(particle_radius, (len(particle_radius), 1))
+    mean_thermal_speed_arr: NDArray[np.float64] = np.atleast_1d(
+        mean_thermal_speed_particle
+    )
+
+    diffusivity_matrix = np.tile(diffusivity_arr, (len(diffusivity_arr), 1))
+    radius_matrix = np.tile(radius_arr, (len(radius_arr), 1))
     g_collection_term_matrix = (
-        np.tile(
-            g_collection_term_particle, (len(g_collection_term_particle), 1)
-        )
-        ** 2
+        np.tile(g_collection_arr, (len(g_collection_arr), 1)) ** 2
     )
     mean_thermal_speed_matrix = (
-        np.tile(
-            mean_thermal_speed_particle, (len(mean_thermal_speed_particle), 1)
-        )
-        ** 2
+        np.tile(mean_thermal_speed_arr, (len(mean_thermal_speed_arr), 1)) ** 2
     )
 
     # Sum of diffusivities and radii across particles

@@ -263,11 +263,12 @@ class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return (  # type: ignore
+        result = (
             charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
                 diffusive_knudsen, coulomb_potential_ratio
             )
         )
+        return np.asarray(result, dtype=np.float64)
 
 
 class CoulumbChahl2019KernelStrategy(ChargedKernelStrategyABC):

@@ -1,7 +1,7 @@
 # Linting Guide
 
 **Version:** 0.2.6
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-03
 
 ## Overview
 
@@ -9,15 +9,17 @@ This guide documents all linting conventions, commands, and requirements for the
 
 ### Linting Approach
 
-particula uses **ruff (check + format) with mypy** to ensure comprehensive code quality:
+particula uses **ruff (check + format) and mypy** to ensure comprehensive code quality:
 
-1. **ruff check** - Fast Python linter with auto-fix capabilities (replaces flake8, pylint)
-2. **ruff format** - Fast Python formatter (replaces black, autopep8)
-3. **mypy** - Static type checking for Python
+1. **ruff check** - Fast Python linter with auto-fix capabilities
+2. **ruff format** - Fast Python formatter
+3. **mypy** - Static type checking for Python (REQUIRED)
 
 **Why this approach?**
 
-Ruff is a modern, extremely fast linter written in Rust that combines the functionality of multiple traditional Python linting tools (flake8, pylint, isort, etc.) into a single tool. Combined with mypy for type checking, this provides comprehensive code quality enforcement while keeping CI times fast.
+Ruff is a modern, extremely fast linter written in Rust that combines the functionality of multiple traditional Python linting tools into a single tool. Combined with mypy for strict type checking, this provides comprehensive code quality enforcement while keeping CI times fast.
+
+**All linters are required** - both ruff and mypy must pass with zero errors for code to be accepted.
 
 ### Integration with ADW
 
@@ -104,15 +106,19 @@ convention = "google"
 - `W`: pycodestyle warnings
 - `C90`: mccabe complexity
 - `D`: pydocstyle (docstrings)
-- `ANN`: flake8-annotations (type hints)
-- `B`: flake8-bugbear
-- `S`: flake8-bandit (security)
-- `N`: pep8-naming
-- `I`: isort (import sorting)
+- `ANN`: type hint annotations
+- `B`: bugbear (likely bugs and design problems)
+- `S`: security checks (bandit rules)
+- `N`: naming conventions
+- `I`: import sorting
 
-### 2. Mypy (Type Checking)
+**Note:** Rule category names reference traditional tools (flake8-*, pep8-*, etc.) but all checks are implemented natively in ruff. We do not use separate flake8, pylint, or other legacy linters.
 
-**Purpose:** Static type checker for Python.
+### 2. Mypy (Type Checking) - REQUIRED
+
+**Purpose:** Static type checker for Python - ensures type safety across the codebase.
+
+**Status:** **REQUIRED** - All code must pass mypy type checking with zero errors.
 
 **Installation:**
 ```bash
@@ -143,6 +149,13 @@ warn_unused_configs = true
 **Key Settings:**
 - **Ignore missing imports**: Enabled (for dependencies without type stubs)
 - **Python version**: 3.9+ (matches project requirement)
+
+**Type Checking Standards:**
+- All functions must have proper type hints for parameters and return values
+- Use `Union[float, NDArray[np.float64]]` for functions that accept both scalars and arrays
+- Use `Optional[T]` for parameters that can be `None`
+- Add type narrowing with `isinstance()` checks before operations that require specific types
+- Use `cast()` from `typing` module when type assertions are needed
 
 ## Running Linters
 
@@ -228,11 +241,14 @@ ruff format particula/
 
 # Step 3: Final check (fail if issues remain)
 ruff check particula/
+
+# Step 4: Type check (REQUIRED - fail if errors found)
+mypy particula/ --ignore-missing-imports
 ```
 
 From `.github/workflows/lint.yml`.
 
-**Note:** Mypy is not currently run in CI but is available for local development and ADW workflows.
+**All linters must pass** - CI will fail if either ruff or mypy reports errors.
 
 ## Auto-Fix Capabilities
 
@@ -554,7 +570,7 @@ mypy particula/ --ignore-missing-imports
 1. ✅ Run `ruff check --fix` to auto-fix issues
 2. ✅ Run `ruff format` to format code
 3. ✅ Run `ruff check` to verify (final check)
-4. ✅ Run `mypy` for type checking (optional but recommended)
+4. ✅ Run `mypy` for type checking (**REQUIRED** - must pass with zero errors)
 5. ✅ Follow Google-style docstrings
 6. ✅ Keep lines to 80 characters
 7. ✅ Use `*_test.py` files for tests (asserts allowed)
@@ -568,10 +584,15 @@ mypy particula/ --ignore-missing-imports
 ruff check particula/ --fix
 ruff format particula/
 ruff check particula/
-mypy particula/ --ignore-missing-imports
+mypy particula/ --ignore-missing-imports  # REQUIRED
 
 # Target directory: particula/
 # Line length: 80
 # Docstring style: Google
 # Test files: *_test.py (asserts allowed)
+# Type checking: Required (mypy must pass)
 ```
+
+**Linting Tools:**
+- **ruff**: Modern Python linter and formatter (replaces flake8, pylint, black, isort)
+- **mypy**: Static type checker (required for all code)

@@ -232,9 +232,12 @@ def get_radius_transfer_rate(
         # Output: array([7.95774715e-14, 1.98943679e-14])
         ```
     """
+    # Type narrowing: handle 2D mass_rate with array particle_radius
+    radius_for_calc: Union[float, NDArray[np.float64]] = particle_radius
     if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
-        particle_radius = particle_radius[:, np.newaxis]
-    return mass_rate / (density * 4 * np.pi * particle_radius**2)
+        if isinstance(particle_radius, np.ndarray):
+            radius_for_calc = particle_radius[:, np.newaxis]
+    return mass_rate / (density * 4 * np.pi * radius_for_calc**2)
 
 
 @validate_inputs(

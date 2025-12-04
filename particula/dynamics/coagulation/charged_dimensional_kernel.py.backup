@@ -100,21 +100,15 @@ def _system_state_properties(
         temperature=temperature,
     )
 
-    # Ensure all values are arrays for indexing and broadcasting operations
-    # This converts scalars to 1-element arrays, and leaves arrays unchanged
-    radius_array = np.atleast_1d(particle_radius)
-    mass_array = np.atleast_1d(particle_mass)
-    friction_array = np.atleast_1d(friction_factor)
-    coulomb_array = np.atleast_1d(coulomb_potential_ratio)
-    diffusive_kn_array = np.atleast_1d(diffusive_knudsen)
-
-    sum_of_radii = radius_array[:, np.newaxis] + radius_array[np.newaxis, :]
-    reduced_mass = get_reduced_self_broadcast(mass_array)
-    reduced_friction_factor = get_reduced_self_broadcast(friction_array)
+    sum_of_radii = (
+        particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+    )
+    reduced_mass = get_reduced_self_broadcast(particle_mass)
+    reduced_friction_factor = get_reduced_self_broadcast(friction_factor)
 
     return (
-        coulomb_array,
-        diffusive_kn_array,
+        coulomb_potential_ratio,
+        diffusive_knudsen,
         sum_of_radii,
         reduced_mass,
         reduced_friction_factor,
@@ -180,27 +174,11 @@ def get_hard_sphere_kernel_via_system_state(
     )
 
     # get dimensionless kernel
-    dimensionless_kernel_raw = get_hard_sphere_kernel(
+    dimensionless_kernel = get_hard_sphere_kernel(
         diffusive_knudsen=diffusive_knudsen,
     )
 
     # get dimensioned kernel
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
         coulomb_potential_ratio=coulomb_potential_ratio,
@@ -260,20 +238,9 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
         temperature=temperature,
         pressure=pressure,
     )
-    dimensionless_kernel_raw = get_coulomb_kernel_dyachkov2007(
+    dimensionless_kernel = get_coulomb_kernel_dyachkov2007(
         diffusive_knudsen=diffusive_knudsen,
         coulomb_potential_ratio=coulomb_potential_ratio,
-    )
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    return get_dimensional_kernel(
-        dimensionless_kernel=dimensionless_kernel,
-        coulomb_potential_ratio=coulomb_potential_ratio,
-        sum_of_radii=sum_of_radii,
-        reduced_mass=reduced_mass,
-        reduced_friction_factor=reduced_friction_factor,
     )
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
@@ -334,14 +301,10 @@ def get_coulomb_kernel_gatti2008_via_system_state(
         temperature=temperature,
         pressure=pressure,
     )
-    dimensionless_kernel_raw = get_coulomb_kernel_gatti2008(
+    dimensionless_kernel = get_coulomb_kernel_gatti2008(
         diffusive_knudsen=diffusive_knudsen,
         coulomb_potential_ratio=coulomb_potential_ratio,
     )
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
         coulomb_potential_ratio=coulomb_potential_ratio,
@@ -401,14 +364,10 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
         temperature=temperature,
         pressure=pressure,
     )
-    dimensionless_kernel_raw = get_coulomb_kernel_gopalakrishnan2012(
+    dimensionless_kernel = get_coulomb_kernel_gopalakrishnan2012(
         diffusive_knudsen=diffusive_knudsen,
         coulomb_potential_ratio=coulomb_potential_ratio,
     )
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
         coulomb_potential_ratio=coulomb_potential_ratio,
@@ -468,14 +427,10 @@ def get_coulomb_kernel_chahl2019_via_system_state(
         temperature=temperature,
         pressure=pressure,
     )
-    dimensionless_kernel_raw = get_coulomb_kernel_chahl2019(
+    dimensionless_kernel = get_coulomb_kernel_chahl2019(
         diffusive_knudsen=diffusive_knudsen,
         coulomb_potential_ratio=coulomb_potential_ratio,
     )
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
         coulomb_potential_ratio=coulomb_potential_ratio,

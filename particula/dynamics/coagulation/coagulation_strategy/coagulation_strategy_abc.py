@@ -6,7 +6,7 @@ coagulation processes in aerosol simulations.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -258,8 +258,10 @@ class CoagulationStrategyABC(ABC):
         kernel = self.kernel(
             particle=particle, temperature=temperature, pressure=pressure
         )
-        loss_rate = self.loss_rate(particle=particle, kernel=kernel)
-        gain_rate = self.gain_rate(particle=particle, kernel=kernel)
+        # Type narrowing: cast to NDArray for method compatibility
+        kernel_arr = cast(NDArray[np.float64], np.atleast_1d(kernel))
+        loss_rate = self.loss_rate(particle=particle, kernel=kernel_arr)
+        gain_rate = self.gain_rate(particle=particle, kernel=kernel_arr)
         return gain_rate - loss_rate
 
     def step(
@@ -293,14 +295,16 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         if self.distribution_type in ["discrete", "continuous_pdf"]:
-            particle.add_concentration(
-                self.net_rate(
-                    particle=particle,
-                    temperature=temperature,
-                    pressure=pressure,
-                )
-                * time_step
+            net_rate_value = self.net_rate(
+                particle=particle,
+                temperature=temperature,
+                pressure=pressure,
             )
+            # Type narrowing: cast to NDArray for add_concentration
+            concentration_change = cast(
+                NDArray[np.float64], np.atleast_1d(net_rate_value * time_step)
+            )
+            particle.add_concentration(concentration_change)
             return particle
 
         if self.distribution_type == "particle_resolved":
@@ -331,13 +335,15 @@ class CoagulationStrategyABC(ABC):
                 temperature=temperature,
                 pressure=pressure,
             )
+            # Type narrowing: cast to NDArray for step function
+            kernel_arr = cast(NDArray[np.float64], np.atleast_1d(kernel))
             # calculate step
             step_func = (
                 particle_resolved_method.get_particle_resolved_coagulation_step
             )
             loss_gain_indices = step_func(
                 particle_radius=particle.get_radius(),
-                kernel=kernel,
+                kernel=kernel_arr,
                 kernel_radius=kernel_radius,
                 volume=particle.get_volume(),
                 time_step=time_step,

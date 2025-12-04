@@ -91,20 +91,32 @@ def get_phi_ao2008(
           https://doi.org/10.1088/1367-2630/10/7/075016
     """
     # valid for v1 > v2, in pairwise comparison
+    # Type narrowing: ensure arrays for indexing operations
+    velocity_array = (
+        particle_velocity
+        if isinstance(particle_velocity, np.ndarray)
+        else np.array([particle_velocity])
+    )
+    inertia_array = (
+        particle_inertia_time
+        if isinstance(particle_inertia_time, np.ndarray)
+        else np.array([particle_inertia_time])
+    )
+
     v1 = np.maximum(
-        particle_velocity[:, np.newaxis], particle_velocity[np.newaxis, :]
+        velocity_array[:, np.newaxis], velocity_array[np.newaxis, :]
     )
     v2 = np.minimum(
-        particle_velocity[:, np.newaxis], particle_velocity[np.newaxis, :]
+        velocity_array[:, np.newaxis], velocity_array[np.newaxis, :]
     )
     # tau1 > tau2 due to v1~=tau1*gravity and v2~=tau2*gravity
     tau1 = np.maximum(
-        particle_inertia_time[:, np.newaxis],
-        particle_inertia_time[np.newaxis, :],
+        inertia_array[:, np.newaxis],
+        inertia_array[np.newaxis, :],
     )
     tau2 = np.minimum(
-        particle_inertia_time[:, np.newaxis],
-        particle_inertia_time[np.newaxis, :],
+        inertia_array[:, np.newaxis],
+        inertia_array[np.newaxis, :],
     )
 
     phi_compute_terms = PhiComputeTerms(v1, v2, tau1, tau2, alpha, phi)
@@ -118,7 +130,7 @@ def get_phi_ao2008(
 
 def _compute_phi_term1(
     terms: PhiComputeTerms,
-) -> NDArray[np.float64]:
+) -> Union[float, NDArray[np.float64]]:
     """Compute the first term of the Φ function.
 
      term_1 = {
@@ -143,7 +155,7 @@ def _compute_phi_term1(
 
 def _compute_phi_term2(
     terms: PhiComputeTerms,
-) -> NDArray[np.float64]:
+) -> Union[float, NDArray[np.float64]]:
     """Compute the second term of the Φ function.
 
     term₂ =
@@ -178,7 +190,7 @@ def _compute_phi_term2(
 
 def _compute_phi_term3(
     terms: PhiComputeTerms,
-) -> NDArray[np.float64]:
+) -> Union[float, NDArray[np.float64]]:
     """Compute the third term of the Φ function.
 
     term_3 =

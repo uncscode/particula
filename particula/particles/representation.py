@@ -552,15 +552,15 @@ class ParticleRepresentation:
             particle_representation.collide_pairs(indices)
             ```
         """
-        (self.distribution, self.concentration, self.charge) = (
-            self.strategy.collide_pairs(
+        (self.distribution, self.concentration, self.charge) = (  # type: ignore[assignment]
+            self.strategy.collide_pairs(  # type: ignore[assignment]
                 self.distribution,
                 self.concentration,
                 self.density,
                 indices,
                 self.charge,
             )
-        )
+        )  # type: ignore[assignment]
 
     def _enforce_increasing_bins(self) -> None:
         """Ensure distribution bins are sorted by increasing radius."""
@@ -568,7 +568,7 @@ class ParticleRepresentation:
             self.distribution,
             self.concentration,
             self.charge,
-        ) = get_sorted_bins_by_radius(
+        ) = get_sorted_bins_by_radius(  # type: ignore[assignment]
             radius=self.get_radius(),
             distribution=self.distribution,
             concentration=self.concentration,

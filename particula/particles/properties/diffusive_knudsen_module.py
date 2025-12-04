@@ -88,22 +88,25 @@ def get_diffusive_knudsen_number(
           https://doi.org/10.1103/PhysRevE.85.026410
     """
     # Calculate the pairwise sum of radii
+    sum_of_radii: Union[float, NDArray[np.float64]]
     if isinstance(particle_radius, np.ndarray):
         sum_of_radii = particle_radius[:, np.newaxis] + particle_radius
     else:
-        sum_of_radii = 2 * particle_radius
+        sum_of_radii = 2.0 * particle_radius
 
     # Calculate reduced mass
+    reduced_mass: Union[float, NDArray[np.float64]]
     if isinstance(particle_mass, np.ndarray):
         reduced_mass = get_reduced_self_broadcast(particle_mass)
     else:
-        reduced_mass = particle_mass
+        reduced_mass = 0.5 * particle_mass
 
     # Calculate reduced friction factor
+    reduced_friction_factor: Union[float, NDArray[np.float64]]
     if isinstance(friction_factor, np.ndarray):
         reduced_friction_factor = get_reduced_self_broadcast(friction_factor)
     else:
-        reduced_friction_factor = friction_factor
+        reduced_friction_factor = 0.5 * friction_factor
 
     # Calculate the kinetic and continuum enhancements
     kinetic_enhance = coulomb_enhancement.get_coulomb_kinetic_limit(

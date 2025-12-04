@@ -96,6 +96,12 @@ def get_coagulation_gain_rate_discrete(
           physics, Chapter 13, Equation 13.61.
     """
     # Calculate bin widths (delta_x_array)
+    # Handle Union type: ensure radius is an array for indexing
+    if not isinstance(radius, np.ndarray):
+        radius = np.asarray([radius])
+    if not isinstance(concentration, np.ndarray):
+        concentration = np.asarray([concentration])
+
     delta_x_array = np.diff(radius, append=2 * radius[-1] - radius[-2])
 
     # Convert concentration to a probability density function (PDF)
@@ -161,7 +167,9 @@ def get_coagulation_loss_rate_continuous(
           physics, Chapter 13, Equation 13.61.
     """
     # concentration (n,) and kernel (n,n)
-    return concentration * np.trapezoid(y=kernel * concentration, x=radius)
+    # Cast result to handle numpy return type
+    # Using type: ignore for np.trapezoid return type compatibility
+    return concentration * np.trapezoid(y=kernel * concentration, x=radius)  # type: ignore[operator,return-value]
 
 
 def get_coagulation_gain_rate_continuous(

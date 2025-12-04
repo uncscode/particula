@@ -71,9 +71,14 @@ def get_turbulent_dns_kernel_ao2008(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    collision_radius = (
-        particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+    # Type narrowing: ensure array for indexing operations
+    radius_array = (
+        particle_radius
+        if isinstance(particle_radius, np.ndarray)
+        else np.array([particle_radius])
     )
+
+    collision_radius = radius_array[:, np.newaxis] + radius_array[np.newaxis, :]
 
     # Compute radial relative velocity ⟨ |w_r| ⟩
     wr = get_radial_relative_velocity_dz2002(
