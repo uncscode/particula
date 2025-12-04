@@ -112,3 +112,8 @@ good-names = ["i", "j", "k", "n", "m", "x", "y", "z", "t", "p", "T", "P", "df", 
 [tool.pylint.design]
 # Maximum number of arguments for function/method (scientific functions can have many)
 max-args = 10
+
+[tool.mypy]
+exclude = [
+    "docs/.assets/.*",
+]

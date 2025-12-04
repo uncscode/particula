@@ -15,7 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-         linter: ["flake8", "pylint", "ruff"]
+         linter: ["ruff", "mypy"]
+         # linter: ["flake8", "pylint", "ruff"]
 
     steps:
     - uses: actions/checkout@v5
@@ -31,20 +32,26 @@ jobs:
         python -m pip install pytest ${{ matrix.linter }}
         python -m pip install .
 
-    -
-      if: ${{ matrix.linter == 'flake8' }}
-      name: Lint with flake8
-      run: |
-        flake8 . --config .github/.flake8
+    # -
+    #   if: ${{ matrix.linter == 'flake8' }}
+    #   name: Lint with flake8
+    #   run: |
+    #     flake8 . --config .github/.flake8
 
-    -
-      if: ${{ matrix.linter == 'pylint' }}
-      name: Lint with pylint
-      run: |
-        pylint $(find particula/ -name "*.py" | xargs)
+    # -
+    #   if: ${{ matrix.linter == 'pylint' }}
+    #   name: Lint with pylint
+    #   run: |
+    #     pylint $(find particula/ -name "*.py" | xargs)
 
     -
       if: ${{ matrix.linter == 'ruff' }}
       name: Ruff Check
       run: |
         ruff check particula
+
+    -
+      if: ${{ matrix.linter == 'mypy' }}
+      name: Type check with mypy
+      run: |
+        mypy particula/ --ignore-missing-imports
