@@ -46,7 +46,14 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         Returns:
             Particle radius in meters.
         """
-        volumes = np.sum(distribution / density, axis=1)
+        # Handle both 1D (multiple bins with single species) and 2D (multiple
+        # bins with multiple species) distributions
+        if distribution.ndim == 1:
+            # Multiple bins with single species - each element is a separate bin
+            volumes = np.asarray(distribution / density)
+        else:
+            # Multiple bins with multiple species - sum across species (axis=1)
+            volumes = np.sum(distribution / density, axis=1)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
     def add_mass(
