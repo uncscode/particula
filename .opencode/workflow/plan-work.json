@@ -10,7 +10,7 @@
       "agent": "plan-work",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
       "model": "base",
-      "timeout": 600,
+      "timeout": 1200,
       "retry": {
         "max_retries": 2,
         "initial_delay": 5.0,
