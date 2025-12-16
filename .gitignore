@@ -164,3 +164,6 @@ agents/*
 
 # ADW worktrees
 trees/
+
+# ADW (AI Developer Workflow) generated files
+logs/
