@@ -312,6 +312,49 @@ class TestRectangularWallLossStrategy(unittest.TestCase):
         )
         self.assertTrue(np.all(np.isfinite(rate_resolved)))
 
+    def test_step_reduces_concentration_discrete(self):
+        """Step should not increase concentration for discrete distribution."""
+        initial_total = self.particle.get_total_concentration()
+        self.strategy_discrete.step(
+            particle=self.particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        final_total = self.particle.get_total_concentration()
+        self.assertLessEqual(final_total, initial_total)
+
+    def test_step_reduces_concentration_continuous_pdf(self):
+        """Step should not increase concentration for continuous_pdf."""
+        initial_total = self.particle_continuous.get_total_concentration()
+        self.strategy_continuous.step(
+            particle=self.particle_continuous,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        final_total = self.particle_continuous.get_total_concentration()
+        self.assertLessEqual(final_total, initial_total)
+
+    def test_particle_resolved_step_shape_and_reduction(self):
+        """Particle-resolved step keeps shape and does not increase counts."""
+        initial_total = self.particle_resolved.get_total_concentration()
+        self.strategy_particle_resolved.random_generator = (
+            np.random.default_rng(42)
+        )
+        updated = self.strategy_particle_resolved.step(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=50.0,
+        )
+        final_total = updated.get_total_concentration()
+        self.assertEqual(
+            updated.get_concentration().shape,
+            self.particle_resolved.get_concentration().shape,
+        )
+        self.assertLessEqual(final_total, initial_total)
+
     def test_zero_concentration_edge_case(self):
         """Zero concentration should remain zero after step."""
         zero_particle = PresetParticleRadiusBuilder().build()
