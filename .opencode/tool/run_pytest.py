@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Pytest Runner Tool with Coverage
+"""Pytest Runner Tool with Coverage.
 
 Runs pytest with coverage and returns either full output or a summary.
 This tool validates test results to prevent false positives.
@@ -13,12 +12,29 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple, TypedDict
 
 
-def parse_pytest_output(output: str) -> Dict:
-    """
-    Parse pytest output to extract key metrics.
+class PytestMetrics(TypedDict):
+    """Container for parsed pytest metrics."""
+
+    passed: int
+    failed: int
+    errors: int
+    skipped: int
+    warnings: int
+    total: int
+    exit_code: int | None
+    duration: float | None
+    coverage_pct: int | None
+    has_failures: bool
+    has_errors: bool
+    failed_tests: List[str]
+    error_tests: List[str]
+
+
+def parse_pytest_output(output: str) -> PytestMetrics:  # noqa: C901
+    """Parse pytest output to extract key metrics.
 
     Args:
         output: The full pytest output text
@@ -26,7 +42,7 @@ def parse_pytest_output(output: str) -> Dict:
     Returns:
         Dictionary with parsed metrics
     """
-    result = {
+    result: PytestMetrics = {
         "passed": 0,
         "failed": 0,
         "errors": 0,
@@ -104,11 +120,12 @@ def parse_pytest_output(output: str) -> Dict:
     return result
 
 
-def format_summary(
-    metrics: Dict, validation_errors: List[str], coverage_threshold: Optional[int] = None
+def format_summary(  # noqa: C901
+    metrics: PytestMetrics,
+    validation_errors: List[str],
+    coverage_threshold: Optional[int] = None,
 ) -> str:
-    """
-    Format a human-readable summary of test results.
+    """Format a human-readable summary of test results.
 
     Args:
         metrics: Parsed metrics from pytest output
@@ -179,20 +196,20 @@ def format_summary(
 
 
 def validate_results(
-    metrics: Dict,
+    metrics: PytestMetrics,
     min_test_count: int = 1,
     coverage_threshold: Optional[int] = None,
 ) -> List[str]:
-    """
-    Validate pytest results against expected criteria.
+    """Validate pytest results against expected criteria.
 
     Args:
-        metrics: Parsed metrics from pytest output
-        min_test_count: Minimum expected number of passing tests (default: 1)
-        coverage_threshold: Minimum required coverage percentage (0-100), or None to skip
+        metrics: Parsed metrics from pytest output.
+        min_test_count: Minimum expected number of passing tests (default: 1).
+        coverage_threshold: Minimum required coverage percentage (0-100), or
+            None to skip the check.
 
     Returns:
-        List of validation errors (empty if all checks pass)
+        List of validation errors (empty if all checks pass).
     """
     errors = []
 
@@ -207,7 +224,9 @@ def validate_results(
     # Check test count
     if metrics["passed"] < min_test_count:
         errors.append(
-            f"Expected at least {min_test_count} passing tests, but only {metrics['passed']} passed"
+            "Expected at least "
+            f"{min_test_count} passing tests, but only "
+            f"{metrics['passed']} passed"
         )
 
     # Check if no tests ran
@@ -218,13 +237,15 @@ def validate_results(
     if coverage_threshold is not None and metrics["coverage_pct"] is not None:
         if metrics["coverage_pct"] < coverage_threshold:
             errors.append(
-                f"Coverage {metrics['coverage_pct']}% is below threshold of {coverage_threshold}%"
+                "Coverage "
+                f"{metrics['coverage_pct']}% is below threshold of "
+                f"{coverage_threshold}%"
             )
 
     return errors
 
 
-def run_pytest(
+def run_pytest(  # noqa: C901
     args: List[str],
     output_mode: str = "summary",
     min_test_count: int = 1,
@@ -236,29 +257,33 @@ def run_pytest(
     cov_report: str = "term-missing",
     fail_fast: bool = False,
 ) -> Tuple[int, str]:
-    """
-    Run pytest with the specified arguments.
+    """Run pytest with the specified arguments.
 
-    Prepends cwd to PYTHONPATH (when provided) so git worktrees using a shared venv
-    import code from the worktree before any installed package copies.
+    Prepends ``cwd`` to ``PYTHONPATH`` (when provided) so git worktrees using a
+    shared virtual environment import code from the worktree before any
+    installed package copies.
 
     Args:
-        args: Additional pytest arguments
-        output_mode: Either "summary", "full", or "json"
-        min_test_count: Minimum expected test count for validation (default: 1)
-        cwd: Working directory (defaults to project root)
-        timeout: Timeout in seconds (default: 600 = 10 minutes)
-        coverage: Enable coverage reporting (default: True)
-        coverage_source: Source module for coverage. If None, uses pyproject.toml config.
-        coverage_threshold: Minimum coverage percentage (0-100), or None to skip
-        cov_report: Coverage report format(s), comma-separated (default: "term-missing")
-        fail_fast: Stop on first failure (default: False)
+        args: Additional pytest arguments.
+        output_mode: Either "summary", "full", or "json".
+        min_test_count: Minimum expected test count for validation (default: 1).
+        cwd: Working directory (defaults to project root).
+        timeout: Timeout in seconds (default: 600 = 10 minutes).
+        coverage: Enable coverage reporting (default: True).
+        coverage_source: Source module for coverage. If None, uses
+            ``pyproject.toml`` config.
+        coverage_threshold: Minimum coverage percentage (0-100), or None to
+            skip.
+        cov_report: Coverage report format(s), comma-separated (default:
+            "term-missing").
+        fail_fast: Stop on first failure (default: False).
 
     Returns:
-        Tuple of (exit_code, output_string)
+        Tuple of (exit_code, output_string).
     """
     # Build pytest command
-    # NOTE: -v and --tb=short are always included. Do not pass these in pytestArgs.
+    # NOTE: -v and --tb=short are always included.
+    # Do not pass these in pytest_args.
     cmd = ["pytest", "-v", "--tb=short"]
 
     # Add fail-fast if requested
@@ -267,8 +292,9 @@ def run_pytest(
 
     # Add coverage if enabled and not already specified in args
     if coverage and not any("--cov" in arg for arg in args):
-        # Only pass --cov=<source> if explicitly provided
-        # Otherwise let pytest-cov use pyproject.toml [tool.coverage.run].source
+        # Only pass --cov=<source> if explicitly provided.
+        # Otherwise let pytest-cov use pyproject.toml
+        # [tool.coverage.run].source.
         if coverage_source:
             cmd.append(f"--cov={coverage_source}")
         else:
@@ -286,7 +312,9 @@ def run_pytest(
         # Try to find project root
         current = Path.cwd()
         while current != current.parent:
-            if (current / "pyproject.toml").exists() or (current / ".git").exists():
+            if (current / "pyproject.toml").exists() or (
+                current / ".git"
+            ).exists():
                 cwd = str(current)
                 break
             current = current.parent
@@ -294,8 +322,10 @@ def run_pytest(
             cwd = str(Path.cwd())
 
     # Run pytest
-    # Ensure the worktree is prioritized for imports when sharing a venv with the main repo.
-    # Copy the environment so we can safely prepend cwd to PYTHONPATH without side effects.
+    # Ensure the worktree is prioritized for imports when sharing a venv with
+    # the main repository.
+    # Copy the environment so we can safely prepend cwd to PYTHONPATH without
+    # side effects.
     env = os.environ.copy()
     if requested_cwd:
         existing_pythonpath = env.get("PYTHONPATH") or ""
@@ -306,7 +336,7 @@ def run_pytest(
         )
 
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             cmd,
             cwd=cwd,
             env=env,
@@ -325,7 +355,9 @@ def run_pytest(
         metrics["exit_code"] = result.returncode
 
         # Validate results (including coverage threshold)
-        validation_errors = validate_results(metrics, min_test_count, coverage_threshold)
+        validation_errors = validate_results(
+            metrics, min_test_count, coverage_threshold
+        )
 
         # Determine final exit code (fail if validation fails)
         exit_code = result.returncode
@@ -334,7 +366,9 @@ def run_pytest(
 
         # Format output based on mode
         if output_mode == "summary":
-            output = format_summary(metrics, validation_errors, coverage_threshold)
+            output = format_summary(
+                metrics, validation_errors, coverage_threshold
+            )
         elif output_mode == "json":
             output = json.dumps(
                 {
@@ -347,7 +381,9 @@ def run_pytest(
             )
         else:  # full
             # Include summary at the end of full output
-            summary = format_summary(metrics, validation_errors, coverage_threshold)
+            summary = format_summary(
+                metrics, validation_errors, coverage_threshold
+            )
             output = f"{full_output}\n\n{summary}"
 
         return exit_code, output
@@ -361,8 +397,14 @@ def run_pytest(
 
 
 def main():
-    """Main entry point for CLI usage."""
-    parser = argparse.ArgumentParser(description="Run pytest with coverage and validation")
+    """Parse CLI arguments and execute pytest runner.
+
+    Returns:
+        Process exit code indicating success (0) or failure (non-zero).
+    """
+    parser = argparse.ArgumentParser(
+        description="Run pytest with coverage and validation"
+    )
     parser.add_argument(
         "--output",
         choices=["summary", "full", "json"],
@@ -375,9 +417,14 @@ def main():
         default=1,
         help="Minimum expected test count (default: 1 for scoped tests)",
     )
-    parser.add_argument("--cwd", type=str, help="Working directory (defaults to project root)")
     parser.add_argument(
-        "--timeout", type=int, default=600, help="Timeout in seconds (default: 600 = 10 minutes)"
+        "--cwd", type=str, help="Working directory (defaults to project root)"
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=600,
+        help="Timeout in seconds (default: 600 = 10 minutes)",
     )
     # Coverage options
     parser.add_argument(
@@ -395,25 +442,37 @@ def main():
         "--coverage-source",
         type=str,
         default=None,
-        help="Source module for coverage. If omitted, uses pyproject.toml [tool.coverage.run].source. Examples: 'adw', 'src/my_package'",
+        help=(
+            "Source module for coverage. If omitted, uses pyproject.toml "
+            "[tool.coverage.run].source. Examples: 'adw', 'src/my_package'"
+        ),
     )
     parser.add_argument(
         "--coverage-threshold",
         type=int,
-        help="Minimum coverage percentage required (0-100). Fails if below threshold.",
+        help=(
+            "Minimum coverage percentage required (0-100). Fails if below "
+            "threshold."
+        ),
     )
     parser.add_argument(
         "--cov-report",
         type=str,
         default="term-missing",
-        help="Coverage report format(s), comma-separated (default: 'term-missing'). Examples: 'term-missing', 'html,xml', 'term-missing,html:coverage_html'",
+        help=(
+            "Coverage report format(s), comma-separated (default: "
+            "'term-missing'). Examples: 'term-missing', 'html,xml', "
+            "'term-missing,html:coverage_html'"
+        ),
     )
     parser.add_argument(
         "--fail-fast",
         action="store_true",
         help="Stop on first failure (-x flag)",
     )
-    parser.add_argument("pytest_args", nargs="*", help="Additional arguments to pass to pytest")
+    parser.add_argument(
+        "pytest_args", nargs="*", help="Additional arguments to pass to pytest"
+    )
 
     args = parser.parse_args()
 
