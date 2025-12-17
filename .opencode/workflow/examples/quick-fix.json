@@ -22,7 +22,7 @@
     {
       "type": "agent",
       "name": "Commit",
-      "agent": "git-commit",
+      "agent": "adw-commit",
       "prompt": "Create commit with conventional message format",
       "model": "light",
       "timeout": 120,
@@ -31,7 +31,7 @@
         "initial_delay": 3.0,
         "backoff": 1.0
       },
-      "description": "Quick commit creation with minimal retry attempts"
+      "description": "Quick commit creation with pre-commit hook handling"
     }
   ]
 }

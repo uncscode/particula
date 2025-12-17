@@ -9,7 +9,7 @@ description: "Use this agent to execute comprehensive test validation. This agen
   \ all tests\"\n  Assistant: \"Let me invoke the tester agent to run the test suite\
   \ and check for failures\"\n\n- User: \"Run tests and fix any failures\"\n  Assistant:\
   \ \"I'm going to use the tester agent to run tests and resolve any failures encountered\""
-mode: subagent
+mode: all
 tools:
   read: true
   edit: true
@@ -20,7 +20,7 @@ tools:
   move: true
   todoread: true
   todowrite: true
-  task: false
+  task: true
   adw: false
   adw_spec: true
   create_workspace: false
@@ -29,7 +29,7 @@ tools:
   platform_operations: false
   run_pytest: true
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -306,6 +306,7 @@ todowrite({
   {id: "2", content: "[SPEC-RELATED] Fix test_new_feature failure: AssertionError in adw/workflows/tests/new_feature_test.py:45", status: "pending", priority: "high"},
   {id: "3", content: "[UNRELATED - 1 FIX ATTEMPT] Fix flaky test timeout in adw/git/tests/worktree_test.py:89", status: "pending", priority: "low"},
   {id: "4", content: "[UNRELATED - 1 FIX ATTEMPT] Fix deprecated API usage in adw/utils/helpers.py:67", status: "pending", priority: "low"},
+  {id: "5", content: "Commit test fixes using adw-commit agent", status: "pending", priority: "medium"},
 ]
 ```
 
@@ -385,6 +386,45 @@ After all fixes are complete, re-run `run_pytest` to confirm:
 
 ### Step 4.3: Verify Todo Completion
 If a fix todo list was created, use `todoread()` to confirm ALL fixes are marked "completed" (including skipped unrelated ones with notes)
+
+## Phase 5: Commit Changes (If Fixes Were Made)
+
+### Step 5.1: Determine If Commit Is Needed
+If any test fixes were made during Phase 3, commit those changes using the adw-commit agent.
+
+**Skip this phase if:**
+- All tests passed initially (no fixes needed)
+- No file changes were made
+
+### Step 5.2: Invoke adw-commit Agent
+Use the `task` tool to invoke the adw-commit subagent:
+
+```python
+task({
+  "description": "Commit test fixes",
+  "subagent_type": "adw-commit",
+  "prompt": "Commit all staged and unstaged changes related to test fixes. Use a commit message summarizing the test fixes made. Working directory: {worktree_path}"
+})
+```
+
+**If adw_id was provided**, include the worktree path in the prompt so adw-commit operates in the correct directory.
+
+### Step 5.3: Verify Commit Success
+Confirm the adw-commit agent successfully committed the changes. If it fails:
+- Check for uncommitted changes
+- Retry once if there was a transient error
+- Report failure if commit cannot be completed
+
+### Step 5.4: Update Todo List
+Mark the commit task as completed:
+```python
+todowrite({
+  todos: [
+    // ... previous todos ...
+    {id: "5", content: "Commit test fixes using adw-commit agent", status: "completed", priority: "medium"}
+  ]
+})
+```
 
 # Validation Success Criteria
 

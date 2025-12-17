@@ -8,6 +8,7 @@ This tool validates test results to prevent false positives.
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -103,13 +104,16 @@ def parse_pytest_output(output: str) -> Dict:
     return result
 
 
-def format_summary(metrics: Dict, validation_errors: List[str]) -> str:
+def format_summary(
+    metrics: Dict, validation_errors: List[str], coverage_threshold: Optional[int] = None
+) -> str:
     """
     Format a human-readable summary of test results.
 
     Args:
         metrics: Parsed metrics from pytest output
         validation_errors: List of validation errors
+        coverage_threshold: Optional coverage threshold for display
 
     Returns:
         Formatted summary string
@@ -121,13 +125,13 @@ def format_summary(metrics: Dict, validation_errors: List[str]) -> str:
 
     # Test counts
     lines.append(f"\nTests Run: {metrics['total']}")
-    lines.append(f"  ✓ Passed:  {metrics['passed']}")
+    lines.append(f"  Passed:  {metrics['passed']}")
     if metrics["failed"] > 0:
-        lines.append(f"  ✗ Failed:  {metrics['failed']}")
+        lines.append(f"  Failed:  {metrics['failed']}")
     if metrics["errors"] > 0:
-        lines.append(f"  ⚠ Errors:  {metrics['errors']}")
+        lines.append(f"  Errors:  {metrics['errors']}")
     if metrics["skipped"] > 0:
-        lines.append(f"  ⊘ Skipped: {metrics['skipped']}")
+        lines.append(f"  Skipped: {metrics['skipped']}")
 
     # Duration
     if metrics["duration"]:
@@ -135,7 +139,13 @@ def format_summary(metrics: Dict, validation_errors: List[str]) -> str:
 
     # Coverage
     if metrics["coverage_pct"] is not None:
-        lines.append(f"Coverage: {metrics['coverage_pct']}%")
+        coverage_status = ""
+        if coverage_threshold is not None:
+            if metrics["coverage_pct"] >= coverage_threshold:
+                coverage_status = f" (threshold: {coverage_threshold}% PASSED)"
+            else:
+                coverage_status = f" (threshold: {coverage_threshold}% FAILED)"
+        lines.append(f"Coverage: {metrics['coverage_pct']}%{coverage_status}")
 
     # Failed tests
     if metrics["failed_tests"]:
@@ -159,22 +169,27 @@ def format_summary(metrics: Dict, validation_errors: List[str]) -> str:
         lines.append("VALIDATION: FAILED")
         lines.append("=" * 60)
         for error in validation_errors:
-            lines.append(f"  ✗ {error}")
+            lines.append(f"  - {error}")
     else:
         lines.append("VALIDATION: PASSED")
         lines.append("=" * 60)
-        lines.append("  ✓ All validation checks passed")
+        lines.append("  All validation checks passed")
 
     return "\n".join(lines)
 
 
-def validate_results(metrics: Dict, min_test_count: int = 1600) -> List[str]:
+def validate_results(
+    metrics: Dict,
+    min_test_count: int = 1,
+    coverage_threshold: Optional[int] = None,
+) -> List[str]:
     """
     Validate pytest results against expected criteria.
 
     Args:
         metrics: Parsed metrics from pytest output
-        min_test_count: Minimum expected number of passing tests
+        min_test_count: Minimum expected number of passing tests (default: 1)
+        coverage_threshold: Minimum required coverage percentage (0-100), or None to skip
 
     Returns:
         List of validation errors (empty if all checks pass)
@@ -199,40 +214,74 @@ def validate_results(metrics: Dict, min_test_count: int = 1600) -> List[str]:
     if metrics["total"] == 0:
         errors.append("No tests were collected or run")
 
+    # Check coverage threshold
+    if coverage_threshold is not None and metrics["coverage_pct"] is not None:
+        if metrics["coverage_pct"] < coverage_threshold:
+            errors.append(
+                f"Coverage {metrics['coverage_pct']}% is below threshold of {coverage_threshold}%"
+            )
+
     return errors
 
 
 def run_pytest(
     args: List[str],
     output_mode: str = "summary",
-    min_test_count: int = 1600,
+    min_test_count: int = 1,
     cwd: Optional[str] = None,
     timeout: int = 600,
+    coverage: bool = True,
+    coverage_source: Optional[str] = None,
+    coverage_threshold: Optional[int] = None,
+    cov_report: str = "term-missing",
+    fail_fast: bool = False,
 ) -> Tuple[int, str]:
     """
     Run pytest with the specified arguments.
 
+    Prepends cwd to PYTHONPATH (when provided) so git worktrees using a shared venv
+    import code from the worktree before any installed package copies.
+
     Args:
         args: Additional pytest arguments
-        output_mode: Either "summary" or "full"
-        min_test_count: Minimum expected test count for validation
+        output_mode: Either "summary", "full", or "json"
+        min_test_count: Minimum expected test count for validation (default: 1)
         cwd: Working directory (defaults to project root)
         timeout: Timeout in seconds (default: 600 = 10 minutes)
+        coverage: Enable coverage reporting (default: True)
+        coverage_source: Source module for coverage. If None, uses pyproject.toml config.
+        coverage_threshold: Minimum coverage percentage (0-100), or None to skip
+        cov_report: Coverage report format(s), comma-separated (default: "term-missing")
+        fail_fast: Stop on first failure (default: False)
 
     Returns:
         Tuple of (exit_code, output_string)
     """
     # Build pytest command
+    # NOTE: -v and --tb=short are always included. Do not pass these in pytestArgs.
     cmd = ["pytest", "-v", "--tb=short"]
 
-    # Add coverage if not already specified
-    if not any("--cov" in arg for arg in args):
-        cmd.extend(["--cov=adw", "--cov-report=term-missing"])
+    # Add fail-fast if requested
+    if fail_fast:
+        cmd.append("-x")
+
+    # Add coverage if enabled and not already specified in args
+    if coverage and not any("--cov" in arg for arg in args):
+        # Only pass --cov=<source> if explicitly provided
+        # Otherwise let pytest-cov use pyproject.toml [tool.coverage.run].source
+        if coverage_source:
+            cmd.append(f"--cov={coverage_source}")
+        else:
+            cmd.append("--cov")  # Enable coverage without specifying source
+        # Add each report format separately
+        for report_format in cov_report.split(","):
+            cmd.append(f"--cov-report={report_format.strip()}")
 
     # Add user arguments
     cmd.extend(args)
 
     # Determine working directory
+    requested_cwd = cwd
     if cwd is None:
         # Try to find project root
         current = Path.cwd()
@@ -245,10 +294,22 @@ def run_pytest(
             cwd = str(Path.cwd())
 
     # Run pytest
+    # Ensure the worktree is prioritized for imports when sharing a venv with the main repo.
+    # Copy the environment so we can safely prepend cwd to PYTHONPATH without side effects.
+    env = os.environ.copy()
+    if requested_cwd:
+        existing_pythonpath = env.get("PYTHONPATH") or ""
+        env["PYTHONPATH"] = (
+            f"{requested_cwd}{os.pathsep}{existing_pythonpath}"
+            if existing_pythonpath
+            else requested_cwd
+        )
+
     try:
         result = subprocess.run(
             cmd,
             cwd=cwd,
+            env=env,
             capture_output=True,
             text=True,
             timeout=timeout,
@@ -263,8 +324,8 @@ def run_pytest(
         metrics = parse_pytest_output(full_output)
         metrics["exit_code"] = result.returncode
 
-        # Validate results
-        validation_errors = validate_results(metrics, min_test_count)
+        # Validate results (including coverage threshold)
+        validation_errors = validate_results(metrics, min_test_count, coverage_threshold)
 
         # Determine final exit code (fail if validation fails)
         exit_code = result.returncode
@@ -273,19 +334,20 @@ def run_pytest(
 
         # Format output based on mode
         if output_mode == "summary":
-            output = format_summary(metrics, validation_errors)
+            output = format_summary(metrics, validation_errors, coverage_threshold)
         elif output_mode == "json":
             output = json.dumps(
                 {
                     "metrics": metrics,
                     "validation_errors": validation_errors,
                     "success": len(validation_errors) == 0,
+                    "coverage_threshold": coverage_threshold,
                 },
                 indent=2,
             )
         else:  # full
             # Include summary at the end of full output
-            summary = format_summary(metrics, validation_errors)
+            summary = format_summary(metrics, validation_errors, coverage_threshold)
             output = f"{full_output}\n\n{summary}"
 
         return exit_code, output
@@ -308,15 +370,55 @@ def main():
         help="Output mode: summary (default), full output, or JSON",
     )
     parser.add_argument(
-        "--min-tests", type=int, default=1600, help="Minimum expected test count (default: 1600)"
+        "--min-tests",
+        type=int,
+        default=1,
+        help="Minimum expected test count (default: 1 for scoped tests)",
     )
     parser.add_argument("--cwd", type=str, help="Working directory (defaults to project root)")
     parser.add_argument(
         "--timeout", type=int, default=600, help="Timeout in seconds (default: 600 = 10 minutes)"
     )
+    # Coverage options
+    parser.add_argument(
+        "--coverage",
+        action="store_true",
+        default=True,
+        help="Enable coverage reporting (default: enabled)",
+    )
+    parser.add_argument(
+        "--no-coverage",
+        action="store_true",
+        help="Disable coverage reporting for faster runs",
+    )
+    parser.add_argument(
+        "--coverage-source",
+        type=str,
+        default=None,
+        help="Source module for coverage. If omitted, uses pyproject.toml [tool.coverage.run].source. Examples: 'adw', 'src/my_package'",
+    )
+    parser.add_argument(
+        "--coverage-threshold",
+        type=int,
+        help="Minimum coverage percentage required (0-100). Fails if below threshold.",
+    )
+    parser.add_argument(
+        "--cov-report",
+        type=str,
+        default="term-missing",
+        help="Coverage report format(s), comma-separated (default: 'term-missing'). Examples: 'term-missing', 'html,xml', 'term-missing,html:coverage_html'",
+    )
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop on first failure (-x flag)",
+    )
     parser.add_argument("pytest_args", nargs="*", help="Additional arguments to pass to pytest")
 
     args = parser.parse_args()
+
+    # Determine coverage setting (--no-coverage overrides --coverage)
+    coverage_enabled = not args.no_coverage
 
     exit_code, output = run_pytest(
         args.pytest_args,
@@ -324,6 +426,11 @@ def main():
         min_test_count=args.min_tests,
         cwd=args.cwd,
         timeout=args.timeout,
+        coverage=coverage_enabled,
+        coverage_source=args.coverage_source,
+        coverage_threshold=args.coverage_threshold,
+        cov_report=args.cov_report,
+        fail_fast=args.fail_fast,
     )
 
     print(output)

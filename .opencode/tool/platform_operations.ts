@@ -19,6 +19,7 @@ const REQUIRED_ISSUE_COMMANDS = new Set([
   "add-labels",
   "remove-labels",
   "comment",
+  "pr-comments",
 ]);
 
 const JSON_CAPABLE_COMMANDS = new Set([
@@ -27,6 +28,7 @@ const JSON_CAPABLE_COMMANDS = new Set([
   "update-issue",
   "add-labels",
   "remove-labels",
+  "pr-comments",
 ]);
 
 type PlatformCommand =
@@ -36,7 +38,8 @@ type PlatformCommand =
   | "update-issue"
   | "add-labels"
   | "remove-labels"
-  | "comment";
+  | "comment"
+  | "pr-comments";
 
 type OutputFormat = "text" | "json";
 
@@ -84,6 +87,11 @@ AVAILABLE COMMANDS:
 • comment: Add comment to issue or PR
   Usage: { command: "comment", issue_number: "123", body: "LGTM" }
 
+• pr-comments: Fetch review comments for a pull request
+  Usage: { command: "pr-comments", issue_number: "42", output_format: "json" }
+  Supports actionable_only: true to filter to unresolved comments with meaningful content.
+  Supports prefer_scope: "fork" | "upstream" for fork/upstream routing.
+
 JSON OUTPUT: Use output_format: "json" to get structured responses for parsing.
 
 HELP: Set help: true to see command-specific CLI usage
@@ -101,6 +109,7 @@ See docs/Agent/development_plans/features/tool-only-agent-permissions.md for con
         "add-labels",
         "remove-labels",
         "comment",
+        "pr-comments",
       ])
       .describe(`Platform operation to execute.
 
@@ -112,6 +121,7 @@ COMMAND DESCRIPTIONS:
 • add-labels - Add labels to an issue or PR
 • remove-labels - Remove labels from an issue or PR
 • comment - Post a comment on an issue or PR
+• pr-comments - Fetch review comments for a pull request
 
 REQUIRED PARAMETERS BY COMMAND:
 • create-pr: title, head, base (required), optional: body, draft
@@ -120,14 +130,15 @@ REQUIRED PARAMETERS BY COMMAND:
 • update-issue: issue_number (required), at least one of: title, body, state, labels
 • add-labels: issue_number, labels (required), optional: output_format
 • remove-labels: issue_number, labels (required), optional: output_format
-• comment: issue_number, body (required)`),
+• comment: issue_number, body (required)
+• pr-comments: issue_number (required), optional: output_format, actionable_only, prefer_scope`),
 
     issue_number: tool.schema
       .string()
       .optional()
       .describe(`Issue or PR number to operate on.
 
-REQUIRED FOR: fetch-issue, update-issue, add-labels, remove-labels, comment
+REQUIRED FOR: fetch-issue, update-issue, add-labels, remove-labels, comment, pr-comments
 
 Can be a simple number or a string. The CLI accepts both formats.
 
@@ -211,7 +222,7 @@ EXAMPLE: labels: "bug,type:patch,model:base"`),
       .optional()
       .describe(`Output format for results.
 
-APPLIES TO: fetch-issue, create-issue, update-issue, add-labels, remove-labels
+APPLIES TO: fetch-issue, create-issue, update-issue, add-labels, remove-labels, pr-comments
 
 DEFAULT: "text" - Human-readable output
 JSON: "json" - Structured JSON for programmatic parsing
@@ -223,11 +234,23 @@ EXAMPLE: output_format: "json"`),
       .optional()
       .describe(`Repository scope preference.
 
-APPLIES TO: fetch-issue only
+APPLIES TO: fetch-issue, pr-comments
 
 For fork workflows where issues live upstream but PRs are on fork.
 
 EXAMPLE: prefer_scope: "upstream"`),
+
+    actionable_only: tool.schema
+      .boolean()
+      .optional()
+      .describe(`Filter to actionable review comments only.
+
+APPLIES TO: pr-comments only
+
+When true, returns only unresolved comments with meaningful content.
+Filters out resolved comments and empty/trivial feedback.
+
+EXAMPLE: actionable_only: true`),
 
     help: tool.schema
       .boolean()
@@ -257,9 +280,15 @@ EXAMPLE: { command: "create-issue", help: true }`),
       }
     }
 
-    if (args.prefer_scope && command !== "fetch-issue") {
+    if (args.prefer_scope && command !== "fetch-issue" && command !== "pr-comments") {
       return buildMissingArgMessage(
-        "'prefer_scope' is only supported for the 'fetch-issue' command"
+        "'prefer_scope' is only supported for 'fetch-issue' and 'pr-comments' commands"
+      );
+    }
+
+    if (args.actionable_only && command !== "pr-comments") {
+      return buildMissingArgMessage(
+        "'actionable_only' is only supported for the 'pr-comments' command"
       );
     }
 
@@ -383,18 +412,78 @@ EXAMPLE: { command: "create-issue", help: true }`),
         break;
       }
 
+      case "pr-comments": {
+        cmdParts.push(args.issue_number as string);
+        if (args.output_format) {
+          cmdParts.push("--format", outputFormat);
+        }
+        if (args.actionable_only === true) {
+          cmdParts.push("--actionable-only");
+        }
+        if (args.prefer_scope) {
+          cmdParts.push("--prefer-scope", args.prefer_scope);
+        }
+        break;
+      }
+
       default:
         return buildMissingArgMessage(`Unsupported command: ${command}`);
     }
 
     try {
-      return await runCommand(cmdParts);
+      const result = await runCommand(cmdParts);
+      
+      // Add clear success signals for create-pr command
+      if (command === "create-pr") {
+        // Check if the result contains a PR URL (indicates success)
+        const prUrlMatch = result.match(/https:\/\/github\.com\/[^\/]+\/[^\/]+\/pull\/(\d+)|https:\/\/gitlab\.com\/[^\/]+\/[^\/]+\/-\/merge_requests\/(\d+)/);
+        const prNumberMatch = result.match(/(?:PR|MR|pull request|merge request)\s*#?(\d+)/i);
+        
+        if (prUrlMatch || prNumberMatch) {
+          // Success - add clear signal
+          const prNumber = prUrlMatch?.[1] || prUrlMatch?.[2] || prNumberMatch?.[1] || "unknown";
+          return `PLATFORM_PR_CREATED
+
+${result}
+
+---
+PR_NUMBER: ${prNumber}
+STATUS: SUCCESS`;
+        } else if (result.toLowerCase().includes("created") || result.toLowerCase().includes("success")) {
+          // Likely success but couldn't extract PR number
+          return `PLATFORM_PR_CREATED
+
+${result}
+
+---
+STATUS: SUCCESS (PR number not parsed - check output above)`;
+        }
+      }
+      
+      return result;
     } catch (error: any) {
       const stdout = truncate(error.stdout?.toString());
       const stderr = truncate(error.stderr?.toString());
 
       if (outputFormat === "json" && stdout) {
         return stdout;
+      }
+
+      // Add clear failure signal for create-pr command
+      if (command === "create-pr") {
+        const parts: string[] = [
+          `PLATFORM_PR_FAILED`,
+          ``,
+          `ERROR: Failed to create pull request via 'adw platform ${command}'`,
+        ];
+        if (stderr) {
+          parts.push(`STDERR:\n${stderr}`);
+        }
+        if (stdout) {
+          parts.push(`STDOUT:\n${stdout}`);
+        }
+        parts.push(``, `---`, `STATUS: FAILED`);
+        return parts.join("\n");
       }
 
       const parts: string[] = [

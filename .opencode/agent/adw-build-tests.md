@@ -33,7 +33,7 @@ tools:
   platform_operations: false
   run_pytest: true
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false

@@ -40,7 +40,7 @@ def create_workspace_cli(
 
     Args:
         issue_number: GitHub issue number (e.g., "123")
-        workflow_type: Workflow type ("complete", "patch", "document", "generate", "fix")
+        workflow_type: Workflow type ("complete", "patch", "document", "generate")
         adw_id: Optional existing ADW ID
         triggered_by: Trigger source ("manual", "cron", "webhook")
         output_mode: Output format ("summary", "full", "json")
@@ -194,7 +194,7 @@ def main():
     parser.add_argument(
         "--workflow-type",
         type=str,
-        choices=["complete", "patch", "document", "generate", "fix"],
+        choices=["complete", "patch", "document", "generate"],
         default="complete",
         help="Workflow type (default: complete)",
     )

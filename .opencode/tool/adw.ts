@@ -1,9 +1,9 @@
 /**
  * Dynamic ADW Tool for OpenCode Integration
- * 
+ *
  * Provides unified interface to all ADW CLI commands directly from OpenCode.
  * This tool enables seamless execution of ADW workflows without switching to terminal.
- * 
+ *
  * See https://opencode.ai/docs/custom-tools/ for OpenCode tool development patterns.
  */
 
@@ -15,13 +15,13 @@ export default tool({
 COMMON WORKFLOWS:
 • complete: Full workflow with validation (plan→build→test→review→document→ship)
   Usage: { command: "complete", issue_number: 123, model: "base" }
-  
+
 • patch: Quick patch workflow (plan→build→ship, skips tests/review)
   Usage: { command: "patch", issue_number: 456 }
 
 WORKFLOW PHASES (for granular control):
 • plan: Create implementation plan
-• build: Execute implementation 
+• build: Execute implementation
 • test: Run validation tests
 • review: Code review and quality checks
 • document: Generate documentation
@@ -30,9 +30,15 @@ WORKFLOW PHASES (for granular control):
 ISSUE MANAGEMENT:
 • create-issue: Create new GitHub issue
   Usage: { command: "create-issue", title: "Add feature", body: "Description..." }
-  
+
 • interpret-issue: Convert text to structured issue
   Usage: { command: "interpret-issue", text: "Add tests for auth module" }
+
+SETUP & TEMPLATE COMMANDS:
+• setup: Environment and template management (requires args for subcommands)
+  Usage: { command: "setup", args: ["template", "extract", "--diff"] }
+  Usage: { command: "setup", args: ["template", "validate"] }
+  Usage: { command: "setup", args: ["env"] }
 
 SYSTEM COMMANDS:
 • status: Show active workflows
@@ -44,9 +50,9 @@ HELP: Set help: true to see command-specific usage
   args: {
     command: tool.schema
       .enum([
-        "complete", "patch", "plan", "build", "test", "review", "document", 
+        "complete", "patch", "plan", "build", "test", "review", "document",
         "ship", "status", "health", "init", "create-issue", "interpret-issue",
-        "maintenance", "launch", "stop", "docstring", "finalize-docs"
+        "maintenance", "launch", "stop", "docstring", "finalize-docs", "setup"
       ])
       .describe(`ADW command to execute. Use help: true to see detailed usage.
 
@@ -63,6 +69,14 @@ WORKFLOW COMMANDS (require issue_number):
 ISSUE COMMANDS:
 • create-issue - Create new GitHub issue (requires: title, body)
 • interpret-issue - Convert text to structured issue (requires: text OR issue_number)
+
+SETUP COMMANDS (use args for subcommands):
+• setup - Environment and template management
+  Subcommands via args: ["env"], ["validate"], ["check"],
+    ["template", "init"], ["template", "apply"], ["template", "extract"],
+    ["template", "validate"], ["template", "token", "list"],
+    ["template", "token", "add", "<NAME>", "--default", "<val>", "--description", "<desc>"],
+    ["template", "token", "remove", "<NAME>"]
 
 SYSTEM COMMANDS:
 • status - Show active ADW workflows
@@ -113,10 +127,29 @@ EXAMPLE: model: "heavy"`),
       .optional()
       .describe(`Additional CLI arguments passed directly to ADW command.
 
-EXAMPLES:
+GENERAL EXAMPLES:
 • ["--dry-run"] - Preview without execution
 • ["--verbose"] - Detailed output
 • ["--help"] - Show command help
+
+SETUP COMMAND EXAMPLES (args are subcommands + flags):
+• ["env"] - Run environment wizard
+• ["validate"] - Validate environment configuration
+• ["check"] - Run preflight checks
+• ["template", "init"] - Initialize template manifest
+• ["template", "init", "--yes"] - Initialize with defaults (no prompts)
+• ["template", "apply"] - Apply templates to project
+• ["template", "apply", "--dry-run"] - Preview template application
+• ["template", "apply", "--check"] - Check placeholders without writing
+• ["template", "extract", "--diff"] - Show drift between live docs and templates
+• ["template", "extract", "--dry-run"] - Preview extraction changes
+• ["template", "extract", "--yes"] - Extract without confirmation
+• ["template", "validate"] - Validate placeholders against manifest
+• ["template", "validate", "--format", "json"] - JSON output for validation
+• ["template", "token", "list"] - List all keyword tokens
+• ["template", "token", "add", "TOKEN_NAME", "--default", "value", "--description", "desc"]
+• ["template", "token", "add", "TOKEN_NAME", "--default", "new", "--description", "d", "--force"]
+• ["template", "token", "remove", "TOKEN_NAME", "--yes"]
 
 Can be used for any flags not covered by specific parameters.`),
     
@@ -187,6 +220,7 @@ body: "## Description\\nImplement user auth\\n\\n## Acceptance Criteria\\n- [ ] 
     const systemCommands = ["status", "health", "init", "maintenance", "launch", "stop"];
     const issueCommands = ["create-issue", "interpret-issue"];
     const docCommands = ["docstring", "finalize-docs"];
+    const setupCommands = ["setup"];
 
     // Validate required arguments based on command type (skip if help flag is set)
     if (!help) {
@@ -207,62 +241,92 @@ body: "## Description\\nImplement user auth\\n\\n## Acceptance Criteria\\n- [ ] 
           return `ERROR: Command 'interpret-issue' requires either 'text' argument or 'issue_number' argument.\n\nUsage: adw interpret-issue --text "Description" OR adw interpret-issue --source-issue <number>`;
         }
       }
+
+      // Setup command requires args for subcommands (unless showing help)
+      if (command === "setup" && (!additionalArgs || additionalArgs.length === 0)) {
+        return `ERROR: Command 'setup' requires 'args' for subcommands.
+
+USAGE EXAMPLES:
+• Environment wizard: { command: "setup", args: ["env"] }
+• Validate config: { command: "setup", args: ["validate"] }
+• Preflight check: { command: "setup", args: ["check"] }
+
+TEMPLATE SUBCOMMANDS:
+• Initialize manifest: { command: "setup", args: ["template", "init"] }
+• Apply templates: { command: "setup", args: ["template", "apply"] }
+• Check for drift: { command: "setup", args: ["template", "extract", "--diff"] }
+• Extract to templates: { command: "setup", args: ["template", "extract", "--yes"] }
+• Validate placeholders: { command: "setup", args: ["template", "validate"] }
+• List tokens: { command: "setup", args: ["template", "token", "list"] }
+• Add token: { command: "setup", args: ["template", "token", "add", "NAME", "--default", "val", "--description", "desc"] }
+• Remove token: { command: "setup", args: ["template", "token", "remove", "NAME", "--yes"] }
+
+Use { command: "setup", help: true } to see CLI help.`;
+      }
     }
 
     // Build command arguments
     const cmdParts = ["uv", "run", "adw", command];
 
-    // Add --help flag if requested
-    if (help) {
-      cmdParts.push("--help");
-    }
-
-    // Add issue number for workflow commands (skip if help flag is set)
-    if (workflowCommands.includes(command) && issue_number && !help) {
-      cmdParts.push(issue_number.toString());
-    }
-
-    // Add optional arguments
-    if (adw_id) {
-      cmdParts.push("--adw-id", adw_id);
-    }
-
-    if (model) {
-      cmdParts.push("--model", model);
-    }
-
-    // Handle command-specific arguments
-    if (command === "create-issue") {
-      if (title) {
-        cmdParts.push("--title", title);
+    // For setup command, args are subcommands and must come immediately after "setup"
+    // e.g., "adw setup template extract --diff" not "adw setup --diff template extract"
+    if (command === "setup") {
+      if (help) {
+        cmdParts.push("--help");
+      } else if (additionalArgs && additionalArgs.length > 0) {
+        cmdParts.push(...additionalArgs);
       }
-      if (body) {
-        cmdParts.push("--body", body);
+      // Setup command doesn't use other parameters like issue_number, model, etc.
+    } else {
+      // Add --help flag if requested
+      if (help) {
+        cmdParts.push("--help");
       }
-    }
 
-    if (command === "interpret-issue") {
-      if (text) {
-        cmdParts.push("--text", text);
-      } else if (issue_number) {
-        cmdParts.push("--source-issue", issue_number.toString());
+      // Add issue number for workflow commands (skip if help flag is set)
+      if (workflowCommands.includes(command) && issue_number && !help) {
+        cmdParts.push(issue_number.toString());
       }
-    }
 
-    if (command === "docstring" && issue_number) {
-      cmdParts.push(issue_number.toString());
-    }
-
-    if (command === "finalize-docs" && issue_number) {
-      cmdParts.push(issue_number.toString());
+      // Add optional arguments
       if (adw_id) {
-        // adw_id already added above
+        cmdParts.push("--adw-id", adw_id);
       }
-    }
 
-    // Add any additional arguments
-    if (additionalArgs && additionalArgs.length > 0) {
-      cmdParts.push(...additionalArgs);
+      if (model) {
+        cmdParts.push("--model", model);
+      }
+
+      // Handle command-specific arguments
+      if (command === "create-issue") {
+        if (title) {
+          cmdParts.push("--title", title);
+        }
+        if (body) {
+          cmdParts.push("--body", body);
+        }
+      }
+
+      if (command === "interpret-issue") {
+        if (text) {
+          cmdParts.push("--text", text);
+        } else if (issue_number) {
+          cmdParts.push("--source-issue", issue_number.toString());
+        }
+      }
+
+      if (command === "docstring" && issue_number) {
+        cmdParts.push(issue_number.toString());
+      }
+
+      if (command === "finalize-docs" && issue_number) {
+        cmdParts.push(issue_number.toString());
+      }
+
+      // Add any additional arguments (for non-setup commands, these go at the end)
+      if (additionalArgs && additionalArgs.length > 0) {
+        cmdParts.push(...additionalArgs);
+      }
     }
 
     try {

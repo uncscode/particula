@@ -1,7 +1,7 @@
 {
   "name": "complete",
-  "version": "1.4.0",
-  "description": "Complete workflow: plan → build → test → format → document → ship",
+  "version": "1.5.0",
+  "description": "Complete workflow: plan → build → validate → test → format → document → ship",
   "workflow_type": "complete",
   "steps": [
     {
@@ -13,6 +13,11 @@
       "type": "workflow",
       "name": "Build",
       "workflow_name": "adw-build"
+    },
+    {
+      "type": "workflow",
+      "name": "Validate",
+      "workflow_name": "adw-validate"
     },
     {
       "type": "workflow",

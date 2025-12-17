@@ -52,10 +52,10 @@ If you finish without the completion signal, the entire workflow will fail even 
 
 # Repository Context
 
-This agent operates within the adw repository structure:
-- **Repository URL**: https://github.com/Gorkowski/particula
+This agent operates within the {{PROJECT_NAME}} repository structure:
+- **Repository URL**: {{REPO_URL}}
 - **Main Branch**: {{MAIN_BRANCH}}
-- **Package Name**: particula
+- **Package Name**: {{PACKAGE_NAME}}
 
 When implementing code, ensure all paths, imports, and references align with this specific repository structure and the established module organization patterns.
 
