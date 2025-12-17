@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
-"""
-Workflow Builder Tool
+"""Workflow Builder Tool.
 
-Provides access to WorkflowBuilderTool for creating and validating ADW workflow JSON files.
-Enables interactive workflow creation with incremental validation.
+Provides access to WorkflowBuilderTool for creating and validating ADW
+workflow JSON files. Enables interactive workflow creation with
+incremental validation.
 """
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 
 def find_project_root() -> Path:
-    """Find project root by looking for pyproject.toml or .git."""
+    """Return repository root by searching for common project markers.
+
+    The search moves upward from the current working directory until a
+    ``pyproject.toml`` file or a ``.git`` directory is found. If neither marker
+    is discovered, the current working directory is returned.
+
+    Returns:
+        Path to the detected project root or the current working directory.
+    """
     current = Path.cwd()
     while current != current.parent:
         if (current / "pyproject.toml").exists() or (current / ".git").exists():
@@ -23,7 +30,7 @@ def find_project_root() -> Path:
     return Path.cwd()
 
 
-def workflow_builder_tool(
+def workflow_builder_tool(  # noqa: C901
     command: str,
     workflow_name: str | None = None,
     description: str | None = None,
@@ -35,25 +42,25 @@ def workflow_builder_tool(
     position: int | None = None,
     workflow_json: str | None = None,
     output_mode: str = "summary",
-) -> tuple[int, str]:
-    """
-    Execute workflow builder commands.
+) -> tuple[int, str]:  # noqa: C901
+    """Execute workflow builder commands.
 
     Args:
-        command: Operation to perform (create, add_step, remove_step, get, list, update, validate)
-        workflow_name: Name of workflow (required for most commands)
-        description: Workflow description (for create)
-        version: Workflow version (for create, default: "1.0.0")
-        workflow_type: Type of workflow (for create: complete, patch, custom)
-        step_json: JSON string of step to add (for add_step)
-        step_index: Index of step to remove (for remove_step)
-        step_name: Name of step to remove (for remove_step)
-        position: Position to insert step (for add_step, None = append)
-        workflow_json: Complete workflow JSON (for update, validate)
-        output_mode: Output format (summary, full, json)
+        command: Operation to perform (create, add_step, remove_step, get,
+            list, update, validate).
+        workflow_name: Name of workflow (required for most commands).
+        description: Workflow description (for create).
+        version: Workflow version (for create, default: "1.0.0").
+        workflow_type: Type of workflow (for create: complete, patch, custom).
+        step_json: JSON string of step to add (for add_step).
+        step_index: Index of step to remove (for remove_step).
+        step_name: Name of step to remove (for remove_step).
+        position: Position to insert step (for add_step, None = append).
+        workflow_json: Complete workflow JSON (for update, validate).
+        output_mode: Output format (summary, full, json).
 
     Returns:
-        Tuple of (exit_code, output_string)
+        Tuple of (exit_code, output_string).
     """
     # Add project root to path
     project_root = find_project_root()
@@ -67,7 +74,10 @@ def workflow_builder_tool(
         # Execute command
         if command == "create":
             if not workflow_name or not description:
-                return 1, "ERROR: 'create' requires workflow_name and description"
+                return (
+                    1,
+                    "ERROR: 'create' requires workflow_name and description",
+                )
 
             success, message = builder.create_workflow(
                 workflow_name, description, version, workflow_type
@@ -75,7 +85,11 @@ def workflow_builder_tool(
 
             if output_mode == "json":
                 output = json.dumps(
-                    {"success": success, "message": message, "workflow_name": workflow_name},
+                    {
+                        "success": success,
+                        "message": message,
+                        "workflow_name": workflow_name,
+                    },
                     indent=2,
                 )
             else:
@@ -85,13 +99,22 @@ def workflow_builder_tool(
 
         elif command == "add_step":
             if not workflow_name or not step_json:
-                return 1, "ERROR: 'add_step' requires workflow_name and step_json"
+                return (
+                    1,
+                    "ERROR: 'add_step' requires workflow_name and step_json",
+                )
 
-            success, message = builder.add_step(workflow_name, step_json, position)
+            success, message = builder.add_step(
+                workflow_name, step_json, position
+            )
 
             if output_mode == "json":
                 output = json.dumps(
-                    {"success": success, "message": message, "workflow_name": workflow_name},
+                    {
+                        "success": success,
+                        "message": message,
+                        "workflow_name": workflow_name,
+                    },
                     indent=2,
                 )
             else:
@@ -103,13 +126,23 @@ def workflow_builder_tool(
             if not workflow_name:
                 return 1, "ERROR: 'remove_step' requires workflow_name"
             if step_index is None and step_name is None:
-                return 1, "ERROR: 'remove_step' requires either step_index or step_name"
+                return (
+                    1,
+                    "ERROR: 'remove_step' requires either step_index or "
+                    "step_name",
+                )
 
-            success, message = builder.remove_step(workflow_name, step_index, step_name)
+            success, message = builder.remove_step(
+                workflow_name, step_index, step_name
+            )
 
             if output_mode == "json":
                 output = json.dumps(
-                    {"success": success, "message": message, "workflow_name": workflow_name},
+                    {
+                        "success": success,
+                        "message": message,
+                        "workflow_name": workflow_name,
+                    },
                     indent=2,
                 )
             else:
@@ -121,12 +154,19 @@ def workflow_builder_tool(
             if not workflow_name:
                 return 1, "ERROR: 'get' requires workflow_name"
 
-            success, message, workflow_data = builder.get_workflow(workflow_name)
+            success, message, workflow_data = builder.get_workflow(
+                workflow_name
+            )
 
             if not success or workflow_data is None:
                 if output_mode == "json":
                     output = json.dumps(
-                        {"success": False, "message": message, "workflow": None}, indent=2
+                        {
+                            "success": False,
+                            "message": message,
+                            "workflow": None,
+                        },
+                        indent=2,
                     )
                 else:
                     output = f"❌ {message}"
@@ -134,7 +174,12 @@ def workflow_builder_tool(
 
             if output_mode == "json":
                 output = json.dumps(
-                    {"success": True, "message": message, "workflow": workflow_data}, indent=2
+                    {
+                        "success": True,
+                        "message": message,
+                        "workflow": workflow_data,
+                    },
+                    indent=2,
                 )
             elif output_mode == "full":
                 lines = []
@@ -147,10 +192,17 @@ def workflow_builder_tool(
             else:  # summary
                 lines = []
                 lines.append(f"✅ Workflow: {workflow_name}")
-                lines.append(f"Description: {workflow_data.get('description', 'N/A')}")
-                lines.append(f"Type: {workflow_data.get('workflow_type', 'N/A')}")
+                lines.append(
+                    f"Description: {workflow_data.get('description', 'N/A')}"
+                )
+                lines.append(
+                    f"Type: {workflow_data.get('workflow_type', 'N/A')}"
+                )
                 lines.append(f"Steps: {len(workflow_data.get('steps', []))}")
-                step_names = [s.get("name", "unnamed") for s in workflow_data.get("steps", [])]
+                step_names = [
+                    s.get("name", "unnamed")
+                    for s in workflow_data.get("steps", [])
+                ]
                 for i, name in enumerate(step_names, 1):
                     lines.append(f"  {i}. {name}")
                 output = "\n".join(lines)
@@ -161,7 +213,9 @@ def workflow_builder_tool(
             workflows = builder.list_workflows()
 
             if output_mode == "json":
-                output = json.dumps({"workflows": workflows, "count": len(workflows)}, indent=2)
+                output = json.dumps(
+                    {"workflows": workflows, "count": len(workflows)}, indent=2
+                )
             else:
                 if not workflows:
                     output = "No workflows found"
@@ -175,7 +229,11 @@ def workflow_builder_tool(
                             desc = wf_data.get("description", "No description")
                             wf_type = wf_data.get("workflow_type", "unknown")
                             step_count = len(wf_data.get("steps", []))
-                            lines.append(f"  • {wf_name} ({wf_type}) - {step_count} steps - {desc}")
+                            lines.append(
+                                "  • "
+                                f"{wf_name} ({wf_type}) - {step_count} steps - "
+                                f"{desc}"
+                            )
                         else:
                             lines.append(f"  • {wf_name} (unable to load)")
                     output = "\n".join(lines)
@@ -184,13 +242,22 @@ def workflow_builder_tool(
 
         elif command == "update":
             if not workflow_name or not workflow_json:
-                return 1, "ERROR: 'update' requires workflow_name and workflow_json"
+                return (
+                    1,
+                    "ERROR: 'update' requires workflow_name and workflow_json",
+                )
 
-            success, message = builder.update_workflow(workflow_name, workflow_json)
+            success, message = builder.update_workflow(
+                workflow_name, workflow_json
+            )
 
             if output_mode == "json":
                 output = json.dumps(
-                    {"success": success, "message": message, "workflow_name": workflow_name},
+                    {
+                        "success": success,
+                        "message": message,
+                        "workflow_name": workflow_name,
+                    },
                     indent=2,
                 )
             else:
@@ -202,15 +269,21 @@ def workflow_builder_tool(
             if not workflow_json:
                 return 1, "ERROR: 'validate' requires workflow_json"
 
-            success, error_msg, parsed_data = builder.validate_workflow_json_str(workflow_json)
+            success, error_msg, parsed_data = (
+                builder.validate_workflow_json_str(workflow_json)
+            )
 
             if output_mode == "json":
                 output = json.dumps(
-                    {"valid": success, "error": error_msg, "data": parsed_data}, indent=2
+                    {"valid": success, "error": error_msg, "data": parsed_data},
+                    indent=2,
                 )
             else:
                 if success:
-                    output = f"✅ Workflow JSON is valid\n\nParsed workflow:\n{json.dumps(parsed_data, indent=2)}"
+                    output = (
+                        "✅ Workflow JSON is valid\n\nParsed workflow:\n"
+                        f"{json.dumps(parsed_data, indent=2)}"
+                    )
                 else:
                     output = f"❌ Validation failed:\n{error_msg}"
 
@@ -219,15 +292,20 @@ def workflow_builder_tool(
         else:
             return (
                 1,
-                f"ERROR: Unknown command '{command}'. Valid commands: create, add_step, remove_step, get, list, update, validate",
+                "ERROR: Unknown command '"
+                f"{command}'. Valid commands: create, add_step, remove_step, "
+                "get, list, update, validate",
             )
 
     except ImportError as e:
         error_msg = (
-            f"Failed to import adw module: {e}\nMake sure you're running from the project root."
+            "Failed to import adw module: "
+            f"{e}\nMake sure you're running from the project root."
         )
         if output_mode == "json":
-            output = json.dumps({"success": False, "error": error_msg}, indent=2)
+            output = json.dumps(
+                {"success": False, "error": error_msg}, indent=2
+            )
         else:
             output = f"ERROR: {error_msg}"
         return 1, output
@@ -235,23 +313,39 @@ def workflow_builder_tool(
     except Exception as e:
         error_msg = f"Unexpected error: {e}"
         if output_mode == "json":
-            output = json.dumps({"success": False, "error": error_msg}, indent=2)
+            output = json.dumps(
+                {"success": False, "error": error_msg}, indent=2
+            )
         else:
             output = f"ERROR: {error_msg}"
         return 1, output
 
 
 def main():
-    """Main entry point for CLI usage."""
+    """Parse CLI arguments and delegate to the workflow builder tool.
+
+    Returns:
+        Process exit code where 0 indicates success and 1 indicates failure.
+    """
     parser = argparse.ArgumentParser(
-        description="Workflow builder tool for creating and validating ADW workflows"
+        description=(
+            "Workflow builder tool for creating and validating ADW workflows"
+        )
     )
 
     # Command argument
     parser.add_argument(
         "command",
         type=str,
-        choices=["create", "add_step", "remove_step", "get", "list", "update", "validate"],
+        choices=[
+            "create",
+            "add_step",
+            "remove_step",
+            "get",
+            "list",
+            "update",
+            "validate",
+        ],
         help="Command to execute",
     )
 
@@ -259,9 +353,14 @@ def main():
     parser.add_argument("--workflow-name", type=str, help="Workflow name")
 
     # Create command arguments
-    parser.add_argument("--description", type=str, help="Workflow description (for create)")
     parser.add_argument(
-        "--version", type=str, default="1.0.0", help="Workflow version (default: 1.0.0)"
+        "--description", type=str, help="Workflow description (for create)"
+    )
+    parser.add_argument(
+        "--version",
+        type=str,
+        default="1.0.0",
+        help="Workflow version (default: 1.0.0)",
     )
     parser.add_argument(
         "--workflow-type",
@@ -272,13 +371,23 @@ def main():
     )
 
     # Step arguments
-    parser.add_argument("--step-json", type=str, help="Step JSON string (for add_step)")
-    parser.add_argument("--step-index", type=int, help="Step index (for remove_step)")
-    parser.add_argument("--step-name", type=str, help="Step name (for remove_step)")
-    parser.add_argument("--position", type=int, help="Position to insert step (for add_step)")
+    parser.add_argument(
+        "--step-json", type=str, help="Step JSON string (for add_step)"
+    )
+    parser.add_argument(
+        "--step-index", type=int, help="Step index (for remove_step)"
+    )
+    parser.add_argument(
+        "--step-name", type=str, help="Step name (for remove_step)"
+    )
+    parser.add_argument(
+        "--position", type=int, help="Position to insert step (for add_step)"
+    )
 
     # Update/validate arguments
-    parser.add_argument("--workflow-json", type=str, help="Complete workflow JSON (for update)")
+    parser.add_argument(
+        "--workflow-json", type=str, help="Complete workflow JSON (for update)"
+    )
 
     # Output mode
     parser.add_argument(
