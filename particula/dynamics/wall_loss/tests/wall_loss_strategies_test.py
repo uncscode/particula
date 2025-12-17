@@ -6,10 +6,13 @@ the :func:`get_particle_resolved_wall_loss_step` helper function.
 """
 
 import unittest
+from typing import Tuple, cast
 
 import numpy as np
 
+from particula.dynamics.wall_loss import get_rectangle_wall_loss_rate
 from particula.dynamics.wall_loss.wall_loss_strategies import (
+    RectangularWallLossStrategy,
     SphericalWallLossStrategy,
     WallLossStrategy,
     get_particle_resolved_wall_loss_step,
@@ -153,6 +156,222 @@ class TestWallLossStrategies(unittest.TestCase):
         )
         final_total = zero_particle.get_total_concentration()
         self.assertEqual(final_total, initial_total)
+
+
+class TestRectangularWallLossStrategy(unittest.TestCase):
+    """Test suite for RectangularWallLossStrategy implementation."""
+
+    def setUp(self):
+        """Set up rectangular strategy fixtures."""
+        self.temperature = 298.15
+        self.pressure = 101325.0
+        self.time_step = 1.0
+        self.chamber_dimensions = (1.0, 0.5, 0.25)
+
+        self.particle = PresetParticleRadiusBuilder().build()
+        self.particle_continuous = PresetParticleRadiusBuilder().build()
+        self.particle_resolved = (
+            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
+        )
+
+        self.strategy_discrete = RectangularWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_dimensions=self.chamber_dimensions,
+            distribution_type="discrete",
+        )
+        self.strategy_continuous = RectangularWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_dimensions=self.chamber_dimensions,
+            distribution_type="continuous_pdf",
+        )
+        self.strategy_particle_resolved = RectangularWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_dimensions=self.chamber_dimensions,
+            distribution_type="particle_resolved",
+        )
+
+    def test_initialization_stores_parameters(self):
+        """Initialization stores parameters and validates distribution type."""
+        strategy = RectangularWallLossStrategy(
+            wall_eddy_diffusivity=2e-3,
+            chamber_dimensions=(1.2, 0.7, 0.4),
+            distribution_type="discrete",
+        )
+        self.assertEqual(strategy.wall_eddy_diffusivity, 2e-3)
+        self.assertEqual(strategy.chamber_dimensions, (1.2, 0.7, 0.4))
+        self.assertEqual(strategy.distribution_type, "discrete")
+
+    def test_invalid_dimension_length_raises(self):
+        """Dimension tuple must have three elements."""
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_dimensions=cast(Tuple[float, float, float], (1.0, 0.5)),
+            )
+
+    def test_non_positive_dimension_raises(self):
+        """Non-positive dimension should raise a ValueError."""
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_dimensions=(1.0, 0.5, -0.1),
+            )
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_dimensions=(1.0, 0.0, 0.1),
+            )
+
+    def test_non_positive_wall_eddy_diffusivity_raises(self):
+        """wall_eddy_diffusivity validation propagates from decorator."""
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=-1.0,
+                chamber_dimensions=self.chamber_dimensions,
+            )
+
+    def test_invalid_distribution_type_raises(self):
+        """Invalid distribution type should raise ValueError."""
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_dimensions=self.chamber_dimensions,
+                distribution_type="invalid",
+            )
+
+    def test_loss_coefficient_positive_for_aspect_ratios(self):
+        """Loss coefficient should be positive and finite for aspect ratios."""
+        geometries = [
+            (0.5, 0.5, 0.5),  # cubic
+            (2.0, 0.3, 0.3),  # elongated
+            (1.0, 1.0, 0.1),  # flat
+        ]
+        for dims in geometries:
+            strategy = RectangularWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_dimensions=dims,
+                distribution_type="discrete",
+            )
+            coefficient = strategy.loss_coefficient(
+                particle=self.particle,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+            self.assertTrue(np.all(np.isfinite(coefficient)))
+            self.assertTrue(np.all(coefficient > 0.0))
+
+    def test_parity_with_rectangle_wall_loss_rate(self):
+        """Strategy rate should match standalone rectangle wall loss rate."""
+        strategy_rate = self.strategy_discrete.rate(
+            particle=self.particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        standalone_rate = get_rectangle_wall_loss_rate(
+            wall_eddy_diffusivity=self.strategy_discrete.wall_eddy_diffusivity,
+            particle_radius=self.particle.get_radius(),
+            particle_density=self.particle.get_effective_density(),
+            particle_concentration=self.particle.get_concentration(),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            chamber_dimensions=self.chamber_dimensions,
+        )
+        np.testing.assert_allclose(strategy_rate, standalone_rate, rtol=1e-10)
+
+    def test_distribution_types_shapes_and_finite(self):
+        """All distribution types return finite rates with correct shape."""
+        rate_discrete = self.strategy_discrete.rate(
+            particle=self.particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertEqual(
+            rate_discrete.shape, self.particle.get_concentration().shape
+        )
+        self.assertTrue(np.all(np.isfinite(rate_discrete)))
+
+        rate_continuous = self.strategy_continuous.rate(
+            particle=self.particle_continuous,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertEqual(
+            rate_continuous.shape,
+            self.particle_continuous.get_concentration().shape,
+        )
+        self.assertTrue(np.all(np.isfinite(rate_continuous)))
+
+        rate_resolved = self.strategy_particle_resolved.rate(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertEqual(
+            rate_resolved.shape,
+            self.particle_resolved.get_concentration().shape,
+        )
+        self.assertTrue(np.all(np.isfinite(rate_resolved)))
+
+    def test_zero_concentration_edge_case(self):
+        """Zero concentration should remain zero after step."""
+        zero_particle = PresetParticleRadiusBuilder().build()
+        zero_particle.concentration[...] = 0.0
+
+        rate = self.strategy_discrete.rate(
+            particle=zero_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.allclose(rate, 0.0))
+
+        initial_total = zero_particle.get_total_concentration()
+        self.strategy_discrete.step(
+            particle=zero_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        final_total = zero_particle.get_total_concentration()
+        self.assertEqual(final_total, initial_total)
+
+    def test_particle_resolved_empty_particles(self):
+        """Empty particle-resolved representation should return empty arrays."""
+        empty_radius = np.array([], dtype=float)
+        empty_density = np.array([], dtype=float)
+        empty_concentration = np.array([], dtype=float)
+
+        coefficients = (
+            self.strategy_particle_resolved.loss_coefficient_for_particles(
+                particle_radius=empty_radius,
+                particle_density=empty_density,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+        )
+        self.assertEqual(coefficients.size, 0)
+
+        survived = get_particle_resolved_wall_loss_step(
+            particle_radius=empty_radius,
+            particle_density=empty_density,
+            concentration=empty_concentration,
+            loss_coefficient_func=lambda r, d: coefficients,
+            time_step=self.time_step,
+            random_generator=self.strategy_particle_resolved.random_generator,
+        )
+        self.assertEqual(survived.size, 0)
+
+    def test_extreme_particle_sizes_remain_finite(self):
+        """Very small and large particle sizes should produce finite values."""
+        radii = np.array([1e-9, 1e-4])
+        densities = np.array([900.0, 1200.0])
+        coefficients = self.strategy_discrete.loss_coefficient_for_particles(
+            particle_radius=radii,
+            particle_density=densities,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.all(np.isfinite(coefficients)))
+        self.assertTrue(np.all(coefficients >= 0.0))
 
 
 class TestGetParticleResolvedWallLossStep(unittest.TestCase):

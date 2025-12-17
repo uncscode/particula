@@ -13,8 +13,24 @@ import pathlib
 import sys
 import unittest
 
+_WORKTREE_ROOT = pathlib.Path(__file__).resolve().parents[3]
+if str(_WORKTREE_ROOT) not in sys.path:
+    sys.path.insert(0, str(_WORKTREE_ROOT))
+
+for _module in [
+    "particula",
+    "particula.dynamics",
+    "particula.dynamics.wall_loss",
+]:
+    sys.modules.pop(_module, None)
+
+
 import numpy as np
 
+from particula.dynamics import (
+    RectangularWallLossStrategy as ExportedRectangularWallLossStrategy,
+    get_rectangle_wall_loss_rate,
+)
 from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
@@ -38,6 +54,7 @@ _wall_loss_strategies = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = _wall_loss_strategies
 _spec.loader.exec_module(_wall_loss_strategies)
 
+RectangularWallLossStrategy = _wall_loss_strategies.RectangularWallLossStrategy
 SphericalWallLossStrategy = _wall_loss_strategies.SphericalWallLossStrategy
 WallLossStrategy = _wall_loss_strategies.WallLossStrategy
 
@@ -175,3 +192,91 @@ class TestWallLossStrategies(unittest.TestCase):
         )
         final_total = zero_particle.get_total_concentration()
         self.assertEqual(final_total, initial_total)
+
+
+class TestRectangularWallLossStrategies(unittest.TestCase):
+    """Mirrored rectangular wall loss tests via dynamics imports."""
+
+    def setUp(self):
+        """Set up rectangular strategy fixtures."""
+        self.temperature = 298.15
+        self.pressure = 101325.0
+        self.time_step = 1.0
+        self.chamber_dimensions = (1.0, 0.6, 0.3)
+
+        self.particle = PresetParticleRadiusBuilder().build()
+        self.particle_resolved = (
+            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
+        )
+
+        self.strategy_discrete = RectangularWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_dimensions=self.chamber_dimensions,
+            distribution_type="discrete",
+        )
+        self.strategy_particle_resolved = RectangularWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_dimensions=self.chamber_dimensions,
+            distribution_type="particle_resolved",
+        )
+
+    def test_export_available_via_dynamics(self):
+        """Rectangular strategy should be importable from particula.dynamics."""
+        exported = ExportedRectangularWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_dimensions=self.chamber_dimensions,
+            distribution_type="discrete",
+        )
+        self.assertIsInstance(exported, ExportedRectangularWallLossStrategy)
+        self.assertEqual(
+            exported.__class__.__name__, "RectangularWallLossStrategy"
+        )
+
+    def test_invalid_distribution_type_raises(self):
+        """Invalid distribution type should raise ValueError."""
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_dimensions=self.chamber_dimensions,
+                distribution_type="invalid",
+            )
+
+    def test_loss_rate_is_negative_and_finite(self):
+        """Loss rate should be finite and non-positive for valid inputs."""
+        rate = self.strategy_discrete.rate(
+            particle=self.particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.all(np.isfinite(rate)))
+        self.assertTrue(np.all(rate <= 0.0))
+
+    def test_parity_with_rectangle_wall_loss_rate(self):
+        """Strategy rate matches standalone rectangle wall loss rate."""
+        strategy_rate = self.strategy_discrete.rate(
+            particle=self.particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        standalone_rate = get_rectangle_wall_loss_rate(
+            wall_eddy_diffusivity=self.strategy_discrete.wall_eddy_diffusivity,
+            particle_radius=self.particle.get_radius(),
+            particle_density=self.particle.get_effective_density(),
+            particle_concentration=self.particle.get_concentration(),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            chamber_dimensions=self.chamber_dimensions,
+        )
+        np.testing.assert_allclose(strategy_rate, standalone_rate, rtol=1e-10)
+
+    def test_particle_resolved_shape(self):
+        """Particle-resolved path should return matching shape and finiteness."""
+        rate = self.strategy_particle_resolved.rate(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertEqual(
+            rate.shape, self.particle_resolved.get_concentration().shape
+        )
+        self.assertTrue(np.all(np.isfinite(rate)))
