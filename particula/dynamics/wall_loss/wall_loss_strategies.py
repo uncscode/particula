@@ -3,7 +3,8 @@
 Defines abstract and concrete strategies for modeling particle wall
 loss processes in different chamber geometries. Strategies operate
 on :class:`~particula.particles.representation.ParticleRepresentation`
-objects and support multiple distribution types.
+objects and support multiple distribution types. Implementations are
+provided for spherical and rectangular chambers.
 
 The wall loss rate is modeled as a first-order size dependent loss process
 
@@ -22,12 +23,13 @@ References:
 """
 
 from abc import ABC, abstractmethod
-from typing import Callable, Union
+from typing import Callable, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.dynamics.properties.wall_loss_coefficient import (
+    get_rectangle_wall_loss_coefficient_via_system_state,
     get_spherical_wall_loss_coefficient_via_system_state,
 )
 from particula.particles.representation import ParticleRepresentation
@@ -456,5 +458,143 @@ class SphericalWallLossStrategy(WallLossStrategy):
             temperature=temperature,
             pressure=pressure,
             chamber_radius=self.chamber_radius,
+        )
+        return np.asarray(coefficient)
+
+
+class RectangularWallLossStrategy(WallLossStrategy):
+    """Wall loss strategy for rectangular (box) chambers.
+
+    Calculates particle wall deposition in rectangular chamber geometry
+    using turbulent diffusion and gravitational settling. Supports
+    discrete, continuous PDF, and particle-resolved distributions.
+
+    Attributes:
+        wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+        chamber_dimensions: Chamber dimensions (length, width, height) [m].
+        distribution_type: Distribution type ("discrete",
+            "continuous_pdf", or "particle_resolved").
+
+    Examples:
+        >>> import particula as par
+        >>> strategy = par.dynamics.RectangularWallLossStrategy(
+        ...     wall_eddy_diffusivity=0.001,
+        ...     chamber_dimensions=(1.0, 0.5, 0.5),
+        ...     distribution_type="discrete",
+        ... )
+        >>> rate = strategy.rate(
+        ...     particle=par.particles.PresetParticleRadiusBuilder().build(),
+        ...     temperature=298.0,
+        ...     pressure=101325.0,
+        ... )
+        >>> _ = strategy.step(
+        ...     particle=par.particles.PresetParticleRadiusBuilder().build(),
+        ...     temperature=298.0,
+        ...     pressure=101325.0,
+        ...     time_step=1.0,
+        ... )
+
+    References:
+        Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
+        gravitational sedimentation of an aerosol in a vessel of arbitrary
+        shape. Journal of Aerosol Science, 12(5), 405–415.
+        McMurry, P. H., & Rader, D. J. (1985). Aerosol wall losses in
+        electrically charged chambers. Aerosol Science and Technology, 4(3),
+        249–268.
+    """
+
+    chamber_dimensions: Tuple[float, float, float]
+
+    @validate_inputs({"wall_eddy_diffusivity": "positive"})
+    def __init__(
+        self,
+        wall_eddy_diffusivity: float,
+        chamber_dimensions: Tuple[float, float, float],
+        distribution_type: str = "discrete",
+    ) -> None:
+        """Initialize rectangular wall loss strategy.
+
+        Args:
+            wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+            chamber_dimensions: Chamber dimensions (length, width, height)
+                in meters. All must be positive.
+            distribution_type: Distribution type ("discrete",
+                "continuous_pdf", or "particle_resolved").
+
+        Raises:
+            ValueError: If ``chamber_dimensions`` does not contain exactly
+                three positive values.
+            ValueError: If ``distribution_type`` is not supported.
+        """
+        super().__init__(
+            wall_eddy_diffusivity=wall_eddy_diffusivity,
+            distribution_type=distribution_type,
+        )
+        if len(chamber_dimensions) != 3:
+            raise ValueError(
+                "chamber_dimensions must be a tuple of length, width, height"
+            )
+        if any(dimension <= 0 for dimension in chamber_dimensions):
+            raise ValueError("All chamber dimensions must be positive")
+        self.chamber_dimensions = (
+            float(chamber_dimensions[0]),
+            float(chamber_dimensions[1]),
+            float(chamber_dimensions[2]),
+        )
+
+    def loss_coefficient(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+        """Return the rectangular wall loss coefficient for the state.
+
+        Args:
+            particle: Particle representation providing radius and density.
+            temperature: Gas temperature [K].
+            pressure: Gas pressure [Pa].
+
+        Returns:
+            Wall loss coefficient [1/s] for each particle bin.
+        """
+        return get_rectangle_wall_loss_coefficient_via_system_state(
+            wall_eddy_diffusivity=self.wall_eddy_diffusivity,
+            particle_radius=particle.get_radius(),
+            particle_density=particle.get_effective_density(),
+            temperature=temperature,
+            pressure=pressure,
+            chamber_dimensions=self.chamber_dimensions,
+        )
+
+    def loss_coefficient_for_particles(
+        self,
+        particle_radius: NDArray[np.float64],
+        particle_density: NDArray[np.float64],
+        temperature: float,
+        pressure: float,
+    ) -> NDArray[np.float64]:
+        """Return wall loss coefficient for provided particle properties.
+
+        This method is used for particle-resolved simulations to evaluate
+        coefficients on active particles without reconstructing the full
+        representation.
+
+        Args:
+            particle_radius: Particle radii [m].
+            particle_density: Particle densities [kg/m^3].
+            temperature: Gas temperature [K].
+            pressure: Gas pressure [Pa].
+
+        Returns:
+            Wall loss coefficient [1/s] for each particle.
+        """
+        coefficient = get_rectangle_wall_loss_coefficient_via_system_state(
+            wall_eddy_diffusivity=self.wall_eddy_diffusivity,
+            particle_radius=particle_radius,
+            particle_density=particle_density,
+            temperature=temperature,
+            pressure=pressure,
+            chamber_dimensions=self.chamber_dimensions,
         )
         return np.asarray(coefficient)
