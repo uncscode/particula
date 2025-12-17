@@ -1,0 +1,21 @@
+{
+  "name": "adw-build",
+  "version": "1.0.0",
+  "description": "Execute implementation plans using the adw-build agent with per-task validation in isolated worktree",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Execute Implementation with Per-Task Validation",
+      "agent": "adw-build",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 3600,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 10.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

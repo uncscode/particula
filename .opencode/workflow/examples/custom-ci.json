@@ -1,0 +1,52 @@
+{
+  "name": "custom-ci",
+  "version": "1.0.0",
+  "description": "Custom CI workflow for validation",
+  "description_long": "Runs linting, testing, and security checks using light model tier for cost-effective CI operations. Suitable for pre-merge validation and automated quality gates.",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Lint Code",
+      "agent": "plan",
+      "prompt": "Run all configured linters (ruff, mypy) and report results",
+      "model": "light",
+      "timeout": 300,
+      "retry": {
+        "max_retries": 2,
+        "initial_delay": 3.0,
+        "backoff": 1.5
+      },
+      "description": "Fast linting with minimal retries for quick feedback"
+    },
+    {
+      "type": "agent",
+      "name": "Run Tests",
+      "agent": "tester",
+      "prompt": "Execute test suite with coverage reporting",
+      "model": "light",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 2,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      },
+      "description": "Comprehensive test execution with coverage metrics"
+    },
+    {
+      "type": "agent",
+      "name": "Security Checks",
+      "agent": "plan",
+      "prompt": "Run security vulnerability scans (bandit, safety) and report findings",
+      "model": "light",
+      "timeout": 300,
+      "continue_on_failure": true,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 3.0,
+        "backoff": 1.0
+      },
+      "description": "Optional security validation - warns but doesn't block on failure"
+    }
+  ]
+}
