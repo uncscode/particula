@@ -21,6 +21,17 @@ docs/Agent/architecture/
     └── template.md                 # Template for creating new ADRs
 ```
 
+## Dynamics wall loss strategies
+
+- Implementations live in
+  `particula/dynamics/wall_loss/wall_loss_strategies.py`.
+- Strategies are exported through both `particula.dynamics.wall_loss` and
+  `particula.dynamics` to keep import parity.
+- Available strategies: `SphericalWallLossStrategy` (radius) and
+  `RectangularWallLossStrategy` (validated `(x, y, z)` dimensions in meters).
+- Tests are mirrored in `particula/dynamics/wall_loss/tests/` and
+  `particula/dynamics/tests/` to cover both export paths.
+
 ## Quick Navigation
 
 ### For New Contributors

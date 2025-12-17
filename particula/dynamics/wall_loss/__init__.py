@@ -1,7 +1,8 @@
 """Wall loss utilities and strategies.
 
-This package provides wall loss rate functions and strategy classes
-for particle wall deposition in various geometries.
+Provides rate calculators and strategy classes for particle wall
+loss in spherical and rectangular chamber geometries, including
+helpers for deterministic and particle-resolved simulations.
 """
 
 from .rate import (
