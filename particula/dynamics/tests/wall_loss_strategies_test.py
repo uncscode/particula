@@ -8,6 +8,8 @@ package import edge cases when running the full test suite
 (``pytest particula``).
 """
 
+# ruff: noqa: E402
+
 import importlib.util
 import pathlib
 import sys
@@ -29,6 +31,8 @@ import numpy as np
 
 from particula.dynamics import (
     RectangularWallLossStrategy as ExportedRectangularWallLossStrategy,
+)
+from particula.dynamics import (
     get_rectangle_wall_loss_rate,
 )
 from particula.particles import (
@@ -241,6 +245,14 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
                 distribution_type="invalid",
             )
 
+    def test_non_positive_wall_eddy_diffusivity_raises(self):
+        """Non-positive wall eddy diffusivity should raise ValueError."""
+        with self.assertRaises(ValueError):
+            RectangularWallLossStrategy(
+                wall_eddy_diffusivity=-1.0,
+                chamber_dimensions=self.chamber_dimensions,
+            )
+
     def test_loss_rate_is_negative_and_finite(self):
         """Loss rate should be finite and non-positive for valid inputs."""
         rate = self.strategy_discrete.rate(
@@ -251,6 +263,27 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(rate)))
         self.assertTrue(np.all(rate <= 0.0))
 
+    def test_zero_concentration_smoke(self):
+        """Zero concentration remains zero via dynamics import path."""
+        zero_particle = PresetParticleRadiusBuilder().build()
+        zero_particle.concentration[...] = 0.0
+        rate = self.strategy_discrete.rate(
+            particle=zero_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.all(np.isfinite(rate)))
+        self.assertTrue(np.allclose(rate, 0.0))
+        initial_total = zero_particle.get_total_concentration()
+        self.strategy_discrete.step(
+            particle=zero_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        final_total = zero_particle.get_total_concentration()
+        self.assertEqual(final_total, initial_total)
+
     def test_parity_with_rectangle_wall_loss_rate(self):
         """Strategy rate matches standalone rectangle wall loss rate."""
         strategy_rate = self.strategy_discrete.rate(
@@ -258,6 +291,7 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
             temperature=self.temperature,
             pressure=self.pressure,
         )
+
         standalone_rate = get_rectangle_wall_loss_rate(
             wall_eddy_diffusivity=self.strategy_discrete.wall_eddy_diffusivity,
             particle_radius=self.particle.get_radius(),
@@ -270,7 +304,7 @@ class TestRectangularWallLossStrategies(unittest.TestCase):
         np.testing.assert_allclose(strategy_rate, standalone_rate, rtol=1e-10)
 
     def test_particle_resolved_shape(self):
-        """Particle-resolved path should return matching shape and finiteness."""
+        """Particle-resolved path returns matching shape and finiteness."""
         rate = self.strategy_particle_resolved.rate(
             particle=self.particle_resolved,
             temperature=self.temperature,
