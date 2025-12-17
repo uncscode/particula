@@ -20,7 +20,7 @@ tools:
   platform_operations: true
   run_pytest: false
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: false
   webfetch: false
   websearch: false

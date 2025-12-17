@@ -37,7 +37,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: true
   websearch: true
@@ -449,7 +449,7 @@ Next Steps:
 ## Tools Available
 - `read`, `write`, `edit`, `move`, `list`, `glob`, `grep` - File operations
 - `task` - Invoke subagents
-- `get_date` - For timestamps
+- `get_datetime` - For timestamps
 - `todoread`, `todowrite` - Task tracking
 
 ### Move Tool Example

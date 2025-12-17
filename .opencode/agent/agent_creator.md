@@ -40,7 +40,7 @@ tools:
   run_pytest: true
   run_linters: true
   # Utility Tools
-  get_date: true
+  get_datetime: true
   get_version: true
   # Disabled Tools (security)
   webfetch: true
@@ -155,7 +155,7 @@ tools:
   run_pytest: false        # Run tests with coverage
   run_linters: false       # Run ruff, mypy with auto-fix
   # Utility Tools
-  get_date: true           # Get current date/time
+  get_datetime: true           # Get current date/time
   get_version: true        # Get package version
   # Disabled Tools (security)
   webfetch: false          # Fetch web content
@@ -199,7 +199,7 @@ Agent instructions and guidelines go here in markdown format.
 | | `platform_operations` | GitHub/GitLab API (issues, PRs, labels) |
 | **Validation** | `run_pytest` | Run tests with coverage |
 | | `run_linters` | Run ruff, mypy with auto-fix |
-| **Utility** | `get_date` | Get current date/time |
+| **Utility** | `get_datetime` | Get current date/time |
 | | `get_version` | Get package version |
 | **Disabled (Security)** | `webfetch` | Fetch web content (usually false) |
 | | `websearch` | Search the web (usually false) |
@@ -220,9 +220,9 @@ Agent files should be placed in:
 
 # Repository Context
 
-This agent operates within the adw repository:
-- **Repository URL**: https://github.com/Gorkowski/particula
-- **Package Name**: particula
+This agent operates within the {{PROJECT_NAME}} repository:
+- **Repository URL**: {{REPO_URL}}
+- **Package Name**: {{PACKAGE_NAME}}
 - **Documentation**: `docs/Agent/` directory contains repository conventions
 
 # Agent Creation Process
@@ -312,7 +312,7 @@ Task Management: todoread, todowrite, task (subagent invocation)
 ADW Workflow: adw, adw_spec, create_workspace, workflow_builder
 Git & Platform: git_operations, platform_operations
 Validation: run_pytest, run_linters
-Utility: get_date, get_version
+Utility: get_datetime, get_version
 Disabled (security): webfetch, websearch, codesearch, bash
 ```
 
@@ -437,7 +437,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -465,7 +465,7 @@ tools:
   platform_operations: false
   run_pytest: true        # Can run tests
   run_linters: true       # Can run linters
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -493,7 +493,7 @@ tools:
   platform_operations: false
   run_pytest: true        # Primary tool
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -521,7 +521,7 @@ tools:
   platform_operations: true  # For PRs (use create-pr command)
   run_pytest: true
   run_linters: true
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -549,7 +549,7 @@ tools:
   platform_operations: true  # For PRs (use create-pr command)
   run_pytest: true
   run_linters: true
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -623,7 +623,7 @@ When designing an agent, go through each tool and decide if it's needed:
 - `grep` - Search content
 - `todoread` / `todowrite` - Task tracking
 - `adw_spec` - Workflow state access
-- `get_date` / `get_version` - Utility info
+- `get_datetime` / `get_version` - Utility info
 
 **Enable Based on Purpose:**
 - `edit` / `write` - Only if agent modifies files
@@ -656,7 +656,7 @@ Before performing any work, you MUST consult these repository-specific guides:
 - **Linting**: `docs/Agent/linting_guide.md`
 - **Documentation**: `docs/Agent/docstring_guide.md`
 
-These guides contain the established conventions for adw.
+These guides contain the established conventions for {{PROJECT_NAME}}.
 ```
 
 ## 3. Documentation Phase
@@ -694,7 +694,7 @@ tools:
   run_pytest: [true/false]
   run_linters: [true/false]
   # Utility Tools
-  get_date: true
+  get_datetime: true
   get_version: true
   # Disabled Tools (security)
   webfetch: false
@@ -733,9 +733,9 @@ tools:
 
 # Repository Context
 
-This agent operates within the adw repository:
-- **Repository URL**: https://github.com/Gorkowski/particula
-- **Package Name**: particula
+This agent operates within the {{PROJECT_NAME}} repository:
+- **Repository URL**: {{REPO_URL}}
+- **Package Name**: {{PACKAGE_NAME}}
 
 # Required Reading
 
@@ -914,7 +914,7 @@ The agent will consult these files:
 | platform_operations | [✅/❌] | [Why] |
 | run_pytest | [✅/❌] | [Why] |
 | run_linters | [✅/❌] | [Why] |
-| get_date | ✅ | [Utility] |
+| get_datetime | ✅ | [Utility] |
 | get_version | ✅ | [Utility] |
 | webfetch | ❌ | [Security] |
 | websearch | ❌ | [Security] |
@@ -1191,7 +1191,7 @@ When creating an agent, produce:
        platform_operations: false  # No GitHub/GitLab API
        run_pytest: false
        run_linters: false
-       get_date: true
+       get_datetime: true
        get_version: true
   webfetch: ask
   websearch: false
@@ -1487,7 +1487,7 @@ AGENT DESIGN SUMMARY
 | | platform_operations | [✅/❌] | [reason] |
 | Validation | run_pytest | [✅/❌] | [reason] |
 | | run_linters | [✅/❌] | [reason] |
-| Utility | get_date/version | ✅ | Standard utils |
+| Utility | get_datetime/version | ✅ | Standard utils |
 | Security | webfetch/search | ❌ | Security |
 | | bash | ❌ | **Always disabled** |
 

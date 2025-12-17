@@ -31,7 +31,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -201,7 +201,7 @@ ls docs/Agent/development_plans/features/*.md
 Create new file with template structure filled in:
 
 ```python
-get_date({"format": "date"})  # Get current date for metadata
+get_datetime({"format": "date"})  # Get current date for metadata
 ```
 
 ```python

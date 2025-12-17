@@ -27,7 +27,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: true
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -155,15 +155,15 @@ Search for and replace these placeholders in `.opencode/` and `docs/Agent/`:
 
 | Placeholder | Source |
 |-------------|--------|
-| `https://github.com/Gorkowski/particula` | `git remote get-url origin` |
-| `particula` | Detected from pyproject.toml, Cargo.toml, package.json |
-| `adw` | Repository directory name or explicit name |
+| `{{REPO_URL}}` | `git remote get-url origin` |
+| `{{PACKAGE_NAME}}` | Detected from pyproject.toml, Cargo.toml, package.json |
+| `{{PROJECT_NAME}}` | Repository directory name or explicit name |
 | `{{MAIN_BRANCH}}` | Usually `main` or `master` |
-| `2.3.0` | From version file or config |
-| `2025-12-14` | Current date |
+| `{{VERSION}}` | From version file or config |
+| `{{LAST_UPDATED}}` | Current date |
 | `{{PRIMARY_LANGUAGE}}` | Detected language |
-| `pytest` | pytest, cargo test, jest, etc. |
-| `pytest` | Full test command |
+| `{{TEST_FRAMEWORK}}` | pytest, cargo test, jest, etc. |
+| `{{TEST_COMMAND}}` | Full test command |
 | `{{COVERAGE_TOOL}}` | pytest-cov, cargo-llvm-cov, etc. |
 | `{{SOURCE_DIRECTORY}}` | src/, lib/, app/, etc. |
 
@@ -462,7 +462,7 @@ adw({"command": "maintenance", "args": ["sync", "file", ".opencode/agent/impleme
 - `rg` (ripgrep) - Search for patterns in files
 - Standard bash commands - File operations, git commands
 - `get_version` - Get version from pyproject.toml/package.json
-- `get_date` - Get current date for timestamps
+- `get_datetime` - Get current date for timestamps
 
 # Error Handling
 
@@ -502,7 +502,7 @@ Detected:
 Running `adw sync all`...
 
 Now customizing configuration:
-- Replacing particula with 'my_package'
+- Replacing {{PACKAGE_NAME}} with 'my_package'
 - Updating test paths from 'adw/' to 'my_package/'
 - Configuring pytest command
 

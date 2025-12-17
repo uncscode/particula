@@ -1,16 +1,16 @@
 {
-  "name": "adw-build",
+  "name": "adw-format",
   "version": "1.0.0",
-  "description": "Build implementation plans using the adw-build agent.",
+  "description": "Format code, add docstrings, and run linting using the adw-format agent in isolated worktree",
   "workflow_type": "custom",
   "steps": [
     {
       "type": "agent",
-      "name": "Build Implementation",
-      "agent": "adw-build",
+      "name": "Format Code and Add Docstrings",
+      "agent": "adw-format",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
-      "model": "base",
-      "timeout": 3600,
+      "model": "light",
+      "timeout": 1800,
       "retry": {
         "max_retries": 1,
         "initial_delay": 10.0,

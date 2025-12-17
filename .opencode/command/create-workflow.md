@@ -98,9 +98,9 @@ For each step, you'll specify:
 - **skip_if**: Skip step if condition is true
 
 Example conditions:
-- `"state.issue_class == '/feature'"` - Only for features
-- `"state.needs_docs == true"` - Only if docs needed
-- `"'critical' in state.labels"` - Only for critical issues
+- "state.issue_class == '/feature'" - Only for features
+- "state.needs_docs == true" - Only if docs needed
+- "'critical' in state.labels" - Only for critical issues
 
 ## Model Tier Selection
 

@@ -1,17 +1,19 @@
 ---
-description: 'Subagent that commits changes with pre-commit hook handling. Invoked
-  by adw-build primary agent after validation passes.
+description: 'Subagent that commits changes with pre-commit hook handling and pushes
+  to remote. Invoked by adw-build primary agent after validation passes.
 
   This subagent: - Analyzes git diff to understand changes - Generates conventional
   commit message - Stages all changes - Runs commit with pre-commit hooks - Fixes
-  pre-commit hook failures (3 internal retries) - Reports commit hash or failure details
+  pre-commit hook failures (3 internal retries) - Pushes to remote (skips main/master
+  branches) - Reports commit hash or failure details
 
   Invoked by: any primary agent, to commit changes to repo.
 
   Examples:
-  - After validation: stage changes, generate message, commit with hooks
+  - After validation: stage changes, generate message, commit with hooks, push to remote
   - Pre-commit fails: fix issues (formatting, linting), retry commit
-  - Returns commit hash on success or detailed failure report'
+  - Returns commit hash on success or detailed failure report
+  - Skips push for main/master branches (safety guard)'
 mode: subagent
 tools:
   read: true
@@ -32,7 +34,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: true
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -387,9 +389,77 @@ git_operations({"command": "status", "porcelain": true, "worktree_path": worktre
 
 Confirm commit was created and working tree is clean.
 
-## Step 6: Report Results
+## Step 6: Push to Remote
 
-### Success Case
+After a successful commit, push to the remote repository. **Skip push for protected branches.**
+
+### 6.1: Get Current Branch Name
+
+**With adw_id:**
+Extract `branch_name` from workflow state (already loaded in Step 1).
+
+**Without adw_id:**
+```python
+status = git_operations({"command": "status", "worktree_path": worktree_path})
+# Parse branch name from status output, or use:
+# git_operations returns current branch in status output
+```
+
+### 6.2: Check for Protected Branches
+
+**Protected branches (skip push):**
+- `main`
+- `master`
+
+```python
+protected_branches = ["main", "master"]
+if branch_name in protected_branches:
+    # Skip push, log reason
+    # Continue to Step 7 (Report Results)
+```
+
+**Why skip main/master:**
+- Direct pushes to main/master should go through PR review
+- Prevents accidental overwrites of protected branches
+- Maintains proper code review workflow
+
+### 6.3: Push to Remote
+
+**With adw_id:**
+```python
+git_operations({
+  "command": "push",
+  "branch": branch_name,
+  "worktree_path": worktree_path
+})
+```
+
+**Without adw_id:**
+```python
+git_operations({
+  "command": "push",
+  "branch": branch_name
+  # worktree_path omitted - uses current working directory
+})
+```
+
+### 6.4: Handle Push Failures
+
+If push fails, **log the error and continue** - do not block or fail the agent.
+
+**Push failure does NOT fail the commit** - the commit is already saved locally. Report push status in the final output so the caller knows the commit succeeded but sync failed.
+
+Common push failure causes (for reference in output):
+1. **Remote branch doesn't exist yet**: Usually auto-created, but some configs block this
+2. **Authentication issues**: Token may lack push permissions
+3. **Remote has diverged**: Manual intervention needed (rebase/merge)
+4. **Network issues**: Transient failure
+
+**Important:** Always continue to Step 7 (Report Results) regardless of push outcome.
+
+## Step 7: Report Results
+
+### Success Case (with push)
 
 ```
 ADW_COMMIT_SUCCESS
@@ -407,6 +477,52 @@ Changed files:
 - adw/core/models.py
 
 Pre-commit hooks: Passed (attempt {n}/3)
+Push: Synced to origin/{branch_name}
+```
+
+### Success Case (push skipped - protected branch)
+
+```
+ADW_COMMIT_SUCCESS
+
+Commit: {short_hash}
+Message: {first line of commit message}
+
+Files changed: {count}
+Insertions: +{lines}
+Deletions: -{lines}
+
+Changed files:
+- adw/utils/parser.py
+- adw/utils/tests/parser_test.py
+- adw/core/models.py
+
+Pre-commit hooks: Passed (attempt {n}/3)
+Push: Skipped (protected branch: {branch_name})
+```
+
+### Success Case (commit succeeded, push failed)
+
+```
+ADW_COMMIT_SUCCESS (push failed)
+
+Commit: {short_hash}
+Message: {first line of commit message}
+
+Files changed: {count}
+Insertions: +{lines}
+Deletions: -{lines}
+
+Changed files:
+- adw/utils/parser.py
+- adw/utils/tests/parser_test.py
+- adw/core/models.py
+
+Pre-commit hooks: Passed (attempt {n}/3)
+Push: FAILED - {error_message}
+
+Note: Commit saved locally. Manual push required:
+  git push origin {branch_name}
 ```
 
 ### Skip Case (No Changes)
@@ -582,6 +698,40 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 - Reviewers need to see what's being removed
 - Files can be restored from `.trash/` if needed
 
+## "Push failed after successful commit"
+
+**Cause:** Various issues can prevent push while commit succeeds locally.
+
+**Symptoms:**
+- Commit created successfully (have commit hash)
+- Push command returns error
+- Remote branch not updated
+
+**Common causes and solutions:**
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `rejected - non-fast-forward` | Remote has commits you don't have | Manual rebase/merge needed |
+| `permission denied` | Token lacks push scope | Check GitHub token permissions |
+| `remote: Repository not found` | Wrong remote URL or no access | Verify remote URL and permissions |
+| `Connection refused` | Network issue | Transient - can retry manually |
+
+**Important:** Push failure does NOT fail the agent. The commit is saved locally and can be pushed manually later:
+```bash
+git push origin <branch_name>
+```
+
+## "Push skipped unexpectedly"
+
+**Cause:** Branch name matches protected branch list (`main`, `master`).
+
+**This is expected behavior** - direct pushes to main/master are blocked to enforce PR workflow.
+
+**If you need to push to main:**
+1. Create a feature branch
+2. Push to feature branch
+3. Create PR to merge into main
+
 # Decision Making
 
 - **No adw_id provided**: Use current working directory, omit issue reference footer
@@ -605,7 +755,7 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 
 **Permissions:**
 - ✅ git add, commit, status, diff, log
+- ✅ git push (except main/master branches)
 - ✅ ruff check/format (for pre-commit fixes)
-- ❌ git push (never pushes)
 
 **References:** `docs/Agent/commit_conventions.md`

@@ -27,7 +27,50 @@
     "workflow_type": {
       "type": "string",
       "title": "Workflow Type",
-      "description": "Workflow type for GitHub label management (complete, patch, document, generate, custom)"
+      "description": "Workflow type for GitHub label management (complete, patch, document, generate, fix, custom)"
+    },
+    "trigger": {
+      "type": "object",
+      "title": "Workflow Trigger",
+      "description": "Optional trigger metadata for automated invocation",
+      "properties": {
+        "label": {
+          "type": "string",
+          "title": "Trigger Label",
+          "description": "Label required to trigger workflow execution",
+          "minLength": 1
+        },
+        "exclude_draft": {
+          "type": "boolean",
+          "title": "Exclude Draft",
+          "description": "Exclude draft pull requests from triggering",
+          "default": false
+        }
+      },
+      "required": ["label"],
+      "additionalProperties": false
+    },
+    "on_failure": {
+      "type": "object",
+      "title": "Failure Handling",
+      "description": "Optional metadata for failure handling (labels, comments)",
+      "properties": {
+        "labels": {
+          "type": "array",
+          "title": "Failure Labels",
+          "description": "Labels to add when workflow fails",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "comment": {
+          "type": "string",
+          "title": "Failure Comment",
+          "description": "Comment to post when workflow fails"
+        }
+      },
+      "additionalProperties": false
     },
     "steps": {
       "type": "array",
@@ -145,6 +188,10 @@
           "description": "Whether to continue workflow execution if this step fails",
           "default": false
         },
+        "constraints": {
+          "$ref": "#/definitions/AgentConstraints",
+          "description": "Optional tool constraints for this agent step"
+        },
         "condition": {
           "$ref": "#/definitions/Condition",
           "description": "Optional condition controlling step execution"
@@ -176,6 +223,39 @@
           "type": "string",
           "title": "Fail Message",
           "description": "Custom error message when fail_if condition is met"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AgentConstraints": {
+      "type": "object",
+      "title": "Agent Constraints",
+      "description": "Tool permissions for agent execution",
+      "properties": {
+        "allowed_tools": {
+          "type": "array",
+          "title": "Allowed Tools",
+          "description": "List of tools explicitly allowed for the agent",
+          "items": {
+            "type": "string",
+            "enum": [
+              "read",
+              "edit",
+              "write",
+              "git_operations",
+              "run_linters",
+              "run_pytest"
+            ]
+          }
+        },
+        "denied_tools": {
+          "type": "array",
+          "title": "Denied Tools",
+          "description": "List of tools explicitly denied for the agent",
+          "items": {
+            "type": "string"
+          },
+          "default": ["bash"]
         }
       },
       "additionalProperties": false

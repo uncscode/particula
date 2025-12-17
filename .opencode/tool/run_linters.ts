@@ -25,7 +25,7 @@ export default tool({
     targetDir: tool.schema
       .string()
       .optional()
-      .describe("Target directory to lint (default: 'adw')"),
+      .describe("Target directory to lint. If omitted, uses pyproject.toml config (lints from project root)."),
     ruffTimeout: tool.schema
       .number()
       .optional()
@@ -39,7 +39,7 @@ export default tool({
     const outputMode = args.outputMode || "summary";
     const autoFix = args.autoFix !== false; // Default to true
     const linters = args.linters || ["ruff", "mypy"]; // Match CI workflow
-    const targetDir = args.targetDir || "adw";
+    const targetDir = args.targetDir;
     const ruffTimeout = args.ruffTimeout || 120;
     const mypyTimeout = args.mypyTimeout || 180;
 
@@ -48,10 +48,15 @@ export default tool({
       "python3",
       `${import.meta.dir}/run_linters.py`,
       `--output=${outputMode}`,
-      `--target-dir=${targetDir}`,
       `--ruff-timeout=${ruffTimeout}`,
       `--mypy-timeout=${mypyTimeout}`,
     ];
+
+    // Only pass --target-dir if explicitly provided
+    // Otherwise let ruff/mypy use pyproject.toml config from project root
+    if (targetDir) {
+      cmdParts.push(`--target-dir=${targetDir}`);
+    }
 
     if (autoFix) {
       cmdParts.push("--auto-fix");

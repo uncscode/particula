@@ -31,7 +31,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: false
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -265,7 +265,7 @@ If you encounter issues during migration, please:
 When documenting a release:
 
 ```python
-get_date({"format": "date"})
+get_datetime({"format": "date"})
 ```
 
 ```python

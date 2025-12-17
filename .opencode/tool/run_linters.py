@@ -29,7 +29,9 @@ class LinterResult:
         self.error_message: Optional[str] = None
 
 
-def run_ruff_check(target_dir: str, auto_fix: bool = True, timeout: int = 120) -> LinterResult:
+def run_ruff_check(
+    target_dir: Optional[str] = None, auto_fix: bool = True, timeout: int = 120
+) -> LinterResult:
     """
     Run ruff check with optional auto-fixing.
 
@@ -39,7 +41,7 @@ def run_ruff_check(target_dir: str, auto_fix: bool = True, timeout: int = 120) -
     3. ruff check (final check, fail if issues remain)
 
     Args:
-        target_dir: Directory to lint
+        target_dir: Directory to lint. If None, uses pyproject.toml config from project root.
         auto_fix: Whether to automatically fix issues
         timeout: Timeout in seconds for each ruff command (default: 120)
 
@@ -48,18 +50,21 @@ def run_ruff_check(target_dir: str, auto_fix: bool = True, timeout: int = 120) -
     """
     result = LinterResult("ruff_check")
 
+    # Build target argument - use "." if no specific target
+    target_arg = f"{target_dir}/" if target_dir else "."
+
     try:
         if auto_fix:
             # Step 1: Apply fixes (don't fail on errors)
-            fix_cmd = ["ruff", "check", "--fix", f"{target_dir}/"]
+            fix_cmd = ["ruff", "check", "--fix", target_arg]
             subprocess.run(fix_cmd, capture_output=True, text=True, timeout=timeout)
 
             # Step 2: Format code
-            format_cmd = ["ruff", "format", f"{target_dir}/"]
+            format_cmd = ["ruff", "format", target_arg]
             subprocess.run(format_cmd, capture_output=True, text=True, timeout=timeout)
 
         # Step 3: Final check (this determines success/failure)
-        check_cmd = ["ruff", "check", f"{target_dir}/"]
+        check_cmd = ["ruff", "check", target_arg]
         proc = subprocess.run(check_cmd, capture_output=True, text=True, timeout=timeout)
 
         result.exit_code = proc.returncode
@@ -93,7 +98,7 @@ def run_ruff_check(target_dir: str, auto_fix: bool = True, timeout: int = 120) -
     return result
 
 
-def run_ruff_format(target_dir: str, timeout: int = 120) -> LinterResult:
+def run_ruff_format(target_dir: Optional[str] = None, timeout: int = 120) -> LinterResult:
     """
     Run ruff format to auto-format code.
 
@@ -101,7 +106,7 @@ def run_ruff_format(target_dir: str, timeout: int = 120) -> LinterResult:
     but kept separate for individual linter testing.
 
     Args:
-        target_dir: Directory to format
+        target_dir: Directory to format. If None, uses pyproject.toml config from project root.
         timeout: Timeout in seconds (default: 120)
 
     Returns:
@@ -109,7 +114,9 @@ def run_ruff_format(target_dir: str, timeout: int = 120) -> LinterResult:
     """
     result = LinterResult("ruff_format")
 
-    cmd = ["ruff", "format", f"{target_dir}/"]
+    # Build target argument - use "." if no specific target
+    target_arg = f"{target_dir}/" if target_dir else "."
+    cmd = ["ruff", "format", target_arg]
 
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
@@ -139,12 +146,12 @@ def run_ruff_format(target_dir: str, timeout: int = 120) -> LinterResult:
     return result
 
 
-def run_mypy(target_dir: str, timeout: int = 180) -> LinterResult:
+def run_mypy(target_dir: Optional[str] = None, timeout: int = 180) -> LinterResult:
     """
     Run mypy for type checking.
 
     Args:
-        target_dir: Directory to type check
+        target_dir: Directory to type check. If None, uses pyproject.toml config from project root.
         timeout: Timeout in seconds (default: 180 = 3 minutes)
 
     Returns:
@@ -152,7 +159,9 @@ def run_mypy(target_dir: str, timeout: int = 180) -> LinterResult:
     """
     result = LinterResult("mypy")
 
-    cmd = ["mypy", f"{target_dir}/", "--ignore-missing-imports"]
+    # Build target argument - use "." if no specific target
+    target_arg = f"{target_dir}/" if target_dir else "."
+    cmd = ["mypy", target_arg, "--ignore-missing-imports"]
 
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
@@ -273,7 +282,7 @@ def format_full_output(results: List[LinterResult], all_passed: bool) -> str:
 
 
 def run_linters(
-    target_dir: str,
+    target_dir: Optional[str],
     auto_fix: bool,
     linters: List[str],
     output_mode: str = "summary",
@@ -285,7 +294,7 @@ def run_linters(
     Run configured linters.
 
     Args:
-        target_dir: Directory to lint
+        target_dir: Directory to lint. If None, uses pyproject.toml config from project root.
         auto_fix: Whether to auto-fix issues
         linters: List of linters to run
         output_mode: Output format (summary, full, json)
@@ -364,8 +373,8 @@ def main():
     parser.add_argument(
         "--target-dir",
         type=str,
-        default="adw",
-        help="Target directory to lint (default: adw)",
+        default=None,
+        help="Target directory to lint. If omitted, uses pyproject.toml config from project root.",
     )
     parser.add_argument(
         "--auto-fix",

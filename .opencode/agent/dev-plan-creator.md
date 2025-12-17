@@ -31,7 +31,7 @@ tools:
   platform_operations: true
   run_pytest: true
   run_linters: true
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: true
   websearch: true
@@ -73,7 +73,7 @@ Plan Details:
 - Success Metrics: {metrics}
 - Dependencies: {dependencies}
 - Owner: {owner}
-- Target Date: {target_date}
+- Target Date: {target_datetime}
 
 Additional Context:
 {any_research_findings}
@@ -129,7 +129,7 @@ Replace all placeholders:
 - `{{OWNERS}}` → From input or `@TBD`
 - `{{START_DATE}}` → Today's date
 - `{{TARGET_DATE}}` → From input
-- `2025-12-14` → Today's date
+- `{{LAST_UPDATED}}` → Today's date
 - `{{SUCCESS_METRICS}}` → From input
 - `{{RISKS}}` → From input
 

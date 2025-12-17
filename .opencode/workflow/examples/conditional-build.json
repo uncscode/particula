@@ -41,11 +41,11 @@
     {
       "type": "agent",
       "name": "Commit",
-      "agent": "git-commit",
+      "agent": "adw-commit",
       "prompt": "Create semantic commit message",
       "model": "light",
       "timeout": 120,
-      "description": "Final commit step - always runs"
+      "description": "Final commit step with pre-commit hook handling - always runs"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "patch",
-  "version": "1.1.0",
-  "description": "Patch workflow: quick fixes (plan → build → test → format → ship)",
+  "version": "1.2.0",
+  "description": "Patch workflow: quick fixes (plan → build → validate → test → format → ship)",
   "workflow_type": "patch",
   "steps": [
     {
@@ -13,6 +13,11 @@
       "type": "workflow",
       "name": "Build",
       "workflow_name": "adw-build"
+    },
+    {
+      "type": "workflow",
+      "name": "Validate",
+      "workflow_name": "adw-validate"
     },
     {
       "type": "workflow",

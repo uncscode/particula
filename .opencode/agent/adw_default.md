@@ -30,7 +30,7 @@ tools:
   platform_operations: true
   run_pytest: true
   run_linters: true
-  get_date: true
+  get_datetime: true
   get_version: true
   webfetch: false
   websearch: false
@@ -76,7 +76,7 @@ This agent uses repository base permissions from `.opencode` configuration. It h
 - **run_pytest**: Execute tests in Python projects
 - **run_linters**: Run linting/formatting via repository configuration
 - **get_version**: Get project version information
-- **get_date**: Get current date/time for timestamps
+- **get_datetime**: Get current date/time for timestamps (UTC by default, America/Denver when `localtime` is true)
 - **Core tool-only set**: read/edit/write/list/glob/grep/todoread/todowrite/create_workspace/workflow_builder/git_operations/platform_operations
 - **Denied**: webfetch, websearch, codesearch, bash
 

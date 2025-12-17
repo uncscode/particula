@@ -12,7 +12,7 @@
       "model": "base",
       "timeout": 1800,
       "retry": {
-        "max_retries": 2,
+        "max_retries": 1,
         "initial_delay": 5.0,
         "backoff": 2.0
       }
