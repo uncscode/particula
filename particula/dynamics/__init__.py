@@ -1,5 +1,8 @@
-"""
-Dynamics exposed via __init__.
+"""Dynamics public API.
+
+Re-exports wall loss, dilution, condensation, and coagulation utilities
+and strategies for convenient access through :mod:`particula.dynamics`.
+Includes spherical and rectangular wall loss strategies.
 """
 
 # pylint: disable=unused-import, disable=line-too-long

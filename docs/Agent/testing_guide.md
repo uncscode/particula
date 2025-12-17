@@ -121,6 +121,22 @@ particula/
     └── quick_start_test.py
 ```
 
+### Wall loss strategy coverage
+
+Wall loss strategy tests are mirrored to ensure both package export paths work:
+
+- `particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py`
+- `particula/dynamics/tests/wall_loss_strategies_test.py`
+
+Each file validates:
+
+- Strategy instantiation for spherical and rectangular geometries
+- Dimension validation for rectangular chambers (exactly three positive values)
+- Distribution types: "discrete", "continuous_pdf", "particle_resolved"
+- Aspect ratio cases (cubic, elongated, flat) produce finite rates
+- Edge cases: zero concentration and empty particle-resolved inputs
+- Parity with `get_rectangle_wall_loss_rate` helper functions
+
 ## Running Tests
 
 ### Basic Commands

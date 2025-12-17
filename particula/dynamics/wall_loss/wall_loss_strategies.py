@@ -1,20 +1,21 @@
 """Wall loss strategy abstractions and implementations.
 
 Defines abstract and concrete strategies for modeling particle wall
-loss processes in different chamber geometries. Strategies operate
-on :class:`~particula.particles.representation.ParticleRepresentation`
+loss processes in different chamber geometries. Strategies operate on
+:class:`~particula.particles.representation.ParticleRepresentation`
 objects and support multiple distribution types. Implementations are
 provided for spherical and rectangular chambers.
 
-The wall loss rate is modeled as a first-order size dependent loss process
+The wall loss rate is modeled as a first-order size dependent loss
+process
 
 .. math::
 
     L = -k (Dp) c,
 
-where :math:`L` is the wall loss rate [#/m^3 s], :math:`k` is the wall
-loss coefficient [1/s], and :math:`c` is the particle number
-concentration [#/m^3].
+where :math:`L` is the wall loss rate [#/m^3 s],
+:math:`k` is the wall loss coefficient [1/s], and :math:`c` is the
+particle number concentration [#/m^3].
 
 References:
     Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
@@ -50,17 +51,17 @@ def get_particle_resolved_wall_loss_step(
     """Perform particle-resolved wall loss step with stochastic removal.
 
     For particle-resolved simulations, each computational particle survives
-    with probability exp(-k * dt), where k is the size-dependent wall loss
-    coefficient. This function uses binomial random draws to determine which
-    particles are lost to the walls.
+    with probability ``exp(-k * dt)``, where ``k`` is the size-dependent wall
+    loss coefficient. Binomial draws determine which particles are lost to the
+    walls.
 
     Args:
         particle_radius: Array of particle radii [m].
         particle_density: Array of particle densities [kg/m^3].
         concentration: Array of particle concentrations [#/m^3].
-        loss_coefficient_func: Function to calculate wall loss coefficient
-            given (radius, density). Other parameters (temperature, pressure,
-            chamber geometry) should be bound via closure.
+        loss_coefficient_func: Callable returning wall loss coefficient for
+            provided particle radius and density. Temperature, pressure, and
+            geometry should be bound via closure.
         time_step: Time step [s].
         random_generator: Random number generator for stochastic draws.
 
@@ -213,8 +214,8 @@ class WallLossStrategy(ABC):
         """Return the wall loss rate for the given state.
 
         The loss rate is computed as ``-k(Dp) * c`` where ``k(Dp)`` is the
-        size-dependent wall loss coefficient and ``c`` is the particle
-        number concentration.
+        size-dependent wall loss coefficient and ``c`` is the particle number
+        concentration.
 
         Args:
             particle: Particle representation to evaluate.
@@ -477,18 +478,19 @@ class RectangularWallLossStrategy(WallLossStrategy):
 
     Examples:
         >>> import particula as par
+        >>> particle = par.particles.PresetParticleRadiusBuilder().build()
         >>> strategy = par.dynamics.RectangularWallLossStrategy(
         ...     wall_eddy_diffusivity=0.001,
         ...     chamber_dimensions=(1.0, 0.5, 0.5),
         ...     distribution_type="discrete",
         ... )
         >>> rate = strategy.rate(
-        ...     particle=par.particles.PresetParticleRadiusBuilder().build(),
+        ...     particle=particle,
         ...     temperature=298.0,
         ...     pressure=101325.0,
         ... )
         >>> _ = strategy.step(
-        ...     particle=par.particles.PresetParticleRadiusBuilder().build(),
+        ...     particle=particle,
         ...     temperature=298.0,
         ...     pressure=101325.0,
         ...     time_step=1.0,

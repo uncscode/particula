@@ -56,7 +56,7 @@ Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.
 ## Get Started with Particula
 
 [Setup Particula](Examples/Setup_Particula/index.md){ .md-button .md-button--primary }
-[API Reference](API/index.md){ .md-button }
+[API Reference](https://uncscode.github.io/particula/API/){ .md-button }
 [Examples](Examples/index.md){ .md-button }
 [Theory](Theory/index.md){ .md-button }
 
@@ -149,16 +149,19 @@ In addition to condensation and coagulation, Particula models particle loss to
 chamber walls. The wall loss API lives in `particula.dynamics.wall_loss` and is
 exposed through the `particula.dynamics` namespace.
 
-The strategy-based wall loss API is built around two classes:
+The strategy-based wall loss API is built around these classes:
 
 - `particula.dynamics.WallLossStrategy` – abstract base class for wall loss
   models.
 - `particula.dynamics.SphericalWallLossStrategy` – spherical chamber wall loss
-  strategy that uses existing wall loss coefficient utilities.
+  strategy.
+- `particula.dynamics.RectangularWallLossStrategy` – rectangular chamber wall
+  loss strategy with `(x, y, z)` dimensions (meters) validated for
+  positivity.
 
 Strategies operate on
 `particula.particles.representation.ParticleRepresentation` instances and
-support `"discrete"`, `"continuous_pdf"`, and `"particle_resolved"`
+support "discrete", "continuous_pdf", and "particle_resolved"
 distribution types.
 
 ```python
@@ -175,9 +178,9 @@ particle = (
     .build()
 )
 
-wall_loss = par.dynamics.SphericalWallLossStrategy(
+wall_loss = par.dynamics.RectangularWallLossStrategy(
     wall_eddy_diffusivity=0.001,  # m^2/s
-    chamber_radius=0.5,  # m
+    chamber_dimensions=(1.0, 0.5, 0.3),  # m
     distribution_type="discrete",
 )
 
@@ -197,6 +200,7 @@ for _ in range(10):
         time_step=1.0,
     )
 ```
+
 
 The legacy function-based API (`get_spherical_wall_loss_rate`,
 `get_rectangle_wall_loss_rate`) remains available for lower-level

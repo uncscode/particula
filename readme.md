@@ -35,34 +35,42 @@ For wall loss there are two complementary APIs:
 - **Function-based rates** (legacy):
   - `particula.dynamics.get_spherical_wall_loss_rate(...)`
   - `particula.dynamics.get_rectangle_wall_loss_rate(...)`
-- **Strategy-based API** (new):
+- **Strategy-based API** (preferred):
   - `particula.dynamics.WallLossStrategy` – abstract base class for wall loss
     models.
-  - `particula.dynamics.SphericalWallLossStrategy` – concrete strategy for
-    spherical chambers.
+  - `particula.dynamics.SphericalWallLossStrategy` – spherical chamber
+    strategy.
+  - `particula.dynamics.RectangularWallLossStrategy` – rectangular chamber
+    strategy with `(x, y, z)` dimensions in meters.
 
 Wall loss strategies operate directly on
 `particula.particles.representation.ParticleRepresentation` instances and
-support all three distribution types: `"discrete"`, `"continuous_pdf"`, and
-`"particle_resolved"`.
+support all three distribution types: "discrete", "continuous_pdf", and
+"particle_resolved".
 
 ```python
 import particula as par
 
 # Assume `particle` is a ParticleRepresentation
-wall_loss = par.dynamics.SphericalWallLossStrategy(
+spherical_loss = par.dynamics.SphericalWallLossStrategy(
     wall_eddy_diffusivity=0.001,  # m^2/s
     chamber_radius=0.5,  # m
     distribution_type="discrete",
 )
 
-rate = wall_loss.rate(
+rectangular_loss = par.dynamics.RectangularWallLossStrategy(
+    wall_eddy_diffusivity=0.001,  # m^2/s
+    chamber_dimensions=(1.0, 0.5, 0.3),  # m
+    distribution_type="discrete",
+)
+
+rate = rectangular_loss.rate(
     particle=particle,
     temperature=298.15,
     pressure=101325.0,
 )
 
-particle = wall_loss.step(
+particle = rectangular_loss.step(
     particle=particle,
     temperature=298.15,
     pressure=101325.0,
@@ -71,3 +79,4 @@ particle = wall_loss.step(
 ```
 
 See the online documentation for more examples and background theory.
+
