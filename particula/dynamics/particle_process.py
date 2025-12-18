@@ -223,13 +223,12 @@ class Coagulation(RunnableABC):
 
 
 class WallLoss(RunnableABC):
-    """Applies particle wall loss using a provided strategy.
+    """Apply wall loss strategy to aerosol particles.
 
-    The process supports discrete, continuous PDF, and particle-resolved
-    particle representations through the configured wall loss strategy.
-    Each execution splits the total ``time_step`` across ``sub_steps`` and
-    clamps concentrations to non-negative values after each sub-step to
-    guard against numerical underflow from aggressive steps.
+    Supports discrete, continuous PDF, and particle-resolved distributions via
+    the configured wall loss strategy. The total ``time_step`` is split across
+    ``sub_steps`` and concentrations are clamped to non-negative values after
+    each sub-step to avoid negative counts from aggressive steps.
 
     Example:
         >>> import particula as par
@@ -248,14 +247,18 @@ class WallLoss(RunnableABC):
         """Create a wall loss runnable.
 
         Args:
-            wall_loss_strategy: Strategy that computes wall loss rate and
+            wall_loss_strategy: Strategy that provides wall loss rates and
                 updates particle concentrations for the configured
                 distribution type.
         """
         self.wall_loss_strategy = wall_loss_strategy
 
     def _clamp_non_negative(self, particle: Any) -> None:
-        """Clamp particle concentrations to non-negative values."""
+        """Clamp particle concentrations to non-negative values.
+
+        Args:
+            particle: Particle object whose concentration is clipped in place.
+        """
         concentration = particle.get_concentration()
         clipped_concentration = np.clip(concentration, 0.0, None)
         if not np.array_equal(clipped_concentration, concentration):
@@ -268,9 +271,8 @@ class WallLoss(RunnableABC):
     ) -> Aerosol:
         """Apply wall loss over the provided time step.
 
-        The total ``time_step`` is divided equally across ``sub_steps``
-        iterations. Concentrations are clamped to remain non-negative
-        after each sub-step.
+        Concentrations are clamped to remain non-negative after each
+        sub-step.
 
         Args:
             aerosol: Aerosol instance to update.
@@ -291,7 +293,14 @@ class WallLoss(RunnableABC):
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
-        """Return the wall loss rate for the aerosol particles."""
+        """Return the wall loss rate for the aerosol particles.
+
+        Args:
+            aerosol: Aerosol instance containing particles to evaluate.
+
+        Returns:
+            Array of wall loss rates matching the particle representation.
+        """
         return self.wall_loss_strategy.rate(
             particle=aerosol.particles,
             temperature=aerosol.atmosphere.temperature,

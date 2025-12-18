@@ -52,6 +52,60 @@ Key advantages of the strategy-based API:
   `"particle_resolved"`.
 - Exposes a consistent interface: `loss_coefficient`, `rate`, and `step`.
 
+## Runnable entry point: `WallLoss` wrapper
+
+Use `particula.dynamics.WallLoss` when you want a runnable that splits
+`time_step` across `sub_steps`, clamps concentrations to non-negative values,
+and plugs into runnable chaining with `|`.
+
+```python
+import particula as par
+
+particle = par.particles.PresetParticleRadiusBuilder().build()
+atmosphere = par.gas.Atmosphere(
+    temperature=298.15,
+    total_pressure=101325.0,
+    partitioning_species=[],
+    gas_only_species=[],
+)
+aerosol = par.Aerosol(atmosphere=atmosphere, particles=particle)
+
+strategy = par.dynamics.SphericalWallLossStrategy(
+    wall_eddy_diffusivity=1e-3,
+    chamber_radius=0.5,
+    distribution_type="discrete",
+)
+wall_loss = par.dynamics.WallLoss(wall_loss_strategy=strategy)
+
+# Split 60 s into 3 sub-steps; concentrations clamp after each sub-step
+aerosol = wall_loss.execute(aerosol, time_step=60.0, sub_steps=3)
+print("Total concentration:", aerosol.particles.get_total_concentration())
+```
+
+### Chaining with other runnables
+
+Combine wall loss with coagulation (or any other runnable) using the `|`
+operator.
+
+```python
+coag_strategy = (
+    par.dynamics.BrownianCoagulationBuilder()
+    .set_distribution_type("discrete")
+    .build()
+)
+coagulation = par.dynamics.Coagulation(
+    coagulation_strategy=coag_strategy,
+)
+
+# Wall loss runs first, then Brownian coagulation in one call
+combined = wall_loss | coagulation
+aerosol = combined.execute(aerosol, time_step=60.0, sub_steps=3)
+```
+
+Switch `SphericalWallLossStrategy` for `RectangularWallLossStrategy`, or
+change the distribution type as needed; the runnable handles the sub-step
+splitting and clamping for any supported strategy.
+
 ## Quick Start: Spherical Wall Loss on a Lognormal Distribution
 
 The fastest way to try the strategy-based API is to:
@@ -367,4 +421,6 @@ Check the following:
 - Learn more about particle representations:
   - [Particle Phase Examples](../Particle_Phase/index.md)
 - Read more about wall loss strategies in the main docs:
-  - [Dynamics and wall loss overview](../../index.md#dynamics-and-wall-loss)
+  - [Dynamics and wall loss overview][wall-loss-overview]
+
+[wall-loss-overview]: ../../index.md#wall-loss-strategies-and-runnable

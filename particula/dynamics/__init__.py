@@ -1,9 +1,10 @@
 """Dynamics public API.
 
 Re-exports wall loss, dilution, condensation, and coagulation utilities,
-strategies, builders, and factories for convenient access through
+strategies, builders, factories, and runnable processes for access through
 :mod:`particula.dynamics`. Includes spherical and rectangular wall loss
-strategies along with their builders and factory.
+strategies with their builders and factory, plus ``MassCondensation``,
+``Coagulation``, and ``WallLoss`` runnables.
 """
 
 # pylint: disable=unused-import, disable=line-too-long

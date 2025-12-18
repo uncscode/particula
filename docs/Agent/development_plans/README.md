@@ -13,6 +13,10 @@ feature template to capture motivation, scope, phases, testing, and rollout.
   In Progress (P2, #817)
   - Scope: Rectangular chamber wall loss strategy with mirrored tests and
     exports.
+- [WallLoss Runnable Process][plan-wall-loss-runnable] — Status:
+  Completed (P1, #819)
+  - Scope: Runnable wrapping wall loss strategies with sub-step splitting,
+    non-negative clamp, exports, and runnable-level tests.
 
 ## References
 
@@ -20,3 +24,4 @@ feature template to capture motivation, scope, phases, testing, and rollout.
 
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md
 [plan-rect]: features/rectangular-wall-loss-strategy.md
+[plan-wall-loss-runnable]: features/wall-loss-runnable.md

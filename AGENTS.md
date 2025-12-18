@@ -204,18 +204,10 @@ strategy = par.dynamics.SphericalWallLossStrategy(
     distribution_type="discrete",
 )
 
-rate = strategy.rate(
-    particle=particle,
-    temperature=298.0,
-    pressure=101325.0,
-)
+wall_loss = par.dynamics.WallLoss(wall_loss_strategy=strategy)
 
-particle = strategy.step(
-    particle=particle,
-    temperature=298.0,
-    pressure=101325.0,
-    time_step=1.0,
-)
+# Split time_step across sub_steps; concentrations clamp at zero each step
+aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
 ```
 
 **Key points:**
@@ -223,6 +215,9 @@ particle = strategy.step(
 - Strategies live in `particula.dynamics.wall_loss` and are exported through
   `particula.dynamics`.
 - `WallLossStrategy` is the abstract base class for wall loss models.
+- `WallLoss` runnable wraps a strategy, splits `time_step` across `sub_steps`,
+  clamps concentrations to non-negative, and composes with other runnables
+  via `|`.
 - `SphericalWallLossStrategy` provides a spherical chamber implementation
   using existing wall loss coefficient utilities.
 - Supported `distribution_type` values are `"discrete"`, `"continuous_pdf"`,

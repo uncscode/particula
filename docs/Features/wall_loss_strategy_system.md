@@ -9,9 +9,14 @@ The wall loss strategy system lets you model particle deposition onto chamber wa
 This feature is built around user-facing APIs exposed via `particula.dynamics`:
 
 - `WallLossStrategy` – abstract base class for wall loss models.
-- `SphericalWallLossStrategy` and `RectangularWallLossStrategy` – chamber implementations using existing wall loss coefficient utilities.
-- `SphericalWallLossBuilder` and `RectangularWallLossBuilder` – validated, unit-aware builders for configuring strategies.
-- `WallLossFactory` – factory for selecting a wall loss geometry by name with builder defaults.
+- `SphericalWallLossStrategy` and `RectangularWallLossStrategy` – chamber
+  implementations using existing wall loss coefficient utilities.
+- `SphericalWallLossBuilder` and `RectangularWallLossBuilder` – validated,
+  unit-aware builders for configuring strategies.
+- `WallLossFactory` – factory for selecting a wall loss geometry by name with
+  builder defaults.
+- `WallLoss` runnable – delegates to a wall loss strategy on `Aerosol`, splits
+  `time_step` across `sub_steps`, and clamps concentrations non-negative.
 
 ## Key Benefits
 
@@ -52,9 +57,50 @@ par.dynamics.WallLossFactory
 
 All wall loss strategies share a common shape:
 
-- Initialize with physical parameters (e.g., wall eddy diffusivity, chamber radius).
-- Call `rate(particle, temperature, pressure)` to compute instantaneous loss rate.
-- Call `step(particle, temperature, pressure, time_step)` to advance the system.
+- Initialize with physical parameters (e.g., wall eddy diffusivity, chamber
+  radius).
+- Call `rate(particle, temperature, pressure)` to compute instantaneous loss
+  rate.
+- Call `step(particle, temperature, pressure, time_step)` to advance the
+  system.
+
+### Runnable entry point: `WallLoss`
+
+`WallLoss` is a `RunnableABC` implementation exported as `par.dynamics.WallLoss`.
+It operates on an `Aerosol` in the runnable pipeline, delegates `rate` and
+`step` to the provided wall loss strategy, splits `time_step` across any
+`sub_steps`, clamps concentrations to be non-negative after each sub-step, and
+works with spherical or rectangular strategies across all supported
+distribution types.
+
+```python
+import particula as par
+
+wall_loss_strategy = par.dynamics.SphericalWallLossStrategy(
+    wall_eddy_diffusivity=1e-3,
+    chamber_radius=0.5,
+    distribution_type="discrete",
+)
+wall_loss = par.dynamics.WallLoss(
+    wall_loss_strategy=wall_loss_strategy,
+)
+
+# Sub-steps split time_step and clamp concentrations after each sub-step
+aerosol = wall_loss.execute(
+    aerosol,
+    time_step=60.0,
+    sub_steps=4,
+)
+
+# Chain with another runnable in a single pipeline
+coagulation = par.dynamics.Coagulation(
+    coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
+        distribution_type="discrete",
+    ),
+)
+combined = coagulation | wall_loss
+aerosol = combined.execute(aerosol, time_step=60.0)
+```
 
 ### Spherical wall loss strategy
 
@@ -265,7 +311,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 - **Design details**: [Agent feature: wall loss strategy system](../Agent/feature/P2-wall-loss-strategy-system.md)
 - **Hands-on guide**: [Chamber wall loss example](../Examples/Chamber_Wall_Loss/wall_loss_strategy.md)
 - **Notebooks**: [Spherical wall loss strategy](../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb)
-- **Dynamics overview**: [Wall loss strategies](../index.md#wall-loss-strategies)
+- **Dynamics overview**: [Wall loss strategies](../index.md#wall-loss-strategies-and-runnable)
 
 ## FAQ
 
