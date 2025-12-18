@@ -6,14 +6,17 @@
 
 The wall loss strategy system lets you model particle deposition onto chamber walls using the same object-oriented patterns as condensation and coagulation. Instead of calling standalone rate functions, you work with strategy objects that operate on `ParticleRepresentation`, support multiple distribution types, and expose a consistent `rate` / `step` interface.
 
-This feature is built around two core APIs exposed via `particula.dynamics`:
+This feature is built around user-facing APIs exposed via `particula.dynamics`:
 
 - `WallLossStrategy` – abstract base class for wall loss models.
-- `SphericalWallLossStrategy` – spherical chamber implementation using existing wall loss coefficient utilities.
+- `SphericalWallLossStrategy` and `RectangularWallLossStrategy` – chamber implementations using existing wall loss coefficient utilities.
+- `SphericalWallLossBuilder` and `RectangularWallLossBuilder` – validated, unit-aware builders for configuring strategies.
+- `WallLossFactory` – factory for selecting a wall loss geometry by name with builder defaults.
 
 ## Key Benefits
 
 - **Consistent dynamics workflow**: Use the same strategy-based API (`rate`, `step`, `distribution_type`) as for condensation and coagulation.
+- **Builder/factory parity with validation**: Configure wall loss using the same unit-aware builder and factory patterns as other dynamics modules, with built-in checks for geometry and distribution types.
 - **Direct integration with ParticleRepresentation**: Apply wall loss directly to particle distributions without writing glue code.
 - **Extensible wall loss models**: Add new chamber geometries or wall loss models as additional `WallLossStrategy` implementations.
 
@@ -37,8 +40,14 @@ import particula as par
 # Abstract interface (not instantiated directly)
 par.dynamics.WallLossStrategy
 
-# Concrete spherical chamber implementation
+# Concrete chamber implementations
 par.dynamics.SphericalWallLossStrategy
+par.dynamics.RectangularWallLossStrategy
+
+# Builder and factory API (also re-exported via particula.dynamics.wall_loss)
+par.dynamics.SphericalWallLossBuilder
+par.dynamics.RectangularWallLossBuilder
+par.dynamics.WallLossFactory
 ```
 
 All wall loss strategies share a common shape:
@@ -65,15 +74,53 @@ wall_loss = par.dynamics.SphericalWallLossStrategy(
 )
 ```
 
+### Rectangular wall loss strategy
+
+`RectangularWallLossStrategy` models deposition in box-shaped chambers. Pair it with `RectangularWallLossBuilder` to validate a (length, width, height) tuple and convert units before constructing the strategy.
+
+### Builder and factory workflow
+
+Builders and the factory give you a validated, unit-aware way to construct wall loss strategies and keep parity with other dynamics modules. Geometry lengths convert to meters and wall eddy diffusivity converts to 1/s; setters validate positivity and enforce a length-3 tuple for rectangular chambers. Distribution types are restricted to the supported set and default to `"discrete"`.
+
+```python
+import particula as par
+
+# Chained builder with unit conversion and validation
+wall_loss = (
+    par.dynamics.SphericalWallLossBuilder()
+    .set_wall_eddy_diffusivity(1e-3, "1/s")
+    .set_chamber_radius(50.0, "cm")  # converts to 0.5 m
+    .set_distribution_type("discrete")
+    .build()
+)
+```
+
+For rectangular chambers, use `set_chamber_dimensions((L, W, H), units)`; each side must be positive and provided as a 3-tuple.
+
+```python
+factory = par.dynamics.WallLossFactory()
+rectangular = factory.get_strategy(
+    strategy_type="rectangular",
+    parameters={
+        "wall_eddy_diffusivity": 1e-4,
+        "chamber_dimensions": (1.0, 0.5, 0.5),
+        "distribution_type": "continuous_pdf",
+    },
+)
+```
+
+`WallLossFactory` is exported via both `particula.dynamics.wall_loss` and `particula.dynamics`, letting you select a geometry by name without manually instantiating builders.
+
 ### Support for multiple distribution types
 
 The strategy system operates on the same distribution types used elsewhere in particula:
 
-- `"discrete"` – radius-binned distributions.
-- `"continuous_pdf"` – continuous probability-density representations.
-- `"particle_resolved"` – ensembles of individual particles.
+- "discrete" – radius-binned distributions.
+- "continuous_pdf" – continuous probability-density representations.
+- "particle_resolved" – ensembles of individual particles.
 
-You select the appropriate mode at initialization via `distribution_type`, and the strategy adjusts its `step` behavior to match the representation.
+You select the appropriate mode at initialization (or via builder/factory parameters) with `distribution_type`, and the strategy adjusts its `step` behavior to match the representation.
+
 
 ## Getting Started
 
@@ -196,18 +243,21 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 | Option                   | Description                                              | Default        |
 |--------------------------|----------------------------------------------------------|----------------|
 | `wall_eddy_diffusivity` | Wall eddy diffusivity controlling wall mixing [m^2/s].  | Required       |
-| `chamber_radius`        | Radius of the spherical chamber [m].                     | Required       |
+| `chamber_radius`        | Radius of the spherical chamber [m] (spherical builder). | Required       |
+| `chamber_dimensions`    | Length, width, height of rectangular chamber [m].        | Required (rectangular) |
 | `distribution_type`     | `"discrete"`, `"continuous_pdf"`, or `"particle_resolved"`. | `"discrete"` |
 
 ## Best Practices
 
 1. **Match distribution type to your builder**: Ensure `distribution_type` matches how your `ParticleRepresentation` was constructed to avoid unintended behavior.
-2. **Use physically reasonable parameters**: Choose `wall_eddy_diffusivity` and `chamber_radius` consistent with your experimental setup.
-3. **Compose processes explicitly**: When combining wall loss with other dynamics, keep a clear, ordered time loop so you can reason about which processes act first in each step.
+2. **Use builder/factory validation**: Set parameters through the builders or factory to enforce positivity, 3D chamber dimensions, and allowed distribution types with automatic unit conversion.
+3. **Use physically reasonable parameters**: Choose `wall_eddy_diffusivity`, `chamber_radius`, or `chamber_dimensions` consistent with your experimental setup.
+4. **Compose processes explicitly**: When combining wall loss with other dynamics, keep a clear, ordered time loop so you can reason about which processes act first in each step.
 
 ## Limitations
 
-- Currently provides a spherical wall loss strategy; other geometries may require additional strategy implementations.
+- Supports spherical and rectangular chambers; other geometries require new strategies/builders to be added to the factory.
+- Factory selection is limited to registered strategy names.
 - Does not include a high-level chamber orchestrator; you are responsible for building the main time-stepping loop that combines multiple strategies.
 
 ## Related Documentation
@@ -215,7 +265,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 - **Design details**: [Agent feature: wall loss strategy system](../Agent/feature/P2-wall-loss-strategy-system.md)
 - **Hands-on guide**: [Chamber wall loss example](../Examples/Chamber_Wall_Loss/wall_loss_strategy.md)
 - **Notebooks**: [Spherical wall loss strategy](../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb)
-- **Dynamics overview**: [Dynamics and wall loss](../index.md#dynamics-and-wall-loss)
+- **Dynamics overview**: [Wall loss strategies](../index.md#wall-loss-strategies)
 
 ## FAQ
 

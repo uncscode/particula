@@ -769,11 +769,11 @@ class BuilderParticleResolvedCountMixin:
 class BuilderWallEddyDiffusivityMixin:
     """Mixin for setting wall eddy diffusivity.
 
-    Provides the ``set_wall_eddy_diffusivity`` method for builders that require
-    wall eddy diffusivity as a parameter.
+    Adds ``set_wall_eddy_diffusivity`` for builders that require wall eddy
+    diffusivity and stores the value in 1/s.
 
     Attributes:
-        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
+        wall_eddy_diffusivity: Wall eddy diffusivity in 1/s.
     """
 
     def __init__(self):
@@ -786,7 +786,7 @@ class BuilderWallEddyDiffusivityMixin:
         wall_eddy_diffusivity: float,
         wall_eddy_diffusivity_units: str = "1/s",
     ):
-        """Set wall eddy diffusivity.
+        """Set wall eddy diffusivity in 1/s.
 
         Args:
             wall_eddy_diffusivity: Wall eddy diffusivity value.
@@ -794,7 +794,10 @@ class BuilderWallEddyDiffusivityMixin:
                 "1/s".
 
         Returns:
-            Self for method chaining.
+            BuilderWallEddyDiffusivityMixin: Self for method chaining.
+
+        Raises:
+            ValueError: If ``wall_eddy_diffusivity`` is not positive.
         """
         self.wall_eddy_diffusivity = get_unit_conversion(
             wall_eddy_diffusivity_units,
@@ -807,11 +810,11 @@ class BuilderWallEddyDiffusivityMixin:
 class BuilderChamberRadiusMixin:
     """Mixin for setting spherical chamber radius.
 
-    Provides the ``set_chamber_radius`` method for builders that require a
-    spherical chamber radius.
+    Adds ``set_chamber_radius`` for builders that require spherical chamber
+    geometry and stores the value in meters.
 
     Attributes:
-        chamber_radius: Chamber radius [m].
+        chamber_radius: Chamber radius in meters.
     """
 
     def __init__(self):
@@ -824,14 +827,17 @@ class BuilderChamberRadiusMixin:
         chamber_radius: float,
         chamber_radius_units: str = "m",
     ):
-        """Set the chamber radius.
+        """Set the chamber radius in meters.
 
         Args:
             chamber_radius: Chamber radius value.
             chamber_radius_units: Units for the value. Defaults to "m".
 
         Returns:
-            Self for method chaining.
+            BuilderChamberRadiusMixin: Self for method chaining.
+
+        Raises:
+            ValueError: If ``chamber_radius`` is not positive.
         """
         self.chamber_radius = get_unit_conversion(
             chamber_radius_units,
@@ -844,11 +850,11 @@ class BuilderChamberRadiusMixin:
 class BuilderChamberDimensionsMixin:
     """Mixin for setting rectangular chamber dimensions.
 
-    Provides the ``set_chamber_dimensions`` method for builders that require
-    rectangular chamber dimensions.
+    Adds ``set_chamber_dimensions`` for builders that require rectangular
+    chamber geometry and stores dimensions in meters.
 
     Attributes:
-        chamber_dimensions: Tuple of (length, width, height) [m].
+        chamber_dimensions: Tuple of (length, width, height) in meters.
     """
 
     def __init__(self):
@@ -861,18 +867,18 @@ class BuilderChamberDimensionsMixin:
         chamber_dimensions: Tuple[float, float, float],
         chamber_dimensions_units: str = "m",
     ):
-        """Set rectangular chamber dimensions.
+        """Set rectangular chamber dimensions in meters.
 
         Args:
             chamber_dimensions: Tuple of (length, width, height).
             chamber_dimensions_units: Units for the values. Defaults to "m".
 
         Returns:
-            Self for method chaining.
+            BuilderChamberDimensionsMixin: Self for method chaining.
 
         Raises:
-            ValueError: If ``chamber_dimensions`` does not contain exactly
-                three values.
+            ValueError: If ``chamber_dimensions`` is not length three or any
+                value is non-positive.
         """
         if len(chamber_dimensions) != 3:
             raise ValueError(
@@ -903,8 +909,8 @@ class BuilderChamberDimensionsMixin:
 class BuilderDistributionTypeMixin:
     """Mixin for setting distribution type.
 
-    Provides ``set_distribution_type`` for builders requiring a distribution
-    type specification.
+    Adds ``set_distribution_type`` for builders requiring a distribution type.
+    Defaults to "discrete" and validates against supported types.
 
     Attributes:
         distribution_type: Distribution type string.
@@ -922,7 +928,7 @@ class BuilderDistributionTypeMixin:
                 "particle_resolved".
 
         Returns:
-            Self for method chaining.
+            BuilderDistributionTypeMixin: Self for method chaining.
 
         Raises:
             ValueError: If ``distribution_type`` is not supported.

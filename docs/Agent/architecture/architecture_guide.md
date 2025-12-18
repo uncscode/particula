@@ -183,7 +183,7 @@ particula/
 - `MassCondensation`: Vapor condensation onto particles
 - `Coagulation`: Particle-particle collisions
 - `Coagulation strategies`: Brownian, charged, turbulent, sedimentation
-- `wall_loss` package: Chamber wall loss coefficients and strategy-based wall loss models (`WallLossStrategy`, `SphericalWallLossStrategy`)
+- `wall_loss` package: Chamber wall loss coefficients, strategy-based wall loss models (`WallLossStrategy`, `SphericalWallLossStrategy`, `RectangularWallLossStrategy`), builders (`SphericalWallLossBuilder`, `RectangularWallLossBuilder`), and `WallLossFactory` exported via `particula.dynamics.wall_loss` and `particula.dynamics`
 - `dilution`: Chamber dilution process
 
 **Dependencies:** gas, particles, util, NumPy, SciPy
@@ -246,6 +246,7 @@ class MyBuilder(BuilderABC):
 - `AtmosphereBuilder` (builds `Atmosphere`)
 - `ParticleMassRepresentationBuilder` (builds `ParticleRepresentation`)
 - `BrownianCoagulationBuilder` (builds `BrownianCoagulationStrategy`)
+- `SphericalWallLossBuilder`, `RectangularWallLossBuilder` (build wall loss strategies using shared mixins for geometry and distribution)
 
 ### Strategy Pattern
 
@@ -301,6 +302,7 @@ class VaporPressureFactory:
 - `DistributionFactory`
 - `ActivityFactory`
 - `CoagulationFactory`
+- `WallLossFactory`
 
 ### Runnable Pattern
 

@@ -33,6 +33,14 @@ Here we show how to include charge effects in the coagulation kernel:
 - [Coagulation Charges via functions](Coagulation/Charge/Coagulation_with_Charge_functional.ipynb)
 - [Coagulation Charges via objects](Coagulation/Charge/Coagulation_with_Charge_objects.ipynb)
 
+## Wall Loss Builders and Factory
+
+- [Wall Loss Builders and Factory](wall_loss_builders_factory.md) – Build
+  spherical and rectangular wall loss strategies with unit-aware setters,
+  distribution options, and factory creation.
+- [Interactive notebook](wall_loss_builders_factory.ipynb) – Run the
+  builder/factory examples from this tutorial.
+
 ## Customization
 
 - [Adding Particles During Simulation](Customization/Adding_Particles_During_Simulation.ipynb) – 

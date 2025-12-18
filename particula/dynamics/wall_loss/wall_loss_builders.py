@@ -25,8 +25,13 @@ class SphericalWallLossBuilder(
 ):
     """Builder for spherical wall loss strategies.
 
-    Constructs a spherical wall loss strategy with validated parameters and
-    unit conversion support.
+    Validates wall eddy diffusivity, chamber radius, and distribution type
+    before constructing :class:`SphericalWallLossStrategy`.
+
+    Attributes:
+        wall_eddy_diffusivity: Wall eddy diffusivity in 1/s.
+        chamber_radius: Chamber radius in meters.
+        distribution_type: Distribution type for the strategy output.
     """
 
     def __init__(self):
@@ -43,10 +48,10 @@ class SphericalWallLossBuilder(
         """Build and return the spherical wall loss strategy.
 
         Returns:
-            Configured :class:`SphericalWallLossStrategy` instance.
+            SphericalWallLossStrategy: Configured wall loss strategy.
 
         Raises:
-            ValueError: If required parameters are not set.
+            ValueError: If required parameters are missing or invalid.
         """
         self.pre_build_check()
         wall_eddy_diffusivity = self.wall_eddy_diffusivity
@@ -69,8 +74,13 @@ class RectangularWallLossBuilder(
 ):
     """Builder for rectangular wall loss strategies.
 
-    Constructs a rectangular wall loss strategy with validated parameters and
-    unit conversion support.
+    Validates wall eddy diffusivity, chamber dimensions, and distribution type
+    before constructing :class:`RectangularWallLossStrategy`.
+
+    Attributes:
+        wall_eddy_diffusivity: Wall eddy diffusivity in 1/s.
+        chamber_dimensions: Tuple of (length, width, height) in meters.
+        distribution_type: Distribution type for the strategy output.
     """
 
     def __init__(self):
@@ -90,10 +100,10 @@ class RectangularWallLossBuilder(
         """Build and return the rectangular wall loss strategy.
 
         Returns:
-            Configured :class:`RectangularWallLossStrategy` instance.
+            RectangularWallLossStrategy: Configured wall loss strategy.
 
         Raises:
-            ValueError: If required parameters are not set.
+            ValueError: If required parameters are missing or invalid.
         """
         self.pre_build_check()
         wall_eddy_diffusivity = self.wall_eddy_diffusivity
