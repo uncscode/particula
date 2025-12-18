@@ -3,7 +3,7 @@
 # pylint: disable=too-few-public-methods
 
 import logging
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -763,4 +763,175 @@ class BuilderParticleResolvedCountMixin:
         if particle_resolved_count_units is not None:
             logger.warning("Ignoring units for particle resolved count.")
         self.particle_resolved_count = particle_resolved_count
+        return self
+
+
+class BuilderWallEddyDiffusivityMixin:
+    """Mixin for setting wall eddy diffusivity.
+
+    Provides the ``set_wall_eddy_diffusivity`` method for builders that require
+    wall eddy diffusivity as a parameter.
+
+    Attributes:
+        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
+    """
+
+    def __init__(self):
+        """Initialize wall eddy diffusivity mixin."""
+        self.wall_eddy_diffusivity: Optional[float] = None
+
+    @validate_inputs({"wall_eddy_diffusivity": "positive"})
+    def set_wall_eddy_diffusivity(
+        self,
+        wall_eddy_diffusivity: float,
+        wall_eddy_diffusivity_units: str = "1/s",
+    ):
+        """Set wall eddy diffusivity.
+
+        Args:
+            wall_eddy_diffusivity: Wall eddy diffusivity value.
+            wall_eddy_diffusivity_units: Units for the value. Defaults to
+                "1/s".
+
+        Returns:
+            Self for method chaining.
+        """
+        self.wall_eddy_diffusivity = get_unit_conversion(
+            wall_eddy_diffusivity_units,
+            "1/s",
+            wall_eddy_diffusivity,
+        )
+        return self
+
+
+class BuilderChamberRadiusMixin:
+    """Mixin for setting spherical chamber radius.
+
+    Provides the ``set_chamber_radius`` method for builders that require a
+    spherical chamber radius.
+
+    Attributes:
+        chamber_radius: Chamber radius [m].
+    """
+
+    def __init__(self):
+        """Initialize chamber radius mixin."""
+        self.chamber_radius: Optional[float] = None
+
+    @validate_inputs({"chamber_radius": "positive"})
+    def set_chamber_radius(
+        self,
+        chamber_radius: float,
+        chamber_radius_units: str = "m",
+    ):
+        """Set the chamber radius.
+
+        Args:
+            chamber_radius: Chamber radius value.
+            chamber_radius_units: Units for the value. Defaults to "m".
+
+        Returns:
+            Self for method chaining.
+        """
+        self.chamber_radius = get_unit_conversion(
+            chamber_radius_units,
+            "m",
+            chamber_radius,
+        )
+        return self
+
+
+class BuilderChamberDimensionsMixin:
+    """Mixin for setting rectangular chamber dimensions.
+
+    Provides the ``set_chamber_dimensions`` method for builders that require
+    rectangular chamber dimensions.
+
+    Attributes:
+        chamber_dimensions: Tuple of (length, width, height) [m].
+    """
+
+    def __init__(self):
+        """Initialize chamber dimensions mixin."""
+        self.chamber_dimensions: Optional[Tuple[float, float, float]] = None
+
+    @validate_inputs({"chamber_dimensions": "positive"})
+    def set_chamber_dimensions(
+        self,
+        chamber_dimensions: Tuple[float, float, float],
+        chamber_dimensions_units: str = "m",
+    ):
+        """Set rectangular chamber dimensions.
+
+        Args:
+            chamber_dimensions: Tuple of (length, width, height).
+            chamber_dimensions_units: Units for the values. Defaults to "m".
+
+        Returns:
+            Self for method chaining.
+
+        Raises:
+            ValueError: If ``chamber_dimensions`` does not contain exactly
+                three values.
+        """
+        if len(chamber_dimensions) != 3:
+            raise ValueError(
+                "chamber_dimensions must contain three values: "
+                "(length, width, height)."
+            )
+        length, width, height = chamber_dimensions
+        self.chamber_dimensions = (
+            get_unit_conversion(
+                chamber_dimensions_units,
+                "m",
+                length,
+            ),
+            get_unit_conversion(
+                chamber_dimensions_units,
+                "m",
+                width,
+            ),
+            get_unit_conversion(
+                chamber_dimensions_units,
+                "m",
+                height,
+            ),
+        )
+        return self
+
+
+class BuilderDistributionTypeMixin:
+    """Mixin for setting distribution type.
+
+    Provides ``set_distribution_type`` for builders requiring a distribution
+    type specification.
+
+    Attributes:
+        distribution_type: Distribution type string.
+    """
+
+    def __init__(self):
+        """Initialize distribution type mixin."""
+        self.distribution_type: str = "discrete"
+
+    def set_distribution_type(self, distribution_type: str):
+        """Set the distribution type.
+
+        Args:
+            distribution_type: One of "discrete", "continuous_pdf", or
+                "particle_resolved".
+
+        Returns:
+            Self for method chaining.
+
+        Raises:
+            ValueError: If ``distribution_type`` is not supported.
+        """
+        valid_types = ["discrete", "continuous_pdf", "particle_resolved"]
+        if distribution_type not in valid_types:
+            raise ValueError(
+                "distribution_type must be one of "
+                f"{valid_types}, got '{distribution_type}'."
+            )
+        self.distribution_type = distribution_type
         return self
