@@ -29,6 +29,7 @@ from particula.dynamics.wall_loss import (
 from particula.dynamics.particle_process import (
     MassCondensation,
     Coagulation,
+    WallLoss,
 )
 
 # particula.dynamics.properties
@@ -152,3 +153,5 @@ from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_met
     get_particle_resolved_coagulation_step,
     get_particle_resolved_update_step,
 )
+
+__all__ = [name for name in globals() if not name.startswith("_")]

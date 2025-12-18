@@ -17,6 +17,7 @@ from .coagulation.coagulation_strategy.coagulation_strategy_abc import (
 from .condensation.condensation_strategies import (
     CondensationStrategy,
 )
+from .wall_loss.wall_loss_strategies import WallLossStrategy
 
 
 class MassCondensation(RunnableABC):
@@ -219,3 +220,80 @@ class Coagulation(RunnableABC):
         )
         rates = np.append(rates, net_rate)
         return rates
+
+
+class WallLoss(RunnableABC):
+    """Applies particle wall loss using a provided strategy.
+
+    The process supports discrete, continuous PDF, and particle-resolved
+    particle representations through the configured wall loss strategy.
+    Each execution splits the total ``time_step`` across ``sub_steps`` and
+    clamps concentrations to non-negative values after each sub-step to
+    guard against numerical underflow from aggressive steps.
+
+    Example:
+        >>> import particula as par
+        >>> strategy = par.dynamics.SphericalWallLossStrategy(
+        ...     wall_eddy_diffusivity=0.001,
+        ...     chamber_radius=0.5,
+        ...     distribution_type="discrete",
+        ... )
+        >>> wall_loss = par.dynamics.WallLoss(
+        ...     wall_loss_strategy=strategy,
+        ... )
+        >>> _ = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
+    """
+
+    def __init__(self, wall_loss_strategy: WallLossStrategy):
+        """Create a wall loss runnable.
+
+        Args:
+            wall_loss_strategy: Strategy that computes wall loss rate and
+                updates particle concentrations for the configured
+                distribution type.
+        """
+        self.wall_loss_strategy = wall_loss_strategy
+
+    def _clamp_non_negative(self, particle: Any) -> None:
+        """Clamp particle concentrations to non-negative values."""
+        concentration = particle.get_concentration()
+        clipped_concentration = np.clip(concentration, 0.0, None)
+        if not np.array_equal(clipped_concentration, concentration):
+            particle.concentration = (
+                clipped_concentration * particle.get_volume()
+            )
+
+    def execute(
+        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+    ) -> Aerosol:
+        """Apply wall loss over the provided time step.
+
+        The total ``time_step`` is divided equally across ``sub_steps``
+        iterations. Concentrations are clamped to remain non-negative
+        after each sub-step.
+
+        Args:
+            aerosol: Aerosol instance to update.
+            time_step: Total simulation interval in seconds.
+            sub_steps: Number of internal steps used to split ``time_step``.
+
+        Returns:
+            Aerosol with updated particle concentrations.
+        """
+        for _ in range(sub_steps):
+            aerosol.particles = self.wall_loss_strategy.step(
+                particle=aerosol.particles,
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
+                time_step=time_step / sub_steps,
+            )
+            self._clamp_non_negative(aerosol.particles)
+        return aerosol
+
+    def rate(self, aerosol: Aerosol) -> Any:
+        """Return the wall loss rate for the aerosol particles."""
+        return self.wall_loss_strategy.rate(
+            particle=aerosol.particles,
+            temperature=aerosol.atmosphere.temperature,
+            pressure=aerosol.atmosphere.total_pressure,
+        )
