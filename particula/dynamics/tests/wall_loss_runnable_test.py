@@ -1,26 +1,18 @@
 """Tests for the WallLoss runnable process."""
 
-import importlib
-import pathlib
-import sys
+# ruff: noqa: D100,D101,D102,D103,D107
 
 import numpy as np
 import pytest
 
-_WORKTREE_ROOT = pathlib.Path(__file__).resolve().parents[3]
-if str(_WORKTREE_ROOT) not in sys.path:
-    sys.path.insert(0, str(_WORKTREE_ROOT))
-for _module in [
-    "particula",
-    "particula.dynamics",
-    "particula.dynamics.wall_loss",
-]:
-    sys.modules.pop(_module, None)
-
 from particula.aerosol import Aerosol
-from particula.dynamics import Coagulation, MassCondensation, WallLoss
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
-    CoagulationStrategyABC,
+from particula.dynamics import (
+    Coagulation,
+    MassCondensation,
+    WallLoss,
+)
+from particula.dynamics.coagulation.coagulation_strategy import (
+    coagulation_strategy_abc,
 )
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationStrategy,
@@ -35,6 +27,8 @@ from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
 )
+
+CoagulationStrategyABC = coagulation_strategy_abc.CoagulationStrategyABC
 
 
 @pytest.fixture()
