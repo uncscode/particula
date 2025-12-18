@@ -422,10 +422,30 @@ class SphericalWallLossStrategy(WallLossStrategy):
         Returns:
             Wall loss coefficient [1/s].
         """
+        radius = np.asarray(particle.get_radius())
+        density = np.asarray(particle.get_effective_density())
+
+        if self.distribution_type == "particle_resolved":
+            concentration = np.asarray(particle.get_concentration())
+            active = (radius > 0) & (concentration > 0)
+            coefficient = np.zeros_like(concentration, dtype=np.float64)
+            if np.any(active):
+                coefficient[active] = (
+                    get_spherical_wall_loss_coefficient_via_system_state(
+                        wall_eddy_diffusivity=self.wall_eddy_diffusivity,
+                        particle_radius=radius[active],
+                        particle_density=density[active],
+                        temperature=temperature,
+                        pressure=pressure,
+                        chamber_radius=self.chamber_radius,
+                    )
+                )
+            return coefficient
+
         return get_spherical_wall_loss_coefficient_via_system_state(
             wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-            particle_radius=particle.get_radius(),
-            particle_density=particle.get_effective_density(),
+            particle_radius=radius,
+            particle_density=density,
             temperature=temperature,
             pressure=pressure,
             chamber_radius=self.chamber_radius,
@@ -560,10 +580,30 @@ class RectangularWallLossStrategy(WallLossStrategy):
         Returns:
             Wall loss coefficient [1/s] for each particle bin.
         """
+        radius = np.asarray(particle.get_radius())
+        density = np.asarray(particle.get_effective_density())
+
+        if self.distribution_type == "particle_resolved":
+            concentration = np.asarray(particle.get_concentration())
+            active = (radius > 0) & (concentration > 0)
+            coefficient = np.zeros_like(concentration, dtype=np.float64)
+            if np.any(active):
+                coefficient[active] = (
+                    get_rectangle_wall_loss_coefficient_via_system_state(
+                        wall_eddy_diffusivity=self.wall_eddy_diffusivity,
+                        particle_radius=radius[active],
+                        particle_density=density[active],
+                        temperature=temperature,
+                        pressure=pressure,
+                        chamber_dimensions=self.chamber_dimensions,
+                    )
+                )
+            return coefficient
+
         return get_rectangle_wall_loss_coefficient_via_system_state(
             wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-            particle_radius=particle.get_radius(),
-            particle_density=particle.get_effective_density(),
+            particle_radius=radius,
+            particle_density=density,
             temperature=temperature,
             pressure=pressure,
             chamber_dimensions=self.chamber_dimensions,
