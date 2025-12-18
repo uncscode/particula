@@ -125,7 +125,7 @@ class WallLossStrategy(ABC):
     rates for different distribution types.
 
     Attributes:
-        wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
         distribution_type: Distribution type ("discrete",
             "continuous_pdf", or "particle_resolved").
         random_generator: Random number generator for stochastic
@@ -143,7 +143,7 @@ class WallLossStrategy(ABC):
         """Initialize the wall loss strategy.
 
         Args:
-            wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+            wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
             distribution_type: Distribution type ("discrete",
                 "continuous_pdf", or "particle_resolved").
 
@@ -348,7 +348,7 @@ class SphericalWallLossStrategy(WallLossStrategy):
     using turbulent diffusion and gravitational settling.
 
     Attributes:
-        wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
         chamber_radius: Radius of the spherical chamber [m].
         distribution_type: Distribution type ("discrete",
             "continuous_pdf", or "particle_resolved").
@@ -392,7 +392,7 @@ class SphericalWallLossStrategy(WallLossStrategy):
         """Initialize spherical wall loss strategy.
 
         Args:
-            wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+            wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
             chamber_radius: Radius of the spherical chamber [m].
             distribution_type: Distribution type ("discrete",
                 "continuous_pdf", or "particle_resolved").
@@ -471,7 +471,7 @@ class RectangularWallLossStrategy(WallLossStrategy):
     discrete, continuous PDF, and particle-resolved distributions.
 
     Attributes:
-        wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+        wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
         chamber_dimensions: Chamber dimensions (length, width, height) [m].
         distribution_type: Distribution type ("discrete",
             "continuous_pdf", or "particle_resolved").
@@ -517,7 +517,7 @@ class RectangularWallLossStrategy(WallLossStrategy):
         """Initialize rectangular wall loss strategy.
 
         Args:
-            wall_eddy_diffusivity: Wall eddy diffusivity [m^2/s].
+            wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
             chamber_dimensions: Chamber dimensions (length, width, height)
                 in meters. All must be positive.
             distribution_type: Distribution type ("discrete",

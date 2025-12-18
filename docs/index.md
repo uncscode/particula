@@ -219,9 +219,11 @@ spherical_loss = builder.build()
 factory = par.dynamics.WallLossFactory()
 rectangular_loss = factory.get_strategy(
     strategy_type="rectangular",
-    wall_eddy_diffusivity=0.001,
-    chamber_dimensions=(1.0, 0.5, 0.3),
-    distribution_type="particle_resolved",
+    parameters={
+        "wall_eddy_diffusivity": 0.001,
+        "chamber_dimensions": (1.0, 0.5, 0.3),
+        "distribution_type": "particle_resolved",
+    },
 )
 ```
 
