@@ -65,6 +65,7 @@ Jump in by selecting any card below and follow along in your browser or local en
     How to simulate experiments for the loss of particles to the chamber walls,
     including the strategy-based wall loss API
     (`WallLossStrategy`, `SphericalWallLossStrategy`, and `RectangularWallLossStrategy`).
+    - [Wall Loss Tutorial](Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb) — Geometry comparison plus coagulation/condensation chaining
 
     [:octicons-arrow-right-24: Tutorial](Chamber_Wall_Loss/index.md)
 

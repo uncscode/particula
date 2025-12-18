@@ -7,6 +7,7 @@ In this example we'll go through the steps for simulation of wall loss in a cham
 - [Wall Loss Forward Simulation](Notebooks/Chamber_Forward_Simulation.ipynb)
 - [Spherical Wall Loss Strategy](Notebooks/Spherical_Wall_Loss_Strategy.ipynb)
 - [Rectangular Wall Loss Strategy](Notebooks/Rectangular_Wall_Loss_Strategy.ipynb)
+- [Wall Loss Tutorial](Notebooks/Wall_Loss_Tutorial.ipynb) - Integrated tutorial comparing spherical vs rectangular chambers with process chaining
 
 ## Guides
 
