@@ -249,4 +249,6 @@ rectangular_loss = factory.get_strategy(
 The legacy function-based API (`get_spherical_wall_loss_rate`,
 `get_rectangle_wall_loss_rate`) remains available for lower-level
 calculations; the strategy classes provide a more consistent interface
-alongside condensation and coagulation strategies.
+alongside condensation and coagulation strategies. For a full
+geometry comparison plus chaining with coagulation and condensation,
+see the [Wall Loss Tutorial notebook](Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb).
