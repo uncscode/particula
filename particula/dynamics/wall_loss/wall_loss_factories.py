@@ -18,13 +18,20 @@ BuilderType = Union[SphericalWallLossBuilder, RectangularWallLossBuilder]
 class WallLossFactory(StrategyFactoryABC):
     """Factory for wall loss strategies.
 
+    Builds wall loss strategies using registered builders and the
+    :class:`StrategyFactoryABC` workflow.
+
     Supported strategy types:
         - "spherical": ``SphericalWallLossStrategy`` for spherical chambers.
         - "rectangular": ``RectangularWallLossStrategy`` for box chambers.
     """
 
     def get_builders(self) -> Dict[str, BuilderType]:
-        """Return available wall loss builders keyed by strategy name."""
+        """Return available wall loss builders keyed by strategy name.
+
+        Returns:
+            Dict[str, BuilderType]: Mapping of strategy type to builder.
+        """
         return {
             "spherical": SphericalWallLossBuilder(),
             "rectangular": RectangularWallLossBuilder(),
@@ -37,13 +44,15 @@ class WallLossFactory(StrategyFactoryABC):
 
         Args:
             strategy_type: Strategy name ("spherical" or "rectangular").
-            parameters: Optional parameter mapping to configure the builder.
+            parameters: Optional parameter mapping for the builder. Keys may
+                include values with unit suffixes and ``distribution_type``.
 
         Returns:
             Built wall loss strategy instance.
 
         Raises:
-            ValueError: If ``strategy_type`` is unknown.
+            ValueError: If ``strategy_type`` is unknown or parameters are
+                invalid.
         """
         builder_map = self.get_builders()
         builder = builder_map.get(strategy_type.lower())

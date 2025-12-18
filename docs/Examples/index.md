@@ -103,7 +103,12 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    [Dynamics](Dynamics/index.md) is a collection of classes that processes `Aerosol` objects, to perform coagulation, condensation, and other processes.
+    [Dynamics](Dynamics/index.md) is a collection of classes that processes
+    `Aerosol` objects, to perform coagulation, condensation, and other
+    processes.
+
+    Key examples:
+    - [Wall Loss Builders and Factory](Dynamics/wall_loss_builders_factory.md)
 
     [:octicons-arrow-right-24: Tutorial](Dynamics/index.md)
 

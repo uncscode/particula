@@ -25,12 +25,19 @@ docs/Agent/architecture/
 
 - Implementations live in
   `particula/dynamics/wall_loss/wall_loss_strategies.py`.
-- Strategies are exported through both `particula.dynamics.wall_loss` and
-  `particula.dynamics` to keep import parity.
+- Builders live in `particula/dynamics/wall_loss/wall_loss_builders.py` and
+  use mixins in `particula/builder_mixin.py` for geometry/distribution
+  validation and unit conversion.
+- `WallLossFactory` resides in
+  `particula/dynamics/wall_loss/wall_loss_factories.py` and is exported
+  alongside strategies via `particula.dynamics.wall_loss` and
+  `particula.dynamics`.
 - Available strategies: `SphericalWallLossStrategy` (radius) and
-  `RectangularWallLossStrategy` (validated `(x, y, z)` dimensions in meters).
+  `RectangularWallLossStrategy` (validated `(x, y, z)` dimensions in meters)
+  with builder and factory support.
 - Tests are mirrored in `particula/dynamics/wall_loss/tests/` and
-  `particula/dynamics/tests/` to cover both export paths.
+  `particula/dynamics/tests/` to cover strategies, builders, and factory
+  export paths.
 
 ## Quick Navigation
 

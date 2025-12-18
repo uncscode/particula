@@ -202,6 +202,29 @@ for _ in range(10):
 ```
 
 
+You can configure wall loss strategies through builders with unit conversion
+and validation for geometry and diffusivity. Distribution type defaults to
+"discrete" and may be set to "continuous_pdf" or "particle_resolved".
+
+```python
+import particula as par
+
+builder = (
+    par.dynamics.SphericalWallLossBuilder()
+    .set_wall_eddy_diffusivity(0.001, "m^2/s")
+    .set_chamber_radius(0.5, "m")
+)
+spherical_loss = builder.build()
+
+factory = par.dynamics.WallLossFactory()
+rectangular_loss = factory.get_strategy(
+    strategy_type="rectangular",
+    wall_eddy_diffusivity=0.001,
+    chamber_dimensions=(1.0, 0.5, 0.3),
+    distribution_type="particle_resolved",
+)
+```
+
 The legacy function-based API (`get_spherical_wall_loss_rate`,
 `get_rectangle_wall_loss_rate`) remains available for lower-level
 calculations; the strategy classes provide a more consistent interface

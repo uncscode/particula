@@ -84,6 +84,7 @@ The system is built on **NumPy** for high-performance vectorized operations and 
 - `MassCondensation`: Vapor condensation onto particles
 - `Coagulation`: Particle-particle collisions
 - `WallLossStrategy`, `SphericalWallLossStrategy`: Strategy-based wall loss for chamber geometries, provided by the `particula.dynamics.wall_loss` package
+- `SphericalWallLossBuilder`, `RectangularWallLossBuilder`, `WallLossFactory`: Builder/factory support for wall loss strategies exported via `particula.dynamics.wall_loss` and `particula.dynamics`
 - `RunnableABC`: Abstract base for chainable processes
 - `RunnableSequence`: Chain multiple processes with `|` operator
 
@@ -105,6 +106,7 @@ The system is built on **NumPy** for high-performance vectorized operations and 
 - `AtmosphereBuilder`: Build `Atmosphere` objects
 - `ParticleMassRepresentationBuilder`: Build `ParticleRepresentation` objects
 - `BrownianCoagulationBuilder`: Build coagulation strategies
+- `SphericalWallLossBuilder`, `RectangularWallLossBuilder`: Build wall loss strategies (used by `WallLossFactory`)
 
 **Dependencies:**
 - `particula.abc_builder.BuilderABC` (base class)
@@ -200,8 +202,10 @@ particula/
 │   ├── particle_process.py # MassCondensation, Coagulation classes
 │   ├── wall_loss/          # Chamber wall loss (package)
 │   │   ├── wall_loss_strategies.py  # Strategy-based wall loss models
+│   │   ├── wall_loss_builders.py    # Builders for wall loss strategies (spherical, rectangular)
+│   │   ├── wall_loss_factories.py   # Factory for wall loss strategies
 │   │   ├── rate.py                 # Legacy wall loss rate functions
-│   │   └── tests/                  # Test coverage for wall loss strategies
+│   │   └── tests/                  # Test coverage for wall loss strategies, builders, factories
 │   └── dilution.py         # Chamber dilution
 ├── activity/               # Activity coefficients, phase separation
 │   ├── tests/              # Test coverage

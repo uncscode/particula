@@ -1,8 +1,8 @@
-"""Wall loss utilities and strategies.
+"""Wall loss utilities, strategies, builders, and factory.
 
-Provides rate calculators and strategy classes for particle wall
-loss in spherical and rectangular chamber geometries, including
-helpers for deterministic and particle-resolved simulations.
+Provides rate calculators, strategy classes, and builders for particle wall
+loss in spherical and rectangular chambers, including helpers for
+deterministic and particle-resolved simulations.
 """
 
 from .rate import (

@@ -78,5 +78,28 @@ particle = rectangular_loss.step(
 )
 ```
 
+Wall loss builders mirror other dynamics builders and handle unit conversion and
+validation for geometry and diffusivity. You can also construct strategies by
+name with the factory if you prefer name-based selection.
+
+```python
+import particula as par
+
+builder = (
+    par.dynamics.RectangularWallLossBuilder()
+    .set_wall_eddy_diffusivity(0.001, "m^2/s")
+    .set_chamber_dimensions((1.0, 0.5, 0.3), "m")
+    .set_distribution_type("discrete")
+)
+rectangular_loss = builder.build()
+
+wall_loss = par.dynamics.WallLossFactory().get_strategy(
+    strategy_type="rectangular",
+    wall_eddy_diffusivity=0.001,
+    chamber_dimensions=(1.0, 0.5, 0.3),
+    distribution_type="continuous_pdf",
+)
+```
+
 See the online documentation for more examples and background theory.
 
