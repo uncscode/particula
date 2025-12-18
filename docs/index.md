@@ -143,13 +143,13 @@ result = process.execute(aerosol, time_step=10.0)
 print(result)
 ```
 
-### Wall loss strategies
+### Wall loss strategies and runnable
 
 In addition to condensation and coagulation, Particula models particle loss to
 chamber walls. The wall loss API lives in `particula.dynamics.wall_loss` and is
 exposed through the `particula.dynamics` namespace.
 
-The strategy-based wall loss API is built around these classes:
+The wall loss API is built around:
 
 - `particula.dynamics.WallLossStrategy` – abstract base class for wall loss
   models.
@@ -158,6 +158,9 @@ The strategy-based wall loss API is built around these classes:
 - `particula.dynamics.RectangularWallLossStrategy` – rectangular chamber wall
   loss strategy with `(x, y, z)` dimensions (meters) validated for
   positivity.
+- `particula.dynamics.WallLoss` – Runnable entry point that wraps a strategy,
+  splits `time_step` across `sub_steps`, clamps concentrations to non-negative
+  after each sub-step, and composes with other runnables using `|`.
 
 Strategies operate on
 `particula.particles.representation.ParticleRepresentation` instances and
@@ -178,29 +181,45 @@ particle = (
     .build()
 )
 
-wall_loss = par.dynamics.RectangularWallLossStrategy(
+atmosphere = (
+    par.gas.AtmosphereBuilder()
+    .set_temperature(298.15, "K")
+    .set_pressure(101325, "Pa")
+    .build()
+)
+
+aerosol = (
+    par.AerosolBuilder()
+    .set_particles(particle)
+    .set_atmosphere(atmosphere)
+    .build()
+)
+
+wall_loss_strategy = par.dynamics.RectangularWallLossStrategy(
     wall_eddy_diffusivity=0.001,  # m^2/s
     chamber_dimensions=(1.0, 0.5, 0.3),  # m
     distribution_type="discrete",
 )
 
-# Instantaneous wall loss rate
-rate = wall_loss.rate(
-    particle=particle,
-    temperature=298.15,
-    pressure=101325.0,
+wall_loss = par.dynamics.WallLoss(
+    wall_loss_strategy=wall_loss_strategy,
 )
 
-# Apply wall loss for 10 seconds
-for _ in range(10):
-    particle = wall_loss.step(
-        particle=particle,
-        temperature=298.15,
-        pressure=101325.0,
-        time_step=1.0,
-    )
-```
+# Apply wall loss with sub-steps; concentrations clamp non-negative each time
+aerosol = wall_loss.execute(
+    aerosol,
+    time_step=10.0,
+    sub_steps=5,
+)
 
+# Chain with other processes using Runnable composition
+coagulation_strategy = par.dynamics.BrownianCoagulationStrategy(
+    distribution_type="discrete",
+)
+coagulation = par.dynamics.Coagulation(coagulation_strategy)
+combined = coagulation | wall_loss
+aerosol = combined.execute(aerosol, time_step=10.0)
+```
 
 You can configure wall loss strategies through builders with unit conversion
 and validation for geometry and diffusivity. Distribution type defaults to
