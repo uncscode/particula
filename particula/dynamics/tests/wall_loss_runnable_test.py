@@ -203,7 +203,7 @@ def test_rectangular_strategy_smoke(aerosol, rectangular_strategy):
     assert updated.particles.get_total_concentration() >= 0.0
 
 
-def test_continuous_distribution_smoke(aerosol_resolved, atmosphere):
+def test_particle_resolved_distribution_smoke(aerosol_resolved, atmosphere):
     strategy = SphericalWallLossStrategy(
         wall_eddy_diffusivity=1e-3,
         chamber_radius=0.5,
