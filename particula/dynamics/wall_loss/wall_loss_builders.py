@@ -23,7 +23,7 @@ class SphericalWallLossBuilder(
     BuilderChamberRadiusMixin,
     BuilderDistributionTypeMixin,
 ):
-    """Builder for :class:`~particula.dynamics.wall_loss.wall_loss_strategies.SphericalWallLossStrategy`.
+    """Builder for spherical wall loss strategies.
 
     Constructs a spherical wall loss strategy with validated parameters and
     unit conversion support.
@@ -49,11 +49,14 @@ class SphericalWallLossBuilder(
             ValueError: If required parameters are not set.
         """
         self.pre_build_check()
-        assert self.wall_eddy_diffusivity is not None
-        assert self.chamber_radius is not None
+        wall_eddy_diffusivity = self.wall_eddy_diffusivity
+        chamber_radius = self.chamber_radius
+        if wall_eddy_diffusivity is None or chamber_radius is None:
+            msg = "Required parameters not set."
+            raise ValueError(msg)
         return SphericalWallLossStrategy(
-            wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-            chamber_radius=self.chamber_radius,
+            wall_eddy_diffusivity=wall_eddy_diffusivity,
+            chamber_radius=chamber_radius,
             distribution_type=self.distribution_type,
         )
 
@@ -64,7 +67,7 @@ class RectangularWallLossBuilder(
     BuilderChamberDimensionsMixin,
     BuilderDistributionTypeMixin,
 ):
-    """Builder for :class:`~particula.dynamics.wall_loss.wall_loss_strategies.RectangularWallLossStrategy`.
+    """Builder for rectangular wall loss strategies.
 
     Constructs a rectangular wall loss strategy with validated parameters and
     unit conversion support.
@@ -93,10 +96,13 @@ class RectangularWallLossBuilder(
             ValueError: If required parameters are not set.
         """
         self.pre_build_check()
-        assert self.wall_eddy_diffusivity is not None
-        assert self.chamber_dimensions is not None
+        wall_eddy_diffusivity = self.wall_eddy_diffusivity
+        chamber_dimensions = self.chamber_dimensions
+        if wall_eddy_diffusivity is None or chamber_dimensions is None:
+            msg = "Required parameters not set."
+            raise ValueError(msg)
         return RectangularWallLossStrategy(
-            wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-            chamber_dimensions=self.chamber_dimensions,
+            wall_eddy_diffusivity=wall_eddy_diffusivity,
+            chamber_dimensions=chamber_dimensions,
             distribution_type=self.distribution_type,
         )
