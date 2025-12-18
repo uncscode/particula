@@ -103,5 +103,8 @@ wall_loss = par.dynamics.WallLossFactory().get_strategy(
 )
 ```
 
-See the online documentation for more examples and background theory.
+See the online documentation for more examples and background theory. For a complete
+walkthrough comparing spherical and rectangular chambers (with coagulation/condensation
+chaining), see the
+[Wall Loss Tutorial notebook](docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb).
 
