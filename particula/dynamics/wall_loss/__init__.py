@@ -23,11 +23,23 @@ from .wall_loss_strategies import (
 from .wall_loss_strategies import (
     get_particle_resolved_wall_loss_step as get_particle_resolved_wall_loss_step,  # noqa: E501
 )
+from .wall_loss_builders import (
+    RectangularWallLossBuilder as RectangularWallLossBuilder,
+)
+from .wall_loss_builders import (
+    SphericalWallLossBuilder as SphericalWallLossBuilder,
+)
+from .wall_loss_factories import (
+    WallLossFactory as WallLossFactory,
+)
 
 __all__ = [
     "WallLossStrategy",
     "SphericalWallLossStrategy",
     "RectangularWallLossStrategy",
+    "SphericalWallLossBuilder",
+    "RectangularWallLossBuilder",
+    "WallLossFactory",
     "get_rectangle_wall_loss_rate",
     "get_spherical_wall_loss_rate",
     "get_particle_resolved_wall_loss_step",
