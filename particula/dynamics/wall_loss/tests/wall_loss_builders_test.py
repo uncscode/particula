@@ -137,3 +137,10 @@ def test_rectangular_negative_diffusivity_raises():
     builder = RectangularWallLossBuilder()
     with pytest.raises(ValueError):
         builder.set_wall_eddy_diffusivity(-0.1)
+
+
+def test_rectangular_zero_diffusivity_raises():
+    """Zero wall eddy diffusivity is invalid."""
+    builder = RectangularWallLossBuilder()
+    with pytest.raises(ValueError):
+        builder.set_wall_eddy_diffusivity(0.0)
