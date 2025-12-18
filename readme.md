@@ -95,9 +95,11 @@ rectangular_loss = builder.build()
 
 wall_loss = par.dynamics.WallLossFactory().get_strategy(
     strategy_type="rectangular",
-    wall_eddy_diffusivity=0.001,
-    chamber_dimensions=(1.0, 0.5, 0.3),
-    distribution_type="continuous_pdf",
+    parameters={
+        "wall_eddy_diffusivity": 0.001,
+        "chamber_dimensions": (1.0, 0.5, 0.3),
+        "distribution_type": "continuous_pdf",
+    },
 )
 ```
 
