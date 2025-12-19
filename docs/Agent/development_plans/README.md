@@ -1,7 +1,15 @@
 # Development Plans
 
-Feature development plans tracked for particula. Each entry follows the
-feature template to capture motivation, scope, phases, testing, and rollout.
+Feature and maintenance development plans tracked for particula. Each entry
+follows the appropriate template to capture motivation, scope, phases, testing,
+and rollout.
+
+## Maintenance Plans
+
+- [Add Charge Support to add_concentration][plan-charge-add-concentration] —
+  Status: Not Started (P2)
+  - Scope: Enable `add_concentration()` to accept optional charge parameter for
+    ion injection in coagulation simulations.
 
 ## Feature Plans
 
@@ -25,3 +33,4 @@ feature template to capture motivation, scope, phases, testing, and rollout.
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md
 [plan-rect]: features/rectangular-wall-loss-strategy.md
 [plan-wall-loss-runnable]: features/wall-loss-runnable.md
+[plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md
