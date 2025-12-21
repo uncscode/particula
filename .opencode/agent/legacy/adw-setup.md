@@ -1,9 +1,9 @@
 ---
 description: >-
-  DEPRECATED: Use `adw-setup-deploy` for deployments or `adw-setup-maintainer` for template maintenance.
+  DEPRECATED: Use `setup-adw` for deployments or `adw-setup-maintainer` for template maintenance.
   
   This agent used deprecated `adw sync` commands. It has been replaced by two focused agents:
-  - `adw-setup-deploy`: Set up ADW in target repositories (uses `adw setup env`, `adw setup template apply`)
+  - `setup-adw`: Set up ADW in target repositories (uses `adw setup env`, `adw setup template apply`)
   - `adw-setup-maintainer`: Maintain templates in ADW repo (uses `adw setup template extract`)
   
   Migration: Replace invocations of this agent with the appropriate specialized agent above.
@@ -45,7 +45,7 @@ Configure ADW for repositories by:
 1. Analyzing repository structure and detecting language/tooling
 2. Running `adw sync all` to copy template files (or checking with `--dry-run`)
 3. Customizing `.opencode/` configuration files for the repository
-4. Filling `docs/Agent/` guides with repository-specific conventions
+4. Filling `adw-docs/` guides with repository-specific conventions
 5. Validating the configuration works with `adw health` and `adw workflow list`
 
 # Operating Modes
@@ -74,7 +74,7 @@ Use allowed tools (no bash):
 
 ```python
 list({"path": ".opencode"})
-list({"path": "docs/Agent"})
+list({"path": "adw-docs"})
 adw({"command": "status"})
 adw({"command": "health"})
 ```
@@ -151,7 +151,7 @@ Review the output and report:
 
 ### Step 2.1: Replace Template Placeholders
 
-Search for and replace these placeholders in `.opencode/` and `docs/Agent/`:
+Search for and replace these placeholders in `.opencode/` and `adw-docs/`:
 
 | Placeholder | Source |
 |-------------|--------|
@@ -175,13 +175,13 @@ Use the `grep` tool to locate template paths (no bash):
 
 ```python
 grep({"pattern": "adw/", "path": ".opencode"})
-grep({"pattern": "adw/", "path": "docs/Agent"})
+grep({"pattern": "adw/", "path": "adw-docs"})
 grep({"pattern": "pytest adw", "path": ".opencode"})
-grep({"pattern": "pytest adw", "path": "docs/Agent"})
+grep({"pattern": "pytest adw", "path": "adw-docs"})
 grep({"pattern": "ruff.*adw", "path": ".opencode"})
-grep({"pattern": "ruff.*adw", "path": "docs/Agent"})
+grep({"pattern": "ruff.*adw", "path": "adw-docs"})
 grep({"pattern": "mypy.*adw", "path": ".opencode"})
-grep({"pattern": "mypy.*adw", "path": "docs/Agent"})
+grep({"pattern": "mypy.*adw", "path": "adw-docs"})
 ```
 
 Replace with the actual source directory (e.g., `src/`, `lib/`, `my_package/`).
@@ -224,9 +224,9 @@ Key files to check:
 
 ## Phase 3: Documentation Setup
 
-### Step 3.1: docs/Agent/ Guides
+### Step 3.1: adw-docs/ Guides
 
-If `docs/Agent/` doesn't exist or is incomplete, create from templates:
+If `adw-docs/` doesn't exist or is incomplete, create from templates:
 
 Required guides:
 - `testing_guide.md` - Test framework, commands, conventions
@@ -270,7 +270,7 @@ Use the `grep` tool to find unfilled placeholders:
 
 ```python
 grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": ".opencode"})
-grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": "docs/Agent"})
+grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": "adw-docs"})
 grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": "AGENTS.md"})
 ```
 
@@ -282,7 +282,7 @@ Use the `grep` tool to confirm paths are updated:
 
 ```python
 grep({"pattern": "adw/", "path": ".opencode"})
-grep({"pattern": "adw/", "path": "docs/Agent"})
+grep({"pattern": "adw/", "path": "adw-docs"})
 ```
 
 
@@ -301,7 +301,7 @@ ADW CONFIGURATION COMPLETE
 - .opencode/agent/*.md (X files)
 - .opencode/command/*.md (X files)
 - .opencode/workflow/*.json (X files)
-- docs/Agent/*.md (X files)
+- adw-docs/*.md (X files)
 - AGENTS.md
 
 **Configuration:**
@@ -521,7 +521,7 @@ Agent: "Running `adw sync all --dry-run`...
 Changes detected:
 - NEW: .opencode/agent/workflow-builder.md
 - UPDATED: .opencode/workflow/complete.json (new step added)
-- UPDATED: docs/Agent/testing_guide.md (minor fixes)
+- UPDATED: adw-docs/testing_guide.md (minor fixes)
 
 Apply these changes? [Y/n]"
 ```

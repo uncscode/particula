@@ -71,7 +71,7 @@ Diff Content:
 
 # Required Reading
 
-- @docs/Agent/testing_guide.md - Repository testing conventions
+- @adw-docs/testing_guide.md - Repository testing conventions
 
 # Review Process
 

@@ -19,8 +19,8 @@ EXAMPLES:
 - Fail fast: run_pytest({failFast: true, pytestArgs: ['adw/core/tests/']})
 - In worktree: run_pytest({cwd: '/path/to/worktree', pytestArgs: ['adw/']})
 - Skip slow tests: run_pytest({pytestArgs: ['-m', 'not slow and not performance'], minTests: 1})
-- Show slowest tests: run_pytest({pytestArgs: ['--durations=10'], minTests: 1})
-- Show all test durations: run_pytest({pytestArgs: ['--durations=0'], minTests: 1})
+- Show slowest tests: run_pytest({durations: 10, minTests: 1})
+- Show all test durations: run_pytest({durations: 0, minTests: 1})
 
 IMPORTANT: For scoped/targeted tests, always set minTests: 1 (default expects full suite).
 NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
@@ -65,6 +65,14 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
       .array(tool.schema.string())
       .optional()
       .describe("Coverage report format(s) (default: ['term-missing']). Examples: ['term-missing'], ['html', 'xml'], ['term-missing', 'html:coverage_html']"),
+    durations: tool.schema
+      .number()
+      .optional()
+      .describe("Show N slowest test durations (0 for all). Maps to pytest --durations=N. Examples: 10 (slowest 10), 0 (all tests)"),
+    durationsMin: tool.schema
+      .number()
+      .optional()
+      .describe("Minimum duration in seconds for inclusion in slowest list (default: 0.005). Only applies when durations is set."),
   },
   async execute(args) {
     const outputMode = args.outputMode || "summary";
@@ -77,6 +85,8 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
     const cwd = args.cwd;
     const failFast = args.failFast || false;
     const covReport = args.covReport || ["term-missing"];
+    const durations = args.durations;
+    const durationsMin = args.durationsMin;
 
     // Build command
     const cmdParts = [
@@ -112,6 +122,14 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
     // Fail fast
     if (failFast) {
       cmdParts.push("--fail-fast");
+    }
+
+    // Durations
+    if (durations !== undefined) {
+      cmdParts.push(`--durations=${durations}`);
+      if (durationsMin !== undefined) {
+        cmdParts.push(`--durations-min=${durationsMin}`);
+      }
     }
 
     // Add pytest arguments

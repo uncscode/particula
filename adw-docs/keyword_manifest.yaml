@@ -1,0 +1,140 @@
+version: '1.0'
+keywords:
+  PROJECT_NAME:
+    default: AI Developer Workflow
+    description: Human-readable project name for docs and CLI
+  REPO_URL:
+    default: https://github.com/Gorkowski/Agent
+    description: Repository URL for links and badges
+  REPO_NAME:
+    default: Agent
+    description: Repository name (short form)
+  REPO_OWNER:
+    default: Gorkowski
+    description: Repository owner or organization
+  ISSUE_TRACKER_URL:
+    default: https://github.com/Gorkowski/Agent/issues
+    description: Issue tracker URL
+  DEFAULT_BRANCH:
+    default: main
+    description: Default git branch name
+  DOCS_DIR:
+    default: adw-docs
+    description: Documentation directory for developer guides
+  TEST_COMMAND:
+    default: pytest
+    description: Test command to run the project's test suite (override for C++ projects
+      as needed)
+  LINT_COMMAND:
+    default: ruff check adw
+    description: 'Primary linting command for code quality checks (Python: ruff, C++:
+      clang-tidy)'
+  FORMAT_COMMAND:
+    default: ruff format adw/
+    description: Python code formatting command (applies ruff to all source files)
+  TYPE_CHECK_COMMAND:
+    default: mypy adw/ --ignore-missing-imports
+    description: Type checking command for Python projects
+  TEST_FILE_PATTERN:
+    default: '*_test.py'
+    description: Python test file naming pattern recognized by pytest and coverage
+      tools
+  SOURCE_DIR:
+    default: adw
+    description: Source code directory (without trailing slash)
+  TEST_DIR:
+    default: adw/tests
+    description: Primary test directory location
+  LINE_LENGTH:
+    default: '100'
+    description: Maximum line length for code and docs
+  COVERAGE_THRESHOLD:
+    default: '80'
+    description: Minimum test coverage percentage
+  EPIC_ID:
+    default: E1
+    description: Next available epic identifier
+  EPIC_NAME:
+    default: Example epic name
+    description: Human-readable epic title
+  EPIC_STATUS:
+    default: Proposed
+    description: Current status of the epic
+  FEATURE_ID:
+    default: F1
+    description: Next available feature identifier
+  FEATURE_NAME:
+    default: Example feature name
+    description: Human-readable feature title
+  FEATURE_STATUS:
+    default: Proposed
+    description: Current status of the feature
+  MAINTENANCE_ID:
+    default: M1
+    description: Next available maintenance identifier
+  MAINTENANCE_AREA:
+    default: Example maintenance area
+    description: High-level area the maintenance plan targets
+  MAINTENANCE_STATUS:
+    default: In Progress
+    description: Current status of the maintenance plan
+  PRIORITY:
+    default: P1
+    description: Priority code (P0–P3) for the plan
+  OWNERS:
+    default: '@owner'
+    description: Comma-separated list of GitHub handles
+  START_DATE:
+    default: '2025-12-01'
+    description: Date the plan kicked off
+  TARGET_DATE:
+    default: '2026-01-31'
+    description: Target completion date for the plan
+  SIZE:
+    default: M
+    description: Size bucket for the plan (XS–XL)
+  VERSION:
+    default: 2.3.0
+    description: Current project version
+  LAST_UPDATED:
+    default: '2025-12-14'
+    description: Document last updated date
+  LANGUAGE:
+    default: Python
+    description: Primary implementation language for the project
+  TEST_FRAMEWORK:
+    default: pytest
+    description: Primary Python test framework (pytest)
+  LINTER_TOOLS:
+    default: ruff, mypy
+    description: Linting and static analysis tools for Python
+  AUTHOR:
+    default: '@owner'
+    description: Author placeholder for templates such as ADRs
+  DATE:
+    default: YYYY-MM-DD
+    description: Date placeholder for documentation templates
+  STATUS:
+    default: Proposed
+    description: Default status for newly drafted ADRs
+  TITLE:
+    default: Short decision title
+    description: Concise title for architecture decisions
+  OPTION_1:
+    default: Option A
+    description: First alternative considered in an ADR
+  OPTION_2:
+    default: Option B
+    description: Second alternative considered in an ADR
+  PACKAGE_NAME:
+    default: adw
+    description: Python package/module name (importable name)
+  DOCSTRING_STYLE:
+    default: Google
+    description: Docstring style for Python code (Google-style required for ADW)
+  PYTHON_VERSION:
+    default: '3.12'
+    description: Minimum Python version
+  LICENSE_TYPE:
+    default: MIT
+    description: Project license identifier

@@ -62,7 +62,7 @@ This agent uses repository base permissions from `.opencode` configuration. It h
 - Repository codebase and documentation
 - Workflow state files via `adw_spec` tool
 - Repository README (`README.md`)
-- Agent documentation (`docs/Agent/README.md`)
+- Agent documentation (`adw-docs/README.md`)
 - All files in the repository
 
 ### Write Access
@@ -92,16 +92,16 @@ This agent operates within the **Agent (ADW System)** repository:
 
 **Always Read First:**
 - `README.md` - Repository overview, installation, quick start, architecture
-- `docs/Agent/README.md` - Complete agent documentation index and navigation guide
+- `adw-docs/README.md` - Complete agent documentation index and navigation guide
 
 **Read Based on Task Type:**
-- `docs/Agent/code_style.md` - Python coding standards (snake_case, type hints, docstrings)
-- `docs/Agent/testing_guide.md` - Testing framework (pytest, coverage, test patterns)
-- `docs/Agent/linting_guide.md` - Code quality tools (ruff, mypy)
-- `docs/Agent/docstring_guide.md` - Google-style docstring format
-- `docs/Agent/commit_conventions.md` - Git commit message format
-- `docs/Agent/pr_conventions.md` - Pull request format and process
-- `docs/Agent/architecture_reference.md` - System architecture and design patterns
+- `adw-docs/code_style.md` - Python coding standards (snake_case, type hints, docstrings)
+- `adw-docs/testing_guide.md` - Testing framework (pytest, coverage, test patterns)
+- `adw-docs/linting_guide.md` - Code quality tools (ruff, mypy)
+- `adw-docs/docstring_guide.md` - Google-style docstring format
+- `adw-docs/commit_conventions.md` - Git commit message format
+- `adw-docs/pr_conventions.md` - Pull request format and process
+- `adw-docs/architecture_reference.md` - System architecture and design patterns
 - `AGENTS.md` - Quick reference for build and test commands
 
 ## Understanding ADW Workflows

@@ -51,11 +51,34 @@ Before creating any issue that modifies functional code, validate that tests are
 - Issues that defer testing to a later phase (e.g., "Phase 5: Update tests")
 - Bodies containing "tests will be updated in a future issue"
 - Bodies containing "test cleanup after feature completion"
+- Bodies containing "Test failures are expected and will be addressed in [next phase]"
 
 **ACCEPT issues with these patterns:**
 - Testing requirements section that specifies tests for THIS issue's changes
 - Success criteria that includes "all tests pass before merge"
 - Test files listed alongside implementation files in scope
+- Large feature (>100 LOC) with smoke tests IF body explicitly states comprehensive tests follow in next phase
+- Comprehensive test phase that explicitly references a previous smoke test phase
+
+**Exception: Large Features (>100 LOC) with Smoke Tests**
+
+If an issue mentions "smoke tests" for a large feature, it is VALID only if:
+1. The body explicitly mentions this is a large feature (>100 LOC)
+2. The body states comprehensive tests will follow in the NEXT phase (not "later" or "eventually")
+3. The issue includes at least smoke test coverage
+
+Example of VALID smoke test issue:
+```
+## Testing Strategy
+This is a large feature (>100 LOC). Phase includes smoke tests for happy path.
+Comprehensive test coverage follows in the next phase (Phase N+1).
+```
+
+Example of INVALID deferred testing:
+```
+## Testing Strategy  
+Tests will be updated in a future issue after all features are complete.
+```
 
 **If validation fails:**
 1. Report the issue back to the primary agent with a warning
@@ -82,7 +105,7 @@ The primary agent will provide issue content in this structured format:
 TITLE: Issue title here
 PHASE: A1
 TRACK: A
-LABELS: agent, blocked, type:patch, model:base, feature
+LABELS: agent, blocked, type:patch, model:default, feature
 DEPENDENCIES: 404, 411
 IS_PARENT: false
 IS_SUBISSUE: true
@@ -96,7 +119,7 @@ PARENT_ISSUE: 403
 - **TITLE** (required): Issue title (WITHOUT phase prefix - will be added automatically)
 - **PHASE** (optional): Phase identifier like "A1", "B2", "C3" (Track letter + number within track)
 - **TRACK** (optional): Track letter (A, B, C, etc.) for grouping related phases
-- **LABELS** (optional): Comma-separated label names (default: "agent,blocked,type:patch,model:base,feature")
+- **LABELS** (optional): Comma-separated label names (default: "agent,blocked,type:patch,model:default,feature")
 - **DEPENDENCIES** (optional): Comma-separated issue numbers (default: none)
 - **IS_PARENT** (optional): true/false (default: false)
 - **IS_SUBISSUE** (optional): true/false (default: false)
@@ -242,17 +265,27 @@ If you skip Step 2.5, created issues will be missing their phase prefixes!
    - ❌ "Update tests for..." (implies tests deferred from previous changes)
    - ❌ "Phase N: Update tests" (implies tests are a separate phase)
    - ❌ "Test cleanup for..." (implies tests lagging behind)
+   - ✅ "Complete [feature] test coverage" is OK if it immediately follows a smoke test phase
 
 2. **Check body for deferred testing language:**
    - ❌ "tests will be updated in a future issue"
    - ❌ "testing will be done after feature completion"
    - ❌ "test cleanup after all phases complete"
    - ❌ "update test fixtures from Phase N changes"
+   - ❌ "Test failures are expected and will be addressed in..."
+   - ✅ "comprehensive tests follow in the next phase" is OK for large features with smoke tests
 
 3. **Check that implementation issues include testing:**
-   - ✅ Has "Testing Requirements" section
+   - ✅ Has "Testing Requirements" or "Testing Strategy" section
    - ✅ Test files mentioned alongside implementation files
    - ✅ Success criteria includes "all tests pass"
+   - ✅ For large features: smoke tests with explicit next-phase comprehensive testing
+
+4. **Check for valid smoke test pattern (large features >100 LOC only):**
+   - ✅ Body mentions "large feature" or ">100 LOC"
+   - ✅ Body includes smoke tests for happy path
+   - ✅ Body explicitly states comprehensive tests in "next phase" (not "later" or "future")
+   - ❌ Smoke tests without immediate follow-up comprehensive test phase
 
 **If anti-patterns detected:**
 ```
@@ -314,7 +347,7 @@ If fields are missing, add appropriate defaults:
 defaults = {
     "PHASE": None,  # Optional - only add prefix if provided
     "TRACK": None,  # Optional - for grouping phases
-    "LABELS": ["agent", "blocked", "type:patch", "model:base", "feature"],
+    "LABELS": ["agent", "blocked", "type:patch", "model:default", "feature"],
     "DEPENDENCIES": [],
     "IS_PARENT": False,
     "IS_SUBISSUE": False,
@@ -476,7 +509,7 @@ create_issue_request = {
   "command": "create-issue",
   "title": "Implement workflow executor engine core",
   "body": """## Description\nBuild the core executor...""",
-  "labels": "agent,blocked,type:patch,model:base,feature",
+  "labels": "agent,blocked,type:patch,model:default,feature",
 }
 ```
 
@@ -498,7 +531,7 @@ create_issue_request = {
 ## Description
 Build the core executor...
 """,
-  "labels": "agent,blocked,type:patch,model:base,feature",
+  "labels": "agent,blocked,type:patch,model:default,feature",
 }
 ```
 
@@ -573,7 +606,7 @@ Report back to the primary agent with clear status:
 **Issue Details:**
 - Title: Implement workflow executor engine core
 - URL: https://github.com/Gorkowski/Agent/issues/411
-- Labels: agent, blocked, type:patch, model:base, feature
+- Labels: agent, blocked, type:patch, model:default, feature
 - Dependencies: Referenced #404 in body
 ```
 
@@ -649,7 +682,7 @@ Memory leak occurs when processing large datasets...
 3. **Step 1**: Parse metadata → title="Fix memory leak...", labels=["agent","blocked","bug-fix"], no PHASE
    - Update: `{"id": "step-1", "status": "completed", "content": "Step 1: Parse ✓ No PHASE"}`
 
-4. **Step 2**: Add defaults → Add "type:patch" and "model:base" to labels
+4. **Step 2**: Add defaults → Add "type:patch" and "model:default" to labels
    - Update: `{"id": "step-2", "status": "completed"}`
 
 5. **Step 2.5**: Format title → No PHASE, title stays as-is
@@ -680,7 +713,7 @@ Use the issue-creator-executor subagent to create this GitHub issue:
 TITLE: Create platform abstraction layer
 PHASE: A1
 TRACK: A
-LABELS: agent, blocked, type:patch, model:base, feature
+LABELS: agent, blocked, type:patch, model:default, feature
 DEPENDENCIES: none
 ---END-METADATA---
 
@@ -723,7 +756,7 @@ Create the foundation for multi-platform support...
 ## Testing Requirements
 - [ ] Add unit tests for platform abstraction
 - [ ] All tests pass before merge""",
-     "labels": "agent,blocked,type:patch,model:base,feature",
+     "labels": "agent,blocked,type:patch,model:default,feature",
    })
    ```
    - Update: `{"id": "step-4", "status": "completed"}`
@@ -760,7 +793,7 @@ Create the foundation for multi-platform support...
 TITLE: Implement CSV exporter
 PHASE: B1
 TRACK: B
-LABELS: agent, blocked, type:patch, model:base, feature
+LABELS: agent, blocked, type:patch, model:default, feature
 IS_SUBISSUE: true
 PARENT_ISSUE: 450
 DEPENDENCIES: 420
@@ -804,7 +837,7 @@ Create CSV exporter class...
 ## Description
 Create CSV exporter class...
 """,
-     "labels": "agent,blocked,type:patch,model:base,feature",
+     "labels": "agent,blocked,type:patch,model:default,feature",
    })
    ```
 5. Execute request
@@ -861,7 +894,7 @@ Integrate state management...
 ## Description
 Integrate state management...
 """,
-     "labels": "agent,blocked,type:patch,model:base,feature",
+     "labels": "agent,blocked,type:patch,model:default,feature",
    })
    ```
 5. Execute request
@@ -986,6 +1019,14 @@ This subagent returns results in plain text that the primary agent captures and 
 2. Suggest restructuring: "Tests for this functionality should be included in the same issue"
 3. Do NOT create the issue until primary agent confirms or provides corrected content
 4. Example fix: Instead of "Phase 5: Update tests", include test updates in each implementation phase
+5. Exception: Large features (>100 LOC) may use smoke tests if comprehensive tests immediately follow
+
+### Issue: Smoke test phase without follow-up
+**Root Cause**: A large feature uses smoke tests but doesn't have an immediate comprehensive test phase.
+**Solution**:
+1. Check if the next phase in the plan is comprehensive testing
+2. If not, report to primary agent: "Smoke test phase requires immediate comprehensive test follow-up"
+3. The comprehensive test phase must be the NEXT phase, not "later" or "eventually"
 
 # Best Practices
 

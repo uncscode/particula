@@ -59,7 +59,7 @@ The ADW workflow maintains metadata in `agents/{adw_id}/`:
 
 # Testing Guide Reference
 
-**IMPORTANT**: Before executing tests, read `docs/Agent/testing_guide.md` to understand:
+**IMPORTANT**: Before executing tests, read `adw-docs/testing_guide.md` to understand:
 - Test framework name and version
 - Test discovery patterns and file naming conventions
 - Test execution commands and options
@@ -263,7 +263,7 @@ Categorize each failure as:
 
 ### Step 2.2: Create Prioritized Fix Todo List
 
-- Read `docs/Agent/testing_guide.md` to understand test framework, commands, and conventions
+- Read `adw-docs/testing_guide.md` to understand test framework, commands, and conventions
 
 Use `todowrite` to create a prioritized fix list:
 
@@ -485,7 +485,7 @@ Unrelated failures (not blocking):
 
 # Decision Making
 
-- If test framework is unclear, check `docs/Agent/testing_guide.md` first
+- If test framework is unclear, check `adw-docs/testing_guide.md` first
 - If unsure about expected behavior, analyze the test assertions
 - If fix approach is ambiguous, choose the minimal change that addresses the error
 - If multiple tests fail, fix spec-related ones first, then attempt unrelated ones

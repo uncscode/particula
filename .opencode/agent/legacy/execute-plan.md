@@ -66,9 +66,9 @@ You are running in **completely autonomous mode** with:
 
 # Required Reading
 
-- @docs/Agent/code_style.md - Coding conventions
-- @docs/Agent/testing_guide.md - Testing framework and patterns
-- @docs/Agent/architecture_reference.md - Architecture patterns
+- @adw-docs/code_style.md - Coding conventions
+- @adw-docs/testing_guide.md - Testing framework and patterns
+- @adw-docs/architecture_reference.md - Architecture patterns
 
 # Execution Steps (Use Todo List)
 

@@ -73,9 +73,9 @@ You are running in **completely autonomous mode** with:
 
 # Required Reading
 
-- @docs/Agent/docstring_guide.md - Google-style docstring format
-- @docs/Agent/linting_guide.md - Linting rules and configuration
-- @docs/Agent/code_style.md - Code conventions
+- @adw-docs/docstring_guide.md - Google-style docstring format
+- @adw-docs/linting_guide.md - Linting rules and configuration
+- @adw-docs/code_style.md - Code conventions
 
 # Subagents
 

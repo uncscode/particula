@@ -24,8 +24,10 @@ AVAILABLE COMMANDS:
   Usage: { command: "push", branch: "feature-123", worktree_path: "./trees/abc" }
 • status: Show git status (porcelain optional)
   Usage: { command: "status", porcelain: true, worktree_path: "./trees/abc" }
-• diff: Show git diff (stat optional)
+• diff: Show git diff with optional stat summary or base comparison
+  Usage: { command: "diff", worktree_path: "./trees/abc" }
   Usage: { command: "diff", stat: true, worktree_path: "./trees/abc" }
+  Usage: { command: "diff", base: "main", stat: true, worktree_path: "./trees/abc" }
 • add: Stage changes (mutually exclusive stage_all vs files)
   Usage: { command: "add", stage_all: true, worktree_path: "./trees/abc" }
   Usage: { command: "add", files: ["file1.py", "file2.py"], worktree_path: "./trees/abc" }
@@ -50,7 +52,7 @@ REQUIRED PARAMETERS BY COMMAND:
 • commit: summary (description, adw_id, worktree_path, stage_all, max_retries optional)
 • push: branch (worktree_path optional)
 • status: none (porcelain, worktree_path optional)
-• diff: none (stat, worktree_path optional)
+• diff: none (stat, base, worktree_path optional)
 • add: exactly one of stage_all or files (worktree_path optional)
 • restore: none required (staged, files, worktree_path optional)
 
@@ -59,114 +61,159 @@ Set help: true to bypass validation and return CLI help.`),
     summary: tool.schema
       .string()
       .optional()
-      .describe(`Commit summary line. Required for command: "commit".
+      .describe(`Commit message summary line (first line of commit message).
+
+Required for: commit
+Mapped flag: --summary
 
 Examples:
 • "Add git operations tool"
-• "Fix lint warnings"
-
-Mapped flag: --summary`),
+• "Fix lint warnings in auth module"`),
 
     description: tool.schema
       .string()
       .optional()
-      .describe(`Optional commit body description for "commit" command.
+      .describe(`Extended commit message body (appears after summary line).
 
+Applies to: commit
 Mapped flag: --description
-Example: "Add tool-only git operations wrapper"`),
+
+Example: { command: "commit", summary: "Add feature", description: "Implements the new auth flow with OAuth2 support" }`),
 
     adw_id: tool.schema
       .string()
       .optional()
-      .describe(`Optional ADW workflow ID appended to commit body for traceability.
+      .describe(`ADW workflow ID appended to commit body as "ADW-ID: <id>" for traceability.
 
+Applies to: commit
 Mapped flag: --adw-id
-Example: "a17d3f8a"`),
+
+Example: { command: "commit", summary: "Fix bug", adw_id: "a17d3f8a" }`),
 
     worktree_path: tool.schema
       .string()
       .optional()
-      .describe(`Target worktree directory. Recommended for all commands to ensure
-isolation.
+      .describe(`Target worktree directory for git operations.
 
+Recommended for all commands to ensure operations run in the correct isolated worktree.
+
+Applies to: all commands
 Mapped flag: --worktree-path
+
 Example: "./trees/a17d3f8a"`),
 
     stage_all: tool.schema
       .boolean()
       .optional()
-      .describe(`Stage all changes.
+      .describe(`Stage all tracked and untracked changes.
 
-Applies to:
-• commit: stages all changes before commit when true (maps to --stage-all)
-• add: mutually exclusive with files; when true, maps to --all
+Applies to: commit, add
+• For commit: stages all changes before committing (maps to --stage-all)
+• For add: stages all changes with git add -A (maps to --all)
+
+Note: For add command, mutually exclusive with files parameter.
 
 Examples:
-• { command: "commit", summary: "msg", stage_all: true }
+• { command: "commit", summary: "Update deps", stage_all: true }
 • { command: "add", stage_all: true }`),
 
     max_retries: tool.schema
       .number()
       .optional()
-      .describe(`Maximum retries for commit when hooks modify files. Default: 3.
+      .describe(`Maximum commit retry attempts when pre-commit hooks modify files.
+
+When hooks (e.g., formatters, linters) modify staged files, the commit is
+retried with the updated files. Default: 3
 
 Applies to: commit
 Mapped flag: --max-retries
-Example: 5`),
+
+Example: { command: "commit", summary: "Add feature", max_retries: 5 }`),
 
     branch: tool.schema
       .string()
       .optional()
-      .describe(`Branch name to push. Required for command: "push".
+      .describe(`Branch name to push to origin.
 
+Required for: push
 Mapped flag: --branch
-Example: "feature-123"`),
+
+Example: { command: "push", branch: "feature-123" }`),
 
     porcelain: tool.schema
       .boolean()
       .optional()
-      .describe(`Return porcelain output for status.
+      .describe(`Return machine-readable porcelain output for status command.
 
 Applies to: status
-Mapped flag: --porcelain`),
+Mapped flag: --porcelain
+
+Example: { command: "status", porcelain: true }`),
 
     stat: tool.schema
       .boolean()
       .optional()
-      .describe(`Include --stat summary for diff.
+      .describe(`Include file change statistics (insertions/deletions per file) in diff output.
 
 Applies to: diff
-Mapped flag: --stat`),
+Mapped flag: --stat
+
+Example: { command: "diff", stat: true }`),
+
+    base: tool.schema
+      .string()
+      .optional()
+      .describe(`Base revision for three-dot diff comparison (base...HEAD).
+
+Shows all changes on current branch since it diverged from the base revision.
+Useful for reviewing PR changes against the target branch.
+
+Applies to: diff
+Mapped flag: --base
+
+Examples:
+• "main" - Compare against local main branch
+• "origin/main" - Compare against remote main branch
+
+Usage: { command: "diff", base: "main", stat: true }`),
 
     files: tool.schema
       .array(tool.schema.string())
       .optional()
-      .describe(`Specific files for add or restore commands.
+      .describe(`Specific files to stage (add) or restore.
 
-Rules for add:
-- Mutually exclusive with stage_all
-- Required when stage_all is false
-- Each file is passed as --files <file>
+Applies to: add, restore
 
-Rules for restore:
-- Optional; when omitted, restores all changes
-- Each file is passed as --files <file>`),
+For add command:
+• Mutually exclusive with stage_all (cannot use both)
+• Required when stage_all is not set
+
+For restore command:
+• Optional; when omitted, restores all changes
+
+Examples:
+• { command: "add", files: ["src/main.py", "src/utils.py"] }
+• { command: "restore", files: ["src/main.py"] }`),
 
     staged: tool.schema
       .boolean()
       .optional()
-      .describe(`Restore from index instead of working tree when true.
+      .describe(`Unstage files from the index instead of discarding working tree changes.
 
 Applies to: restore
-Mapped flag: --staged`),
+Mapped flag: --staged
+
+Example: { command: "restore", staged: true, files: ["src/main.py"] }`),
 
     help: tool.schema
       .boolean()
       .optional()
-      .describe(`Show CLI help for the chosen command.
+      .describe(`Show CLI help for the specified command.
 
-When true, validation is skipped and the tool executes with --help to return
-command usage details.`),
+When true, parameter validation is skipped and the tool returns the CLI
+help text for the chosen command.
+
+Example: { command: "diff", help: true }`),
   },
 
   async execute(args) {
@@ -181,6 +228,7 @@ command usage details.`),
       branch,
       porcelain,
       stat,
+      base,
       files,
       staged,
       help,
@@ -249,6 +297,9 @@ command usage details.`),
       case "diff": {
         if (stat) {
           cmdParts.push("--stat");
+        }
+        if (base) {
+          cmdParts.push("--base", base);
         }
         if (worktree_path) {
           cmdParts.push("--worktree-path", worktree_path);

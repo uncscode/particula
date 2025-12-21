@@ -70,7 +70,7 @@ task({
 # Required Reading
 
 - @docs/Features/ - Existing feature docs
-- @docs/Agent/documentation_guide.md - Documentation standards
+- @adw-docs/documentation_guide.md - Documentation standards
 - @README.md - Feature overview in README
 
 # Write Permissions
@@ -258,7 +258,7 @@ The fastest way to use {feature}:
 
 ## Related Documentation
 
-- **Detailed Guide**: [docs/Agent/{related-guide}.md](../Agent/{guide}.md)
+- **Detailed Guide**: [adw-docs/{related-guide}.md](../../adw-docs/{guide}.md)
 - **Examples**: [docs/Examples/{feature}.md](../Examples/{feature}.md)
 - **Architecture**: [docs/Theory/{concept}.md](../Theory/{concept}.md)
 
@@ -292,10 +292,10 @@ Use `edit` to update capabilities, use cases, etc.
 ## Step 5: Link to Other Documentation
 
 Ensure feature doc links to:
-- Detailed guides in `docs/Agent/`
+- Detailed guides in `adw-docs/`
 - Practical examples in `docs/Examples/`
 - Conceptual documentation in `docs/Theory/`
-- Architecture in `docs/Agent/architecture/`
+- Architecture in `adw-docs/architecture/`
 
 ## Step 6: Validate Markdown Links
 

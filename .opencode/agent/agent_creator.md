@@ -223,7 +223,7 @@ Agent files should be placed in:
 This agent operates within the {{PROJECT_NAME}} repository:
 - **Repository URL**: {{REPO_URL}}
 - **Package Name**: {{PACKAGE_NAME}}
-- **Documentation**: `docs/Agent/` directory contains repository conventions
+- **Documentation**: `adw-docs/` directory contains repository conventions
 
 # Agent Creation Process
 
@@ -320,7 +320,7 @@ Disabled (security): webfetch, websearch, codesearch, bash
 - "Does it need to integrate with external systems?"
 
 **Repository Context**:
-- "What documentation should this agent reference?" (Show docs/Agent/ files)
+- "What documentation should this agent reference?" (Show adw-docs/ files)
 - "Are there specific conventions or patterns it should follow?"
 
 **Workflow Integration**:
@@ -586,31 +586,31 @@ DO NOT modify:
 Recommend specific files the agent should read for context:
 
 **For Architecture/Planning Agents:**
-- `docs/Agent/architecture_reference.md` - Design principles and patterns
-- `docs/Agent/architecture/architecture_guide.md` - Detailed architecture docs
-- `docs/Agent/architecture/decisions/` - Architecture Decision Records (ADRs)
-- `docs/Agent/code_style.md` - Coding conventions
+- `adw-docs/architecture_reference.md` - Design principles and patterns
+- `adw-docs/architecture/architecture_guide.md` - Detailed architecture docs
+- `adw-docs/architecture/decisions/` - Architecture Decision Records (ADRs)
+- `adw-docs/code_style.md` - Coding conventions
 
 **For Implementation Agents:**
-- `docs/Agent/code_style.md` - Naming, formatting, patterns
-- `docs/Agent/testing_guide.md` - Test framework and patterns
-- `docs/Agent/linting_guide.md` - Code quality standards
-- `docs/Agent/docstring_guide.md` - Documentation format
+- `adw-docs/code_style.md` - Naming, formatting, patterns
+- `adw-docs/testing_guide.md` - Test framework and patterns
+- `adw-docs/linting_guide.md` - Code quality standards
+- `adw-docs/docstring_guide.md` - Documentation format
 
 **For Documentation Agents:**
-- `docs/Agent/documentation_guide.md` - Doc format and standards
-- `docs/Agent/docstring_guide.md` - Docstring conventions
+- `adw-docs/documentation_guide.md` - Doc format and standards
+- `adw-docs/docstring_guide.md` - Docstring conventions
 - `README.md` - Project overview
 
 **For Review Agents:**
-- `docs/Agent/review_guide.md` - Review criteria and standards
-- `docs/Agent/code_style.md` - Style conventions to enforce
-- `docs/Agent/testing_guide.md` - Test quality expectations
+- `adw-docs/review_guide.md` - Review criteria and standards
+- `adw-docs/code_style.md` - Style conventions to enforce
+- `adw-docs/testing_guide.md` - Test quality expectations
 
 **For Feature Development Agents:**
-- `docs/Agent/development_plans/features/` - Feature development plans
-- `docs/Agent/architecture_reference.md` - Architectural patterns
-- `docs/Agent/testing_guide.md` - Testing requirements
+- `adw-docs/dev-plans/features/` - Feature development plans
+- `adw-docs/architecture_reference.md` - Architectural patterns
+- `adw-docs/testing_guide.md` - Testing requirements
 
 ### E. Tool Selection Checklist
 
@@ -650,11 +650,11 @@ Ensure the agent references repository guides:
 
 Before performing any work, you MUST consult these repository-specific guides:
 
-- **Architecture**: `docs/Agent/architecture_reference.md`
-- **Code Style**: `docs/Agent/code_style.md`
-- **Testing**: `docs/Agent/testing_guide.md`
-- **Linting**: `docs/Agent/linting_guide.md`
-- **Documentation**: `docs/Agent/docstring_guide.md`
+- **Architecture**: `adw-docs/architecture_reference.md`
+- **Code Style**: `adw-docs/code_style.md`
+- **Testing**: `adw-docs/testing_guide.md`
+- **Linting**: `adw-docs/linting_guide.md`
+- **Documentation**: `adw-docs/docstring_guide.md`
 
 These guides contain the established conventions for {{PROJECT_NAME}}.
 ```
@@ -740,7 +740,7 @@ This agent operates within the {{PROJECT_NAME}} repository:
 # Required Reading
 
 Before executing tasks, consult these repository guides:
-- [List of relevant docs/Agent/ files]
+- [List of relevant adw-docs/ files]
 
 # Process
 
@@ -773,9 +773,9 @@ Before executing tasks, consult these repository guides:
 
 ### B. Supporting Documentation
 
-Create a documentation file in `docs/Agent/agents/` directory:
+Create a documentation file in `adw-docs/agents/` directory:
 
-**File**: `docs/Agent/agents/[agent-name].md`
+**File**: `adw-docs/agents/[agent-name].md`
 
 ```markdown
 # [Agent Name] - Usage Guide
@@ -982,7 +982,7 @@ Before generating final content, verify with the developer:
    - Detailed markdown instructions
    - Examples specific to the discussed use cases
 
-2. **Documentation**: `docs/Agent/agents/[agent-name].md`
+2. **Documentation**: `adw-docs/agents/[agent-name].md`
    - Comprehensive usage guide
    - The specific examples from your conversation
    - Troubleshooting based on potential issues discussed
@@ -1009,7 +1009,7 @@ Present the generated content like this:
 ---
 
 ## 2. Usage Guide
-**Save as**: `docs/Agent/agents/[name].md`
+**Save as**: `adw-docs/agents/[name].md`
 
 [Complete usage guide content]
 
@@ -1026,7 +1026,7 @@ Present the generated content like this:
 **Next Steps**:
 1. Review the generated content above
 2. Save the agent definition to `.opencode/agent/[name].md`
-3. Save the usage guide to `docs/Agent/agents/[name].md`
+3. Save the usage guide to `adw-docs/agents/[name].md`
 4. Test the agent with: [example invocation]
 5. Iterate if needed - I'm happy to refine!
 
@@ -1144,7 +1144,7 @@ When creating an agent, produce:
    - Comprehensive markdown instructions
    - Clear examples and guidelines
 
-2. **Documentation file** (`docs/Agent/agents/[name].md`):
+2. **Documentation file** (`adw-docs/agents/[name].md`):
    - Usage guide
    - Examples
    - Best practices
@@ -1170,7 +1170,7 @@ When creating an agent, produce:
 2. **Design decisions**:
    - **Mode**: `subagent` (focused, single task)
    - **Scope**: Security-focused code review
-   - **Context**: `docs/Agent/security_guide.md`, OWASP guidelines
+   - **Context**: `adw-docs/security_guide.md`, OWASP guidelines
    - **Tool Configuration**:
      ```yaml
      tools:
@@ -1201,7 +1201,7 @@ When creating an agent, produce:
 
 3. **Implementation**:
    - Create `.opencode/agent/security_reviewer.md`
-   - Create `docs/Agent/agents/security-reviewer.md`
+   - Create `adw-docs/agents/security-reviewer.md`
    - Include security checklist and common vulnerability patterns
 
 4. **Deliverables**:
@@ -1518,7 +1518,7 @@ Does this design meet your needs? Any final adjustments before I generate the ag
 **To use this agent**:
 1. Review the content above
 2. Save `.opencode/agent/[name].md` with the agent definition
-3. Save `docs/Agent/agents/[name].md` with the usage guide
+3. Save `adw-docs/agents/[name].md` with the usage guide
 4. Test with: [example invocation]
 
 **Want any changes?** I'm happy to:

@@ -1,16 +1,16 @@
 ---
-description: 'Subagent that manages architecture documentation in docs/Agent/architecture/.
+description: 'Subagent that manages architecture documentation in adw-docs/architecture/.
   Invoked by the documentation primary agent to create ADRs, update the architecture
   outline, and maintain architecture documentation.
 
   This subagent: - Loads workflow context from adw_spec tool - Creates Architecture
   Decision Records (ADRs) following template - Archives old ADRs when approaches are
   superseded - Updates architecture_outline.md when new modules added - Updates architecture_guide.md
-  for major changes - Maintains docs/Agent/architecture/decisions/README.md - Excludes
+  for major changes - Maintains adw-docs/architecture/decisions/README.md - Excludes
   tests/ from outlines (just notes existence) - Validates markdown links
 
-  Write permissions: - docs/Agent/architecture/*.md: ALLOW - docs/Agent/architecture/decisions/*.md:
-  ALLOW - docs/Agent/architecture/decisions/archive/*.md: ALLOW'
+  Write permissions: - adw-docs/architecture/*.md: ALLOW - adw-docs/architecture/decisions/*.md:
+  ALLOW - adw-docs/architecture/decisions/archive/*.md: ALLOW'
 mode: subagent
 tools:
   read: true
@@ -41,7 +41,7 @@ tools:
 
 # Architecture Subagent
 
-Create ADRs, update architecture outline, and maintain architecture documentation in docs/Agent/architecture/.
+Create ADRs, update architecture outline, and maintain architecture documentation in adw-docs/architecture/.
 
 # Core Mission
 
@@ -62,7 +62,7 @@ Changes:
 - Modified components: <list_changed_components>
 
 Tasks:
-- Update docs/Agent/architecture/architecture_outline.md with new modules (exclude tests/)
+- Update adw-docs/architecture/architecture_outline.md with new modules (exclude tests/)
 - Create ADR if significant architectural decision made
 - Archive old ADRs if approaches superseded
 ```
@@ -78,17 +78,17 @@ task({
 
 # Required Reading
 
-- @docs/Agent/architecture/decisions/ADR-001-github-operations-consolidation.md - ADR template
-- @docs/Agent/architecture/architecture_outline.md - Current structure
-- @docs/Agent/architecture/architecture_guide.md - Architecture guide
-- @docs/Agent/architecture_reference.md - Architecture reference
+- @adw-docs/architecture/decisions/ADR-001-github-operations-consolidation.md - ADR template
+- @adw-docs/architecture/architecture_outline.md - Current structure
+- @adw-docs/architecture/architecture_guide.md - Architecture guide
+- @adw-docs/architecture_reference.md - Architecture reference
 
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `docs/Agent/architecture/*.md` - Architecture docs
-- ✅ `docs/Agent/architecture/decisions/*.md` - ADRs
-- ✅ `docs/Agent/architecture/decisions/archive/*.md` - Archived ADRs
+- ✅ `adw-docs/architecture/*.md` - Architecture docs
+- ✅ `adw-docs/architecture/decisions/*.md` - ADRs
+- ✅ `adw-docs/architecture/decisions/archive/*.md` - Archived ADRs
 
 **DENIED:**
 - ❌ All other directories
@@ -179,14 +179,14 @@ todowrite({
 ### 4.1: Determine Next ADR Number
 
 ```bash
-ls docs/Agent/architecture/decisions/ADR-*.md | tail -1
+ls adw-docs/architecture/decisions/ADR-*.md | tail -1
 ```
 
 ### 4.2: Read ADR Template
 
 Use ADR-001 as template reference:
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/architecture/decisions/ADR-001-github-operations-consolidation.md"})
+read({"filePath": "{worktree_path}/adw-docs/architecture/decisions/ADR-001-github-operations-consolidation.md"})
 ```
 
 ### 4.3: Create New ADR
@@ -197,7 +197,7 @@ get_datetime({"format": "date"})
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Agent/architecture/decisions/ADR-{NNN}-{kebab-case-title}.md",
+  "filePath": "{worktree_path}/adw-docs/architecture/decisions/ADR-{NNN}-{kebab-case-title}.md",
   "content": """# ADR-{NNN}: {Decision Title}
 
 **Status:** Accepted
@@ -368,20 +368,20 @@ Files updated as part of this decision:
 ### 5.1: Create Archive Directory (if needed)
 
 ```bash
-mkdir -p docs/Agent/architecture/decisions/archive
+mkdir -p adw-docs/architecture/decisions/archive
 ```
 
 ### 5.2: Move Superseded ADR
 
 ```bash
-mv docs/Agent/architecture/decisions/ADR-{old}.md docs/Agent/architecture/decisions/archive/
+mv adw-docs/architecture/decisions/ADR-{old}.md adw-docs/architecture/decisions/archive/
 ```
 
 ### 5.3: Update Superseded ADR Status
 
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/architecture/decisions/archive/ADR-{old}.md",
+  "filePath": "{worktree_path}/adw-docs/architecture/decisions/archive/ADR-{old}.md",
   "oldString": "**Status:** Accepted",
   "newString": "**Status:** Superseded by ADR-{new}"
 })
@@ -391,13 +391,13 @@ edit({
 
 Read current outline:
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/architecture/architecture_outline.md"})
+read({"filePath": "{worktree_path}/adw-docs/architecture/architecture_outline.md"})
 ```
 
 Add new modules to appropriate sections:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/architecture/architecture_outline.md",
+  "filePath": "{worktree_path}/adw-docs/architecture/architecture_outline.md",
   "oldString": "{existing_module_section}",
   "newString": "{existing_module_section}\n\n### {new_module}/\n\n{Module description}\n\n**Key Components:**\n- `{component_1}.py` - {description}\n- `tests/` - Test coverage"
 })
@@ -421,7 +421,7 @@ Authentication and authorization module.
 Add new ADR to index:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/architecture/decisions/README.md",
+  "filePath": "{worktree_path}/adw-docs/architecture/decisions/README.md",
   "oldString": "{last_adr_entry}",
   "newString": "{last_adr_entry}\n| ADR-{NNN} | {Title} | Accepted | {date} |"
 })
@@ -431,7 +431,7 @@ edit({
 
 Check all links in created/updated files:
 ```bash
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' docs/Agent/architecture/**/*.md
+grep -oE '\[([^\]]+)\]\(([^)]+)\)' adw-docs/architecture/**/*.md
 ```
 
 Verify all internal links are valid.
@@ -449,10 +449,10 @@ Actions:
 - Archive: Moved ADR-{old} to archive/ (superseded)
 
 Files modified:
-- docs/Agent/architecture/decisions/ADR-{NNN}-{title}.md (new)
-- docs/Agent/architecture/architecture_outline.md (updated)
-- docs/Agent/architecture/decisions/README.md (updated)
-- docs/Agent/architecture/decisions/archive/ADR-{old}.md (archived)
+- adw-docs/architecture/decisions/ADR-{NNN}-{title}.md (new)
+- adw-docs/architecture/architecture_outline.md (updated)
+- adw-docs/architecture/decisions/README.md (updated)
+- adw-docs/architecture/decisions/archive/ADR-{old}.md (archived)
 
 ADR Summary:
 - Decision: {brief decision}
@@ -553,9 +553,9 @@ Actions:
 - Outline updated: Added workflows/engine/ module
 
 Files modified:
-- docs/Agent/architecture/decisions/ADR-008-workflow-engine-architecture.md (new)
-- docs/Agent/architecture/architecture_outline.md (updated)
-- docs/Agent/architecture/decisions/README.md (updated)
+- adw-docs/architecture/decisions/ADR-008-workflow-engine-architecture.md (new)
+- adw-docs/architecture/architecture_outline.md (updated)
+- adw-docs/architecture/decisions/README.md (updated)
 
 ADR Summary:
 - Decision: Implement declarative JSON-based workflow engine
@@ -573,7 +573,7 @@ Links validated: 15 links, all valid
 
 **Output Signal:** `ARCHITECTURE_UPDATE_COMPLETE` or `ARCHITECTURE_UPDATE_FAILED`
 
-**Scope:** `docs/Agent/architecture/` only
+**Scope:** `adw-docs/architecture/` only
 
 **ADR Format:** Follow ADR-001 template exactly
 
@@ -583,4 +583,4 @@ Links validated: 15 links, all valid
 
 **Always:** Update README.md index, validate links
 
-**References:** `docs/Agent/architecture/decisions/ADR-001-*.md` (template)
+**References:** `adw-docs/architecture/decisions/ADR-001-*.md` (template)

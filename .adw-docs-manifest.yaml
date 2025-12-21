@@ -1,0 +1,50 @@
+version: '1.0'
+language: python
+created_at: '2025-12-21T21:25:52.922382+00:00'
+created_by: adw setup docs scaffold --language python
+values:
+  PROJECT_NAME: particula
+  REPO_URL: https://github.com/uncscode/particula
+  REPO_NAME: particula
+  REPO_OWNER: uncscode
+  ISSUE_TRACKER_URL: https://github.com/uncscode/particula/issues
+  DEFAULT_BRANCH: main
+  DOCS_DIR: docs
+  TEST_COMMAND: pytest
+  LINT_COMMAND: ruff check particula/
+  FORMAT_COMMAND: ruff format particula/
+  TYPE_CHECK_COMMAND: mypy particula/ --ignore-missing-imports
+  TEST_FILE_PATTERN: '*_test.py'
+  SOURCE_DIR: particula
+  TEST_DIR: particula
+  LINE_LENGTH: '80'
+  COVERAGE_THRESHOLD: '80'
+  EPIC_ID: E1
+  EPIC_NAME: Example epic name
+  EPIC_STATUS: Proposed
+  FEATURE_ID: F1
+  FEATURE_NAME: Example feature name
+  FEATURE_STATUS: Proposed
+  MAINTENANCE_ID: M1
+  MAINTENANCE_AREA: Example maintenance area
+  MAINTENANCE_STATUS: In Progress
+  PRIORITY: P1
+  OWNERS: '@Gorkowski'
+  START_DATE: '2025-12-01'
+  TARGET_DATE: '2026-01-31'
+  SIZE: M
+  VERSION: 0.2.6
+  LAST_UPDATED: '2025-12-21'
+  LANGUAGE: Python
+  TEST_FRAMEWORK: pytest
+  LINTER_TOOLS: ruff, mypy
+  AUTHOR: '@Gorkowski'
+  DATE: YYYY-MM-DD
+  STATUS: Proposed
+  TITLE: Short decision title
+  OPTION_1: Option A
+  OPTION_2: Option B
+  PACKAGE_NAME: particula
+  DOCSTRING_STYLE: Google
+  PYTHON_VERSION: '3.9'
+  LICENSE_TYPE: MIT

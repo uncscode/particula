@@ -81,11 +81,11 @@ task({
 
 # Required Reading
 
-- @docs/Agent/docstring_guide.md - Google-style docstring format
-- @docs/Agent/docstring_function.md - Function docstring examples
-- @docs/Agent/docstring_class.md - Class docstring examples
-- @docs/Agent/linting_guide.md - Linting rules and configuration
-- @docs/Agent/code_style.md - Code conventions
+- @adw-docs/docstring_guide.md - Google-style docstring format
+- @adw-docs/docstring_function.md - Function docstring examples
+- @adw-docs/docstring_class.md - Class docstring examples
+- @adw-docs/linting_guide.md - Linting rules and configuration
+- @adw-docs/code_style.md - Code conventions
 
 # Docstring Requirements
 
@@ -454,4 +454,4 @@ Context: Parser now uses new data models
 
 **Excluded:** Test files (`*_test.py`) don't require docstrings
 
-**References:** `docs/Agent/docstring_guide.md`, `docs/Agent/linting_guide.md`
+**References:** `adw-docs/docstring_guide.md`, `adw-docs/linting_guide.md`

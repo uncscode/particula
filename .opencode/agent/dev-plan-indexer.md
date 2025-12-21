@@ -54,10 +54,10 @@ Keep development plan indexes accurate and organized by:
 
 # Index File Locations
 
-- `docs/Agent/development_plans/epics/index.md`
-- `docs/Agent/development_plans/features/index.md`
-- `docs/Agent/development_plans/maintenance/index.md`
-- `docs/Agent/development_plans/README.md`
+- `adw-docs/dev-plans/epics/index.md`
+- `adw-docs/dev-plans/features/index.md`
+- `adw-docs/dev-plans/maintenance/index.md`
+- `adw-docs/dev-plans/README.md`
 
 # Input Formats
 
@@ -127,7 +127,7 @@ Development {type} plans tracked in this repository.
 ### Step 1: Read Current Index
 ```python
 read({
-  "filePath": "docs/Agent/development_plans/{type}/index.md"
+  "filePath": "adw-docs/dev-plans/{type}/index.md"
 })
 ```
 
@@ -135,7 +135,7 @@ read({
 
 ```python
 edit({
-  "filePath": "docs/Agent/development_plans/{type}/index.md",
+  "filePath": "adw-docs/dev-plans/{type}/index.md",
   "oldString": "## Active Plans\n\n| ID | Name | Status | Parent | Link |\n|----|------|--------|--------|------|\n",
   "newString": "## Active Plans\n\n| ID | Name | Status | Parent | Link |\n|----|------|--------|--------|------|\n| {id} | {title} | Proposed | {parent_link} | [View]({filename}) |\n"
 })
@@ -150,7 +150,7 @@ Calculate the next ID:
 
 ```python
 edit({
-  "filePath": "docs/Agent/development_plans/{type}/index.md",
+  "filePath": "adw-docs/dev-plans/{type}/index.md",
   "oldString": "**Next Available ID:** {old_next_id}",
   "newString": "**Next Available ID:** {new_next_id}"
 })
@@ -162,7 +162,7 @@ INDEX_UPDATED
 
 Action: Document added to index
 Document: {id} - {title}
-Index: docs/Agent/development_plans/{type}/index.md
+Index: adw-docs/dev-plans/{type}/index.md
 
 Next Available IDs:
 - Epic: E{n}
@@ -175,7 +175,7 @@ Next Available IDs:
 ### Step 1: Read Current Index
 ```python
 read({
-  "filePath": "docs/Agent/development_plans/{type}/index.md"
+  "filePath": "adw-docs/dev-plans/{type}/index.md"
 })
 ```
 
@@ -185,7 +185,7 @@ Find the row for the document ID and update status:
 
 ```python
 edit({
-  "filePath": "docs/Agent/development_plans/{type}/index.md",
+  "filePath": "adw-docs/dev-plans/{type}/index.md",
   "oldString": "| {id} | {title} | {old_status} |",
   "newString": "| {id} | {title} | {new_status} |"
 })
@@ -237,15 +237,15 @@ Use the `move` tool to relocate the file:
 ```python
 move({
   "source": "{current_path}",
-  "destination": "docs/Agent/development_plans/{type}/completed/{filename}"
+  "destination": "adw-docs/dev-plans/{type}/completed/{filename}"
 })
 ```
 
 **Example:**
 ```python
 move({
-  "source": "docs/Agent/development_plans/features/E1-F1-platform-abstraction.md",
-  "destination": "docs/Agent/development_plans/features/completed/E1-F1-platform-abstraction.md"
+  "source": "adw-docs/dev-plans/features/E1-F1-platform-abstraction.md",
+  "destination": "adw-docs/dev-plans/features/completed/E1-F1-platform-abstraction.md"
 })
 ```
 
@@ -254,7 +254,7 @@ move({
 Remove from Active Plans table:
 ```python
 edit({
-  "filePath": "docs/Agent/development_plans/{type}/index.md",
+  "filePath": "adw-docs/dev-plans/{type}/index.md",
   "oldString": "| {id} | {title} | {status} | {parent} | [View]({filename}) |\n",
   "newString": ""
 })
@@ -263,7 +263,7 @@ edit({
 Add to Completed Plans table:
 ```python
 edit({
-  "filePath": "docs/Agent/development_plans/{type}/index.md",
+  "filePath": "adw-docs/dev-plans/{type}/index.md",
   "oldString": "## Completed Plans\n\n| ID | Name | Completed | Link |\n|----|------|-----------|------|\n",
   "newString": "## Completed Plans\n\n| ID | Name | Completed | Link |\n|----|------|-----------|------|\n| {id} | {title} | {date} | [View](completed/{filename}) |\n"
 })
@@ -275,7 +275,7 @@ DOCUMENT_MOVED_TO_COMPLETED
 
 Document: {id} - {title}
 From: {current_path}
-To: docs/Agent/development_plans/{type}/completed/{filename}
+To: adw-docs/dev-plans/{type}/completed/{filename}
 
 Updates Made:
 - Status changed to: Shipped
@@ -379,7 +379,7 @@ To build an accurate index from scratch:
 ```python
 # List all files in the type folder
 list({
-  "path": "docs/Agent/development_plans/{type}"
+  "path": "adw-docs/dev-plans/{type}"
 })
 
 # For each file, extract ID from filename
@@ -397,7 +397,7 @@ read({
 ```
 INDEX_UPDATE_WARNING
 
-Index file not found: docs/Agent/development_plans/{type}/index.md
+Index file not found: adw-docs/dev-plans/{type}/index.md
 
 Action: Creating new index file from template.
 Scanning existing documents to populate...
@@ -419,7 +419,7 @@ Recommendation: Assign new ID. Next available: {next_id}
 ```
 INDEX_UPDATE_WARNING
 
-Completed folder not found: docs/Agent/development_plans/{type}/completed/
+Completed folder not found: adw-docs/dev-plans/{type}/completed/
 
 Action: Creating completed/ folder with .gitkeep
 ```
@@ -443,10 +443,10 @@ Before reporting completion:
 # Scope Restrictions
 
 ## CAN Modify
-- `docs/Agent/development_plans/epics/index.md`
-- `docs/Agent/development_plans/features/index.md`
-- `docs/Agent/development_plans/maintenance/index.md`
-- `docs/Agent/development_plans/*/completed/*.md` (write)
+- `adw-docs/dev-plans/epics/index.md`
+- `adw-docs/dev-plans/features/index.md`
+- `adw-docs/dev-plans/maintenance/index.md`
+- `adw-docs/dev-plans/*/completed/*.md` (write)
 - Individual plan documents (status updates only)
 
 ## CANNOT Modify

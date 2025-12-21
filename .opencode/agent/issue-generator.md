@@ -8,7 +8,7 @@ description: "Use this agent to analyze issues or feature documents and generate
   \ URL or text that needs to be analyzed and structured - You need parent issues\
   \ with sub-issues linked together - You want comprehensive, detailed issue formatting\
   \ following repository standards\nExamples:\n- User: \"Create issues for phases\
-  \ 8-11 from docs/Agent/development_plans/features/P1-workflow-engine-features.md\"\
+  \ 8-11 from adw-docs/dev-plans/features/P1-workflow-engine-features.md\"\
   \n  Assistant: \"I'll analyze the feature document and create detailed issues for\
   \ each phase with proper dependencies.\"\n\n- User: \"Analyze issue #400 and create\
   \ the sub-issues it describes\"\n  Assistant: \"I'll fetch issue #400, read the\
@@ -98,20 +98,83 @@ Transform feature plans, issue descriptions, or user requests into comprehensive
 4. **No technical debt accumulation**: Tests never "lag behind" implementation
 5. **CI/CD integrity**: Every commit on main has passing tests
 
+## Exception: Large Features (>100 LOC) - Smoke Tests First
+
+For large features that exceed ~100 LOC, you MAY split into:
+
+1. **Phase N:** Core implementation with smoke tests
+   - Implement the main feature (>100 LOC of implementation)
+   - Add smoke tests that verify basic happy path
+   - CI must pass - smoke tests provide minimum coverage
+
+2. **Phase N+1:** Comprehensive test coverage (REQUIRED immediately after)
+   - Add edge case tests, error handling tests
+   - Add integration tests
+   - Reach full coverage threshold (80%+)
+
+**If you use smoke tests, you MUST have an immediately following comprehensive test phase.** No other implementation work can happen between the smoke test phase and the comprehensive test phase.
+
+```
+✅ Phase 1: Add validation framework with smoke tests (large feature, >100 LOC)
+   - Implement core validation logic
+   - Add smoke tests for happy path
+   
+✅ Phase 2: Complete validation test coverage  ← REQUIRED after smoke tests
+   - Add edge case tests
+   - Add integration tests
+   - Achieve 80%+ coverage
+   
+✅ Phase 3: Add validation caching  ← Next feature work comes AFTER full tests
+```
+
+**This exception does NOT apply to:**
+- **Refactors** - Must have full tests to verify behavior preservation
+- **Removals** - Must update/remove tests to keep CI green  
+- **Bug fixes** - Must have regression test proving the fix
+
+## Combining Phases from Plans with Separated Testing
+
+When analyzing a feature plan that has testing in a separate phase, you MUST combine the phases:
+
+### Source Plan (WRONG - has separated testing)
+```
+- Phase 1: Implement feature A
+- Phase 2: Implement feature B  
+- Phase 3: Implement feature C
+- Phase 4: Update tests for features A, B, C  ← WRONG
+```
+
+### Generated Issues (CORRECT - tests combined with implementation)
+```
+Issue 1: Implement feature A with tests
+  - Implementation for feature A
+  - Tests for feature A
+  
+Issue 2: Implement feature B with tests
+  - Implementation for feature B
+  - Tests for feature B
+  
+Issue 3: Implement feature C with tests
+  - Implementation for feature C
+  - Tests for feature C
+```
+
+**DO NOT create the "Phase 4: Update tests" issue.** Instead, distribute the test work into each implementation issue.
+
 # When to Use This Agent
 
 - **Batch issue creation**: Create multiple related issues from a feature document (e.g., phases 1-7 from a plan)
 - **Complex features**: Break down large features into parent/sub-issue structures
 - **Issue analysis**: Analyze existing issue text or URLs and create structured issues
-- **Document-driven**: Generate issues from documentation in `docs/Agent/development_plans/features/` or similar
+- **Document-driven**: Generate issues from documentation in `adw-docs/dev-plans/features/` or similar
 - **Dependency management**: Create issues with proper dependency chains and linking
 
 # Permissions and Scope
 
 ## Read Access
 - Read all repository files to understand context
-- Read feature documents in `docs/Agent/development_plans/features/`
-- Read architecture references in `docs/Agent/architecture/`
+- Read feature documents in `adw-docs/dev-plans/features/`
+- Read architecture references in `adw-docs/architecture/`
 - Read existing issues via GitHub API (if URL provided)
 - Read repository conventions and guides
 
@@ -132,16 +195,16 @@ Transform feature plans, issue descriptions, or user requests into comprehensive
 This agent operates within the Agent repository:
 - **Repository URL**: https://github.com/Gorkowski/Agent
 - **Package Name**: adw
-- **Documentation**: `docs/Agent/` directory contains repository conventions
+- **Documentation**: `adw-docs/` directory contains repository conventions
 
 # Required Reading
 
 Before generating issues, consult these repository guides:
 
-- **Issue Format**: `docs/Agent/issue_interpret_guide.md` - Detailed issue formatting standards
-- **Code Culture**: `docs/Agent/code_culture.md` - 100-line rule, smooth reviews philosophy
-- **Architecture**: `docs/Agent/architecture_reference.md` - System design patterns
-- **Feature Plans**: `docs/Agent/development_plans/features/` - Feature plans
+- **Issue Format**: `adw-docs/issue_interpret_guide.md` - Detailed issue formatting standards
+- **Code Culture**: `adw-docs/code_culture.md` - 100-line rule, smooth reviews philosophy
+- **Architecture**: `adw-docs/architecture_reference.md` - System design patterns
+- **Feature Plans**: `adw-docs/dev-plans/features/` - Feature plans
 
 # Process
 
@@ -161,7 +224,7 @@ Before generating issues, consult these repository guides:
 - Is this a single issue or parent/sub-issue structure?
 - What are the phases or components?
 - What are the dependencies between issues?
-- What labels are appropriate (type:patch, type:complete, model:base, model:heavy)?
+- What labels are appropriate (type:patch, type:complete, model:default, model:heavy)?
 - What scope estimates (~100 LOC per issue)?
 
 ## Step 2: Create Todo List
@@ -231,7 +294,7 @@ For each issue to create:
 ```markdown
 ---ISSUE-METADATA---
 TITLE: <Clear, concise title>
-LABELS: <comma-separated labels: agent, blocked, type:patch, model:base, feature>
+LABELS: <comma-separated labels: agent, blocked, type:patch, model:default, feature>
 DEPENDENCIES: <comma-separated issue numbers if applicable, or "none">
 IS_PARENT: <true/false>
 IS_SUBISSUE: <true/false>
@@ -317,7 +380,7 @@ result = new_function()
 ## References
 
 **Feature Plans:**
-- `docs/Agent/development_plans/features/P1-workflow-engine-core.md` - Context document
+- `adw-docs/dev-plans/features/P1-workflow-engine-core.md` - Context document
 
 **Related Issues:**
 - #403 - Parent issue
@@ -327,8 +390,8 @@ result = new_function()
 - `adw/module/file.py` - Related implementation
 
 **Coding Standards:**
-- `docs/Agent/code_style.md` - Python standards
-- `docs/Agent/testing_guide.md` - Testing patterns
+- `adw-docs/code_style.md` - Python standards
+- `adw-docs/testing_guide.md` - Testing patterns
 ```
 
 **IMPORTANT**: Keep all sections from our previous successful issues:
@@ -406,19 +469,19 @@ After all issues are created, provide a summary:
 ✅ Successfully created 4 issues:
 
 1. **Issue #411**: Implement workflow executor engine core (Phase 4)
-   - Labels: agent, blocked, type:patch, model:base, feature
+   - Labels: agent, blocked, type:patch, model:default, feature
    - Dependencies: #404 (Phase 1)
    
 2. **Issue #412**: Integrate state management and GitHub status updates (Phase 5)
-   - Labels: agent, blocked, type:patch, model:base, feature
+   - Labels: agent, blocked, type:patch, model:default, feature
    - Dependencies: #411 (Phase 4)
    
 3. **Issue #413**: Implement retry logic with exponential backoff (Phase 6)
-   - Labels: agent, blocked, type:patch, model:base, feature
+   - Labels: agent, blocked, type:patch, model:default, feature
    - Dependencies: #411 (Phase 4)
    
 4. **Issue #414**: Implement dynamic CLI command registration (Phase 7)
-   - Labels: agent, blocked, type:patch, model:base, feature
+   - Labels: agent, blocked, type:patch, model:default, feature
    - Dependencies: #411 (Phase 4)
 
 **Implementation Order:**
@@ -447,8 +510,11 @@ All issues marked with `blocked` label to prevent auto-start. Remove label when 
 When reviewing generated issues, verify:
 - ❌ REJECT issues that say "tests will be updated in a future issue"
 - ❌ REJECT separate "Phase N: Update tests" issues for already-changed code
+- ❌ REJECT plans that defer testing to end phases (combine tests with implementation)
 - ✅ ACCEPT issues where test updates are part of implementation requirements
 - ✅ ACCEPT issues where success criteria includes "all tests pass"
+- ✅ ACCEPT large feature (>100 LOC) with smoke tests IF immediately followed by comprehensive test phase
+- ✅ ACCEPT comprehensive test phase that immediately follows a smoke test phase
 
 ## Dependency Management
 - **Explicit**: Clearly state dependencies in metadata and body
@@ -459,8 +525,10 @@ When reviewing generated issues, verify:
 - **type:patch**: Code changes with docstrings only (no user-facing docs)
 - **type:complete**: Code changes + user-facing documentation
 - **type:document**: Documentation/planning only, no code
-- **model:base**: Standard complexity (most issues)
-- **model:heavy**: Complex issues requiring deep analysis
+- **model:default**: Uses workflow/agent preset model (most issues - no override)
+- **model:light**: Override to light tier (haiku) for simple tasks
+- **model:base**: Override to base tier (sonnet) for standard work
+- **model:heavy**: Override to heavy tier (opus) for complex analysis
 - **agent**: Issue can be done by AI agent
 - **blocked**: Issue blocked from auto-starting (add to all new issues)
 - **feature**: New functionality
@@ -473,11 +541,11 @@ When reviewing generated issues, verify:
 
 **User Input:**
 ```
-Create issues for phases 8-11 from docs/Agent/development_plans/features/P1-workflow-engine-features.md
+Create issues for phases 8-11 from adw-docs/dev-plans/features/P1-workflow-engine-features.md
 ```
 
 **Agent Process:**
-1. Read `docs/Agent/development_plans/features/P1-workflow-engine-features.md`
+1. Read `adw-docs/dev-plans/features/P1-workflow-engine-features.md`
 2. Extract phases 8-11 with details
 3. Create todo list with 4 items (one per phase)
 4. For each phase:
@@ -541,7 +609,7 @@ Create a parent issue for "Implement comprehensive data export system" with 3 su
 ## Invalid Metadata
 - Ensure all required metadata fields are present
 - Provide defaults if user input is vague:
-  - Labels: Default to `agent, blocked, type:patch, model:base, feature`
+  - Labels: Default to `agent, blocked, type:patch, model:default, feature`
   - Dependencies: Default to "none"
   - IS_PARENT: Default to "false"
   - IS_SUBISSUE: Default to "false"
@@ -587,6 +655,6 @@ Create a parent issue for "Implement comprehensive data export system" with 3 su
 # See Also
 
 - **Subagent**: `.opencode/agent/issue-creator-executor.md` - Subagent that executes CLI
-- **Issue Format Guide**: `docs/Agent/issue_interpret_guide.md` - Detailed issue formatting
-- **Code Culture**: `docs/Agent/code_culture.md` - 100-line rule philosophy
-- **Feature Plans**: `docs/Agent/development_plans/features/` - Source documents for issues
+- **Issue Format Guide**: `adw-docs/issue_interpret_guide.md` - Detailed issue formatting
+- **Code Culture**: `adw-docs/code_culture.md` - 100-line rule philosophy
+- **Feature Plans**: `adw-docs/dev-plans/features/` - Source documents for issues

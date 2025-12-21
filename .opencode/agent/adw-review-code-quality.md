@@ -73,8 +73,8 @@ Linter Findings:
 
 # Required Reading
 
-- @docs/Agent/code_style.md - Repository coding conventions
-- @docs/Agent/docstring_guide.md - Documentation standards
+- @adw-docs/code_style.md - Repository coding conventions
+- @adw-docs/docstring_guide.md - Documentation standards
 
 # Review Process
 

@@ -43,8 +43,8 @@ Generate ordered implementation steps with file paths and details. Write plan to
 
 # Required Reading
 
-- @docs/Agent/code_style.md - Coding conventions
-- @docs/Agent/architecture_reference.md - Architecture patterns
+- @adw-docs/code_style.md - Coding conventions
+- @adw-docs/architecture_reference.md - Architecture patterns
 
 # Using the adw_spec Tool
 
@@ -184,7 +184,7 @@ Use `read`, `glob`, `grep` to:
 - Understand existing patterns
 - Identify integration points
 
-Read @docs/Agent/code_style.md and @docs/Agent/architecture_reference.md and @docs/Agent/README.md for:
+Read @adw-docs/code_style.md and @adw-docs/architecture_reference.md and @adw-docs/README.md for:
 - Naming conventions
 - Module organization
 - Design patterns

@@ -79,12 +79,12 @@ task({
 
 # Required Reading
 
-- @docs/Agent/testing_guide.md - Test framework, patterns, conventions, **test duration tiers**
-- @docs/Agent/code_style.md - Naming conventions for test files
+- @adw-docs/testing_guide.md - Test framework, patterns, conventions, **test duration tiers**
+- @adw-docs/code_style.md - Naming conventions for test files
 
 # Test Duration Tiers (IMPORTANT)
 
-This subagent focuses on **fast tests** to provide quick feedback. See `docs/Agent/testing_guide.md` for complete details.
+This subagent focuses on **fast tests** to provide quick feedback. See `adw-docs/testing_guide.md` for complete details.
 
 | Tier | Duration | Run by this agent? |
 |------|----------|-------------------|
@@ -482,4 +482,4 @@ Context: Parser now uses new data models
 
 **Retries:** 3 internal attempts before failing
 
-**References:** `docs/Agent/testing_guide.md`, `docs/Agent/code_style.md`
+**References:** `adw-docs/testing_guide.md`, `adw-docs/code_style.md`

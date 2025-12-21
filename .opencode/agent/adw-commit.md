@@ -85,7 +85,7 @@ task({
 
 # Required Reading
 
-- @docs/Agent/commit_conventions.md - Commit message format
+- @adw-docs/commit_conventions.md - Commit message format
 
 # Commit Message Format
 
@@ -758,4 +758,4 @@ git push origin <branch_name>
 - ✅ git push (except main/master branches)
 - ✅ ruff check/format (for pre-commit fixes)
 
-**References:** `docs/Agent/commit_conventions.md`
+**References:** `adw-docs/commit_conventions.md`

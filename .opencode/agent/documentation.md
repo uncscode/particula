@@ -69,20 +69,20 @@ You are running as an **orchestrator** that:
 
 # Required Reading
 
-- @docs/Agent/documentation_guide.md - Documentation standards
-- @docs/Agent/docstring_guide.md - Docstring format
-- @docs/Agent/architecture_reference.md - Architecture patterns
+- @adw-docs/documentation_guide.md - Documentation standards
+- @adw-docs/docstring_guide.md - Docstring format
+- @adw-docs/architecture_reference.md - Architecture patterns
 
 # Available Subagents
 
 | Subagent | Purpose | Scope |
 |----------|---------|-------|
 | **docstring** | Update Python docstrings | `*.py` files |
-| **docs** | Update general documentation | `docs/Agent/*.md`, `README.md`, `docs/*.md` |
-| **docs-feature** | Update feature documentation | `docs/Agent/development_plans/features/*.md` |
-| **docs-maintenance** | Update maintenance docs | `docs/Agent/development_plans/maintenance/*.md` |
+| **docs** | Update general documentation | `adw-docs/*.md`, `README.md`, `docs/*.md` |
+| **docs-feature** | Update feature documentation | `adw-docs/dev-plans/features/*.md` |
+| **docs-maintenance** | Update maintenance docs | `adw-docs/dev-plans/maintenance/*.md` |
 | **examples** | Create/update examples | `docs/Examples/*.md`, `.py`, `.ipynb` |
-| **architecture** | ADRs and architecture outline | `docs/Agent/architecture/*.md` |
+| **architecture** | ADRs and architecture outline | `adw-docs/architecture/*.md` |
 | **theory** | Conceptual documentation | `docs/Theory/*.md` |
 | **features** | High-level feature docs | `docs/Features/*.md` |
 | **docs-validator** | Validate links and formatting | All docs (read-only) |
@@ -247,7 +247,7 @@ Arguments: adw_id={adw_id}
 Changes made:
 {summary_of_implementation}
 
-Update README.md, docs/Agent/*.md guides, docs/index.md as needed.
+Update README.md, adw-docs/*.md guides, docs/index.md as needed.
 """,
   "subagent_type": "docs"
 })
@@ -262,7 +262,7 @@ Update README.md, docs/Agent/*.md guides, docs/index.md as needed.
 ```python
 task({
   "description": "Update feature documentation",
-  "prompt": f"""Document feature in docs/Agent/development_plans/features/.
+  "prompt": f"""Document feature in adw-docs/dev-plans/features/.
 
 Arguments: adw_id={adw_id}
 

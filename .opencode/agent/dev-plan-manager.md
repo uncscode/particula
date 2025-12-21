@@ -51,7 +51,7 @@ permission:
 
 # Development Plan Manager
 
-Interactive agent for creating and managing development plans in `docs/Agent/development_plans/`.
+Interactive agent for creating and managing development plans in `adw-docs/dev-plans/`.
 
 # Core Mission
 
@@ -84,7 +84,7 @@ Phases within documents get full prefix for GitHub issue titles:
 # Folder Structure
 
 ```
-docs/Agent/development_plans/
+adw-docs/dev-plans/
 ├── README.md                    # Overview, links to indexes
 ├── template-epic.md
 ├── template-feature.md
@@ -108,10 +108,10 @@ docs/Agent/development_plans/
 # Required Reading
 
 Before starting work, consult:
-- `docs/Agent/development_plans/README.md` - Overview and conventions
-- `docs/Agent/development_plans/epics/index.md` - Current epic IDs
-- `docs/Agent/development_plans/features/index.md` - Current feature IDs
-- `docs/Agent/development_plans/maintenance/index.md` - Current maintenance IDs
+- `adw-docs/dev-plans/README.md` - Overview and conventions
+- `adw-docs/dev-plans/epics/index.md` - Current epic IDs
+- `adw-docs/dev-plans/features/index.md` - Current feature IDs
+- `adw-docs/dev-plans/maintenance/index.md` - Current maintenance IDs
 
 # Process
 
@@ -143,6 +143,7 @@ Ask about:
 - **Size Estimate**: How many phases? What's the largest phase size?
 - **Dependencies**: What must be done first? What depends on this?
 - **Success Metrics**: How will we know this is done?
+- **Testing Strategy**: How will each phase be tested? (Tests ship with code, never in a separate phase)
 
 ### For Updates
 
@@ -175,7 +176,7 @@ Read the appropriate index file to get the next available ID:
 
 ```python
 read({
-  "filePath": "docs/Agent/development_plans/features/index.md"
+  "filePath": "adw-docs/dev-plans/features/index.md"
 })
 ```
 
@@ -355,6 +356,102 @@ Or should I just update the status field?"
 - **Always update index.md** after document changes
 - **Always include completion date** when moving to completed/
 
+# Tests-With-Feature Principle (CRITICAL)
+
+**Every phase that adds, modifies, or removes code MUST include corresponding test updates in the same phase.**
+
+## Anti-Pattern (DO NOT DO THIS)
+```
+- [ ] **E9-F7-P1:** Add new validation logic
+  - Implement input validation for API endpoints
+  
+- [ ] **E9-F7-P2:** Write tests for validation  ❌ WRONG
+  - Note: Test failures are expected and will be addressed in this phase
+```
+
+This is wrong because:
+1. P1 ships without test coverage, violating quality gates
+2. Test failures in CI are "expected" - normalizing broken builds
+3. Reviewers can't verify P1 correctness without tests
+4. Creates technical debt by design
+
+## Correct Pattern (DO THIS)
+```
+- [ ] **E9-F7-P1:** Add new validation logic with tests
+  - Implement input validation for API endpoints
+  - Add unit tests for validation logic
+  - Update integration tests for affected endpoints
+  - All tests must pass before phase completion
+```
+
+## Why This Matters
+
+1. **Each phase is a complete, shippable increment** - Tests prove it works
+2. **CI stays green** - No "expected failures" that mask real issues
+3. **Code review is meaningful** - Reviewers see implementation + verification together
+4. **~100 LOC rule includes tests** - Tests are production code, not an afterthought
+5. **Enables safe refactoring** - Future phases have coverage from day one
+
+## Exception: Large Features (>100 LOC) - Smoke Tests First
+
+For large features that exceed the ~100 LOC guideline, you MAY split into:
+
+1. **Phase N:** Core implementation with smoke tests
+   - Implement the main feature (~100 LOC of implementation)
+   - Add smoke tests that verify basic happy path
+   - CI must pass - smoke tests provide minimum coverage
+
+2. **Phase N+1:** Comprehensive test coverage (REQUIRED)
+   - Add edge case tests, error handling tests
+   - Add integration tests
+   - Reach full coverage threshold
+
+**If you use smoke tests, you MUST have an immediately following comprehensive test phase.** No other implementation work can happen between the smoke test phase and the comprehensive test phase.
+
+```
+- [ ] **E9-F7-P1:** Add validation framework with smoke tests
+  - Implement core validation logic (large feature, >100 LOC)
+  - Add smoke tests for happy path validation
+  - CI passes with basic coverage
+  
+- [ ] **E9-F7-P2:** Complete validation test coverage  ← REQUIRED after smoke tests
+  - Add edge case tests (empty input, malformed data)
+  - Add integration tests with API endpoints
+  - Achieve 80%+ coverage for validation module
+  
+- [ ] **E9-F7-P3:** Add validation caching  ← Next feature work comes AFTER full tests
+  - ...
+```
+
+**This exception does NOT apply to:**
+- Refactors (must have full tests to verify behavior preservation)
+- Removals (must update/remove tests to keep CI green)
+- Bug fixes (must have regression test proving the fix)
+
+## How to Handle Test-Heavy Features
+
+If a feature requires substantial test infrastructure, create the infrastructure first:
+
+```
+- [ ] **E9-F7-P1:** Create test fixtures and helpers for validation
+  - Add test factory functions
+  - Create mock validation contexts
+  - Add parametrized test templates
+  
+- [ ] **E9-F7-P2:** Add validation logic with tests
+  - Implement validation (uses fixtures from P1)
+  - Add comprehensive tests using the fixtures
+```
+
+## Phase Completion Criteria
+
+A phase is NOT complete until:
+- [ ] All new code has corresponding tests (smoke tests minimum for large features)
+- [ ] All modified code has updated tests (full tests required for refactors)
+- [ ] All removed code has removed/updated tests (required - no exceptions)
+- [ ] CI passes with no expected failures
+- [ ] Test coverage for changed files meets threshold (80%+, or smoke test minimum for large feature phase 1)
+
 # Document Conventions
 
 ## Final Phase Template
@@ -437,12 +534,12 @@ Next Steps:
 # Scope Restrictions
 
 ## CAN Modify
-- `docs/Agent/development_plans/**/*.md` - All plan documents
-- `docs/Agent/development_plans/**/index.md` - Index files
-- `docs/Agent/development_plans/README.md` - Main readme
+- `adw-docs/dev-plans/**/*.md` - All plan documents
+- `adw-docs/dev-plans/**/index.md` - Index files
+- `adw-docs/dev-plans/README.md` - Main readme
 
 ## CANNOT Modify
-- Files outside `docs/Agent/development_plans/`
+- Files outside `adw-docs/dev-plans/`
 - Template files (suggest changes only)
 - Existing file IDs (would break references)
 
@@ -458,7 +555,7 @@ Use the `move` tool for relocating files to completed folders:
 
 ```python
 move({
-  "source": "docs/Agent/development_plans/features/E1-F1-platform-abstraction.md",
-  "destination": "docs/Agent/development_plans/features/completed/E1-F1-platform-abstraction.md"
+  "source": "adw-docs/dev-plans/features/E1-F1-platform-abstraction.md",
+  "destination": "adw-docs/dev-plans/features/completed/E1-F1-platform-abstraction.md"
 })
 ```

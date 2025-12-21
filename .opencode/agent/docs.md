@@ -1,16 +1,16 @@
 ---
-description: 'Subagent that updates general documentation in docs/Agent/, README.md,
+description: 'Subagent that updates general documentation in adw-docs/, README.md,
   and root-level docs. Invoked by the documentation primary agent to ensure guides
   and references stay current with code changes.
 
-  This subagent: - Loads workflow context from adw_spec tool - Updates docs/Agent/*.md
-  guides (code_style, testing_guide, etc.) - Updates docs/Agent/agents/*.md agent
+  This subagent: - Loads workflow context from adw_spec tool - Updates adw-docs/*.md
+  guides (code_style, testing_guide, etc.) - Updates adw-docs/agents/*.md agent
   documentation - Updates README.md (Quick Start, CLI commands, installation) - Updates
   docs/index.md and docs/*.md root-level docs - Creates new docs for new features
   when appropriate - Ensures markdown links are valid
 
-  Write permissions: - docs/Agent/*.md (excluding architecture/, feature/, maintenance/)
-  - docs/Agent/agents/*.md - docs/*.md (root level) - README.md - AGENTS.md'
+  Write permissions: - adw-docs/*.md (excluding architecture/, feature/, maintenance/)
+  - adw-docs/agents/*.md - docs/*.md (root level) - README.md - AGENTS.md'
 mode: subagent
 tools:
   read: true
@@ -41,7 +41,7 @@ tools:
 
 # Docs Subagent
 
-Update general documentation in docs/Agent/, README.md, and root-level docs to reflect code changes.
+Update general documentation in adw-docs/, README.md, and root-level docs to reflect code changes.
 
 # Core Mission
 
@@ -49,7 +49,7 @@ Keep general documentation current with:
 - Updated guides reflecting code changes
 - README.md with accurate CLI commands and installation
 - docs/index.md with correct navigation
-- Agent documentation in docs/Agent/agents/
+- Agent documentation in adw-docs/agents/
 - Root-level docs (cost-optimization, troubleshooting, etc.)
 - Valid markdown links throughout
 
@@ -66,7 +66,7 @@ Files changed:
 
 Update:
 - README.md if CLI commands or installation changed
-- docs/Agent/*.md guides if relevant
+- adw-docs/*.md guides if relevant
 - docs/index.md if structure changed
 ```
 
@@ -81,23 +81,23 @@ task({
 
 # Required Reading
 
-- @docs/Agent/documentation_guide.md - Documentation standards
-- @docs/Agent/code_style.md - Code conventions
+- @adw-docs/documentation_guide.md - Documentation standards
+- @adw-docs/code_style.md - Code conventions
 - @README.md - Current README structure
 
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `docs/Agent/*.md` - Main guides (excluding subdirectories)
-- ✅ `docs/Agent/agents/*.md` - Agent documentation
+- ✅ `adw-docs/*.md` - Main guides (excluding subdirectories)
+- ✅ `adw-docs/agents/*.md` - Agent documentation
 - ✅ `docs/*.md` - Root-level docs (index.md, cost-optimization.md, etc.)
 - ✅ `README.md` - Project README
 - ✅ `AGENTS.md` - Agent quick reference
 
 **EXCLUDED (handled by other subagents):**
-- ❌ `docs/Agent/architecture/` - architecture subagent
-- ❌ `docs/Agent/development_plans/features/` - docs-feature subagent
-- ❌ `docs/Agent/development_plans/maintenance/` - docs-maintenance subagent
+- ❌ `adw-docs/architecture/` - architecture subagent
+- ❌ `adw-docs/dev-plans/features/` - docs-feature subagent
+- ❌ `adw-docs/dev-plans/maintenance/` - docs-maintenance subagent
 - ❌ `docs/Examples/` - examples subagent
 - ❌ `docs/Theory/` - theory subagent
 - ❌ `docs/Features/` - features subagent
@@ -136,16 +136,16 @@ From input context, identify:
 
 | Change Type | Documentation to Update |
 |-------------|------------------------|
-| New CLI command | README.md (CLI Reference), docs/Agent/README.md |
+| New CLI command | README.md (CLI Reference), adw-docs/README.md |
 | New config option | README.md (Configuration), cost-optimization.md |
-| API change | docs/Agent/code_style.md if patterns change |
-| Testing change | docs/Agent/testing_guide.md |
-| Linting change | docs/Agent/linting_guide.md |
-| New agent | docs/Agent/agents/{agent-name}.md, AGENTS.md |
-| Review process | docs/Agent/review_guide.md |
-| Commit format | docs/Agent/commit_conventions.md |
-| PR format | docs/Agent/pr_conventions.md |
-| Docstring format | docs/Agent/docstring_guide.md |
+| API change | adw-docs/code_style.md if patterns change |
+| Testing change | adw-docs/testing_guide.md |
+| Linting change | adw-docs/linting_guide.md |
+| New agent | adw-docs/agents/{agent-name}.md, AGENTS.md |
+| Review process | adw-docs/review_guide.md |
+| Commit format | adw-docs/commit_conventions.md |
+| PR format | adw-docs/pr_conventions.md |
+| Docstring format | adw-docs/docstring_guide.md |
 
 ## Step 3: Create Todo List
 
@@ -160,7 +160,7 @@ todowrite({
     },
     {
       "id": "2",
-      "content": "Update docs/Agent/testing_guide.md",
+      "content": "Update adw-docs/testing_guide.md",
       "status": "pending",
       "priority": "medium"
     },
@@ -306,7 +306,7 @@ DOCS_UPDATE_COMPLETE
 
 Files updated: {count}
 - README.md: Updated CLI Reference section (+2 commands)
-- docs/Agent/testing_guide.md: Added new test pattern
+- adw-docs/testing_guide.md: Added new test pattern
 - docs/index.md: Added link to new guide
 - AGENTS.md: Updated quick reference
 
@@ -377,14 +377,14 @@ Changes made:
 Files changed:
 - adw/cli.py
 - adw/commands/docstring.py
-- docs/Agent/testing_guide.md (partial)
+- adw-docs/testing_guide.md (partial)
 ```
 
 **Process:**
 1. Load context, analyze changes
 2. Identify docs to update:
    - README.md (new CLI command, new env var)
-   - docs/Agent/testing_guide.md (test markers)
+   - adw-docs/testing_guide.md (test markers)
    - AGENTS.md (new command)
 3. Create todos
 4. Update each file
@@ -397,7 +397,7 @@ DOCS_UPDATE_COMPLETE
 
 Files updated: 3
 - README.md: Added `docstring` command to CLI Reference, added OPENCODE_TIMEOUT env var
-- docs/Agent/testing_guide.md: Added test markers section
+- adw-docs/testing_guide.md: Added test markers section
 - AGENTS.md: Updated quick reference with new command
 
 Updates:
@@ -414,8 +414,8 @@ Links checked: 12 internal, 3 external
 **Output Signal:** `DOCS_UPDATE_COMPLETE` or `DOCS_UPDATE_FAILED`
 
 **Scope:**
-- ✅ docs/Agent/*.md (main guides)
-- ✅ docs/Agent/agents/*.md
+- ✅ adw-docs/*.md (main guides)
+- ✅ adw-docs/agents/*.md
 - ✅ docs/*.md (root level)
 - ✅ README.md, AGENTS.md
 - ❌ architecture/, feature/, maintenance/, Examples/, Theory/, Features/
@@ -424,4 +424,4 @@ Links checked: 12 internal, 3 external
 
 **Validation:** Check all markdown links before completion
 
-**References:** `docs/Agent/documentation_guide.md`
+**References:** `adw-docs/documentation_guide.md`

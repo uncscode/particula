@@ -81,6 +81,7 @@ Change the document status:
 - Update phase status: `Status: Not Started` → `Status: Complete`
 - Add issue numbers: `Issue: TBD` → `Issue: #123`
 - Add new phases (with correct ID prefix)
+- **Enforce tests-with-feature**: Never add standalone "Write tests" phases
 
 ## 3. Content Updates
 - Update scope sections
@@ -160,14 +161,26 @@ If adding a new phase, ensure:
 1. Correct ID prefix (match document ID)
 2. Proper phase number (increment from last)
 3. Placed before the final "Update dev-docs" phase
+4. **Tests included with implementation** (no standalone test phases)
+
+#### Tests-With-Feature Validation
+
+When adding a new phase:
+- REJECT requests for "Write tests for X" or "Add test coverage" as standalone phases (unless it's the required follow-up to a smoke test phase)
+- Instead, modify the existing implementation phase to include tests
+- Or if tests need new infrastructure, create "Add test fixtures/helpers" phase first
+
+**Smoke Test Follow-up Rule:**
+If the previous phase used smoke tests (large feature >100 LOC), the next phase MUST be comprehensive test coverage. Do not allow any implementation work to be inserted between a smoke test phase and its required comprehensive test phase.
 
 ```python
 edit({
   "filePath": "{file_path}",
   "oldString": "- [ ] **{DOC_ID}-P{N}:** Update development documentation",
-  "newString": """- [ ] **{DOC_ID}-P{N}:** {new_phase_title}
+  "newString": """- [ ] **{DOC_ID}-P{N}:** {new_phase_title} with tests
   - Issue: TBD | Size: {size} | Status: Not Started
-  - {goal}
+  - Goal: {goal}
+  - Tests: {test_requirements}
 
 - [ ] **{DOC_ID}-P{N+1}:** Update development documentation"""
 })
@@ -234,7 +247,7 @@ Next Steps:
 
 Input:
 ```
-File Path: docs/Agent/development_plans/features/E1-F2-gitlab-client.md
+File Path: adw-docs/dev-plans/features/E1-F2-gitlab-client.md
 Document ID: E1-F2
 
 Updates Requested:
@@ -256,7 +269,7 @@ Actions:
 
 Input:
 ```
-File Path: docs/Agent/development_plans/features/F3-dark-mode.md
+File Path: adw-docs/dev-plans/features/F3-dark-mode.md
 Document ID: F3
 
 Updates Requested:
@@ -277,7 +290,7 @@ Actions:
 
 Input:
 ```
-File Path: docs/Agent/development_plans/features/E2-F1-observer-pattern.md
+File Path: adw-docs/dev-plans/features/E2-F1-observer-pattern.md
 Document ID: E2-F1
 
 Updates Requested:
@@ -306,7 +319,7 @@ Error: Document not found
 Path: {file_path}
 
 Recommendation: Verify file path. Use glob to search:
-- docs/Agent/development_plans/features/*{partial_name}*.md
+- adw-docs/dev-plans/features/*{partial_name}*.md
 ```
 
 ## Invalid Phase ID
@@ -352,9 +365,9 @@ Before reporting completion:
 # Scope Restrictions
 
 ## CAN Edit
-- `docs/Agent/development_plans/epics/*.md`
-- `docs/Agent/development_plans/features/*.md`
-- `docs/Agent/development_plans/maintenance/*.md`
+- `adw-docs/dev-plans/epics/*.md`
+- `adw-docs/dev-plans/features/*.md`
+- `adw-docs/dev-plans/maintenance/*.md`
 
 ## CANNOT Edit
 - Template files

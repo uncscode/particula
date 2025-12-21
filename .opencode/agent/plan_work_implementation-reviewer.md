@@ -74,8 +74,8 @@ task({
 
 # Required Reading
 
-- @docs/Agent/code_style.md - Code conventions
-- @docs/Agent/testing_guide.md - Testing patterns
+- @adw-docs/code_style.md - Code conventions
+- @adw-docs/testing_guide.md - Testing patterns
 
 # Process
 

@@ -70,8 +70,8 @@ Diff Content:
 
 # Required Reading
 
-- @docs/Agent/docstring_guide.md - Repository docstring conventions (Google-style)
-- @docs/Agent/code_style.md - Type hint requirements
+- @adw-docs/docstring_guide.md - Repository docstring conventions (Google-style)
+- @adw-docs/code_style.md - Type hint requirements
 
 # Review Process
 
