@@ -74,19 +74,45 @@ def test_add_mass():
 
 
 def test_add_concentration():
-    """Test concentration addition."""
+    """Test concentration addition and charge passthrough."""
     distribution = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
     concentration = np.array([5.0, 6.0], dtype=np.float64)
     added_distribution = distribution.copy()
     added_concentration = np.array([1.0, 2.0], dtype=np.float64)
+    charge = np.array([0.3, -0.1], dtype=np.float64)
     expected = concentration + added_concentration
-    _, new_conc = speciated_mass_strategy.add_concentration(
-        distribution,
-        concentration,
-        added_distribution,
-        added_concentration,
+    new_dist, new_conc, returned_charge = (
+        speciated_mass_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+            charge=charge,
+        )
     )
+    np.testing.assert_array_equal(new_dist, distribution)
     np.testing.assert_array_equal(new_conc, expected)
+    assert returned_charge is charge
+    np.testing.assert_array_equal(returned_charge, charge)
+
+
+def test_add_concentration_charge_none_returns_none():
+    """When charge is None, charge should stay None."""
+    distribution = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+    concentration = np.array([5.0, 6.0], dtype=np.float64)
+    added_distribution = distribution.copy()
+    added_concentration = np.array([1.0, 2.0], dtype=np.float64)
+
+    _new_dist, _new_conc, returned_charge = (
+        speciated_mass_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+        )
+    )
+
+    assert returned_charge is None
 
 
 def test_add_concentration_distribution_error():

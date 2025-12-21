@@ -91,14 +91,17 @@ def test_add_concentration_append():
     concentration = np.array([2.0], dtype=np.float64)
     added_distribution = np.array([[3.0, 4.0]], dtype=np.float64)
     added_concentration = np.array([1.0], dtype=np.float64)
-    new_dist, new_conc = particle_resolved_strategy.add_concentration(
-        distribution,
-        concentration,
-        added_distribution,
-        added_concentration,
+    new_dist, new_conc, new_charge = (
+        particle_resolved_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+        )
     )
     np.testing.assert_array_equal(new_dist[-1], added_distribution[0])
     np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
+    assert new_charge is None
 
 
 def test_add_concentration_fill_empties():
@@ -107,14 +110,17 @@ def test_add_concentration_fill_empties():
     concentration = np.array([2.0, 0.0], dtype=np.float64)
     added_distribution = np.array([[7.0, 8.0]], dtype=np.float64)
     added_concentration = np.array([1.0], dtype=np.float64)
-    new_dist, new_conc = particle_resolved_strategy.add_concentration(
-        distribution,
-        concentration,
-        added_distribution,
-        added_concentration,
+    new_dist, new_conc, new_charge = (
+        particle_resolved_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+        )
     )
     np.testing.assert_array_equal(new_dist, np.array([[1.0, 2.0], [7.0, 8.0]]))
     np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
+    assert new_charge is None
 
 
 def test_add_concentration_partial_fill():
@@ -123,14 +129,140 @@ def test_add_concentration_partial_fill():
     concentration = np.array([0.0, 0.0], dtype=np.float64)
     added_distribution = np.array([[7.0, 8.0], [9.0, 10.0]], dtype=np.float64)
     added_concentration = np.array([1.0, 1.0], dtype=np.float64)
-    new_dist, new_conc = particle_resolved_strategy.add_concentration(
+    new_dist, new_conc, new_charge = (
+        particle_resolved_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+        )
+    )
+    np.testing.assert_array_equal(new_dist, added_distribution)
+    np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
+    assert new_charge is None
+
+
+def test_add_concentration_with_charge_append():
+    """Test appending charged particles adds charge values."""
+    distribution = np.array([[1.0, 2.0]], dtype=np.float64)
+    concentration = np.array([1.0], dtype=np.float64)
+    charge = np.array([0.5], dtype=np.float64)
+    added_distribution = np.array([[3.0, 4.0]], dtype=np.float64)
+    added_concentration = np.array([1.0], dtype=np.float64)
+    added_charge = np.array([2.0], dtype=np.float64)
+
+    _, _, new_charge = particle_resolved_strategy.add_concentration(
         distribution,
         concentration,
         added_distribution,
         added_concentration,
+        charge=charge,
+        added_charge=added_charge,
     )
-    np.testing.assert_array_equal(new_dist, added_distribution)
-    np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0]))
+
+    assert new_charge is not None
+    np.testing.assert_array_equal(new_charge, np.array([0.5, 2.0]))
+
+
+def test_add_concentration_fill_empty_with_charge():
+    """Test filling empty bins places leading charges."""
+    distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
+    concentration = np.array([0.0, 1.0], dtype=np.float64)
+    charge = np.array([0.0, -1.0], dtype=np.float64)
+    added_distribution = np.array([[7.0, 8.0]], dtype=np.float64)
+    added_concentration = np.array([1.0], dtype=np.float64)
+    added_charge = np.array([3.0], dtype=np.float64)
+
+    _, _, new_charge = particle_resolved_strategy.add_concentration(
+        distribution,
+        concentration,
+        added_distribution,
+        added_concentration,
+        charge=charge,
+        added_charge=added_charge,
+    )
+
+    assert new_charge is not None
+    np.testing.assert_array_equal(new_charge, np.array([3.0, -1.0]))
+
+
+def test_add_concentration_partial_fill_with_charge():
+    """Test partial fill then append charges."""
+    distribution = np.array([[1.0, 2.0], [5.0, 6.0]], dtype=np.float64)
+    concentration = np.array([0.0, 1.0], dtype=np.float64)
+    charge = np.array([0.0, -1.0], dtype=np.float64)
+    added_distribution = np.array([[7.0, 8.0], [9.0, 10.0]], dtype=np.float64)
+    added_concentration = np.array([1.0, 1.0], dtype=np.float64)
+    added_charge = np.array([4.0, 5.0], dtype=np.float64)
+
+    _, _, new_charge = particle_resolved_strategy.add_concentration(
+        distribution,
+        concentration,
+        added_distribution,
+        added_concentration,
+        charge=charge,
+        added_charge=added_charge,
+    )
+
+    assert new_charge is not None
+    np.testing.assert_array_equal(new_charge, np.array([4.0, -1.0, 5.0]))
+
+
+def test_add_concentration_charge_defaults_to_zero():
+    """Test defaulting charges to zero when omitted."""
+    distribution = np.array([[1.0, 2.0]], dtype=np.float64)
+    concentration = np.array([1.0], dtype=np.float64)
+    charge = np.array([1.0], dtype=np.float64)
+    added_distribution = np.array([[3.0, 4.0]], dtype=np.float64)
+    added_concentration = np.array([1.0], dtype=np.float64)
+
+    _, _, new_charge = particle_resolved_strategy.add_concentration(
+        distribution,
+        concentration,
+        added_distribution,
+        added_concentration,
+        charge=charge,
+    )
+
+    assert new_charge is not None
+    np.testing.assert_array_equal(new_charge, np.array([1.0, 0.0]))
+
+
+def test_add_concentration_charge_shape_mismatch():
+    """Test shape mismatch between charge and concentration raises error."""
+    distribution = np.array([[1.0, 2.0]], dtype=np.float64)
+    concentration = np.array([1.0], dtype=np.float64)
+    added_distribution = np.array([[3.0, 4.0]], dtype=np.float64)
+    added_concentration = np.array([1.0], dtype=np.float64)
+    added_charge = np.array([[1.0, 2.0]], dtype=np.float64)
+
+    with pytest.raises(ValueError):
+        particle_resolved_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+            charge=np.array([0.0], dtype=np.float64),
+            added_charge=added_charge,
+        )
+
+
+def test_add_concentration_charge_none_passthrough():
+    """Test charge None path returns None unchanged."""
+    distribution = np.array([[1.0, 2.0]], dtype=np.float64)
+    concentration = np.array([1.0], dtype=np.float64)
+    added_distribution = np.array([[3.0, 4.0]], dtype=np.float64)
+    added_concentration = np.array([1.0], dtype=np.float64)
+
+    _, _, new_charge = particle_resolved_strategy.add_concentration(
+        distribution,
+        concentration,
+        added_distribution,
+        added_concentration,
+        charge=None,
+    )
+
+    assert new_charge is None
 
 
 def test_add_concentration_error():

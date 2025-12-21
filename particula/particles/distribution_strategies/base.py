@@ -125,7 +125,13 @@ class DistributionStrategy(ABC):
         concentration: NDArray[np.float64],
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        charge: Optional[NDArray[np.float64]] = None,
+        added_charge: Optional[NDArray[np.float64]] = None,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        Optional[NDArray[np.float64]],
+    ]:
         """Add concentration to the distribution of particles.
 
         Arguments:
@@ -134,10 +140,14 @@ class DistributionStrategy(ABC):
               size or mass.
             - added_distribution : The distribution to be added.
             - added_concentration : The concentration to be added.
+            - charge : Optional charge array to update alongside
+              concentration. If None, charge is ignored and returned None.
+            - added_charge : Optional charge array for added particles.
 
         Returns:
-            - The updated distribution array
+            - The updated distribution array.
             - The updated concentration array.
+            - The updated charge array, or None if charge input was None.
         """
 
     @abstractmethod

@@ -21,7 +21,7 @@ def setup_particle(
     distribution: np.ndarray = np.array([1.0, 2.0, 3.0]),
     density: Any = 1.0,
     concentration: np.ndarray = np.array([10, 20, 30]),
-    charge: float = 1.0,
+    charge: Any = 1.0,
 ) -> ParticleRepresentation:
     """Setup ParticleRepresentation for testing with configurable parameters.
 
@@ -265,3 +265,44 @@ def test_bin_order_after_add_mass():
         particle.get_concentration(), np.array([10, 20, 30])
     )
     np.testing.assert_array_equal(particle.get_charge(), np.array([1, 2, 3]))
+
+
+def test_add_concentration_charge_passthrough_updates_representation():
+    """add_concentration should wire charge through the strategy."""
+    particle = setup_particle(
+        strategy=ParticleResolvedSpeciatedMass(),
+        distribution=np.array([[1.0, 2.0]], dtype=np.float64),
+        density=np.array([1.0, 1.0], dtype=np.float64),
+        concentration=np.array([1.0], dtype=np.float64),
+        charge=0.5,
+    )
+
+    particle.add_concentration(
+        added_concentration=np.array([1.0], dtype=np.float64),
+        added_distribution=np.array([[3.0, 4.0]], dtype=np.float64),
+        added_charge=np.array([2.0], dtype=np.float64),
+    )
+
+    np.testing.assert_array_equal(
+        particle.get_charge(), np.array([0.5, 2.0], dtype=np.float64)
+    )
+
+
+def test_add_concentration_charge_none_returns_none():
+    """When charge is None, add_concentration should preserve None."""
+    particle = ParticleRepresentation(
+        strategy=ParticleResolvedSpeciatedMass(),
+        activity=ActivityIdealMass(),
+        surface=SurfaceStrategyVolume(),
+        distribution=np.array([[1.0, 2.0]], dtype=np.float64),
+        density=np.array([1.0, 1.0], dtype=np.float64),
+        concentration=np.array([1.0], dtype=np.float64),
+        charge=None,  # type: ignore[arg-type]
+    )
+
+    particle.add_concentration(
+        added_concentration=np.array([1.0], dtype=np.float64),
+        added_distribution=np.array([[3.0, 4.0]], dtype=np.float64),
+    )
+
+    assert particle.get_charge() is None
