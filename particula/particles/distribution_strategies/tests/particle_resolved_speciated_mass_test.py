@@ -208,6 +208,38 @@ def test_add_concentration_partial_fill_with_charge():
     np.testing.assert_array_equal(new_charge, np.array([4.0, -1.0, 5.0]))
 
 
+def test_add_concentration_more_empty_bins_than_added():
+    """Test when empty_bins_count > added_bins_count with charge."""
+    distribution = np.array(
+        [[1.0, 2.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], dtype=np.float64
+    )
+    concentration = np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float64)
+    charge = np.array([-1.0, 0.0, 0.0, 0.0], dtype=np.float64)
+    added_distribution = np.array([[7.0, 8.0], [9.0, 10.0]], dtype=np.float64)
+    added_concentration = np.array([1.0, 1.0], dtype=np.float64)
+    added_charge = np.array([2.0, 3.0], dtype=np.float64)
+
+    new_dist, new_conc, new_charge = (
+        particle_resolved_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+            charge=charge,
+            added_charge=added_charge,
+        )
+    )
+
+    # First bin unchanged, bins 1-2 filled, bin 3 remains empty
+    expected_dist = np.array(
+        [[1.0, 2.0], [7.0, 8.0], [9.0, 10.0], [0.0, 0.0]], dtype=np.float64
+    )
+    np.testing.assert_array_equal(new_dist, expected_dist)
+    np.testing.assert_array_equal(new_conc, np.array([1.0, 1.0, 1.0, 0.0]))
+    assert new_charge is not None
+    np.testing.assert_array_equal(new_charge, np.array([-1.0, 2.0, 3.0, 0.0]))
+
+
 def test_add_concentration_charge_defaults_to_zero():
     """Test defaulting charges to zero when omitted."""
     distribution = np.array([[1.0, 2.0]], dtype=np.float64)
