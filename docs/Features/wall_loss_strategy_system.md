@@ -327,7 +327,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ## Related Documentation
 
-- **Design details**: [Agent feature: wall loss strategy system](../Agent/feature/P2-wall-loss-strategy-system.md)
+- **Design details**: [Feature plan: charged wall loss strategy](../../adw-docs/dev-plans/features/charged-wall-loss-strategy.md)
 - **Hands-on guide**: [Chamber wall loss example](../Examples/Chamber_Wall_Loss/wall_loss_strategy.md)
 - **Notebooks**: [Spherical wall loss strategy](../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb)
 - **Dynamics overview**: [Wall loss strategies](../index.md#wall-loss-strategies-and-runnable)

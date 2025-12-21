@@ -1,8 +1,9 @@
 """Wall loss utilities, strategies, builders, and factory.
 
 Provides rate calculators, strategy classes, and builders for particle wall
-loss in spherical and rectangular chambers, including helpers for
-deterministic and particle-resolved simulations.
+loss in spherical and rectangular chambers. Includes charged wall loss with
+image-charge enhancement even at zero wall potential, optional electric-field
+drift, and deterministic or particle-resolved helpers.
 """
 
 from .rate import (

@@ -12,7 +12,7 @@ This guide serves as the entry point to the **particula** architecture documenta
 The architecture documentation is organized as follows:
 
 ```
-docs/Agent/architecture/
+adw-docs/architecture/
 ├── architecture_guide.md           # Detailed architectural documentation
 ├── architecture_outline.md         # High-level system overview
 └── decisions/                      # Architecture Decision Records (ADRs)
@@ -27,14 +27,18 @@ docs/Agent/architecture/
   `particula/dynamics/wall_loss/wall_loss_strategies.py`.
 - Builders live in `particula/dynamics/wall_loss/wall_loss_builders.py` and
   use mixins in `particula/builder_mixin.py` for geometry/distribution
-  validation and unit conversion.
+  validation, unit conversion, and charged parameters (`wall_potential`,
+  `wall_electric_field`).
 - `WallLossFactory` resides in
   `particula/dynamics/wall_loss/wall_loss_factories.py` and is exported
   alongside strategies via `particula.dynamics.wall_loss` and
   `particula.dynamics`.
-- Available strategies: `SphericalWallLossStrategy` (radius) and
-  `RectangularWallLossStrategy` (validated `(x, y, z)` dimensions in meters)
-  with builder and factory support.
+- Available strategies: `SphericalWallLossStrategy` (radius),
+  `RectangularWallLossStrategy` (validated `(x, y, z)` dimensions in meters),
+  and `ChargedWallLossStrategy` (image-charge + optional electric-field drift
+  for spherical or rectangular geometry, reduces to neutral when charge/field
+  are zero) with builder (`ChargedWallLossBuilder`) and factory entry
+  `strategy_type="charged"`.
 - Tests are mirrored in `particula/dynamics/wall_loss/tests/` and
   `particula/dynamics/tests/` to cover strategies, builders, and factory
   export paths.
@@ -157,7 +161,7 @@ ADW commands reference these architecture documents to:
 - **[Code Style Guide](code_style.md)**: Coding conventions and standards
 - **[Testing Guide](testing_guide.md)**: Test organization and patterns
 - **[Review Guide](review_guide.md)**: Code review criteria including architecture
-- **[Documentation Guide](documentation_guide.md)**: How to document architectural changes
+- **[Conditional Docs](conditional_docs.md)**: How to document architectural changes
 
 ## Maintaining Architecture Documentation
 

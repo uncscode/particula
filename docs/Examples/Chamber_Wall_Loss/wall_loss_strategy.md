@@ -1,16 +1,18 @@
-# Wall Loss Strategies with `SphericalWallLossStrategy`
+# Wall Loss Strategies (Neutral and Charged)
 
-Learn how to use the new strategy-based wall loss API for chamber simulations in **particula**.
+Learn how to use the strategy-based wall loss API for chamber simulations in
+**particula**, including the charged/image-charge extension.
 
-This guide focuses on the `WallLossStrategy` abstract base class and the
-`SphericalWallLossStrategy` implementation, and shows how to:
+This guide focuses on the `WallLossStrategy` abstract base class plus
+`SphericalWallLossStrategy` for neutral cases and `ChargedWallLossStrategy`
+when particle charge or applied electric fields matter, and shows how to:
 
 - Build a simple particle distribution using `PresetParticleRadiusBuilder`.
 - Configure `SphericalWallLossStrategy` for a spherical chamber.
+- Compare neutral and charged coefficients (image-charge and optional field
+  drift).
 - Integrate wall loss over time and visualize concentration decay.
 - Connect wall loss strategies with other dynamics components.
-- Extend to charged scenarios with `ChargedWallLossStrategy` when wall
-  potentials or applied electric fields matter.
 
 For a full forward simulation including dilution and coagulation, see the
 [Chamber Forward Simulation](Notebooks/Chamber_Forward_Simulation.ipynb).
@@ -155,6 +157,116 @@ At this point you have:
 - A `ParticleRepresentation` with radius bins and number concentration.
 - A `SphericalWallLossStrategy` that computes a first-order wall loss rate
   for each bin.
+
+## Charged wall loss: neutral vs charged comparison
+
+`ChargedWallLossStrategy` augments the neutral coefficient with:
+
+- Neutral reduction: when particle charge and `wall_electric_field` are zero, it
+  matches the neutral coefficient.
+- Image-charge enhancement: when `wall_potential=0` but charge is non-zero, the
+  coefficient still changes due to image-charge effects.
+- Optional drift: set `wall_electric_field` (scalar for spherical, length-3
+  tuple for rectangular) to add a charge-sign-dependent drift term.
+
+The snippet below compares neutral, image-charge-only, and field-driven cases
+for a spherical chamber. Charges are given in units of elementary charge
+(dimensionless).
+
+```python
+import numpy as np
+import particula as par
+
+
+def make_particle(charge):
+    return (
+        par.particles.PresetParticleRadiusBuilder()
+        .set_mode(np.array([80e-9]), "m")
+        .set_geometric_standard_deviation(np.array([1.5]))
+        .set_number_concentration(np.array([5e7]), "1/m^3")
+        .set_density(1e3, "kg/m^3")
+        .set_charge(charge)
+        .build()
+    )
+
+
+neutral_particle = make_particle(0.0)
+positive_particle = make_particle(5.0)   # +5 e
+negative_particle = make_particle(-5.0)  # -5 e
+
+neutral_strategy = par.dynamics.SphericalWallLossStrategy(
+    wall_eddy_diffusivity=1e-3,
+    chamber_radius=0.5,
+    distribution_type="discrete",
+)
+
+charged_image_only = par.dynamics.ChargedWallLossStrategy(
+    wall_eddy_diffusivity=1e-3,
+    chamber_geometry="spherical",
+    chamber_radius=0.5,
+    wall_potential=0.0,        # image-charge still active
+    wall_electric_field=0.0,   # drift disabled
+    distribution_type="discrete",
+)
+
+charged_with_field = par.dynamics.ChargedWallLossStrategy(
+    wall_eddy_diffusivity=1e-3,
+    chamber_geometry="spherical",
+    chamber_radius=0.5,
+    wall_potential=0.05,       # V
+    wall_electric_field=50.0,  # V/m (scalar for spherical; tuple for rectangular)
+    distribution_type="discrete",
+)
+
+T = 298.15  # K
+P = 101325.0  # Pa
+
+neutral_rate = neutral_strategy.rate(neutral_particle, temperature=T, pressure=P)
+
+# Reduces to neutral when charge and field are zero
+charged_neutral_rate = charged_image_only.rate(
+    neutral_particle, temperature=T, pressure=P
+)
+
+# Image-charge only (wall_potential=0) still differs from neutral when charge != 0
+charged_positive_rate = charged_image_only.rate(
+    positive_particle, temperature=T, pressure=P
+)
+
+# Electric-field drift modifies deposition and depends on charge sign
+drift_positive = charged_with_field.rate(
+    positive_particle, temperature=T, pressure=P
+)
+drift_negative = charged_with_field.rate(
+    negative_particle, temperature=T, pressure=P
+)
+
+print(
+    "Neutral vs charged (charge=0):",
+    np.allclose(neutral_rate, charged_neutral_rate),
+)
+print(
+    "Image-charge only mean ratio (charged/neutral):",
+    float(charged_positive_rate.mean() / neutral_rate.mean()),
+)
+print(
+    "Field drift (+E, q>0) mean rate:",
+    f"{drift_positive.mean():.3e}",
+)
+print(
+    "Field drift (+E, q<0) mean rate:",
+    f"{drift_negative.mean():.3e}",
+)
+```
+
+Expected observations:
+
+- The first print returns `True`, confirming neutral reduction when charge and
+  field are zero.
+- The image-charge ratio is typically not 1.0 when `wall_potential=0` but charge
+  is non-zero.
+- The field-driven mean rates differ for positive vs negative charge,
+  highlighting the sign-dependent drift term.
 
 ## Step-by-Step: Time Integration and Concentration Decay
 
@@ -372,11 +484,15 @@ API lets you perform the same type of simulation using
 
 ## Configuration Options
 
-| Option                   | Description                                              | Default        |
-|--------------------------|----------------------------------------------------------|----------------|
-| `wall_eddy_diffusivity` | Wall eddy diffusivity controlling wall mixing [m^2/s].  | Required (no default) |
-| `chamber_radius`        | Radius of the spherical chamber [m].                     | Required (no default) |
-| `distribution_type`     | Distribution type: `"discrete"`, `"continuous_pdf"`, or `"particle_resolved"`. | `"discrete"` |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `wall_eddy_diffusivity` | Wall eddy diffusivity controlling wall mixing [m^2/s]. | Required (no default) |
+| `chamber_geometry` | `"spherical"` or `"rectangular"` (required for charged strategies). | `"spherical"` |
+| `chamber_radius` | Radius of the spherical chamber [m]; required when `chamber_geometry="spherical"`. | Required for spherical |
+| `chamber_dimensions` | `(x, y, z)` dimensions in meters; required when `chamber_geometry="rectangular"`. | Required for rectangular |
+| `wall_potential` | Applied wall potential in volts. Image-charge enhancement remains active even when set to `0.0`. | `0.0` |
+| `wall_electric_field` | Optional electric-field drift term (V/m). Scalar for spherical, length-3 tuple for rectangular. Set `0.0` to disable drift. | `0.0` |
+| `distribution_type` | Distribution type: `"discrete"`, `"continuous_pdf"`, or `"particle_resolved"`. | `"discrete"` |
 
 ## Troubleshooting
 
@@ -403,6 +519,15 @@ Ensure `distribution_type` is exactly one of:
 - `"particle_resolved"`
 
 Any other string will raise a `ValueError` during initialization.
+
+### Charged strategy looks identical to neutral
+
+- Confirm particle charges are non-zero (set via `.set_charge(...)` on the
+  particle builder).
+- If both `wall_potential` and `wall_electric_field` are zero and charges are
+  zero, the charged strategy intentionally reduces to the neutral coefficient.
+- For rectangular chambers, ensure `wall_electric_field` is a length-3 tuple; a
+  scalar is valid only for spherical geometry.
 
 ### Concentration does not change over time
 

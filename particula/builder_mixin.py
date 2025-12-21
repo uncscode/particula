@@ -930,7 +930,12 @@ class BuilderChamberDimensionsMixin:
 
 
 class BuilderWallPotentialMixin:
-    """Mixin for setting wall potential in volts."""
+    """Mixin for setting wall potential in volts.
+
+    Stores electrostatic wall potential used by charged wall loss strategies.
+    A zero potential still permits image-charge enhancement when particle
+    charge is non-zero.
+    """
 
     def __init__(self):
         """Initialize wall potential mixin."""
@@ -940,7 +945,18 @@ class BuilderWallPotentialMixin:
     def set_wall_potential(
         self, wall_potential: float, wall_potential_units: str = "V"
     ):
-        """Set wall potential with optional unit conversion."""
+        """Set wall potential in volts.
+
+        Args:
+            wall_potential: Electrostatic wall potential in volts. Zero keeps
+                the chamber neutral but still allows image-charge effects for
+                charged particles.
+            wall_potential_units: Units for ``wall_potential``. Defaults to
+                "V".
+
+        Returns:
+            BuilderWallPotentialMixin: Self for method chaining.
+        """
         if wall_potential_units in {"V", "volt", "volts"}:
             self.wall_potential = wall_potential
             return self
@@ -951,7 +967,13 @@ class BuilderWallPotentialMixin:
 
 
 class BuilderWallElectricFieldMixin:
-    """Mixin for setting wall electric field magnitude."""
+    """Mixin for setting wall electric field magnitude.
+
+    Supports optional drift terms for charged wall loss strategies.
+    Accepts a scalar magnitude for spherical chambers or a three-component
+    tuple for rectangular geometries. A value of 0.0 disables field-driven
+    drift.
+    """
 
     def __init__(self):
         """Initialize wall electric field mixin."""
@@ -979,8 +1001,19 @@ class BuilderWallElectricFieldMixin:
     ):
         """Set wall electric field magnitude in V/m.
 
-        Accepts scalar magnitude for spherical geometry or a three-element
-        tuple for rectangular geometry.
+        Args:
+            wall_electric_field: Scalar magnitude for spherical chambers or a
+                three-element ``(Ex, Ey, Ez)`` tuple for rectangular chambers.
+                Use ``0.0`` to disable field-driven drift.
+            wall_electric_field_units: Units for ``wall_electric_field``.
+                Defaults to "V/m".
+
+        Returns:
+            BuilderWallElectricFieldMixin: Self for method chaining.
+
+        Raises:
+            ValueError: If the tuple is not length three or any entry is not
+                finite.
         """
         validated_field = self._validate_wall_electric_field(
             wall_electric_field
