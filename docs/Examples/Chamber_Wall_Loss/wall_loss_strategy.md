@@ -9,6 +9,8 @@ This guide focuses on the `WallLossStrategy` abstract base class and the
 - Configure `SphericalWallLossStrategy` for a spherical chamber.
 - Integrate wall loss over time and visualize concentration decay.
 - Connect wall loss strategies with other dynamics components.
+- Extend to charged scenarios with `ChargedWallLossStrategy` when wall
+  potentials or applied electric fields matter.
 
 For a full forward simulation including dilution and coagulation, see the
 [Chamber Forward Simulation](Notebooks/Chamber_Forward_Simulation.ipynb).

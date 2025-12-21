@@ -8,11 +8,16 @@ from typing import Any, Dict, Optional, Union
 
 from particula.abc_factory import StrategyFactoryABC
 from particula.dynamics.wall_loss.wall_loss_builders import (
+    ChargedWallLossBuilder,
     RectangularWallLossBuilder,
     SphericalWallLossBuilder,
 )
 
-BuilderType = Union[SphericalWallLossBuilder, RectangularWallLossBuilder]
+BuilderType = Union[
+    SphericalWallLossBuilder,
+    RectangularWallLossBuilder,
+    ChargedWallLossBuilder,
+]
 
 
 class WallLossFactory(StrategyFactoryABC):
@@ -35,6 +40,7 @@ class WallLossFactory(StrategyFactoryABC):
         return {
             "spherical": SphericalWallLossBuilder(),
             "rectangular": RectangularWallLossBuilder(),
+            "charged": ChargedWallLossBuilder(),
         }
 
     def get_strategy(

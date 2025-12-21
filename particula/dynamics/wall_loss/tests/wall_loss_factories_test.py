@@ -4,6 +4,7 @@ import pytest
 
 from particula.dynamics.wall_loss.wall_loss_factories import WallLossFactory
 from particula.dynamics.wall_loss.wall_loss_strategies import (
+    ChargedWallLossStrategy,
     RectangularWallLossStrategy,
     SphericalWallLossStrategy,
 )
@@ -51,4 +52,18 @@ def test_factory_invalid_strategy_type_raises():
 def test_factory_get_builders_contains_expected_keys():
     """Factory exposes both spherical and rectangular builders."""
     builders = WallLossFactory().get_builders()
-    assert set(builders) == {"spherical", "rectangular"}
+    assert set(builders) == {"spherical", "rectangular", "charged"}
+
+
+def test_factory_creates_charged_strategy():
+    """Factory builds a charged wall loss strategy."""
+    strategy = WallLossFactory().get_strategy(
+        strategy_type="charged",
+        parameters={
+            "wall_eddy_diffusivity": 0.001,
+            "chamber_geometry": "spherical",
+            "chamber_radius": 0.5,
+            "wall_potential": 0.0,
+        },
+    )
+    assert isinstance(strategy, ChargedWallLossStrategy)

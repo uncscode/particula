@@ -3,7 +3,7 @@
 # pylint: disable=too-few-public-methods
 
 import logging
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -799,6 +799,9 @@ class BuilderWallEddyDiffusivityMixin:
         Raises:
             ValueError: If ``wall_eddy_diffusivity`` is not positive.
         """
+        if wall_eddy_diffusivity_units in {"1/s", "s^-1"}:
+            self.wall_eddy_diffusivity = wall_eddy_diffusivity
+            return self
         self.wall_eddy_diffusivity = get_unit_conversion(
             wall_eddy_diffusivity_units,
             "1/s",
@@ -839,6 +842,12 @@ class BuilderChamberRadiusMixin:
         Raises:
             ValueError: If ``chamber_radius`` is not positive.
         """
+        if chamber_radius_units in {"m", "meter", "meters"}:
+            self.chamber_radius = chamber_radius
+            return self
+        if chamber_radius_units in {"cm", "centimeter", "centimeters"}:
+            self.chamber_radius = chamber_radius * 0.01
+            return self
         self.chamber_radius = get_unit_conversion(
             chamber_radius_units,
             "m",
@@ -886,6 +895,20 @@ class BuilderChamberDimensionsMixin:
                 "(length, width, height)."
             )
         length, width, height = chamber_dimensions
+        if chamber_dimensions_units in {"m", "meter", "meters"}:
+            self.chamber_dimensions = (
+                length,
+                width,
+                height,
+            )
+            return self
+        if chamber_dimensions_units in {"cm", "centimeter", "centimeters"}:
+            self.chamber_dimensions = (
+                length * 0.01,
+                width * 0.01,
+                height * 0.01,
+            )
+            return self
         self.chamber_dimensions = (
             get_unit_conversion(
                 chamber_dimensions_units,
@@ -902,6 +925,97 @@ class BuilderChamberDimensionsMixin:
                 "m",
                 height,
             ),
+        )
+        return self
+
+
+class BuilderWallPotentialMixin:
+    """Mixin for setting wall potential in volts."""
+
+    def __init__(self):
+        """Initialize wall potential mixin."""
+        self.wall_potential: float = 0.0
+
+    @validate_inputs({"wall_potential": "finite"})
+    def set_wall_potential(
+        self, wall_potential: float, wall_potential_units: str = "V"
+    ):
+        """Set wall potential with optional unit conversion."""
+        if wall_potential_units in {"V", "volt", "volts"}:
+            self.wall_potential = wall_potential
+            return self
+        self.wall_potential = get_unit_conversion(
+            wall_potential_units, "V", wall_potential
+        )
+        return self
+
+
+class BuilderWallElectricFieldMixin:
+    """Mixin for setting wall electric field magnitude."""
+
+    def __init__(self):
+        """Initialize wall electric field mixin."""
+        self.wall_electric_field: Union[float, Tuple[float, float, float]] = 0.0
+
+    def _validate_wall_electric_field(
+        self, wall_electric_field: Union[float, Tuple[float, float, float]]
+    ) -> Union[float, Tuple[float, float, float]]:
+        if isinstance(wall_electric_field, tuple):
+            if len(wall_electric_field) != 3:
+                raise ValueError(
+                    "wall_electric_field tuple must be length three for rectangular geometries."
+                )
+            if not np.all(np.isfinite(wall_electric_field)):
+                raise ValueError("wall_electric_field entries must be finite.")
+            return wall_electric_field
+        if not np.isfinite(wall_electric_field):
+            raise ValueError("wall_electric_field must be finite.")
+        return float(wall_electric_field)
+
+    def set_wall_electric_field(
+        self,
+        wall_electric_field: Union[float, Tuple[float, float, float]],
+        wall_electric_field_units: str = "V/m",
+    ):
+        """Set wall electric field magnitude in V/m.
+
+        Accepts scalar magnitude for spherical geometry or a three-element
+        tuple for rectangular geometry.
+        """
+        validated_field = self._validate_wall_electric_field(
+            wall_electric_field
+        )
+        if isinstance(validated_field, tuple):
+            if wall_electric_field_units in {"V/m", "volt/m", "volts/m"}:
+                self.wall_electric_field = cast(
+                    Tuple[float, float, float], validated_field
+                )
+                return self
+            converted_field = (
+                get_unit_conversion(
+                    wall_electric_field_units, "V/m", validated_field[0]
+                ),
+                get_unit_conversion(
+                    wall_electric_field_units, "V/m", validated_field[1]
+                ),
+                get_unit_conversion(
+                    wall_electric_field_units, "V/m", validated_field[2]
+                ),
+            )
+            self.wall_electric_field = cast(
+                Tuple[float, float, float], converted_field
+            )
+            return self
+        if wall_electric_field_units in {"V/m", "volt/m", "volts/m"}:
+            self.wall_electric_field = validated_field
+            return self
+        self.wall_electric_field = get_unit_conversion(
+            wall_electric_field_units, "V/m", validated_field
+        )
+        return self
+
+        self.wall_electric_field = get_unit_conversion(
+            wall_electric_field_units, "V/m", validated_field
         )
         return self
 

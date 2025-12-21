@@ -24,7 +24,7 @@ References:
 """
 
 from abc import ABC, abstractmethod
-from typing import Callable, Tuple, Union
+from typing import Callable, Tuple, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -33,7 +33,12 @@ from particula.dynamics.properties.wall_loss_coefficient import (
     get_rectangle_wall_loss_coefficient_via_system_state,
     get_spherical_wall_loss_coefficient_via_system_state,
 )
+from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
+from particula.particles.properties.coulomb_enhancement import (
+    get_coulomb_enhancement_ratio,
+)
 from particula.particles.representation import ParticleRepresentation
+from particula.util.constants import ELEMENTARY_CHARGE_VALUE
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -481,6 +486,393 @@ class SphericalWallLossStrategy(WallLossStrategy):
             chamber_radius=self.chamber_radius,
         )
         return np.asarray(coefficient)
+
+
+class ChargedWallLossStrategy(WallLossStrategy):
+    """Wall loss strategy with electrostatic effects.
+
+    Extends neutral wall loss with image-charge enhancement, optional
+    electric-field drift, and diffusion modification for charged particles.
+    Behaves as the neutral strategy when both charge and field terms are zero
+    while still applying the image-charge-only enhancement when charge is
+    non-zero and ``wall_potential`` is zero.
+
+    References:
+        McMurry, P. H., & Rader, D. J. (1985). Aerosol wall losses in
+        electrically charged chambers. Aerosol Science and Technology, 4(3),
+        249–268.
+        Lai, A. C. K., & Nazaroff, W. W. (2000). Modeling indoor particle
+        deposition from turbulent flow onto smooth surfaces. J. Aerosol Sci.,
+        31(4), 463–476.
+        Hinds, W. C. (1999). *Aerosol Technology*. Wiley.
+    """
+
+    chamber_geometry: str
+    chamber_radius: Union[float, None]
+    chamber_dimensions: Union[Tuple[float, float, float], None]
+    wall_potential: float
+    wall_electric_field: Union[float, Tuple[float, float, float]]
+
+    @validate_inputs(
+        {
+            "wall_eddy_diffusivity": "positive",
+            "wall_potential": "finite",
+            "wall_electric_field": "finite",
+            "chamber_radius": "positive",
+            "chamber_dimensions": "positive",
+        }
+    )
+    def __init__(
+        self,
+        wall_eddy_diffusivity: float,
+        chamber_geometry: str,
+        chamber_radius: Union[float, None] = None,
+        chamber_dimensions: Union[Tuple[float, float, float], None] = None,
+        wall_potential: float = 0.0,
+        wall_electric_field: Union[float, Tuple[float, float, float]] = 0.0,
+        distribution_type: str = "discrete",
+    ) -> None:
+        """Initialize charged wall loss strategy.
+
+        Args:
+            wall_eddy_diffusivity: Wall eddy diffusivity [1/s].
+            chamber_geometry: Geometry string ("spherical" or "rectangular").
+            chamber_radius: Radius for spherical chambers [m].
+            chamber_dimensions: Dimensions (length, width, height) for
+                rectangular chambers [m].
+            wall_potential: Wall potential [V]; zero keeps image-charge term.
+            wall_electric_field: Electric field magnitude [V/m] or 3-vector for
+                rectangular chambers. Zero disables drift term.
+            distribution_type: Distribution type.
+
+        Raises:
+            ValueError: If geometry is invalid or required geometry parameters
+                are missing.
+        """
+        super().__init__(
+            wall_eddy_diffusivity=wall_eddy_diffusivity,
+            distribution_type=distribution_type,
+        )
+        geometry = chamber_geometry.lower()
+        if geometry not in {"spherical", "rectangular"}:
+            raise ValueError(
+                "chamber_geometry must be 'spherical' or 'rectangular'."
+            )
+        if geometry == "spherical":
+            if chamber_radius is None:
+                raise ValueError("chamber_radius is required for spherical.")
+            self.chamber_radius = float(chamber_radius)
+            self.chamber_dimensions = None
+        else:
+            if chamber_dimensions is None:
+                raise ValueError(
+                    "chamber_dimensions are required for rectangular."
+                )
+            if len(chamber_dimensions) != 3:
+                raise ValueError(
+                    "chamber_dimensions must be length, width, height."
+                )
+            if any(dimension <= 0 for dimension in chamber_dimensions):
+                raise ValueError("All chamber dimensions must be positive")
+            self.chamber_dimensions = (
+                float(chamber_dimensions[0]),
+                float(chamber_dimensions[1]),
+                float(chamber_dimensions[2]),
+            )
+            self.chamber_radius = None
+        self.chamber_geometry = geometry
+        self.wall_potential = float(wall_potential)
+        self.wall_electric_field = wall_electric_field
+
+    @property
+    def _geometry_scale(self) -> float:
+        """Return characteristic geometry length for field scaling."""
+        if self.chamber_geometry == "spherical" and self.chamber_radius:
+            return self.chamber_radius
+        if self.chamber_dimensions:
+            return float(np.min(self.chamber_dimensions))
+        return 1.0
+
+    def _neutral_coefficient(
+        self,
+        particle_radius: NDArray[np.float64],
+        particle_density: NDArray[np.float64],
+        temperature: float,
+        pressure: float,
+    ) -> NDArray[np.float64]:
+        if self.chamber_geometry == "spherical":
+            return np.asarray(
+                get_spherical_wall_loss_coefficient_via_system_state(
+                    wall_eddy_diffusivity=self.wall_eddy_diffusivity,
+                    particle_radius=particle_radius,
+                    particle_density=particle_density,
+                    temperature=temperature,
+                    pressure=pressure,
+                    chamber_radius=float(cast(float, self.chamber_radius)),
+                )
+            )
+        return np.asarray(
+            get_rectangle_wall_loss_coefficient_via_system_state(
+                wall_eddy_diffusivity=self.wall_eddy_diffusivity,
+                particle_radius=particle_radius,
+                particle_density=particle_density,
+                temperature=temperature,
+                pressure=pressure,
+                chamber_dimensions=cast(
+                    Tuple[float, float, float], self.chamber_dimensions
+                ),
+            )
+        )
+
+    def _electrostatic_factor(
+        self,
+        particle_radius: NDArray[np.float64],
+        particle_charge: NDArray[np.float64],
+        temperature: float,
+    ) -> NDArray[np.float64]:
+        if not np.any(particle_charge):
+            return np.ones_like(particle_radius, dtype=np.float64)
+        phi_raw = np.asarray(
+            get_coulomb_enhancement_ratio(
+                particle_radius=particle_radius,
+                charge=particle_charge,
+                temperature=temperature,
+            )
+        )
+        phi = phi_raw.diagonal() if phi_raw.ndim == 2 else phi_raw
+        phi = np.abs(phi)
+        phi_clipped = np.clip(phi, -50.0, 50.0)
+        factor = np.exp(phi_clipped)
+        return np.where(particle_charge == 0, 1.0, factor)
+
+    def _resolve_electric_field(self) -> float:
+        if isinstance(self.wall_electric_field, (tuple, list, np.ndarray)):
+            magnitude = float(np.linalg.norm(self.wall_electric_field))
+        else:
+            magnitude = float(self.wall_electric_field)
+        potential_field = 0.0
+        if self.wall_potential != 0 and self._geometry_scale > 0:
+            potential_field = self.wall_potential / self._geometry_scale
+        return magnitude + potential_field
+
+    def _drift_term(
+        self,
+        particle_radius: NDArray[np.float64],
+        particle_charge: NDArray[np.float64],
+        temperature: float,
+        pressure: float,
+    ) -> NDArray[np.float64]:
+        del pressure  # pressure currently unused for drift approximation
+        if not np.any(particle_charge):
+            return np.zeros_like(particle_radius, dtype=np.float64)
+        electric_field = self._resolve_electric_field()
+        if electric_field == 0:
+            return np.zeros_like(particle_radius, dtype=np.float64)
+        viscosity = get_dynamic_viscosity(temperature=temperature)
+        diameter = 2.0 * np.clip(particle_radius, 1e-30, None)
+        mobility = (
+            np.abs(particle_charge)
+            * ELEMENTARY_CHARGE_VALUE
+            / (3.0 * np.pi * viscosity * diameter)
+        )
+        drift_velocity = mobility * electric_field * np.sign(particle_charge)
+        drift_term = drift_velocity / max(self._geometry_scale, 1e-30)
+        return np.nan_to_num(drift_term, nan=0.0)
+
+    def _combine_coefficients(
+        self,
+        neutral: NDArray[np.float64],
+        electrostatic_factor: NDArray[np.float64],
+        drift_term: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        combined = neutral * electrostatic_factor + drift_term
+        return np.clip(
+            np.nan_to_num(combined, nan=0.0),
+            0.0,
+            np.finfo(np.float64).max,
+        )
+
+    def loss_coefficient(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+        radius = np.asarray(particle.get_radius())
+        density = np.asarray(particle.get_effective_density())
+        charge = particle.get_charge()
+        charge_array = (
+            np.zeros_like(radius, dtype=np.float64)
+            if charge is None
+            else np.asarray(charge, dtype=np.float64)
+        )
+
+        if self.distribution_type == "particle_resolved":
+            concentration = np.asarray(particle.get_concentration())
+            active = (radius > 0) & (concentration > 0)
+            coefficient = np.zeros_like(concentration, dtype=np.float64)
+            if np.any(active):
+                neutral = self._neutral_coefficient(
+                    particle_radius=radius[active],
+                    particle_density=density[active],
+                    temperature=temperature,
+                    pressure=pressure,
+                )
+                electrostatic_factor = self._electrostatic_factor(
+                    particle_radius=radius[active],
+                    particle_charge=charge_array[active],
+                    temperature=temperature,
+                )
+                drift_term = self._drift_term(
+                    particle_radius=radius[active],
+                    particle_charge=charge_array[active],
+                    temperature=temperature,
+                    pressure=pressure,
+                )
+                coefficient[active] = self._combine_coefficients(
+                    neutral=neutral,
+                    electrostatic_factor=electrostatic_factor,
+                    drift_term=drift_term,
+                )
+            return coefficient
+
+        neutral = self._neutral_coefficient(
+            particle_radius=radius,
+            particle_density=density,
+            temperature=temperature,
+            pressure=pressure,
+        )
+        electrostatic_factor = self._electrostatic_factor(
+            particle_radius=radius,
+            particle_charge=charge_array,
+            temperature=temperature,
+        )
+        drift_term = self._drift_term(
+            particle_radius=radius,
+            particle_charge=charge_array,
+            temperature=temperature,
+            pressure=pressure,
+        )
+        return self._combine_coefficients(
+            neutral=neutral,
+            electrostatic_factor=electrostatic_factor,
+            drift_term=drift_term,
+        )
+
+    def loss_coefficient_for_particles(
+        self,
+        particle_radius: NDArray[np.float64],
+        particle_density: NDArray[np.float64],
+        temperature: float,
+        pressure: float,
+    ) -> NDArray[np.float64]:
+        charge_cache = getattr(self, "_particle_charge_cache", None)
+        charge_array = (
+            charge_cache
+            if isinstance(charge_cache, np.ndarray)
+            and charge_cache.shape == particle_radius.shape
+            else np.zeros_like(particle_radius, dtype=np.float64)
+        )
+        neutral = self._neutral_coefficient(
+            particle_radius=particle_radius,
+            particle_density=particle_density,
+            temperature=temperature,
+            pressure=pressure,
+        )
+        electrostatic_factor = self._electrostatic_factor(
+            particle_radius=particle_radius,
+            particle_charge=charge_array,
+            temperature=temperature,
+        )
+        drift_term = self._drift_term(
+            particle_radius=particle_radius,
+            particle_charge=charge_array,
+            temperature=temperature,
+            pressure=pressure,
+        )
+        return self._combine_coefficients(
+            neutral=neutral,
+            electrostatic_factor=electrostatic_factor,
+            drift_term=drift_term,
+        )
+
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> ParticleRepresentation:
+        if self.distribution_type != "particle_resolved":
+            return super().step(
+                particle=particle,
+                temperature=temperature,
+                pressure=pressure,
+                time_step=time_step,
+            )
+
+        concentration = np.asarray(particle.get_concentration())
+        radius = np.asarray(particle.get_radius())
+        density = np.asarray(particle.get_effective_density())
+        charge = particle.get_charge()
+        charge_array = (
+            np.zeros_like(radius, dtype=np.float64)
+            if charge is None
+            else np.asarray(charge, dtype=np.float64)
+        )
+        active = (radius > 0) & (concentration > 0)
+        self._particle_charge_cache = charge_array
+        coefficient = np.zeros_like(concentration, dtype=np.float64)
+        if np.any(active):
+            neutral = self._neutral_coefficient(
+                particle_radius=radius[active],
+                particle_density=density[active],
+                temperature=temperature,
+                pressure=pressure,
+            )
+            electrostatic_factor = self._electrostatic_factor(
+                particle_radius=radius[active],
+                particle_charge=charge_array[active],
+                temperature=temperature,
+            )
+            drift_term = self._drift_term(
+                particle_radius=radius[active],
+                particle_charge=charge_array[active],
+                temperature=temperature,
+                pressure=pressure,
+            )
+            coefficient[active] = self._combine_coefficients(
+                neutral=neutral,
+                electrostatic_factor=electrostatic_factor,
+                drift_term=drift_term,
+            )
+
+        if not np.any(active):
+            particle.concentration = concentration * particle.get_volume()
+            return particle
+
+        survival_probability_active = np.exp(-coefficient[active] * time_step)
+        survival_probability_active = np.clip(
+            survival_probability_active, 0.0, 1.0
+        )
+
+        survived = np.zeros_like(concentration, dtype=np.float64)
+        survived[active] = self.random_generator.binomial(
+            n=1, p=survival_probability_active
+        )
+
+        new_concentration = concentration * survived
+        volume = particle.get_volume()
+        particle.concentration = new_concentration * volume
+
+        lost_particles = (concentration > 0) & (survived == 0)
+        if np.any(lost_particles):
+            if particle.distribution.ndim == 1:
+                particle.distribution[lost_particles] = 0.0
+            else:
+                particle.distribution[lost_particles, :] = 0.0
+
+        return particle
 
 
 class RectangularWallLossStrategy(WallLossStrategy):

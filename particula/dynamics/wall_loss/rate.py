@@ -9,6 +9,9 @@ from particula.dynamics.properties.wall_loss_coefficient import (
     get_rectangle_wall_loss_coefficient_via_system_state,
     get_spherical_wall_loss_coefficient_via_system_state,
 )
+from particula.dynamics.wall_loss.wall_loss_strategies import (
+    ChargedWallLossStrategy,
+)
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
@@ -130,3 +133,52 @@ def get_rectangle_wall_loss_rate(
 
     # Step 2: Calculate and return the wall loss rate
     return -loss_coefficient * particle_concentration
+
+
+def get_charged_wall_loss_rate(
+    wall_eddy_diffusivity: float,
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_density: Union[float, NDArray[np.float64]],
+    particle_concentration: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+    chamber_geometry: str,
+    chamber_radius: Union[float, None] = None,
+    chamber_dimensions: Union[Tuple[float, float, float], None] = None,
+    wall_potential: float = 0.0,
+    wall_electric_field: Union[float, Tuple[float, float, float]] = 0.0,
+) -> Union[float, NDArray[np.float64]]:
+    """Calculate charged wall loss rate for spherical or rectangular chambers."""
+    strategy = ChargedWallLossStrategy(
+        wall_eddy_diffusivity=wall_eddy_diffusivity,
+        chamber_geometry=chamber_geometry,
+        chamber_radius=chamber_radius,
+        chamber_dimensions=chamber_dimensions,
+        wall_potential=wall_potential,
+        wall_electric_field=wall_electric_field,
+        distribution_type="discrete",
+    )
+    radius_array = np.asarray(particle_radius, dtype=float)
+    density_array = np.asarray(particle_density, dtype=float)
+    charge_array = np.asarray(particle_charge, dtype=float)
+    coefficient = strategy._combine_coefficients(  # pylint: disable=protected-access
+        neutral=strategy._neutral_coefficient(  # pylint: disable=protected-access
+            particle_radius=radius_array,
+            particle_density=density_array,
+            temperature=temperature,
+            pressure=pressure,
+        ),
+        electrostatic_factor=strategy._electrostatic_factor(  # pylint: disable=protected-access
+            particle_radius=radius_array,
+            particle_charge=charge_array,
+            temperature=temperature,
+        ),
+        drift_term=strategy._drift_term(  # pylint: disable=protected-access
+            particle_radius=radius_array,
+            particle_charge=charge_array,
+            temperature=temperature,
+            pressure=pressure,
+        ),
+    )
+    return -coefficient * np.asarray(particle_concentration, dtype=float)
