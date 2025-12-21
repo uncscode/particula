@@ -82,17 +82,28 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         concentration = np.where(new_mass_sum > 0, concentration, 0)
         return new_mass, concentration
 
-    def add_concentration(
+    def add_concentration(  # pylint: disable=too-many-branches
         self,
         distribution: NDArray[np.float64],
         concentration: NDArray[np.float64],
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Add new particles to the distribution.
+        charge: Optional[NDArray[np.float64]] = None,
+        added_charge: Optional[NDArray[np.float64]] = None,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        Optional[NDArray[np.float64]],
+    ]:
+        """Add new particles to the distribution with optional charge.
+
+        Charge handling mirrors the fill-then-append logic used for
+        concentration: empty bins are filled first, then remaining particles
+        are appended. Charge is only processed when a charge array is provided;
+        otherwise charge is passed through as None to preserve compatibility.
 
         Returns:
-            Updated distribution and concentration arrays.
+            Updated distribution, concentration, and charge arrays.
         """
         rescaled = False
         if np.all(added_concentration == 1):
@@ -119,23 +130,50 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             where=concentration != 0,
         )
 
+        # Handle charge defaults and validation.
+        charge_added = added_charge
+        if charge is not None:
+            if charge_added is None:
+                # Default new particle charges to zero when not provided.
+                charge_added = np.zeros_like(added_concentration)
+            if charge_added.shape != added_concentration.shape:
+                message = (
+                    "When adding concentration with charge, added_charge "
+                    "must match added_concentration shape."
+                )
+                logger.error(message)
+                raise ValueError(message)
+
         empty_bins = np.flatnonzero(concentration == 0)
         empty_bins_count = len(empty_bins)
         added_bins_count = len(added_concentration)
         if empty_bins_count >= added_bins_count:
             distribution[empty_bins] = added_distribution
             concentration[empty_bins] = added_concentration
-            return distribution, concentration
+            if charge is not None:
+                assert charge_added is not None
+                charge[empty_bins] = charge_added
+            return distribution, concentration, charge
         if empty_bins_count > 0:
             distribution[empty_bins] = added_distribution[:empty_bins_count]
             concentration[empty_bins] = added_concentration[:empty_bins_count]
+            if charge is not None:
+                assert charge_added is not None
+                charge[empty_bins] = charge_added[:empty_bins_count]
         distribution = np.concatenate(
             (distribution, added_distribution[empty_bins_count:]), axis=0
         )
         concentration = np.concatenate(
             (concentration, added_concentration[empty_bins_count:]), axis=0
         )
-        return distribution, concentration
+        if charge is None:
+            return distribution, concentration, None
+        assert charge_added is not None
+        charge = np.concatenate(
+            (charge, charge_added[empty_bins_count:]),
+            axis=0,
+        )
+        return distribution, concentration, charge
 
     def collide_pairs(  # pylint: disable=too-many-positional-arguments
         self,

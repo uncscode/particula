@@ -500,15 +500,20 @@ class ParticleRepresentation:
         self,
         added_concentration: NDArray[np.float64],
         added_distribution: Optional[NDArray[np.float64]] = None,
+        *,
+        added_charge: Optional[NDArray[np.float64]] = None,
     ) -> None:
         """Add concentration to the particle distribution.
 
         Arguments:
             - added_concentration : The concentration to be added per bin
-                (1/m^3).
+              (1/m^3).
             - added_distribution : Optional distribution array to merge into
               the existing distribution. If None, the current distribution
               is reused.
+            - added_charge : Optional charge array for newly added particles.
+              Defaults to zeros when charge is tracked but no values are
+              provided. Ignored when charge is not tracked.
 
         Example:
             ``` py title="Add Concentration"
@@ -520,13 +525,17 @@ class ParticleRepresentation:
             message = "Added distribution is value None."
             logger.warning(message)
             added_distribution = self.get_distribution()
-        (self.distribution, self.concentration) = (
-            self.strategy.add_concentration(
-                distribution=self.get_distribution(),
-                concentration=self.get_concentration(),
-                added_distribution=added_distribution,
-                added_concentration=added_concentration,
-            )
+        (
+            self.distribution,
+            self.concentration,
+            self.charge,
+        ) = self.strategy.add_concentration(
+            distribution=self.get_distribution(),
+            concentration=self.get_concentration(),
+            added_distribution=added_distribution,
+            added_concentration=added_concentration,
+            charge=self.charge,
+            added_charge=added_charge,
         )
         self._enforce_increasing_bins()
 

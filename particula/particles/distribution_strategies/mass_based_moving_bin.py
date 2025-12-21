@@ -69,11 +69,18 @@ class MassBasedMovingBin(DistributionStrategy):
         concentration: NDArray[np.float64],
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        charge: Optional[NDArray[np.float64]] = None,
+        added_charge: Optional[NDArray[np.float64]] = None,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        Optional[NDArray[np.float64]],
+    ]:
         """Add concentration to the distribution.
 
         Returns:
-            Updated distribution and concentration arrays.
+            Updated distribution, concentration, and charge arrays
+            (charge unchanged for this strategy).
         """
         if (distribution.shape != added_distribution.shape) or (
             not np.allclose(distribution, added_distribution, rtol=1e-6)
@@ -93,7 +100,7 @@ class MassBasedMovingBin(DistributionStrategy):
             raise ValueError(message)
 
         concentration += added_concentration
-        return distribution, concentration
+        return distribution, concentration, charge
 
     def collide_pairs(  # pylint: disable=too-many-positional-arguments
         self,
