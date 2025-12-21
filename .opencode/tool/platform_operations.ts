@@ -215,7 +215,7 @@ EXAMPLE: state: "closed"`),
 OPTIONAL FOR: create-issue, update-issue
 REQUIRED FOR: add-labels, remove-labels
 
-EXAMPLE: labels: "bug,type:patch,model:base"`),
+EXAMPLE: labels: "bug,type:patch,model:default"`),
 
     output_format: tool.schema
       .enum(["text", "json"])

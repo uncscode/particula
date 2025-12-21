@@ -106,9 +106,9 @@ Coordinate a multi-agent code review system that:
 
 # Required Reading
 
-- @docs/Agent/code_style.md - Code conventions (Python & C++)
-- @docs/Agent/review_guide.md - Review standards
-- @docs/Agent/testing_guide.md - Test quality expectations
+- @adw-docs/code_style.md - Code conventions (Python & C++)
+- @adw-docs/review_guide.md - Review standards
+- @adw-docs/testing_guide.md - Test quality expectations
 
 # Subagents
 

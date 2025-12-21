@@ -75,10 +75,10 @@ task({
 
 # Required Reading
 
-- @docs/Agent/docstring_guide.md - Google-style format
-- @docs/Agent/docstring_function.md - Function docstring examples
-- @docs/Agent/docstring_class.md - Class docstring examples
-- @docs/Agent/code_style.md - Code conventions
+- @adw-docs/docstring_guide.md - Google-style format
+- @adw-docs/docstring_function.md - Function docstring examples
+- @adw-docs/docstring_class.md - Class docstring examples
+- @adw-docs/code_style.md - Code conventions
 
 # Write Permissions
 
@@ -251,7 +251,7 @@ Check:
 ### 4.6: Check Links in Docstrings
 
 Look for references like:
-- `See: docs/Agent/...`
+- `See: adw-docs/...`
 - URLs in docstrings
 - Cross-references to other modules
 
@@ -393,4 +393,4 @@ Test directories noted: adw/utils/tests/, adw/core/tests/
 
 **Validation:** Calls linter subagent before completion
 
-**References:** `docs/Agent/docstring_guide.md`, `docs/Agent/code_style.md`
+**References:** `adw-docs/docstring_guide.md`, `adw-docs/code_style.md`

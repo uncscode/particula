@@ -84,8 +84,8 @@ Research Focus:
 
 # Required Reading
 
-- @docs/Agent/architecture_reference.md - Architecture overview
-- @docs/Agent/code_style.md - Code conventions
+- @adw-docs/architecture_reference.md - Architecture overview
+- @adw-docs/code_style.md - Code conventions
 
 # Process
 

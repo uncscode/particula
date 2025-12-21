@@ -81,9 +81,9 @@ Additional Context:
 
 # Template Locations
 
-- Epic: `docs/Agent/development_plans/template-epic.md`
-- Feature: `docs/Agent/development_plans/template-feature.md`
-- Maintenance: `docs/Agent/development_plans/template-maintenance.md`
+- Epic: `adw-docs/dev-plans/template-epic.md`
+- Feature: `adw-docs/dev-plans/template-feature.md`
+- Maintenance: `adw-docs/dev-plans/template-maintenance.md`
 
 # Process
 
@@ -98,7 +98,7 @@ Extract from input:
 
 ```python
 read({
-  "filePath": "docs/Agent/development_plans/template-{type}.md"
+  "filePath": "adw-docs/dev-plans/template-{type}.md"
 })
 ```
 
@@ -153,51 +153,122 @@ Replace all placeholders:
 
 ## Step 5: Format Phases
 
-Convert phase list to proper format with ID prefixes:
+Convert phase list to proper format with ID prefixes.
 
-### Input
+### Tests-With-Feature Principle (CRITICAL)
+
+**Every phase that adds, modifies, or removes code MUST include corresponding tests in the same phase.**
+
+DO NOT create separate "Write tests" phases. Tests are part of the implementation, not an afterthought.
+
+### Exception: Large Features (>100 LOC)
+
+For features that exceed ~100 LOC, you MAY split into:
+1. Core implementation with **smoke tests** (basic happy path coverage)
+2. **Comprehensive test coverage phase (REQUIRED immediately after)**
+
+**If you use smoke tests, you MUST create an immediately following comprehensive test phase.** No other implementation work can happen between them.
+
+This exception does NOT apply to:
+- **Refactors** - Must have full tests to verify behavior preservation
+- **Removals** - Must update/remove tests to keep CI green
+- **Bug fixes** - Must have regression test proving the fix
+
+### WRONG Input (reject this pattern)
 ```
 Phases:
 1. Create base interface
 2. Implement rate limiter class
 3. Add retry logic
-4. Write tests
+4. Write tests  ❌ NEVER DO THIS - tests must be in phases 1-3
 ```
 
-### Output (for E1-F3)
+### CORRECT Input (standard feature, ~100 LOC per phase)
+```
+Phases:
+1. Create base interface with unit tests
+2. Implement rate limiter class with tests
+3. Add retry logic with integration tests
+```
+
+### CORRECT Input (large feature, >100 LOC)
+```
+Phases:
+1. Implement core rate limiter with smoke tests (large feature)
+2. Complete rate limiter test coverage
+3. Add retry logic with integration tests
+```
+
+### Output (for E1-F3, standard feature)
 ```markdown
 ## 3. Phase Checklist
 
-- [ ] **E1-F3-P1:** Create base interface
+- [ ] **E1-F3-P1:** Create base interface with unit tests
   - Issue: TBD | Size: M | Status: Not Started
   - Goal: Define rate limiter interface contract
+  - Implementation: Create abstract base class and protocol
+  - Tests: Unit tests for interface compliance, type checking
   
-- [ ] **E1-F3-P2:** Implement rate limiter class
+- [ ] **E1-F3-P2:** Implement rate limiter class with tests
   - Issue: TBD | Size: M | Status: Not Started
   - Goal: Core implementation with token bucket algorithm
+  - Implementation: TokenBucketRateLimiter class
+  - Tests: Unit tests for rate limiting behavior, edge cases
   
-- [ ] **E1-F3-P3:** Add retry logic
+- [ ] **E1-F3-P3:** Add retry logic with integration tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Automatic retry with exponential backoff
+  - Implementation: RetryHandler with configurable backoff
+  - Tests: Integration tests for retry scenarios, timeout handling
   
-- [ ] **E1-F3-P4:** Write tests
-  - Issue: TBD | Size: M | Status: Not Started
-  - Goal: Unit and integration tests for rate limiter
-  
-- [ ] **E1-F3-P5:** Update development documentation
+- [ ] **E1-F3-P4:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
   - Update index.md and README.md with final status
   - Add completion notes and lessons learned
 ```
 
-**CRITICAL**: Always add the "Update development documentation" phase as the final phase.
+### Output (for E1-F4, large feature >100 LOC)
+```markdown
+## 3. Phase Checklist
+
+- [ ] **E1-F4-P1:** Implement distributed rate limiter with smoke tests
+  - Issue: TBD | Size: L | Status: Not Started
+  - Goal: Core distributed rate limiting implementation (>100 LOC)
+  - Implementation: Redis-backed distributed token bucket
+  - Tests: Smoke tests for basic rate limiting happy path
+  - Note: Large feature - comprehensive tests in P2
+  
+- [ ] **E1-F4-P2:** Complete distributed rate limiter test coverage
+  - Issue: TBD | Size: M | Status: Not Started
+  - Goal: Full test coverage for distributed rate limiter
+  - Tests: Edge cases, failure scenarios, concurrency tests
+  - Coverage: Achieve 80%+ for rate limiter module
+  
+- [ ] **E1-F4-P3:** Update development documentation
+  - Issue: TBD | Size: XS | Status: Not Started
+  - Update index.md and README.md with final status
+  - Add completion notes and lessons learned
+```
+
+### Phase Completion Criteria
+
+Each phase is complete when:
+- [ ] All new/modified code has corresponding tests (smoke tests minimum for large feature P1)
+- [ ] CI passes with no "expected failures"
+- [ ] Test coverage meets threshold (80%+ for changed files, or smoke minimum for large feature P1)
+
+**CRITICAL**: 
+- Always add the "Update development documentation" phase as the final phase
+- Never create standalone "Write tests" phases for refactors, removals, or bug fixes
+- Large feature exception (>100 LOC): smoke tests in P1, comprehensive tests in P2 (REQUIRED - no implementation between them)
+- If the user provides phases without tests, add test requirements to each implementation phase
 
 ## Step 6: Write Document
 
 Determine output path:
-- Epic: `docs/Agent/development_plans/epics/{filename}.md`
-- Feature: `docs/Agent/development_plans/features/{filename}.md`
-- Maintenance: `docs/Agent/development_plans/maintenance/{filename}.md`
+- Epic: `adw-docs/dev-plans/epics/{filename}.md`
+- Feature: `adw-docs/dev-plans/features/{filename}.md`
+- Maintenance: `adw-docs/dev-plans/maintenance/{filename}.md`
 
 ```python
 write({
@@ -243,10 +314,23 @@ Before reporting completion:
 - [ ] All template placeholders replaced (no `{{...}}` remaining)
 - [ ] Document ID in filename matches metadata
 - [ ] All phases have correct ID prefix
+- [ ] **Each implementation phase includes test requirements** (no separate "Write tests" phase)
 - [ ] Final phase is "Update development documentation"
 - [ ] Dates use YYYY-MM-DD format
 - [ ] Parent epic link is valid (if applicable)
 - [ ] File written to correct folder
+
+# Tests-With-Feature Validation
+
+Before writing the document, validate that:
+1. No phase is named "Write tests", "Add tests", "Test coverage", or similar
+2. Every phase that modifies code includes a "Tests:" line describing test requirements
+3. The ~100 LOC per phase includes both implementation AND tests
+
+If the input phases don't include tests, transform them:
+- "Implement X" → "Implement X with unit tests"
+- "Add feature Y" → "Add feature Y with tests"
+- "Refactor Z" → "Refactor Z with updated tests"
 
 # Error Handling
 
@@ -255,7 +339,7 @@ Before reporting completion:
 DEV_PLAN_CREATION_FAILED
 
 Error: Template not found
-Expected: docs/Agent/development_plans/template-{type}.md
+Expected: adw-docs/dev-plans/template-{type}.md
 
 Recommendation: Verify template exists or create it first.
 ```
@@ -292,12 +376,12 @@ Recommendation: Provide all required fields:
 # Scope Restrictions
 
 ## CAN Write To
-- `docs/Agent/development_plans/epics/*.md`
-- `docs/Agent/development_plans/features/*.md`
-- `docs/Agent/development_plans/maintenance/*.md`
+- `adw-docs/dev-plans/epics/*.md`
+- `adw-docs/dev-plans/features/*.md`
+- `adw-docs/dev-plans/maintenance/*.md`
 
 ## CANNOT Write To
 - Template files
 - Index files (handled by dev-plan-indexer)
-- Files outside development_plans/
+- Files outside dev-plans/
 - Completed/ folders (handled by dev-plan-indexer)

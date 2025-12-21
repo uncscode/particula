@@ -79,7 +79,7 @@ task({
 # Required Reading
 
 - @docs/Examples/index.md - Examples index and structure
-- @docs/Agent/documentation_guide.md - Documentation standards
+- @adw-docs/documentation_guide.md - Documentation standards
 - @docs/Examples/basic-workflow.md - Example of good tutorial
 
 # Write Permissions
@@ -283,9 +283,9 @@ if __name__ == "__main__":
 
 ## Next Steps
 
-- Learn about [Development Plan Features](../../docs/Agent/development_plans/README.md#feature-plans)
+- Learn about [Development Plan Features](../../adw-docs/dev-plans/README.md#feature-plans)
 - Read the [API Reference](../API/{module}.md)
-- See the [Architecture Guide](../../docs/Agent/architecture/architecture_guide.md)
+- See the [Architecture Guide](../../adw-docs/architecture/architecture_guide.md)
 
 ## See Also
 
@@ -642,4 +642,4 @@ Index updated: docs/Examples/index.md (+2 entries)
 - Check markdown links
 - Include prerequisites and expected output
 
-**References:** `docs/Examples/index.md`, `docs/Agent/documentation_guide.md`
+**References:** `docs/Examples/index.md`, `adw-docs/documentation_guide.md`

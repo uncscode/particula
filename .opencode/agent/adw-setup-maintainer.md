@@ -2,11 +2,11 @@
 description: >-
   Use this agent to maintain ADW templates by syncing changes from live files
   back into template files. This agent manages TWO sync relationships:
-  1. docs/Agent/ ↔ adw/templates/Agent/ (documentation)
+  1. adw-docs/ ↔ adw/templates/Agent/ (documentation)
   2. .opencode/ ↔ adw/templates/opencode_config/ (OpenCode configuration)
   
   This agent should be invoked when:
-  - Live documentation in docs/Agent/ has been updated and templates need syncing
+  - Live documentation in adw-docs/ has been updated and templates need syncing
   - OpenCode configuration in .opencode/ has changed (agents, commands, workflows)
   - New files have been added that need template versions
   - Files have been moved to legacy/ folders and templates need restructuring
@@ -68,18 +68,18 @@ Maintain the bidirectional sync between live files and their template counterpar
 
 | Live Location | Template Location | Content Type |
 |---------------|-------------------|--------------|
-| `docs/Agent/` | `adw/templates/Agent/` | Documentation guides (tokenized with `{{PLACEHOLDERS}}`) |
+| `adw-docs/` | `adw/templates/Agent/` | Documentation guides (tokenized with `{{PLACEHOLDERS}}`) |
 | `.opencode/` | `adw/templates/opencode_config/` | OpenCode configuration (agents, commands, workflows) |
 
 ### Detailed Structure
 
-**Documentation (`docs/Agent/` ↔ `adw/templates/Agent/`):**
-- `docs/Agent/*.md` → `adw/templates/Agent/*.md`
-- `docs/Agent/agents/*.md` → `adw/templates/Agent/agents/*.md`
-- `docs/Agent/architecture/*.md` → `adw/templates/Agent/architecture/*.md`
-- `docs/Agent/architecture/decisions/*.md` → `adw/templates/Agent/architecture/decisions/*.md`
-- `docs/Agent/development_plans/**/*.md` → `adw/templates/Agent/development_plans/**/*.md`
-- `docs/Agent/security/*.md` → `adw/templates/Agent/security/*.md`
+**Documentation (`adw-docs/` ↔ `adw/templates/Agent/`):**
+- `adw-docs/*.md` → `adw/templates/Agent/*.md`
+- `adw-docs/agents/*.md` → `adw/templates/Agent/agents/*.md`
+- `adw-docs/architecture/*.md` → `adw/templates/Agent/architecture/*.md`
+- `adw-docs/architecture/decisions/*.md` → `adw/templates/Agent/architecture/decisions/*.md`
+- `adw-docs/dev-plans/**/*.md` → `adw/templates/Agent/dev-plans/**/*.md`
+- `adw-docs/security/*.md` → `adw/templates/Agent/security/*.md`
 
 **OpenCode Configuration (`.opencode/` ↔ `adw/templates/opencode_config/`):**
 - `.opencode/agent/*.md` → `adw/templates/opencode_config/agent/*.md`
@@ -92,7 +92,7 @@ Maintain the bidirectional sync between live files and their template counterpar
 
 # When to Use This Agent
 
-- After updating documentation in `docs/Agent/`
+- After updating documentation in `adw-docs/`
 - After updating OpenCode configuration in `.opencode/`
 - When adding new documentation files that need templates
 - When adding, modifying, or deprecating agent files
@@ -106,13 +106,13 @@ Maintain the bidirectional sync between live files and their template counterpar
 This agent runs **inside the ADW repository** where templates are maintained. It requires:
 - Manifest mode set to `live` for extraction operations
 - Access to all tracked folder pairs:
-  - `docs/Agent/` ↔ `adw/templates/Agent/`
+  - `adw-docs/` ↔ `adw/templates/Agent/`
   - `.opencode/` ↔ `adw/templates/opencode_config/`
 
 # Required Reading
 
 Before starting, consult:
-- `docs/Agent/setup_guide.md` - Template synchronization section
+- `adw-docs/setup_guide.md` - Template synchronization section
 - `adw/templates/keyword_manifest.yaml` - Current keyword definitions
 - `adw/templates/README.md` - Template maintenance workflow
 
@@ -461,7 +461,7 @@ For maintainers (ADW repository):
   adw setup template init  # Select 'live' mode when prompted
 
 For deployments (target repositories):
-  Use the adw-setup-deploy agent instead.
+  Use the setup-adw agent instead.
 ```
 
 ## Wrong Manifest Mode
@@ -474,7 +474,7 @@ This agent is for template maintainers (live mode).
 Your manifest is in 'template' mode, which is for deployments.
 
 Options:
-1. Use adw-setup-deploy agent for deployment operations
+1. Use setup-adw agent for deployment operations
 2. Reinitialize with: adw setup template init  # Select 'live' mode
 ```
 
@@ -511,8 +511,8 @@ Agent: "I'll check for drift between live docs and templates...
 Running: adw setup template extract --diff
 
 Found 2 files with content changes:
-- docs/Agent/testing_guide.md (added new test patterns section)
-- docs/Agent/code_style.md (updated import ordering)
+- adw-docs/testing_guide.md (added new test patterns section)
+- adw-docs/code_style.md (updated import ordering)
 
 No new files detected.
 No unknown placeholders found.

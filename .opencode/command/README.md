@@ -39,6 +39,5 @@ The following commands are now handled by JSON workflows in `.opencode/workflow/
 |-------------|---------|
 | `/interpret_issue` | `adw interpret-issue` |
 | `/create_issue` | `adw create-issue` |
-| `/health_check` | `adw health` |
 
 See `.opencode/workflow/` for available JSON workflow definitions.

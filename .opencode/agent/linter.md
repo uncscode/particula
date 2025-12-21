@@ -199,4 +199,4 @@ Fixes applied: 5
 
 **Permissions:** ✅ Run linters, edit code | ❌ Modify config files
 
-**References:** `docs/Agent/linting_guide.md`, `.github/workflows/lint.yml`
+**References:** `adw-docs/linting_guide.md`, `.github/workflows/lint.yml`

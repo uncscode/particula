@@ -71,9 +71,9 @@ task({
 
 # Required Reading
 
-- @docs/Agent/architecture_reference.md - Architecture overview
-- @docs/Agent/architecture/architecture_outline.md - Module structure
-- @docs/Agent/code_style.md - Code conventions
+- @adw-docs/architecture_reference.md - Architecture overview
+- @adw-docs/architecture/architecture_outline.md - Module structure
+- @adw-docs/code_style.md - Code conventions
 
 # Process
 

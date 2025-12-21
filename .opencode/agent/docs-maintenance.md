@@ -1,15 +1,15 @@
 ---
-description: 'Subagent that manages maintenance documentation in docs/Agent/development_plans/maintenance/.
+description: 'Subagent that manages maintenance documentation in adw-docs/dev-plans/maintenance/.
   Invoked by the documentation primary agent to create and update maintenance docs
   for deprecations, migrations, release notes, and technical debt.
 
   This subagent: - Loads workflow context from adw_spec tool - Creates maintenance
   docs for deprecations, migrations - Updates existing maintenance guides - Creates
   release notes when appropriate - Archives old/superseded maintenance docs to archive/
-  - Follows template.md format - Maintains docs/Agent/development_plans/README.md
+  - Follows template.md format - Maintains adw-docs/dev-plans/README.md
   (#maintenance-plans) index - Validates markdown links
 
-  Write permissions: - docs/Agent/development_plans/maintenance/*.md: ALLOW - docs/Agent/development_plans/archive/maintenance/*.md:
+  Write permissions: - adw-docs/dev-plans/maintenance/*.md: ALLOW - adw-docs/dev-plans/archive/maintenance/*.md:
   ALLOW'
 mode: subagent
 tools:
@@ -41,7 +41,7 @@ tools:
 
 # Docs-Maintenance Subagent
 
-Create and update maintenance documentation in docs/Agent/development_plans/maintenance/ for deprecations, migrations, release notes, and technical debt.
+Create and update maintenance documentation in adw-docs/dev-plans/maintenance/ for deprecations, migrations, release notes, and technical debt.
 
 # Core Mission
 
@@ -61,7 +61,7 @@ Arguments: adw_id=<workflow-id>
 Change type: <issue_class>
 Details: <summary>
 
-Update docs/Agent/development_plans/maintenance/ if needed (migrations, release notes, etc.)
+Update adw-docs/dev-plans/maintenance/ if needed (migrations, release notes, etc.)
 ```
 
 **Invocation:**
@@ -75,15 +75,15 @@ task({
 
 # Required Reading
 
-- @docs/Agent/development_plans/template-maintenance.md - Maintenance doc template
-- @docs/Agent/development_plans/README.md#maintenance-plans - Maintenance docs index
-- @docs/Agent/documentation_guide.md - Documentation standards
+- @adw-docs/dev-plans/template-maintenance.md - Maintenance doc template
+- @adw-docs/dev-plans/README.md#maintenance-plans - Maintenance docs index
+- @adw-docs/documentation_guide.md - Documentation standards
 
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `docs/Agent/development_plans/maintenance/*.md` - Create and update maintenance docs
-- ✅ `docs/Agent/development_plans/archive/maintenance/*.md` - Archive old/superseded docs
+- ✅ `adw-docs/dev-plans/maintenance/*.md` - Create and update maintenance docs
+- ✅ `adw-docs/dev-plans/archive/maintenance/*.md` - Archive old/superseded docs
 
 **DENIED:**
 - ❌ All other directories
@@ -142,7 +142,7 @@ todowrite({
     },
     {
       "id": "3",
-      "content": "Update docs/Agent/development_plans/README.md (#maintenance-plans) index",
+      "content": "Update adw-docs/dev-plans/README.md (#maintenance-plans) index",
       "status": "pending",
       "priority": "medium"
     },
@@ -159,7 +159,7 @@ todowrite({
 ## Step 4: Read Maintenance Template
 
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/development_plans/template-maintenance.md"})
+read({"filePath": "{worktree_path}/adw-docs/dev-plans/template-maintenance.md"})
 ```
 
 Understand required sections:
@@ -180,7 +180,7 @@ When breaking changes or API changes occur:
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/maintenance/{feature}_migration_guide.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{feature}_migration_guide.md",
   "content": """# Migration Guide: {Feature/Change Name}
 
 **Version:** {from_version} → {to_version}
@@ -270,7 +270,7 @@ get_datetime({"format": "date"})
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/maintenance/release-notes-{version}.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/release-notes-{version}.md",
   "content": """# Release Notes: v{version}
 
 **Release Date:** {current_date}
@@ -308,7 +308,7 @@ Related: #{issue_number}
 
 {Description and migration path}
 
-See: [Development Plan Maintenance Overview](../../docs/Agent/development_plans/README.md#maintenance-plans)
+See: [Development Plan Maintenance Overview](../../adw-docs/dev-plans/README.md#maintenance-plans)
 
 ## Deprecations
 
@@ -364,7 +364,7 @@ See [GitHub Releases](https://github.com/Gorkowski/Agent/releases/tag/v{version}
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/maintenance/{feature}_deprecation.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{feature}_deprecation.md",
   "content": """# Deprecation Notice: {Feature/Function Name}
 
 **Status:** Deprecated
@@ -426,7 +426,7 @@ When maintenance docs are no longer relevant (e.g., old release notes, completed
 
 ```bash
 # Move to archive
-mv docs/Agent/development_plans/maintenance/{old-doc}.md docs/Agent/development_plans/archive/maintenance/
+mv adw-docs/dev-plans/maintenance/{old-doc}.md adw-docs/dev-plans/archive/maintenance/
 ```
 
 **When to archive:**
@@ -441,13 +441,13 @@ Update README.md to remove or move link to archived section.
 
 Read current index:
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/development_plans/README.md"})
+read({"filePath": "{worktree_path}/adw-docs/dev-plans/README.md"})
 ```
 
 Add new doc to appropriate section:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/README.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/README.md",
   "oldString": "{existing_section}",
   "newString": "{existing_section}\n- [{Doc Title}]({doc-name}.md) - {brief description}"
 })
@@ -457,7 +457,7 @@ edit({
 
 Check all links in created/updated doc:
 ```bash
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' docs/Agent/development_plans/maintenance/{doc}.md
+grep -oE '\[([^\]]+)\]\(([^)]+)\)' adw-docs/dev-plans/maintenance/{doc}.md
 ```
 
 Verify all internal and external links are valid.
@@ -472,7 +472,7 @@ DOCS_MAINTENANCE_UPDATE_COMPLETE
 Action: {Created/Updated} maintenance documentation
 
 Files:
-- docs/Agent/development_plans/maintenance/{doc-name}.md ({new/updated})
+- adw-docs/dev-plans/maintenance/{doc-name}.md ({new/updated})
 
 Type: {Migration Guide / Release Notes / Deprecation Notice / Technical Debt}
 
@@ -547,7 +547,7 @@ DOCS_MAINTENANCE_UPDATE_COMPLETE
 Action: Created migration guide
 
 Files:
-- docs/Agent/development_plans/maintenance/git_github_migration_guide.md (new)
+- adw-docs/dev-plans/maintenance/git_github_migration_guide.md (new)
 
 Type: Migration Guide
 
@@ -566,12 +566,12 @@ Links validated: 5 links, all valid
 
 **Output Signal:** `DOCS_MAINTENANCE_UPDATE_COMPLETE` or `DOCS_MAINTENANCE_UPDATE_FAILED`
 
-**Scope:** `docs/Agent/development_plans/maintenance/*.md` only
+**Scope:** `adw-docs/dev-plans/maintenance/*.md` only
 
 **Doc Types:** Migration Guide, Release Notes, Deprecation Notice, Technical Debt
 
-**Always:** Update docs/Agent/development_plans/README.md (#maintenance-plans) index, validate links
+**Always:** Update adw-docs/dev-plans/README.md (#maintenance-plans) index, validate links
 
-**Template:** Follow `docs/Agent/development_plans/template-maintenance.md` for technical debt tracking
+**Template:** Follow `adw-docs/dev-plans/template-maintenance.md` for technical debt tracking
 
-**References:** `docs/Agent/development_plans/template-maintenance.md`, `docs/Agent/documentation_guide.md`
+**References:** `adw-docs/dev-plans/template-maintenance.md`, `adw-docs/documentation_guide.md`

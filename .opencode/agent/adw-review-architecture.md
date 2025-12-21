@@ -73,9 +73,9 @@ Diff Content:
 
 # Required Reading
 
-- @docs/Agent/architecture_reference.md - Repository architecture overview
-- @docs/Agent/architecture/architecture_guide.md - Detailed architectural patterns
-- @docs/Agent/code_style.md - Module organization conventions
+- @adw-docs/architecture_reference.md - Repository architecture overview
+- @adw-docs/architecture/architecture_guide.md - Detailed architectural patterns
+- @adw-docs/code_style.md - Module organization conventions
 
 # Review Process
 

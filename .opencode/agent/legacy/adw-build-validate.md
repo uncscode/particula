@@ -467,4 +467,4 @@ Action Required: Fix the {count} gaps listed above and re-validate.
 - Does NOT fix them
 - Primary agent (adw-build) handles fixes
 
-**References:** Workflow state via `adw_spec`, `docs/Agent/testing_guide.md`
+**References:** Workflow state via `adw_spec`, `adw-docs/testing_guide.md`

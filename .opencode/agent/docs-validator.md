@@ -73,8 +73,8 @@ task({
 
 # Required Reading
 
-- @docs/Agent/documentation_guide.md - Documentation standards
-- @docs/Agent/linting_guide.md - Quality standards
+- @adw-docs/documentation_guide.md - Documentation standards
+- @adw-docs/linting_guide.md - Quality standards
 
 # Permissions
 
@@ -157,7 +157,7 @@ find .opencode/ -name "*.md" -type f 2>/dev/null
 ```
 
 Categorize files:
-- `docs/Agent/*.md` - Agent guides
+- `adw-docs/*.md` - Agent guides
 - `docs/Examples/*.md` - Examples
 - `docs/Theory/*.md` - Theory docs
 - `docs/Features/*.md` - Feature docs
@@ -254,15 +254,15 @@ awk 'length > 120' {file}
 
 For different doc types, verify required sections:
 
-**Agent docs (`docs/Agent/*.md`):**
+**Agent docs (`adw-docs/*.md`):**
 - Has header (H1)
 - Has version/date (optional)
 
-**Feature docs (`docs/Agent/development_plans/features/*.md`):**
+**Feature docs (`adw-docs/dev-plans/features/*.md`):**
 - Has Status metadata
 - Has Overview section
 
-**ADRs (`docs/Agent/architecture/decisions/*.md`):**
+**ADRs (`adw-docs/architecture/decisions/*.md`):**
 - Has Status line
 - Has Date line
 - Has Context section
@@ -276,7 +276,7 @@ For different doc types, verify required sections:
 DOCS_VALIDATION_COMPLETE
 
 Files validated: {count}
-- docs/Agent/: {count} files
+- adw-docs/: {count} files
 - docs/Examples/: {count} files
 - docs/Theory/: {count} files
 - docs/Features/: {count} files
@@ -417,7 +417,7 @@ Tasks:
 DOCS_VALIDATION_COMPLETE
 
 Files validated: 45
-- docs/Agent/: 22 files
+- adw-docs/: 22 files
 - docs/Examples/: 10 files
 - docs/Theory/: 5 files
 - docs/Features/: 3 files
@@ -434,7 +434,7 @@ Links checked: 127
 
 | Source File | Link Text | Target | Issue |
 |-------------|-----------|--------|-------|
-| `docs/Agent/testing_guide.md` | [old guide] | `../old/testing.md` | File not found |
+| `adw-docs/testing_guide.md` | [old guide] | `../old/testing.md` | File not found |
 | `docs/Examples/basic.md` | [api docs] | `../../API/core.md` | Wrong path |
 
 ## Broken Anchor Links (1)
@@ -468,4 +468,4 @@ Validation: COMPLETED WITH WARNINGS
 
 **Always:** Report all issues found with actionable details
 
-**References:** `docs/Agent/documentation_guide.md`
+**References:** `adw-docs/documentation_guide.md`

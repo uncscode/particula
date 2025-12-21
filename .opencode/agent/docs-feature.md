@@ -1,15 +1,15 @@
 ---
-description: 'Subagent that manages feature documentation in docs/Agent/development_plans/features/.
+description: 'Subagent that manages feature documentation in adw-docs/dev-plans/features/.
   Invoked by the documentation primary agent to create and update feature documentation
   following the established template format.
 
   This subagent: - Loads workflow context from adw_spec tool - Creates new feature
   docs following template-feature.md format - Updates existing feature docs when features
   change - Archives completed/deprecated feature docs to archive/features/ - Maintains
-  docs/Agent/development_plans/README.md index - Ensures feature docs stay current
+  adw-docs/dev-plans/README.md index - Ensures feature docs stay current
   with implementation - Validates markdown links
 
-  Write permissions: - docs/Agent/development_plans/features/*.md: ALLOW - docs/Agent/development_plans/archive/features/*.md:
+  Write permissions: - adw-docs/dev-plans/features/*.md: ALLOW - adw-docs/dev-plans/archive/features/*.md:
   ALLOW'
 mode: subagent
 tools:
@@ -41,7 +41,7 @@ tools:
 
 # Docs-Feature Subagent
 
-Create and update feature documentation in docs/Agent/development_plans/features/ following the established template format.
+Create and update feature documentation in adw-docs/dev-plans/features/ following the established template format.
 
 # Core Mission
 
@@ -67,23 +67,23 @@ Create or update feature documentation following template.md format.
 ```python
 task({
   "description": "Update feature documentation",
-  "prompt": f"Document new feature in docs/Agent/development_plans/features/.\n\nArguments: adw_id={adw_id}\n\nFeature: {issue_title}\nDetails: {issue_body}",
+  "prompt": f"Document new feature in adw-docs/dev-plans/features/.\n\nArguments: adw_id={adw_id}\n\nFeature: {issue_title}\nDetails: {issue_body}",
   "subagent_type": "docs-feature"
 })
 ```
 
 # Required Reading
 
-- @docs/Agent/development_plans/template-feature.md - Feature doc template
-- @docs/Agent/development_plans/README.md - Feature plans index
-- @docs/Agent/documentation_guide.md - Documentation standards
+- @adw-docs/dev-plans/template-feature.md - Feature doc template
+- @adw-docs/dev-plans/README.md - Feature plans index
+- @adw-docs/documentation_guide.md - Documentation standards
 
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `docs/Agent/development_plans/features/*.md` - Create and update feature docs
-- ✅ `docs/Agent/development_plans/README.md` - Update index
-- ✅ `docs/Agent/development_plans/archive/features/*.md` - Archive completed/deprecated features
+- ✅ `adw-docs/dev-plans/features/*.md` - Create and update feature docs
+- ✅ `adw-docs/dev-plans/README.md` - Update index
+- ✅ `adw-docs/dev-plans/archive/features/*.md` - Archive completed/deprecated features
 
 **DENIED:**
 - ❌ All other directories
@@ -122,7 +122,7 @@ From `spec_content`, extract:
 ### 2.2: Check Existing Feature Docs
 
 ```bash
-ls docs/Agent/development_plans/features/
+ls adw-docs/dev-plans/features/
 ```
 
 Determine:
@@ -137,7 +137,7 @@ todowrite({
   "todos": [
     {
       "id": "1",
-      "content": "Read feature template (docs/Agent/development_plans/template-feature.md)",
+      "content": "Read feature template (adw-docs/dev-plans/template-feature.md)",
       "status": "pending",
       "priority": "high"
     },
@@ -149,7 +149,7 @@ todowrite({
     },
     {
       "id": "3",
-      "content": "Update docs/Agent/development_plans/README.md index",
+      "content": "Update adw-docs/dev-plans/README.md index",
       "status": "pending",
       "priority": "high"
     },
@@ -166,7 +166,7 @@ todowrite({
 ## Step 4: Read Feature Template
 
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/development_plans/template-feature.md"})
+read({"filePath": "{worktree_path}/adw-docs/dev-plans/template-feature.md"})
 ```
 
 Understand required sections:
@@ -193,7 +193,7 @@ Use kebab-case based on feature name:
 
 Check existing naming conventions:
 ```bash
-ls docs/Agent/development_plans/features/*.md
+ls adw-docs/dev-plans/features/*.md
 ```
 
 ### 5.2: For NEW Feature Doc
@@ -206,7 +206,7 @@ get_datetime({"format": "date"})  # Get current date for metadata
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/features/{feature-name}.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/features/{feature-name}.md",
   "content": """# Feature: {Feature Name}
 
 **Status:** In Progress
@@ -314,7 +314,7 @@ write({
 
 Read existing doc:
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/development_plans/features/{existing-feature}.md"})
+read({"filePath": "{worktree_path}/adw-docs/dev-plans/features/{existing-feature}.md"})
 ```
 
 Update relevant sections using `edit`:
@@ -326,7 +326,7 @@ Update relevant sections using `edit`:
 
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/features/{feature}.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/features/{feature}.md",
   "oldString": "**Updated:** {old_date}",
   "newString": "**Updated:** {current_date}"
 })
@@ -338,13 +338,13 @@ When a feature is fully completed (Status: Done) or deprecated:
 
 ```bash
 # Move to archive
-mv docs/Agent/development_plans/features/{old-feature}.md docs/Agent/development_plans/archive/features/
+mv adw-docs/dev-plans/features/{old-feature}.md adw-docs/dev-plans/archive/features/
 ```
 
 Update the archived doc's status:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/archive/features/{old-feature}.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/archive/features/{old-feature}.md",
   "oldString": "**Status:** In Progress",
   "newString": "**Status:** Completed (Archived)"
 })
@@ -356,13 +356,13 @@ Update README.md to move link to archived section or remove.
 
 Read current index:
 ```python
-read({"filePath": "{worktree_path}/docs/Agent/development_plans/README.md"})
+read({"filePath": "{worktree_path}/adw-docs/dev-plans/README.md"})
 ```
 
 Add new feature to the Feature Plans section:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Agent/development_plans/README.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/README.md",
   "oldString": "{existing_list_item}",
   "newString": "{existing_list_item}\n| [{Feature Name}][plan-{feature-slug}] | {brief description}"
 })
@@ -374,7 +374,7 @@ Also add the reference link at the bottom of the Feature Plans section.
 
 Check all links in created/updated doc:
 ```bash
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' docs/Agent/development_plans/features/{feature}.md
+grep -oE '\[([^\]]+)\]\(([^)]+)\)' adw-docs/dev-plans/features/{feature}.md
 ```
 
 Verify:
@@ -391,7 +391,7 @@ DOCS_FEATURE_UPDATE_COMPLETE
 
 Action: {Created new / Updated existing} feature documentation
 
-File: docs/Agent/development_plans/features/{feature-name}.md
+File: adw-docs/dev-plans/features/{feature-name}.md
 Sections populated:
 - Overview and Problem Statement
 - Phases with ~100 LOC philosophy
@@ -453,9 +453,9 @@ Details: Implement OpenCode as a backend option for ADW, enabling users to use o
 **Process:**
 1. Load context, analyze feature scope
 2. Check existing docs - no existing opencode-backend doc
-3. Create new file: `docs/Agent/development_plans/features/opencode-backend-support.md`
+3. Create new file: `adw-docs/dev-plans/features/opencode-backend-support.md`
 4. Fill template with feature details
-5. Update development_plans/README.md index
+5. Update dev-plans/README.md index
 6. Validate links
 7. Report completion
 
@@ -465,7 +465,7 @@ DOCS_FEATURE_UPDATE_COMPLETE
 
 Action: Created new feature documentation
 
-File: docs/Agent/development_plans/features/opencode-backend-support.md
+File: adw-docs/dev-plans/features/opencode-backend-support.md
 Sections populated:
 - Overview: OpenCode backend implementation
 - Phases: 3 phases defined (~100 LOC each)
@@ -483,12 +483,12 @@ Links validated: 8 links checked, all valid
 
 **Output Signal:** `DOCS_FEATURE_UPDATE_COMPLETE` or `DOCS_FEATURE_UPDATE_FAILED`
 
-**Scope:** `docs/Agent/development_plans/features/*.md` only
+**Scope:** `adw-docs/dev-plans/features/*.md` only
 
-**Template:** Follow `docs/Agent/development_plans/template-feature.md` structure
+**Template:** Follow `adw-docs/dev-plans/template-feature.md` structure
 
 **Philosophy:** ~100 LOC per phase, smooth is safe, safe is fast
 
-**Always:** Update development_plans/README.md index, validate links
+**Always:** Update dev-plans/README.md index, validate links
 
-**References:** `docs/Agent/development_plans/template-feature.md`, `docs/Agent/documentation_guide.md`
+**References:** `adw-docs/dev-plans/template-feature.md`, `adw-docs/documentation_guide.md`

@@ -101,9 +101,15 @@ The adw-commit subagent handles everything: staging, commit message, linting, pr
 
 | Signal | Action |
 |--------|--------|
-| `ADW_COMMIT_SUCCESS` | ✅ Proceed to Step 3 |
-| `ADW_COMMIT_SKIPPED` | ✅ Proceed to Step 3 (no changes) |
+| `ADW_COMMIT_SUCCESS` | ✅ Proceed to Step 3 (new commit created) |
+| `ADW_COMMIT_SKIPPED` | ✅ Proceed to Step 3 (**changes already committed** - this is normal when prior steps committed) |
 | `ADW_COMMIT_FAILED` | ❌ Report `SHIPPER_FAILED` and STOP |
+
+⚠️ **Critical: `ADW_COMMIT_SKIPPED` does NOT mean "no changes to ship"!**
+
+When `ADW_COMMIT_SKIPPED` is returned, it means the worktree has no **uncommitted** changes - but the branch likely has commits that were made by earlier workflow steps (e.g., `adw-build`, `adw-format`). These commits ARE on the branch and NEED to be shipped as a PR.
+
+**Always proceed to Step 3 after SKIPPED** - the PR should be created based on the branch's commits against the target branch, not based on uncommitted changes.
 
 ## Step 3: Build PR Body and Create Pull Request
 
@@ -111,17 +117,67 @@ The adw-commit subagent handles everything: staging, commit message, linting, pr
 
 ### 3.1: Gather Context
 
-**Get git diff for analysis:**
+**Determine target branch:**
 ```python
-git_operations({"command": "diff", "stat": true, "worktree_path": "{worktree_path}"})
-git_operations({"command": "diff", "worktree_path": "{worktree_path}"})
+target_branch = state.get("target_branch", "main")
 ```
+
+**Check for commits to ship (CRITICAL):**
+
+⚠️ **Do NOT use plain `git diff` or `git status` to determine if there are changes to ship!**
+
+These commands only show **uncommitted** changes. When commits are already made and pushed (by prior workflow steps like `adw-build`), they return empty - but there ARE commits on the branch to ship.
+
+**How to determine if there are changes to ship:**
+
+1. **Check `ADW_COMMIT_SUCCESS` or `ADW_COMMIT_SKIPPED` from Step 2:**
+   - `ADW_COMMIT_SUCCESS` → New commit was just created, definitely has changes
+   - `ADW_COMMIT_SKIPPED` → Worktree was clean, but **commits exist from prior steps**
+
+2. **Check if branch was pushed:**
+   - The branch exists on remote (adw-commit pushes automatically)
+   - If the branch name differs from `main`/`master`, it has changes to ship
+
+3. **Trust the workflow state:**
+   - If `branch_name` is set and not the default branch, there are changes
+   - If `spec_content` describes implementation steps, work was done
+
+**Extract change information from `spec_content`:**
+The implementation plan (`spec_content`) contains the authoritative list of what was changed:
+1. Parse the "Steps" or "Files" sections for file paths
+2. Look for patterns like `**Files:** \`path/to/file.py\`` 
+3. Extract summaries of what each file does
+
+**Check changes against target branch (RECOMMENDED):**
+```python
+# Use --base to see ALL commits on this branch vs target branch
+# This shows changes even when worktree is clean (commits already made)
+git_operations({
+  "command": "diff",
+  "base": "origin/main",  # or target_branch from state
+  "stat": true,
+  "worktree_path": "{worktree_path}"
+})
+```
+
+**Why use `--base`:** Plain `git diff` only shows **uncommitted** changes. When prior workflow steps already committed, it returns empty. Using `--base` compares against the target branch and shows ALL changes that will be in the PR.
+
+**Optional: Check uncommitted changes:**
+```python
+# This will likely be empty if prior steps committed - that's OK!
+git_operations({"command": "status", "porcelain": true, "worktree_path": "{worktree_path}"})
+git_operations({"command": "diff", "stat": true, "worktree_path": "{worktree_path}"})
+```
+
+**Key insight:** An empty `git diff` (without `--base`) does NOT mean "nothing to ship". It means "nothing uncommitted". The branch still has commits that need a PR. **Always use `--base` to see the full picture.**
 
 **From workflow state (already loaded):**
 - `issue.number`, `issue.title`, `issue.body`
 - `workflow_type` (complete/patch/document)
-- `spec_content` (implementation plan)
+- `spec_content` (implementation plan - **contains list of changed files**)
 - `adw_id` (workflow identifier)
+
+**Important:** Even if `ADW_COMMIT_SKIPPED` was returned (meaning changes were already committed in a prior step), there ARE still commits on this branch that need to be shipped as a PR. The branch exists, has commits, and was pushed - proceed to create the PR using information from `spec_content`.
 
 ### 3.2: Generate PR Title
 
@@ -137,10 +193,35 @@ git_operations({"command": "diff", "worktree_path": "{worktree_path}"})
 
 ### 3.3: Build PR Body
 
-**Analyze changes from diff:**
+**Analyze changes (use multiple sources):**
+
+**Primary method - git diff with --base:**
+```python
+# Compare branch against target to see ALL PR changes
+git_operations({
+  "command": "diff",
+  "base": "origin/main",  # Use target_branch from state if available
+  "stat": true,
+  "worktree_path": "{worktree_path}"
+})
+```
+
+This shows all files changed on the branch compared to the target, even when the worktree is clean.
+
+**Fallback if git diff --base is empty or fails**, extract change information from:
+1. **`spec_content`** - The implementation plan lists files that were modified
+2. **adw-commit response** - Contains "Files changed" with insertions/deletions
+3. **Issue body** - Describes what was requested
+
+**From git diff --base output (when available):**
 - New files: What do they provide?
 - Modified files: What changed and why?
 - Test files: What coverage was added?
+
+**From spec_content (always available):**
+- Parse the "Steps" or "Phase" sections for file paths
+- Look for patterns like "File: `path/to/file.py`" or "Modify `path/to/file.py`"
+- Extract the implementation approach description
 
 **Identify if diagrams are needed:**
 - New data flows or pipelines?
@@ -690,6 +771,34 @@ Summary:
 
 # Troubleshooting
 
+## "No changes detected" / "Working tree clean"
+
+**Cause:** Shipper used `git diff` or `git status` (without `--base`) which only shows **uncommitted** changes. When prior workflow steps (adw-build, adw-format) already committed and pushed, the worktree IS clean but the branch HAS commits to ship.
+
+**Symptoms:**
+- `git status` shows "nothing to commit, working tree clean"
+- `git diff` (without `--base`) returns empty
+- `ADW_COMMIT_SKIPPED` returned (this is expected!)
+- Shipper incorrectly reports "no changes to ship"
+
+**Fix:** Use `git diff --base` to compare against the target branch:
+```python
+# This shows ALL changes on the branch vs target, even if worktree is clean
+git_operations({
+  "command": "diff",
+  "base": "origin/main",  # or target_branch from state
+  "stat": true,
+  "worktree_path": "{worktree_path}"
+})
+```
+
+**Additional strategies:**
+1. Use `spec_content` from workflow state to identify what was implemented
+2. Trust that `ADW_COMMIT_SKIPPED` means "already committed" not "nothing to ship"
+3. **Always proceed to create PR** when branch exists and was pushed
+
+**The branch has commits** - the worktree being clean just means those commits are already made. Use `--base` to see them.
+
 ## "No PR created"
 
 **Cause:** Shipper completed commit but didn't call `platform_operations create-pr`.
@@ -711,4 +820,4 @@ Summary:
 # References
 
 - **adw-commit subagent**: `.opencode/agent/adw-commit.md` - Handles commit, linting, push
-- **PR conventions**: `docs/Agent/pr_conventions.md` - PR format guidelines
+- **PR conventions**: `adw-docs/pr_conventions.md` - PR format guidelines

@@ -110,7 +110,7 @@ diff_stat = git_operations({"command": "diff", "stat": true, "worktree_path": wo
 Priority: `commit_type` arg → workflow_type → issue labels → diff analysis → default (feat)
 
 ## Step 4: Generate Message
-Read `docs/Agent/commit_conventions.md` for format.
+Read `adw-docs/commit_conventions.md` for format.
 
 **Format:**
 ```
@@ -255,4 +255,4 @@ Retries: 1 (pre-commit hook modified files)
 
 **Permissions:** ✅ Commit/status/diff via git_operations | ❌ Push operations (including force push)
 
-**References:** `docs/Agent/commit_conventions.md`
+**References:** `adw-docs/commit_conventions.md`

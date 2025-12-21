@@ -75,7 +75,7 @@ task({
 - @docs/Theory/index.md - Theory docs index
 - @docs/Theory/isolated-execution.md - Example theory doc
 - @docs/Theory/state-driven-architecture.md - Example theory doc
-- @docs/Agent/documentation_guide.md - Documentation standards
+- @adw-docs/documentation_guide.md - Documentation standards
 
 # Write Permissions
 

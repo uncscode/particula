@@ -87,9 +87,9 @@ ALL file operations MUST use the `worktree_path` from workflow state. This agent
 
 # Required Reading
 
-- @docs/Agent/code_style.md - Coding conventions
-- @docs/Agent/testing_guide.md - Testing framework and patterns
-- @docs/Agent/linting_guide.md - Code quality standards
+- @adw-docs/code_style.md - Coding conventions
+- @adw-docs/testing_guide.md - Testing framework and patterns
+- @adw-docs/linting_guide.md - Code quality standards
 
 # Execution Flow
 
@@ -728,4 +728,4 @@ Small issues that don't affect functionality.
 - Fixes are committed via adw-commit subagent
 - No changes = no commit (just report success)
 
-**References:** `adw_spec` for workflow state, `docs/Agent/testing_guide.md`, `docs/Agent/linting_guide.md`
+**References:** `adw_spec` for workflow state, `adw-docs/testing_guide.md`, `adw-docs/linting_guide.md`
