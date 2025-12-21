@@ -148,11 +148,11 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         empty_bins_count = len(empty_bins)
         added_bins_count = len(added_concentration)
         if empty_bins_count >= added_bins_count:
-            distribution[empty_bins] = added_distribution
-            concentration[empty_bins] = added_concentration
+            distribution[empty_bins[:added_bins_count]] = added_distribution
+            concentration[empty_bins[:added_bins_count]] = added_concentration
             if charge is not None:
                 assert charge_added is not None
-                charge[empty_bins] = charge_added
+                charge[empty_bins[:added_bins_count]] = charge_added
             return distribution, concentration, charge
         if empty_bins_count > 0:
             distribution[empty_bins] = added_distribution[:empty_bins_count]
