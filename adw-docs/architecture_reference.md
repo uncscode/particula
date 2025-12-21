@@ -1,77 +1,199 @@
-<!--
-Summary: Architecture reference landing page that points readers to architecture docs, ADRs, and reviews.
-Usage:
-- Copy into {{DOCS_DIR}}/architecture_reference.md when scaffolding documentation.
-- Update the guidance or links if the architecture docs move.
-- Keep sections concise (≈100 lines) and focused on navigation.
-Placeholders:
-- {{PROJECT_NAME}}
-- {{VERSION}}
-- {{LAST_UPDATED}}
-- {{DOCS_DIR}}
--->
-
 # Architecture Reference
 
-**Project:** {{PROJECT_NAME}}
-**Version:** {{VERSION}}
-**Last Updated:** {{LAST_UPDATED}}
+**Version:** 0.2.6
+**Last Updated:** 2025-12-02
 
-This document is the first stop for anyone looking for architecture resources in {{PROJECT_NAME}}.
-It connects contributors with guidance on how to explore the system, make decisions, and keep architectural records healthy.
+## Overview
 
-## Architecture at a Glance
+This guide serves as the entry point to the **particula** architecture documentation. It provides references to detailed architectural resources and guidance on when to consult each.
 
-{{DOCS_DIR}}/
-├── architecture/
-│   ├── architecture_guide.md         # Detailed principles and patterns
-│   ├── architecture_outline.md       # High-level system overview
-│   └── decisions/                   # ADRs and governance
-├── dev-plans/README.md               # Feature/maintenance plan guidance
-├── review_guide.md                  # Code review criteria
-└── code_style.md                    # Coding conventions
+## Architecture Documentation Structure
 
-## Navigation
+The architecture documentation is organized as follows:
+
+```
+docs/Agent/architecture/
+├── architecture_guide.md           # Detailed architectural documentation
+├── architecture_outline.md         # High-level system overview
+└── decisions/                      # Architecture Decision Records (ADRs)
+    ├── README.md                   # ADR index and guidelines
+    ├── template.md                 # Template for new ADRs
+    └── template.md                 # Template for creating new ADRs
+```
+
+## Dynamics wall loss strategies
+
+- Implementations live in
+  `particula/dynamics/wall_loss/wall_loss_strategies.py`.
+- Builders live in `particula/dynamics/wall_loss/wall_loss_builders.py` and
+  use mixins in `particula/builder_mixin.py` for geometry/distribution
+  validation and unit conversion.
+- `WallLossFactory` resides in
+  `particula/dynamics/wall_loss/wall_loss_factories.py` and is exported
+  alongside strategies via `particula.dynamics.wall_loss` and
+  `particula.dynamics`.
+- Available strategies: `SphericalWallLossStrategy` (radius) and
+  `RectangularWallLossStrategy` (validated `(x, y, z)` dimensions in meters)
+  with builder and factory support.
+- Tests are mirrored in `particula/dynamics/wall_loss/tests/` and
+  `particula/dynamics/tests/` to cover strategies, builders, and factory
+  export paths.
+
+## Quick Navigation
 
 ### For New Contributors
-1. **[Architecture Outline](architecture/architecture_outline.md)** – Understand the major components and how the repo is organized.
-2. **[Architecture Guide](architecture/architecture_guide.md)** – Read the patterns and principles that keep {{PROJECT_NAME}} consistent.
-3. **[Architecture Decisions](architecture/decisions/README.md)** – See why past choices were made and what trade-offs were accepted.
-4. **[Review Guide](review_guide.md)** – Learn the expectations for authoring and reviewing architectural work.
 
-### For Feature Implementers
-1. **[Architecture Guide](architecture/architecture_guide.md)** – Check that your approach matches established patterns before coding.
-2. **[Architecture Outline](architecture/architecture_outline.md)** – Locate the correct modules for your feature and understand dependencies.
-3. **[Code Style](code_style.md)** – Follow the style rules that keep {{PROJECT_NAME}} readable and consistent.
-4. **[Dev Plans](dev-plans/README.md)** – Confirm the feature belongs to an existing epic or maintenance plan and matches its scope.
+Start here to understand the system:
+
+1. **[Architecture Outline](architecture/architecture_outline.md)**: Quick overview of components and structure
+2. **[Architecture Guide](architecture/architecture_guide.md)**: Detailed patterns and principles
+3. **[Decision Records](architecture/decisions/)**: Historical context for key decisions
+
+### For Implementing Features
+
+When implementing new features, consult:
+
+1. **[Architecture Guide](architecture/architecture_guide.md)**: Ensure your design follows established patterns
+2. **[Architecture Outline](architecture/architecture_outline.md)**: Understand module boundaries
+3. **[Code Style Guide](code_style.md)**: Follow coding conventions
 
 ### For Making Architectural Decisions
-1. **[Architecture Guide](architecture/architecture_guide.md)** – Align with the documented principles.
-2. **[Architecture Decisions](architecture/decisions/README.md)** – Record the motivation, context, and alternatives for your decision.
-3. **[Review Guide](review_guide.md)** – Use the architecture review checklist to ensure the decision is well-scrutinized.
-4. **Architecture ADR template** – Author the record from [architecture/decisions/template.md](architecture/decisions/template.md) so formatting and metadata stay consistent.
+
+When making significant architectural decisions:
+
+1. Review **[Architecture Guide](architecture/architecture_guide.md)** for alignment with principles
+2. Review **[Decision Records](architecture/decisions/)** for related past decisions
+3. Create a new **[ADR](architecture/decisions/template.md)** to document your decision
+4. Request architectural review using `/architecture_review`
 
 ### For Code Reviews
-1. **[Review Guide](review_guide.md)** – Apply the architecture-specific review criteria.
-2. **[Architecture Guide](architecture/architecture_guide.md)** – Verify the change adheres to documented patterns.
-3. **[Code Style](code_style.md)** – Look for style regressions and formatting issues.
-4. **[Architecture Decisions](architecture/decisions/README.md)** – Understand existing ADRs so you can assess the impact of the new change.
 
-## When to Create ADRs
+When reviewing code for architectural concerns:
 
-Create an Architecture Decision Record whenever you are making a substantial change to how {{PROJECT_NAME}} is structured or behaves.
-Begin with the consistent metadata in [architecture/decisions/template.md](architecture/decisions/template.md) so the context, options, and outcome stay traceable.
-The decision should reference the architecture guide, outline, and any relevant review notes.
-If the change will be reviewed formally, reference the architecture review checklist from [architecture/decisions/README.md](architecture/decisions/README.md), mention the ADR in that discussion, and request an architecture review via the `/architecture_review` command so reviewers know to evaluate the proposal.
+1. Check alignment with **[Architectural Principles](architecture/architecture_guide.md#architectural-principles)**
+2. Verify adherence to **[Design Patterns](architecture/architecture_guide.md#design-patterns)**
+3. Ensure avoidance of **[Anti-Patterns](architecture/architecture_guide.md#anti-patterns)**
+4. Reference **[Review Guide](review_guide.md)** for review criteria
+
+## Primary Documentation
+
+### [Architecture Guide](architecture/architecture_guide.md)
+
+The comprehensive architectural documentation covering:
+
+- **Architectural Principles**: Core design principles guiding the system
+- **System Architecture**: High-level structure and component organization
+- **Design Patterns**: Standard patterns used throughout the codebase
+- **Anti-Patterns**: Approaches to avoid
+- **Data Flow**: How data moves through the system
+- **Error Handling**: Exception hierarchy and error strategies
+- **Testing Architecture**: Test organization and strategies
+- **Performance & Security**: Key considerations
+
+**When to Read:**
+- Designing new modules or major features
+- Understanding system-wide patterns
+- Making architectural decisions
+- Conducting architecture reviews
+
+### [Architecture Outline](architecture/architecture_outline.md)
+
+A high-level overview providing:
+
+- **System Overview**: What the system does
+- **Core Components**: Main building blocks and their responsibilities
+- **Module Structure**: Directory organization
+- **Technology Stack**: Languages, frameworks, and key dependencies
+- **Quick Reference**: Design principles and common patterns
+- **Extension Points**: Areas designed for customization
+
+**When to Read:**
+- First exploring the codebase
+- Understanding component responsibilities
+- Finding where to add new features
+- Getting oriented quickly
+
+### [Architecture Decision Records (ADRs)](architecture/decisions/)
+
+Historical record of significant architectural decisions:
+
+- **Context**: Why the decision was needed
+- **Decision**: What was chosen
+- **Alternatives**: What else was considered
+- **Consequences**: Trade-offs and outcomes
+
+**When to Read:**
+- Understanding why things work the way they do
+- Reconsidering past decisions in new contexts
+- Learning from past trade-offs
+- Creating similar decisions
+
+**When to Create:**
+- Making significant architectural changes
+- Choosing technologies or frameworks
+- Establishing new patterns
+- Changing system boundaries
+
+See [ADR README](architecture/decisions/README.md) for guidelines on creating ADRs.
+
+## Integration with ADW
+
+ADW commands reference these architecture documents to:
+
+- **Understand Structure**: Know where code belongs
+- **Follow Patterns**: Use established approaches
+- **Respect Boundaries**: Maintain module separation
+- **Make Decisions**: Create ADRs for significant changes
+
+### Relevant ADW Commands
+
+- `/architecture_review`: Review code for architectural consistency
+- `/feature`: Plan features using architectural patterns
+- `/implement`: Implement following architectural guidelines
+- `/review`: Check adherence to architecture
+
+## Related Documentation
+
+- **[Code Style Guide](code_style.md)**: Coding conventions and standards
+- **[Testing Guide](testing_guide.md)**: Test organization and patterns
+- **[Review Guide](review_guide.md)**: Code review criteria including architecture
+- **[Documentation Guide](documentation_guide.md)**: How to document architectural changes
 
 ## Maintaining Architecture Documentation
 
-Keep the architecture guide, outline, and ADR index in sync with the living system:
+### When to Update
 
-- **Update the guide** when you introduce new architectural patterns, frameworks, or major components.
-- **Refresh the outline** when modules are renamed, relocated, or retired so the high-level view stays accurate.
-- **Review ADRs** when decisions are superseded and mark them accordingly.
-- **Validate links** any time files move; run the scaffold link checks to ensure no relative paths break.
-- **Coordinate with dev-plans** when features span multiple epics so implementers know where to look for architecture context.
+Update architecture documentation when:
 
-Treat this file as both a directory and a reminder: architecture documentation thrives when it is easy to find references, understand the rationale, and keep everything connected.
+- **Adding Major Features**: Update guide and outline with new patterns
+- **Changing Module Structure**: Update outline with new organization
+- **Making Architectural Decisions**: Create ADR, update guide
+- **Deprecating Components**: Update guide, create deprecation ADR
+- **Introducing New Patterns**: Add to design patterns section
+
+### How to Update
+
+1. **Make Changes**: Update relevant documentation files
+2. **Create ADR**: For significant decisions, create an ADR in `decisions/`
+3. **Update Index**: Add new ADRs to [decisions/README.md](architecture/decisions/README.md)
+4. **Cross-Reference**: Link related documents
+5. **Review**: Get architecture review before finalizing
+
+### Review Process
+
+Architecture documentation changes should be reviewed by:
+- Technical leads
+- Senior engineers familiar with the system
+- Anyone who will be affected by the changes
+
+Use `/architecture_review` to request review.
+
+## Questions?
+
+If you're unsure about:
+- **Where something belongs**: Check [Architecture Outline](architecture/architecture_outline.md)
+- **What pattern to use**: Check [Architecture Guide](architecture/architecture_guide.md)
+- **Why something was done**: Check [Decision Records](architecture/decisions/)
+- **Whether to create an ADR**: Check [ADR Guidelines](architecture/decisions/README.md)
+
+When in doubt, ask for an architecture review or consult with technical leads.
