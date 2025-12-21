@@ -158,6 +158,11 @@ The wall loss API is built around:
 - `particula.dynamics.RectangularWallLossStrategy` – rectangular chamber wall
   loss strategy with `(x, y, z)` dimensions (meters) validated for
   positivity.
+- `particula.dynamics.ChargedWallLossStrategy` – charged/image-charge wall loss
+  for spherical or rectangular chambers; includes optional
+  `wall_electric_field` drift and reduces to the neutral coefficient when
+  particle charge and field are zero while retaining image-charge effects when
+  `wall_potential` is zero.
 - `particula.dynamics.WallLoss` – Runnable entry point that wraps a strategy,
   splits `time_step` across `sub_steps`, clamps concentrations to non-negative
   after each sub-step, and composes with other runnables using `|`.
@@ -165,7 +170,10 @@ The wall loss API is built around:
 Strategies operate on
 `particula.particles.representation.ParticleRepresentation` instances and
 support "discrete", "continuous_pdf", and "particle_resolved"
-distribution types.
+distribution types. The charged strategy adds `wall_potential` plus optional
+`wall_electric_field` (scalar for spherical or length-3 tuple for rectangular)
+and falls back to the neutral coefficient when particle charge and field are
+zero.
 
 ```python
 import numpy as np
@@ -221,27 +229,51 @@ combined = coagulation | wall_loss
 aerosol = combined.execute(aerosol, time_step=10.0)
 ```
 
+To enable charged/electrostatic wall loss, pass geometry, `wall_potential`, and
+optional `wall_electric_field` (set to 0 to disable drift). When particle
+charge is zero the charged strategy matches the neutral coefficient while still
+supporting image-charge effects when `wall_potential` is zero.
+
+```python
+charged_loss = par.dynamics.ChargedWallLossStrategy(
+    wall_eddy_diffusivity=0.001,
+    chamber_geometry="spherical",
+    chamber_radius=0.5,
+    wall_potential=0.05,  # V
+    wall_electric_field=0.0,  # V/m (use a tuple for rectangular geometry)
+    distribution_type="discrete",
+)
+```
+
 You can configure wall loss strategies through builders with unit conversion
-and validation for geometry and diffusivity. Distribution type defaults to
+and validation for geometry, diffusivity, and (for charged wall loss)
+`wall_potential` and `wall_electric_field`. Distribution type defaults to
 "discrete" and may be set to "continuous_pdf" or "particle_resolved".
 
 ```python
 import particula as par
 
 builder = (
-    par.dynamics.SphericalWallLossBuilder()
+    par.dynamics.ChargedWallLossBuilder()
     .set_wall_eddy_diffusivity(0.001, "m^2/s")
-    .set_chamber_radius(0.5, "m")
+    .set_chamber_geometry("rectangular")
+    .set_chamber_dimensions((1.0, 0.5, 0.3), "m")
+    .set_wall_potential(0.05, "V")
+    .set_wall_electric_field((50.0, 0.0, 0.0), "V/m")
+    .set_distribution_type("particle_resolved")
 )
-spherical_loss = builder.build()
+charged_loss = builder.build()
 
 factory = par.dynamics.WallLossFactory()
-rectangular_loss = factory.get_strategy(
-    strategy_type="rectangular",
+charged_from_factory = factory.get_strategy(
+    strategy_type="charged",
     parameters={
+        "chamber_geometry": "spherical",
+        "chamber_radius": 0.5,
         "wall_eddy_diffusivity": 0.001,
-        "chamber_dimensions": (1.0, 0.5, 0.3),
-        "distribution_type": "particle_resolved",
+        "wall_potential": 0.0,
+        "wall_electric_field": 0.0,
+        "distribution_type": "continuous_pdf",
     },
 )
 ```

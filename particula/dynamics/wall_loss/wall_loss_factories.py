@@ -1,7 +1,7 @@
 """Wall loss strategy factory.
 
-Provides a factory for creating wall loss strategies by name using registered
-builders.
+Provides a factory for creating neutral or charged wall loss strategies by
+name using registered builders.
 """
 
 from typing import Any, Dict, Optional, Union
@@ -29,6 +29,9 @@ class WallLossFactory(StrategyFactoryABC):
     Supported strategy types:
         - "spherical": ``SphericalWallLossStrategy`` for spherical chambers.
         - "rectangular": ``RectangularWallLossStrategy`` for box chambers.
+        - "charged": ``ChargedWallLossStrategy`` with image-charge
+          enhancement and optional electric-field drift; requires geometry
+          and matching size parameters.
     """
 
     def get_builders(self) -> Dict[str, BuilderType]:
@@ -49,9 +52,12 @@ class WallLossFactory(StrategyFactoryABC):
         """Create a wall loss strategy using its corresponding builder.
 
         Args:
-            strategy_type: Strategy name ("spherical" or "rectangular").
-            parameters: Optional parameter mapping for the builder. Keys may
-                include values with unit suffixes and ``distribution_type``.
+            strategy_type: Strategy name ("spherical", "rectangular", or
+                "charged").
+            parameters: Optional parameter mapping for the builder. Include
+                geometry keys (``chamber_radius`` or ``chamber_dimensions``)
+                plus optional ``wall_potential`` and ``wall_electric_field``
+                entries, and ``distribution_type`` when needed.
 
         Returns:
             Built wall loss strategy instance.

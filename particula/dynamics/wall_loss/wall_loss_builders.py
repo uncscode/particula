@@ -132,7 +132,13 @@ class ChargedWallLossBuilder(
     BuilderWallPotentialMixin,
     BuilderWallElectricFieldMixin,
 ):
-    """Builder for charged wall loss strategies."""
+    """Builder for charged wall loss strategies.
+
+    Configures image-charge-enhanced wall loss with optional
+    electric-field drift for spherical or rectangular chambers.
+    Requires geometry plus the matching size parameter. Zero wall potential
+    still allows charge-driven enhancement.
+    """
 
     def __init__(self):
         """Initialize the charged wall loss builder."""
@@ -149,7 +155,17 @@ class ChargedWallLossBuilder(
         self.chamber_geometry: Optional[str] = None
 
     def set_chamber_geometry(self, chamber_geometry: str):
-        """Set chamber geometry ('spherical' or 'rectangular')."""
+        """Set chamber geometry.
+
+        Args:
+            chamber_geometry: ``"spherical"`` or ``"rectangular"``.
+
+        Returns:
+            ChargedWallLossBuilder: Self for method chaining.
+
+        Raises:
+            ValueError: If ``chamber_geometry`` is not supported.
+        """
         normalized = chamber_geometry.lower()
         if normalized not in {"spherical", "rectangular"}:
             raise ValueError(
@@ -159,7 +175,21 @@ class ChargedWallLossBuilder(
         return self
 
     def set_parameters(self, parameters: dict):
-        """Set required and optional parameters from mapping."""
+        """Set required and optional parameters from mapping.
+
+        Args:
+            parameters: Mapping containing required ``wall_eddy_diffusivity``
+                and ``chamber_geometry`` plus optional geometry size,
+                ``wall_potential``, and ``wall_electric_field`` entries with
+                optional ``*_units`` keys.
+
+        Returns:
+            ChargedWallLossBuilder: Self for method chaining.
+
+        Raises:
+            ValueError: If required keys are missing or unexpected keys are
+                provided.
+        """
         required = {"wall_eddy_diffusivity", "chamber_geometry"}
         optional = {
             "chamber_radius",
@@ -208,7 +238,16 @@ class ChargedWallLossBuilder(
         return self
 
     def build(self) -> ChargedWallLossStrategy:
-        """Build and return a charged wall loss strategy."""
+        """Build and return a charged wall loss strategy.
+
+        Returns:
+            ChargedWallLossStrategy: Charged strategy with geometry-specific
+                sizing and electrostatic settings.
+
+        Raises:
+            ValueError: If geometry is unset, matching size parameters are
+                missing, or required values are not provided.
+        """
         self.pre_build_check()
         if self.wall_eddy_diffusivity is None:
             raise ValueError("wall_eddy_diffusivity must be set before build")

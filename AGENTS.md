@@ -129,16 +129,16 @@ particula/
 
 ## Documentation
 
-**Location:** `docs/Agent/`
+**Location:** `adw-docs/`
 
 **Key guides:**
-- `testing_guide.md` - Test framework and conventions
-- `linting_guide.md` - Linting tools and configuration
-- `code_style.md` - Naming, formatting, type hints
-- `docstring_guide.md` - Google-style docstring format
-- `commit_conventions.md` - Commit message format
-- `pr_conventions.md` - Pull request conventions
-- `architecture_reference.md` - Module structure
+- `adw-docs/testing_guide.md` - Test framework and conventions
+- `adw-docs/linting_guide.md` - Linting tools and configuration
+- `adw-docs/code_style.md` - Naming, formatting, type hints
+- `adw-docs/docstring_guide.md` - Google-style docstring format
+- `adw-docs/commit_conventions.md` - Commit message format
+- `adw-docs/pr_conventions.md` - Pull request conventions
+- `adw-docs/architecture/architecture_reference.md` - Module structure
 
 ## Common Patterns
 
@@ -198,9 +198,12 @@ def function(arg1: float, arg2: str) -> bool:
 ```python
 import particula as par
 
-strategy = par.dynamics.SphericalWallLossStrategy(
+strategy = par.dynamics.ChargedWallLossStrategy(
     wall_eddy_diffusivity=0.001,
+    chamber_geometry="spherical",
     chamber_radius=0.5,
+    wall_potential=0.05,  # V; image-charge still applies when set to 0
+    wall_electric_field=0.0,  # V/m (tuple for rectangular geometry)
     distribution_type="discrete",
 )
 
@@ -218,8 +221,13 @@ aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
 - `WallLoss` runnable wraps a strategy, splits `time_step` across `sub_steps`,
   clamps concentrations to non-negative, and composes with other runnables
   via `|`.
-- `SphericalWallLossStrategy` provides a spherical chamber implementation
-  using existing wall loss coefficient utilities.
+- `ChargedWallLossStrategy` adds image-charge enhancement (active even when
+  `wall_potential` is 0), optional `wall_electric_field` drift, and falls back
+  to the neutral coefficient when particle charge and field are zero.
+- Use `ChargedWallLossBuilder` with `set_chamber_geometry` plus
+  `set_chamber_radius` or `set_chamber_dimensions`, and
+  `set_wall_potential`/`set_wall_electric_field`; `WallLossFactory` supports
+  `strategy_type="charged"`.
 - Supported `distribution_type` values are `"discrete"`, `"continuous_pdf"`,
   and `"particle_resolved"`.
 
@@ -294,7 +302,7 @@ pytest --cov=particula
 ## Getting Help
 
 **Documentation:**
-- Full guides: `docs/Agent/`
+- Full guides: `adw-docs/`
 - Examples: `docs/Examples/`
 - Theory: `docs/Theory/`
 
@@ -308,5 +316,5 @@ adw workflow list         # List available workflows
 ---
 
 **Last Updated:** 2025-12-03  
-**For questions about ADW:** See `docs/Agent/README.md`  
+**For questions about ADW:** See `adw-docs/README.md`  
 **For questions about particula:** See main `readme.md`

@@ -21,6 +21,10 @@ and rollout.
   In Progress (P2, #817)
   - Scope: Rectangular chamber wall loss strategy with mirrored tests and
     exports.
+- [Charged/Electrostatic Wall Loss Strategy][plan-charged-wall-loss] — Status:
+  In Progress (P1, #821)
+  - Scope: Charged wall loss with image-charge, optional E-field drift,
+    builder/factory integration, neutral reduction path, docs/examples.
 - [WallLoss Runnable Process][plan-wall-loss-runnable] — Status:
   Completed (P1, #819)
   - Scope: Runnable wrapping wall loss strategies with sub-step splitting,
@@ -32,5 +36,6 @@ and rollout.
 
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md
 [plan-rect]: features/rectangular-wall-loss-strategy.md
+[plan-charged-wall-loss]: features/charged-wall-loss-strategy.md
 [plan-wall-loss-runnable]: features/wall-loss-runnable.md
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md

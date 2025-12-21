@@ -541,8 +541,8 @@ class ChargedWallLossStrategy(WallLossStrategy):
             chamber_dimensions: Dimensions (length, width, height) for
                 rectangular chambers [m].
             wall_potential: Wall potential [V]; zero keeps image-charge term.
-            wall_electric_field: Electric field magnitude [V/m] or 3-vector for
-                rectangular chambers. Zero disables drift term.
+            wall_electric_field: Electric field magnitude [V/m] (scalar) or
+                3-vector for rectangular chambers. Zero disables drift term.
             distribution_type: Distribution type.
 
         Raises:
@@ -600,6 +600,17 @@ class ChargedWallLossStrategy(WallLossStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
+        """Return neutral wall loss coefficient for configured geometry.
+
+        Args:
+            particle_radius: Particle radii in meters.
+            particle_density: Particle densities in kg/m³.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+
+        Returns:
+            Neutral wall loss coefficient in 1/s for each particle size.
+        """
         if self.chamber_geometry == "spherical":
             return np.asarray(
                 get_spherical_wall_loss_coefficient_via_system_state(
@@ -630,6 +641,20 @@ class ChargedWallLossStrategy(WallLossStrategy):
         particle_charge: NDArray[np.float64],
         temperature: float,
     ) -> NDArray[np.float64]:
+        """Compute electrostatic enhancement factor.
+
+        Applies image-charge-derived enhancement based on particle charge.
+        Returns ones when charge is zero so the strategy reduces to neutral
+        even if ``wall_potential`` is zero.
+
+        Args:
+            particle_radius: Particle radii in meters.
+            particle_charge: Particle charge in elementary charges.
+            temperature: Gas temperature in kelvin.
+
+        Returns:
+            Multiplicative electrostatic factor for the wall loss coefficient.
+        """
         if not np.any(particle_charge):
             return np.ones_like(particle_radius, dtype=np.float64)
         phi_raw = np.asarray(
@@ -646,6 +671,15 @@ class ChargedWallLossStrategy(WallLossStrategy):
         return np.where(particle_charge == 0, 1.0, factor)
 
     def _resolve_electric_field(self) -> float:
+        """Return resolved electric field magnitude in V/m.
+
+        Combines the configured wall electric field (scalar or vector) with a
+        geometry-scaled potential-derived field; returns zero when both are
+        zero.
+
+        Returns:
+            Total electric field magnitude in volts per meter.
+        """
         if isinstance(self.wall_electric_field, (tuple, list, np.ndarray)):
             magnitude = float(np.linalg.norm(self.wall_electric_field))
         else:
@@ -662,6 +696,20 @@ class ChargedWallLossStrategy(WallLossStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
+        """Compute electric-field drift contribution.
+
+        Returns zero when charge is zero or when the resolved electric field
+        is zero.
+
+        Args:
+            particle_radius: Particle radii in meters.
+            particle_charge: Particle charge in elementary charges.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+
+        Returns:
+            Additive drift term in 1/s for the wall loss coefficient.
+        """
         del pressure  # pressure currently unused for drift approximation
         if not np.any(particle_charge):
             return np.zeros_like(particle_radius, dtype=np.float64)
@@ -685,6 +733,17 @@ class ChargedWallLossStrategy(WallLossStrategy):
         electrostatic_factor: NDArray[np.float64],
         drift_term: NDArray[np.float64],
     ) -> NDArray[np.float64]:
+        """Combine neutral, electrostatic, and drift contributions.
+
+        Args:
+            neutral: Neutral wall loss coefficient in 1/s.
+            electrostatic_factor: Multiplicative factor from image charge.
+            drift_term: Additive drift term in 1/s.
+
+        Returns:
+            Combined wall loss coefficient clipped to non-negative finite
+            values.
+        """
         combined = neutral * electrostatic_factor + drift_term
         return np.clip(
             np.nan_to_num(combined, nan=0.0),
@@ -698,6 +757,22 @@ class ChargedWallLossStrategy(WallLossStrategy):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
+        """Compute charged wall loss coefficient from particle properties.
+
+        Applies image-charge enhancement even when ``wall_potential`` is zero
+        and adds drift when ``wall_electric_field`` is non-zero.
+        Reduces to the neutral coefficient when charge and field are zero and
+        supports particle-resolved active subsets.
+
+        Args:
+            particle: Particle representation providing radius, density, and
+                charge.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+
+        Returns:
+            Wall loss coefficient in 1/s as a scalar or array.
+        """
         radius = np.asarray(particle.get_radius())
         density = np.asarray(particle.get_effective_density())
         charge = particle.get_charge()
@@ -766,6 +841,21 @@ class ChargedWallLossStrategy(WallLossStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
+        """Compute charged wall loss coefficient for provided particle arrays.
+
+        Uses cached particle charges when available. Applies image-charge
+        enhancement even at zero wall potential and adds drift only when the
+        resolved electric field is non-zero.
+
+        Args:
+            particle_radius: Particle radii in meters.
+            particle_density: Particle densities in kg/m³.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+
+        Returns:
+            Wall loss coefficient in 1/s for each particle.
+        """
         charge_cache = getattr(self, "_particle_charge_cache", None)
         charge_array = (
             charge_cache
@@ -803,6 +893,21 @@ class ChargedWallLossStrategy(WallLossStrategy):
         pressure: float,
         time_step: float,
     ) -> ParticleRepresentation:
+        """Advance particle-resolved concentration with charged wall loss.
+
+        Computes survival probabilities using neutral, image-charge, and
+        optional drift contributions. Clamps probabilities to [0, 1] and
+        updates particle concentrations and distributions.
+
+        Args:
+            particle: Particle representation to update.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+            time_step: Time step in seconds.
+
+        Returns:
+            Updated particle representation.
+        """
         if self.distribution_type != "particle_resolved":
             return super().step(
                 particle=particle,
