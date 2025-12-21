@@ -17,8 +17,11 @@ from particula.dynamics.dilution import (
 )
 
 from particula.dynamics.wall_loss import (
+    get_charged_wall_loss_rate,
     get_rectangle_wall_loss_rate,
     get_spherical_wall_loss_rate,
+    ChargedWallLossBuilder,
+    ChargedWallLossStrategy,
     RectangularWallLossBuilder,
     RectangularWallLossStrategy,
     SphericalWallLossBuilder,

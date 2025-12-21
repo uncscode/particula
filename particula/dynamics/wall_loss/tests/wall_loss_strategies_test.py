@@ -10,8 +10,12 @@ from typing import Tuple, cast
 
 import numpy as np
 
-from particula.dynamics.wall_loss import get_rectangle_wall_loss_rate
+from particula.dynamics.wall_loss import (
+    get_charged_wall_loss_rate,
+    get_rectangle_wall_loss_rate,
+)
 from particula.dynamics.wall_loss.wall_loss_strategies import (
+    ChargedWallLossStrategy,
     RectangularWallLossStrategy,
     SphericalWallLossStrategy,
     WallLossStrategy,
@@ -415,6 +419,228 @@ class TestRectangularWallLossStrategy(unittest.TestCase):
         )
         self.assertTrue(np.all(np.isfinite(coefficients)))
         self.assertTrue(np.all(coefficients >= 0.0))
+
+
+class TestChargedWallLossStrategy(unittest.TestCase):
+    """Charged wall loss strategy behavioral checks."""
+
+    def setUp(self):
+        self.temperature = 298.15
+        self.pressure = 101325.0
+        self.particle = PresetParticleRadiusBuilder().build()
+        self.particle_charged = PresetParticleRadiusBuilder().build()
+        charges = np.full_like(self.particle_charged.get_radius(), 1.0)
+        self.particle_charged.charge = charges
+        self.neutral_strategy = SphericalWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_radius=0.5,
+            distribution_type="discrete",
+        )
+        self.charged_strategy = ChargedWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_geometry="spherical",
+            chamber_radius=0.5,
+            distribution_type="discrete",
+        )
+
+    def test_charged_differs_from_neutral_for_nonzero_charge(self):
+        """Non-zero charge should modify coefficients relative to neutral."""
+        neutral_coeff = self.neutral_strategy.loss_coefficient(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        charged_coeff = self.charged_strategy.loss_coefficient(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertFalse(np.allclose(neutral_coeff, charged_coeff))
+
+    def test_reduces_to_neutral_when_charge_zero(self):
+        """Zero charge reduces to neutral even with field present."""
+        zero_charge_particle = PresetParticleRadiusBuilder().build()
+        zero_charge_particle.charge = np.zeros_like(
+            zero_charge_particle.get_radius()
+        )
+        charged_strategy = ChargedWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_geometry="spherical",
+            chamber_radius=0.5,
+            wall_electric_field=50.0,
+            distribution_type="discrete",
+        )
+        neutral_coeff = self.neutral_strategy.loss_coefficient(
+            particle=zero_charge_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        charged_coeff = charged_strategy.loss_coefficient(
+            particle=zero_charge_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        np.testing.assert_allclose(neutral_coeff, charged_coeff, rtol=1e-12)
+
+    def test_zero_potential_image_charge_effect(self):
+        """Charge with zero potential still changes coefficient via image term."""
+        charged_coeff = self.charged_strategy.loss_coefficient(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        neutral_coeff = self.neutral_strategy.loss_coefficient(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.any(np.abs(charged_coeff - neutral_coeff) > 0))
+
+    def test_rate_helper_matches_strategy(self):
+        """Rate helper should match charged strategy rate."""
+        concentration = self.particle_charged.get_concentration()
+        charged_rate = get_charged_wall_loss_rate(
+            wall_eddy_diffusivity=1e-3,
+            particle_radius=self.particle_charged.get_radius(),
+            particle_density=self.particle_charged.get_effective_density(),
+            particle_concentration=concentration,
+            particle_charge=self.particle_charged.get_charge(),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            chamber_geometry="spherical",
+            chamber_radius=0.5,
+        )
+        strategy_rate = self.charged_strategy.rate(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        np.testing.assert_allclose(charged_rate, strategy_rate)
+
+    def test_electric_field_drift_respects_charge_sign(self):
+        """Electric field drift increases coefficient for like-sign charges."""
+        positive_particle = PresetParticleRadiusBuilder().build()
+        positive_particle.charge = np.full_like(
+            positive_particle.get_radius(), 2.0
+        )
+        negative_particle = PresetParticleRadiusBuilder().build()
+        negative_particle.charge = np.full_like(
+            negative_particle.get_radius(), -2.0
+        )
+        strategy = ChargedWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_geometry="spherical",
+            chamber_radius=0.5,
+            wall_electric_field=100.0,
+            distribution_type="discrete",
+        )
+        positive_coeff = strategy.loss_coefficient(
+            particle=positive_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        negative_coeff = strategy.loss_coefficient(
+            particle=negative_particle,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.all(positive_coeff >= negative_coeff))
+
+    def test_missing_geometry_inputs_raise(self):
+        """Missing geometry dimensions should raise a ValueError."""
+        with self.assertRaises(ValueError):
+            ChargedWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_geometry="spherical",
+            )
+        with self.assertRaises(ValueError):
+            ChargedWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_geometry="rectangular",
+            )
+
+    def test_invalid_geometry_string_raises(self):
+        """Unsupported geometry strings should raise a ValueError."""
+        with self.assertRaises(ValueError):
+            ChargedWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_geometry="cylindrical",
+                chamber_radius=0.5,
+            )
+
+    def test_rectangular_dimensions_validation(self):
+        """Rectangular geometry requires three positive dimensions."""
+        with self.assertRaises(ValueError):
+            ChargedWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_geometry="rectangular",
+                chamber_dimensions=cast(Tuple[float, float, float], (1.0, 0.5)),
+            )
+        with self.assertRaises(ValueError):
+            ChargedWallLossStrategy(
+                wall_eddy_diffusivity=1e-3,
+                chamber_geometry="rectangular",
+                chamber_dimensions=(1.0, 0.5, -0.1),
+            )
+
+    def test_wall_potential_contributes_to_drift_term(self):
+        """Wall potential adds drift contribution even when field is zero."""
+        strategy_no_potential = ChargedWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_geometry="spherical",
+            chamber_radius=0.5,
+            wall_potential=0.0,
+            distribution_type="discrete",
+        )
+        strategy_with_potential = ChargedWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_geometry="spherical",
+            chamber_radius=0.5,
+            wall_potential=10.0,
+            distribution_type="discrete",
+        )
+        coeff_base = strategy_no_potential.loss_coefficient(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        coeff_potential = strategy_with_potential.loss_coefficient(
+            particle=self.particle_charged,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertTrue(np.all(coeff_potential >= coeff_base))
+        self.assertTrue(np.any(coeff_potential > coeff_base))
+
+    def test_particle_resolved_survival_bounds(self):
+        """Particle-resolved survival probabilities stay within bounds."""
+        particle_resolved = (
+            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
+        )
+        particle_resolved.charge = np.full_like(
+            particle_resolved.get_radius(), 1.0
+        )
+        strategy = ChargedWallLossStrategy(
+            wall_eddy_diffusivity=1e-3,
+            chamber_geometry="rectangular",
+            chamber_dimensions=(1.0, 0.5, 0.25),
+            wall_electric_field=(10.0, 0.0, 0.0),
+            distribution_type="particle_resolved",
+        )
+        strategy.random_generator = np.random.default_rng(42)
+        initial_total = particle_resolved.get_total_concentration()
+        updated = strategy.step(
+            particle=particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=10.0,
+        )
+        concentration = updated.get_concentration()
+        self.assertTrue(np.all(concentration >= 0.0))
+        self.assertLessEqual(
+            updated.get_total_concentration(),
+            initial_total,
+        )
 
 
 class TestGetParticleResolvedWallLossStep(unittest.TestCase):

@@ -9,10 +9,12 @@ The wall loss strategy system lets you model particle deposition onto chamber wa
 This feature is built around user-facing APIs exposed via `particula.dynamics`:
 
 - `WallLossStrategy` – abstract base class for wall loss models.
-- `SphericalWallLossStrategy` and `RectangularWallLossStrategy` – chamber
-  implementations using existing wall loss coefficient utilities.
-- `SphericalWallLossBuilder` and `RectangularWallLossBuilder` – validated,
-  unit-aware builders for configuring strategies.
+- `SphericalWallLossStrategy`, `RectangularWallLossStrategy`, and
+  `ChargedWallLossStrategy` – chamber implementations using existing wall loss
+  coefficient utilities plus electrostatic modifiers for charged particles.
+- `SphericalWallLossBuilder`, `RectangularWallLossBuilder`, and
+  `ChargedWallLossBuilder` – validated, unit-aware builders for configuring
+  strategies and electrostatic parameters (wall potential, electric field).
 - `WallLossFactory` – factory for selecting a wall loss geometry by name with
   builder defaults.
 - `WallLoss` runnable – delegates to a wall loss strategy on `Aerosol`, splits
@@ -63,6 +65,23 @@ All wall loss strategies share a common shape:
   rate.
 - Call `step(particle, temperature, pressure, time_step)` to advance the
   system.
+
+#### Charged wall loss support
+
+`ChargedWallLossStrategy` augments neutral wall loss with image-charge and
+optional electric-field drift effects. Configure it via
+`ChargedWallLossBuilder` or directly:
+
+```python
+charged_wall_loss = par.dynamics.ChargedWallLossStrategy(
+    wall_eddy_diffusivity=1e-3,
+    chamber_geometry="spherical",
+    chamber_radius=0.5,
+    wall_potential=1.0,        # volts (optional)
+    wall_electric_field=25.0,  # V/m (optional drift term)
+    distribution_type="discrete",
+)
+```
 
 ### Runnable entry point: `WallLoss`
 

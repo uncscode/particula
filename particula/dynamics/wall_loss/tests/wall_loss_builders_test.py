@@ -3,10 +3,12 @@
 import pytest
 
 from particula.dynamics.wall_loss.wall_loss_builders import (
+    ChargedWallLossBuilder,
     RectangularWallLossBuilder,
     SphericalWallLossBuilder,
 )
 from particula.dynamics.wall_loss.wall_loss_strategies import (
+    ChargedWallLossStrategy,
     RectangularWallLossStrategy,
     SphericalWallLossStrategy,
 )
@@ -144,3 +146,76 @@ def test_rectangular_zero_diffusivity_raises():
     builder = RectangularWallLossBuilder()
     with pytest.raises(ValueError):
         builder.set_wall_eddy_diffusivity(0.0)
+
+
+def test_charged_builder_spherical_success():
+    """Charged builder constructs spherical charged strategy."""
+    strategy = (
+        ChargedWallLossBuilder()
+        .set_wall_eddy_diffusivity(0.001)
+        .set_chamber_geometry("spherical")
+        .set_chamber_radius(0.5)
+        .set_wall_potential(1.0)
+        .build()
+    )
+    assert isinstance(strategy, ChargedWallLossStrategy)
+    assert strategy.chamber_geometry == "spherical"
+
+
+def test_charged_builder_missing_geometry_raises():
+    """Geometry is required before build."""
+    builder = ChargedWallLossBuilder().set_wall_eddy_diffusivity(0.001)
+    with pytest.raises(ValueError):
+        builder.build()
+
+
+def test_charged_builder_rectangular_missing_dimensions_raises():
+    """Rectangular geometry requires chamber dimensions."""
+    builder = (
+        ChargedWallLossBuilder()
+        .set_wall_eddy_diffusivity(0.001)
+        .set_chamber_geometry("rectangular")
+    )
+    with pytest.raises(ValueError):
+        builder.build()
+
+
+def test_charged_builder_invalid_geometry_string():
+    """Invalid geometry strings should raise ValueError."""
+    builder = ChargedWallLossBuilder().set_wall_eddy_diffusivity(0.001)
+    with pytest.raises(ValueError):
+        builder.set_chamber_geometry("cylindrical")
+
+
+def test_charged_builder_wall_electric_field_tuple_length_invalid():
+    """Electric field tuples must have length three for rectangular geometry."""
+    builder = ChargedWallLossBuilder()
+    with pytest.raises(ValueError):
+        builder.set_wall_electric_field((1.0, 2.0))
+
+
+def test_charged_builder_wall_electric_field_nonfinite_raises():
+    """Non-finite electric field values are rejected."""
+    builder = ChargedWallLossBuilder()
+    with pytest.raises(ValueError):
+        builder.set_wall_electric_field(float("nan"))
+
+
+def test_charged_builder_set_parameters_sets_optional_fields():
+    """set_parameters wires optional potential and field into built strategy."""
+    strategy = (
+        ChargedWallLossBuilder()
+        .set_parameters(
+            {
+                "wall_eddy_diffusivity": 0.001,
+                "chamber_geometry": "rectangular",
+                "chamber_dimensions": (1.0, 0.5, 0.5),
+                "wall_potential": 2.0,
+                "wall_electric_field": (10.0, 0.0, 0.0),
+            }
+        )
+        .build()
+    )
+    assert strategy.wall_potential == pytest.approx(2.0)
+    assert strategy.wall_electric_field == (10.0, 0.0, 0.0)
+    assert strategy.chamber_geometry == "rectangular"
