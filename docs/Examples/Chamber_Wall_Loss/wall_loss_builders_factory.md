@@ -134,5 +134,6 @@ rectangular distribution continuous_pdf
 
 ## See also
 
-- Existing wall loss strategy walkthroughs: [Chamber Wall Loss examples](../Chamber_Wall_Loss/index.md)
-- Dynamics overview: [Dynamics examples](index.md)
+- Chamber Wall Loss examples: [Chamber Wall Loss index](index.md)
+- Dynamics overview: [Dynamics examples](../Dynamics/index.md)
+- Interactive notebook: [Wall Loss Builders and Factory (Interactive)](Notebooks/wall_loss_builders_factory.ipynb)

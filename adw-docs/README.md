@@ -1,63 +1,127 @@
-# {{PROJECT_NAME}} developer docs (Python)
+# Agent Documentation for particula
 
-This scaffold provides ready-to-use developer documentation for {{PROJECT_NAME}} built around the Python tooling stack. Keep the placeholders intact until you run the docs apply step; the values will be filled from your docs manifest.
+**Version:** 0.2.6
+**Last Updated:** 2025-12-21
 
-## What lives here
+## Overview
 
-- [Testing Guide](./testing_guide.md) — how to structure, name, and run tests with pytest and coverage
-- [Code Style](./code_style.md) — naming, imports, typing, and formatting rules
-- [Linting Guide](./linting_guide.md) — lint, format, and type-check commands
-- [Docstring Guide](./docstring_guide.md) — {{DOCSTRING_STYLE}} docstrings with examples
-- [Commit Conventions](./commit_conventions.md) — semantic commit rules and examples
-- [PR Conventions](./pr_conventions.md) — PR template, checklist, and reviewer tips
+This directory contains documentation guides for ADW (AI Developer Workflow) agents working on the **particula** repository. These guides define coding standards, testing requirements, linting rules, and development workflows specific to particula.
 
-## Quick start
+## Quick Navigation
 
+### Core Development Guides
+
+| Guide | Purpose | Key Info |
+|-------|---------|----------|
+| **[Testing Guide](testing_guide.md)** | Test framework and requirements | pytest, 500+ tests, *_test.py pattern |
+| **[Linting Guide](linting_guide.md)** | Code quality tools | ruff (check + format), mypy |
+| **[Code Style Guide](code_style.md)** | Naming and formatting conventions | snake_case functions, 80-char lines |
+| **[Docstring Guide](docstring_guide.md)** | Documentation standards | Google-style, type hints required |
+
+### Workflow Guides
+
+| Guide | Purpose | Key Info |
+|-------|---------|----------|
+| **[Commit Conventions](commit_conventions.md)** | Commit message format | Conventional Commits, imperative mood |
+| **[PR Conventions](pr_conventions.md)** | Pull request standards | GitHub, CI checks, ~100 lines |
+| **[Review Guide](review_guide.md)** | Code review criteria | Scientific correctness, test coverage |
+| **[Code Culture](code_culture.md)** | Development philosophy | 100-line rule, "smooth is safe, safe is fast" |
+
+### Reference Guides
+
+| Guide | Purpose | Key Info |
+|-------|---------|----------|
+| **[Architecture Reference](architecture_reference.md)** | Architecture documentation | Module structure, design decisions |
+| **[Conditional Docs](conditional_docs.md)** | Task-driven documentation | When to read each guide |
+
+## Repository Information
+
+### Project Details
+
+- **Package Name**: particula
+- **Version**: 0.2.6
+- **Language**: Python 3.9+
+- **Repository**: https://github.com/uncscode/particula.git
+- **Main Branch**: main
+- **Description**: A simple, fast, and powerful particle simulator
+
+### Development Stack
+
+- **Testing**: pytest (minimum 500 tests, currently 711)
+- **Linting**: ruff check + format, mypy
+- **Documentation**: MkDocs with Material theme
+- **CI/CD**: GitHub Actions (test, lint, docs build)
+- **Package Manager**: pip, uv, or conda
+- **Build System**: flit
+
+### Code Quality Standards
+
+- **Line Length**: 80 characters
+- **Docstring Style**: Google-style (configured in pyproject.toml)
+- **Test Pattern**: `*_test.py`
+- **Type Hints**: Required for all public functions
+- **Test Coverage**: ≥90% for new code
+
+## Quick Reference Commands
+
+### Testing
 ```bash
-# Install dependencies (example)
-uv venv .venv && source .venv/bin/activate
-uv pip install -e ".[dev]"
+# Run all tests
+pytest
 
-# Run tests
-{{TEST_COMMAND}}
+# Run with coverage
+pytest --cov=particula --cov-report=term-missing
 
-# Run coverage
-{{TEST_COMMAND}} --cov={{PACKAGE_NAME}} --cov-report=term-missing
-
-# Lint, format, and type-check
-{{LINT_COMMAND}}
-{{FORMAT_COMMAND}}
-{{TYPE_CHECK_COMMAND}}
+# Using ADW tool
+.opencode/tool/run_pytest.py
 ```
 
-- Minimum Python version: {{PYTHON_VERSION}}
-- Line length target: {{LINE_LENGTH}} characters
-- Coverage target: {{COVERAGE_THRESHOLD}}%
+### Linting
+```bash
+# Run linters (auto-fix, format, check)
+ruff check particula/ --fix
+ruff format particula/
+ruff check particula/
 
-## How to use these stubs
+# Using ADW tool
+.opencode/tool/run_linters.py
 
-1) **Scaffold** the docs for Python:
-   ```bash
-   adw setup docs scaffold --language python
-   ```
-2) **Edit** `.adw-docs-manifest.yaml` (or your manifest) to set placeholder values.
-3) **Apply** the manifest to replace placeholders:
-   ```bash
-   adw setup docs apply
-   ```
-4) **Customize** sections as your project evolves. Keep placeholders for values controlled by the manifest so future apply steps remain idempotent.
+# Type checking
+mypy particula/ --ignore-missing-imports
+```
 
-## Contributing to docs
+### Documentation
+```bash
+# Build documentation
+mkdocs build
 
-- Keep code examples syntactically valid Python that respects the style rules in [Code Style](./code_style.md).
-- Prefer concise, actionable guidance over long essays; link to the other guides instead of duplicating content.
-- When adding new placeholders, also add defaults and descriptions to `adw/templates/keyword_manifest.yaml`.
+# Serve with live reload
+mkdocs serve
 
-## Related guides
+# Access at http://localhost:8000
+```
 
-- [Testing Guide](./testing_guide.md)
-- [Code Style](./code_style.md)
-- [Linting Guide](./linting_guide.md)
-- [Docstring Guide](./docstring_guide.md)
-- [Commit Conventions](./commit_conventions.md)
-- [PR Conventions](./pr_conventions.md)
+## Development Plans
+
+Active development plans are tracked in the [dev-plans/](dev-plans/) directory:
+
+- **Features**: [dev-plans/features/](dev-plans/features/)
+- **Maintenance**: [dev-plans/maintenance/](dev-plans/maintenance/)
+- **Epics**: [dev-plans/epics/](dev-plans/epics/)
+
+See [dev-plans/README.md](dev-plans/README.md) for current plans.
+
+## Architecture Documentation
+
+Architecture decisions and guides are in the [architecture/](architecture/) directory:
+
+- **[Architecture Guide](architecture/architecture_guide.md)**: Patterns and principles
+- **[Architecture Outline](architecture/architecture_outline.md)**: System overview
+- **[Decision Records](architecture/decisions/)**: ADRs documenting key decisions
+
+## See Also
+
+- **[AGENTS.md](../AGENTS.md)** - Quick reference for particula development
+- **[Contributing Guide](../docs/contribute/CONTRIBUTING.md)** - Full contribution workflow
+- **[Project README](../readme.md)** - Main project documentation
+- **[MkDocs Site](https://uncscode.github.io/particula)** - Online documentation

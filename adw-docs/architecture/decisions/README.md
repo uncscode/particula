@@ -1,28 +1,17 @@
-<!--
-Summary: ADR index stub explaining purpose, statuses, and how to author decision records for {{PROJECT_NAME}}.
-Usage:
-- Copy into {{DOCS_DIR}}/architecture/decisions/README.md when scaffolding documentation.
-- Update the index table as ADRs are created and keep statuses in sync with records.
-- Link new ADRs back into the architecture guide or outline when decisions affect those docs.
-Placeholders:
-- {{PROJECT_NAME}}
-- {{DOCS_DIR}}
-- {{DATE}}
--->
-
 # Architecture Decision Records
 
-This directory contains Architecture Decision Records (ADRs) for {{PROJECT_NAME}}.
+This directory contains Architecture Decision Records (ADRs) for particula.
 
 ## What is an ADR?
 
-An ADR documents a significant architectural decision, its context, alternatives, and consequences so the reasoning stays discoverable over time.
+An ADR documents a significant architectural decision, its context, alternatives,
+and consequences so the reasoning stays discoverable over time.
 
 ## ADR Index
 
 | ID | Title | Status | Date |
 | --- | --- | --- | --- |
-| ADR-001 | [Example Decision](ADR-001-example.md) | Proposed | {{DATE}} |
+| ADR-001 | [Strategy-based wall loss subsystem](ADR-001-strategy-based-wall-loss-subsystem.md) | Accepted | 2025-12-02 |
 
 Add a new row for each ADR and keep the table sorted by ID.
 
