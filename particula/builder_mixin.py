@@ -985,7 +985,8 @@ class BuilderWallElectricFieldMixin:
         if isinstance(wall_electric_field, tuple):
             if len(wall_electric_field) != 3:
                 raise ValueError(
-                    "wall_electric_field tuple must be length three for rectangular geometries."
+                    "wall_electric_field tuple must be length three for "
+                    "rectangular geometries."
                 )
             if not np.all(np.isfinite(wall_electric_field)):
                 raise ValueError("wall_electric_field entries must be finite.")
@@ -1042,11 +1043,6 @@ class BuilderWallElectricFieldMixin:
         if wall_electric_field_units in {"V/m", "volt/m", "volts/m"}:
             self.wall_electric_field = validated_field
             return self
-        self.wall_electric_field = get_unit_conversion(
-            wall_electric_field_units, "V/m", validated_field
-        )
-        return self
-
         self.wall_electric_field = get_unit_conversion(
             wall_electric_field_units, "V/m", validated_field
         )

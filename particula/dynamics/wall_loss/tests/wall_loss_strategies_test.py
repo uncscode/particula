@@ -425,6 +425,7 @@ class TestChargedWallLossStrategy(unittest.TestCase):
     """Charged wall loss strategy behavioral checks."""
 
     def setUp(self):
+        """Set up test fixtures for charged wall loss tests."""
         self.temperature = 298.15
         self.pressure = 101325.0
         self.particle = PresetParticleRadiusBuilder().build()
@@ -483,7 +484,7 @@ class TestChargedWallLossStrategy(unittest.TestCase):
         np.testing.assert_allclose(neutral_coeff, charged_coeff, rtol=1e-12)
 
     def test_zero_potential_image_charge_effect(self):
-        """Charge with zero potential still changes coefficient via image term."""
+        """Charge with zero potential changes coefficient via image term."""
         charged_coeff = self.charged_strategy.loss_coefficient(
             particle=self.particle_charged,
             temperature=self.temperature,

@@ -198,23 +198,11 @@ def get_charged_wall_loss_rate(
     radius_array = np.asarray(particle_radius, dtype=float)
     density_array = np.asarray(particle_density, dtype=float)
     charge_array = np.asarray(particle_charge, dtype=float)
-    coefficient = strategy._combine_coefficients(  # pylint: disable=protected-access
-        neutral=strategy._neutral_coefficient(  # pylint: disable=protected-access
-            particle_radius=radius_array,
-            particle_density=density_array,
-            temperature=temperature,
-            pressure=pressure,
-        ),
-        electrostatic_factor=strategy._electrostatic_factor(  # pylint: disable=protected-access
-            particle_radius=radius_array,
-            particle_charge=charge_array,
-            temperature=temperature,
-        ),
-        drift_term=strategy._drift_term(  # pylint: disable=protected-access
-            particle_radius=radius_array,
-            particle_charge=charge_array,
-            temperature=temperature,
-            pressure=pressure,
-        ),
+    coefficient = strategy.compute_coefficient_from_arrays(
+        particle_radius=radius_array,
+        particle_density=density_array,
+        particle_charge=charge_array,
+        temperature=temperature,
+        pressure=pressure,
     )
     return -coefficient * np.asarray(particle_concentration, dtype=float)
