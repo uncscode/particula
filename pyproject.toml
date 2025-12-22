@@ -31,14 +31,22 @@ repository = "https://github.com/uncscode/particula"
 
 [project.optional-dependencies]
 dev = [
-    "pylint", "pytest", "autopep8", "jupyterlab",
+    "pylint", "pytest", "pytest-cov", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
-    "griffe", "openai", "GitPython", "ruff", "mypy"
+    "griffe", "openai", "GitPython", "ruff", "mypy",
 ]
 extra = [
     "matplotlib", "pandas", "pint", "thermo", "tqdm",
+]
+adw = [
+    "adw @ git+https://github.com/Gorkowski/Agent.git ; python_version >= '3.12'",
+]
+all = [
+    "particula[dev]",
+    "particula[extra]",
+    "particula[adw]",
 ]
 
 [build-system]
