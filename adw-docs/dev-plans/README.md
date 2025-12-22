@@ -4,6 +4,14 @@ Feature and maintenance development plans tracked for particula. Each entry
 follows the appropriate template to capture motivation, scope, phases, testing,
 and rollout.
 
+## Epics
+
+- [E1: Staggered ODE Stepping for Particle-Resolved Condensation][epic-staggered-condensation]
+  — Status: Not Started (P2)
+  - Scope: Staggered ODE stepping framework for particle-resolved condensation
+    with three modes (half-step, random, batch) for improved stability and
+    mass conservation.
+
 ## Maintenance Plans
 
 - [Add Charge Support to add_concentration][plan-charge-add-concentration] —
@@ -34,6 +42,7 @@ and rollout.
 
 - Parent wall loss epic: [#72](https://github.com/uncscode/particula/issues/72)
 
+[epic-staggered-condensation]: epics/E1-staggered-condensation-stepping.md
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md
 [plan-rect]: features/rectangular-wall-loss-strategy.md
 [plan-charged-wall-loss]: features/charged-wall-loss-strategy.md
