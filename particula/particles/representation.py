@@ -528,7 +528,7 @@ class ParticleRepresentation:
         (
             self.distribution,
             self.concentration,
-            self.charge,
+            updated_charge,
         ) = self.strategy.add_concentration(
             distribution=self.get_distribution(),
             concentration=self.get_concentration(),
@@ -537,6 +537,10 @@ class ParticleRepresentation:
             charge=self.charge,
             added_charge=added_charge,
         )
+        # charge is always returned when passed (self.charge is non-None)
+        if self.charge is not None:
+            assert updated_charge is not None
+            self.charge = updated_charge
         self._enforce_increasing_bins()
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
