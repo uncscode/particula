@@ -82,7 +82,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         concentration = np.where(new_mass_sum > 0, concentration, 0)
         return new_mass, concentration
 
-    def add_concentration(  # pylint: disable=too-many-branches
+    def add_concentration(  # pylint: disable=too-many-branches  # noqa: C901
         self,
         distribution: NDArray[np.float64],
         concentration: NDArray[np.float64],
@@ -150,15 +150,13 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         if empty_bins_count >= added_bins_count:
             distribution[empty_bins[:added_bins_count]] = added_distribution
             concentration[empty_bins[:added_bins_count]] = added_concentration
-            if charge is not None:
-                assert charge_added is not None
+            if charge is not None and charge_added is not None:
                 charge[empty_bins[:added_bins_count]] = charge_added
             return distribution, concentration, charge
         if empty_bins_count > 0:
             distribution[empty_bins] = added_distribution[:empty_bins_count]
             concentration[empty_bins] = added_concentration[:empty_bins_count]
-            if charge is not None:
-                assert charge_added is not None
+            if charge is not None and charge_added is not None:
                 charge[empty_bins] = charge_added[:empty_bins_count]
         distribution = np.concatenate(
             (distribution, added_distribution[empty_bins_count:]), axis=0
@@ -168,11 +166,11 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         )
         if charge is None:
             return distribution, concentration, None
-        assert charge_added is not None
-        charge = np.concatenate(
-            (charge, charge_added[empty_bins_count:]),
-            axis=0,
-        )
+        if charge_added is not None:
+            charge = np.concatenate(
+                (charge, charge_added[empty_bins_count:]),
+                axis=0,
+            )
         return distribution, concentration, charge
 
     def collide_pairs(  # pylint: disable=too-many-positional-arguments
