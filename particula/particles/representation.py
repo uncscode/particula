@@ -539,7 +539,10 @@ class ParticleRepresentation:
         )
         # charge is always returned when passed (self.charge is non-None)
         if self.charge is not None:
-            assert updated_charge is not None
+            if updated_charge is None:
+                raise ValueError(
+                    "updated_charge must not be None when charge is set"
+                )
             self.charge = updated_charge
         self._enforce_increasing_bins()
 

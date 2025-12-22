@@ -1,4 +1,4 @@
-name: lint
+name: Linting
 
 on:
   push:
@@ -8,50 +8,51 @@ on:
   merge_group:
     branches: [ main ]
 
-jobs:
-  linting:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
-         linter: ["ruff", "mypy"]
-         # linter: ["flake8", "pylint", "ruff"]
+        linter: ["ruff", "mypy"]
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python 3.12
-      uses: actions/setup-python@v6.0.0
+      uses: actions/setup-python@v6.1.0
       with:
         python-version: "3.12"
-        cache: 'pip' # caching pip dependencies
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
-        python -m pip install pytest ${{ matrix.linter }}
-        python -m pip install .
+        python -m pip install -e ".[dev]"
+        python -m pip install ${{ matrix.linter }}
 
-    # -
-    #   if: ${{ matrix.linter == 'flake8' }}
-    #   name: Lint with flake8
-    #   run: |
-    #     flake8 . --config .github/.flake8
-
-    # -
-    #   if: ${{ matrix.linter == 'pylint' }}
-    #   name: Lint with pylint
-    #   run: |
-    #     pylint $(find particula/ -name "*.py" | xargs)
-
-    -
+    - name: Lint with ruff
       if: ${{ matrix.linter == 'ruff' }}
-      name: Ruff Check
       run: |
-        ruff check particula
+        ruff check particula/ --fix || true
+        ruff format particula/
+        ruff check particula/
 
-    -
+    - name: Commit ruff fixes
+      if: ${{ matrix.linter == 'ruff' && github.event_name == 'push' }}
+      uses: stefanzweifel/git-auto-commit-action@v7
+      with:
+        commit_message: "style: auto-fix ruff issues"
+        file_pattern: "particula/"
+
+    - name: Type check with mypy
       if: ${{ matrix.linter == 'mypy' }}
-      name: Type check with mypy
       run: |
         mypy particula/ --ignore-missing-imports
