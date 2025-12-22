@@ -196,6 +196,7 @@ class ChargedWallLossBuilder(
             "chamber_dimensions",
             "wall_potential",
             "wall_electric_field",
+            "distribution_type",
         }
         valid = (
             required
@@ -235,6 +236,8 @@ class ChargedWallLossBuilder(
                 parameters["wall_electric_field"],
                 parameters.get("wall_electric_field_units", "V/m"),
             )
+        if "distribution_type" in parameters:
+            self.set_distribution_type(parameters["distribution_type"])
         return self
 
     def build(self) -> ChargedWallLossStrategy:

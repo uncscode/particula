@@ -886,6 +886,52 @@ class ChargedWallLossStrategy(WallLossStrategy):
             drift_term=drift_term,
         )
 
+    def compute_coefficient_from_arrays(
+        self,
+        particle_radius: NDArray[np.float64],
+        particle_density: NDArray[np.float64],
+        particle_charge: NDArray[np.float64],
+        temperature: float,
+        pressure: float,
+    ) -> NDArray[np.float64]:
+        """Compute charged wall loss coefficient from explicit arrays.
+
+        Public method for computing coefficients with explicit charge arrays,
+        useful for rate helpers and direct calculations without cached state.
+
+        Args:
+            particle_radius: Particle radii in meters.
+            particle_density: Particle densities in kg/m³.
+            particle_charge: Particle charge in elementary charges.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+
+        Returns:
+            Wall loss coefficient in 1/s for each particle.
+        """
+        neutral = self._neutral_coefficient(
+            particle_radius=particle_radius,
+            particle_density=particle_density,
+            temperature=temperature,
+            pressure=pressure,
+        )
+        electrostatic_factor = self._electrostatic_factor(
+            particle_radius=particle_radius,
+            particle_charge=particle_charge,
+            temperature=temperature,
+        )
+        drift_term = self._drift_term(
+            particle_radius=particle_radius,
+            particle_charge=particle_charge,
+            temperature=temperature,
+            pressure=pressure,
+        )
+        return self._combine_coefficients(
+            neutral=neutral,
+            electrostatic_factor=electrostatic_factor,
+            drift_term=drift_term,
+        )
+
     def step(
         self,
         particle: ParticleRepresentation,
