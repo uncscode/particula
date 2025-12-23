@@ -389,7 +389,7 @@ class PresetParticleRadiusBuilder(
             SurfaceStrategyVolume(surface_tension=0.072, density=1000)
         )
         self.set_density(1000, "kg/m^3")
-        self.set_charge(np.zeros_like(self.radius_bins.shape))
+        self.set_charge(np.zeros_like(self.radius_bins))
         self.distribution_type = "pmf"
 
     @validate_inputs({"radius_bins": "positive"})
