@@ -3547,6 +3547,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.rate.get_charged_wall_loss_rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;get_charged_wall_loss_rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.dynamics.wall_loss.rate.get_rectangle_wall_loss_rate" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7153,7 +7164,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -11845,6 +11856,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.rate.get_charged_wall_loss_rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;get_charged_wall_loss_rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.dynamics.wall_loss.rate.get_rectangle_wall_loss_rate" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11909,7 +11931,9 @@
 
     <div class="doc doc-contents first">
 
-        <p>Calculates wall loss rate for particles in various geometries.</p>
+        <p>Calculate wall loss rates for particles in various geometries.</p>
+<p>Supports neutral spherical and rectangular rate helpers plus charged wall
+loss with image-charge enhancement and optional electric-field drift.</p>
 
 
 
@@ -11930,6 +11954,312 @@
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="particula.dynamics.wall_loss.rate.get_charged_wall_loss_rate" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">get_charged_wall_loss_rate</span>
+
+
+<a href="#particula.dynamics.wall_loss.rate.get_charged_wall_loss_rate" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_charged_wall_loss_rate</span><span class="p">(</span><span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">particle_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">particle_charge</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculate charged wall loss rate for spherical or rectangular chambers.</p>
+<p>Combines neutral deposition with image-charge enhancement and optional
+electric-field drift. Image-charge effects apply when particles carry
+charge even if <code>wall_potential</code> is zero; drift is applied only when
+<code>wall_electric_field</code> is non-zero. Reduces to the neutral rate when
+both charge and electric field are zero.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>wall_eddy_diffusivity</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Wall eddy diffusivity in s⁻¹.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>particle_radius</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle radius in meters.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>particle_density</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle density in kg/m³.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>particle_concentration</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle concentration in #/m³.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>particle_charge</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle charge in elementary charge units.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Gas temperature in kelvin.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>pressure</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Gas pressure in pascals.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>chamber_geometry</code></b>
+              (<code><span title="str">str</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Geometry name, <code>"spherical"</code> or
+<code>"rectangular"</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>chamber_radius</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, None]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Chamber radius in meters for spherical geometry.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>chamber_dimensions</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="typing.Tuple">Tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>], None]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p><code>(length, width, height)</code> in meters for
+rectangular geometry.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>wall_potential</code></b>
+              (<code><span title="float">float</span></code>, default:
+                  <code>0.0</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Wall potential in volts. Zero still enables
+image-charge effects when charge is non-zero.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>wall_electric_field</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="typing.Tuple">Tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>]]</code>, default:
+                  <code>0.0</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Electric field magnitude in V/m (scalar for
+spherical or tuple for rectangular). Zero disables drift.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+          –
+          <div class="doc-md-description">
+            <p>Charged wall loss rate in #/m³·s as scalar or array matching</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+          –
+          <div class="doc-md-description">
+            <p><code>particle_concentration</code>.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If geometry arguments are inconsistent or not finite.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/wall_loss/rate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_charged_wall_loss_rate</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_charge</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate charged wall loss rate for spherical or rectangular chambers.</span>
+
+<span class="sd">    Combines neutral deposition with image-charge enhancement and optional</span>
+<span class="sd">    electric-field drift. Image-charge effects apply when particles carry</span>
+<span class="sd">    charge even if ``wall_potential`` is zero; drift is applied only when</span>
+<span class="sd">    ``wall_electric_field`` is non-zero. Reduces to the neutral rate when</span>
+<span class="sd">    both charge and electric field are zero.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        wall_eddy_diffusivity: Wall eddy diffusivity in s⁻¹.</span>
+<span class="sd">        particle_radius: Particle radius in meters.</span>
+<span class="sd">        particle_density: Particle density in kg/m³.</span>
+<span class="sd">        particle_concentration: Particle concentration in #/m³.</span>
+<span class="sd">        particle_charge: Particle charge in elementary charge units.</span>
+<span class="sd">        temperature: Gas temperature in kelvin.</span>
+<span class="sd">        pressure: Gas pressure in pascals.</span>
+<span class="sd">        chamber_geometry: Geometry name, ``&quot;spherical&quot;`` or</span>
+<span class="sd">            ``&quot;rectangular&quot;``.</span>
+<span class="sd">        chamber_radius: Chamber radius in meters for spherical geometry.</span>
+<span class="sd">        chamber_dimensions: ``(length, width, height)`` in meters for</span>
+<span class="sd">            rectangular geometry.</span>
+<span class="sd">        wall_potential: Wall potential in volts. Zero still enables</span>
+<span class="sd">            image-charge effects when charge is non-zero.</span>
+<span class="sd">        wall_electric_field: Electric field magnitude in V/m (scalar for</span>
+<span class="sd">            spherical or tuple for rectangular). Zero disables drift.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Charged wall loss rate in #/m³·s as scalar or array matching</span>
+<span class="sd">        ``particle_concentration``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If geometry arguments are inconsistent or not finite.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
+        <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
+        <span class="n">chamber_geometry</span><span class="o">=</span><span class="n">chamber_geometry</span><span class="p">,</span>
+        <span class="n">chamber_radius</span><span class="o">=</span><span class="n">chamber_radius</span><span class="p">,</span>
+        <span class="n">chamber_dimensions</span><span class="o">=</span><span class="n">chamber_dimensions</span><span class="p">,</span>
+        <span class="n">wall_potential</span><span class="o">=</span><span class="n">wall_potential</span><span class="p">,</span>
+        <span class="n">wall_electric_field</span><span class="o">=</span><span class="n">wall_electric_field</span><span class="p">,</span>
+        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">radius_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">density_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_density</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">charge_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">coefficient</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">compute_coefficient_from_arrays</span><span class="p">(</span>
+        <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_array</span><span class="p">,</span>
+        <span class="n">particle_density</span><span class="o">=</span><span class="n">density_array</span><span class="p">,</span>
+        <span class="n">particle_charge</span><span class="o">=</span><span class="n">charge_array</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">coefficient</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -12047,14 +12377,7 @@ coefficient computed via
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/wall_loss/rate.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 83</span>
 <span class="normal"> 84</span>
 <span class="normal"> 85</span>
 <span class="normal"> 86</span>
@@ -12103,7 +12426,14 @@ coefficient computed via
 <span class="normal">129</span>
 <span class="normal">130</span>
 <span class="normal">131</span>
-<span class="normal">132</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_rectangle_wall_loss_rate</span><span class="p">(</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_rectangle_wall_loss_rate</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -12283,14 +12613,7 @@ https://en.wikipedia.org/wiki/Aerosol.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/wall_loss/rate.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
@@ -12340,7 +12663,14 @@ https://en.wikipedia.org/wiki/Aerosol.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span>
-<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_spherical_wall_loss_rate</span><span class="p">(</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_spherical_wall_loss_rate</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>

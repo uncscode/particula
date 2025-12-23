@@ -7375,7 +7375,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -13538,7 +13538,7 @@ representations.</p>
         <span class="n">SurfaceStrategyVolume</span><span class="p">(</span><span class="n">surface_tension</span><span class="o">=</span><span class="mf">0.072</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">=</span> <span class="s2">&quot;pmf&quot;</span>
 </code></pre></div></td></tr></table></div>
                   </details>

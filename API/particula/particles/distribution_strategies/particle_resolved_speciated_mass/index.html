@@ -7203,7 +7203,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -12090,21 +12090,25 @@ approach when each particle's composition must be modeled explicitly.</p>
 
 
 <a href="#particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass.add_concentration" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_concentration</span><span class="p">(</span><span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_concentration</span><span class="p">(</span><span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">added_charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Add new particles to the distribution.</p>
+        <p>Add new particles to the distribution with optional charge.</p>
+<p>Charge handling mirrors the fill-then-append logic used for
+concentration: empty bins are filled first, then remaining particles
+are appended. Charge is only processed when a charge array is provided;
+otherwise charge is passed through as None to preserve compatibility.</p>
 
 
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="tuple">tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+              <code><span title="tuple">tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>
           –
           <div class="doc-md-description">
-            <p>Updated distribution and concentration arrays.</p>
+            <p>Updated distribution, concentration, and charge arrays.</p>
           </div>
         </li>
     </ul>
@@ -12165,17 +12169,64 @@ approach when each particle's composition must be modeled explicitly.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches  # noqa: C901</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">added_distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add new particles to the distribution.</span>
+    <span class="n">charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">added_charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+<span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add new particles to the distribution with optional charge.</span>
+
+<span class="sd">    Charge handling mirrors the fill-then-append logic used for</span>
+<span class="sd">    concentration: empty bins are filled first, then remaining particles</span>
+<span class="sd">    are appended. Charge is only processed when a charge array is provided;</span>
+<span class="sd">    otherwise charge is passed through as None to preserve compatibility.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Updated distribution and concentration arrays.</span>
+<span class="sd">        Updated distribution, concentration, and charge arrays.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rescaled</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">added_concentration</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
@@ -12202,23 +12253,48 @@ approach when each particle's composition must be modeled explicitly.</p>
         <span class="n">where</span><span class="o">=</span><span class="n">concentration</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="c1"># Handle charge defaults and validation.</span>
+    <span class="n">charge_added</span> <span class="o">=</span> <span class="n">added_charge</span>
+    <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">charge_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Default new particle charges to zero when not provided.</span>
+            <span class="n">charge_added</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">added_concentration</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">charge_added</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">added_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;When adding concentration with charge, added_charge &quot;</span>
+                <span class="s2">&quot;must match added_concentration shape.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
     <span class="n">empty_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">concentration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">empty_bins_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">empty_bins</span><span class="p">)</span>
     <span class="n">added_bins_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">added_concentration</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">empty_bins_count</span> <span class="o">&gt;=</span> <span class="n">added_bins_count</span><span class="p">:</span>
-        <span class="n">distribution</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">]</span> <span class="o">=</span> <span class="n">added_distribution</span>
-        <span class="n">concentration</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">]</span> <span class="o">=</span> <span class="n">added_concentration</span>
-        <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span>
+        <span class="n">distribution</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">[:</span><span class="n">added_bins_count</span><span class="p">]]</span> <span class="o">=</span> <span class="n">added_distribution</span>
+        <span class="n">concentration</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">[:</span><span class="n">added_bins_count</span><span class="p">]]</span> <span class="o">=</span> <span class="n">added_concentration</span>
+        <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">charge_added</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">charge</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">[:</span><span class="n">added_bins_count</span><span class="p">]]</span> <span class="o">=</span> <span class="n">charge_added</span>
+        <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">charge</span>
     <span class="k">if</span> <span class="n">empty_bins_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">distribution</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">]</span> <span class="o">=</span> <span class="n">added_distribution</span><span class="p">[:</span><span class="n">empty_bins_count</span><span class="p">]</span>
         <span class="n">concentration</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">]</span> <span class="o">=</span> <span class="n">added_concentration</span><span class="p">[:</span><span class="n">empty_bins_count</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">charge_added</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">charge</span><span class="p">[</span><span class="n">empty_bins</span><span class="p">]</span> <span class="o">=</span> <span class="n">charge_added</span><span class="p">[:</span><span class="n">empty_bins_count</span><span class="p">]</span>
     <span class="n">distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
         <span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">added_distribution</span><span class="p">[</span><span class="n">empty_bins_count</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
     <span class="p">)</span>
     <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
         <span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">added_concentration</span><span class="p">[</span><span class="n">empty_bins_count</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span>
+    <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">charge_added</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">charge_added</span><span class="p">[</span><span class="n">empty_bins_count</span><span class="p">:]),</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">charge</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -12401,43 +12477,7 @@ summed during collisions. If None, charge handling is skipped.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/distribution_strategies/particle_resolved_speciated_mass.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
 <span class="normal">177</span>
 <span class="normal">178</span>
 <span class="normal">179</span>
@@ -12462,7 +12502,43 @@ summed during collisions. If None, charge handling is skipped.</p>
 <span class="normal">198</span>
 <span class="normal">199</span>
 <span class="normal">200</span>
-<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>

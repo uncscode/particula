@@ -25,7 +25,7 @@
     
     
       
-        <title>Wall Loss Strategies with SphericalWallLossStrategy - Particula</title>
+        <title>Wall Loss Strategies (Neutral and Charged) - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#wall-loss-strategies-with-sphericalwalllossstrategy" class="md-skip">
+        <a href="#wall-loss-strategies-neutral-and-charged" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Wall Loss Strategies with SphericalWallLossStrategy
+              Wall Loss Strategies (Neutral and Charged)
             
           </span>
         </div>
@@ -7069,7 +7069,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -7087,7 +7087,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -7170,6 +7170,17 @@
     <span class="md-ellipsis">
       
         Quick Start: Spherical Wall Loss on a Lognormal Distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#charged-wall-loss-neutral-vs-charged-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charged wall loss: neutral vs charged comparison
       
     </span>
   </a>
@@ -7315,6 +7326,17 @@
     <span class="md-ellipsis">
       
         ValueError: Invalid distribution type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#charged-strategy-looks-identical-to-neutral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charged strategy looks identical to neutral
       
     </span>
   </a>
@@ -12108,6 +12130,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#charged-wall-loss-neutral-vs-charged-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charged wall loss: neutral vs charged comparison
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#step-by-step-time-integration-and-concentration-decay" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -12253,6 +12286,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#charged-strategy-looks-identical-to-neutral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charged strategy looks identical to neutral
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#concentration-does-not-change-over-time" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -12302,13 +12346,17 @@
   
 
 
-<h1 id="wall-loss-strategies-with-sphericalwalllossstrategy">Wall Loss Strategies with <code>SphericalWallLossStrategy</code><a class="headerlink" href="#wall-loss-strategies-with-sphericalwalllossstrategy" title="Permanent link">&para;</a></h1>
-<p>Learn how to use the new strategy-based wall loss API for chamber simulations in <strong>particula</strong>.</p>
-<p>This guide focuses on the <code>WallLossStrategy</code> abstract base class and the
-<code>SphericalWallLossStrategy</code> implementation, and shows how to:</p>
+<h1 id="wall-loss-strategies-neutral-and-charged">Wall Loss Strategies (Neutral and Charged)<a class="headerlink" href="#wall-loss-strategies-neutral-and-charged" title="Permanent link">&para;</a></h1>
+<p>Learn how to use the strategy-based wall loss API for chamber simulations in
+<strong>particula</strong>, including the charged/image-charge extension.</p>
+<p>This guide focuses on the <code>WallLossStrategy</code> abstract base class plus
+<code>SphericalWallLossStrategy</code> for neutral cases and <code>ChargedWallLossStrategy</code>
+when particle charge or applied electric fields matter, and shows how to:</p>
 <ul>
 <li>Build a simple particle distribution using <code>PresetParticleRadiusBuilder</code>.</li>
 <li>Configure <code>SphericalWallLossStrategy</code> for a spherical chamber.</li>
+<li>Compare neutral and charged coefficients (image-charge and optional field
+  drift).</li>
 <li>Integrate wall loss over time and visualize concentration decay.</li>
 <li>Connect wall loss strategies with other dynamics components.</li>
 </ul>
@@ -12439,6 +12487,112 @@ splitting and clamping for any supported strategy.</p>
 <li>A <code>ParticleRepresentation</code> with radius bins and number concentration.</li>
 <li>A <code>SphericalWallLossStrategy</code> that computes a first-order wall loss rate
   for each bin.</li>
+</ul>
+<h2 id="charged-wall-loss-neutral-vs-charged-comparison">Charged wall loss: neutral vs charged comparison<a class="headerlink" href="#charged-wall-loss-neutral-vs-charged-comparison" title="Permanent link">&para;</a></h2>
+<p><code>ChargedWallLossStrategy</code> augments the neutral coefficient with:</p>
+<ul>
+<li>Neutral reduction: when particle charge and <code>wall_electric_field</code> are zero, it
+  matches the neutral coefficient.</li>
+<li>Image-charge enhancement: when <code>wall_potential=0</code> but charge is non-zero, the
+  coefficient still changes due to image-charge effects.</li>
+<li>Optional drift: set <code>wall_electric_field</code> (scalar for spherical, length-3
+  tuple for rectangular) to add a charge-sign-dependent drift term.</li>
+</ul>
+<p>The snippet below compares neutral, image-charge-only, and field-driven cases
+for a spherical chamber. Charges are given in units of elementary charge
+(dimensionless).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_particle</span><span class="p">(</span><span class="n">charge</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">80e-9</span><span class="p">]),</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">]))</span>
+        <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5e7</span><span class="p">]),</span> <span class="s2">&quot;1/m^3&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1e3</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="p">)</span>
+
+
+<span class="n">neutral_particle</span> <span class="o">=</span> <span class="n">make_particle</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">positive_particle</span> <span class="o">=</span> <span class="n">make_particle</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>   <span class="c1"># +5 e</span>
+<span class="n">negative_particle</span> <span class="o">=</span> <span class="n">make_particle</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">)</span>  <span class="c1"># -5 e</span>
+
+<span class="n">neutral_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">charged_image_only</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">wall_potential</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>        <span class="c1"># image-charge still active</span>
+    <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>   <span class="c1"># drift disabled</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">charged_with_field</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">wall_potential</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>       <span class="c1"># V</span>
+    <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>  <span class="c1"># V/m (scalar for spherical; tuple for rectangular)</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">298.15</span>  <span class="c1"># K</span>
+<span class="n">P</span> <span class="o">=</span> <span class="mf">101325.0</span>  <span class="c1"># Pa</span>
+
+<span class="n">neutral_rate</span> <span class="o">=</span> <span class="n">neutral_strategy</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">neutral_particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
+
+<span class="c1"># Reduces to neutral when charge and field are zero</span>
+<span class="n">charged_neutral_rate</span> <span class="o">=</span> <span class="n">charged_image_only</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
+    <span class="n">neutral_particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span>
+<span class="p">)</span>
+
+<span class="c1"># Image-charge only (wall_potential=0) still differs from neutral when charge != 0</span>
+<span class="n">charged_positive_rate</span> <span class="o">=</span> <span class="n">charged_image_only</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
+    <span class="n">positive_particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span>
+<span class="p">)</span>
+
+<span class="c1"># Electric-field drift modifies deposition and depends on charge sign</span>
+<span class="n">drift_positive</span> <span class="o">=</span> <span class="n">charged_with_field</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
+    <span class="n">positive_particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span>
+<span class="p">)</span>
+<span class="n">drift_negative</span> <span class="o">=</span> <span class="n">charged_with_field</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span>
+    <span class="n">negative_particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Neutral vs charged (charge=0):&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">neutral_rate</span><span class="p">,</span> <span class="n">charged_neutral_rate</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Image-charge only mean ratio (charged/neutral):&quot;</span><span class="p">,</span>
+    <span class="nb">float</span><span class="p">(</span><span class="n">charged_positive_rate</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="n">neutral_rate</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Field drift (+E, q&gt;0) mean rate:&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drift_positive</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Field drift (+E, q&lt;0) mean rate:&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drift_negative</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Expected observations:</p>
+<ul>
+<li>The first print returns <code>True</code>, confirming neutral reduction when charge and
+  field are zero.</li>
+<li>The image-charge ratio is typically not 1.0 when <code>wall_potential=0</code> but charge
+  is non-zero.</li>
+<li>The field-driven mean rates differ for positive vs negative charge,
+  highlighting the sign-dependent drift term.</li>
 </ul>
 <h2 id="step-by-step-time-integration-and-concentration-decay">Step-by-Step: Time Integration and Concentration Decay<a class="headerlink" href="#step-by-step-time-integration-and-concentration-decay" title="Permanent link">&para;</a></h2>
 <p>Next, integrate wall loss over time and visualize the decay in total
@@ -12637,9 +12791,29 @@ API lets you perform the same type of simulation using
 <td>Required (no default)</td>
 </tr>
 <tr>
+<td><code>chamber_geometry</code></td>
+<td><code>"spherical"</code> or <code>"rectangular"</code> (required for charged strategies).</td>
+<td><code>"spherical"</code></td>
+</tr>
+<tr>
 <td><code>chamber_radius</code></td>
-<td>Radius of the spherical chamber [m].</td>
-<td>Required (no default)</td>
+<td>Radius of the spherical chamber [m]; required when <code>chamber_geometry="spherical"</code>.</td>
+<td>Required for spherical</td>
+</tr>
+<tr>
+<td><code>chamber_dimensions</code></td>
+<td><code>(x, y, z)</code> dimensions in meters; required when <code>chamber_geometry="rectangular"</code>.</td>
+<td>Required for rectangular</td>
+</tr>
+<tr>
+<td><code>wall_potential</code></td>
+<td>Applied wall potential in volts. Image-charge enhancement remains active even when set to <code>0.0</code>.</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>wall_electric_field</code></td>
+<td>Optional electric-field drift term (V/m). Scalar for spherical, length-3 tuple for rectangular. Set <code>0.0</code> to disable drift.</td>
+<td><code>0.0</code></td>
 </tr>
 <tr>
 <td><code>distribution_type</code></td>
@@ -12667,6 +12841,15 @@ API lets you perform the same type of simulation using
 <li><code>"particle_resolved"</code></li>
 </ul>
 <p>Any other string will raise a <code>ValueError</code> during initialization.</p>
+<h3 id="charged-strategy-looks-identical-to-neutral">Charged strategy looks identical to neutral<a class="headerlink" href="#charged-strategy-looks-identical-to-neutral" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Confirm particle charges are non-zero (set via <code>.set_charge(...)</code> on the
+  particle builder).</li>
+<li>If both <code>wall_potential</code> and <code>wall_electric_field</code> are zero and charges are
+  zero, the charged strategy intentionally reduces to the neutral coefficient.</li>
+<li>For rectangular chambers, ensure <code>wall_electric_field</code> is a length-3 tuple; a
+  scalar is valid only for spherical geometry.</li>
+</ul>
 <h3 id="concentration-does-not-change-over-time">Concentration does not change over time<a class="headerlink" href="#concentration-does-not-change-over-time" title="Permanent link">&para;</a></h3>
 <p>Check the following:</p>
 <ul>

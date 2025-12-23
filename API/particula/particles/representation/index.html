@@ -7388,7 +7388,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -12693,7 +12693,7 @@ and volume for particle calculations.</p>
 
 
 <a href="#particula.particles.representation.ParticleRepresentation.add_concentration" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_concentration</span><span class="p">(</span><span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">added_distribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_concentration</span><span class="p">(</span><span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">added_distribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">added_charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -12718,6 +12718,15 @@ and volume for particle calculations.</p>
             <p>Optional distribution array to merge into
 the existing distribution. If None, the current distribution
 is reused.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>- added_charge </code></b>
+          –
+          <div class="doc-md-description">
+            <p>Optional charge array for newly added particles.
+Defaults to zeros when charge is tracked but no values are
+provided. Ignored when charge is not tracked.</p>
           </div>
         </li>
     </ul>
@@ -12763,19 +12772,40 @@ is reused.</p>
 <span class="normal">528</span>
 <span class="normal">529</span>
 <span class="normal">530</span>
-<span class="normal">531</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">added_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">added_distribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">added_charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add concentration to the particle distribution.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        - added_concentration : The concentration to be added per bin</span>
-<span class="sd">            (1/m^3).</span>
+<span class="sd">          (1/m^3).</span>
 <span class="sd">        - added_distribution : Optional distribution array to merge into</span>
 <span class="sd">          the existing distribution. If None, the current distribution</span>
 <span class="sd">          is reused.</span>
+<span class="sd">        - added_charge : Optional charge array for newly added particles.</span>
+<span class="sd">          Defaults to zeros when charge is tracked but no values are</span>
+<span class="sd">          provided. Ignored when charge is not tracked.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        ``` py title=&quot;Add Concentration&quot;</span>
@@ -12787,14 +12817,25 @@ is reused.</p>
         <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Added distribution is value None.&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="n">added_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">()</span>
-    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
-            <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(),</span>
-            <span class="n">concentration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
-            <span class="n">added_distribution</span><span class="o">=</span><span class="n">added_distribution</span><span class="p">,</span>
-            <span class="n">added_concentration</span><span class="o">=</span><span class="n">added_concentration</span><span class="p">,</span>
-        <span class="p">)</span>
+    <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">updated_charge</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
+        <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(),</span>
+        <span class="n">concentration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
+        <span class="n">added_distribution</span><span class="o">=</span><span class="n">added_distribution</span><span class="p">,</span>
+        <span class="n">added_concentration</span><span class="o">=</span><span class="n">added_concentration</span><span class="p">,</span>
+        <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+        <span class="n">added_charge</span><span class="o">=</span><span class="n">added_charge</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="c1"># charge is always returned when passed (self.charge is non-None)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">updated_charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;updated_charge must not be None when charge is set&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">updated_charge</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_enforce_increasing_bins</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -12924,23 +12965,7 @@ coagulation simulations.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span>
-<span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">549</span>
 <span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span>
@@ -12954,7 +12979,23 @@ coagulation simulations.</p>
 <span class="normal">560</span>
 <span class="normal">561</span>
 <span class="normal">562</span>
-<span class="normal">563</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collide pairs of particles, used for ParticleResolved Strategies.</span>
 
 <span class="sd">    Performs coagulation between particle pairs by delegating to the</span>

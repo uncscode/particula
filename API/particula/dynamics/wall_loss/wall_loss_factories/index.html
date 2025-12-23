@@ -7170,7 +7170,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -11944,8 +11944,8 @@
     <div class="doc doc-contents first">
 
         <p>Wall loss strategy factory.</p>
-<p>Provides a factory for creating wall loss strategies by name using registered
-builders.</p>
+<p>Provides a factory for creating neutral or charged wall loss strategies by
+name using registered builders.</p>
 
 
 
@@ -11993,6 +11993,9 @@ builders.</p>
   <ul>
 <li>"spherical": <code>SphericalWallLossStrategy</code> for spherical chambers.</li>
 <li>"rectangular": <code>RectangularWallLossStrategy</code> for box chambers.</li>
+<li>"charged": <code>ChargedWallLossStrategy</code> with image-charge
+  enhancement and optional electric-field drift; requires geometry
+  and matching size parameters.</li>
 </ul>
 </details>
 
@@ -12046,16 +12049,17 @@ builders.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_factories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BuilderType</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BuilderType</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return available wall loss builders keyed by strategy name.</span>
 
 <span class="sd">    Returns:</span>
@@ -12064,6 +12068,7 @@ builders.</p>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;spherical&quot;</span><span class="p">:</span> <span class="n">SphericalWallLossBuilder</span><span class="p">(),</span>
         <span class="s2">&quot;rectangular&quot;</span><span class="p">:</span> <span class="n">RectangularWallLossBuilder</span><span class="p">(),</span>
+        <span class="s2">&quot;charged&quot;</span><span class="p">:</span> <span class="n">ChargedWallLossBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -12094,7 +12099,8 @@ builders.</p>
               (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
-            <p>Strategy name ("spherical" or "rectangular").</p>
+            <p>Strategy name ("spherical", "rectangular", or
+"charged").</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -12104,8 +12110,10 @@ builders.</p>
 )
           –
           <div class="doc-md-description">
-            <p>Optional parameter mapping for the builder. Keys may
-include values with unit suffixes and <code>distribution_type</code>.</p>
+            <p>Optional parameter mapping for the builder. Include
+geometry keys (<code>chamber_radius</code> or <code>chamber_dimensions</code>)
+plus optional <code>wall_potential</code> and <code>wall_electric_field</code>
+entries, and <code>distribution_type</code> when needed.</p>
           </div>
         </li>
     </ul>
@@ -12137,16 +12145,7 @@ invalid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_factories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
@@ -12167,15 +12166,30 @@ invalid.</p>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a wall loss strategy using its corresponding builder.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        strategy_type: Strategy name (&quot;spherical&quot; or &quot;rectangular&quot;).</span>
-<span class="sd">        parameters: Optional parameter mapping for the builder. Keys may</span>
-<span class="sd">            include values with unit suffixes and ``distribution_type``.</span>
+<span class="sd">        strategy_type: Strategy name (&quot;spherical&quot;, &quot;rectangular&quot;, or</span>
+<span class="sd">            &quot;charged&quot;).</span>
+<span class="sd">        parameters: Optional parameter mapping for the builder. Include</span>
+<span class="sd">            geometry keys (``chamber_radius`` or ``chamber_dimensions``)</span>
+<span class="sd">            plus optional ``wall_potential`` and ``wall_electric_field``</span>
+<span class="sd">            entries, and ``distribution_type`` when needed.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Built wall loss strategy instance.</span>

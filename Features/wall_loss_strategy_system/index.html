@@ -7047,7 +7047,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -9785,6 +9785,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Unified wall loss API in particula.dynamics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#charged-wall-loss-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charged wall loss support
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -12176,6 +12193,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Unified wall loss API in particula.dynamics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#charged-wall-loss-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Charged wall loss support
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -12492,10 +12526,12 @@
 <p>This feature is built around user-facing APIs exposed via <code>particula.dynamics</code>:</p>
 <ul>
 <li><code>WallLossStrategy</code> – abstract base class for wall loss models.</li>
-<li><code>SphericalWallLossStrategy</code> and <code>RectangularWallLossStrategy</code> – chamber
-  implementations using existing wall loss coefficient utilities.</li>
-<li><code>SphericalWallLossBuilder</code> and <code>RectangularWallLossBuilder</code> – validated,
-  unit-aware builders for configuring strategies.</li>
+<li><code>SphericalWallLossStrategy</code>, <code>RectangularWallLossStrategy</code>, and
+  <code>ChargedWallLossStrategy</code> – chamber implementations using existing wall loss
+  coefficient utilities plus electrostatic modifiers for charged particles.</li>
+<li><code>SphericalWallLossBuilder</code>, <code>RectangularWallLossBuilder</code>, and
+  <code>ChargedWallLossBuilder</code> – validated, unit-aware builders for configuring
+  strategies and electrostatic parameters (wall potential, electric field).</li>
 <li><code>WallLossFactory</code> – factory for selecting a wall loss geometry by name with
   builder defaults.</li>
 <li><code>WallLoss</code> runnable – delegates to a wall loss strategy on <code>Aerosol</code>, splits
@@ -12541,6 +12577,19 @@
 <li>Call <code>step(particle, temperature, pressure, time_step)</code> to advance the
   system.</li>
 </ul>
+<h4 id="charged-wall-loss-support">Charged wall loss support<a class="headerlink" href="#charged-wall-loss-support" title="Permanent link">&para;</a></h4>
+<p><code>ChargedWallLossStrategy</code> augments neutral wall loss with image-charge and
+optional electric-field drift effects. Configure it via
+<code>ChargedWallLossBuilder</code> or directly:</p>
+<div class="highlight"><pre><span></span><code><span class="n">charged_wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">wall_potential</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>        <span class="c1"># volts (optional)</span>
+    <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span>  <span class="c1"># V/m (optional drift term)</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
 <h3 id="runnable-entry-point-wallloss">Runnable entry point: <code>WallLoss</code><a class="headerlink" href="#runnable-entry-point-wallloss" title="Permanent link">&para;</a></h3>
 <p><code>WallLoss</code> is a <code>RunnableABC</code> implementation exported as <code>par.dynamics.WallLoss</code>.
 It operates on an <code>Aerosol</code> in the runnable pipeline, delegates <code>rate</code> and
@@ -12761,7 +12810,7 @@ distribution types.</p>
 </ul>
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Design details</strong>: <a href="../Agent/feature/P2-wall-loss-strategy-system.md">Agent feature: wall loss strategy system</a></li>
+<li><strong>Design details</strong>: <a href="../../adw-docs/dev-plans/features/charged-wall-loss-strategy.md">Feature plan: charged wall loss strategy</a></li>
 <li><strong>Hands-on guide</strong>: <a href="../../Examples/Chamber_Wall_Loss/wall_loss_strategy/">Chamber wall loss example</a></li>
 <li><strong>Notebooks</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy/">Spherical wall loss strategy</a></li>
 <li><strong>Dynamics overview</strong>: <a href="../../#wall-loss-strategies-and-runnable">Wall loss strategies</a></li>

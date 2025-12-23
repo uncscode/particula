@@ -3575,6 +3575,56 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ChargedWallLossBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" ChargedWallLossBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;build
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_chamber_geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_chamber_geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.dynamics.wall_loss.wall_loss_builders.RectangularWallLossBuilder" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7187,7 +7237,7 @@
   <span class="md-ellipsis">
     
   
-    Wall Loss Strategies with SphericalWallLossStrategy
+    Wall Loss Strategies (Neutral and Charged)
   
 
     
@@ -11879,6 +11929,56 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ChargedWallLossBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" ChargedWallLossBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;build
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_chamber_geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_chamber_geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.dynamics.wall_loss.wall_loss_builders.RectangularWallLossBuilder" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -12004,6 +12104,509 @@ parameters and unit conversion support.</p>
 
 
 
+<h3 id="particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ChargedWallLossBuilder</span>
+
+
+<a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ChargedWallLossBuilder</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            BuilderABC (particula.abc_builder.BuilderABC)" href="../../../abc_builder/#particula.abc_builder.BuilderABC">BuilderABC</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderWallEddyDiffusivityMixin (particula.builder_mixin.BuilderWallEddyDiffusivityMixin)" href="../../../builder_mixin/#particula.builder_mixin.BuilderWallEddyDiffusivityMixin">BuilderWallEddyDiffusivityMixin</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderDistributionTypeMixin (particula.builder_mixin.BuilderDistributionTypeMixin)" href="../../../builder_mixin/#particula.builder_mixin.BuilderDistributionTypeMixin">BuilderDistributionTypeMixin</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderChamberRadiusMixin (particula.builder_mixin.BuilderChamberRadiusMixin)" href="../../../builder_mixin/#particula.builder_mixin.BuilderChamberRadiusMixin">BuilderChamberRadiusMixin</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderChamberDimensionsMixin (particula.builder_mixin.BuilderChamberDimensionsMixin)" href="../../../builder_mixin/#particula.builder_mixin.BuilderChamberDimensionsMixin">BuilderChamberDimensionsMixin</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderWallPotentialMixin (particula.builder_mixin.BuilderWallPotentialMixin)" href="../../../builder_mixin/#particula.builder_mixin.BuilderWallPotentialMixin">BuilderWallPotentialMixin</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderWallElectricFieldMixin (particula.builder_mixin.BuilderWallElectricFieldMixin)" href="../../../builder_mixin/#particula.builder_mixin.BuilderWallElectricFieldMixin">BuilderWallElectricFieldMixin</a></code></p>
+
+
+
+        <p>Builder for charged wall loss strategies.</p>
+<p>Configures image-charge-enhanced wall loss with optional
+electric-field drift for spherical or rectangular chambers.
+Requires geometry plus the matching size parameter. Zero wall potential
+still allows charge-driven enhancement.</p>
+
+        <p>Initialize the charged wall loss builder.</p>
+
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the charged wall loss builder.&quot;&quot;&quot;</span>
+    <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">required_parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">BuilderWallEddyDiffusivityMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">BuilderChamberRadiusMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">BuilderChamberDimensionsMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">BuilderWallPotentialMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">BuilderWallElectricFieldMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.build" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">build</span>
+
+
+<a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.build" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ChargedWallLossStrategy</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build and return a charged wall loss strategy.</p>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>ChargedWallLossStrategy</code></b> (              <code><a class="autorefs autorefs-internal" title="            ChargedWallLossStrategy (particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy)" href="../wall_loss_strategies/#particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy">ChargedWallLossStrategy</a></code>
+)          –
+          <div class="doc-md-description">
+            <p>Charged strategy with geometry-specific
+sizing and electrostatic settings.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If geometry is unset, matching size parameters are
+missing, or required values are not provided.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChargedWallLossStrategy</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return a charged wall loss strategy.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ChargedWallLossStrategy: Charged strategy with geometry-specific</span>
+<span class="sd">            sizing and electrostatic settings.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If geometry is unset, matching size parameters are</span>
+<span class="sd">            missing, or required values are not provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wall_eddy_diffusivity must be set before build&quot;</span><span class="p">)</span>
+    <span class="n">wall_eddy_diffusivity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_radius must be set for spherical&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
+            <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
+            <span class="n">chamber_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span><span class="p">,</span>
+            <span class="n">chamber_radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chamber_radius</span><span class="p">,</span>
+            <span class="n">wall_potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_potential</span><span class="p">,</span>
+            <span class="n">wall_electric_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
+            <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">==</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;chamber_dimensions must be set for rectangular geometry&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
+            <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="n">wall_eddy_diffusivity</span><span class="p">,</span>
+            <span class="n">chamber_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span><span class="p">,</span>
+            <span class="n">chamber_dimensions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chamber_dimensions</span><span class="p">,</span>
+            <span class="n">wall_potential</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_potential</span><span class="p">,</span>
+            <span class="n">wall_electric_field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
+            <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chamber_geometry must be set before build()&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_chamber_geometry" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_chamber_geometry</span>
+
+
+<a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_chamber_geometry" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_chamber_geometry</span><span class="p">(</span><span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set chamber geometry.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>chamber_geometry</code></b>
+              (<code><span title="str">str</span></code>)
+          –
+          <div class="doc-md-description">
+            <p><code>"spherical"</code> or <code>"rectangular"</code>.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>ChargedWallLossBuilder</code></b>          –
+          <div class="doc-md-description">
+            <p>Self for method chaining.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>chamber_geometry</code> is not supported.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_chamber_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chamber_geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set chamber geometry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chamber_geometry: ``&quot;spherical&quot;`` or ``&quot;rectangular&quot;``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ChargedWallLossBuilder: Self for method chaining.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If ``chamber_geometry`` is not supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">normalized</span> <span class="o">=</span> <span class="n">chamber_geometry</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">normalized</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span> <span class="s2">&quot;rectangular&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;chamber_geometry must be &#39;spherical&#39; or &#39;rectangular&#39;.&quot;</span>
+        <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">chamber_geometry</span> <span class="o">=</span> <span class="n">normalized</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_parameters" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_parameters</span>
+
+
+<a href="#particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_parameters" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set required and optional parameters from mapping.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>parameters</code></b>
+              (<code><span title="dict">dict</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Mapping containing required <code>wall_eddy_diffusivity</code>
+and <code>chamber_geometry</code> plus optional geometry size,
+<code>wall_potential</code>, and <code>wall_electric_field</code> entries with
+optional <code>*_units</code> keys.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>ChargedWallLossBuilder</code></b>          –
+          <div class="doc-md-description">
+            <p>Self for method chaining.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If required keys are missing or unexpected keys are
+provided.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set required and optional parameters from mapping.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parameters: Mapping containing required ``wall_eddy_diffusivity``</span>
+<span class="sd">            and ``chamber_geometry`` plus optional geometry size,</span>
+<span class="sd">            ``wall_potential``, and ``wall_electric_field`` entries with</span>
+<span class="sd">            optional ``*_units`` keys.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ChargedWallLossBuilder: Self for method chaining.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If required keys are missing or unexpected keys are</span>
+<span class="sd">            provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">,</span> <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">}</span>
+    <span class="n">optional</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;chamber_radius&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wall_potential&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wall_electric_field&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;distribution_type&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">required</span>
+        <span class="o">|</span> <span class="n">optional</span>
+        <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_units&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">optional</span> <span class="o">|</span> <span class="n">required</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Missing required parameter(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">invalid</span> <span class="o">:=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Trying to set an invalid parameter(s) &#39;</span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_eddy_diffusivity_units&quot;</span><span class="p">,</span> <span class="s2">&quot;1/s&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_geometry</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_geometry&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">&quot;chamber_radius&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_radius</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_radius&quot;</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chamber_radius_units&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;chamber_dimensions&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_chamber_dimensions</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chamber_dimensions_units&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;wall_potential&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_potential</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_potential&quot;</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_potential_units&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;wall_electric_field&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wall_electric_field</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;wall_electric_field&quot;</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wall_electric_field_units&quot;</span><span class="p">,</span> <span class="s2">&quot;V/m&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;distribution_type&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;distribution_type&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h3 id="particula.dynamics.wall_loss.wall_loss_builders.RectangularWallLossBuilder" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RectangularWallLossBuilder</span>
 
@@ -12062,18 +12665,18 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span>
-<span class="normal">96</span>
-<span class="normal">97</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the rectangular wall loss builder.&quot;&quot;&quot;</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -12143,12 +12746,7 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
@@ -12162,7 +12760,12 @@ before constructing :class:<code>RectangularWallLossStrategy</code>.</p>
 <span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
-<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RectangularWallLossStrategy</span><span class="p">:</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RectangularWallLossStrategy</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the rectangular wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
@@ -12258,15 +12861,15 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
-<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the spherical wall loss builder.&quot;&quot;&quot;</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -12333,12 +12936,7 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/wall_loss/wall_loss_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
@@ -12352,7 +12950,12 @@ before constructing :class:<code>SphericalWallLossStrategy</code>.</p>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
-<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SphericalWallLossStrategy</span><span class="p">:</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SphericalWallLossStrategy</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build and return the spherical wall loss strategy.</span>
 
 <span class="sd">    Returns:</span>
