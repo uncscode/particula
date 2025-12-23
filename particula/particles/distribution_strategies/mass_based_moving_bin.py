@@ -76,11 +76,16 @@ class MassBasedMovingBin(DistributionStrategy):
         NDArray[np.float64],
         Optional[NDArray[np.float64]],
     ]:
-        """Add concentration to the distribution.
+        """Add concentration to the distribution with optional charge.
+
+        Charge follows concentration-weighted averaging when both ``charge``
+        and ``added_charge`` are provided. If ``charge`` is ``None`` it is
+        returned as ``None``. When ``added_charge`` is ``None`` the existing
+        charge is preserved. Empty bins fall back to ``added_charge`` to avoid
+        divide-by-zero.
 
         Returns:
-            Updated distribution, concentration, and charge arrays
-            (charge unchanged for this strategy).
+            Updated distribution, concentration, and charge arrays.
         """
         if (distribution.shape != added_distribution.shape) or (
             not np.allclose(distribution, added_distribution, rtol=1e-6)
@@ -99,8 +104,46 @@ class MassBasedMovingBin(DistributionStrategy):
             logger.error(message)
             raise ValueError(message)
 
+        original_concentration = concentration.copy()
         concentration += added_concentration
-        return distribution, concentration, charge
+
+        if charge is None:
+            return distribution, concentration, None
+
+        if charge.shape != original_concentration.shape:
+            message = (
+                "When adding concentration with charge, charge must match "
+                "concentration shape."
+            )
+            logger.error(message)
+            raise ValueError(message)
+
+        if added_charge is None:
+            return distribution, concentration, charge
+
+        if added_charge.shape != added_concentration.shape:
+            message = (
+                "When adding concentration with charge, added_charge must "
+                "match added_concentration shape."
+            )
+            logger.error(message)
+            raise ValueError(message)
+
+        total_concentration = original_concentration + added_concentration
+        numerator = (
+            charge * original_concentration + added_charge * added_concentration
+        )
+        # Weighted average with zero-bin fallback to added_charge to avoid NaN.
+        updated_charge = np.divide(
+            numerator,
+            total_concentration,
+            out=np.zeros_like(total_concentration, dtype=np.float64),
+            where=total_concentration != 0,
+        )
+        updated_charge = np.where(
+            total_concentration == 0, added_charge, updated_charge
+        )
+        return distribution, concentration, updated_charge
 
     def collide_pairs(  # pylint: disable=too-many-positional-arguments
         self,

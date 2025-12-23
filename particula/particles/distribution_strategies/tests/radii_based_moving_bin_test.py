@@ -1,8 +1,15 @@
 """Tests for the :class:`RadiiBasedMovingBin` distribution strategy."""
 # pylint: disable=R0801
 
+from pathlib import Path
+import sys
+
 import numpy as np
 import pytest
+
+ROOT = Path(__file__).resolve().parents[4]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from particula.particles.distribution_strategies import RadiiBasedMovingBin
 
@@ -63,15 +70,67 @@ def test_add_mass():
     np.testing.assert_array_equal(new_conc, concentration)
 
 
-def test_add_concentration():
-    """Test concentration addition and charge passthrough."""
+def test_add_concentration_weighted_charge():
+    """Charge is updated by concentration-weighted average."""
+    distribution = np.array([1.0, 2.0], dtype=np.float64)
+    concentration = np.array([1.0, 2.0], dtype=np.float64)
+    added_distribution = np.array([1.0, 2.0], dtype=np.float64)
+    added_concentration = np.array([1.0, 2.0], dtype=np.float64)
+    charge = np.array([0.1, 0.2], dtype=np.float64)
+    added_charge = np.array([0.3, -0.2], dtype=np.float64)
+
+    expected_conc = concentration + added_concentration
+    expected_charge = np.array([0.2, 0.0])
+
+    new_dist, new_conc, returned_charge = (
+        radii_based_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+            charge=charge,
+            added_charge=added_charge,
+        )
+    )
+    np.testing.assert_array_equal(new_dist, distribution)
+    np.testing.assert_array_equal(new_conc, expected_conc)
+    np.testing.assert_allclose(returned_charge, expected_charge)
+
+
+def test_add_concentration_zero_total_uses_added_charge():
+    """Zero-total bins fall back to added_charge to avoid NaNs."""
+    distribution = np.array([1.0, 2.0], dtype=np.float64)
+    concentration = np.array([0.0, 3.0], dtype=np.float64)
+    added_distribution = np.array([1.0, 2.0], dtype=np.float64)
+    added_concentration = np.array([0.0, 1.0], dtype=np.float64)
+    charge = np.array([0.4, -0.4], dtype=np.float64)
+    added_charge = np.array([1.4, 0.4], dtype=np.float64)
+    expected_conc = concentration + added_concentration
+
+    _new_dist, new_conc, returned_charge = (
+        radii_based_strategy.add_concentration(
+            distribution,
+            concentration,
+            added_distribution,
+            added_concentration,
+            charge=charge,
+            added_charge=added_charge,
+        )
+    )
+
+    np.testing.assert_array_equal(new_conc, expected_conc)
+    np.testing.assert_allclose(returned_charge, np.array([1.4, -0.2]))
+
+
+def test_add_concentration_missing_added_charge_preserves_charge():
+    """When added_charge is None, existing charge is preserved."""
     distribution = np.array([1.0, 2.0], dtype=np.float64)
     concentration = np.array([1.0, 2.0], dtype=np.float64)
     added_distribution = np.array([1.0, 2.0], dtype=np.float64)
     added_concentration = np.array([0.5, 0.5], dtype=np.float64)
     charge = np.array([0.1, 0.2], dtype=np.float64)
-    expected_conc = concentration + added_concentration
-    new_dist, new_conc, returned_charge = (
+
+    _new_dist, _new_conc, returned_charge = (
         radii_based_strategy.add_concentration(
             distribution,
             concentration,
@@ -80,8 +139,7 @@ def test_add_concentration():
             charge=charge,
         )
     )
-    np.testing.assert_array_equal(new_dist, distribution)
-    np.testing.assert_array_equal(new_conc, expected_conc)
+
     assert returned_charge is charge
     np.testing.assert_array_equal(returned_charge, charge)
 
@@ -128,6 +186,51 @@ def test_add_concentration_shape_error():
             concentration,
             distribution,
             np.array([[1.0, 1.0]], dtype=np.float64),
+        )
+
+
+def test_add_concentration_added_charge_shape_error():
+    """added_charge must match added_concentration shape."""
+    distribution = np.array([1.0, 2.0], dtype=np.float64)
+    concentration = np.array([1.0, 2.0], dtype=np.float64)
+    charge = np.array([0.1, 0.2], dtype=np.float64)
+
+    with pytest.raises(ValueError):
+        radii_based_strategy.add_concentration(
+            distribution,
+            concentration,
+            distribution,
+            np.array([1.0, 1.0], dtype=np.float64),
+            charge=charge,
+            added_charge=np.array([[0.1, 0.2]], dtype=np.float64),
+        )
+
+
+def test_add_concentration_charge_shape_error():
+    """charge must match concentration shape when provided."""
+    distribution = np.array([1.0, 2.0], dtype=np.float64)
+    concentration = np.array([1.0, 2.0], dtype=np.float64)
+    with pytest.raises(ValueError):
+        radii_based_strategy.add_concentration(
+            distribution,
+            concentration,
+            distribution,
+            np.array([1.0, 1.0], dtype=np.float64),
+            charge=np.array([[0.1, 0.2]], dtype=np.float64),
+            added_charge=np.array([0.1, 0.2], dtype=np.float64),
+        )
+
+
+def test_add_concentration_distribution_value_mismatch_error():
+    """Distribution mismatch on value triggers ValueError."""
+    distribution = np.array([1.0, 2.0], dtype=np.float64)
+    concentration = np.array([1.0, 2.0], dtype=np.float64)
+    with pytest.raises(ValueError):
+        radii_based_strategy.add_concentration(
+            distribution,
+            concentration,
+            np.array([1.0, 2.01], dtype=np.float64),
+            np.array([1.0, 1.0], dtype=np.float64),
         )
 
 
