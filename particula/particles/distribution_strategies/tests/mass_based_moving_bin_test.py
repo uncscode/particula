@@ -2,8 +2,8 @@
 
 # pylint: disable=R0801
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -12,9 +12,14 @@ ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from particula.particles.distribution_strategies import MassBasedMovingBin
 
-mass_based_strategy = MassBasedMovingBin()
+def _load_mass_based_strategy():
+    from particula.particles.distribution_strategies import MassBasedMovingBin
+
+    return MassBasedMovingBin()
+
+
+mass_based_strategy = _load_mass_based_strategy()
 
 
 def test_source_file_path():
@@ -212,7 +217,7 @@ def test_add_concentration_added_charge_shape_error():
 
 
 def test_add_concentration_charge_shape_error():
-    """charge must match concentration shape when provided."""
+    """Charge must match concentration shape when provided."""
     distribution = np.array([1.0, 2.0], dtype=np.float64)
     concentration = np.array([1.0, 2.0], dtype=np.float64)
     with pytest.raises(ValueError):
