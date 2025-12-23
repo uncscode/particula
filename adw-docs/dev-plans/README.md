@@ -15,7 +15,7 @@ and rollout.
 ## Maintenance Plans
 
 - [Add Charge Support to add_concentration][plan-charge-add-concentration] —
-  Status: Not Started (P2)
+  Status: Shipped (P2)
   - Scope: Enable `add_concentration()` to accept optional charge parameter for
     ion injection in coagulation simulations.
 

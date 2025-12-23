@@ -2,8 +2,8 @@
 
 **ID:** M1
 **Priority:** P2
-**Status:** Not Started
-**Last Updated:** 2025-12-19
+**Status:** Shipped
+**Last Updated:** 2025-12-23
 
 ## Priority Justification
 
@@ -93,23 +93,23 @@ and `ParticleRepresentation.add_concentration()`.
 **Size:** S (~50-70 LOC including tests)
 
 **Tasks:**
-- [ ] Update `DistributionStrategy.add_concentration()` abstract signature to
+- [x] Update `DistributionStrategy.add_concentration()` abstract signature to
       include `added_charge: Optional[NDArray[np.float64]] = None`
-- [ ] Update return type to include optional charge array
-- [ ] Implement charge handling in `ParticleResolvedSpeciatedMass.add_concentration()`:
+- [x] Update return type to include optional charge array
+- [x] Implement charge handling in `ParticleResolvedSpeciatedMass.add_concentration()`:
   - Append charge values for new particles
   - Fill empty bins with provided charge or default to 0
-- [ ] Update `ParticleRepresentation.add_concentration()` to:
+- [x] Update `ParticleRepresentation.add_concentration()` to:
   - Accept `*, added_charge: Optional[NDArray[np.float64]] = None` (keyword-only)
   - Pass charge to strategy and update `self.charge`
-- [ ] Add tests for particle-resolved charge addition scenarios
-- [ ] Update docstrings documenting ParticleResolved behavior
+- [x] Add tests for particle-resolved charge addition scenarios
+- [x] Update docstrings documenting ParticleResolved behavior
 
 **Acceptance Criteria:**
-- [ ] New ions can be added with specified charges
-- [ ] Missing charge defaults to 0 for new particles
-- [ ] Existing calls without `added_charge` continue to work
-- [ ] Tests cover append, fill-empty, and partial-fill scenarios with charge
+- [x] New ions can be added with specified charges
+- [x] Missing charge defaults to 0 for new particles
+- [x] Existing calls without `added_charge` continue to work
+- [x] Tests cover append, fill-empty, and partial-fill scenarios with charge
 
 ### Phase 2: Bin-Based Strategy Charge Support (M1-P2)
 
@@ -119,18 +119,18 @@ averaging.
 **Size:** S (~50-70 LOC including tests)
 
 **Tasks:**
-- [ ] Implement charge handling in `MassBasedMovingBin.add_concentration()`:
+- [x] Implement charge handling in `MassBasedMovingBin.add_concentration()`:
   - Compute concentration-weighted average charge when adding to bins
   - Default to existing charge when `added_charge=None`
-- [ ] Implement same pattern in `RadiiBasedMovingBin.add_concentration()`
-- [ ] Implement same pattern in `SpeciatedMassMovingBin.add_concentration()`
-- [ ] Add tests for bin-based charge averaging scenarios
-- [ ] Update docstrings documenting bin-based behavior differences
+- [x] Implement same pattern in `RadiiBasedMovingBin.add_concentration()`
+- [x] Implement same pattern in `SpeciatedMassMovingBin.add_concentration()`
+- [x] Add tests for bin-based charge averaging scenarios
+- [x] Update docstrings documenting bin-based behavior differences
 
 **Acceptance Criteria:**
-- [ ] Adding concentration updates charge via weighted average
-- [ ] Missing charge preserves existing bin charges
-- [ ] Docstrings clearly explain bin-based vs particle-resolved behavior
+- [x] Adding concentration updates charge via weighted average
+- [x] Missing charge preserves existing bin charges
+- [x] Docstrings clearly explain bin-based vs particle-resolved behavior
 
 ### Phase 3: Documentation Update (M1-P3)
 
@@ -139,9 +139,9 @@ averaging.
 **Size:** XS
 
 **Tasks:**
-- [ ] Update this maintenance document status to Shipped
-- [ ] Add completion notes and lessons learned
-- [ ] Update README.md in development_plans if needed
+- [x] Update this maintenance document status to Shipped
+- [x] Add completion notes and lessons learned
+- [x] Update README.md in development_plans if needed
 
 ## Technical Approach
 
@@ -269,6 +269,27 @@ new_charge[i] = (old_concentration[i] * old_charge[i] + added_concentration[i] *
 - **Developer Impact:** Consistent charge handling across particle operations
 - **System Impact:** Minor API addition, fully backward compatible
 
+## Completion Notes
+
+### Implementation Summary
+
+- **Phase 1 (#78):** Added keyword-only `added_charge` handling in
+  `ParticleRepresentation` and particle-resolved strategy, including tests for
+  append/fill paths.
+- **Phase 2 (#79):** Implemented concentration-weighted charge updates across
+  bin-based strategies with documentation and coverage.
+
+### Lessons Learned
+
+- Align charge array shape validation early to avoid downstream errors.
+- Maintain parity between particle-resolved and bin-based docstrings to reduce
+  support questions.
+
+### Actual vs Planned
+
+- Matched plan; all phases shipped as scheduled with backward compatibility
+  confirmed.
+
 ## References
 
 - Related Architecture: Strategy pattern in `distribution_strategies/`
@@ -299,3 +320,4 @@ When generating issues from this maintenance plan:
 | Date | Change | Author |
 |------|--------|--------|
 | 2025-12-19 | Initial maintenance plan created | ADW Workflow |
+| 2025-12-23 | Feature shipped - all phases complete | ADW Workflow |
