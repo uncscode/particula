@@ -71,3 +71,17 @@ def test_get_shape_check_2d_and_header():
         get_shape_check(time, np.ones((3, 2)), ["only_one"])
     with pytest.raises(ValueError):
         get_shape_check(time, np.ones((3, 3)), ["a", "b"])
+
+
+def test_get_shape_check_numpy2_compatibility():
+    """NumPy 2.0 scalar conversion uses Python int axis."""
+    time = np.arange(5)
+    data = np.ones((3, 5))
+    reshaped = get_shape_check(time, data, ["a", "b", "c"])
+    assert reshaped.shape == (5, 3)
+    assert np.array_equal(reshaped, np.ones((5, 3)))
+
+    square = np.ones((5, 5))
+    square_result = get_shape_check(time, square, list("abcde"))
+    assert square_result.shape == (5, 5)
+    assert np.array_equal(square_result, square)
