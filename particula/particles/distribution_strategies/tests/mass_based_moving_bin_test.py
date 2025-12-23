@@ -24,10 +24,10 @@ mass_based_strategy = _load_mass_based_strategy()
 
 def test_source_file_path():
     """Ensure MassBasedMovingBin resolves to the worktree source."""
-    assert (
-        "trees/86472619/particula/particles/distribution_strategies/mass_based_moving_bin.py"
-        in (mass_based_strategy.add_concentration.__code__.co_filename)
-    )
+    filename = Path(mass_based_strategy.add_concentration.__code__.co_filename)
+    # Check that the implementation comes from the expected module/file,
+    # without depending on a workflow-specific tree path.
+    assert filename.name == "mass_based_moving_bin.py"
 
 
 def test_get_name():
