@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Pytest Runner Tool with Coverage
+"""Pytest Runner Tool with Coverage
 
 Runs pytest with coverage and returns either full output or a summary.
 This tool validates test results to prevent false positives.
@@ -17,8 +16,7 @@ from typing import Dict, List, Optional, Tuple
 
 
 def parse_pytest_output(output: str) -> Dict:
-    """
-    Parse pytest output to extract key metrics.
+    """Parse pytest output to extract key metrics.
 
     Args:
         output: The full pytest output text
@@ -105,10 +103,11 @@ def parse_pytest_output(output: str) -> Dict:
 
 
 def format_summary(
-    metrics: Dict, validation_errors: List[str], coverage_threshold: Optional[int] = None
+    metrics: Dict,
+    validation_errors: List[str],
+    coverage_threshold: Optional[int] = None,
 ) -> str:
-    """
-    Format a human-readable summary of test results.
+    """Format a human-readable summary of test results.
 
     Args:
         metrics: Parsed metrics from pytest output
@@ -183,8 +182,7 @@ def validate_results(
     min_test_count: int = 1,
     coverage_threshold: Optional[int] = None,
 ) -> List[str]:
-    """
-    Validate pytest results against expected criteria.
+    """Validate pytest results against expected criteria.
 
     Args:
         metrics: Parsed metrics from pytest output
@@ -238,8 +236,7 @@ def run_pytest(
     durations: Optional[int] = None,
     durations_min: Optional[float] = None,
 ) -> Tuple[int, str]:
-    """
-    Run pytest with the specified arguments.
+    """Run pytest with the specified arguments.
 
     Prepends cwd to PYTHONPATH (when provided) so git worktrees using a shared venv
     import code from the worktree before any installed package copies.
@@ -296,7 +293,9 @@ def run_pytest(
         # Try to find project root
         current = Path.cwd()
         while current != current.parent:
-            if (current / "pyproject.toml").exists() or (current / ".git").exists():
+            if (current / "pyproject.toml").exists() or (
+                current / ".git"
+            ).exists():
                 cwd = str(current)
                 break
             current = current.parent
@@ -335,7 +334,9 @@ def run_pytest(
         metrics["exit_code"] = result.returncode
 
         # Validate results (including coverage threshold)
-        validation_errors = validate_results(metrics, min_test_count, coverage_threshold)
+        validation_errors = validate_results(
+            metrics, min_test_count, coverage_threshold
+        )
 
         # Determine final exit code (fail if validation fails)
         exit_code = result.returncode
@@ -344,7 +345,9 @@ def run_pytest(
 
         # Format output based on mode
         if output_mode == "summary":
-            output = format_summary(metrics, validation_errors, coverage_threshold)
+            output = format_summary(
+                metrics, validation_errors, coverage_threshold
+            )
         elif output_mode == "json":
             output = json.dumps(
                 {
@@ -357,7 +360,9 @@ def run_pytest(
             )
         else:  # full
             # Include summary at the end of full output
-            summary = format_summary(metrics, validation_errors, coverage_threshold)
+            summary = format_summary(
+                metrics, validation_errors, coverage_threshold
+            )
             output = f"{full_output}\n\n{summary}"
 
             # Fall back to summary if full output is too long (>500 lines)
@@ -381,7 +386,9 @@ def run_pytest(
 
 def main():
     """Main entry point for CLI usage."""
-    parser = argparse.ArgumentParser(description="Run pytest with coverage and validation")
+    parser = argparse.ArgumentParser(
+        description="Run pytest with coverage and validation"
+    )
     parser.add_argument(
         "--output",
         choices=["summary", "full", "json"],
@@ -394,9 +401,14 @@ def main():
         default=1,
         help="Minimum expected test count (default: 1 for scoped tests)",
     )
-    parser.add_argument("--cwd", type=str, help="Working directory (defaults to project root)")
     parser.add_argument(
-        "--timeout", type=int, default=600, help="Timeout in seconds (default: 600 = 10 minutes)"
+        "--cwd", type=str, help="Working directory (defaults to project root)"
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=600,
+        help="Timeout in seconds (default: 600 = 10 minutes)",
     )
     # Coverage options
     parser.add_argument(
@@ -444,7 +456,9 @@ def main():
         default=None,
         help="Minimum duration in seconds for inclusion in slowest list (default: 0.005).",
     )
-    parser.add_argument("pytest_args", nargs="*", help="Additional arguments to pass to pytest")
+    parser.add_argument(
+        "pytest_args", nargs="*", help="Additional arguments to pass to pytest"
+    )
 
     args = parser.parse_args()
 
