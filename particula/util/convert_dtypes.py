@@ -172,9 +172,9 @@ def get_shape_check(
             concatenate_axis_new = 1  # Default to the axis=1
         else:
             # Find the axis that doesn't match the length of time
-            concatenate_axis_new = np.argwhere(
-                np.array(data.shape) != len(time)
-            ).flatten()[0]
+            indices = np.argwhere(np.array(data.shape) != len(time)).flatten()
+            # NumPy 2.0 requires a Python int for axis values
+            concatenate_axis_new = int(indices[0].item())
         # Reshape new data so the concatenate axis is axis=1
         data = np.moveaxis(data, concatenate_axis_new, 1)
 
