@@ -4,22 +4,43 @@ Feature and maintenance development plans tracked for particula. Each entry
 follows the appropriate template to capture motivation, scope, phases, testing,
 and rollout.
 
+## Indexes
+
+- [Epics Index](epics/index.md) — All epics with status and next available ID
+- [Features Index](features/index.md) — All features with status and next
+  available ID
+- [Maintenance Index](maintenance/index.md) — All maintenance plans with status
+
 ## Epics
 
-- [E1: Staggered ODE Stepping for Particle-Resolved Condensation][epic-staggered-condensation]
+- [E1: Staggered ODE Stepping for Particle-Resolved Condensation][epic-e1]
   — Status: Not Started (P2)
   - Scope: Staggered ODE stepping framework for particle-resolved condensation
     with three modes (half-step, random, batch) for improved stability and
     mass conservation.
-
-## Maintenance Plans
-
-- [Add Charge Support to add_concentration][plan-charge-add-concentration] —
-  Status: Shipped (P2)
-  - Scope: Enable `add_concentration()` to accept optional charge parameter for
-    ion injection in coagulation simulations.
+  - Features: [E1-F1][e1-f1], [E1-F2][e1-f2], [E1-F3][e1-f3], [E1-F4][e1-f4],
+    [E1-F5][e1-f5], [E1-F6][e1-f6]
 
 ## Feature Plans
+
+### Epic E1: Staggered Condensation Features
+
+- [E1-F1: Core Staggered Stepping Logic][e1-f1] — Status: Not Started (P2)
+  - Scope: `CondensationIsothermalStaggered` class with theta modes and two-pass
+    stepping algorithm.
+- [E1-F2: Batch-Wise Stepping Mode][e1-f2] — Status: Not Started (P2)
+  - Scope: Gauss-Seidel batch stepping with configurable batch count.
+- [E1-F3: Builder and Factory Integration][e1-f3] — Status: Not Started (P2)
+  - Scope: Builder and factory support for staggered condensation strategy.
+- [E1-F4: Mass Conservation Validation][e1-f4] — Status: Not Started (P2)
+  - Scope: Comprehensive test suites validating mass conservation properties.
+- [E1-F5: Stability and Performance Benchmarks][e1-f5] — Status: Not Started
+  (P3)
+  - Scope: Benchmark tests for stability and performance characteristics.
+- [E1-F6: Documentation and Examples][e1-f6] — Status: Not Started (P3)
+  - Scope: Docstrings, Jupyter notebook examples, and dev-docs updates.
+
+### Standalone Features (Wall Loss)
 
 - [Wall Loss Builders, Mixins, and Factory][plan-wall-loss-builders] — Status:
   In Progress (P1, #818)
@@ -38,13 +59,33 @@ and rollout.
   - Scope: Runnable wrapping wall loss strategies with sub-step splitting,
     non-negative clamp, exports, and runnable-level tests.
 
+## Maintenance Plans
+
+- [Add Charge Support to add_concentration][plan-charge-add-concentration] —
+  Status: Shipped (P2)
+  - Scope: Enable `add_concentration()` to accept optional charge parameter for
+    ion injection in coagulation simulations.
+
 ## References
 
 - Parent wall loss epic: [#72](https://github.com/uncscode/particula/issues/72)
 
-[epic-staggered-condensation]: epics/E1-staggered-condensation-stepping.md
+<!-- Epic Links -->
+[epic-e1]: epics/E1-staggered-condensation-stepping.md
+
+<!-- E1 Feature Links -->
+[e1-f1]: features/E1-F1-core-staggered-stepping.md
+[e1-f2]: features/E1-F2-batch-stepping-mode.md
+[e1-f3]: features/E1-F3-builder-factory-integration.md
+[e1-f4]: features/E1-F4-mass-conservation-validation.md
+[e1-f5]: features/E1-F5-stability-performance-benchmarks.md
+[e1-f6]: features/E1-F6-documentation-examples.md
+
+<!-- Standalone Feature Links -->
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md
 [plan-rect]: features/rectangular-wall-loss-strategy.md
 [plan-charged-wall-loss]: features/charged-wall-loss-strategy.md
 [plan-wall-loss-runnable]: features/wall-loss-runnable.md
+
+<!-- Maintenance Links -->
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md
