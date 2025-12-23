@@ -13,7 +13,7 @@
 **Updated:** 2025-12-23
 
 **Parent Epic:** [E1: Staggered ODE Stepping][epic-e1]
-**Related Issues:** TBD
+**Related Issues:** #91, #92, #93, #94
 **Related PRs:** TBD
 
 ---
@@ -81,7 +81,7 @@ against a fixed gas concentration. At large time steps, this causes:
 
 - [ ] **E1-F1-P1:** Create `CondensationIsothermalStaggered` class skeleton with
       tests
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #91 | Size: S | Status: Not Started
   - File: `particula/dynamics/condensation/condensation_strategies.py`
   - Add new class inheriting from `CondensationStrategy`
   - Add `theta_mode` parameter: `"half"`, `"random"`, `"batch"`
@@ -90,7 +90,7 @@ against a fixed gas concentration. At large time steps, this causes:
   - Include unit tests for class instantiation and parameter validation
 
 - [ ] **E1-F1-P2:** Implement `_get_theta_values()` helper method with tests
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #92 | Size: S | Status: Not Started
   - Generate theta array based on mode:
     - `"half"`: `np.full(n_particles, 0.5)`
     - `"random"`: `np.random.uniform(0, 1, n_particles)`
@@ -98,14 +98,14 @@ against a fixed gas concentration. At large time steps, this causes:
   - Include unit tests for each mode verifying shape and value ranges
 
 - [ ] **E1-F1-P3:** Implement `_make_batches()` helper method with tests
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #93 | Size: S | Status: Not Started
   - Shuffle particle indices if `shuffle_each_step=True`
   - Divide indices into `num_batches` groups
   - Return list of index arrays
   - Include unit tests for batch creation, shuffling, and edge cases
 
 - [ ] **E1-F1-P4:** Implement two-pass staggered `step()` method with tests
-  - Issue: TBD | Size: M | Status: Not Started
+  - Issue: #94 | Size: M | Status: Not Started
   - Pass 1: Each particle grows for `theta_p * dt`, update gas cumulatively
   - Pass 2: Each particle grows for `(1 - theta_p) * dt` with updated gas
   - Preserve existing API: `step(particle, gas_species, temperature, pressure,
