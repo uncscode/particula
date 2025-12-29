@@ -40,13 +40,9 @@ dev = [
 extra = [
     "matplotlib", "pandas", "pint", "thermo", "tqdm",
 ]
-adw = [
-    "adw @ git+https://github.com/Gorkowski/Agent.git ; python_version >= '3.12'",
-]
 all = [
     "particula[dev]",
     "particula[extra]",
-    "particula[adw]",
 ]
 
 [build-system]
