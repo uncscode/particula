@@ -9,7 +9,10 @@ commands have been replaced by JSON workflows in `.opencode/workflow/`.
 
 ## Available Commands
 
+- **create-workflow.md** - Create custom ADW workflow with interactive builder
+- **epic-to-issues.md** - Generate type:generate issues for all features in an epic
 - **remove_trees.md** - List and remove git worktrees in `trees/`
+- **tools.md** - List built-in development tools
 - **version.md** - Display version information
 
 ## Using Commands
