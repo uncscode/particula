@@ -62,32 +62,58 @@ some simulations benefit from:
 
 ### Upstream
 
-- **E1-F1**: Core Staggered Stepping Logic (must be complete)
-  - Provides `CondensationIsothermalStaggered` class
-  - Provides `_make_batches()` method foundation
+- **E1-F1**: Core Staggered Stepping Logic (specific phases required)
+  - **E1-F1-P1** (Required): Provides `CondensationIsothermalStaggered` class skeleton
+  - **E1-F1-P2** (Required): Provides `_get_theta_values()` method
+  - **E1-F1-P3** (Required): Provides `_make_batches()` method foundation
+  - **E1-F1-P4** (Required): Provides two-pass `step()` structure to extend
+
+**Note**: E1-F2 extends the batch logic already stubbed in E1-F1. The E1-F1
+implementation handles `num_batches=1` case; E1-F2 adds multi-batch Gauss-Seidel
+behavior and edge case handling for `num_batches > 1`.
 
 ### Downstream
 
 - E1-F3: Builder and Factory Integration
-- E1-F4: Mass Conservation Validation
-- E1-F5: Stability and Performance Benchmarks
+- E1-F4: Mass Conservation Validation (tests batch mode conservation)
+- E1-F5: Stability and Performance Benchmarks (benchmarks batch vs no-batch)
 
 ## Phase Checklist
 
 - [ ] **E1-F2-P1:** Implement batch-wise Gauss-Seidel stepping with tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Process batches sequentially within each pass
-  - Update gas concentration after each batch completes
+  - **Prerequisite**: E1-F1-P1 through E1-F1-P4 must be complete
+  - Modify `step()` to process batches sequentially within each pass
+  - Update gas concentration after each batch completes (not just at pass end)
   - Support combining batching with theta modes (e.g., random theta within
     batches)
-  - Include tests for batch ordering effects and gas update timing
+  - **Vectorization opportunity**: Within each batch, particles can be processed
+    in parallel if their interactions are independent within the batch
+  - Include tests for:
+    - Batch ordering effects (different orders → different results)
+    - Gas update timing (verify updates happen between batches)
+    - Batch + theta mode combinations
+  - Test file: `particula/dynamics/condensation/tests/condensation_strategies_test.py`
 
 - [ ] **E1-F2-P2:** Add batch size validation and edge cases with tests
   - Issue: TBD | Size: XS | Status: Not Started
-  - Handle `num_batches > n_particles` gracefully (reduce to n_particles)
-  - Handle `num_batches = 1` (equivalent to no batching)
-  - Validate `num_batches >= 1`
-  - Include edge case tests for all boundary conditions
+  - Handle `num_batches > n_particles` gracefully:
+    - Clip to `n_particles` (each particle gets its own batch)
+    - Log warning when clipping occurs
+  - Handle `num_batches = 1`:
+    - Equivalent to no batching; single gas update per pass
+    - Verify behavior matches E1-F1-P4 default implementation
+  - Handle `num_batches = n_particles`:
+    - Maximum granularity; per-particle gas updates
+    - Most accurate but slowest
+  - Validate `num_batches >= 1` in `__init__`:
+    - Raise `ValueError` for `num_batches < 1`
+  - Include edge case tests:
+    - `num_batches = 0` → ValueError
+    - `num_batches = -1` → ValueError
+    - `num_batches = 1` with 1000 particles → single batch
+    - `num_batches = 5000` with 100 particles → 100 batches (clipped)
+    - `num_batches = n_particles` → n_particles batches
 
 ## Critical Testing Requirements
 
@@ -177,12 +203,91 @@ def step(self, particle, gas_species, temperature, pressure, time_step):
 ### Edge Case Handling
 
 ```python
+import logging
+import warnings
+
+logger = logging.getLogger("particula")
+
+
 def _validate_num_batches(self, num_batches: int, n_particles: int) -> int:
+    """Validate and potentially clip num_batches to valid range.
+    
+    Args:
+        num_batches: Requested number of batches.
+        n_particles: Number of particles in the system.
+        
+    Returns:
+        Valid number of batches (1 <= result <= n_particles).
+        
+    Raises:
+        ValueError: If num_batches < 1.
+    """
     if num_batches < 1:
-        raise ValueError("num_batches must be >= 1")
-    # Silently clip to n_particles (can't have more batches than particles)
-    return min(num_batches, n_particles)
+        raise ValueError(
+            f"num_batches must be >= 1, got {num_batches}"
+        )
+    
+    if num_batches > n_particles:
+        message = (
+            f"num_batches ({num_batches}) > n_particles ({n_particles}), "
+            f"clipping to {n_particles} batches"
+        )
+        logger.info(message)
+        return n_particles
+    
+    return num_batches
 ```
+
+### Vectorization Within Batches
+
+For performance, particles within the same batch can be processed in parallel
+when their gas interactions are independent:
+
+```python
+def _process_batch_vectorized(
+    self,
+    batch_indices: NDArray[np.intp],
+    theta: NDArray[np.float64],
+    pass_num: int,
+    particle: ParticleRepresentation,
+    gas_concentration: NDArray[np.float64],
+    temperature: float,
+    pressure: float,
+    time_step: float,
+) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Process a batch of particles with vectorized operations.
+    
+    All particles in the batch see the same gas concentration (pre-batch
+    update), so their mass transfers can be computed in parallel.
+    
+    Returns:
+        Tuple of (mass_changes for batch particles, total gas consumption)
+    """
+    # Extract batch particle data as slices
+    batch_radii = particle.get_radius()[batch_indices]
+    batch_masses = particle.get_species_mass()[batch_indices]
+    
+    # Compute time fractions for batch
+    if pass_num == 1:
+        dt_local = theta[batch_indices] * time_step
+    else:
+        dt_local = (1 - theta[batch_indices]) * time_step
+    
+    # Vectorized mass transfer calculation
+    # (uses existing infrastructure from parent class)
+    mass_rates = self._batch_mass_transfer_rate(
+        batch_radii, batch_masses, gas_concentration, temperature, pressure
+    )
+    
+    mass_changes = mass_rates * dt_local[:, np.newaxis]  # broadcast
+    total_gas_change = mass_changes.sum(axis=0)
+    
+    return mass_changes, total_gas_change
+```
+
+**Note**: Full vectorization may not be possible due to the sequential nature
+of Gauss-Seidel updates. The above shows vectorization *within* a batch, which
+is valid since all particles in a batch see the same pre-batch gas state.
 
 ## Success Criteria
 
@@ -217,10 +322,19 @@ particle, gas = strategy.step(
 )
 ```
 
+## Risks and Mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Vectorization complexity increases implementation time | Medium | Low | Start with per-particle loops; optimize later if needed |
+| Batch ordering affects reproducibility | Medium | Medium | Document that results depend on batch order; provide `shuffle_each_step=False` option |
+| Gauss-Seidel convergence issues at extreme batch counts | Low | Medium | Test thoroughly in E1-F4; document recommended batch ranges |
+
 ## Change Log
 
 | Date       | Change                                | Author       |
 |------------|---------------------------------------|--------------|
 | 2025-12-23 | Initial feature documentation created | ADW Workflow |
+| 2025-12-29 | Added dependency phase details, vectorization notes, risks | ADW Workflow |
 
 [epic-e1]: ../epics/E1-staggered-condensation-stepping.md

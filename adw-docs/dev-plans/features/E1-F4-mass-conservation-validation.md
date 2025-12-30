@@ -133,16 +133,93 @@ Location: `particula/dynamics/condensation/tests/staggered_mass_conservation_tes
 ### Test Harness Design
 
 ```python
+"""Mass conservation tests for staggered condensation."""
+
 import numpy as np
 import pytest
+from numpy.typing import NDArray
+
 from particula.dynamics.condensation import CondensationIsothermalStaggered
+from particula.gas import AtmosphereBuilder, GasSpeciesBuilder
+from particula.particles import (
+    ParticleRepresentationBuilder,
+    ParticleResolvedSpeciatedMassBuilder,
+)
 
 
-def calculate_total_mass(particle, gas_species, air_volume):
-    """Calculate total mass in system (particles + gas)."""
-    particle_mass = np.sum(particle.mass)
-    gas_mass = gas_species.concentration * air_volume * gas_species.molar_mass
-    return particle_mass + gas_mass
+def calculate_total_mass(
+    particle,
+    gas_species,
+) -> float:
+    """Calculate total mass in system (particles + gas).
+    
+    Args:
+        particle: ParticleRepresentation with speciated mass.
+        gas_species: GasSpecies with concentration.
+        
+    Returns:
+        Total mass in kg (particle mass + gas mass).
+    """
+    # Sum all particle mass (across all species)
+    particle_mass = np.sum(particle.get_mass())
+    
+    # Gas mass = concentration (kg/m³) summed across species
+    # Note: concentration is already in mass units for our setup
+    gas_mass = np.sum(gas_species.get_concentration())
+    
+    return float(particle_mass + gas_mass)
+
+
+@pytest.fixture
+def create_test_system():
+    """Factory fixture to create particle systems with specified particle count.
+    
+    Returns:
+        Function that creates (particle, gas_species) tuple.
+    """
+    def _create(n_particles: int):
+        """Create particle system with n_particles particles.
+        
+        Args:
+            n_particles: Number of particles to create.
+            
+        Returns:
+            Tuple of (particle, gas_species).
+        """
+        # Create gas species (water vapor)
+        gas_species = (
+            GasSpeciesBuilder()
+            .set_molar_mass(0.018, "kg/mol")
+            .set_vapor_pressure(3000.0, "Pa")  # ~saturated at 298 K
+            .set_concentration(0.01, "kg/m^3")  # initial gas concentration
+            .build()
+        )
+        
+        # Create particle distribution
+        # Log-normal distribution of particle masses
+        rng = np.random.default_rng(42)  # reproducible
+        particle_masses = rng.lognormal(
+            mean=-20, sigma=1.0, size=n_particles
+        )  # kg
+        
+        # Use ParticleResolvedSpeciatedMass distribution
+        distribution = (
+            ParticleResolvedSpeciatedMassBuilder()
+            .set_mass(particle_masses, "kg")
+            .set_density(1000.0, "kg/m^3")
+            .build()
+        )
+        
+        particle = (
+            ParticleRepresentationBuilder()
+            .set_distribution(distribution)
+            .set_concentration(np.ones(n_particles), "1/m^3")
+            .build()
+        )
+        
+        return particle, gas_species
+    
+    return _create
 
 
 class TestMassConservation:
@@ -150,27 +227,27 @@ class TestMassConservation:
 
     RELATIVE_TOLERANCE = 1e-12
 
-    @pytest.fixture
-    def setup_system(self, n_particles):
-        """Create particle system with specified particle count."""
-        # ... setup code
-        return particle, gas_species, air_volume
-
     @pytest.mark.parametrize("theta_mode", ["half", "random", "batch"])
     @pytest.mark.parametrize("n_particles", [100, 1000, 10000])
-    def test_mass_conservation(self, theta_mode, n_particles, setup_system):
+    def test_mass_conservation(
+        self,
+        theta_mode: str,
+        n_particles: int,
+        create_test_system,
+    ):
         """Verify total mass is conserved to within tolerance."""
-        particle, gas_species, air_volume = setup_system
+        particle, gas_species = create_test_system(n_particles)
 
-        initial_mass = calculate_total_mass(particle, gas_species, air_volume)
+        initial_mass = calculate_total_mass(particle, gas_species)
 
         strategy = CondensationIsothermalStaggered(
-            molar_mass=gas_species.molar_mass,
+            molar_mass=0.018,  # kg/mol for water
             theta_mode=theta_mode,
             num_batches=10,
+            random_state=42,  # reproducibility
         )
 
-        particle, gas_species = strategy.step(
+        particle_out, gas_out = strategy.step(
             particle=particle,
             gas_species=gas_species,
             temperature=298.0,
@@ -178,11 +255,12 @@ class TestMassConservation:
             time_step=1.0,
         )
 
-        final_mass = calculate_total_mass(particle, gas_species, air_volume)
+        final_mass = calculate_total_mass(particle_out, gas_out)
 
         relative_error = abs(final_mass - initial_mass) / initial_mass
         assert relative_error < self.RELATIVE_TOLERANCE, (
-            f"Mass conservation violated: relative error = {relative_error}"
+            f"Mass conservation violated for theta_mode={theta_mode}, "
+            f"n_particles={n_particles}: relative error = {relative_error:.2e}"
         )
 ```
 
@@ -253,10 +331,19 @@ pytest -k "test_mass_conservation and random and 1000"
 pytest -k "kelvin"
 ```
 
+## Risks and Mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| 10000 particle tests too slow for CI | Medium | Low | Mark with `@pytest.mark.slow` if > 5s |
+| Fixture setup complexity | Low | Medium | Use factory fixture pattern for flexibility |
+| Tolerance too strict for numerical precision | Low | High | Document rationale; relax to 1e-10 if needed |
+
 ## Change Log
 
 | Date       | Change                                | Author       |
 |------------|---------------------------------------|--------------|
 | 2025-12-23 | Initial feature documentation created | ADW Workflow |
+| 2025-12-29 | Added complete fixture code, factory pattern | ADW Workflow |
 
 [epic-e1]: ../epics/E1-staggered-condensation-stepping.md
