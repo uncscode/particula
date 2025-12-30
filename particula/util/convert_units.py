@@ -15,7 +15,9 @@ References:
     - Pint documentation: https://pint.readthedocs.io/
 """
 
-from typing import Optional
+from typing import Optional, Union
+
+import numpy as np
 
 try:
     import pint
@@ -25,11 +27,14 @@ except ImportError:
     unit_registry = None  # pylint: disable=invalid-name
 
 
+ReturnType = Union[float, np.ndarray]
+
+
 def get_unit_conversion(
     old: str,
     new: str,
-    value: Optional[float] = None,
-) -> float:
+    value: Optional[Union[float, np.ndarray]] = None,
+) -> ReturnType:
     """Convert a numeric value or unit expression from one unit to another using
     Pint.
 
@@ -49,8 +54,8 @@ def get_unit_conversion(
             `pip install pint`.
 
     Returns:
-        - A float representing either the conversion factor or the fully
-          converted value in the target unit.
+        - A float or ``numpy.ndarray`` representing either the conversion
+          factor or the fully converted value in the target unit.
 
     Examples:
         ``` py title="Example Multi-Unit Conversion"
@@ -86,4 +91,9 @@ def get_unit_conversion(
     result = old_quantity.to(
         new_quantity
     ).magnitude  # get the new value without units
-    return float(result)
+
+    result_array = np.asarray(result)
+    if result_array.shape == ():
+        return result_array.item()
+
+    return result_array.astype(float)
