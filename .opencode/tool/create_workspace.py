@@ -100,7 +100,13 @@ def create_workspace_cli(  # noqa: C901
             return 1, output
 
         if result_adw_id is None:
-            return 1, "ERROR: Workspace creation did not return an ADW ID"
+            # This case suggests an unexpected state in workspace creation logic
+            # where no error was reported but also no ADW ID was returned
+            return (
+                1,
+                "ERROR: Workspace creation did not return an ADW ID. "
+                "This suggests a logic error in the create_workspace function.",
+            )
 
         # Workspace created successfully
         # Load state to get full details
