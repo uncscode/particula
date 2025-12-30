@@ -785,7 +785,7 @@ class BuilderWallEddyDiffusivityMixin:
         self,
         wall_eddy_diffusivity: float,
         wall_eddy_diffusivity_units: str = "1/s",
-    ):
+    ) -> "BuilderWallEddyDiffusivityMixin":
         """Set wall eddy diffusivity in 1/s.
 
         Args:
@@ -802,10 +802,13 @@ class BuilderWallEddyDiffusivityMixin:
         if wall_eddy_diffusivity_units in {"1/s", "s^-1"}:
             self.wall_eddy_diffusivity = wall_eddy_diffusivity
             return self
-        self.wall_eddy_diffusivity = get_unit_conversion(
-            wall_eddy_diffusivity_units,
-            "1/s",
-            wall_eddy_diffusivity,
+        self.wall_eddy_diffusivity = cast(
+            float,
+            get_unit_conversion(
+                wall_eddy_diffusivity_units,
+                "1/s",
+                wall_eddy_diffusivity,
+            ),
         )
         return self
 
@@ -829,7 +832,7 @@ class BuilderChamberRadiusMixin:
         self,
         chamber_radius: float,
         chamber_radius_units: str = "m",
-    ):
+    ) -> "BuilderChamberRadiusMixin":
         """Set the chamber radius in meters.
 
         Args:
@@ -848,10 +851,13 @@ class BuilderChamberRadiusMixin:
         if chamber_radius_units in {"cm", "centimeter", "centimeters"}:
             self.chamber_radius = chamber_radius * 0.01
             return self
-        self.chamber_radius = get_unit_conversion(
-            chamber_radius_units,
-            "m",
-            chamber_radius,
+        self.chamber_radius = cast(
+            float,
+            get_unit_conversion(
+                chamber_radius_units,
+                "m",
+                chamber_radius,
+            ),
         )
         return self
 
@@ -875,7 +881,7 @@ class BuilderChamberDimensionsMixin:
         self,
         chamber_dimensions: Tuple[float, float, float],
         chamber_dimensions_units: str = "m",
-    ):
+    ) -> "BuilderChamberDimensionsMixin":
         """Set rectangular chamber dimensions in meters.
 
         Args:
@@ -910,20 +916,29 @@ class BuilderChamberDimensionsMixin:
             )
             return self
         self.chamber_dimensions = (
-            get_unit_conversion(
-                chamber_dimensions_units,
-                "m",
-                length,
+            cast(
+                float,
+                get_unit_conversion(
+                    chamber_dimensions_units,
+                    "m",
+                    length,
+                ),
             ),
-            get_unit_conversion(
-                chamber_dimensions_units,
-                "m",
-                width,
+            cast(
+                float,
+                get_unit_conversion(
+                    chamber_dimensions_units,
+                    "m",
+                    width,
+                ),
             ),
-            get_unit_conversion(
-                chamber_dimensions_units,
-                "m",
-                height,
+            cast(
+                float,
+                get_unit_conversion(
+                    chamber_dimensions_units,
+                    "m",
+                    height,
+                ),
             ),
         )
         return self
@@ -944,7 +959,7 @@ class BuilderWallPotentialMixin:
     @validate_inputs({"wall_potential": "finite"})
     def set_wall_potential(
         self, wall_potential: float, wall_potential_units: str = "V"
-    ):
+    ) -> "BuilderWallPotentialMixin":
         """Set wall potential in volts.
 
         Args:
@@ -960,8 +975,8 @@ class BuilderWallPotentialMixin:
         if wall_potential_units in {"V", "volt", "volts"}:
             self.wall_potential = wall_potential
             return self
-        self.wall_potential = get_unit_conversion(
-            wall_potential_units, "V", wall_potential
+        self.wall_potential = cast(
+            float, get_unit_conversion(wall_potential_units, "V", wall_potential)
         )
         return self
 
@@ -999,7 +1014,7 @@ class BuilderWallElectricFieldMixin:
         self,
         wall_electric_field: Union[float, Tuple[float, float, float]],
         wall_electric_field_units: str = "V/m",
-    ):
+    ) -> "BuilderWallElectricFieldMixin":
         """Set wall electric field magnitude in V/m.
 
         Args:
@@ -1026,14 +1041,23 @@ class BuilderWallElectricFieldMixin:
                 )
                 return self
             converted_field = (
-                get_unit_conversion(
-                    wall_electric_field_units, "V/m", validated_field[0]
+                cast(
+                    float,
+                    get_unit_conversion(
+                        wall_electric_field_units, "V/m", validated_field[0]
+                    ),
                 ),
-                get_unit_conversion(
-                    wall_electric_field_units, "V/m", validated_field[1]
+                cast(
+                    float,
+                    get_unit_conversion(
+                        wall_electric_field_units, "V/m", validated_field[1]
+                    ),
                 ),
-                get_unit_conversion(
-                    wall_electric_field_units, "V/m", validated_field[2]
+                cast(
+                    float,
+                    get_unit_conversion(
+                        wall_electric_field_units, "V/m", validated_field[2]
+                    ),
                 ),
             )
             self.wall_electric_field = cast(
@@ -1043,8 +1067,11 @@ class BuilderWallElectricFieldMixin:
         if wall_electric_field_units in {"V/m", "volt/m", "volts/m"}:
             self.wall_electric_field = validated_field
             return self
-        self.wall_electric_field = get_unit_conversion(
-            wall_electric_field_units, "V/m", validated_field
+        self.wall_electric_field = cast(
+            float,
+            get_unit_conversion(
+                wall_electric_field_units, "V/m", validated_field
+            ),
         )
         return self
 
