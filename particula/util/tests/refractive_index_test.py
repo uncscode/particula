@@ -61,7 +61,17 @@ def test_near_zero_volumes_remain_finite():
     assert cmath.isfinite(result)
 
 
-def test_volume_fractions_not_sum_to_one_still_process():
-    """Non-normalized volume fractions should still yield finite output."""
-    result = get_effective_refractive_index(1.45, 1.25, 0.2, 0.9)
-    assert cmath.isfinite(result)
+def test_volume_fractions_are_automatically_normalized():
+    """Volume fractions not summing to one are normalized by total volume."""
+    m_zero = 1.45
+    m_one = 1.25
+    volume_zero = 0.2
+    volume_one = 0.9
+    expected = _expected_effective_index(m_zero, m_one, volume_zero, volume_one)
+    result = get_effective_refractive_index(
+        m_zero=m_zero,
+        m_one=m_one,
+        volume_zero=volume_zero,
+        volume_one=volume_one,
+    )
+    assert result == pytest.approx(expected)

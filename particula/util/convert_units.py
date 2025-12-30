@@ -96,4 +96,4 @@ def get_unit_conversion(
     if result_array.shape == ():
         return result_array.item()
 
-    return result_array.astype(float)
+    return result_array

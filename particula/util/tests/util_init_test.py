@@ -27,7 +27,7 @@ EXPECTED_EXPORTS = {
 def test_expected_exports_are_present():
     """All documented util exports should be importable."""
     missing = {name for name in EXPECTED_EXPORTS if not hasattr(util, name)}
-    assert not missing
+    assert not missing, f"Missing exports: {missing}"
 
 
 def test_all_matches_attributes_when_defined():

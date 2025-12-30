@@ -69,6 +69,8 @@ def run_ruff_check(
     # Build target argument - use "." if no specific target
     target_arg = f"{target_dir}/" if target_dir else "."
 
+    # Subprocess calls use controlled arguments (ruff with validated paths)
+    # shell=False prevents shell injection from user input
     try:
         if auto_fix:
             # Step 1: Apply fixes (don't fail on errors)
