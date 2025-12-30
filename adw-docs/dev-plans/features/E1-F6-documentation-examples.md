@@ -87,7 +87,9 @@ Without documentation, users cannot:
   - Demonstrate all three modes (half, random, batch)
   - Show mass conservation verification
   - Compare stability with simultaneous stepping
-  - Include visualization of results
+  - Include visualization of results (matplotlib plots)
+  - **Also update**: `docs/Examples/Dynamics/index.md` to link to new notebook
+  - Ensure notebook runs cleanly with `jupyter nbconvert --execute`
 
 - [ ] **E1-F6-P3:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
@@ -286,10 +288,19 @@ help(CondensationIsothermalStaggered)
 jupyter notebook docs/Examples/Dynamics/staggered_condensation_example.ipynb
 ```
 
+## Risks and Mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Notebook execution fails in CI | Medium | Medium | Add notebook validation step; pin dependencies |
+| Docstring linter finds issues | Low | Low | Run linter locally before merge |
+| Index.md link broken | Low | Medium | Validate links in E1-F6-P3 dev-docs update |
+
 ## Change Log
 
 | Date       | Change                                | Author       |
 |------------|---------------------------------------|--------------|
 | 2025-12-23 | Initial feature documentation created | ADW Workflow |
+| 2025-12-29 | Added index.md update requirement, risks section | ADW Workflow |
 
 [epic-e1]: ../epics/E1-staggered-condensation-stepping.md

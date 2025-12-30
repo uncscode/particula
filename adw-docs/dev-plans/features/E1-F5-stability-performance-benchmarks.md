@@ -94,9 +94,12 @@ understand:
 ## Critical Testing Requirements
 
 - **Slow Test Marking**: All benchmarks must use `@pytest.mark.slow`
+- **Performance Test Marking**: Use `@pytest.mark.performance` for timing benchmarks
 - **Reproducibility**: Set random seeds for deterministic results
 - **Documentation**: Record benchmark results in test docstrings
-- **CI Exclusion**: Slow tests excluded from normal CI runs
+- **CI Exclusion**: Slow and performance tests excluded from normal CI runs
+  - Run with: `pytest -m "slow or performance"`
+  - Skip with: `pytest -m "not slow and not performance"`
 
 ## Testing Strategy
 
@@ -300,10 +303,19 @@ pytest -m slow -v
 pytest -m "not slow"
 ```
 
+## Risks and Mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Benchmarks flaky due to system load | High | Medium | Run multiple iterations; report mean ± std |
+| 100k particle tests use too much memory | Medium | Medium | Monitor memory; reduce if needed |
+| Performance targets not met | Medium | High | Profile and optimize in follow-up PR |
+
 ## Change Log
 
 | Date       | Change                                | Author       |
 |------------|---------------------------------------|--------------|
 | 2025-12-23 | Initial feature documentation created | ADW Workflow |
+| 2025-12-29 | Added @pytest.mark.performance, risks section | ADW Workflow |
 
 [epic-e1]: ../epics/E1-staggered-condensation-stepping.md
