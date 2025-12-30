@@ -29,17 +29,20 @@ const JSON_CAPABLE_COMMANDS = new Set([
   "add-labels",
   "remove-labels",
   "pr-comments",
+  "rate-limit",
 ]);
 
-type PlatformCommand =
-  | "create-pr"
-  | "fetch-issue"
-  | "create-issue"
-  | "update-issue"
-  | "add-labels"
-  | "remove-labels"
-  | "comment"
-  | "pr-comments";
+ type PlatformCommand =
+   | "create-pr"
+   | "fetch-issue"
+   | "create-issue"
+   | "update-issue"
+   | "add-labels"
+   | "remove-labels"
+   | "comment"
+   | "pr-comments"
+   | "rate-limit";
+
 
 type OutputFormat = "text" | "json";
 
@@ -92,6 +95,11 @@ AVAILABLE COMMANDS:
   Supports actionable_only: true to filter to unresolved comments with meaningful content.
   Supports prefer_scope: "fork" | "upstream" for fork/upstream routing.
 
+• rate-limit: Check API rate limit status
+  Usage: { command: "rate-limit" }
+  Usage: { command: "rate-limit", output_format: "json" }
+  Supports prefer_scope: "fork" | "upstream" for fork/upstream routing.
+
 JSON OUTPUT: Use output_format: "json" to get structured responses for parsing.
 
 HELP: Set help: true to see command-specific CLI usage
@@ -110,6 +118,7 @@ See docs/Agent/development_plans/features/tool-only-agent-permissions.md for con
         "remove-labels",
         "comment",
         "pr-comments",
+        "rate-limit",
       ])
       .describe(`Platform operation to execute.
 
@@ -222,7 +231,7 @@ EXAMPLE: labels: "bug,type:patch,model:default"`),
       .optional()
       .describe(`Output format for results.
 
-APPLIES TO: fetch-issue, create-issue, update-issue, add-labels, remove-labels, pr-comments
+APPLIES TO: fetch-issue, create-issue, update-issue, add-labels, remove-labels, pr-comments, rate-limit
 
 DEFAULT: "text" - Human-readable output
 JSON: "json" - Structured JSON for programmatic parsing
@@ -234,7 +243,7 @@ EXAMPLE: output_format: "json"`),
       .optional()
       .describe(`Repository scope preference.
 
-APPLIES TO: fetch-issue, pr-comments
+APPLIES TO: fetch-issue, pr-comments, rate-limit
 
 For fork workflows where issues live upstream but PRs are on fork.
 
@@ -280,9 +289,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
       }
     }
 
-    if (args.prefer_scope && command !== "fetch-issue" && command !== "pr-comments") {
+    if (args.prefer_scope && !["fetch-issue", "pr-comments", "rate-limit"].includes(command)) {
       return buildMissingArgMessage(
-        "'prefer_scope' is only supported for 'fetch-issue' and 'pr-comments' commands"
+        "'prefer_scope' is only supported for 'fetch-issue', 'pr-comments', and 'rate-limit' commands"
       );
     }
 
@@ -419,6 +428,16 @@ EXAMPLE: { command: "create-issue", help: true }`),
         }
         if (args.actionable_only === true) {
           cmdParts.push("--actionable-only");
+        }
+        if (args.prefer_scope) {
+          cmdParts.push("--prefer-scope", args.prefer_scope);
+        }
+        break;
+      }
+
+      case "rate-limit": {
+        if (args.output_format) {
+          cmdParts.push("--format", outputFormat);
         }
         if (args.prefer_scope) {
           cmdParts.push("--prefer-scope", args.prefer_scope);
