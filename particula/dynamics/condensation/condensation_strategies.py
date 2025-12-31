@@ -823,6 +823,43 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         raise ValueError(f"Invalid theta_mode: {self.theta_mode}")
 
+    def _make_batches(self, n_particles: int) -> list[NDArray[np.intp]]:
+        """Divide particle indices into batches for Gauss-Seidel updates.
+
+        Creates batches of particle indices for sequential processing.
+        Optionally shuffles the order before batching for randomized updates.
+
+        Args:
+            n_particles: Number of particles in the simulation.
+
+        Returns:
+            List of arrays, each containing particle indices for one batch.
+
+        Notes:
+            - Returns an empty list when ``n_particles`` is zero.
+            - Clips ``num_batches`` to ``n_particles`` to avoid empty batches
+              when ``num_batches`` exceeds the particle count.
+            - When ``shuffle_each_step`` is True, indices are shuffled using
+              the stored ``random_state`` (``Generator``, ``RandomState``, or
+              seed), otherwise the original ordering is preserved.
+        """
+        if n_particles == 0:
+            return []
+
+        indices = np.arange(n_particles, dtype=np.intp)
+
+        if self.shuffle_each_step:
+            if isinstance(self.random_state, np.random.Generator):
+                self.random_state.shuffle(indices)
+            elif isinstance(self.random_state, np.random.RandomState):
+                self.random_state.shuffle(indices)
+            else:
+                rng = np.random.default_rng(self.random_state)
+                rng.shuffle(indices)
+
+        effective_batches = min(self.num_batches, n_particles)
+        return list(np.array_split(indices, effective_batches))
+
     # pylint: disable=too-many-positional-arguments, too-many-arguments
     def mass_transfer_rate(
         self,
