@@ -871,9 +871,22 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Compute mass transfer rate for staggered condensation.
 
-        Mirrors the isothermal strategy while leaving skip handling to the
-        caller. Radii are filled and clipped to the minimum physical size
-        before computing first-order transport and pressure delta.
+        Mirrors the base isothermal flow while leaving skip-partitioning to the
+        caller. Radii are filled and clipped to ``MIN_PARTICLE_RADIUS_M``,
+        transport is computed with optional viscosity, and the pressure delta is
+        converted to mass-transfer rates.
+
+        Args:
+            particle: Particle representation providing radii and masses.
+            gas_species: Gas species with vapor properties and concentrations.
+            temperature: System temperature in kelvin.
+            pressure: System pressure in pascals.
+            dynamic_viscosity: Optional gas viscosity forwarded to
+                :meth:`first_order_mass_transport`.
+
+        Returns:
+            Mass transfer rate per particle per species (kg/s), shaped like
+            ``particle.get_species_mass()``.
         """
         radius_with_fill = np.maximum(
             self._fill_zero_radius(particle.get_radius()), MIN_PARTICLE_RADIUS_M
@@ -906,8 +919,15 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     ) -> NDArray[np.float64]:
         """Compute staggered condensation rate per particle.
 
-        Delegates to the staggered ``mass_transfer_rate`` and scales by particle
-        concentration before applying optional skip partitioning.
+        Args:
+            particle: Particle representation supplying concentrations.
+            gas_species: Gas species with vapor properties and concentrations.
+            temperature: System temperature in kelvin.
+            pressure: System pressure in pascals.
+
+        Returns:
+            Condensation/evaporation rate (kg/s) scaled by particle
+            concentration with skip-partitioning applied.
         """
         mass_rate = self.mass_transfer_rate(
             particle=particle,
@@ -941,12 +961,35 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         radii: Optional[NDArray[np.float64]] = None,
         first_order_mass_transport: Optional[NDArray[np.float64]] = None,
     ) -> NDArray[np.float64]:
-        """Calculate mass change for one particle without mutating inputs."""
+        """Calculate mass change for one particle without mutating inputs.
+
+        Uses a working gas concentration array to compute pressure deltas and
+        mass-transfer rates, then applies inventory limits via
+        :func:`get_mass_transfer`. Optional precomputed radii and first-order
+        transport coefficients can be reused across passes to avoid duplicate
+        work.
+
+        Args:
+            particle: Particle representation with distribution and activity.
+            particle_index: Index of the particle being updated.
+            gas_species: Gas species object providing vapor strategies.
+            gas_concentration: Working gas concentration array (kg/m^3).
+            temperature: System temperature in kelvin.
+            pressure: System pressure in pascals.
+            dt_local: Local timestep for this particle in seconds.
+            radii: Optional precomputed radii array to reuse.
+            first_order_mass_transport: Optional precomputed transport
+                coefficients.
+
+        Returns:
+            Per-species mass change for the particle (kg), shaped ``(n_species,)``.
+        """
         particle_mass = particle.get_species_mass()[particle_index]
         particle_concentration = np.asarray(
             particle.concentration[particle_index]
         )
         gas_mass = np.asarray(gas_concentration, dtype=np.float64)
+
         radius = (
             radii[particle_index]
             if radii is not None
@@ -1040,10 +1083,22 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
         """Perform two-pass staggered condensation update.
 
-        Splits the timestep into two passes (``theta`` and ``1 - theta``),
-        updating a working copy of gas concentration after each batch to
-        emulate Gauss-Seidel coupling while deferring particle and gas
-        mutations until the end.
+        The timestep is split into two passes using per-particle ``theta``
+        values. Each pass iterates over batches of particles, accumulating mass
+        changes, updating a working gas concentration after each batch (Gauss-
+        Seidel style), and deferring mutation of the particle and gas objects
+        until the end. This mirrors staggered condensation approaches discussed
+        by Jacobson (1997) and Riemer et al. (2009) for improved stability.
+
+        Args:
+            particle: Particle representation to update.
+            gas_species: Gas species object providing vapor properties.
+            temperature: System temperature in kelvin.
+            pressure: System pressure in pascals.
+            time_step: Full timestep to split across the two passes (seconds).
+
+        Returns:
+            Updated ``(particle, gas_species)`` tuple after both passes.
         """
         n_particles = particle.concentration.shape[0]
         if time_step == 0.0 or n_particles == 0:
