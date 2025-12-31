@@ -35,7 +35,7 @@ Units are all Base SI units.
 """
 
 import logging
-import warnings  # NEW
+import warnings
 from abc import ABC, abstractmethod
 from typing import Optional, Sequence, Tuple, Union
 
@@ -746,7 +746,8 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             theta_mode: Staggered stepping mode; must be one of
                 ``("half", "random", "batch")``.
             num_batches: Number of batches for Gauss-Seidel style updates;
-                must be at least 1.
+                must be at least 1. Values larger than the particle count are
+                clipped with an informational log to avoid empty batches.
             shuffle_each_step: Whether to shuffle particle order every step.
             random_state: Optional seed or generator controlling randomness
                 for staggered permutations.
@@ -773,7 +774,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 f"'{theta_mode}'"
             )
         if num_batches < 1:
-            raise ValueError("num_batches must be at least 1.")
+            raise ValueError("num_batches must be >= 1.")
 
         self.theta_mode = theta_mode
         self.num_batches = num_batches
@@ -823,6 +824,39 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         raise ValueError(f"Invalid theta_mode: {self.theta_mode}")
 
+    def _validate_num_batches(self, num_batches: int, n_particles: int) -> int:
+        """Validate and clip ``num_batches`` for batching.
+
+        Args:
+            num_batches: Requested number of batches.
+            n_particles: Number of particles available for batching.
+
+        Returns:
+            A valid batch count respecting ``n_particles``. Returns the
+            clipped value when ``num_batches`` exceeds ``n_particles``.
+
+        Raises:
+            ValueError: If ``num_batches`` is less than 1.
+
+        Notes:
+            Logs an ``INFO`` message when clipping occurs. When ``n_particles``
+            is zero the caller short-circuits before invoking this helper, so
+            no logging occurs for the empty case.
+        """
+        if num_batches < 1:
+            raise ValueError("num_batches must be >= 1.")
+
+        if num_batches > n_particles and n_particles > 0:
+            logger.info(
+                "Clipping num_batches from %s to %s to avoid empty batches",
+                num_batches,
+                n_particles,
+            )
+            # Clipping avoids empty batches while preserving all particles.
+            return n_particles
+
+        return num_batches
+
     def _make_batches(self, n_particles: int) -> list[NDArray[np.intp]]:
         """Divide particle indices into batches for Gauss-Seidel updates.
 
@@ -837,14 +871,18 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         Notes:
             - Returns an empty list when ``n_particles`` is zero.
-            - Clips ``num_batches`` to ``n_particles`` to avoid empty batches
-              when ``num_batches`` exceeds the particle count.
+            - Clips and logs when ``num_batches`` exceeds ``n_particles`` to
+              avoid empty batches.
             - When ``shuffle_each_step`` is True, indices are shuffled using
               the stored ``random_state`` (``Generator``, ``RandomState``, or
               seed), otherwise the original ordering is preserved.
         """
         if n_particles == 0:
             return []
+
+        effective_batches = self._validate_num_batches(
+            self.num_batches, n_particles
+        )
 
         indices = np.arange(n_particles, dtype=np.intp)
 
@@ -857,7 +895,6 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 rng = np.random.default_rng(self.random_state)
                 rng.shuffle(indices)
 
-        effective_batches = min(self.num_batches, n_particles)
         return list(np.array_split(indices, effective_batches))
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
