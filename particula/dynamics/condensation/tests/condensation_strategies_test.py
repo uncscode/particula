@@ -404,3 +404,144 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         strategy.theta_mode = "unsupported"
         with self.assertRaises(ValueError):
             strategy._get_theta_values(3)
+
+    def test_make_batches_correct_count(self):
+        """_make_batches creates requested batch count when possible."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, num_batches=4, shuffle_each_step=False
+        )
+        batches = strategy._make_batches(100)
+        self.assertEqual(len(batches), 4)
+        self.assertEqual(sum(len(batch) for batch in batches), 100)
+
+    def test_make_batches_no_shuffle_when_disabled(self):
+        """Shuffling disabled preserves the original order."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, num_batches=1, shuffle_each_step=False
+        )
+        batches = strategy._make_batches(10)
+        np.testing.assert_array_equal(batches[0], np.arange(10))
+
+    def test_make_batches_shuffles_when_enabled(self):
+        """Shuffling enabled permutes indices."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=1,
+            shuffle_each_step=True,
+            random_state=0,
+        )
+        batches = strategy._make_batches(20)
+        self.assertFalse(np.array_equal(batches[0], np.arange(20)))
+
+    def test_make_batches_preserves_all_indices(self):
+        """All indices appear exactly once across batches."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=5,
+            shuffle_each_step=True,
+            random_state=123,
+        )
+        batches = strategy._make_batches(57)
+        all_indices = np.concatenate(batches)
+        np.testing.assert_array_equal(np.sort(all_indices), np.arange(57))
+
+    def test_make_batches_reproducible(self):
+        """Same seed yields identical batches."""
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=3,
+            shuffle_each_step=True,
+            random_state=21,
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=3,
+            shuffle_each_step=True,
+            random_state=21,
+        )
+        batches_a = strategy_a._make_batches(20)
+        batches_b = strategy_b._make_batches(20)
+        for batch_a, batch_b in zip(batches_a, batches_b):
+            np.testing.assert_array_equal(batch_a, batch_b)
+
+    def test_make_batches_single_batch(self):
+        """num_batches=1 returns a single full batch."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, num_batches=1, shuffle_each_step=False
+        )
+        batches = strategy._make_batches(7)
+        self.assertEqual(len(batches), 1)
+        self.assertEqual(len(batches[0]), 7)
+
+    def test_make_batches_more_batches_than_particles(self):
+        """Excess batches clip to particle count."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, num_batches=10, shuffle_each_step=False
+        )
+        batches = strategy._make_batches(3)
+        self.assertEqual(len(batches), 3)
+        np.testing.assert_array_equal(np.concatenate(batches), np.arange(3))
+        self.assertTrue(all(len(batch) == 1 for batch in batches))
+
+    def test_make_batches_single_particle(self):
+        """Single particle returns one-element batch."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, num_batches=4, shuffle_each_step=True
+        )
+        batches = strategy._make_batches(1)
+        self.assertEqual(len(batches), 1)
+        np.testing.assert_array_equal(batches[0], np.array([0], dtype=np.intp))
+
+    def test_make_batches_zero_particles_returns_empty(self):
+        """Zero particles returns empty list."""
+        strategy = CondensationIsothermalStaggered(molar_mass=0.018)
+        batches = strategy._make_batches(0)
+        self.assertEqual(batches, [])
+
+    def test_make_batches_random_state_shuffle_path(self):
+        """Uses RandomState shuffle path when provided."""
+        random_state_a = np.random.RandomState(5)
+        random_state_b = np.random.RandomState(5)
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=2,
+            shuffle_each_step=True,
+            random_state=random_state_a,
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=2,
+            shuffle_each_step=True,
+            random_state=random_state_b,
+        )
+        batches_a = strategy_a._make_batches(6)
+        batches_b = strategy_b._make_batches(6)
+        self.assertFalse(
+            np.array_equal(np.concatenate(batches_a), np.arange(6))
+        )
+        for batch_a, batch_b in zip(batches_a, batches_b):
+            np.testing.assert_array_equal(batch_a, batch_b)
+
+    def test_make_batches_generator_shuffle_path(self):
+        """Uses Generator shuffle path when provided."""
+        generator_a = np.random.default_rng(7)
+        generator_b = np.random.default_rng(7)
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=2,
+            shuffle_each_step=True,
+            random_state=generator_a,
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            num_batches=2,
+            shuffle_each_step=True,
+            random_state=generator_b,
+        )
+        batches_a = strategy_a._make_batches(6)
+        batches_b = strategy_b._make_batches(6)
+        self.assertFalse(
+            np.array_equal(np.concatenate(batches_a), np.arange(6))
+        )
+        for batch_a, batch_b in zip(batches_a, batches_b):
+            np.testing.assert_array_equal(batch_a, batch_b)
