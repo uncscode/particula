@@ -1091,8 +1091,11 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         values. Each pass iterates over batches of particles, accumulating mass
         changes, updating a working gas concentration after each batch (Gauss-
         Seidel style), and deferring mutation of the particle and gas objects
-        until the end. This mirrors staggered condensation approaches discussed
-        by Jacobson (1997) and Riemer et al. (2009) for improved stability.
+        until the end. Gas is updated after every batch in both passes; when
+        ``num_batches`` is 1 this reduces to the original single-batch behavior
+        for backward compatibility. This mirrors staggered condensation
+        approaches discussed by Jacobson (1997) and Riemer et al. (2009) for
+        improved stability.
 
         Args:
             particle: Particle representation to update.
@@ -1132,6 +1135,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         for batch in batches:
             batch_dm_total.fill(0.0)
+            # Gauss-Seidel: update gas after each batch in this pass.
             for particle_index in batch:
                 dt_local = theta_dt_first[particle_index]
                 if dt_local <= 0.0:
@@ -1155,6 +1159,8 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         for batch in batches:
             batch_dm_total.fill(0.0)
+            # Second pass also updates gas after each batch; matches single-batch
+            # behavior when ``num_batches`` is 1.
             for particle_index in batch:
                 dt_local = theta_dt_second[particle_index]
                 if dt_local <= 0.0:
