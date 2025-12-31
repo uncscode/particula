@@ -4,6 +4,7 @@
 # pylint: disable=protected-access
 import copy
 import logging
+import logging.handlers
 import types
 import unittest
 
