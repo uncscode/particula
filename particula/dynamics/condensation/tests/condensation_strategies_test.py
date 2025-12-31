@@ -2,13 +2,12 @@
 
 # pylint: disable=R0801
 # pylint: disable=protected-access
-import logging
 import copy
+import logging
 import types
 import unittest
 
 import numpy as np
-import pytest
 
 import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
@@ -530,7 +529,10 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
             strategy._make_batches(5)
         self.assertRegex(
             str(exc_info.exception),
-            r"(num_batches.*(>=|at least)\s*1|number sections must be larger than 0)",
+            (
+                r"(num_batches.*(>=|at least)\s*1|"
+                r"number sections must be larger than 0)"
+            ),
         )
 
     def test_validate_num_batches_negative_raises_value_error(self):
@@ -542,7 +544,6 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
 
     def test_make_batches_more_batches_than_particles(self):
         """Excess batches clip to particle count."""
-
         strategy = CondensationIsothermalStaggered(
             molar_mass=0.018, num_batches=10, shuffle_each_step=False
         )
