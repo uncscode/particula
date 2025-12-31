@@ -308,6 +308,21 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertIsInstance(rate, np.ndarray)
         self.assertEqual(rate.shape, self.particle.get_species_mass().shape)
         np.testing.assert_array_equal(rate[..., 0], np.zeros_like(rate[..., 0]))
+        self.assertTrue(np.all(np.isfinite(rate)))
+
+    def test_rate_api_accepts_positional_arguments(self):
+        """rate supports positional call matching base signature."""
+        strategy = CondensationIsothermalStaggered(molar_mass=self.molar_mass)
+        rate_positional = strategy.rate(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+        )
+        self.assertIsInstance(rate_positional, np.ndarray)
+        self.assertEqual(
+            rate_positional.shape, self.particle.get_species_mass().shape
+        )
 
     def test_get_theta_values_half_mode_returns_half(self):
         """Half mode returns 0.5 with correct shape and dtype."""
@@ -594,6 +609,53 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
             volume=self.particle.volume,
         )
 
+    def test_calculate_single_particle_transfer_default_transport(self):
+        """Helper returns finite per-species mass change with internal transport."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        mass_change = strategy._calculate_single_particle_transfer(
+            particle=self.particle,
+            particle_index=0,
+            gas_species=self.gas_species,
+            gas_concentration=self.gas_species.get_concentration().copy(),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            dt_local=0.05,
+            radii=None,
+            first_order_mass_transport=None,
+        )
+        species_count = self.particle.get_species_mass().shape[1]
+        self.assertEqual(mass_change.shape, (species_count,))
+        self.assertTrue(np.all(np.isfinite(mass_change)))
+
+    def test_calculate_single_particle_transfer_scalar_transport(self):
+        """Helper accepts scalar transport coefficient and returns finite values."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        scalar_transport = float(
+            strategy.first_order_mass_transport(
+                particle_radius=self.particle.get_radius()[0],
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+        )
+        mass_change = strategy._calculate_single_particle_transfer(
+            particle=self.particle,
+            particle_index=0,
+            gas_species=self.gas_species,
+            gas_concentration=self.gas_species.get_concentration().copy(),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            dt_local=0.05,
+            radii=self.particle.get_radius(),
+            first_order_mass_transport=scalar_transport,
+        )
+        species_count = self.particle.get_species_mass().shape[1]
+        self.assertEqual(mass_change.shape, (species_count,))
+        self.assertTrue(np.all(np.isfinite(mass_change)))
+
     def test_step_half_mode_produces_valid_output(self):
         """step with theta_mode='half' returns updated particle and gas."""
         strategy = CondensationIsothermalStaggered(
@@ -689,7 +751,8 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
             skip_partitioning_indices=[skip_idx],
         )
         initial_mass = self.particle.get_species_mass().copy()
-        particle_new, _ = strategy.step(
+        initial_gas = self.gas_species.get_concentration().copy()
+        particle_new, gas_new = strategy.step(
             self.particle,
             self.gas_species,
             self.temperature,
@@ -699,6 +762,26 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         np.testing.assert_allclose(
             particle_new.get_species_mass()[..., skip_idx],
             initial_mass[..., skip_idx],
+        )
+        np.testing.assert_allclose(
+            gas_new.get_concentration()[skip_idx], initial_gas[skip_idx]
+        )
+
+    def test_step_positional_api_matches_signature(self):
+        """step accepts positional args compatible with base signature."""
+        strategy = CondensationIsothermalStaggered(molar_mass=self.molar_mass)
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            self.time_step,
+        )
+        self.assertIsNotNone(particle_new)
+        self.assertIsNotNone(gas_new)
+        self.assertEqual(
+            particle_new.get_species_mass().shape,
+            self.particle.get_species_mass().shape,
         )
 
     def test_step_zero_time_step_returns_inputs(self):
