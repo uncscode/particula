@@ -861,7 +861,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
 
     def test_step_updates_gas_between_batches(self):
         """Multi-batch step differs from single batch due to gas updates."""
-        particle_single, gas_single = self._make_three_particle_state()
+        self._make_three_particle_state()
         particle_multi, gas_multi = self._make_three_particle_state()
 
         strategy_multi = CondensationIsothermalStaggered(
