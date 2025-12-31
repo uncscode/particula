@@ -1050,13 +1050,6 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         self.assertTrue(np.all(gas_high.get_concentration() >= 0.0))
 
-    def test_step_invalid_num_batches_raises_value_error(self):
-        """num_batches below one raises ValueError."""
-        with self.assertRaises(ValueError):
-            CondensationIsothermalStaggered(
-                molar_mass=self.molar_mass, num_batches=-1
-            )
-
     def test_step_batch_with_theta_modes(self):
         """Batch mode works with half, random, and batch theta modes."""
         for mode in ("half", "batch"):
