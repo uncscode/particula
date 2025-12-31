@@ -869,14 +869,32 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """Placeholder for staggered mass transfer rate.
+        """Compute mass transfer rate for staggered condensation.
 
-        Raises:
-            NotImplementedError: Always, until staggered algorithm is added.
+        Mirrors the isothermal strategy while leaving skip handling to the
+        caller. Radii are filled and clipped to the minimum physical size
+        before computing first-order transport and pressure delta.
         """
-        raise NotImplementedError(
-            "CondensationIsothermalStaggered.mass_transfer_rate is not "
-            "implemented."
+        radius_with_fill = np.maximum(
+            self._fill_zero_radius(particle.get_radius()), MIN_PARTICLE_RADIUS_M
+        )
+        first_order_mass_transport = self.first_order_mass_transport(
+            particle_radius=radius_with_fill,
+            temperature=temperature,
+            pressure=pressure,
+            dynamic_viscosity=dynamic_viscosity,
+        )
+        pressure_delta = self.calculate_pressure_delta(
+            particle, gas_species, temperature, radius_with_fill
+        )
+        pressure_delta = np.nan_to_num(
+            pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
+        )
+        return get_mass_transfer_rate(
+            pressure_delta=pressure_delta,
+            first_order_mass_transport=first_order_mass_transport,
+            temperature=temperature,
+            molar_mass=self.molar_mass,
         )
 
     def rate(
@@ -886,14 +904,130 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
-        """Placeholder for staggered condensation rate per particle.
+        """Compute staggered condensation rate per particle.
 
-        Raises:
-            NotImplementedError: Always, until staggered algorithm is added.
+        Delegates to the staggered ``mass_transfer_rate`` and scales by particle
+        concentration before applying optional skip partitioning.
         """
-        raise NotImplementedError(
-            "CondensationIsothermalStaggered.rate is not implemented."
+        mass_rate = self.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=temperature,
+            pressure=pressure,
         )
+
+        if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
+            concentration = particle.concentration[:, np.newaxis]
+        else:
+            concentration = particle.concentration
+
+        rates_raw = mass_rate * concentration
+        rates = (
+            np.asarray(rates_raw)
+            if not isinstance(rates_raw, np.ndarray)
+            else rates_raw
+        )
+        return self._apply_skip_partitioning(rates)
+
+    def _calculate_single_particle_transfer(
+        self,
+        particle: ParticleRepresentation,
+        particle_index: int,
+        gas_species: GasSpecies,
+        gas_concentration: NDArray[np.float64],
+        temperature: float,
+        pressure: float,
+        dt_local: float,
+        radii: Optional[NDArray[np.float64]] = None,
+        first_order_mass_transport: Optional[NDArray[np.float64]] = None,
+    ) -> NDArray[np.float64]:
+        """Calculate mass change for one particle without mutating inputs."""
+        particle_mass = particle.get_species_mass()[particle_index]
+        particle_concentration = np.asarray(
+            particle.concentration[particle_index]
+        )
+        gas_mass = np.asarray(gas_concentration, dtype=np.float64)
+        radius = (
+            radii[particle_index]
+            if radii is not None
+            else particle.get_radius()[particle_index]
+        )
+        radius = np.maximum(radius, MIN_PARTICLE_RADIUS_M)
+
+        if first_order_mass_transport is None:
+            mass_transport = self.first_order_mass_transport(
+                particle_radius=radius,
+                temperature=temperature,
+                pressure=pressure,
+            )
+        elif np.ndim(first_order_mass_transport) == 0:
+            mass_transport = first_order_mass_transport
+        else:
+            mass_transport = first_order_mass_transport[particle_index]
+
+        pure_vapor_pressure = gas_species.get_pure_vapor_pressure(temperature)
+        partial_pressure_particle = particle.activity.partial_pressure(
+            pure_vapor_pressure=pure_vapor_pressure,
+            mass_concentration=particle_mass,
+        )
+
+        vapor_strategy = gas_species.pure_vapor_pressure_strategy
+        molar_mass = gas_species.molar_mass
+        if isinstance(vapor_strategy, list):
+            partial_pressure_gas = np.array(
+                [
+                    strategy.partial_pressure(
+                        concentration=gas_mass[idx],
+                        molar_mass=molar_mass[idx],  # type: ignore[index]
+                        temperature=temperature,
+                    )
+                    for idx, strategy in enumerate(vapor_strategy)
+                ],
+                dtype=np.float64,
+            )
+        else:
+            partial_pressure_gas = vapor_strategy.partial_pressure(
+                concentration=gas_mass,
+                molar_mass=molar_mass,
+                temperature=temperature,
+            )
+
+        kelvin_term = particle.surface.kelvin_term(
+            radius=radius,
+            molar_mass=self.molar_mass,
+            mass_concentration=particle_mass,
+            temperature=temperature,
+        )
+        pressure_delta = get_partial_pressure_delta(
+            partial_pressure_gas=partial_pressure_gas,
+            partial_pressure_particle=partial_pressure_particle,
+            kelvin_term=kelvin_term,
+        )
+        pressure_delta = np.nan_to_num(
+            pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
+        )
+
+        mass_rate = get_mass_transfer_rate(
+            pressure_delta=pressure_delta,
+            first_order_mass_transport=mass_transport,
+            temperature=temperature,
+            molar_mass=self.molar_mass,
+        )
+        # Reshape single-particle data to (1, n_species) for get_mass_transfer
+        mass_rate_2d = np.atleast_2d(np.asarray(mass_rate))
+        particle_mass_2d = np.atleast_2d(particle_mass)
+        particle_conc_1d = np.atleast_1d(particle_concentration)
+        gas_mass_1d = np.atleast_1d(gas_mass)
+
+        mass_to_change = get_mass_transfer(
+            mass_rate=mass_rate_2d,
+            time_step=dt_local,
+            gas_mass=gas_mass_1d,
+            particle_mass=particle_mass_2d,
+            particle_concentration=particle_conc_1d,
+        )
+        # Squeeze back to 1D (n_species,) for single particle
+        return mass_to_change.squeeze()
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
     def step(
@@ -904,11 +1038,89 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         pressure: float,
         time_step: float,
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
-        """Placeholder for staggered condensation timestep.
+        """Perform two-pass staggered condensation update.
 
-        Raises:
-            NotImplementedError: Always, until staggered algorithm is added.
+        Splits the timestep into two passes (``theta`` and ``1 - theta``),
+        updating a working copy of gas concentration after each batch to
+        emulate Gauss-Seidel coupling while deferring particle and gas
+        mutations until the end.
         """
-        raise NotImplementedError(
-            "CondensationIsothermalStaggered.step is not implemented."
+        n_particles = particle.concentration.shape[0]
+        if time_step == 0.0 or n_particles == 0:
+            return particle, gas_species
+
+        radii = np.maximum(
+            self._fill_zero_radius(particle.get_radius()), MIN_PARTICLE_RADIUS_M
         )
+        first_order_mass_transport = np.asarray(
+            self.first_order_mass_transport(
+                particle_radius=radii,
+                temperature=temperature,
+                pressure=pressure,
+            )
+        )
+
+        theta = self._get_theta_values(n_particles)
+        theta_dt_first = theta * time_step
+        theta_dt_second = (1.0 - theta) * time_step
+        batches = self._make_batches(n_particles)
+
+        working_gas_concentration = np.asarray(
+            gas_species.get_concentration(), dtype=np.float64
+        ).copy()
+        mass_changes = np.zeros_like(particle.get_species_mass())
+        batch_dm_total = np.zeros_like(working_gas_concentration)
+
+        for batch in batches:
+            batch_dm_total.fill(0.0)
+            for particle_index in batch:
+                dt_local = theta_dt_first[particle_index]
+                if dt_local <= 0.0:
+                    continue
+                mass_change = self._calculate_single_particle_transfer(
+                    particle=particle,
+                    particle_index=int(particle_index),
+                    gas_species=gas_species,
+                    gas_concentration=working_gas_concentration,
+                    temperature=temperature,
+                    pressure=pressure,
+                    dt_local=float(dt_local),
+                    radii=radii,
+                    first_order_mass_transport=first_order_mass_transport,
+                )
+                mass_changes[particle_index] += mass_change
+                batch_dm_total += mass_change
+            working_gas_concentration = np.maximum(
+                working_gas_concentration - batch_dm_total, 0.0
+            )
+
+        for batch in batches:
+            batch_dm_total.fill(0.0)
+            for particle_index in batch:
+                dt_local = theta_dt_second[particle_index]
+                if dt_local <= 0.0:
+                    continue
+                mass_change = self._calculate_single_particle_transfer(
+                    particle=particle,
+                    particle_index=int(particle_index),
+                    gas_species=gas_species,
+                    gas_concentration=working_gas_concentration,
+                    temperature=temperature,
+                    pressure=pressure,
+                    dt_local=float(dt_local),
+                    radii=radii,
+                    first_order_mass_transport=first_order_mass_transport,
+                )
+                mass_changes[particle_index] += mass_change
+                batch_dm_total += mass_change
+            working_gas_concentration = np.maximum(
+                working_gas_concentration - batch_dm_total, 0.0
+            )
+
+        mass_changes = self._apply_skip_partitioning(mass_changes)
+        particle.add_mass(added_mass=mass_changes)
+        if self.update_gases:
+            gas_species.add_concentration(
+                added_concentration=-mass_changes.sum(axis=0)
+            )
+        return particle, gas_species

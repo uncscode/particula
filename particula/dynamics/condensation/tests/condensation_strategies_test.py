@@ -232,6 +232,17 @@ class TestCondensationIsothermal(unittest.TestCase):
 class TestCondensationIsothermalStaggered(unittest.TestCase):
     """Test class for the CondensationIsothermalStaggered strategy."""
 
+    def setUp(self):
+        """Reuse isothermal fixtures for staggered tests."""
+        base = TestCondensationIsothermal()
+        base.setUp()
+        self.molar_mass = base.molar_mass
+        self.temperature = base.temperature
+        self.pressure = base.pressure
+        self.time_step = 0.1
+        self.particle = base.particle
+        self.gas_species = base.gas_species
+
     def test_defaults(self):
         """Defaults stored correctly for staggered strategy."""
         strategy = CondensationIsothermalStaggered(molar_mass=0.018)
@@ -268,15 +279,35 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         with self.assertRaises(ValueError):
             CondensationIsothermalStaggered(molar_mass=0.018, num_batches=0)
 
-    def test_stub_methods_raise_not_implemented(self):
-        """Stub methods should raise NotImplementedError until implemented."""
-        strategy = CondensationIsothermalStaggered(molar_mass=0.018)
-        with self.assertRaises(NotImplementedError):
-            strategy.mass_transfer_rate(None, None, 298.15, 101325)
-        with self.assertRaises(NotImplementedError):
-            strategy.rate(None, None, 298.15, 101325)
-        with self.assertRaises(NotImplementedError):
-            strategy.step(None, None, 298.15, 101325, 1.0)
+    def test_mass_transfer_rate_returns_array(self):
+        """mass_transfer_rate returns finite array with expected shape."""
+        strategy = CondensationIsothermalStaggered(molar_mass=self.molar_mass)
+        mass_rate = strategy.mass_transfer_rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertIsInstance(mass_rate, np.ndarray)
+        self.assertEqual(
+            mass_rate.shape, self.particle.get_species_mass().shape
+        )
+        self.assertTrue(np.all(np.isfinite(mass_rate)))
+
+    def test_rate_returns_array_and_respects_skip(self):
+        """rate returns array and zeros skipped indices."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, skip_partitioning_indices=[0]
+        )
+        rate = strategy.rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertIsInstance(rate, np.ndarray)
+        self.assertEqual(rate.shape, self.particle.get_species_mass().shape)
+        np.testing.assert_array_equal(rate[..., 0], np.zeros_like(rate[..., 0]))
 
     def test_get_theta_values_half_mode_returns_half(self):
         """Half mode returns 0.5 with correct shape and dtype."""
@@ -545,3 +576,164 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         for batch_a, batch_b in zip(batches_a, batches_b):
             np.testing.assert_array_equal(batch_a, batch_b)
+
+    def _make_empty_particle(self):
+        """Create an empty particle representation matching fixtures."""
+        n_species = self.particle.get_species_mass().shape[1]
+        empty_mass = np.empty((0, n_species))
+        empty_concentration = np.empty((0,), dtype=np.float64)
+        empty_charge = np.empty((0,), dtype=np.float64)
+        return self.particle.__class__(
+            strategy=self.particle.strategy,
+            activity=self.particle.activity,
+            surface=self.particle.surface,
+            distribution=empty_mass,
+            density=self.particle.density,
+            concentration=empty_concentration,
+            charge=empty_charge,
+            volume=self.particle.volume,
+        )
+
+    def test_step_half_mode_produces_valid_output(self):
+        """step with theta_mode='half' returns updated particle and gas."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsNotNone(particle_new)
+        self.assertIsNotNone(gas_new)
+
+    def test_step_random_mode_produces_valid_output(self):
+        """step with theta_mode='random' returns updated particle and gas."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="random",
+            random_state=42,
+        )
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsNotNone(particle_new)
+        self.assertIsNotNone(gas_new)
+
+    def test_step_batch_mode_produces_valid_output(self):
+        """step with theta_mode='batch' returns updated particle and gas."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="batch",
+            num_batches=2,
+            shuffle_each_step=False,
+        )
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsNotNone(particle_new)
+        self.assertIsNotNone(gas_new)
+
+    def test_step_non_negative_masses_and_gas(self):
+        """step keeps particle masses and gas concentrations non-negative."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertTrue(np.all(particle_new.get_species_mass() >= 0.0))
+        self.assertTrue(np.all(gas_new.get_concentration() >= 0.0))
+
+    def test_step_basic_mass_conservation(self):
+        """Total mass approximately conserved for small time step."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        initial_total = (
+            self.particle.get_mass().sum()
+            + self.gas_species.get_concentration().sum()
+        )
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=0.01,
+        )
+        final_total = (
+            particle_new.get_mass().sum() + gas_new.get_concentration().sum()
+        )
+        np.testing.assert_allclose(initial_total, final_total, rtol=1e-10)
+
+    def test_step_respects_skip_partitioning_indices(self):
+        """Skip indices remain unchanged after step."""
+        skip_idx = 0
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            skip_partitioning_indices=[skip_idx],
+        )
+        initial_mass = self.particle.get_species_mass().copy()
+        particle_new, _ = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        np.testing.assert_allclose(
+            particle_new.get_species_mass()[..., skip_idx],
+            initial_mass[..., skip_idx],
+        )
+
+    def test_step_zero_time_step_returns_inputs(self):
+        """time_step=0 returns unchanged particle and gas."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        initial_mass = self.particle.get_species_mass().copy()
+        initial_gas = self.gas_species.get_concentration().copy()
+        particle_new, gas_new = strategy.step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=0.0,
+        )
+        np.testing.assert_allclose(
+            particle_new.get_species_mass(), initial_mass
+        )
+        np.testing.assert_allclose(gas_new.get_concentration(), initial_gas)
+
+    def test_step_empty_particles_noop(self):
+        """Zero-particle input returns unchanged gas and empty particle."""
+        empty_particle = self._make_empty_particle()
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass, theta_mode="half"
+        )
+        particle_new, gas_new = strategy.step(
+            empty_particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertEqual(particle_new.get_species_mass().shape[0], 0)
+        np.testing.assert_allclose(
+            gas_new.get_concentration(), self.gas_species.get_concentration()
+        )
