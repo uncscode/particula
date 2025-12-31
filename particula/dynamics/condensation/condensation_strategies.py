@@ -1030,10 +1030,13 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 dtype=np.float64,
             )
         else:
-            partial_pressure_gas = vapor_strategy.partial_pressure(
-                concentration=gas_mass,
-                molar_mass=molar_mass,
-                temperature=temperature,
+            partial_pressure_gas = np.asarray(
+                vapor_strategy.partial_pressure(
+                    concentration=gas_mass,
+                    molar_mass=molar_mass,
+                    temperature=temperature,
+                ),
+                dtype=np.float64,
             )
 
         kelvin_term = particle.surface.kelvin_term(
