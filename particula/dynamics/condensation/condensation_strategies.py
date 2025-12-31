@@ -824,7 +824,6 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         raise ValueError(f"Invalid theta_mode: {self.theta_mode}")
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
-
     def mass_transfer_rate(
         self,
         particle: ParticleRepresentation,
