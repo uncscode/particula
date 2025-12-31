@@ -780,7 +780,49 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         self.shuffle_each_step = shuffle_each_step
         self.random_state = random_state
 
+    def _get_theta_values(self, n_particles: int) -> NDArray[np.float64]:
+        """Generate theta values for staggered condensation steps.
+
+        Theta values split the timestep across two passes. The first pass uses
+        ``theta`` and the second uses ``1 - theta``. Values depend on the
+        configured ``theta_mode`` and reuse the stored random state for
+        reproducibility in random mode.
+
+        Args:
+            n_particles: Number of particles requiring theta values.
+
+        Returns:
+            Array of shape ``(n_particles,)`` with fractional step values:
+            - ``half`` mode returns all ``0.5`` values.
+            - ``random`` mode draws uniform values in ``[0, 1]`` using the
+              stored ``random_state`` (seed, ``Generator``, or
+              ``RandomState``).
+            - ``batch`` mode returns all ``1.0``; batching is handled
+              elsewhere.
+
+        Raises:
+            ValueError: If ``theta_mode`` is unsupported.
+        """
+        if self.theta_mode == "half":
+            return np.full(n_particles, 0.5, dtype=np.float64)
+
+        if self.theta_mode == "random":
+            if isinstance(self.random_state, np.random.Generator):
+                rng = self.random_state
+                return rng.uniform(0.0, 1.0, n_particles)
+            if isinstance(self.random_state, np.random.RandomState):
+                return self.random_state.random(n_particles)
+
+            rng = np.random.default_rng(self.random_state)
+            return rng.uniform(0.0, 1.0, n_particles)
+
+        if self.theta_mode == "batch":
+            return np.ones(n_particles, dtype=np.float64)
+
+        raise ValueError(f"Invalid theta_mode: {self.theta_mode}")
+
     # pylint: disable=too-many-positional-arguments, too-many-arguments
+
     def mass_transfer_rate(
         self,
         particle: ParticleRepresentation,

@@ -277,3 +277,130 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
             strategy.rate(None, None, 298.15, 101325)
         with self.assertRaises(NotImplementedError):
             strategy.step(None, None, 298.15, 101325, 1.0)
+
+    def test_get_theta_values_half_mode_returns_half(self):
+        """Half mode returns 0.5 with correct shape and dtype."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="half"
+        )
+        theta = strategy._get_theta_values(5)
+        np.testing.assert_array_equal(theta, np.full(5, 0.5))
+        self.assertEqual(theta.shape, (5,))
+        self.assertEqual(theta.dtype, np.float64)
+
+    def test_get_theta_values_random_mode_range_and_shape(self):
+        """Random mode stays in [0, 1] with correct shape and dtype."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=123
+        )
+        theta = strategy._get_theta_values(100)
+        self.assertTrue(np.all(theta >= 0.0))
+        self.assertTrue(np.all(theta <= 1.0))
+        self.assertEqual(theta.shape, (100,))
+        self.assertEqual(theta.dtype, np.float64)
+
+    def test_get_theta_values_random_mode_reproducible(self):
+        """Random mode reproducible with same integer seed."""
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=42
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=42
+        )
+        theta_a = strategy_a._get_theta_values(50)
+        theta_b = strategy_b._get_theta_values(50)
+        np.testing.assert_array_equal(theta_a, theta_b)
+
+    def test_get_theta_values_random_mode_different_seed(self):
+        """Different seeds produce different theta arrays."""
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=1
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=2
+        )
+        theta_a = strategy_a._get_theta_values(20)
+        theta_b = strategy_b._get_theta_values(20)
+        self.assertFalse(np.allclose(theta_a, theta_b))
+
+    def test_get_theta_values_random_mode_accepts_random_state(self):
+        """Random mode supports np.random.RandomState."""
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            theta_mode="random",
+            random_state=np.random.RandomState(7),
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            theta_mode="random",
+            random_state=np.random.RandomState(7),
+        )
+        theta_a = strategy_a._get_theta_values(15)
+        theta_b = strategy_b._get_theta_values(15)
+        np.testing.assert_array_equal(theta_a, theta_b)
+
+    def test_get_theta_values_random_mode_accepts_generator(self):
+        """Random mode supports np.random.Generator."""
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            theta_mode="random",
+            random_state=np.random.default_rng(9),
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=0.018,
+            theta_mode="random",
+            random_state=np.random.default_rng(9),
+        )
+        theta_a = strategy_a._get_theta_values(12)
+        theta_b = strategy_b._get_theta_values(12)
+        np.testing.assert_array_equal(theta_a, theta_b)
+
+    def test_get_theta_values_batch_mode_returns_ones(self):
+        """Batch mode returns ones with correct shape and dtype."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="batch"
+        )
+        theta = strategy._get_theta_values(8)
+        np.testing.assert_array_equal(theta, np.ones(8))
+        self.assertEqual(theta.shape, (8,))
+        self.assertEqual(theta.dtype, np.float64)
+
+    def test_get_theta_values_single_particle_all_modes(self):
+        """Single particle handled for half, random, and batch modes."""
+        strategy_half = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="half"
+        )
+        strategy_random = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=5
+        )
+        strategy_batch = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="batch"
+        )
+
+        theta_half = strategy_half._get_theta_values(1)
+        theta_random = strategy_random._get_theta_values(1)
+        theta_batch = strategy_batch._get_theta_values(1)
+
+        np.testing.assert_array_equal(theta_half, np.array([0.5]))
+        self.assertEqual(theta_half.shape, (1,))
+        self.assertTrue(0.0 <= theta_random[0] <= 1.0)
+        self.assertEqual(theta_random.shape, (1,))
+        np.testing.assert_array_equal(theta_batch, np.array([1.0]))
+        self.assertEqual(theta_batch.shape, (1,))
+
+    def test_get_theta_values_zero_particles_returns_empty(self):
+        """Zero particles returns empty float64 array."""
+        for mode in ("half", "random", "batch"):
+            strategy = CondensationIsothermalStaggered(
+                molar_mass=0.018, theta_mode=mode, random_state=3
+            )
+            theta = strategy._get_theta_values(0)
+            self.assertEqual(theta.shape, (0,))
+            self.assertEqual(theta.dtype, np.float64)
+
+    def test_get_theta_values_invalid_theta_mode_raises_value_error(self):
+        """Mutating theta_mode to unsupported value triggers ValueError."""
+        strategy = CondensationIsothermalStaggered(molar_mass=0.018)
+        strategy.theta_mode = "unsupported"
+        with self.assertRaises(ValueError):
+            strategy._get_theta_values(3)
