@@ -3,6 +3,8 @@
 # pylint: disable=R0801
 # pylint: disable=protected-access
 
+import copy
+import types
 import unittest
 
 import numpy as np
@@ -609,6 +611,42 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
             volume=self.particle.volume,
         )
 
+    def _make_particle_with_masses(
+        self, mass_distribution: np.ndarray, concentration: float
+    ):
+        """Create a particle with supplied masses and concentration."""
+        charge = np.zeros(mass_distribution.shape[0], dtype=np.float64)
+        concentrations = np.full(
+            mass_distribution.shape[0], concentration, dtype=np.float64
+        )
+        return self.particle.__class__(
+            strategy=self.particle.strategy,
+            activity=self.particle.activity,
+            surface=self.particle.surface,
+            distribution=mass_distribution,
+            density=self.particle.density,
+            concentration=concentrations,
+            charge=charge,
+            volume=self.particle.volume,
+        )
+
+    def _make_three_particle_state(self):
+        """Return particle and gas copies with three distinct particles."""
+        base_mass = self.particle.get_species_mass()[0]
+        mass_distribution = np.vstack(
+            [
+                base_mass,
+                base_mass * 1.1,
+                base_mass * 0.9,
+            ]
+        )
+        particle = self._make_particle_with_masses(
+            mass_distribution=mass_distribution,
+            concentration=float(self.particle.concentration[0]),
+        )
+        gas_species = copy.deepcopy(self.gas_species)
+        return particle, gas_species
+
     def test_calculate_single_particle_transfer_default_transport(self):
         """Helper returns finite mass change with internal transport."""
         strategy = CondensationIsothermalStaggered(
@@ -819,4 +857,266 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertEqual(particle_new.get_species_mass().shape[0], 0)
         np.testing.assert_allclose(
             gas_new.get_concentration(), self.gas_species.get_concentration()
+        )
+
+    def test_step_updates_gas_between_batches(self):
+        """Multi-batch step differs from single batch due to gas updates."""
+        particle_single, gas_single = self._make_three_particle_state()
+        particle_multi, gas_multi = self._make_three_particle_state()
+
+        strategy_single = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=1,
+            shuffle_each_step=False,
+        )
+        strategy_multi = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=2,
+            shuffle_each_step=False,
+        )
+
+        gas_inputs: list[np.ndarray] = []
+
+        def fake_calc(self, *, gas_concentration, **kwargs):
+            gas_inputs.append(np.array(gas_concentration, copy=True))
+            return np.array([gas_concentration[0] * 0.05, 0.0])
+
+        strategy_multi._calculate_single_particle_transfer = types.MethodType(  # type: ignore[attr-defined]
+            fake_calc, strategy_multi
+        )
+
+        strategy_multi.step(
+            particle_multi,
+            gas_multi,
+            self.temperature,
+            self.pressure,
+            time_step=1.0,
+        )
+
+        # second batch sees reduced gas compared to first batch
+        self.assertGreater(len(gas_inputs), 2)
+        self.assertLess(gas_inputs[2][0], gas_inputs[0][0])
+        self.assertTrue(np.all(np.isfinite(gas_inputs[-1])))
+        self.assertTrue(np.all(gas_inputs[-1] >= 0.0))
+
+    def test_step_num_batches_changes_outcome(self):
+        """Different num_batches yields different final states."""
+        particle_one, gas_one = self._make_three_particle_state()
+        particle_many, gas_many = self._make_three_particle_state()
+
+        strategy_one = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=1,
+            shuffle_each_step=False,
+        )
+        strategy_many = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=3,
+            shuffle_each_step=False,
+        )
+
+        def fake_calc(self, *, gas_concentration, **kwargs):
+            # Scale mass change by current gas to make batching observable.
+            return np.array([gas_concentration[0] * 0.1, 0.0])
+
+        strategy_one._calculate_single_particle_transfer = types.MethodType(  # type: ignore[attr-defined]
+            fake_calc, strategy_one
+        )
+        strategy_many._calculate_single_particle_transfer = types.MethodType(  # type: ignore[attr-defined]
+            fake_calc, strategy_many
+        )
+
+        particle_one, gas_one = strategy_one.step(
+            particle_one,
+            gas_one,
+            self.temperature,
+            self.pressure,
+            time_step=1.0,
+        )
+        particle_many, gas_many = strategy_many.step(
+            particle_many,
+            gas_many,
+            self.temperature,
+            self.pressure,
+            time_step=1.0,
+        )
+
+        gas_delta = np.linalg.norm(
+            gas_one.get_concentration() - gas_many.get_concentration()
+        )
+        particle_delta = np.linalg.norm(
+            particle_one.get_species_mass() - particle_many.get_species_mass()
+        )
+        self.assertGreater(gas_delta, 0.0)
+        self.assertGreater(particle_delta, 0.0)
+        self.assertTrue(np.all(np.isfinite(particle_many.get_species_mass())))
+        self.assertTrue(np.all(particle_many.get_species_mass() >= 0.0))
+
+    def test_step_batch_order_affects_result(self):
+        """Different batch ordering changes outcomes (Gauss-Seidel property)."""
+        particle_ordered, gas_ordered = self._make_three_particle_state()
+        particle_shuffled, gas_shuffled = self._make_three_particle_state()
+
+        strategy_ordered = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=3,
+            shuffle_each_step=False,
+        )
+        strategy_shuffled = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=3,
+            shuffle_each_step=True,
+            random_state=11,
+        )
+
+        def fake_calc(self, *, gas_concentration, particle_index, **kwargs):
+            # Include particle_index so order changes accumulation.
+            return np.array(
+                [gas_concentration[0] * 0.05 + particle_index * 1e-11, 0.0]
+            )
+
+        strategy_ordered._calculate_single_particle_transfer = types.MethodType(  # type: ignore[attr-defined]
+            fake_calc, strategy_ordered
+        )
+        strategy_shuffled._calculate_single_particle_transfer = (
+            types.MethodType(  # type: ignore[attr-defined]
+                fake_calc, strategy_shuffled
+            )
+        )
+
+        particle_ordered, gas_ordered = strategy_ordered.step(
+            particle_ordered,
+            gas_ordered,
+            self.temperature,
+            self.pressure,
+            time_step=1.0,
+        )
+        particle_shuffled, gas_shuffled = strategy_shuffled.step(
+            particle_shuffled,
+            gas_shuffled,
+            self.temperature,
+            self.pressure,
+            time_step=1.0,
+        )
+
+        gas_delta = np.linalg.norm(
+            gas_ordered.get_concentration() - gas_shuffled.get_concentration()
+        )
+        particle_delta = np.linalg.norm(
+            particle_ordered.get_species_mass()
+            - particle_shuffled.get_species_mass()
+        )
+        self.assertGreater(gas_delta, 0.0)
+        self.assertGreater(particle_delta, 0.0)
+
+    def test_step_num_batches_exceeds_particle_count_clips(self):
+        """Excess batches clip to particle count without changing outcome."""
+        particle_high, gas_high = self._make_three_particle_state()
+        particle_exact, gas_exact = self._make_three_particle_state()
+
+        strategy_high = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=10,
+            shuffle_each_step=False,
+        )
+        strategy_exact = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="half",
+            num_batches=3,
+            shuffle_each_step=False,
+        )
+
+        particle_high, gas_high = strategy_high.step(
+            particle_high,
+            gas_high,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        particle_exact, gas_exact = strategy_exact.step(
+            particle_exact,
+            gas_exact,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+
+        np.testing.assert_allclose(
+            gas_high.get_concentration(), gas_exact.get_concentration()
+        )
+        np.testing.assert_allclose(
+            particle_high.get_species_mass(), particle_exact.get_species_mass()
+        )
+        self.assertTrue(np.all(gas_high.get_concentration() >= 0.0))
+
+    def test_step_invalid_num_batches_raises_value_error(self):
+        """num_batches below one raises ValueError."""
+        with self.assertRaises(ValueError):
+            CondensationIsothermalStaggered(
+                molar_mass=self.molar_mass, num_batches=-1
+            )
+
+    def test_step_batch_with_theta_modes(self):
+        """Batch mode works with half, random, and batch theta modes."""
+        for mode in ("half", "batch"):
+            particle, gas_species = self._make_three_particle_state()
+            strategy = CondensationIsothermalStaggered(
+                molar_mass=self.molar_mass,
+                theta_mode=mode,
+                num_batches=3,
+                shuffle_each_step=False,
+            )
+            particle_new, gas_new = strategy.step(
+                particle,
+                gas_species,
+                self.temperature,
+                self.pressure,
+                time_step=self.time_step,
+            )
+            self.assertTrue(np.all(particle_new.get_species_mass() >= 0.0))
+            self.assertTrue(np.all(np.isfinite(gas_new.get_concentration())))
+
+        particle_a, gas_a = self._make_three_particle_state()
+        particle_b, gas_b = self._make_three_particle_state()
+        strategy_a = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="random",
+            num_batches=3,
+            shuffle_each_step=False,
+            random_state=7,
+        )
+        strategy_b = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            theta_mode="random",
+            num_batches=3,
+            shuffle_each_step=False,
+            random_state=7,
+        )
+        particle_a, gas_a = strategy_a.step(
+            particle_a,
+            gas_a,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        particle_b, gas_b = strategy_b.step(
+            particle_b,
+            gas_b,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+
+        np.testing.assert_allclose(
+            gas_a.get_concentration(), gas_b.get_concentration()
+        )
+        np.testing.assert_allclose(
+            particle_a.get_species_mass(), particle_b.get_species_mass()
         )
