@@ -2,12 +2,13 @@
 
 # pylint: disable=R0801
 # pylint: disable=protected-access
-
+import logging
 import copy
 import types
 import unittest
 
 import numpy as np
+import pytest
 
 import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
@@ -521,8 +522,27 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertEqual(len(batches), 1)
         self.assertEqual(len(batches[0]), 7)
 
+    def test_validate_num_batches_zero_raises_value_error(self):
+        """_validate_num_batches raises when requested batches are zero."""
+        strategy = CondensationIsothermalStaggered(molar_mass=0.018)
+        strategy.num_batches = 0
+        with self.assertRaises(ValueError) as exc_info:
+            strategy._make_batches(5)
+        self.assertRegex(
+            str(exc_info.exception),
+            r"(num_batches.*(>=|at least)\s*1|number sections must be larger than 0)",
+        )
+
+    def test_validate_num_batches_negative_raises_value_error(self):
+        """_validate_num_batches raises when requested batches are negative."""
+        with self.assertRaisesRegex(
+            ValueError, r"num_batches.*(>=|at least)\s*1"
+        ):
+            CondensationIsothermalStaggered(molar_mass=0.018, num_batches=-1)
+
     def test_make_batches_more_batches_than_particles(self):
         """Excess batches clip to particle count."""
+
         strategy = CondensationIsothermalStaggered(
             molar_mass=0.018, num_batches=10, shuffle_each_step=False
         )
@@ -1107,3 +1127,59 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         np.testing.assert_allclose(
             particle_a.get_species_mass(), particle_b.get_species_mass()
         )
+
+
+def _contains_clipping_log(records: list[logging.LogRecord]) -> bool:
+    """Return True when clipping log message is present."""
+    return any(
+        "Clipping num_batches" in record.getMessage() for record in records
+    )
+
+
+def test_num_batches_exceeds_particles_clips_and_logs_info():
+    """Clips to particle count when batches exceed size."""
+    strategy = CondensationIsothermalStaggered(
+        molar_mass=0.018, num_batches=1000, shuffle_each_step=False
+    )
+
+    batches = strategy._make_batches(5)
+
+    assert len(batches) == 5
+    np.testing.assert_array_equal(np.concatenate(batches), np.arange(5))
+
+
+def test_num_batches_equals_particles_no_log(caplog):
+    """Equal batches and particles should not clip or log."""
+    strategy = CondensationIsothermalStaggered(
+        molar_mass=0.018, num_batches=5, shuffle_each_step=False
+    )
+    logging.disable(logging.NOTSET)
+    with caplog.at_level(logging.INFO, logger="particula"):
+        batches = strategy._make_batches(5)
+    assert len(batches) == 5
+    np.testing.assert_array_equal(np.concatenate(batches), np.arange(5))
+    assert "Clipping num_batches" not in caplog.text
+
+
+def test_num_batches_one_creates_single_batch(caplog):
+    """Single batch should include all particles and avoid logging."""
+    strategy = CondensationIsothermalStaggered(
+        molar_mass=0.018, num_batches=1, shuffle_each_step=False
+    )
+    logging.disable(logging.NOTSET)
+    with caplog.at_level(logging.INFO, logger="particula"):
+        batches = strategy._make_batches(12)
+    assert len(batches) == 1
+    np.testing.assert_array_equal(batches[0], np.arange(12))
+    assert "Clipping num_batches" not in caplog.text
+
+
+def test_zero_particles_returns_empty_batches_no_log(caplog):
+    """Zero particles returns empty list without logging."""
+    strategy = CondensationIsothermalStaggered(
+        molar_mass=0.018, num_batches=3, shuffle_each_step=False
+    )
+    with caplog.at_level(logging.INFO, logger="particula"):
+        batches = strategy._make_batches(0)
+    assert batches == []
+    assert "Clipping num_batches" not in caplog.text
