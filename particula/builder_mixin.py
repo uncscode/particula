@@ -1,4 +1,9 @@
-"""Mixin classes for Builder classes to set attributes and units."""
+"""Builder mixin helpers for assigning particle attributes and units.
+
+This module defines mixins that provide builders with fluent setters for
+physical quantities such as density, surface tension, concentration, and
+chamber geometry while handling unit conversions and input validation.
+"""
 
 # pylint: disable=too-few-public-methods
 
@@ -15,24 +20,13 @@ logger = logging.getLogger("particula")
 
 
 class BuilderDensityMixin:
-    """Mixin class for setting density and density_units.
+    """Mixin that stores a particle density with unit conversion.
 
-    This class provides a method to assign a particle's density in kg/m^3,
-    optionally converting from other units.
+    This mixin provides `set_density` so builders can accept density values
+    in arbitrary units and normalize them to kilograms per cubic meter.
 
     Attributes:
-        - density : Stores the density in kg/m^3 after conversion.
-
-    Methods:
-        - set_density: Assign the density attribute, converting from given
-            units to kg/m^3.
-
-    Examples:
-        ```py title="Setting particle density"
-        builder = MyBuilderClass()
-        builder.set_density(1000, "g/m^3")
-        # density is now 1.0 kg/m^3
-        ```
+        density: Particle density in kg/m^3 after conversion.
     """
 
     def __init__(self):
@@ -45,21 +39,15 @@ class BuilderDensityMixin:
         density: Union[float, NDArray[np.float64]],
         density_units: str,
     ):
-        """Set the density of the particle in kg/m^3.
+        """Set the particle density in kilograms per cubic meter.
 
-        Arguments:
-            - density : Density value.
-            - density_units : Units of the provided density.
-                Default is "kg/m^3".
+        Args:
+            density: Positive density value to store.
+            density_units: Units for ``density``. Defaults to ``"kg/m^3"`` and
+                accepts any unit supported by the converter.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_density(1000, "g/m^3")
-            # density is now 1.0 kg/m^3
-            ```
+            BuilderDensityMixin: Self for method chaining.
         """
         if density_units == "kg/m^3":
             self.density = density
@@ -69,20 +57,13 @@ class BuilderDensityMixin:
 
 
 class BuilderSurfaceTensionMixin:
-    """Mixin class for setting surface_tension.
+    """Mixin that stores surface tension values in N/m.
 
-    This class provides a method to assign a particle's surface tension,
-    in N/m units, optionally converting from other units.
+    This mixin provides `set_surface_tension` so builders can accept surface
+    tension inputs in arbitrary units and persist them in newtons per meter.
 
     Attributes:
-        - surface_tension : Stores the surface tension in N/m after conversion.
-
-    Methods:
-        - set_surface_tension: Assign the surface_tension, converting from
-            other units as needed.
-
-    References:
-        - No references available yet.
+        surface_tension: Surface tension in N/m after conversion.
     """
 
     def __init__(self):
@@ -95,20 +76,15 @@ class BuilderSurfaceTensionMixin:
         surface_tension: Union[float, NDArray[np.float64]],
         surface_tension_units: str,
     ):
-        """Set the surface tension of the particle in N/m.
+        """Set the particle surface tension in newtons per meter.
 
-        Arguments:
-            - surface_tension : Surface tension value.
-            - surface_tension_units : Units of the provided surface tension.
-                Default is "N/m".
+        Args:
+            surface_tension: Positive surface tension value to store.
+            surface_tension_units: Units for ``surface_tension``. Defaults to
+                ``"N/m"`` and accepts any supported conversion.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_surface_tension(0.072, "N/m")
-            ```
+            BuilderSurfaceTensionMixin: Self for method chaining.
         """
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
@@ -120,23 +96,13 @@ class BuilderSurfaceTensionMixin:
 
 
 class BuilderSurfaceTensionTableMixin:
-    """Mixin class for setting a surface tension lookup table.
+    """Mixin that stores surface tension lookup tables in N/m.
 
-    This class provides a method to assign and store a table of
-    surface tension values in N/m, optionally converting from
-    other units.
+    The mixin offers `set_surface_tension_table` so builders can normalize
+    arrays of surface tension values to newtons per meter and retain them.
 
     Attributes:
-        - surface_tension_table : An array of surface tension values in N/m.
-
-    Methods:
-        - set_surface_tension_table: Assign and convert the surface tension
-          table to N/m as needed.
-
-    Examples:
-        ```py
-        builder.set_surface_tension_table([0.072, 0.073], "N/m")
-        ```
+        surface_tension_table: Array of surface tension values in N/m.
     """
 
     def __init__(self):
@@ -149,7 +115,16 @@ class BuilderSurfaceTensionTableMixin:
         surface_tension_table: NDArray[np.float64],
         surface_tension_table_units: str = "N/m",
     ):
-        """Set a table of surface tension values in N/m."""
+        """Normalize a surface tension table to newtons per meter.
+
+        Args:
+            surface_tension_table: Array of surface tension values.
+            surface_tension_table_units: Units for the values. Defaults to
+                ``"N/m"``.
+
+        Returns:
+            BuilderSurfaceTensionTableMixin: Self for method chaining.
+        """
         table = np.asarray(surface_tension_table, dtype=np.float64)
         if surface_tension_table_units != "N/m":
             table = table * get_unit_conversion(
@@ -160,19 +135,13 @@ class BuilderSurfaceTensionTableMixin:
 
 
 class BuilderMolarMassMixin:
-    """Mixin class for setting molar_mass and molar_mass_units.
+    """Mixin that stores molar mass values in kg/mol.
 
-    This class provides a method to assign a particle's molar mass in kg/mol,
-    optionally converting from other units.
+    The mixin provides `set_molar_mass` so builders can accept molar mass inputs
+    in arbitrary units and normalize them to kilograms per mole.
 
     Attributes:
-        - molar_mass : Stores the molar mass in kg/mol.
-
-    Methods:
-        - set_molar_mass: Assign the molar_mass, converting units as necessary.
-
-    References:
-        - No references available yet.
+        molar_mass: Stored molar mass in kg/mol.
     """
 
     def __init__(self):
@@ -185,21 +154,15 @@ class BuilderMolarMassMixin:
         molar_mass: Union[float, NDArray[np.float64]],
         molar_mass_units: str,
     ):
-        """Set the molar mass of the particle in kg/mol.
+        """Set the molar mass in kilograms per mole.
 
-        Arguments:
-            - molar_mass : Molar mass value.
-            - molar_mass_units : Units of the provided molar mass.
-                Default is "kg/mol".
+        Args:
+            molar_mass: Positive molar mass value to store.
+            molar_mass_units: Units for ``molar_mass``. Defaults to
+                ``"kg/mol"``.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_molar_mass(18, "g/mol")
-            # molar_mass is now 0.018 kg/mol
-            ```
+            BuilderMolarMassMixin: Self for method chaining.
         """
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
@@ -211,24 +174,14 @@ class BuilderMolarMassMixin:
 
 
 class BuilderConcentrationMixin:
-    """Mixin class for setting concentration in a mixture.
+    """Mixin that stores concentration values in default units.
 
-    This class provides a method to assign a particle or species concentration
-    in kg/m^3 by default, optionally converting from other units.
+    The mixin exposes `set_concentration` so builders can accept concentration
+    inputs in arbitrary units and persist them in the configured default units.
 
     Attributes:
-        - concentration : The concentration in the default units.
-        - default_units : The default concentration units (e.g., "kg/m^3").
-
-    Methods:
-        - set_concentration: Assign the concentration, converting units
-            as needed.
-
-    Examples:
-        ```py title="Example usage"
-        builder = MyBuilderClass(default_units="g/m^3")
-        builder.set_concentration(500, "g/m^3")
-        ```
+        concentration: Stored concentration in `default_units`.
+        default_units: Default units applied when no conversion is needed.
     """
 
     def __init__(self, default_units: str = "kg/m^3"):
@@ -242,20 +195,15 @@ class BuilderConcentrationMixin:
         concentration: Union[float, NDArray[np.float64]],
         concentration_units: str,
     ):
-        """Set the concentration in the mixture.
+        """Assign the concentration normalized to the default units.
 
-        Arguments:
-            - concentration : Concentration value.
-            - concentration_units : Units of the provided concentration.
+        Args:
+            concentration: Non-negative concentration value to store.
+            concentration_units: Units for ``concentration``. Converted to
+                ``self.default_units`` before storage.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_concentration(0.5, "kg/m^3")
-            # stored as 0.5 in the default_units
-            ```
+            BuilderConcentrationMixin: Self for method chaining.
         """
         if concentration_units == self.default_units:
             self.concentration = concentration
@@ -267,19 +215,10 @@ class BuilderConcentrationMixin:
 
 
 class BuilderChargeMixin:
-    """Mixin class for setting a particle's charge.
-
-    This class provides a method to assign charge in terms of number of
-    elemental charges (dimensionless), ignoring units.
+    """Mixin that stores a particle charge count.
 
     Attributes:
-        - charge : The assigned charge.
-
-    Methods:
-        - set_charge: Assign the particle's charge.
-
-    References:
-        - No references available yet.
+        charge: Assigned charge in elemental charge units (dimensionless).
     """
 
     def __init__(self):
@@ -291,21 +230,14 @@ class BuilderChargeMixin:
         charge: Union[float, NDArray[np.float64]],
         charge_units: Optional[str] = None,
     ):
-        """Set the number of elemental charges on the particle.
+        """Set the particle charge count.
 
-        Arguments:
-            - charge : Numeric value of the charge.
-            - charge_units : Optional; if provided, a warning is logged
-                and ignored.
+        Args:
+            charge: Numeric value describing elemental charges.
+            charge_units: Optional units that are logged and ignored.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_charge(10)
-            # charge is now 10 elementary charges
-            ```
+            BuilderChargeMixin: Self for method chaining.
         """
         if charge_units is not None:
             logger.warning("Ignoring units for charge parameter.")
@@ -314,13 +246,10 @@ class BuilderChargeMixin:
 
 
 class BuilderPhaseIndexMixin:
-    """Mixin class for setting a phase index array.
+    """Mixin that stores phase index assignments for species.
 
     Attributes:
-        - phase_index : Array assigning species to phase IDs.
-
-    Methods:
-        - set_phase_index : Assign the phase index array. Units ignored.
+        phase_index: Array mapping each species to a phase identifier.
     """
 
     def __init__(self):
@@ -332,7 +261,15 @@ class BuilderPhaseIndexMixin:
         phase_index: Union[Sequence[int], NDArray[np.int_]],
         phase_index_units: Optional[str] = None,
     ):
-        """Set the phase index describing species phase membership."""
+        """Assign phase membership indices to species.
+
+        Args:
+            phase_index: Sequence or array of integers describing phase IDs.
+            phase_index_units: Optional units that are logged and ignored.
+
+        Returns:
+            BuilderPhaseIndexMixin: Self for method chaining.
+        """
         if phase_index_units is not None:
             logger.warning("Ignoring units for phase index parameter.")
         self.phase_index = np.array(phase_index, dtype=int)
@@ -340,16 +277,10 @@ class BuilderPhaseIndexMixin:
 
 
 class BuilderMassMixin:
-    """Mixin class for setting particle mass in kg.
-
-    This class provides a method to assign mass in kg, optionally converting
-    from other units.
+    """Mixin that stores particle mass in kilograms.
 
     Attributes:
-        - mass : The mass of the particle in kg.
-
-    Methods:
-        - set_mass: Assign the mass, converting from specified units.
+        mass: Particle mass in kg after conversion.
     """
 
     def __init__(self):
@@ -362,20 +293,14 @@ class BuilderMassMixin:
         mass: Union[float, NDArray[np.float64]],
         mass_units: str,
     ):
-        """Set the mass of the particle in kg.
+        """Set the particle mass in kilograms.
 
-        Arguments:
-            - mass : Numeric mass value.
-            - mass_units : Units of the provided mass. Default is "kg".
+        Args:
+            mass: Non-negative mass value to store.
+            mass_units: Units for ``mass``. Defaults to ``"kg"``.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_mass(1.0, "g")
-            # mass is now 0.001 kg
-            ```
+            BuilderMassMixin: Self for method chaining.
         """
         if mass_units == "kg":
             self.mass = mass
@@ -385,16 +310,10 @@ class BuilderMassMixin:
 
 
 class BuilderVolumeMixin:
-    """Mixin class for setting volume in m^3.
-
-    This class provides a method to assign volume in m^3,
-    optionally converting from other units.
+    """Mixin that stores particle volume in cubic meters.
 
     Attributes:
-        - volume : The volume in m^3.
-
-    Methods:
-        - set_volume: Assign the volume, converting units as needed.
+        volume: Particle volume in m^3 after conversion.
     """
 
     def __init__(self):
@@ -407,20 +326,14 @@ class BuilderVolumeMixin:
         volume: Union[float, NDArray[np.float64]],
         volume_units: str,
     ):
-        """Set the volume in m^3.
+        """Set the particle volume in cubic meters.
 
-        Arguments:
-            - volume : Volume value.
-            - volume_units : Units of the provided volume. Default is "m^3".
+        Args:
+            volume: Non-negative volume value to store.
+            volume_units: Units for ``volume``. Defaults to ``"m^3"``.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_volume(1.0, "L")
-            # volume is now 0.001 m^3
-            ```
+            BuilderVolumeMixin: Self for method chaining.
         """
         if volume_units == "m^3":
             self.volume = volume
@@ -430,16 +343,10 @@ class BuilderVolumeMixin:
 
 
 class BuilderRadiusMixin:
-    """Mixin class for setting a particle's radius in meters.
-
-    This class provides a method to assign radius in meters,
-    optionally converting from other units.
+    """Mixin that stores particle radius in meters.
 
     Attributes:
-        - radius : The radius in meters.
-
-    Methods:
-        - set_radius: Assign the radius, converting units as needed.
+        radius: Particle radius in meters after conversion.
     """
 
     def __init__(self):
@@ -452,20 +359,14 @@ class BuilderRadiusMixin:
         radius: Union[float, NDArray[np.float64]],
         radius_units: str,
     ):
-        """Set the radius of the particle in meters.
+        """Set the particle radius in meters.
 
-        Arguments:
-            - radius : Numeric radius value.
-            - radius_units : Units of the provided radius. Default is "m".
+        Args:
+            radius: Non-negative radius value to store.
+            radius_units: Units for ``radius``. Defaults to ``"m"``.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_radius(1.0, "um")
-            # radius is now 1e-6 m
-            ```
+            BuilderRadiusMixin: Self for method chaining.
         """
         if radius_units == "m":
             self.radius = radius
@@ -475,17 +376,10 @@ class BuilderRadiusMixin:
 
 
 class BuilderTemperatureMixin:
-    """Mixin class for setting temperature in Kelvin.
-
-    This class provides a method to assign temperature in Kelvin,
-    optionally converting from specified units such as 'degC', 'degF',
-    'degR', or 'K'.
+    """Mixin that stores temperatures in Kelvin.
 
     Attributes:
-        - temperature : The temperature in Kelvin.
-
-    Methods:
-        - set_temperature: Assign the temperature, converting units as needed.
+        temperature: Temperature in Kelvin after conversion.
     """
 
     def __init__(self):
@@ -494,24 +388,18 @@ class BuilderTemperatureMixin:
 
     @validate_inputs({"temperature": "finite"})
     def set_temperature(self, temperature: float, temperature_units: str = "K"):
-        """Set the temperature of the atmosphere in Kelvin.
+        """Set the temperature in Kelvin.
 
-        Arguments:
-            - temperature : Numeric temperature value.
-            - temperature_units : Units of the given temperature.
-                Defaults to "K". Accepts "degC", "degF", "degR", or "K".
+        Args:
+            temperature: Finite temperature value.
+            temperature_units: Units for ``temperature``. Defaults to ``"K"``.
+                Accepts ``"degC"``, ``"degF"``, ``"degR"``, or ``"K"``.
 
         Returns:
-            - self : The class instance for method chaining.
+            BuilderTemperatureMixin: Self for method chaining.
 
         Raises:
-            - ValueError : If the converted temperature is below absolute zero.
-
-        Examples:
-            ```py title="Setting temperature"
-            builder.set_temperature(25, "degC")
-            # temperature is now 298.15 K
-            ```
+            ValueError: If the converted temperature is below absolute zero.
         """
         if temperature_units == "K":
             self.temperature = temperature
@@ -523,23 +411,10 @@ class BuilderTemperatureMixin:
 
 
 class BuilderTemperatureTableMixin:
-    """Mixin class for setting a temperature lookup table.
-
-    This class provides a method to assign multiple temperature values
-    in Kelvin, optionally converting from other common temperature units
-    (e.g., degC, degF).
+    """Mixin that stores temperature lookup tables in Kelvin.
 
     Attributes:
-        - temperature_table : An array of temperatures in Kelvin.
-
-    Methods:
-        - set_temperature_table: Assign and convert the temperature table
-          to K as needed.
-
-    Examples:
-        ```py
-        builder.set_temperature_table([273.15, 298.15], "K")
-        ```
+        temperature_table: Array of temperatures in Kelvin after conversion.
     """
 
     def __init__(self):
@@ -552,7 +427,15 @@ class BuilderTemperatureTableMixin:
         temperature_table: NDArray[np.float64],
         temperature_table_units: str = "K",
     ):
-        """Set a table of temperature values in Kelvin."""
+        """Assign a table of temperatures in Kelvin.
+
+        Args:
+            temperature_table: Array of temperature values.
+            temperature_table_units: Units for the values. Defaults to ``"K"``.
+
+        Returns:
+            BuilderTemperatureTableMixin: Self for method chaining.
+        """
         temps = np.asarray(temperature_table, dtype=np.float64)
         if temperature_table_units != "K":
             temps = np.array(
@@ -567,17 +450,10 @@ class BuilderTemperatureTableMixin:
 
 
 class BuilderPressureMixin:
-    """Mixin class for setting total pressure in Pa.
-
-    This class provides a method to assign the total gas mixture pressure
-    in pascals, optionally converting from units like 'kPa', 'MPa', 'psi',
-    'bar', or 'atm'.
+    """Mixin that stores total gas pressure in pascals.
 
     Attributes:
-        - pressure : The total pressure in Pa.
-
-    Methods:
-        - set_pressure: Assign the pressure, converting units as needed.
+        pressure: Total pressure in Pa after conversion.
     """
 
     def __init__(self):
@@ -590,20 +466,14 @@ class BuilderPressureMixin:
         pressure: Union[float, NDArray[np.float64]],
         pressure_units: str,
     ):
-        """Set the total pressure of the atmosphere.
+        """Set the total pressure in pascals.
 
-        Arguments:
-            - pressure : Numeric pressure value.
-            - pressure_units : Units of the given pressure. Default is "Pa".
+        Args:
+            pressure: Non-negative pressure value to store.
+            pressure_units: Units for ``pressure``. Defaults to ``"Pa"``.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_pressure(1.0, "bar")
-            # pressure is now 1e5 Pa
-            ```
+            BuilderPressureMixin: Self for method chaining.
         """
         if pressure_units == "Pa":
             self.pressure = pressure
@@ -613,22 +483,12 @@ class BuilderPressureMixin:
 
 
 class BuilderLognormalMixin:
-    """Mixin class for setting lognormal distribution parameters.
-
-    This class provides methods to assign and manage lognormal distribution
-    parameters for particle radius, including the mode, geometric standard
-    deviation, and number concentration.
+    """Mixin that stores lognormal distribution properties for radius.
 
     Attributes:
-        - mode : Array of modes in meters.
-        - number_concentration : Number concentration in 1/m^3.
-        - geometric_standard_deviation : The dimensionless geometric std. dev.
-
-    Methods:
-        - set_mode: Assign the modal radius.
-        - set_geometric_standard_deviation: Assign the geometric std. dev.
-            (ignored units).
-        - set_number_concentration: Assign the number concentration in 1/m^3.
+        mode: Mode radii in meters.
+        number_concentration: Number concentration in 1/m^3.
+        geometric_standard_deviation: Geometric standard deviation values.
     """
 
     def __init__(self):
@@ -643,20 +503,14 @@ class BuilderLognormalMixin:
         mode: NDArray[np.float64],
         mode_units: str,
     ):
-        """Set the mode for the lognormal distribution in meters.
+        """Set lognormal mode radii in meters.
 
-        Arguments:
-            - mode : Array of modal radius values.
-            - mode_units : Units of the provided mode. Default is "m".
+        Args:
+            mode: Array of modal radius values.
+            mode_units: Units for ``mode``. Defaults to ``"m"``.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_mode(np.array([1e-8, 2e-8]), "m")
-            # modes are now [1e-8, 2e-8] m
-            ```
+            BuilderLognormalMixin: Self for method chaining.
         """
         if mode_units == "m":
             self.mode = mode
@@ -670,21 +524,15 @@ class BuilderLognormalMixin:
         geometric_standard_deviation: NDArray[np.float64],
         geometric_standard_deviation_units: Optional[str] = None,
     ):
-        """Set the geometric standard deviation for the lognormal distribution.
+        """Set the geometric standard deviation values.
 
-        Arguments:
-            - geometric_standard_deviation : Dimensionless geometric std. dev.
-            - geometric_standard_deviation_units : Ignored
-                (for interface consistency).
+        Args:
+            geometric_standard_deviation: Dimensionless geometric std. dev.
+            geometric_standard_deviation_units: Optional units that are logged
+                and ignored for interface consistency.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_geometric_standard_deviation(np.array([1.5, 2.0]))
-            # geometric std dev is now [1.5, 2.0]
-            ```
+            BuilderLognormalMixin: Self for method chaining.
         """
         if geometric_standard_deviation_units is not None:
             logger.warning("Ignoring units for surface strategy parameter.")
@@ -697,21 +545,15 @@ class BuilderLognormalMixin:
         number_concentration: NDArray[np.float64],
         number_concentration_units: str,
     ):
-        """Set the number concentration for the lognormal distribution in 1/m^3.
+        """Set the number concentration in 1/m^3.
 
-        Arguments:
-            - number_concentration : Array of number concentration values.
-            - number_concentration_units : Units of the concentration,
-                must be "1/m^3" or equivalent.
+        Args:
+            number_concentration: Array of number concentration values.
+            number_concentration_units: Units for ``number_concentration``. Must
+                be ``"1/m^3"`` or ``"m^-3"`` for direct storage.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_number_concentration(np.array([1e6, 5e5]), "m^-3")
-            # stored as [1e6, 5e5] 1/m^3
-            ```
+            BuilderLognormalMixin: Self for method chaining.
         """
         if number_concentration_units in {"1/m^3", "m^-3"}:
             self.number_concentration = number_concentration
@@ -723,16 +565,10 @@ class BuilderLognormalMixin:
 
 
 class BuilderParticleResolvedCountMixin:
-    """Mixin class for setting a particle-resolved count.
-
-    This class provides a method to define how many individual particles
-    should be resolved in a simulation or model.
+    """Mixin that stores a particle-resolved count.
 
     Attributes:
-        - particle_resolved_count : The number of particles to resolve.
-
-    Methods:
-        - set_particle_resolved_count: Assign the particle-resolved count.
+        particle_resolved_count: Number of particles to resolve.
     """
 
     def __init__(self):
@@ -745,20 +581,15 @@ class BuilderParticleResolvedCountMixin:
         particle_resolved_count: int,
         particle_resolved_count_units: Optional[str] = None,
     ):
-        """Set the number of particles to resolve.
+        """Assign the particle-resolved count.
 
-        Arguments:
-            - particle_resolved_count : Positive integer count of particles.
-            - particle_resolved_count_units : Ignored, for interface
-                consistency.
+        Args:
+            particle_resolved_count: Positive integer number of particles.
+            particle_resolved_count_units: Optional units that are logged and
+                ignored.
 
         Returns:
-            - self : The class instance for method chaining.
-
-        Examples:
-            ```py
-            builder.set_particle_resolved_count(1000)
-            ```
+            BuilderParticleResolvedCountMixin: Self for method chaining.
         """
         if particle_resolved_count_units is not None:
             logger.warning("Ignoring units for particle resolved count.")
@@ -945,11 +776,14 @@ class BuilderChamberDimensionsMixin:
 
 
 class BuilderWallPotentialMixin:
-    """Mixin for setting wall potential in volts.
+    """Mixin that stores electrostatic wall potential in volts.
 
     Stores electrostatic wall potential used by charged wall loss strategies.
     A zero potential still permits image-charge enhancement when particle
     charge is non-zero.
+
+    Attributes:
+        wall_potential: Electrostatic wall potential in volts.
     """
 
     def __init__(self):
@@ -976,18 +810,22 @@ class BuilderWallPotentialMixin:
             self.wall_potential = wall_potential
             return self
         self.wall_potential = cast(
-            float, get_unit_conversion(wall_potential_units, "V", wall_potential)
+            float,
+            get_unit_conversion(wall_potential_units, "V", wall_potential),
         )
         return self
 
 
 class BuilderWallElectricFieldMixin:
-    """Mixin for setting wall electric field magnitude.
+    """Mixin that stores wall electric field magnitudes in V/m.
 
     Supports optional drift terms for charged wall loss strategies.
     Accepts a scalar magnitude for spherical chambers or a three-component
     tuple for rectangular geometries. A value of 0.0 disables field-driven
     drift.
+
+    Attributes:
+        wall_electric_field: Electric field magnitude (scalar or tuple) in V/m.
     """
 
     def __init__(self):
@@ -997,6 +835,17 @@ class BuilderWallElectricFieldMixin:
     def _validate_wall_electric_field(
         self, wall_electric_field: Union[float, Tuple[float, float, float]]
     ) -> Union[float, Tuple[float, float, float]]:
+        """Validate and normalize wall electric field inputs.
+
+        Args:
+            wall_electric_field: Scalar magnitude or ``(Ex, Ey, Ez)`` tuple.
+
+        Returns:
+            Union[float, Tuple[float, float, float]]: Validated scalar or tuple.
+
+        Raises:
+            ValueError: If tuple length is not three or entries are not finite.
+        """
         if isinstance(wall_electric_field, tuple):
             if len(wall_electric_field) != 3:
                 raise ValueError(
