@@ -864,12 +864,6 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         particle_single, gas_single = self._make_three_particle_state()
         particle_multi, gas_multi = self._make_three_particle_state()
 
-        strategy_single = CondensationIsothermalStaggered(
-            molar_mass=self.molar_mass,
-            theta_mode="half",
-            num_batches=1,
-            shuffle_each_step=False,
-        )
         strategy_multi = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass,
             theta_mode="half",

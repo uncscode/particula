@@ -1159,8 +1159,8 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         for batch in batches:
             batch_dm_total.fill(0.0)
-            # Second pass also updates gas after each batch; matches single-batch
-            # behavior when ``num_batches`` is 1.
+            # Second pass updates gas after each batch for parity with
+            # num_batches=1 behavior.
             for particle_index in batch:
                 dt_local = theta_dt_second[particle_index]
                 if dt_local <= 0.0:
