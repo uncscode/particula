@@ -811,7 +811,9 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 rng = self.random_state
                 return rng.uniform(0.0, 1.0, n_particles)
             if isinstance(self.random_state, np.random.RandomState):
-                return self.random_state.random(n_particles)
+                return self.random_state.random(n_particles).astype(
+                    np.float64, copy=False
+                )
 
             rng = np.random.default_rng(self.random_state)
             return rng.uniform(0.0, 1.0, n_particles)
