@@ -706,3 +706,129 @@ class CondensationIsothermal(CondensationStrategy):
                 added_concentration=-mass_transfer.sum(axis=0)
             )
         return particle, gas_species
+
+
+class CondensationIsothermalStaggered(CondensationStrategy):
+    """Staggered condensation strategy stub.
+
+    Defines staged stepping controls but leaves condensation algorithm
+    unimplemented. Staggered stepping is intended to improve numerical
+    stability by splitting updates across batches or random permutations.
+
+    Attributes:
+        theta_mode: Stepping mode, one of "half", "random", or "batch".
+        num_batches: Number of batches for staggered updates (>= 1).
+        shuffle_each_step: Whether to reshuffle particle order each step.
+        random_state: Optional seed or generator for reproducibility.
+    """
+
+    VALID_THETA_MODES = ("half", "random", "batch")
+
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
+    def __init__(
+        self,
+        molar_mass: Union[float, NDArray[np.float64]],
+        theta_mode: str = "half",
+        num_batches: int = 1,
+        shuffle_each_step: bool = True,
+        random_state: Optional[
+            Union[int, np.random.Generator, np.random.RandomState]
+        ] = None,
+        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
+        accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
+        update_gases: bool = True,
+        skip_partitioning_indices: Optional[Sequence[int]] = None,
+    ):
+        """Initialize the staggered condensation strategy.
+
+        Args:
+            molar_mass: Molar mass of the condensing species [kg/mol].
+            theta_mode: Staggered stepping mode; must be one of
+                ``("half", "random", "batch")``.
+            num_batches: Number of batches for Gauss-Seidel style updates;
+                must be at least 1.
+            shuffle_each_step: Whether to shuffle particle order every step.
+            random_state: Optional seed or generator controlling randomness
+                for staggered permutations.
+            diffusion_coefficient: Diffusion coefficient [m^2/s].
+            accommodation_coefficient: Mass accommodation coefficient.
+            update_gases: Whether to update gas concentrations.
+            skip_partitioning_indices: Species indices to skip partitioning.
+
+        Raises:
+            ValueError: If ``theta_mode`` is unsupported or ``num_batches`` is
+                less than 1.
+        """
+        super().__init__(
+            molar_mass=molar_mass,
+            diffusion_coefficient=diffusion_coefficient,
+            accommodation_coefficient=accommodation_coefficient,
+            update_gases=update_gases,
+            skip_partitioning_indices=skip_partitioning_indices,
+        )
+
+        if theta_mode not in self.VALID_THETA_MODES:
+            raise ValueError(
+                f"theta_mode must be one of {self.VALID_THETA_MODES}, got "
+                f"'{theta_mode}'"
+            )
+        if num_batches < 1:
+            raise ValueError("num_batches must be at least 1.")
+
+        self.theta_mode = theta_mode
+        self.num_batches = num_batches
+        self.shuffle_each_step = shuffle_each_step
+        self.random_state = random_state
+
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
+    def mass_transfer_rate(
+        self,
+        particle: ParticleRepresentation,
+        gas_species: GasSpecies,
+        temperature: float,
+        pressure: float,
+        dynamic_viscosity: Optional[float] = None,
+    ) -> Union[float, NDArray[np.float64]]:
+        """Placeholder for staggered mass transfer rate.
+
+        Raises:
+            NotImplementedError: Always, until staggered algorithm is added.
+        """
+        raise NotImplementedError(
+            "CondensationIsothermalStaggered.mass_transfer_rate is not "
+            "implemented."
+        )
+
+    def rate(
+        self,
+        particle: ParticleRepresentation,
+        gas_species: GasSpecies,
+        temperature: float,
+        pressure: float,
+    ) -> NDArray[np.float64]:
+        """Placeholder for staggered condensation rate per particle.
+
+        Raises:
+            NotImplementedError: Always, until staggered algorithm is added.
+        """
+        raise NotImplementedError(
+            "CondensationIsothermalStaggered.rate is not implemented."
+        )
+
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        gas_species: GasSpecies,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> Tuple[ParticleRepresentation, GasSpecies]:
+        """Placeholder for staggered condensation timestep.
+
+        Raises:
+            NotImplementedError: Always, until staggered algorithm is added.
+        """
+        raise NotImplementedError(
+            "CondensationIsothermalStaggered.step is not implemented."
+        )

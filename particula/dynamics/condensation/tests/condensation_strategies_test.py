@@ -10,6 +10,7 @@ import numpy as np
 import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
+    CondensationIsothermalStaggered,
 )
 
 
@@ -226,3 +227,53 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertIs(returned_2d, array_2d)
         expected_2d = np.tile(np.array([0.0, 1.0, 0.0, 3.0]), (2, 1))
         np.testing.assert_array_equal(array_2d, expected_2d)
+
+
+class TestCondensationIsothermalStaggered(unittest.TestCase):
+    """Test class for the CondensationIsothermalStaggered strategy."""
+
+    def test_defaults(self):
+        """Defaults stored correctly for staggered strategy."""
+        strategy = CondensationIsothermalStaggered(molar_mass=0.018)
+        self.assertEqual(strategy.theta_mode, "half")
+        self.assertEqual(strategy.num_batches, 1)
+        self.assertTrue(strategy.shuffle_each_step)
+        self.assertIsNone(strategy.random_state)
+
+    def test_theta_mode_random_stores_seed(self):
+        """Random theta mode stores provided random state."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="random", random_state=42
+        )
+        self.assertEqual(strategy.theta_mode, "random")
+        self.assertEqual(strategy.random_state, 42)
+
+    def test_theta_mode_batch_stores_batches(self):
+        """Batch theta mode stores batch count."""
+        strategy = CondensationIsothermalStaggered(
+            molar_mass=0.018, theta_mode="batch", num_batches=4
+        )
+        self.assertEqual(strategy.theta_mode, "batch")
+        self.assertEqual(strategy.num_batches, 4)
+
+    def test_invalid_theta_mode_raises(self):
+        """Invalid theta_mode raises ValueError."""
+        with self.assertRaises(ValueError):
+            CondensationIsothermalStaggered(
+                molar_mass=0.018, theta_mode="unsupported"
+            )
+
+    def test_num_batches_less_than_one_raises(self):
+        """num_batches below one raises ValueError."""
+        with self.assertRaises(ValueError):
+            CondensationIsothermalStaggered(molar_mass=0.018, num_batches=0)
+
+    def test_stub_methods_raise_not_implemented(self):
+        """Stub methods should raise NotImplementedError until implemented."""
+        strategy = CondensationIsothermalStaggered(molar_mass=0.018)
+        with self.assertRaises(NotImplementedError):
+            strategy.mass_transfer_rate(None, None, 298.15, 101325)
+        with self.assertRaises(NotImplementedError):
+            strategy.rate(None, None, 298.15, 101325)
+        with self.assertRaises(NotImplementedError):
+            strategy.step(None, None, 298.15, 101325, 1.0)
