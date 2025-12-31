@@ -295,7 +295,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(mass_rate)))
 
     def test_rate_returns_array_and_respects_skip(self):
-        """rate returns array and zeros skipped indices."""
+        """Rate returns array and zeros skipped indices."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass, skip_partitioning_indices=[0]
         )
@@ -311,7 +311,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(rate)))
 
     def test_rate_api_accepts_positional_arguments(self):
-        """rate supports positional call matching base signature."""
+        """Rate supports positional call matching base signature."""
         strategy = CondensationIsothermalStaggered(molar_mass=self.molar_mass)
         rate_positional = strategy.rate(
             self.particle,
@@ -610,7 +610,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
 
     def test_calculate_single_particle_transfer_default_transport(self):
-        """Helper returns finite per-species mass change with internal transport."""
+        """Helper returns finite mass change with internal transport."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass, theta_mode="half"
         )
@@ -630,7 +630,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(mass_change)))
 
     def test_calculate_single_particle_transfer_scalar_transport(self):
-        """Helper accepts scalar transport coefficient and returns finite values."""
+        """Helper handles scalar transport coefficient with finite mass."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass, theta_mode="half"
         )
@@ -657,7 +657,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(mass_change)))
 
     def test_step_half_mode_produces_valid_output(self):
-        """step with theta_mode='half' returns updated particle and gas."""
+        """Step with theta_mode='half' returns updated particle and gas."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass, theta_mode="half"
         )
@@ -672,7 +672,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertIsNotNone(gas_new)
 
     def test_step_random_mode_produces_valid_output(self):
-        """step with theta_mode='random' returns updated particle and gas."""
+        """Step with theta_mode='random' returns updated particle and gas."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass,
             theta_mode="random",
@@ -689,7 +689,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertIsNotNone(gas_new)
 
     def test_step_batch_mode_produces_valid_output(self):
-        """step with theta_mode='batch' returns updated particle and gas."""
+        """Step with theta_mode='batch' returns updated particle and gas."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass,
             theta_mode="batch",
@@ -707,7 +707,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertIsNotNone(gas_new)
 
     def test_step_non_negative_masses_and_gas(self):
-        """step keeps particle masses and gas concentrations non-negative."""
+        """Step keeps particle masses and gas concentrations non-negative."""
         strategy = CondensationIsothermalStaggered(
             molar_mass=self.molar_mass, theta_mode="half"
         )
@@ -768,7 +768,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
 
     def test_step_positional_api_matches_signature(self):
-        """step accepts positional args compatible with base signature."""
+        """Step accepts positional args compatible with base signature."""
         strategy = CondensationIsothermalStaggered(molar_mass=self.molar_mass)
         particle_new, gas_new = strategy.step(
             self.particle,

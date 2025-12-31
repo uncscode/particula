@@ -982,7 +982,8 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 coefficients.
 
         Returns:
-            Per-species mass change for the particle (kg), shaped ``(n_species,)``.
+            Per-species mass change for the particle (kg), shaped
+            ``(n_species,)``.
         """
         particle_mass = particle.get_species_mass()[particle_index]
         particle_concentration = np.asarray(
