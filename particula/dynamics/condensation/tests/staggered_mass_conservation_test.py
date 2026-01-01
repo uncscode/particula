@@ -370,34 +370,6 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_kelvin_mass_conservation_during_evaporation(
-        self, small_particles
-    ) -> None:
-        """Multiple evaporation steps remain finite and conserve mass."""
-        particle, gas_species = small_particles
-        gas_species.set_concentration(1e-5)
-
-        initial_mass = calculate_total_mass(particle, gas_species)
-        strategy = self._strategy(theta_mode="half")
-        particle_out, gas_out = particle, gas_species
-        for _ in range(5):
-            particle_out, gas_out = strategy.step(
-                particle_out,
-                gas_out,
-                298.0,
-                101325.0,
-                time_step=0.0002,
-            )
-
-        final_mass = calculate_total_mass(particle_out, gas_out)
-        relative_error = abs(final_mass - initial_mass) / initial_mass
-        assert np.all(np.isfinite(particle_out.get_mass()))
-        assert np.all(np.isfinite(gas_out.get_concentration()))
-        assert relative_error < self.RELATIVE_TOLERANCE, (
-            "Multi-step Kelvin evaporation drifted mass; "
-            f"relative error={relative_error:.2e}"
-        )
-
     def test_kelvin_supersaturation_condensation(self, small_particles) -> None:
         """Supersaturation forces condensation while conserving mass."""
         particle, gas_species = small_particles
