@@ -1,15 +1,17 @@
 """Tests for CondensationIsothermalStaggeredBuilder."""
+# ruff: noqa: E402
 
 import os
 import sys
 import types
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 os.environ.setdefault("SCIPY_USE_CALC_DOCSTRINGS", "0")
 
-lognormal_module = types.ModuleType(
+lognormal_module: Any = types.ModuleType(
     "particula.particles.properties.lognormal_size_distribution"
 )
 
