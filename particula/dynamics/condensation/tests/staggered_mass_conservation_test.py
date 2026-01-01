@@ -4,19 +4,18 @@ This suite validates that particle + gas mass remains conserved for the
 staggered condensation strategy across theta modes, particle counts, step
 counts, and large time steps. Tolerances follow issue requirements:
 - Single step: 1e-12 relative (machine precision)
-- Multi-step (10, 100, 1000 steps): 1e-10 relative (accumulated error allowance)
-- Large time step: 1e-3 relative (non-accumulating regimes)
+- Multi-step (10, 100, 1000 steps): 1e-10 relative (accumulated error
+  allowance)
+- Large time step: 1e-3 relative (relaxed due to numerical approximation
+  limits at large dt)
 Heavy cases (n_particles=10000 single step and the 1000-step multi-step
 scenario) are marked slow so the default suite stays fast.
 """
 
 from __future__ import annotations
 
-import warnings
-
 import numpy as np
 import pytest
-from _pytest.warning_types import PytestUnknownMarkWarning
 from numpy.typing import NDArray
 
 from particula.dynamics.condensation import CondensationIsothermalStaggered
@@ -27,8 +26,6 @@ from particula.particles import (
     ResolvedParticleMassRepresentationBuilder,
     SurfaceStrategyVolume,
 )
-
-warnings.filterwarnings("ignore", category=PytestUnknownMarkWarning)
 
 
 def calculate_total_mass(
@@ -107,7 +104,7 @@ class TestMassConservation:
 
     # Single-step tolerance ensures machine precision.
     RELATIVE_TOLERANCE = 1e-12
-    # Multi-step tolerance allows slight accumulation over O(1000) steps.
+    # Multi-step tolerance allows slight accumulation over up to 1000 steps.
     MULTI_STEP_TOLERANCE = 1e-10
     # Large time steps allow a relaxed tolerance for non-accumulating checks.
     LARGE_TIME_STEP_TOLERANCE = 1e-3
@@ -164,6 +161,9 @@ class TestMassConservation:
             pytest.param(100, 1000, marks=pytest.mark.slow),
         ],
     )
+    # Batch mode excluded: deterministic batching with fixed RNG already
+    # exercised in single-step and large time step tests; random mode provides
+    # better coverage of stochastic accumulation in multi-step scenarios.
     @pytest.mark.parametrize(
         "theta_mode",
         ["half", "random"],
@@ -188,7 +188,11 @@ class TestMassConservation:
         )
 
         # Use shorter time steps to keep accumulation within tolerance.
-        time_step = 0.0002 if steps < 100 else 0.00005
+        # Smaller dt for longer runs reduces per-step numerical error,
+        # maintaining cumulative error below MULTI_STEP_TOLERANCE.
+        time_step_short = 0.0002  # For 10-100 step runs
+        time_step_long = 0.00005  # For 100+ step runs
+        time_step = time_step_short if steps < 100 else time_step_long
         for _ in range(steps):
             particle, gas_species = strategy.step(
                 particle,
