@@ -24,7 +24,6 @@ Example:
 from typing import Optional, Union
 
 import numpy as np
-from numpy.typing import NDArray
 
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import BuilderMolarMassMixin

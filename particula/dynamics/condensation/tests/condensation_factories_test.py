@@ -1,9 +1,11 @@
 """Test cases for CondensationFactory and CondensationIsothermal classes."""
+# ruff: noqa: E402
 
 import os
 import sys
 import types
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -13,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[4]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-lognormal_module = types.ModuleType(
+lognormal_module: Any = types.ModuleType(
     "particula.particles.properties.lognormal_size_distribution"
 )
 
