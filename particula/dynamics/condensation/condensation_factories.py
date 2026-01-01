@@ -20,7 +20,13 @@ class CondensationFactory(
         CondensationStrategy,
     ]
 ):
-    """Factory class for condensation strategies."""
+    """Factory class for condensation strategies.
+
+    Supports strategy types:
+        - "isothermal": Standard isothermal condensation.
+        - "isothermal_staggered": Staggered isothermal condensation with
+          batch stepping for stability.
+    """
 
     def get_builders(
         self,

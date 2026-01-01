@@ -56,31 +56,13 @@ def test_isothermal_condensation():
     assert isinstance(strategy, CondensationIsothermal)
 
 
-def test_isothermal_staggered_condensation_defaults():
-    """Factory exposes staggered builder mapping and defaults work."""
+def test_isothermal_staggered_condensation_defaults_via_factory():
+    """Factory returns staggered strategy with default parameters set."""
     factory = CondensationFactory()
     builder_map = factory.get_builders()
 
     assert "isothermal_staggered" in builder_map
 
-    strategy = (
-        builder_map["isothermal_staggered"]
-        .set_molar_mass(0.018, "kg/mol")
-        .set_diffusion_coefficient(2e-5, "m^2/s")
-        .set_accommodation_coefficient(1.0)
-        .build()
-    )
-
-    assert isinstance(strategy, CondensationIsothermalStaggered)
-    assert strategy.theta_mode == "half"
-    assert strategy.num_batches == 1
-    assert strategy.shuffle_each_step is True
-    assert strategy.random_state is None
-
-
-def test_isothermal_staggered_condensation_via_factory():
-    """Test the creation of an isothermal staggered strategy via factory."""
-    factory = CondensationFactory()
     strategy = factory.get_strategy(
         "isothermal_staggered",
         {
@@ -91,16 +73,44 @@ def test_isothermal_staggered_condensation_via_factory():
             "accommodation_coefficient": 1.0,
         },
     )
+
     assert isinstance(strategy, CondensationIsothermalStaggered)
-    # Verify default values are set
     assert strategy.theta_mode == "half"
     assert strategy.num_batches == 1
     assert strategy.shuffle_each_step is True
     assert strategy.random_state is None
+    assert strategy.update_gases is True
+
+
+def test_isothermal_staggered_condensation_custom_parameters_via_factory():
+    """Factory propagates non-default staggered parameters to the strategy."""
+    factory = CondensationFactory()
+    strategy = factory.get_strategy(
+        "isothermal_staggered",
+        {
+            "molar_mass": 0.018,
+            "molar_mass_units": "kg/mol",
+            "diffusion_coefficient": 2e-5,
+            "diffusion_coefficient_units": "m^2/s",
+            "accommodation_coefficient": 1.0,
+            "theta_mode": "batch",
+            "num_batches": 3,
+            "shuffle_each_step": False,
+            "random_state": 42,
+            "update_gases": False,
+        },
+    )
+
+    assert isinstance(strategy, CondensationIsothermalStaggered)
+    assert strategy.theta_mode == "batch"
+    assert strategy.num_batches == 3
+    assert strategy.shuffle_each_step is False
+    assert strategy.random_state == 42
+    assert strategy.update_gases is False
 
 
 def test_invalid_condensation_strategy():
     """Test that an invalid condensation strategy raises a ValueError."""
     factory = CondensationFactory()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Unknown strategy type: nonexistent"):
         factory.get_strategy("nonexistent", {})
