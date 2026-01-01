@@ -21,7 +21,8 @@ Example:
     ... )
 """
 
-from typing import Optional, Union, cast
+import logging
+from typing import Any, Optional, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -38,6 +39,8 @@ from .condensation_builder_mixin import (
     BuilderDiffusionCoefficientMixin,
     BuilderUpdateGasesMixin,
 )
+
+logger = logging.getLogger("particula")
 
 
 class CondensationIsothermalStaggeredBuilder(
@@ -73,6 +76,61 @@ class CondensationIsothermalStaggeredBuilder(
         self.random_state: Optional[
             Union[int, np.random.Generator, np.random.RandomState]
         ] = None
+
+    def set_parameters(
+        self, parameters: dict[str, Any]
+    ) -> "CondensationIsothermalStaggeredBuilder":
+        """Set required and optional parameters from a dictionary."""
+        required = self.required_parameters
+        missing = [param for param in required if param not in parameters]
+        if missing:
+            error_message = (
+                f"Missing required parameter(s): {', '.join(missing)}"
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+        valid_keys = set(
+            required
+            + [f"{key}_units" for key in required]
+            + [
+                "theta_mode",
+                "num_batches",
+                "shuffle_each_step",
+                "random_state",
+                "update_gases",
+            ]
+        )
+        if invalid_keys := [key for key in parameters if key not in valid_keys]:
+            error_message = (
+                f"Trying to set an invalid parameter(s) '{invalid_keys}'. "
+                f"The valid parameter(s) '{valid_keys}'."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+        for key in required:
+            unit_key = f"{key}_units"
+            if unit_key in parameters:
+                getattr(self, f"set_{key}")(
+                    parameters[key], parameters[unit_key]
+                )
+            else:
+                logger.warning("Using default units for parameter: '%s'.", key)
+                getattr(self, f"set_{key}")(parameters[key])
+
+        if "theta_mode" in parameters:
+            self.set_theta_mode(parameters["theta_mode"])
+        if "num_batches" in parameters:
+            self.set_num_batches(parameters["num_batches"])
+        if "shuffle_each_step" in parameters:
+            self.set_shuffle_each_step(parameters["shuffle_each_step"])
+        if "random_state" in parameters:
+            self.set_random_state(parameters["random_state"])
+        if "update_gases" in parameters:
+            self.set_update_gases(parameters["update_gases"])
+
+        return self
 
     def set_theta_mode(
         self, theta_mode: str
