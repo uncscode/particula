@@ -86,6 +86,9 @@ convention = "google"          # accepts "google", "numpy", or "pep257"
 [tool.pytest.ini_options]
 testpaths = ["particula"]
 norecursedirs = ["trees", ".git", "dist", "build", "particula/dynamics/wall_loss/tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
 
 # Configuration for pylint
 [tool.pylint.main]
