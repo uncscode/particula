@@ -21,9 +21,10 @@ Example:
     ... )
 """
 
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import BuilderMolarMassMixin
@@ -149,17 +150,16 @@ class CondensationIsothermalStaggeredBuilder(
         """Validate parameters and create a condensation strategy."""
         self.pre_build_check()
 
-        if self.molar_mass is None:
-            raise ValueError("molar_mass must be set")
-        if self.diffusion_coefficient is None:
-            raise ValueError("diffusion_coefficient must be set")
-        if self.accommodation_coefficient is None:
-            raise ValueError("accommodation_coefficient must be set")
-
+        # pre_build_check ensures these are not None
         return CondensationIsothermalStaggered(
-            molar_mass=self.molar_mass,
-            diffusion_coefficient=self.diffusion_coefficient,
-            accommodation_coefficient=self.accommodation_coefficient,
+            molar_mass=cast(Union[float, NDArray[np.float64]], self.molar_mass),
+            diffusion_coefficient=cast(
+                Union[float, NDArray[np.float64]], self.diffusion_coefficient
+            ),
+            accommodation_coefficient=cast(
+                Union[float, NDArray[np.float64]],
+                self.accommodation_coefficient,
+            ),
             update_gases=self.update_gases,
             theta_mode=self.theta_mode,
             num_batches=self.num_batches,

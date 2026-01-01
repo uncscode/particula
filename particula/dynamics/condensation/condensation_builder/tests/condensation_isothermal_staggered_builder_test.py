@@ -11,6 +11,10 @@ import pytest
 
 os.environ.setdefault("SCIPY_USE_CALC_DOCSTRINGS", "0")
 
+ROOT = Path(__file__).resolve().parents[5]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 lognormal_module: Any = types.ModuleType(
     "particula.particles.properties.lognormal_size_distribution"
 )
@@ -26,10 +30,6 @@ lognormal_module.get_lognormal_sample_distribution = _stubbed_lognormal
 sys.modules["particula.particles.properties.lognormal_size_distribution"] = (
     lognormal_module
 )
-
-ROOT = Path(__file__).resolve().parents[5]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
 from particula.dynamics.condensation.condensation_builder import (
     CondensationIsothermalStaggeredBuilder,

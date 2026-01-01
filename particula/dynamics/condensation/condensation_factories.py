@@ -1,6 +1,6 @@
 """Factory for building condensation strategies."""
 
-from typing import Any, Dict
+from typing import Dict, Union
 
 from particula.abc_factory import StrategyFactoryABC
 
@@ -11,10 +11,26 @@ from .condensation_builder import (
 from .condensation_strategies import CondensationStrategy
 
 
-class CondensationFactory(StrategyFactoryABC[Any, CondensationStrategy]):
+class CondensationFactory(
+    StrategyFactoryABC[
+        Union[
+            CondensationIsothermalBuilder,
+            CondensationIsothermalStaggeredBuilder,
+        ],
+        CondensationStrategy,
+    ]
+):
     """Factory class for condensation strategies."""
 
-    def get_builders(self) -> Dict[str, Any]:
+    def get_builders(
+        self,
+    ) -> Dict[
+        str,
+        Union[
+            CondensationIsothermalBuilder,
+            CondensationIsothermalStaggeredBuilder,
+        ],
+    ]:
         """Return the mapping of strategy types to builder instances.
 
         Returns:

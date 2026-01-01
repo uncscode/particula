@@ -78,6 +78,27 @@ def test_isothermal_staggered_condensation_defaults():
     assert strategy.random_state is None
 
 
+def test_isothermal_staggered_condensation_via_factory():
+    """Test the creation of an isothermal staggered strategy via factory."""
+    factory = CondensationFactory()
+    strategy = factory.get_strategy(
+        "isothermal_staggered",
+        {
+            "molar_mass": 0.018,
+            "molar_mass_units": "kg/mol",
+            "diffusion_coefficient": 2e-5,
+            "diffusion_coefficient_units": "m^2/s",
+            "accommodation_coefficient": 1.0,
+        },
+    )
+    assert isinstance(strategy, CondensationIsothermalStaggered)
+    # Verify default values are set
+    assert strategy.theta_mode == "half"
+    assert strategy.num_batches == 1
+    assert strategy.shuffle_each_step is True
+    assert strategy.random_state is None
+
+
 def test_invalid_condensation_strategy():
     """Test that an invalid condensation strategy raises a ValueError."""
     factory = CondensationFactory()
