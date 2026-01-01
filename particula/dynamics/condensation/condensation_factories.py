@@ -4,15 +4,14 @@ from typing import Any, Dict
 
 from particula.abc_factory import StrategyFactoryABC
 
-from .condensation_builder.condensation_isothermal_builder import (
+from .condensation_builder import (
     CondensationIsothermalBuilder,
+    CondensationIsothermalStaggeredBuilder,
 )
 from .condensation_strategies import CondensationStrategy
 
 
-class CondensationFactory(
-    StrategyFactoryABC[CondensationIsothermalBuilder, CondensationStrategy]
-):
+class CondensationFactory(StrategyFactoryABC[Any, CondensationStrategy]):
     """Factory class for condensation strategies."""
 
     def get_builders(self) -> Dict[str, Any]:
@@ -21,4 +20,7 @@ class CondensationFactory(
         Returns:
             Dictionary mapping condensation strategy names to builders.
         """
-        return {"isothermal": CondensationIsothermalBuilder()}
+        return {
+            "isothermal": CondensationIsothermalBuilder(),
+            "isothermal_staggered": CondensationIsothermalStaggeredBuilder(),
+        }
