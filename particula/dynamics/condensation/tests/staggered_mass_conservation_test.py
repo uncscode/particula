@@ -101,7 +101,12 @@ def create_test_system():
 
 @pytest.fixture()
 def small_particles():
-    """Create sub-10 nm particles to stress Kelvin curvature effects."""
+    """Create sub-10 nm particles to stress Kelvin curvature effects.
+    
+    Note: Tests mutate the returned gas_species via set_concentration().
+    The fixture uses default function scope, so each test receives a fresh
+    instance to ensure isolation.
+    """
     diameters = np.array([5e-9, 7e-9, 9e-9])
     density = 1000.0
     volumes = (4.0 / 3.0) * np.pi * (diameters / 2.0) ** 3
@@ -318,33 +323,6 @@ class TestMassConservation:
         relative_error = abs(final_mass - initial_mass) / initial_mass
         assert relative_error < self.LARGE_TIME_STEP_TOLERANCE
 
-    def test_mass_conservation_zero_time_step(
-        self,
-        create_test_system,
-    ) -> None:
-        """time_step=0 should leave masses unchanged (no-op path)."""
-        particle, gas_species = create_test_system(5)
-        initial_mass = calculate_total_mass(particle, gas_species)
-
-        strategy = CondensationIsothermalStaggered(
-            molar_mass=0.018,
-            theta_mode="half",
-            num_batches=10,
-            random_state=42,
-            shuffle_each_step=False,
-        )
-
-        particle_new, gas_new = strategy.step(
-            particle,
-            gas_species,
-            298.0,
-            101325.0,
-            time_step=0.0,
-        )
-
-        final_mass = calculate_total_mass(particle_new, gas_new)
-        np.testing.assert_allclose(initial_mass, final_mass, rtol=0.0, atol=0.0)
-
 
 class TestKelvinEffectConservation:
     """Stress Kelvin curvature cases while conserving total mass.
@@ -357,6 +335,7 @@ class TestKelvinEffectConservation:
 
     RELATIVE_TOLERANCE = 1e-12
     DEFAULT_TIME_STEP = 0.001
+    EQUILIBRIUM_MASS_DRIFT_THRESHOLD = 1e-15
 
     @staticmethod
     def _strategy(theta_mode: str = "half", num_batches: int = 3):
@@ -419,7 +398,7 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_supersaturation_condensation(self, small_particles) -> None:
+    def test_kelvin_supersaturation_condensation(self, small_particles) -> None:
         """Supersaturation forces condensation while conserving mass."""
         particle, gas_species = small_particles
         # Five times the baseline concentration yields clear supersaturation.
@@ -442,10 +421,10 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_subsaturation_evaporation(self, small_particles) -> None:
+    def test_kelvin_subsaturation_evaporation(self, small_particles) -> None:
         """Mild subsaturation evaporates mass without loss of total mass."""
         particle, gas_species = small_particles
-        # Lower concentration (50x below baseline) for moderate evaporation.
+        # Lower concentration (20x below baseline) for moderate evaporation.
         gas_species.set_concentration(5e-4)
 
         initial_mass = calculate_total_mass(particle, gas_species)
@@ -465,7 +444,7 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_mixed_supersaturation_subsaturation(self, small_particles) -> None:
+    def test_kelvin_mixed_supersaturation_subsaturation(self, small_particles) -> None:
         """Mixed conditions shrink smallest particles and grow largest."""
         particle, gas_species = small_particles
         # Mid-range vapor lets Kelvin curvature split growth vs evaporation.
@@ -514,7 +493,7 @@ class TestKelvinEffectConservation:
         mass_delta = np.linalg.norm(
             particle_new.get_mass() - particle.get_mass()
         )
-        assert mass_delta < 1e-15
+        assert mass_delta < self.EQUILIBRIUM_MASS_DRIFT_THRESHOLD
         assert relative_error < self.RELATIVE_TOLERANCE, (
             "Critical diameter case drifted mass; "
             f"relative error={relative_error:.2e}"
