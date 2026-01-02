@@ -196,5 +196,9 @@ def apply_per_bin_limit(
     if mass_to_change.ndim == 2:
         limit = -particle_mass * particle_concentration[:, None]
     else:
-        limit = -particle_mass * particle_concentration
+        mass_flat = np.asarray(particle_mass, dtype=np.float64).reshape(-1)
+        conc_flat = np.asarray(
+            particle_concentration, dtype=np.float64
+        ).reshape(-1)
+        limit = -mass_flat * conc_flat
     return np.maximum(mass_to_change, limit)
