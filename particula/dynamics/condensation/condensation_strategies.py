@@ -1,37 +1,16 @@
-"""Particle Vapor Equilibrium, condensation and evaporation
-based on partial pressures to get dm/dt or other forms of
-particle growth and decay.
+"""Provide condensation strategies for aerosol mass transfer.
 
-From Seinfeld and Pandas: The Condensation (chapter 13) Equation 13.3
-This function calculates the rate of change of the mass of an aerosol
-particle with diameter Dp.
+This module defines the abstract :class:`CondensationStrategy` base class
+alongside concrete implementations that compute mass transfer rates for
+isothermal and staggered condensation updates. Helpers cover Knudsen-number
+calculations, vapor transition corrections, and batch-aware mass adjustments
+that keep updates stable when radii approach continuum limits.
 
-The rate of change of mass, dm, is given by the formula:
-    dm/dt = 4π * radius * Di * Mi * f(Kn, alpha) * delta_pi / RT
-where:
-    radius is the radius of the particle,
-    Di is the diffusion coefficient of species i,
-    Mi is the molar mass of species i,
-    f(Kn, alpha) is a transition function of the Knudsen number (Kn) and the
-    mass accommodation coefficient (alpha),
-    delta_pi is the partial pressure of species i in the gas phase vs the
-    particle phase.
-    R is the gas constant,
-    T is the temperature.
-
-    An additional denominator term is added to acount for temperature changes,
-    which is need for cloud droplets, but can be used in general too.
-
-This is also in Aerosol Modeling Chapter 2 Equation 2.40
-
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and Physics:
-From Air Pollution to Climate Change. In Wiley (3rd ed.).
-John Wiley & Sons, Inc.
-
-Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
-(D. Topping & M. Bane, Eds.). Wiley. https://doi.org/10.1002/9781119625728
-
-Units are all Base SI units.
+References:
+    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
+      Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
+    - Topping, D. & Bane, M. (2022). Introduction to Aerosol Modelling. Wiley.
+      https://doi.org/10.1002/9781119625728
 """
 
 import logging
@@ -125,15 +104,15 @@ class CondensationStrategy(ABC):
     ):
         """Initialize the CondensationStrategy instance.
 
-        Arguments:
-            - molar_mass : Molar mass of the species [kg/mol].
-            - diffusion_coefficient : Diffusion coefficient [m^2/s].
-            - accommodation_coefficient : Mass accommodation coefficient
-              (unitless).
-            - update_gases : Flag indicating whether gas concentrations should
-              be updated on condensation.
-            - skip_partitioning_indices : Optional list of indices for species
-              that should not partition during condensation (default is None).
+        Args:
+            molar_mass: Molar mass of the species [kg/mol].
+            diffusion_coefficient: Diffusion coefficient [m^2/s].
+            accommodation_coefficient: Mass accommodation coefficient
+                (unitless).
+            update_gases: Flag indicating whether gas concentrations should
+                be updated on condensation.
+            skip_partitioning_indices: Optional list of indices for species
+                that should not partition during condensation (default is None).
         """
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
