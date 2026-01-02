@@ -147,6 +147,7 @@ def _benchmark_overhead(
     particle, gas_species = create_test_system(n_particles, seed=SEED)
 
     baseline = CondensationIsothermal(molar_mass=DEFAULT_MOLAR_MASS)
+
     staggered = CondensationIsothermalStaggered(
         molar_mass=DEFAULT_MOLAR_MASS,
         theta_mode=theta_mode,
