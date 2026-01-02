@@ -345,10 +345,17 @@ class CondensationStrategy(ABC):
         pure_vapor_pressure = gas_species.get_pure_vapor_pressure(
             temperature=temperature
         )
-        partial_pressure_particle = particle.activity.partial_pressure(
-            pure_vapor_pressure=pure_vapor_pressure,
-            mass_concentration=mass_concentration_in_particle,
+        partial_pressure_particle = np.asarray(
+            particle.activity.partial_pressure(
+                pure_vapor_pressure=pure_vapor_pressure,
+                mass_concentration=mass_concentration_in_particle,
+            )
         )
+        if (
+            partial_pressure_particle.ndim == 2
+            and partial_pressure_particle.shape[1] == 1
+        ):
+            partial_pressure_particle = partial_pressure_particle[:, 0]
 
         partial_pressure_gas = gas_species.get_partial_pressure(temperature)
         kelvin_term = particle.surface.kelvin_term(
@@ -552,12 +559,13 @@ class CondensationIsothermal(CondensationStrategy):
     ):
         """Initialize the CondensationIsothermal strategy.
 
-        Arguments:
+        Args:
             molar_mass: Molar mass of the species [kg/mol].
             diffusion_coefficient: Diffusion coefficient [m^2/s].
             accommodation_coefficient: Mass accommodation coefficient.
-            update_gases: Whether to update gas concentrations.
-            skip_partitioning_indices: Species indices to skip.
+            update_gases: Whether to update gas concentrations on update.
+            skip_partitioning_indices: Species indices that should skip
+                partitioning.
         """
         super().__init__(
             molar_mass=molar_mass,
@@ -576,12 +584,31 @@ class CondensationIsothermal(CondensationStrategy):
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
-        """Examples:
-        ```py title="Example – Mass-transfer rate"
-        m_rate = iso_cond.mass_transfer_rate(
-            particle, gas_species, 298.15, 101325
-        )
-        ```.
+        """Compute the isothermal mass transfer rate per particle.
+
+        Particle radii are filled for zeros, clipped to the minimum valid
+        radius, and the resulting pressure delta is converted to a mass transfer
+        rate while discarding non-finite values.
+
+        Args:
+            particle: Particle representation providing radius and activity
+                information.
+            gas_species: Gas species supplying vapor properties and
+                concentrations.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            dynamic_viscosity: Optional dynamic viscosity passed to the first-
+                order transport calculation.
+
+        Returns:
+            Mass transfer rate per particle and per species in kg/s.
+
+        Examples:
+            ```py title="Example – Mass-transfer rate"
+            m_rate = iso_cond.mass_transfer_rate(
+                particle, gas_species, 298.15, 101325
+            )
+            ```
         """
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
 
@@ -623,10 +650,25 @@ class CondensationIsothermal(CondensationStrategy):
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
-        """Examples:
-        ```py title="Example – Condensation rate array"
-        rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
-        ```.
+        """Compute the condensation rate per particle or bin.
+
+        Mass transfer rates are multiplied by particle concentration, optional
+        skip-partitioning is applied, and the result is returned as an array
+        matching the particle inventory shape.
+
+        Args:
+            particle: Particle representation supplying concentration data.
+            gas_species: Gas species providing vapor properties.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+
+        Returns:
+            Condensation rate in kg/s per particle or bin.
+
+        Examples:
+            ```py title="Example – Condensation rate array"
+            rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
+            ```
         """
         # Step 1: Calculate the mass transfer rate due to condensation
         mass_rate = self.mass_transfer_rate(
@@ -666,12 +708,28 @@ class CondensationIsothermal(CondensationStrategy):
         pressure: float,
         time_step: float,
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
-        """Examples:
-        ```py title="Example – One timestep"
-        particle, gas_species = iso_cond.step(
-            particle, gas_species, 298.15, 101325, time_step=1.0
-        )
-        ```.
+        """Advance the simulation one timestep using isothermal condensation.
+
+        The mass transfer rate is computed, optional skip-partitioning applied,
+        and both the particle and gas states are updated while respecting
+        inventory limits.
+
+        Args:
+            particle: Particle representation to advance.
+            gas_species: Gas species whose concentration may decrease.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            time_step: Duration of the time step in seconds.
+
+        Returns:
+            Tuple of the updated particle and gas species objects.
+
+        Examples:
+            ```py
+            updated_particle, updated_gas = iso_cond.step(
+                particle, gas_species, 298.15, 101325, 1.0
+            )
+            ```
         """
         # Calculate the mass transfer rate
         mass_rate = self.mass_transfer_rate(
@@ -691,13 +749,25 @@ class CondensationIsothermal(CondensationStrategy):
         mass_rate_array = self._apply_skip_partitioning(mass_rate_array)
 
         # calculate the mass gain or loss per bin
+        gas_mass_array: NDArray[np.float64] = np.atleast_1d(
+            np.asarray(gas_species.get_concentration(), dtype=np.float64)
+        )
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=time_step,
-            gas_mass=gas_species.get_concentration(),  # type: ignore
+            gas_mass=gas_mass_array,
             particle_mass=particle.get_species_mass(),
             particle_concentration=particle.get_concentration(),
         )
+        species_count = particle.get_species_mass().shape[1]
+        if mass_transfer.ndim == 1:
+            mass_transfer = mass_transfer.reshape(-1, species_count)
+        elif mass_transfer.shape[1] > species_count:
+            mass_transfer = mass_transfer[:, :species_count]
+        elif mass_transfer.shape[1] < species_count:
+            mass_transfer = np.broadcast_to(
+                mass_transfer, (mass_transfer.shape[0], species_count)
+            )
         # apply the mass change
         particle.add_mass(added_mass=mass_transfer)
         if self.update_gases:
@@ -1047,10 +1117,17 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             mass_transport = first_order_mass_transport[particle_index]
 
         pure_vapor_pressure = gas_species.get_pure_vapor_pressure(temperature)
-        partial_pressure_particle = particle.activity.partial_pressure(
-            pure_vapor_pressure=pure_vapor_pressure,
-            mass_concentration=particle_mass,
+        partial_pressure_particle = np.asarray(
+            particle.activity.partial_pressure(
+                pure_vapor_pressure=pure_vapor_pressure,
+                mass_concentration=particle_mass,
+            )
         )
+        if (
+            partial_pressure_particle.ndim == 2
+            and partial_pressure_particle.shape[1] == 1
+        ):
+            partial_pressure_particle = partial_pressure_particle[:, 0]
 
         vapor_strategy = gas_species.pure_vapor_pressure_strategy
         molar_mass = gas_species.molar_mass

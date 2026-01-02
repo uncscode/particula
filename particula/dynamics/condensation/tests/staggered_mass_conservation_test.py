@@ -102,7 +102,7 @@ def create_test_system():
 @pytest.fixture()
 def small_particles():
     """Create sub-10 nm particles to stress Kelvin curvature effects.
-    
+
     Note: Tests mutate the returned gas_species via set_concentration().
     The fixture uses default function scope, so each test receives a fresh
     instance to ensure isolation.
@@ -416,7 +416,9 @@ class TestKelvinEffectConservation:
             f"relative error={relative_error:.2e}"
         )
 
-    def test_kelvin_mixed_supersaturation_subsaturation(self, small_particles) -> None:
+    def test_kelvin_mixed_supersaturation_subsaturation(
+        self, small_particles
+    ) -> None:
         """Mixed conditions shrink smallest particles and grow largest."""
         particle, gas_species = small_particles
         # Mid-range vapor lets Kelvin curvature split growth vs evaporation.
