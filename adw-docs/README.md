@@ -74,7 +74,12 @@ pytest --cov=particula --cov-report=term-missing
 
 # Using ADW tool
 .opencode/tool/run_pytest.py
+
+# Slow + performance benchmarks (excluded from CI)
+pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
 ```
+Targets: <2x overhead vs simultaneous, ~O(n) scaling at 1k/10k/100k, and theta-mode
+comparisons (half/random/batch) with deterministic seeds.
 
 ### Linting
 ```bash

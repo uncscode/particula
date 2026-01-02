@@ -9,7 +9,7 @@ and rollout.
 - [Epics Index](epics/index.md) — All epics with status and next available ID
 - [Features Index](features/index.md) — All features with status and next
   available ID
-- [Maintenance Index](maintenance/index.md) — All maintenance plans with status
+- [Maintenance Plan: Add Charge Support to add_concentration](maintenance/M1-add-concentration-charge-support.md) — All maintenance plans with status
 
 ## Epics
 
@@ -34,9 +34,9 @@ and rollout.
   - Scope: Builder and factory support for staggered condensation strategy.
 - [E1-F4: Mass Conservation Validation][e1-f4] — Status: Not Started (P2)
   - Scope: Comprehensive test suites validating mass conservation properties.
-- [E1-F5: Stability and Performance Benchmarks][e1-f5] — Status: Not Started
+- [E1-F5: Stability and Performance Benchmarks][e1-f5] — Status: In Progress
   (P3)
-  - Scope: Benchmark tests for stability and performance characteristics.
+  - Scope: Benchmark tests for stability and performance characteristics (P2 performance benchmarks landed; issue #137).
 - [E1-F6: Documentation and Examples][e1-f6] — Status: Not Started (P3)
   - Scope: Docstrings, Jupyter notebook examples, and dev-docs updates.
 

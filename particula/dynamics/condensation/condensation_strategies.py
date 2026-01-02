@@ -763,11 +763,14 @@ class CondensationIsothermal(CondensationStrategy):
 
 
 class CondensationIsothermalStaggered(CondensationStrategy):
-    """Staggered condensation strategy stub.
+    """Staggered condensation strategy with two-pass batching.
 
-    Defines staged stepping controls but leaves condensation algorithm
-    unimplemented. Staggered stepping is intended to improve numerical
-    stability by splitting updates across batches or random permutations.
+    Implements Gauss-Seidel style staggering that splits timesteps across two
+    passes. Supports theta modes ("half", "random", "batch"), validates batch
+    counts to avoid empty batches, and reuses the stored random state for
+    deterministic shuffling when requested. Mass transfer computations clamp
+    radii to ``MIN_PARTICLE_RADIUS_M`` and clip non-finite deltas to keep
+    updates stable near continuum limits.
 
     Attributes:
         theta_mode: Stepping mode, one of "half", "random", or "batch".
@@ -962,10 +965,10 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Compute mass transfer rate for staggered condensation.
 
-        Mirrors the base isothermal flow while leaving skip-partitioning to the
-        caller. Radii are filled and clipped to ``MIN_PARTICLE_RADIUS_M``,
-        transport is computed with optional viscosity, and the pressure delta is
-        converted to mass-transfer rates.
+        Mirrors the isothermal flow while leaving skip-partitioning to callers.
+        Radii are filled and clipped to ``MIN_PARTICLE_RADIUS_M`` before
+        transport is computed, pressure deltas are converted to rates, and any
+        non-finite deltas are zeroed to avoid propagating NaNs or infinities.
 
         Args:
             particle: Particle representation providing radii and masses.
@@ -1055,10 +1058,11 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         """Calculate mass change for one particle without mutating inputs.
 
         Uses a working gas concentration array to compute pressure deltas and
-        mass-transfer rates, then applies inventory limits via
-        :func:`get_mass_transfer`. Optional precomputed radii and first-order
-        transport coefficients can be reused across passes to avoid duplicate
-        work.
+        mass-transfer rates, applies nan-safe clipping to pressure deltas, and
+        enforces the minimum particle radius before evaluating transport.
+        Inventory limits are applied via :func:`get_mass_transfer`. Optional
+        precomputed radii and first-order transport coefficients can be reused
+        across passes to avoid duplicate work.
 
         Args:
             particle: Particle representation with distribution and activity.
@@ -1189,11 +1193,12 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         values. Each pass iterates over batches of particles, accumulating mass
         changes, updating a working gas concentration after each batch (Gauss-
         Seidel style), and deferring mutation of the particle and gas objects
-        until the end. Gas is updated after every batch in both passes; when
-        ``num_batches`` is 1 this reduces to the original single-batch behavior
-        for backward compatibility. This mirrors staggered condensation
-        approaches discussed by Jacobson (1997) and Riemer et al. (2009) for
-        improved stability.
+        until the end. Batch counts are validated and clipped to avoid empty
+        batches before iteration. Gas is updated after every batch in both
+        passes; when ``num_batches`` is 1 this reduces to the original single-
+        batch behavior for backward compatibility. This mirrors staggered
+        condensation approaches discussed by Jacobson (1997) and Riemer et al.
+        (2009) for improved stability.
 
         Args:
             particle: Particle representation to update.

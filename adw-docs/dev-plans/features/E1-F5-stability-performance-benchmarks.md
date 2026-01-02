@@ -1,19 +1,19 @@
 # Feature E1-F5: Stability and Performance Benchmarks
 
-**Status:** Not Started
+**Status:** In Progress
 **Priority:** P3
-**Assignees:** TBD
+**Assignees:** ADW Workflow
 **Labels:** feature, dynamics, condensation, benchmarks, performance
 **Milestone:** v0.3.x
 **Size:** S (~100 LOC tests)
 
-**Start Date:** TBD
+**Start Date:** 2026-01-02
 **Target Date:** TBD
 **Created:** 2025-12-23
-**Updated:** 2025-12-23
+**Updated:** 2026-01-02
 
 **Parent Epic:** [E1: Staggered ODE Stepping][epic-e1]
-**Related Issues:** TBD
+**Related Issues:** #99 (parent), #137 (E1-F5-P2 performance benchmarks)
 **Related PRs:** TBD
 
 ---
@@ -83,13 +83,12 @@ understand:
   - Document stability improvement metrics
   - Mark appropriate tests with `@pytest.mark.slow`
 
-- [ ] **E1-F5-P2:** Create performance benchmark tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E1-F5-P2:** Create performance benchmark tests
+  - Issue: #137 | Size: S | Status: Completed (slow+performance suite added)
   - File: `particula/dynamics/condensation/tests/staggered_performance_test.py`
-  - Compare runtime: simultaneous vs staggered modes
-  - Test scaling with particle count (1k, 10k, 100k)
-  - Document performance characteristics
-  - Mark all performance tests with `@pytest.mark.slow`
+  - Run: `pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"` (CI-excluded slow+performance)
+  - Coverage: overhead target <2x vs simultaneous; scaling at 1k/10k/100k; theta modes half/random/batch with deterministic seeds
+  - Notes: module-level slow+performance markers; batch clipping/logging, nan-safe pressure handling, deterministic shuffling; mass transfer inventory guard; compile guard for imports
 
 ## Critical Testing Requirements
 
@@ -98,7 +97,7 @@ understand:
 - **Reproducibility**: Set random seeds for deterministic results
 - **Documentation**: Record benchmark results in test docstrings
 - **CI Exclusion**: Slow and performance tests excluded from normal CI runs
-  - Run with: `pytest -m "slow or performance"`
+  - Run with: `pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"`
   - Skip with: `pytest -m "not slow and not performance"`
 
 ## Testing Strategy
@@ -122,12 +121,18 @@ Location: `particula/dynamics/condensation/tests/staggered_performance_test.py`
 
 **Test Cases:**
 
-- [ ] `test_performance_1k_particles` - Runtime with 1,000 particles
-- [ ] `test_performance_10k_particles` - Runtime with 10,000 particles
-- [ ] `test_performance_100k_particles` - Runtime with 100,000 particles
-- [ ] `test_performance_scaling` - Verify O(n) scaling
-- [ ] `test_performance_mode_comparison` - Runtime: half vs random vs batch
-- [ ] `test_performance_vs_simultaneous` - Overhead vs baseline
+- [x] `test_performance_1k_particles` - Runtime with 1,000 particles (<2x overhead target)
+- [x] `test_performance_10k_particles` - Runtime with 10,000 particles (<2x overhead target)
+- [x] `test_performance_100k_particles` - Runtime with 100,000 particles (capped iterations, <2x target)
+- [x] `test_performance_scaling` - Verify O(n) scaling across 1k/10k/100k
+- [x] `test_performance_mode_comparison` - Runtime: half vs random vs batch with deterministic seeds
+- [x] `test_performance_vs_simultaneous` - Overhead vs baseline (module-level slow+performance markers)
+
+**Results & Targets (P2):**
+- Overhead target: <2x staggered vs simultaneous across 1k/10k/100k (enforced in benchmarks).
+- Scaling expectation: roughly O(n) wall time across 1k/10k/100k cases with capped iterations.
+- Theta mode comparison: half, random, batch timed with deterministic seeds; printed timings for documentation.
+- Execution: `pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"` (slow+performance markers keep this out of CI).
 
 ## Technical Approach
 
@@ -293,14 +298,14 @@ class TestPerformanceBenchmarks:
 # Run stability benchmarks
 pytest particula/dynamics/condensation/tests/staggered_stability_test.py -v -m slow
 
-# Run performance benchmarks
-pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m slow
+# Run performance benchmarks (slow+performance; excluded from CI)
+pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
 
 # Run all slow tests
 pytest -m slow -v
 
-# Skip slow tests in normal CI
-pytest -m "not slow"
+# Skip slow/performance tests in normal CI
+pytest -m "not slow and not performance"
 ```
 
 ## Risks and Mitigations
@@ -317,5 +322,6 @@ pytest -m "not slow"
 |------------|---------------------------------------|--------------|
 | 2025-12-23 | Initial feature documentation created | ADW Workflow |
 | 2025-12-29 | Added @pytest.mark.performance, risks section | ADW Workflow |
+| 2026-01-02 | Updated P2 performance benchmarks, markers, and run command (#137) | ADW Workflow |
 
 [epic-e1]: ../epics/E1-staggered-condensation-stepping.md

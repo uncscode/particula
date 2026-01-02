@@ -61,9 +61,10 @@ def apply_condensation_limit(
     """Limit condensation so that total uptake does not exceed available gas.
 
     Positive mass changes (condensation) are summed per species and compared
-    to the available gas mass. When the requested uptake exceeds the gas
-    inventory, a scaling factor preserves conservation by clipping the
-    condensation while leaving evaporation untouched.
+    to the available gas mass after accounting for simultaneous evaporation.
+    When the net uptake (condensation plus evaporation) would exceed the gas
+    inventory, only the positive portion is scaled to preserve conservation
+    while evaporation remains untouched.
 
     Args:
         mass_to_change: Requested mass change per bin and species in kg.
@@ -122,8 +123,8 @@ def apply_evaporation_limit(
 
     The available inventory (I) per species is the sum of particle mass scaled
     by particle concentration. When the requested evaporation exceeds the
-    inventory, the negative mass changes are scaled to ensure no bin loses more
-    mass than exists.
+    inventory, only the negative entries are scaled so that no bin loses more
+    mass than exists, while condensation entries are left unchanged.
 
     Args:
         mass_to_change: Candidate mass change per bin/species in kg.
@@ -176,7 +177,8 @@ def apply_per_bin_limit(
 
     For each bin the maximum allowable evaporation is the particle mass per
     bin multiplied by the bin concentration. Any requested mass change that
-    would deplete the bin beyond its inventory is clipped at that limit.
+    would deplete the bin beyond its inventory is clipped at that limit; this
+    guard follows the global gas and inventory scaling steps.
 
     Args:
         mass_to_change: Proposed mass change per bin/species in kg.

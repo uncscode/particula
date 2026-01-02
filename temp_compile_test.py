@@ -1,15 +1,18 @@
 """Compile check for condensation strategies module.
 
-This module verifies that ``particula/dynamics/condensation/
-condensation_strategies.py`` still compiles cleanly after recent updates.
+Ensures ``particula/dynamics/condensation/condensation_strategies.py``
+compiles after staggered batching and nan-safety updates without running
+runtime-heavy tests.
 """
 
 import py_compile
 
 
 def test_compile_condensation():
-    """Compile the condensation strategies module to ensure
-    syntactic validity.
+    """Compile the condensation strategies module to catch syntax errors.
+
+    Raises:
+        py_compile.PyCompileError: If the module fails to compile.
     """
     py_compile.compile(
         "particula/dynamics/condensation/condensation_strategies.py",
