@@ -37,6 +37,31 @@ Tests are discovered automatically by pytest. No special configuration is needed
 - **Minimum test count**: 500 tests (validated by ADW)
 - **Coverage**: Configured to measure coverage for `particula/` package
 - **Timeout**: Test commands have a 600-second (10 minute) timeout
+- **Warnings as errors**: CI runs with `-Werror` flag (see below)
+
+### Warnings Are Treated as Errors
+
+**IMPORTANT:** In CI, tests run with `pytest -Werror`, which treats all warnings as errors.
+
+This means any `RuntimeWarning`, `DeprecationWarning`, or other warning will cause the test to **FAIL** in CI, even if the test logic passes.
+
+**Why this matters:**
+- Tests that pass locally may fail in CI if they emit warnings
+- Warnings indicate potential issues that should be addressed
+- This ensures clean, warning-free code in production
+
+**Example failure:**
+```
+FAILED test_file.py::test_function - RuntimeWarning: divide by zero encountered
+```
+
+**How to handle warnings in tests:**
+
+1. **Fix the underlying issue** (preferred): Modify code to avoid the warning condition
+2. **Use `pytest.warns()` to assert expected warnings**: When a warning is intentional behavior
+3. **Filter specific warnings**: When warnings are expected and acceptable
+
+See the [Handling Expected Warnings](#handling-expected-warnings) section for details.
 
 ## File Naming Conventions
 
@@ -375,6 +400,86 @@ def test_raises_type_error():
         function_expecting_int("string")
 ```
 
+### Handling Expected Warnings
+
+Since CI runs with `-Werror`, tests that trigger warnings will fail. Use these patterns to handle expected warnings:
+
+**Option 1: Assert expected warnings with `pytest.warns()`**
+
+Use this when the warning is intentional behavior that should be tested:
+
+```python
+import pytest
+import warnings
+
+
+def test_expected_warning():
+    """Test that function emits expected warning."""
+    with pytest.warns(RuntimeWarning, match="radius values are zero"):
+        result = function_that_warns()
+    assert result == expected_value
+
+
+def test_multiple_warnings():
+    """Test function that emits multiple warnings."""
+    with pytest.warns(RuntimeWarning) as warning_info:
+        result = function_with_multiple_warnings()
+    assert len(warning_info) == 2
+    assert "first message" in str(warning_info[0].message)
+```
+
+**Option 2: Filter specific warnings with `warnings.filterwarnings`**
+
+Use this when warnings are acceptable side effects, not the focus of the test:
+
+```python
+import warnings
+
+
+def test_with_filtered_warning():
+    """Test functionality while filtering known warning."""
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="All radius values are zero",
+            category=RuntimeWarning,
+        )
+        result = function_that_warns()
+    assert result == expected_value
+```
+
+**Option 3: Use pytest marker to filter warnings**
+
+Use this for test functions where warnings are expected throughout:
+
+```python
+import pytest
+
+
+@pytest.mark.filterwarnings("ignore:All radius values are zero:RuntimeWarning")
+def test_with_zero_radius():
+    """Test with zero radius values (warning expected)."""
+    result = calculate_with_zero_radius()
+    assert result is not None
+```
+
+**Option 4: Configure in `pyproject.toml` (use sparingly)**
+
+For warnings that are acceptable project-wide:
+
+```toml
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:some_third_party_lib.*",
+]
+```
+
+**Best Practices:**
+- Prefer fixing the code over suppressing warnings
+- If suppressing, be as specific as possible (message + category)
+- Document why a warning is being suppressed
+- Use `pytest.warns()` when the warning itself is the behavior being tested
+
 ### Testing Scientific Functions
 
 ```python
@@ -535,13 +640,29 @@ Tests run automatically on every push and pull request via GitHub Actions.
 
 **Workflow file:** `.github/workflows/test.yml`
 
-**Test command:**
+**Test command (CI):**
+```bash
+pytest -Werror
+```
+
+**IMPORTANT:** The `-Werror` flag treats all warnings as errors. This means:
+- Any `RuntimeWarning`, `DeprecationWarning`, etc. will cause test failure
+- Tests must be warning-free to pass in CI
+- See [Handling Expected Warnings](#handling-expected-warnings) for how to address this
+
+**Local testing with coverage:**
 ```bash
 pytest -v --tb=short --cov=particula --cov-report=term-missing
 ```
 
+**Local testing with warnings as errors (matches CI):**
+```bash
+pytest -Werror
+```
+
 **Requirements for PR merge:**
 - All tests must pass
+- No warnings emitted (due to `-Werror`)
 - Minimum 500 tests must pass
 - No test errors
 
@@ -605,11 +726,15 @@ pytest --cov=particula --cov-report=term
 4. ✅ Run tests with coverage: `pytest --cov=particula`
 5. ✅ Follow pytest conventions for test functions and classes
 6. ✅ Write independent, focused tests with descriptive names
+7. ✅ **Tests must be warning-free** (CI runs with `-Werror`)
 
 **Quick Reference:**
 ```bash
 # Run all tests
 pytest
+
+# Run with warnings as errors (matches CI)
+pytest -Werror
 
 # Run with coverage
 pytest --cov=particula --cov-report=term-missing

@@ -165,6 +165,9 @@ def run_simulation(
 class TestStabilityBenchmarks:
     """Stability benchmarks contrasting simultaneous and staggered updates."""
 
+    @pytest.mark.filterwarnings(
+        "ignore:All radius values are zero:RuntimeWarning"
+    )
     @pytest.mark.parametrize("time_step", [1.0, 10.0, 100.0])
     def test_stability_large_time_step(self, time_step: float) -> None:
         """Staggered stays stable at large dt; simultaneous may diverge."""
@@ -206,6 +209,9 @@ class TestStabilityBenchmarks:
             assert is_numerically_stable(particle_sim)
             assert var_sim <= VARIANCE_LIMIT
 
+    @pytest.mark.filterwarnings(
+        "ignore:All radius values are zero:RuntimeWarning"
+    )
     def test_stability_variance_comparison(self) -> None:
         """Variance growth is lower or equal for staggered at moderate dt."""
         seed = 7
@@ -245,6 +251,9 @@ class TestStabilityBenchmarks:
         assert var_sim <= VARIANCE_LIMIT
         assert var_stag <= VARIANCE_LIMIT
 
+    @pytest.mark.filterwarnings(
+        "ignore:All radius values are zero:RuntimeWarning"
+    )
     @pytest.mark.parametrize("theta_mode", ["half", "random", "batch"])
     def test_stability_mode_comparison(self, theta_mode: str) -> None:
         """All theta modes stay stable at challenging dt with fixed seed."""
@@ -270,6 +279,9 @@ class TestStabilityBenchmarks:
         variance = float(np.var(particle_out.get_mass()))
         assert variance < MAX_VARIANCE
 
+    @pytest.mark.filterwarnings(
+        "ignore:All radius values are zero:RuntimeWarning"
+    )
     @pytest.mark.parametrize("num_batches", [1, 2, 5, 10])
     def test_stability_batch_count_effect(self, num_batches: int) -> None:
         """Batch counts stay stable; variance remains bounded and comparable."""
@@ -296,6 +308,9 @@ class TestStabilityBenchmarks:
         variance = float(np.var(particle_out.get_mass()))
         assert variance < MAX_VARIANCE
 
+    @pytest.mark.filterwarnings(
+        "ignore:All radius values are zero:RuntimeWarning"
+    )
     def test_stability_zero_time_step_noop(self) -> None:
         """Zero time step returns early without mutation and stays stable."""
         particle, gas_species = create_test_system(10, seed=19)
@@ -324,6 +339,9 @@ class TestStabilityBenchmarks:
             == np.asarray(gas_species.get_concentration()).shape
         )
 
+    @pytest.mark.filterwarnings(
+        "ignore:All radius values are zero:RuntimeWarning"
+    )
     def test_stability_zero_particles_safe(self) -> None:
         """Zero-particle systems exit cleanly and are reported stable."""
         particle, gas_species = create_test_system(0, seed=5)

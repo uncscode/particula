@@ -759,7 +759,12 @@ class CondensationIsothermal(CondensationStrategy):
             particle_mass=particle.get_species_mass(),
             particle_concentration=particle.get_concentration(),
         )
-        species_count = particle.get_species_mass().shape[1]
+        species_mass = particle.get_species_mass()
+        # Handle both 1D (single species) and 2D (multi-species) arrays
+        if species_mass.ndim == 1:
+            species_count = 1
+        else:
+            species_count = species_mass.shape[1]
         if mass_transfer.ndim == 1:
             mass_transfer = mass_transfer.reshape(-1, species_count)
         elif mass_transfer.shape[1] > species_count:
