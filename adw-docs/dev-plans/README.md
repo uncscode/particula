@@ -9,7 +9,7 @@ and rollout.
 - [Epics Index](epics/index.md) — All epics with status and next available ID
 - [Features Index](features/index.md) — All features with status and next
   available ID
-- [Maintenance Plan: Add Charge Support to add_concentration](maintenance/M1-add-concentration-charge-support.md) — All maintenance plans with status
+- [Maintenance Index](maintenance/index.md) — All maintenance plans with status
 
 ## Epics
 
