@@ -6,7 +6,9 @@ time step, and robustness across theta modes and batch counts. Target: the
 staggered strategy sustains ~10x larger stable time steps while keeping masses
 finite and non-negative.
 
-Run with: pytest particula/dynamics/condensation/tests/staggered_stability_test.py -v -m slow
+Run with:
+    pytest particula/dynamics/condensation/tests/staggered_stability_test.py \
+        -v -m slow
 """
 
 from __future__ import annotations
@@ -24,9 +26,9 @@ from numpy.typing import NDArray
 try:  # pragma: no cover - defensive patch
     from numpy import _globals as _np_globals
 
-    _np_globals._CopyMode.__bool__ = lambda self: False  # type: ignore[attr-defined]
-except Exception:  # pragma: no cover
-    pass
+    _np_globals._CopyMode.__bool__ = lambda self: False  # type: ignore[method-assign]
+except Exception:  # pragma: no cover  # noqa: S110
+    pass  # Silently ignore if NumPy internals changed; patch is optional
 
 # Stub scipy.stats.lognorm to avoid SciPy import-time failures under NumPy 2.x;
 # tests in this module do not rely on SciPy distributions.
@@ -44,11 +46,11 @@ try:  # pragma: no cover - defensive patch
             raise RuntimeError("scipy.stats.lognorm stubbed for tests")
 
     _scipy_stats_stub = types.ModuleType("scipy.stats")
-    _scipy_stats_stub.lognorm = _StubLogNorm()
+    _scipy_stats_stub.lognorm = _StubLogNorm()  # type: ignore[attr-defined]
     sys.modules["scipy.stats"] = _scipy_stats_stub
     _real_scipy.stats = _scipy_stats_stub  # type: ignore[attr-defined]
-except Exception:  # pragma: no cover
-    pass
+except Exception:  # pragma: no cover  # noqa: S110
+    pass  # Silently ignore if SciPy internals changed; stub is optional
 
 from particula.dynamics.condensation import (
     CondensationIsothermal,

@@ -88,6 +88,7 @@ testpaths = ["particula"]
 norecursedirs = ["trees", ".git", "dist", "build", "particula/dynamics/wall_loss/tests"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "performance: marks tests as performance-intensive (deselect with '-m \"not performance\"')",
 ]
 
 # Configuration for pylint
