@@ -218,6 +218,24 @@ pytest particula/activity/tests/activity_coefficients_test.py::test_function_nam
 .opencode/tool/run_pytest.py --min-tests 500
 ```
 
+### Performance benchmarks (slow + performance markers)
+
+The staggered condensation performance benchmarks are heavy and excluded from CI. They
+measure overhead (<2x vs simultaneous), scaling at 1k/10k/100k particles (target ~O(n)),
+and compare theta modes (half, random, batch) with deterministic seeds.
+
+**Run the suite:**
+```bash
+pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
+```
+
+Notes:
+- Requires `-m "slow and performance"` because the module is marked slow+performance.
+- Expected overhead: staggered <2x simultaneous; scaling roughly linear in particle
+  count.
+- Use printed timings to compare theta modes; fixed seeds and bounded iterations reduce
+  noise.
+
 ### CI/CD Commands
 
 The GitHub Actions workflow runs:

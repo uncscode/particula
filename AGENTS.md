@@ -7,7 +7,7 @@
 **Name:** particula  
 **Description:** A simple, fast, and powerful particle simulator  
 **Language:** Python 3.9+  
-**Repository:** https://github.com/Gorkowski/particula.git  
+**Repository:** https://github.com/uncscode/particula.git  
 **Version:** 0.2.6
 
 ## Quick Start
@@ -29,10 +29,15 @@ ruff check particula/
 # Run type checker
 mypy particula/ --ignore-missing-imports
 
+# Slow + performance benchmarks (excluded from CI)
+pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
+
 # ADW tools
 .opencode/tool/run_pytest.py      # Run tests with validation
 .opencode/tool/run_linters.py     # Run linters following CI workflow
 ```
+Overhead target: staggered <2x simultaneous, scaling ~O(n) at 1k/10k/100k particles, and
+includes theta-mode comparisons (half/random/batch) with deterministic seeds.
 
 ### Installation
 
