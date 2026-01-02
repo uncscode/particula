@@ -36,8 +36,10 @@ pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m
 .opencode/tool/run_pytest.py      # Run tests with validation
 .opencode/tool/run_linters.py     # Run linters following CI workflow
 ```
-Overhead target: staggered <2x simultaneous, scaling ~O(n) at 1k/10k/100k particles, and
-includes theta-mode comparisons (half/random/batch) with deterministic seeds.
+Performance benchmarks verify O(n) scaling at 1k/10k/100k particles, theta-mode
+comparisons (half/random/batch), and deterministic seeds. Note: staggered uses
+Gauss-Seidel per-particle loops (sequential), so high overhead vs simultaneous
+(vectorized) is expected and not enforced as a target.
 
 ### Installation
 

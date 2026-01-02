@@ -221,8 +221,8 @@ pytest particula/activity/tests/activity_coefficients_test.py::test_function_nam
 ### Performance benchmarks (slow + performance markers)
 
 The staggered condensation performance benchmarks are heavy and excluded from CI. They
-measure overhead (<2x vs simultaneous), scaling at 1k/10k/100k particles (target ~O(n)),
-and compare theta modes (half, random, batch) with deterministic seeds.
+verify O(n) scaling at 1k/10k/100k particles, compare theta modes (half, random, batch),
+and ensure deterministic behavior with fixed seeds.
 
 **Run the suite:**
 ```bash
@@ -231,8 +231,9 @@ pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m
 
 Notes:
 - Requires `-m "slow and performance"` because the module is marked slow+performance.
-- Expected overhead: staggered <2x simultaneous; scaling roughly linear in particle
-  count.
+- Staggered uses Gauss-Seidel per-particle loops (sequential), so high overhead vs
+  simultaneous (vectorized) is expected and not enforced as a target.
+- Tests verify O(n) scaling: 10x more particles should take approximately 10x more time.
 - Use printed timings to compare theta modes; fixed seeds and bounded iterations reduce
   noise.
 
