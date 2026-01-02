@@ -22,23 +22,19 @@ def calc_mass_to_change(
     """Calculate the requested mass change for every particle/species pair.
 
     The instantaneous mass-transfer rate (ṁ) is integrated over a time
-    interval (Δt) and scaled by the particle number concentration (C):
+    interval (Δt) and scaled by the particle number concentration (C) for
+    each bin and species:
 
-    - Δm = ṁ × Δt × C
-        - Δm is the mass change per bin or per (bin, species) in kg,
-        - ṁ is the mass rate in kg s⁻¹,
-        - Δt is the time step in seconds,
-        - C is the particle concentration in m⁻³.
+    Δm = ṁ × Δt × C
 
-    Arguments:
-        - mass_rate : Mass transfer rate (ṁ) for each particle or
-          ``(particle, species)`` pair in kg s⁻¹.
-        - time_step : Time interval Δt in seconds.
-        - particle_concentration : Number concentration C in m⁻³.
+    Args:
+        mass_rate: Mass transfer rate (ṁ) for each particle or ``(particle,
+            species)`` pair in kg s⁻¹.
+        time_step: Time step Δt in seconds.
+        particle_concentration: Number concentration C in m⁻³.
 
     Returns:
-        - Requested mass change Δm for every particle/species combination
-          in kg.
+        Requested mass change Δm for every particle/species combination in kg.
 
     Examples:
         ```py title="Scalar rate"
@@ -62,23 +58,22 @@ def apply_condensation_limit(
     mass_to_change: NDArray[np.float64],
     gas_mass: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.bool_]]:
-    """Limit condensation so that total uptake never exceeds available gas.
+    """Limit condensation so that total uptake does not exceed available gas.
 
-    For each chemical species the positive mass change (condensation) is
-    summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
-    (M_g), a scaling factor is applied:
+    Positive mass changes (condensation) are summed per species and compared
+    to the available gas mass. When the requested uptake exceeds the gas
+    inventory, a scaling factor preserves conservation by clipping the
+    condensation while leaving evaporation untouched.
 
-    - scale = (M_g − Σ_evap) / Σ_cond   if Σ_cond > 0
-    - scale = 1                         otherwise
-
-    Arguments:
-        - mass_to_change : Requested mass change per bin and species in kg.
-        - gas_mass : Total gas mass available for condensation in kg.
+    Args:
+        mass_to_change: Requested mass change per bin and species in kg.
+        gas_mass: Total gas mass available for condensation in kg.
 
     Returns:
-        - mass_to_change_scaled : Mass change array after scaling.
-        - evap_sum : Column sum of evaporation (negative Δm) per species.
-        - neg_mask : Boolean mask identifying evaporation elements.
+        mass_to_change_scaled: Mass change array after applying the scaling
+            factor for condensation.
+        evap_sum: Column sum of evaporation (negative Δm) per species.
+        neg_mask: Boolean mask identifying evaporation elements.
 
     Examples:
         ```py title="Insufficient gas example"
@@ -92,16 +87,22 @@ def apply_condensation_limit(
     neg_mask = mass_to_change < 0.0
     cond_sum = np.where(pos_mask, mass_to_change, 0.0).sum(axis=0)
     evap_sum = np.where(neg_mask, mass_to_change, 0.0).sum(axis=0)
+    gas_mass_array = np.asarray(gas_mass, dtype=np.float64)
     cond_scale = np.ones_like(np.atleast_1d(cond_sum))
-    need_scale = (cond_sum > 0.0) & (cond_sum + evap_sum > gas_mass)
     if np.ndim(cond_sum) == 0:
+        need_scale = (cond_sum > 0.0) & (cond_sum + evap_sum > gas_mass_array)
         if need_scale:
+            gas_mass_scalar = float(gas_mass_array.reshape(-1)[0])
             cond_scale = np.array(
-                [(gas_mass.item() - evap_sum.item()) / cond_sum.item()]
+                [(gas_mass_scalar - float(evap_sum)) / float(cond_sum)]
             )
     else:
+        gas_mass_aligned = np.broadcast_to(
+            np.atleast_1d(gas_mass_array), cond_sum.shape
+        )
+        need_scale = (cond_sum > 0.0) & (cond_sum + evap_sum > gas_mass_aligned)
         cond_scale[need_scale] = (
-            gas_mass[need_scale] - evap_sum[need_scale]
+            gas_mass_aligned[need_scale] - evap_sum[need_scale]
         ) / cond_sum[need_scale]
     cond_scale = np.clip(cond_scale, 0.0, 1.0)
     mass_to_change = np.where(
@@ -117,24 +118,22 @@ def apply_evaporation_limit(
     evap_sum: NDArray[np.float64],
     neg_mask: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
-    """Limit evaporation so that total loss does not exceed particle inventory.
+    """Limit evaporation so that mass loss honors the particle inventory.
 
-    The available inventory (I) per species is the sum of particle mass
-    multiplied by particle concentration.  If −Σ_evap > I the evaporation
-    terms are scaled:
+    The available inventory (I) per species is the sum of particle mass scaled
+    by particle concentration. When the requested evaporation exceeds the
+    inventory, the negative mass changes are scaled to ensure no bin loses more
+    mass than exists.
 
-    - scale = I / (−Σ_evap)
-
-    Arguments:
-        - mass_to_change : Candidate mass change per bin/species in kg.
-        - particle_mass : Mass of a single particle in each bin/species in
-          kg.
-        - particle_concentration : Number concentration in m⁻³.
-        - evap_sum : Column sum of evaporation in kg (negative values).
-        - neg_mask : Boolean mask indicating evaporation entries.
+    Args:
+        mass_to_change: Candidate mass change per bin/species in kg.
+        particle_mass: Mass of one particle in each bin/species in kg.
+        particle_concentration: Number concentration in m⁻³.
+        evap_sum: Column sum of evaporation in kg (negative values).
+        neg_mask: Boolean mask identifying evaporation entries.
 
     Returns:
-        - Mass change array after enforcing the inventory limit.
+        Mass change array with evaporation scaled to the available inventory.
 
     Examples:
         ```py title="Inventory-limited evaporation"
@@ -150,13 +149,21 @@ def apply_evaporation_limit(
         )
     else:
         inventory = (particle_mass * particle_concentration).sum()
+    inventory_array = np.asarray(inventory, dtype=np.float64)
     evap_scale = np.ones_like(np.atleast_1d(evap_sum))
-    need_scale = -evap_sum > inventory
     if np.ndim(evap_sum) == 0:
+        need_scale = -evap_sum > inventory_array
         if need_scale:
-            evap_scale = np.array([inventory / (-evap_sum)])
+            inventory_scalar = float(inventory_array.reshape(-1)[0])
+            evap_scale = np.array([inventory_scalar / (-evap_sum)])
     else:
-        evap_scale[need_scale] = inventory[need_scale] / (-evap_sum[need_scale])
+        inventory_aligned = np.broadcast_to(
+            np.atleast_1d(inventory_array), evap_sum.shape
+        )
+        need_scale = -evap_sum > inventory_aligned
+        evap_scale[need_scale] = inventory_aligned[need_scale] / (
+            -evap_sum[need_scale]
+        )
     return np.where(neg_mask, mass_to_change * evap_scale, mass_to_change)
 
 
@@ -165,23 +172,19 @@ def apply_per_bin_limit(
     particle_mass: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Ensure no single bin loses more mass than it contains.
+    """Ensure no bin loses more mass than it contains.
 
-    For every bin the maximum allowable evaporation is the total mass
-    present in that bin:
+    For each bin the maximum allowable evaporation is the particle mass per
+    bin multiplied by the bin concentration. Any requested mass change that
+    would deplete the bin beyond its inventory is clipped at that limit.
 
-    - limit = −m_p × C
-
-    where *m_p* is the particle mass and *C* the particle concentration.
-    Any requested mass change lower than this limit is clipped.
-
-    Arguments:
-        - mass_to_change : Proposed mass change per bin/species in kg.
-        - particle_mass : Mass of one particle per bin/species in kg.
-        - particle_concentration : Number concentration in m⁻³.
+    Args:
+        mass_to_change: Proposed mass change per bin/species in kg.
+        particle_mass: Mass of a single particle per bin/species in kg.
+        particle_concentration: Number concentration in m⁻³.
 
     Returns:
-        - Mass change array after applying the per-bin limit.
+        Mass change array after applying the per-bin evaporation limit.
 
     Examples:
         ```py title="Per-bin clipping"

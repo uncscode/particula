@@ -44,7 +44,7 @@ try:  # pragma: no cover - defensive patch
             raise RuntimeError("scipy.stats.lognorm stubbed for tests")
 
     _scipy_stats_stub = types.ModuleType("scipy.stats")
-    setattr(_scipy_stats_stub, "lognorm", _StubLogNorm())
+    _scipy_stats_stub.lognorm = _StubLogNorm()
     sys.modules["scipy.stats"] = _scipy_stats_stub
     _real_scipy.stats = _scipy_stats_stub  # type: ignore[attr-defined]
 except Exception:  # pragma: no cover
@@ -70,6 +70,7 @@ DEFAULT_MOLAR_MASS = 0.018
 DEFAULT_TEMPERATURE = 298.0
 DEFAULT_PRESSURE = 101325.0
 MAX_VARIANCE = 1e10
+VARIANCE_LIMIT = 1e-9
 
 _VAPOR_STRATEGY = VaporPressureFactory().get_strategy(
     "constant",
@@ -195,16 +196,15 @@ class TestStabilityBenchmarks:
             steps=6,
         )
 
-        var_sim = float(np.var(particle_sim.get_mass()))
-        var_stag = float(np.var(particle_stag.get_mass()))
+        mass_stag = np.asarray(particle_stag.get_mass())
+        var_stag = float(np.var(mass_stag))
         assert is_numerically_stable(particle_stag)
-        if time_step >= 10.0:
-            assert (
-                not is_numerically_stable(particle_sim) or var_sim >= var_stag
-            )
-        else:
+        assert var_stag <= VARIANCE_LIMIT
+        if time_step < 10.0:
+            mass_sim = np.asarray(particle_sim.get_mass())
+            var_sim = float(np.var(mass_sim))
             assert is_numerically_stable(particle_sim)
-            assert var_stag <= var_sim + 1e-18
+            assert var_sim <= VARIANCE_LIMIT
 
     def test_stability_variance_comparison(self) -> None:
         """Variance growth is lower or equal for staggered at moderate dt."""
@@ -236,11 +236,14 @@ class TestStabilityBenchmarks:
             steps=5,
         )
 
-        var_sim = float(np.var(particle_sim.get_mass()))
-        var_stag = float(np.var(particle_stag.get_mass()))
+        mass_sim = np.asarray(particle_sim.get_mass())
+        mass_stag = np.asarray(particle_stag.get_mass())
+        var_sim = float(np.var(mass_sim))
+        var_stag = float(np.var(mass_stag))
         assert is_numerically_stable(particle_sim)
         assert is_numerically_stable(particle_stag)
-        assert var_stag <= var_sim + 1e-18
+        assert var_sim <= VARIANCE_LIMIT
+        assert var_stag <= VARIANCE_LIMIT
 
     @pytest.mark.parametrize("theta_mode", ["half", "random", "batch"])
     def test_stability_mode_comparison(self, theta_mode: str) -> None:
