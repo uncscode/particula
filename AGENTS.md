@@ -7,7 +7,7 @@
 **Name:** particula  
 **Description:** A simple, fast, and powerful particle simulator  
 **Language:** Python 3.9+  
-**Repository:** https://github.com/uncscode/particula.git  
+**Repository:** https://github.com/Gorkowski/particula.git  
 **Version:** 0.2.6
 
 ## Quick Start
