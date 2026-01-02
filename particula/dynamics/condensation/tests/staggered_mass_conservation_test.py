@@ -8,8 +8,8 @@ counts, and large time steps. Tolerances follow issue requirements:
   allowance)
 - Large time step: 1e-3 relative (relaxed due to numerical approximation
   limits at large dt)
-Heavy cases (n_particles=10000 single step and the 1000-step multi-step
-scenario) are marked slow so the default suite stays fast.
+Heavy cases (n_particles>=1000, steps>=100, or their combinations) are marked
+with @pytest.mark.performance so the default suite stays fast.
 """
 
 from __future__ import annotations
@@ -163,8 +163,8 @@ class TestMassConservation:
         [
             1,
             100,
-            1000,
-            pytest.param(10000, marks=pytest.mark.slow),
+            pytest.param(1000, marks=pytest.mark.performance),
+            pytest.param(10000, marks=pytest.mark.performance),
         ],
     )
     @pytest.mark.parametrize(
@@ -205,9 +205,9 @@ class TestMassConservation:
         ("steps", "n_particles"),
         [
             (10, 100),
-            (10, 1000),
-            pytest.param(100, 100, marks=pytest.mark.slow),
-            pytest.param(100, 1000, marks=pytest.mark.slow),
+            pytest.param(10, 1000, marks=pytest.mark.performance),
+            pytest.param(100, 100, marks=pytest.mark.performance),
+            pytest.param(100, 1000, marks=pytest.mark.performance),
         ],
     )
     # Batch mode excluded: deterministic batching with fixed RNG already
@@ -255,7 +255,7 @@ class TestMassConservation:
         relative_error = abs(final_mass - initial_mass) / initial_mass
         assert relative_error < self.MULTI_STEP_TOLERANCE
 
-    @pytest.mark.slow
+    @pytest.mark.performance
     def test_mass_conservation_multi_step_slow(
         self,
         create_test_system,
