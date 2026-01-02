@@ -43,10 +43,92 @@ from particula.particles import (
     SurfaceStrategyVolume,
 )
 
-pytestmark = [
-    pytest.mark.slow,
-    pytest.mark.performance,
-]
+# =============================================================================
+# SMOKE TEST (Fast, runs in CI/CD)
+# =============================================================================
+
+
+def test_staggered_condensation_smoke():
+    """Smoke test for staggered condensation basic functionality.
+
+    This fast test verifies that the CondensationIsothermalStaggered strategy:
+    - Can be instantiated with valid parameters
+    - Executes a step without errors
+    - Returns valid particle and gas objects
+
+    Uses minimal particle count (10 particles) for fast execution (<1s).
+    Not marked slow/performance so it runs in CI/CD.
+    """
+    n_particles = 10
+    seed = 42
+    molar_mass = 0.018
+    temperature_k = 298.0
+    pressure_pa = 101325.0
+    time_step = 0.0001
+
+    # Create minimal test system
+    rng = np.random.default_rng(seed)
+    masses = rng.lognormal(mean=-20.0, sigma=0.5, size=(n_particles, 1))
+
+    vapor_strategy = VaporPressureFactory().get_strategy(
+        "constant",
+        {"vapor_pressure": pressure_pa, "vapor_pressure_units": "Pa"},
+    )
+
+    distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()
+    particle = (
+        ResolvedParticleMassRepresentationBuilder()
+        .set_distribution_strategy(distribution_strategy)
+        .set_activity_strategy(ActivityIdealMass())
+        .set_surface_strategy(
+            SurfaceStrategyVolume(surface_tension=0.072, density=1000.0)
+        )
+        .set_mass(masses, "kg")
+        .set_density(np.full_like(masses, 1000.0), "kg/m^3")
+        .set_charge(np.zeros_like(masses))
+        .set_volume(1.0, "m^3")
+        .build()
+    )
+
+    gas_species = (
+        GasSpeciesBuilder()
+        .set_name("water")
+        .set_molar_mass(molar_mass, "kg/mol")
+        .set_vapor_pressure_strategy(vapor_strategy)
+        .set_partitioning(True)
+        .set_concentration(0.01, "kg/m^3")
+        .build()
+    )
+
+    # Create staggered condensation strategy
+    staggered = CondensationIsothermalStaggered(
+        molar_mass=molar_mass,
+        theta_mode="random",
+        num_batches=2,
+        random_state=seed,
+        shuffle_each_step=True,
+    )
+
+    # Execute one step - this should complete without errors
+    updated_particle, updated_gas = staggered.step(
+        particle,
+        gas_species,
+        temperature_k,
+        pressure_pa,
+        time_step=time_step,
+    )
+
+    # Verify outputs are valid
+    assert updated_particle is not None, "Particle should not be None"
+    assert updated_gas is not None, "Gas should not be None"
+    assert updated_particle.get_mass().shape[0] == n_particles, (
+        "Particle count should be preserved"
+    )
+
+
+# =============================================================================
+# PERFORMANCE BENCHMARKS (Slow, excluded from CI/CD)
+# =============================================================================
 
 DEFAULT_MOLAR_MASS = 0.018
 DEFAULT_NUM_BATCHES = 10
@@ -205,21 +287,29 @@ def _run_timing_report(n_particles: int) -> tuple[float, float, float]:
     return baseline_time, staggered_time, overhead
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_performance_1k_particles() -> None:
     """Report timing for 1k particles (informational benchmark)."""
     _run_timing_report(1000)
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_performance_10k_particles() -> None:
     """Report timing for 10k particles (informational benchmark)."""
     _run_timing_report(10000)
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_performance_100k_particles() -> None:
     """Report timing for 100k particles (informational benchmark)."""
     _run_timing_report(100000)
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_performance_scaling_is_linear() -> None:
     """Verify staggered algorithm scales O(n) with particle count.
 
@@ -267,6 +357,8 @@ def _run_theta_mode(n_particles: int, theta_mode: str) -> float:
     )
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_performance_mode_comparison() -> None:
     """Compare half/random/batch timings and keep them within a narrow band."""
     n_particles = 10000
@@ -298,6 +390,8 @@ def test_performance_mode_comparison() -> None:
     )
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_performance_vs_simultaneous() -> None:
     """Report overhead comparison between staggered and simultaneous.
 
@@ -320,6 +414,8 @@ def test_performance_vs_simultaneous() -> None:
     assert staggered_time < 300.0, "Staggered took too long (>300s)"
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_create_test_system_is_deterministic() -> None:
     """Factory recreates identical masses and concentrations for same seed."""
     particle_a, gas_a = create_test_system(1000, seed=SEED)
@@ -332,6 +428,8 @@ def test_create_test_system_is_deterministic() -> None:
     )
 
 
+@pytest.mark.slow
+@pytest.mark.performance
 def test_invalid_num_batches_or_n_particles_raises_value_error() -> None:
     """Guardrails enforce positive particle counts and batch sizes."""
     with pytest.raises(ValueError):
