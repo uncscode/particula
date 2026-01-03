@@ -1,11 +1,11 @@
 # Epic E1: Staggered ODE Stepping for Particle-Resolved Condensation
 
-**Status**: Not Started
+**Status**: Completed
 **Priority**: P2
 **Owners**: @Gorkowski
 **Start Date**: TBD
 **Target Date**: TBD
-**Last Updated**: 2025-12-29
+**Last Updated**: 2026-01-03
 **Size**: Medium (6-8 features, ~20 phases)
 
 ## Vision
@@ -61,7 +61,7 @@ This approach draws on established numerical methods:
 
 ### Feature F1: Core Staggered Stepping Logic
 
-- [ ] **E1-F1-P1**: Create `CondensationIsothermalStaggered` class skeleton with tests
+- [x] **E1-F1-P1**: Create `CondensationIsothermalStaggered` class skeleton with tests
   - File: `particula/dynamics/condensation/condensation_strategies.py`
   - Add new class inheriting from `CondensationStrategy`
   - Add `theta_mode` parameter: `"half"`, `"random"`, `"batch"`
@@ -69,20 +69,20 @@ This approach draws on established numerical methods:
   - Add `shuffle_each_step` parameter (default: True for random mode)
   - Include unit tests for class instantiation and parameter validation
 
-- [ ] **E1-F1-P2**: Implement `_get_theta_values()` helper method with tests
+- [x] **E1-F1-P2**: Implement `_get_theta_values()` helper method with tests
   - Generate θ array based on mode:
     - `"half"`: `np.full(n_particles, 0.5)`
     - `"random"`: `np.random.uniform(0, 1, n_particles)`
     - `"batch"`: `np.ones(n_particles)` (batching handled separately)
   - Include unit tests for each mode
 
-- [ ] **E1-F1-P3**: Implement `_make_batches()` helper method with tests
+- [x] **E1-F1-P3**: Implement `_make_batches()` helper method with tests
   - Shuffle particle indices if `shuffle_each_step=True`
   - Divide into `num_batches` groups
   - Return list of index arrays
   - Include unit tests for batch creation and shuffling
 
-- [ ] **E1-F1-P4**: Implement two-pass staggered `step()` method with tests
+- [x] **E1-F1-P4**: Implement two-pass staggered `step()` method with tests
   - Pass 1: Each particle grows for `θ_p × Δt`, update gas cumulatively
   - Pass 2: Each particle grows for `(1 - θ_p) × Δt` with updated gas
   - Preserve existing API: `step(particle, gas_species, temperature, pressure, time_step)`
@@ -90,13 +90,13 @@ This approach draws on established numerical methods:
 
 ### Feature F2: Batch-Wise Stepping Mode
 
-- [ ] **E1-F2-P1**: Implement batch-wise Gauss-Seidel stepping with tests
+- [x] **E1-F2-P1**: Implement batch-wise Gauss-Seidel stepping with tests
   - Process batches sequentially within each pass
   - Update gas concentration after each batch completes
   - Support combining batching with θ modes (e.g., random θ within batches)
   - Include tests for batch ordering effects
 
-- [ ] **E1-F2-P2**: Add batch size validation and edge cases with tests
+- [x] **E1-F2-P2**: Add batch size validation and edge cases with tests
   - Handle `num_batches > n_particles` gracefully
   - Handle `num_batches = 1` (equivalent to no batching)
   - Validate `num_batches >= 1`
@@ -104,44 +104,44 @@ This approach draws on established numerical methods:
 
 ### Feature F3: Builder and Factory Integration
 
-- [ ] **E1-F3-P1**: Create `CondensationIsothermalStaggeredBuilder` with tests
+- [x] **E1-F3-P1**: Create `CondensationIsothermalStaggeredBuilder` with tests
   - File: `particula/dynamics/condensation/condensation_builder/condensation_isothermal_staggered_builder.py`
   - Methods: `set_theta_mode()`, `set_num_batches()`, `set_shuffle_each_step()`
   - Inherit common methods from mixin
   - Include builder tests
 
-- [ ] **E1-F3-P2**: Register in `CondensationFactory` with tests
+- [x] **E1-F3-P2**: Register in `CondensationFactory` with tests
   - Add `"isothermal_staggered"` strategy type
   - Wire up factory parameters
   - Include factory tests
 
-- [ ] **E1-F3-P3**: Export from `particula.dynamics` namespace with tests
+- [x] **E1-F3-P3**: Export from `particula.dynamics` namespace with tests
   - Update `particula/dynamics/__init__.py`
   - Update `particula/dynamics/condensation/__init__.py`
   - Include import tests
 
 ### Feature F4: Mass Conservation Validation
 
-- [ ] **E1-F4-P1**: Create mass conservation test harness with comprehensive tests
+- [x] **E1-F4-P1**: Create mass conservation test harness with comprehensive tests
   - File: `particula/dynamics/condensation/tests/staggered_mass_conservation_test.py`
   - Test all three modes: half, random, batch
   - Verify `|total_initial - total_final| < tolerance` (1e-12 relative)
   - Test with varying particle counts (100, 1000, 10000)
 
-- [ ] **E1-F4-P2**: Add Kelvin effect stress tests
+- [x] **E1-F4-P2**: Add Kelvin effect stress tests
   - Test small particles (< 10 nm) with high Kelvin curvature
   - Verify evaporation occurs correctly under vapor competition
   - Test supersaturation and subsaturation scenarios
 
 ### Feature F5: Stability and Performance Benchmarks
 
-- [ ] **E1-F5-P1**: Create stability benchmark tests
+- [x] **E1-F5-P1**: Create stability benchmark tests
   - File: `particula/dynamics/condensation/tests/staggered_stability_test.py`
   - Compare variance in particle size distribution vs simultaneous update
   - Test large time steps (1s, 10s, 100s) where simultaneous fails
   - Document stability improvement metrics
 
-- [ ] **E1-F5-P2**: Create performance benchmark tests
+- [x] **E1-F5-P2**: Create performance benchmark tests
   - Compare runtime: simultaneous vs staggered modes
   - Test scaling with particle count (1k, 10k, 100k)
   - Document performance characteristics
@@ -149,21 +149,53 @@ This approach draws on established numerical methods:
 
 ### Feature F6: Documentation and Examples
 
-- [ ] **E1-F6-P1**: Add docstrings and inline documentation with validation
+- [x] **E1-F6-P1**: Add docstrings and inline documentation with validation
   - Google-style docstrings for all new public methods
   - Add literature citations in module docstring
   - Run docstring linter to validate
 
-- [ ] **E1-F6-P2**: Create usage example notebook
+- [x] **E1-F6-P2**: Create usage example notebook
   - File: `docs/Examples/Dynamics/staggered_condensation_example.ipynb`
   - Demonstrate all three modes
   - Show mass conservation verification
   - Compare stability with simultaneous stepping
 
-- [ ] **E1-F6-P3**: Update development documentation
+- [x] **E1-F6-P3**: Update development documentation
   - Update `adw-docs/dev-plans/README.md` with epic status
   - Create `adw-docs/dev-plans/epics/index.md` if needed
   - Add completion notes and lessons learned
+
+## Completion Notes
+
+Completion Date: 2026-01-03  
+Summary: Completed 6/6 features and 16/16 phases.
+
+### Implementation Summary
+- Delivered staggered condensation strategy with half, random, and batch theta modes.
+- Integrated builder and factory pathways with exports for `CondensationIsothermalStaggered`.
+- Added mass conservation validation across modes and particle counts with regression thresholds.
+- Landed stability/performance benchmarks and marked slow paths for CI hygiene.
+- Completed docstrings with citations plus usage tutorial notebook covering all modes.
+- Updated development documentation and indices to reflect completion.
+
+### Key Decisions
+- Kept theta modes scoped to half/random/batch with shuffle defaults to limit bias.
+- Retained two-pass update with cumulative gas updates to prioritize mass conservation.
+- Marked performance/stability suites as slow to avoid CI runtime regression.
+
+### Lessons Learned
+- Batch ordering and shuffling materially affect variance; deterministic seeds aid comparisons.
+- Mass conservation tolerances are sensitive to particle counts; regression tests guard drift.
+- Documentation plus notebook examples reduce onboarding time for staggered stepping.
+
+### Actual vs Planned
+- All planned features shipped; no scope removed or deferred.
+- Performance and stability coverage delivered as separate slow suites per plan.
+- Documentation and tutorial assets completed alongside code/tests.
+
+### Future Work
+- Extend staggered stepping to discrete-bin and continuous-PDF distributions.
+- Explore GPU/JAX acceleration and adaptive batching heuristics after usage feedback.
 
 ## Critical Testing Requirements
 
