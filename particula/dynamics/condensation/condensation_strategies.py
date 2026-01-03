@@ -6,6 +6,16 @@ isothermal and staggered condensation updates. Helpers cover Knudsen-number
 calculations, vapor transition corrections, and batch-aware mass adjustments
 that keep updates stable when radii approach continuum limits.
 
+The staggered implementation draws on established numerical methods:
+
+1. **Operator Splitting**: LeVeque (2002) — Finite Volume Methods for
+   Hyperbolic Problems.
+2. **Symplectic Integration**: Hairer, Lubich, & Wanner (2006) — Geometric
+   Numerical Integration.
+3. **Mass-Conserving Condensation**: Jacobson (1997, 1999) — Analytical
+   Predictor of Condensation (APC).
+4. **Particle-Resolved Modeling**: Riemer et al. (2009) — PartMC-MOSAIC.
+
 References:
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
       Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
@@ -763,20 +773,47 @@ class CondensationIsothermal(CondensationStrategy):
 
 
 class CondensationIsothermalStaggered(CondensationStrategy):
-    """Staggered condensation strategy with two-pass batching.
+    """Staggered isothermal condensation with two-pass Gauss-Seidel updates.
 
-    Implements Gauss-Seidel style staggering that splits timesteps across two
-    passes. Supports theta modes ("half", "random", "batch"), validates batch
-    counts to avoid empty batches, and reuses the stored random state for
-    deterministic shuffling when requested. Mass transfer computations clamp
-    radii to ``MIN_PARTICLE_RADIUS_M`` and clip non-finite deltas to keep
-    updates stable near continuum limits.
+    This strategy splits each timestep into two passes to improve stability
+    and mass conservation for particle-resolved condensation. Batching applies
+    a Gauss-Seidel sweep over particle subsets, updating gas after each batch.
+
+    Three stepping modes are supported:
+
+    - ``"half"``: Deterministic half-step with ``theta = 0.5`` for all
+      particles.
+    - ``"random"``: Per-particle ``theta`` drawn from ``U[0, 1]`` using the
+      configured RNG for reproducibility.
+    - ``"batch"``: Gauss-Seidel batches with ``theta = 1.0``; staggering is
+      provided by batch sequencing rather than per-particle theta.
 
     Attributes:
-        theta_mode: Stepping mode, one of "half", "random", or "batch".
-        num_batches: Number of batches for staggered updates (>= 1).
+        theta_mode: Stepping mode, one of ``("half", "random", "batch")``.
+        num_batches: Number of batches for staggered updates (>= 1, clipped to
+            particle count).
         shuffle_each_step: Whether to reshuffle particle order each step.
-        random_state: Optional seed or generator for reproducibility.
+        random_state: Optional seed, ``numpy.random.Generator``, or
+            ``RandomState`` used for reproducible shuffling and theta draws.
+
+    Example:
+        >>> from particula.dynamics.condensation import (
+        ...     CondensationIsothermalStaggered,
+        ... )
+        >>> strategy = CondensationIsothermalStaggered(
+        ...     molar_mass=0.018,
+        ...     theta_mode="random",
+        ...     num_batches=8,
+        ...     shuffle_each_step=True,
+        ...     random_state=1234,
+        ... )
+        >>> particle, gas = strategy.step(
+        ...     particle, gas_species, 298.0, 101325.0, 0.1
+        ... )
+
+    See Also:
+        CondensationIsothermal: Simultaneous (non-staggered) condensation.
+        CondensationIsothermalStaggeredBuilder: Fluent builder for this class.
     """
 
     VALID_THETA_MODES = ("half", "random", "batch")
@@ -796,18 +833,18 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         update_gases: bool = True,
         skip_partitioning_indices: Optional[Sequence[int]] = None,
     ):
-        """Initialize the staggered condensation strategy.
+        """Initialize staggered condensation with theta and batch controls.
 
         Args:
             molar_mass: Molar mass of the condensing species [kg/mol].
             theta_mode: Staggered stepping mode; must be one of
                 ``("half", "random", "batch")``.
-            num_batches: Number of batches for Gauss-Seidel style updates;
-                must be at least 1. Values larger than the particle count are
-                clipped with an informational log to avoid empty batches.
-            shuffle_each_step: Whether to shuffle particle order every step.
-            random_state: Optional seed or generator controlling randomness
-                for staggered permutations.
+            num_batches: Number of Gauss-Seidel batches; clipped to the
+                particle count to avoid empty batches.
+            shuffle_each_step: Whether to reshuffle particle order every step;
+                set False for deterministic ordering.
+            random_state: Optional seed, ``numpy.random.Generator``, or
+                ``RandomState`` reused for shuffling and random theta draws.
             diffusion_coefficient: Diffusion coefficient [m^2/s].
             accommodation_coefficient: Mass accommodation coefficient.
             update_gases: Whether to update gas concentrations.
@@ -817,6 +854,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             ValueError: If ``theta_mode`` is unsupported or ``num_batches`` is
                 less than 1.
         """
+
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
@@ -839,24 +877,22 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         self.random_state = random_state
 
     def _get_theta_values(self, n_particles: int) -> NDArray[np.float64]:
-        """Generate theta values for staggered condensation steps.
+        """Generate per-particle theta fractions for staggered passes.
 
-        Theta values split the timestep across two passes. The first pass uses
-        ``theta`` and the second uses ``1 - theta``. Values depend on the
-        configured ``theta_mode`` and reuse the stored random state for
-        reproducibility in random mode.
+        Theta splits the timestep across two passes: the first uses ``theta``
+        and the second uses ``1 - theta``. Behavior depends on ``theta_mode``
+        and reuses the stored RNG for reproducibility.
 
         Args:
             n_particles: Number of particles requiring theta values.
 
         Returns:
-            Array of shape ``(n_particles,)`` with fractional step values:
-            - ``half`` mode returns all ``0.5`` values.
-            - ``random`` mode draws uniform values in ``[0, 1]`` using the
-              stored ``random_state`` (seed, ``Generator``, or
-              ``RandomState``).
-            - ``batch`` mode returns all ``1.0``; batching is handled
-              elsewhere.
+            Array of shape ``(n_particles,)``:
+            - ``"half"`` returns all ``0.5`` values.
+            - ``"random"`` draws ``U[0, 1]`` using the configured seed,
+              ``Generator``, or ``RandomState``.
+            - ``"batch"`` returns all ``1.0`` because staggering is provided
+              by batch sequencing.
 
         Raises:
             ValueError: If ``theta_mode`` is unsupported.
@@ -882,23 +918,22 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         raise ValueError(f"Invalid theta_mode: {self.theta_mode}")
 
     def _validate_num_batches(self, num_batches: int, n_particles: int) -> int:
-        """Validate and clip ``num_batches`` for batching.
+        """Validate and clip the batch count to avoid empty batches.
 
         Args:
             num_batches: Requested number of batches.
             n_particles: Number of particles available for batching.
 
         Returns:
-            A valid batch count respecting ``n_particles``. Returns the
-            clipped value when ``num_batches`` exceeds ``n_particles``.
+            Batch count that respects the particle count; clips and logs when
+            ``num_batches`` exceeds ``n_particles``.
 
         Raises:
             ValueError: If ``num_batches`` is less than 1.
 
         Notes:
-            Logs an ``INFO`` message when clipping occurs. When ``n_particles``
-            is zero the caller short-circuits before invoking this helper, so
-            no logging occurs for the empty case.
+            The caller skips this helper when ``n_particles`` is zero, so no
+            logging occurs for the empty case.
         """
         if num_batches < 1:
             raise ValueError("num_batches must be >= 1.")
@@ -917,22 +952,22 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     def _make_batches(self, n_particles: int) -> list[NDArray[np.intp]]:
         """Divide particle indices into batches for Gauss-Seidel updates.
 
-        Creates batches of particle indices for sequential processing.
-        Optionally shuffles the order before batching for randomized updates.
+        Creates particle index batches for sequential processing. Optionally
+        shuffles indices before batching using the configured RNG to provide
+        reproducible randomness.
 
         Args:
             n_particles: Number of particles in the simulation.
 
         Returns:
-            List of arrays, each containing particle indices for one batch.
+            List of arrays, each containing particle indices for one batch; an
+            empty list when ``n_particles`` is zero.
 
         Notes:
-            - Returns an empty list when ``n_particles`` is zero.
             - Clips and logs when ``num_batches`` exceeds ``n_particles`` to
               avoid empty batches.
-            - When ``shuffle_each_step`` is True, indices are shuffled using
-              the stored ``random_state`` (``Generator``, ``RandomState``, or
-              seed), otherwise the original ordering is preserved.
+            - Uses the stored seed, ``Generator``, or ``RandomState`` for
+              shuffling; preserves order when ``shuffle_each_step`` is False.
         """
         if n_particles == 0:
             return []
@@ -1055,14 +1090,15 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         radii: Optional[NDArray[np.float64]] = None,
         first_order_mass_transport: Optional[NDArray[np.float64]] = None,
     ) -> NDArray[np.float64]:
-        """Calculate mass change for one particle without mutating inputs.
+        """Calculate per-particle mass change without mutating inputs.
 
-        Uses a working gas concentration array to compute pressure deltas and
-        mass-transfer rates, applies nan-safe clipping to pressure deltas, and
-        enforces the minimum particle radius before evaluating transport.
-        Inventory limits are applied via :func:`get_mass_transfer`. Optional
-        precomputed radii and first-order transport coefficients can be reused
-        across passes to avoid duplicate work.
+        Works on a copy of the gas concentration to compute pressure deltas
+        and mass-transfer rates, clamps radii to ``MIN_PARTICLE_RADIUS_M``, and
+        zeros non-finite deltas for stability. Optional precomputed radii and
+        transport coefficients are reused across passes to avoid duplicate
+        work. Vapor strategies may be a list; the appropriate strategy is used
+        per species. Mass changes are constrained by :func:`get_mass_transfer`
+        to respect available inventory.
 
         Args:
             particle: Particle representation with distribution and activity.
@@ -1074,7 +1110,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             dt_local: Local timestep for this particle in seconds.
             radii: Optional precomputed radii array to reuse.
             first_order_mass_transport: Optional precomputed transport
-                coefficients.
+                coefficients to reuse.
 
         Returns:
             Per-species mass change for the particle (kg), shaped
@@ -1189,16 +1225,13 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
         """Perform two-pass staggered condensation update.
 
-        The timestep is split into two passes using per-particle ``theta``
-        values. Each pass iterates over batches of particles, accumulating mass
-        changes, updating a working gas concentration after each batch (Gauss-
-        Seidel style), and deferring mutation of the particle and gas objects
-        until the end. Batch counts are validated and clipped to avoid empty
-        batches before iteration. Gas is updated after every batch in both
-        passes; when ``num_batches`` is 1 this reduces to the original single-
-        batch behavior for backward compatibility. This mirrors staggered
-        condensation approaches discussed by Jacobson (1997) and Riemer et al.
-        (2009) for improved stability.
+        Splits the timestep into two passes using per-particle ``theta`` and
+        ``1 - theta``. Each pass iterates over Gauss-Seidel batches, updating a
+        working gas concentration after every batch and accumulating particle
+        mass changes without mutating inputs. Batch counts are validated and
+        clipped to avoid empty batches; ``num_batches = 1`` collapses to the
+        original single-batch behavior. Mass changes are applied once at the
+        end, after optional skip-partitioning.
 
         Args:
             particle: Particle representation to update.
@@ -1209,6 +1242,10 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
         Returns:
             Updated ``(particle, gas_species)`` tuple after both passes.
+
+        Raises:
+            ValueError: Propagated from invalid ``theta_mode`` or
+                ``num_batches``.
         """
         n_particles = particle.concentration.shape[0]
         if time_step == 0.0 or n_particles == 0:
