@@ -11,6 +11,7 @@ These notebooks demonstrate bin-based and fully resolved approaches to modeling 
 - [Condensation 1: Bins](Condensation/Condensation_1_Bin.ipynb)
 - [Condensation 2: Masses Binned](Condensation/Condensation_2_MassBin.ipynb)
 - [Condensation 3: Masses Resolved](Condensation/Condensation_3_MassResolved.ipynb)
+- [Staggered Condensation](Condensation/Staggered_Condensation_Example.ipynb) – Demonstrates staggered ODE stepping for improved stability and mass conservation.
 
 ## Coagulation
 
