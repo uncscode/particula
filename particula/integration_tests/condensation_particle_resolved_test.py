@@ -123,7 +123,9 @@ class TestCondensationParticleResolved(unittest.TestCase):
         """Particle mass should increase while gas-phase water decreases."""
         initial_particle_mass = self.aerosol.particles.get_mass_concentration()
         initial_gas_water = (
-            self.aerosol.atmosphere.partitioning_species.get_concentration()[0]
+            self.aerosol.atmosphere.partitioning_species.get_concentration()[
+                0
+            ].item()
         )
 
         aerosol = self.aerosol
@@ -132,7 +134,9 @@ class TestCondensationParticleResolved(unittest.TestCase):
 
         final_particle_mass = aerosol.particles.get_mass_concentration()
         final_gas_water = (
-            aerosol.atmosphere.partitioning_species.get_concentration()[0]
+            aerosol.atmosphere.partitioning_species.get_concentration()[
+                0
+            ].item()
         )
 
         # assertions
