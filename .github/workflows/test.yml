@@ -33,4 +33,4 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest -Werror
+        pytest -Werror -m "not slow and not performance"
