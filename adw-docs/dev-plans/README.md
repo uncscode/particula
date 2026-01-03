@@ -14,7 +14,7 @@ and rollout.
 ## Epics
 
 - [E1: Staggered ODE Stepping for Particle-Resolved Condensation][epic-e1]
-  — Status: Not Started (P2)
+  — Status: Completed (P2)
   - Scope: Staggered ODE stepping framework for particle-resolved condensation
     with three modes (half-step, random, batch) for improved stability and
     mass conservation.
@@ -25,19 +25,19 @@ and rollout.
 
 ### Epic E1: Staggered Condensation Features
 
-- [E1-F1: Core Staggered Stepping Logic][e1-f1] — Status: Not Started (P2)
+- [E1-F1: Core Staggered Stepping Logic][e1-f1] — Status: Completed (P2)
   - Scope: `CondensationIsothermalStaggered` class with theta modes and two-pass
     stepping algorithm.
-- [E1-F2: Batch-Wise Stepping Mode][e1-f2] — Status: Not Started (P2)
+- [E1-F2: Batch-Wise Stepping Mode][e1-f2] — Status: Completed (P2)
   - Scope: Gauss-Seidel batch stepping with configurable batch count.
-- [E1-F3: Builder and Factory Integration][e1-f3] — Status: Not Started (P2)
+- [E1-F3: Builder and Factory Integration][e1-f3] — Status: Completed (P2)
   - Scope: Builder and factory support for staggered condensation strategy.
-- [E1-F4: Mass Conservation Validation][e1-f4] — Status: Not Started (P2)
+- [E1-F4: Mass Conservation Validation][e1-f4] — Status: Completed (P2)
   - Scope: Comprehensive test suites validating mass conservation properties.
-- [E1-F5: Stability and Performance Benchmarks][e1-f5] — Status: In Progress
+- [E1-F5: Stability and Performance Benchmarks][e1-f5] — Status: Completed
   (P3)
   - Scope: Benchmark tests for stability and performance characteristics (P2 performance benchmarks landed; issue #137).
-- [E1-F6: Documentation and Examples][e1-f6] — Status: Not Started (P3)
+- [E1-F6: Documentation and Examples][e1-f6] — Status: Completed (P3)
   - Scope: Docstrings, Jupyter notebook examples, and dev-docs updates.
 
 ### Standalone Features (Wall Loss)

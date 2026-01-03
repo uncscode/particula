@@ -5,13 +5,13 @@ maintenance tasks toward a larger goal.
 
 ## Active Epics
 
-| ID | Name | Status | Priority | Features |
-|----|------|--------|----------|----------|
-| E1 | [Staggered ODE Stepping for Particle-Resolved Condensation](E1-staggered-condensation-stepping.md) | Not Started | P2 | 6 |
+*None at this time.*
 
 ## Completed Epics
 
-*None yet.*
+| ID | Name | Status | Priority | Features |
+|----|------|--------|----------|----------|
+| E1 | [Staggered ODE Stepping for Particle-Resolved Condensation](E1-staggered-condensation-stepping.md) | Completed | P2 | 6 |
 
 ## Next Available ID
 
