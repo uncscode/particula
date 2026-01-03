@@ -3308,6 +3308,8 @@
       
         
       
+        
+      
     
     
     
@@ -3396,6 +3398,34 @@
     
   
     particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../condensation_builder/condensation_isothermal_staggered_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder
   
 
     
@@ -7957,6 +7987,8 @@
       
         
       
+        
+      
     
     
     
@@ -8073,6 +8105,34 @@
     
   
     Condensation Tutorial: Particle Resolved
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Examples/Dynamics/Condensation/Staggered_Condensation_Example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Staggered Condensation Stepping
   
 
     
@@ -12000,27 +12060,27 @@ enforce physical limits such as available gas mass or particle inventory.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Limit condensation so that total uptake never exceeds available gas.</p>
-<p>For each chemical species the positive mass change (condensation) is
-summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
-(M_g), a scaling factor is applied:</p>
-<ul>
-<li>scale = (M_g − Σ_evap) / Σ_cond   if Σ_cond &gt; 0</li>
-<li>scale = 1                         otherwise</li>
-</ul>
+        <p>Limit condensation so that total uptake does not exceed available gas.</p>
+<p>Positive mass changes (condensation) are summed per species and compared
+to the available gas mass after accounting for simultaneous evaporation.
+When the net uptake (condensation plus evaporation) would exceed the gas
+inventory, only the positive portion is scaled to preserve conservation
+while evaporation remains untouched.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- mass_to_change </code></b>
+            <b><code>mass_to_change</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Requested mass change per bin and species in kg.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- gas_mass </code></b>
+            <b><code>gas_mass</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Total gas mass available for condensation in kg.</p>
@@ -12032,30 +12092,25 @@ summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          –
+<b><code>mass_to_change_scaled</code></b> (              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+)          –
           <div class="doc-md-description">
-            <ul>
-<li>mass_to_change_scaled : Mass change array after scaling.</li>
-</ul>
+            <p>Mass change array after applying the scaling
+factor for condensation.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          –
+<b><code>evap_sum</code></b> (              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+)          –
           <div class="doc-md-description">
-            <ul>
-<li>evap_sum : Column sum of evaporation (negative Δm) per species.</li>
-</ul>
+            <p>Column sum of evaporation (negative Δm) per species.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
-          –
+<b><code>neg_mask</code></b> (              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
+)          –
           <div class="doc-md-description">
-            <ul>
-<li>neg_mask : Boolean mask identifying evaporation elements.</li>
-</ul>
+            <p>Boolean mask identifying evaporation elements.</p>
           </div>
         </li>
     </ul>
@@ -12071,7 +12126,11 @@ summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/mass_transfer_utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 61</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
 <span class="normal"> 62</span>
 <span class="normal"> 63</span>
 <span class="normal"> 64</span>
@@ -12120,27 +12179,29 @@ summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
 <span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
-<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_condensation_limit</span><span class="p">(</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_condensation_limit</span><span class="p">(</span>
     <span class="n">mass_to_change</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gas_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Limit condensation so that total uptake never exceeds available gas.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Limit condensation so that total uptake does not exceed available gas.</span>
 
-<span class="sd">    For each chemical species the positive mass change (condensation) is</span>
-<span class="sd">    summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass</span>
-<span class="sd">    (M_g), a scaling factor is applied:</span>
+<span class="sd">    Positive mass changes (condensation) are summed per species and compared</span>
+<span class="sd">    to the available gas mass after accounting for simultaneous evaporation.</span>
+<span class="sd">    When the net uptake (condensation plus evaporation) would exceed the gas</span>
+<span class="sd">    inventory, only the positive portion is scaled to preserve conservation</span>
+<span class="sd">    while evaporation remains untouched.</span>
 
-<span class="sd">    - scale = (M_g − Σ_evap) / Σ_cond   if Σ_cond &gt; 0</span>
-<span class="sd">    - scale = 1                         otherwise</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        - mass_to_change : Requested mass change per bin and species in kg.</span>
-<span class="sd">        - gas_mass : Total gas mass available for condensation in kg.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        mass_to_change: Requested mass change per bin and species in kg.</span>
+<span class="sd">        gas_mass: Total gas mass available for condensation in kg.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - mass_to_change_scaled : Mass change array after scaling.</span>
-<span class="sd">        - evap_sum : Column sum of evaporation (negative Δm) per species.</span>
-<span class="sd">        - neg_mask : Boolean mask identifying evaporation elements.</span>
+<span class="sd">        mass_to_change_scaled: Mass change array after applying the scaling</span>
+<span class="sd">            factor for condensation.</span>
+<span class="sd">        evap_sum: Column sum of evaporation (negative Δm) per species.</span>
+<span class="sd">        neg_mask: Boolean mask identifying evaporation elements.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py title=&quot;Insufficient gas example&quot;</span>
@@ -12154,16 +12215,22 @@ summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
     <span class="n">neg_mask</span> <span class="o">=</span> <span class="n">mass_to_change</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
     <span class="n">cond_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos_mask</span><span class="p">,</span> <span class="n">mass_to_change</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">evap_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">neg_mask</span><span class="p">,</span> <span class="n">mass_to_change</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">gas_mass_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">gas_mass</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">cond_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">cond_sum</span><span class="p">))</span>
-    <span class="n">need_scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">cond_sum</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cond_sum</span> <span class="o">+</span> <span class="n">evap_sum</span> <span class="o">&gt;</span> <span class="n">gas_mass</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">cond_sum</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">need_scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">cond_sum</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cond_sum</span> <span class="o">+</span> <span class="n">evap_sum</span> <span class="o">&gt;</span> <span class="n">gas_mass_array</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">need_scale</span><span class="p">:</span>
+            <span class="n">gas_mass_scalar</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">gas_mass_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">cond_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[(</span><span class="n">gas_mass</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">evap_sum</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="o">/</span> <span class="n">cond_sum</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
+                <span class="p">[(</span><span class="n">gas_mass_scalar</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">evap_sum</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">cond_sum</span><span class="p">)]</span>
             <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">gas_mass_aligned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">gas_mass_array</span><span class="p">),</span> <span class="n">cond_sum</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">need_scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">cond_sum</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">cond_sum</span> <span class="o">+</span> <span class="n">evap_sum</span> <span class="o">&gt;</span> <span class="n">gas_mass_aligned</span><span class="p">)</span>
         <span class="n">cond_scale</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">gas_mass</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">-</span> <span class="n">evap_sum</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span>
+            <span class="n">gas_mass_aligned</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">-</span> <span class="n">evap_sum</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">/</span> <span class="n">cond_sum</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span>
     <span class="n">cond_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cond_scale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="n">mass_to_change</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
@@ -12189,51 +12256,53 @@ summed (Σ_cond).  If Σ_cond + Σ_evap exceeds the available gas mass
 
     <div class="doc doc-contents ">
 
-        <p>Limit evaporation so that total loss does not exceed particle inventory.</p>
-<p>The available inventory (I) per species is the sum of particle mass
-multiplied by particle concentration.  If −Σ_evap &gt; I the evaporation
-terms are scaled:</p>
-<ul>
-<li>scale = I / (−Σ_evap)</li>
-</ul>
+        <p>Limit evaporation so that mass loss honors the particle inventory.</p>
+<p>The available inventory (I) per species is the sum of particle mass scaled
+by particle concentration. When the requested evaporation exceeds the
+inventory, only the negative entries are scaled so that no bin loses more
+mass than exists, while condensation entries are left unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- mass_to_change </code></b>
+            <b><code>mass_to_change</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Candidate mass change per bin/species in kg.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- particle_mass </code></b>
+            <b><code>particle_mass</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Mass of a single particle in each bin/species in
-kg.</p>
+            <p>Mass of one particle in each bin/species in kg.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- particle_concentration </code></b>
+            <b><code>particle_concentration</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Number concentration in m⁻³.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- evap_sum </code></b>
+            <b><code>evap_sum</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Column sum of evaporation in kg (negative values).</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- neg_mask </code></b>
+            <b><code>neg_mask</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Boolean mask indicating evaporation entries.</p>
+            <p>Boolean mask identifying evaporation entries.</p>
           </div>
         </li>
     </ul>
@@ -12245,9 +12314,7 @@ kg.</p>
               <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>Mass change array after enforcing the inventory limit.</li>
-</ul>
+            <p>Mass change array with evaporation scaled to the available inventory.</p>
           </div>
         </li>
     </ul>
@@ -12263,9 +12330,7 @@ kg.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/mass_transfer_utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
@@ -12310,31 +12375,37 @@ kg.</p>
 <span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
-<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_evaporation_limit</span><span class="p">(</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_evaporation_limit</span><span class="p">(</span>
     <span class="n">mass_to_change</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">evap_sum</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">neg_mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Limit evaporation so that total loss does not exceed particle inventory.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Limit evaporation so that mass loss honors the particle inventory.</span>
 
-<span class="sd">    The available inventory (I) per species is the sum of particle mass</span>
-<span class="sd">    multiplied by particle concentration.  If −Σ_evap &gt; I the evaporation</span>
-<span class="sd">    terms are scaled:</span>
+<span class="sd">    The available inventory (I) per species is the sum of particle mass scaled</span>
+<span class="sd">    by particle concentration. When the requested evaporation exceeds the</span>
+<span class="sd">    inventory, only the negative entries are scaled so that no bin loses more</span>
+<span class="sd">    mass than exists, while condensation entries are left unchanged.</span>
 
-<span class="sd">    - scale = I / (−Σ_evap)</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        - mass_to_change : Candidate mass change per bin/species in kg.</span>
-<span class="sd">        - particle_mass : Mass of a single particle in each bin/species in</span>
-<span class="sd">          kg.</span>
-<span class="sd">        - particle_concentration : Number concentration in m⁻³.</span>
-<span class="sd">        - evap_sum : Column sum of evaporation in kg (negative values).</span>
-<span class="sd">        - neg_mask : Boolean mask indicating evaporation entries.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        mass_to_change: Candidate mass change per bin/species in kg.</span>
+<span class="sd">        particle_mass: Mass of one particle in each bin/species in kg.</span>
+<span class="sd">        particle_concentration: Number concentration in m⁻³.</span>
+<span class="sd">        evap_sum: Column sum of evaporation in kg (negative values).</span>
+<span class="sd">        neg_mask: Boolean mask identifying evaporation entries.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - Mass change array after enforcing the inventory limit.</span>
+<span class="sd">        Mass change array with evaporation scaled to the available inventory.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py title=&quot;Inventory-limited evaporation&quot;</span>
@@ -12350,13 +12421,21 @@ kg.</p>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">inventory</span> <span class="o">=</span> <span class="p">(</span><span class="n">particle_mass</span> <span class="o">*</span> <span class="n">particle_concentration</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">inventory_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">inventory</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">evap_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">evap_sum</span><span class="p">))</span>
-    <span class="n">need_scale</span> <span class="o">=</span> <span class="o">-</span><span class="n">evap_sum</span> <span class="o">&gt;</span> <span class="n">inventory</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">evap_sum</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">need_scale</span> <span class="o">=</span> <span class="o">-</span><span class="n">evap_sum</span> <span class="o">&gt;</span> <span class="n">inventory_array</span>
         <span class="k">if</span> <span class="n">need_scale</span><span class="p">:</span>
-            <span class="n">evap_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">inventory</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">evap_sum</span><span class="p">)])</span>
+            <span class="n">inventory_scalar</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">inventory_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">evap_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">inventory_scalar</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">evap_sum</span><span class="p">)])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">evap_scale</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">=</span> <span class="n">inventory</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">evap_sum</span><span class="p">[</span><span class="n">need_scale</span><span class="p">])</span>
+        <span class="n">inventory_aligned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">inventory_array</span><span class="p">),</span> <span class="n">evap_sum</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+        <span class="n">need_scale</span> <span class="o">=</span> <span class="o">-</span><span class="n">evap_sum</span> <span class="o">&gt;</span> <span class="n">inventory_aligned</span>
+        <span class="n">evap_scale</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">=</span> <span class="n">inventory_aligned</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="o">-</span><span class="n">evap_sum</span><span class="p">[</span><span class="n">need_scale</span><span class="p">]</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">neg_mask</span><span class="p">,</span> <span class="n">mass_to_change</span> <span class="o">*</span> <span class="n">evap_scale</span><span class="p">,</span> <span class="n">mass_to_change</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -12377,34 +12456,34 @@ kg.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Ensure no single bin loses more mass than it contains.</p>
-<p>For every bin the maximum allowable evaporation is the total mass
-present in that bin:</p>
-<ul>
-<li>limit = −m_p × C</li>
-</ul>
-<p>where <em>m_p</em> is the particle mass and <em>C</em> the particle concentration.
-Any requested mass change lower than this limit is clipped.</p>
+        <p>Ensure no bin loses more mass than it contains.</p>
+<p>For each bin the maximum allowable evaporation is the particle mass per
+bin multiplied by the bin concentration. Any requested mass change that
+would deplete the bin beyond its inventory is clipped at that limit; this
+guard follows the global gas and inventory scaling steps.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- mass_to_change </code></b>
+            <b><code>mass_to_change</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Proposed mass change per bin/species in kg.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- particle_mass </code></b>
+            <b><code>particle_mass</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Mass of one particle per bin/species in kg.</p>
+            <p>Mass of a single particle per bin/species in kg.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- particle_concentration </code></b>
+            <b><code>particle_concentration</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Number concentration in m⁻³.</p>
@@ -12419,9 +12498,7 @@ Any requested mass change lower than this limit is clipped.</p>
               <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>Mass change array after applying the per-bin limit.</li>
-</ul>
+            <p>Mass change array after applying the per-bin evaporation limit.</p>
           </div>
         </li>
     </ul>
@@ -12436,15 +12513,7 @@ Any requested mass change lower than this limit is clipped.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/mass_transfer_utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
 <span class="normal">174</span>
@@ -12470,28 +12539,34 @@ Any requested mass change lower than this limit is clipped.</p>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_per_bin_limit</span><span class="p">(</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_per_bin_limit</span><span class="p">(</span>
     <span class="n">mass_to_change</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure no single bin loses more mass than it contains.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure no bin loses more mass than it contains.</span>
 
-<span class="sd">    For every bin the maximum allowable evaporation is the total mass</span>
-<span class="sd">    present in that bin:</span>
+<span class="sd">    For each bin the maximum allowable evaporation is the particle mass per</span>
+<span class="sd">    bin multiplied by the bin concentration. Any requested mass change that</span>
+<span class="sd">    would deplete the bin beyond its inventory is clipped at that limit; this</span>
+<span class="sd">    guard follows the global gas and inventory scaling steps.</span>
 
-<span class="sd">    - limit = −m_p × C</span>
-
-<span class="sd">    where *m_p* is the particle mass and *C* the particle concentration.</span>
-<span class="sd">    Any requested mass change lower than this limit is clipped.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        - mass_to_change : Proposed mass change per bin/species in kg.</span>
-<span class="sd">        - particle_mass : Mass of one particle per bin/species in kg.</span>
-<span class="sd">        - particle_concentration : Number concentration in m⁻³.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        mass_to_change: Proposed mass change per bin/species in kg.</span>
+<span class="sd">        particle_mass: Mass of a single particle per bin/species in kg.</span>
+<span class="sd">        particle_concentration: Number concentration in m⁻³.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - Mass change array after applying the per-bin limit.</span>
+<span class="sd">        Mass change array after applying the per-bin evaporation limit.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py title=&quot;Per-bin clipping&quot;</span>
@@ -12503,7 +12578,11 @@ Any requested mass change lower than this limit is clipped.</p>
     <span class="k">if</span> <span class="n">mass_to_change</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">limit</span> <span class="o">=</span> <span class="o">-</span><span class="n">particle_mass</span> <span class="o">*</span> <span class="n">particle_concentration</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">limit</span> <span class="o">=</span> <span class="o">-</span><span class="n">particle_mass</span> <span class="o">*</span> <span class="n">particle_concentration</span>
+        <span class="n">mass_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">particle_mass</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">conc_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="n">particle_concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">limit</span> <span class="o">=</span> <span class="o">-</span><span class="n">mass_flat</span> <span class="o">*</span> <span class="n">conc_flat</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">mass_to_change</span><span class="p">,</span> <span class="n">limit</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -12526,37 +12605,33 @@ Any requested mass change lower than this limit is clipped.</p>
 
         <p>Calculate the requested mass change for every particle/species pair.</p>
 <p>The instantaneous mass-transfer rate (ṁ) is integrated over a time
-interval (Δt) and scaled by the particle number concentration (C):</p>
-<ul>
-<li>Δm = ṁ × Δt × C<ul>
-<li>Δm is the mass change per bin or per (bin, species) in kg,</li>
-<li>ṁ is the mass rate in kg s⁻¹,</li>
-<li>Δt is the time step in seconds,</li>
-<li>C is the particle concentration in m⁻³.</li>
-</ul>
-</li>
-</ul>
+interval (Δt) and scaled by the particle number concentration (C) for
+each bin and species:</p>
+<p>Δm = ṁ × Δt × C</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- mass_rate </code></b>
+            <b><code>mass_rate</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Mass transfer rate (ṁ) for each particle or
-<code>(particle, species)</code> pair in kg s⁻¹.</p>
+            <p>Mass transfer rate (ṁ) for each particle or <code>(particle,
+species)</code> pair in kg s⁻¹.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- time_step </code></b>
+            <b><code>time_step</code></b>
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
-            <p>Time interval Δt in seconds.</p>
+            <p>Time step Δt in seconds.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- particle_concentration </code></b>
+            <b><code>particle_concentration</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Number concentration C in m⁻³.</p>
@@ -12571,10 +12646,7 @@ interval (Δt) and scaled by the particle number concentration (C):</p>
               <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>Requested mass change Δm for every particle/species combination
-in kg.</li>
-</ul>
+            <p>Requested mass change Δm for every particle/species combination in kg.</p>
           </div>
         </li>
     </ul>
@@ -12636,11 +12708,7 @@ in kg.</li>
 <span class="normal">51</span>
 <span class="normal">52</span>
 <span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calc_mass_to_change</span><span class="p">(</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calc_mass_to_change</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -12648,23 +12716,19 @@ in kg.</li>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the requested mass change for every particle/species pair.</span>
 
 <span class="sd">    The instantaneous mass-transfer rate (ṁ) is integrated over a time</span>
-<span class="sd">    interval (Δt) and scaled by the particle number concentration (C):</span>
+<span class="sd">    interval (Δt) and scaled by the particle number concentration (C) for</span>
+<span class="sd">    each bin and species:</span>
 
-<span class="sd">    - Δm = ṁ × Δt × C</span>
-<span class="sd">        - Δm is the mass change per bin or per (bin, species) in kg,</span>
-<span class="sd">        - ṁ is the mass rate in kg s⁻¹,</span>
-<span class="sd">        - Δt is the time step in seconds,</span>
-<span class="sd">        - C is the particle concentration in m⁻³.</span>
+<span class="sd">    Δm = ṁ × Δt × C</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        - mass_rate : Mass transfer rate (ṁ) for each particle or</span>
-<span class="sd">          ``(particle, species)`` pair in kg s⁻¹.</span>
-<span class="sd">        - time_step : Time interval Δt in seconds.</span>
-<span class="sd">        - particle_concentration : Number concentration C in m⁻³.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        mass_rate: Mass transfer rate (ṁ) for each particle or ``(particle,</span>
+<span class="sd">            species)`` pair in kg s⁻¹.</span>
+<span class="sd">        time_step: Time step Δt in seconds.</span>
+<span class="sd">        particle_concentration: Number concentration C in m⁻³.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - Requested mass change Δm for every particle/species combination</span>
-<span class="sd">          in kg.</span>
+<span class="sd">        Requested mass change Δm for every particle/species combination in kg.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py title=&quot;Scalar rate&quot;</span>
