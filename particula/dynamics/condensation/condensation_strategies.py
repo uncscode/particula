@@ -780,7 +780,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
     executes Gauss-Seidel sweeps over batches of particles and optionally
     updates the shared gas field after every batch to reduce lag.
 
-    Theta_mode controls how the first-pass fraction (theta) is selected:
+    theta_mode controls how the first-pass fraction (theta) is selected:
         - ``"half"`` uses a deterministic half-step (theta = 0.5) for all
           particles.
         - ``"random"`` samples theta ~ U[0, 1] with the configured RNG.
