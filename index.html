@@ -721,17 +721,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#wall-loss-strategies-and-runnable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wall loss strategies and runnable
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -12202,17 +12191,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#wall-loss-strategies-and-runnable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Wall loss strategies and runnable
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -12353,136 +12331,6 @@
 <span class="c1">#   The result is an Aerosol instance with updated particle properties.</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="wall-loss-strategies-and-runnable">Wall loss strategies and runnable<a class="headerlink" href="#wall-loss-strategies-and-runnable" title="Permanent link">&para;</a></h3>
-<p>In addition to condensation and coagulation, Particula models particle loss to
-chamber walls. The wall loss API lives in <code>particula.dynamics.wall_loss</code> and is
-exposed through the <code>particula.dynamics</code> namespace.</p>
-<p>The wall loss API is built around:</p>
-<ul>
-<li><code>particula.dynamics.WallLossStrategy</code> – abstract base class for wall loss
-  models.</li>
-<li><code>particula.dynamics.SphericalWallLossStrategy</code> – spherical chamber wall loss
-  strategy.</li>
-<li><code>particula.dynamics.RectangularWallLossStrategy</code> – rectangular chamber wall
-  loss strategy with <code>(x, y, z)</code> dimensions (meters) validated for
-  positivity.</li>
-<li><code>particula.dynamics.ChargedWallLossStrategy</code> – charged/image-charge wall loss
-  for spherical or rectangular chambers; includes optional
-  <code>wall_electric_field</code> drift and reduces to the neutral coefficient when
-  particle charge and field are zero while retaining image-charge effects when
-  <code>wall_potential</code> is zero.</li>
-<li><code>particula.dynamics.WallLoss</code> – Runnable entry point that wraps a strategy,
-  splits <code>time_step</code> across <code>sub_steps</code>, clamps concentrations to non-negative
-  after each sub-step, and composes with other runnables using <code>|</code>.</li>
-</ul>
-<p>Strategies operate on
-<code>particula.particles.representation.ParticleRepresentation</code> instances and
-support "discrete", "continuous_pdf", and "particle_resolved"
-distribution types. The charged strategy adds <code>wall_potential</code> plus optional
-<code>wall_electric_field</code> (scalar for spherical or length-3 tuple for rectangular)
-and falls back to the neutral coefficient when particle charge and field are
-zero.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-
-<span class="c1"># Build a simple particle distribution (as in the quick start above)</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">]),</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">]))</span>
-    <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e8</span><span class="p">]),</span> <span class="s2">&quot;1/m^3&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">1e3</span><span class="p">,</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-
-<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mf">298.15</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-
-<span class="n">aerosol</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">AerosolBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_particles</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_atmosphere</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-
-<span class="n">wall_loss_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">RectangularWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
-    <span class="n">chamber_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span>  <span class="c1"># m</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
-    <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">wall_loss_strategy</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Apply wall loss with sub-steps; concentrations clamp non-negative each time</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
-    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Chain with other processes using Runnable composition</span>
-<span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span><span class="n">coagulation_strategy</span><span class="p">)</span>
-<span class="n">combined</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">combined</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
-</code></pre></div>
-<p>To enable charged/electrostatic wall loss, pass geometry, <code>wall_potential</code>, and
-optional <code>wall_electric_field</code> (set to 0 to disable drift). When particle
-charge is zero the charged strategy matches the neutral coefficient while still
-supporting image-charge effects when <code>wall_potential</code> is zero.</p>
-<div class="highlight"><pre><span></span><code><span class="n">charged_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
-    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
-    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">wall_potential</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>  <span class="c1"># V</span>
-    <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># V/m (use a tuple for rectangular geometry)</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>You can configure wall loss strategies through builders with unit conversion
-and validation for geometry, diffusivity, and (for charged wall loss)
-<code>wall_potential</code> and <code>wall_electric_field</code>. Distribution type defaults to
-"discrete" and may be set to "continuous_pdf" or "particle_resolved".</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-
-<span class="n">builder</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_chamber_geometry</span><span class="p">(</span><span class="s2">&quot;rectangular&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_chamber_dimensions</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_wall_potential</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_wall_electric_field</span><span class="p">((</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="s2">&quot;V/m&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;particle_resolved&quot;</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">charged_loss</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-
-<span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLossFactory</span><span class="p">()</span>
-<span class="n">charged_from_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;charged&quot;</span><span class="p">,</span>
-    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;chamber_geometry&quot;</span><span class="p">:</span> <span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_radius&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
-        <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
-        <span class="s2">&quot;wall_potential&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;wall_electric_field&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
-    <span class="p">},</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>The legacy function-based API (<code>get_spherical_wall_loss_rate</code>,
-<code>get_rectangle_wall_loss_rate</code>) remains available for lower-level
-calculations; the strategy classes provide a more consistent interface
-alongside condensation and coagulation strategies. For a full
-geometry comparison plus chaining with coagulation and condensation,
-see the <a href="Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial/">Wall Loss Tutorial notebook</a>.</p>
 
 
 
