@@ -5,8 +5,8 @@
 **Owners**: TBD
 **Start Date**: 2026-01-07
 **Target Date**: TBD
-**Last Updated**: 2026-01-07
-**Size**: Large (3 features, ~17 phases)
+**Last Updated**: 2026-01-08
+**Size**: Large (3 features, ~15 phases)
 
 ## Vision
 
@@ -14,8 +14,8 @@ Refactor the `activity/` and `equilibria/` modules to align with particula's
 Strategy-Builder-Factory design pattern, enabling consistent, extensible, and
 testable activity calculations. This epic introduces:
 
-1. **New Activity Strategies**: `ActivityNonIdealBinary` (BAT model) and
-   `ActivityKelvinEffect` following the existing `ActivityStrategy` ABC
+1. **New Activity Strategy**: `ActivityNonIdealBinary` (BAT model) following
+   the existing `ActivityStrategy` ABC
 2. **Equilibria as Runnable**: Transform liquid-vapor partitioning into a
    `Runnable` pattern similar to `dynamics/` for solving equilibrium states
 3. **Documentation**: Comprehensive examples, theory, and feature documentation
@@ -23,15 +23,18 @@ testable activity calculations. This epic introduces:
 The refactor preserves existing calculation functions while wrapping them in
 strategy classes that integrate with the builder and factory system.
 
+> **Note**: The Kelvin effect is NOT part of this refactor. It is a surface
+> phenomenon already implemented in `SurfaceStrategy.kelvin_term()` and properly
+> applied during condensation calculations in `dynamics/condensation/`.
+
 ## Scope
 
 ### In Scope
 
 - **Activity Module Refactor**:
   - Create `ActivityNonIdealBinary` strategy wrapping BAT model functions
-  - Create `ActivityKelvinEffect` strategy for vapor pressure Kelvin correction
-  - Create corresponding builders with validation and mixins
-  - Add strategy entries to `ActivityFactory`
+  - Create corresponding builder with validation and mixins
+  - Add strategy entry to `ActivityFactory`
   - Keep core calculation functions in `activity/` module (strategies call them)
 
 - **Equilibria Module Refactor**:
@@ -69,20 +72,18 @@ strategy classes that integrate with the builder and factory system.
 
 | ID | Name | Priority | Phases | Status |
 |----|------|----------|--------|--------|
-| E2-F1 | [Activity Strategy Refactor](../features/E2-F1-activity-strategy-refactor.md) | P1 | 7 | Planning |
+| E2-F1 | [Activity Strategy Refactor](../features/E2-F1-activity-strategy-refactor.md) | P1 | 5 | Planning |
 | E2-F2 | [Equilibria Runnable Refactor](../features/E2-F2-equilibria-runnable-refactor.md) | P2 | 6 | Planning |
 | E2-F3 | [Integration and Documentation](../features/E2-F3-integration-documentation.md) | P1 | 4 | Planning |
 
 ## Phase Overview
 
-### E2-F1: Activity Strategy Refactor (7 phases)
+### E2-F1: Activity Strategy Refactor (5 phases)
 - P0: **Code Quality** - Improve docstrings, fix typos, add validation to `activity/` module
 - P1: Create `ActivityNonIdealBinary` strategy wrapping BAT functions
 - P2: Create `ActivityNonIdealBinaryBuilder` with validation
-- P3: Create `ActivityKelvinEffect` strategy for Kelvin correction
-- P4: Create `ActivityKelvinEffectBuilder` with validation
-- P5: Update `ActivityFactory` with new strategy entries
-- P6: **Function Isolation** - Refactor complex functions, improve organization
+- P3: Update `ActivityFactory` with new strategy entry
+- P4: **Function Isolation** - Refactor complex functions, improve organization
 
 ### E2-F2: Equilibria Runnable Refactor (6 phases)
 - P0: **Code Quality** - Refactor `partitioning.py` (extract helpers, add docstrings)
@@ -135,8 +136,7 @@ ActivityStrategy (ABC)
 ├── ActivityIdealMass (existing)
 ├── ActivityIdealVolume (existing)
 ├── ActivityKappaParameter (existing)
-├── ActivityNonIdealBinary (new - BAT model)
-└── ActivityKelvinEffect (new - Kelvin correction)
+└── ActivityNonIdealBinary (new - BAT model)
 ```
 
 ### Builder Pattern
@@ -171,4 +171,5 @@ result = equilibria.execute(aerosol, temperature, pressure)
 |------|--------|--------|
 | 2026-01-07 | Initial epic creation | ADW |
 | 2026-01-07 | Added code quality phases (P0) and cleanup phases to E2-F1 and E2-F2 | ADW |
+| 2026-01-08 | Removed ActivityKelvinEffect from E2-F1 (already in SurfaceStrategy); 7→5 phases | ADW |
 
