@@ -6,7 +6,7 @@
 **Start Date**: TBD
 **Target Date**: TBD
 **Last Updated**: 2026-01-07
-**Size**: Medium (7 phases, ~600 LOC)
+**Size**: Medium (5 phases, ~450 LOC)
 
 ## Overview
 
@@ -15,20 +15,22 @@ the existing `ActivityStrategy` ABC pattern. This feature introduces:
 
 1. **`ActivityNonIdealBinary`**: Strategy wrapping BAT model (Gorkowski 2019)
    for non-ideal organic-water mixture activity calculations
-2. **`ActivityKelvinEffect`**: Strategy for Kelvin effect vapor pressure
-   correction based on particle curvature
 
-Both strategies delegate to existing calculation functions in `activity/`,
+The strategy delegates to existing calculation functions in `activity/`,
 maintaining the separation between algorithm implementation and strategy
 orchestration.
+
+> **Note**: The Kelvin effect is intentionally NOT included as an activity
+> strategy. The Kelvin effect is a surface phenomenon already implemented in
+> `SurfaceStrategy.kelvin_term()` and properly applied during condensation
+> calculations. Activity strategies compute thermodynamic activities; surface
+> strategies handle curvature effects on vapor pressure.
 
 ## Acceptance Criteria
 
 - [ ] `ActivityNonIdealBinary` strategy computes BAT model activity
 - [ ] `ActivityNonIdealBinaryBuilder` validates required parameters
-- [ ] `ActivityKelvinEffect` strategy computes Kelvin correction
-- [ ] `ActivityKelvinEffectBuilder` validates required parameters
-- [ ] `ActivityFactory` supports `"non_ideal_binary"` and `"kelvin"` types
+- [ ] `ActivityFactory` supports `"non_ideal_binary"` type
 - [ ] All existing `activity/` tests continue passing
 - [ ] New strategies have 80%+ test coverage
 - [ ] Docstrings follow Google-style format with examples
@@ -68,40 +70,6 @@ class ActivityNonIdealBinary(ActivityStrategy):
         ...
 ```
 
-### ActivityKelvinEffect Strategy
-
-Applies Kelvin curvature correction to vapor pressure:
-
-```python
-class ActivityKelvinEffect(ActivityStrategy):
-    """Activity with Kelvin effect correction for curved surfaces.
-    
-    Modifies activity to account for increased vapor pressure over
-    curved particle surfaces (Kelvin equation).
-    
-    Attributes:
-        surface_tension: Surface tension [N/m].
-        molar_mass: Molar mass [kg/mol].
-        density: Species density [kg/m^3].
-        base_strategy: Underlying activity strategy for base activity.
-    """
-    
-    def __init__(
-        self,
-        surface_tension: float,
-        molar_mass: float,
-        density: float,
-        base_strategy: Optional[ActivityStrategy] = None,
-    ) -> None: ...
-    
-    def activity(
-        self, mass_concentration: Union[float, NDArray[np.float64]],
-        particle_radius: Optional[Union[float, NDArray[np.float64]]] = None,
-    ) -> Union[float, NDArray[np.float64]]:
-        """Compute activity with Kelvin correction."""
-        ...
-```
-
 ### Builder Classes
 
 ```python
@@ -113,16 +81,6 @@ class ActivityNonIdealBinaryBuilder(
     def set_oxygen2carbon(self, value: float) -> Self: ...
     def set_functional_group(self, group: Optional[str]) -> Self: ...
     def build(self) -> ActivityNonIdealBinary: ...
-
-
-class ActivityKelvinEffectBuilder(
-    BuilderABC, BuilderMolarMassMixin, BuilderDensityMixin
-):
-    """Builder for ActivityKelvinEffect strategy."""
-    
-    def set_surface_tension(self, value: float, units: str = "N/m") -> Self: ...
-    def set_base_strategy(self, strategy: ActivityStrategy) -> Self: ...
-    def build(self) -> ActivityKelvinEffect: ...
 ```
 
 ## Phases
@@ -200,50 +158,7 @@ validation and fluent interface.
 
 ---
 
-### Phase E2-F1-P3: Create ActivityKelvinEffect Strategy
-
-**Issue**: TBD | **Size**: M | **Status**: Not Started
-
-Create the `ActivityKelvinEffect` strategy for Kelvin curvature correction
-to vapor pressure over small particles.
-
-**Tasks**:
-- Create Kelvin effect calculation function in `particles/properties/`
-- Create `ActivityKelvinEffect` class in `particles/activity_strategies.py`
-- Implement `activity()` method with Kelvin correction
-- Support optional base strategy composition
-- Add comprehensive docstrings with Kelvin equation reference
-- Add unit tests verifying Kelvin correction behavior
-
-**Files Modified**:
-- `particula/particles/properties/kelvin_effect.py` (new)
-- `particula/particles/activity_strategies.py`
-- `particula/particles/tests/activity_strategies_test.py`
-
----
-
-### Phase E2-F1-P4: Create ActivityKelvinEffectBuilder
-
-**Issue**: TBD | **Size**: S | **Status**: Not Started
-
-Create the builder class for `ActivityKelvinEffect` with parameter
-validation and fluent interface.
-
-**Tasks**:
-- Create `ActivityKelvinEffectBuilder` in `particles/activity_builders.py`
-- Inherit from `BuilderABC`, `BuilderMolarMassMixin`, `BuilderDensityMixin`
-- Add `set_surface_tension()` method with unit conversion
-- Add `set_base_strategy()` method for strategy composition
-- Implement `build()` with pre-build validation
-- Add unit tests in `particles/tests/activity_builders_test.py`
-
-**Files Modified**:
-- `particula/particles/activity_builders.py`
-- `particula/particles/tests/activity_builders_test.py`
-
----
-
-### Phase E2-F1-P5: Update ActivityFactory
+### Phase E2-F1-P3: Update ActivityFactory
 
 **Issue**: TBD | **Size**: S | **Status**: Not Started
 
@@ -251,7 +166,6 @@ Update `ActivityFactory` to support new strategy types via string keys.
 
 **Tasks**:
 - Add `"non_ideal_binary"` mapping to `ActivityNonIdealBinaryBuilder`
-- Add `"kelvin"` and `"kelvin_effect"` mappings to `ActivityKelvinEffectBuilder`
 - Update factory docstrings with new strategy types
 - Add factory dispatch tests for new strategies
 - Verify backward compatibility with existing strategy types
@@ -262,9 +176,9 @@ Update `ActivityFactory` to support new strategy types via string keys.
 
 ---
 
-### Phase E2-F1-P6: Activity Module Function Isolation and Cleanup
+### Phase E2-F1-P4: Activity Module Function Isolation and Cleanup
 
-**Issue**: TBD | **Size**: S | **Status**: Not Started
+**Issue**: TBD | **Size**: M | **Status**: Not Started
 
 Improve function isolation and code organization in `activity/` module for
 maintainability and testability.
@@ -317,7 +231,6 @@ maintainability and testability.
 - Gorkowski, K., Preston, T. C., & Zuend, A. (2019). Relative-humidity-dependent
   organic aerosol thermodynamics via an efficient reduced-complexity model.
   Atmospheric Chemistry and Physics. https://doi.org/10.5194/acp-19-13383-2019
-- Kelvin equation for curvature effects on vapor pressure
 
 ## Change Log
 
@@ -325,4 +238,5 @@ maintainability and testability.
 |------|--------|--------|
 | 2026-01-07 | Initial feature creation | ADW |
 | 2026-01-07 | Added P0 code quality phase and P6 function isolation phase | ADW |
+| 2026-01-08 | Removed ActivityKelvinEffect phases (P3, P4) - Kelvin effect already implemented in SurfaceStrategy | ADW |
 
