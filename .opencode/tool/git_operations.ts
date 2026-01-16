@@ -33,6 +33,13 @@ AVAILABLE COMMANDS:
   Usage: { command: "add", files: ["file1.py", "file2.py"], worktree_path: "./trees/abc" }
 • restore: Restore changes (optional staged flag and files list)
   Usage: { command: "restore", staged: true, files: ["file.py"], worktree_path: "./trees/abc" }
+• worktree-list: List registered git worktrees
+  Usage: { command: "worktree-list" }
+• worktree-prune: Prune stale git worktree references
+  Usage: { command: "worktree-prune" }
+• worktree-remove: Remove a worktree by ADW ID (supports --force)
+  Usage: { command: "worktree-remove", adw_id: "abc12345" }
+  Usage: { command: "worktree-remove", adw_id: "abc12345", force: true }
 
 WORKTREE ISOLATION & ADW ID TRACEABILITY:
 - Always set worktree_path when running inside ADW-managed trees
@@ -45,7 +52,17 @@ Set help: true to view command help without validation or required parameters.
 
   args: {
     command: tool.schema
-      .enum(["commit", "push", "status", "diff", "add", "restore"])
+      .enum([
+        "commit",
+        "push",
+        "status",
+        "diff",
+        "add",
+        "restore",
+        "worktree-list",
+        "worktree-remove",
+        "worktree-prune",
+      ])
       .describe(`Git command to execute. Use help: true to see CLI usage.
 
 REQUIRED PARAMETERS BY COMMAND:
@@ -55,6 +72,9 @@ REQUIRED PARAMETERS BY COMMAND:
 • diff: none (stat, base, worktree_path optional)
 • add: exactly one of stage_all or files (worktree_path optional)
 • restore: none required (staged, files, worktree_path optional)
+• worktree-list: none required
+• worktree-prune: none required
+• worktree-remove: adw_id required (force optional)
 
 Set help: true to bypass validation and return CLI help.`),
 
@@ -116,6 +136,16 @@ Note: For add command, mutually exclusive with files parameter.
 Examples:
 • { command: "commit", summary: "Update deps", stage_all: true }
 • { command: "add", stage_all: true }`),
+
+    force: tool.schema
+      .boolean()
+      .optional()
+      .describe(`Force removal of the worktree even when dirty.
+
+Applies to: worktree-remove
+Mapped flag: --force (default true)
+
+Example: { command: "worktree-remove", adw_id: "abc12345", force: true }`),
 
     max_retries: tool.schema
       .number()
@@ -224,6 +254,7 @@ Example: { command: "diff", help: true }`),
       adw_id,
       worktree_path,
       stage_all,
+      force,
       max_retries,
       branch,
       porcelain,
@@ -234,9 +265,152 @@ Example: { command: "diff", help: true }`),
       help,
     } = args;
 
-    const cmdParts = ["uv", "run", "adw", "git", command];
+    const cmdParts = ["uv", "run", "adw", "git"];
+
+    const appendCommandParts = (skipValidation = false): string | undefined => {
+      switch (command) {
+        case "commit": {
+          cmdParts.push("commit");
+          if (!skipValidation && (!summary || !summary.trim())) {
+            return "ERROR: 'commit' command requires non-empty 'summary'.";
+          }
+
+          if (summary && summary.trim()) {
+            cmdParts.push("--summary", summary);
+          }
+          if (description) {
+            cmdParts.push("--description", description);
+          }
+          if (adw_id) {
+            cmdParts.push("--adw-id", adw_id);
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          if (stage_all) {
+            cmdParts.push("--stage-all");
+          }
+          const retries = max_retries ?? 3;
+          cmdParts.push("--max-retries", retries.toString());
+          return undefined;
+        }
+
+        case "push": {
+          cmdParts.push("push");
+          if (!skipValidation && !branch) {
+            return "ERROR: 'push' command requires 'branch'.";
+          }
+          if (branch) {
+            cmdParts.push("--branch", branch);
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "status": {
+          cmdParts.push("status");
+          if (porcelain) {
+            cmdParts.push("--porcelain");
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "diff": {
+          cmdParts.push("diff");
+          if (stat) {
+            cmdParts.push("--stat");
+          }
+          if (base) {
+            cmdParts.push("--base", base);
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "add": {
+          cmdParts.push("add");
+          const hasStageAll = Boolean(stage_all);
+          const hasFiles = Boolean(files && files.length > 0);
+
+          if (!skipValidation && hasStageAll && hasFiles) {
+            return "ERROR: 'add' command cannot combine 'stage_all' with 'files'.";
+          }
+          if (!skipValidation && !hasStageAll && !hasFiles) {
+            return "ERROR: 'add' command requires either 'stage_all' or 'files'.";
+          }
+
+          if (hasStageAll) {
+            cmdParts.push("--all");
+          }
+          if (hasFiles && files) {
+            files.forEach((filePath) => {
+              cmdParts.push("--files", filePath);
+            });
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "restore": {
+          cmdParts.push("restore");
+          if (staged) {
+            cmdParts.push("--staged");
+          }
+          if (files && files.length > 0) {
+            files.forEach((filePath) => {
+              cmdParts.push("--files", filePath);
+            });
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "worktree-list": {
+          cmdParts.push("worktree", "list");
+          return undefined;
+        }
+
+        case "worktree-prune": {
+          cmdParts.push("worktree", "prune");
+          return undefined;
+        }
+
+        case "worktree-remove": {
+          cmdParts.push("worktree", "remove");
+          if (!skipValidation && (!adw_id || !adw_id.trim())) {
+            return "ERROR: 'worktree-remove' command requires 'adw_id'.";
+          }
+          if (adw_id && adw_id.trim()) {
+            cmdParts.push(adw_id);
+          }
+          if (force !== false) {
+            cmdParts.push("--force");
+          }
+          return undefined;
+        }
+
+        default:
+          return `ERROR: Unsupported command '${command}'.`;
+      }
+    };
 
     if (help) {
+      const validationMessage = appendCommandParts(true);
+      if (validationMessage && validationMessage.startsWith("ERROR")) {
+        return validationMessage;
+      }
+
       cmdParts.push("--help");
       try {
         const result = await Bun.$`${cmdParts}`.text();
@@ -248,111 +422,14 @@ Example: { command: "diff", help: true }`),
       }
     }
 
-    switch (command) {
-      case "commit": {
-        if (!summary || !summary.trim()) {
-          return "ERROR: 'commit' command requires non-empty 'summary'.";
-        }
-
-        cmdParts.push("--summary", summary);
-        if (description) {
-          cmdParts.push("--description", description);
-        }
-        if (adw_id) {
-          cmdParts.push("--adw-id", adw_id);
-        }
-        if (worktree_path) {
-          cmdParts.push("--worktree-path", worktree_path);
-        }
-        if (stage_all) {
-          cmdParts.push("--stage-all");
-        }
-        const retries = max_retries ?? 3;
-        cmdParts.push("--max-retries", retries.toString());
-        break;
-      }
-
-      case "push": {
-        if (!branch) {
-          return "ERROR: 'push' command requires 'branch'.";
-        }
-
-        cmdParts.push("--branch", branch);
-        if (worktree_path) {
-          cmdParts.push("--worktree-path", worktree_path);
-        }
-        break;
-      }
-
-      case "status": {
-        if (porcelain) {
-          cmdParts.push("--porcelain");
-        }
-        if (worktree_path) {
-          cmdParts.push("--worktree-path", worktree_path);
-        }
-        break;
-      }
-
-      case "diff": {
-        if (stat) {
-          cmdParts.push("--stat");
-        }
-        if (base) {
-          cmdParts.push("--base", base);
-        }
-        if (worktree_path) {
-          cmdParts.push("--worktree-path", worktree_path);
-        }
-        break;
-      }
-
-      case "add": {
-        const hasStageAll = Boolean(stage_all);
-        const hasFiles = Boolean(files && files.length > 0);
-
-        if (hasStageAll && hasFiles) {
-          return "ERROR: 'add' command cannot combine 'stage_all' with 'files'.";
-        }
-        if (!hasStageAll && !hasFiles) {
-          return "ERROR: 'add' command requires either 'stage_all' or 'files'.";
-        }
-
-        if (hasStageAll) {
-          cmdParts.push("--all");
-        }
-        if (hasFiles) {
-          files.forEach((filePath) => {
-            cmdParts.push("--files", filePath);
-          });
-        }
-        if (worktree_path) {
-          cmdParts.push("--worktree-path", worktree_path);
-        }
-        break;
-      }
-
-      case "restore": {
-        if (staged) {
-          cmdParts.push("--staged");
-        }
-        if (files && files.length > 0) {
-          files.forEach((filePath) => {
-            cmdParts.push("--files", filePath);
-          });
-        }
-        if (worktree_path) {
-          cmdParts.push("--worktree-path", worktree_path);
-        }
-        break;
-      }
-
-      default:
-        return `ERROR: Unsupported command '${command}'.`;
+    const validationMessage = appendCommandParts();
+    if (validationMessage && validationMessage.startsWith("ERROR")) {
+      return validationMessage;
     }
 
     try {
       const result = await Bun.$`${cmdParts}`.text();
+
 
       if (result.includes("ERROR:") || result.includes("Error:")) {
         return `Git Command Failed:\n${result}`;

@@ -3,23 +3,23 @@
   "theme": "opencode",
   "autoupdate": false,
   "permission": {
+    "read": {
+      "{env:ADW_PROJECT_ROOT}/src/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/lib/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/tests/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/docs/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/.opencode/**": "allow"
+    },
+    "write": {
+      "{env:ADW_PROJECT_ROOT}/src/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/lib/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/tests/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/docs/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/.opencode/**": "allow"
+    },
     "edit": "allow",
     "webfetch": "ask",
     "external_directory": "deny",
-    "read": [
-      ["allow", "{env:ADW_PROJECT_ROOT}/src/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/lib/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/tests/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/docs/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/.opencode/**"]
-    ],
-    "write": [
-      ["allow", "{env:ADW_PROJECT_ROOT}/src/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/lib/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/tests/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/docs/**"],
-      ["allow", "{env:ADW_PROJECT_ROOT}/.opencode/**"]
-    ],
     "bash": {
       "uv run *": "allow",
       "adw setup *": "allow",
