@@ -1,0 +1,21 @@
+{
+  "name": "adw-validate",
+  "version": "1.0.0",
+  "description": "Validate implementation against spec intent, fix gaps, and commit fixes. Single run with 20-minute timeout.",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Validate Implementation and Fix Gaps",
+      "agent": "adw-validate",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "light",
+      "timeout": 1200,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 1,
+        "backoff": 1.0
+      }
+    }
+  ]
+}
