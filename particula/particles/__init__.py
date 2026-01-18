@@ -25,6 +25,7 @@ from particula.particles.activity_strategies import (
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityKappaParameter,
+    ActivityNonIdealBinary,
 )
 from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
