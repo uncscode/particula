@@ -142,3 +142,13 @@ result = process.execute(aerosol, time_step=10.0)
 #   The result is an Aerosol instance with updated particle properties.
 print(result)
 ```
+
+---
+
+### Feature deep-dives
+
+- [Condensation strategy system](Features/condensation_strategy_system.md) —
+  strategy-based condensation (simultaneous and staggered theta modes) with
+  runnable pipelines.
+- [Wall loss strategy system](Features/wall_loss_strategy_system.md) — chamber
+  wall loss strategies with builders, factory, and runnable integration.
