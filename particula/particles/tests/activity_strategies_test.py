@@ -3,7 +3,6 @@ Replace with real values in the future.
 """
 
 import numpy as np
-
 import pytest
 
 from particula.activity.activity_coefficients import bat_activity_coefficients
@@ -14,7 +13,6 @@ from particula.particles.activity_strategies import (
     ActivityKappaParameter,
     ActivityNonIdealBinary,
 )
-
 
 # Test ActivityNonIdealBinary
 
@@ -161,7 +159,10 @@ def test_activity_non_ideal_binary_invalid_shape_scalar():
     )
     with pytest.raises(
         ValueError,
-        match="ActivityNonIdealBinary expects mass_concentration with last dimension of size 2.",
+        match=(
+            "ActivityNonIdealBinary expects mass_concentration with last "
+            "dimension of size 2."
+        ),
     ):
         strategy.activity(1.0)
 
@@ -173,7 +174,10 @@ def test_activity_non_ideal_binary_invalid_shape_wrong_last_dim():
     )
     with pytest.raises(
         ValueError,
-        match="ActivityNonIdealBinary expects mass_concentration with last dimension of size 2.",
+        match=(
+            "ActivityNonIdealBinary expects mass_concentration with last "
+            "dimension of size 2."
+        ),
     ):
         strategy.activity(np.array([0.5, 0.3, 0.2]))
 
