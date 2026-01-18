@@ -146,7 +146,7 @@ class BuilderMolarMassMixin:
 
     def __init__(self):
         """Initialize molar mass mixin."""
-        self.molar_mass = None
+        self.molar_mass: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"molar_mass": "positive"})
     def set_molar_mass(
