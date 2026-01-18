@@ -12,6 +12,8 @@ from typing import List, NamedTuple, Union
 import numpy as np
 from numpy.typing import NDArray
 
+FloatArray = Union[float, NDArray[np.float64]]
+
 
 class FitValues(NamedTuple):
     """Named tuple for the fit values for the activity model."""
@@ -44,19 +46,17 @@ def coefficients_c(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
     fit_values: List[float],
-) -> NDArray[np.float64]:
+) -> FloatArray:
     """Compute fitted BAT coefficients from published parameters.
 
     Args:
-        molar_mass_ratio: Water-to-organic molar mass ratio. Scalars return
-            scalars, array inputs return ``np.ndarray``.
-        oxygen2carbon: Oxygen-to-carbon ratio. Scalars return scalars, array
-            inputs return ``np.ndarray``.
+        molar_mass_ratio: Water-to-organic molar mass ratio.
+        oxygen2carbon: Oxygen-to-carbon ratio.
         fit_values: Fit parameters (a1,a2,s) from ``FitValues``.
 
     Returns:
-        NDArray[np.float64]: Computed coefficient array matching ``fit_values``
-            shape.
+        Computed coefficient array matching ``fit_values`` shape.
+        Scalar inputs return scalar; array inputs return ``np.ndarray``.
 
     Examples:
         >>> from particula.activity.bat_coefficients import (

@@ -1,5 +1,6 @@
 """Calculates the Gibbs free energy of mixing for a binary solution."""
 
+import warnings
 from typing import Tuple
 
 import numpy as np
@@ -40,5 +41,20 @@ def gibbs_free_energy(
     return gibbs_ideal, gibbs_real
 
 
-# Temporary alias for backward compatibility; remove in later phase.
-gibbs_free_engery = gibbs_free_energy
+def gibbs_free_engery(
+    organic_mole_fraction: NDArray[np.float64],
+    gibbs_mix: NDArray[np.float64],
+) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Deprecated alias for gibbs_free_energy.
+
+    .. deprecated:: 0.3.0
+        Use :func:`gibbs_free_energy` instead. This alias will be removed
+        in a future version.
+    """
+    warnings.warn(
+        "gibbs_free_engery is deprecated and will be removed in a future "
+        "version. Use gibbs_free_energy instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return gibbs_free_energy(organic_mole_fraction, gibbs_mix)

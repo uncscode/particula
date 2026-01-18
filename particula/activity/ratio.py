@@ -53,15 +53,17 @@ def from_molar_mass_ratio(
     molar_mass_ratio: Union[float, Iterable[float], NDArray[np.float64]],
     other_molar_mass: float = 18.01528,
 ) -> FloatArray:
-    """Convert from molar mass ratio to molar mass (MW water / MW organic).
+    """Convert molar mass ratio to organic molar mass.
 
     Args:
-        molar_mass_ratio: Molar mass ratio. Must be positive.
+        molar_mass_ratio: Molar mass ratio (MW water / MW organic).
+            Must be positive.
         other_molar_mass: Reference molar mass (default water, 18.01528).
             Must be positive.
 
     Returns:
-        Molar mass. Float for scalar input; ndarray for list/array input.
+        Organic molar mass. Float for scalar input; ndarray for list/array
+        input.
 
     Raises:
         ValueError: If molar_mass_ratio or other_molar_mass is not positive.
