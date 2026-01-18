@@ -26,18 +26,21 @@ def bat_blending_weights(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
 ) -> NDArray[np.float64]:
-    """Function to estimate the blending weights for the BAT model.
+    """Estimate BAT blending weights for oxygen-rich regimes.
 
     Args:
-        - molar_mass_ratio : The molar mass ratio of water to organic
-            matter.
-        - oxygen2carbon : The oxygen to carbon ratio.
+        molar_mass_ratio: Ratio of water to organic matter. Must be positive.
+        oxygen2carbon: Oxygen-to-carbon ratio. Must be nonnegative.
 
     Returns:
-        - blending_weights : Array of blending weights for the BAT model
-            in the low, mid, and high oxygen2carbon regions. The weights
-            size is (3,) if oxygen2carbon is a single value, or (n, 3)
-            if oxygen2carbon is an array of size n.
+        NDArray[np.float64]: Blending weights for the low, mid, and high
+            oxygen regions. Scalar inputs return shape (3,), array inputs
+            return (n, 3) where n is the length of ``oxygen2carbon``.
+
+    Examples:
+        >>> from particula.activity.bat_blending import bat_blending_weights
+        >>> bat_blending_weights(molar_mass_ratio=0.5, oxygen2carbon=0.35)
+        array([0.00000000e+00, 9.11531178e-05, 9.99908847e-01])
     """
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
@@ -62,15 +65,24 @@ def bat_blending_weights(
 def _calculate_blending_weights(
     oxygen2carbon: float, oxygen2carbon_ml: float
 ) -> NDArray[np.float64]:
-    """Helper function to calculate blending weights for oxygen2carbon.
+    """Helper to compute blending weights for a single oxygen value.
 
     Args:
-        - oxygen2carbon : The oxygen to carbon ratio.
-        - oxygen2carbon_ml : The single-phase oxygen to carbon ratio.
+        oxygen2carbon: The oxygen-to-carbon ratio for the sample point.
+        oxygen2carbon_ml: The single-phase oxygen-to-carbon threshold.
 
     Returns:
-        - blending_weights : List of blending weights for the BAT model
-            in the low, mid, and high oxygen2carbon regions.
+        NDArray[np.float64]: Weights for the low, mid, and high regimes.
+
+    Examples:
+        >>> from particula.activity.bat_blending import (
+        ...     _calculate_blending_weights,
+        ... )
+        >>> _calculate_blending_weights(
+        ...     oxygen2carbon=0.35,
+        ...     oxygen2carbon_ml=0.225,
+        ... )
+        array([0.00000000e+00, 9.11531178e-05, 9.99908847e-01])
     """
     blending_weights = np.zeros(3)  # [low, mid, high] oxygen2carbon regions
 
