@@ -371,9 +371,9 @@ class ActivityKappaParameter(ActivityStrategy):
 
     def __init__(
         self,
-        kappa: NDArray[np.float64] | None = None,
-        density: NDArray[np.float64] | None = None,
-        molar_mass: NDArray[np.float64] | None = None,
+        kappa: Optional[NDArray[np.float64]] = None,
+        density: Optional[NDArray[np.float64]] = None,
+        molar_mass: Optional[NDArray[np.float64]] = None,
         water_index: int = 0,
     ):
         """Initialize the ActivityKappaParameter strategy.
