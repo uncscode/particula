@@ -18,7 +18,9 @@ CLEAR_BUILD_PATH = Path(__file__).resolve().parent.parent / "clear_build.py"
 
 
 def load_module() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("clear_build", CLEAR_BUILD_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "clear_build", CLEAR_BUILD_PATH
+    )
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)  # type: ignore[arg-type]
@@ -50,20 +52,26 @@ def test_find_project_root_falls_back_to_start(
     assert clear_build_module.find_project_root(start) == start.resolve()
 
 
-def test_validate_path_accepts_inside_root(clear_build_module: ModuleType, tmp_path: Path) -> None:
+def test_validate_path_accepts_inside_root(
+    clear_build_module: ModuleType, tmp_path: Path
+) -> None:
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     resolved = clear_build_module.validate_path(build_dir, tmp_path)
     assert resolved == build_dir.resolve()
 
 
-def test_validate_path_rejects_outside_root(clear_build_module: ModuleType, tmp_path: Path) -> None:
+def test_validate_path_rejects_outside_root(
+    clear_build_module: ModuleType, tmp_path: Path
+) -> None:
     outside = tmp_path.parent / "outside"
     with pytest.raises(ValueError):
         clear_build_module.validate_path(outside, tmp_path)
 
 
-def test_validate_path_rejects_project_root(clear_build_module: ModuleType, tmp_path: Path) -> None:
+def test_validate_path_rejects_project_root(
+    clear_build_module: ModuleType, tmp_path: Path
+) -> None:
     with pytest.raises(ValueError):
         clear_build_module.validate_path(tmp_path, tmp_path)
 
@@ -79,7 +87,9 @@ def test_validate_path_rejects_symlink_escape(
         clear_build_module.validate_path(escape_link, tmp_path)
 
 
-def test_get_directory_size_counts_files(clear_build_module: ModuleType, tmp_path: Path) -> None:
+def test_get_directory_size_counts_files(
+    clear_build_module: ModuleType, tmp_path: Path
+) -> None:
     build_dir = tmp_path / "build"
     nested = build_dir / "nested"
     nested.mkdir(parents=True)
@@ -91,7 +101,9 @@ def test_get_directory_size_counts_files(clear_build_module: ModuleType, tmp_pat
     assert count == 2
 
 
-def test_get_directory_size_ignores_missing(clear_build_module: ModuleType, tmp_path: Path) -> None:
+def test_get_directory_size_ignores_missing(
+    clear_build_module: ModuleType, tmp_path: Path
+) -> None:
     total, count = clear_build_module.get_directory_size(tmp_path / "missing")
     assert (total, count) == (0, 0)
 
@@ -183,7 +195,9 @@ def test_clear_build_handles_missing_directory(
     assert "does not exist" in output.lower()
 
 
-def test_clear_build_validation_failure(clear_build_module: ModuleType, tmp_path: Path) -> None:
+def test_clear_build_validation_failure(
+    clear_build_module: ModuleType, tmp_path: Path
+) -> None:
     project_root = tmp_path / "root"
     project_root.mkdir()
     outside = tmp_path.parent / "outside"
@@ -223,7 +237,13 @@ def test_cli_dry_run(
 ) -> None:
     project_root, build_dir = populated_build
     exit_code = clear_build_module.main(
-        ["--build-dir", str(build_dir), "--dry-run", "--project-root", str(project_root)]
+        [
+            "--build-dir",
+            str(build_dir),
+            "--dry-run",
+            "--project-root",
+            str(project_root),
+        ]
     )
     captured = capsys.readouterr().out
     assert exit_code == 0
@@ -232,7 +252,9 @@ def test_cli_dry_run(
 
 
 def test_cli_force_delete(
-    clear_build_module: ModuleType, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    clear_build_module: ModuleType,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
 ) -> None:
     project_root = tmp_path / "root"
     build_dir = project_root / "build"
@@ -240,7 +262,13 @@ def test_cli_force_delete(
     (build_dir / "file.bin").write_bytes(b"data")
 
     exit_code = clear_build_module.main(
-        ["--build-dir", str(build_dir), "--force", "--project-root", str(project_root)]
+        [
+            "--build-dir",
+            str(build_dir),
+            "--force",
+            "--project-root",
+            str(project_root),
+        ]
     )
     captured = capsys.readouterr().out
     assert exit_code == 0
@@ -249,7 +277,9 @@ def test_cli_force_delete(
 
 
 def test_cli_validation_failure(
-    clear_build_module: ModuleType, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    clear_build_module: ModuleType,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
 ) -> None:
     project_root = tmp_path / "root"
     project_root.mkdir()

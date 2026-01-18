@@ -60,7 +60,9 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
         joined = encoded.decode("utf-8", errors="ignore")
         truncated = True
-        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
+        notice_parts.append(
+            f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB"
+        )
 
     notice = "; ".join(notice_parts) if truncated else ""
     if truncated:
@@ -74,7 +76,9 @@ def _bounded_append(collection: List[str], value: str, limit: int) -> None:
         collection.append(value)
 
 
-def parse_cmake_output(output: str, exit_code: Optional[int] = None) -> Dict[str, Any]:
+def parse_cmake_output(
+    output: str, exit_code: Optional[int] = None
+) -> Dict[str, Any]:
     """Parse CMake output to extract key metrics.
 
     Processes the output line-by-line to collect generator, build type,
@@ -107,7 +111,9 @@ def parse_cmake_output(output: str, exit_code: Optional[int] = None) -> Dict[str
     target_pattern = re.compile(r"Target\s+(.+?)\s+\(([^)]+)\)")
     built_target_pattern = re.compile(r"Built target\s+(.+)")
     generator_pattern = re.compile(r"CMake\s+Generator:\s*(.+)")
-    build_type_pattern = re.compile(r"CMAKE_BUILD_TYPE[\s:=\"]+([A-Za-z0-9_+-]+)")
+    build_type_pattern = re.compile(
+        r"CMAKE_BUILD_TYPE[\s:=\"]+([A-Za-z0-9_+-]+)"
+    )
     duration_pattern = re.compile(r"([0-9]+(?:\.[0-9]+)?)s(?:ec|econds)?")
 
     targets_list = cast(List[Dict[str, str]], metrics["targets"])
@@ -133,13 +139,18 @@ def parse_cmake_output(output: str, exit_code: Optional[int] = None) -> Dict[str
                 metrics["truncated_targets"] = True
             else:
                 targets_list.append(
-                    {"name": tgt_match.group(1).strip(), "type": tgt_match.group(2).strip()}
+                    {
+                        "name": tgt_match.group(1).strip(),
+                        "type": tgt_match.group(2).strip(),
+                    }
                 )
 
         built_match = built_target_pattern.search(stripped)
         if built_match:
             if len(targets_list) < MESSAGE_CAPTURE_LIMIT:
-                targets_list.append({"name": built_match.group(1).strip(), "type": "unknown"})
+                targets_list.append(
+                    {"name": built_match.group(1).strip(), "type": "unknown"}
+                )
             else:
                 metrics["truncated_targets"] = True
 
@@ -170,7 +181,9 @@ def parse_cmake_output(output: str, exit_code: Optional[int] = None) -> Dict[str
     return metrics
 
 
-def format_summary(metrics: Dict[str, Any], source_dir: str, build_dir: str) -> str:
+def format_summary(
+    metrics: Dict[str, Any], source_dir: str, build_dir: str
+) -> str:
     """Format human-readable summary of CMake configuration.
 
     Args:
@@ -231,10 +244,16 @@ def format_summary(metrics: Dict[str, Any], source_dir: str, build_dir: str) -> 
         lines.append(f"\nDuration: {metrics['duration']:.2f}s")
 
     if metrics.get("ninja_fallback"):
-        lines.append("\nNote: Ninja requested but not available; used default generator")
+        lines.append(
+            "\nNote: Ninja requested but not available; used default generator"
+        )
 
     lines.append("\n" + "=" * 60)
-    validation = "PASSED" if metrics.get("success") and metrics.get("errors", 0) == 0 else "FAILED"
+    validation = (
+        "PASSED"
+        if metrics.get("success") and metrics.get("errors", 0) == 0
+        else "FAILED"
+    )
     lines.append(f"VALIDATION: {validation}")
     lines.append("=" * 60)
 
@@ -244,14 +263,18 @@ def format_summary(metrics: Dict[str, Any], source_dir: str, build_dir: str) -> 
 def _load_presets(source_dir: str) -> Dict[str, Any]:
     presets_path = Path(source_dir) / "CMakePresets.json"
     if not presets_path.exists():
-        raise FileNotFoundError(f"CMakePresets.json not found at {presets_path}")
+        raise FileNotFoundError(
+            f"CMakePresets.json not found at {presets_path}"
+        )
     return json.loads(presets_path.read_text())
 
 
 def _validate_preset_name(preset: str, preset_data: Dict[str, Any]) -> None:
     configure_presets = preset_data.get("configurePresets") or []
     names = {
-        item.get("name") for item in configure_presets if isinstance(item, dict) and "name" in item
+        item.get("name")
+        for item in configure_presets
+        if isinstance(item, dict) and "name" in item
     }
     if preset not in names:
         raise ValueError(f"Preset '{preset}' not found in configurePresets")
@@ -305,7 +328,11 @@ def run_cmake(
         metrics = parse_cmake_output("", exit_code=1)
         metrics["success"] = False
         metrics["errors"] = metrics.get("errors", 0) + 1
-        _bounded_append(cast(List[str], metrics["error_messages"]), str(exc), MESSAGE_CAPTURE_LIMIT)
+        _bounded_append(
+            cast(List[str], metrics["error_messages"]),
+            str(exc),
+            MESSAGE_CAPTURE_LIMIT,
+        )
         output = format_summary(metrics, source_dir, build_dir)
         return 1, output
 
@@ -316,8 +343,12 @@ def run_cmake(
             text=True,
             timeout=timeout,
         )
-        combined_output = result.stdout + ("\n" + result.stderr if result.stderr else "")
-        metrics = parse_cmake_output(combined_output, exit_code=result.returncode)
+        combined_output = result.stdout + (
+            "\n" + result.stderr if result.stderr else ""
+        )
+        metrics = parse_cmake_output(
+            combined_output, exit_code=result.returncode
+        )
 
         if ninja and not ninja_requested:
             metrics["ninja_fallback"] = True
@@ -339,7 +370,9 @@ def run_cmake(
                     MESSAGE_CAPTURE_LIMIT,
                 )
 
-        truncated_output, was_truncated, notice = _truncate_output(combined_output)
+        truncated_output, was_truncated, notice = _truncate_output(
+            combined_output
+        )
 
         if output_mode == "summary":
             output_text = format_summary(metrics, source_dir, build_dir)
@@ -393,7 +426,11 @@ def run_cmake(
         metrics = parse_cmake_output("", exit_code=1)
         metrics["success"] = False
         metrics["errors"] = metrics.get("errors", 0) + 1
-        _bounded_append(cast(List[str], metrics["error_messages"]), message, MESSAGE_CAPTURE_LIMIT)
+        _bounded_append(
+            cast(List[str], metrics["error_messages"]),
+            message,
+            MESSAGE_CAPTURE_LIMIT,
+        )
         if output_mode == "json":
             payload = {
                 "metrics": metrics,
@@ -408,7 +445,11 @@ def run_cmake(
         metrics = parse_cmake_output("", exit_code=1)
         metrics["success"] = False
         metrics["errors"] = metrics.get("errors", 0) + 1
-        _bounded_append(cast(List[str], metrics["error_messages"]), message, MESSAGE_CAPTURE_LIMIT)
+        _bounded_append(
+            cast(List[str], metrics["error_messages"]),
+            message,
+            MESSAGE_CAPTURE_LIMIT,
+        )
         if output_mode == "json":
             payload = {
                 "metrics": metrics,
@@ -436,13 +477,25 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "  python3 .opencode/tool/run_cmake.py --preset release --output json\n"
         ),
     )
-    parser.add_argument("--output", choices=["summary", "full", "json"], default="summary")
+    parser.add_argument(
+        "--output", choices=["summary", "full", "json"], default="summary"
+    )
     parser.add_argument("--preset", type=str, help="CMake preset name")
-    parser.add_argument("--source-dir", type=str, default=".", help="Source directory")
-    parser.add_argument("--build-dir", type=str, default="build", help="Build directory")
-    parser.add_argument("--ninja", action="store_true", help="Use Ninja generator")
-    parser.add_argument("--timeout", type=int, default=300, help="Timeout in seconds")
-    parser.add_argument("cmake_args", nargs="*", help="Additional CMake arguments")
+    parser.add_argument(
+        "--source-dir", type=str, default=".", help="Source directory"
+    )
+    parser.add_argument(
+        "--build-dir", type=str, default="build", help="Build directory"
+    )
+    parser.add_argument(
+        "--ninja", action="store_true", help="Use Ninja generator"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=300, help="Timeout in seconds"
+    )
+    parser.add_argument(
+        "cmake_args", nargs="*", help="Additional CMake arguments"
+    )
     return parser
 
 

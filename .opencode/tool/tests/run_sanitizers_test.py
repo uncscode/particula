@@ -12,11 +12,15 @@ from typing import List, Tuple
 
 import pytest
 
-RUN_SANITIZERS_PATH = Path(__file__).resolve().parent.parent / "run_sanitizers.py"
+RUN_SANITIZERS_PATH = (
+    Path(__file__).resolve().parent.parent / "run_sanitizers.py"
+)
 
 
 def load_module() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("run_sanitizers", RUN_SANITIZERS_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "run_sanitizers", RUN_SANITIZERS_PATH
+    )
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
@@ -30,7 +34,9 @@ def run_sanitizers_module() -> ModuleType:
 
 
 class DummyProcess:
-    def __init__(self, stdout: str = "", stderr: str = "", returncode: int = 0) -> None:
+    def __init__(
+        self, stdout: str = "", stderr: str = "", returncode: int = 0
+    ) -> None:
         self.stdout = stdout
         self.stderr = stderr
         self.returncode = returncode
@@ -62,21 +68,43 @@ UBSAN_ERROR_OUTPUT = (
 )
 
 
-def test_env_var_for_sanitizer_helpers(run_sanitizers_module: ModuleType) -> None:
-    assert run_sanitizers_module._env_var_for_sanitizer("asan") == run_sanitizers_module.ASAN_ENV
-    assert run_sanitizers_module._env_var_for_sanitizer("tsan") == run_sanitizers_module.TSAN_ENV
-    assert run_sanitizers_module._env_var_for_sanitizer("ubsan") == run_sanitizers_module.UBSAN_ENV
+def test_env_var_for_sanitizer_helpers(
+    run_sanitizers_module: ModuleType,
+) -> None:
+    assert (
+        run_sanitizers_module._env_var_for_sanitizer("asan")
+        == run_sanitizers_module.ASAN_ENV
+    )
+    assert (
+        run_sanitizers_module._env_var_for_sanitizer("tsan")
+        == run_sanitizers_module.TSAN_ENV
+    )
+    assert (
+        run_sanitizers_module._env_var_for_sanitizer("ubsan")
+        == run_sanitizers_module.UBSAN_ENV
+    )
     assert run_sanitizers_module._env_var_for_sanitizer("unknown") is None
 
 
 def test_select_parser_mappings(run_sanitizers_module: ModuleType) -> None:
-    assert run_sanitizers_module._select_parser("asan") is run_sanitizers_module.parse_asan_output
-    assert run_sanitizers_module._select_parser("tsan") is run_sanitizers_module.parse_tsan_output
-    assert run_sanitizers_module._select_parser("ubsan") is run_sanitizers_module.parse_ubsan_output
+    assert (
+        run_sanitizers_module._select_parser("asan")
+        is run_sanitizers_module.parse_asan_output
+    )
+    assert (
+        run_sanitizers_module._select_parser("tsan")
+        is run_sanitizers_module.parse_tsan_output
+    )
+    assert (
+        run_sanitizers_module._select_parser("ubsan")
+        is run_sanitizers_module.parse_ubsan_output
+    )
     assert run_sanitizers_module._select_parser("missing") is None
 
 
-def test_run_sanitizer_rejects_unknown_sanitizer(run_sanitizers_module: ModuleType) -> None:
+def test_run_sanitizer_rejects_unknown_sanitizer(
+    run_sanitizers_module: ModuleType,
+) -> None:
     exit_code, output = run_sanitizers_module.run_sanitizer(
         build_dir=None,
         executable=Path("/bin/true"),
@@ -87,7 +115,9 @@ def test_run_sanitizer_rejects_unknown_sanitizer(run_sanitizers_module: ModuleTy
     assert "Unsupported sanitizer" in output
 
 
-def test_parse_asan_output_extracts_fields(run_sanitizers_module: ModuleType) -> None:
+def test_parse_asan_output_extracts_fields(
+    run_sanitizers_module: ModuleType,
+) -> None:
     errors = run_sanitizers_module.parse_asan_output(ASAN_ERROR_OUTPUT)
 
     assert len(errors) == 1
@@ -98,7 +128,9 @@ def test_parse_asan_output_extracts_fields(run_sanitizers_module: ModuleType) ->
     assert any("#0" in frame for frame in err.stack_trace)
 
 
-def test_parse_tsan_output_multiple_blocks(run_sanitizers_module: ModuleType) -> None:
+def test_parse_tsan_output_multiple_blocks(
+    run_sanitizers_module: ModuleType,
+) -> None:
     errors = run_sanitizers_module.parse_tsan_output(TSAN_ERROR_OUTPUT)
 
     assert len(errors) == 2
@@ -107,7 +139,9 @@ def test_parse_tsan_output_multiple_blocks(run_sanitizers_module: ModuleType) ->
     assert errors[1].location.endswith("tsan2.cpp:20")
 
 
-def test_parse_ubsan_output_with_stack(run_sanitizers_module: ModuleType) -> None:
+def test_parse_ubsan_output_with_stack(
+    run_sanitizers_module: ModuleType,
+) -> None:
     errors = run_sanitizers_module.parse_ubsan_output(UBSAN_ERROR_OUTPUT)
 
     assert len(errors) == 1
@@ -116,17 +150,24 @@ def test_parse_ubsan_output_with_stack(run_sanitizers_module: ModuleType) -> Non
     assert len(errors[0].stack_trace) == 1
 
 
-def test_extract_location_parses_file_and_line(run_sanitizers_module: ModuleType) -> None:
+def test_extract_location_parses_file_and_line(
+    run_sanitizers_module: ModuleType,
+) -> None:
     frame = "#3 0x0 in fn /src/path/file.cc:99:13"
 
-    assert run_sanitizers_module._extract_location(frame) == "/src/path/file.cc:99:13"
+    assert (
+        run_sanitizers_module._extract_location(frame)
+        == "/src/path/file.cc:99:13"
+    )
     assert run_sanitizers_module._extract_location("no match here") == ""
 
 
 def test_truncate_output_limits(run_sanitizers_module: ModuleType) -> None:
     long_lines = "\n".join(["x" * 200 for _ in range(600)])
 
-    truncated_output, truncated, notice = run_sanitizers_module._truncate_output(long_lines)
+    truncated_output, truncated, notice = (
+        run_sanitizers_module._truncate_output(long_lines)
+    )
 
     assert truncated is True
     assert "Output truncated to 500 lines" in notice
@@ -214,7 +255,9 @@ def test_run_sanitizer_nonzero_exit_no_errors(
     assert "Overhead Ratio: 2.00x" in summary
 
 
-def test_run_sanitizer_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_sanitizer_timeout(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
 
     def raise_timeout(*_: object, **__: object) -> None:  # type: ignore[override]
@@ -281,7 +324,9 @@ def test_run_sanitizer_suppressions_and_json_schema(
     assert data["timed_out"] is False
 
 
-def test_load_suppressions_missing_file(run_sanitizers_module: ModuleType, tmp_path: Path) -> None:
+def test_load_suppressions_missing_file(
+    run_sanitizers_module: ModuleType, tmp_path: Path
+) -> None:
     missing_path = tmp_path / "missing.txt"
 
     assert run_sanitizers_module._load_suppressions(missing_path) == []
@@ -309,11 +354,15 @@ def test_run_sanitizer_full_output_truncation_notice(
     assert "Output truncated" in output
 
 
-def test_run_sanitizer_error_cap_note(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_sanitizer_error_cap_note(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
 
     def fake_parser(_: str):
-        return [module.SanitizerError("err", "loc", None, []) for _ in range(60)]
+        return [
+            module.SanitizerError("err", "loc", None, []) for _ in range(60)
+        ]
 
     monkeypatch.setattr(module, "_select_parser", lambda __: fake_parser)
 
@@ -328,7 +377,9 @@ def test_run_sanitizer_error_cap_note(monkeypatch: pytest.MonkeyPatch, tmp_path:
     assert f"Errors capped at first {module.ERROR_LIMIT}" in summary
 
 
-def test_cli_parses_and_writes_output(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_cli_parses_and_writes_output(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     output_file = tmp_path / "out.txt"
 

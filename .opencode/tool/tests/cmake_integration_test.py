@@ -91,9 +91,10 @@ def build_dir(example_project: Path) -> Generator[Path, None, None]:
 
 
 @pytest.fixture()
-def in_example_project(monkeypatch: pytest.MonkeyPatch, example_project: Path) -> None:
+def in_example_project(
+    monkeypatch: pytest.MonkeyPatch, example_project: Path
+) -> None:
     """Run commands from the example project directory for preset invocations."""
-
     monkeypatch.chdir(example_project)
 
 
@@ -101,7 +102,9 @@ def in_example_project(monkeypatch: pytest.MonkeyPatch, example_project: Path) -
 
 
 def test_configure_with_preset_default_summary(
-    run_cmake_module: ModuleType, example_project: Path, in_example_project: None
+    run_cmake_module: ModuleType,
+    example_project: Path,
+    in_example_project: None,
 ) -> None:
     expected_build_dir = example_project / "build" / "default"
     if expected_build_dir.exists():
@@ -205,7 +208,10 @@ def test_timeout_flagged(
     payload = json.loads(output)
     metrics = payload.get("metrics", {})
     if exit_code != 0:
-        assert metrics.get("timeout") is True or "timeout" in payload.get("output", "").lower()
+        assert (
+            metrics.get("timeout") is True
+            or "timeout" in payload.get("output", "").lower()
+        )
     else:
         # Fast hosts may finish within 1s; timeout should be explicitly false in that case.
         assert metrics.get("timeout") is False

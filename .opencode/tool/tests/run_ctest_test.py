@@ -28,13 +28,17 @@ def run_ctest_module() -> ModuleType:
 
 
 class DummyProcess:
-    def __init__(self, stdout: str = "", stderr: str = "", returncode: int = 0) -> None:
+    def __init__(
+        self, stdout: str = "", stderr: str = "", returncode: int = 0
+    ) -> None:
         self.stdout = stdout
         self.stderr = stderr
         self.returncode = returncode
 
 
-def test_parse_ctest_output_pass_and_duration(run_ctest_module: ModuleType) -> None:
+def test_parse_ctest_output_pass_and_duration(
+    run_ctest_module: ModuleType,
+) -> None:
     output = (
         "Test project /tmp/build\n"
         "1/1 Test #1: test_example ................   Passed    0.01 sec\n\n"
@@ -50,7 +54,9 @@ def test_parse_ctest_output_pass_and_duration(run_ctest_module: ModuleType) -> N
     assert metrics["failed_tests"] == []
 
 
-def test_parse_ctest_output_failures_and_section(run_ctest_module: ModuleType) -> None:
+def test_parse_ctest_output_failures_and_section(
+    run_ctest_module: ModuleType,
+) -> None:
     output = (
         "1/2 Test #1: ok_test ................   Passed    0.01 sec\n"
         "2/2 Test #2: bad_test ...............***Failed    0.01 sec\n\n"
@@ -67,7 +73,9 @@ def test_parse_ctest_output_failures_and_section(run_ctest_module: ModuleType) -
     assert "bad_test" in metrics["failed_tests"]
 
 
-def test_validate_results_flags_all_errors(run_ctest_module: ModuleType) -> None:
+def test_validate_results_flags_all_errors(
+    run_ctest_module: ModuleType,
+) -> None:
     metrics = {
         "passed": 0,
         "failed": 2,
@@ -85,10 +93,14 @@ def test_validate_results_flags_all_errors(run_ctest_module: ModuleType) -> None
     assert any("Expected at least" in err for err in errors)
     assert any("timed out" in err for err in errors)
     assert any("ctest command not found" in err for err in errors)
-    assert any("CTestTestfile" in err or "Build directory" in err for err in errors)
+    assert any(
+        "CTestTestfile" in err or "Build directory" in err for err in errors
+    )
 
 
-def test_format_summary_includes_failed_tests(run_ctest_module: ModuleType) -> None:
+def test_format_summary_includes_failed_tests(
+    run_ctest_module: ModuleType,
+) -> None:
     metrics = {
         "passed": 3,
         "failed": 1,
@@ -109,7 +121,9 @@ def test_format_summary_includes_failed_tests(run_ctest_module: ModuleType) -> N
 def test_truncate_output_limits(run_ctest_module: ModuleType) -> None:
     long_lines = "\n".join(["x" * 200 for _ in range(600)])
 
-    truncated_output, truncated, notice = run_ctest_module._truncate_output(long_lines)
+    truncated_output, truncated, notice = run_ctest_module._truncate_output(
+        long_lines
+    )
 
     assert truncated is True
     assert "Output truncated to 500 lines" in notice
@@ -117,7 +131,9 @@ def test_truncate_output_limits(run_ctest_module: ModuleType) -> None:
     assert truncated_output.rstrip().endswith(notice)
 
 
-def test_run_ctest_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_ctest_success(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -147,10 +163,21 @@ def test_run_ctest_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
 
     assert exit_code == 0
     assert "VALIDATION: PASSED" in output
-    assert ["ctest", "--output-on-failure", "-R", "foo", "-E", "bar", "-j", "4"] in commands
+    assert [
+        "ctest",
+        "--output-on-failure",
+        "-R",
+        "foo",
+        "-E",
+        "bar",
+        "-j",
+        "4",
+    ] in commands
 
 
-def test_run_ctest_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_ctest_timeout(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -161,13 +188,17 @@ def test_run_ctest_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
 
     monkeypatch.setattr(module.subprocess, "run", raise_timeout)
 
-    exit_code, output = module.run_ctest(build_dir=build_dir, timeout=1, output_mode="summary")
+    exit_code, output = module.run_ctest(
+        build_dir=build_dir, timeout=1, output_mode="summary"
+    )
 
     assert exit_code == 1
     assert "timed out" in output.lower()
 
 
-def test_run_ctest_missing_command(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_ctest_missing_command(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -188,18 +219,23 @@ def test_run_ctest_missing_build_dir(tmp_path: Path) -> None:
     module = load_module()
     build_dir = tmp_path / "missing"
 
-    exit_code, output = module.run_ctest(build_dir=build_dir, output_mode="json")
+    exit_code, output = module.run_ctest(
+        build_dir=build_dir, output_mode="json"
+    )
 
     payload = json.loads(output)
     assert exit_code == 1
     assert payload["metrics"]["build_dir_error"] is True
     assert payload["success"] is False
     assert any(
-        "CTestTestfile" in err or "Build directory" in err for err in payload["validation_errors"]
+        "CTestTestfile" in err or "Build directory" in err
+        for err in payload["validation_errors"]
     )
 
 
-def test_run_ctest_full_and_json_truncate(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_ctest_full_and_json_truncate(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -212,11 +248,15 @@ def test_run_ctest_full_and_json_truncate(monkeypatch: pytest.MonkeyPatch, tmp_p
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
-    exit_code_full, full_output = module.run_ctest(build_dir=build_dir, output_mode="full")
+    exit_code_full, full_output = module.run_ctest(
+        build_dir=build_dir, output_mode="full"
+    )
     assert exit_code_full == 1  # validation fails because total=0
     assert "Output truncated" in full_output
 
-    exit_code_json, json_output = module.run_ctest(build_dir=build_dir, output_mode="json")
+    exit_code_json, json_output = module.run_ctest(
+        build_dir=build_dir, output_mode="json"
+    )
     payload = json.loads(json_output)
 
     assert exit_code_json == 1
@@ -224,7 +264,9 @@ def test_run_ctest_full_and_json_truncate(monkeypatch: pytest.MonkeyPatch, tmp_p
     assert "Output truncated" in payload["truncation_notice"]
 
 
-def test_run_ctest_min_test_enforced(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_ctest_min_test_enforced(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -243,7 +285,9 @@ def test_run_ctest_min_test_enforced(monkeypatch: pytest.MonkeyPatch, tmp_path: 
 
 
 def test_main_wires_cli_arguments(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
 ) -> None:
     module = load_module()
     build_dir = tmp_path / "build"

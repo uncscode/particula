@@ -4,7 +4,8 @@ Change to MixinMolar classes, after PR integration.
 """
 
 import logging
-from typing import Optional, Union
+import warnings
+from typing import Any, List, Optional, Self, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -20,6 +21,7 @@ from particula.particles.activity_strategies import (
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityKappaParameter,
+    ActivityNonIdealBinary,
     ActivityStrategy,
 )
 
@@ -140,7 +142,14 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
             ```
         """
         self.pre_build_check()
-        return ActivityIdealMolar(molar_mass=self.molar_mass)
+        molar_mass_value = self.molar_mass
+        if molar_mass_value is None:
+            error_message = (
+                "Required parameter 'molar_mass' not set before building."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+        return ActivityIdealMolar(molar_mass=molar_mass_value)
 
 
 class ActivityKappaParameterBuilder(
@@ -271,4 +280,203 @@ class ActivityKappaParameterBuilder(
             density=self.density,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
             water_index=self.water_index,  # type: ignore
+        )
+
+
+class ActivityNonIdealBinaryBuilder(
+    BuilderABC, BuilderMolarMassMixin, BuilderDensityMixin
+):
+    """Builder for ActivityNonIdealBinary strategy using BAT model.
+
+    Provides a fluent interface to configure the binary non-ideal
+    activity strategy with validation of required parameters and optional
+    functional group metadata.
+
+    Required parameters (via setters or ``set_parameters``):
+        - molar_mass: Organic molar mass in kg/mol.
+        - oxygen2carbon: Oxygen to carbon atomic ratio (dimensionless).
+        - density: Organic density in kg/m^3.
+
+    Optional parameters:
+        - functional_group: Functional group identifier string or list.
+
+    Examples:
+        >>> import particula as par
+        >>> builder = (
+        ...     par.particles.ActivityNonIdealBinaryBuilder()
+        ...     .set_molar_mass(0.200, "kg/mol")
+        ...     .set_oxygen2carbon(0.4)
+        ...     .set_density(1400.0, "kg/m^3")
+        ...     .set_functional_group("carboxylic_acid")
+        ... )
+        >>> strategy = builder.build()
+        >>> strategy.get_name()
+        'ActivityNonIdealBinary'
+    """
+
+    def __init__(self) -> None:
+        """Initialize the builder with required parameters."""
+        required_parameters = ["molar_mass", "oxygen2carbon", "density"]
+        BuilderABC.__init__(self, required_parameters)
+        BuilderMolarMassMixin.__init__(self)
+        BuilderDensityMixin.__init__(self)
+        self.molar_mass: Optional[Union[float, NDArray[np.float64]]] = None
+        self.density: Optional[Union[float, NDArray[np.float64]]] = None
+        self.oxygen2carbon: Optional[float] = None
+        self.functional_group: Optional[Union[str, List[str]]] = None
+
+    @staticmethod
+    def _to_scalar(value: Union[float, NDArray[np.float64]]) -> float:
+        """Convert scalar-like input to float, rejecting multi-value arrays."""
+        array_value = np.asarray(value, dtype=np.float64)
+        if array_value.size != 1:
+            error_message = "Expected a scalar value for parameter assignment."
+            logger.error(error_message)
+            raise ValueError(error_message)
+        return float(array_value.item())
+
+    def set_oxygen2carbon(
+        self,
+        oxygen2carbon: Union[float, NDArray[np.float64]],
+        oxygen2carbon_units: Optional[str] = None,
+    ) -> Self:
+        """Set oxygen-to-carbon ratio ensuring nonnegativity.
+
+        Args:
+            oxygen2carbon: Oxygen to carbon atomic ratio (>=0).
+            oxygen2carbon_units: Ignored (dimensionless); warns if provided.
+
+        Returns:
+            Self for fluent chaining.
+
+        Raises:
+            ValueError: If ``oxygen2carbon`` contains negative values.
+        """
+        array_value = np.asarray(oxygen2carbon, dtype=np.float64)
+        if np.any(array_value < 0):
+            error_message = "Oxygen to carbon ratio must be nonnegative."
+            logger.error(error_message)
+            raise ValueError(error_message)
+        if oxygen2carbon_units is not None:
+            warnings.warn(
+                "Ignoring units for oxygen2carbon (dimensionless).",
+                UserWarning,
+                stacklevel=2,
+            )
+        self.oxygen2carbon = self._to_scalar(array_value)
+        return self
+
+    def set_functional_group(
+        self,
+        functional_group: Optional[Union[str, List[str]]],
+        functional_group_units: Optional[str] = None,
+    ) -> Self:
+        """Set optional functional group identifier(s).
+
+        Args:
+            functional_group: Functional group value; accepts None, str,
+                or list.
+            functional_group_units: Ignored; warns if provided.
+
+
+        Returns:
+            Self for fluent chaining.
+        """
+        if functional_group_units is not None:
+            warnings.warn(
+                "Ignoring units for functional_group.",
+                UserWarning,
+                stacklevel=2,
+            )
+        self.functional_group = functional_group
+        return self
+
+    def set_parameters(
+        self, parameters: dict[str, Any]
+    ) -> "ActivityNonIdealBinaryBuilder":
+        """Batch assign parameters with optional units and validation."""
+        missing = [p for p in self.required_parameters if p not in parameters]
+        if missing:
+            error_message = (
+                f"Missing required parameter(s): {', '.join(missing)}"
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+        valid_keys = set(
+            self.required_parameters
+            + [f"{key}_units" for key in self.required_parameters]
+            + ["functional_group", "functional_group_units"]
+        )
+        invalid_keys = [key for key in parameters if key not in valid_keys]
+        if invalid_keys:
+            error_message = (
+                f"Trying to set an invalid parameter(s) '{invalid_keys}'. "
+                f"The valid parameter(s) '{valid_keys}'."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+        if "molar_mass_units" in parameters:
+            self.set_molar_mass(
+                parameters["molar_mass"], parameters["molar_mass_units"]
+            )
+        else:
+            logger.warning("Using default units for parameter: 'molar_mass'.")
+            self.set_molar_mass(parameters["molar_mass"], "kg/mol")
+
+        if "oxygen2carbon_units" in parameters:
+            self.set_oxygen2carbon(
+                parameters["oxygen2carbon"],
+                parameters["oxygen2carbon_units"],
+            )
+        else:
+            logger.warning(
+                "Using default units for parameter: 'oxygen2carbon'."
+            )
+            self.set_oxygen2carbon(parameters["oxygen2carbon"])
+
+        if "density_units" in parameters:
+            self.set_density(parameters["density"], parameters["density_units"])
+        else:
+            logger.warning("Using default units for parameter: 'density'.")
+            self.set_density(parameters["density"], "kg/m^3")
+
+        if "functional_group" in parameters:
+            self.set_functional_group(
+                parameters["functional_group"],
+                parameters.get("functional_group_units"),
+            )
+
+        return self
+
+    def build(self) -> ActivityNonIdealBinary:
+        """Validate required inputs then build the strategy."""
+        self.pre_build_check()
+        if self.molar_mass is None:
+            error_message = (
+                "Required parameter 'molar_mass' not set before building."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+        if self.oxygen2carbon is None:
+            error_message = (
+                "Required parameter 'oxygen2carbon' not set before building."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+        if self.density is None:
+            error_message = (
+                "Required parameter 'density' not set before building."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+        molar_mass_value = self._to_scalar(self.molar_mass)
+        oxygen2carbon_value = self._to_scalar(self.oxygen2carbon)
+        density_value = self._to_scalar(self.density)
+        return ActivityNonIdealBinary(
+            molar_mass=molar_mass_value,
+            oxygen2carbon=oxygen2carbon_value,
+            density=density_value,
+            functional_group=self.functional_group,
         )

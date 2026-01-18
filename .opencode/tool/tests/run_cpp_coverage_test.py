@@ -11,11 +11,15 @@ from typing import List
 
 import pytest
 
-RUN_CPP_COVERAGE_PATH = Path(__file__).resolve().parent.parent / "run_cpp_coverage.py"
+RUN_CPP_COVERAGE_PATH = (
+    Path(__file__).resolve().parent.parent / "run_cpp_coverage.py"
+)
 
 
 def load_module() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("run_cpp_coverage", RUN_CPP_COVERAGE_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "run_cpp_coverage", RUN_CPP_COVERAGE_PATH
+    )
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     import sys
@@ -85,7 +89,9 @@ LOW_COVERAGE_OUTPUT = json.dumps(
 
 
 class DummyProcess:
-    def __init__(self, stdout: str = "", stderr: str = "", returncode: int = 0) -> None:
+    def __init__(
+        self, stdout: str = "", stderr: str = "", returncode: int = 0
+    ) -> None:
         self.stdout = stdout
         self.stderr = stderr
         self.returncode = returncode
@@ -113,7 +119,9 @@ def test_coverage_metrics_zero_totals(coverage_module: ModuleType) -> None:
     assert metrics.function_percent == 0.0
 
 
-def test_parse_gcovr_output_parses_totals_and_files(coverage_module: ModuleType) -> None:
+def test_parse_gcovr_output_parses_totals_and_files(
+    coverage_module: ModuleType,
+) -> None:
     metrics = coverage_module.parse_gcovr_output(GCOVR_OUTPUT)
 
     assert "__total__" in metrics
@@ -125,7 +133,9 @@ def test_parse_gcovr_output_parses_totals_and_files(coverage_module: ModuleType)
     assert metrics["src/example_lib.cpp"].branches_total == 16
 
 
-def test_parse_gcovr_output_invalid_json_raises(coverage_module: ModuleType) -> None:
+def test_parse_gcovr_output_invalid_json_raises(
+    coverage_module: ModuleType,
+) -> None:
     with pytest.raises(RuntimeError):
         coverage_module.parse_gcovr_output("{not-json}")
 
@@ -142,7 +152,9 @@ def test_validate_threshold_pass_and_fail(coverage_module: ModuleType) -> None:
     assert "below" in msg_low
 
 
-def test_format_summary_includes_threshold_and_files(coverage_module: ModuleType) -> None:
+def test_format_summary_includes_threshold_and_files(
+    coverage_module: ModuleType,
+) -> None:
     metrics = coverage_module.CoverageMetrics(50, 100, 10, 20, 5, 10)
     summary = coverage_module.format_summary(
         metrics,
@@ -161,7 +173,9 @@ def test_format_summary_includes_threshold_and_files(coverage_module: ModuleType
     assert "VALIDATION: PASSED" in summary
 
 
-def test_run_coverage_success_with_args(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_success_with_args(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -190,14 +204,20 @@ def test_run_coverage_success_with_args(monkeypatch: pytest.MonkeyPatch, tmp_pat
     assert payload["success"] is True
     assert payload["tool"] == "llvm-cov"
     assert payload["html_dir"] == str(html_dir)
-    assert payload["metrics"]["__total__"]["line_percent"] == pytest.approx(77.45098, rel=1e-3)
-    assert payload["metrics"]["src/example_lib.cpp"]["branch_percent"] == pytest.approx(75.0)
+    assert payload["metrics"]["__total__"]["line_percent"] == pytest.approx(
+        77.45098, rel=1e-3
+    )
+    assert payload["metrics"]["src/example_lib.cpp"][
+        "branch_percent"
+    ] == pytest.approx(75.0)
     assert any("--llvm-cov" in cmd for cmd in commands)
     assert any("--filter" in cmd for cmd in commands)
     assert any("--html" in cmd for cmd in commands)
 
 
-def test_run_coverage_threshold_failure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_threshold_failure(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -217,7 +237,9 @@ def test_run_coverage_threshold_failure(monkeypatch: pytest.MonkeyPatch, tmp_pat
     assert exit_code == 1
     assert payload["success"] is False
     assert payload["files_below_threshold"]
-    assert any("below" in err or "code" in err for err in payload["validation_errors"])
+    assert any(
+        "below" in err or "code" in err for err in payload["validation_errors"]
+    )
 
 
 def test_run_coverage_missing_build_dir_json(tmp_path: Path) -> None:
@@ -236,7 +258,9 @@ def test_run_coverage_missing_build_dir_json(tmp_path: Path) -> None:
     assert any("does not exist" in err for err in payload["validation_errors"])
 
 
-def test_run_coverage_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_timeout(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -246,13 +270,17 @@ def test_run_coverage_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
 
     monkeypatch.setattr(module.subprocess, "run", raise_timeout)
 
-    exit_code, output = module.run_coverage(build_dir=build_dir, timeout=1, output_mode="summary")
+    exit_code, output = module.run_coverage(
+        build_dir=build_dir, timeout=1, output_mode="summary"
+    )
 
     assert exit_code == 1
     assert "timed out" in output.lower()
 
 
-def test_run_coverage_missing_gcovr(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_missing_gcovr(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -268,7 +296,9 @@ def test_run_coverage_missing_gcovr(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert "command not found" in output
 
 
-def test_run_coverage_non_zero_exit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_non_zero_exit(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -278,7 +308,9 @@ def test_run_coverage_non_zero_exit(monkeypatch: pytest.MonkeyPatch, tmp_path: P
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
-    exit_code, output = module.run_coverage(build_dir=build_dir, output_mode="json")
+    exit_code, output = module.run_coverage(
+        build_dir=build_dir, output_mode="json"
+    )
 
     payload = json.loads(output)
     assert exit_code == 1
@@ -286,24 +318,32 @@ def test_run_coverage_non_zero_exit(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert any("exited" in err for err in payload["validation_errors"])
 
 
-def test_run_coverage_full_output_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_full_output_success(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
 
     def fake_run(cmd: List[str], **_: object) -> DummyProcess:  # type: ignore[override]
-        return DummyProcess(stdout=GCOVR_OUTPUT, stderr="stderr-text", returncode=0)
+        return DummyProcess(
+            stdout=GCOVR_OUTPUT, stderr="stderr-text", returncode=0
+        )
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
-    exit_code, output = module.run_coverage(build_dir=build_dir, output_mode="full")
+    exit_code, output = module.run_coverage(
+        build_dir=build_dir, output_mode="full"
+    )
 
     assert exit_code == 0
     assert "line_covered" in output
     assert "stderr-text" in output
 
 
-def test_run_coverage_truncates_output(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_coverage_truncates_output(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     module = load_module()
     build_dir = tmp_path / "build"
     build_dir.mkdir()
@@ -315,7 +355,9 @@ def test_run_coverage_truncates_output(monkeypatch: pytest.MonkeyPatch, tmp_path
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
-    exit_code, output = module.run_coverage(build_dir=build_dir, output_mode="json")
+    exit_code, output = module.run_coverage(
+        build_dir=build_dir, output_mode="json"
+    )
 
     payload = json.loads(output)
     assert exit_code == 1  # validation fails because totals are zero
@@ -324,7 +366,9 @@ def test_run_coverage_truncates_output(monkeypatch: pytest.MonkeyPatch, tmp_path
 
 
 def test_main_wires_arguments(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
 ) -> None:
     module = load_module()
     build_dir = tmp_path / "build"

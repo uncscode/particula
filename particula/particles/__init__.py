@@ -31,6 +31,7 @@ from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
     ActivityIdealMolarBuilder,
     ActivityKappaParameterBuilder,
+    ActivityNonIdealBinaryBuilder,
 )
 from particula.particles.activity_factories import (
     ActivityFactory,
