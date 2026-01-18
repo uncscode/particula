@@ -1,0 +1,21 @@
+{
+  "name": "adw-build",
+  "version": "1.0.0",
+  "description": "Build implementation plans using the adw-build agent.",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Build Implementation",
+      "agent": "adw-build",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 3600,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 10.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}
