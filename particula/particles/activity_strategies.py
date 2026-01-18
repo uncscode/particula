@@ -8,7 +8,7 @@ parameterizations.
 # pyright: reportArgumentType=false
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -269,7 +269,7 @@ class ActivityNonIdealBinary(ActivityStrategy):
         molar_mass: float,
         oxygen2carbon: float,
         density: float,
-        functional_group: Optional[Union[str, list[str]]] = None,
+        functional_group: Optional[Union[str, List[str]]] = None,
     ) -> None:
         """Initialize the binary non-ideal activity strategy."""
         self.molar_mass_kg = float(molar_mass)
