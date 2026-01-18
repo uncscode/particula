@@ -1,0 +1,21 @@
+{
+  "name": "plan-work-multireview",
+  "version": "1.1.0",
+  "description": "Generate implementation plans using multi-agent research and sequential review (architecture → implementation → performance → testing → completeness)",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Generate Multi-Review Implementation Plan",
+      "agent": "plan_work_multireview",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}
