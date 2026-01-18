@@ -45,16 +45,30 @@ def coefficients_c(
     oxygen2carbon: Union[float, NDArray[np.float64]],
     fit_values: List[float],
 ) -> NDArray[np.float64]:
-    """Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
+    """Compute fitted BAT coefficients from published parameters.
 
     Args:
-        - molar_mass_ratio : The molar mass ratio of water to organic
-          matter.
-        - oxygen2carbon : The oxygen to carbon ratio.
-        - fit_values : The fit values for the activity model.
+        molar_mass_ratio: Water-to-organic molar mass ratio. Scalars return
+            scalars, array inputs return ``np.ndarray``.
+        oxygen2carbon: Oxygen-to-carbon ratio. Scalars return scalars, array
+            inputs return ``np.ndarray``.
+        fit_values: Fit parameters (a1,a2,s) from ``FitValues``.
 
     Returns:
-        - The coefficients for the activity model.
+        NDArray[np.float64]: Computed coefficient array matching ``fit_values``
+            shape.
+
+    Examples:
+        >>> from particula.activity.bat_coefficients import (
+        ...     coefficients_c,
+        ...     G19_FIT_MID,
+        ... )
+        >>> coefficients_c(
+        ...     molar_mass_ratio=0.5,
+        ...     oxygen2carbon=1.2,
+        ...     fit_values=G19_FIT_MID.a1,
+        ... )
+        0.025427174197017652
     """
     # force to array
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
