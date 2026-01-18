@@ -11,7 +11,9 @@ from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
     ActivityIdealMolarBuilder,
     ActivityKappaParameterBuilder,
+    ActivityNonIdealBinaryBuilder,
 )
+from particula.particles.activity_strategies import ActivityNonIdealBinary
 
 
 def test_build_ideal_activity_mass():
@@ -174,3 +176,106 @@ def test_build_kappa_parameter_activity_dict():
     with pytest.raises(ValueError) as excinfo:
         builder_missing2.set_parameters(parameters)
     assert "Missing required parameter(s): water_index" in str(excinfo.value)
+
+
+def test_activity_non_ideal_binary_builder_success_and_optional_group():
+    """Build succeeds with required params and preserves optional group."""
+    builder = ActivityNonIdealBinaryBuilder()
+    strategy = (
+        builder.set_molar_mass(0.200, "kg/mol")
+        .set_oxygen2carbon(0.4)
+        .set_density(1400.0, "kg/m^3")
+        .set_functional_group("alcohol")
+        .build()
+    )
+    assert isinstance(strategy, ActivityNonIdealBinary)
+    assert strategy.functional_group == "alcohol"
+    assert strategy.get_name() == "ActivityNonIdealBinary"
+
+
+def test_activity_non_ideal_binary_builder_functional_group_list():
+    """Optional functional_group accepts list and is preserved."""
+    functional_groups = ["carboxylic_acid", "alcohol"]
+    strategy = (
+        ActivityNonIdealBinaryBuilder()
+        .set_molar_mass(0.150, "kg/mol")
+        .set_oxygen2carbon(0.5)
+        .set_density(1300.0, "kg/m^3")
+        .set_functional_group(functional_groups)
+        .build()
+    )
+    assert strategy.functional_group == functional_groups
+
+
+def test_activity_non_ideal_binary_builder_warns_on_units():
+    """Units args for dimensionless params warn and are ignored."""
+    builder = ActivityNonIdealBinaryBuilder()
+    with pytest.warns(UserWarning):
+        builder.set_oxygen2carbon(0.3, oxygen2carbon_units="ratio")
+    with pytest.warns(UserWarning):
+        builder.set_functional_group(
+            "alcohol", functional_group_units="unitless"
+        )
+
+
+def test_activity_non_ideal_binary_builder_negative_oxygen2carbon_raises():
+    """Negative oxygen2carbon raises ValueError."""
+    builder = ActivityNonIdealBinaryBuilder()
+    with pytest.raises(ValueError):
+        builder.set_oxygen2carbon(-0.1)
+
+
+def test_activity_non_ideal_binary_builder_missing_required_on_build():
+    """Missing required parameters triggers pre_build_check error."""
+    builder = ActivityNonIdealBinaryBuilder()
+    builder.set_molar_mass(0.200, "kg/mol")
+    builder.set_density(1400.0, "kg/m^3")
+    with pytest.raises(ValueError):
+        builder.build()
+
+
+def test_activity_non_ideal_binary_builder_fluent_returns_self():
+    """Fluent setters return the builder instance."""
+    builder = ActivityNonIdealBinaryBuilder()
+    assert builder.set_molar_mass(0.2, "kg/mol") is builder
+    assert builder.set_density(1000.0, "kg/m^3") is builder
+    assert builder.set_oxygen2carbon(0.3) is builder
+    assert builder.set_functional_group("alcohol") is builder
+
+
+def test_activity_non_ideal_binary_builder_unit_conversion_mixins():
+    """Mixin setters perform unit conversion before build."""
+    strategy = (
+        ActivityNonIdealBinaryBuilder()
+        .set_molar_mass(200, "g/mol")
+        .set_oxygen2carbon(0.4)
+        .set_density(1.4, "g/cm^3")
+        .build()
+    )
+    assert strategy.molar_mass_kg == pytest.approx(0.2, rel=1e-6)
+    assert strategy.density == pytest.approx(1400.0, rel=1e-6)
+
+
+def test_activity_non_ideal_binary_builder_set_parameters_supports_units():
+    """set_parameters handles units and optional functional_group."""
+    builder = ActivityNonIdealBinaryBuilder()
+    parameters = {
+        "molar_mass": 200,
+        "molar_mass_units": "g/mol",
+        "oxygen2carbon": 0.45,
+        "density": 1.25,
+        "density_units": "g/cm^3",
+        "functional_group": "ether",
+    }
+    builder.set_parameters(parameters)
+    strategy = builder.build()
+    assert strategy.functional_group == "ether"
+    assert strategy.molar_mass_kg == pytest.approx(0.2, rel=1e-6)
+    assert strategy.oxygen2carbon == pytest.approx(0.45, rel=1e-6)
+
+
+def test_activity_non_ideal_binary_builder_set_parameters_missing_required():
+    """set_parameters errors on missing required keys."""
+    builder = ActivityNonIdealBinaryBuilder()
+    with pytest.raises(ValueError):
+        builder.set_parameters({"molar_mass": 0.2, "density": 1400.0})

@@ -10,11 +10,15 @@ from typing import List, Tuple
 
 import pytest
 
-RUN_CPP_LINTERS_PATH = Path(__file__).resolve().parent.parent / "run_cpp_linters.py"
+RUN_CPP_LINTERS_PATH = (
+    Path(__file__).resolve().parent.parent / "run_cpp_linters.py"
+)
 
 
 def load_module() -> ModuleType:
-    spec = importlib.util.spec_from_file_location("run_cpp_linters", RUN_CPP_LINTERS_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "run_cpp_linters", RUN_CPP_LINTERS_PATH
+    )
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
     import sys
@@ -56,16 +60,24 @@ def test_get_cpp_files_filters_and_sorts(
 def test_check_linter_available_true_false(
     monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType
 ) -> None:
-    monkeypatch.setattr(run_cpp_linters_module.shutil, "which", lambda *_: "/usr/bin/tool")
+    monkeypatch.setattr(
+        run_cpp_linters_module.shutil, "which", lambda *_: "/usr/bin/tool"
+    )
     assert run_cpp_linters_module.check_linter_available("dummy") is True
 
     monkeypatch.setattr(run_cpp_linters_module.shutil, "which", lambda *_: None)
     assert run_cpp_linters_module.check_linter_available("dummy") is False
 
 
-def test_helper_truncate_and_boundaries(run_cpp_linters_module: ModuleType) -> None:
-    long_lines = "\n".join(["line"] * (run_cpp_linters_module.OUTPUT_LINE_LIMIT + 5))
-    truncated, was_truncated, notice = run_cpp_linters_module._truncate_output(long_lines)
+def test_helper_truncate_and_boundaries(
+    run_cpp_linters_module: ModuleType,
+) -> None:
+    long_lines = "\n".join(
+        ["line"] * (run_cpp_linters_module.OUTPUT_LINE_LIMIT + 5)
+    )
+    truncated, was_truncated, notice = run_cpp_linters_module._truncate_output(
+        long_lines
+    )
 
     assert was_truncated is True
     assert "truncated" in notice
@@ -100,13 +112,17 @@ def test_run_subprocess_file_not_found(
     assert timed_out is False
 
 
-def test_parse_linters_arg_defaults_and_trim(run_cpp_linters_module: ModuleType) -> None:
+def test_parse_linters_arg_defaults_and_trim(
+    run_cpp_linters_module: ModuleType,
+) -> None:
     assert run_cpp_linters_module.parse_linters_arg("") == [
         "clang-format",
         "clang-tidy",
         "cppcheck",
     ]
-    assert run_cpp_linters_module.parse_linters_arg(" clang-format , cppcheck ") == [
+    assert run_cpp_linters_module.parse_linters_arg(
+        " clang-format , cppcheck "
+    ) == [
         "clang-format",
         "cppcheck",
     ]
@@ -115,27 +131,39 @@ def test_parse_linters_arg_defaults_and_trim(run_cpp_linters_module: ModuleType)
 def test_clang_format_skips_when_missing(
     monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType
 ) -> None:
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: False)
-    result = run_cpp_linters_module.run_clang_format([], auto_fix=False, timeout=10)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: False
+    )
+    result = run_cpp_linters_module.run_clang_format(
+        [], auto_fix=False, timeout=10
+    )
     assert result.skipped is True
     assert "not found" in (result.error_message or "")
 
 
 def test_clang_format_reports_issues(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
     commands: List[List[str]] = []
 
-    def fake_run(cmd: List[str], timeout: int) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        cmd: List[str], timeout: int
+    ) -> Tuple[int, str, str, bool, str | None]:
         commands.append(list(cmd))
         return 1, f"{files[0]}: warning: format", "", False, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
 
-    result = run_cpp_linters_module.run_clang_format(files, auto_fix=False, timeout=5)
+    result = run_cpp_linters_module.run_clang_format(
+        files, auto_fix=False, timeout=5
+    )
 
     assert result.success is False
     assert result.files_with_issues > 0
@@ -144,10 +172,14 @@ def test_clang_format_reports_issues(
 
 
 def test_clang_tidy_requires_compile_commands(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
     result = run_cpp_linters_module.run_clang_tidy(
         files, build_dir=str(tmp_path / "build"), auto_fix=False, timeout=5
@@ -158,15 +190,21 @@ def test_clang_tidy_requires_compile_commands(
 
 
 def test_clang_tidy_parses_warnings(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     (build_dir / "compile_commands.json").write_text("[]")
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
-    def fake_run(*_: object, **__: object) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        *_: object, **__: object
+    ) -> Tuple[int, str, str, bool, str | None]:
         return 0, f"{files[0]}:10: warning: test", "", False, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
@@ -181,18 +219,24 @@ def test_clang_tidy_parses_warnings(
 
 
 def test_clang_tidy_batching(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     file_count = run_cpp_linters_module.CLANG_TIDY_BATCH_SIZE + 5
     files = create_cpp_files(tmp_path, count=file_count)
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     (build_dir / "compile_commands.json").write_text("[]")
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
     commands: List[List[str]] = []
 
-    def fake_run(cmd: List[str], timeout: int) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        cmd: List[str], timeout: int
+    ) -> Tuple[int, str, str, bool, str | None]:
         commands.append(list(cmd))
         return 0, "", "", False, None
 
@@ -210,16 +254,19 @@ def test_clang_tidy_batching(
 
 
 def test_cppcheck_parses_warnings_and_errors(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
-    def fake_run(*_: object, **__: object) -> Tuple[int, str, str, bool, str | None]:
-        stderr = (
-            f"{files[0]}:10: (warning) thing\n"
-            f"{files[0]}:12: (error) boom"
-        )
+    def fake_run(
+        *_: object, **__: object
+    ) -> Tuple[int, str, str, bool, str | None]:
+        stderr = f"{files[0]}:10: (warning) thing\n{files[0]}:12: (error) boom"
         return 1, "", stderr, False, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
@@ -233,11 +280,19 @@ def test_cppcheck_parses_warnings_and_errors(
 
 
 def test_run_cpp_linters_all_skipped(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: [tmp_path / "file.cpp"])
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: False)
+    monkeypatch.setattr(
+        run_cpp_linters_module,
+        "get_cpp_files",
+        lambda *_: [tmp_path / "file.cpp"],
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: False
+    )
 
     exit_code, summary = run_cpp_linters_module.run_cpp_linters(
         source_dir=str(tmp_path),
@@ -254,10 +309,14 @@ def test_run_cpp_linters_all_skipped(
 
 
 def test_run_cpp_linters_no_files_found(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: [])
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
     exit_code, summary = run_cpp_linters_module.run_cpp_linters(
         source_dir=str(tmp_path),
@@ -273,11 +332,17 @@ def test_run_cpp_linters_no_files_found(
 
 
 def test_run_cpp_linters_missing_build_dir(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: files)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "get_cpp_files", lambda *_: files
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
     exit_code, summary = run_cpp_linters_module.run_cpp_linters(
         source_dir=str(tmp_path),
@@ -293,13 +358,21 @@ def test_run_cpp_linters_missing_build_dir(
 
 
 def test_run_cpp_linters_success_with_warnings(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: files)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "get_cpp_files", lambda *_: files
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
-    def fake_run(cmd: List[str], timeout: int) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        cmd: List[str], timeout: int
+    ) -> Tuple[int, str, str, bool, str | None]:
         if cmd[0] == "clang-tidy":
             return 0, f"{files[0]}:10: warning: test", "", False, None
         return 0, "", "", False, None
@@ -325,13 +398,21 @@ def test_run_cpp_linters_success_with_warnings(
 
 
 def test_run_cpp_linters_failure_on_errors(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: files)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "get_cpp_files", lambda *_: files
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
-    def fake_run(*_: object, **__: object) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        *_: object, **__: object
+    ) -> Tuple[int, str, str, bool, str | None]:
         return 1, "", f"{files[0]}:10: (error) fail", False, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
@@ -350,14 +431,24 @@ def test_run_cpp_linters_failure_on_errors(
 
 
 def test_run_cpp_linters_json_includes_truncated(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    long_output = "\n".join(["line"] * (run_cpp_linters_module.OUTPUT_LINE_LIMIT + 10))
-    monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: files)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    long_output = "\n".join(
+        ["line"] * (run_cpp_linters_module.OUTPUT_LINE_LIMIT + 10)
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "get_cpp_files", lambda *_: files
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
-    def fake_run(*_: object, **__: object) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        *_: object, **__: object
+    ) -> Tuple[int, str, str, bool, str | None]:
         return 0, long_output, "", False, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
@@ -396,13 +487,21 @@ def test_format_full_output_includes_truncated_notice(
 
 
 def test_timeout_handling(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "get_cpp_files", lambda *_: files)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "get_cpp_files", lambda *_: files
+    )
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
-    def fake_run(*_: object, **__: object) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        *_: object, **__: object
+    ) -> Tuple[int, str, str, bool, str | None]:
         return 1, "", "", True, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
@@ -414,14 +513,20 @@ def test_timeout_handling(
 
 
 def test_auto_fix_flags_passed(
-    monkeypatch: pytest.MonkeyPatch, run_cpp_linters_module: ModuleType, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    run_cpp_linters_module: ModuleType,
+    tmp_path: Path,
 ) -> None:
     files = create_cpp_files(tmp_path)
-    monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
+    monkeypatch.setattr(
+        run_cpp_linters_module, "check_linter_available", lambda *_: True
+    )
 
     commands: List[List[str]] = []
 
-    def fake_run(cmd: List[str], timeout: int) -> Tuple[int, str, str, bool, str | None]:
+    def fake_run(
+        cmd: List[str], timeout: int
+    ) -> Tuple[int, str, str, bool, str | None]:
         commands.append(list(cmd))
         return 0, "", "", False, None
 

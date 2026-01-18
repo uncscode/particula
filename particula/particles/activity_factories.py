@@ -9,11 +9,13 @@ from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
     ActivityIdealMolarBuilder,
     ActivityKappaParameterBuilder,
+    ActivityNonIdealBinaryBuilder,
 )
 from particula.particles.activity_strategies import (
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityKappaParameter,
+    ActivityNonIdealBinary,
 )
 
 
@@ -25,8 +27,14 @@ class ActivityFactory(
             ActivityIdealMassBuilder,
             ActivityIdealMolarBuilder,
             ActivityKappaParameterBuilder,
+            ActivityNonIdealBinaryBuilder,
         ],
-        Union[ActivityIdealMass, ActivityIdealMolar, ActivityKappaParameter],
+        Union[
+            ActivityIdealMass,
+            ActivityIdealMolar,
+            ActivityKappaParameter,
+            ActivityNonIdealBinary,
+        ],
     ]
 ):
     """Factory for creating activity strategy builders for liquid mixtures.
@@ -85,4 +93,6 @@ class ActivityFactory(
             "molar_ideal": ActivityIdealMolarBuilder(),
             "kappa_parameter": ActivityKappaParameterBuilder(),
             "kappa": ActivityKappaParameterBuilder(),
+            "non_ideal_binary": ActivityNonIdealBinaryBuilder(),
+            "binary_non_ideal": ActivityNonIdealBinaryBuilder(),
         }

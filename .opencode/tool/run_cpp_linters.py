@@ -69,7 +69,6 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         A tuple of truncated output, whether truncation occurred, and a
         human-readable notice describing truncation.
     """
-
     lines = output.splitlines()
     truncated = False
     notices: List[str] = []
@@ -92,16 +91,16 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
     return joined, truncated, notice
 
 
-def _bounded_append(collection: List[str], value: str, limit: int = ISSUE_CAPTURE_LIMIT) -> None:
+def _bounded_append(
+    collection: List[str], value: str, limit: int = ISSUE_CAPTURE_LIMIT
+) -> None:
     """Append while respecting a maximum size."""
-
     if len(collection) < limit:
         collection.append(value)
 
 
 def check_linter_available(linter: str) -> bool:
     """Check if linter command is available on PATH."""
-
     return shutil.which(linter) is not None
 
 
@@ -114,16 +113,19 @@ def get_cpp_files(source_dir: str) -> List[Path]:
     Returns:
         Sorted list of discovered C/C++ file paths.
     """
-
     root = Path(source_dir)
     extensions = {".cpp", ".cc", ".cxx", ".c", ".hpp", ".h"}
     files = {
-        path for path in root.rglob("*") if path.suffix.lower() in extensions and path.is_file()
+        path
+        for path in root.rglob("*")
+        if path.suffix.lower() in extensions and path.is_file()
     }
     return sorted(files, key=str)
 
 
-def _run_subprocess(cmd: Sequence[str], timeout: int) -> Tuple[int, str, str, bool, Optional[str]]:
+def _run_subprocess(
+    cmd: Sequence[str], timeout: int
+) -> Tuple[int, str, str, bool, Optional[str]]:
     """Run subprocess with timeout handling.
 
     Args:
@@ -135,11 +137,14 @@ def _run_subprocess(cmd: Sequence[str], timeout: int) -> Tuple[int, str, str, bo
         optional error message when execution failed before running the
         command.
     """
-
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=timeout
+        )
         return proc.returncode, proc.stdout, proc.stderr, False, None
-    except subprocess.TimeoutExpired as exc:  # pragma: no cover - exercised via unit test
+    except (
+        subprocess.TimeoutExpired
+    ) as exc:  # pragma: no cover - exercised via unit test
         stdout = str(exc.stdout or "")
         stderr = str(exc.stderr or "")
         return 1, stdout, stderr, True, None
@@ -149,7 +154,9 @@ def _run_subprocess(cmd: Sequence[str], timeout: int) -> Tuple[int, str, str, bo
         return 1, "", str(exc), False, str(exc)
 
 
-def run_clang_format(files: List[Path], auto_fix: bool, timeout: int) -> LinterResult:
+def run_clang_format(
+    files: List[Path], auto_fix: bool, timeout: int
+) -> LinterResult:
     """Run clang-format over the provided file list.
 
     Args:
@@ -160,7 +167,6 @@ def run_clang_format(files: List[Path], auto_fix: bool, timeout: int) -> LinterR
     Returns:
         Populated :class:`LinterResult` for clang-format execution.
     """
-
     result = LinterResult("clang-format")
 
     if not check_linter_available("clang-format"):
@@ -182,7 +188,9 @@ def run_clang_format(files: List[Path], auto_fix: bool, timeout: int) -> LinterR
         cmd.extend(["--dry-run", "--Werror"])
     cmd.extend(str(path) for path in files)
 
-    exit_code, stdout, stderr, timed_out, error_message = _run_subprocess(cmd, timeout)
+    exit_code, stdout, stderr, timed_out, error_message = _run_subprocess(
+        cmd, timeout
+    )
     result.exit_code = exit_code
     result.timeout = timed_out
 
@@ -216,7 +224,9 @@ def run_clang_format(files: List[Path], auto_fix: bool, timeout: int) -> LinterR
                     issue_files.add(path)
         result.files_with_issues = len(issue_files) or len(files)
         if not result.issues:
-            _bounded_append(result.issues, "clang-format reported formatting differences")
+            _bounded_append(
+                result.issues, "clang-format reported formatting differences"
+            )
     else:
         result.success = True
 
@@ -237,7 +247,6 @@ def run_clang_tidy(
     Returns:
         Populated :class:`LinterResult` detailing clang-tidy execution.
     """
-
     result = LinterResult("clang-tidy")
 
     if not check_linter_available("clang-tidy"):
@@ -275,10 +284,14 @@ def run_clang_tidy(
             cmd.append("--fix")
         cmd.extend(str(path) for path in chunk)
 
-        exit_code, stdout, stderr, timed_out, error_message = _run_subprocess(cmd, timeout)
+        exit_code, stdout, stderr, timed_out, error_message = _run_subprocess(
+            cmd, timeout
+        )
         combined_output = (stdout + "\n" + stderr).strip()
         truncated_output, was_truncated, _ = _truncate_output(combined_output)
-        result.stdout = "\n".join(filter(None, [result.stdout, truncated_output])).strip()
+        result.stdout = "\n".join(
+            filter(None, [result.stdout, truncated_output])
+        ).strip()
         result.truncated = result.truncated or was_truncated
 
         if error_message:
@@ -289,7 +302,9 @@ def run_clang_tidy(
         if timed_out:
             result.success = False
             result.timeout = True
-            result.error_message = f"clang-tidy timed out after {timeout} seconds"
+            result.error_message = (
+                f"clang-tidy timed out after {timeout} seconds"
+            )
             return result
 
         result.exit_code = max(result.exit_code, exit_code)
@@ -319,7 +334,6 @@ def run_cppcheck(files: List[Path], timeout: int) -> LinterResult:
     Returns:
         Populated :class:`LinterResult` for cppcheck execution.
     """
-
     result = LinterResult("cppcheck")
 
     if not check_linter_available("cppcheck"):
@@ -343,7 +357,9 @@ def run_cppcheck(files: List[Path], timeout: int) -> LinterResult:
     ]
     cmd.extend(str(path) for path in files)
 
-    exit_code, stdout, stderr, timed_out, error_message = _run_subprocess(cmd, timeout)
+    exit_code, stdout, stderr, timed_out, error_message = _run_subprocess(
+        cmd, timeout
+    )
     result.exit_code = exit_code
     result.timeout = timed_out
 
@@ -380,7 +396,9 @@ def run_cppcheck(files: List[Path], timeout: int) -> LinterResult:
     return result
 
 
-def format_summary(results: List[LinterResult], duration: float, all_skipped: bool) -> str:
+def format_summary(
+    results: List[LinterResult], duration: float, all_skipped: bool
+) -> str:
     """Format human-readable summary for linter results.
 
     Args:
@@ -391,7 +409,6 @@ def format_summary(results: List[LinterResult], duration: float, all_skipped: bo
     Returns:
         Multi-line summary string with validation banner.
     """
-
     lines: List[str] = []
     lines.append("=" * 60)
     lines.append("C++ LINTERS SUMMARY")
@@ -451,7 +468,6 @@ def format_summary(results: List[LinterResult], duration: float, all_skipped: bo
 
 def format_full_output(results: List[LinterResult], summary: str) -> str:
     """Format full output with per-linter stdout/stderr and summary."""
-
     lines: List[str] = []
     for result in results:
         lines.append("=" * 60)
@@ -470,9 +486,10 @@ def format_full_output(results: List[LinterResult], summary: str) -> str:
     return "\n".join(lines)
 
 
-def format_json_output(results: List[LinterResult], duration: float, all_skipped: bool) -> str:
+def format_json_output(
+    results: List[LinterResult], duration: float, all_skipped: bool
+) -> str:
     """Format JSON output with bounded content."""
-
     payload = {
         "duration": duration,
         "all_skipped": all_skipped,
@@ -497,7 +514,8 @@ def format_json_output(results: List[LinterResult], duration: float, all_skipped
         ],
     }
     payload["success"] = (
-        not any(not r.success and not r.skipped for r in results) and not all_skipped
+        not any(not r.success and not r.skipped for r in results)
+        and not all_skipped
     )
     return json.dumps(payload, indent=2)
 
@@ -524,7 +542,6 @@ def run_cpp_linters(
     Returns:
         Tuple of exit code (0 on success) and formatted output string.
     """
-
     normalized_linters = [l.strip() for l in linters if l.strip()]
     if not normalized_linters:
         normalized_linters = ["clang-format", "clang-tidy", "cppcheck"]
@@ -541,13 +558,18 @@ def run_cpp_linters(
 
     if "clang-format" in normalized_linters:
         results.append(
-            run_clang_format(file_list, auto_fix=auto_fix, timeout=timeouts["clang-format"])
+            run_clang_format(
+                file_list, auto_fix=auto_fix, timeout=timeouts["clang-format"]
+            )
         )
 
     if "clang-tidy" in normalized_linters:
         results.append(
             run_clang_tidy(
-                file_list, build_dir=build_dir, auto_fix=auto_fix, timeout=timeouts["clang-tidy"]
+                file_list,
+                build_dir=build_dir,
+                auto_fix=auto_fix,
+                timeout=timeouts["clang-tidy"],
             )
         )
 
@@ -556,8 +578,12 @@ def run_cpp_linters(
 
     duration = time.perf_counter() - start_time
 
-    all_skipped = all(result.skipped for result in results) if results else False
-    any_failures = any((not r.success) and not r.skipped for r in results) or all_skipped
+    all_skipped = (
+        all(result.skipped for result in results) if results else False
+    )
+    any_failures = (
+        any((not r.success) and not r.skipped for r in results) or all_skipped
+    )
 
     summary = format_summary(results, duration, all_skipped)
 
@@ -583,14 +609,12 @@ def parse_linters_arg(raw: str) -> List[str]:
     Returns:
         Normalized list of linter names, or defaults when empty.
     """
-
     entries = [item.strip() for item in raw.split(",") if item.strip()]
     return entries or ["clang-format", "clang-tidy", "cppcheck"]
 
 
 def main() -> int:
     """CLI entrypoint for running C++ linters."""
-
     parser = argparse.ArgumentParser(
         description="Run C++ linters with optional auto-fix and bounded output",
         epilog="""
