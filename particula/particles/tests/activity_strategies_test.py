@@ -2,6 +2,8 @@
 Replace with real values in the future.
 """
 
+from typing import Optional
+
 import numpy as np
 import pytest
 
@@ -22,7 +24,7 @@ def _compute_expected_activity(
     molar_mass: float,
     oxygen2carbon: float,
     density: float,
-    functional_group: str | None = None,
+    functional_group: Optional[str] = None,
 ) -> np.ndarray:
     water_moles = mass_concentration[..., 0] / 0.01801528
     organic_moles = mass_concentration[..., 1] / molar_mass
