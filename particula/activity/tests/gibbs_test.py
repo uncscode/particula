@@ -3,7 +3,10 @@
 import numpy as np
 import pytest
 
-from particula.activity.gibbs import gibbs_free_energy, gibbs_free_engery
+from particula.activity.gibbs import (
+    gibbs_free_energy,
+    gibbs_free_engery,  # Deprecated misspelled alias
+)
 
 
 def test_gibbs_free_energy_shapes_positive():
