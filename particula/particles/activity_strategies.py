@@ -8,11 +8,13 @@ parameterizations.
 # pyright: reportArgumentType=false
 
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.activity.activity_coefficients import bat_activity_coefficients
+from particula.activity.ratio import to_molar_mass_ratio
 from particula.particles.properties.activity_module import (
     get_ideal_activity_mass,
     get_ideal_activity_molar,
@@ -224,6 +226,115 @@ class ActivityIdealVolume(ActivityStrategy):
 
 
 # Non-ideal activity strategies
+class ActivityNonIdealBinary(ActivityStrategy):
+    """Non-ideal activity for binary organic-water mixtures using BAT model.
+
+    Uses the Binary Activity Thermodynamics model (Gorkowski et al., 2019)
+    to compute organic activity coefficients for organic-water mixtures
+    given mass concentrations. Assumes the last dimension of input is
+    ordered as [water, organic].
+
+    Args:
+        molar_mass: Organic species molar mass in kg/mol.
+        oxygen2carbon: Oxygen to carbon atomic ratio (dimensionless).
+        density: Organic species density in kg/m^3.
+        functional_group: Optional functional group identifier for OH-
+            equivalent conversion in the BAT helper.
+
+    Examples:
+        >>> import numpy as np
+        >>> from particula.particles.activity_strategies import (
+        ...     ActivityNonIdealBinary,
+        ... )
+        >>> strategy = ActivityNonIdealBinary(
+        ...     molar_mass=0.2,
+        ...     oxygen2carbon=0.5,
+        ...     density=1400.0,
+        ...     functional_group="carboxylic_acid",
+        ... )
+        >>> mass_concentration = np.array([0.5, 0.5])
+        >>> activity = strategy.activity(mass_concentration)
+        >>> float(activity)  # doctest: +ELLIPSIS
+        0.0...
+
+    References:
+        Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
+        Relative-humidity-dependent organic aerosol thermodynamics via an
+        efficient reduced-complexity model. Atmospheric Chemistry and
+        Physics, 19(19), 13383-13410. https://doi.org/10.5194/acp-19-13383-2019
+    """
+
+    def __init__(
+        self,
+        molar_mass: float,
+        oxygen2carbon: float,
+        density: float,
+        functional_group: Optional[Union[str, list[str]]] = None,
+    ) -> None:
+        """Initialize the binary non-ideal activity strategy."""
+        self.molar_mass_kg = float(molar_mass)
+        self.molar_mass_g = self.molar_mass_kg * 1000.0
+        self.oxygen2carbon = oxygen2carbon
+        self.density = density
+        self.functional_group = functional_group
+
+    def activity(
+        self, mass_concentration: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """Calculate organic activity using the BAT model.
+
+        Args:
+            mass_concentration: Binary mass concentrations with last
+                dimension size 2 ordered as [water, organic], in kg/m^3.
+
+        Returns:
+            Organic activity (dimensionless) matching the BAT helper.
+
+        Raises:
+            ValueError: If the input is scalar or last dimension is not 2.
+            ValueError: If any total moles are non-positive.
+        """
+        mass_array = np.asarray(mass_concentration, dtype=np.float64)
+        if mass_array.ndim == 0 or mass_array.shape[-1] != 2:
+            raise ValueError(
+                "ActivityNonIdealBinary expects mass_concentration with last "
+                "dimension of size 2."
+            )
+
+        water_moles = mass_array[..., 0] / 0.01801528
+        organic_moles = mass_array[..., 1] / self.molar_mass_kg
+        total_moles = water_moles + organic_moles
+
+        if np.any(total_moles <= 0):
+            raise ValueError(
+                "Total moles must be positive for activity calculation."
+            )
+
+        organic_mole_fraction = organic_moles / total_moles
+        molar_mass_ratio = to_molar_mass_ratio(self.molar_mass_g)
+
+        (
+            _activity_water,
+            activity_organic,
+            _mass_water,
+            _mass_organic,
+            _gamma_water,
+            _gamma_organic,
+        ) = bat_activity_coefficients(
+            molar_mass_ratio=molar_mass_ratio,
+            organic_mole_fraction=organic_mole_fraction,
+            oxygen2carbon=self.oxygen2carbon,
+            density=self.density,
+            functional_group=self.functional_group,
+        )
+
+        return activity_organic
+
+    def get_name(self) -> str:
+        """Return the strategy identifier."""
+        return "ActivityNonIdealBinary"
+
+
 class ActivityKappaParameter(ActivityStrategy):
     """Non-ideal activity strategy using the kappa hygroscopic parameter.
 
