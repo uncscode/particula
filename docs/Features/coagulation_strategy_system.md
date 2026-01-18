@@ -196,7 +196,7 @@ turb_dns = factory.get_strategy(
 ```python
 combined = par.dynamics.CombineCoagulationStrategy(
     strategies=[
-        par.dynamics.BrownianCoagulationStrategy("discrete"),
+        par.dynamics.BrownianCoagulationStrategy(distribution_type="discrete"),
         par.dynamics.TurbulentShearCoagulationStrategy(
             distribution_type="discrete",
             turbulent_dissipation=1e-3,
