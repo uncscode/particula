@@ -279,7 +279,18 @@ def brownian_coagulation_kernel(
     """Identify collision pairs for Brownian coagulation.
     
     1D grid launch: (n_boxes,)
-    Each thread handles all particles in one box using Monte Carlo sampling.
+    
+    Design note: we intentionally use one thread per box rather than a
+    2D launch over (n_boxes, n_particles). The Brownian coagulation
+    algorithm here is formulated as a box-level Monte Carlo process:
+    each thread keeps the RNG state, collision counters, and temporary
+    accumulators local while iterating over the particles in its box.
+    
+    This provides ample parallelism across boxes for typical CFD cases
+    (O(10^2–10^3) particles per box) and avoids additional complexity
+    from per-particle synchronization / reductions that a 2D launch
+    would require. If profiling later shows this kernel is a bottleneck,
+    we can refactor to a 2D launch with per-particle work sharing.
     """
     box_idx = wp.tid()
     # ... stochastic collision detection for this box ...
