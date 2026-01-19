@@ -168,8 +168,10 @@ def find_phase_separation(
     then combines the detected indices into a consolidated separation report.
 
     Args:
-        activity_water: Water activity values. Scalars are promoted to NumPy arrays.
-        activity_org: Organic activity values. Scalars are promoted to NumPy arrays.
+        activity_water: Water activity values. Scalars are promoted to NumPy
+            arrays.
+        activity_org: Organic activity values. Scalars are promoted to NumPy
+            arrays.
 
     Returns:
         Dictionary containing:
