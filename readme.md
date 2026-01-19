@@ -2,6 +2,8 @@
 
 A simple, fast, and powerful particle simulator for aerosol science.
 
+**Requires:** Python 3.12+
+
 [Documentation](https://uncscode.github.io/particula) | [Examples](https://uncscode.github.io/particula/Examples/) | [PyPI](https://pypi.org/project/particula/)
 
 ## Installation
