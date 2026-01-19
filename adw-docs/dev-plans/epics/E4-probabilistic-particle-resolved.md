@@ -210,16 +210,14 @@ def combine_bounds_coagulation(lower_a, upper_a, mean_a, lower_b, upper_b, mean_
 ```python
 class ProbabilisticParticleResolved(DistributionStrategy):
     def __init__(self, seed=None, random_pool_size=10000):
+        # Use a single RNG instance for all random draws to ensure reproducibility.
+        # The random_pool_size argument is retained for backward compatibility but unused.
         self.rng = np.random.default_rng(seed)
-        self._random_pool = self.rng.random(random_pool_size)
-        self._pool_index = 0
     
     def _get_random_values(self, n: int) -> NDArray:
-        if self._pool_index + n > len(self._random_pool):
-            self._refresh_random_pool()
-        values = self._random_pool[self._pool_index:self._pool_index + n]
-        self._pool_index += n
-        return values
+        # Draw directly from the RNG to avoid mid-operation pool refreshes that
+        # can change the random sequence when call patterns change.
+        return self.rng.random(n)
 ```
 
 ## Theoretical Considerations: Distribution Shape Choice
