@@ -8,7 +8,7 @@ improve readability and testability.
 
 from __future__ import annotations
 
-from typing import Literal, cast, overload
+from typing import Literal, Sequence, cast, overload
 
 import numpy as np
 from numpy.typing import NDArray
@@ -45,14 +45,14 @@ def _calculate_phase(
     Returns:
         Tuple containing:
         - c_j_phase: Organic concentrations per species in the phase [µg/m³].
-        - c_j_aq_phase: Aqueous concentrations per species in the phase [µg/m³].
+        - c_j_aq_phase: Aqueous concentrations per species in the phase
+            [µg/m³].
         - c_phase_total: Total concentration (organic + water) in the phase
             [µg/m³].
         - c_aq_total: Total aqueous concentration in the phase [µg/m³].
-        - denominator: Stabilized denominator (1 - mass_fraction_water)^-1
-            with zero-fill when the mass fraction is one.
+        - denominator: Stabilized denominator ``(1 - mass_fraction_water)``
+            inverse with zero-fill when the mass fraction is one.
     """
-
     q_phase = np.asarray(q_phase, dtype=float)
     mass_fraction_water_phase = np.asarray(
         mass_fraction_water_phase, dtype=float
@@ -82,7 +82,6 @@ def _calculate_alpha_phase(
     NDArray[np.float64],
 ]:
     """Wrapper to compute alpha-phase concentrations."""
-
     return _calculate_phase(
         c_j_liquid, q_ab[:, 0], mass_fraction_water_ab[:, 0]
     )
@@ -100,7 +99,6 @@ def _calculate_beta_phase(
     NDArray[np.float64],
 ]:
     """Wrapper to compute beta-phase concentrations."""
-
     return _calculate_phase(
         c_j_liquid, q_ab[:, 1], mass_fraction_water_ab[:, 1]
     )
@@ -137,7 +135,6 @@ def _calculate_cstar(
         Phase-specific C* array [µg/m³]; zeros if the mass-weighted molar mass
         is zero to maintain numerical stability.
     """
-
     if mass_weighted_molar_mass <= 0:
         return np.zeros_like(c_star_j_dry, dtype=float)
 
@@ -228,7 +225,6 @@ def liquid_vapor_obj_function(
         ... ) > 0
         True
     """
-
     species_count = len(c_star_j_dry)
     if (
         q_ab.shape != (species_count, 2)
@@ -358,8 +354,9 @@ def liquid_vapor_partitioning(
 
     Args:
         c_star_j_dry: Dry saturation concentrations [µg/m³], shape (n,).
-        concentration_organic_matter: Organic aerosol mass concentration [µg/m³],
-            shape (n,).
+        concentration_organic_matter: Organic aerosol mass concentration
+            [µg/m³], shape (n,).
+
         molar_mass: Species molar masses [g/mol], shape (n,).
         gamma_organic_ab: Activity coefficients, shape (n, 2) [-].
         mass_fraction_water_ab: Water mass fractions, shape (n, 2) [-].
@@ -377,7 +374,6 @@ def liquid_vapor_partitioning(
         ValueError: If array lengths are inconsistent or guess length mismatches
         the number of species.
     """
-
     c_star_j_dry = np.asarray(c_star_j_dry, dtype=float)
     concentration_organic_matter = np.asarray(
         concentration_organic_matter, dtype=float
@@ -407,7 +403,8 @@ def liquid_vapor_partitioning(
         or q_ab.shape[1] != 2
     ):
         raise ValueError(
-            "gamma_organic_ab, mass_fraction_water_ab, and q_ab must have two columns."
+            "gamma_organic_ab, mass_fraction_water_ab, and q_ab must have two "
+            "columns."
         )
 
     if partition_coefficient_guess is None:
@@ -478,11 +475,12 @@ def get_properties_for_liquid_vapor_partitioning(
         ValueError: If input lengths are inconsistent or water activity cannot
         be broadcast to the species dimension.
     """
-
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=float)
     molar_mass = np.asarray(molar_mass, dtype=float)
     density = np.asarray(density, dtype=float)
-    water_activity_desired = np.asarray(water_activity_desired, dtype=float)
+    water_activity_desired_array = np.atleast_1d(
+        np.asarray(water_activity_desired, dtype=float)
+    )
 
     species_count = len(oxygen2carbon)
     if len(molar_mass) != species_count or len(density) != species_count:
@@ -490,13 +488,13 @@ def get_properties_for_liquid_vapor_partitioning(
             "molar_mass, oxygen2carbon, and density must share length."
         )
 
-    if water_activity_desired.size not in {1, species_count}:
+    if water_activity_desired_array.size not in {1, species_count}:
         raise ValueError(
             "water_activity_desired must be scalar or match species length."
         )
-    if water_activity_desired.size == 1:
-        water_activity_desired = np.full(
-            species_count, water_activity_desired.item()
+    if water_activity_desired_array.size == 1:
+        water_activity_desired_array = np.full(
+            species_count, float(water_activity_desired_array.item())
         )
 
     gamma_organic_ab = np.empty([species_count, 2], dtype=float)
@@ -506,22 +504,45 @@ def get_properties_for_liquid_vapor_partitioning(
     molar_mass_ratio = 18.015 / molar_mass
 
     for i, oxy in enumerate(oxygen2carbon):
-        # Pass scalar water_activity wrapped in array to get array returns
-        alpha, beta, q_alpha = fixed_water_activity(
-            water_activity=np.atleast_1d(water_activity_desired[i]),
+        water_activity_scalar = float(water_activity_desired_array[i])
+        water_activity = np.atleast_1d(water_activity_scalar)
+        alpha_raw, beta_raw, q_alpha_raw = fixed_water_activity(
+            water_activity=water_activity,
             molar_mass_ratio=molar_mass_ratio[i],
             oxygen2carbon=oxy,
             density=density[i],
         )
-        gamma_organic_ab[i, 0] = alpha[-1][0]
-        mass_fraction_water_ab[i, 0] = alpha[2][0]
-        if beta is None:
+
+        alpha_activity_raw = np.atleast_1d(
+            np.asarray(cast(Sequence[float], alpha_raw)[-1], dtype=float)
+        )
+        alpha_water_fraction_raw = np.atleast_1d(
+            np.asarray(cast(Sequence[float], alpha_raw)[2], dtype=float)
+        )
+
+        gamma_organic_ab[i, 0] = float(alpha_activity_raw.ravel()[0])
+        mass_fraction_water_ab[i, 0] = float(
+            alpha_water_fraction_raw.ravel()[0]
+        )
+
+        if beta_raw is None:
             gamma_organic_ab[i, 1] = 0.0
             mass_fraction_water_ab[i, 1] = 0.0
         else:
-            gamma_organic_ab[i, 1] = beta[-1][0]
-            mass_fraction_water_ab[i, 1] = beta[2][0]
-        q_ab[i, 0] = q_alpha[0]
-        q_ab[i, 1] = 1 - q_alpha[0]
+            beta_activity_raw = np.atleast_1d(
+                np.asarray(cast(Sequence[float], beta_raw)[-1], dtype=float)
+            )
+            beta_water_fraction_raw = np.atleast_1d(
+                np.asarray(cast(Sequence[float], beta_raw)[2], dtype=float)
+            )
+            gamma_organic_ab[i, 1] = float(beta_activity_raw.ravel()[0])
+            mass_fraction_water_ab[i, 1] = float(
+                beta_water_fraction_raw.ravel()[0]
+            )
+
+        q_alpha_array = np.atleast_1d(np.asarray(q_alpha_raw, dtype=float))
+        q_value = float(q_alpha_array.ravel()[0])
+        q_ab[i, 0] = q_value
+        q_ab[i, 1] = 1 - q_value
 
     return gamma_organic_ab, mass_fraction_water_ab, q_ab
