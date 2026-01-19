@@ -29,6 +29,16 @@ and rollout.
     Brownian coagulation.
   - Features: [E3-F1][e3-f1], [E3-F2][e3-f2], [E3-F3][e3-f3], [E3-F4][e3-f4]
 
+- [E4: Probabilistic Particle-Resolved Representation][epic-e4]
+  — Status: Planning
+  - Scope: New particle representation combining particle-resolved accuracy with
+    super-droplet efficiency. Each computational particle represents a population
+    with masses uniformly distributed in a configurable window (default 10%
+    width). Enables 100-1000x fewer computational particles while preserving
+    distribution information.
+  - Features: [E4-F1][e4-f1], [E4-F2][e4-f2], [E4-F3][e4-f3], [E4-F4][e4-f4],
+    [E4-F5][e4-f5], [E4-F6][e4-f6], [E4-F7][e4-f7], [E4-F8][e4-f8], [E4-F9][e4-f9]
+
 ## Feature Plans
 
 ### Epic E1: Staggered Condensation Features
@@ -81,6 +91,7 @@ and rollout.
 <!-- Epic Links -->
 [epic-e1]: epics/E1-staggered-condensation-stepping.md
 [epic-e3]: epics/E3-data-representation-refactor.md
+[epic-e4]: epics/E4-probabilistic-particle-resolved.md
 
 <!-- E3 Feature Links -->
 [e3-f1]: features/E3-F1-particle-data-container.md
@@ -95,6 +106,17 @@ and rollout.
 [e1-f4]: features/E1-F4-mass-conservation-validation.md
 [e1-f5]: features/E1-F5-stability-performance-benchmarks.md
 [e1-f6]: features/E1-F6-documentation-examples.md
+
+<!-- E4 Feature Links -->
+[e4-f1]: features/E4-F1-core-strategy-data.md
+[e4-f2]: features/E4-F2-distribution-shape-interface.md
+[e4-f3]: features/E4-F3-extended-representation.md
+[e4-f4]: features/E4-F4-probabilistic-condensation.md
+[e4-f5]: features/E4-F5-probabilistic-coagulation.md
+[e4-f6]: features/E4-F6-split-merge-maintenance.md
+[e4-f7]: features/E4-F7-builder-factory.md
+[e4-f8]: features/E4-F8-representation-conversion.md
+[e4-f9]: features/E4-F9-documentation-examples.md
 
 <!-- Standalone Feature Links -->
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md

@@ -9,6 +9,7 @@ maintenance tasks toward a larger goal.
 |----|------|--------|----------|----------|
 | E2 | [Activity and Equilibria Strategy-Builder-Factory Refactor](E2-activity-equilibria-refactor.md) | Planning | P1 | 3 |
 | E3 | [Data Representation Refactor for Extensibility and GPU Backends](E3-data-representation-refactor.md) | Planning | P1 | 4 |
+| E4 | [Probabilistic Particle-Resolved Representation](E4-probabilistic-particle-resolved.md) | Planning | P1 | 9 |
 
 ## Completed Epics
 
@@ -18,4 +19,4 @@ maintenance tasks toward a larger goal.
 
 ## Next Available ID
 
-**E4**
+**E5**
