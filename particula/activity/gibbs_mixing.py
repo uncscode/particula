@@ -106,24 +106,43 @@ def gibbs_mix_weight(
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
-    """Gibbs free energy of mixing.
+    """Calculate weighted Gibbs free energy of mixing for the BAT model.
 
-    See Gorkowski (2019), with weighted oxygen2carbon regions.
-    Only can run one compound at a time.
+    Blends Gibbs free energy fits across low, mid, and high oxygen-to-carbon
+    (O:C) regions to avoid discontinuities in activity coefficient
+    calculations. The blending weights come from :func:`bat_blending_weights`
+    and transition smoothly between the Gorkowski et al. (2019) fits. Only one
+    compound is processed per call; vector inputs are iterated elementwise.
 
     Args:
-        - molar_mass_ratio : The molar mass ratio of water to organic
-          matter.
-        - organic_mole_fraction : The fraction of organic matter.
-        - oxygen2carbon : The oxygen to carbon ratio.
-        - density : The density of the mixture, in kg/m^3.
-        - functional_group : Optional functional group(s) of the organic
-          compound, if applicable.
+        molar_mass_ratio: Ratio of water to organic molar mass
+            (:math:`MW_{water} / MW_{organic}`). Dimensionless.
+        organic_mole_fraction: Mole fraction of the organic component.
+            Range: [0, 1].
+        oxygen2carbon: Oxygen-to-carbon atomic ratio of the organic compound.
+        density: Density of the organic compound in kg/m^3.
+        functional_group: Optional functional group for OH-equivalent
+            conversion (e.g., "alcohol", "carboxylic_acid", "ether").
 
     Returns:
-        - gibbs_mix : Gibbs energy of mixing (including 1/RT)
-        - derivative_gibbs : derivative of Gibbs energy with respect to
-          mole fraction of organics (includes 1/RT)
+        Tuple containing:
+            gibbs_mix: Gibbs energy of mixing normalized by :math:`RT`
+                (dimensionless).
+            derivative_gibbs: Derivative of Gibbs energy with respect to the
+                organic mole fraction, normalized by :math:`RT`.
+
+    Examples:
+        >>> from particula.activity import gibbs_mix_weight
+        >>> g_mix, dg_dx = gibbs_mix_weight(
+        ...     molar_mass_ratio=0.09,
+        ...     organic_mole_fraction=0.3,
+        ...     oxygen2carbon=0.4,
+        ...     density=1400.0,
+        ... )
+
+    References:
+        Gorkowski et al. (2019), Section 2.2 and SI S2.
+        https://doi.org/10.5194/acp-19-13383-2019
     """
     density = np.asarray(density, dtype=np.float64)
 
@@ -179,20 +198,23 @@ def _calculate_gibbs_mix_single(
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
-    """Calculate Gibbs free energy of mixing for a single set of inputs.
+    """Compute Gibbs free energy for one compound using blended weights.
+
+    Uses the precomputed blending weights to select the appropriate fit
+    combinations (low/mid or mid/high O:C) from Gorkowski et al. (2019).
 
     Args:
-        - molar_mass_ratio : The molar_mass ratio of water to organic
-          matter.
-        - organic_mole_fraction : The fraction of organic matter.
-        - oxygen2carbon : The oxygen to carbon ratio.
-        - density : The density of the mixture, in kg/m^3.
-        - weights : Blending weights for the BAT model.
+        molar_mass_ratio: Ratio of water to organic molar mass.
+        organic_mole_fraction: Mole fraction of the organic component.
+        oxygen2carbon: Oxygen-to-carbon atomic ratio.
+        density: Density of the organic compound in kg/m^3.
+        weights: Three-element array of blending weights for low, mid, high
+            O:C regions.
 
     Returns:
-        - gibbs_mix : Gibbs energy of mixing (including 1/RT)
-        - derivative_gibbs : derivative of Gibbs energy with respect to
-          mole fraction of organics (includes 1/RT)
+        gibbs_mix: Gibbs energy of mixing normalized by :math:`RT`.
+        derivative_gibbs: Derivative of Gibbs energy with respect to the
+            organic mole fraction, normalized by :math:`RT`.
     """
     if weights[1] > 0:  # if mid region is used
         gibbs_mix_mid, derivative_gibbs_mid = gibbs_of_mixing(

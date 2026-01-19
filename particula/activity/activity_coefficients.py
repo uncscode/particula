@@ -43,21 +43,45 @@ def bat_activity_coefficients(
 ]:
     """Calculate the activity coefficients for water-organic mixtures.
 
+    Uses the BAT (Binary Activity Thermodynamics) model to compute activity
+    coefficients for binary organic-water mixtures based on AIOMFAC-derived
+    fits. Optionally converts functional groups to OH-equivalent form to align
+    with the BAT parameterization.
+
     Args:
-        - molar_mass_ratio : Ratio of the molecular weight of water to the
-          molecular weight of organic matter.
-        - organic_mole_fraction : Molar fraction of organic matter in the
-          mixture.
-        - oxygen2carbon : Oxygen to carbon ratio in the organic compound.
-        - density : Density of the mixture, in kg/m^3.
-        - functional_group : Optional functional group(s) of the organic
-          compound, if applicable.
+        molar_mass_ratio: Ratio of the molecular weight of water to the
+            molecular weight of organic matter (dimensionless).
+        organic_mole_fraction: Molar fraction of organic matter in the mixture.
+            Range: [0, 1].
+        oxygen2carbon: Oxygen-to-carbon ratio in the organic compound.
+        density: Density of the mixture, in kg/m^3.
+        functional_group: Optional functional group(s) of the organic compound
+            (e.g., "alcohol", "carboxylic_acid", "ether").
 
     Returns:
-        - A tuple containing the activity of water, activity
-          of organic matter, mass fraction of water, and mass
-          fraction of organic matter, gamma_water (activity coefficient),
-          and gamma_organic (activity coefficient).
+        Tuple of six values:
+            activity_water: Thermodynamic activity of water (:math:`a_w`).
+                Range: [0, 1] for stable systems.
+            activity_organic: Thermodynamic activity of the organic component
+                (:math:`a_{org}`). Range: [0, 1] for stable systems.
+            mass_water: Mass fraction of water in the mixture. Range: [0, 1].
+            mass_organic: Mass fraction of organic; :math:`1 - mass_water`.
+            gamma_water: Activity coefficient of water (:math:`\gamma_w`).
+            gamma_organic: Activity coefficient of the organic component
+                (:math:`\gamma_{org}`).
+
+    Examples:
+        >>> from particula.activity import bat_activity_coefficients
+        >>> a_w, a_org, m_w, m_org, g_w, g_org = bat_activity_coefficients(
+        ...     molar_mass_ratio=0.09,
+        ...     organic_mole_fraction=0.3,
+        ...     oxygen2carbon=0.4,
+        ...     density=1400.0,
+        ... )
+
+    References:
+        Gorkowski et al. (2019), Equations 1-6 and SI S1-S2.
+        https://doi.org/10.5194/acp-19-13383-2019
     """
     oxygen2carbon, molar_mass_ratio = convert_to_oh_equivalent(
         oxygen2carbon=oxygen2carbon,
