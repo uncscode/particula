@@ -15,6 +15,10 @@ from particula.particles.activity_strategies import (
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityKappaParameter,
+    ActivityNonIdealBinary,
+)
+from particula.particles.activity_builders import (
+    ActivityNonIdealBinaryBuilder,
 )
 
 
@@ -57,6 +61,66 @@ def test_kappa_parameter_strategy_with_parameters():
         strategy.molar_mass, parameters["molar_mass"], atol=1e-4
     )
     assert strategy.water_index == parameters["water_index"]
+
+
+def test_activity_factory_non_ideal_binary_dispatch_returns_strategy():
+    """Factory returns ActivityNonIdealBinary for non_ideal_binary key."""
+    parameters = {
+        "molar_mass": 0.200,
+        "oxygen2carbon": 0.4,
+        "density": 1400.0,
+    }
+    strategy = ActivityFactory().get_strategy("non_ideal_binary", parameters)
+    assert isinstance(strategy, ActivityNonIdealBinary)
+    assert strategy.get_name() == "ActivityNonIdealBinary"
+
+
+def test_activity_factory_non_ideal_binary_optional_functional_group():
+    """Optional functional_group is passed through to strategy."""
+    parameters = {
+        "molar_mass": 0.150,
+        "oxygen2carbon": 0.5,
+        "density": 1300.0,
+        "functional_group": "alcohol",
+    }
+    strategy = ActivityFactory().get_strategy("non_ideal_binary", parameters)
+    assert isinstance(strategy, ActivityNonIdealBinary)
+    assert strategy.functional_group == "alcohol"
+
+
+def test_activity_factory_non_ideal_binary_missing_required_param_raises():
+    """Missing required parameter raises ValueError via builder validation."""
+    parameters = {
+        "molar_mass": 0.200,
+        # Missing oxygen2carbon and density
+    }
+    with pytest.raises(ValueError):
+        ActivityFactory().get_strategy("non_ideal_binary", parameters)
+
+
+def test_activity_factory_get_builders_includes_non_ideal_binary():
+    """get_builders exposes non_ideal_binary and its alias mapping."""
+    builders = ActivityFactory().get_builders()
+    assert "non_ideal_binary" in builders
+    assert "binary_non_ideal" in builders
+    assert isinstance(
+        builders["non_ideal_binary"], ActivityNonIdealBinaryBuilder
+    )
+    assert isinstance(
+        builders["binary_non_ideal"], ActivityNonIdealBinaryBuilder
+    )
+
+
+def test_activity_factory_binary_non_ideal_alias_dispatches():
+    """Alias binary_non_ideal dispatches to ActivityNonIdealBinary."""
+    parameters = {
+        "molar_mass": 0.180,
+        "oxygen2carbon": 0.6,
+        "density": 1250.0,
+    }
+    strategy = ActivityFactory().get_strategy("binary_non_ideal", parameters)
+    assert isinstance(strategy, ActivityNonIdealBinary)
+    assert strategy.get_name() == "ActivityNonIdealBinary"
 
 
 def test_invalid_strategy_type():
