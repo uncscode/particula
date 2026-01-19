@@ -12924,10 +12924,7 @@ flags.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/species.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">375</span>
 <span class="normal">376</span>
 <span class="normal">377</span>
 <span class="normal">378</span>
@@ -12937,7 +12934,10 @@ flags.</p>
 <span class="normal">382</span>
 <span class="normal">383</span>
 <span class="normal">384</span>
-<span class="normal">385</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">added_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add concentration (kg/m^3) to the gas species.</span>
@@ -13027,10 +13027,7 @@ concatenated with those of the current object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/species.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">408</span>
 <span class="normal">409</span>
 <span class="normal">410</span>
 <span class="normal">411</span>
@@ -13088,7 +13085,10 @@ concatenated with those of the current object.</p>
 <span class="normal">463</span>
 <span class="normal">464</span>
 <span class="normal">465</span>
-<span class="normal">466</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;GasSpecies&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Append another GasSpecies instance to this one (in-place).</span>
 
 <span class="sd">    Arguments:</span>
@@ -13440,7 +13440,8 @@ concatenated with those of the current object.</p>
 <span class="normal">286</span>
 <span class="normal">287</span>
 <span class="normal">288</span>
-<span class="normal">289</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_partial_pressure</span><span class="p">(</span>
+<span class="normal">289</span>
+<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_partial_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the partial pressure of the gas at a given temperature (K).</span>
@@ -13471,6 +13472,7 @@ concatenated with those of the current object.</p>
                     <span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">],</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -13711,9 +13713,7 @@ concatenated with those of the current object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/species.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">335</span>
 <span class="normal">336</span>
 <span class="normal">337</span>
 <span class="normal">338</span>
@@ -13748,7 +13748,10 @@ concatenated with those of the current object.</p>
 <span class="normal">367</span>
 <span class="normal">368</span>
 <span class="normal">369</span>
-<span class="normal">370</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_concentration</span><span class="p">(</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation concentration at a given temperature (K).</span>
@@ -13778,6 +13781,7 @@ concatenated with those of the current object.</p>
                 <span class="k">for</span> <span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">],</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -13853,8 +13857,7 @@ concatenated with those of the current object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/species.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">291</span>
-<span class="normal">292</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">292</span>
 <span class="normal">293</span>
 <span class="normal">294</span>
 <span class="normal">295</span>
@@ -13893,7 +13896,9 @@ concatenated with those of the current object.</p>
 <span class="normal">328</span>
 <span class="normal">329</span>
 <span class="normal">330</span>
-<span class="normal">331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_ratio</span><span class="p">(</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_ratio</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the saturation ratio of the gas at a given temperature (K).</span>
@@ -13924,6 +13929,7 @@ concatenated with those of the current object.</p>
                     <span class="bp">self</span><span class="o">.</span><span class="n">pure_vapor_pressure_strategy</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">],</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -13975,10 +13981,7 @@ concatenated with those of the current object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/species.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">390</span>
 <span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
@@ -13991,7 +13994,10 @@ concatenated with those of the current object.</p>
 <span class="normal">400</span>
 <span class="normal">401</span>
 <span class="normal">402</span>
-<span class="normal">403</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_concentration</span><span class="p">(</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">new_concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Overwrite the concentration of the gas species in kg/m^3.</span>

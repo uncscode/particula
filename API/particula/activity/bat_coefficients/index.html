@@ -12020,36 +12020,38 @@ https://doi.org/10.5194/acp-19-13383-2019</p>
 
 
 <a href="#particula.activity.bat_coefficients.coefficients_c" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">coefficients_c</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">fit_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">coefficients_c</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">fit_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Coefficients for activity model, see Gorkowski (2019). equation S1 S2.</p>
+        <p>Compute fitted BAT coefficients from published parameters.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- molar_mass_ratio </code></b>
+            <b><code>molar_mass_ratio</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
-            <p>The molar mass ratio of water to organic
-matter.</p>
+            <p>Water-to-organic molar mass ratio.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- oxygen2carbon </code></b>
+            <b><code>oxygen2carbon</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
-            <p>The oxygen to carbon ratio.</p>
+            <p>Oxygen-to-carbon ratio.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- fit_values </code></b>
+            <b><code>fit_values</code></b>
+              (<code><span title="typing.List">List</span>[<span title="float">float</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>The fit values for the activity model.</p>
+            <p>Fit parameters (a1,a2,s) from <code>FitValues</code>.</p>
           </div>
         </li>
     </ul>
@@ -12058,22 +12060,39 @@ matter.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+              <code><span title="particula.activity.bat_coefficients.FloatArray">FloatArray</span></code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>The coefficients for the activity model.</li>
-</ul>
+            <p>Computed coefficient array matching <code>fit_values</code> shape.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="particula.activity.bat_coefficients.FloatArray">FloatArray</span></code>
+          –
+          <div class="doc-md-description">
+            <p>Scalar inputs return scalar; array inputs return <code>np.ndarray</code>.</p>
           </div>
         </li>
     </ul>
 
 
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.activity.bat_coefficients</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">coefficients_c</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">G19_FIT_MID</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coefficients_c</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">fit_values</span><span class="o">=</span><span class="n">G19_FIT_MID</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">0.025427174197017652</span>
+</code></pre></div>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/activity/bat_coefficients.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
@@ -12096,21 +12115,47 @@ matter.</p>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coefficients_c</span><span class="p">(</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coefficients_c</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">fit_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coefficients for activity model, see Gorkowski (2019). equation S1 S2.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute fitted BAT coefficients from published parameters.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        - molar_mass_ratio : The molar mass ratio of water to organic</span>
-<span class="sd">          matter.</span>
-<span class="sd">        - oxygen2carbon : The oxygen to carbon ratio.</span>
-<span class="sd">        - fit_values : The fit values for the activity model.</span>
+<span class="sd">        molar_mass_ratio: Water-to-organic molar mass ratio.</span>
+<span class="sd">        oxygen2carbon: Oxygen-to-carbon ratio.</span>
+<span class="sd">        fit_values: Fit parameters (a1,a2,s) from ``FitValues``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - The coefficients for the activity model.</span>
+<span class="sd">        Computed coefficient array matching ``fit_values`` shape.</span>
+<span class="sd">        Scalar inputs return scalar; array inputs return ``np.ndarray``.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from particula.activity.bat_coefficients import (</span>
+<span class="sd">        ...     coefficients_c,</span>
+<span class="sd">        ...     G19_FIT_MID,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; coefficients_c(</span>
+<span class="sd">        ...     molar_mass_ratio=0.5,</span>
+<span class="sd">        ...     oxygen2carbon=1.2,</span>
+<span class="sd">        ...     fit_values=G19_FIT_MID.a1,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        0.025427174197017652</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># force to array</span>
     <span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">molar_mass_ratio</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>

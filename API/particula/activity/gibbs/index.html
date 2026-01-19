@@ -1267,6 +1267,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.activity.gibbs.gibbs_free_energy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;gibbs_free_energy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.activity.gibbs.gibbs_free_engery" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11862,6 +11873,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#particula.activity.gibbs.gibbs_free_energy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;gibbs_free_energy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.activity.gibbs.gibbs_free_engery" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -11940,34 +11962,36 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="particula.activity.gibbs.gibbs_free_engery" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">gibbs_free_engery</span>
+<h3 id="particula.activity.gibbs.gibbs_free_energy" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">gibbs_free_energy</span>
 
 
-<a href="#particula.activity.gibbs.gibbs_free_engery" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gibbs_free_engery</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+<a href="#particula.activity.gibbs.gibbs_free_energy" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gibbs_free_energy</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Calculate the gibbs free energy of the mixture. Ideal and non-ideal.</p>
+        <p>Compute ideal and real Gibbs free energy of mixing.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- organic_mole_fraction </code></b>
+            <b><code>organic_mole_fraction</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>A numpy array of organic mole
-fractions.</p>
+            <p>Mole fraction of the organic component.
+Values should be between 0 and 1.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- gibbs_mix </code></b>
+            <b><code>gibbs_mix</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>A numpy array of gibbs free energy of mixing.</p>
+            <p>Gibbs free energy of mixing (non-ideal contribution).</p>
           </div>
         </li>
     </ul>
@@ -11976,30 +12000,31 @@ fractions.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+              <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>gibbs_ideal : The ideal gibbs free energy of mixing.</li>
-</ul>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          –
-          <div class="doc-md-description">
-            <ul>
-<li>gibbs_real : The real gibbs free energy of mixing.</li>
-</ul>
+            <p>Tuple containing:
+gibbs_ideal: Ideal Gibbs free energy of mixing.
+gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</p>
           </div>
         </li>
     </ul>
 
 
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.activity.gibbs</span><span class="w"> </span><span class="kn">import</span> <span class="n">gibbs_free_energy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x_org</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g_mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g_ideal</span><span class="p">,</span> <span class="n">g_real</span> <span class="o">=</span> <span class="n">gibbs_free_energy</span><span class="p">(</span><span class="n">x_org</span><span class="p">,</span> <span class="n">g_mix</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g_ideal</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">g_real</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">((3,), (3,))</span>
+</code></pre></div>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/activity/gibbs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">11</span>
-<span class="normal">12</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">12</span>
 <span class="normal">13</span>
 <span class="normal">14</span>
 <span class="normal">15</span>
@@ -12017,26 +12042,107 @@ fractions.</p>
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gibbs_free_engery</span><span class="p">(</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gibbs_free_energy</span><span class="p">(</span>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the gibbs free energy of the mixture. Ideal and non-ideal.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute ideal and real Gibbs free energy of mixing.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        - organic_mole_fraction : A numpy array of organic mole</span>
-<span class="sd">            fractions.</span>
-<span class="sd">        - gibbs_mix : A numpy array of gibbs free energy of mixing.</span>
+<span class="sd">        organic_mole_fraction: Mole fraction of the organic component.</span>
+<span class="sd">            Values should be between 0 and 1.</span>
+<span class="sd">        gibbs_mix: Gibbs free energy of mixing (non-ideal contribution).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - gibbs_ideal : The ideal gibbs free energy of mixing.</span>
-<span class="sd">        - gibbs_real : The real gibbs free energy of mixing.</span>
+<span class="sd">        Tuple containing:</span>
+<span class="sd">            gibbs_ideal: Ideal Gibbs free energy of mixing.</span>
+<span class="sd">            gibbs_real: Real Gibbs free energy of mixing (ideal + mix).</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; from particula.activity.gibbs import gibbs_free_energy</span>
+<span class="sd">        &gt;&gt;&gt; x_org = np.array([0.2, 0.5, 0.8])</span>
+<span class="sd">        &gt;&gt;&gt; g_mix = np.array([0.1, 0.2, 0.1])</span>
+<span class="sd">        &gt;&gt;&gt; g_ideal, g_real = gibbs_free_energy(x_org, g_mix)</span>
+<span class="sd">        &gt;&gt;&gt; g_ideal.shape, g_real.shape</span>
+<span class="sd">        ((3,), (3,))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gibbs_ideal</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">get_safe_log</span><span class="p">(</span>
         <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span>
     <span class="p">)</span> <span class="o">+</span> <span class="n">organic_mole_fraction</span> <span class="o">*</span> <span class="n">get_safe_log</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">)</span>
     <span class="n">gibbs_real</span> <span class="o">=</span> <span class="n">gibbs_ideal</span> <span class="o">+</span> <span class="n">gibbs_mix</span>
     <span class="k">return</span> <span class="n">gibbs_ideal</span><span class="p">,</span> <span class="n">gibbs_real</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="particula.activity.gibbs.gibbs_free_engery" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">gibbs_free_engery</span>
+
+
+<a href="#particula.activity.gibbs.gibbs_free_engery" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gibbs_free_engery</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Deprecated alias for gibbs_free_energy.</p>
+<p>.. deprecated:: 0.3.0
+    Use :func:<code>gibbs_free_energy</code> instead. This alias will be removed
+    in a future version.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/activity/gibbs.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gibbs_free_engery</span><span class="p">(</span>
+    <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">gibbs_mix</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deprecated alias for gibbs_free_energy.</span>
+
+<span class="sd">    .. deprecated:: 0.3.0</span>
+<span class="sd">        Use :func:`gibbs_free_energy` instead. This alias will be removed</span>
+<span class="sd">        in a future version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;gibbs_free_engery is deprecated and will be removed in a future &quot;</span>
+        <span class="s2">&quot;version. Use gibbs_free_energy instead.&quot;</span><span class="p">,</span>
+        <span class="ne">DeprecationWarning</span><span class="p">,</span>
+        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">gibbs_free_energy</span><span class="p">(</span><span class="n">organic_mole_fraction</span><span class="p">,</span> <span class="n">gibbs_mix</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

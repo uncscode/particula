@@ -12018,7 +12018,7 @@ of species in a mixture of liquids.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            StrategyFactoryABC (particula.abc_factory.StrategyFactoryABC)" href="../../abc_factory/#particula.abc_factory.StrategyFactoryABC">StrategyFactoryABC</a>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            ActivityIdealMassBuilder (particula.particles.activity_builders.ActivityIdealMassBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityIdealMassBuilder">ActivityIdealMassBuilder</a>, <a class="autorefs autorefs-internal" title="            ActivityIdealMolarBuilder (particula.particles.activity_builders.ActivityIdealMolarBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityIdealMolarBuilder">ActivityIdealMolarBuilder</a>, <a class="autorefs autorefs-internal" title="            ActivityKappaParameterBuilder (particula.particles.activity_builders.ActivityKappaParameterBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityKappaParameterBuilder">ActivityKappaParameterBuilder</a>], <span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            ActivityIdealMass (particula.particles.activity_strategies.ActivityIdealMass)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityIdealMass">ActivityIdealMass</a>, <a class="autorefs autorefs-internal" title="            ActivityIdealMolar (particula.particles.activity_strategies.ActivityIdealMolar)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityIdealMolar">ActivityIdealMolar</a>, <a class="autorefs autorefs-internal" title="            ActivityKappaParameter (particula.particles.activity_strategies.ActivityKappaParameter)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityKappaParameter">ActivityKappaParameter</a>]]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            StrategyFactoryABC (particula.abc_factory.StrategyFactoryABC)" href="../../abc_factory/#particula.abc_factory.StrategyFactoryABC">StrategyFactoryABC</a>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            ActivityIdealMassBuilder (particula.particles.activity_builders.ActivityIdealMassBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityIdealMassBuilder">ActivityIdealMassBuilder</a>, <a class="autorefs autorefs-internal" title="            ActivityIdealMolarBuilder (particula.particles.activity_builders.ActivityIdealMolarBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityIdealMolarBuilder">ActivityIdealMolarBuilder</a>, <a class="autorefs autorefs-internal" title="            ActivityKappaParameterBuilder (particula.particles.activity_builders.ActivityKappaParameterBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityKappaParameterBuilder">ActivityKappaParameterBuilder</a>, <a class="autorefs autorefs-internal" title="            ActivityNonIdealBinaryBuilder (particula.particles.activity_builders.ActivityNonIdealBinaryBuilder)" href="../activity_builders/#particula.particles.activity_builders.ActivityNonIdealBinaryBuilder">ActivityNonIdealBinaryBuilder</a>], <span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            ActivityIdealMass (particula.particles.activity_strategies.ActivityIdealMass)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityIdealMass">ActivityIdealMass</a>, <a class="autorefs autorefs-internal" title="            ActivityIdealMolar (particula.particles.activity_strategies.ActivityIdealMolar)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityIdealMolar">ActivityIdealMolar</a>, <a class="autorefs autorefs-internal" title="            ActivityKappaParameter (particula.particles.activity_strategies.ActivityKappaParameter)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityKappaParameter">ActivityKappaParameter</a>, <a class="autorefs autorefs-internal" title="            ActivityNonIdealBinary (particula.particles.activity_strategies.ActivityNonIdealBinary)" href="../activity_strategies/#particula.particles.activity_strategies.ActivityNonIdealBinary">ActivityNonIdealBinary</a>]]</code></p>
 
 
 
@@ -12157,15 +12157,7 @@ mass_ideal_builder = builder_map["mass_ideal"]</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/activity_factories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
 <span class="normal">79</span>
@@ -12177,7 +12169,17 @@ mass_ideal_builder = builder_map["mass_ideal"]</p>
 <span class="normal">85</span>
 <span class="normal">86</span>
 <span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a mapping of strategy types to their corresponding builders.</span>
 
 <span class="sd">    Returns:</span>
@@ -12197,6 +12199,8 @@ mass_ideal_builder = builder_map["mass_ideal"]</p>
         <span class="s2">&quot;molar_ideal&quot;</span><span class="p">:</span> <span class="n">ActivityIdealMolarBuilder</span><span class="p">(),</span>
         <span class="s2">&quot;kappa_parameter&quot;</span><span class="p">:</span> <span class="n">ActivityKappaParameterBuilder</span><span class="p">(),</span>
         <span class="s2">&quot;kappa&quot;</span><span class="p">:</span> <span class="n">ActivityKappaParameterBuilder</span><span class="p">(),</span>
+        <span class="s2">&quot;non_ideal_binary&quot;</span><span class="p">:</span> <span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">(),</span>
+        <span class="s2">&quot;binary_non_ideal&quot;</span><span class="p">:</span> <span class="n">ActivityNonIdealBinaryBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
