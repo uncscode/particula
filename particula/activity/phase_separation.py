@@ -1,48 +1,60 @@
-"""Calculate the phase separation of organic compounds in water.
+"""Phase separation utilities for organic–water systems.
 
-The functions are based on the BAT model.
+Implements BAT (Binary Activity Thermodynamics) phase-separation helpers used
+by the activity module to identify liquid–liquid phase separation (LLPS) and
+compute transfer functions.
 
-Gorkowski, K., Preston, T. C., Zuend, A. (2019).
-Relative-humidity-dependent organic aerosol thermodynamics
-Via an efficient reduced-complexity model.
-Atmospheric Chemistry and Physics
-https://doi.org/10.5194/acp-19-13383-2019
+Constants:
+    MIN_SPREAD_IN_AW: Minimum allowed spread in water activity when computing
+        the transition width for :func:`q_alpha`. Prevents numerical issues
+        in the logistic transfer when activity ranges are extremely small.
+        Value: 1e-6 (dimensionless).
+
+    Q_ALPHA_AT_1PHASE_AW: Target :math:`q_\alpha` value at the single-phase
+        activity boundary. Used to calibrate the sigmoid steepness in
+        :func:`q_alpha`. Value: 0.99 (dimensionless).
+
+References:
+    Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
+    Relative-humidity-dependent organic aerosol thermodynamics via an
+    efficient reduced-complexity model. Atmospheric Chemistry and Physics.
+    https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Union
+from typing import Dict, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.machine_limit import get_safe_exp, get_safe_log
 
-MIN_SPREAD_IN_AW = 10**-6
-Q_ALPHA_AT_1PHASE_AW = 0.99
+MIN_SPREAD_IN_AW: float = 10**-6
+Q_ALPHA_AT_1PHASE_AW: float = 0.99
 
 
 def organic_water_single_phase(
     molar_mass_ratio: Union[int, float, list, np.ndarray],
 ) -> np.ndarray:
-    """Solubility limit of organic compounds in water.
+    """Compute single-phase O:C limit for organic–water mixtures.
 
-    Convert the given molar mass ratio (MW water / MW organic) to a
-    and oxygen2carbon value were above is a single phase with water and below
-    phase separation is possible.
+    Converts the molar mass ratio (:math:`MW_{water} / MW_{organic}`) to the
+    oxygen-to-carbon threshold above which mixtures remain single phase.
+    Below this threshold, liquid–liquid phase separation (LLPS) is possible.
 
     Args:
-        - molar_mass_ratio: The molar mass ratio with respect to water.
+        molar_mass_ratio: Molar mass ratio with respect to water.
 
     Returns:
-        - The single phase cross point.
+        Single-phase O:C crossover point as a NumPy array.
+
+    Examples:
+        >>> organic_water_single_phase(molar_mass_ratio=0.1)
+        array(...)
 
     References:
-        - Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
-          Relative-humidity-dependent organic aerosol thermodynamics
-          Via an efficient reduced-complexity model.
-          Atmospheric Chemistry and Physics
-          https://doi.org/10.5194/acp-19-13383-2019
+        Gorkowski et al. (2019).
+        https://doi.org/10.5194/acp-19-13383-2019
     """
-    # check inputs
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
 
     return (
@@ -52,27 +64,25 @@ def organic_water_single_phase(
 
 
 # pylint: disable=too-many-locals
-def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
-    """Find phase separation in activity data.
+def find_phase_sep_index(
+    activity_data: NDArray[np.float64],
+) -> Dict[str, Union[int, float]]:
+    """Detect phase separation using activity monotonicity and limits.
 
-    This function finds phase separation using activity>1 and
-    inflections in the activity curve data.
-    In physical systems activity can not be above one and
-    curve should be monotonic. Or else there will be phase separation.
+    Identifies potential phase separation by checking for activities above one
+    and curvature inflections in the activity curve. Physical systems should
+    have activity ≤ 1 and monotonic behavior; violations indicate LLPS.
 
     Args:
-    - activity_data: A array of activity data.
+        activity_data: Array of activity values.
 
     Returns:
-    dict: A dictionary containing the following keys:
-        - 'phase_sep_activity': Phase separation via activity
-            (1 if there is phase separation, 0 otherwise)
-        - 'phase_sep_curve': Phase separation via activity curvature
-            (1 if there is phase separation, 0 otherwise)
-        - 'index_phase_sep_starts': Index where phase separation starts
-        - 'index_phase_sep_end': Index where phase separation ends
+        Dictionary with detection flags and indices:
+            phase_sep_activity: 1 if any activity exceeds 1, else 0.
+            phase_sep_curve: 1 if curvature changes sign, else 0.
+            index_phase_sep_starts: Index where separation starts.
+            index_phase_sep_end: Index where separation ends.
     """
-    # check inputs
     activity_data = np.asarray(activity_data, dtype=np.float64)
 
     # Compute difference between consecutive elements in the array
@@ -149,31 +159,27 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
 
 def find_phase_separation(
     activity_water: NDArray[np.float64], activity_org: NDArray[np.float64]
-) -> dict:
-    """This function checks for phase separation in each activity curve.
+) -> Dict[str, Union[int, float]]:
+    """Check for phase separation across water and organic activity curves.
+
+    Applies :func:`find_phase_sep_index` to both water and organic activities,
+    then combines the detected indices into a consolidated separation report.
 
     Args:
-    - activity_water (np.array): A numpy array of water activity values.
-    - activity_org (np.array): A numpy array of organic activity values.
+        activity_water: Water activity values.
+        activity_org: Organic activity values.
 
     Returns:
-    dict: A dictionary containing the following keys:
-        - 'phase_sep_check': An integer indicating whether phase separation
-                is present (1) or not (0).
-        - 'lower_seperation_index': The index of the lower separation point
-                in the activity curve.
-        - 'upper_seperation_index': The index of the upper separation point in
-                the activity curve.
-        - 'matching_upper_seperation_index': The index where the difference
-                between activity_water_beta and match_a_w is greater than 0.
-        - 'lower_seperation': The value of water activity at the lower
-                separation point.
-        - 'upper_seperation': The value of water activity at the upper
-                separation point.
-        - 'matching_upper_seperation': The value of water activity at the
-                matching upper separation point.
+        Dictionary containing:
+            phase_sep_check: 1 if any phase separation is detected, else 0.
+            lower_seperation_index: Lower separation index across both series.
+            upper_seperation_index: Upper separation index across both series.
+            matching_upper_seperation_index: Index where water activity crosses
+                the matched separation value.
+            lower_seperation: Water activity at lower separation index.
+            upper_seperation: Water activity at upper separation index.
+            matching_upper_seperation: Water activity at the matched index.
     """
-    # check for phase separation in each activity curve
     water_sep = find_phase_sep_index(activity_water)
     organic_sep = find_phase_sep_index(activity_org)
 
@@ -246,23 +252,26 @@ def q_alpha(
     seperation_activity: NDArray[np.float64],
     activities: NDArray[np.float64],
 ) -> np.ndarray:
-    """Calculates the q_alpha value using a squeezed logistic function.
+    """Compute :math:`q_\alpha` transition using a squeezed logistic curve.
+
+    Maps activity values to a smooth transition between phase-separated and
+    single-phase regimes. The sigmoid is calibrated so that
+    :data:`Q_ALPHA_AT_1PHASE_AW` is reached at the single-phase boundary and
+    the transition width is bounded below by :data:`MIN_SPREAD_IN_AW`.
 
     Args:
-        - seperation_activity (np.array): A numpy array of values representing
-            the separation activity.
-        - activities (np.array): A numpy array of activity values.
+        seperation_activity: Activity at which the mixture transitions
+            between phases.
+        activities: Activity values to evaluate.
 
     Returns:
-        np.array: The q_alpha value.
+        NumPy array of :math:`q_\alpha` values with the same shape as
+        ``activities``.
 
-    Notes:
-        - The q_alpha value represents the transfer from
-            q_alpha ~0 to q_alpha ~1.
-        - The function uses a sigmoid curve parameter to calculate the
-            q_alpha value.
+    Examples:
+        >>> q_alpha(0.8, np.array([0.7, 0.8, 0.9]))
+        array(...)
     """
-    # check inputs
     if seperation_activity == 0:
         return np.ones_like(activities)
 

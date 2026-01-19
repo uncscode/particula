@@ -3,6 +3,7 @@
 import unittest
 
 import numpy as np
+import numpy.testing as npt
 
 from particula.activity.bat_coefficients import (
     G19_FIT_HIGH,
@@ -10,6 +11,7 @@ from particula.activity.bat_coefficients import (
     G19_FIT_MID,
 )
 from particula.activity.gibbs_mixing import (
+    _calculate_gibbs_mix_single,
     gibbs_mix_weight,
     gibbs_of_mixing,
 )
@@ -53,6 +55,13 @@ class TestGibbsMixing(unittest.TestCase):
         self.assertTrue(np.all(gibbs_mix >= 0))
         self.assertTrue(np.all(derivative_gibbs**2 >= 0))
 
+        # shape check for array inputs
+        self.assertEqual(
+            np.shape(gibbs_mix), np.shape(self.organic_mole_fraction_array)
+        )
+        # derivative can be negative; ensure finite values
+        assert np.all(np.isfinite(derivative_gibbs))
+
     def test_gibbs_mix_weight(self) -> None:
         """Test for gibbs_mix_weight function."""
         gibbs_mix, derivative_gibbs = gibbs_mix_weight(
@@ -82,3 +91,11 @@ class TestGibbsMixing(unittest.TestCase):
         )
         self.assertTrue(np.all(gibbs_mix >= 0))
         self.assertTrue(np.all(derivative_gibbs**2 >= 0))
+
+        self.assertEqual(
+            np.shape(gibbs_mix), np.shape(self.organic_mole_fraction_array)
+        )
+        self.assertEqual(
+            np.shape(derivative_gibbs),
+            np.shape(self.organic_mole_fraction_array),
+        )
