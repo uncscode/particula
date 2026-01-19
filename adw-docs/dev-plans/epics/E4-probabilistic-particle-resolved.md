@@ -190,7 +190,9 @@ def combine_bounds_coagulation(lower_a, upper_a, mean_a, lower_b, upper_b, mean_
             rel_width_a = (upper_a[s] - lower_a[s]) / (2 * mean_a[s]) if mean_a[s] > 0 else 0
             rel_width_b = (upper_b[s] - lower_b[s]) / (2 * mean_b[s]) if mean_b[s] > 0 else 0
             product_rel_width = weight_a * rel_width_a + weight_b * rel_width_b
-            product_lower[s] = total_mass_s * (1 - product_rel_width)
+            # Clamp lower factor to avoid negative masses if product_rel_width > 1
+            lower_factor = max(0.0, 1 - product_rel_width)
+            product_lower[s] = total_mass_s * lower_factor
             product_upper[s] = total_mass_s * (1 + product_rel_width)
         else:
             product_lower[s] = 0
