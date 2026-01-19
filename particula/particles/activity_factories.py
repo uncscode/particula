@@ -44,7 +44,8 @@ class ActivityFactory(
 
     - **mass_ideal**: Raoult's Law based on mass fractions
     - **molar_ideal**: Raoult's Law based on mole fractions
-    - **kappa_parameter** / **kappa**: Kappa hygroscopic parameter (Petters 2007)
+    - **kappa_parameter** / **kappa**: Kappa hygroscopic parameter
+      (Petters 2007)
     - **non_ideal_binary** / **binary_non_ideal**: BAT model for non-ideal
       organic–water mixtures (Gorkowski 2019)
 
