@@ -31,7 +31,7 @@ This directory contains documentation guides for ADW (AI Developer Workflow) age
 
 | Guide | Purpose | Key Info |
 |-------|---------|----------|
-| **[Architecture Reference](architecture_reference.md)** | Architecture documentation | Module structure, design decisions |
+| **[Architecture Reference](architecture/architecture_guide.md)** | Architecture documentation | Module structure, design decisions |
 | **[Conditional Docs](conditional_docs.md)** | Task-driven documentation | When to read each guide |
 
 ## Repository Information
@@ -127,6 +127,6 @@ Architecture decisions and guides are in the [architecture/](architecture/) dire
 ## See Also
 
 - **[AGENTS.md](../AGENTS.md)** - Quick reference for particula development
-- **[Contributing Guide](../docs/contribute/CONTRIBUTING.md)** - Full contribution workflow
+- **[Contributing Guide](../docs/contribute/CONTRIBUTING.md)** — Full contribution workflow
 - **[Project README](../readme.md)** - Main project documentation
 - **[MkDocs Site](https://uncscode.github.io/particula)** - Online documentation

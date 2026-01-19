@@ -360,7 +360,7 @@ For changes affecting multiple modules or introducing new patterns, request an a
 ## References
 
 - **[Architecture Guide](architecture_guide.md)**: Detailed architectural documentation
-- **[Decision Records](decisions/)**: Architectural decision history (future ADRs)
+- **[Decision Records](decisions/README.md)**: Architectural decision history (future ADRs)
 - **[Code Style Guide](../code_style.md)**: Coding standards and conventions
 - **[Testing Guide](../testing_guide.md)**: Testing conventions and pytest usage
 - **[Docstring Guide](../docstring_guide.md)**: Google-style docstring format

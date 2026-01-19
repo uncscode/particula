@@ -145,7 +145,7 @@ particula/
 - `adw-docs/docstring_guide.md` - Google-style docstring format
 - `adw-docs/commit_conventions.md` - Commit message format
 - `adw-docs/pr_conventions.md` - Pull request conventions
-- `adw-docs/architecture/architecture_reference.md` - Module structure
+- `adw-docs/architecture/architecture_guide.md` - Module structure
 
 ## Common Patterns
 

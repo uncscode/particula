@@ -354,7 +354,7 @@ def calculate_density(
 
 ### Type Hint Style
 
-**Preferred (Python 3.10+): Use `|` unions and built-in generics.**
+**Preferred (Python 3.12+ baseline): Use `|` unions and built-in generics.**
 ```python
 # Preferred with 3.12+
 value: float | int
@@ -374,6 +374,7 @@ def process(data: np.ndarray | None = None) -> float:
         data = np.array([1.0, 2.0, 3.0])
     return np.mean(data)
 ```
+
 
 **Use NDArray for numpy arrays:**
 ```python
