@@ -510,7 +510,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         batches_a = strategy_a._make_batches(20)
         batches_b = strategy_b._make_batches(20)
-        for batch_a, batch_b in zip(batches_a, batches_b):
+        for batch_a, batch_b in zip(batches_a, batches_b, strict=True):
             np.testing.assert_array_equal(batch_a, batch_b)
 
     def test_make_batches_single_batch(self):
@@ -584,7 +584,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertFalse(
             np.array_equal(np.concatenate(batches_a), np.arange(6))
         )
-        for batch_a, batch_b in zip(batches_a, batches_b):
+        for batch_a, batch_b in zip(batches_a, batches_b, strict=True):
             np.testing.assert_array_equal(batch_a, batch_b)
 
     def test_make_batches_generator_shuffle_path(self):
@@ -608,7 +608,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertFalse(
             np.array_equal(np.concatenate(batches_a), np.arange(6))
         )
-        for batch_a, batch_b in zip(batches_a, batches_b):
+        for batch_a, batch_b in zip(batches_a, batches_b, strict=True):
             np.testing.assert_array_equal(batch_a, batch_b)
 
     def _make_empty_particle(self):

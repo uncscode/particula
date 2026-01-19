@@ -277,6 +277,7 @@ class GasSpecies:
                         self.pure_vapor_pressure_strategy,
                         self.concentration,  # type: ignore
                         self.molar_mass,  # type: ignore
+                        strict=True,
                     )
                 ],
                 dtype=np.float64,
@@ -319,6 +320,7 @@ class GasSpecies:
                         self.pure_vapor_pressure_strategy,
                         self.concentration,  # type: ignore
                         self.molar_mass,  # type: ignore
+                        strict=True,
                     )
                 ],
                 dtype=np.float64,
@@ -360,6 +362,7 @@ class GasSpecies:
                     for (strategy, m) in zip(
                         self.pure_vapor_pressure_strategy,
                         self.molar_mass,  # type: ignore
+                        strict=True,
                     )
                 ],
                 dtype=np.float64,
