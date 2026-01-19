@@ -40,6 +40,8 @@ def _build_partitioning_inputs(
         c_star_j_dry,
         concentration_organic_matter,
         molar_mass,
+        oxygen2carbon,
+        density,
         gamma_organic_ab,
         mass_fraction_water_ab,
         q_ab,
