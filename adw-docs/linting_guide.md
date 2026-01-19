@@ -141,14 +141,14 @@ Currently configured via command-line arguments. Can be added to `pyproject.toml
 ```toml
 [tool.mypy]
 ignore_missing_imports = true
-python_version = "3.9"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 ```
 
 **Key Settings:**
 - **Ignore missing imports**: Enabled (for dependencies without type stubs)
-- **Python version**: 3.9+ (matches project requirement)
+- **Python version**: 3.12+ (matches project requirement)
 
 **Type Checking Standards:**
 - All functions must have proper type hints for parameters and return values

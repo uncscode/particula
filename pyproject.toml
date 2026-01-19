@@ -2,7 +2,7 @@
 name = "particula"
 description = "a simple, fast, and powerful particle simulator"
 readme = "readme.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = {file = "license"}
 authors = [
     {name = "Particula developers", email = "uncscode@users.noreply.github.com"},
@@ -10,6 +10,9 @@ authors = [
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: MIT License",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
@@ -32,7 +35,7 @@ repository = "https://github.com/uncscode/particula"
 [project.optional-dependencies]
 dev = [
     "pylint", "pytest", "pytest-cov", "autopep8", "jupyterlab",
-    "typing", "build", "flake8", "jupyter-book", "ghp-import",
+    "build", "flake8", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
     "griffe", "openai", "GitPython", "ruff", "mypy",

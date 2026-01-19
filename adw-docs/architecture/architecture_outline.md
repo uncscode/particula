@@ -243,7 +243,7 @@ particula/
 
 ### Core Technologies
 
-- **Language:** Python (3.9+)
+- **Language:** Python (3.12+)
 - **Build System:** setuptools (via pyproject.toml)
 - **Package Manager:** pip, uv
 - **Testing Framework:** pytest

@@ -11,13 +11,13 @@ This guide documents Python-specific coding standards for the **particula** repo
 
 ### Language Version
 
-**Minimum Version**: Python 3.9
+**Minimum Version**: Python 3.12
 
 **Current Development Version**: Python 3.13
 
 From `pyproject.toml`:
 ```toml
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 ```
 
 ## Naming Conventions
@@ -253,7 +253,7 @@ class MyClass:
 # Standard library
 import os
 import sys
-from typing import List, Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
 # Third-party
 import numpy as np
@@ -262,9 +262,15 @@ from numpy.typing import NDArray
 # Local
 from particula.activity.bat_blending import bat_blending_weights
 from particula.util.validate_inputs import validate_inputs
+
+if TYPE_CHECKING:  # only when needed for type checking
+    from collections.abc import Iterable
+    from typing import Sequence
 ```
 
 **Key Points:**
+- Prefer built-in generics (`list[int]`, `dict[str, float]`) and `|` unions
+- Use `typing` imports mainly for `TYPE_CHECKING`, Protocols, and TypeVars
 - One import per line for explicit imports
 - Group imports with blank lines
 - Sort imports alphabetically within each group (ruff handles this)
@@ -348,19 +354,22 @@ def calculate_density(
 
 ### Type Hint Style
 
-**Use Union for multiple types:**
+**Preferred (Python 3.10+): Use `|` unions and built-in generics.**
 ```python
-# Good
+# Preferred with 3.12+
+value: float | int
+array: float | NDArray[np.float64]
+
+# Acceptable (legacy typing module style)
 value: Union[float, int]
 array: Union[float, NDArray[np.float64]]
-
-# Note: Python 3.10+ supports `float | int`, but we target 3.9+
 ```
 
-**Use Optional for None:**
+**Optional values:**
 ```python
-# Good
-def process(data: Optional[np.ndarray] = None) -> float:
+# Preferred
+
+def process(data: np.ndarray | None = None) -> float:
     if data is None:
         data = np.array([1.0, 2.0, 3.0])
     return np.mean(data)
