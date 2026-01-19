@@ -1,10 +1,16 @@
-"""Activity coefficients for organic-water mixtures.
+"""Compute activity coefficients for binary organic-water mixtures using BAT.
 
-Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
-Relative-humidity-dependent organic aerosol thermodynamics
-Via an efficient reduced-complexity model.
-Atmospheric Chemistry and Physics
-https://doi.org/10.5194/acp-19-13383-2019
+The Binary Activity Thermodynamics (BAT) model leverages AIOMFAC-derived
+fits to describe thermodynamic activities of water and organics across realistic
+O:C and concentration ranges. The helper optionally converts functional group
+information to OH-equivalent form before blending Gibbs mixing weights and
+translating them into activity coefficients.
+
+References:
+    Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
+    Relative-humidity-dependent organic aerosol thermodynamics via an efficient
+    reduced-complexity model. Atmospheric Chemistry and Physics.
+    https://doi.org/10.5194/acp-19-13383-2019
 """
 
 from typing import List, Optional, Tuple, Union
@@ -41,7 +47,7 @@ def bat_activity_coefficients(
     Union[float, NDArray[np.float64]],
     Union[float, NDArray[np.float64]],
 ]:
-    """Calculate the activity coefficients for water-organic mixtures.
+    r"""Calculate the activity coefficients for water-organic mixtures.
 
     Uses the BAT (Binary Activity Thermodynamics) model to compute activity
     coefficients for binary organic-water mixtures based on AIOMFAC-derived

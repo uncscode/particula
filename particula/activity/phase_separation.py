@@ -1,4 +1,4 @@
-"""Phase separation utilities for organic–water systems.
+r"""Phase separation utilities for organic–water systems.
 
 Implements BAT (Binary Activity Thermodynamics) phase-separation helpers used
 by the activity module to identify liquid–liquid phase separation (LLPS) and
@@ -21,7 +21,7 @@ References:
     https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Dict, Tuple, Union
+from typing import Dict, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -65,7 +65,7 @@ def organic_water_single_phase(
 
 # pylint: disable=too-many-locals
 def find_phase_sep_index(
-    activity_data: NDArray[np.float64],
+    activity_data: Union[float, NDArray[np.float64]],
 ) -> Dict[str, Union[int, float]]:
     """Detect phase separation using activity monotonicity and limits.
 
@@ -74,7 +74,8 @@ def find_phase_sep_index(
     have activity ≤ 1 and monotonic behavior; violations indicate LLPS.
 
     Args:
-        activity_data: Array of activity values.
+        activity_data: Activity values, scalars or arrays promoted to NumPy
+            arrays respecting the same dtype and shape.
 
     Returns:
         Dictionary with detection flags and indices:
@@ -158,7 +159,8 @@ def find_phase_sep_index(
 
 
 def find_phase_separation(
-    activity_water: NDArray[np.float64], activity_org: NDArray[np.float64]
+    activity_water: Union[float, NDArray[np.float64]],
+    activity_org: Union[float, NDArray[np.float64]],
 ) -> Dict[str, Union[int, float]]:
     """Check for phase separation across water and organic activity curves.
 
@@ -166,8 +168,8 @@ def find_phase_separation(
     then combines the detected indices into a consolidated separation report.
 
     Args:
-        activity_water: Water activity values.
-        activity_org: Organic activity values.
+        activity_water: Water activity values. Scalars are promoted to NumPy arrays.
+        activity_org: Organic activity values. Scalars are promoted to NumPy arrays.
 
     Returns:
         Dictionary containing:
@@ -180,8 +182,11 @@ def find_phase_separation(
             upper_seperation: Water activity at upper separation index.
             matching_upper_seperation: Water activity at the matched index.
     """
-    water_sep = find_phase_sep_index(activity_water)
-    organic_sep = find_phase_sep_index(activity_org)
+    activity_water_arr = np.asarray(activity_water, dtype=np.float64)
+    activity_org_arr = np.asarray(activity_org, dtype=np.float64)
+
+    water_sep = find_phase_sep_index(activity_water_arr)
+    organic_sep = find_phase_sep_index(activity_org_arr)
 
     # gather all the indexes into a list for easier access
     indexes = [
@@ -191,68 +196,65 @@ def find_phase_separation(
         organic_sep["index_phase_sep_end"],
     ]
 
+    lower_seperation_index = 2
+    upper_seperation_index = 2
+    match_index_prime = 2
+
     # If there is a phase separation curve in the water activity data
     if water_sep["phase_sep_curve"] == 1:
         phase_sep_check = 1
 
-        # Check for the direction of the curve (increasing or decreasing)
-        if activity_water[0] < activity_water[-1]:  # increasing a_w with index
-            # find the min and max indexes
-            lower_seperation_index: int = int(min(indexes))
-            upper_seperation_index: int = int(max(indexes))
-            match_a_w = activity_water[upper_seperation_index]
+        if activity_water_arr[0] < activity_water_arr[-1]:  # increasing order
+            lower_seperation_index = int(min(indexes))
+            upper_seperation_index = int(max(indexes))
+            match_a_w = activity_water_arr[upper_seperation_index]
 
-            # start from the lower_seperation_index and find the index where
-            # the difference between activity_water and match_a_w changes sign
             match_slice = np.sign(
-                match_a_w - activity_water[lower_seperation_index:]
+                match_a_w - activity_water_arr[lower_seperation_index:]
             )
             match_index_prime_arr = np.where(match_slice == -1)
             if len(match_index_prime_arr[0]) == 0:
-                match_index_prime: int = lower_seperation_index
+                match_index_prime = lower_seperation_index
             else:
                 match_index_prime = int(
                     match_index_prime_arr[0][0] + lower_seperation_index
                 )
-        else:  # decreasing a_w with index
-            # find the min and max indexes
+        else:  # decreasing order
             lower_seperation_index = int(max(indexes))
             upper_seperation_index = int(min(indexes))
-            match_a_w = activity_water[upper_seperation_index]
+            match_a_w = activity_water_arr[upper_seperation_index]
 
-            # start from the lower_seperation_index and find the index where
-            # the difference between activity_water and match_a_w changes sign
             match_slice = np.sign(
-                activity_water[:lower_seperation_index] - match_a_w
+                activity_water_arr[:lower_seperation_index] - match_a_w
             )
             match_index_prime_arr = np.where(match_slice == -1)
             if len(match_index_prime_arr[0]) == 0:
                 match_index_prime = lower_seperation_index
             else:
                 match_index_prime = int(match_index_prime_arr[0][0])
-
     else:
-        upper_seperation_index = 2
-        lower_seperation_index = 2
-        match_index_prime = 2
         phase_sep_check = 0  # no phase seperation
+
+    lower_seperation_activity = activity_water_arr[int(lower_seperation_index)]
+    upper_seperation_activity = activity_water_arr[int(upper_seperation_index)]
+    matching_upper_activity = activity_water_arr[int(match_index_prime)]
 
     return {
         "phase_sep_check": phase_sep_check,
         "lower_seperation_index": lower_seperation_index,
         "upper_seperation_index": upper_seperation_index,
         "matching_upper_seperation_index": match_index_prime,
-        "lower_seperation": activity_water[int(lower_seperation_index)],
-        "upper_seperation": activity_water[int(upper_seperation_index)],
-        "matching_upper_seperation": activity_water[int(match_index_prime)],
+        "lower_seperation": lower_seperation_activity,
+        "upper_seperation": upper_seperation_activity,
+        "matching_upper_seperation": matching_upper_activity,
     }
 
 
 def q_alpha(
-    seperation_activity: NDArray[np.float64],
-    activities: NDArray[np.float64],
+    seperation_activity: Union[float, NDArray[np.float64]],
+    activities: Union[float, NDArray[np.float64]],
 ) -> np.ndarray:
-    """Compute :math:`q_\alpha` transition using a squeezed logistic curve.
+    r"""Compute :math:`q_\alpha` transition using a squeezed logistic curve.
 
     Maps activity values to a smooth transition between phase-separated and
     single-phase regimes. The sigmoid is calibrated so that
@@ -261,8 +263,9 @@ def q_alpha(
 
     Args:
         seperation_activity: Activity at which the mixture transitions
-            between phases.
-        activities: Activity values to evaluate.
+            between phases. Scalars or arrays are flattened internally.
+        activities: Activity values to evaluate. Scalars are promoted to NumPy
+            arrays before computing the logistic curve.
 
     Returns:
         NumPy array of :math:`q_\alpha` values with the same shape as
@@ -272,29 +275,30 @@ def q_alpha(
         >>> q_alpha(0.8, np.array([0.7, 0.8, 0.9]))
         array(...)
     """
-    if seperation_activity == 0:
-        return np.ones_like(activities)
+    separation_activity_array = np.asarray(
+        seperation_activity, dtype=np.float64
+    )
+    activities_array = np.asarray(activities, dtype=np.float64)
 
-    # spread in transfer from 50/50 point
-    delta_seperation = 1 - seperation_activity
+    if np.all(separation_activity_array == 0):
+        return np.ones_like(activities_array)
 
-    # check min value allowed
+    delta_seperation = 1 - separation_activity_array
+
     above_min_delta_seperation_value = delta_seperation > MIN_SPREAD_IN_AW
     delta_seperation = (
         delta_seperation * above_min_delta_seperation_value
         + (not above_min_delta_seperation_value) * MIN_SPREAD_IN_AW
     )
 
-    # calculate curve parameter of sigmoid
     sigmoid_curve_parameter = (
         get_safe_log(1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_seperation
     )
 
-    # calculate q_alpha return value
     return 1 - 1 / (
         1
         + get_safe_exp(
             sigmoid_curve_parameter
-            * (activities - seperation_activity + delta_seperation)
+            * (activities_array - separation_activity_array + delta_seperation)
         )
     )

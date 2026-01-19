@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-import numpy.testing as npt
 
 from particula.activity.bat_coefficients import (
     G19_FIT_HIGH,
@@ -11,7 +10,6 @@ from particula.activity.bat_coefficients import (
     G19_FIT_MID,
 )
 from particula.activity.gibbs_mixing import (
-    _calculate_gibbs_mix_single,
     gibbs_mix_weight,
     gibbs_of_mixing,
 )
