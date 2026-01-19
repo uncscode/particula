@@ -1,21 +1,19 @@
-"""Tests covering partitioning helpers, validation, and regression safeguards."""
+"""Tests for partitioning helpers, validation, and regression safeguards."""
 
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
-from scipy.optimize import OptimizeResult
-
 from particula.equilibria import partitioning
 from particula.particles.properties.organic_density_module import (
     get_organic_density_array,
 )
+from scipy.optimize import OptimizeResult
 
 
 def _build_partitioning_inputs(
     species_count: int = 5, water_activity: float = 0.7
 ):
     """Create representative inputs for partitioning helpers."""
-
     species_count = max(1, species_count)
     c_star_j_dry = np.linspace(1e-3, 1.0, species_count, dtype=float)
     concentration_organic_matter = np.linspace(
@@ -49,6 +47,7 @@ def _build_partitioning_inputs(
 
 
 def test_calculate_alpha_phase_basic_and_zero_water():
+    """Validate alpha-phase computation for finite and unity water cases."""
     c_j_liquid = np.array([1.0, 2.0], dtype=float)
     q_ab = np.array([[0.5, 0.2], [1.0, 0.0]], dtype=float)
     mass_fraction_water_ab = np.array([[0.2, 0.0], [1.0, 0.0]], dtype=float)
@@ -89,6 +88,7 @@ def test_calculate_alpha_phase_basic_and_zero_water():
 
 
 def test_calculate_beta_phase_basic_and_zero_water():
+    """Validate beta-phase computation for finite and unity water cases."""
     c_j_liquid = np.array([1.0, 3.0], dtype=float)
     q_ab = np.array([[0.1, 0.9], [0.0, 1.0]], dtype=float)
     mass_fraction_water_ab = np.array([[0.3, 0.7], [0.0, 1.0]], dtype=float)
@@ -129,7 +129,9 @@ def test_calculate_beta_phase_basic_and_zero_water():
 
 
 def test_calculate_cstar_zero_mass_weighted_returns_zero():
+    """Return zeros for C* when mass-weighted molar mass is zero."""
     c_star_j_dry = np.array([1e-3, 5e-3], dtype=float)
+
     gamma_phase = np.ones_like(c_star_j_dry)
     q_phase = np.full_like(c_star_j_dry, 0.5)
     molar_mass = np.full_like(c_star_j_dry, 200.0)
@@ -147,6 +149,8 @@ def test_calculate_cstar_zero_mass_weighted_returns_zero():
 
 
 def test_get_properties_beta_none_zero_fill(monkeypatch):
+    """Zero-fill beta arrays when water activity yields no beta phase."""
+
     def _fake_fixed_water_activity(*args, **kwargs):
         alpha = (
             np.array([0.5], dtype=float),
@@ -180,6 +184,7 @@ def test_get_properties_beta_none_zero_fill(monkeypatch):
 
 
 def test_liquid_vapor_partitioning_regression_shapes_and_finiteness():
+    """Safeguard shapes and finiteness of partitioning regression outputs."""
     (
         c_star_j_dry,
         concentration_organic_matter,
@@ -210,6 +215,7 @@ def test_liquid_vapor_partitioning_regression_shapes_and_finiteness():
 
 
 def test_liquid_vapor_partitioning_single_species_and_zero_concentration():
+    """Handle single-species and zero-concentration edge cases without fail."""
     (
         c_star_j_dry,
         _,
@@ -239,6 +245,7 @@ def test_liquid_vapor_partitioning_single_species_and_zero_concentration():
 
 
 def test_partition_coefficient_guess_matches_length(monkeypatch):
+    """Partition guess defaults to correct length and passes into optimizer."""
     (
         c_star_j_dry,
         concentration_organic_matter,
@@ -271,6 +278,7 @@ def test_partition_coefficient_guess_matches_length(monkeypatch):
 
 
 def test_partition_coefficient_guess_length_mismatch_raises():
+    """Raise when partition guess length mismatches the species count."""
     (
         c_star_j_dry,
         concentration_organic_matter,
@@ -294,6 +302,7 @@ def test_partition_coefficient_guess_length_mismatch_raises():
 
 
 def test_liquid_vapor_partitioning_rejects_negative_or_nonfinite_inputs():
+    """Validation decorator rejects negative or non-finite inputs."""
     (
         c_star_j_dry,
         concentration_organic_matter,
@@ -327,6 +336,7 @@ def test_liquid_vapor_partitioning_rejects_negative_or_nonfinite_inputs():
 
 
 def test_get_properties_length_mismatch_raises():
+    """Input length mismatch in property helper raises informative errors."""
     with pytest.raises(ValueError):
         partitioning.get_properties_for_liquid_vapor_partitioning(
             water_activity_desired=np.array([0.4, 0.4, 0.4], dtype=float),
