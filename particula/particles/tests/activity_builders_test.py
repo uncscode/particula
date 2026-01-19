@@ -247,9 +247,9 @@ def test_activity_non_ideal_binary_builder_unit_conversion_mixins():
     """Mixin setters perform unit conversion before build."""
     strategy = (
         ActivityNonIdealBinaryBuilder()
-        .set_molar_mass(200, "g/mol")
+        .set_molar_mass(0.2, "kg/mol")
         .set_oxygen2carbon(0.4)
-        .set_density(1.4, "g/cm^3")
+        .set_density(1400.0, "kg/m^3")
         .build()
     )
     assert strategy.molar_mass_kg == pytest.approx(0.2, rel=1e-6)
@@ -260,11 +260,11 @@ def test_activity_non_ideal_binary_builder_set_parameters_supports_units():
     """set_parameters handles units and optional functional_group."""
     builder = ActivityNonIdealBinaryBuilder()
     parameters = {
-        "molar_mass": 200,
-        "molar_mass_units": "g/mol",
+        "molar_mass": 0.2,
+        "molar_mass_units": "kg/mol",
         "oxygen2carbon": 0.45,
-        "density": 1.25,
-        "density_units": "g/cm^3",
+        "density": 1250.0,
+        "density_units": "kg/m^3",
         "functional_group": "ether",
     }
     builder.set_parameters(parameters)
