@@ -1,7 +1,10 @@
 """Particula activity sub-package.
 
-Provides Binary Activity Thermodynamics (BAT) utilities for organic–water
-systems following Gorkowski, Preston, and Zuend (2019).
+Provides Binary Activity Thermodynamics (BAT) helpers for organic–water
+thermodynamics. Public APIs cover BAT activity coefficients, Gibbs mixing
+weights, ratio conversions, and phase-separation diagnostics derived from
+Gorkowski, Preston, and Zuend (2019). The package re-exports constants and
+helper routines to simplify imports and keep validation consistent.
 
 References:
     Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
@@ -13,10 +16,10 @@ References:
 from particula.activity.activity_coefficients import bat_activity_coefficients
 from particula.activity.bat_blending import bat_blending_weights
 from particula.activity.bat_coefficients import (
-    FitValues,
     G19_FIT_HIGH,
     G19_FIT_LOW,
     G19_FIT_MID,
+    FitValues,
     coefficients_c,
 )
 from particula.activity.convert_functional_group import convert_to_oh_equivalent

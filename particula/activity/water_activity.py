@@ -78,8 +78,11 @@ def biphasic_water_activity_point(
         if np.isnan(activities[0]).any():
             raise ValueError("water activity is NaN, check inputs")
 
+        activities_water_seq = np.asarray(activities[0], dtype=np.float64)
+        activities_organic_seq = np.asarray(activities[1], dtype=np.float64)
+
         phase_check = phase_separation.find_phase_separation(
-            activities[0], activities[1]
+            activities_water_seq, activities_organic_seq
         )
 
         if phase_check["phase_sep_check"] == 1:
@@ -182,19 +185,16 @@ def fixed_water_activity(
     # else phase separation occurs
     # split the activities into alpha and beta phases
 
+    upper_index = int(phase_check["upper_seperation_index"])
+    matching_upper_index = int(phase_check["matching_upper_seperation_index"])
+
     # alpha water rich phase
-    alpha_water_activity = activities_water[
-        phase_check["upper_seperation_index"] :
-    ]
-    alpha_organic_mole_fraction = organic_mole_fraction_array[
-        phase_check["upper_seperation_index"] :
-    ]
+    alpha_water_activity = activities_water[upper_index:]
+    alpha_organic_mole_fraction = organic_mole_fraction_array[upper_index:]
     # beta organic rich phase
-    beta_water_activity = activities_water[
-        : phase_check["matching_upper_seperation_index"]
-    ]
+    beta_water_activity = activities_water[:matching_upper_index]
     beta_organic_mole_fraction = organic_mole_fraction_array[
-        : phase_check["matching_upper_seperation_index"]
+        :matching_upper_index
     ]
 
     # find the water activity of the alpha phase

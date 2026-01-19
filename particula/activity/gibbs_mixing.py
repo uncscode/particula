@@ -43,20 +43,41 @@ def gibbs_of_mixing(
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
-    """Calculate the Gibbs free energy of mixing for a binary mixture.
+    """Compute the Gibbs free energy of mixing for a single fit region.
+
+    This helper evaluates the Gibbs energy and its derivative for the low,
+    mid, or high O:C fit indicated by ``fit_dict``. The calculation follows
+    Gorkowski et al. (2019) with AIOMFAC-derived coefficients and normalizes
+    by :math:`RT` to remain dimensionless.
 
     Args:
-        - molar_mass_ratio : The molar mass ratio of water to organic
-          matter.
-        - organic_mole_fraction : The fraction of organic matter.
-        - oxygen2carbon : The oxygen to carbon ratio.
-        - density : The density of the mixture, in kg/m^3.
-        - fit_dict : A dictionary of fit values for the low oxygen2carbon
-            region
+        molar_mass_ratio: Ratio of water to organic molar mass
+            (:math:`MW_{water} / MW_{organic}`). Dimensionless.
+        organic_mole_fraction: Mole fraction of the organic component.
+            Range: [0, 1].
+        oxygen2carbon: Oxygen-to-carbon ratio for the organic compound.
+        density: Mixture density in kg/m^3 assuming water is the other phase.
+        fit_dict: Fit constants defining the selected O:C region (low, mid,
+            or high) from the BAT parameterization.
 
     Returns:
-        - A tuple containing the Gibbs free energy of mixing and its
-          derivative.
+        Tuple containing the Gibbs mixing energy and its derivative with
+        respect to the organic mole fraction. Both values are normalized by
+        :math:`RT` and share the shape of ``organic_mole_fraction``.
+
+    Examples:
+        >>> from particula.activity import gibbs_of_mixing
+        >>> g_mix, dg_dx = gibbs_of_mixing(
+        ...     molar_mass_ratio=0.09,
+        ...     organic_mole_fraction=0.3,
+        ...     oxygen2carbon=0.4,
+        ...     density=1400.0,
+        ...     fit_dict=G19_FIT_LOW,
+        ... )
+
+    References:
+        Gorkowski, K., Preston, T. C., & Zuend, A. (2019), Equations 1-6 and
+        Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019
     """
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
     organic_mole_fraction = np.asarray(organic_mole_fraction, dtype=np.float64)
@@ -106,13 +127,13 @@ def gibbs_mix_weight(
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
-    """Calculate weighted Gibbs free energy of mixing for the BAT model.
+    """Blend Gibbs mixing energies across O:C regimes for BAT activity.
 
-    Blends Gibbs free energy fits across low, mid, and high oxygen-to-carbon
-    (O:C) regions to avoid discontinuities in activity coefficient
-    calculations. The blending weights come from :func:`bat_blending_weights`
-    and transition smoothly between the Gorkowski et al. (2019) fits. Only one
-    compound is processed per call; vector inputs are iterated elementwise.
+    The BAT model interpolates between Gorkowski et al. (2019) fits for low,
+    mid, and high oxygen-to-carbon ratios via :func:`bat_blending_weights`. The
+    weights ensure smooth transitions so downstream activity coefficient
+    calculations remain continuous regardless of single-compound inputs or
+    vectorized batches.
 
     Args:
         molar_mass_ratio: Ratio of water to organic molar mass
