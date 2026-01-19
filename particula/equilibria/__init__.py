@@ -6,6 +6,9 @@ from particula.equilibria.equilibria_strategies import (
     LiquidVaporPartitioningStrategy,
     PhaseConcentrations,
 )
+from particula.equilibria.equilibria_builders import (
+    LiquidVaporPartitioningBuilder,
+)
 from particula.equilibria.partitioning import (
     get_properties_for_liquid_vapor_partitioning,
     liquid_vapor_obj_function,
@@ -20,4 +23,5 @@ __all__ = [
     "LiquidVaporPartitioningStrategy",
     "EquilibriumResult",
     "PhaseConcentrations",
+    "LiquidVaporPartitioningBuilder",
 ]
