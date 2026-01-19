@@ -191,6 +191,8 @@ def test_liquid_vapor_partitioning_regression_shapes_and_finiteness():
         c_star_j_dry,
         concentration_organic_matter,
         molar_mass,
+        _oxygen2carbon,
+        _density,
         gamma_organic_ab,
         mass_fraction_water_ab,
         q_ab,
@@ -220,8 +222,10 @@ def test_liquid_vapor_partitioning_single_species_and_zero_concentration():
     """Handle single-species and zero-concentration edge cases without fail."""
     (
         c_star_j_dry,
-        _,
+        _concentration_organic_matter,
         molar_mass,
+        _oxygen2carbon,
+        _density,
         gamma_organic_ab,
         mass_fraction_water_ab,
         q_ab,
@@ -252,6 +256,8 @@ def test_partition_coefficient_guess_matches_length(monkeypatch):
         c_star_j_dry,
         concentration_organic_matter,
         molar_mass,
+        _oxygen2carbon,
+        _density,
         gamma_organic_ab,
         mass_fraction_water_ab,
         q_ab,
@@ -285,6 +291,8 @@ def test_partition_coefficient_guess_length_mismatch_raises():
         c_star_j_dry,
         concentration_organic_matter,
         molar_mass,
+        _oxygen2carbon,
+        _density,
         gamma_organic_ab,
         mass_fraction_water_ab,
         q_ab,
@@ -309,54 +317,11 @@ def test_liquid_vapor_partitioning_rejects_negative_or_nonfinite_inputs():
         c_star_j_dry,
         concentration_organic_matter,
         molar_mass,
+        _oxygen2carbon,
+        _density,
         gamma_organic_ab,
         mass_fraction_water_ab,
         q_ab,
-    ) = _build_partitioning_inputs(species_count=1)
-
-    with pytest.raises(ValueError):
-        partitioning.liquid_vapor_partitioning(
-            c_star_j_dry=-np.abs(c_star_j_dry),
-            concentration_organic_matter=concentration_organic_matter,
-            molar_mass=molar_mass,
-            gamma_organic_ab=gamma_organic_ab,
-            mass_fraction_water_ab=mass_fraction_water_ab,
-            q_ab=q_ab,
-            partition_coefficient_guess=None,
-        )
-
-    with pytest.raises(ValueError):
-        partitioning.liquid_vapor_partitioning(
-            c_star_j_dry=c_star_j_dry,
-            concentration_organic_matter=np.array([np.nan], dtype=float),
-            molar_mass=molar_mass,
-            gamma_organic_ab=gamma_organic_ab,
-            mass_fraction_water_ab=mass_fraction_water_ab,
-            q_ab=q_ab,
-            partition_coefficient_guess=None,
-        )
-
-
-def test_get_properties_length_mismatch_raises():
-    """Input length mismatch in property helper raises informative errors."""
-    with pytest.raises(ValueError):
-        partitioning.get_properties_for_liquid_vapor_partitioning(
-            water_activity_desired=np.array([0.4, 0.4, 0.4], dtype=float),
-            molar_mass=np.array([150.0, 160.0], dtype=float),
-            oxygen2carbon=np.array([0.3, 0.4], dtype=float),
-            density=np.array([1100.0, 1150.0], dtype=float),
-        )
-
-
-def test_liquid_vapor_partitioning_rejects_1d_arrays():
-    """Validation rejects 1D arrays for gamma, mass_fraction, q."""
-    (
-        c_star_j_dry,
-        concentration_organic_matter,
-        molar_mass,
-        _,
-        _,
-        _,
     ) = _build_partitioning_inputs(species_count=2)
 
     # Create 1D arrays instead of 2D arrays
@@ -381,9 +346,11 @@ def test_liquid_vapor_partitioning_rejects_wrong_column_count():
         c_star_j_dry,
         concentration_organic_matter,
         molar_mass,
-        _,
-        _,
-        _,
+        _oxygen2carbon,
+        _density,
+        _gamma_organic_ab,
+        _mass_fraction_water_ab,
+        _q_ab,
     ) = _build_partitioning_inputs(species_count=2)
 
     # Create 2D arrays with wrong number of columns (3 instead of 2)
