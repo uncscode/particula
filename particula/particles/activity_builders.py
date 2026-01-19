@@ -4,11 +4,18 @@ Change to MixinMolar classes, after PR integration.
 """
 
 import logging
+import sys
 import warnings
-from typing import Any, List, Optional, Self, Union
+from typing import Any, List, Optional, Union
 
 import numpy as np
 from numpy.typing import NDArray
+
+# Self was added to typing in Python 3.11
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 from particula.abc_builder import (
     BuilderABC,

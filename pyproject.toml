@@ -19,7 +19,7 @@ keywords = [
 ]
 
 dependencies = [
-    "numpy>=2.0.0", "scipy>=1.12",
+    "numpy>=2.0.0", "scipy>=1.12", "typing_extensions>=4.0.0",
 ]
 
 # This is set automatically by flit using `particula.__version__`
