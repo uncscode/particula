@@ -344,3 +344,57 @@ def test_get_properties_length_mismatch_raises():
             oxygen2carbon=np.array([0.3, 0.4], dtype=float),
             density=np.array([1100.0, 1150.0], dtype=float),
         )
+
+
+def test_liquid_vapor_partitioning_rejects_1d_arrays():
+    """Validation rejects 1D arrays for gamma, mass_fraction, q."""
+    (
+        c_star_j_dry,
+        concentration_organic_matter,
+        molar_mass,
+        _,
+        _,
+        _,
+    ) = _build_partitioning_inputs(species_count=2)
+
+    # Create 1D arrays instead of 2D arrays
+    gamma_1d = np.array([1.0, 1.0], dtype=float)
+    mass_fraction_1d = np.array([0.5, 0.5], dtype=float)
+    q_1d = np.array([0.5, 0.5], dtype=float)
+
+    with pytest.raises(ValueError, match="must be 2D arrays"):
+        partitioning.liquid_vapor_partitioning(
+            c_star_j_dry=c_star_j_dry,
+            concentration_organic_matter=concentration_organic_matter,
+            molar_mass=molar_mass,
+            gamma_organic_ab=gamma_1d,
+            mass_fraction_water_ab=mass_fraction_1d,
+            q_ab=q_1d,
+        )
+
+
+def test_liquid_vapor_partitioning_rejects_wrong_column_count():
+    """Validation rejects 2D arrays with wrong number of columns."""
+    (
+        c_star_j_dry,
+        concentration_organic_matter,
+        molar_mass,
+        _,
+        _,
+        _,
+    ) = _build_partitioning_inputs(species_count=2)
+
+    # Create 2D arrays with wrong number of columns (3 instead of 2)
+    gamma_3cols = np.ones((2, 3), dtype=float)
+    mass_fraction_3cols = np.ones((2, 3), dtype=float)
+    q_3cols = np.ones((2, 3), dtype=float)
+
+    with pytest.raises(ValueError, match="must have two columns"):
+        partitioning.liquid_vapor_partitioning(
+            c_star_j_dry=c_star_j_dry,
+            concentration_organic_matter=concentration_organic_matter,
+            molar_mass=molar_mass,
+            gamma_organic_ab=gamma_3cols,
+            mass_fraction_water_ab=mass_fraction_3cols,
+            q_ab=q_3cols,
+        )
