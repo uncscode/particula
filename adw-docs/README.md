@@ -40,7 +40,7 @@ This directory contains documentation guides for ADW (AI Developer Workflow) age
 
 - **Package Name**: particula
 - **Version**: 0.2.6
-- **Language**: Python 3.9+
+- **Language**: Python 3.12+
 - **Repository**: https://github.com/uncscode/particula.git
 - **Main Branch**: main
 - **Description**: A simple, fast, and powerful particle simulator
