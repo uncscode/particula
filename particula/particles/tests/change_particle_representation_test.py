@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from particula.particles import PresetResolvedParticleMassBuilder
 from particula.particles.change_particle_representation import (
     get_particle_resolved_binned_radius,

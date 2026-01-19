@@ -1,7 +1,6 @@
 """Tests for the vapor pressure factories."""
 
 import pytest
-
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,

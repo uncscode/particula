@@ -1,7 +1,6 @@
 """Integration test for quick start example in particula."""
 
 import numpy as np
-
 import particula as par
 
 

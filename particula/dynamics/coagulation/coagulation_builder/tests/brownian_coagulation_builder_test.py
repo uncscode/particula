@@ -1,7 +1,6 @@
 """Tests for the BrownianCoagulationBuilder class."""
 
 import pytest
-
 from particula.dynamics import (
     BrownianCoagulationBuilder,
     BrownianCoagulationStrategy,

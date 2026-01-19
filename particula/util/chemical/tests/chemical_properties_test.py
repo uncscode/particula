@@ -1,7 +1,6 @@
 """Test for chemical_properties.py module."""
 
 import pytest
-
 from particula.util.chemical.chemical_properties import (
     get_chemical_stp_properties,
 )

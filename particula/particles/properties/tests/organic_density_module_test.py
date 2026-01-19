@@ -1,7 +1,6 @@
 """Tests for the organic density module."""
 
 import numpy as np
-
 from particula.particles.properties.organic_density_module import (
     get_organic_density_array,
     get_organic_density_estimate,

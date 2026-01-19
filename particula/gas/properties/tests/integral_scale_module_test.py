@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas.properties.integral_scale_module import (
     get_eulerian_integral_length,
     get_lagrangian_integral_time,

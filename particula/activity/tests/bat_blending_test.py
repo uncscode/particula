@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.activity.bat_blending import bat_blending_weights
 
 

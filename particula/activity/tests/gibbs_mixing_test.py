@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from particula.activity.bat_coefficients import (
     G19_FIT_HIGH,
     G19_FIT_LOW,

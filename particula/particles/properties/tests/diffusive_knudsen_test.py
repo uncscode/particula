@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.diffusive_knudsen_module import (
     get_diffusive_knudsen_number,
 )

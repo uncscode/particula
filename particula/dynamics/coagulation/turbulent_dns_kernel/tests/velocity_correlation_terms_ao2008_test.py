@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (  # noqa: E501
     compute_b1,
     compute_b2,

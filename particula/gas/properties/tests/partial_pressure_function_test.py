@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas.properties.pressure_function import (
     get_partial_pressure,
 )

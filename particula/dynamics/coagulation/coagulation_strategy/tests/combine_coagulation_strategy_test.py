@@ -10,7 +10,6 @@ both discrete and continuous_pdf distribution types.
 import unittest
 
 import numpy as np
-
 from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (  # noqa: E501
     BrownianCoagulationStrategy,
 )

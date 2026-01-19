@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
 )

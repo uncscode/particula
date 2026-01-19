@@ -3,7 +3,6 @@
 import time
 
 import numpy as np
-from scipy.interpolate import RegularGridInterpolator
 
 # fmt: off
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (  # noqa: E501  # pylint: disable=line-too-long
@@ -13,6 +12,7 @@ from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_met
     get_particle_resolved_coagulation_step,
     get_particle_resolved_update_step,
 )
+from scipy.interpolate import RegularGridInterpolator
 
 # fmt: on
 

@@ -5,7 +5,6 @@ The Strategy is tested independently.
 
 import numpy as np
 import pytest
-
 from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,

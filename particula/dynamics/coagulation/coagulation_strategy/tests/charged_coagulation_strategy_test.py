@@ -10,7 +10,6 @@ discrete and continuous_pdf distribution types.
 import unittest
 
 import numpy as np
-
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )

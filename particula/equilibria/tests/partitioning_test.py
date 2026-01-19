@@ -1,7 +1,6 @@
 """Test to make sure the partitioning can run, does not test the results."""
 
 import numpy as np
-
 from particula.equilibria import partitioning
 from particula.particles.properties.organic_density_module import (
     get_organic_density_array,

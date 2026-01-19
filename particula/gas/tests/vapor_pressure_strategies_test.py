@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ArblasterLiquidVaporPressureStrategy,

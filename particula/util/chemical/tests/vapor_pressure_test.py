@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.util.chemical.chemical_vapor_pressure import (
     get_chemical_vapor_pressure,
 )

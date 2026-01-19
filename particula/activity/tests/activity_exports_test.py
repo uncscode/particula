@@ -8,7 +8,6 @@ helper behaves over the minimum allowed spread.
 from importlib import reload
 
 import numpy as np
-
 import particula.activity as activity
 
 

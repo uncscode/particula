@@ -1,7 +1,6 @@
 """Test the round module."""
 
 import numpy as np
-
 from particula.util.arbitrary_round import get_arbitrary_round
 
 

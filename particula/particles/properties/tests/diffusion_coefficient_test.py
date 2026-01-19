@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.diffusion_coefficient import (
     get_diffusion_coefficient,
 )

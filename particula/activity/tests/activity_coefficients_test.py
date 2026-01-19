@@ -1,7 +1,6 @@
 """Test for activity_coefficients function."""
 
 import numpy as np
-
 from particula.activity.activity_coefficients import bat_activity_coefficients
 
 

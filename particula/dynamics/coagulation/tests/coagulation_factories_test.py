@@ -4,7 +4,6 @@ the appropriate ValueError.
 """
 
 import pytest
-
 from particula.dynamics import (
     BrownianCoagulationStrategy,
     ChargedCoagulationStrategy,

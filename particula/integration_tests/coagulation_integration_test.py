@@ -9,7 +9,6 @@ Brownian coagulation strategy.
 import unittest
 
 import numpy as np
-
 import particula as par
 
 

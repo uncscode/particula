@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.dilution import (
     get_dilution_rate,
     get_volume_dilution_coefficient,

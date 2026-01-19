@@ -10,7 +10,6 @@ both discrete and continuous_pdf distribution types.
 import unittest
 
 import numpy as np
-
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy import (  # noqa: E501
     TurbulentDNSCoagulationStrategy,
 )

@@ -9,7 +9,6 @@ The tests cover:
 """
 
 import numpy as np
-
 from particula.particles.representation import get_sorted_bins_by_radius
 
 

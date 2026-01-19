@@ -1,7 +1,6 @@
 """Tests for the SedimentationCoagulationBuilder class."""
 
 import pytest
-
 from particula.dynamics.coagulation.coagulation_builder import (
     sedimentation_coagulation_builder,
 )

@@ -28,7 +28,6 @@ for _module in [
 
 
 import numpy as np
-
 from particula.dynamics import (
     RectangularWallLossStrategy as ExportedRectangularWallLossStrategy,
 )

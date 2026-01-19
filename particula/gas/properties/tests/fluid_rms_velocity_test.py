@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas.properties.fluid_rms_velocity import (
     get_fluid_rms_velocity,
 )  # Update 'your_module' with the actual module name

@@ -3,7 +3,6 @@ and checking/validation of the parameters.
 """
 
 import pytest
-
 from particula.gas.species import GasSpecies
 from particula.gas.species_builders import (
     GasSpeciesBuilder,

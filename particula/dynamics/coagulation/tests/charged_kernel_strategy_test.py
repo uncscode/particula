@@ -1,7 +1,6 @@
 """Test Kernel class and its methods."""
 
 import numpy as np
-
 from particula.dynamics.coagulation import charged_kernel_strategy
 
 # Define constants for common test data

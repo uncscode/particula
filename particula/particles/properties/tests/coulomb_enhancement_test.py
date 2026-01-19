@@ -1,7 +1,6 @@
 """Test of the ratio function in the coulomb_enhancement module."""
 
 import numpy as np
-
 from particula.particles.properties import coulomb_enhancement
 
 

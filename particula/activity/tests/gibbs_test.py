@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.activity.gibbs import (
     gibbs_free_energy,
     gibbs_free_engery,  # Deprecated misspelled alias

@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas.properties.concentration_function import (
     get_concentration_from_pressure,
 )

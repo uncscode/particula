@@ -1,7 +1,6 @@
 """Tests for the CombineCoagulationStrategyBuilder class."""
 
 import pytest
-
 from particula.dynamics import (
     BrownianCoagulationBuilder,
     ChargedCoagulationBuilder,

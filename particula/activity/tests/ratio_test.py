@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.activity.ratio import from_molar_mass_ratio, to_molar_mass_ratio
 
 

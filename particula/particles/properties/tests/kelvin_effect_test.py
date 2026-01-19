@@ -1,7 +1,6 @@
 """Test the Kelvin effect module."""
 
 import numpy as np
-
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,

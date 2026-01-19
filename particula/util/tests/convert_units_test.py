@@ -1,9 +1,8 @@
 """Pytest coverage for ``convert_units`` helper."""
 
 import numpy as np
-import pytest
-
 import particula.util.convert_units as convert_units
+import pytest
 
 pint = pytest.importorskip("pint")
 

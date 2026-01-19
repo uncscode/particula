@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.util.chemical.chemical_surface_tension import (
     get_chemical_surface_tension,
 )
