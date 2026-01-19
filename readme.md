@@ -58,7 +58,7 @@ particula/
 | Tutorials & walkthroughs  | [Examples/](https://uncscode.github.io/particula/Examples/) |
 | Scientific background     | [Theory/](https://uncscode.github.io/particula/Theory/) |
 | API reference             | [Full Docs](https://uncscode.github.io/particula) |
-| Contributing              | [contribute/](docs/contribute/CONTRIBUTING.md) |
+| Contributing              | [contribute/](./docs/contribute/CONTRIBUTING.md) |
 
 ### Examples by Topic
 
@@ -71,9 +71,9 @@ particula/
 
 ### Featured Examples
 
-- [**Aerosol Tutorial**](docs/Examples/Aerosol/Aerosol_Tutorial.ipynb) — Learn how to build gas species, atmospheres, particle distributions, and combine them into an `Aerosol` object.
+- [**Aerosol Tutorial**](./docs/Examples/Aerosol/Aerosol_Tutorial.ipynb) — Learn how to build gas species, atmospheres, particle distributions, and combine them into an `Aerosol` object.
 
-- [**Organic Partitioning & Coagulation**](docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
+- [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
 
 ## Features
 
