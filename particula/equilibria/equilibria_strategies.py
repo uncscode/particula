@@ -230,9 +230,6 @@ class LiquidVaporPartitioningStrategy(EquilibriaStrategy):
         )
 
     def _to_phase(self, phase: PhaseOutput) -> PhaseConcentrations:
-        if not self._is_valid_phase_output(phase):
-            raise ValueError("phase output must be a length-4 sequence")
-
         organic = np.asarray(phase[0], dtype=float)
         aqueous = np.asarray(phase[1], dtype=float)
         if organic.shape != aqueous.shape:
