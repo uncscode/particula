@@ -205,7 +205,7 @@ class CondensationIsothermal(CondensationStrategy):
             return_legacy = False
         
         if isinstance(gas_species, GasSpecies):
-            gas_data = gas_data_from_species(gas_species)
+            gas_data = from_species(gas_species)
         else:
             gas_data = gas_species
         
