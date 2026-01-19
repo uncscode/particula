@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation import charged_dimensionless_kernel
 
 # test single value

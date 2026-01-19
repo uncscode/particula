@@ -4,7 +4,6 @@ via system state.
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.charged_dimensional_kernel import (
     get_coulomb_kernel_chahl2019_via_system_state,
     get_coulomb_kernel_dyachkov2007_via_system_state,

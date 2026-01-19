@@ -7,7 +7,6 @@ The Builder is tested independently.
 
 import numpy as np
 import pytest
-
 from particula.particles.activity_builders import (
     ActivityNonIdealBinaryBuilder,
 )

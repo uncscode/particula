@@ -1,7 +1,6 @@
 """Tests for the VaporPressureBuilder class."""
 
 import pytest
-
 from particula.gas.vapor_pressure_builders import (
     AntoineVaporPressureBuilder,
     ClausiusClapeyronVaporPressureBuilder,

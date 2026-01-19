@@ -8,7 +8,6 @@ The Builder is tested independently.
 
 import numpy as np
 import pytest
-
 from particula.particles.surface_factories import (
     SurfaceFactory,
 )

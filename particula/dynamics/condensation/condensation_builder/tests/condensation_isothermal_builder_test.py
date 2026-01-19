@@ -1,7 +1,6 @@
 """Test for CondensationIsothermalBuilder."""
 
 import pytest
-
 from particula.dynamics import (
     CondensationIsothermal,
     CondensationIsothermalBuilder,

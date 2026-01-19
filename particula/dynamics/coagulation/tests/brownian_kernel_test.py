@@ -4,7 +4,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation import brownian_kernel
 from particula.util.constants import BOLTZMANN_CONSTANT
 

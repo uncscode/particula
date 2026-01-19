@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.util.validate_inputs import validate_inputs
 
 # Define a sample function to test the decorator

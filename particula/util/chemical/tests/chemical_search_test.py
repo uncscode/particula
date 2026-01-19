@@ -6,7 +6,6 @@ These tests check:
 """
 
 import pytest
-
 from particula.util.chemical.chemical_search import (
     CHEMICALS_AVAILABLE,
     get_chemical_search,

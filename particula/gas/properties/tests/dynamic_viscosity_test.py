@@ -1,7 +1,6 @@
 """Test dynamic viscosity property functions."""
 
 import pytest
-
 from particula.gas import get_dynamic_viscosity
 
 

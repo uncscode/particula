@@ -1,7 +1,6 @@
 """Test the kappa convert module."""
 
 import numpy as np
-
 from particula.particles.properties.convert_kappa_volumes import (
     get_kappa_from_volumes,
     get_solute_volume_from_kappa,

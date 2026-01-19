@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.mean_thermal_speed_module import (
     get_mean_thermal_speed,
 )

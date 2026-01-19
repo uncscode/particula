@@ -6,7 +6,6 @@ Correctness is tested by activity_strategies_test.py.
 
 import numpy as np
 import pytest
-
 from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
     ActivityIdealMolarBuilder,

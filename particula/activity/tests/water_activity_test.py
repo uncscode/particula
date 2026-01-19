@@ -1,7 +1,6 @@
 """Test for water activity calculation."""
 
 import numpy as np
-
 from particula.activity.water_activity import (
     biphasic_water_activity_point,
     fixed_water_activity,

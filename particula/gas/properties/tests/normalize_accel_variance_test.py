@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas.properties.normalize_accel_variance import (
     get_normalized_accel_variance_ao2008,
 )

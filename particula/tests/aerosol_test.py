@@ -3,7 +3,6 @@
 import unittest
 
 import numpy as np
-
 from particula.aerosol import Aerosol
 from particula.gas import (
     AtmosphereBuilder,

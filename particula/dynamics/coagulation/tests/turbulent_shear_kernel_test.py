@@ -4,7 +4,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
     get_turbulent_shear_kernel_st1956,
     get_turbulent_shear_kernel_st1956_via_system_state,

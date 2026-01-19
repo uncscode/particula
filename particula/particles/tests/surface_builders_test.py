@@ -6,7 +6,6 @@ BuilderMixin methods are tested in abc_builder_test.py.
 
 import numpy as np
 import pytest
-
 from particula.particles.surface_builders import (
     SurfaceStrategyMassBuilder,
     SurfaceStrategyMolarBuilder,

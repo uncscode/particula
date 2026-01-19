@@ -4,7 +4,6 @@
 
 import numpy as np
 import pytest
-
 from particula.aerosol import Aerosol
 from particula.dynamics import (
     Coagulation,

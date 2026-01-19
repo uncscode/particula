@@ -1,7 +1,6 @@
 """Tests for the ChargedCoagulationBuilder class."""
 
 import pytest
-
 from particula.dynamics import (
     ChargedCoagulationBuilder,
     ChargedCoagulationStrategy,

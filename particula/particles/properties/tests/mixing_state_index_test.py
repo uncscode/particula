@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.mixing_state_index import (
     get_mixing_state_index,
 )

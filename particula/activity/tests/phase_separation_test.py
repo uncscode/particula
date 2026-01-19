@@ -1,7 +1,6 @@
 """test for phase_separation.py."""
 
 import numpy as np
-
 from particula.activity.phase_separation import (
     find_phase_sep_index,
     find_phase_separation,

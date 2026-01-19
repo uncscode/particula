@@ -2,7 +2,6 @@
 # pylint: disable=R0801
 
 import numpy as np
-
 from particula.dynamics.properties.wall_loss_coefficient import (
     get_rectangle_wall_loss_coefficient,
     get_rectangle_wall_loss_coefficient_via_system_state,

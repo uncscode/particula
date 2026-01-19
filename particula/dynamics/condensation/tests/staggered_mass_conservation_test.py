@@ -17,7 +17,6 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from numpy.typing import NDArray
-
 from particula.dynamics.condensation import CondensationIsothermalStaggered
 from particula.gas import GasSpeciesBuilder, VaporPressureFactory
 from particula.particles import (

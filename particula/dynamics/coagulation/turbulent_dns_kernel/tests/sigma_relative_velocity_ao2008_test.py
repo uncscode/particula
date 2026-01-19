@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (  # noqa: E501
     get_relative_velocity_variance,
 )

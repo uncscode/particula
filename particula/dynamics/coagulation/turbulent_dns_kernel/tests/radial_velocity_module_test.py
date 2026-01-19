@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (  # noqa: E501
     get_radial_relative_velocity_ao2008,
     get_radial_relative_velocity_dz2002,

@@ -6,7 +6,6 @@ from typing import Optional
 
 import numpy as np
 import pytest
-
 from particula.activity.activity_coefficients import bat_activity_coefficients
 from particula.activity.ratio import to_molar_mass_ratio
 from particula.particles.activity_strategies import (

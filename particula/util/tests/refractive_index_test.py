@@ -3,7 +3,6 @@
 import cmath
 
 import pytest
-
 from particula.util.refractive_index_mixing import (
     get_effective_refractive_index,
 )

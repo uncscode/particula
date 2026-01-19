@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.util.convert_dtypes import (
     get_coerced_type,
     get_dict_from_list,

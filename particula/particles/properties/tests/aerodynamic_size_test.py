@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.aerodynamic_size import (
     get_aerodynamic_length,
     get_aerodynamic_shape_factor,

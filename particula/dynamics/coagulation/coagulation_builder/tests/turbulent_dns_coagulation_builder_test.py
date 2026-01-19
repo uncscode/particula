@@ -3,7 +3,6 @@
 # pylint: disable=duplicate-code
 
 import pytest
-
 from particula.dynamics import (
     TurbulentDNSCoagulationBuilder,
     TurbulentDNSCoagulationStrategy,

@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.inertia_time import (
     get_particle_inertia_time,
 )

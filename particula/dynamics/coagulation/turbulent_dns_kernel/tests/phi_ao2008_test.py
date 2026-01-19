@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
     get_phi_ao2008,
 )

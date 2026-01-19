@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.activity.convert_functional_group import (
     convert_to_oh_equivalent,
 )

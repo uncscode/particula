@@ -9,7 +9,6 @@ import types
 import unittest
 
 import numpy as np
-
 import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,

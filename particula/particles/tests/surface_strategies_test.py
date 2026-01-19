@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.surface_strategies import (
     SurfaceStrategyMass,
     SurfaceStrategyMolar,

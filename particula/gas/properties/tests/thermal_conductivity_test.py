@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.gas import get_thermal_conductivity
 
 

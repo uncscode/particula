@@ -4,7 +4,6 @@
 
 import numpy as np
 import pytest
-
 from particula.builder_mixin import (
     BuilderChargeMixin,
     BuilderConcentrationMixin,

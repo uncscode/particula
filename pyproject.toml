@@ -56,6 +56,8 @@ build-backend = "flit_core.buildapi"
 [tool.ruff]
 line-length = 80
 fix = true
+src = ["particula"]
+include = ["particula/**/*.py"]
 extend-exclude = [
   "**/*.ipynb",    # ignore every .ipynb anywhere in the project
 ]
@@ -127,4 +129,5 @@ max-args = 10
 [tool.mypy]
 exclude = [
     "docs/.assets/.*",
+    "trees/.*",
 ]

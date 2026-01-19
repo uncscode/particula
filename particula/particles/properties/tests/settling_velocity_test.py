@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from particula.particles.properties.settling_velocity import (
     get_particle_settling_velocity,
     get_particle_settling_velocity_via_inertia,

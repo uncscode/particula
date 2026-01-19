@@ -1,7 +1,6 @@
 """Test cases for CondensationIsothermalBuilder in particula.dynamics."""
 
 import pytest
-
 from particula.dynamics.condensation.condensation_builder.condensation_builder_mixin import (  # noqa: E501
     BuilderAccommodationCoefficientMixin,
     BuilderDiffusionCoefficientMixin,

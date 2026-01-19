@@ -3,7 +3,6 @@
 from typing import Any
 
 import numpy as np
-
 from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import (
     ParticleResolvedSpeciatedMass,
