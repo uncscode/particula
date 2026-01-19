@@ -235,7 +235,7 @@ def condensation_mass_transfer_kernel(
         # ... Fuchs-Sutugin or transition regime physics ...
         # computed_transfer = ...
         
-        mass_transfer[box_idx, particle_idx, s] = 0.0  # placeholder
+        mass_transfer[box_idx, particle_idx, s] = 0.0  # TODO: implement condensation mass transfer using proper Fuchs-Sutugin / transition-regime physics
 
 
 @wp.kernel
