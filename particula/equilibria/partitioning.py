@@ -312,8 +312,6 @@ def liquid_vapor_obj_function(
 
     c_liquid_total_water_new = c_aq_new_alpha + c_aq_new_beta
 
-    c_liquid_total_water_new = c_aq_new_alpha + c_aq_new_beta
-
     alpha_phase_output = (
         c_j_liquid_new_alpha,
         c_j_aq_new_alpha,
@@ -396,6 +394,16 @@ def liquid_vapor_partitioning(
     if len(expected_length) != 1:
         raise ValueError(
             "All input arrays must share the same length for species dimension."
+        )
+    # Check that arrays are 2D before accessing shape[1]
+    if (
+        gamma_organic_ab.ndim != 2
+        or mass_fraction_water_ab.ndim != 2
+        or q_ab.ndim != 2
+    ):
+        raise ValueError(
+            "gamma_organic_ab, mass_fraction_water_ab, and q_ab must be "
+            "2D arrays."
         )
     if (
         gamma_organic_ab.shape[1] != 2
