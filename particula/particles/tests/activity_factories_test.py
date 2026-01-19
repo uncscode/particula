@@ -8,6 +8,9 @@ The Builder is tested independently.
 import numpy as np
 import pytest
 
+from particula.particles.activity_builders import (
+    ActivityNonIdealBinaryBuilder,
+)
 from particula.particles.activity_factories import (
     ActivityFactory,
 )
@@ -16,9 +19,6 @@ from particula.particles.activity_strategies import (
     ActivityIdealMolar,
     ActivityKappaParameter,
     ActivityNonIdealBinary,
-)
-from particula.particles.activity_builders import (
-    ActivityNonIdealBinaryBuilder,
 )
 
 
