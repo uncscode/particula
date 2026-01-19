@@ -13,6 +13,15 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 | E2-F2 | [Equilibria Runnable Refactor](E2-F2-equilibria-runnable-refactor.md) | Planning | P2 | 6 |
 | E2-F3 | [Integration and Documentation](E2-F3-integration-documentation.md) | Planning | P1 | 4 |
 
+### Epic E3: Data Representation Refactor for Extensibility and GPU Backends
+
+| ID | Name | Status | Priority | Phases |
+|----|------|--------|----------|--------|
+| E3-F1 | [Particle Data Container](E3-F1-particle-data-container.md) | Planning | P1 | 4 |
+| E3-F2 | [Gas Data Container](E3-F2-gas-data-container.md) | Planning | P1 | 3 |
+| E3-F3 | [Warp Integration and GPU Kernels](E3-F3-backend-warp-integration.md) | Planning | P2 | 6 |
+| E3-F4 | [Facade and Migration](E3-F4-facade-migration.md) | Planning | P1 | 5 |
+
 ### Standalone Features (Wall Loss)
 
 | ID | Name | Status | Priority | Phases |

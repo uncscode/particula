@@ -21,6 +21,14 @@ and rollout.
   - Features: [E1-F1][e1-f1], [E1-F2][e1-f2], [E1-F3][e1-f3], [E1-F4][e1-f4],
     [E1-F5][e1-f5], [E1-F6][e1-f6]
 
+- [E3: Data Representation Refactor for Extensibility and GPU Backends][epic-e3]
+  — Status: Planning
+  - Scope: Isolate data representation from classes/methods using dataclass
+    pattern. Enable extensibility (add fields without breaking simulations) and
+    GPU acceleration via NVIDIA Warp for particle-resolved condensation and
+    Brownian coagulation.
+  - Features: [E3-F1][e3-f1], [E3-F2][e3-f2], [E3-F3][e3-f3], [E3-F4][e3-f4]
+
 ## Feature Plans
 
 ### Epic E1: Staggered Condensation Features
@@ -72,6 +80,13 @@ and rollout.
 
 <!-- Epic Links -->
 [epic-e1]: epics/E1-staggered-condensation-stepping.md
+[epic-e3]: epics/E3-data-representation-refactor.md
+
+<!-- E3 Feature Links -->
+[e3-f1]: features/E3-F1-particle-data-container.md
+[e3-f2]: features/E3-F2-gas-data-container.md
+[e3-f3]: features/E3-F3-backend-warp-integration.md
+[e3-f4]: features/E3-F4-facade-migration.md
 
 <!-- E1 Feature Links -->
 [e1-f1]: features/E1-F1-core-staggered-stepping.md
