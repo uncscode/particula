@@ -33,7 +33,6 @@ def test_equilibria_imports() -> None:
 # Regression guard: legacy wrapper continues to warn and delegate.
 def test_legacy_deprecation_warnings(monkeypatch: pytest.MonkeyPatch) -> None:
     """Legacy wrapper warns and delegates to implementation."""
-
     sentinel_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
 
     def _sentinel(*args: object, **kwargs: object) -> str:
