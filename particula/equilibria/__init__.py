@@ -52,7 +52,6 @@ def liquid_vapor_partitioning(*args, **kwargs):
     implementation. Prefer :class:`LiquidVaporPartitioningStrategy` or
     :class:`Equilibria` for new code.
     """
-
     warnings.warn(
         "Direct liquid_vapor_partitioning is deprecated; use "
         "LiquidVaporPartitioningStrategy or Equilibria instead.",
@@ -68,7 +67,6 @@ def get_properties_for_liquid_vapor_partitioning(*args, **kwargs):
     Emits a :class:`DeprecationWarning` and delegates to the partitioning
     implementation. Prefer the strategy interfaces for new code.
     """
-
     warnings.warn(
         "Direct get_properties_for_liquid_vapor_partitioning is deprecated; "
         "use strategy interfaces instead.",
@@ -86,7 +84,6 @@ def liquid_vapor_obj_function(*args, **kwargs):
     Emits a :class:`DeprecationWarning` and delegates to the partitioning
     implementation. Prefer the strategy interfaces for new code.
     """
-
     warnings.warn(
         "Direct liquid_vapor_obj_function is deprecated; use strategy "
         "interfaces instead.",

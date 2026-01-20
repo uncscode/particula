@@ -3,25 +3,24 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pytest
 
 import particula as par
+from particula.aerosol import Aerosol
 from particula.equilibria import (
     Equilibria,
     EquilibriaFactory,
     EquilibriaStrategy,
+    EquilibriumResult,
     LiquidVaporPartitioningBuilder,
     LiquidVaporPartitioningStrategy,
-    EquilibriumResult,
-    PhaseConcentrations,
     get_properties_for_liquid_vapor_partitioning,
     liquid_vapor_obj_function,
     liquid_vapor_partitioning,
 )
-
 
 EXPECTED_ALL = {
     "EquilibriaStrategy",
@@ -39,7 +38,6 @@ EXPECTED_ALL = {
 
 def test_imports_from_module_surface():
     """Surface imports are available from particula.equilibria."""
-
     assert EquilibriaStrategy is not None
     assert LiquidVaporPartitioningStrategy is not None
     assert Equilibria is not None
@@ -47,7 +45,6 @@ def test_imports_from_module_surface():
 
 def test_imports_via_top_level_package():
     """Top-level particula exposes equilibria surface attributes."""
-
     assert hasattr(par.equilibria, "Equilibria")
     assert hasattr(par.equilibria, "EquilibriaFactory")
     assert hasattr(par.equilibria, "LiquidVaporPartitioningStrategy")
@@ -55,7 +52,6 @@ def test_imports_via_top_level_package():
 
 def test_legacy_imports_continue_to_work():
     """Legacy imports remain available for backward compatibility."""
-
     assert callable(liquid_vapor_partitioning)
     assert callable(get_properties_for_liquid_vapor_partitioning)
     assert callable(liquid_vapor_obj_function)
@@ -69,7 +65,6 @@ def test_legacy_imports_continue_to_work():
 
 def test___all___contains_expected_surface():
     """__all__ exports exactly the expected public API surface."""
-
     from particula import equilibria as eq
 
     assert set(eq.__all__) == EXPECTED_ALL
@@ -103,12 +98,23 @@ def test_deprecation_wrappers_delegate_and_warn(
     wrapper_name: str,
     impl_name: str,
     args: tuple[Any, ...],
-    kwargs: dict[str, Any],
+    kwargs: dict[
+        str,
+        Any,
+    ],
 ):
-    """Legacy wrappers emit DeprecationWarning and delegate to implementations."""
+    """Legacy wrappers warn and delegate.
 
+    The wrappers just delegate to the underlying implementations so that we can
+    assert the shortcuts still work while warning users to move to strategies.
+    """
     sentinel = object()
-    calls: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
+    calls: list[
+        tuple[
+            tuple[Any, ...],
+            dict[str, Any],
+        ]
+    ] = []
 
     def _sentinel(*call_args: Any, **call_kwargs: Any) -> Any:
         calls.append((call_args, call_kwargs))
@@ -125,7 +131,6 @@ def test_deprecation_wrappers_delegate_and_warn(
 
 def test_integration_strategy_factory_runnable_flow():
     """Strategy → Factory → Runnable wiring executes without heavy compute."""
-
     factory = EquilibriaFactory()
     strategy = factory.get_strategy(
         "liquid_vapor", parameters={"water_activity": 0.5}
@@ -160,7 +165,6 @@ def test_integration_strategy_factory_runnable_flow():
 
 def test_builder_creates_strategy():
     """Builder produces a configured strategy."""
-
     builder = LiquidVaporPartitioningBuilder()
     strategy = builder.set_water_activity(0.75).build()
     assert isinstance(strategy, LiquidVaporPartitioningStrategy)
