@@ -10,7 +10,10 @@ Examples:
     Basic usage with a strategy::
 
         >>> import numpy as np
-        >>> from particula.equilibria import Equilibria, LiquidVaporPartitioningStrategy
+        >>> from particula.equilibria import (
+        ...     Equilibria,
+        ...     LiquidVaporPartitioningStrategy,
+        ... )
         >>> strategy = LiquidVaporPartitioningStrategy(water_activity=0.75)
         >>> runnable = Equilibria(strategy=strategy)
         >>> aerosol = runnable.execute(aerosol, time_step=1.0)
@@ -29,11 +32,17 @@ Note:
 from __future__ import annotations
 
 import inspect
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 
 from particula.aerosol import Aerosol
 from particula.equilibria.equilibria_strategies import EquilibriaStrategy
 from particula.runnable import RunnableABC
+
+if TYPE_CHECKING:
+    from particula.equilibria.equilibria_strategies import (
+        EquilibriumResult,
+        PhaseConcentrations,
+    )
 
 
 class Equilibria(RunnableABC):
@@ -44,11 +53,15 @@ class Equilibria(RunnableABC):
     """
 
     def __init__(self, strategy: EquilibriaStrategy) -> None:
+        """Initialize with the provided equilibria strategy.
+
+        Args:
+            strategy: Concrete ``EquilibriaStrategy`` used during execution.
+        """
         self.strategy = strategy
 
     def rate(self, aerosol: Aerosol) -> Any:  # noqa: ARG002
         """Return the strategy identifier for non-rate processes."""
-
         return self.strategy.get_name()
 
     def execute(
@@ -69,7 +82,6 @@ class Equilibria(RunnableABC):
             AttributeError: When required partitioning inputs are missing.
             TypeError: If the strategy returns ``None``.
         """
-
         if sub_steps <= 0:
             raise ValueError("sub_steps must be positive")
 
@@ -97,7 +109,6 @@ class Equilibria(RunnableABC):
         clear message when a required field is unavailable to keep failures
         explicit during testing.
         """
-
         required_keys = [
             "c_star_j_dry",
             "concentration_organic_matter",
@@ -107,7 +118,7 @@ class Equilibria(RunnableABC):
         ]
 
         if hasattr(aerosol, "partitioning_inputs"):
-            candidate = getattr(aerosol, "partitioning_inputs")
+            candidate = aerosol.partitioning_inputs
             if isinstance(candidate, Mapping):
                 missing = [k for k in required_keys if k not in candidate]
                 if missing:
@@ -141,11 +152,11 @@ class Equilibria(RunnableABC):
         Accepts either an updated ``Aerosol`` instance, a mapping/struct with
         recognizable concentration fields, or raises when ``None`` is returned.
         """
-
         if result is None:
             raise TypeError("Equilibria strategy returned None")
 
-        from particula.equilibria.equilibria_strategies import (  # local import to avoid cycle
+        # Local import to prevent import cycles during typing checks.
+        from particula.equilibria.equilibria_strategies import (
             EquilibriumResult,
             PhaseConcentrations,
         )
@@ -154,30 +165,52 @@ class Equilibria(RunnableABC):
             return result
 
         if isinstance(result, EquilibriumResult):
-            aerosol.equilibria_result = result  # type: ignore[attr-defined]
-            return aerosol
+            return self._attach_equilibrium_result_dataclass(aerosol, result)
 
         if isinstance(result, Mapping):
-            if "phase_concentrations" in result:
-                aerosol.phase_concentrations = result["phase_concentrations"]  # type: ignore[attr-defined]
-            if "mass_concentrations" in result:
-                aerosol.mass_concentrations = result["mass_concentrations"]  # type: ignore[attr-defined]
-            aerosol.equilibria_result = result  # type: ignore[attr-defined]
-            return aerosol
+            return self._apply_mapping_result(aerosol, result)
 
         if hasattr(result, "phase_concentrations") or hasattr(
             result, "mass_concentrations"
         ):
-            aerosol.equilibria_result = result  # type: ignore[attr-defined]
-            if hasattr(result, "phase_concentrations"):
-                aerosol.phase_concentrations = result.phase_concentrations  # type: ignore[attr-defined]
-            if hasattr(result, "mass_concentrations"):
-                aerosol.mass_concentrations = result.mass_concentrations  # type: ignore[attr-defined]
-            return aerosol
+            return self._apply_attribute_result(aerosol, result)
 
         if isinstance(result, PhaseConcentrations):
-            aerosol.phase_concentrations = result  # type: ignore[attr-defined]
-            aerosol.equilibria_result = result  # type: ignore[attr-defined]
-            return aerosol
+            return self._attach_phase_concentrations(aerosol, result)
 
+        return aerosol
+
+    @staticmethod
+    def _attach_equilibrium_result_dataclass(
+        aerosol: Aerosol, result: EquilibriumResult
+    ) -> Aerosol:
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
+        return aerosol
+
+    @staticmethod
+    def _apply_mapping_result(
+        aerosol: Aerosol, result: Mapping[str, Any]
+    ) -> Aerosol:
+        if "phase_concentrations" in result:
+            aerosol.phase_concentrations = result["phase_concentrations"]  # type: ignore[attr-defined]
+        if "mass_concentrations" in result:
+            aerosol.mass_concentrations = result["mass_concentrations"]  # type: ignore[attr-defined]
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
+        return aerosol
+
+    @staticmethod
+    def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol:
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
+        if hasattr(result, "phase_concentrations"):
+            aerosol.phase_concentrations = result.phase_concentrations  # type: ignore[attr-defined]
+        if hasattr(result, "mass_concentrations"):
+            aerosol.mass_concentrations = result.mass_concentrations  # type: ignore[attr-defined]
+        return aerosol
+
+    @staticmethod
+    def _attach_phase_concentrations(
+        aerosol: Aerosol, result: PhaseConcentrations
+    ) -> Aerosol:
+        aerosol.phase_concentrations = result  # type: ignore[attr-defined]
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
         return aerosol
