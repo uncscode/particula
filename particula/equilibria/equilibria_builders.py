@@ -76,7 +76,7 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
         if invalid_keys:
             raise ValueError(
                 f"Invalid parameter(s): {sorted(invalid_keys)}. "
-                "Allowed keys: {'water_activity'}."
+                "Allowed keys: water_activity."
             )
 
         if "water_activity" in parameters:
