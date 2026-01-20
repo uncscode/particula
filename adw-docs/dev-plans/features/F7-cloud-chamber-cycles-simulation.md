@@ -1,13 +1,13 @@
 # Feature F7: Cloud Chamber Injection Cycles Simulation
 
-**Status**: Planning  
+**Status**: In Progress  
 **Priority**: P2  
-**Owners**: TBD  
-**Start Date**: TBD  
+**Owners**: ADW Workflow  
+**Start Date**: 2026-01-19  
 **Target Date**: TBD  
-**Last Updated**: 2026-01-19  
-**Size**: L (1 notebook, ~500 LOC)  
-**Notebook**: `docs/Examples/Simulations/cloud_chamber_cycles.ipynb`
+**Last Updated**: 2026-01-20  
+**Size**: L (1 notebook, ~1500 LOC)  
+**Notebook**: `docs/Examples/Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb`
 
 ## Vision
 
@@ -104,8 +104,8 @@ condensation.
 
 ## Phase Checklist
 
-- [ ] **F7-P1**: Create notebook structure and single-cycle simulation (~150 LOC)
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **F7-P1**: Create notebook structure and single-cycle simulation (~150 LOC)
+  - Issue: #896 | Size: M | Status: Completed
   - Set up notebook with imports, plotting style, chamber parameters
   - Define seed species (ammonium sulfate, sucrose) with κ values
   - Create particle-resolved speciated mass representation using builder
@@ -116,16 +116,26 @@ condensation.
   - Add detailed markdown explanations for beginners
   - Internal consistency checks (mass conservation)
 
-- [ ] **F7-P2**: Extend to 4 cycles with multiple scenarios (~200 LOC)
-  - Issue: TBD | Size: M | Status: Not Started
-  - Implement full 4-cycle simulation loop
-  - Add dilution process between cycles using `get_dilution_rate`
-  - Create Scenario A: Ammonium sulfate only (size distribution)
-  - Create Scenario B: Sucrose only (size distribution)
-  - Create Scenario C: Mixed AS + sucrose population
-  - Show mass accumulation in larger particles over cycles
-  - Compare activation behavior between seed types
-  - Visualize activated fraction vs dry diameter
+- [x] **F7-P2**: Extend to 4 cycles with multiple scenarios (~1303 LOC added)
+  - Issue: #897 | Size: L | Status: Completed
+  - Implemented `apply_particle_dilution()` helper for particle-resolved dilution
+  - Implemented `run_cycle()` helper for activation-deactivation cycles
+  - Implemented `run_multi_cycle()` wrapper for N-cycle simulations
+  - Created Scenario A: Ammonium sulfate only (κ=0.61, 5 sizes)
+  - Created Scenario B: Sucrose only (κ=0.10, 5 sizes)
+  - Created Scenario C: Mixed AS + sucrose population (10 particles)
+  - Comprehensive visualizations (13 sections total):
+    - Particle size trajectories over 4 cycles per scenario
+    - Activated fraction vs dry diameter comparison
+    - Water mass fraction evolution
+    - Mass accumulation in larger particles
+    - Comparison overlay plot across all scenarios
+  - Added internal validation checks for helper functions and history structure
+  - Demonstrated key physics:
+    - κ-Köhler theory: Higher κ → lower critical supersaturation
+    - Size-dependent activation: Larger particles activate first
+    - Competition for water vapor in mixed populations
+    - Mass preferentially accumulates in larger particles
 
 - [ ] **F7-P3**: Add comprehensive visualizations and documentation (~150 LOC)
   - Issue: TBD | Size: M | Status: Not Started
@@ -255,63 +265,72 @@ aerosol = (
 )
 ```
 
-### Cycle Implementation
+### Cycle Implementation (F7-P2 Shipped)
+
+The following helper functions were implemented in F7-P2 (#897):
 
 ```python
-from particula.dynamics import get_dilution_rate
+def apply_particle_dilution(
+    particle_mass: np.ndarray,
+    dilution_coefficient: float,
+    dt: float,
+) -> np.ndarray:
+    """Apply dilution to particle masses for particle-resolved simulations.
+    
+    For particle-resolved distributions, dilution reduces total particle
+    number/mass proportionally. Implemented as exponential decay.
+    
+    Args:
+        particle_mass: Array of particle masses (n_particles, n_species).
+        dilution_coefficient: Dilution rate coefficient in s⁻¹.
+        dt: Time step in seconds.
+        
+    Returns:
+        Updated particle masses after dilution.
+    """
+    dilution_factor = np.exp(-dilution_coefficient * dt)
+    return particle_mass * dilution_factor
+
 
 def run_cycle(
     aerosol: par.Aerosol,
-    gas: par.Gas,
     condensation: par.dynamics.MassCondensation,
     wall_loss: par.dynamics.WallLoss,
     humid_duration: int = 30,
     dry_duration: int = 60,
     dilution_coefficient: float = 0.01,
+    rh_humid: float = 1.004,
+    rh_dry: float = 0.65,
+    water_index: int = 2,
 ) -> tuple[par.Aerosol, list[dict]]:
-    """Run one activation-deactivation cycle.
-    
-    Args:
-        aerosol: Current aerosol state.
-        gas: Gas phase with water vapor.
-        condensation: Configured MassCondensation runnable.
-        wall_loss: Configured WallLoss runnable.
-        humid_duration: Time steps at high RH (seconds).
-        dry_duration: Time steps during dry dilution (seconds).
-        dilution_coefficient: Rate of dilution (1/s).
-        
-    Returns:
-        Updated aerosol and list of state snapshots for plotting.
-    """
-    history = []
-    
-    # Phase 1: Humid injection (activation) - high RH, no dilution
-    for t in range(humid_duration):
-        aerosol = condensation.execute(aerosol, time_step=1.0)
-        aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
-        history.append({"time": t, "phase": "humid", "aerosol": aerosol})
-    
-    # Phase 2: Dry air dilution (deactivation)
-    for t in range(dry_duration):
-        # Calculate dilution rate and apply
-        concentration = aerosol.particles.get_concentration()
-        dilution_rate = get_dilution_rate(
-            coefficient=dilution_coefficient,
-            concentration=concentration,
-        )
-        # Apply dilution (reduces concentration, lowers RH)
-        aerosol = aerosol.add_concentration(-dilution_rate * 1.0)  # time_step=1.0
-        
-        aerosol = condensation.execute(aerosol, time_step=1.0)
-        aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
-        history.append({
-            "time": humid_duration + t,
-            "phase": "dry",
-            "aerosol": aerosol,
-        })
-    
-    return aerosol, history
+    """Run one activation-deactivation cycle with humid/dry phases."""
+    # Implementation uses set_water_activity() helper and
+    # apply_particle_dilution() during dry phase
+    ...
+
+
+def run_multi_cycle(
+    aerosol: par.Aerosol,
+    condensation: par.dynamics.MassCondensation,
+    wall_loss: par.dynamics.WallLoss,
+    n_cycles: int = 4,
+    humid_duration: int = 30,
+    dry_duration: int = 60,
+    dilution_coefficient: float = 0.01,
+    rh_humid: float = 1.004,
+    rh_dry: float = 0.65,
+    water_index: int = 2,
+) -> tuple[par.Aerosol, list[dict]]:
+    """Run N cycles sequentially with cumulative time tracking."""
+    # Uses copy.deepcopy() to avoid mutating original aerosol
+    ...
 ```
+
+**Key Implementation Notes:**
+- Dilution uses mass-based exponential decay (not concentration-based)
+- `run_cycle()` modifies `aerosol.particle_mass` directly during dry phase
+- History records `{"time": t, "phase": phase, "masses": masses_copy.copy()}`
+- Cumulative time tracking across cycles for proper visualization
 
 ### Key Learning Outcomes
 
@@ -329,3 +348,5 @@ def run_cycle(
 |------|--------|--------|
 | 2026-01-19 | ADW | Initial plan created |
 | 2026-01-19 | ADW | Added builder patterns, explicit dependencies, LOC estimates |
+| 2026-01-19 | ADW | F7-P1 completed: Notebook structure and single-cycle simulation (#896) |
+| 2026-01-20 | ADW | F7-P2 completed: 4 cycles with 3 scenarios, ~1303 LOC added (#897) |

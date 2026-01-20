@@ -43,6 +43,14 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Soot_Formation_in_Flames.ipynb)
 
+- __[Cloud Chamber Cycles](Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb)__
+
+    ---
+
+    Multi-cycle cloud chamber simulation (4 activation-deactivation cycles) with three seed composition scenarios: Ammonium Sulfate (κ=0.61), Sucrose (κ=0.10), and Mixed populations. Features comprehensive visualizations including particle size trajectories, activated fraction vs dry diameter, water mass fraction evolution, and mass accumulation analysis.
+
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb)
+
 </div>
 
 

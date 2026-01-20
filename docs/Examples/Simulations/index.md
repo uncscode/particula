@@ -15,3 +15,11 @@ This directory hosts end‑to‑end aerosol simulation notebooks built with Part
 
 - **[Soot Formation in Flames](Notebooks/Soot_Formation_in_Flames.ipynb)**  
   Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
+
+- **[Cloud Chamber Cycles](Notebooks/Cloud_Chamber_Cycles.ipynb)**  
+  Multi-cycle cloud chamber simulation with 4 activation-deactivation cycles and three seed composition scenarios:
+  - **Scenario A**: Ammonium Sulfate seeds (κ=0.61, high hygroscopicity)
+  - **Scenario B**: Sucrose seeds (κ=0.10, lower hygroscopicity)
+  - **Scenario C**: Mixed AS + sucrose population (competition for water vapor)
+  
+  Features helper functions for repeated cycles (`run_cycle()`, `run_multi_cycle()`), particle-resolved dilution during dry phases, and comprehensive visualizations including particle size trajectories, activated fraction vs dry diameter, water mass fraction evolution, mass accumulation analysis, and comparison overlay plots.
