@@ -27,7 +27,6 @@ from particula.equilibria.equilibria_builders import (
 )
 from particula.equilibria.equilibria_strategies import EquilibriaStrategy
 
-
 BuilderType = LiquidVaporPartitioningBuilder
 
 
