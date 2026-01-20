@@ -122,7 +122,7 @@ and rollout.
 [e1-f2]: features/completed/E1-F2-batch-stepping-mode.md
 [e1-f3]: features/completed/E1-F3-builder-factory-integration.md
 [e1-f4]: features/completed/E1-F4-mass-conservation-validation.md
-[e1-f5]: features/E1-F5-stability-performance-benchmarks.md
+[e1-f5]: features/completed/E1-F5-stability-performance-benchmarks.md
 [e1-f6]: features/completed/E1-F6-documentation-examples.md
 
 <!-- E4 Feature Links -->
