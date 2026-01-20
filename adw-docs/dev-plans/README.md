@@ -77,6 +77,23 @@ and rollout.
   - Scope: Runnable wrapping wall loss strategies with sub-step splitting,
     non-negative clamp, exports, and runnable-level tests.
 
+### Standalone Features (End-to-End Simulation Notebooks)
+
+- [Wildfire Plume Evolution Simulation][plan-wildfire] — Status: Planning (P2)
+  - Scope: Multi-stage temperature profile simulation of wildfire smoke from
+    near-source emission to regional transport. Demonstrates combined
+    coagulation (Brownian + turbulent shear + sedimentation) and dilution.
+- [Marine Aerosol Sea Spray Aging Simulation][plan-marine] — Status: Planning
+  (P2)
+  - Scope: NaCl + organic film sea spray evolution in marine boundary layer
+    through cloud deck formation. Showcases BAT model activity coefficients
+    and phase separation diagnostics.
+- [Cloud Chamber Injection Cycles Simulation][plan-cloud-chamber] — Status:
+  Planning (P2)
+  - Scope: 4-cycle cloud droplet activation/deactivation in rectangular chamber
+    with particle-resolved speciated mass tracking. Demonstrates wall loss,
+    dilution, injection, and κ-dependent activation for different seed types.
+
 ## Maintenance Plans
 
 - [Add Charge Support to add_concentration][plan-charge-add-concentration] —
@@ -123,6 +140,9 @@ and rollout.
 [plan-rect]: features/rectangular-wall-loss-strategy.md
 [plan-charged-wall-loss]: features/charged-wall-loss-strategy.md
 [plan-wall-loss-runnable]: features/wall-loss-runnable.md
+[plan-wildfire]: features/F5-wildfire-plume-simulation.md
+[plan-marine]: features/F6-marine-aerosol-simulation.md
+[plan-cloud-chamber]: features/F7-cloud-chamber-cycles-simulation.md
 
 <!-- Maintenance Links -->
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md

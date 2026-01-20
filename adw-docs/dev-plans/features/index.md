@@ -30,6 +30,14 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 | F2 | [Rectangular Wall Loss Strategy](rectangular-wall-loss-strategy.md) | In Progress | P2 | 1 |
 | F3 | [Charged/Electrostatic Wall Loss Strategy](charged-wall-loss-strategy.md) | In Progress | P1 | 2 |
 
+### Standalone Features (End-to-End Simulation Notebooks)
+
+| ID | Name | Status | Priority | Phases |
+|----|------|--------|----------|--------|
+| F5 | [Wildfire Plume Evolution Simulation](F5-wildfire-plume-simulation.md) | Planning | P2 | 3 |
+| F6 | [Marine Aerosol Sea Spray Aging Simulation](F6-marine-aerosol-simulation.md) | Planning | P2 | 3 |
+| F7 | [Cloud Chamber Injection Cycles Simulation](F7-cloud-chamber-cycles-simulation.md) | Planning | P2 | 4 |
+
 ## Completed Features
 
 ### Epic E1: Staggered ODE Stepping for Particle-Resolved Condensation
@@ -51,4 +59,4 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 
 ## Next Available ID
 
-**Standalone:** F5
+**Standalone:** F8

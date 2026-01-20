@@ -1,0 +1,331 @@
+# Feature F7: Cloud Chamber Injection Cycles Simulation
+
+**Status**: Planning  
+**Priority**: P2  
+**Owners**: TBD  
+**Start Date**: TBD  
+**Target Date**: TBD  
+**Last Updated**: 2026-01-19  
+**Size**: L (1 notebook, ~500 LOC)  
+**Notebook**: `docs/Examples/Simulations/cloud_chamber_cycles.ipynb`
+
+## Vision
+
+Create a comprehensive end-to-end simulation notebook demonstrating cloud
+droplet activation and deactivation cycles in a rectangular cloud chamber. This
+notebook will showcase particle-resolved speciated mass tracking through
+multiple humidity cycles, demonstrating how water mass accumulates
+preferentially in larger particles and how different seed compositions (varying
+hygroscopicity) respond to cloud processing.
+
+Cloud chambers are essential tools for studying aerosol-cloud interactions.
+Understanding how particles of different sizes and compositions activate into
+cloud droplets, and how repeated cycling affects the particle population, is
+critical for interpreting chamber experiments and parameterizing cloud
+microphysics in models. This simulation demonstrates particula's full
+capabilities: particle-resolved tracking, wall loss, dilution, injection, and
+condensation.
+
+## Scope
+
+### In Scope
+
+- **4 complete cycles**:
+  1. Humid injection → Droplet activation/growth (5+ μm diameter)
+  2. Dry air dilution → Droplet deactivation/shrinkage
+  3. Repeat for 4 total cycles
+
+- **Multiple seed scenarios** (to show interesting physics):
+  - Scenario A: Ammonium sulfate seeds (high κ ≈ 0.61) - different sizes
+  - Scenario B: Sucrose seeds (moderate κ ≈ 0.1) - different sizes
+  - Scenario C: Mixed population (AS + sucrose) - competition for water vapor
+
+- **Environmental conditions**:
+  - Activation phase: ~100.4% RH (0.4% supersaturation)
+  - Deactivation phase: ~60-70% RH (droplets shrink but don't fully dry)
+  - Target droplet size: 5+ μm diameter at peak activation
+
+- **Processes**:
+  - Condensation/evaporation (isothermal, humidity-driven)
+  - Rectangular chamber wall loss
+  - Dilution (clean dry air injection)
+  - Water vapor injection (humid air pulses)
+
+- **Particle representation**: Particle-resolved speciated mass
+  - Track individual particle histories through all 4 cycles
+  - Species: seed material (AS or sucrose) + water
+
+- **Key physics to demonstrate**:
+  - Size-dependent activation (Kelvin effect)
+  - Hygroscopicity (κ) differences between seed types
+  - Mass accumulation in larger particles over cycles
+  - Wall loss preferentially removes larger droplets
+  - Composition tracking (water mass fraction evolution)
+
+- **Visualizations**:
+  - Individual particle trajectories (size vs time)
+  - Size distribution evolution through cycles
+  - Water mass fraction per particle
+  - Activated fraction vs dry diameter
+  - Wall loss rates by size
+  - Comparison between seed types
+
+- **Chamber**: Rectangular geometry with realistic dimensions
+
+- **Beginner-friendly**: Detailed explanations of cloud activation, Köhler
+  theory basics, and chamber experiment design
+
+### Out of Scope
+
+- Full Köhler curve calculations (use κ-Köhler approximation)
+- Temperature changes during cycles (isothermal assumption)
+- Collision/coalescence of droplets
+- Entrainment mixing
+- Comparison to specific chamber experiments
+
+## Dependencies
+
+### Core Classes (all available in `particula`)
+
+- `particula.particles.ParticleResolvedSpeciatedMass` — distribution strategy
+- `particula.particles.ParticleResolvedSpeciatedMassBuilder` — builder pattern
+- `particula.dynamics.MassCondensation` — runnable for condensation/evaporation
+- `particula.dynamics.WallLoss` — runnable wrapping wall loss strategies
+- `particula.dynamics.RectangularWallLossStrategy` — rectangular chamber geometry
+- `particula.dynamics.RectangularWallLossBuilder` — builder for rectangular
+- `particula.dynamics.get_dilution_rate` — dilution rate calculation
+- `particula.particles.ActivityKappaParameter` — κ-based hygroscopic growth
+- `particula.particles.ActivityKappaParameterBuilder` — builder for κ activity
+
+### Optional (for advanced scenarios)
+
+- `particula.dynamics.CondensationIsothermalStaggered` — staggered ODE stepping
+  for improved mass conservation (E1 feature, already shipped)
+
+## Phase Checklist
+
+- [ ] **F7-P1**: Create notebook structure and single-cycle simulation (~150 LOC)
+  - Issue: TBD | Size: M | Status: Not Started
+  - Set up notebook with imports, plotting style, chamber parameters
+  - Define seed species (ammonium sulfate, sucrose) with κ values
+  - Create particle-resolved speciated mass representation using builder
+  - Configure rectangular chamber wall loss via `RectangularWallLossBuilder`
+  - Implement single activation-deactivation cycle
+  - Show droplet growth to 5+ μm at 100.4% RH
+  - Visualize individual particle trajectories
+  - Add detailed markdown explanations for beginners
+  - Internal consistency checks (mass conservation)
+
+- [ ] **F7-P2**: Extend to 4 cycles with multiple scenarios (~200 LOC)
+  - Issue: TBD | Size: M | Status: Not Started
+  - Implement full 4-cycle simulation loop
+  - Add dilution process between cycles using `get_dilution_rate`
+  - Create Scenario A: Ammonium sulfate only (size distribution)
+  - Create Scenario B: Sucrose only (size distribution)
+  - Create Scenario C: Mixed AS + sucrose population
+  - Show mass accumulation in larger particles over cycles
+  - Compare activation behavior between seed types
+  - Visualize activated fraction vs dry diameter
+
+- [ ] **F7-P3**: Add comprehensive visualizations and documentation (~150 LOC)
+  - Issue: TBD | Size: M | Status: Not Started
+  - Add wall loss analysis (size-dependent losses)
+  - Create summary comparison plots (all scenarios)
+  - Add water mass fraction evolution visualization
+  - Write "What You Learned" section with key takeaways
+  - Add concept boxes for Köhler theory, κ-theory
+  - Update `docs/Examples/Simulations/index.md`
+  - Update `docs/Examples/index.md` with new card
+
+- [ ] **F7-P4**: Update development documentation
+  - Issue: TBD | Size: XS | Status: Not Started
+  - Update `adw-docs/dev-plans/features/index.md`
+  - Add entry to `adw-docs/dev-plans/README.md`
+  - Move plan to completed/ folder
+
+## Critical Testing Requirements
+
+- **No Coverage Modifications**: Notebooks don't require test coverage, but any
+  helper functions added to particula core must have 80%+ coverage.
+- **Self-Contained**: Notebook should run end-to-end without errors.
+- **Internal Consistency**: Mass conservation, droplet activation thresholds.
+- **Reproducibility**: Fixed random seeds for consistent outputs.
+
+## Testing Strategy
+
+- Notebook will be validated by running all cells without errors
+- Internal checks:
+  - Total mass (seed + water) conserved within 1% (accounting for wall loss)
+  - Droplets reach 5+ μm diameter at peak supersaturation
+  - Higher κ seeds activate at lower supersaturation
+  - Larger dry particles activate before smaller ones
+  - Wall loss increases with droplet size
+- No external `*_test.py` files needed for notebook-only feature
+
+## Shipping Checklist
+
+1. Update `adw-docs/dev-plans/features/index.md` with F7 entry
+2. Update `docs/Examples/Simulations/index.md` with notebook link
+3. Update `docs/Examples/index.md` with simulation card
+4. Ensure notebook runs cleanly in fresh environment
+5. Merge PR referencing this plan
+
+## Technical Notes
+
+### Chamber Configuration
+
+```python
+import particula as par
+
+# Rectangular cloud chamber dimensions
+chamber_length = 1.0  # m
+chamber_width = 0.5   # m
+chamber_height = 0.5  # m
+chamber_volume = chamber_length * chamber_width * chamber_height  # m³
+
+# Build wall loss strategy using builder pattern
+wall_loss_strategy = (
+    par.dynamics.RectangularWallLossBuilder()
+    .set_chamber_dimensions((chamber_length, chamber_width, chamber_height))
+    .set_wall_eddy_diffusivity(0.001)  # m²/s
+    .set_distribution_type("particle_resolved")
+    .build()
+)
+
+# Wrap in runnable for execution
+wall_loss = par.dynamics.WallLoss(wall_loss_strategy=wall_loss_strategy)
+```
+
+### Seed Species Properties
+
+```python
+# Ammonium sulfate (NH4)2SO4
+as_molar_mass = 0.13214  # kg/mol
+as_density = 1770  # kg/m³
+as_kappa = 0.61  # high hygroscopicity
+
+# Sucrose C12H22O11
+sucrose_molar_mass = 0.34230  # kg/mol
+sucrose_density = 1587  # kg/m³
+sucrose_kappa = 0.10  # moderate hygroscopicity
+
+# Water
+water_molar_mass = 0.018015  # kg/mol
+water_density = 997  # kg/m³
+```
+
+### Activity Strategy Setup
+
+```python
+# Build κ-based activity strategy for ammonium sulfate
+as_activity = (
+    par.particles.ActivityKappaParameterBuilder()
+    .set_kappa(as_kappa)
+    .set_density(as_density)
+    .set_molar_mass(as_molar_mass)
+    .set_water_index(1)  # water is second species
+    .build()
+)
+
+# Build κ-based activity strategy for sucrose
+sucrose_activity = (
+    par.particles.ActivityKappaParameterBuilder()
+    .set_kappa(sucrose_kappa)
+    .set_density(sucrose_density)
+    .set_molar_mass(sucrose_molar_mass)
+    .set_water_index(1)
+    .build()
+)
+```
+
+### Particle Representation Setup
+
+```python
+# Create particle-resolved speciated mass distribution
+distribution_strategy = par.particles.ParticleResolvedSpeciatedMassBuilder().build()
+
+# Build aerosol with particles of different dry diameters
+# Each particle tracks [seed_mass, water_mass]
+aerosol = (
+    par.AerosolBuilder()
+    .set_distribution_strategy(distribution_strategy)
+    .set_activity_strategy(as_activity)
+    # ... additional configuration
+    .build()
+)
+```
+
+### Cycle Implementation
+
+```python
+from particula.dynamics import get_dilution_rate
+
+def run_cycle(
+    aerosol: par.Aerosol,
+    gas: par.Gas,
+    condensation: par.dynamics.MassCondensation,
+    wall_loss: par.dynamics.WallLoss,
+    humid_duration: int = 30,
+    dry_duration: int = 60,
+    dilution_coefficient: float = 0.01,
+) -> tuple[par.Aerosol, list[dict]]:
+    """Run one activation-deactivation cycle.
+    
+    Args:
+        aerosol: Current aerosol state.
+        gas: Gas phase with water vapor.
+        condensation: Configured MassCondensation runnable.
+        wall_loss: Configured WallLoss runnable.
+        humid_duration: Time steps at high RH (seconds).
+        dry_duration: Time steps during dry dilution (seconds).
+        dilution_coefficient: Rate of dilution (1/s).
+        
+    Returns:
+        Updated aerosol and list of state snapshots for plotting.
+    """
+    history = []
+    
+    # Phase 1: Humid injection (activation) - high RH, no dilution
+    for t in range(humid_duration):
+        aerosol = condensation.execute(aerosol, time_step=1.0)
+        aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
+        history.append({"time": t, "phase": "humid", "aerosol": aerosol})
+    
+    # Phase 2: Dry air dilution (deactivation)
+    for t in range(dry_duration):
+        # Calculate dilution rate and apply
+        concentration = aerosol.particles.get_concentration()
+        dilution_rate = get_dilution_rate(
+            coefficient=dilution_coefficient,
+            concentration=concentration,
+        )
+        # Apply dilution (reduces concentration, lowers RH)
+        aerosol = aerosol.add_concentration(-dilution_rate * 1.0)  # time_step=1.0
+        
+        aerosol = condensation.execute(aerosol, time_step=1.0)
+        aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
+        history.append({
+            "time": humid_duration + t,
+            "phase": "dry",
+            "aerosol": aerosol,
+        })
+    
+    return aerosol, history
+```
+
+### Key Learning Outcomes
+
+1. How supersaturation drives cloud droplet activation
+2. Size-dependent activation (Kelvin effect / curvature)
+3. Hygroscopicity (κ) controls critical supersaturation
+4. Mass accumulates preferentially in larger particles
+5. Wall loss in chambers is size-dependent
+6. Particle-resolved tracking through complex processes
+7. Competition for water vapor in mixed populations
+
+## Change Log
+
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-01-19 | ADW | Initial plan created |
+| 2026-01-19 | ADW | Added builder patterns, explicit dependencies, LOC estimates |
