@@ -84,7 +84,7 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
 
         return self
 
-    def pre_build_check(self):
+    def pre_build_check(self) -> None:
         """Ensure builder is ready to build a strategy."""
         super().pre_build_check()
         if self._water_activity is None:
