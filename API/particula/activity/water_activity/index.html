@@ -3724,6 +3724,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -3768,6 +3776,118 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria_builders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria_builders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria_factories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria_factories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria_strategies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria_strategies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -9495,6 +9615,8 @@
       
         
       
+        
+      
     
     
     
@@ -9555,6 +9677,34 @@
     
   
     Biomass Burning Cloud Interactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../Examples/Simulations/Notebooks/Cloud_Chamber_Cycles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Chamber Activation–Deactivation Cycle (Single Run)
   
 
     
@@ -12097,7 +12247,10 @@ compound, if applicable.</p>
 <span class="normal">90</span>
 <span class="normal">91</span>
 <span class="normal">92</span>
-<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">biphasic_water_activity_point</span><span class="p">(</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">biphasic_water_activity_point</span><span class="p">(</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">hydrogen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -12149,8 +12302,11 @@ compound, if applicable.</p>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;water activity is NaN, check inputs&quot;</span><span class="p">)</span>
 
+        <span class="n">activities_water_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">activities_organic_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">activities</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
         <span class="n">phase_check</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">find_phase_separation</span><span class="p">(</span>
-            <span class="n">activities</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">activities</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">activities_water_seq</span><span class="p">,</span> <span class="n">activities_organic_seq</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;phase_sep_check&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -12239,10 +12395,7 @@ If no phase separation occurs, the beta phase values are None.</li>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/activity/water_activity.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
@@ -12476,19 +12629,16 @@ If no phase separation occurs, the beta phase values are None.</li>
     <span class="c1"># else phase separation occurs</span>
     <span class="c1"># split the activities into alpha and beta phases</span>
 
+    <span class="n">upper_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;upper_seperation_index&quot;</span><span class="p">])</span>
+    <span class="n">matching_upper_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;matching_upper_seperation_index&quot;</span><span class="p">])</span>
+
     <span class="c1"># alpha water rich phase</span>
-    <span class="n">alpha_water_activity</span> <span class="o">=</span> <span class="n">activities_water</span><span class="p">[</span>
-        <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;upper_seperation_index&quot;</span><span class="p">]</span> <span class="p">:</span>
-    <span class="p">]</span>
-    <span class="n">alpha_organic_mole_fraction</span> <span class="o">=</span> <span class="n">organic_mole_fraction_array</span><span class="p">[</span>
-        <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;upper_seperation_index&quot;</span><span class="p">]</span> <span class="p">:</span>
-    <span class="p">]</span>
+    <span class="n">alpha_water_activity</span> <span class="o">=</span> <span class="n">activities_water</span><span class="p">[</span><span class="n">upper_index</span><span class="p">:]</span>
+    <span class="n">alpha_organic_mole_fraction</span> <span class="o">=</span> <span class="n">organic_mole_fraction_array</span><span class="p">[</span><span class="n">upper_index</span><span class="p">:]</span>
     <span class="c1"># beta organic rich phase</span>
-    <span class="n">beta_water_activity</span> <span class="o">=</span> <span class="n">activities_water</span><span class="p">[</span>
-        <span class="p">:</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;matching_upper_seperation_index&quot;</span><span class="p">]</span>
-    <span class="p">]</span>
+    <span class="n">beta_water_activity</span> <span class="o">=</span> <span class="n">activities_water</span><span class="p">[:</span><span class="n">matching_upper_index</span><span class="p">]</span>
     <span class="n">beta_organic_mole_fraction</span> <span class="o">=</span> <span class="n">organic_mole_fraction_array</span><span class="p">[</span>
-        <span class="p">:</span> <span class="n">phase_check</span><span class="p">[</span><span class="s2">&quot;matching_upper_seperation_index&quot;</span><span class="p">]</span>
+        <span class="p">:</span><span class="n">matching_upper_index</span>
     <span class="p">]</span>
 
     <span class="c1"># find the water activity of the alpha phase</span>

@@ -3630,6 +3630,14 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -3674,6 +3682,118 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria_builders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria_builders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria_factories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria_factories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equilibria/equilibria_strategies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.equilibria.equilibria_strategies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4684,23 +4804,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get_builders">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#particula.particles.activity_factories.ActivityFactory.get_builders--mass_ideal_builder-activityidealmassbuilder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mass_ideal_builder -&gt; ActivityIdealMassBuilder()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -9518,6 +9621,8 @@
       
         
       
+        
+      
     
     
     
@@ -9578,6 +9683,34 @@
     
   
     Biomass Burning Cloud Interactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../Examples/Simulations/Notebooks/Cloud_Chamber_Cycles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Chamber Activation–Deactivation Cycle (Single Run)
   
 
     
@@ -11916,23 +12049,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_builders">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#particula.particles.activity_factories.ActivityFactory.get_builders--mass_ideal_builder-activityidealmassbuilder" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mass_ideal_builder -&gt; ActivityIdealMassBuilder()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
       </ul>
@@ -12023,9 +12139,16 @@ of species in a mixture of liquids.</p>
 
 
         <p>Factory for creating activity strategy builders for liquid mixtures.</p>
-<p>This class supports various strategies (e.g., mass-ideal, molar-ideal,
-kappa-parameter) to compute activity and partial pressures of species
-based on Raoult's Law or kappa hygroscopic parameter.</p>
+<p>This class supports strategies to compute activity and partial pressures
+of species based on different thermodynamic models:</p>
+<ul>
+<li><strong>mass_ideal</strong>: Raoult's Law based on mass fractions</li>
+<li><strong>molar_ideal</strong>: Raoult's Law based on mole fractions</li>
+<li><strong>kappa_parameter</strong> / <strong>kappa</strong>: Kappa hygroscopic parameter
+  (Petters 2007)</li>
+<li><strong>non_ideal_binary</strong> / <strong>binary_non_ideal</strong>: BAT model for non-ideal
+  organic–water mixtures (Gorkowski 2019)</li>
+</ul>
 
 
 <p><span class="doc-section-title">Methods:</span></p>
@@ -12034,39 +12157,24 @@ based on Raoult's Law or kappa hygroscopic parameter.</p>
             <b><code><a class="autorefs autorefs-internal" title="            get_builders (particula.particles.activity_factories.ActivityFactory.get_builders)" href="#particula.particles.activity_factories.ActivityFactory.get_builders">get_builders</a></code></b>
             –
             <div class="doc-md-description">
-              <p>Provides a mapping from strategy type to its corresponding builder.</p>
+              <p>Provides a mapping from strategy type to builder.</p>
             </div>
           </li>
           <li class="doc-section-item field-body">
             <b><code><span title="particula.particles.activity_factories.ActivityFactory.get_strategy">get_strategy</span></code></b>
             –
             <div class="doc-md-description">
-              <p>Validates inputs and returns a strategy instance for the specified
-strategy type (e.g., 'mass_ideal', 'molar_ideal', or
-'kappa_parameter').</p>
+              <p>Validates inputs and returns a strategy instance for the
+specified strategy type.</p>
             </div>
           </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-          –
-          <div class="doc-md-description">
-            <ul>
-<li>ActivityStrategy: Instance configured for the chosen activity
-approach.</li>
-</ul>
-          </div>
-        </li>
     </ul>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code>-<span title="ValueError">ValueError</span></code>
+              <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
             <p>If the strategy type is unknown or if required parameters
@@ -12079,14 +12187,30 @@ are missing or invalid.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><span class="filename">Factory Usage Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityFactory</span><span class="p">()</span>
-<span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;mass_ideal&quot;</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">activity</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
-<span class="c1"># result -&gt; ...</span>
-</code></pre></div>
-        <p>References:
-- "Raoult's Law,"
-    <a href="https://en.wikipedia.org/wiki/Raoult%27s_law">Wikipedia</a>.</p>
 
+<span class="c1"># Ideal mass activity</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;mass_ideal&quot;</span><span class="p">)</span>
+
+<span class="c1"># Non-ideal binary (BAT model)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.200</span><span class="p">,</span>
+    <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+    <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">bat_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;non_ideal_binary&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="c1"># bat_strategy.get_name() -&gt; &quot;ActivityNonIdealBinary&quot;</span>
+</code></pre></div>
+
+
+<details class="references" open>
+  <summary>References</summary>
+  <ul>
+<li>Petters, M. D., &amp; Kreidenweis, S. M. (2007).
+  DOI:10.5194/acp-7-1961-2007</li>
+<li>Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019).
+  DOI:10.5194/acp-19-13383-2019</li>
+</ul>
+</details>
 
 
 
@@ -12135,64 +12259,86 @@ are missing or invalid.</p>
         <li class="doc-section-item field-body">
           –
           <div class="doc-md-description">
-            <p>(e.g., 'mass_ideal', 'molar_ideal', 'kappa_parameter') to a builder</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-          –
-          <div class="doc-md-description">
-            <p>instance.</p>
+            <p>to a builder instance.</p>
           </div>
         </li>
     </ul>
 
 
+<details class="supported-types" open>
+  <summary>Supported types</summary>
+  <ul>
+<li>"mass_ideal": ActivityIdealMassBuilder (Raoult's Law, mass)</li>
+<li>"molar_ideal": ActivityIdealMolarBuilder (Raoult's Law, mole)</li>
+<li>"kappa_parameter": ActivityKappaParameterBuilder (kappa model)</li>
+<li>"kappa": Alias for "kappa_parameter"</li>
+<li>"non_ideal_binary": ActivityNonIdealBinaryBuilder (BAT model)</li>
+<li>"binary_non_ideal": Alias for "non_ideal_binary"</li>
+</ul>
+</details>
+
 <p><span class="doc-section-title">Examples:</span></p>
-    <p>```py title="Builders Retrieval Example"
-factory = ActivityFactory()
-builder_map = factory.get_builders()
-mass_ideal_builder = builder_map["mass_ideal"]</p>
-<h5 id="particula.particles.activity_factories.ActivityFactory.get_builders--mass_ideal_builder-activityidealmassbuilder">mass_ideal_builder -&gt; ActivityIdealMassBuilder()<a class="headerlink" href="#particula.particles.activity_factories.ActivityFactory.get_builders--mass_ideal_builder-activityidealmassbuilder" title="Permanent link">&para;</a></h5>
+    <div class="highlight"><span class="filename">Builders Retrieval Example</span><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">ActivityFactory</span><span class="p">()</span>
+<span class="n">builder_map</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
+<span class="n">non_ideal_builder</span> <span class="o">=</span> <span class="n">builder_map</span><span class="p">[</span><span class="s2">&quot;non_ideal_binary&quot;</span><span class="p">]</span>
+<span class="c1"># non_ideal_builder -&gt; ActivityNonIdealBinaryBuilder()</span>
+</code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/activity_factories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span>
-<span class="normal">96</span>
-<span class="normal">97</span>
-<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a mapping of strategy types to their corresponding builders.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict[str, Any]: A dictionary mapping the activity strategy type</span>
-<span class="sd">        (e.g., &#39;mass_ideal&#39;, &#39;molar_ideal&#39;, &#39;kappa_parameter&#39;) to a builder</span>
-<span class="sd">        instance.</span>
+<span class="sd">        to a builder instance.</span>
+
+<span class="sd">    Supported types:</span>
+<span class="sd">        - &quot;mass_ideal&quot;: ActivityIdealMassBuilder (Raoult&#39;s Law, mass)</span>
+<span class="sd">        - &quot;molar_ideal&quot;: ActivityIdealMolarBuilder (Raoult&#39;s Law, mole)</span>
+<span class="sd">        - &quot;kappa_parameter&quot;: ActivityKappaParameterBuilder (kappa model)</span>
+<span class="sd">        - &quot;kappa&quot;: Alias for &quot;kappa_parameter&quot;</span>
+<span class="sd">        - &quot;non_ideal_binary&quot;: ActivityNonIdealBinaryBuilder (BAT model)</span>
+<span class="sd">        - &quot;binary_non_ideal&quot;: Alias for &quot;non_ideal_binary&quot;</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```py title=&quot;Builders Retrieval Example&quot;</span>
 <span class="sd">        factory = ActivityFactory()</span>
 <span class="sd">        builder_map = factory.get_builders()</span>
-<span class="sd">        mass_ideal_builder = builder_map[&quot;mass_ideal&quot;]</span>
-<span class="sd">        # mass_ideal_builder -&gt; ActivityIdealMassBuilder()</span>
+<span class="sd">        non_ideal_builder = builder_map[&quot;non_ideal_binary&quot;]</span>
+<span class="sd">        # non_ideal_builder -&gt; ActivityNonIdealBinaryBuilder()</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;mass_ideal&quot;</span><span class="p">:</span> <span class="n">ActivityIdealMassBuilder</span><span class="p">(),</span>
