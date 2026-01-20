@@ -142,13 +142,17 @@ def plume_temperature(time, T_initial=1000, T_ambient=298, tau=30):
 ### Combined Coagulation Setup
 
 ```python
-coag_strategy = par.dynamics.CombineCoagulationStrategyBuilder()
-    .add_strategy(par.dynamics.BrownianCoagulationBuilder().build())
-    .add_strategy(par.dynamics.TurbulentShearCoagulationBuilder()
-        .set_turbulent_dissipation(0.1)  # m²/s³, energetic plume
-        .build())
-    .add_strategy(par.dynamics.SedimentationCoagulationBuilder().build())
-    .build()
+coag_strategy = (
+    par.dynamics.CombineCoagulationStrategyBuilder()
+        .add_strategy(par.dynamics.BrownianCoagulationBuilder().build())
+        .add_strategy(
+            par.dynamics.TurbulentShearCoagulationBuilder()
+            .set_turbulent_dissipation(0.1)  # m²/s³, energetic plume
+            .build()
+        )
+        .add_strategy(par.dynamics.SedimentationCoagulationBuilder().build())
+        .build()
+)
 ```
 
 ### Key Learning Outcomes
