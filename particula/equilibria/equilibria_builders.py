@@ -93,7 +93,8 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
     def build(self) -> LiquidVaporPartitioningStrategy:
         """Build the configured :class:`LiquidVaporPartitioningStrategy`."""
         self.pre_build_check()
-        assert self._water_activity is not None  # validated in pre_build_check
+        if self._water_activity is None:
+            raise ValueError("water_activity must be set before build")
         return LiquidVaporPartitioningStrategy(
             water_activity=self._water_activity
         )
