@@ -24,6 +24,7 @@ from typing import Any
 try:
     from tqdm import tqdm
 except ImportError:
+    tqdm = None  # type: ignore[assignment]
     AVAILABLE_TQDM = False
 else:
     AVAILABLE_TQDM = True
@@ -201,15 +202,13 @@ class RunnableSequence:
         """
         sub_step_time_step = time_step / sub_steps
         # If tqdm is available, wrap the process loop in a progress bar
-        loop_iterator = (
-            range(sub_steps)
-            if not AVAILABLE_TQDM
-            else tqdm(
+        loop_iterator = range(sub_steps)
+        if AVAILABLE_TQDM and tqdm is not None:
+            loop_iterator = tqdm(
                 range(sub_steps),
                 desc="Executing Runnable",
                 mininterval=0.5,
             )
-        )
         for _ in loop_iterator:
             # loop over each process in the sequence
             for process in self.processes:
