@@ -75,6 +75,8 @@ particula/
 
 - [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
 
+- [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb) — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across 3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), showing how hygroscopicity affects activation at different supersaturations.
+
 ## Features
 
 - **Gas & Particle Phases** — Full thermodynamic modeling with swappable strategies

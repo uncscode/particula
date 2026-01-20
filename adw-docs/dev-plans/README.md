@@ -89,10 +89,11 @@ and rollout.
     through cloud deck formation. Showcases BAT model activity coefficients
     and phase separation diagnostics.
 - [Cloud Chamber Injection Cycles Simulation][plan-cloud-chamber] — Status:
-  Planning (P2)
+  In Progress (P2 complete, #897)
   - Scope: 4-cycle cloud droplet activation/deactivation in rectangular chamber
     with particle-resolved speciated mass tracking. Demonstrates wall loss,
     dilution, injection, and κ-dependent activation for different seed types.
+  - Phases: P1 (#896) + P2 (#897) complete. P3-P4 remaining.
 
 ## Maintenance Plans
 
