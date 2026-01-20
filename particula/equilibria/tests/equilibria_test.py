@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-
 from particula.equilibria.equilibria import Equilibria
 from particula.equilibria.equilibria_strategies import (
     EquilibriaStrategy,
@@ -49,12 +48,14 @@ def _equilibrium_result() -> EquilibriumResult:
 
 
 def test_init_stores_strategy():
+    """Ensure the initializer keeps the provided strategy."""
     strategy = MagicMock(spec=EquilibriaStrategy)
     runnable = Equilibria(strategy)
     assert runnable.strategy is strategy
 
 
 def test_rate_returns_strategy_name():
+    """Rate reports the configured strategy identifier."""
     strategy = MagicMock(spec=EquilibriaStrategy)
     strategy.get_name.return_value = "ReturnAerosol"
     runnable = Equilibria(strategy)
@@ -62,6 +63,7 @@ def test_rate_returns_strategy_name():
 
 
 def test_execute_returns_aerosol_instance():
+    """Strategy results that are aerosols are returned directly."""
     aerosol = _AerosolStub()
     strategy = MagicMock(spec=EquilibriaStrategy)
     strategy.solve.return_value = aerosol
@@ -71,6 +73,7 @@ def test_execute_returns_aerosol_instance():
 
 
 def test_execute_applies_mapping_result():
+    """Mappings with concentration fields are attached to the aerosol."""
     aerosol = _AerosolStub()
     strategy = MagicMock(spec=EquilibriaStrategy)
     strategy.solve.return_value = {
@@ -84,6 +87,7 @@ def test_execute_applies_mapping_result():
 
 
 def test_execute_raises_on_none_result():
+    """None results raise to avoid silent failures."""
     aerosol = _AerosolStub()
     strategy = MagicMock(spec=EquilibriaStrategy)
     strategy.solve.return_value = None
@@ -115,6 +119,7 @@ class _CountingStrategy(EquilibriaStrategy):
 
 
 def test_sub_steps_calls_strategy_each_time_and_passes_dt():
+    """Verify each sub-step calls the strategy with the delta time."""
     aerosol = _AerosolStub()
     strategy = _CountingStrategy()
     runnable = Equilibria(strategy)
@@ -124,6 +129,7 @@ def test_sub_steps_calls_strategy_each_time_and_passes_dt():
 
 
 def test_invalid_sub_steps_raises():
+    """Non-positive sub_steps are rejected."""
     aerosol = _AerosolStub()
     strategy = MagicMock(spec=EquilibriaStrategy)
     runnable = Equilibria(strategy)
@@ -132,6 +138,7 @@ def test_invalid_sub_steps_raises():
 
 
 def test_pipe_operator_returns_runnable_sequence():
+    """Composition via | yields a RunnableSequence containing both processes."""
     strategy = MagicMock(spec=EquilibriaStrategy)
     runnable = Equilibria(strategy)
     other = MagicMock(spec=RunnableABC)
@@ -141,6 +148,7 @@ def test_pipe_operator_returns_runnable_sequence():
 
 
 def test_missing_partitioning_input_raises_attribute_error():
+    """AttributeError surfaces when required inputs are missing."""
     strategy = MagicMock(spec=EquilibriaStrategy)
     runnable = Equilibria(strategy)
     aerosol = _AerosolStub(inputs={"c_star_j_dry": np.array([1.0])})
@@ -149,6 +157,7 @@ def test_missing_partitioning_input_raises_attribute_error():
 
 
 def test_liquid_vapor_partitioning_strategy_runs():
+    """Ensure the real LiquidVaporPartitioningStrategy coherently runs."""
     strategy = LiquidVaporPartitioningStrategy(water_activity=0.5)
     runnable = Equilibria(strategy)
     aerosol = _AerosolStub()
@@ -157,6 +166,7 @@ def test_liquid_vapor_partitioning_strategy_runs():
 
 
 def test_phase_concentrations_result_is_attached():
+    """PhaseConcentrations results are stored on the aerosol."""
     aerosol = _AerosolStub()
     phase = PhaseConcentrations(
         species_concentrations=np.array([1.0]),
@@ -175,6 +185,8 @@ def test_phase_concentrations_result_is_attached():
 
 
 def test_equilibrium_result_is_attached_and_attribute_inputs_used():
+    """Attribute-backed aerosols are accepted and store results."""
+
     class _AttrAerosol:
         def __init__(self):
             self.c_star_j_dry = np.array([3.0])
@@ -196,6 +208,7 @@ def test_equilibrium_result_is_attached_and_attribute_inputs_used():
 
 
 def test_object_with_phase_concentrations_attribute_is_attached():
+    """Objects exposing concentration attributes get persisted."""
     aerosol = _AerosolStub()
 
     class _ResultWithAttrs:
