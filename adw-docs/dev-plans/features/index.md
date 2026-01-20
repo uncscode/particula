@@ -36,7 +36,6 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 |----|------|--------|----------|--------|
 | F5 | [Wildfire Plume Evolution Simulation](F5-wildfire-plume-simulation.md) | Planning | P2 | 3 |
 | F6 | [Marine Aerosol Sea Spray Aging Simulation](F6-marine-aerosol-simulation.md) | Planning | P2 | 3 |
-| F7 | [Cloud Chamber Injection Cycles Simulation](F7-cloud-chamber-cycles-simulation.md) | In Progress (P2) | P2 | 4 |
 
 ## Completed Features
 
@@ -56,6 +55,7 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 | ID | Name | Completion Date |
 |----|------|-----------------|
 | F4 | [WallLoss Runnable Process](completed/wall-loss-runnable.md) | 2025-12-18 |
+| F7 | [Cloud Chamber Injection Cycles Simulation](completed/F7-cloud-chamber-cycles-simulation.md) | 2026-01-20 |
 
 ## Next Available ID
 
