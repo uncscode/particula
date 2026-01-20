@@ -89,11 +89,11 @@ and rollout.
     through cloud deck formation. Showcases BAT model activity coefficients
     and phase separation diagnostics.
 - [Cloud Chamber Injection Cycles Simulation][plan-cloud-chamber] — Status:
-  In Progress (P2 complete, #897)
+  Completed (P4)
   - Scope: 4-cycle cloud droplet activation/deactivation in rectangular chamber
     with particle-resolved speciated mass tracking. Demonstrates wall loss,
     dilution, injection, and κ-dependent activation for different seed types.
-  - Phases: P1 (#896) + P2 (#897) complete. P3-P4 remaining.
+  - Phases: P1 (#896) + P2 (#897) + P3 + P4 completed.
 
 ## Maintenance Plans
 
@@ -107,7 +107,7 @@ and rollout.
 - Parent wall loss epic: [#72](https://github.com/uncscode/particula/issues/72)
 
 <!-- Epic Links -->
-[epic-e1]: epics/E1-staggered-condensation-stepping.md
+[epic-e1]: epics/completed/E1-staggered-condensation-stepping.md
 [epic-e3]: epics/E3-data-representation-refactor.md
 [epic-e4]: epics/E4-probabilistic-particle-resolved.md
 
@@ -118,12 +118,12 @@ and rollout.
 [e3-f4]: features/E3-F4-facade-migration.md
 
 <!-- E1 Feature Links -->
-[e1-f1]: features/E1-F1-core-staggered-stepping.md
-[e1-f2]: features/E1-F2-batch-stepping-mode.md
-[e1-f3]: features/E1-F3-builder-factory-integration.md
-[e1-f4]: features/E1-F4-mass-conservation-validation.md
+[e1-f1]: features/completed/E1-F1-core-staggered-stepping.md
+[e1-f2]: features/completed/E1-F2-batch-stepping-mode.md
+[e1-f3]: features/completed/E1-F3-builder-factory-integration.md
+[e1-f4]: features/completed/E1-F4-mass-conservation-validation.md
 [e1-f5]: features/E1-F5-stability-performance-benchmarks.md
-[e1-f6]: features/E1-F6-documentation-examples.md
+[e1-f6]: features/completed/E1-F6-documentation-examples.md
 
 <!-- E4 Feature Links -->
 [e4-f1]: features/E4-F1-core-strategy-data.md
@@ -143,7 +143,7 @@ and rollout.
 [plan-wall-loss-runnable]: features/wall-loss-runnable.md
 [plan-wildfire]: features/F5-wildfire-plume-simulation.md
 [plan-marine]: features/F6-marine-aerosol-simulation.md
-[plan-cloud-chamber]: features/F7-cloud-chamber-cycles-simulation.md
+[plan-cloud-chamber]: features/completed/F7-cloud-chamber-cycles-simulation.md
 
 <!-- Maintenance Links -->
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md
