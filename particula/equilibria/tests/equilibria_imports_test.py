@@ -107,12 +107,7 @@ def test_deprecation_wrappers_delegate_and_warn(
     assert the shortcuts still work while warning users to move to strategies.
     """
     sentinel = object()
-    calls: list[
-        tuple[
-            tuple[Any, ...],
-            dict[str, Any],
-        ]
-    ] = []
+    calls: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
 
     def _sentinel(*call_args: Any, **call_kwargs: Any) -> Any:
         calls.append((call_args, call_kwargs))
