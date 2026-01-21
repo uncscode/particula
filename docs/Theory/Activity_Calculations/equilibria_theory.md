@@ -135,12 +135,12 @@ where the particle-phase concentrations include both organic mass and associated
 
 The equilibria calculations are implemented in the `particula.equilibria` module:
 
-| Function | Purpose |
-|----------|---------|
-| `liquid_vapor_partitioning()` | Main equilibrium solver |
-| `liquid_vapor_obj_function()` | Objective function for optimization |
-| `get_properties_for_liquid_vapor_partitioning()` | Compute activity/phase inputs |
-| `_calculate_cstar()` | Phase-specific C* calculation |
+| API | Purpose |
+|-----|---------|
+| `Equilibria` | High-level interface for gas–particle equilibrium calculations |
+| `LiquidVaporPartitioningStrategy` | Strategy class implementing liquid–vapor partitioning behavior |
+| `liquid_vapor_partitioning()` | Convenience function wrapping the main equilibrium solver |
+| `get_properties_for_liquid_vapor_partitioning()` | Compute activity/phase inputs used by the solver |
 
 ### Example Usage
 
