@@ -5,3 +5,7 @@ Particula's Theory section contains a collection of theoretical topics and conce
 In addition, we have discussions on implementation details, such as the use of OpenAI models and the integration of various tools and libraries. This section is designed to provide a deeper understanding of the underlying principles and methodologies that drive the functionality of Particula.
 
 See the sidebar on the left for a list of topic categories and their contents.
+
+## Activity Calculations
+
+For the theoretical foundations of activity calculations including the Binary Activity Thermodynamics (BAT) model and liquid-vapor partitioning, see the [Activity Calculations](Activity_Calculations/index.md) section.
