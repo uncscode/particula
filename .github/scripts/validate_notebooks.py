@@ -106,36 +106,42 @@ def execute_notebook(
         Tuple of (success, error_message, timed_out).
         success is None if timed out (not a failure).
     """
-    try:
-        # Create a temporary file for the output
-        # nbconvert appends .ipynb to the output name, so we need a temp file
-        with tempfile.NamedTemporaryFile(
-            suffix=".ipynb", delete=True
-        ) as temp_output:
-            # Get the path without the .ipynb extension (nbconvert adds it)
-            # Remove the last 6 characters ('.ipynb') reliably
-            output_path = temp_output.name[:-6]
-            temp_output.close()  # Close the file so nbconvert can write to it
+    # Create a temporary file for the output
+    # nbconvert appends .ipynb to the output name, so we need a temp file
+    temp_output = tempfile.NamedTemporaryFile(
+        suffix=".ipynb", delete=False
+    )
+    temp_output.close()  # Close immediately, we just need the path
+    # Get the path without the .ipynb extension (nbconvert adds it)
+    output_path = temp_output.name[:-6]
 
-            result = subprocess.run(
-                [
-                    sys.executable,
-                    "-m",
-                    "nbconvert",
-                    "--to",
-                    "notebook",
-                    "--execute",
-                    "--ExecutePreprocessor.timeout",
-                    str(timeout),
-                    "--ExecutePreprocessor.kernel_name=python3",
-                    "--output",
-                    output_path,
-                    str(notebook_path),
-                ],
-                capture_output=True,
-                text=True,
-                timeout=timeout + 30,  # Extra buffer for nbconvert overhead
-            )
+    try:
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "nbconvert",
+                "--to",
+                "notebook",
+                "--execute",
+                "--ExecutePreprocessor.timeout",
+                str(timeout),
+                "--ExecutePreprocessor.kernel_name=python3",
+                "--output",
+                output_path,
+                str(notebook_path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=timeout + 30,  # Extra buffer for nbconvert overhead
+        )
+
+        # Clean up the temporary file
+        try:
+            os.unlink(temp_output.name)
+        except OSError:
+            pass  # File may not exist if nbconvert failed early
 
         if result.returncode == 0:
             return True, None, False
@@ -152,8 +158,18 @@ def execute_notebook(
         return False, error_msg, False
 
     except subprocess.TimeoutExpired:
+        # Clean up on timeout
+        try:
+            os.unlink(temp_output.name)
+        except OSError:
+            pass
         return None, "Execution timed out (skipped)", True
     except Exception as e:
+        # Clean up on error
+        try:
+            os.unlink(temp_output.name)
+        except OSError:
+            pass
         return False, str(e), False
 
 
