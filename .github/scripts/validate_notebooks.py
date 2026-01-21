@@ -161,6 +161,7 @@ def execute_notebook(
         try:
             os.unlink(temp_output.name)
         except OSError:
+            # File may already have been removed or never created; ignore cleanup errors
             pass
         return None, "Execution timed out (skipped)", True
     except Exception as e:
