@@ -110,10 +110,12 @@ def execute_notebook(
         # Create a temporary file for the output
         # nbconvert appends .ipynb to the output name, so we need a temp file
         with tempfile.NamedTemporaryFile(
-            suffix=".ipynb", delete=True, mode="w"
+            suffix=".ipynb", delete=True
         ) as temp_output:
             # Get the path without the .ipynb extension (nbconvert adds it)
-            output_path = temp_output.name.rsplit(".ipynb", 1)[0]
+            # Remove the last 6 characters ('.ipynb') reliably
+            output_path = temp_output.name[:-6]
+            temp_output.close()  # Close the file so nbconvert can write to it
 
             result = subprocess.run(
                 [
