@@ -41,6 +41,7 @@ dev = [
     "griffe", "openai", "GitPython", "ruff", "mypy",
 ]
 extra = [
+    "ipykernel", "nbclient", "nbconvert", "nbformat",
     "matplotlib", "pandas", "pint", "thermo", "tqdm",
 ]
 all = [
