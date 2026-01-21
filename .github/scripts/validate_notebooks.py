@@ -20,6 +20,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -106,25 +107,33 @@ def execute_notebook(
         success is None if timed out (not a failure).
     """
     try:
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "nbconvert",
-                "--to",
-                "notebook",
-                "--execute",
-                "--ExecutePreprocessor.timeout",
-                str(timeout),
-                "--ExecutePreprocessor.kernel_name=python3",
-                "--output",
-                "/dev/null",
-                str(notebook_path),
-            ],
-            capture_output=True,
-            text=True,
-            timeout=timeout + 30,  # Extra buffer for nbconvert overhead
-        )
+        # Create a temporary file for the output
+        # nbconvert appends .ipynb to the output name, so we need a temp file
+        with tempfile.NamedTemporaryFile(
+            suffix=".ipynb", delete=True, mode="w"
+        ) as temp_output:
+            # Get the path without the .ipynb extension (nbconvert adds it)
+            output_path = temp_output.name.rsplit(".ipynb", 1)[0]
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "nbconvert",
+                    "--to",
+                    "notebook",
+                    "--execute",
+                    "--ExecutePreprocessor.timeout",
+                    str(timeout),
+                    "--ExecutePreprocessor.kernel_name=python3",
+                    "--output",
+                    output_path,
+                    str(notebook_path),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=timeout + 30,  # Extra buffer for nbconvert overhead
+            )
 
         if result.returncode == 0:
             return True, None, False
