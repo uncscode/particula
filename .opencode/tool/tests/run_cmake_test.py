@@ -32,9 +32,7 @@ def run_cmake_module() -> ModuleType:
 
 
 class DummyResult:
-    def __init__(
-        self, returncode: int = 0, stdout: str = "", stderr: str = ""
-    ) -> None:
+    def __init__(self, returncode: int = 0, stdout: str = "", stderr: str = "") -> None:
         self.returncode = returncode
         self.stdout = stdout
         self.stderr = stderr
@@ -59,9 +57,7 @@ Target example_app (EXECUTABLE)
     assert len(metrics["targets"]) == 1
 
 
-def test_parse_cmake_output_errors_and_warnings(
-    run_cmake_module: ModuleType,
-) -> None:
+def test_parse_cmake_output_errors_and_warnings(run_cmake_module: ModuleType) -> None:
     output = """
 CMake Warning at CMakeLists.txt:10 (message):
   Deprecated feature
@@ -76,9 +72,7 @@ CMake Error at CMakeLists.txt:20 (find_package):
     assert len(metrics["error_messages"]) == 1
 
 
-def test_parse_cmake_output_truncates_targets(
-    run_cmake_module: ModuleType,
-) -> None:
+def test_parse_cmake_output_truncates_targets(run_cmake_module: ModuleType) -> None:
     targets = "\n".join([f"Target target_{i} (EXECUTABLE)" for i in range(60)])
     metrics = run_cmake_module.parse_cmake_output(targets, exit_code=0)
     assert len(metrics["targets"]) == 50
@@ -87,9 +81,7 @@ def test_parse_cmake_output_truncates_targets(
     assert "truncated" in summary
 
 
-def test_format_summary_handles_missing_fields(
-    run_cmake_module: ModuleType,
-) -> None:
+def test_format_summary_handles_missing_fields(run_cmake_module: ModuleType) -> None:
     metrics = {
         "success": False,
         "generator": None,
@@ -128,14 +120,10 @@ def test_run_cmake_with_preset_builds_command(
     module = load_module()
     source_dir, build_dir = preset_file
 
-    def fake_run(
-        cmd: list, capture_output: bool, text: bool, timeout: int
-    ) -> DummyResult:  # type: ignore[override]
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
         assert "--preset" in cmd
         assert "debug" in cmd
-        return DummyResult(
-            returncode=0, stdout="-- Configuring done\n", stderr=""
-        )
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
     exit_code, output = module.run_cmake(
@@ -148,9 +136,7 @@ def test_run_cmake_with_preset_builds_command(
     assert "VALIDATION: PASSED" in output
 
 
-def test_run_cmake_ninja_fallback(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_run_cmake_ninja_fallback(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     module = load_module()
     source_dir = tmp_path / "src"
     build_dir = tmp_path / "build"
@@ -159,14 +145,10 @@ def test_run_cmake_ninja_fallback(
     def fake_which(_: str) -> None:
         return None
 
-    def fake_run(
-        cmd: list, capture_output: bool, text: bool, timeout: int
-    ) -> DummyResult:  # type: ignore[override]
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
         # Ensure -G Ninja not present when fallback triggered
         assert "-G" not in cmd
-        return DummyResult(
-            returncode=0, stdout="-- Configuring done\n", stderr=""
-        )
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
 
     monkeypatch.setattr(module.shutil, "which", fake_which)
     monkeypatch.setattr(module.subprocess, "run", fake_run)
@@ -181,18 +163,14 @@ def test_run_cmake_ninja_fallback(
     assert "Ninja requested" in output
 
 
-def test_run_cmake_timeout(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_run_cmake_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     module = load_module()
     source_dir = tmp_path / "src"
     build_dir = tmp_path / "build"
     source_dir.mkdir()
 
     def fake_run(*_, **__):
-        raise subprocess.TimeoutExpired(
-            cmd="cmake", timeout=1, output="partial", stderr="late"
-        )
+        raise subprocess.TimeoutExpired(cmd="cmake", timeout=1, output="partial", stderr="late")
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
     exit_code, output = module.run_cmake(
@@ -205,9 +183,7 @@ def test_run_cmake_timeout(
     assert "timed out" in output.lower()
 
 
-def test_run_cmake_not_found(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_run_cmake_not_found(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     module = load_module()
     source_dir = tmp_path / "src"
     build_dir = tmp_path / "build"
@@ -217,9 +193,7 @@ def test_run_cmake_not_found(
         raise FileNotFoundError()
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
-    exit_code, output = module.run_cmake(
-        source_dir=str(source_dir), build_dir=str(build_dir)
-    )
+    exit_code, output = module.run_cmake(source_dir=str(source_dir), build_dir=str(build_dir))
     assert exit_code == 1
     assert "not available" not in output
 
@@ -274,9 +248,7 @@ def test_run_cmake_preset_not_supported(
     assert "not supported" in output.lower()
 
 
-def test_run_cmake_json_truncation(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_run_cmake_json_truncation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     module = load_module()
     source_dir = tmp_path / "src"
     build_dir = tmp_path / "build"
@@ -311,9 +283,7 @@ def test_cli_parses_arguments(
     monkeypatch.setattr(module, "run_cmake", fake_run_cmake)
 
     with pytest.raises(SystemExit) as excinfo:
-        module.main(
-            ["--source-dir", "src", "--build-dir", "build", "--timeout", "10"]
-        )
+        module.main(["--source-dir", "src", "--build-dir", "build", "--timeout", "10"])
     assert excinfo.value.code == 0
     captured = capsys.readouterr().out
     assert "CLI OK" in captured
@@ -339,17 +309,13 @@ def test_cli_json_output(
 
 def test_truncate_output_byte_limit(run_cmake_module: ModuleType) -> None:
     long_output = "x" * 60_000
-    truncated, was_truncated, notice = run_cmake_module._truncate_output(
-        long_output
-    )
+    truncated, was_truncated, notice = run_cmake_module._truncate_output(long_output)
     assert was_truncated is True
     assert "48KB" in notice
     assert notice in truncated
 
 
-def test_run_cmake_full_output_truncation(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_run_cmake_full_output_truncation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     module = load_module()
     source_dir = tmp_path / "src"
     build_dir = tmp_path / "build"
@@ -370,9 +336,7 @@ def test_run_cmake_full_output_truncation(
     assert "CMAKE SUMMARY" in output
 
 
-def test_run_cmake_ninja_generator(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_run_cmake_ninja_generator(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     module = load_module()
     source_dir = tmp_path / "src"
     build_dir = tmp_path / "build"
@@ -381,22 +345,15 @@ def test_run_cmake_ninja_generator(
     def fake_which(_: str) -> str:
         return "/usr/bin/ninja"
 
-    def fake_run(
-        cmd: list, capture_output: bool, text: bool, timeout: int
-    ) -> DummyResult:  # type: ignore[override]
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
         assert ["-G", "Ninja"] in [cmd[i : i + 2] for i in range(len(cmd) - 1)]
-        return DummyResult(
-            returncode=0, stdout="-- Configuring done\n", stderr=""
-        )
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
 
     monkeypatch.setattr(module.shutil, "which", fake_which)
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
     exit_code, output = module.run_cmake(
-        source_dir=str(source_dir),
-        build_dir=str(build_dir),
-        ninja=True,
-        output_mode="summary",
+        source_dir=str(source_dir), build_dir=str(build_dir), ninja=True, output_mode="summary"
     )
 
     assert exit_code == 0

@@ -27,17 +27,13 @@ def run_pytest_module() -> ModuleType:
 
 
 class DummyProcess:
-    def __init__(
-        self, stdout: str = "", stderr: str = "", returncode: int = 0
-    ) -> None:
+    def __init__(self, stdout: str = "", stderr: str = "", returncode: int = 0) -> None:
         self.stdout = stdout
         self.stderr = stderr
         self.returncode = returncode
 
 
-def test_parse_pytest_output_extracts_counts(
-    run_pytest_module: ModuleType,
-) -> None:
+def test_parse_pytest_output_extracts_counts(run_pytest_module: ModuleType) -> None:
     output = """===== 3 passed, 1 skipped in 0.50s =====\nTOTAL        4     0    75%"""
     metrics = run_pytest_module.parse_pytest_output(output)
 
@@ -47,9 +43,7 @@ def test_parse_pytest_output_extracts_counts(
     assert metrics["coverage_pct"] == 75
 
 
-def test_validate_results_flags_all_issues(
-    run_pytest_module: ModuleType,
-) -> None:
+def test_validate_results_flags_all_issues(run_pytest_module: ModuleType) -> None:
     metrics = {
         "passed": 0,
         "failed": 1,
@@ -65,21 +59,15 @@ def test_validate_results_flags_all_issues(
         "error_tests": [],
     }
 
-    errors = run_pytest_module.validate_results(
-        metrics, min_test_count=1, coverage_threshold=80
-    )
+    errors = run_pytest_module.validate_results(metrics, min_test_count=1, coverage_threshold=80)
 
     assert "Found 1 failed test(s)" in errors
     assert "Found 1 test error(s)" in errors
     assert any("Expected at least" in err for err in errors)
-    assert any(
-        "Coverage 50% is below threshold of 80%" in err for err in errors
-    )
+    assert any("Coverage 50% is below threshold of 80%" in err for err in errors)
 
 
-def test_format_summary_reports_validation_and_coverage(
-    run_pytest_module: ModuleType,
-) -> None:
+def test_format_summary_reports_validation_and_coverage(run_pytest_module: ModuleType) -> None:
     metrics = {
         "passed": 2,
         "failed": 0,
@@ -94,9 +82,7 @@ def test_format_summary_reports_validation_and_coverage(
     }
     validation_errors = ["sample validation error"]
 
-    summary = run_pytest_module.format_summary(
-        metrics, validation_errors, coverage_threshold=80
-    )
+    summary = run_pytest_module.format_summary(metrics, validation_errors, coverage_threshold=80)
 
     assert "Coverage: 90% (threshold: 80% PASSED)" in summary
     assert "VALIDATION: FAILED" in summary

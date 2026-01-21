@@ -89,11 +89,7 @@ def example_project() -> Path:
 
 @pytest.fixture(scope="session")
 def build_dir(example_project: Path) -> Generator[Path, None, None]:
-    root = (
-        example_project
-        / "build"
-        / f"integration_run_ctest_{uuid.uuid4().hex[:8]}"
-    )
+    root = example_project / "build" / f"integration_run_ctest_{uuid.uuid4().hex[:8]}"
     root.parent.mkdir(parents=True, exist_ok=True)
     try:
         yield root
@@ -120,17 +116,11 @@ def ensure_built(example_project: Path, build_dir: Path) -> Path:
 
     if not (build_dir / "CTestTestfile.cmake").exists():
         try:
-            run_command(
-                ["cmake", "-S", str(example_project), "-B", str(build_dir)]
-            )
+            run_command(["cmake", "-S", str(example_project), "-B", str(build_dir)])
             run_command(["cmake", "--build", str(build_dir)])
-        except (
-            subprocess.CalledProcessError
-        ) as exc:  # pragma: no cover - integration only
+        except subprocess.CalledProcessError as exc:  # pragma: no cover - integration only
             output = exc.stderr or exc.stdout or str(exc)
-            pytest.skip(
-                f"Failed to configure/build example_cpp_dev: {output.strip()}"
-            )
+            pytest.skip(f"Failed to configure/build example_cpp_dev: {output.strip()}")
         except subprocess.TimeoutExpired:  # pragma: no cover - integration only
             pytest.skip("cmake configure/build step timed out")
         except FileNotFoundError:  # pragma: no cover - integration only
@@ -149,10 +139,9 @@ def _parse_json(output: str) -> dict[str, object]:
 # --- Integration scenarios --------------------------------------------------
 
 
-def test_run_all_summary_output(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_run_all_summary_output(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Summary output runs every discovered test and reports validation success."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         output_mode="summary",
@@ -164,10 +153,9 @@ def test_run_all_summary_output(
     assert "Tests Run:" in output
 
 
-def test_full_output_includes_raw_ctest(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_full_output_includes_raw_ctest(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Full output retains the raw CTest log and reports the 100% pass summary."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         output_mode="full",
@@ -178,10 +166,9 @@ def test_full_output_includes_raw_ctest(
     assert "100% tests passed" in output
 
 
-def test_json_output_metrics_and_flags(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_json_output_metrics_and_flags(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """JSON output surfaces structured metrics, flags, and validation metadata."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         output_mode="json",
@@ -200,10 +187,9 @@ def test_json_output_metrics_and_flags(
     assert metrics["build_dir_error"] is False
 
 
-def test_include_filter_runs_known_test(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_include_filter_runs_known_test(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Include filters still execute the expected example test."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         include_filter="test_example_lib",
@@ -221,6 +207,7 @@ def test_exclude_filter_non_matching_still_runs(
     run_ctest_module: ModuleType, ensure_built: Path
 ) -> None:
     """Exclude filters that match nothing do not prevent a successful run."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         exclude_filter="__no_match__",
@@ -234,10 +221,9 @@ def test_exclude_filter_non_matching_still_runs(
     assert metrics["total"] >= 1
 
 
-def test_parallel_execution(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_parallel_execution(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Running with multiple jobs still succeeds and reports the same metrics."""
+
     jobs = min(4, max(1, os.cpu_count() or 1))
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
@@ -252,10 +238,9 @@ def test_parallel_execution(
     assert metrics["total"] > 0
 
 
-def test_min_test_count_validation(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_min_test_count_validation(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Requesting more tests than exist yields a validation failure."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         min_test_count=5,
@@ -269,10 +254,9 @@ def test_min_test_count_validation(
     assert any("Expected at least 5 tests" in err for err in validation_errors)
 
 
-def test_no_matching_tests_reports_zero(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_no_matching_tests_reports_zero(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Include filters that match nothing report zero tests and fail validation."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         include_filter="__no_such_test__",
@@ -288,10 +272,9 @@ def test_no_matching_tests_reports_zero(
     assert any("No tests were collected" in err for err in validation_errors)
 
 
-def test_timeout_flagged(
-    run_ctest_module: ModuleType, ensure_built: Path
-) -> None:
+def test_timeout_flagged(run_ctest_module: ModuleType, ensure_built: Path) -> None:
     """Timeout enforcement either flags the timeout or passes when the host is fast."""
+
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
         timeout=1,
@@ -309,10 +292,9 @@ def test_timeout_flagged(
         assert payload["success"] is True
 
 
-def test_invalid_build_directory_error(
-    run_ctest_module: ModuleType, tmp_path: Path
-) -> None:
+def test_invalid_build_directory_error(run_ctest_module: ModuleType, tmp_path: Path) -> None:
     """Pointing at a non-existent build directory reports build_dir_error."""
+
     missing = tmp_path / "missing_ctest_build"
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=missing,
@@ -329,9 +311,7 @@ def test_invalid_build_directory_error(
 
 
 def test_ctest_missing_flag(
-    run_ctest_module: ModuleType,
-    ensure_built: Path,
-    monkeypatch: pytest.MonkeyPatch,
+    run_ctest_module: ModuleType, ensure_built: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Simulate a missing ctest binary to ensure the flag is exposed."""
 
@@ -351,9 +331,7 @@ def test_ctest_missing_flag(
     assert exit_code == 1
     assert metrics["ctest_missing"] is True
     assert payload["success"] is False
-    assert any(
-        "ctest command not found" in err.lower() for err in validation_errors
-    )
+    assert any("ctest command not found" in err.lower() for err in validation_errors)
 
 
 # --- Additional coverage ----------------------------------------------------
@@ -361,22 +339,16 @@ def test_ctest_missing_flag(
 
 def test_truncate_output_limits_size(run_ctest_module: ModuleType) -> None:
     long_line = "x" * 200
-    payload = "\n".join(
-        long_line for _ in range(run_ctest_module.OUTPUT_LINE_LIMIT + 10)
-    )
+    payload = "\n".join(long_line for _ in range(run_ctest_module.OUTPUT_LINE_LIMIT + 10))
 
-    truncated_output, truncated, notice = run_ctest_module._truncate_output(
-        payload
-    )
+    truncated_output, truncated, notice = run_ctest_module._truncate_output(payload)
 
     assert truncated is True
     assert "truncated" in notice.lower()
     assert "..." in truncated_output
 
 
-def test_parse_ctest_output_handles_invalid_duration(
-    run_ctest_module: ModuleType,
-) -> None:
+def test_parse_ctest_output_handles_invalid_duration(run_ctest_module: ModuleType) -> None:
     raw_output = (
         "50% tests passed, 1 tests failed out of 2\n"
         "Total Test time (real) = abc sec\n"
@@ -393,9 +365,7 @@ def test_parse_ctest_output_handles_invalid_duration(
     assert set(metrics["failed_tests"]) == {"sample_case", "integration_case"}
 
 
-def test_validate_results_captures_all_flags(
-    run_ctest_module: ModuleType,
-) -> None:
+def test_validate_results_captures_all_flags(run_ctest_module: ModuleType) -> None:
     metrics = {
         "failed": 2,
         "total": 1,
@@ -411,14 +381,10 @@ def test_validate_results_captures_all_flags(
     assert any("at least 3" in err for err in errors)
     assert any("timed out" in err for err in errors)
     assert any("ctest command not found" in err for err in errors)
-    assert any(
-        "CTestTestfile" in err or "Build directory" in err for err in errors
-    )
+    assert any("CTestTestfile" in err or "Build directory" in err for err in errors)
 
 
-def test_format_summary_truncates_failed_tests(
-    run_ctest_module: ModuleType,
-) -> None:
+def test_format_summary_truncates_failed_tests(run_ctest_module: ModuleType) -> None:
     metrics = {
         "total": 12,
         "passed": 10,
@@ -428,9 +394,7 @@ def test_format_summary_truncates_failed_tests(
         "failed_tests": [f"test_{i}" for i in range(15)],
     }
 
-    summary = run_ctest_module.format_summary(
-        metrics, ["some validation error"]
-    )
+    summary = run_ctest_module.format_summary(metrics, ["some validation error"])
 
     assert "Failed Tests (15):" in summary
     assert "... and 5 more" in summary
@@ -438,9 +402,7 @@ def test_format_summary_truncates_failed_tests(
 
 
 def test_run_ctest_timeout_sets_flags(
-    run_ctest_module: ModuleType,
-    ensure_built: Path,
-    monkeypatch: pytest.MonkeyPatch,
+    run_ctest_module: ModuleType, ensure_built: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     def raise_timeout(*_: object, **__: object) -> None:  # type: ignore[override]
         raise subprocess.TimeoutExpired(cmd="ctest", timeout=1)
@@ -463,16 +425,12 @@ def test_run_ctest_timeout_sets_flags(
 
 
 def test_run_ctest_full_output_truncates(
-    run_ctest_module: ModuleType,
-    ensure_built: Path,
-    monkeypatch: pytest.MonkeyPatch,
+    run_ctest_module: ModuleType, ensure_built: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     long_output = (
         "100% tests passed, 0 tests failed out of 1\n"
         "Total Test time (real) = 1.00 sec\n"
-        + "\n".join(
-            f"line {i}" for i in range(run_ctest_module.OUTPUT_LINE_LIMIT + 50)
-        )
+        + "\n".join(f"line {i}" for i in range(run_ctest_module.OUTPUT_LINE_LIMIT + 50))
     )
 
     class FakeCompletedProcess:
@@ -481,11 +439,7 @@ def test_run_ctest_full_output_truncates(
             self.stderr = ""
             self.returncode = 0
 
-    monkeypatch.setattr(
-        run_ctest_module.subprocess,
-        "run",
-        lambda *_, **__: FakeCompletedProcess(),
-    )
+    monkeypatch.setattr(run_ctest_module.subprocess, "run", lambda *_, **__: FakeCompletedProcess())
 
     exit_code, output = run_ctest_module.run_ctest(
         build_dir=ensure_built,
@@ -496,9 +450,7 @@ def test_run_ctest_full_output_truncates(
     assert "Output truncated" in output
 
 
-def test_parse_args_maps_cli_options(
-    run_ctest_module: ModuleType, tmp_path: Path
-) -> None:
+def test_parse_args_maps_cli_options(run_ctest_module: ModuleType, tmp_path: Path) -> None:
     args = run_ctest_module._parse_args(
         [
             "--build-dir",

@@ -15,15 +15,14 @@ from .conftest import (
     requires_ninja,
 )
 
-RUN_COVERAGE_PATH = (
-    Path(__file__).resolve().parent.parent / "run_cpp_coverage.py"
-)
+RUN_COVERAGE_PATH = Path(__file__).resolve().parent.parent / "run_cpp_coverage.py"
 
 pytestmark = [INTEGRATION_MARK, requires_cmake, requires_ninja, requires_gcovr]
 
 
 def _configure_and_build() -> Path:
     """Configure, build, and run tests for coverage instrumentation."""
+
     subprocess.run(
         ["cmake", "--preset", "coverage"],
         cwd=str(example_cpp_dir),
@@ -83,9 +82,7 @@ def coverage_build_dir() -> Path:
     return _configure_and_build()
 
 
-def test_threshold_passes_with_low_requirement(
-    coverage_build_dir: Path,
-) -> None:
+def test_threshold_passes_with_low_requirement(coverage_build_dir: Path) -> None:
     result = _run_coverage(
         coverage_build_dir,
         threshold=0,
@@ -113,30 +110,22 @@ def test_threshold_failure_reports_files(coverage_build_dir: Path) -> None:
     assert payload.get("validation_errors") not in (None, [])
 
 
-def test_html_report_is_generated(
-    tmp_path: Path, coverage_build_dir: Path
-) -> None:
+def test_html_report_is_generated(tmp_path: Path, coverage_build_dir: Path) -> None:
     html_dir = tmp_path / "coverage_html"
-    result = _run_coverage(
-        coverage_build_dir, html_dir=html_dir, output="summary"
-    )
+    result = _run_coverage(coverage_build_dir, html_dir=html_dir, output="summary")
 
     assert result.returncode == 0
     assert (html_dir / "index.html").exists()
 
 
 def test_filter_option_limits_scope(coverage_build_dir: Path) -> None:
-    result = _run_coverage(
-        coverage_build_dir, filter_path="src/", output="summary"
-    )
+    result = _run_coverage(coverage_build_dir, filter_path="src/", output="summary")
 
     assert result.returncode == 0
     assert len((result.stdout or "").splitlines()) < 100
 
 
-def test_json_output_contains_metrics_and_truncation_flag(
-    coverage_build_dir: Path,
-) -> None:
+def test_json_output_contains_metrics_and_truncation_flag(coverage_build_dir: Path) -> None:
     result = _run_coverage(coverage_build_dir, output="json")
     payload = json.loads(result.stdout or "{}")
 

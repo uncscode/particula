@@ -149,9 +149,7 @@ def parse_pytest_output(output: str) -> Dict:
 
 
 def format_summary(
-    metrics: Dict,
-    validation_errors: List[str],
-    coverage_threshold: Optional[int] = None,
+    metrics: Dict, validation_errors: List[str], coverage_threshold: Optional[int] = None
 ) -> str:
     """Format a human-readable summary of test results.
 
@@ -372,9 +370,7 @@ def run_pytest(
         # Try to find project root
         current = Path.cwd()
         while current != current.parent:
-            if (current / "pyproject.toml").exists() or (
-                current / ".git"
-            ).exists():
+            if (current / "pyproject.toml").exists() or (current / ".git").exists():
                 cwd = str(current)
                 break
             current = current.parent
@@ -413,9 +409,7 @@ def run_pytest(
         metrics["exit_code"] = result.returncode
 
         # Validate results (including coverage threshold)
-        validation_errors = validate_results(
-            metrics, min_test_count, coverage_threshold
-        )
+        validation_errors = validate_results(metrics, min_test_count, coverage_threshold)
 
         # Determine final exit code (fail if validation fails)
         exit_code = result.returncode
@@ -424,9 +418,7 @@ def run_pytest(
 
         # Format output based on mode
         if output_mode == "summary":
-            output = format_summary(
-                metrics, validation_errors, coverage_threshold
-            )
+            output = format_summary(metrics, validation_errors, coverage_threshold)
         elif output_mode == "json":
             output = json.dumps(
                 {
@@ -439,9 +431,7 @@ def run_pytest(
             )
         else:  # full
             # Include summary at the end of full output
-            summary = format_summary(
-                metrics, validation_errors, coverage_threshold
-            )
+            summary = format_summary(metrics, validation_errors, coverage_threshold)
             output = f"{full_output}\n\n{summary}"
 
             # Fall back to summary if full output is too long (>500 lines)
