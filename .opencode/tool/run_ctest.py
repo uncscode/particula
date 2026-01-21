@@ -55,6 +55,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         Tuple of the possibly truncated output, whether truncation occurred,
         and a truncation notice string.
     """
+
     lines = output.splitlines()
     truncated = False
     notice_parts: List[str] = []
@@ -69,9 +70,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
         joined = encoded.decode("utf-8", errors="ignore")
         truncated = True
-        notice_parts.append(
-            f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB"
-        )
+        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
 
     notice = "; ".join(notice_parts) if truncated else ""
     if truncated:
@@ -90,6 +89,7 @@ def parse_ctest_output(output: str) -> Dict[str, Any]:
         control flags, and placeholders for caller-set values such as
         ``exit_code``.
     """
+
     metrics: Dict[str, Any] = {
         "passed": 0,
         "failed": 0,
@@ -118,9 +118,7 @@ def parse_ctest_output(output: str) -> Dict[str, Any]:
     if "No tests were found" in output:
         metrics.update({"total": 0, "failed": 0, "passed": 0})
 
-    duration_match = re.search(
-        r"Total Test time \(real\)\s*=\s*([\d.]+)\s*sec", output
-    )
+    duration_match = re.search(r"Total Test time \(real\)\s*=\s*([\d.]+)\s*sec", output)
     if duration_match:
         try:
             metrics["duration"] = float(duration_match.group(1))
@@ -128,15 +126,11 @@ def parse_ctest_output(output: str) -> Dict[str, Any]:
             metrics["duration"] = None
 
     failed_tests: List[str] = []
-    failed_line_pattern = re.compile(
-        r"Test\s+#\d+:\s+([^\s]+)\s+.*\*\*\*Failed", re.IGNORECASE
-    )
+    failed_line_pattern = re.compile(r"Test\s+#\d+:\s+([^\s]+)\s+.*\*\*\*Failed", re.IGNORECASE)
     for match in failed_line_pattern.finditer(output):
         failed_tests.append(match.group(1))
 
-    section_pattern = re.compile(
-        r"^\s*\d+\s+-\s+(.+?)(?:\s+\(Failed\))?$", re.MULTILINE
-    )
+    section_pattern = re.compile(r"^\s*\d+\s+-\s+(.+?)(?:\s+\(Failed\))?$", re.MULTILINE)
     for match in section_pattern.finditer(output):
         failed_tests.append(match.group(1).strip())
 
@@ -146,9 +140,7 @@ def parse_ctest_output(output: str) -> Dict[str, Any]:
     return metrics
 
 
-def validate_results(
-    metrics: Dict[str, Any], min_test_count: int = 1
-) -> List[str]:
+def validate_results(metrics: Dict[str, Any], min_test_count: int = 1) -> List[str]:
     """Validate CTest results against expected criteria.
 
     Args:
@@ -159,6 +151,7 @@ def validate_results(
     Returns:
         List of validation error messages. Empty list indicates success.
     """
+
     errors: List[str] = []
 
     if metrics.get("failed", 0) > 0:
@@ -186,9 +179,7 @@ def validate_results(
     return errors
 
 
-def format_summary(
-    metrics: Dict[str, Any], validation_errors: List[str]
-) -> str:
+def format_summary(metrics: Dict[str, Any], validation_errors: List[str]) -> str:
     """Format a human-readable summary of CTest results.
 
     Args:
@@ -198,6 +189,7 @@ def format_summary(
     Returns:
         Multi-line summary string styled after the pytest runner output.
     """
+
     lines: List[str] = []
     lines.append("=" * 60)
     lines.append("CTEST SUMMARY")
@@ -259,6 +251,7 @@ def run_ctest(
         Tuple of (exit_code, output_string) where exit_code is 0 on success and
         1 on validation or execution failure.
     """
+
     metrics = parse_ctest_output("")
     metrics["timeout_seconds"] = timeout
     validation_errors: List[str] = []
@@ -267,9 +260,7 @@ def run_ctest(
     ctest_file = build_path / "CTestTestfile.cmake"
     if not build_path.exists() or not ctest_file.exists():
         metrics["build_dir_error"] = True
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
         summary = format_summary(metrics, validation_errors)
         if output_mode == "json":
             payload = {
@@ -304,23 +295,17 @@ def run_ctest(
         combined_output = "".join([process.stdout or "", process.stderr or ""])
         metrics.update(parse_ctest_output(combined_output))
         metrics["exit_code"] = process.returncode
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
     except subprocess.TimeoutExpired:
         metrics["timeout"] = True
         metrics["exit_code"] = 1
         combined_output = f"ERROR: CTest timed out after {timeout} seconds"
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
     except FileNotFoundError:
         metrics["ctest_missing"] = True
         metrics["exit_code"] = 1
         combined_output = "ERROR: ctest command not found"
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
 
     success = (
         metrics.get("failed", 0) == 0
@@ -371,29 +356,15 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument("--build-dir", type=Path, required=True, help="CMake build directory")
+    parser.add_argument("-R", "--include", dest="include", help="Regex to include tests")
+    parser.add_argument("-E", "--exclude", dest="exclude", help="Regex to exclude tests")
+    parser.add_argument("-j", "--parallel", type=int, default=0, help="Number of parallel jobs")
     parser.add_argument(
-        "--build-dir", type=Path, required=True, help="CMake build directory"
+        "--timeout", type=int, default=DEFAULT_TIMEOUT, help="Timeout in seconds (default: 300)"
     )
     parser.add_argument(
-        "-R", "--include", dest="include", help="Regex to include tests"
-    )
-    parser.add_argument(
-        "-E", "--exclude", dest="exclude", help="Regex to exclude tests"
-    )
-    parser.add_argument(
-        "-j", "--parallel", type=int, default=0, help="Number of parallel jobs"
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=DEFAULT_TIMEOUT,
-        help="Timeout in seconds (default: 300)",
-    )
-    parser.add_argument(
-        "--min-tests",
-        type=int,
-        default=1,
-        help="Minimum expected number of tests (default: 1)",
+        "--min-tests", type=int, default=1, help="Minimum expected number of tests (default: 1)"
     )
     parser.add_argument(
         "--output",

@@ -97,6 +97,12 @@ and rollout.
 
 ## Maintenance Plans
 
+- [Jupyter Notebook API Migration][plan-notebook-migration] — Status: Planning
+  (P2)
+  - Scope: Migrate all 46 documentation Jupyter notebooks to current API
+    patterns (builders, factories, `get_*` methods). Update descriptions and
+    validate with `run_notebook` tool.
+
 - [Add Charge Support to add_concentration][plan-charge-add-concentration] —
   Status: Shipped (P2)
   - Scope: Enable `add_concentration()` to accept optional charge parameter for
@@ -146,4 +152,5 @@ and rollout.
 [plan-cloud-chamber]: features/completed/F7-cloud-chamber-cycles-simulation.md
 
 <!-- Maintenance Links -->
+[plan-notebook-migration]: maintenance/M2-notebook-api-migration.md
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md

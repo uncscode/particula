@@ -39,7 +39,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 class LinterResult:
@@ -78,7 +78,8 @@ class LinterResult:
 def run_ruff_check(
     target_dir: Optional[str] = None, auto_fix: bool = True, timeout: int = 120
 ) -> LinterResult:
-    """Run ruff check with optional auto-fixing.
+    """
+    Run ruff check with optional auto-fixing.
 
     Follows .github/workflows/lint.yml workflow:
     1. ruff check --fix (apply fixes, don't fail)
@@ -102,21 +103,15 @@ def run_ruff_check(
         if auto_fix:
             # Step 1: Apply fixes (don't fail on errors)
             fix_cmd = ["ruff", "check", "--fix", target_arg]
-            subprocess.run(
-                fix_cmd, capture_output=True, text=True, timeout=timeout
-            )
+            subprocess.run(fix_cmd, capture_output=True, text=True, timeout=timeout)
 
             # Step 2: Format code
             format_cmd = ["ruff", "format", target_arg]
-            subprocess.run(
-                format_cmd, capture_output=True, text=True, timeout=timeout
-            )
+            subprocess.run(format_cmd, capture_output=True, text=True, timeout=timeout)
 
         # Step 3: Final check (this determines success/failure)
         check_cmd = ["ruff", "check", target_arg]
-        proc = subprocess.run(
-            check_cmd, capture_output=True, text=True, timeout=timeout
-        )
+        proc = subprocess.run(check_cmd, capture_output=True, text=True, timeout=timeout)
 
         result.exit_code = proc.returncode
         result.stdout = proc.stdout
@@ -149,10 +144,9 @@ def run_ruff_check(
     return result
 
 
-def run_ruff_format(
-    target_dir: Optional[str] = None, timeout: int = 120
-) -> LinterResult:
-    """Run ruff format to auto-format code.
+def run_ruff_format(target_dir: Optional[str] = None, timeout: int = 120) -> LinterResult:
+    """
+    Run ruff format to auto-format code.
 
     Note: This is now called as part of run_ruff_check() workflow,
     but kept separate for individual linter testing.
@@ -171,9 +165,7 @@ def run_ruff_format(
     cmd = ["ruff", "format", target_arg]
 
     try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout
-        )
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
         result.exit_code = proc.returncode
         result.stdout = proc.stdout
@@ -200,10 +192,9 @@ def run_ruff_format(
     return result
 
 
-def run_mypy(
-    target_dir: Optional[str] = None, timeout: int = 180
-) -> LinterResult:
-    """Run mypy for type checking.
+def run_mypy(target_dir: Optional[str] = None, timeout: int = 180) -> LinterResult:
+    """
+    Run mypy for type checking.
 
     Args:
         target_dir: Directory to type check. If None, uses pyproject.toml config from project root.
@@ -219,9 +210,7 @@ def run_mypy(
     cmd = ["mypy", target_arg, "--ignore-missing-imports"]
 
     try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout
-        )
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
         result.exit_code = proc.returncode
         result.stdout = proc.stdout
@@ -230,9 +219,7 @@ def run_mypy(
 
         # Count errors in output
         # Mypy outputs errors on individual lines
-        error_lines = [
-            line for line in result.stdout.split("\n") if ": error:" in line
-        ]
+        error_lines = [line for line in result.stdout.split("\n") if ": error:" in line]
         result.issues_found = len(error_lines)
 
     except subprocess.TimeoutExpired:
@@ -384,9 +371,7 @@ def run_linters(
     if cwd is None:
         current = Path.cwd()
         while current != current.parent:
-            if (current / "pyproject.toml").exists() or (
-                current / ".git"
-            ).exists():
+            if (current / "pyproject.toml").exists() or (current / ".git").exists():
                 cwd = str(current)
                 break
             current = current.parent

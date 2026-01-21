@@ -1,0 +1,23 @@
+{
+  "name": "fix",
+  "version": "1.0.0",
+  "description": "Fix workflow: convert actionable PR review comments into a GitHub issue",
+  "description_long": "PR-triggered workflow that fetches actionable review comments from a PR, groups them by file/line with reviewer attribution, and creates a GitHub issue prefixed with [Fixes PR #N] for the fix workflow to address. Triggered by the request:fix label on PRs.",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Generate Fix Issue",
+      "description": "Convert actionable PR review comments into a structured GitHub issue",
+      "agent": "fix-issue-generator",
+      "prompt": "Process PR review comments and generate fix issue.\n\npr_number=$ARGUMENTS\nadw_id=${adw_id}\n\nSteps:\n1. Fetch actionable review comments for the PR\n2. Group findings by file/line with reviewer attribution\n3. Create GitHub issue with [Fixes PR #N] prefix and agent label\n4. Report success or failure",
+      "model": "base",
+      "timeout": 600,
+      "retry": {
+        "max_retries": 2,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

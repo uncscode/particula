@@ -15,21 +15,15 @@ from .conftest import (
     requires_sanitizers,
 )
 
-RUN_SANITIZERS_PATH = (
-    Path(__file__).resolve().parent.parent / "run_sanitizers.py"
-)
+RUN_SANITIZERS_PATH = Path(__file__).resolve().parent.parent / "run_sanitizers.py"
 EXECUTABLE_NAME = "test_sanitizer_demo"
 
-pytestmark = [
-    INTEGRATION_MARK,
-    requires_cmake,
-    requires_ninja,
-    requires_sanitizers,
-]
+pytestmark = [INTEGRATION_MARK, requires_cmake, requires_ninja, requires_sanitizers]
 
 
 def _configure_and_build(preset: str) -> Path:
     """Configure and build the example project for a given preset."""
+
     subprocess.run(
         ["cmake", "--preset", preset],
         cwd=str(example_cpp_dir),
@@ -58,6 +52,7 @@ def _run_sanitizer(
     suppressions: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Invoke run_sanitizers.py for the demo executable."""
+
     executable = build_dir / EXECUTABLE_NAME
     cmd = [
         sys.executable,
@@ -113,18 +108,14 @@ def test_tsan_detects_data_race(tsan_build_dir: Path) -> None:
 
 
 def test_ubsan_detects_undefined_behavior(ubsan_build_dir: Path) -> None:
-    result = _run_sanitizer(
-        "ubsan", ubsan_build_dir, "ubsan", output_mode="json"
-    )
+    result = _run_sanitizer("ubsan", ubsan_build_dir, "ubsan", output_mode="json")
     payload = json.loads(result.stdout or "{}")
 
     assert result.returncode != 0
     assert payload.get("errors") not in (None, [])
 
 
-def test_json_output_includes_errors_and_truncation_flag(
-    asan_build_dir: Path,
-) -> None:
+def test_json_output_includes_errors_and_truncation_flag(asan_build_dir: Path) -> None:
     result = _run_sanitizer("asan", asan_build_dir, "asan", output_mode="json")
     payload = json.loads(result.stdout or "{}")
 
@@ -135,15 +126,11 @@ def test_json_output_includes_errors_and_truncation_flag(
     assert payload.get("exit_code") != 0
 
 
-def test_suppressions_reduce_reported_errors(
-    tmp_path: Path, asan_build_dir: Path
-) -> None:
+def test_suppressions_reduce_reported_errors(tmp_path: Path, asan_build_dir: Path) -> None:
     suppression_file = tmp_path / "suppressions.txt"
     suppression_file.write_text("heap-buffer-overflow\n")
 
-    baseline = _run_sanitizer(
-        "asan", asan_build_dir, "asan", output_mode="json"
-    )
+    baseline = _run_sanitizer("asan", asan_build_dir, "asan", output_mode="json")
     suppressed = _run_sanitizer(
         "asan",
         asan_build_dir,
@@ -157,6 +144,4 @@ def test_suppressions_reduce_reported_errors(
 
     assert baseline_payload.get("errors") not in (None, [])
     assert suppressed_payload.get("suppressed_count", 0) >= 1
-    assert len(suppressed_payload.get("errors", [])) <= len(
-        baseline_payload.get("errors", [])
-    )
+    assert len(suppressed_payload.get("errors", [])) <= len(baseline_payload.get("errors", []))

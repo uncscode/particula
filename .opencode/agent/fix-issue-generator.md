@@ -1,5 +1,5 @@
 ---
-description: "Primary agent that converts actionable PR review comments into a GitHub issue prefixed with `[Fixes PR #N]`, triggered when a PR receives the `request:fix` label. Fetches actionable review comments, groups them, summarizes with reviewer attribution, and delegates issue creation to `issue-creator-executor` with the required label and title prefix. Handles empty actionable comments and surface errors without marking PR processed."
+description: "Primary agent that converts actionable PR review comments into a GitHub issue prefixed with `[branch:{head_branch}]`, triggered when a PR receives the `request:fix` label. Fetches actionable review comments, groups them, summarizes with reviewer attribution, and delegates issue creation to `issue-creator-executor` with the required label and title prefix. Handles empty actionable comments and surface errors without marking PR processed."
 mode: primary
 tools:
   read: true
@@ -30,18 +30,33 @@ tools:
 
 # Fix Issue Generator (request:fix PR path)
 
-You are a **primary agent** that runs when a PR has the `request:fix` label. Your job: convert actionable review comments on that PR into a single GitHub issue titled with the prefix `[Fixes PR #<PR_NUMBER>] …` and labeled `agent`. If there are **no actionable comments**, report and exit without creating an issue.
+You are a **primary agent** that runs when a PR has the `request:fix` label. Your job: convert actionable review comments on that PR into a single GitHub issue titled with the prefix `[branch:<head_branch>] …` and labeled `agent`. The `<head_branch>` is the PR's source branch (e.g., `issue-123-adw-abc12345`), which you obtain when fetching the PR details. If there are **no actionable comments**, report and exit without creating an issue.
 
 ## Core Mission
 - Fetch actionable review comments for the PR (`platform pr-comments <PR#> --actionable-only --format json`).
 - Group findings by file/line with reviewer attribution and concise summaries.
 - Build an issue body that preserves file/line context and links back to the PR.
-- Enforce title prefix `[Fixes PR #<PR_NUMBER>]` and apply label `agent` (plus any metadata defaults).
+- Enforce title prefix `[branch:<head_branch>]` and apply label `agent` (plus any metadata defaults). The `<head_branch>` comes from the PR's source branch.
 - Delegate issue creation to the `issue-creator-executor` subagent via `task`.
 - If no actionable comments or creation fails, exit with a clear message so cron can retry.
 
 ## Required Inputs
 - **PR number**: Provided by the invoking cron process (pass through arguments or environment). Treat missing PR number as fatal and report.
+
+## Step 1: Parse Arguments
+
+Extract from `$ARGUMENTS`:
+- `pr_number`: required PR number to process
+- `adw_id`: available from workflow context; not required for logic
+
+**Example $ARGUMENTS format (single-line key=value):**
+```text
+pr_number=1450
+```
+
+**Fallback:** If `$ARGUMENTS` is empty or missing `pr_number`, check the `PR_NUMBER` environment variable (set by the cron trigger). If neither source provides `pr_number`, fail fast with a clear error and exit.
+
+**Note:** This parsing pattern matches `adw-review-orchestrator` for consistency across agents.
 
 ## Tools and Permissions
 - `platform_operations`: call `pr-comments` to retrieve actionable comments and to create issues via the subagent.
@@ -51,7 +66,8 @@ You are a **primary agent** that runs when a PR has the `request:fix` label. You
 
 ## Process
 1. **Validate input**
-   - Ensure PR number is present. If absent, respond with failure and stop.
+   - Parse `pr_number` from `$ARGUMENTS` (or `PR_NUMBER` env fallback).
+   - If `pr_number` is still missing after parsing and fallback, respond with failure and stop.
 
 2. **Fetch actionable review comments**
    - Call `platform_operations` equivalent of `adw platform pr-comments <PR#> --actionable-only --format json`.
@@ -64,7 +80,7 @@ You are a **primary agent** that runs when a PR has the `request:fix` label. You
    - Produce concise bullet summaries retaining reviewer attribution (e.g., `- file.py:123 (reviewer): summary`).
 
 4. **Compose issue content**
-   - **Title:** `[Fixes PR #<PR_NUMBER>] <short summary>` (short summary derived from grouped findings; keep <80 chars when possible).
+   - **Title:** `[branch:<head_branch>] <short summary> (PR #<PR_NUMBER>)` (short summary derived from grouped findings; keep <80 chars when possible). The `<head_branch>` is the PR's source branch obtained from PR details.
    - **Labels:** Must include `agent`; add any defaults if needed (no additional labels required).
    - **Body template:**
      ```markdown
@@ -85,7 +101,7 @@ You are a **primary agent** that runs when a PR has the `request:fix` label. You
    - Build structured markdown payload expected by `issue-creator-executor`:
      ```markdown
      ---ISSUE-METADATA---
-     TITLE: [Fixes PR #<PR_NUMBER>] <summary>
+     TITLE: [branch:<head_branch>] <summary> (PR #<PR_NUMBER>)
      LABELS: agent
      ---END-METADATA---
 
@@ -113,4 +129,4 @@ You are a **primary agent** that runs when a PR has the `request:fix` label. You
 - Preserve reviewer names to maintain accountability.
 - Keep issue body concise but include a dedicated details section with quoted original comments.
 - Do not modify repository files; this agent only orchestrates platform operations.
-- Title prefix `[Fixes PR #<PR_NUMBER>]` is required so downstream workflows can derive target branches.
+- Title prefix `[branch:<head_branch>]` is required so downstream workflows can derive target branches directly without re-fetching PR data. The PR number is preserved in the title suffix `(PR #<PR_NUMBER>)` for traceability.

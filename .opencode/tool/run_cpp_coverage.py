@@ -54,6 +54,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
             str: A human-readable truncation notice, or an empty string if not
                 truncated.
     """
+
     lines = output.splitlines()
     truncated = False
     notice_parts: List[str] = []
@@ -68,9 +69,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
         joined = encoded.decode("utf-8", errors="ignore")
         truncated = True
-        notice_parts.append(
-            f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB"
-        )
+        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
 
     notice = "; ".join(notice_parts) if truncated else ""
     if truncated:
@@ -100,26 +99,16 @@ class CoverageMetrics:
 
     @property
     def line_percent(self) -> float:
-        return (
-            100.0 * self.lines_covered / self.lines_total
-            if self.lines_total
-            else 0.0
-        )
+        return 100.0 * self.lines_covered / self.lines_total if self.lines_total else 0.0
 
     @property
     def branch_percent(self) -> float:
-        return (
-            100.0 * self.branches_covered / self.branches_total
-            if self.branches_total
-            else 0.0
-        )
+        return 100.0 * self.branches_covered / self.branches_total if self.branches_total else 0.0
 
     @property
     def function_percent(self) -> float:
         return (
-            100.0 * self.functions_covered / self.functions_total
-            if self.functions_total
-            else 0.0
+            100.0 * self.functions_covered / self.functions_total if self.functions_total else 0.0
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -148,11 +137,10 @@ def parse_gcovr_output(output: str) -> Dict[str, CoverageMetrics]:
     Raises:
         RuntimeError: If the ``output`` string cannot be parsed as JSON.
     """
+
     try:
         data = json.loads(output)
-    except (
-        json.JSONDecodeError
-    ) as exc:  # pragma: no cover - surfaced via runtime error path
+    except json.JSONDecodeError as exc:  # pragma: no cover - surfaced via runtime error path
         raise RuntimeError(f"Failed to parse gcovr JSON: {exc}") from exc
 
     metrics: Dict[str, CoverageMetrics] = {}
@@ -186,9 +174,7 @@ def parse_gcovr_output(output: str) -> Dict[str, CoverageMetrics]:
     return metrics
 
 
-def validate_threshold(
-    metrics: CoverageMetrics, threshold: Optional[float]
-) -> Tuple[bool, str]:
+def validate_threshold(metrics: CoverageMetrics, threshold: Optional[float]) -> Tuple[bool, str]:
     """Validate line coverage against a threshold (percentage).
 
     Args:
@@ -203,15 +189,14 @@ def validate_threshold(
                 or if no threshold is provided.
             str: Human-readable message describing the validation result.
     """
+
     if threshold is None:
         return True, "No threshold provided; skipping validation"
 
     percent = metrics.line_percent
     passed = percent >= threshold
     comparator = "meets" if passed else "below"
-    message = (
-        f"Line coverage {percent:.1f}% {comparator} threshold {threshold:.1f}%"
-    )
+    message = f"Line coverage {percent:.1f}% {comparator} threshold {threshold:.1f}%"
     return passed, message
 
 
@@ -245,6 +230,7 @@ def format_summary(
         threshold status, any files below the threshold, execution duration
         (when provided), and validation results.
     """
+
     lines: List[str] = []
     lines.append("=" * 60)
     lines.append(f"C++ COVERAGE SUMMARY ({tool} via gcovr)")
@@ -262,12 +248,8 @@ def format_summary(
     )
 
     if threshold is not None:
-        threshold_status = (
-            "PASSED" if metrics.line_percent >= threshold else "FAILED"
-        )
-        lines.append(
-            f"\nThreshold: {threshold:.1f}% lines ({threshold_status})"
-        )
+        threshold_status = "PASSED" if metrics.line_percent >= threshold else "FAILED"
+        lines.append(f"\nThreshold: {threshold:.1f}% lines ({threshold_status})")
     else:
         lines.append("\nThreshold: not set")
 
@@ -276,9 +258,7 @@ def format_summary(
         lines.append("  None")
     else:
         for path, percent in files_below_threshold:
-            lines.append(
-                f"  - {path}: {percent:.1f}% (target: {threshold:.1f}%)"
-            )
+            lines.append(f"  - {path}: {percent:.1f}% (target: {threshold:.1f}%)")
 
     if duration is not None:
         lines.append(f"\nDuration: {duration:.2f}s")
@@ -345,11 +325,10 @@ def run_coverage(
           ``output_mode == "json"`` this is a JSON document containing metrics
           and validation details; otherwise it is human-readable text.
     """
+
     start_time = time.perf_counter()
     validation_errors: List[str] = []
-    metrics_map: Dict[str, CoverageMetrics] = {
-        "__total__": CoverageMetrics(0, 0, 0, 0, 0, 0)
-    }
+    metrics_map: Dict[str, CoverageMetrics] = {"__total__": CoverageMetrics(0, 0, 0, 0, 0, 0)}
     files_below_threshold: List[Tuple[str, float]] = []
     combined_output = ""
     timed_out = False
@@ -357,9 +336,7 @@ def run_coverage(
 
     build_path = Path(build_dir)
     if not build_path.exists():
-        validation_errors.append(
-            f"Build directory does not exist: {build_path}"
-        )
+        validation_errors.append(f"Build directory does not exist: {build_path}")
         summary = format_summary(
             metrics_map["__total__"],
             threshold,
@@ -419,9 +396,7 @@ def run_coverage(
     except RuntimeError as exc:
         validation_errors.append(str(exc))
 
-    overall_metrics = metrics_map.get(
-        "__total__", CoverageMetrics(0, 0, 0, 0, 0, 0)
-    )
+    overall_metrics = metrics_map.get("__total__", CoverageMetrics(0, 0, 0, 0, 0, 0))
 
     if threshold is not None:
         files_below_threshold = [
@@ -430,9 +405,7 @@ def run_coverage(
             if path != "__total__" and metric.line_percent < threshold
         ]
 
-    threshold_passed, threshold_message = validate_threshold(
-        overall_metrics, threshold
-    )
+    threshold_passed, threshold_message = validate_threshold(overall_metrics, threshold)
     if threshold is not None and not threshold_passed:
         validation_errors.append(threshold_message)
 
@@ -441,22 +414,13 @@ def run_coverage(
 
     duration = time.perf_counter() - start_time
 
-    success = (
-        threshold_passed
-        and not validation_errors
-        and exit_code == 0
-        and not timed_out
-    )
+    success = threshold_passed and not validation_errors and exit_code == 0 and not timed_out
 
-    truncated_output, truncated, truncation_notice = _truncate_output(
-        combined_output
-    )
+    truncated_output, truncated, truncation_notice = _truncate_output(combined_output)
 
     if output_mode == "json":
         payload = {
-            "metrics": {
-                key: value.to_dict() for key, value in metrics_map.items()
-            },
+            "metrics": {key: value.to_dict() for key, value in metrics_map.items()},
             "files_below_threshold": files_below_threshold,
             "validation_errors": validation_errors,
             "success": success,
@@ -494,13 +458,12 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     Returns:
         argparse.Namespace: Parsed arguments for the C++ coverage runner.
     """
+
     parser = argparse.ArgumentParser(
         description="Generate C++ coverage reports with threshold validation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
-        "--build-dir", type=Path, required=True, help="CMake build directory"
-    )
+    parser.add_argument("--build-dir", type=Path, required=True, help="CMake build directory")
     parser.add_argument(
         "--threshold",
         type=float,
@@ -513,15 +476,8 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         default="gcov",
         help="Coverage backend to use (default: gcov)",
     )
-    parser.add_argument(
-        "--filter", default=None, help="Filter coverage to path/pattern"
-    )
-    parser.add_argument(
-        "--html",
-        type=Path,
-        default=None,
-        help="Generate HTML report in directory",
-    )
+    parser.add_argument("--filter", default=None, help="Filter coverage to path/pattern")
+    parser.add_argument("--html", type=Path, default=None, help="Generate HTML report in directory")
     parser.add_argument(
         "--timeout",
         type=int,

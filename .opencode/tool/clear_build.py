@@ -40,18 +40,15 @@ def find_project_root(start: Optional[Path] = None) -> Path:
     Returns:
         Resolved ``Path`` representing the project root.
     """
+
     current = (start or Path.cwd()).resolve()
     for ancestor in [current] + list(current.parents):
-        if (ancestor / ".git").exists() or (
-            ancestor / "pyproject.toml"
-        ).exists():
+        if (ancestor / ".git").exists() or (ancestor / "pyproject.toml").exists():
             return ancestor
     return current
 
 
-def validate_path(
-    build_dir: str | Path, project_root: Path | None = None
-) -> Path:
+def validate_path(build_dir: str | Path, project_root: Path | None = None) -> Path:
     """Validate that the build directory is within the project root.
 
     Resolves both paths and ensures the build directory is contained within the
@@ -70,6 +67,7 @@ def validate_path(
         ValueError: If the path is empty, outside the project root, or equals
             the root itself.
     """
+
     if not str(build_dir).strip():
         raise ValueError("Build directory path must not be empty")
 
@@ -77,9 +75,7 @@ def validate_path(
     resolved_build = Path(build_dir).expanduser().resolve()
 
     if not resolved_build.is_relative_to(root):
-        raise ValueError(
-            f"Path '{resolved_build}' is outside project root '{root}'."
-        )
+        raise ValueError(f"Path '{resolved_build}' is outside project root '{root}'.")
 
     if resolved_build == root:
         raise ValueError("Refusing to operate on the project root directory.")
@@ -97,6 +93,7 @@ def get_directory_size(path: Path) -> Tuple[int, int]:
         A tuple of ``(total_bytes, file_count)``. Returns ``(0, 0)`` when the
         path does not exist.
     """
+
     if not path.exists():
         return 0, 0
 
@@ -130,6 +127,7 @@ def format_size(bytes_size: int) -> str:
     Returns:
         Human-readable size using B, KB, MB, GB, or TB units.
     """
+
     units = ["B", "KB", "MB", "GB", "TB"]
     size = float(bytes_size)
     for unit in units:
@@ -139,9 +137,7 @@ def format_size(bytes_size: int) -> str:
     return f"{size:.1f} TB"
 
 
-def _append_validation_footer(
-    lines: List[str], validation_errors: List[str]
-) -> None:
+def _append_validation_footer(lines: List[str], validation_errors: List[str]) -> None:
     lines.append("\n" + SEPARATOR)
     if validation_errors:
         lines.append("VALIDATION: FAILED")
@@ -176,6 +172,7 @@ def clear_build(
         Tuple of ``(exit_code, summary_text)``. Exit code ``0`` on success or
         safe no-op; ``1`` on validation or deletion failure.
     """
+
     lines: List[str] = [SEPARATOR, "CLEAR BUILD", SEPARATOR]
     validation_errors: List[str] = []
 
@@ -202,25 +199,19 @@ def clear_build(
 
     if dry_run:
         lines.append("\nMode: DRY RUN (no files deleted)")
-        lines.append(
-            f"Would delete: {file_count} files ({format_size(total_bytes)})"
-        )
+        lines.append(f"Would delete: {file_count} files ({format_size(total_bytes)})")
         _append_validation_footer(lines, validation_errors)
         return 0, "\n".join(lines)
 
     if not force:
-        validation_errors.append(
-            "Deletion not performed. Re-run with --force to delete."
-        )
+        validation_errors.append("Deletion not performed. Re-run with --force to delete.")
         _append_validation_footer(lines, validation_errors)
         return 1, "\n".join(lines)
 
     try:
         shutil.rmtree(resolved_build, ignore_errors=False)
         lines.append("\nMode: FORCE DELETE")
-        lines.append(
-            f"Deleted: {file_count} files ({format_size(total_bytes)})"
-        )
+        lines.append(f"Deleted: {file_count} files ({format_size(total_bytes)})")
         _append_validation_footer(lines, validation_errors)
         return 0, "\n".join(lines)
     except PermissionError as exc:
@@ -234,6 +225,7 @@ def clear_build(
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the CLI argument parser."""
+
     description = (
         "Safely clear build directories with validation, dry-run previews, "
         "and a force flag to perform deletion."
@@ -278,6 +270,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Optional[List[str]] = None) -> int:
     """CLI entrypoint for the clear_build tool."""
+
     parser = build_parser()
     args = parser.parse_args(argv)
 
