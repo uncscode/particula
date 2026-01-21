@@ -112,11 +112,10 @@ def execute_notebook(
         suffix=".ipynb", delete=False
     )
     temp_output.close()  # Close immediately, we just need the path
-    # Get the path without the .ipynb extension (nbconvert adds it)
-    output_path = temp_output.name[:-6]
+    # Remove .ipynb suffix - nbconvert will add it back
+    output_path = temp_output.name.removesuffix(".ipynb")
 
     try:
-
         result = subprocess.run(
             [
                 sys.executable,
