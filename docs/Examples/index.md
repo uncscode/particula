@@ -93,6 +93,16 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     [:octicons-arrow-right-24: Tutorial](Nucleation/index.md)
 
+-   __[Activity Calculations](Activity/index.md)__
+
+    ---
+
+    Learn how to compute chemical activity in organic-water mixtures
+    using ideal, kappa, and BAT (non-ideal) models. Includes examples
+    for equilibria calculations.
+
+    [:octicons-arrow-right-24: Tutorial](Activity/activity_tutorial.ipynb)
+
 </div>
 
 
