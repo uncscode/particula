@@ -111,7 +111,7 @@ flowchart TD
     C -->|Ideal| D["a = x (Raoult's Law)"]
     C -->|BAT Model| E[Compute Gibbs Mixing Weights]
     E --> F[Calculate gamma from BAT Coefficients]
-    F --> G["a = gamma x x"]
+    F --> G["a = gamma × x"]
     D --> H[Activity Values]
     G --> H
     H --> I[Use in Partitioning/Equilibria]
