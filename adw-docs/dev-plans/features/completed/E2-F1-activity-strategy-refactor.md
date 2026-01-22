@@ -1,11 +1,11 @@
 # Feature E2-F1: Activity Strategy Refactor
 
-**Status**: Planning
+**Status**: Completed
 **Priority**: P1
-**Parent Epic**: [E2 - Activity and Equilibria Strategy-Builder-Factory Refactor](../epics/E2-activity-equilibria-refactor.md)
-**Start Date**: TBD
-**Target Date**: TBD
-**Last Updated**: 2026-01-07
+**Parent Epic**: [E2 - Activity and Equilibria Strategy-Builder-Factory Refactor](../epics/completed/E2-activity-equilibria-refactor.md)
+**Start Date**: 2026-01-07
+**Completion Date**: 2026-01-21
+**Last Updated**: 2026-01-21
 **Size**: Medium (5 phases, ~450 LOC)
 
 ## Overview
@@ -239,4 +239,5 @@ maintainability and testability.
 | 2026-01-07 | Initial feature creation | ADW |
 | 2026-01-07 | Added P0 code quality phase and P6 function isolation phase | ADW |
 | 2026-01-08 | Removed ActivityKelvinEffect phases (P3, P4) - Kelvin effect already implemented in SurfaceStrategy | ADW |
+| 2026-01-21 | Marked feature completed; updated status, dates, and parent epic link | ADW |
 

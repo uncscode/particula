@@ -1,11 +1,11 @@
 # Feature E2-F3: Integration and Documentation
 
-**Status**: Planning
+**Status**: Completed
 **Priority**: P1
-**Parent Epic**: [E2 - Activity and Equilibria Strategy-Builder-Factory Refactor](../epics/E2-activity-equilibria-refactor.md)
-**Start Date**: TBD
-**Target Date**: TBD
-**Last Updated**: 2026-01-07
+**Parent Epic**: [E2 - Activity and Equilibria Strategy-Builder-Factory Refactor](../epics/completed/E2-activity-equilibria-refactor.md)
+**Start Date**: 2026-01-07
+**Completion Date**: 2026-01-21
+**Last Updated**: 2026-01-21
 **Size**: Medium (4 phases, ~300 LOC + documentation)
 
 ## Overview
@@ -204,4 +204,5 @@ docs/
 |------|--------|--------|
 | 2026-01-07 | Initial feature creation | ADW |
 | 2026-01-07 | Added Activity_Calculations/index.md to P2 tasks | ADW |
+| 2026-01-21 | Marked feature completed; updated status, dates, and parent epic link | ADW |
 

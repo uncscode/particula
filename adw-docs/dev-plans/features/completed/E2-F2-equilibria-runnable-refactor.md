@@ -1,11 +1,11 @@
 # Feature E2-F2: Equilibria Runnable Refactor
 
-**Status**: Planning
+**Status**: Completed
 **Priority**: P2
-**Parent Epic**: [E2 - Activity and Equilibria Strategy-Builder-Factory Refactor](../epics/E2-activity-equilibria-refactor.md)
-**Start Date**: TBD
-**Target Date**: TBD
-**Last Updated**: 2026-01-07
+**Parent Epic**: [E2 - Activity and Equilibria Strategy-Builder-Factory Refactor](../epics/completed/E2-activity-equilibria-refactor.md)
+**Start Date**: 2026-01-07
+**Completion Date**: 2026-01-21
+**Last Updated**: 2026-01-21
 **Size**: Medium (6 phases, ~500 LOC)
 
 ## Overview
@@ -333,4 +333,5 @@ class EquilibriumResult:
 |------|--------|--------|
 | 2026-01-07 | Initial feature creation | ADW |
 | 2026-01-07 | Added P0 code quality phase and P5 cleanup phase | ADW |
+| 2026-01-21 | Marked feature completed; updated status, dates, and parent epic link | ADW |
 

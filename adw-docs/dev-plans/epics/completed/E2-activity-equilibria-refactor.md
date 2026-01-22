@@ -1,11 +1,11 @@
 # Epic E2: Activity and Equilibria Strategy-Builder-Factory Refactor
 
-**Status**: Planning
+**Status**: Completed
 **Priority**: P1
 **Owners**: TBD
 **Start Date**: 2026-01-07
-**Target Date**: TBD
-**Last Updated**: 2026-01-08
+**Completion Date**: 2026-01-21
+**Last Updated**: 2026-01-21
 **Size**: Large (3 features, ~15 phases)
 
 ## Vision
@@ -72,9 +72,9 @@ strategy classes that integrate with the builder and factory system.
 
 | ID | Name | Priority | Phases | Status |
 |----|------|----------|--------|--------|
-| E2-F1 | [Activity Strategy Refactor](../features/E2-F1-activity-strategy-refactor.md) | P1 | 5 | Planning |
-| E2-F2 | [Equilibria Runnable Refactor](../features/E2-F2-equilibria-runnable-refactor.md) | P2 | 6 | Planning |
-| E2-F3 | [Integration and Documentation](../features/E2-F3-integration-documentation.md) | P1 | 4 | Planning |
+| E2-F1 | [Activity Strategy Refactor](../features/completed/E2-F1-activity-strategy-refactor.md) | P1 | 5 | Completed |
+| E2-F2 | [Equilibria Runnable Refactor](../features/completed/E2-F2-equilibria-runnable-refactor.md) | P2 | 6 | Completed |
+| E2-F3 | [Integration and Documentation](../features/completed/E2-F3-integration-documentation.md) | P1 | 4 | Completed |
 
 ## Phase Overview
 
@@ -165,6 +165,25 @@ result = equilibria.execute(aerosol, temperature, pressure)
 | API inconsistency | Medium | Medium | Follow existing naming conventions |
 | Documentation gaps | Medium | Low | Dedicated documentation phase |
 
+## Completion Notes
+
+### Summary
+- Delivered ActivityNonIdealBinary strategy and builder plus factory integration for activity module.
+- Delivered equilibria runnable, strategies, and builders following Strategy-Builder-Factory-Runnable pattern.
+- Added integration and documentation assets across theory, features, and examples to close the epic.
+
+### Deviations from Plan
+- Kelvin effect remained scoped to SurfaceStrategy; no separate activity strategy added.
+- Documentation volume exceeded initial estimate but remained within XS change budget.
+
+### Lessons Learned
+- Aligning strategy/builder/factory patterns across modules simplifies exports and testing.
+- Early link validation prevents regressions when moving dev-plan assets to completed.
+
+### Actual vs Planned
+- Shipped all three features with planned phases; no scope deferrals.
+- Maintained backward-compatible docs and links after relocation to completed/.
+
 ## Change Log
 
 | Date | Change | Author |
@@ -172,4 +191,5 @@ result = equilibria.execute(aerosol, temperature, pressure)
 | 2026-01-07 | Initial epic creation | ADW |
 | 2026-01-07 | Added code quality phases (P0) and cleanup phases to E2-F1 and E2-F2 | ADW |
 | 2026-01-08 | Removed ActivityKelvinEffect from E2-F1 (already in SurfaceStrategy); 7→5 phases | ADW |
+| 2026-01-21 | Marked epic completed; added completion notes and updated feature links/statuses | ADW |
 
