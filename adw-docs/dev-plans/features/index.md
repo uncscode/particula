@@ -5,14 +5,6 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 
 ## Active Features
 
-### Epic E2: Activity and Equilibria Strategy-Builder-Factory Refactor
-
-| ID | Name | Status | Priority | Phases |
-|----|------|--------|----------|--------|
-| E2-F1 | [Activity Strategy Refactor](E2-F1-activity-strategy-refactor.md) | Planning | P1 | 7 |
-| E2-F2 | [Equilibria Runnable Refactor](E2-F2-equilibria-runnable-refactor.md) | Planning | P2 | 6 |
-| E2-F3 | [Integration and Documentation](E2-F3-integration-documentation.md) | Planning | P1 | 4 |
-
 ### Epic E3: Data Representation Refactor for Extensibility and GPU Backends
 
 | ID | Name | Status | Priority | Phases |
@@ -50,12 +42,21 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 | E1-F5 | [Stability and Performance Benchmarks](completed/E1-F5-stability-performance-benchmarks.md) | 2026-01-07 |
 | E1-F6 | [Documentation and Examples](completed/E1-F6-documentation-examples.md) | 2026-01-07 |
 
+### Epic E2: Activity and Equilibria Strategy-Builder-Factory Refactor
+
+| ID | Name | Completion Date |
+|----|------|-----------------|
+| E2-F1 | [Activity Strategy Refactor](completed/E2-F1-activity-strategy-refactor.md) | 2026-01-21 |
+| E2-F2 | [Equilibria Runnable Refactor](completed/E2-F2-equilibria-runnable-refactor.md) | 2026-01-21 |
+| E2-F3 | [Integration and Documentation](completed/E2-F3-integration-documentation.md) | 2026-01-21 |
+
 ### Standalone Features
 
 | ID | Name | Completion Date |
 |----|------|-----------------|
 | F4 | [WallLoss Runnable Process](completed/wall-loss-runnable.md) | 2025-12-18 |
 | F7 | [Cloud Chamber Injection Cycles Simulation](completed/F7-cloud-chamber-cycles-simulation.md) | 2026-01-20 |
+
 
 ## Next Available ID
 
