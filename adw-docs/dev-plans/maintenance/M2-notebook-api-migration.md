@@ -322,18 +322,24 @@ completion notes but still include it in the PR for documentation.
 
 ### Per-Phase Validation
 ```bash
-# Run single notebook
-run_notebook({notebookPath: "path/to/notebook.ipynb", timeout: 120})
+# Run single notebook and save outputs (required for docs)
+run_notebook({notebookPath: "path/to/notebook.ipynb", timeout: 120, writeExecuted: "path/to/notebook.ipynb"})
 
-# Run directory batch
-run_notebook({notebookPath: "docs/Examples/Dynamics/Coagulation/", recursive: true})
+# Run directory batch and save outputs
+run_notebook({notebookPath: "docs/Examples/Dynamics/Coagulation/", recursive: true, writeExecuted: "inplace"})
 ```
+
+**Important:** Notebook outputs must be saved because they are rendered as
+documentation on the website. The `writeExecuted` parameter saves the executed
+notebook (with all cell outputs, plots, and figures) back to the file. Always
+commit the executed notebooks with their outputs.
 
 ### Acceptance Criteria per Notebook
 1. `run_notebook` passes (no uncaught errors)
 2. Uses current builder/factory patterns
 3. No deprecated imports
 4. Descriptions are clear and accurate
+5. **Cell outputs saved** - All outputs (text, plots, figures) are committed
 
 ## Size Estimates
 
@@ -390,6 +396,10 @@ When generating issues from this maintenance plan:
 3. Run pre-phase validation to identify which notebooks actually need changes
 4. Use `run_notebook` tool to validate each phase completion
 5. Apply labels: `maintenance`, `priority:P2`, `documentation`, `notebooks`
+6. **Save notebook outputs** - The executed notebook outputs (cell outputs, plots,
+   figures) must be saved and committed. These outputs are rendered as documentation
+   on the website via mkdocs. Use `run_notebook` with `writeExecuted` parameter to
+   save the executed notebook back to the original path.
 
 ## Change Log
 
@@ -398,3 +408,4 @@ When generating issues from this maintenance plan:
 | 2026-01-21 | Initial maintenance plan created | ADW Workflow |
 | 2026-01-21 | Added CI workflow for notebook validation (M2-P0) | ADW Workflow |
 | 2026-01-21 | Plan review: split phases for max 4 notebooks each, fixed species_density migration path, added pre-phase validation guidance, corrected Taichi notebook path | ADW Workflow |
+| 2026-01-22 | Added requirement to save notebook outputs - outputs are used as docs on website | ADW Workflow |
