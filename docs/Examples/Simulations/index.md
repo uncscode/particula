@@ -16,8 +16,8 @@ This directory hosts end‑to‑end aerosol simulation notebooks built with Part
 - **[Soot Formation in Flames](Notebooks/Soot_Formation_in_Flames.ipynb)**  
   Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
 
-- **[Cloud Chamber Cycles](Notebooks/Cloud_Chamber_Cycles.ipynb)**  
-  Four-cycle cloud chamber simulation with particle-resolved speciated mass tracking and κ-dependent activation across three seed scenarios.
-  - Wall-loss analysis with size-binned losses and chamber coefficients
-  - Comparison gallery: activation overlays, size evolution, mass balance, water fraction
-  - Concept boxes for Köhler theory, κ-theory, and chamber wall losses
+- **[Cloud Chamber Single Cycle](Notebooks/Cloud_Chamber_Single_Cycle.ipynb)**  
+  Single activation–deactivation cycle with kappa-based activity, wall loss, growth/shrink visualization, and mass conservation checks. See Also: Multi Cycle.
+
+- **[Cloud Chamber Multi Cycle](Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)**  
+  Four-cycle comparison across ammonium sulfate, sucrose, and mixed seeds with kappa-dependent activation, wall-loss analysis, and gallery overlays. See Also: Single Cycle.
