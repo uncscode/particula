@@ -43,13 +43,21 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Soot_Formation_in_Flames.ipynb)
 
-- __[Cloud Chamber Cycles](Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb)__
+- __[Cloud Chamber Single Cycle](Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb)__
 
     ---
 
-    Four-cycle cloud chamber simulation with κ-dependent activation across three seed scenarios. Includes size-binned wall-loss analysis, comparison gallery (activation overlays, size evolution, mass balance, water fraction), and concept boxes for Köhler theory, κ-theory, and wall losses.
+    Single activation-deactivation cycle in a rectangular cloud chamber with κ-theory hygroscopicity. Demonstrates chamber geometry setup, wall loss configuration, lognormal particle sampling, and condensation dynamics. Ideal for learning the basics of cloud droplet activation.
 
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb)
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb)
+
+- __[Cloud Chamber Multi Cycle](Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)__
+
+    ---
+
+    Four-cycle cloud chamber simulation comparing three seed scenarios: ammonium sulfate (κ=0.61), sucrose (κ=0.10), and mixed AS+sucrose. Includes κ-dependent activation analysis, water uptake tracking, mass retention over cycles, and concept boxes for Köhler and κ-theory.
+
+    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)
 
 </div>
 

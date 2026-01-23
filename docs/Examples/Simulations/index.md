@@ -17,7 +17,7 @@ This directory hosts end‑to‑end aerosol simulation notebooks built with Part
   Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
 
 - **[Cloud Chamber Single Cycle](Notebooks/Cloud_Chamber_Single_Cycle.ipynb)**  
-  Single activation–deactivation cycle with kappa-based activity, wall loss, growth/shrink visualization, and mass conservation checks. See Also: Multi Cycle.
+  Single activation–deactivation cycle with kappa-based activity, wall loss, growth/shrink visualization, and mass conservation checks.
 
 - **[Cloud Chamber Multi Cycle](Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)**  
-  Four-cycle comparison across ammonium sulfate, sucrose, and mixed seeds with kappa-dependent activation, wall-loss analysis, and gallery overlays. See Also: Single Cycle.
+  Four-cycle comparison across ammonium sulfate, sucrose, and mixed seeds with kappa-dependent activation, wall-loss analysis, and gallery overlays.
