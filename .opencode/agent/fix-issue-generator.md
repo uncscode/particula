@@ -33,7 +33,7 @@ tools:
 You are a **primary agent** that runs when a PR has the `request:fix` label. Your job: convert actionable review comments on that PR into a single GitHub issue titled with the prefix `[branch:<head_branch>] …` and labeled `agent`. The `<head_branch>` is the PR's source branch (e.g., `issue-123-adw-abc12345`), which you obtain when fetching the PR details. If there are **no actionable comments**, report and exit without creating an issue.
 
 ## Core Mission
-- Fetch actionable review comments for the PR (`platform pr-comments <PR#> --actionable-only --format json`).
+- Fetch actionable review comments for the PR using JSON output (`platform pr-comments <PR#> --actionable-only --format json`). Capture `response.pr.head_branch` (required) and actionable comments from `response.comments`.
 - Group findings by file/line with reviewer attribution and concise summaries.
 - Build an issue body that preserves file/line context and links back to the PR.
 - Enforce title prefix `[branch:<head_branch>]` and apply label `agent` (plus any metadata defaults). The `<head_branch>` comes from the PR's source branch.
@@ -71,8 +71,9 @@ pr_number=1450
 
 2. **Fetch actionable review comments**
    - Call `platform_operations` equivalent of `adw platform pr-comments <PR#> --actionable-only --format json`.
-   - If the call fails, surface the error and stop (do not mark success).
-   - If the response is empty, report "No actionable comments" and stop.
+   - Expected JSON shape: `{ pr: { head_branch, ... }, comments: [...] }`.
+   - Extract `head_branch = response.pr.head_branch` (REQUIRED). Extract actionable comments from `response.comments`.
+   - If the call fails, surface the error and stop (do not mark success). If `head_branch` is missing or empty, log a clear error and fail (do not guess). If `response.comments` is empty, report "No actionable comments" and stop.
 
 3. **Normalize and group**
    - For each actionable comment, capture: reviewer, file path, line (if present), and body/summary.
@@ -80,7 +81,12 @@ pr_number=1450
    - Produce concise bullet summaries retaining reviewer attribution (e.g., `- file.py:123 (reviewer): summary`).
 
 4. **Compose issue content**
-   - **Title:** `[branch:<head_branch>] <short summary> (PR #<PR_NUMBER>)` (short summary derived from grouped findings; keep <80 chars when possible). The `<head_branch>` is the PR's source branch obtained from PR details.
+   - **Title format:** `[branch:<head_branch>] <short summary> (PR #<PR_NUMBER>)`.
+   - **Title summary:** Derive `<short summary>` from grouped findings; keep it under ~80 characters
+     when possible.
+   - **Title branch source and errors:** The `<head_branch>` MUST come from
+     `response.pr.head_branch` (JSON). If `head_branch` is missing or empty, fail with a clear
+     error and stop—do not guess.
    - **Labels:** Must include `agent`; add any defaults if needed (no additional labels required).
    - **Body template:**
      ```markdown
@@ -99,14 +105,15 @@ pr_number=1450
 
 5. **Delegate to subagent**
    - Build structured markdown payload expected by `issue-creator-executor`:
-     ```markdown
-     ---ISSUE-METADATA---
-     TITLE: [branch:<head_branch>] <summary> (PR #<PR_NUMBER>)
-     LABELS: agent
-     ---END-METADATA---
+    ```markdown
+    ---ISSUE-METADATA---
+    TITLE: [branch:<head_branch>] <summary> (PR #<PR_NUMBER>)
+    LABELS: agent
+    ---END-METADATA---
 
-     <issue body from step 4>
-     ```
+    <issue body from step 4>
+    ```
+   - `<head_branch>` must be the extracted `response.pr.head_branch`. If it is missing/empty, fail fast and do not invoke the subagent.
    - Invoke via `task` using `issue-creator-executor` subagent. Retry on transient subagent errors up to 3 attempts, adjusting payload if necessary (e.g., escape characters).
 
 6. **Output handling**
@@ -117,8 +124,27 @@ pr_number=1450
 ## Error Cases
 - Missing PR number → fail fast with explicit message.
 - `pr-comments` request fails → return failure; do not attempt issue creation.
+- Missing/empty `response.pr.head_branch` → log clear error and fail; do not guess or proceed.
 - Empty actionable list → report and exit success-without-issue.
 - Subagent failure → report failure and payload summary so cron can retry.
+
+## Example JSON Response (pr-comments --format json)
+```json
+{
+  "pr": {
+    "number": 123,
+    "head_branch": "issue-123-adw-abc12345"
+  },
+  "comments": []
+}
+```
+
+- Extract `head_branch = response.pr.head_branch` (required for title prefix).
+- Comments live in `response.comments`.
+- Draft and non-draft PRs both include `head_branch` in JSON output.
+
+**Title example (uses extracted head_branch):**
+`[branch:issue-123-adw-abc12345] Fix review feedback (PR #123)`
 
 ## Outputs
 - Success message with issue number and title.

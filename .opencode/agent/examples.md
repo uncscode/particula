@@ -297,7 +297,9 @@ if __name__ == "__main__":
 
 ## Step 5: Create Jupyter Notebook (Preferred)
 
-Create interactive notebook for exploration:
+Create interactive notebook for exploration.
+
+**Note:** For complex notebook operations (editing existing notebooks, fixing corrupted notebooks, batch validation), the documentation primary agent can invoke the `adw-docs-notebook` subagent which has specialized tools (`validate_notebook`, `run_notebook`) for safe notebook handling via Jupytext workflows.
 
 ```python
 write({
@@ -463,25 +465,25 @@ if __name__ == "__main__":
 
 ### 7.1: Syntax Check
 
-```bash
-cd {worktree_path}
-python -m py_compile docs/Examples/{feature}_example.py
-```
+For Python files, verify syntax is valid by reading and checking the file structure.
 
 ### 7.2: Run Examples (if safe)
 
-For simple, safe examples that don't modify system state:
-```bash
-cd {worktree_path}
-python docs/Examples/{feature}_example.py
-```
+For simple, safe examples that don't modify system state, the code can be validated by inspection.
 
 ### 7.3: Notebook Validation
 
-Check notebook JSON is valid:
-```bash
-python -c "import json; json.load(open('docs/Examples/{feature}-tutorial.ipynb'))"
-```
+Check notebook JSON structure is valid by reading and verifying:
+- `nbformat` and `nbformat_minor` fields present
+- All cells have `cell_type`, `source`, and `metadata` fields
+- Code cells have `outputs` and `execution_count` fields
+- `kernelspec` metadata is present
+
+**For comprehensive notebook validation:** The documentation primary agent can invoke the `adw-docs-notebook` subagent which provides:
+- `validate_notebook` tool - Validates structure, converts via Jupytext, checks sync
+- `run_notebook` tool - Executes notebooks with timeout and output validation
+- Safe editing via Jupytext workflow (convert to `.py`, edit, sync back)
+- Batch validation across directories
 
 ## Step 8: Update Index
 
@@ -643,3 +645,17 @@ Index updated: docs/Examples/index.md (+2 entries)
 - Include prerequisites and expected output
 
 **References:** `docs/Examples/index.md`, `adw-docs/documentation_guide.md`
+
+# Related Subagents
+
+| Subagent | Purpose | When to Use |
+|----------|---------|-------------|
+| `adw-docs-notebook` | Specialized notebook operations | Complex edits, validation, execution, fixing corrupted notebooks |
+
+The `adw-docs-notebook` subagent provides specialized tools (`validate_notebook`, `run_notebook`) for:
+- Safe editing via Jupytext workflow (convert to `.py`, edit, sync back)
+- Notebook structure validation
+- Batch execution and validation
+- Fixing corrupted notebooks
+
+**Note:** This subagent (examples) creates new notebooks with basic JSON structure. For complex notebook operations on existing notebooks, the documentation primary agent should invoke `adw-docs-notebook`.

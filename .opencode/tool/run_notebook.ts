@@ -12,6 +12,10 @@ const MISSING_SCRIPT_HINT = "Missing backing script .opencode/tool/run_notebook.
 export default tool({
   description: `Execute Jupyter notebooks with validation and structured outputs.
 
+BREAKING CHANGE: Default behavior overwrites the source notebook and creates a .ipynb.bak backup. Use noOverwrite to keep the source unchanged or noBackup to skip backups. writeExecuted can still be combined with default overwrite.
+
+Validation runs before execution to fail fast on corrupted notebooks; use skipValidation when debugging known-invalid notebooks.
+
 EXAMPLES:
 - Single notebook: run_notebook({notebookPath: 'docs/Examples/setup-template-init-tutorial.ipynb'})
 - All notebooks in dir: run_notebook({notebookPath: 'docs/Examples/', recursive: true})
@@ -50,7 +54,23 @@ NOTE: Default timeout is 600 seconds per notebook.`,
     writeExecuted: tool.schema
       .string()
       .optional()
-      .describe("Directory where executed notebook copies should be written")
+      .describe(
+        "Directory where executed notebook copies should be written; when overwriting (default) source is also updated",
+      ),
+    noOverwrite: tool.schema
+      .boolean()
+      .optional()
+      .describe(
+        "Do not overwrite the source notebook; execute into writeExecuted or validation temp directory and implicitly skip backups (equivalent to enabling noBackup)",
+      ),
+    noBackup: tool.schema
+      .boolean()
+      .optional()
+      .describe("Skip creation of the .ipynb.bak backup when overwriting the source notebook"),
+    skipValidation: tool.schema
+      .boolean()
+      .optional()
+      .describe("Skip pre-execution validation when running known-invalid notebooks"),
   },
   async execute(args) {
     const outputMode = args.outputMode || "summary";
@@ -60,6 +80,9 @@ NOTE: Default timeout is 600 seconds per notebook.`,
     const expectOutput = args.expectOutput || [];
     const cwd = args.cwd as string | undefined;
     const writeExecuted = args.writeExecuted as string | undefined;
+    const noOverwrite = args.noOverwrite || false;
+    const noBackup = args.noBackup || false;
+    const skipValidation = args.skipValidation || false;
 
     const cmdParts: (string | number)[] = [
       "python3",
@@ -68,11 +91,11 @@ NOTE: Default timeout is 600 seconds per notebook.`,
       `--output=${outputMode}`,
       `--timeout=${timeout}`,
     ];
-    
+
     if (writeExecuted) {
       cmdParts.push(`--write-executed=${writeExecuted}`);
     }
-    
+
     if (cwd) {
       cmdParts.push(`--cwd=${cwd}`);
     }
@@ -83,6 +106,18 @@ NOTE: Default timeout is 600 seconds per notebook.`,
 
     if (expectOutput.length > 0) {
       cmdParts.push("--expect-output", ...expectOutput);
+    }
+
+    if (noOverwrite) {
+      cmdParts.push("--no-overwrite");
+    }
+
+    if (noBackup) {
+      cmdParts.push("--no-backup");
+    }
+
+    if (skipValidation) {
+      cmdParts.push("--skip-validation");
     }
 
     try {
