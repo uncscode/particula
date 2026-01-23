@@ -35,6 +35,7 @@ class ValidationResult:
     execution_valid: bool | None  # None if skipped due to timeout
     execution_error: str | None
     timed_out: bool
+    file_missing: bool = False  # True if file was deleted/not found
 
 
 def validate_syntax(notebook_path: Path) -> tuple[bool, list[str]]:
@@ -108,9 +109,7 @@ def execute_notebook(
     """
     # Create a temporary file for the output
     # nbconvert appends .ipynb to the output name, so we need a temp file
-    temp_output = tempfile.NamedTemporaryFile(
-        suffix=".ipynb", delete=False
-    )
+    temp_output = tempfile.NamedTemporaryFile(suffix=".ipynb", delete=False)
     temp_output.close()  # Close immediately, we just need the path
     # Remove .ipynb suffix - nbconvert will add it back
     output_path = temp_output.name.removesuffix(".ipynb")
@@ -188,11 +187,12 @@ def validate_notebook(notebook_path: str, timeout: int) -> ValidationResult:
     if not path.exists():
         return ValidationResult(
             notebook=notebook_path,
-            syntax_valid=False,
-            syntax_errors=[f"File not found: {notebook_path}"],
+            syntax_valid=True,  # Not a syntax error - file just doesn't exist
+            syntax_errors=[],
             execution_valid=None,
-            execution_error=None,
+            execution_error="File not found (deleted)",
             timed_out=False,
+            file_missing=True,
         )
 
     # Phase 1: Syntax validation
@@ -220,7 +220,9 @@ def print_result(result: ValidationResult) -> None:
     """Print validation result with formatting."""
     notebook_name = Path(result.notebook).name
 
-    if result.syntax_valid and result.execution_valid:
+    if result.file_missing:
+        print(f"  SKIP: {notebook_name} (file deleted/not found)")
+    elif result.syntax_valid and result.execution_valid:
         print(f"  PASS: {notebook_name}")
     elif result.timed_out:
         print(f"  SKIP: {notebook_name} (timeout - execution took >5 min)")
@@ -281,13 +283,18 @@ def main() -> int:
         1 for r in results if r.syntax_valid and r.execution_valid is True
     )
     failed = sum(
-        1 for r in results if not r.syntax_valid or r.execution_valid is False
+        1
+        for r in results
+        if not r.file_missing
+        and (not r.syntax_valid or r.execution_valid is False)
     )
-    skipped = sum(1 for r in results if r.timed_out)
+    skipped_timeout = sum(1 for r in results if r.timed_out)
+    skipped_missing = sum(1 for r in results if r.file_missing)
 
     print(f"  Passed:  {passed}")
     print(f"  Failed:  {failed}")
-    print(f"  Skipped: {skipped} (timeout)")
+    print(f"  Skipped: {skipped_timeout} (timeout)")
+    print(f"  Skipped: {skipped_missing} (deleted)")
     print("=" * 60)
 
     # Return failure if any notebooks failed (not for timeouts)
