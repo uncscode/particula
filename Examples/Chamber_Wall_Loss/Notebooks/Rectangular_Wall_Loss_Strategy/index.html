@@ -9956,6 +9956,8 @@
       
         
       
+        
+      
     
     
     
@@ -10036,14 +10038,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../Simulations/Notebooks/Cloud_Chamber_Cycles/" class="md-nav__link">
+      <a href="../../../Simulations/Notebooks/Cloud_Chamber_Multi_Cycle/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Cloud Chamber Activation-Deactivation Cycle (Single Run)
+    Cloud Chamber Multi Cycle (split from Cloud_Chamber_Cycles.ipynb)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Simulations/Notebooks/Cloud_Chamber_Single_Cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Chamber Single Cycle (split from Cloud_Chamber_Cycles.ipynb)
   
 
     
@@ -13112,7 +13142,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9db59287">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=907cbd67">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13125,7 +13155,7 @@ Runtime is kept small (&lt;1 s) with tiny arrays and short integration horizons.
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1a9e1ffe">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=df4119bc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13143,7 +13173,7 @@ Runtime is kept small (&lt;1 s) with tiny arrays and short integration horizons.
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f25bbf6c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5d2e3c84">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13154,7 +13184,7 @@ Runtime is kept small (&lt;1 s) with tiny arrays and short integration horizons.
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ad5f5c2f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5451936e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13187,7 +13217,7 @@ np.set_printoptions(precision=3, suppress=True)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=560d4348">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=51d60d48">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13198,7 +13228,7 @@ np.set_printoptions(precision=3, suppress=True)</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=87fdbddc">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=622455b2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13229,7 +13259,7 @@ print("Initial total concentration:", f"{particle.get_total_concentration():.3e}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dd419303">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=920e3e7a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13240,7 +13270,7 @@ print("Initial total concentration:", f"{particle.get_total_concentration():.3e}
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=646979de">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d8078251">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13279,7 +13309,7 @@ P = 101325.0  # Pa</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=889d27c9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8a674baf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13290,7 +13320,7 @@ P = 101325.0  # Pa</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2655633e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a6385062">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13321,7 +13351,7 @@ print("First three rates (1/s):", rate[:3])</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b563f8c0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=015044b0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13332,7 +13362,7 @@ print("First three rates (1/s):", rate[:3])</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ffcc1821">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=954134ff">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13383,7 +13413,7 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cd0eb4a0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af7308d4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13394,7 +13424,7 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2246778e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2d99d2cd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13437,7 +13467,7 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fbdd96a7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16a39c0f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13449,7 +13479,7 @@ Only the underlying particle representation changes.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=87a9501d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b16a2a09">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13510,7 +13540,7 @@ wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4b8fdca3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cb9df964">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
