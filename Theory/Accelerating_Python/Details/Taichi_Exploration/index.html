@@ -13377,25 +13377,35 @@ Startup and kernel-launch costs limit Taichi’s advantage on very small problem
 
 <span class="c1"># non-standard libraries for this script</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">taichi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ti</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">taichi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ti</span>
+    <span class="n">TAI_CHI_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="n">ti</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">TAI_CHI_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="c1"># plot settings</span>
-<span class="n">TAILWIND</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">TAILWIND</span>
-<span class="n">base_color</span> <span class="o">=</span> <span class="n">TAILWIND</span><span class="p">[</span><span class="s2">"gray"</span><span class="p">][</span><span class="s2">"600"</span><span class="p">]</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s2">"text.color"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
-        <span class="s2">"axes.labelcolor"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
-        <span class="s2">"figure.figsize"</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="s2">"font.size"</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
-        <span class="s2">"axes.edgecolor"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
-        <span class="s2">"axes.labelcolor"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
-        <span class="s2">"xtick.color"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
-        <span class="s2">"ytick.color"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
-        <span class="s2">"pdf.fonttype"</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
-        <span class="s2">"ps.fonttype"</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
-    <span class="p">}</span>
-<span class="p">)</span>
+<span class="k">if</span> <span class="n">TAI_CHI_AVAILABLE</span><span class="p">:</span>
+    <span class="n">TAILWIND</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">TAILWIND</span>
+    <span class="n">base_color</span> <span class="o">=</span> <span class="n">TAILWIND</span><span class="p">[</span><span class="s2">"gray"</span><span class="p">][</span><span class="s2">"600"</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">"text.color"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
+            <span class="s2">"axes.labelcolor"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
+            <span class="s2">"figure.figsize"</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s2">"font.size"</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+            <span class="s2">"axes.edgecolor"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
+            <span class="s2">"axes.labelcolor"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
+            <span class="s2">"xtick.color"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
+            <span class="s2">"ytick.color"</span><span class="p">:</span> <span class="n">base_color</span><span class="p">,</span>
+            <span class="s2">"pdf.fonttype"</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+            <span class="s2">"ps.fonttype"</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">"Taichi not installed in this environment; skipping Taichi-dependent cells."</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import time
 import statistics
@@ -13411,25 +13421,35 @@ import particula as par
 
 # non-standard libraries for this script
 import psutil
-import taichi as ti
+try:
+    import taichi as ti
+    TAI_CHI_AVAILABLE = True
+except ModuleNotFoundError:
+    ti = None
+    TAI_CHI_AVAILABLE = False
 
 # plot settings
-TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "axes.labelcolor": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "axes.labelcolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)</div>
+if TAI_CHI_AVAILABLE:
+    TAILWIND = par.util.colors.TAILWIND
+    base_color = TAILWIND["gray"]["600"]
+    plt.rcParams.update(
+        {
+            "text.color": base_color,
+            "axes.labelcolor": base_color,
+            "figure.figsize": (5, 4),
+            "font.size": 14,
+            "axes.edgecolor": base_color,
+            "axes.labelcolor": base_color,
+            "xtick.color": base_color,
+            "ytick.color": base_color,
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
+        }
+    )
+else:
+    print(
+        "Taichi not installed in this environment; skipping Taichi-dependent cells."
+    )</div>
 </div>
 </div>
 </div>
