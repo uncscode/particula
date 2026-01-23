@@ -47,7 +47,7 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    Single activation-deactivation cycle in a rectangular cloud chamber with κ-theory hygroscopicity. Demonstrates chamber geometry setup, wall loss configuration, lognormal particle sampling, and condensation dynamics. Ideal for learning the basics of cloud droplet activation.
+    Single activation-deactivation cycle with κ-theory hygroscopicity and wall loss in a rectangular chamber.
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb)
 
@@ -55,7 +55,7 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    Four-cycle cloud chamber simulation comparing three seed scenarios: ammonium sulfate (κ=0.61), sucrose (κ=0.10), and mixed AS+sucrose. Includes κ-dependent activation analysis, water uptake tracking, mass retention over cycles, and concept boxes for Köhler and κ-theory.
+    Four-cycle simulation comparing κ-dependent activation across ammonium sulfate, sucrose, and mixed seed scenarios.
 
     [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)
 
