@@ -86,6 +86,7 @@ You are running as an **orchestrator** that:
 | **theory** | Conceptual documentation | `docs/Theory/*.md` |
 | **features** | High-level feature docs | `docs/Features/*.md` |
 | **docs-validator** | Validate links and formatting | All docs (read-only) |
+| **adw-docs-notebook** | Jupyter notebook creation, editing, validation | `docs/Examples/**/*.ipynb`, `docs/**/*.ipynb` |
 | **adw-commit** | Commit changes | Git operations |
 | **linter** | Code quality validation | Python files |
 
@@ -158,7 +159,7 @@ From `spec_content`, identify:
 | `.py` files changed | **docstring** |
 | Any code changes | **docs** (README, guides) |
 | `issue_class == /feature` | **docs-feature** |
-| New user-facing feature | **examples** |
+| New user-facing feature | **examples**, **adw-docs-notebook** (for .ipynb) |
 | New module/component | **architecture** |
 | New design pattern | **theory** |
 | Major feature | **features** |
@@ -316,6 +317,102 @@ Create markdown guide and Jupyter notebook (.ipynb preferred).
 ```
 
 **Expected:** `EXAMPLES_UPDATE_COMPLETE`
+
+### 6.5.1: ADW-Docs-Notebook Subagent
+
+**When:** Need to create, edit, validate, or fix Jupyter notebooks
+
+This specialized subagent handles Jupyter notebook operations safely. It can be invoked directly by the documentation primary agent or delegated through the examples subagent.
+
+**Task Types:**
+- `create` - Create new notebook with proper JSON structure
+- `edit` - Modify existing notebook (uses Jupytext for complex edits)
+- `validate` - Check notebook structure without modifications
+- `convert` - Convert notebook to/from Python script
+- `execute` - Run notebook and verify it completes
+- `batch-validate` - Validate all notebooks in a directory
+- `fix` - Attempt to repair a corrupted notebook
+
+```python
+# Create a tutorial notebook
+task({
+  "description": "Create tutorial notebook",
+  "prompt": f"""Create tutorial notebook.
+
+Arguments: adw_id={adw_id}
+
+Task: create
+Notebook: docs/Examples/feature-tutorial.ipynb
+Details: Create interactive tutorial with setup, examples, and summary cells
+""",
+  "subagent_type": "adw-docs-notebook"
+})
+
+# Edit an existing notebook
+task({
+  "description": "Edit notebook",
+  "prompt": f"""Edit notebook.
+
+Arguments: adw_id={adw_id}
+
+Task: edit
+Notebook: docs/Examples/setup.ipynb
+Details: Add a new code cell showing environment configuration
+""",
+  "subagent_type": "adw-docs-notebook"
+})
+
+# Validate all example notebooks
+task({
+  "description": "Validate notebooks",
+  "prompt": f"""Validate notebooks.
+
+Arguments: adw_id={adw_id}
+
+Task: batch-validate
+Notebook: docs/Examples/
+Details: Validate all .ipynb files, report issues
+""",
+  "subagent_type": "adw-docs-notebook"
+})
+
+# Execute and verify a notebook
+task({
+  "description": "Execute notebook",
+  "prompt": f"""Execute notebook.
+
+Arguments: adw_id={adw_id}
+
+Task: execute
+Notebook: docs/Examples/tutorial.ipynb
+Details: Execute and verify outputs include "Success" and "DataFrame"
+""",
+  "subagent_type": "adw-docs-notebook"
+})
+
+# Fix a corrupted notebook
+task({
+  "description": "Fix corrupted notebook",
+  "prompt": f"""Fix corrupted notebook.
+
+Arguments: adw_id={adw_id}
+
+Task: fix
+Notebook: docs/Examples/broken.ipynb
+Details: Notebook fails to open, diagnose and repair
+""",
+  "subagent_type": "adw-docs-notebook"
+})
+```
+
+**Expected:** `NOTEBOOK_UPDATE_COMPLETE`, `NOTEBOOK_UPDATE_PARTIAL`, or `NOTEBOOK_UPDATE_FAILED`
+
+**Key Features:**
+- Uses Jupytext workflow for safe complex edits (convert to .py, edit, sync back)
+- Validates notebooks before and after changes
+- Supports batch operations across directories
+- Has specialized tools: `validate_notebook` and `run_notebook`
+- Retries up to 3 times for recoverable errors
 
 ### 6.6: Architecture Subagent
 
@@ -501,6 +598,7 @@ ALWAYS:
 IF issue_class == /feature:
     → docs-feature subagent
     → examples subagent (if user-facing)
+    → adw-docs-notebook subagent (if interactive tutorial needed)
     → features subagent (if major)
 
 IF issue_class == /bug OR deprecation:

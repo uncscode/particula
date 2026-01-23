@@ -83,12 +83,23 @@ You are running in **completely autonomous mode** with:
 
 # Subagents
 
-This agent orchestrates two subagents:
+This agent orchestrates subagents for testing and committing:
 
 | Subagent | Purpose | When Called |
 |----------|---------|-------------|
 | `adw-build-tests` | Validate/write tests, run fast tests, fix failures | After ALL implementation completes |
 | `adw-commit` | Commit with pre-commit hooks | After tests pass |
+
+## Related Subagents (Documentation Phase)
+
+The following subagents are invoked during the documentation workflow (`adw workflow document`) but may be relevant for implementations involving notebooks:
+
+| Subagent | Purpose | Tools |
+|----------|---------|-------|
+| `adw-docs-notebook` | Create, edit, validate, execute Jupyter notebooks | `validate_notebook`, `run_notebook` |
+| `examples` | Create tutorials, examples, and notebooks in `docs/Examples/` | Standard file tools |
+
+**Note:** If your implementation includes Jupyter notebooks in `docs/Examples/`, the `adw-docs-notebook` subagent (invoked via the documentation workflow) provides specialized tools for safe notebook editing using Jupytext workflows.
 
 # Execution Flow
 
@@ -443,6 +454,28 @@ Recommendation: {specific fix suggestion}
 
 **NOTE:** Spec validation is handled by `adw-validate` agent.
 Docstrings and linting are handled by `adw-format` agent.
+
+# Notebook Handling
+
+If the implementation plan includes Jupyter notebooks (`.ipynb` files):
+
+## During Build Phase
+
+This agent does NOT have notebook-specific tools. For notebook changes:
+- Create/edit notebooks using standard `write`/`edit` tools
+- Ensure valid JSON structure (nbformat v4)
+- Clear outputs when modifying code cells
+
+## After Build Phase
+
+Notebooks are fully validated during the documentation workflow:
+- **`adw-docs-notebook`** subagent provides specialized tools:
+  - `validate_notebook` - Validate structure, convert via Jupytext, sync
+  - `run_notebook` - Execute notebooks with timeout and output validation
+- Safe editing workflow: convert to `.py` via Jupytext, edit, sync back
+- Batch validation and execution across directories
+
+**Recommendation:** For complex notebook edits, defer to the documentation phase where `adw-docs-notebook` can use its specialized tools for safe, validated notebook operations.
 
 # Decision Making (Autonomous)
 

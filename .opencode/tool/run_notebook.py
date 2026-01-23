@@ -11,12 +11,17 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Sequence
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_TIMEOUT = 600
 TOTAL_GUARD_PADDING = 60
@@ -138,7 +143,7 @@ def _validate_output(executed_path: Path, expected_strings: Sequence[str]) -> Li
     return missing
 
 
-def _truncate(text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT) -> Tuple[str, bool]:
+def _truncate(text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT) -> tuple[str, bool]:
     """Truncate text with a notice when exceeding limit."""
 
     if len(text) <= limit:
@@ -149,7 +154,9 @@ def _truncate(text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT) -> Tuple[str, bool
 def _format_summary(
     results: List[Any],
     validation_errors: Dict[str, List[str]],
+    validation_failures: Dict[str, Dict[str, object]],
     total_time: float,
+    validation_unavailable: bool = False,
 ) -> str:
     """Build human-readable summary output."""
 
@@ -183,8 +190,25 @@ def _format_summary(
         for nb, missing in validation_errors.items():
             lines.append(f"  - {Path(nb).name}: missing expectations: {', '.join(missing)}")
 
+    if validation_failures:
+        lines.append("\nValidation Failures:")
+        for nb, failure in validation_failures.items():
+            detail = failure.get("message", "Validation failed")
+            prefix = f"  - {Path(nb).name}"
+            cell_index = failure.get("failed_cell_index")
+            if cell_index is not None:
+                prefix += f" (cell {cell_index})"
+            lines.append(f"{prefix}: {detail}")
+
+    if validation_unavailable:
+        lines.append("\nValidation module unavailable; executed without pre-validation.")
+
     lines.append("\n" + "=" * 60)
-    lines.append("VALIDATION: FAILED" if (failures or validation_errors) else "VALIDATION: PASSED")
+    lines.append(
+        "VALIDATION: FAILED"
+        if (failures or validation_errors or validation_failures)
+        else "VALIDATION: PASSED"
+    )
     lines.append("=" * 60)
     return "\n".join(lines)
 
@@ -210,38 +234,149 @@ def _serialize_result(result: Any, include_output: bool) -> Dict[str, object]:
     return payload
 
 
+def _create_backup(nb_path: Path) -> Optional[Path]:
+    """Create a single backup copy of the notebook.
+
+    Args:
+        nb_path: Path to the notebook file to back up.
+
+    Returns:
+        The backup path or None when the copy fails.
+    """
+
+    backup_path = nb_path.with_suffix(".ipynb.bak")
+    try:
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(nb_path, backup_path)
+    except OSError as exc:  # pragma: no cover - exercised via failure test
+        logger.warning(
+            "Failed to create notebook backup: %s -> %s (%s)",
+            nb_path,
+            backup_path,
+            exc,
+        )
+        return None
+
+    logger.info("Created notebook backup: %s -> %s", nb_path, backup_path)
+    return backup_path
+
+
 def run_notebooks(
     notebooks: List[Path],
     timeout: int,
     expect_output: Sequence[str],
     output_mode: str,
     write_executed: Optional[Path],
-) -> Tuple[int, str]:
+    skip_validation: bool = False,
+    no_overwrite: bool = False,
+    no_backup: bool = False,
+) -> tuple[int, str]:
     """Execute notebooks and format output for the requested mode."""
 
     NotebookExecutionResult, execute_notebook = _load_executor()
 
     temp_dir: Optional[tempfile.TemporaryDirectory[str]] = None
-    validation_dir = write_executed
-    if expect_output and validation_dir is None:
-        temp_dir = tempfile.TemporaryDirectory()
-        validation_dir = Path(temp_dir.name)
+    validation_dir: Optional[Path] = None
 
-    results: List[NotebookExecutionResult] = []
+    # When not overwriting, prefer write_executed for execution output; otherwise allocate a
+    # temporary directory only when validation expectations require it.
+    if no_overwrite:
+        validation_dir = write_executed
+        if expect_output and validation_dir is None:
+            temp_dir = tempfile.TemporaryDirectory()
+            validation_dir = Path(temp_dir.name)
+
+    results: List[Any] = []
     validation_errors: Dict[str, List[str]] = {}
+    validation_failures: Dict[str, Dict[str, object]] = {}
     start = time.time()
+
+    validation_function = None
+    validation_unavailable: bool = False
+    if not skip_validation:
+        try:
+            from adw.utils.notebook_validation import validate_notebook_json  # type: ignore
+
+            validation_function = validate_notebook_json
+        except ImportError:
+            validation_function = None
+            validation_unavailable = True
 
     try:
         for nb_path in notebooks:
-            output_path = None
-            if validation_dir is not None:
-                output_path = validation_dir / nb_path.name
+            if validation_function is not None:
+                validation_result = validation_function(nb_path)
+                if not validation_result.valid:
+                    summarized_errors = []
+                    for error in validation_result.errors[:3]:
+                        summarized_errors.append(f"{error.error_type}: {error.message}")
+                    error_message = (
+                        "; ".join(summarized_errors) if summarized_errors else "Validation failed"
+                    )
+                    first_cell_index = (
+                        validation_result.errors[0].cell_index
+                        if validation_result.errors
+                        and hasattr(validation_result.errors[0], "cell_index")
+                        else None
+                    )
+                    failure_payload = {
+                        "message": error_message,
+                        "failed_cell_index": first_cell_index,
+                    }
+                    validation_failures[str(nb_path)] = failure_payload
 
-            result = execute_notebook(nb_path, output_path=output_path, timeout=timeout)
+                    result = NotebookExecutionResult(
+                        success=False,
+                        notebook_path=str(nb_path),
+                        output_path=None,
+                        execution_time=0.0,
+                        error_message=f"Validation failed: {error_message}",
+                        failed_cell_index=first_cell_index,
+                    )
+                    results.append(result)
+                    continue
+
+            execution_output_path: Optional[Path] = None
+            secondary_copy: Optional[Path] = None
+
+            if no_overwrite:
+                # Prefer write_executed over validation_dir for the execution output location.
+                if write_executed is not None:
+                    execution_output_path = write_executed / nb_path.name
+                elif validation_dir is not None:
+                    execution_output_path = validation_dir / nb_path.name
+            else:
+                if not no_backup:
+                    _create_backup(nb_path)
+                execution_output_path = nb_path
+                if write_executed is not None:
+                    secondary_copy = write_executed / nb_path.name
+
+            if execution_output_path is not None:
+                execution_output_path.parent.mkdir(parents=True, exist_ok=True)
+
+            result = execute_notebook(nb_path, output_path=execution_output_path, timeout=timeout)
             results.append(result)
 
-            if result.success and expect_output and output_path:
-                missing = _validate_output(output_path, expect_output)
+            executed_for_validation: Optional[Path] = None
+            if result.output_path:
+                executed_for_validation = Path(result.output_path)
+            elif not no_overwrite:
+                executed_for_validation = nb_path
+            elif execution_output_path is not None:
+                executed_for_validation = execution_output_path
+
+            if result.success and secondary_copy is not None:
+                try:
+                    secondary_copy.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(executed_for_validation or nb_path, secondary_copy)
+                except OSError as exc:  # pragma: no cover - exercised via I/O failure
+                    logger.warning(
+                        "Failed to write executed notebook copy to %s (%s)", secondary_copy, exc
+                    )
+
+            if result.success and expect_output and executed_for_validation is not None:
+                missing = _validate_output(executed_for_validation, expect_output)
                 if missing:
                     validation_errors[result.notebook_path] = missing
     finally:
@@ -249,7 +384,9 @@ def run_notebooks(
             temp_dir.cleanup()
 
     total_time = time.time() - start
-    overall_success = all(r.success for r in results) and not validation_errors
+    overall_success = (
+        all(r.success for r in results) and not validation_errors and not validation_failures
+    )
 
     if output_mode == "json":
         payload = {
@@ -259,6 +396,7 @@ def run_notebooks(
             "total_execution_time": total_time,
             "results": [_serialize_result(r, include_output=False) for r in results],
             "validation_errors": validation_errors,
+            "validation_failures": validation_failures,
             "success": overall_success,
             "truncated": False,
         }
@@ -280,14 +418,26 @@ def run_notebooks(
                 lines.append(f"Executed Copy: {res.output_path}")
             lines.append("")
 
-        summary = _format_summary(results, validation_errors, total_time)
+        summary = _format_summary(
+            results,
+            validation_errors,
+            validation_failures,
+            total_time,
+            validation_unavailable,
+        )
         lines.append(summary)
         combined = "\n".join(lines)
         truncated_text, truncated = _truncate(combined)
         suffix = "\n[output was truncated]" if truncated else ""
         return (0 if overall_success else 1), f"{truncated_text}{suffix}"
 
-    summary = _format_summary(results, validation_errors, total_time)
+    summary = _format_summary(
+        results,
+        validation_errors,
+        validation_failures,
+        total_time,
+        validation_unavailable,
+    )
     return (0 if overall_success else 1), summary
 
 
@@ -298,6 +448,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         description="Execute Jupyter notebooks with validation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
+            "BREAKING CHANGE: default now overwrites the source notebook and creates a .ipynb.bak backup."
+            " Use --no-overwrite to preserve old behavior or --no-backup to skip backups.\n\n"
             "Examples:\n"
             "  python3 .opencode/tool/run_notebook.py docs/Examples/setup-template-init-tutorial.ipynb\n"
             "  python3 .opencode/tool/run_notebook.py docs/Examples/ --recursive\n"
@@ -341,6 +493,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         default=None,
         help="Optional directory to write executed notebook copies",
     )
+    parser.add_argument(
+        "--no-overwrite",
+        action="store_true",
+        help="Do not overwrite the source notebook; execute into write-executed or validation temp dir",
+    )
+    parser.add_argument(
+        "--no-backup",
+        action="store_true",
+        help="Skip creation of the .ipynb.bak backup when overwriting source (default is to create one)",
+    )
+    parser.add_argument(
+        "--skip-validation",
+        action="store_true",
+        help="Skip pre-execution notebook validation (for debugging known-invalid notebooks)",
+    )
 
     args = parser.parse_args(list(argv) if argv is not None else None)
 
@@ -351,6 +518,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     expect_output = list(args.expect_output)
     cwd = Path(args.cwd) if args.cwd else None
     write_executed = Path(args.write_executed) if args.write_executed else None
+    skip_validation = bool(args.skip_validation)
+    no_overwrite = bool(args.no_overwrite)
+    no_backup = bool(args.no_backup or args.no_overwrite)
 
     try:
         if timeout <= 0:
@@ -375,6 +545,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     expect_output=expect_output,
                     output_mode=output_mode,
                     write_executed=write_executed,
+                    skip_validation=skip_validation,
+                    no_overwrite=no_overwrite,
+                    no_backup=no_backup,
                 )
     except NotebookDependencyError as exc:
         print(f"ERROR: {exc}")

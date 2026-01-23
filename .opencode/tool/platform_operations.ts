@@ -95,6 +95,26 @@ AVAILABLE COMMANDS:
   Supports actionable_only: true to filter to unresolved comments with meaningful content.
   Supports prefer_scope: "fork" | "upstream" for fork/upstream routing.
 
+  JSON OUTPUT STRUCTURE:
+  When output_format: "json", returns PR metadata alongside comments:
+  {
+    "pr": {
+      "number": 42,
+      "title": "feat: Add feature",
+      "head_branch": "issue-123-adw-abc12345",  // Source branch for the PR
+      "base_branch": "main",
+      "state": "open",
+      "is_draft": false,
+      "url": "https://..."
+    },
+    "comments": [...]  // Array of review comments
+  }
+
+  EXTRACTING HEAD BRANCH:
+  response.pr.head_branch → "issue-123-adw-abc12345"
+
+  NOTE: Text output remains unchanged (just comments, no PR metadata).
+
 • rate-limit: Check API rate limit status
   Usage: { command: "rate-limit" }
   Usage: { command: "rate-limit", output_format: "json" }
