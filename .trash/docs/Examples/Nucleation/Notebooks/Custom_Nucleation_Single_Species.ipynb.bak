@@ -267,29 +267,26 @@
    "metadata": {},
    "outputs": [],
    "source": [
-"# setup dynamics for condensation using the fluent builder\n",
-     "condensation_method = (\n",
-     "    par.dynamics.CondensationIsothermalBuilder()\n",
-     "    .set_molar_mass(molar_mass_ammonium_sulfate, \"kg/mol\")\n",
-     "    .set_diffusion_coefficient(2e-5, \"m^2/s\")\n",
-     "    .set_accommodation_coefficient(1.0)\n",
-     "    .set_update_gases(True)\n",
-     "    .build()\n",
-     ")\n",
-     "condensation_runnable = par.dynamics.MassCondensation(\n",
-     "    condensation_strategy=condensation_method\n",
-     ")\n",
-     "# setup dynamics for coagulation\n",
-     "coagulation_strategy = (\n",
-     "    par.dynamics.BrownianCoagulationBuilder()\n",
-     "    .set_distribution_type(\"particle_resolved\")\n",
-     "    .build()\n",
-     ")\n",
-     "coagulation_runnable = par.dynamics.Coagulation(\n",
-     "    coagulation_strategy=coagulation_strategy\n",
-     ")\n",
-     "\n",
-     "step_count = 0"
+    "# setup dynamics for condensation\n",
+    "condensation_method = par.dynamics.CondensationIsothermal(\n",
+    "    molar_mass=molar_mass_ammonium_sulfate,\n",
+    "    accommodation_coefficient=1,\n",
+    "    diffusion_coefficient=2e-5,\n",
+    ")\n",
+    "condensation_runnable = par.dynamics.MassCondensation(\n",
+    "    condensation_strategy=condensation_method\n",
+    ")\n",
+    "# setup dynamics for coagulation\n",
+    "coagulation_strategy = (\n",
+    "    par.dynamics.BrownianCoagulationBuilder()\n",
+    "    .set_distribution_type(\"particle_resolved\")\n",
+    "    .build()\n",
+    ")\n",
+    "coagulation_runnable = par.dynamics.Coagulation(\n",
+    "    coagulation_strategy=coagulation_strategy\n",
+    ")\n",
+    "\n",
+    "step_count = 0"
    ]
   },
   {
@@ -654,7 +651,7 @@
    "source": [
     "## Graphing\n",
     "\n",
-    "In this section, we will visualize the nucleation events over time. The initial particles will be displayed, followed by their coagulated pairs. The simulation now uses the fluent condensation builder (CondensationIsothermalBuilder) before wrapping it in the MassCondensation runnable; particle growth results from both coagulation and condensation processes."
+    "In this section, we will visualize the nucleation events over time. The initial particles will be displayed, followed by their coagulated pairs. As the simulation progresses, particle growth results from both coagulation and condensation processes."
    ]
   },
   {

@@ -1,4 +1,10 @@
-"""Particle resolved speciated mass strategy."""
+"""Particle-resolved speciated mass distribution strategy.
+
+This module defines a strategy where each particle maintains mass per
+species along with optional charge. It handles concentration updates,
+coagulation, and charge conservation while remaining compatible with the
+particle-resolved kernel framework.
+"""
 
 import logging
 from typing import Optional
@@ -12,40 +18,52 @@ logger = logging.getLogger("particula")
 
 
 class ParticleResolvedSpeciatedMass(DistributionStrategy):
-    """Strategy for particle-resolved masses with multiple species.
+    """Represent particle-resolved mass for multiple species.
 
-    Allows each particle to have separate masses for each species, with
-    individualized densities. This strategy provides a more detailed
-    approach when each particle's composition must be modeled explicitly.
+    Each particle maintains per-species masses and optional charge, enabling
+    detailed tracking of condensation or coagulation events in particle-resolved
+    workflows.
+
+    Attributes:
+        None explicitly stored; the strategy operates purely on arrays passed to
+        its methods.
 
     Methods:
-    - get_name : Return the type of the distribution strategy.
-    - get_species_mass : Calculate the mass per species.
-    - get_mass : Calculate the mass of the particles or bin.
-    - get_total_mass : Calculate the total mass of particles.
-    - get_radius : Calculate the radius of particles.
-    - add_mass : Add mass to the particle distribution.
-    - add_concentration : Add concentration to the distribution.
-    - collide_pairs : Perform collision logic on specified particle pairs.
+        get_species_mass: Return mass distribution per species.
+        get_radius: Compute particle radius from mass and density.
+        add_mass: Update particle distribution when mass is added.
+        add_concentration: Extend the distribution with new particles.
+        collide_pairs: Merge mass/concentration when particles coagulate.
     """
 
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculate the mass per species for each particle.
+        """Return the per-species mass array for each particle.
+
+        Args:
+            distribution: Mass per particle array with shape ``(N,)`` or
+                ``(N, M)`` depending on the species count.
+            density: Species densities used when converting between mass and
+                volume (ignored for this strategy but part of the interface).
 
         Returns:
-            Mass per species array for each particle.
+            NDArray[np.float64]: Array of per-species masses identical to
+                ``distribution``.
         """
         return distribution
 
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculate particle radius from multi-species mass and density.
+        """Compute particle radius from mass and density.
+
+        Args:
+            distribution: Mass array for each particle and species.
+            density: Per-species densities used to convert mass to volume.
 
         Returns:
-            Particle radius in meters for each particle.
+            NDArray[np.float64]: Radius in metres for each particle.
         """
         if distribution.ndim == 1:
             volumes = distribution / density
@@ -62,9 +80,16 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Add mass to individual particles in the distribution.
 
+        Args:
+            distribution: Current mass distribution per particle and species.
+            concentration: Concentration of each particle or bin.
+            density: Species densities used for consistency with the interface.
+            added_mass: Mass change to apply per particle.
+
         Returns:
-            Updated distribution and concentration arrays.
+            Tuple of the updated distribution and concentration arrays.
         """
+
         if distribution.ndim == 2:
             concentration_expand = concentration[:, np.newaxis]
         else:
@@ -95,16 +120,22 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         NDArray[np.float64],
         Optional[NDArray[np.float64]],
     ]:
-        """Add new particles to the distribution with optional charge.
+        """Add new particles and optional charge to the distribution.
 
-        Charge handling mirrors the fill-then-append logic used for
-        concentration: empty bins are filled first, then remaining particles
-        are appended. Charge is only processed when a charge array is provided;
-        otherwise charge is passed through as None to preserve compatibility.
+        Args:
+            distribution: Existing mass distribution array.
+            concentration: Existing concentration per particle or bin.
+            added_distribution: Mass distribution of arriving particles.
+            added_concentration: Concentration of arriving particles.
+            charge: Optional charge array for current particles.
+            added_charge: Optional charge array for arriving particles.
 
         Returns:
-            Updated distribution, concentration, and charge arrays.
+            Tuple of distribution, concentration, and charge arrays after update.
         """
+
+        added_distribution = np.atleast_1d(added_distribution)
+        added_concentration = np.atleast_1d(added_concentration)
         rescaled = False
         if np.all(added_concentration == 1):
             rescaled = True
@@ -131,11 +162,16 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         )
 
         # Handle charge defaults and validation.
+
         charge_added = added_charge
+
         if charge is not None:
+            charge = np.atleast_1d(charge)
             if charge_added is None:
                 # Default new particle charges to zero when not provided.
                 charge_added = np.zeros_like(added_concentration)
+            else:
+                charge_added = np.atleast_1d(charge_added)
             if charge_added.shape != added_concentration.shape:
                 message = (
                     "When adding concentration with charge, added_charge "
@@ -183,35 +219,23 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     ) -> tuple[
         NDArray[np.float64], NDArray[np.float64], Optional[NDArray[np.float64]]
     ]:
-        """Collide specified particle pairs by merging mass and charge.
+        """Merge mass, concentration, and charge for collided particle pairs.
 
-        Performs coagulation between particle pairs for particle-resolved
-        simulations. The smaller particle's mass is added to the larger
-        particle, and the smaller particle's concentration is set to zero.
-        If a charge array is provided, charges are conserved by summing the
-        charges of the colliding pair.
-
-        The charge handling is optimized: charges are only processed when the
-        charge array is provided as a numpy array AND at least one of the
-        colliding particles has a non-zero charge.
-
-        Arguments:
-            - distribution : The mass distribution array. Shape is (N,) for
-                single species or (N, M) for M species per particle.
-            - concentration : The concentration array of shape (N,).
-            - density : The density array of shape (M,) for species densities.
-            - indices : Collision pair indices array of shape (K, 2) where
-                each row is [small_index, large_index].
-            - charge : Optional charge array of shape (N,). If provided and
-                contains non-zero values in colliding pairs, charges will be
-                summed during collisions. If None, charge handling is skipped.
+        Args:
+            distribution: Mass distribution array. Shape ``(N,)`` for single
+                species or ``(N, M)`` for multiple species.
+            concentration: Concentration array of shape ``(N,)``.
+            density: Species density array of shape ``(M,)``.
+            indices: Collision pairs where each row is ``[small_index,
+                large_index]`` describing the merge direction.
+            charge: Optional charge array. When provided, charges are conserved
+                by summing the colliding pair charges.
 
         Returns:
-            A tuple containing:
-                - Updated distribution array with merged masses.
-                - Updated concentration array with zeroed small particles.
-                - Updated charge array (None if input was None).
+            Tuple of updated distribution, concentration, and optional charge
+            arrays.
         """
+
         small_index = indices[:, 0]
         large_index = indices[:, 1]
 

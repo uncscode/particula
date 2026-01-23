@@ -1,6 +1,9 @@
-"""Change the particle-resolved representation to a binned representation.
-A binning approach is used to calculate the kernel.
-This creates a simple particle representation to pass to the kernel function.
+"""Helpers for converting particle-resolved representations to binned forms.
+
+This module provides utilities for defining kernel bins from particle-resolved
+radii and for converting a particle-resolved representation into a
+SpeciatedMassMovingBin representation that is compatible with kernel-based
+calculations.
 """
 
 from copy import deepcopy
@@ -9,6 +12,9 @@ from typing import Optional
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.dynamics.condensation.condensation_strategies import (
+    MIN_PARTICLE_RADIUS_M,
+)
 from particula.particles.distribution_strategies import (
     SpeciatedMassMovingBin,
 )
@@ -21,25 +27,20 @@ def get_particle_resolved_binned_radius(
     total_bins: Optional[int] = None,
     bins_per_radius_decade: int = 10,
 ) -> NDArray[np.float64]:
-    """Determine binned radii for kernel calculations.
+    """Compute radius bin edges for kernel calculations.
 
-    If bin_radius is provided, those edges are used directly. Otherwise,
-    a log-spaced array is generated based on the particle's minimum and
-    maximum radii and either a total number of bins or bins per radius
-    decade.
-
-    Arguments:
-        - particle : The ParticleRepresentation instance for radius binning.
-        - bin_radius : Optional array of radius bin edges in meters.
-        - total_bins : Exact number of bins to generate, if set.
-        - bins_per_radius_decade : Number of bins per decade of radius,
-          used only if total_bins is None.
+    Args:
+        particle: ParticleRepresentation used to derive radius statistics.
+        bin_radius: Explicit radius bin edges in metres, if already defined.
+        total_bins: Number of log-spaced bins to generate when provided.
+        bins_per_radius_decade: Bin density per radius decade when
+            ``total_bins`` is None.
 
     Returns:
-        - NDArray[np.float64] : The bin edges (radii) in meters.
+        NDArray[np.float64]: Radius bin edges in metres.
 
     Raises:
-        - ValueError : If finite radii cannot be determined for binning.
+        ValueError: When particle radii cannot be determined or are not finite.
     """
     # if the bin radius is set, return it
     if bin_radius is not None:
@@ -80,20 +81,16 @@ def get_speciated_mass_representation_from_particle_resolved(
     particle: ParticleRepresentation,
     bin_radius: NDArray[np.float64],
 ) -> ParticleRepresentation:
-    """Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.
+    """Convert a particle-resolved representation into a moving-bin format.
 
-    This function bins the mass and charge distributions for each species
-    according to the provided bin_radius array, using median or mean
-    values in each bin. The distribution_strategy is switched to
-    SpeciatedMassMovingBin.
-
-    Arguments:
-        - particle : The ParticleRepresentation to convert.
-        - bin_radius : Array of radius bin edges in meters.
+    Args:
+        particle: ParticleResolved representation to convert.
+        bin_radius: Radius bin edges in metres used for grouping particles.
 
     Returns:
-        - ParticleRepresentation : A new representation with binned
-          mass and concentration for each species.
+        ParticleRepresentation: Copy of the original representation with
+            SpeciatedMassMovingBin strategy applied and mass/concentration
+            rebinned onto the provided radii.
     """
     # deep copy the particle to avoid modifying the original
     new_particle = deepcopy(particle)
@@ -118,7 +115,11 @@ def get_speciated_mass_representation_from_particle_resolved(
     new_charge = np.zeros(len(bin_radius))
     old_charge = particle.get_charge()
     if np.shape(old_charge) != np.shape(old_concentration):
-        old_charge = np.zeros_like(old_concentration) + old_charge
+        aligned_charge = np.zeros_like(old_concentration)
+        flat_charge = np.reshape(old_charge, -1)
+        copy_len = min(flat_charge.size, aligned_charge.size)
+        aligned_charge[:copy_len] = flat_charge[:copy_len]
+        old_charge = aligned_charge
 
     # loop through the bins and get the median
     for index, _ in enumerate(bin_radius):
@@ -139,22 +140,30 @@ def get_speciated_mass_representation_from_particle_resolved(
             new_charge[index] = np.nan
             new_concentration[index] = 0
 
-    # check for nans and all zeros in the new distribution
-    mask_nan_zeros = np.isnan(new_distribution) | (new_distribution == 0)
+    # Replace NaNs with zeros so kernel steps see valid bins
+    new_distribution = np.where(np.isnan(new_distribution), 0, new_distribution)
 
     new_charge = np.where(np.isnan(new_charge), 0, new_charge)
     new_concentration = np.where(
         np.isnan(new_concentration), 0, new_concentration
     )
 
-    # filter out the nans and zeros
+    # Remove empty bins to keep the kernel radius grid strictly ordered
+    valid_bins = new_concentration > 0
+    if not np.any(valid_bins):
+        valid_bins = np.ones_like(valid_bins, dtype=bool)
     if new_distribution.ndim == 1:
-        new_particle.distribution = new_distribution[~mask_nan_zeros]
-        new_particle.charge = new_charge[~mask_nan_zeros]
-        new_particle.concentration = new_concentration[~mask_nan_zeros]
-        return new_particle
-    mask_nan_zeros = np.any(mask_nan_zeros, axis=1)
-    new_particle.distribution = new_distribution[~mask_nan_zeros, :]
-    new_particle.charge = new_charge[~mask_nan_zeros]
-    new_particle.concentration = new_concentration[~mask_nan_zeros]
+        new_distribution = np.maximum(
+            new_distribution[valid_bins], MIN_PARTICLE_RADIUS_M
+        )
+    else:
+        new_distribution = np.maximum(
+            new_distribution[valid_bins, :], MIN_PARTICLE_RADIUS_M
+        )
+    new_charge = new_charge[valid_bins]
+    new_concentration = new_concentration[valid_bins]
+
+    new_particle.distribution = new_distribution
+    new_particle.charge = new_charge
+    new_particle.concentration = new_concentration
     return new_particle

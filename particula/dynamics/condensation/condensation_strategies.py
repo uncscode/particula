@@ -136,21 +136,20 @@ class CondensationStrategy(ABC):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the mean free path of the gas molecules based on the
-        temperature, pressure, and dynamic viscosity of the gas.
+        """Calculate the mean free path of gas molecules.
 
-        Arguments:
-            - temperature : The temperature of the gas [K].
-            - pressure : The pressure of the gas [Pa].
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
-                not provided, it will be calculated based on the temperature
+        Args:
+            temperature: The temperature of the gas in kelvin.
+            pressure: The pressure of the gas in pascals.
+            dynamic_viscosity: Optional dynamic viscosity [Pa*s]; calculated
+                when not provided.
 
         Returns:
-            The mean free path of the gas molecules in meters (m).
+            The mean free path of the gas molecules in meters.
 
         References:
-        - Mean Free Path
-            [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
+            - Mean Free Path
+                (https://en.wikipedia.org/wiki/Mean_free_path)
 
         Examples:
             ```py title="Example – Mean-free-path"
@@ -173,21 +172,17 @@ class CondensationStrategy(ABC):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """The Knudsen number for a particle.
+        """Compute the Knudsen number for a particle.
 
-        Calculate the Knudsen number based on the mean free path of the gas
-        molecules and the radius of the particle.
-
-        Arguments:
-            - radius : The radius of the particle [m].
-            - temperature : The temperature of the gas [K].
-            - pressure : The pressure of the gas [Pa].
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
-                not provided, it will be calculated based on the temperature
+        Args:
+            radius: Particle radius in metres.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+            dynamic_viscosity: Optional dynamic viscosity [Pa*s]; computed when
+                missing.
 
         Returns:
-            The Knudsen number, which is the ratio of the mean free path to
-                the particle radius.
+            The Knudsen number, i.e., mean free path divided by particle radius.
 
         References:
             - [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
@@ -216,28 +211,23 @@ class CondensationStrategy(ABC):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """First-order mass transport coefficient per particle.
+        """Compute the first-order mass transport coefficient K.
 
-        Calculate the first-order mass transport coefficient, K, for a given
-        particle based on the diffusion coefficient, radius, and vapor
-        transition correction factor.
-
-        Arguments:
-            - radius : The radius of the particle [m].
-            - temperature : The temperature at which the first-order mass
-                transport coefficient is to be calculated.
-            - pressure : The pressure of the gas phase.
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
-                not provided, it will be calculated based on the temperature
+        Args:
+            particle_radius: Radius of the particle in metres.
+            temperature: Gas temperature in kelvin.
+            pressure: Gas pressure in pascals.
+            dynamic_viscosity: Optional dynamic viscosity [Pa*s]; computed when
+                not provided.
 
         Returns:
-            The first-order mass transport coefficient per particle (m^3/s).
+            First-order mass transport coefficient [m^3/s] per particle.
 
         References:
-        - Chapter 2, Equation 2.49 (excluding particle number)
-        - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
-            (D. Topping & M. Bane, Eds.). Wiley.
-            [DOI](https://doi.org/10.1002/9781119625728)
+            - Chapter 2, Equation 2.49 (excluding particle number)
+            - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
+                (D. Topping & M. Bane, Eds.). Wiley.
+                [DOI](https://doi.org/10.1002/9781119625728)
 
         Examples:
             ```py title="Example – First-order mass-transport"
@@ -267,18 +257,17 @@ class CondensationStrategy(ABC):
     def _fill_zero_radius(
         self, radius: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Fill zero radius values with the maximum radius. The concentration
-        value of zero will ensure that the rate of condensation is zero. The
-        fill is necessary to avoid division by zero in the array operations.
+        """Replace zero radii with the largest observed radius.
 
-        Arguments:
-            - radius : The radius of the particles.
+        Args:
+            radius: Array of particle radii in metres.
 
         Returns:
-            - radius : The radius of the particles with zero values filled.
+            NDArray[np.float64]: Array with zero entries replaced by the maximum
+                radius to keep divisions safe.
 
         Raises:
-            - Warning : If all radius values are zero.
+            Warning: When every radius value is zero.
 
         Examples:
             ```py title="Example – Fill zero radii"
@@ -762,6 +751,10 @@ class CondensationIsothermal(CondensationStrategy):
             mass_transfer = np.broadcast_to(
                 mass_transfer, (mass_transfer.shape[0], species_count)
             )
+        # collapse back to 1D for single-species particles to avoid
+        # broadcasting mismatches in particle.add_mass
+        if species_count == 1 and mass_transfer.ndim == 2:
+            mass_transfer = mass_transfer.reshape(-1)
         # apply the mass change
         particle.add_mass(added_mass=mass_transfer)
         if self.update_gases:
