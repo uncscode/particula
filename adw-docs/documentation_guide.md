@@ -704,7 +704,7 @@ mkdocs serve
 ruff check particula/ --select=D
 
 # Validate notebooks
-.opencode/tool/run_notebooks.py --validate
+.opencode/tool/run_notebook.py --validate
 ```
 
 ### Key Files
