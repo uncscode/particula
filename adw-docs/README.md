@@ -1,7 +1,7 @@
 # Agent Documentation for particula
 
 **Version:** 0.2.6
-**Last Updated:** 2025-12-21
+**Last Updated:** 2026-01-23
 
 ## Overview
 
@@ -16,7 +16,8 @@ This directory contains documentation guides for ADW (AI Developer Workflow) age
 | **[Testing Guide](testing_guide.md)** | Test framework and requirements | pytest, 500+ tests, *_test.py pattern |
 | **[Linting Guide](linting_guide.md)** | Code quality tools | ruff (check + format), mypy |
 | **[Code Style Guide](code_style.md)** | Naming and formatting conventions | snake_case functions, 80-char lines |
-| **[Docstring Guide](docstring_guide.md)** | Documentation standards | Google-style, type hints required |
+| **[Docstring Guide](docstring_guide.md)** | Docstring format standards | Google-style, type hints required |
+| **[Documentation Guide](documentation_guide.md)** | Documentation workflows | MkDocs, examples, ADRs |
 
 ### Workflow Guides
 
@@ -32,6 +33,7 @@ This directory contains documentation guides for ADW (AI Developer Workflow) age
 | Guide | Purpose | Key Info |
 |-------|---------|----------|
 | **[Architecture Reference](architecture/architecture_guide.md)** | Architecture documentation | Module structure, design decisions |
+| **[Notebook Validation Guide](notebook_validation_guide.md)** | Notebook tooling | validate_notebook, run_notebook, Jupytext |
 | **[Conditional Docs](conditional_docs.md)** | Task-driven documentation | When to read each guide |
 
 ## Repository Information
