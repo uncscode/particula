@@ -196,10 +196,17 @@ except SomeError as e:
 ### Dynamics - Condensation
 
 - [ ] **M2-P9:** Condensation core notebooks
-  - `docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb` - fix shape errors
-  - `docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb`
-  - `docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb`
-  - Size: S | Status: Not Started
+  - `docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb` - migrated to
+    `CondensationIsothermalBuilder`; shape mismatch persists in plotting/execution
+    (rate vs aerosol/bin shapes). Needs another pass to align shapes and rerun
+    `run_notebook` with executed outputs saved.
+  - `docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb` - migrated
+    to builder/factory patterns; executed outputs pending save (writeExecuted
+    overwrite currently blocked).
+  - `docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb` - mass
+    edges fixed; uses builder/factory; executed outputs pending save (writeExecuted
+    overwrite currently blocked).
+  - Size: S | Status: In Progress
 
 - [ ] **M2-P10:** Condensation advanced notebooks
   - `docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb`

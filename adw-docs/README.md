@@ -118,6 +118,17 @@ Active development plans are tracked in the [dev-plans/](dev-plans/) directory:
 
 See [dev-plans/README.md](dev-plans/README.md) for current plans.
 
+### Current Maintenance Snapshot (M2-P9: Condensation notebooks)
+
+- **Migration progress:** Condensation notebooks now use
+  `CondensationIsothermalBuilder`; `GasSpeciesBuilder` naming is consistent with
+  NumPy arrays; mass-resolved bin edges are fixed.
+- **Known issue:** `Condensation_1_Bin.ipynb` still hits a shape mismatch during
+  plotting/execution; needs another pass to align rate vs aerosol/bin shapes.
+- **Pending:** Executed outputs are not yet saved because `run_notebook` with
+  `writeExecuted` overwrite is currently blocked; rerun to save outputs once
+  the overwrite constraint is cleared.
+
 ## Architecture Documentation
 
 Architecture decisions and guides are in the [architecture/](architecture/) directory:
