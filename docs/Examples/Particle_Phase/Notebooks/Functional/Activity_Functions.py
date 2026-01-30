@@ -27,7 +27,7 @@
 #
 # ## Structure of the Notebook
 #
-# 1. **Mass-Based vs. Molar-Based vs. Volueme-Based**
+# 1. **Mass-Based vs. Molar-Based vs. Volume-Based**
 #    - Definitions and when to use each method
 #    - Examples and comparative analysis
 #
