@@ -18,9 +18,11 @@
 # This notebook demonstrates Brownian coagulation for a **discrete/PMF**
 # representation using the public `par.dynamics` API:
 #
-# 1. Build a Brownian coagulation strategy with `distribution_type="discrete"`.
+# 1. Build a Brownian coagulation strategy with
+#    `distribution_type="discrete"`.
 # 2. Wrap it in `par.dynamics.Coagulation`.
-# 3. Execute a short, lightweight step on a PMF aerosol and visualize the change.
+# 3. Run a short, lightweight step on a PMF aerosol and visualize
+#    the change.
 #
 # The setup mirrors the pattern notebooks (see `Coagulation_1_PMF_Pattern`) but
 # keeps grids small so it runs quickly (<120 s).
@@ -28,9 +30,8 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 import particula as par
 
 # %% [markdown]
@@ -127,7 +128,9 @@ plt.show()
 # %% [markdown]
 # ## Summary
 #
-# - Strategy: `BrownianCoagulationBuilder().set_distribution_type("discrete").build()`
+# - Strategy: `BrownianCoagulationBuilder().set_distribution_type(`
+#   "discrete").build()
+# - Runnable: `par.dynamics.Coagulation`
 # - Runnable: `par.dynamics.Coagulation`
 # - Representation: PMF (bin-based number concentration)
 # - Runtime guardrails: small grid, short horizon for fast execution

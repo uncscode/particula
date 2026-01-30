@@ -46,29 +46,31 @@ def main():
     print(f"  Total concentration: {concentration_organic} ug/m^3")
     print(f"  O:C ratios: {o2c_ratio}")
 
-    print(f"\n=== Equilibrium Results ===")
+    print("\n=== Equilibrium Results ===")
     print(f"Partition coefficients: {result.partition_coefficients}")
-    print(f"  (fraction in condensed phase)")
+    print("  (fraction in condensed phase)")
 
-    print(f"\nAlpha phase (water-rich):")
+    print("\nAlpha phase (water-rich):")
     print(
         f"  Species concentrations: {result.alpha_phase.species_concentrations}"
     )
     print(
-        f"  Water concentration: {result.alpha_phase.water_concentration:.2f} ug/m^3"
+        "  Water concentration: "
+        f"{result.alpha_phase.water_concentration:.2f} ug/m^3"
     )
     print(
-        f"  Total concentration: {result.alpha_phase.total_concentration:.2f} ug/m^3"
+        "  Total concentration: "
+        f"{result.alpha_phase.total_concentration:.2f} ug/m^3"
     )
 
     if result.beta_phase is not None:
-        print(f"\nBeta phase (organic-rich):")
+        print("\nBeta phase (organic-rich):")
         print(
-            f"  Species concentrations: "
+            "  Species concentrations: "
             f"{result.beta_phase.species_concentrations}"
         )
         print(
-            f"  Water concentration: "
+            "  Water concentration: "
             f"{result.beta_phase.water_concentration:.2f} ug/m^3"
         )
 

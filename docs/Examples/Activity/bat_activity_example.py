@@ -53,7 +53,8 @@ def main():
 
         print(f"Organic mass fraction: {org_frac:.1f}")
         print(
-            f"  Mass conc: water={mass[0] * 1e9:.1f}, org={mass[1] * 1e9:.1f} ng/m^3"
+            f"  Mass conc: water={mass[0] * 1e9:.1f}, "
+            f"org={mass[1] * 1e9:.1f} ng/m^3"
         )
         print(
             f"  Ideal activity:     water={ideal_activity[0]:.4f}, "

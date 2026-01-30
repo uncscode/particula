@@ -18,18 +18,19 @@
 # This notebook shows Brownian coagulation for a **continuous/PDF** distribution
 # using the public builder pattern:
 #
-# 1. Build a Brownian coagulation strategy with `distribution_type="continuous_pdf"`.
+# 1. Build a Brownian coagulation strategy with
+#    `distribution_type="continuous_pdf"`.
 # 2. Wrap it in `par.dynamics.Coagulation`.
-# 3. Run a short, lightweight step on a PDF aerosol and visualize the change.
+# 3. Run a short, lightweight step on a PDF aerosol and visualize
+#    change.
 #
 # Grid sizes and time horizon are kept small for quick execution (<120 s).
 
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 import particula as par
 
 # %% [markdown]
@@ -119,7 +120,8 @@ plt.show()
 # %% [markdown]
 # ## Summary
 #
-# - Strategy: `BrownianCoagulationBuilder().set_distribution_type("continuous_pdf").build()`
+# - Strategy: `BrownianCoagulationBuilder().set_distribution_type(`
+#   "continuous_pdf").build()
 # - Runnable: `par.dynamics.Coagulation`
 # - Representation: PDF (continuous number concentration per size)
 # - Runtime guardrails: small grid, short horizon
