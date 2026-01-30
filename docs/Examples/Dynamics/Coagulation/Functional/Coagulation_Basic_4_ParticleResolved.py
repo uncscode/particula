@@ -17,15 +17,14 @@
 #
 # This notebook demonstrates Brownian coagulation for a **particle-resolved**
 # representation using the builder pattern and the public `par.dynamics`
-# `Coagulation` runnable. It mirrors the pattern notebooks but keeps sample sizes
-# small for quick execution (<120 s).
+# `Coagulation` runnable. It mirrors the pattern notebooks but keeps
+# sample sizes small for quick execution (<120 s).
 
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 import particula as par
 
 # %% [markdown]
@@ -107,7 +106,7 @@ radii_after = _aerosol_after.particles.get_radius()
 # %%
 bins = np.logspace(
     np.log10(radii_before.min()), np.log10(radii_before.max()), 80
-)
+).tolist()
 
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.hist(
@@ -137,7 +136,8 @@ plt.show()
 # %% [markdown]
 # ## Summary
 #
-# - Strategy: `BrownianCoagulationBuilder().set_distribution_type("particle_resolved").build()`
+# - Strategy: `BrownianCoagulationBuilder().set_distribution_type(`
+#   "particle_resolved").build()
 # - Runnable: `par.dynamics.Coagulation`
 # - Representation: particle-resolved sampled radii/mass
 # - Runtime guardrails: ~12k samples, short horizon, few sub-steps

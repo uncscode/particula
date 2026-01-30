@@ -51,7 +51,8 @@ def main():
     mole_fractions = moles / np.sum(moles)
     print(f"\nMole fractions: {mole_fractions}")
     print(
-        f"Activity = mole fraction (ideal): {np.allclose(activity, mole_fractions)}"
+        "Activity = mole fraction (ideal): "
+        f"{np.allclose(activity, mole_fractions)}"
     )
 
 

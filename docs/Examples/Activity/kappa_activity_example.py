@@ -36,7 +36,7 @@ def main():
     # 2. Compute activity at different water contents
     print("=== Kappa Parameter Activity ===")
     print(f"Kappa values: {kappa_values}")
-    print(f"Species: water (kappa=0), ammonium sulfate (kappa=0.61)\n")
+    print("Species: water (kappa=0), ammonium sulfate (kappa=0.61)\n")
 
     water_fractions = [0.3, 0.5, 0.7, 0.9]
     for water_frac in water_fractions:

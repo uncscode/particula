@@ -21,18 +21,18 @@
 # - `distribution_type="discrete"` → PMF
 # - `distribution_type="continuous_pdf"` → PDF
 #
-# Both are wrapped in `par.dynamics.Coagulation` and run over a short horizon for
-# quick execution (<120 s). We also show how to convert between PMF and PDF using
+# Both are wrapped in `par.dynamics.Coagulation`.
+# We run them over a short horizon for quick execution (<120 s).
+# We also show how to convert between PMF and PDF using
 # `par.particles.get_pdf_distribution_in_pmf` for like-for-like comparisons.
 
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import trapezoid
-
+import numpy as np
 import particula as par
+from scipy.integrate import trapezoid
 
 # %% [markdown]
 # ## Build aerosols (PMF and PDF)
