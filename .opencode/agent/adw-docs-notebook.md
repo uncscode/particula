@@ -14,7 +14,7 @@ description: 'Subagent that handles Jupyter notebook creation, editing, validati
   Invoked by: examples subagent, documentation primary agent, or directly for notebook
   maintenance tasks
 
-  Write permissions: - docs/Examples/*.ipynb: ALLOW - docs/**/*.ipynb: ALLOW -
+  Write permissions: - docs/Examples/**/*.ipynb: ALLOW - docs/**/*.ipynb: ALLOW -
   *.ipynb files in explicitly allowed directories: ALLOW
 
   Examples:
