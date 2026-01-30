@@ -12,6 +12,20 @@
 #     name: python3
 # ---
 
+"""Explore mixing rules and activity coefficient calculations.
+
+This notebook walks through mass-based, molar-based, and volume-based
+mixing rules, compares ideal activity coefficients, and demonstrates the
+kappa value parameterization to model non-ideal solution behavior. Each
+section builds the required data arrays, computes activities with the
+public ``par.particles`` helpers, and plots the results.
+
+Example:
+    Run this notebook to generate activity coefficient plots for two- and
+three-component systems under different mixing assumptions.
+"""
+
+
 # %% [markdown]
 # # Activity Tutorial
 #
@@ -38,9 +52,8 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 import particula as par
 
 # %% [markdown]
