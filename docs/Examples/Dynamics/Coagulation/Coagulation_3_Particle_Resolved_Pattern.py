@@ -12,17 +12,18 @@
 #     name: python3
 # ---
 
+# %%
 """Demonstrate particle-resolved Brownian coagulation.
 
-This notebook generates a modest bimodal sample of particle-resolved
-particles, builds a Brownian coagulation strategy with
-``distribution_type="particle_resolved"``, runs a short coagulation step,
-and plots histograms of the sampled radii before and after executing the
-runnable.
+Generates a modest bimodal particle-resolved sample, configures Brownian
+coagulation with ``distribution_type="particle_resolved"``, runs a short
+step, and plots histograms of radii before/after execution to show how the
+sample redistributes. Uses a small sample size to keep runtime fast.
 
 Example:
-    Run this script to visualize how Brownian coagulation redistributes a
-set of sampled radii in a particle-resolved representation.
+    Run the script to visualize how Brownian coagulation redistributes a
+    set of sampled radii in a particle-resolved representation via the
+    public ``par.dynamics`` API.
 """
 
 

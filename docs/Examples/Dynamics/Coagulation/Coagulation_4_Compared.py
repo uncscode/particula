@@ -12,17 +12,20 @@
 #     name: python3
 # ---
 
+# %%
 """Compare PMF and PDF coagulation representations.
 
-This notebook builds PMF and PDF aerosols over a shared radius grid,
-configures Brownian coagulation with both ``distribution_type="discrete"``
-and ``distribution_type="continuous_pdf"``, runs short steps, converts
-between representations using ``get_pdf_distribution_in_pmf``, and plots
-before/after concentrations in both PMF and PDF units.
+Builds PMF and PDF aerosols over a shared radius grid, configures Brownian
+coagulation with both ``distribution_type="discrete"`` and
+``distribution_type="continuous_pdf"``, runs short guarded steps, converts
+between representations via ``get_pdf_distribution_in_pmf``, and plots
+before/after concentrations in PMF and PDF units for side-by-side behavior
+checks. Uses modest grids and a single short step to keep runtime quick.
 
 Example:
-    Execute the script to see matching PMF and PDF concentration
-curves before and after coagulation to compare their behaviors.
+    Execute the script to see matching PMF and PDF concentration curves
+    before and after coagulation, enabling comparison across
+    representations.
 """
 
 
