@@ -2,1114 +2,1082 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://uncscode.github.io/particula/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/abc_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/abc_factory/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/aerosol/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/aerosol_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/builder_mixin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/equilibria/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/logger_setup/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/runnable/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/activity_coefficients/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/bat_blending/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/bat_coefficients/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/convert_functional_group/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/gibbs/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/gibbs_mixing/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/phase_separation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/ratio/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/activity/water_activity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/dilution/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/particle_process/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/properties/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/wall_loss/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/brownian_kernel/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/charged_dimensional_kernel/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/charged_dimensionless_kernel/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/charged_kernel_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_rate/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/particle_resolved_step/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/sedimentation_kernel/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_shear_kernel/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/brownian_coagulation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/sedimentation_coagulation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/psi_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_f2_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/mass_transfer/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/mass_transfer_utils/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_builder/condensation_builder_mixin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_builder/condensation_isothermal_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_builder/condensation_isothermal_staggered_builder/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/properties/wall_loss_coefficient/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/wall_loss/rate/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/wall_loss/wall_loss_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/wall_loss/wall_loss_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/dynamics/wall_loss/wall_loss_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/equilibria/equilibria/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/equilibria/equilibria_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/equilibria/equilibria_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/equilibria/equilibria_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/equilibria/partitioning/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/atmosphere/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/atmosphere_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/species/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/species_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/species_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/vapor_pressure_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/vapor_pressure_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/vapor_pressure_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/concentration_function/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/dynamic_viscosity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/fluid_rms_velocity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/integral_scale_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/kinematic_viscosity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/kolmogorov_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/mean_free_path/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/normalize_accel_variance/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/pressure_function/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/taylor_microscale_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/thermal_conductivity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/vapor_pressure_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/activity_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/activity_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/activity_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/change_particle_representation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/representation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/representation_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/representation_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/surface_builders/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/surface_factories/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/surface_strategies/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/base/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/mass_based_moving_bin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/particle_resolved_speciated_mass/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/radii_based_moving_bin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/speciated_mass_moving_bin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/activity_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/aerodynamic_mobility_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/aerodynamic_size/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/collision_radius_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/convert_kappa_volumes/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/convert_mass_concentration/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/convert_mole_fraction/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/convert_size_distribution/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/coulomb_enhancement/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/diffusion_coefficient/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/diffusive_knudsen_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/friction_factor_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/inertia_time/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/kelvin_effect_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/knudsen_number_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/lognormal_size_distribution/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/mean_thermal_speed_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/mixing_state_index/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/organic_density_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/partial_pressure_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/reynolds_number/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/settling_velocity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/slip_correction_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/sort_bins/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/special_functions/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/stokes_number/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/properties/vapor_correction_module/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/arbitrary_round/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/chemical/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/colors/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/constants/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/convert_dtypes/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/convert_units/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/lf2013_coagulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/machine_limit/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/reduced_quantity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/refractive_index_mixing/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/validate_inputs/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/chemical/chemical_properties/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/chemical/chemical_search/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/chemical/chemical_surface_tension/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/chemical/chemical_vapor_pressure/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/chemical/thermo_import/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/util/lf2013_coagulation/src_lf2013_coagulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Activity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Activity/activity_tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Activity/bat_activity_example/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Activity/equilibria_example/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Activity/ideal_activity_example/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Activity/kappa_activity_example/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Aerosol/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Aerosol/Aerosol_Tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Chamber_Wall_Loss/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Coagulation_4_Compared/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved/</loc>
-         <lastmod>2026-01-24</lastmod>
-    </url>
-    <url>
-         <loc>https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Condensation/Condensation_1_Bin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Condensation/Condensation_2_MassBin/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Condensation/Condensation_3_MassResolved/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Condensation/Staggered_Condensation_Example/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Dynamics/Customization/Adding_Particles_During_Simulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Equilibria/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Equilibria/Notebooks/activity_part1/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Equilibria/Notebooks/equilibria_part1/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Gas_Phase/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Gas_Phase/Notebooks/AtmosphereTutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Gas_Phase/Notebooks/Gas_Species/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Gas_Phase/Notebooks/Vapor_Pressure/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Nucleation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/Notebooks/Activity_Tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/Notebooks/Aerosol_Distributions/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/Notebooks/Distribution_Tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Setup_Particula/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Setup_Particula/Details/Contributor_Setup/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Setup_Particula/Details/New_to_Python/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Setup_Particula/Details/Setup_Conda/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Setup_Particula/Details/Setup_PIP/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Setup_Particula/Details/Setup_UV/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Examples/Simulations/Notebooks/Soot_Formation_in_Flames/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/activity_system/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/coagulation_strategy_system/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/condensation_strategy_system/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/wall_loss_strategy_system/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Accelerating_Python/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Accelerating_Python/Details/One-Line_Vision/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Accelerating_Python/Details/Taichi_Exploration/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Activity_Calculations/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Activity_Calculations/activity_theory/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Activity_Calculations/equilibria_theory/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Code_Concepts/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Code_Concepts/Details/Design_Patterns/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Code_Concepts/Details/Object_Oriented_Patterns/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Code_Concepts/Details/WARMED_principle/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/OpenAI_Models/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/OpenAI_Models/Models/Agents/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/OpenAI_Models/Models/Chat/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/OpenAI_Models/Models/Reasoning/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Condensation_Equations/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/ionparticle_coagulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/Droplet_Coagulation_Kernel_Ayala2008/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Properties/dynamic_viscosity/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Properties/mean_free_path/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/CODE_OF_CONDUCT/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/CONTRIBUTING/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Code_Specifications/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Code_Specifications/Details/Class_docstring_format/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Code_Specifications/Details/Function_docstring_format/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Code_Specifications/Details/Linear_Git_Repository/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/Details/Add_Class/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/Details/Add_Example/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/Details/Add_Function/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/Details/Add_Theory/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/Details/Add_Unit_Test/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/contribute/Feature_Workflow/Details/Add_to_init/</loc>
-         <lastmod>2026-01-24</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
 </urlset>
