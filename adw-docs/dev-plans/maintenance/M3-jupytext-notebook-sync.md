@@ -1,6 +1,6 @@
 # Maintenance M3: Jupytext Notebook Sync Migration (Pilot)
 
-**Status**: Planning
+**Status**: Shipped
 **Priority**: P2
 **Owners**: ADW / Maintainers
 **Target Date**: 2026-Q1
@@ -82,12 +82,12 @@ but not synced.
 
 ### Phase 1: Configuration Files (`M3-P1`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #975 | **Size:** S | **Status:** Complete
 
-- [ ] **M3-P1-1:** Create `jupytext.toml` with pairing rules for `docs/Examples/`
-- [ ] **M3-P1-2:** Update `pyproject.toml` - add `docs/Examples/**/*.py` to ruff config
-- [ ] **M3-P1-3:** Update `mkdocs.yml` to exclude `.py` files from documentation build
-- [ ] **M3-P1-4:** Add `*.ipynb.bak` to `.gitignore`
+- [x] **M3-P1-1:** Create `jupytext.toml` with pairing rules for `docs/Examples/`
+- [x] **M3-P1-2:** Update `pyproject.toml` - add `docs/Examples/**/*.py` to ruff config
+- [x] **M3-P1-3:** Update `mkdocs.yml` to exclude `.py` files from documentation build
+- [x] **M3-P1-4:** Add `*.ipynb.bak` to `.gitignore`
 
 **Acceptance Criteria:**
 - `jupytext.toml` exists with correct pairing rules
@@ -97,12 +97,12 @@ but not synced.
 
 ### Phase 2: Convert Pilot Notebooks (`M3-P2`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #976 | **Size:** S | **Status:** Complete
 
-- [ ] **M3-P2-1:** Convert `docs/Examples/Activity/activity_tutorial.ipynb` to paired format
-- [ ] **M3-P2-2:** Convert `docs/Examples/Gas_Phase/Notebooks/*.ipynb` (3 notebooks)
-- [ ] **M3-P2-3:** Run `ruff check` on new `.py` files and fix linting issues
-- [ ] **M3-P2-4:** Validate all conversions with `--check-sync`
+- [x] **M3-P2-1:** Convert `docs/Examples/Activity/activity_tutorial.ipynb` to paired format
+- [x] **M3-P2-2:** Convert `docs/Examples/Gas_Phase/Notebooks/*.ipynb` (3 notebooks)
+- [x] **M3-P2-3:** Run `ruff check` on new `.py` files and fix linting issues
+- [x] **M3-P2-4:** Validate all conversions with `--check-sync`
 
 **Acceptance Criteria:**
 - All 4 pilot notebooks have corresponding `.py:percent` files
@@ -112,11 +112,11 @@ but not synced.
 
 ### Phase 3: Workflow Validation (`M3-P3`)
 
-**Issue:** TBD | **Size:** XS | **Status:** Not Started
+**Issue:** #977 | **Size:** XS | **Status:** Complete
 
-- [ ] **M3-P3-1:** Test edit workflow: edit `.py` → sync → validate notebook runs
-- [ ] **M3-P3-2:** Execute converted notebooks to verify they still work
-- [ ] **M3-P3-3:** Document any issues or lessons learned
+- [x] **M3-P3-1:** Test edit workflow: edit `.py` → sync → validate notebook runs
+- [x] **M3-P3-2:** Execute converted notebooks to verify they still work
+- [x] **M3-P3-3:** Document any issues or lessons learned
 
 **Acceptance Criteria:**
 - End-to-end workflow tested on at least one notebook
@@ -125,12 +125,12 @@ but not synced.
 
 ### Phase 4: Documentation Update (`M3-P4`)
 
-**Issue:** TBD | **Size:** XS | **Status:** Not Started
+**Issue:** #978 | **Size:** XS | **Status:** Complete
 
-- [ ] **M3-P4-1:** Update `adw-docs/documentation_guide.md` with Jupytext workflow
-- [ ] **M3-P4-2:** Update `AGENTS.md` with notebook editing guidance
-- [ ] **M3-P4-3:** Update this plan with completion notes and lessons learned
-- [ ] **M3-P4-4:** Create follow-up issue M4 for remaining ~35 notebooks
+- [x] **M3-P4-1:** Update `adw-docs/documentation_guide.md` with Jupytext workflow
+- [x] **M3-P4-2:** Update `AGENTS.md` with notebook editing guidance
+- [x] **M3-P4-3:** Update this plan with completion notes and lessons learned
+- [x] **M3-P4-4:** Create follow-up issue M4 for remaining ~35 notebooks
 
 **Acceptance Criteria:**
 - Documentation guide includes complete LLM editing workflow
@@ -269,7 +269,7 @@ After migration, LLMs should follow this workflow for notebook edits:
 
 ## Future Work
 
-See [M4: Jupytext Full Migration](M4-jupytext-full-migration.md) for:
+See [M4: Jupytext Full Migration](M4-jupytext-full-migration.md) (Issue #175) for:
 - Converting remaining ~35 notebooks
 - Pre-commit hook for automatic sync+execute
 - CI validation for sync status
@@ -293,3 +293,4 @@ M4 is blocked until this pilot (M3) completes successfully.
 | 2026-01-30 | Split into 8 smaller phases with size estimates and ID prefixes | ADW |
 | 2026-01-30 | Fixed pyproject.toml config, added .gitignore entry, added final docs phase | ADW |
 | 2026-01-30 | Reduced scope to pilot: Activity + Gas_Phase only (4 notebooks, 4 phases) | ADW |
+| 2026-01-30 | Marked as Shipped - all 4 phases complete, M4 issue created | ADW |

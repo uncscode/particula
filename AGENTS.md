@@ -306,6 +306,33 @@ pytest --cov=particula
 .opencode/tool/run_linters.py && .opencode/tool/run_pytest.py
 ```
 
+## Notebook Editing (Jupytext Paired Sync)
+
+Notebooks in `docs/Examples/` use Jupytext paired sync. Edit `.py` files, not `.ipynb`:
+
+```bash
+# 1. Edit the .py file (percent format with # %% cell markers)
+# 2. Lint the .py file
+ruff check docs/Examples/path/to/file.py --fix
+ruff format docs/Examples/path/to/file.py
+
+# 3. Sync to update .ipynb
+validate_notebook docs/Examples/path/to/file.ipynb --sync
+
+# 4. Execute to validate and generate outputs
+run_notebook docs/Examples/path/to/file.ipynb
+
+# 5. Commit both files (.py and .ipynb)
+```
+
+**Key points:**
+- Always edit `.py` files, not `.ipynb` directly
+- Lint before sync to catch syntax errors
+- Execute after sync to validate code and generate website outputs
+- Commit both files to keep them paired
+
+**Full documentation:** `adw-docs/documentation_guide.md` (Jupytext Paired Sync Workflow section)
+
 ## Getting Help
 
 **Documentation:**
@@ -322,6 +349,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2025-12-03  
+**Last Updated:** 2026-01-30  
 **For questions about ADW:** See `adw-docs/README.md`  
 **For questions about particula:** See main `readme.md`
