@@ -57,8 +57,8 @@ build-backend = "flit_core.buildapi"
 [tool.ruff]
 line-length = 80
 fix = true
-src = ["particula"]
-include = ["particula/**/*.py"]
+src = ["particula", "docs/Examples"]
+include = ["particula/**/*.py", "docs/Examples/**/*.py"]
 extend-exclude = [
   "**/*.ipynb",    # ignore every .ipynb anywhere in the project
 ]
@@ -75,15 +75,17 @@ ignore = [
   "D203",  # or drop this and keep D211 instead
   "D205", # add back later
   "D213",  # or drop this and keep D212 instead
-  "D417",  # Missing argument descriptions in the docstring :contentReference[oaicite:0]{index=0}
+  "D417",  # Missing argument descriptions in the docstring
 ]
 extend-ignore = [
-  "ANN",    # ignore all missing-type-*/missing-return-type checks :contentReference[oaicite:1]{index=1}
+  "ANN",    # ignore all missing-type-*/missing-return-type checks
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Ignore assert‐usage (S101) in any file ending with _test.py
 "*_test.py" = ["S101", "E721", "B008"]
+"docs/Examples/**/*.py" = ["D100", "D103", "INP001"]
+
 
 [tool.ruff.lint.pydocstyle]
 # enforce Google-style sections and disable incompatible rules

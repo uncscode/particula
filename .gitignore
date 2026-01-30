@@ -101,6 +101,8 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+# Jupyter notebook backups (created by run_notebook tool)
+*.ipynb.bak
 
 # IPython
 profile_default/

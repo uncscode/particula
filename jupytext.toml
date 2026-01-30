@@ -1,0 +1,5 @@
+# Jupytext configuration for particula
+# Pairs notebooks in docs/Examples with percent-format Python scripts
+
+[formats]
+"docs/Examples/**/*.ipynb" = "ipynb,py:percent"
