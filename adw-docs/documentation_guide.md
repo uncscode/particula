@@ -530,6 +530,20 @@ ruff format docs/Examples/
 4. **Commit both files** to keep them paired
 5. **Use `--check-sync` in CI** to catch drift
 
+#### Coagulation tutorial pairing (M4-P6)
+
+- The coagulation tutorials were migrated to Jupytext percent format in the
+  M4-P6 maintenance task. Keep the paired files in sync:
+  - `docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py` /
+    `.ipynb`
+  - `docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py`
+    / `.ipynb`
+  - `docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py` / `.ipynb`
+- Preserve the `particula_dev312` kernelspec in the notebook metadata after
+  syncing.
+- After edits: lint → sync → execute → check-sync to confirm the `.py` and
+  `.ipynb` stay aligned and outputs are refreshed.
+
 See [Maintenance Plan M3](dev-plans/maintenance/M3-jupytext-notebook-sync.md)
 for migration details.
 

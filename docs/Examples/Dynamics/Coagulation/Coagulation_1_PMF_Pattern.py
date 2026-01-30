@@ -12,16 +12,17 @@
 #     name: python3
 # ---
 
+# %%
 """Showcase a PMF-based Brownian coagulation example.
 
-This notebook builds a lognormal PMF aerosol, configures a Brownian
-coagulation strategy with ``distribution_type="discrete"``, runs a short,
-safe step, and visualizes the PMF concentration before and after the
-coagulation runnable executes.
+Builds a lognormal PMF aerosol, configures Brownian coagulation with
+``distribution_type="discrete"``, runs a short guarded step, and plots PMF
+concentration before/after execution to visualize redistribution. Designed
+for quick execution with a small grid and modest sub-steps.
 
 Example:
-    Execute this script to generate before/after concentration curves for
-a discrete PMF aerosol.
+    Run the script to generate before/after concentration curves for a
+    discrete PMF aerosol using the public ``par.dynamics`` API.
 """
 
 
