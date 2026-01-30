@@ -1,7 +1,7 @@
 # Documentation Guide
 
 **Version:** 0.2.6
-**Last Updated:** 2026-01-23
+**Last Updated:** 2026-01-30
 
 ## Overview
 
@@ -337,6 +337,201 @@ import particula as par
 # Cell 3+: Tutorial content
 ...
 ```
+
+### Jupytext Paired Sync Workflow
+
+Notebooks in `docs/Examples/` use **Jupytext paired sync** for LLM-friendly
+editing. Each `.ipynb` file has a corresponding `.py:percent` file that stays
+in sync.
+
+#### Why Paired Sync?
+
+| Problem with Direct `.ipynb` | Solution with Paired Sync |
+|------------------------------|---------------------------|
+| JSON structure errors | Edit plain `.py` files |
+| Cannot lint notebooks | Run ruff/mypy on `.py` |
+| Unreadable PR diffs | Clean Python diffs |
+| Merge conflicts nightmare | Standard git merge |
+| No type checking | mypy works on `.py` |
+
+#### File Structure
+
+```
+docs/Examples/Dynamics/Coagulation/
+├── Coagulation_Tutorial.ipynb    # For users/MkDocs (JSON)
+└── Coagulation_Tutorial.py       # For development (percent format)
+```
+
+#### LLM Editing Workflow
+
+When editing notebooks, LLMs should follow this workflow:
+
+```
+1. EDIT the .py file (percent format)
+   - Plain text, lintable, easy diffs
+   - Uses # %% cell markers
+
+2. LINT the .py file (catch syntax errors early)
+   ruff check docs/Examples/path/to/file.py --fix
+   ruff format docs/Examples/path/to/file.py
+
+3. SYNC to regenerate .ipynb from edited .py
+   validate_notebook({notebookPath: 'path/to/file.ipynb', sync: true})
+   - The .py is newer, so it overwrites the .ipynb
+
+4. EXECUTE .ipynb to validate code works AND generate outputs
+   run_notebook({notebookPath: 'path/to/file.ipynb'})
+   - If execution FAILS: the .py edit broke something, fix it
+   - If execution PASSES: outputs (graphs, tables) are now in .ipynb
+   - Creates .ipynb.bak backup automatically
+
+5. COMMIT both files
+   - .py for development (source of truth for code)
+   - .ipynb for users/docs (with outputs for website)
+```
+
+#### Why This Order Matters
+
+| Step | Purpose |
+|------|---------|
+| Lint first | Catches syntax errors before sync |
+| Sync before execute | Transfers .py edits into .ipynb |
+| Execute after sync | Validates code AND generates website outputs |
+
+If you execute before syncing, you're testing the OLD code, not your edits!
+
+#### Why Execution is Required
+
+MkDocs renders notebooks with `execute: False`, meaning outputs must be
+pre-stored in the `.ipynb` file. Without execution:
+- Graphs and plots won't appear on the website
+- Print statements and table outputs will be missing
+- Users see empty code cells
+
+#### Execution Also Validates Your Code
+
+The `run_notebook` execution serves two purposes:
+1. **Validation**: If execution fails, your `.py` edit broke something
+2. **Output generation**: Successful execution stores graphs/tables in `.ipynb`
+
+This means you don't need a separate "test the .py file" step - executing the
+synced `.ipynb` tests it for you.
+
+#### Percent Format Example
+
+The `.py` file uses Jupytext percent format:
+
+```python
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
+# ---
+
+# %% [markdown]
+# # Tutorial Title
+#
+# This notebook demonstrates...
+
+# %%
+import numpy as np
+import particula as par
+
+# %% [markdown]
+# ## Section 1
+#
+# Explanation text...
+
+# %%
+# Code cell
+result = par.some_function()
+print(result)
+```
+
+#### ADW Tool Commands
+
+```python
+# Check sync status (read-only, CI-friendly)
+validate_notebook({
+    "notebookPath": "docs/Examples",
+    "recursive": True,
+    "checkSync": True
+})
+
+# Sync all notebooks (bidirectional, newer wins)
+validate_notebook({
+    "notebookPath": "docs/Examples",
+    "recursive": True,
+    "sync": True
+})
+
+# Convert single notebook to .py
+validate_notebook({
+    "notebookPath": "notebook.ipynb",
+    "convertToPy": True
+})
+
+# Execute notebook (overwrites with outputs, creates .bak backup)
+run_notebook({
+    "notebookPath": "docs/Examples/Activity/activity_tutorial.ipynb"
+})
+
+# Execute without overwriting (validation only)
+run_notebook({
+    "notebookPath": "notebook.ipynb",
+    "noOverwrite": True
+})
+
+# Execute all notebooks in directory
+run_notebook({
+    "notebookPath": "docs/Examples/Activity",
+    "recursive": True
+})
+```
+
+#### CLI Commands
+
+```bash
+# Check sync status
+python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --check-sync
+
+# Sync all notebooks
+python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --sync
+
+# Convert to .py:percent
+python3 .opencode/tool/validate_notebook.py notebook.ipynb --convert-to-py
+
+# Execute notebook (overwrites with outputs)
+python3 .opencode/tool/run_notebook.py docs/Examples/Activity/activity_tutorial.ipynb
+
+# Execute without overwriting (validation only)
+python3 .opencode/tool/run_notebook.py notebook.ipynb --no-overwrite
+
+# Execute all notebooks in directory
+python3 .opencode/tool/run_notebook.py docs/Examples/Activity --recursive
+
+# Lint example Python files
+ruff check docs/Examples/ --fix
+ruff format docs/Examples/
+```
+
+#### Best Practices
+
+1. **Always edit `.py` files** for code changes
+2. **Sync after editing** to update the `.ipynb`
+3. **Lint before committing** to catch style issues
+4. **Commit both files** to keep them paired
+5. **Use `--check-sync` in CI** to catch drift
+
+See [Maintenance Plan M3](dev-plans/maintenance/M3-jupytext-notebook-sync.md)
+for migration details.
 
 ### Feature Documentation Structure
 
