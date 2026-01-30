@@ -12,6 +12,12 @@
 #     name: python3
 # ---
 
+"""Tutorial for building a custom single-species nucleation simulation.
+
+Sets up sulfate gas and resolved particles and constrains arrays to one species.
+Includes condensation, coagulation, and custom mass-based nucleation steps.
+"""
+
 # %% [markdown]
 # # Custom Nucleation: Single Species
 #
@@ -73,7 +79,11 @@ particle_mass_sample = (
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
+    """Clamp single-species arrays to 1-D while keeping charge unchanged.
+
+    Args:
+        particles: Particle representation to update in place.
+    """
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -89,7 +99,11 @@ def squeeze_single_species_arrays(
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
+    """Enforce 1-D shapes and wrap add methods for a single species case.
+
+    Args:
+        particles: Particle representation whose add methods are wrapped.
+    """
     squeeze_single_species_arrays(particles)
 
     squeeze_single_species_arrays(particles)
@@ -143,7 +157,11 @@ def ensure_single_species_shapes(
 
 
 def build_aerosol() -> par.Aerosol:
-    """Construct a fresh aerosol with consistent gas and particle setup."""
+    """Construct an aerosol with sulfate gas and resolved particle masses.
+
+    Returns:
+        Aerosol object initialized with sulfate gas and resolved particles.
+    """
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")

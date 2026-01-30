@@ -14,6 +14,8 @@
 #   notebookname: Particle_Surface_Tutorial
 # ---
 
+"""Tutorial on surface strategies and Kelvin effect calculations for particles."""
+
 # %% [markdown]
 # # Particle Surface Tutorial
 #

@@ -362,6 +362,16 @@ docs/Examples/Dynamics/Coagulation/
 └── Coagulation_Tutorial.py       # For development (percent format)
 ```
 
+Current Jupytext paired coverage (percent format) includes the Nucleation and
+Particle_Phase tutorials:
+
+- `docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species`
+- `docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial`
+- `docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial`
+
+These are paired via `.py:percent` scripts and stay in sync with their `.ipynb`
+notebooks.
+
 #### LLM Editing Workflow
 
 When editing notebooks, LLMs should follow this workflow:
@@ -812,7 +822,7 @@ See [Code Style Guide](code_style.md) for details.
 See [Architecture](architecture/architecture_guide.md).
 
 <!-- Bad: Absolute paths -->
-See [Code Style Guide](/home/user/particula/adw-docs/code_style.md).
+See [Code Style Guide](code_style.md).
 ```
 
 ### Admonitions (MkDocs)

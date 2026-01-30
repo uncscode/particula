@@ -12,6 +12,8 @@
 #     name: python3
 # ---
 
+"""Tutorial on building particle representations with builders and factories."""
+
 # %% [markdown]
 # # Particle Representation
 #

@@ -100,21 +100,26 @@ These `.py` files exist without matching notebooks - need investigation:
 - `ruff check` passes on new `.py` files
 - All notebooks execute successfully
 
-### Phase 2: Convert Dynamics Notebooks (`M4-P2`)
+### Phase 2: Nucleation + Particle_Phase Part 1 (`M4-P2`)
 
-**Issue:** TBD | **Size:** M | **Status:** Not Started
+**Issue:** #984 | **Size:** S | **Status:** Completed (2026-01-30)
 
-- [ ] **M4-P2-1:** Investigate orphaned `.py` files in Dynamics/Coagulation/Functional
-- [ ] **M4-P2-2:** Convert `docs/Examples/Dynamics/Coagulation/` notebooks (4 new)
-- [ ] **M4-P2-3:** Convert `docs/Examples/Dynamics/Condensation/` notebooks (4)
-- [ ] **M4-P2-4:** Convert `docs/Examples/Dynamics/Customization/` notebooks (1)
-- [ ] **M4-P2-5:** Run `ruff check` and fix linting issues
-- [ ] **M4-P2-6:** Validate and execute all conversions
+- [x] **M4-P2-1:** Convert `Custom_Nucleation_Single_Species` to paired `.py`
+- [x] **M4-P2-2:** Convert `Particle_Surface_Tutorial` to paired `.py`
+- [x] **M4-P2-3:** Convert `Particle_Representation_Tutorial` to paired `.py`
+- [x] **M4-P2-4:** `ruff check` + `ruff format` on new percent scripts
+- [x] **M4-P2-5:** Sync + `--check-sync` for all three notebooks
+- [x] **M4-P2-6:** Execute notebooks and review warnings
 
 **Acceptance Criteria:**
-- Orphaned `.py` files resolved (synced, removed, or documented)
-- All 13 Dynamics notebooks converted and synced
-- All notebooks execute successfully
+- All three target notebooks paired (`.ipynb` + `.py`) and linted
+- Sync validation passes for Nucleation + Particle_Phase (Part 1)
+- Executions complete without errors; warnings reviewed
+
+**Completion Note (2026-01-30):**
+- Jupytext migration for Nucleation + Particle_Phase Part 1 completed
+- Converted and executed: Nucleation single species, Particle surface, particle
+  representation tutorials
 
 ### Phase 3: Convert Chamber & Nucleation Notebooks (`M4-P3`)
 
