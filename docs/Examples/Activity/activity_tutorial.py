@@ -158,23 +158,20 @@ print(f"Organic O:C ratio: {bat_strategy.oxygen2carbon}")
 mass = np.array([0.5, 0.5]) * 1e-9  # kg/m^3
 
 ideal_activity = ideal_strategy.activity(mass_concentration=mass)
-bat_activity = bat_strategy.activity(mass_concentration=mass)
+# Note: BAT model returns only organic activity (scalar)
+bat_organic_activity = bat_strategy.activity(mass_concentration=mass)
 
 print("At 50% water by mass:")
 print(
     f"  Ideal activity:     water={ideal_activity[0]:.4f}, organic={ideal_activity[1]:.4f}"
 )
-print(
-    f"  Non-ideal (BAT):    water={bat_activity[0]:.4f}, organic={bat_activity[1]:.4f}"
-)
+print(f"  Non-ideal (BAT):    organic={bat_organic_activity:.4f}")
 
-# Compute activity coefficients
+# Compute activity coefficient for organic
 moles = mass / np.array([18.015e-3, 200.0e-3])
 mole_frac = moles / np.sum(moles)
-gamma = bat_activity / mole_frac
-print(
-    f"\n  Activity coefficients: water={gamma[0]:.4f}, organic={gamma[1]:.4f}"
-)
+gamma_organic = bat_organic_activity / mole_frac[1]
+print(f"\n  Organic activity coefficient: gamma={gamma_organic:.4f}")
 
 # %% [markdown]
 # ### 2.3 Visualization: Ideal vs Non-Ideal Comparison
@@ -184,12 +181,13 @@ print(
 water_fractions = np.linspace(0.1, 0.9, 40)
 
 ideal_water = []
-bat_water = []
+bat_organic = []
 
 for wf in water_fractions:
     mass = np.array([wf, 1.0 - wf]) * 1e-9
     ideal_water.append(ideal_strategy.activity(mass_concentration=mass)[0])
-    bat_water.append(bat_strategy.activity(mass_concentration=mass)[0])
+    # BAT returns organic activity (scalar), not water activity
+    bat_organic.append(float(bat_strategy.activity(mass_concentration=mass)))
 
 # Plot
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -198,18 +196,18 @@ ax.plot(
     ideal_water,
     "b--",
     linewidth=2,
-    label="Ideal (Raoult's Law)",
+    label="Ideal Water Activity",
 )
 ax.plot(
     water_fractions,
-    bat_water,
+    bat_organic,
     "r-",
     linewidth=2,
-    label="Non-Ideal (BAT, O:C=0.4)",
+    label="Non-Ideal Organic Activity (BAT, O:C=0.4)",
 )
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
-ax.set_ylabel("Water Activity", fontsize=12)
-ax.set_title("Water Activity: Ideal vs Non-Ideal", fontsize=14)
+ax.set_ylabel("Activity", fontsize=12)
+ax.set_title("Activity: Ideal vs Non-Ideal (BAT)", fontsize=14)
 ax.legend(fontsize=11)
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
@@ -226,15 +224,15 @@ water_fractions = np.linspace(0.1, 0.9, 40)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 
-# Ideal reference
-ideal_water = [
-    ideal_strategy.activity(mass_concentration=np.array([wf, 1 - wf]) * 1e-9)[0]
+# Ideal reference (organic activity)
+ideal_organic = [
+    ideal_strategy.activity(mass_concentration=np.array([wf, 1 - wf]) * 1e-9)[1]
     for wf in water_fractions
 ]
-ax.plot(water_fractions, ideal_water, "k--", linewidth=1.5, label="Ideal")
+ax.plot(water_fractions, ideal_organic, "k--", linewidth=1.5, label="Ideal")
 
-# BAT at different O:C ratios
-colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(o2c_values)))
+# BAT at different O:C ratios (returns organic activity)
+colors = plt.cm.get_cmap("viridis")(np.linspace(0.2, 0.8, len(o2c_values)))
 for o2c, color in zip(o2c_values, colors):
     strat = (
         par.particles.ActivityNonIdealBinaryBuilder()
@@ -243,13 +241,13 @@ for o2c, color in zip(o2c_values, colors):
         .set_density(1200.0, "kg/m^3")
         .build()
     )
-    bat_water = [
-        strat.activity(mass_concentration=np.array([wf, 1 - wf]) * 1e-9)[0]
+    bat_organic = [
+        float(strat.activity(mass_concentration=np.array([wf, 1 - wf]) * 1e-9))
         for wf in water_fractions
     ]
     ax.plot(
         water_fractions,
-        bat_water,
+        bat_organic,
         "-",
         color=color,
         linewidth=2,
@@ -257,8 +255,8 @@ for o2c, color in zip(o2c_values, colors):
     )
 
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
-ax.set_ylabel("Water Activity", fontsize=12)
-ax.set_title("Effect of O:C Ratio on Water Activity (BAT Model)", fontsize=14)
+ax.set_ylabel("Organic Activity", fontsize=12)
+ax.set_title("Effect of O:C Ratio on Organic Activity (BAT Model)", fontsize=14)
 ax.legend(fontsize=10, loc="lower right")
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
@@ -320,7 +318,7 @@ water_fractions = np.linspace(0.2, 0.95, 40)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 
-colors = plt.cm.plasma(np.linspace(0.2, 0.8, len(kappa_values)))
+colors = plt.cm.get_cmap("plasma")(np.linspace(0.2, 0.8, len(kappa_values)))
 for kappa, color in zip(kappa_values, colors):
     strat = par.particles.ActivityKappaParameter(
         kappa=np.array([0.0, kappa]),
