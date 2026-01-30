@@ -317,10 +317,10 @@ ruff check docs/Examples/path/to/file.py --fix
 ruff format docs/Examples/path/to/file.py
 
 # 3. Sync to update .ipynb
-validate_notebook docs/Examples/path/to/file.ipynb --sync
+python3 .opencode/tool/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
 
 # 4. Execute to validate and generate outputs
-run_notebook docs/Examples/path/to/file.ipynb
+python3 .opencode/tool/run_notebook.py docs/Examples/path/to/file.ipynb
 
 # 5. Commit both files (.py and .ipynb)
 ```
