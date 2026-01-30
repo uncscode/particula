@@ -269,7 +269,7 @@ After migration, LLMs should follow this workflow for notebook edits:
 
 ## Future Work
 
-See [M4: Jupytext Full Migration](M4-jupytext-full-migration.md) (Issue #175) for:
+See [M4: Jupytext Full Migration](M4-jupytext-full-migration.md) (Issue #979) for:
 - Converting remaining ~35 notebooks
 - Pre-commit hook for automatic sync+execute
 - CI validation for sync status
