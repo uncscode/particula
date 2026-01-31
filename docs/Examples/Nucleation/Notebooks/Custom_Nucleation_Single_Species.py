@@ -7,10 +7,21 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.17.3
 #   kernelspec:
-#     display_name: particula
+#     display_name: particula_dev312
 #     language: python
 #     name: python3
 # ---
+
+# %%
+"""Demonstrate a custom single-species nucleation workflow with particula.
+
+The guide builds an aerosol with ammonium sulfate vapor, applies fixed nucleation
+rates, and couples condensation and coagulation runnables while maintaining mass
+conservation and user-defined particle shapes.
+
+Examples:
+    >>> custom_nucleation = CustomNucleationSingleSpecies()
+"""
 
 # %% [markdown]
 # # Custom Nucleation: Single Species
@@ -24,8 +35,8 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # particula
 import particula as par
@@ -73,8 +84,16 @@ particle_mass_sample = (
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
+    """Clamp single-species arrays to 1-D while preserving charge shape.
 
+    Args:
+        particles: Particle container with distribution, concentration, and
+            optional charge arrays that should remain 1-D for
+            single-species workflows.
+
+    Returns:
+        None: This helper mutates the particle representation in place.
+    """
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -90,10 +109,16 @@ def squeeze_single_species_arrays(
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
+    """Enforce 1-D shapes and patch mutators for single-species aerosols.
 
-    squeeze_single_species_arrays(particles)
+    Args:
+        particles: Particle representation whose distribution, concentration,
+            and charge arrays should be constrained to one dimension; also used
+            to override mass and concentration mutation hooks for 1-D inputs.
 
+    Returns:
+        None: This helper mutates the particle representation in place.
+    """
     squeeze_single_species_arrays(particles)
 
     original_add_mass = particles.strategy.add_mass
@@ -102,6 +127,15 @@ def ensure_single_species_shapes(
     def _add_mass_single_species(
         distribution, concentration, density, added_mass
     ):
+        """Wrap add_mass to keep single-species arrays one-dimensional.
+
+        Args:
+            distribution: Particle distribution array representing masses.
+            concentration: Concentration array corresponding to the particles.
+            density: Density value used for the mass calculation.
+            added_mass: Mass to add; will be squeezed to 1-D before calling
+                the original method.
+        """
         added_mass = np.atleast_1d(np.squeeze(added_mass))
         result = original_add_mass(
             distribution, concentration, density, added_mass
@@ -117,6 +151,16 @@ def ensure_single_species_shapes(
         charge=None,
         added_charge=None,
     ):
+        """Wrap add_concentration to maintain single-species shapes.
+
+        Args:
+            distribution: Current particle distribution array.
+            concentration: Current concentration array.
+            added_distribution: Distribution array for the incoming mass.
+            added_concentration: Concentration array for the incoming mass.
+            charge: Optional charge array for the existing particles.
+            added_charge: Optional charge array for the incoming particles.
+        """
         added_distribution = np.atleast_1d(np.squeeze(added_distribution))
         added_concentration = np.atleast_1d(np.squeeze(added_concentration))
         added_charge = (
@@ -145,8 +189,12 @@ def ensure_single_species_shapes(
 
 
 def build_aerosol() -> par.Aerosol:
-    """Construct a fresh aerosol with consistent gas and particle setup."""
+    """Construct a single-species aerosol with gas and particle setup.
 
+    Returns:
+        Aerosol: Initialized aerosol containing sulfate gas and resolved
+            particle masses configured for single-species simulations.
+    """
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")
@@ -381,7 +429,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 bin_edges = bins_lognormal
 
-for i, t in enumerate(time):
+for i, _ in enumerate(time):
     if i > 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
         aerosol.atmosphere.partitioning_species.add_concentration(
