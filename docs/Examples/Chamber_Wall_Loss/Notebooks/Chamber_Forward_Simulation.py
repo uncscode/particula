@@ -29,9 +29,8 @@
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
 import numpy as np
-from matplotlib import pyplot as plt
-
 import particula as par
+from matplotlib import pyplot as plt
 
 # %%
 # Define initial simulation parameters
@@ -84,12 +83,14 @@ particle_mass = (
     4 / 3 * np.pi * radius_bins**3 * 1000
 )  # mass of the particles in kg
 
-kernel = par.dynamics.get_brownian_kernel_via_system_state(
-    particle_radius=radius_bins,
-    particle_mass=particle_mass,
-    temperature=293.15,
-    pressure=101325,
-    alpha_collision_efficiency=1,
+kernel = np.asarray(
+    par.dynamics.get_brownian_kernel_via_system_state(
+        particle_radius=radius_bins,
+        particle_mass=particle_mass,
+        temperature=293.15,
+        pressure=101325,
+        alpha_collision_efficiency=1,
+    ),
 )
 coagulation_loss = par.dynamics.get_coagulation_loss_rate_discrete(
     concentration=concentration_pmf,
@@ -173,16 +174,17 @@ chamber_wall_loss_rate_matrix = np.zeros((len(time_array), len(radius_bins)))
 # set the initial concentration
 concentration_matrix[0, :] = concentration_pmf
 
-kernel = par.dynamics.get_brownian_kernel_via_system_state(
-    particle_radius=radius_bins,
-    particle_mass=particle_mass,
-    temperature=293.15,
-    pressure=101325,
-    alpha_collision_efficiency=1,
+kernel = np.asarray(
+    par.dynamics.get_brownian_kernel_via_system_state(
+        particle_radius=radius_bins,
+        particle_mass=particle_mass,
+        temperature=293.15,
+        pressure=101325,
+        alpha_collision_efficiency=1,
+    )
 )
 # iterate over the time steps
-for i, time in enumerate(time_array[1:], start=1):
-
+for i in range(1, len(time_array)):
     # calculate the coagulation rate
     coagulation_loss = par.dynamics.get_coagulation_loss_rate_discrete(
         concentration=concentration_matrix[i - 1, :],

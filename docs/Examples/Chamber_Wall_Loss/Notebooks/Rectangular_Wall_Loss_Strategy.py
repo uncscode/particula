@@ -46,7 +46,10 @@ np.set_printoptions(precision=3, suppress=True)
 # %%
 particle = par.particles.PresetParticleRadiusBuilder().build()
 print("Bins:", particle.get_radius().size)
-print("Initial total concentration:", f"{particle.get_total_concentration():.3e} 1/m^3")
+print(
+    "Initial total concentration:",
+    f"{particle.get_total_concentration():.3e} 1/m^3",
+)
 
 # %% [markdown]
 # ## 2) Configure `RectangularWallLossStrategy`
