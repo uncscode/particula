@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "98659331",
+   "id": "8c6b0c87",
    "metadata": {},
    "source": [
     "# Coagulation Basic 2: PDF (Builder + Coagulation)\n",
@@ -22,7 +22,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "f716dea5",
+   "id": "222fe024",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -35,7 +35,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cac92cd3",
+   "id": "a58145dd",
    "metadata": {},
    "source": [
     "## Build a PDF aerosol\n",
@@ -47,7 +47,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ea395763",
+   "id": "d50fbe1f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -86,7 +86,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7b4f9386",
+   "id": "127ade54",
    "metadata": {},
    "source": [
     "## Configure coagulation (continuous PDF)"
@@ -95,7 +95,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "cdf1967a",
+   "id": "af123ca6",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -113,7 +113,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "65704a78",
+   "id": "2597794b",
    "metadata": {},
    "source": [
     "## Execute a short coagulation step"
@@ -122,7 +122,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a7091ccf",
+   "id": "88fb7d3b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -140,7 +140,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9b2da0f3",
+   "id": "e264cf8d",
    "metadata": {},
    "source": [
     "## Plot: PDF concentration before/after"
@@ -149,7 +149,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "5caac975",
+   "id": "508b1bd3",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -167,7 +167,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3497cd22",
+   "id": "4bc58e5b",
    "metadata": {},
    "source": [
     "## Summary\n",

@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "b7d2606c",
+   "id": "6077cf62",
    "metadata": {},
    "source": [
     "# Coagulation Basic 4: Particle Resolved (Builder + Coagulation)\n",
@@ -16,7 +16,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "79936d01",
+   "id": "5fad7775",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -29,7 +29,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e1e0a787",
+   "id": "9fc4fca4",
    "metadata": {},
    "source": [
     "## Build a particle-resolved aerosol\n",
@@ -41,7 +41,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "fdfc02f2",
+   "id": "a02f7100",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -85,7 +85,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e7e66e68",
+   "id": "0a41771c",
    "metadata": {},
    "source": [
     "## Configure coagulation (particle_resolved)"
@@ -94,7 +94,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "51c78fa5",
+   "id": "673cce8b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -112,7 +112,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6bb099fd",
+   "id": "07ad2fe4",
    "metadata": {},
    "source": [
     "## Execute a short coagulation step"
@@ -121,7 +121,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "d5499fc2",
+   "id": "922840a1",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -138,7 +138,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3ba71186",
+   "id": "d55369aa",
    "metadata": {},
    "source": [
     "## Plot: particle-resolved histogram before/after"
@@ -147,7 +147,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "3ba19c3c",
+   "id": "6ab8c539",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -183,7 +183,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b6462a75",
+   "id": "7cee0001",
    "metadata": {},
    "source": [
     "## Summary\n",

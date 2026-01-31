@@ -73,7 +73,16 @@ particle_mass_sample = (
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
+    """Clamp single-species arrays to 1-D while preserving charge shape.
+
+    Args:
+        particles: Particle container with distribution, concentration, and
+            optional charge arrays that should remain 1-D for
+            single-species workflows.
+
+    Returns:
+        None: This helper mutates the particle representation in place.
+    """
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -89,9 +98,17 @@ def squeeze_single_species_arrays(
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
-    squeeze_single_species_arrays(particles)
+    """Enforce 1-D shapes and patch mutators for single-species aerosols.
 
+    Args:
+        particles: Particle representation whose distribution, concentration,
+            and charge arrays should be constrained to one dimension; also used
+            to override mass and concentration mutation hooks for 1-D inputs.
+
+    Returns:
+        None: This helper mutates the particle representation in place.
+    """
+    squeeze_single_species_arrays(particles)
     squeeze_single_species_arrays(particles)
 
     original_add_mass = particles.strategy.add_mass
@@ -143,7 +160,12 @@ def ensure_single_species_shapes(
 
 
 def build_aerosol() -> par.Aerosol:
-    """Construct a fresh aerosol with consistent gas and particle setup."""
+    """Construct a single-species aerosol with gas and particle setup.
+
+    Returns:
+        Aerosol: Initialized aerosol containing sulfate gas and resolved
+            particle masses configured for single-species simulations.
+    """
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")
