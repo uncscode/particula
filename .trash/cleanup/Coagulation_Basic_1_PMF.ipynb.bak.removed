@@ -2,27 +2,28 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "bf6d30fe",
+   "id": "c007b80b",
    "metadata": {},
    "source": [
-    "# Coagulation Basic 2: PDF (Builder + Coagulation)\n",
+    "# Coagulation Basic 1: PMF (Builder + Coagulation)\n",
     "\n",
-    "This notebook shows Brownian coagulation for a **continuous/PDF** distribution\n",
-    "using the public builder pattern:\n",
+    "This notebook demonstrates Brownian coagulation for a **discrete/PMF**\n",
+    "representation using the public `par.dynamics` API:\n",
     "\n",
     "1. Build a Brownian coagulation strategy with\n",
-    "   `distribution_type=\"continuous_pdf\"`.\n",
+    "   `distribution_type=\"discrete\"`.\n",
     "2. Wrap it in `par.dynamics.Coagulation`.\n",
-    "3. Run a short, lightweight step on a PDF aerosol and visualize\n",
-    "   change.\n",
+    "3. Run a short, lightweight step on a PMF aerosol and visualize\n",
+    "   the change.\n",
     "\n",
-    "Grid sizes and time horizon are kept small for quick execution (<120 s)."
+    "The setup mirrors the pattern notebooks (see `Coagulation_1_PMF_Pattern`) but\n",
+    "keeps grids small so it runs quickly (<120 s)."
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "13bc201b",
+   "id": "7fb89f4e",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -35,34 +36,34 @@
   },
   {
    "cell_type": "markdown",
-   "id": "34b519c7",
+   "id": "2e9e984c",
    "metadata": {},
    "source": [
-    "## Build a PDF aerosol\n",
+    "## Build a PMF aerosol\n",
     "\n",
-    "We build a lognormal PDF on a modest grid. PDF units are m⁻³·m⁻¹ (number per\n",
-    "volume per size)."
+    "We create a lognormal PMF on a modest grid and attach it to a simple\n",
+    "atmosphere. The PMF uses number concentration (m⁻³) per bin."
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "32a43682",
+   "id": "1b68233e",
    "metadata": {},
    "outputs": [],
    "source": [
-    "# Radius bins (log-spaced)\n",
-    "radius_bins = np.logspace(-8, -6, 140)  # m\n",
+    "# Radius bins (log-spaced, modest resolution for speed)\n",
+    "radius_bins = np.logspace(-8, -6, 120)  # m\n",
     "\n",
-    "# Lognormal PDF (concentration per unit size)\n",
-    "concentration_pdf = par.particles.get_lognormal_pdf_distribution(\n",
+    "# Lognormal PMF (concentration per bin)\n",
+    "concentration_pmf = par.particles.get_lognormal_pmf_distribution(\n",
     "    x_values=radius_bins,\n",
-    "    mode=np.array([120e-9]),\n",
+    "    mode=np.array([80e-9]),\n",
     "    geometric_standard_deviation=np.array([1.5]),\n",
-    "    number_of_particles=np.array([8e8]),  # m^-3 total when integrated\n",
+    "    number_of_particles=np.array([5e8]),  # m^-3 total\n",
     ")\n",
     "\n",
-    "# Atmosphere (ambient)\n",
+    "# Atmosphere (ambient, non-condensing)\n",
     "atmosphere = (\n",
     "    par.gas.AtmosphereBuilder()\n",
     "    .set_temperature(25, \"degC\")\n",
@@ -70,38 +71,42 @@
     "    .build()\n",
     ")\n",
     "\n",
-    "# PDF particle representation\n",
-    "particles_pdf = (\n",
+    "# PMF particle representation\n",
+    "particles_pmf = (\n",
     "    par.particles.PresetParticleRadiusBuilder()\n",
-    "    .set_distribution_type(\"pdf\")\n",
+    "    .set_distribution_type(\"pmf\")\n",
     "    .set_radius_bins(radius_bins, radius_bins_units=\"m\")\n",
-    "    .set_concentration(concentration_pdf, concentration_units=\"m^-3\")\n",
+    "    .set_concentration(concentration_pmf, concentration_units=\"m^-3\")\n",
     "    .set_density(np.array([1_000.0]), density_units=\"kg/m^3\")\n",
     "    .set_charge(np.zeros_like(radius_bins))\n",
     "    .build()\n",
     ")\n",
     "\n",
-    "aerosol_pdf = par.Aerosol(atmosphere=atmosphere, particles=particles_pdf)"
+    "# Aerosol object\n",
+    "pmf_aerosol = par.Aerosol(atmosphere=atmosphere, particles=particles_pmf)"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "28abef1d",
+   "id": "7d2a4b76",
    "metadata": {},
    "source": [
-    "## Configure coagulation (continuous PDF)"
+    "## Configure coagulation (discrete)\n",
+    "\n",
+    "Use the Brownian builder with `distribution_type=\"discrete\"`, then wrap in the\n",
+    "public `Coagulation` runnable."
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ae44df15",
+   "id": "6c4c09f2",
    "metadata": {},
    "outputs": [],
    "source": [
     "coagulation_strategy = (\n",
     "    par.dynamics.BrownianCoagulationBuilder()\n",
-    "    .set_distribution_type(\"continuous_pdf\")\n",
+    "    .set_distribution_type(\"discrete\")\n",
     "    .build()\n",
     ")\n",
     "coagulation_process = par.dynamics.Coagulation(\n",
@@ -113,53 +118,56 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c8720467",
+   "id": "63a0f328",
    "metadata": {},
    "source": [
-    "## Execute a short coagulation step"
+    "## Execute a short coagulation step\n",
+    "\n",
+    "We keep the time step and sub-steps small for quick execution. The\n",
+    "`Coagulation` runnable updates the aerosol in-place and returns it."
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "427f66fd",
+   "id": "db50a76a",
    "metadata": {},
    "outputs": [],
    "source": [
     "time_step = 200  # seconds\n",
-    "sub_steps = 10\n",
+    "time_substeps = 10\n",
     "\n",
-    "pdf_before = aerosol_pdf.particles.get_concentration()\n",
-    "radii = aerosol_pdf.particles.get_radius()\n",
+    "pmf_before = pmf_aerosol.particles.get_concentration()\n",
+    "radii = pmf_aerosol.particles.get_radius()\n",
     "\n",
-    "aerosol_pdf_after = coagulation_process.execute(\n",
-    "    aerosol_pdf, time_step=time_step, sub_steps=sub_steps\n",
+    "pmf_after_aerosol = coagulation_process.execute(\n",
+    "    pmf_aerosol, time_step=time_step, sub_steps=time_substeps\n",
     ")\n",
-    "pdf_after = aerosol_pdf_after.particles.get_concentration()"
+    "pmf_after = pmf_after_aerosol.particles.get_concentration()"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "3319b545",
+   "id": "a367de19",
    "metadata": {},
    "source": [
-    "## Plot: PDF concentration before/after"
+    "## Plot: concentration before/after"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "59a8a5d6",
+   "id": "521e0373",
    "metadata": {},
    "outputs": [],
    "source": [
     "fig, ax = plt.subplots(figsize=(8, 5))\n",
-    "ax.plot(radii, pdf_before, label=\"Before\", color=\"tab:blue\")\n",
-    "ax.plot(radii, pdf_after, label=\"After\", color=\"tab:orange\")\n",
+    "ax.plot(radii, pmf_before, label=\"Before\", color=\"tab:blue\")\n",
+    "ax.plot(radii, pmf_after, label=\"After\", color=\"tab:orange\")\n",
     "ax.set_xscale(\"log\")\n",
     "ax.set_xlabel(\"Particle radius (m)\")\n",
-    "ax.set_ylabel(r\"PDF concentration ($m^{-4}$)\")\n",
-    "ax.set_title(\"PDF coagulation (Brownian, continuous)\")\n",
+    "ax.set_ylabel(r\"Number concentration ($m^{-3}$)\")\n",
+    "ax.set_title(\"PMF coagulation (Brownian, discrete)\")\n",
     "ax.legend()\n",
     "ax.grid(alpha=0.3)\n",
     "plt.show()"
@@ -167,23 +175,21 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e2b61d11",
+   "id": "6e4cbd8b",
    "metadata": {},
    "source": [
     "## Summary\n",
     "\n",
     "- Strategy: `BrownianCoagulationBuilder().set_distribution_type(`\n",
-    "  \"continuous_pdf\").build()\n",
+    "  \"discrete\").build()\n",
     "- Runnable: `par.dynamics.Coagulation`\n",
-    "- Representation: PDF (continuous number concentration per size)\n",
-    "- Runtime guardrails: small grid, short horizon"
+    "- Runnable: `par.dynamics.Coagulation`\n",
+    "- Representation: PMF (bin-based number concentration)\n",
+    "- Runtime guardrails: small grid, short horizon for fast execution"
    ]
   }
  ],
  "metadata": {
-  "jupytext": {
-   "formats": "ipynb,py:percent"
-  },
   "kernelspec": {
    "display_name": "particula_dev312",
    "language": "python",

@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "d15ed933",
+   "id": "6077cf62",
    "metadata": {},
    "source": [
     "# Coagulation Basic 4: Particle Resolved (Builder + Coagulation)\n",
@@ -16,7 +16,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "354afc92",
+   "id": "5fad7775",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -29,7 +29,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0e2a0e28",
+   "id": "9fc4fca4",
    "metadata": {},
    "source": [
     "## Build a particle-resolved aerosol\n",
@@ -41,7 +41,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "aa09ae78",
+   "id": "a02f7100",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -85,7 +85,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "680b8b89",
+   "id": "0a41771c",
    "metadata": {},
    "source": [
     "## Configure coagulation (particle_resolved)"
@@ -94,7 +94,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "3028f834",
+   "id": "673cce8b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -112,7 +112,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "8a6f4aa7",
+   "id": "07ad2fe4",
    "metadata": {},
    "source": [
     "## Execute a short coagulation step"
@@ -121,7 +121,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "211d7803",
+   "id": "922840a1",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -138,7 +138,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "13815364",
+   "id": "d55369aa",
    "metadata": {},
    "source": [
     "## Plot: particle-resolved histogram before/after"
@@ -147,7 +147,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "5c7d72a0",
+   "id": "6ab8c539",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -183,7 +183,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6875ad29",
+   "id": "7cee0001",
    "metadata": {},
    "source": [
     "## Summary\n",
@@ -197,9 +197,6 @@
   }
  ],
  "metadata": {
-  "jupytext": {
-   "formats": "ipynb,py:percent"
-  },
   "kernelspec": {
    "display_name": "particula_dev312",
    "language": "python",

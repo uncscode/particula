@@ -365,6 +365,18 @@ docs/Examples/Dynamics/Coagulation/
 **All 35 notebooks in `docs/Examples/` are now paired via `.py:percent` scripts**
 (completed in M4 migration). Each `.ipynb` has a corresponding `.py` file that
 stays in sync. Always edit the `.py` file and sync to update the `.ipynb`.
+Current Jupytext paired coverage (percent format) includes the Nucleation,
+Particle_Phase, and Dynamics/Coagulation charge tutorials:
+
+- `docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species`
+- `docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial`
+- `docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial`
+- `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional`
+- `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects`
+
+These are paired via `.py:percent` scripts and stay in sync with their `.ipynb`
+notebooks. Execute the `.ipynb` after syncing to refresh plots and tables for the
+site.
 
 #### LLM Editing Workflow
 

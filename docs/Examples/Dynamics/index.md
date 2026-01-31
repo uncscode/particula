@@ -39,10 +39,15 @@ These illustrate functional approaches to coagulation, comparing PMF- and PDF-ba
 
 ### Charge
 
-Here we show how to include charge effects in the coagulation kernel:
+Charged coagulation tutorials are Jupytext-paired (`.py:percent` ⇄ `.ipynb`).
+Edit the `.py`, then sync and execute to refresh outputs for the site.
 
-- [Coagulation Charges via functions](Coagulation/Charge/Coagulation_with_Charge_functional.ipynb)
-- [Coagulation Charges via objects](Coagulation/Charge/Coagulation_with_Charge_objects.ipynb)
+- [Coagulation with Charge (functional)](Coagulation/Charge/Coagulation_with_Charge_functional.ipynb)
+  – Edit [the paired `.py`](Coagulation/Charge/Coagulation_with_Charge_functional.py);
+    executed outputs are present in the notebook.
+- [Coagulation with Charge (objects)](Coagulation/Charge/Coagulation_with_Charge_objects.ipynb)
+  – Edit [the paired `.py`](Coagulation/Charge/Coagulation_with_Charge_objects.py);
+    executed outputs are present in the notebook.
 
 ## Customization
 
