@@ -7559,6 +7559,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -7618,7 +7622,35 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: PMF Particle Distribution
+    Coagulation Pattern 1: PMF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Coagulation/Coagulation_2_PDF_Pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coagulation Pattern 2: PDF
   
 
     
@@ -7646,7 +7678,7 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: Particle-Resolved Approach
+    Coagulation Pattern 3: Particle Resolved
   
 
     
@@ -7674,7 +7706,35 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: Comparison of Number and Mass
+    Coagulation Pattern 4: PMF vs PDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Coagulation/Coagulation_5_Time_Evolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coagulation Pattern 5: Time Evolution Comparison
   
 
     
@@ -7714,10 +7774,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_5_2_4" id="__nav_3_5_2_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5_2_6" id="__nav_3_5_2_6_label" tabindex="0">
             
   
   
@@ -7735,8 +7795,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5_2_4">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_2_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7840,10 +7900,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_7" >
         
           
-          <label class="md-nav__link" for="__nav_3_5_2_5" id="__nav_3_5_2_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5_2_7" id="__nav_3_5_2_7_label" tabindex="0">
             
   
   
@@ -7861,8 +7921,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5_2_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_2_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12356,13 +12416,22 @@ including condensation, coagulation, and special customizations.</p>
 <li><a href="Condensation/Staggered_Condensation_Example/">Staggered Condensation</a> – Demonstrates staggered ODE stepping for improved stability and mass conservation.</li>
 </ul>
 <h2 id="coagulation">Coagulation<a class="headerlink" href="#coagulation" title="Permanent link">&para;</a></h2>
+<p>These coagulation tutorials are maintained as Jupytext percent pairs (<code>.py</code> ⇄
+<code>.ipynb</code>). Edit the <code>.py</code> file, then sync and execute to refresh outputs.</p>
 <ul>
-<li><a href="Coagulation/Coagulation_1_PMF_Pattern/">Coagulation 1: PMF Pattern</a> – Shows probability mass function approach.</li>
-<li><a href="Coagulation/Coagulation_3_Particle_Resolved_Pattern/">Coagulation 3: Particle Resolved</a> – Demonstrates a particle-resolved approach.</li>
-<li><a href="Coagulation/Coagulation_4_Compared/">Coagulation 4: Methods Compared</a> – Compares multiple coagulation strategies.</li>
+<li><a href="Coagulation/Coagulation_1_PMF_Pattern/">Coagulation 1: PMF Pattern</a>
+  – Probability mass function (discrete) approach.</li>
+<li><a href="Coagulation/Coagulation_2_PDF_Pattern/">Coagulation 2: PDF Pattern</a>
+  – Probability density function (continuous) approach.</li>
+<li><a href="Coagulation/Coagulation_3_Particle_Resolved_Pattern/">Coagulation 3: Particle Resolved</a>
+  – Particle-resolved approach with individual particle tracking.</li>
+<li><a href="Coagulation/Coagulation_4_Compared/">Coagulation 4: Methods Compared</a>
+  – Side-by-side strategy comparison (PMF vs PDF) using the PMF↔PDF helper.</li>
+<li><a href="Coagulation/Coagulation_5_Time_Evolution/">Coagulation 5: Time Evolution</a>
+  – Compare number concentration decay over time for PMF, PDF, and particle-resolved.</li>
 </ul>
 <h3 id="functional">Functional<a class="headerlink" href="#functional" title="Permanent link">&para;</a></h3>
-<p>These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods.</p>
+<p>These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods. All coagulation tutorials are Jupytext-paired: edit the <code>.py</code>, run <code>python3 .opencode/tool/validate_notebook.py &lt;ipynb&gt; --sync</code>, then <code>python3 .opencode/tool/run_notebook.py &lt;ipynb&gt;</code>.</p>
 <ul>
 <li><a href="Coagulation/Functional/Coagulation_Basic_1_PMF/">Coagulation 1: Probability Mass Function</a></li>
 <li><a href="Coagulation/Functional/Coagulation_Basic_2_PDF/">Coagulation Tutorial: Basic 2-PDF</a></li>

@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://uncscode.github.io/particula/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern/">
       
       
-        <link rel="prev" href="../Coagulation_1_PMF_Pattern/">
+        <link rel="prev" href="../Coagulation_2_PDF_Pattern/">
       
       
         <link rel="next" href="../Coagulation_4_Compared/">
@@ -25,7 +25,7 @@
     
     
       
-        <title>Coagulation Patterns: Particle-Resolved Approach - Particula</title>
+        <title>Coagulation Pattern 3: Particle Resolved - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#coagulation-patterns-particle-resolved-approach" class="md-skip">
+        <a href="#coagulation-pattern-3-particle-resolved" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Coagulation Patterns: Particle-Resolved Approach
+              Coagulation Pattern 3: Particle Resolved
             
           </span>
         </div>
@@ -7561,6 +7561,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -7620,7 +7624,35 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: PMF Particle Distribution
+    Coagulation Pattern 1: PMF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Coagulation_2_PDF_Pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coagulation Pattern 2: PDF
   
 
     
@@ -7657,7 +7689,7 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: Particle-Resolved Approach
+    Coagulation Pattern 3: Particle Resolved
   
 
     
@@ -7675,7 +7707,7 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: Particle-Resolved Approach
+    Coagulation Pattern 3: Particle Resolved
   
 
     
@@ -7704,10 +7736,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#aerosol-setup" class="md-nav__link">
+  <a href="#build-a-particle-resolved-aerosol" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Aerosol Setup
+        Build a particle-resolved aerosol
       
     </span>
   </a>
@@ -7715,10 +7747,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#simulation" class="md-nav__link">
+  <a href="#configure-coagulation-particle_resolved" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Simulation
+        Configure coagulation (particle_resolved)
       
     </span>
   </a>
@@ -7726,10 +7758,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#graphing" class="md-nav__link">
+  <a href="#execute-a-short-coagulation-step" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Graphing
+        Execute a short coagulation step
       
     </span>
   </a>
@@ -7737,10 +7769,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
+  <a href="#plot-particle-resolved-histogram-beforeafter" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conclusion
+        Plot: particle-resolved histogram before/after
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
       
     </span>
   </a>
@@ -7792,7 +7835,35 @@
   <span class="md-ellipsis">
     
   
-    Coagulation Patterns: Comparison of Number and Mass
+    Coagulation Pattern 4: PMF vs PDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Coagulation_5_Time_Evolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coagulation Pattern 5: Time Evolution Comparison
   
 
     
@@ -7832,10 +7903,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_5_2_4" id="__nav_3_5_2_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5_2_6" id="__nav_3_5_2_6_label" tabindex="0">
             
   
   
@@ -7853,8 +7924,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5_2_4">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_2_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7958,10 +8029,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_2_7" >
         
           
-          <label class="md-nav__link" for="__nav_3_5_2_5" id="__nav_3_5_2_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5_2_7" id="__nav_3_5_2_7_label" tabindex="0">
             
   
   
@@ -7979,8 +8050,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5_2_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_5_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_2_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12379,10 +12450,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#aerosol-setup" class="md-nav__link">
+  <a href="#build-a-particle-resolved-aerosol" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Aerosol Setup
+        Build a particle-resolved aerosol
       
     </span>
   </a>
@@ -12390,10 +12461,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#simulation" class="md-nav__link">
+  <a href="#configure-coagulation-particle_resolved" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Simulation
+        Configure coagulation (particle_resolved)
       
     </span>
   </a>
@@ -12401,10 +12472,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#graphing" class="md-nav__link">
+  <a href="#execute-a-short-coagulation-step" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Graphing
+        Execute a short coagulation step
       
     </span>
   </a>
@@ -12412,10 +12483,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
+  <a href="#plot-particle-resolved-histogram-beforeafter" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conclusion
+        Plot: particle-resolved histogram before/after
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
       
     </span>
   </a>
@@ -13185,21 +13267,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="coagulation-patterns-particle-resolved-approach">Coagulation Patterns: Particle-Resolved Approach<a class="anchor-link" href="#coagulation-patterns-particle-resolved-approach">¶</a></h1><p>In this notebook, we explore coagulation patterns through a particle-resolved approach. Rather than directly invoking coagulation functions for each calculation, we adopt a more modular and object-oriented programming structure. By employing design patterns, such as the <code>Builder</code> pattern, we simplify the setup and validation of parameters, making the process more maintainable and scalable.</p>
-<p>This approach allows for the efficient management of both the gas phase and the particle distribution, incorporating the verification of input parameters for accuracy and consistency. The <code>Builder</code> classes facilitate setting up the coagulation environment, from defining the atmospheric conditions to creating particle distributions and specifying their resolved masses.</p>
-<p>In this example, we preset a non-condensing gas species in the atmosphere and use a lognormal distribution for particles. We represent the particles using a particle-resolved mass framework, where we handle properties like density, charge, and mass with strategies to define the activity, surface area, and distribution.</p>
-<p><strong>Imports</strong></p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d5030744">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13217,60 +13286,68 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
-<span class="c1">#!pip install particula[extra] --quiet</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="sd">"""Demonstrate particle-resolved Brownian coagulation.</span>
 
-<span class="c1"># particula imports</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="sd">Generates a modest bimodal particle-resolved sample, configures Brownian</span>
+<span class="sd">coagulation with ``distribution_type="particle_resolved"``, runs a short</span>
+<span class="sd">step, and plots histograms of radii before/after execution to show how the</span>
+<span class="sd">sample redistributes. Uses a small sample size to keep runtime fast.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    Run the script to visualize how Brownian coagulation redistributes a</span>
+<span class="sd">    set of sampled radii in a particle-resolved representation via the</span>
+<span class="sd">    public ``par.dynamics`` API.</span>
+<span class="sd">"""</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
-#!pip install particula[extra] --quiet
-import numpy as np
-import matplotlib.pyplot as plt
+<div class="clipboard-copy-txt" id="cell-1">"""Demonstrate particle-resolved Brownian coagulation.
 
-# particula imports
-import particula as par</div>
+Generates a modest bimodal particle-resolved sample, configures Brownian
+coagulation with ``distribution_type="particle_resolved"``, runs a short
+step, and plots histograms of radii before/after execution to show how the
+sample redistributes. Uses a small sample size to keep runtime fast.
+
+Example:
+    Run the script to visualize how Brownian coagulation redistributes a
+    set of sampled radii in a particle-resolved representation via the
+    public ``par.dynamics`` API.
+"""</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>'Demonstrate particle-resolved Brownian coagulation.\n\nGenerates a modest bimodal particle-resolved sample, configures Brownian\ncoagulation with ``distribution_type="particle_resolved"``, runs a short\nstep, and plots histograms of radii before/after execution to show how the\nsample redistributes. Uses a small sample size to keep runtime fast.\n\nExample:\n    Run the script to visualize how Brownian coagulation redistributes a\n    set of sampled radii in a particle-resolved representation via the\n    public ``par.dynamics`` API.\n'</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7d5c010d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="aerosol-setup">Aerosol Setup<a class="anchor-link" href="#aerosol-setup">¶</a></h2><p>In this section, we define the core components of our particle-resolved coagulation system, focusing on the atmosphere setup, particle distribution, and mass resolution. This step-by-step breakdown helps clarify how the <code>Builder</code> pattern organizes the construction of complex objects and ensures input parameters are properly verified.</p>
-<p><strong>Atmospheric Setup</strong>
-We begin by configuring the atmosphere using the <code>AtmosphereBuilder</code>. This allows for flexibility in defining environmental parameters such as temperature and pressure, as well as adding gas species. In this case, we add a preset gas species that does not condense and set the atmospheric conditions to 25°C and 1 atm.</p>
-<p><strong>Particle Distribution</strong>
-The particle distribution is generated using a lognormal distribution, a common approach for representing aerosol particle sizes. The parameters for this distribution include:</p>
-<ul>
-<li>A mode of 100 nm, representing the mean particle diameter.</li>
-<li>A geometric standard deviation (GSD) of 1.3, which controls the spread of particle sizes.</li>
-<li>The total number of particles is 100,000 samples taken to capture the variability of the distribution.</li>
-</ul>
-<p><strong>Mass Calculation</strong>
-The mass of each particle is calculated assuming a particle density of 1500 kg/m³. This density corresponds to typical aerosol materials like dust or certain types of particulate matter. The particle masses are computed using the formula for the volume of a sphere, multiplied by the density.</p>
-<p><strong>Resolved Particle Mass Representation</strong>
-To capture the diversity of the aerosol population, we use a particle-resolved representation for mass. This approach explicitly tracks individual particle masses and assigns properties such as density and charge. The key strategies used are:</p>
-<ul>
-<li><strong>Distribution strategy</strong>: Defines how mass is distributed among particles.</li>
-<li><strong>Activity strategy</strong>: Describes how the activity of the particles is represented, in this case, assuming ideal mass behavior.</li>
-<li><strong>Surface strategy</strong>: Calculates particle surface behavior by volume mixing.</li>
-</ul>
-<p><strong>Final Aerosol Object</strong>
-The <code>Aerosol</code> object brings together the atmosphere and the resolved particle masses into a cohesive framework. This encapsulated representation can then be used to simulate particle interactions and coagulation events within the atmosphere.</p>
-<p>Finally, we print the properties of the <code>aerosol</code> object’s atmosphere to verify the correct setup.</p>
+<h1 id="coagulation-pattern-3-particle-resolved">Coagulation Pattern 3: Particle Resolved<a class="anchor-link" href="#coagulation-pattern-3-particle-resolved">¶</a></h1><p>Brownian coagulation using the public <code>par.dynamics</code> API with a
+particle-resolved representation:</p>
+<ol>
+<li>Build a Brownian coagulation strategy with
+<code>distribution_type="particle_resolved"</code>.</li>
+<li>Wrap it in <code>par.dynamics.Coagulation</code>.</li>
+<li>Run a short, fast step on a sampled aerosol and visualize the change.</li>
+</ol>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7ac32835">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13288,154 +13365,36 @@ The <code>Aerosol</code> object brings together the atmosphere and the resolved 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Preset gas species that does not condense in the atmosphere</span>
-<span class="c1"># AtmosphereBuilder constructs the atmosphere with predefined species</span>
-<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atmosphere</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the atmosphere object</span>
-<span class="p">)</span>
-
-<span class="c1"># Generate a particle distribution using a lognormal sample distribution</span>
-<span class="c1"># This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)</span>
-<span class="n">particle_sample</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_sample_distribution</span><span class="p">(</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">]),</span>  <span class="c1"># Mean particle diameter of 100 nm</span>
-    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">]),</span>  <span class="c1"># GSD of 1.3</span>
-    <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span>  <span class="c1"># Total number of particles</span>
-    <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>  <span class="c1"># Number of samples for particle distribution</span>
-<span class="p">)</span>
-
-<span class="c1"># Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3</span>
-<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>
-<span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
-
-<span class="c1"># Build a resolved mass representation for each particle</span>
-<span class="c1"># This defines how particle mass, activity, and surface are represented</span>
-<span class="n">resolved_masses</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ResolvedParticleMassRepresentationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleResolvedSpeciatedMass</span><span class="p">()</span>
-    <span class="p">)</span>  <span class="c1"># Use speciated mass distribution</span>
-    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
-    <span class="p">)</span>  <span class="c1"># Define activity based on ideal mass</span>
-    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span>
-        <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">()</span>
-    <span class="p">)</span>  <span class="c1"># Define surface area based on particle volume</span>
-    <span class="o">.</span><span class="n">set_mass</span><span class="p">(</span><span class="n">particle_mass_sample</span><span class="p">,</span> <span class="s2">"kg"</span><span class="p">)</span>  <span class="c1"># Assign mass of particles (in kg)</span>
-    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>  <span class="c1"># Set particle density to 1500 kg/m^3</span>
-    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Assume neutral particles with no charge</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="s2">"cm^3"</span><span class="p">)</span>  <span class="c1"># Set volume of particle distribution</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the resolved mass representation</span>
-<span class="p">)</span>
-
-<span class="c1"># Create an aerosol object with the defined atmosphere and resolved particles</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">resolved_masses</span><span class="p">)</span>
-
-<span class="c1"># Print the properties of the atmosphere</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
+<span class="c1">#!pip install particula[extra] --quiet</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># Preset gas species that does not condense in the atmosphere
-# AtmosphereBuilder constructs the atmosphere with predefined species
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
-    .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
-    .build()  # Finalize the atmosphere object
-)
-
-# Generate a particle distribution using a lognormal sample distribution
-# This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)
-particle_sample = par.particles.get_lognormal_sample_distribution(
-    mode=np.array([100e-9]),  # Mean particle diameter of 100 nm
-    geometric_standard_deviation=np.array([1.3]),  # GSD of 1.3
-    number_of_particles=np.array([1e4]),  # Total number of particles
-    number_of_samples=100_000,  # Number of samples for particle distribution
-)
-
-# Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3
-particle_mass_sample = (
-    4 / 3 * np.pi * particle_sample**3 * 1500
-)  # Particle mass in kg
-
-# Build a resolved mass representation for each particle
-# This defines how particle mass, activity, and surface are represented
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(
-        par.particles.ParticleResolvedSpeciatedMass()
-    )  # Use speciated mass distribution
-    .set_activity_strategy(
-        par.particles.ActivityIdealMass()
-    )  # Define activity based on ideal mass
-    .set_surface_strategy(
-        par.particles.SurfaceStrategyVolume()
-    )  # Define surface area based on particle volume
-    .set_mass(particle_mass_sample, "kg")  # Assign mass of particles (in kg)
-    .set_density(1500, "kg/m^3")  # Set particle density to 1500 kg/m^3
-    .set_charge(0)  # Assume neutral particles with no charge
-    .set_volume(0.1, "cm^3")  # Set volume of particle distribution
-    .build()  # Finalize the resolved mass representation
-)
-
-# Create an aerosol object with the defined atmosphere and resolved particles
-aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
-
-# Print the properties of the atmosphere
-print(aerosol)</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Gas mixture at 298.15 K, 101325.0 Pa, partitioning=None, gas_only_species=None
-Particle Representation:
-	Strategy: ParticleResolvedSpeciatedMass
-	Activity: ActivityIdealMass
-	Surface: SurfaceStrategyVolume
-	Mass Concentration: 8.563e-06 [kg/m^3]
-	Number Concentration: 1.000e+12 [#/m^3]
-</pre>
+<div class="clipboard-copy-txt" id="cell-2"># In Colab uncomment the following command to install particula:
+#!pip install particula[extra] --quiet
+import matplotlib.pyplot as plt
+import numpy as np
+import particula as par</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13941def">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="simulation">Simulation<a class="anchor-link" href="#simulation">¶</a></h2><p>In this section, we run the coagulation simulation by first defining the coagulation strategy and the process through which it is executed.</p>
-<ul>
-<li><p><strong>Coagulation Strategy:</strong> The strategy for how coagulation is performed is selected using <code>coagulation.ParticleResolved()</code>. This specific strategy dictates how particle interactions are handled at the individual particle level, ensuring that the coagulation process respects the details of a particle-resolved approach. In this context, particles are treated as distinct entities, and the merging process is computed explicitly for each pair that interacts.</p>
-</li>
-<li><p><strong>Particle Process:</strong> Once the strategy is defined, the <code>Coagulation</code> process is initialized by passing the chosen strategy (<code>coagulation_strategy</code>) to the <code>particle_process.Coagulation</code> class. This <code>Coagulation</code> class is responsible for running the actual simulation. It orchestrates the execution of coagulation by applying the selected strategy over the particle distribution. During each execution step, the particle properties—such as mass, size, and count—are updated according to the rules defined by the particle-resolved strategy.</p>
-</li>
-<li><p><strong>Execution of the Process:</strong> The coagulation process is applied in steps using the <code>coagulation_process.execute()</code> method. In each step, the particles' masses are updated based on the time step and sub-steps provided. The time step controls the temporal resolution of the simulation, while the sub-steps break the time step into finer increments to ensure accurate resolution of coagulation events.</p>
-</li>
-</ul>
-<p>For each step:</p>
-<ol>
-<li>The radii of particles are obtained before and after the coagulation step.</li>
-<li>The updated particle properties, such as radius and mass, are recorded.</li>
-<li>After the final step, we count the number of particles that have fully coagulated, i.e., those that have a mass of zero.</li>
-</ol>
+<h2 id="build-a-particle-resolved-aerosol">Build a particle-resolved aerosol<a class="anchor-link" href="#build-a-particle-resolved-aerosol">¶</a></h2><p>Sample a modest bimodal lognormal distribution, assign mass/density, and
+combine with a simple atmosphere.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=00c2f985">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13453,114 +13412,95 @@ Particle Representation:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define the coagulation strategy and process</span>
-<span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="s2">"particle_resolved"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Sample radii (small sample for speed)</span>
+<span class="n">radii_sample</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_sample_distribution</span><span class="p">(</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">80e-9</span><span class="p">,</span> <span class="mf">200e-9</span><span class="p">]),</span>
+    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]),</span>
+    <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">4e4</span><span class="p">,</span> <span class="mf">2e4</span><span class="p">]),</span>
+    <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">50_000</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1_000.0</span><span class="p">])</span>
+<span class="n">mass_sample</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radii_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density</span>
+
+<span class="c1"># Atmosphere (ambient)</span>
+<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="s2">"degC"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"atm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
-<span class="n">coagulation_process</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
-    <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coagulation_strategy</span>
+
+<span class="c1"># Particle-resolved representation</span>
+<span class="n">particles_resolved</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ResolvedParticleMassRepresentationBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleResolvedSpeciatedMass</span><span class="p">())</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">())</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">())</span>
+    <span class="o">.</span><span class="n">set_mass</span><span class="p">(</span><span class="n">mass_sample</span><span class="p">,</span> <span class="n">mass_units</span><span class="o">=</span><span class="s2">"kg"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">density_units</span><span class="o">=</span><span class="s2">"kg/m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">volume_units</span><span class="o">=</span><span class="s2">"m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="c1"># Set up time and sub-steps for the coagulation process</span>
-<span class="n">time_step</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">sub_steps</span> <span class="o">=</span> <span class="mi">100</span>
-
-<span class="c1"># Define lognormal bins for particle radius histogram</span>
-<span class="n">bins_lognormal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-
-<span class="c1"># Get initial particle radii before the coagulation process</span>
-<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
-
-<span class="c1"># Perform coagulation process for step 1</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
+<span class="n">aerosol_resolved</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span>
+    <span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">particles_resolved</span>
 <span class="p">)</span>
-<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
-
-<span class="c1"># Perform coagulation process for step 2</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
-<span class="p">)</span>
-<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
-
-<span class="c1"># Count particles that have coagulated (i.e., have zero mass)</span>
-<span class="n">zero_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Particles that coagulated: </span><span class="si">{</span><span class="n">zero_count</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3"># Define the coagulation strategy and process
-coagulation_strategy = (
-    par.dynamics.BrownianCoagulationBuilder()
-    .set_distribution_type(distribution_type="particle_resolved")
+<div class="clipboard-copy-txt" id="cell-3"># Sample radii (small sample for speed)
+radii_sample = par.particles.get_lognormal_sample_distribution(
+    mode=np.array([80e-9, 200e-9]),
+    geometric_standard_deviation=np.array([1.4, 1.5]),
+    number_of_particles=np.array([4e4, 2e4]),
+    number_of_samples=50_000,
+)
+
+density = np.array([1_000.0])
+mass_sample = 4 / 3 * np.pi * radii_sample**3 * density
+
+# Atmosphere (ambient)
+atmosphere = (
+    par.gas.AtmosphereBuilder()
+    .set_temperature(25, "degC")
+    .set_pressure(1, "atm")
     .build()
 )
-coagulation_process = par.dynamics.Coagulation(
-    coagulation_strategy=coagulation_strategy
+
+# Particle-resolved representation
+particles_resolved = (
+    par.particles.ResolvedParticleMassRepresentationBuilder()
+    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
+    .set_activity_strategy(par.particles.ActivityIdealMass())
+    .set_surface_strategy(par.particles.SurfaceStrategyVolume())
+    .set_mass(mass_sample, mass_units="kg")
+    .set_density(density, density_units="kg/m^3")
+    .set_charge(0)
+    .set_volume(1e-3, volume_units="m^3")
+    .build()
 )
 
-# Set up time and sub-steps for the coagulation process
-time_step = 1000
-sub_steps = 100
-
-# Define lognormal bins for particle radius histogram
-bins_lognormal = np.logspace(-8, -6, 100)
-
-# Get initial particle radii before the coagulation process
-initial_radii = aerosol.particles.get_radius()
-
-# Perform coagulation process for step 1
-aerosol = coagulation_process.execute(
-    aerosol, time_step=time_step, sub_steps=sub_steps
-)
-radii_after_step_1 = aerosol.particles.get_radius()
-
-# Perform coagulation process for step 2
-aerosol = coagulation_process.execute(
-    aerosol, time_step=time_step, sub_steps=sub_steps
-)
-radii_after_step_2 = aerosol.particles.get_radius()
-
-# Count particles that have coagulated (i.e., have zero mass)
-zero_count = np.sum(aerosol.particles.get_mass() == 0)
-print(f"Particles that coagulated: {zero_count}")</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Particles that coagulated: 51710
-</pre>
+aerosol_resolved = par.Aerosol(
+    atmosphere=atmosphere, particles=particles_resolved
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=79db67fa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="graphing">Graphing<a class="anchor-link" href="#graphing">¶</a></h2><p>In this section, we visualize the evolution of the particle size distribution as the coagulation process progresses.</p>
-<ul>
-<li>We use a histogram to show the distribution of particle radii at three stages: initially, after step 1, and after step 2.</li>
-<li>The x-axis is scaled logarithmically to properly represent the range of particle sizes, which can span multiple orders of magnitude.</li>
-<li>The plot helps illustrate the effect of coagulation, where particles merge over time, shifting the distribution towards larger sizes and reducing the number of smaller particles.</li>
-</ul>
-<p>This visual representation provides an intuitive understanding of how the coagulation process influences particle sizes, which is key to understanding aerosol dynamics in various atmospheric conditions.</p>
+<h2 id="configure-coagulation-particle_resolved">Configure coagulation (particle_resolved)<a class="anchor-link" href="#configure-coagulation-particle_resolved">¶</a></h2>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7761ccc6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -13578,84 +13518,183 @@ print(f"Particles that coagulated: {zero_count}")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Create figure for visualizing the histogram of particle radii</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-
-<span class="c1"># Plot initial radii distribution</span>
-<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">initial_radii</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Initial"</span><span class="p">)</span>
-
-<span class="c1"># Plot radii distribution after step 1</span>
-<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">radii_after_step_1</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
-    <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">bins</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span>
-    <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span>
-    <span class="n">label</span><span class="o">=</span><span class="s2">"After 1 step"</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"particle_resolved"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">coagulation_process</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
+    <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coagulation_strategy</span>
 <span class="p">)</span>
 
-<span class="c1"># Plot radii distribution after step 2</span>
-<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">radii_after_step_2</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
-    <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-    <span class="n">bins</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span>
-    <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span>
-    <span class="n">label</span><span class="o">=</span><span class="s2">"After 2 steps"</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">coagulation_process</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-4">coagulation_strategy = (
+    par.dynamics.BrownianCoagulationBuilder()
+    .set_distribution_type("particle_resolved")
+    .build()
+)
+coagulation_process = par.dynamics.Coagulation(
+    coagulation_strategy=coagulation_strategy
+)
 
-<span class="c1"># Set axes to logarithmic scale for x-axis (particle radius)</span>
+print(coagulation_process)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>&lt;particula.dynamics.particle_process.Coagulation object at 0x7fc4de1f2ab0&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=866fe3aa">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="execute-a-short-coagulation-step">Execute a short coagulation step<a class="anchor-link" href="#execute-a-short-coagulation-step">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f625db6d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">time_step</span> <span class="o">=</span> <span class="mi">3600</span>  <span class="c1"># seconds (1 hour)</span>
+<span class="n">sub_steps</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="n">radii_before</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+
+<span class="n">aerosol_after</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="n">aerosol_resolved</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
+<span class="p">)</span>
+<span class="n">radii_after</span> <span class="o">=</span> <span class="n">aerosol_after</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">time_step = 3600  # seconds (1 hour)
+sub_steps = 20
+
+radii_before = aerosol_resolved.particles.get_radius()
+
+aerosol_after = coagulation_process.execute(
+    aerosol_resolved, time_step=time_step, sub_steps=sub_steps
+)
+radii_after = aerosol_after.particles.get_radius()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5862cc1b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="plot-particle-resolved-histogram-beforeafter">Plot: particle-resolved histogram before/after<a class="anchor-link" href="#plot-particle-resolved-histogram-beforeafter">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5640ed31">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">radii_before</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">radii_before</span><span class="p">,</span>
+    <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+    <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"tab:blue"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Before"</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">radii_after</span><span class="p">,</span>
+    <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+    <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"tab:orange"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"After"</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-
-<span class="c1"># Add labels and legend</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Radius (m)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number of particles"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="c1"># Show the plot</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"PDF of sampled particles"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Particle-resolved coagulation (Brownian)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># Create figure for visualizing the histogram of particle radii
-fig, ax = plt.subplots(figsize=(8, 6))
+<div class="clipboard-copy-txt" id="cell-6">bins = np.logspace(np.log10(radii_before.min()), -5, 80).tolist()
 
-# Plot initial radii distribution
-bins, edges = np.histogram(initial_radii, bins=bins_lognormal)
-ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="Initial")
-
-# Plot radii distribution after step 1
-bins, edges = np.histogram(radii_after_step_1, bins=bins_lognormal)
-ax.bar(
-    edges[:-1],
-    bins,
-    width=np.diff(edges),
-    align="edge",
-    label="After 1 step",
-    alpha=0.7,
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.hist(
+    radii_before,
+    bins=bins,
+    histtype="step",
+    color="tab:blue",
+    label="Before",
+    density=True,
 )
-
-# Plot radii distribution after step 2
-bins, edges = np.histogram(radii_after_step_2, bins=bins_lognormal)
-ax.bar(
-    edges[:-1],
-    bins,
-    width=np.diff(edges),
-    align="edge",
-    label="After 2 steps",
-    alpha=0.6,
+ax.hist(
+    radii_after,
+    bins=bins,
+    histtype="step",
+    color="tab:orange",
+    label="After",
+    density=True,
 )
-
-# Set axes to logarithmic scale for x-axis (particle radius)
 ax.set_xscale("log")
-
-# Add labels and legend
-ax.set_xlabel("Radius (m)")
-ax.set_ylabel("Number of particles")
-plt.legend()
-
-# Show the plot
+ax.set_xlim(1e-8, 1e-5)
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("PDF of sampled particles")
+ax.set_title("Particle-resolved coagulation (Brownian)")
+ax.legend()
+ax.grid(alpha=0.3)
 plt.show()</div>
 </div>
 </div>
@@ -13668,20 +13707,25 @@ plt.show()</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
-<img alt="No description has been provided for this image" class="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAsAAAAIRCAYAAABETQtlAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjcsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvTLEjVAAAAAlwSFlzAAAPYQAAD2EBqD+naQAAUK5JREFUeJzt3XlcVdX+//H3YRRUwIFBEgXTHHLWUsq8lSQaVialluaQ5bWLlXJz+uZ1arA0c8jSShT7NlrftIJECVNLccjCHLlqpt4E9JsCOTCf3x99OT9PoHLkHA6yX8/H4zwuZ+111v5stXPfLtde22Q2m80CAAAADMLF2QUAAAAAVYkADAAAAEMhAAMAAMBQCMAAAAAwFAIwAAAADIUADAAAAEMhAAMAAMBQ3JxdwPWgpKREJ0+eVN26dWUymZxdDgAAAP7CbDbrjz/+UHBwsFxcrjzHSwCugJMnTyokJMTZZQAAAOAqTpw4ocaNG1+xDwG4AurWrSvpz19QHx8fJ1cDAACAv8rNzVVISIglt10JAbgCSpc9+Pj4EIABAACqsYosV+UmOAAAABgKARgAAACGQgAGAACAobAGGAAAVCvFxcUqLCx0dhmohjw8PK66xVlFEIABAEC1YDablZmZqezsbGeXgmrKxcVFYWFh8vDwqNQ4BGAAAFAtlIbfgIAAeXt78/ApWCl9MFlGRoaaNGlSqT8fBGAAAOB0xcXFlvDboEEDZ5eDasrf318nT55UUVGR3N3dr3kcboIDAABOV7rm19vb28mVoDorXfpQXFxcqXEIwAAAoNpg2QOuxF5/PgjAAAAAMBQCMAAAAAyFm+AAAEC1Fjo5sUrP9+srUQ4d32QyafXq1erfv/9l+4wYMULZ2dlas2ZNhcb89ddfFRYWpp9++kkdO3a0S501GQEYAACgEmwNqxkZGapXr56kywfXhQsXymw2O6BaSARgAACAKhUUFHTVPr6+vlVQiXGxBhgAAMBO7rzzTj3zzDOaOHGi6tevr6CgIM2YMcOqj8lksswWh4WFSZI6deokk8mkO++8U9Kfs8qXLpFISkpSjx495OfnpwYNGqhfv346cuRIFVxRzeTUABwaGiqTyVTmFRMTI0nKy8tTTEyMGjRooDp16ig6OlpZWVlWYxw/flxRUVHy9vZWQECAJkyYoKKiIqs+GzduVOfOneXp6anmzZsrPj6+qi4RAAAYzMqVK1W7dm1t375dc+bM0axZs5ScnFxu3x07dkiSvvnmG2VkZOjzzz8vt9/58+cVGxurH374QSkpKXJxcdGDDz6okpISh11HTebUJRA7d+602sh47969uueee/Twww9LksaPH6/ExER9+umn8vX11dixYzVgwABt2bJF0p+bIEdFRSkoKEhbt25VRkaGhg0bJnd3d7388suSpKNHjyoqKkpjxozRBx98oJSUFD3xxBNq1KiRIiMjq/6iAQBAjda+fXtNnz5dktSiRQstXrxYKSkpuueee8r09ff3lyQ1aNDgiksjoqOjrd4vX75c/v7+2r9/v9q2bWvH6o3BqTPA/v7+CgoKsrwSEhJ044036m9/+5tycnIUFxen119/XXfffbe6dOmiFStWaOvWrdq2bZskaf369dq/f7/ef/99dezYUX379tULL7ygN998UwUFBZKkpUuXKiwsTPPmzVPr1q01duxYPfTQQ5o/f74zLx0AANRQ7du3t3rfqFEjnTp1qlJjHjp0SI888oiaNWsmHx8fhYaGSvrzX8Jhu2qzBrigoEDvv/++Hn/8cZlMJu3atUuFhYWKiIiw9GnVqpWaNGmi1NRUSVJqaqratWunwMBAS5/IyEjl5uZq3759lj6XjlHap3SM8uTn5ys3N9fqBQAAUBHu7u5W700mU6WXKtx33306c+aM3n33XW3fvl3bt2+XJMuEH2xTbXaBWLNmjbKzszVixAhJUmZmpjw8POTn52fVLzAwUJmZmZY+l4bf0uOlx67UJzc3VxcvXpSXl1eZWmbPnq2ZM2fa47IAoNopb09VR+97CqB8Hh4ekmS1JPSvfv/9d6Wnp+vdd9/VHXfcIUn6/vvvq6S+mqrazADHxcWpb9++Cg4OdnYpmjJlinJyciyvEydOOLskAABQAwUEBMjLy0tJSUnKyspSTk5OmT716tVTgwYN9M477+jw4cPasGGDYmNjnVBtzVEtZoCPHTumb775xurOx6CgIBUUFCg7O9tqFjgrK8uySDwoKMhy9+Slx0uPlf7vX3eOyMrKko+PT7mzv5Lk6ekpT0/PSl8XAACovJr8LxRubm5atGiRZs2apWnTpumOO+7Qxo0brfq4uLjo448/1jPPPKO2bduqZcuWWrRokWXLNNjOZK4GjxmZMWOG3n77bZ04cUJubn9m8pycHPn7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119/XXfffbe6dOmiFStWaOvWrdq2bZskaf369dq/f7/ef/99dezYUX379tULL7ygN998UwUFBZKkpUuXKiwsTPPmzVPr1q01duxYPfTQQ5o/f/5la8rPz2d3CwAAgBrK5gC8YcMGvf766+ratatcXFzUtGlTDR06VHPmzNHs2bNtLiAmJkZRUVGKiIiwat+1a5cKCwut2lu1aqUmTZooNTVVkpSamqp27dopMDDQ0icyMlK5ubnat2+fpc9fx46MjLSMUZ7Zs2fL19fX8goJCbH5ugAAAFA92bwE4vz58woICJAk1atXT6dPn9ZNN92kdu3a6ccff7RprI8//lg//vijdu7cWeZYZmamPDw85OfnZ9UeGBiozMxMS59Lw2/p8dJjV+qTm5urixcvysvLq8y5p0yZotjYWMv73NxcQjCASmF9KwBUHzYH4JYtWyo9PV2hoaHq0KGD3n77bYWGhmrp0qVq1KhRhcc5ceKEnn32WSUnJ6tWrVq2luFQnp6e8vT0dHYZAOB0tuz2AADXC5uXQDz77LPKyMiQJE2fPl1r165VkyZNtGjRIsuNZxWxa9cunTp1Sp07d5abm5vc3Ny0adMmLVq0SG5ubgoMDFRBQYGys7OtPpeVlaWgoCBJUlBQUJldIUrfX62Pj49PubO/AAAAqNlsngEeOnSo5ecuXbro2LFjOnjwoJo0aaKGDRtWeJxevXppz549Vm0jR45Uq1atNGnSJIWEhMjd3V0pKSmKjo6WJKWnp+v48eMKDw+XJIWHh+ull17SqVOnLMsykpOT5ePjozZt2lj6fP3111bnSU5OtowBAAAAY7E5AF/KbDbLy8tLnTt3tvmzdevWVdu2ba3aateurQYNGljaR40apdjYWNWvX18+Pj56+umnFR4eru7du0uSevfurTZt2uixxx7TnDlzlJmZqalTpyomJsayhGHMmDFavHixJk6cqMcff1wbNmzQqlWrlJjIejwAAAAjuqYHYcTFxalt27aqVauWatWqpbZt22rZsmX2rk3z589Xv379FB0drZ49eyooKEiff/655birq6sSEhLk6uqq8PBwDR06VMOGDdOsWbMsfcLCwpSYmKjk5GR16NBB8+bN07Jly9gDGAAAwKBMZrPZbMsHpk2bptdff90yGyv9udXY4sWLNX78eKvwWVPk5ubK19dXOTk58vHxcXY5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s8f3jJubm15++WX17NlT7du3V4sWLdSvXz9HlPvn+Rw2MqrMSy+9pJdeesnZZQCowXx9fZWVleXsMgDUYH379lXfvn2r5FzMADtRw4YN5erqWub/VLKyshQUFOSkqgDUJHzPAHC06/F7hgDsRB4eHurSpYtSUlIsbSUlJUpJSeFBFgDsgu8ZAI52PX7PsATCwc6dO6fDhw9b3h89elRpaWmqX7++mjRpotjYWA0fPlxdu3bVrbfeqgULFuj8+fMaOXKkE6sGcD3hewaAo9W47xmH7S8Bs9lsNn/77bdmSWVew4cPt/R54403zE2aNDF7eHiYb731VvO2bducVzCA6w7fMwAcraZ9z5jMZrPZCbkbAAAAcArWAAMAAMBQCMAAAAAwFAIwAAAADIUADAAAAEMhAAMAAMBQCMAAAAAwFAIwAAAADIUADAAAAEMhAAMAAMBQCMAAUAPceeedGjdunOV9aGioFixY4NBz/v777woICNCvv/5aqXEGDx6sefPm2acoAKgAAjAAVJERI0bIZDLJZDLJ3d1dYWFhmjhxovLy8ux+rp07d2r06NF2H/dSL730kh544AGFhoZWapypU6fqpZdeUk5Ojn0KA4CrIAADQBXq06ePMjIy9Msvv2j+/Pl6++23NX36dLufx9/fX97e3nYft9SFCxcUFxenUaNGVXqstm3b6sYbb9T7779vh8oA4OoIwABQhTw9PRUUFKSQkBD1799fERERSk5Othz//fff9cgjj+iGG26Qt7e32rVrp48++shqjPPnz2vYsGGqU6eOGjVqVO7ygUuXQPz6668ymUxKS0uzHM/OzpbJZNLGjRslSWfPntWQIUPk7+8vLy8vtWjRQitWrLjsdXz99dfy9PRU9+7dLW0bN26UyWTSunXr1KlTJ3l5eenuu+/WqVOntHbtWrVu3Vo+Pj569NFHdeHCBavx7rvvPn388ccV/WUEgEohAAOAk+zdu1dbt26Vh4eHpS0vL09dunRRYmKi9u7dq9GjR+uxxx7Tjh07LH0mTJigTZs26YsvvtD69eu1ceNG/fjjj5Wq5V//+pf279+vtWvX6sCBA1qyZIkaNmx42f7fffedunTpUu6xGTNmaPHixdq6datOnDihgQMHasGCBfrwww+VmJio9evX64033rD6zK233qodO3YoPz+/UtcBABXh5uwCAMBIEhISVKdOHRUVFSk/P18uLi5avHix5fgNN9yg5557zvL+6aef1rp167Rq1SrdeuutOnfunOLi4vT++++rV69ekqSVK1eqcePGlarr+PHj6tSpk7p27SpJV13Xe+zYMQUHB5d77MUXX9Ttt98uSRo1apSmTJmiI0eOqFmzZpKkhx56SN9++60mTZpk+UxwcLAKCgqUmZmppk2bVupaAOBqCMAAUIXuuusuLVmyROfPn9f8+fPl5uam6Ohoy/Hi4mK9/PLLWrVqlX777TcVFBQoPz/fsp73yJEjKigoULdu3SyfqV+/vlq2bFmpup566ilFR0frxx9/VO/evdW/f3/ddtttl+1/8eJF1apVq9xj7du3t/wcGBgob29vS/gtbbt0RluSvLy8JKnM0ggAcASWQABAFapdu7aaN2+uDh06aPny5dq+fbvi4uIsx+fOnauFCxdq0qRJ+vbbb5WWlqbIyEgVFBRc8zldXP78qjebzZa2wsJCqz59+/bVsWPHNH78eJ08eVK9evWymon+q4YNG+rs2bPlHnN3d7f8XLrjxaVMJpNKSkqs2s6cOSPpz5v3AMDRCMAA4CQuLi76r//6L02dOlUXL16UJG3ZskUPPPCAhg4dqg4dOqhZs2b697//bfnMjTfeKHd3d23fvt3SdvbsWas+f1UaKjMyMixtl94Qd2m/4cOH6/3339eCBQv0zjvvXHbMTp06af/+/RW+1qvZu3evGjdufMV1xwBgLwRgAHCihx9+WK6urnrzzTclSS1atFBycrK2bt2qAwcO6O9//7uysrIs/evUqaNRo0ZpwoQJ2rBhg/bu3asRI0ZYZnnL4+Xlpe7du+uVV17RgQMHtGnTJk2dOtWqz7Rp0/TFF1/o8OHD2rdvnxISEtS6devLjhkZGal9+/ZddhbYVt9995169+5tl7EA4GoIwADgRG5ubho7dqzmzJmj8+fPa+rUqercubMiIyN15513KigoSP3797f6zNy5c3XHHXfovvvuU0REhHr06HHZHRlKLV++XEVFRerSpYvGjRunF1980eq4h4eHpkyZovbt26tnz55ydXW94rZk7dq1U+fOnbVq1aprvvZSeXl5WrNmjZ588slKjwUAFWEyX7ooDACACkpMTNSECRO0d+/eK85AX82SJUu0evVqrV+/3o7VAcDlsQsEAOCaREVF6dChQ/rtt98UEhJyzeO4u7uX2RcYAByJGWAAAAAYCmuAAQAAYCgEYAAAABgKARgAAACGQgAGAACAoRCAAQAAYCgEYAAAABgKARgAAACGQgAGAACAoRCAAQAAYCj/D3Q9NgF98emjAAAAAElFTkSuQmCC"/>
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAsMAAAHbCAYAAAAu4ZcpAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjcsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvTLEjVAAAAAlwSFlzAAAPYQAAD2EBqD+naQAAYiBJREFUeJzt3XlcVGX///H3gDIgyKKyqCG4hoaKSph7C6WWmtldVpZLZpu2WXfqXa5lZOWS5VK5tt1piy22u+V636amuSdueKsgJoKIgjDn94df5ufIgIwyM+C8no8HD53rbJ9zZg68OVznOibDMAwBAAAAHsjL3QUAAAAA7kIYBgAAgMciDAMAAMBjEYYBAADgsQjDAAAA8FiEYQAAAHgswjAAAAA8FmEYAAAAHoswDAAAAI9FGAYqmDFjxshkMjm83I033qgbb7yx7AsqJ+bNmyeTyaQDBw64fNtX+7G92OV+BkuyYsUKmUwmrVixokzXW1oWi0WxsbEaP368W7bvCq44xn///bf8/f31ww8/OG0bQFkjDAMOKAxchV++vr5q1KiRhgwZorS0tDLbTk5OjsaMGeO2YAA4y/Tp0zVv3jx3l1HEv//9bx06dEhDhgyxtl18vptMJoWFhemmm27Sjz/+6MZqy6/q1avrkUce0ciRI91dClBqldxdAFARjRs3TnXr1tXZs2e1evVqzZgxQz/88IO2bdumKlWqXPH6c3JyNHbsWEkqcsXx5Zdf1vDhw694G4A7TJ8+XTVq1FD//v1t2jt27KgzZ87Ix8fHLXW9+eabuu+++xQUFFRkWuH5bhiG0tLSNG/ePN1+++367rvv1K1bNzdUe3lcdYwff/xxTZ06VcuWLdPNN9/s1G0BZYEwDFyGrl27Kj4+XpL0yCOPqHr16po0aZK++eYb3X///Ze9XovFory8vBLnqVSpkipVKp+nbn5+viwWi9sCDSouLy8v+fr6umXbf/zxh7Zs2aKJEyfanX7h+S5JAwcOVHh4uP7973+XGIbL2/ngqmPcuHFjxcbGat68eYRhVAh0kwDKQOE3/P3790uS3nrrLbVt21bVq1eXn5+fWrVqpS+++KLIciaTSUOGDNEnn3yi6667TmazWTNnzlRoaKgkaezYsdY/z44ZM0ZS8f01P/74YyUkJKhKlSoKCQlRx44d9csvv5RYd25urkaPHq0GDRrIbDYrMjJSL774onJzcy+5zwcOHJDJZNJbb72lKVOmqH79+jKbzdqxY4ckadeuXfrHP/6hatWqydfXV/Hx8fr2229t1nHu3DmNHTtWDRs2lK+vr6pXr6727dvr119/tZlv2bJl6tChg/z9/RUcHKw777xTO3fuLLG+bt26qV69enantWnTxibcSOePX6tWreTn56dq1arpvvvu06FDh4os+/7776t+/fry8/NTQkKCVq1adcljdfF2LvU+TZ8+3fp5qFWrlgYPHqyTJ0/azLNq1Srdc889qlOnjvW9e+6553TmzJki2/z888/VpEkT+fr6KjY2VosWLVL//v0VHR1tnae4/qSF7/OlujbMnTtXN998s8LCwmQ2m9WkSRPNmDHDZp7o6Ght375dv/32m/VzXfiXj+K2//nnn1vflxo1aujBBx/U4cOHbebp37+/AgICdPjwYfXs2VMBAQEKDQ3VCy+8oIKCghLrlqSvv/5aPj4+6tix4yXnlaTg4GD5+fnZ/FJ6qfPhUp/hP//8UyaTyeYc2bhxo0wmk1q2bGmz/a5du6p169bW19HR0erWrZtWr16thIQE+fr6ql69evrwww9tlrN3jEv7OXL0GN9666367rvvZBhGqY4p4E7l8/ISUMHs3btX0vn+cpL09ttvq0ePHurTp4/y8vL02Wef6Z577tHixYt1xx132Cy7bNkyLVy4UEOGDFGNGjXUvHlzzZgxQ0888YTuuusu9erVS5LUrFmzYrc/duxYjRkzRm3bttW4cePk4+Oj//73v1q2bJluu+02u8tYLBb16NFDq1ev1qOPPqrGjRtr69atmjx5sv766y99/fXXpdr3uXPn6uzZs3r00UdlNptVrVo1bd++Xe3atVPt2rU1fPhw+fv7a+HCherZs6e+/PJL3XXXXZLOB/ukpCQ98sgjSkhIUFZWljZs2KBNmzbp1ltvlSQtWbJEXbt2Vb169TRmzBidOXNG77zzjtq1a6dNmzbZBLoL9e7dW3379tXvv/+u66+/3tp+8OBB/ec//9Gbb75pbRs/frxGjhype++9V4888ojS09P1zjvvqGPHjvrjjz8UHBwsSZo9e7Yee+wxtW3bVs8++6z27dunHj16qFq1aoqMjLzksSrN+zRmzBiNHTtWiYmJeuKJJ7R7927NmDFDv//+u9asWaPKlStLOh8Sc3Jy9MQTT6h69epav3693nnnHf3vf//T559/bt3m999/r969e6tp06ZKSkpSRkaGBg4cqNq1a5fq/S2tGTNm6LrrrlOPHj1UqVIlfffdd3ryySdlsVg0ePBgSdKUKVP01FNPKSAgQC+99JIkKTw8vNh1zps3TwMGDND111+vpKQkpaWl6e2339aaNWts3hdJKigoUOfOndW6dWu99dZbWrJkiSZOnKj69evriSeeKLH2tWvXKjY21npsL5aZmanjx4/LMAwdO3ZM77zzjrKzs/Xggw8Wmdfe+VCaz3BsbKyCg4O1cuVK9ejRQ9L5oOrl5aUtW7YoKytLgYGBslgsWrt2rR599FGb7SYnJ+sf//iHBg4cqH79+mnOnDnq37+/WrVqpeuuu67YfS/t58jRY9yqVStNnjxZ27dvV2xsbInHH3A7A0CpzZ0715BkLFmyxEhPTzcOHTpkfPbZZ0b16tUNPz8/43//+59hGIaRk5Njs1xeXp4RGxtr3HzzzTbtkgwvLy9j+/btNu3p6emGJGP06NFFahg9erRx4am7Z88ew8vLy7jrrruMgoICm3ktFov1/506dTI6depkff3RRx8ZXl5exqpVq2yWmTlzpiHJWLNmTYnHYv/+/YYkIzAw0Dh27JjNtFtuucVo2rSpcfbsWZta2rZtazRs2NDa1rx5c+OOO+4ocTtxcXFGWFiY8ffff1vbtmzZYnh5eRl9+/a1thW+N/v37zcMwzAyMzMNs9lsPP/88zbre+ONNwyTyWQcPHjQMAzDOHDggOHt7W2MHz/eZr6tW7calSpVsrbn5eUZYWFhRlxcnJGbm2ud7/333zck2Rxbe0rzPh07dszw8fExbrvtNpt53n33XUOSMWfOHGvbxZ8xwzCMpKQkm30zDMNo2rSpcc011xinTp2ytq1YscKQZERFRVnbli9fbkgyli9fbrPOwvd57ty51raLP4PF1dO5c2ejXr16Nm3XXXed3WN18fYLj3dsbKxx5swZ63yLFy82JBmjRo2ytvXr18+QZIwbN85mnS1atDBatWpVZFsXu+aaa4y77767SHvhZ+riL7PZbMybN89m3pLOh9J+hu+44w4jISHB+rpXr15Gr169DG9vb+PHH380DMMwNm3aZEgyvvnmG+t8UVFRhiRj5cqV1rZjx44V+fzbe49L+zly9BivXbvWkGQsWLCgyDSgvKGbBHAZEhMTFRoaqsjISN13330KCAjQokWLrFfb/Pz8rPNmZGQoMzNTHTp00KZNm4qsq1OnTmrSpMll1/L111/LYrFo1KhR8vKyPaVLGv7q888/V+PGjRUTE6Pjx49bvwq7fCxfvrxU27/77rut3Tok6cSJE1q2bJnuvfdenTp1yrrev//+W507d9aePXusf+YODg7W9u3btWfPHrvrPnr0qDZv3qz+/furWrVq1vZmzZrp1ltvLXH4psDAQHXt2lULFy60+VPtggULdMMNN6hOnTqSpK+++koWi0X33nuvzXGIiIhQw4YNrcdhw4YNOnbsmB5//HGbPqD9+/e3e9PVxUrzPi1ZskR5eXl69tlnbeYZNGiQAgMD9f3331vbLvyMnT59WsePH1fbtm1lGIb++OMPSdKRI0e0detW9e3bVwEBAdb5O3XqpKZNm16yZkdcWE/hldROnTpp3759yszMdHh9hcf7ySeftOnnescddygmJsbmWBR6/PHHbV536NBB+/btu+S2/v77b4WEhBQ7fdq0afr111/166+/6uOPP9ZNN92kRx55RF999VWReS8+Hxz5DBd+jzh9+rQkafXq1br99tsVFxdn7Y6zatUqmUwmtW/f3ma7TZo0UYcOHayvQ0NDde21115y/0vzObpQaY9x4fE8fvx4idsHygOPDsMrV65U9+7dVatWLZlMplL/WbhQYd/Ni7/8/f2dUzDKjcIfjsuXL9eOHTu0b98+de7c2Tp98eLFuuGGG+Tr66tq1aopNDRUM2bMsBsK6tate0W17N27V15eXg4H6j179mj79u0KDQ21+WrUqJEk6dixY5LOh9vU1FTr18X7cHH9ycnJMgxDI0eOLLLu0aNH26x73LhxOnnypBo1aqSmTZvqn//8p/7880/rug4ePChJuvbaa4vU37hxYx0/ftwaHOzp3bu3Dh06pHXr1lmP1caNG9W7d2+b42AYhho2bFik3p07d1prLaylYcOGNtuoXLlysX2TL1Sa96m4/fXx8VG9evWs0yUpJSXFGrAK+2926tRJkqzvUeH8DRo0KLIte21XYs2aNUpMTLT2iQ0NDdW//vUvm3ocUdJ7HxMTY3MsJMnX19cmhErnA1lGRkaptmeU0Lc1ISFBiYmJSkxMVJ8+ffT999+rSZMmGjJkSJEbXi8+Hxz5DHfo0EH5+flat26ddu/erWPHjqlDhw7q2LGjTRhu0qSJTbCWZP3l7kKl2f/SfI4KOXKMC49nWY9HDTiDR/cZPn36tJo3b66HH37Y2i/TES+88EKR35JvueUWm/6JuDolJCQUuQGr0KpVq9SjRw917NhR06dPV82aNVW5cmXNnTtXn376aZH5L7wy40oWi0VNmzbVpEmT7E4v7APbq1cv/fbbb9b2fv362dxMdXH9FotF0vnz48JfEC5UGMQ6duyovXv36ptvvtEvv/yiWbNmafLkyZo5c6YeeeSRy963Qt27d1eVKlW0cOFCtW3bVgsXLpSXl5fuuecem3pNJpN+/PFHeXt7F1nHhVdUy4uCggLdeuutOnHihIYNG6aYmBj5+/vr8OHD6t+/v/U9cERxoaU0N6Dt3btXt9xyi2JiYjRp0iRFRkbKx8dHP/zwgyZPnnxZ9TjK3ntXWtWrVy91aJbOj8pw00036e2339aePXts+uReyfkcHx8vX19frVy5UnXq1FFYWJgaNWqkDh06aPr06crNzdWqVausfe4vVNz+lxTyHf0cOXKMC49njRo1Sr0M4C4eHYa7du2qrl27Fjs9NzdXL730kv7973/r5MmTio2N1YQJE6x3PwcEBNj8oNyyZYt27NihmTNnOrt0lGNffvmlfH199fPPP8tsNlvb586dW+p1OHI1pX79+rJYLNqxY4fi4uIcWm7Lli265ZZbStzexIkTbYJCrVq1Slxv4VXSypUrKzEx8ZJ1VKtWTQMGDNCAAQOUnZ2tjh07asyYMXrkkUcUFRUlSdq9e3eR5Xbt2qUaNWqU+JcYf39/devWTZ9//rkmTZqkBQsWqEOHDjb7UL9+fRmGobp161qvittTWMuePXtshos6d+6c9u/fr+bNm5e4n6V5ny7c3wuvNufl5Wn//v3W47l161b99ddfmj9/vvr27Wud7+JROArXl5ycXGRbF7cV/ln74lErLr4Ca893332n3NxcffvttzZXKO11tSntZ/vCY3Hx8Fy7d++2Ti8LMTEx1pFgSis/P1+SlJ2dXeJ8jnyGfXx8rCOU1KlTx9rtoUOHDsrNzdUnn3yitLS0Uo96cSml/RxdjsLj2bhx4yteF+BsHt1N4lKGDBmidevW6bPPPtOff/6pe+65R126dCm2f+OsWbOsv8XDc3l7e8tkMtlcUTtw4IBD3XAKH9xxcTCxp2fPnvLy8tK4ceOKXMkp6arQvffeq8OHD+uDDz4oMu3MmTPWP922atXK+ifixMTES3bHCAsL04033qj33ntPR48eLTI9PT3d+v+///7bZlpAQIAaNGhgHdqtZs2aiouL0/z5822OxbZt2/TLL7/o9ttvL7EW6XxXiSNHjmjWrFnasmWLTRcJ6fyVb29vb40dO7bI8TIMw1pjfHy8QkNDNXPmTJs/jc+bN6/M3qfExET5+Pho6tSpNrXMnj1bmZmZ1pFICq/QXTiPYRh6++23bdZbq1YtxcbG6sMPP7QJbb/99pu2bt1qM29UVJS8vb21cuVKm/bp06dfct/s1ZOZmWn3F0B/f/9SHa/4+HiFhYVp5syZNkP9/fjjj9q5c2eRUVmuRJs2bbRt27ZSDSkonf8F6JdffpGPj88lw56jn+EOHTrov//9r5YvX279WVKjRg01btxYEyZMsM5TFkr7ObocGzduVFBQUIkjWQDlhUdfGS5JSkqK5s6dq5SUFOtVpBdeeEE//fST5s6dq9dee81m/rNnz+qTTz7hyWDQHXfcoUmTJqlLly564IEHdOzYMU2bNk0NGjSw6Q9bEj8/PzVp0kQLFixQo0aNVK1aNcXGxtodoqhBgwZ66aWX9Morr6hDhw7q1auXzGazfv/9d9WqVUtJSUl2t/HQQw9p4cKFevzxx7V8+XK1a9dOBQUF2rVrlxYuXKiff/652K4glzJt2jS1b99eTZs21aBBg1SvXj2lpaVp3bp1+t///qctW7ZIOn/Tz4033qhWrVqpWrVq2rBhg7744gubR+K++eab6tq1q9q0aaOBAwdah6UKCgqyjr1ckttvv11Vq1bVCy+8IG9vb91999020+vXr69XX31VI0aM0IEDB9SzZ09VrVpV+/fv16JFi/Too4/qhRdeUOXKlfXqq6/qscce080336zevXtr//79mjt3bqn6DJfmfQoNDdWIESM0duxYdenSRT169NDu3bs1ffp0XX/99dahvGJiYlS/fn298MILOnz4sAIDA/Xll1/a/VP/a6+9pjvvvFPt2rXTgAEDlJGRoXfffVexsbE2ATkoKEj33HOP3nnnHZlMJtWvX1+LFy+29pkuyW233SYfHx91795djz32mLKzs/XBBx8oLCysyC9ErVq10owZM/Tqq6+qQYMGCgsLs/tghsqVK2vChAkaMGCAOnXqpPvv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o6M1ZcoUm3ni4uI0ZswYSZJhGBozZozq1Kkjs9msWrVq6emnny629vT0dC1btqxI9waTyaT33ntP3bp1U5UqVdS4cWOtW7dOycnJuvHGG+Xv76+2bdsWOY7du3fXt99+qzNnzpR4zADgUgjDAK5qfn5+1iuoXl5emjp1qrZv36758+dr2bJlevHFF23mz8nJ0YQJEzRr1ixt375dU6dO1b333mu94nz06FG1bdu2yHYOHz6sjh07ymw2a9myZdq4caMefvjhYrtoJCUl6cMPP9TMmTO1fft2Pffcc3rwwQf122+/lbg/b731lpo3b64//vhDI0eOlCRVrVpV8+bN044dO/T222/rgw8+0OTJk63LLFy4UGPGjNFrr72mDRs2qGbNmpo+fbpDx/FiX375pSZPnqz33ntPe/bs0ddff62mTZsWO//q1autYfdihQF/8+bNiomJ0QMPPKDHHntMI0aM0IYNG2QYhoYMGWKzTHx8vPLz8/Xf//73ivYDANz39z0AcCLDMLR06VL9/PPPeuqppyRJzz77rHV6dHS0Xn31VT3++OM2wfDcuXOaPn26mjdvbm3z8/NTbm6uIiIiit3etGnTFBQUpM8++0yVK1eWJDVq1MjuvLm5uXrttde0ZMkStWnTRpJUr149rV69Wu+99546depU7HZuvvlmPf/88zZtL7/8ss1+vfDCC/rss8+sQX/KlCkaOHCgBg4cKEl69dVXtWTJkiJXhx2RkpKiiIgIJSYmqnLlyqpTp44SEhKKnf/gwYMKDw+320ViwIABuvfeeyWdv8rdpk0bjRw5Up07d5YkPfPMMxowYIDNMlWqVFFQUJAOHjx42fsAABJhGMBVZvHixQoICNC5c+dksVj0wAMPWP+0v2TJEiUlJWnXrl3KyspSfn6+zp49q5ycHFWpUkXS+f6ozZo1c3i7mzdvVocOHaxBuCTJycnKycnRrbfeatOel5enFi1alLhsfHx8kbYFCxZo6tSp2rt3r7Kzs5Wfn6/AwEDr9J07d+rxxx+3WaZNmzZavnz5JWstzj333KMpU6aoXr166tKli26//XZ179692D7UZ86cka+vr91pFx7v8PBwSbK5yhweHq6zZ88qKyvLZr/8/PyUk5Nz2fsAABLdJABcZW666SZt3rxZe/bs0ZkzZzR//nz5+/vrwIED6tatm5o1a6Yvv/xSGzdu1LRp0yTZ3ojm5+cnk8nk8Hb9/PxKPW9hP+Xvv/9emzdvtn7t2LHjkv2G/f39bV6vW7dOffr00e23367Fixfrjz/+0EsvvXTFN9d5eXnJMAybtgv7IUdGRmr37t2aPn26/Pz89OSTT6pjx45F+ioXqlGjhjIyMuxOu/AXiMJjb6/t4psZT5w4odDQUAf2CgCK4sowgKuKv7+/GjRoUKR948aNslgsmjhxovVP9QsXLizVOn18fFRQUFDiPM2aNdP8+fN17ty5S14dLrw5LyUlpcQuEaWxdu1aRUVF6aWXXrK2Xdx1oHHjxvrvf/+rvn37Wtv+85//lLje0NBQHT161Po6KytL+/fvt5nHz89P3bt3V/fu3TV48GDFxMRo69atatmyZZH1tWjRQqmpqcrIyFBISIhD+2jP3r17dfbs2UteSQeAS+HKMACP0KBBA507d07vvPOO9u3bp48++kgzZ84s1bLR0dH6888/tXv3bh0/ftzu1c8hQ4YoKytL9913nzZs2KA9e/boo48+0u7du4vMW7VqVb3wwgt67rnnNH/+fO3du1ebNm3SO++8o/nz5zu0Xw0bNlRKSoo+++wz7d27V1OnTtWiRYts5nnmmWc0Z84czZ07V3/99ZdGjx6t7du3l7jem2++WR999JFWrVqlrVu3ql+/fvL29rZOnzdvnmbPnq1t27Zp3759+vjjj+Xn56eoqCi762vRooVq1KihNWvWOLR/xVm1apXq1aun+vXrl8n6AHguwjAAj9C8eXNNmjRJEyZMUGxsrD755BMlJSWVatlBgwbp2muvVXx8vEJDQ+0GuurVq2vZsmXKzs5Wp06d1KpVK33wwQfFXiV+5ZVXNHLkSCUlJalx48bq0qWLvv/+e9WtW9eh/erRo4eee+45DRkyRHFxcVq7dq11lIlCvXv31siRI/Xiiy+qVatWOnjwoJ544okS1ztixAh16tRJ3bp10x133KGePXvaBM/g4GB98MEHateunZo1a6YlS5bou+++U/Xq1e2uz9vbWwMGDNAnn3zi0P4V59///rcGDRpUJusC4NlMxsWdwgAAcILU1FRdd9112rRpU7FXkEtj+/btuvnmm/XXX38pKCioDCsE4Im4MgwAcImIiAjNnj1bKSkpV7Seo0eP6sMPPyQIAygTXBkGAACAx+LKMAAAADwWYRgAAAAeizAMAAAAj0UYBgAAgMciDAMAAMBjEYYBAADgsQjDAAAA8FiEYQAAAHgswjAAAAA81v8Da7cU2Zk0xoUAAAAASUVORK5CYII="/>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=391392cb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="conclusion">Conclusion<a class="anchor-link" href="#conclusion">¶</a></h2><p>In this notebook, we have demonstrated a particle-resolved approach to modeling coagulation patterns in aerosol systems. By leveraging the <code>Builder</code> pattern and modular design, we have created a flexible and extensible framework for simulating particle interactions and tracking their properties over time.</p>
+<h2 id="summary">Summary<a class="anchor-link" href="#summary">¶</a></h2><ul>
+<li>Strategy: <code>BrownianCoagulationBuilder().set_distribution_type("particle_resolved")</code></li>
+<li>Runnable: <code>par.dynamics.Coagulation</code></li>
+<li>Representation: particle-resolved sampled radii/mass</li>
+<li>Runtime guardrails: ~50k samples, 1-hour horizon, 20 sub-steps</li>
+</ul>
 </div>
 </div>
 </div>
