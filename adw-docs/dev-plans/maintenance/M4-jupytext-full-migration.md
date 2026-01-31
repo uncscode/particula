@@ -366,6 +366,26 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 - `ruff check` passes on new `.py` files
 - All notebooks execute successfully without API warnings
 
+### Phase 2: Nucleation + Particle_Phase Part 1 (`M4-P2`)
+
+**Issue:** #984 | **Size:** S | **Status:** Completed (2026-01-30)
+
+- [x] **M4-P2-1:** Convert `Custom_Nucleation_Single_Species` to paired `.py`
+- [x] **M4-P2-2:** Convert `Particle_Surface_Tutorial` to paired `.py`
+- [x] **M4-P2-3:** Convert `Particle_Representation_Tutorial` to paired `.py`
+- [x] **M4-P2-4:** `ruff check` + `ruff format` on new percent scripts
+- [x] **M4-P2-5:** Sync + `--check-sync` for all three notebooks
+- [x] **M4-P2-6:** Execute notebooks and review warnings
+
+**Acceptance Criteria:**
+- All three target notebooks paired (`.ipynb` + `.py`) and linted
+- Sync validation passes for Nucleation + Particle_Phase (Part 1)
+- Executions complete without errors; warnings reviewed
+
+**Completion Note (2026-01-30):**
+- Jupytext migration for Nucleation + Particle_Phase Part 1 completed
+- Converted and executed: Nucleation single species, Particle surface, particle
+  representation tutorials
 ---
 
 ### Phase 11: Simulations - Cloud Chamber (`M4-P11`)
