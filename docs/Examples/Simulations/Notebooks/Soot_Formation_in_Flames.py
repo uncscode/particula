@@ -381,7 +381,7 @@ fig.legend(
     title="Chemicals",
     fontsize="small",
 )
-plt.tight_layout(rect=[0, 0, 1, 1])
+plt.tight_layout(rect=(0, 0, 1, 1))
 plt.show()
 
 # %% [markdown]
@@ -1015,7 +1015,7 @@ fig.legend(
     title="Chemicals",
     fontsize="small",
 )
-plt.tight_layout(rect=[0, 0, 1, 1])
+plt.tight_layout(rect=(0, 0, 1, 1))
 plt.show()
 
 # 📊 Plot 2: Mass fraction (normalized by total particle mass)
@@ -1055,7 +1055,7 @@ fig.legend(
     title="Chemicals",
     fontsize="small",
 )
-plt.tight_layout(rect=[0, 0, 1, 1])
+plt.tight_layout(rect=(0, 0, 1, 1))
 plt.show()
 
 # %% [markdown]
