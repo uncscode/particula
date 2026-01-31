@@ -19,12 +19,15 @@ These coagulation tutorials are maintained as Jupytext percent pairs (`.py` ⇄
 `.ipynb`). Edit the `.py` file, then sync and execute to refresh outputs.
 
 - [Coagulation 1: PMF Pattern](Coagulation/Coagulation_1_PMF_Pattern.ipynb)
-  – Probability mass function approach. Paired `.py` source (py:percent) with
-    kernelspec `particula_dev312`.
+  – Probability mass function (discrete) approach.
+- [Coagulation 2: PDF Pattern](Coagulation/Coagulation_2_PDF_Pattern.ipynb)
+  – Probability density function (continuous) approach.
 - [Coagulation 3: Particle Resolved](Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb)
-  – Particle-resolved approach. Paired `.py`; sync then run to refresh outputs.
+  – Particle-resolved approach with individual particle tracking.
 - [Coagulation 4: Methods Compared](Coagulation/Coagulation_4_Compared.ipynb)
   – Side-by-side strategy comparison (PMF vs PDF) using the PMF↔PDF helper.
+- [Coagulation 5: Time Evolution](Coagulation/Coagulation_5_Time_Evolution.ipynb)
+  – Compare number concentration decay over time for PMF, PDF, and particle-resolved.
 
 ### Functional
 
