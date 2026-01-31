@@ -56,8 +56,8 @@ import particula as par
 radii_sample = par.particles.get_lognormal_sample_distribution(
     mode=np.array([80e-9, 200e-9]),
     geometric_standard_deviation=np.array([1.4, 1.5]),
-    number_of_particles=np.array([4e3, 2e3]),
-    number_of_samples=12_000,
+    number_of_particles=np.array([4e4, 2e4]),
+    number_of_samples=50_000,
 )
 
 density = np.array([1_000.0])
@@ -107,8 +107,8 @@ print(coagulation_process)
 # ## Execute a short coagulation step
 
 # %%
-time_step = 200  # seconds
-sub_steps = 5
+time_step = 3600  # seconds (1 hour)
+sub_steps = 20
 
 radii_before = aerosol_resolved.particles.get_radius()
 
@@ -121,9 +121,7 @@ radii_after = aerosol_after.particles.get_radius()
 # ## Plot: particle-resolved histogram before/after
 
 # %%
-bins = np.logspace(
-    np.log10(radii_before.min()), np.log10(radii_before.max()), 80
-).tolist()
+bins = np.logspace(np.log10(radii_before.min()), -5, 80).tolist()
 
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.hist(
@@ -143,6 +141,7 @@ ax.hist(
     density=True,
 )
 ax.set_xscale("log")
+ax.set_xlim(1e-8, 1e-5)
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("PDF of sampled particles")
 ax.set_title("Particle-resolved coagulation (Brownian)")
@@ -156,4 +155,4 @@ plt.show()
 # - Strategy: `BrownianCoagulationBuilder().set_distribution_type("particle_resolved")`
 # - Runnable: `par.dynamics.Coagulation`
 # - Representation: particle-resolved sampled radii/mass
-# - Runtime guardrails: ~12k samples, short horizon, few sub-steps
+# - Runtime guardrails: ~50k samples, 1-hour horizon, 20 sub-steps

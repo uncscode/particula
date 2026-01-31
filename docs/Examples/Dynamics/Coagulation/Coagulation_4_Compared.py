@@ -54,12 +54,12 @@ from scipy.integrate import trapezoid
 
 # %%
 # Shared grid (modest resolution)
-radius_bins = np.logspace(-8, -6, 140)  # m
+radius_bins = np.logspace(-8, -5, 150)  # m (10 nm to 10 um)
 
 # Lognormal parameters (kept small for speed)
 mode = np.array([120e-9])
 gsd = np.array([1.5])
-number_conc = np.array([8e8])  # m^-3 total
+number_conc = np.array([1e10])  # m^-3 total
 
 # PMF (number per bin)
 concentration_pmf = par.particles.get_lognormal_pmf_distribution(
@@ -138,8 +138,8 @@ print(coagulation_pdf)
 # ## Execute short coagulation steps
 
 # %%
-time_step = 200  # seconds
-sub_steps = 10
+time_step = 3600  # seconds (1 hour)
+sub_steps = 100
 
 # PMF run
 pmf_before = aerosol_pmf.particles.get_concentration()
@@ -204,6 +204,7 @@ ax.plot(
     linestyle="--",
 )
 ax.set_xscale("log")
+ax.set_xlim(1e-8, 1e-5)
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Number concentration ($m^{-3}$)")
 ax.set_title("PMF vs PDF coagulation (converted to PMF units)")
@@ -230,6 +231,7 @@ ax.plot(
     radius_bins, pdf_after, label="PDF after", color="tab:red", linestyle="--"
 )
 ax.set_xscale("log")
+ax.set_xlim(1e-8, 1e-5)
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"PDF concentration ($m^{-4}$)")
 ax.set_title("PMF vs PDF coagulation (PDF units)")
@@ -245,4 +247,5 @@ plt.show()
 # - Both run through `par.dynamics.Coagulation`
 # - Conversions use `par.particles.get_pdf_distribution_in_pmf` for consistent
 #   comparisons across representations.
-# - Runtime kept short with modest grids and a single 200 s step.
+# - Runtime with extended grids (10 nm–10 µm) and 1-hour step for visible
+#   coagulation effects.
