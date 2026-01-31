@@ -362,15 +362,18 @@ docs/Examples/Dynamics/Coagulation/
 └── Coagulation_Tutorial.py       # For development (percent format)
 ```
 
-Current Jupytext paired coverage (percent format) includes the Nucleation and
-Particle_Phase tutorials:
+Current Jupytext paired coverage (percent format) includes the Nucleation,
+Particle_Phase, and Dynamics/Coagulation charge tutorials:
 
 - `docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species`
 - `docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial`
 - `docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial`
+- `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional`
+- `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects`
 
 These are paired via `.py:percent` scripts and stay in sync with their `.ipynb`
-notebooks.
+notebooks. Execute the `.ipynb` after syncing to refresh plots and tables for the
+site.
 
 #### LLM Editing Workflow
 

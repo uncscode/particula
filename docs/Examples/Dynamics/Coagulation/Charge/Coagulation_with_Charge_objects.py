@@ -15,7 +15,7 @@
 # %%
 """Show how to compose a charged coagulation strategy with the builder API.
 
-The script creates a charged log-distributed particle population, calculates the
+The script creates a charged log-distributed particle population, calculates
 supporting transport properties, builds the charged strategy via
 ChargedCoagulationBuilder, and visualizes the resulting kernel on a log-log
 grid.

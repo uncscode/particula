@@ -15,9 +15,9 @@
 # %%
 """Demonstrate the factory-based charged coagulation workflow with particula.
 
-The tutorial constructs a charged particle size distribution, derives the
-supporting transport properties, obtains a charged strategy through
-CoagulationFactory, and visualizes the resulting kernel on a log-log grid.
+The tutorial constructs a charged particle size distribution, derives supporting
+transport properties, obtains a charged strategy through CoagulationFactory, and
+visualizes the resulting kernel on a log-log grid.
 
 Examples:
     >>> par.dynamics.CoagulationFactory().get_strategy(
