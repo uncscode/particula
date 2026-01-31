@@ -13300,16 +13300,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># In Colab uncomment the following command to install particula:</span>
 <span class="c1">#!pip install particula[extra] --quiet</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># particula</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># In Colab uncomment the following command to install particula:
 #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # particula
 import particula as par</div>
@@ -13385,7 +13385,6 @@ import particula as par</div>
     <span class="n">particles</span><span class="p">:</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentation</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Keep single-species mass/concentration strictly 1-D; leave charge untouched."""</span>
-
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="s2">"distribution"</span><span class="p">):</span>
         <span class="n">particles</span><span class="o">.</span><span class="n">distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">distribution</span><span class="p">)</span>
@@ -13402,7 +13401,6 @@ import particula as par</div>
     <span class="n">particles</span><span class="p">:</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentation</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""</span>
-
     <span class="n">squeeze_single_species_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
 
     <span class="n">squeeze_single_species_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
@@ -13457,7 +13455,6 @@ import particula as par</div>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">build_aerosol</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Construct a fresh aerosol with consistent gas and particle setup."""</span>
-
     <span class="n">gas_sulfate</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
         <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"sulfate"</span><span class="p">)</span>
@@ -13535,7 +13532,6 @@ def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
     """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
-
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -13552,7 +13548,6 @@ def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
     """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
-
     squeeze_single_species_arrays(particles)
 
     squeeze_single_species_arrays(particles)
@@ -13607,7 +13602,6 @@ def ensure_single_species_shapes(
 
 def build_aerosol() -&gt; par.Aerosol:
     """Construct a fresh aerosol with consistent gas and particle setup."""
-
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")
@@ -14154,7 +14148,7 @@ Total iterations to do: 400
 
 <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">bins_lognormal</span>
 
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># 1. Add more vapor to the gas phase (e.g., by external sources)</span>
         <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
@@ -14267,7 +14261,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 bin_edges = bins_lognormal
 
-for i, t in enumerate(time):
+for i, _ in enumerate(time):
     if i &gt; 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
         aerosol.atmosphere.partitioning_species.add_concentration(
