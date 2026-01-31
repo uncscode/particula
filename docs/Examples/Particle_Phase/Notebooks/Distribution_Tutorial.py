@@ -38,7 +38,7 @@ Example:
 #
 # The representation of particle distributions is core to the simulation, but it can vary depending on what you are trying to achieve. In this tutorial, we will cover the  distribution strategies currently implemented.
 #
-# The distribution strategies, define how to calculate properties derived from the particle distribution. These include particle mass, radius, and total mass. All of which can have different methods depending if the distribution is mass-based, radius-based, or speciated-mass based.
+# The distribution strategies define how to calculate properties derived from the particle distribution. These include particle mass, radius, and total mass, all of which can have different methods depending on whether the distribution is mass-based, radius-based, or speciated-mass based.
 #
 # We will cover the following distribution strategies:
 #
