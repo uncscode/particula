@@ -46,7 +46,7 @@ import particula as par
 # %% [markdown]
 # ## Probability Density Function
 #
-# (fix this, more details for aerosol science)
+# In aerosol science, a probability density function (PDF) describes how likely it is to find particles with diameters in a small interval around a given size. For a number-based size distribution, the PDF indicates the fraction of the total particle number per unit diameter, allowing us to represent populations that span many orders of magnitude in size in a continuous way.
 #
 # The probability density function (PDF) of a lognormal distribution is given by:
 #
