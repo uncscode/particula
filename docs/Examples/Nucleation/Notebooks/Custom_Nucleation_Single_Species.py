@@ -84,11 +84,15 @@ particle_mass_sample = (
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Ensure the particle arrays remain one-dimensional for single-species setups.
+    """Clamp single-species arrays to 1-D while preserving charge shape.
 
     Args:
-        particles: Particle representation whose distribution, concentration, and
-            charge arrays need to be normalized.
+        particles: Particle container with distribution, concentration, and
+            optional charge arrays that should remain 1-D for
+            single-species workflows.
+
+    Returns:
+        None: This helper mutates the particle representation in place.
     """
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
@@ -105,13 +109,16 @@ def squeeze_single_species_arrays(
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Patch particle strategies to preserve one-dimensional shapes for single species.
+    """Enforce 1-D shapes and patch mutators for single-species aerosols.
 
     Args:
-        particles: Particle representation whose strategy methods will be wrapped.
-    """
-    squeeze_single_species_arrays(particles)
+        particles: Particle representation whose distribution, concentration,
+            and charge arrays should be constrained to one dimension; also used
+            to override mass and concentration mutation hooks for 1-D inputs.
 
+    Returns:
+        None: This helper mutates the particle representation in place.
+    """
     squeeze_single_species_arrays(particles)
 
     original_add_mass = particles.strategy.add_mass
@@ -182,11 +189,11 @@ def ensure_single_species_shapes(
 
 
 def build_aerosol() -> par.Aerosol:
-    """Construct a new aerosol system with sulfate vapor and resolved masses.
+    """Construct a single-species aerosol with gas and particle setup.
 
     Returns:
-        A configured aerosol that pairs the local atmosphere with resolved sulfate
-        particle masses prepared for single-species dynamics.
+        Aerosol: Initialized aerosol containing sulfate gas and resolved
+            particle masses configured for single-species simulations.
     """
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
@@ -422,7 +429,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 bin_edges = bins_lognormal
 
-for i, _t in enumerate(time):
+for i, _ in enumerate(time):
     if i > 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
         aerosol.atmosphere.partitioning_species.add_concentration(

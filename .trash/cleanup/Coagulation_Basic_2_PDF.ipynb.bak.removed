@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "bf6d30fe",
+   "id": "8c6b0c87",
    "metadata": {},
    "source": [
     "# Coagulation Basic 2: PDF (Builder + Coagulation)\n",
@@ -22,7 +22,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "13bc201b",
+   "id": "222fe024",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -35,7 +35,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "34b519c7",
+   "id": "a58145dd",
    "metadata": {},
    "source": [
     "## Build a PDF aerosol\n",
@@ -47,7 +47,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "32a43682",
+   "id": "d50fbe1f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -86,7 +86,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "28abef1d",
+   "id": "127ade54",
    "metadata": {},
    "source": [
     "## Configure coagulation (continuous PDF)"
@@ -95,7 +95,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ae44df15",
+   "id": "af123ca6",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -113,7 +113,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c8720467",
+   "id": "2597794b",
    "metadata": {},
    "source": [
     "## Execute a short coagulation step"
@@ -122,7 +122,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "427f66fd",
+   "id": "88fb7d3b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -140,7 +140,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3319b545",
+   "id": "e264cf8d",
    "metadata": {},
    "source": [
     "## Plot: PDF concentration before/after"
@@ -149,7 +149,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "59a8a5d6",
+   "id": "508b1bd3",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -167,7 +167,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e2b61d11",
+   "id": "4bc58e5b",
    "metadata": {},
    "source": [
     "## Summary\n",
@@ -181,9 +181,6 @@
   }
  ],
  "metadata": {
-  "jupytext": {
-   "formats": "ipynb,py:percent"
-  },
   "kernelspec": {
    "display_name": "particula_dev312",
    "language": "python",
