@@ -4,7 +4,7 @@
 **Priority**: P2
 **Owners**: ADW / Maintainers
 **Target Date**: 2026-Q2
-**Last Updated**: 2026-01-30
+**Last Updated**: 2026-01-31
 **Size**: Medium (~35 notebooks, 15 phases)
 **Unblocked**: M3 (Pilot) completed successfully
 
@@ -180,7 +180,7 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 3: Particle_Phase Part 2 (`M4-P3`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #1004 | **Size:** S | **Status:** Completed
 
 **Notebooks (3):**
 - `docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb`
@@ -188,16 +188,23 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 - `docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb`
 
 **Tasks:**
-- [ ] Convert all 3 notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute notebooks to verify they work
-- [ ] Check for API updates needed
+- [x] Convert all 3 notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute notebooks to verify they work
+- [x] Check for API updates needed
+
+**Completion Notes:**
+- Converted all 3 notebooks to paired `.py:percent` format
+- Linted with ruff check --fix and ruff format
+- Synced and validated with --check-sync
+- Executed all notebooks successfully without API warnings
+- No API issues detected
 
 **Acceptance Criteria:**
-- All 3 notebooks converted and synced
-- `ruff check` passes on new `.py` files
-- All notebooks execute successfully without API warnings
+- All 3 notebooks converted and synced (met)
+- `ruff check` passes on new `.py` files (met)
+- All notebooks execute successfully without API warnings (met)
 
 ---
 
@@ -631,7 +638,7 @@ If API issues are found:
 |-------|-----------|-----------|--------|
 | M4-P1 | 3 | Aerosol + Equilibria | Not Started |
 | M4-P2 | 3 | Nucleation + Particle_Phase (1) | Not Started |
-| M4-P3 | 3 | Particle_Phase (2) | Not Started |
+| M4-P3 | 3 | Particle_Phase (2) | Completed |
 | M4-P4 | 3 | Particle_Phase Functional + Chamber_Wall_Loss (1) | Not Started |
 | M4-P5 | 3 | Chamber_Wall_Loss (2) | Not Started |
 | M4-P6 | 3 | Dynamics/Coagulation Main | Completed |
