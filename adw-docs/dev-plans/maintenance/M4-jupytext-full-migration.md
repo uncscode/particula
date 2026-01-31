@@ -278,23 +278,28 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 7: Dynamics/Coagulation Charge (`M4-P7`)
 
-**Issue:** TBD | **Size:** XS | **Status:** Not Started
+**Issue:** #989 | **Size:** XS | **Status:** Completed (charged pair migrated)
 
 **Notebooks (2):**
 - `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb`
 - `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb`
 
 **Tasks:**
-- [ ] Convert both notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute notebooks to verify they work
-- [ ] Check for API updates needed
+- [x] Convert both notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute notebooks to verify they work
+- [x] Check for API updates needed (none observed; kernelspec display name set to `particula_dev312`)
 
 **Acceptance Criteria:**
-- Both notebooks converted and synced
-- `ruff check` passes on new `.py` files
-- All notebooks execute successfully without API warnings
+- Both notebooks converted and synced (met)
+- `ruff check` passes on new `.py` files (met)
+- All notebooks execute successfully without API warnings (met)
+
+**Completion Notes (2026-01-30):**
+- Converted and synced both charged coagulation notebooks with Jupytext percent format
+- Standardized kernelspec to `particula_dev312`; execution outputs present
+- No API changes required; linted cleanly and executed without warnings
 
 ---
 
@@ -653,3 +658,4 @@ If API issues are found:
 |------|--------|--------|
 | 2026-01-30 | Initial plan created (deferred from M3 pilot) | ADW |
 | 2026-01-30 | Restructured to max 3 notebooks per phase for isolated validation | ADW |
+| 2026-01-30 | Marked M4-P7 (charged coagulation) completed; added completion notes | ADW |
