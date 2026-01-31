@@ -458,11 +458,11 @@ for i, t in enumerate(time):
     if i == 0:
         bin_edges = edges
     total_number_resolved[i] = np.sum(number_distribution > 0)
-    saturation_ratio_output[i] = float(
+    saturation_ratio_output[i] = np.asarray(
         aerosol.atmosphere.partitioning_species.get_saturation_ratio(
             temperature=298.15
         )
-    )
+    ).flat[0]
 
     if i % 20 == 0:
         # Retrieve and print the total number of resolved particles simulated
