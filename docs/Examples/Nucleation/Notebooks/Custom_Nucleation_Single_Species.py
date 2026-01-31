@@ -12,6 +12,17 @@
 #     name: python3
 # ---
 
+# %%
+"""Demonstrate a custom single-species nucleation workflow with particula.
+
+The guide builds an aerosol with ammonium sulfate vapor, applies fixed nucleation
+rates, and couples condensation and coagulation runnables while maintaining mass
+conservation and user-defined particle shapes.
+
+Examples:
+    >>> custom_nucleation = CustomNucleationSingleSpecies()
+"""
+
 # %% [markdown]
 # # Custom Nucleation: Single Species
 #
@@ -24,8 +35,8 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # particula
 import particula as par
@@ -73,8 +84,12 @@ particle_mass_sample = (
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
+    """Ensure the particle arrays remain one-dimensional for single-species setups.
 
+    Args:
+        particles: Particle representation whose distribution, concentration, and
+            charge arrays need to be normalized.
+    """
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -90,8 +105,11 @@ def squeeze_single_species_arrays(
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
+    """Patch particle strategies to preserve one-dimensional shapes for single species.
 
+    Args:
+        particles: Particle representation whose strategy methods will be wrapped.
+    """
     squeeze_single_species_arrays(particles)
 
     squeeze_single_species_arrays(particles)
@@ -102,6 +120,15 @@ def ensure_single_species_shapes(
     def _add_mass_single_species(
         distribution, concentration, density, added_mass
     ):
+        """Wrap add_mass to keep single-species arrays one-dimensional.
+
+        Args:
+            distribution: Particle distribution array representing masses.
+            concentration: Concentration array corresponding to the particles.
+            density: Density value used for the mass calculation.
+            added_mass: Mass to add; will be squeezed to 1-D before calling
+                the original method.
+        """
         added_mass = np.atleast_1d(np.squeeze(added_mass))
         result = original_add_mass(
             distribution, concentration, density, added_mass
@@ -117,6 +144,16 @@ def ensure_single_species_shapes(
         charge=None,
         added_charge=None,
     ):
+        """Wrap add_concentration to maintain single-species shapes.
+
+        Args:
+            distribution: Current particle distribution array.
+            concentration: Current concentration array.
+            added_distribution: Distribution array for the incoming mass.
+            added_concentration: Concentration array for the incoming mass.
+            charge: Optional charge array for the existing particles.
+            added_charge: Optional charge array for the incoming particles.
+        """
         added_distribution = np.atleast_1d(np.squeeze(added_distribution))
         added_concentration = np.atleast_1d(np.squeeze(added_concentration))
         added_charge = (
@@ -145,8 +182,12 @@ def ensure_single_species_shapes(
 
 
 def build_aerosol() -> par.Aerosol:
-    """Construct a fresh aerosol with consistent gas and particle setup."""
+    """Construct a new aerosol system with sulfate vapor and resolved masses.
 
+    Returns:
+        A configured aerosol that pairs the local atmosphere with resolved sulfate
+        particle masses prepared for single-species dynamics.
+    """
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")
@@ -381,7 +422,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 bin_edges = bins_lognormal
 
-for i, t in enumerate(time):
+for i, _t in enumerate(time):
     if i > 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
         aerosol.atmosphere.partitioning_species.add_concentration(
