@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "bb340982",
+   "id": "46f62185",
    "metadata": {},
    "source": [
     "# Coagulation Basic 1: PMF (Builder + Coagulation)\n",
@@ -23,7 +23,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "0a519dd9",
+   "id": "97ca0bda",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -36,7 +36,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "061a935d",
+   "id": "f4bbd465",
    "metadata": {},
    "source": [
     "## Build a PMF aerosol\n",
@@ -48,7 +48,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "0e460ca3",
+   "id": "352bc878",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -88,7 +88,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2e1b938f",
+   "id": "c64cdd50",
    "metadata": {},
    "source": [
     "## Configure coagulation (discrete)\n",
@@ -100,7 +100,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "f4b2f814",
+   "id": "c535b6d2",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -118,7 +118,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a6f34691",
+   "id": "042581a5",
    "metadata": {},
    "source": [
     "## Execute a short coagulation step\n",
@@ -130,7 +130,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a31b03e7",
+   "id": "98de694c",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -148,7 +148,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2f5f1773",
+   "id": "ec548324",
    "metadata": {},
    "source": [
     "## Plot: concentration before/after"
@@ -157,7 +157,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ebee1887",
+   "id": "0bb8c1f8",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -175,7 +175,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d95f4f9d",
+   "id": "bda9da00",
    "metadata": {},
    "source": [
     "## Summary\n",

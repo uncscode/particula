@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "abc4b440",
+   "id": "d77e36af",
    "metadata": {},
    "source": [
     "# Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)\n",
@@ -22,7 +22,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "7ba1f9ba",
+   "id": "8fff8ff0",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -36,7 +36,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "34861a6e",
+   "id": "42d45fe6",
    "metadata": {},
    "source": [
     "## Build aerosols (PMF and PDF)"
@@ -45,7 +45,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "c499d981",
+   "id": "8a5b46df",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -110,7 +110,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f6e956d8",
+   "id": "2879847d",
    "metadata": {},
    "source": [
     "## Configure coagulation runnables"
@@ -119,7 +119,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "18ab616b",
+   "id": "0474bca5",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -145,7 +145,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "daf7a62c",
+   "id": "1e521776",
    "metadata": {},
    "source": [
     "## Execute short coagulation steps"
@@ -154,7 +154,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a3ec78c1",
+   "id": "8f51ebf5",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -178,7 +178,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "54dfc8f5",
+   "id": "214d3d87",
    "metadata": {},
    "source": [
     "## Convert for apples-to-apples comparison\n",
@@ -190,7 +190,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "6616b144",
+   "id": "47d37d89",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -217,7 +217,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "171f624e",
+   "id": "daf61058",
    "metadata": {},
    "source": [
     "## Plots"
@@ -226,7 +226,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "79cd87c9",
+   "id": "c307da16",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -259,7 +259,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "94beb256",
+   "id": "e4e0ac5b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -291,7 +291,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2cf6f8c7",
+   "id": "c623a02c",
    "metadata": {},
    "source": [
     "## Summary\n",

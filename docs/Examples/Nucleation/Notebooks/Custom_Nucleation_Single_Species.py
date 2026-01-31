@@ -24,8 +24,8 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # particula
 import particula as par
@@ -74,7 +74,6 @@ def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
     """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
-
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -91,7 +90,6 @@ def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
     """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
-
     squeeze_single_species_arrays(particles)
 
     squeeze_single_species_arrays(particles)
@@ -146,7 +144,6 @@ def ensure_single_species_shapes(
 
 def build_aerosol() -> par.Aerosol:
     """Construct a fresh aerosol with consistent gas and particle setup."""
-
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")
@@ -381,7 +378,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 bin_edges = bins_lognormal
 
-for i, t in enumerate(time):
+for i, _ in enumerate(time):
     if i > 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
         aerosol.atmosphere.partitioning_species.add_concentration(
