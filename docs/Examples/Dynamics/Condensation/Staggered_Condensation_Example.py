@@ -37,8 +37,9 @@
 # #!pip install particula[extra] --quiet
 import copy
 
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+
 import particula as par
 
 # Set random seed for reproducibility
@@ -106,7 +107,7 @@ rng = np.random.default_rng(RANDOM_SEED)
 particle_radii = rng.lognormal(mean=np.log(100e-9), sigma=0.5, size=n_particles)
 
 # Calculate particle masses
-particle_masses = (4 / 3) * np.pi * particle_radii**3 * density
+particle_masses = (4/3) * np.pi * particle_radii**3 * density
 mass_speciation = particle_masses.reshape(-1, 1)  # Single species
 densities = np.array([density])  # Single species density array
 
@@ -131,7 +132,7 @@ particles = (
 
 print(f"Created {n_particles} particles")
 print(f"Initial total particle mass: {np.sum(particle_masses):.6e} kg")
-print(f"Mean particle radius: {np.mean(particle_radii) * 1e9:.1f} nm")
+print(f"Mean particle radius: {np.mean(particle_radii)*1e9:.1f} nm")
 
 
 # %% [markdown]
@@ -147,7 +148,6 @@ print(f"Mean particle radius: {np.mean(particle_radii) * 1e9:.1f} nm")
 #
 # Let's run the same simulation with each mode and compare the results.
 
-
 # %%
 def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
     """Run condensation simulation and track mass over time."""
@@ -156,32 +156,25 @@ def run_simulation(strategy, aerosol, time_step, n_steps, sub_steps=1):
     # Deep copy for this simulation
     current_aerosol = par.Aerosol(
         atmosphere=copy.deepcopy(aerosol.atmosphere),
-        particles=copy.deepcopy(aerosol.particles),
+        particles=copy.deepcopy(aerosol.particles)
     )
 
     particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
-    gas_mass = float(
-        current_aerosol.atmosphere.partitioning_species.get_concentration()
-    )
+    gas_mass = float(current_aerosol.atmosphere.partitioning_species.get_concentration())
     mass_history = [particle_mass]
     gas_mass_history = [gas_mass]
 
-    for _ in range(n_steps):
+    for step in range(n_steps):
         # Execute condensation
-        current_aerosol = condensation.execute(
-            current_aerosol, time_step, sub_steps
-        )
+        current_aerosol = condensation.execute(current_aerosol, time_step, sub_steps)
 
         # Record masses after step
         particle_mass = float(np.sum(current_aerosol.particles.get_mass()))
-        gas_mass = float(
-            current_aerosol.atmosphere.partitioning_species.get_concentration()
-        )
+        gas_mass = float(current_aerosol.atmosphere.partitioning_species.get_concentration())
         mass_history.append(particle_mass)
         gas_mass_history.append(gas_mass)
 
     return np.array(mass_history), np.array(gas_mass_history)
-
 
 # Create base aerosol
 aerosol_base = par.Aerosol(atmosphere=atmosphere, particles=particles)
@@ -229,28 +222,26 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
 # Plot total mass over time
 for mode, data in results.items():
-    ax1.plot(time, data["total_mass"], label=f"{mode}", linewidth=2)
+    ax1.plot(time, data["total_mass"], label=f'{mode}', linewidth=2)
 
 ax1.set_xlabel("Time (s)")
 ax1.set_ylabel("Total System Mass (kg)")
 ax1.set_title("Total Mass Over Time")
 ax1.legend()
-ax1.ticklabel_format(style="scientific", axis="y", scilimits=(0, 0))
+ax1.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
 
 # Plot relative mass error
 for mode, data in results.items():
     initial_mass = data["total_mass"][0]
     relative_error = np.abs(data["total_mass"] - initial_mass) / initial_mass
-    ax2.plot(time, relative_error, label=f"{mode}", linewidth=2)
+    ax2.plot(time, relative_error, label=f'{mode}', linewidth=2)
 
 ax2.set_xlabel("Time (s)")
 ax2.set_ylabel("Relative Mass Error")
 ax2.set_title("Mass Conservation Error")
 ax2.set_yscale("log")
 ax2.legend()
-ax2.axhline(
-    y=1e-10, color="gray", linestyle="--", alpha=0.5, label="Target (1e-10)"
-)
+ax2.axhline(y=1e-10, color='gray', linestyle='--', alpha=0.5, label='Target (1e-10)')
 
 plt.tight_layout()
 plt.show()
@@ -307,16 +298,8 @@ time_stability = np.arange(n_steps_stability + 1) * large_time_step
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
 # Particle mass evolution
-ax1.plot(
-    time_stability, staggered_mass, label="Staggered (random)", linewidth=2
-)
-ax1.plot(
-    time_stability,
-    simultaneous_mass,
-    label="Simultaneous",
-    linewidth=2,
-    linestyle="--",
-)
+ax1.plot(time_stability, staggered_mass, label='Staggered (random)', linewidth=2)
+ax1.plot(time_stability, simultaneous_mass, label='Simultaneous', linewidth=2, linestyle='--')
 ax1.set_xlabel("Time (s)")
 ax1.set_ylabel("Particle Mass (kg)")
 ax1.set_title(f"Particle Mass (dt = {large_time_step}s)")
@@ -326,21 +309,11 @@ ax1.legend()
 staggered_total = staggered_mass + staggered_gas
 simultaneous_total = simultaneous_mass + simultaneous_gas
 
-staggered_error = (
-    np.abs(staggered_total - staggered_total[0]) / staggered_total[0]
-)
-simultaneous_error = (
-    np.abs(simultaneous_total - simultaneous_total[0]) / simultaneous_total[0]
-)
+staggered_error = np.abs(staggered_total - staggered_total[0]) / staggered_total[0]
+simultaneous_error = np.abs(simultaneous_total - simultaneous_total[0]) / simultaneous_total[0]
 
-ax2.plot(time_stability, staggered_error, label="Staggered", linewidth=2)
-ax2.plot(
-    time_stability,
-    simultaneous_error,
-    label="Simultaneous",
-    linewidth=2,
-    linestyle="--",
-)
+ax2.plot(time_stability, staggered_error, label='Staggered', linewidth=2)
+ax2.plot(time_stability, simultaneous_error, label='Simultaneous', linewidth=2, linestyle='--')
 ax2.set_xlabel("Time (s)")
 ax2.set_ylabel("Relative Mass Error")
 ax2.set_title("Mass Conservation at Large Time Steps")
@@ -395,7 +368,7 @@ fig, ax = plt.subplots(figsize=(8, 5))
 for num_batches, total_mass in batch_results.items():
     initial = total_mass[0]
     error = np.abs(total_mass - initial) / initial
-    ax.plot(time, error, label=f"num_batches={num_batches}", linewidth=2)
+    ax.plot(time, error, label=f'num_batches={num_batches}', linewidth=2)
 
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Relative Mass Error")
