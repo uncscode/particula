@@ -7,10 +7,21 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.17.3
 #   kernelspec:
-#     display_name: particula
+#     display_name: particula_dev312
 #     language: python
 #     name: python3
 # ---
+
+# %%
+"""Demonstrate a custom single-species nucleation workflow with particula.
+
+The guide builds an aerosol with ammonium sulfate vapor, applies fixed nucleation
+rates, and couples condensation and coagulation runnables while maintaining mass
+conservation and user-defined particle shapes.
+
+Examples:
+    >>> custom_nucleation = CustomNucleationSingleSpecies()
+"""
 
 # %% [markdown]
 # # Custom Nucleation: Single Species
@@ -116,6 +127,15 @@ def ensure_single_species_shapes(
     def _add_mass_single_species(
         distribution, concentration, density, added_mass
     ):
+        """Wrap add_mass to keep single-species arrays one-dimensional.
+
+        Args:
+            distribution: Particle distribution array representing masses.
+            concentration: Concentration array corresponding to the particles.
+            density: Density value used for the mass calculation.
+            added_mass: Mass to add; will be squeezed to 1-D before calling
+                the original method.
+        """
         added_mass = np.atleast_1d(np.squeeze(added_mass))
         result = original_add_mass(
             distribution, concentration, density, added_mass
@@ -131,6 +151,16 @@ def ensure_single_species_shapes(
         charge=None,
         added_charge=None,
     ):
+        """Wrap add_concentration to maintain single-species shapes.
+
+        Args:
+            distribution: Current particle distribution array.
+            concentration: Current concentration array.
+            added_distribution: Distribution array for the incoming mass.
+            added_concentration: Concentration array for the incoming mass.
+            charge: Optional charge array for the existing particles.
+            added_charge: Optional charge array for the incoming particles.
+        """
         added_distribution = np.atleast_1d(np.squeeze(added_distribution))
         added_concentration = np.atleast_1d(np.squeeze(added_concentration))
         added_charge = (
