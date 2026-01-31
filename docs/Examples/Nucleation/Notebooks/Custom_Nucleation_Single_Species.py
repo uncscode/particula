@@ -109,7 +109,6 @@ def ensure_single_species_shapes(
         None: This helper mutates the particle representation in place.
     """
     squeeze_single_species_arrays(particles)
-    squeeze_single_species_arrays(particles)
 
     original_add_mass = particles.strategy.add_mass
     original_add_concentration = particles.strategy.add_concentration
