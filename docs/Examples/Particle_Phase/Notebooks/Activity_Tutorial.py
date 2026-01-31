@@ -1,3 +1,17 @@
+"""Activity tutorial for mixing rules and water activity predictions.
+
+This tutorial demonstrates mixing behavior in aerosol solutions, including
+ideal and non-ideal mixing rules. Topics covered include mass-based and
+molar-based activity calculations, and kappa value parameterization for
+predicting water activity in non-ideal solutions.
+
+Example:
+    Run this tutorial to learn about different activity strategies::
+
+        import particula as par
+        activity_mass = par.particles.ActivityIdealMass()
+        activities = activity_mass.activity(mass_concentration=[0.2, 0.8])
+"""
 # ---
 # jupyter:
 #   jupytext:

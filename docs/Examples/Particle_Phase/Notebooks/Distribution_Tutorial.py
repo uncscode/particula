@@ -1,3 +1,24 @@
+"""Distribution strategy tutorial for particle property calculations.
+
+This tutorial covers the distribution strategies implemented in particula
+for calculating particle properties. Strategies define how to compute
+derived properties like particle mass, radius, and total mass based on
+the distribution type (mass-based, radius-based, or speciated-mass).
+
+Strategies covered:
+    - MassBasedMovingBin: Calculate radius from known particle mass
+    - RadiiBasedMovingBin: Calculate mass from known particle radius
+    - SpeciatedMassMovingBin: Multi-species mass-based calculations
+
+Example:
+    Calculate particle radius from mass::
+
+        import numpy as np
+        import particula as par
+        mass = np.linspace(0, 10, 5)  # kg
+        density = np.array([1000.0])  # kg/m^3
+        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)
+"""
 # ---
 # jupyter:
 #   jupytext:
@@ -48,7 +69,7 @@ import particula as par
 
 # %%
 mass_distribution = np.linspace(0, 10, 5)  # kg
-density = 1000  # kg/m^3
+density = np.array([1000.0])  # kg/m^3
 
 radius = par.particles.MassBasedMovingBin().get_radius(
     mass_distribution, density
@@ -78,17 +99,17 @@ print(f"Same as the sum*concentration: {np.sum(mass_distribution)} kg")
 
 # %%
 radii_distribution = np.linspace(0, 0.1, 5)  # m
-density = 1000  # kg/m^3
+density_radii = np.array([1000.0])  # kg/m^3
 
 radii_strategy = par.particles.RadiiBasedMovingBinBuilder().build()
 
-mass_distribution = radii_strategy.get_mass(radii_distribution, density)
+mass_distribution = radii_strategy.get_mass(radii_distribution, density_radii)
 print(f"Mass of the particles: {mass_distribution} kg")
 
 total_mass = radii_strategy.get_total_mass(
     radii_distribution,
     concentration=np.ones_like(radii_distribution),
-    density=density,
+    density=density_radii,
 )
 print(f"Total mass of the particles: {total_mass} kg")
 
