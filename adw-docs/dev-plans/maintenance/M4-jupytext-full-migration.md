@@ -425,24 +425,33 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 12: Simulations - Soot + Cough (`M4-P12`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #994 | **Size:** S | **Status:** Completed (2026-01-30)
 
 **Notebooks (2) - Long-Running:**
 - `docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb`
 - `docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb`
 
 **Tasks:**
-- [ ] Profile execution time for each notebook
-- [ ] Convert both notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute with extended timeout (1200s)
-- [ ] Mark for pre-commit exclusion if >60s
+- [x] Profile execution time for each notebook
+- [x] Convert both notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute with extended timeout (1200s)
+- [x] Mark for pre-commit exclusion if >60s
 
 **Acceptance Criteria:**
-- Both notebooks converted and synced
-- Execution times documented
-- Slow notebook handling configured
+- Both notebooks converted and synced (met)
+- Execution times documented (met)
+- Slow notebook handling configured (met)
+
+**Completion Notes (2026-01-30):**
+- Jupytext migration for Soot + Cough simulation notebooks completed
+- Converted to paired `.py:percent` format, linted, synced, and executed
+- Execution times profiled:
+  - `Soot_Formation_in_Flames.ipynb`: ~8-9 minutes (>300s) → Nightly CI only
+  - `Cough_Droplets_Partitioning.ipynb`: ~2 minutes (60-300s) → CI only
+- No API deprecation warnings encountered during execution
+- Files created: `Soot_Formation_in_Flames.py` (~1152 LOC), `Cough_Droplets_Partitioning.py` (~886 LOC)
 
 ---
 
@@ -608,8 +617,8 @@ Execution times will be documented as each simulation phase completes:
 |----------|----------------|----------|
 | Cloud_Chamber_Single_Cycle.ipynb | TBD (P11) | |
 | Cloud_Chamber_Multi_Cycle.ipynb | TBD (P11) | |
-| Soot_Formation_in_Flames.ipynb | TBD (P12) | |
-| Cough_Droplets_Partitioning.ipynb | TBD (P12) | |
+| Soot_Formation_in_Flames.ipynb | ~8-9 min | Nightly CI only (>300s) |
+| Cough_Droplets_Partitioning.ipynb | ~2 min | CI only (60-300s) |
 | Organic_Partitioning_and_Coagulation.ipynb | TBD (P13) | |
 | Biomass_Burning_Cloud_Interactions.ipynb | TBD (P13) | |
 
@@ -647,7 +656,7 @@ If API issues are found:
 | M4-P9 | 3 | Dynamics/Condensation (1) | Not Started |
 | M4-P10 | 2 | Dynamics/Condensation (2) + Customization | Not Started |
 | M4-P11 | 2 | Simulations - Cloud Chamber (slow) | Not Started |
-| M4-P12 | 2 | Simulations - Soot + Cough (slow) | Not Started |
+| M4-P12 | 2 | Simulations - Soot + Cough (slow) | Completed |
 | M4-P13 | 2 | Simulations - Organic + Biomass (slow) | Not Started |
 | M4-P14 | - | Pre-commit Hook | Not Started |
 | M4-P15 | - | CI Validation & Documentation | Not Started |

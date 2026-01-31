@@ -108,6 +108,17 @@ and rollout.
   - Scope: Enable `add_concentration()` to accept optional charge parameter for
     ion injection in coagulation simulations.
 
+- [Jupytext Notebook Sync Migration (Pilot)][plan-jupytext-pilot] — Status:
+  Completed (P2)
+  - Scope: Pilot migration of 4 notebooks (Activity, Gas_Phase) to Jupytext
+    paired sync format (`.py:percent`). Validate workflow with ADW tools.
+
+- [Jupytext Notebook Sync - Full Migration][plan-jupytext-full] — Status:
+  In Progress (P2)
+  - Scope: Complete migration of remaining ~35 notebooks to Jupytext paired sync
+    format. Implement pre-commit hooks and CI validation.
+  - Progress: 3/15 phases completed (M4-P2, M4-P6, M4-P12)
+
 ## References
 
 - Parent wall loss epic: [#72](https://github.com/uncscode/particula/issues/72)
@@ -154,3 +165,5 @@ and rollout.
 <!-- Maintenance Links -->
 [plan-notebook-migration]: maintenance/M2-notebook-api-migration.md
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md
+[plan-jupytext-pilot]: maintenance/M3-jupytext-notebook-sync.md
+[plan-jupytext-full]: maintenance/M4-jupytext-full-migration.md
