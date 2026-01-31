@@ -362,15 +362,27 @@ docs/Examples/Dynamics/Coagulation/
 └── Coagulation_Tutorial.py       # For development (percent format)
 ```
 
-Current Jupytext paired coverage (percent format) includes the Nucleation and
-Particle_Phase tutorials:
+Most notebooks in `docs/Examples/` have been migrated to Jupytext paired sync
+format. To find all paired notebooks, look for `.py` files alongside `.ipynb`
+files in the Examples directories:
 
-- `docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species`
-- `docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial`
-- `docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial`
+```bash
+# List all paired .py files
+find docs/Examples -name "*.py" -type f | head -20
+```
 
-These are paired via `.py:percent` scripts and stay in sync with their `.ipynb`
-notebooks.
+Categories with paired notebooks include:
+- `Activity/` - Activity coefficient tutorials
+- `Aerosol/` - Aerosol building tutorials
+- `Chamber_Wall_Loss/Notebooks/` - Wall loss strategy examples
+- `Dynamics/Coagulation/` - Coagulation tutorials and functional examples
+- `Equilibria/Notebooks/` - Equilibria and activity examples
+- `Gas_Phase/Notebooks/` - Gas species and atmosphere tutorials
+- `Nucleation/Notebooks/` - Nucleation tutorials
+- `Particle_Phase/Notebooks/` - Particle representation tutorials
+- `Simulations/Notebooks/` - End-to-end simulation notebooks
+
+All paired files use the `.py:percent` format with `# %%` cell markers.
 
 #### LLM Editing Workflow
 
