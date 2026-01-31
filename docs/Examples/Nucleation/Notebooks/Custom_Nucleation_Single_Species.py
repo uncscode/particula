@@ -7,16 +7,10 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.17.3
 #   kernelspec:
-#     display_name: .venv
+#     display_name: particula
 #     language: python
 #     name: python3
 # ---
-
-"""Tutorial for building a custom single-species nucleation simulation.
-
-Sets up sulfate gas and resolved particles and constrains arrays to one species.
-Includes condensation, coagulation, and custom mass-based nucleation steps.
-"""
 
 # %% [markdown]
 # # Custom Nucleation: Single Species
@@ -30,8 +24,8 @@ Includes condensation, coagulation, and custom mass-based nucleation steps.
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 # particula
 import particula as par
@@ -79,11 +73,8 @@ particle_mass_sample = (
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Clamp single-species arrays to 1-D while keeping charge unchanged.
+    """Keep single-species mass/concentration strictly 1-D; leave charge untouched."""
 
-    Args:
-        particles: Particle representation to update in place.
-    """
     if hasattr(particles, "distribution"):
         particles.distribution = np.atleast_1d(
             np.squeeze(particles.distribution)
@@ -99,11 +90,8 @@ def squeeze_single_species_arrays(
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
 ):
-    """Enforce 1-D shapes and wrap add methods for a single species case.
+    """Keep mass/concentration 1-D and patch add_mass/add_concentration for 1 species."""
 
-    Args:
-        particles: Particle representation whose add methods are wrapped.
-    """
     squeeze_single_species_arrays(particles)
 
     squeeze_single_species_arrays(particles)
@@ -157,11 +145,8 @@ def ensure_single_species_shapes(
 
 
 def build_aerosol() -> par.Aerosol:
-    """Construct an aerosol with sulfate gas and resolved particle masses.
+    """Construct a fresh aerosol with consistent gas and particle setup."""
 
-    Returns:
-        Aerosol object initialized with sulfate gas and resolved particles.
-    """
     gas_sulfate = (
         par.gas.GasSpeciesBuilder()
         .set_name("sulfate")
@@ -396,7 +381,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 bin_edges = bins_lognormal
 
-for i, _ in enumerate(time):
+for i, t in enumerate(time):
     if i > 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
         aerosol.atmosphere.partitioning_species.add_concentration(
@@ -473,11 +458,11 @@ for i, _ in enumerate(time):
     if i == 0:
         bin_edges = edges
     total_number_resolved[i] = np.sum(number_distribution > 0)
-    saturation_ratio_output[i] = float(
+    saturation_ratio_output[i] = np.asarray(
         aerosol.atmosphere.partitioning_species.get_saturation_ratio(
             temperature=298.15
         )
-    )
+    ).flat[0]
 
     if i % 20 == 0:
         # Retrieve and print the total number of resolved particles simulated

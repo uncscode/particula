@@ -1,6 +1,6 @@
 # Maintenance M4: Jupytext Notebook Sync - Full Migration
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P2
 **Owners**: ADW / Maintainers
 **Target Date**: 2026-Q2
@@ -249,7 +249,7 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 6: Dynamics/Coagulation Main (`M4-P6`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #988 | **Size:** S | **Status:** Completed
 
 **Notebooks (3):**
 - `docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb`
@@ -257,16 +257,22 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 - `docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb`
 
 **Tasks:**
-- [ ] Convert all 3 notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute notebooks to verify they work
-- [ ] Check for API updates needed
+- [x] Convert all 3 notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute notebooks to verify they work
+- [x] Check for API updates needed
+
+**Completion Notes:**
+- Converted to paired `.py:percent` format and synced back to `.ipynb`.
+- Aligned coagulation API calls with current builders (`BrownianCoagulationBuilder` → `Coagulation`).
+- Executed all three notebooks cleanly; no deprecation warnings.
 
 **Acceptance Criteria:**
-- All 3 notebooks converted and synced
-- `ruff check` passes on new `.py` files
-- All notebooks execute successfully without API warnings
+- All 3 notebooks converted and synced (met)
+- `ruff check` passes on new `.py` files (met)
+- All notebooks execute successfully without API warnings (met)
+
 
 ---
 
@@ -623,7 +629,7 @@ If API issues are found:
 | M4-P3 | 3 | Particle_Phase (2) | Not Started |
 | M4-P4 | 3 | Particle_Phase Functional + Chamber_Wall_Loss (1) | Not Started |
 | M4-P5 | 3 | Chamber_Wall_Loss (2) | Not Started |
-| M4-P6 | 3 | Dynamics/Coagulation Main | Not Started |
+| M4-P6 | 3 | Dynamics/Coagulation Main | Completed |
 | M4-P7 | 2 | Dynamics/Coagulation Charge | Not Started |
 | M4-P8 | 4 | Dynamics/Coagulation Functional (sync existing) | Not Started |
 | M4-P9 | 3 | Dynamics/Condensation (1) | Not Started |
