@@ -180,7 +180,7 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 3: Particle_Phase Part 2 (`M4-P3`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #1004 | **Size:** S | **Status:** Completed
 
 **Notebooks (3):**
 - `docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb`
@@ -188,16 +188,23 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 - `docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb`
 
 **Tasks:**
-- [ ] Convert all 3 notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute notebooks to verify they work
-- [ ] Check for API updates needed
+- [x] Convert all 3 notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute notebooks to verify they work
+- [x] Check for API updates needed
+
+**Completion Notes:**
+- Converted all 3 notebooks to paired `.py:percent` format
+- Linted with ruff check --fix and ruff format
+- Synced and validated with --check-sync
+- Executed all notebooks successfully without API warnings
+- No API issues detected
 
 **Acceptance Criteria:**
-- All 3 notebooks converted and synced
-- `ruff check` passes on new `.py` files
-- All notebooks execute successfully without API warnings
+- All 3 notebooks converted and synced (met)
+- `ruff check` passes on new `.py` files (met)
+- All notebooks execute successfully without API warnings (met)
 
 ---
 
@@ -278,23 +285,28 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 7: Dynamics/Coagulation Charge (`M4-P7`)
 
-**Issue:** TBD | **Size:** XS | **Status:** Not Started
+**Issue:** #989 | **Size:** XS | **Status:** Completed (charged pair migrated)
 
 **Notebooks (2):**
 - `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb`
 - `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb`
 
 **Tasks:**
-- [ ] Convert both notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute notebooks to verify they work
-- [ ] Check for API updates needed
+- [x] Convert both notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute notebooks to verify they work
+- [x] Check for API updates needed (none observed; kernelspec display name set to `particula_dev312`)
 
 **Acceptance Criteria:**
-- Both notebooks converted and synced
-- `ruff check` passes on new `.py` files
-- All notebooks execute successfully without API warnings
+- Both notebooks converted and synced (met)
+- `ruff check` passes on new `.py` files (met)
+- All notebooks execute successfully without API warnings (met)
+
+**Completion Notes (2026-01-30):**
+- Converted and synced both charged coagulation notebooks with Jupytext percent format
+- Standardized kernelspec to `particula_dev312`; execution outputs present
+- No API changes required; linted cleanly and executed without warnings
 
 ---
 
@@ -635,7 +647,7 @@ If API issues are found:
 |-------|-----------|-----------|--------|
 | M4-P1 | 3 | Aerosol + Equilibria | Not Started |
 | M4-P2 | 3 | Nucleation + Particle_Phase (1) | Not Started |
-| M4-P3 | 3 | Particle_Phase (2) | Not Started |
+| M4-P3 | 3 | Particle_Phase (2) | Completed |
 | M4-P4 | 3 | Particle_Phase Functional + Chamber_Wall_Loss (1) | Not Started |
 | M4-P5 | 3 | Chamber_Wall_Loss (2) | Not Started |
 | M4-P6 | 3 | Dynamics/Coagulation Main | Completed |
@@ -662,4 +674,4 @@ If API issues are found:
 |------|--------|--------|
 | 2026-01-30 | Initial plan created (deferred from M3 pilot) | ADW |
 | 2026-01-30 | Restructured to max 3 notebooks per phase for isolated validation | ADW |
-| 2026-01-30 | M4-P12 completed: Soot + Cough notebooks migrated, execution times documented | ADW |
+| 2026-01-30 | Marked M4-P7 (charged coagulation) completed; added completion notes | ADW |
