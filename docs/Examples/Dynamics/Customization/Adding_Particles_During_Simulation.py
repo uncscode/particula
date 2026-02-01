@@ -24,8 +24,8 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # particula imports
 import particula as par
