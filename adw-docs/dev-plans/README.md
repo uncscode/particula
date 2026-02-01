@@ -117,7 +117,7 @@ and rollout.
   In Progress (P2)
   - Scope: Complete migration of remaining ~35 notebooks to Jupytext paired sync
     format. Implement pre-commit hooks and CI validation.
-  - Progress: 3/15 phases completed (M4-P2, M4-P6, M4-P12)
+  - Progress: 10/15 phases completed (all notebook conversions done; P14-P15 remain)
 
 ## References
 

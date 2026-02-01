@@ -346,7 +346,7 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 9: Dynamics/Condensation Part 1 (`M4-P9`)
 
-**Issue:** TBD | **Size:** S | **Status:** Not Started
+**Issue:** #991 | **Size:** S | **Status:** Completed (2026-02-01)
 
 **Notebooks (3):**
 - `docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb`
@@ -354,16 +354,27 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 - `docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb`
 
 **Tasks:**
-- [ ] Convert all 3 notebooks to `.py:percent` format
-- [ ] Run `ruff check --fix` and `ruff format` on new `.py` files
-- [ ] Validate sync with `--check-sync`
-- [ ] Execute notebooks to verify they work
-- [ ] Check for API updates needed (condensation API recently updated)
+- [x] Convert all 3 notebooks to `.py:percent` format
+- [x] Run `ruff check --fix` and `ruff format` on new `.py` files
+- [x] Validate sync with `--check-sync`
+- [x] Execute notebooks to verify they work
+- [x] Check for API updates needed (condensation API recently updated)
+
+**Completion Notes (2026-02-01):**
+- All 3 notebooks converted to paired `.py:percent` format
+- Created `.py` files:
+  - `Condensation_1_Bin.py`
+  - `Condensation_2_MassBin.py`
+  - `Condensation_3_MassResolved.py`
+- All ruff linting passed
+- Sync validated successfully with `--check-sync`
+- All 3 notebooks executed successfully without errors
+- No API deprecation warnings - all notebooks use current API (`CondensationIsothermal`, `MassCondensation`)
 
 **Acceptance Criteria:**
-- All 3 notebooks converted and synced
-- `ruff check` passes on new `.py` files
-- All notebooks execute successfully without API warnings
+- All 3 notebooks converted and synced (met)
+- `ruff check` passes on new `.py` files (met)
+- All notebooks execute successfully without API warnings (met)
 
 ---
 
@@ -666,7 +677,7 @@ If API issues are found:
 | M4-P6 | 3 | Dynamics/Coagulation Main | Completed |
 | M4-P7 | 2 | Dynamics/Coagulation Charge | Not Started |
 | M4-P8 | 4 | Dynamics/Coagulation Functional (sync existing) | Not Started |
-| M4-P9 | 3 | Dynamics/Condensation (1) | Not Started |
+| M4-P9 | 3 | Dynamics/Condensation (1) | Completed |
 | M4-P10 | 2 | Dynamics/Condensation (2) + Customization | Not Started |
 | M4-P11 | 2 | Simulations - Cloud Chamber (slow) | Completed |
 | M4-P12 | 2 | Simulations - Soot + Cough (slow) | Not Started |
@@ -690,3 +701,4 @@ If API issues are found:
 | 2026-01-30 | Marked M4-P7 (charged coagulation) completed; added completion notes | ADW |
 | 2026-01-31 | Completed M4-P13 (Organic + Biomass); fixed deprecated `organic_array` API | ADW |
 | 2026-01-31 | **ALL 35 NOTEBOOKS CONVERTED** - ready for Phase 14 (pre-commit hook) | ADW |
+| 2026-02-01 | Completed M4-P9 (Dynamics/Condensation Part 1); 3 notebooks converted, API current | ADW |

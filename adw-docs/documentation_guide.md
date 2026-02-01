@@ -371,6 +371,7 @@ Categories with paired notebooks include:
 - `Aerosol/` - Aerosol building tutorials
 - `Chamber_Wall_Loss/Notebooks/` - Wall loss strategy examples
 - `Dynamics/Coagulation/` - Coagulation tutorials and functional examples
+- `Dynamics/Condensation/` - Condensation tutorials
 - `Equilibria/Notebooks/` - Equilibria and activity examples
 - `Gas_Phase/Notebooks/` - Gas species and atmosphere tutorials
 - `Nucleation/Notebooks/` - Nucleation tutorials
