@@ -4,3 +4,15 @@ repos:
     hooks:
       - id: ruff
       - id: ruff-format
+  - repo: local
+    hooks:
+      - id: jupytext-sync-execute
+        name: Sync and execute changed notebooks
+        entry: .opencode/hooks/sync-execute-notebooks.sh
+        language: script
+        files: ^docs/Examples/.*\.py$
+        exclude: |
+          (?x)^( 
+            docs/Examples/Simulations/.*  # Slow notebooks - CI only
+          )$
+        pass_filenames: true
