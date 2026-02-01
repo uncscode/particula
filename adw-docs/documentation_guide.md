@@ -1,7 +1,7 @@
 # Documentation Guide
 
 **Version:** 0.2.6
-**Last Updated:** 2026-01-30
+**Last Updated:** 2026-01-31
 
 ## Overview
 
@@ -362,15 +362,22 @@ docs/Examples/Dynamics/Coagulation/
 └── Coagulation_Tutorial.py       # For development (percent format)
 ```
 
-Current Jupytext paired coverage (percent format) includes the Nucleation and
-Particle_Phase tutorials:
+**All 35 notebooks in `docs/Examples/` are now paired via `.py:percent` scripts**
+(completed in M4 migration). Each `.ipynb` has a corresponding `.py` file that
+stays in sync. Always edit the `.py` file and sync to update the `.ipynb`.
 
-- `docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species`
-- `docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial`
-- `docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial`
+Categories with paired notebooks include:
+- `Activity/` - Activity coefficient tutorials
+- `Aerosol/` - Aerosol building tutorials
+- `Chamber_Wall_Loss/Notebooks/` - Wall loss strategy examples
+- `Dynamics/Coagulation/` - Coagulation tutorials and functional examples
+- `Equilibria/Notebooks/` - Equilibria and activity examples
+- `Gas_Phase/Notebooks/` - Gas species and atmosphere tutorials
+- `Nucleation/Notebooks/` - Nucleation tutorials
+- `Particle_Phase/Notebooks/` - Particle representation tutorials
+- `Simulations/Notebooks/` - End-to-end simulation notebooks
 
-These are paired via `.py:percent` scripts and stay in sync with their `.ipynb`
-notebooks.
+All paired files use the `.py:percent` format with `# %%` cell markers.
 
 #### LLM Editing Workflow
 
@@ -540,22 +547,20 @@ ruff format docs/Examples/
 4. **Commit both files** to keep them paired
 5. **Use `--check-sync` in CI** to catch drift
 
-#### Coagulation tutorial pairing (M4-P6)
+#### Migration Complete (M4)
 
-- The coagulation tutorials were migrated to Jupytext percent format in the
-  M4-P6 maintenance task. Keep the paired files in sync:
-  - `docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py` /
-    `.ipynb`
-  - `docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py`
-    / `.ipynb`
-  - `docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py` / `.ipynb`
-- Preserve the `particula_dev312` kernelspec in the notebook metadata after
-  syncing.
+All 35 notebooks in `docs/Examples/` were migrated to Jupytext paired sync
+format in the M4 maintenance plan. Key notes:
+
+- Preserve the `particula_dev312` kernelspec in notebook metadata after syncing
 - After edits: lint → sync → execute → check-sync to confirm the `.py` and
-  `.ipynb` stay aligned and outputs are refreshed.
+  `.ipynb` stay aligned and outputs are refreshed
+- Simulation notebooks (`docs/Examples/Simulations/`) are excluded from
+  pre-commit hooks due to long execution times (CI-only validation)
 
-See [Maintenance Plan M3](dev-plans/maintenance/M3-jupytext-notebook-sync.md)
-for migration details.
+See [Maintenance Plan M4](dev-plans/maintenance/M4-jupytext-full-migration.md)
+for migration details and [M3](dev-plans/maintenance/M3-jupytext-notebook-sync.md)
+for the pilot workflow.
 
 ### Feature Documentation Structure
 

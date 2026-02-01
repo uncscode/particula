@@ -166,3 +166,65 @@ def test_particle_resolved_coagulation_step_duplicate_collisions():
     assert np.all(loss_gain_index[:, 0] < loss_gain_index[:, 1])
     assert np.all(particle_radius[loss_gain_index[:, 0]] == 0)
     assert np.all(particle_radius[loss_gain_index[:, 1]] > 1.0)
+
+
+def test_particle_resolved_coagulation_step_particles_outside_kernel_range():
+    """Test coagulation when particles are outside the kernel_radius range.
+
+    This reproduces the scenario from the Biomass_Burning_Cloud_Interactions
+    notebook where particles grow via condensation to sizes larger than the
+    kernel bins, causing _bin_particles to fail.
+    """
+    # Particles much larger than kernel_radius range (simulating cloud droplets
+    # that grew via condensation)
+    particle_radius = np.array(
+        [1e-5, 2e-5, 5e-5, 1e-4], dtype=np.float64
+    )  # 10-100 µm
+    # Kernel computed for smaller particle range
+    kernel = np.random.rand(10, 10)
+    kernel_radius = np.linspace(1e-9, 1e-6, 10)  # 1 nm to 1 µm
+
+    volume = 1e-6
+    time_step = 1.0
+    random_generator = np.random.default_rng(seed=42)
+
+    # This should not raise an error - particles outside range should be
+    # handled gracefully
+    loss_gain_index = get_particle_resolved_coagulation_step(
+        particle_radius,
+        kernel,
+        kernel_radius,
+        volume,
+        time_step,
+        random_generator,
+    )
+    assert loss_gain_index.shape[1] == 2
+
+
+def test_particle_resolved_coagulation_step_mixed_range_particles():
+    """Test coagulation with particles both inside and outside kernel range.
+
+    Some particles are within kernel_radius, others are larger (overflow) or
+    smaller (underflow).
+    """
+    # Mix of particles: some in range, some overflow, some underflow
+    particle_radius = np.array(
+        [1e-10, 1e-9, 5e-8, 1e-7, 1e-6, 1e-5],  # underflow to overflow
+        dtype=np.float64,
+    )
+    kernel = np.random.rand(10, 10)
+    kernel_radius = np.linspace(1e-9, 1e-7, 10)  # kernel covers middle range
+
+    volume = 1e-6
+    time_step = 1.0
+    random_generator = np.random.default_rng(seed=42)
+
+    loss_gain_index = get_particle_resolved_coagulation_step(
+        particle_radius,
+        kernel,
+        kernel_radius,
+        volume,
+        time_step,
+        random_generator,
+    )
+    assert loss_gain_index.shape[1] == 2

@@ -9,7 +9,7 @@ updates in particula.
 |----|-------|--------|----------|
 | [M2](M2-notebook-api-migration.md) | Jupyter Notebook API Migration | Planning | P2 |
 | [M3](M3-jupytext-notebook-sync.md) | Jupytext Notebook Sync Migration (Pilot) | Planning | P2 |
-| [M4](M4-jupytext-full-migration.md) | Jupytext Notebook Sync - Full Migration | In Progress | P2 |
+| [M4](M4-jupytext-full-migration.md) | Jupytext Notebook Sync - Full Migration | In Progress (P7 completed) | P2 |
 
 ## Completed Maintenance
 
