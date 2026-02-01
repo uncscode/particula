@@ -1,21 +1,3 @@
-"""Aerosol size distribution tutorial using lognormal functions.
-
-This tutorial demonstrates how to calculate and plot lognormal distributions
-for aerosol particles. Covers both probability density functions (PDF) and
-probability mass functions (PMF) for single-mode and multi-mode particle
-size distributions commonly used in aerosol science.
-
-Example:
-    Create a single-mode lognormal distribution::
-
-        import numpy as np
-        import particula as par
-        x_values = np.logspace(-3, 1, 2000)
-        distribution = par.particles.get_lognormal_pdf_distribution(
-            x_values, mode=np.array([0.02]), geometric_std=np.array([1.4]),
-            number_of_particles=np.array([1e3])
-        )
-"""
 # ---
 # jupyter:
 #   jupytext:
@@ -46,7 +28,7 @@ import particula as par
 # %% [markdown]
 # ## Probability Density Function
 #
-# In aerosol science, a probability density function (PDF) describes how likely it is to find particles with diameters in a small interval around a given size. For a number-based size distribution, the PDF indicates the fraction of the total particle number per unit diameter, allowing us to represent populations that span many orders of magnitude in size in a continuous way.
+# (fix this, more details for aerosol science)
 #
 # The probability density function (PDF) of a lognormal distribution is given by:
 #
