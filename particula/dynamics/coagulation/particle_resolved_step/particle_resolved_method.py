@@ -200,8 +200,12 @@ def get_particle_resolved_coagulation_step(
         # Step 7: Determine the number of coagulation tests to run based
         # on kernel value and system parameters
         tests = int(np.ceil(kernel_values.item() * time_step * events / volume))
-        if tests == 0 or events == 0:
+        if tests <= 0 or events == 0:
             continue
+        # Cap tests to prevent memory issues when particles are outside
+        # the kernel radius range (which can cause inflated kernel values)
+        max_tests = max(len(small_indices), len(large_indices)) * 10
+        tests = min(tests, max_tests)
 
         # Step 8: Randomly select small and large particle pairs for
         # coagulation tests
