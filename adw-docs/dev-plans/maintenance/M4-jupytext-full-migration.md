@@ -134,6 +134,17 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ---
 
+## Acceptance Criteria Mapping
+
+- [x] CI job blocks on desynced notebooks via `--check-sync`.
+- [x] CI executes notebooks with split timeouts (600s fast, 1200s slow).
+- [x] Repository free of `.ipynb.bak` and orphaned pairs.
+- [x] Documentation guide reflects CI + pre-commit behavior and slow
+  notebook handling.
+- [x] Maintenance plan status set to Shipped and index updated.
+
+---
+
 ## Phase Checklist
 
 ### Phase 1: Aerosol + Equilibria (`M4-P1`)
@@ -294,7 +305,7 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 7: Dynamics/Coagulation Charge (`M4-P7`)
 
-**Issue:** #989 | **Size:** XS | **Status:** Completed (charged pair migrated)
+**Issue:** #989 | **Size:** XS | **Status:** Completed
 
 **Notebooks (2):**
 - `docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb`
@@ -432,7 +443,7 @@ These `.py` files already exist WITH matching notebooks - they need **sync valid
 
 ### Phase 12: Simulations - Soot + Cough (`M4-P12`)
 
-**Issue:** #994 | **Size:** S | **Status:** Completed (2026-01-30)
+**Issue:** #994 | **Size:** S | **Status:** Completed
 
 **Notebooks (2) - Long-Running:**
 - `docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb`
@@ -683,12 +694,12 @@ If API issues are found:
 | M4-P4 | 3 | Particle_Phase Functional + Chamber_Wall_Loss (1) | Not Started |
 | M4-P5 | 3 | Chamber_Wall_Loss (2) | Not Started |
 | M4-P6 | 3 | Dynamics/Coagulation Main | Completed |
-| M4-P7 | 2 | Dynamics/Coagulation Charge | Not Started |
+| M4-P7 | 2 | Dynamics/Coagulation Charge | Completed |
 | M4-P8 | 4 | Dynamics/Coagulation Functional (sync existing) | Not Started |
 | M4-P9 | 3 | Dynamics/Condensation (1) | Completed |
 | M4-P10 | 2 | Dynamics/Condensation (2) + Customization | Not Started |
 | M4-P11 | 2 | Simulations - Cloud Chamber (slow) | Completed |
-| M4-P12 | 2 | Simulations - Soot + Cough (slow) | Not Started |
+| M4-P12 | 2 | Simulations - Soot + Cough (slow) | Completed |
 | M4-P13 | 2 | Simulations - Organic + Biomass (slow) | Completed |
 | M4-P14 | - | Pre-commit Hook | Completed |
 | M4-P15 | - | CI Validation & Documentation | Completed |
@@ -710,4 +721,4 @@ If API issues are found:
 | 2026-01-31 | Completed M4-P13 (Organic + Biomass); fixed deprecated `organic_array` API | ADW |
 | 2026-01-31 | **ALL 35 NOTEBOOKS CONVERTED** - ready for Phase 14 (pre-commit hook) | ADW |
 | 2026-02-01 | Completed M4-P9 (Dynamics/Condensation Part 1); 3 notebooks converted, API current | ADW |
-| 2026-02-01 | Completed M4-P14 (pre-commit hook) and M4-P15 (CI validation & docs); marked plan Shipped | ADW |
+| 2026-02-01 | Completed M4-P14 (pre-commit hook) and M4-P15 (CI validation & docs); marked plan Shipped and validated CI split-timeout workflow | ADW |
