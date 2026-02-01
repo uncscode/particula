@@ -337,6 +337,12 @@ class CoagulationStrategyABC(ABC):
             )
             # Type narrowing: cast to NDArray for step function
             kernel_arr = cast(NDArray[np.float64], np.atleast_1d(kernel))
+            # Ensure kernel_radius is monotonically increasing for binning
+            # and reorder kernel matrix accordingly
+            sort_indices = np.argsort(kernel_radius)
+            kernel_radius = kernel_radius[sort_indices]
+            if kernel_arr.ndim == 2:
+                kernel_arr = kernel_arr[sort_indices][:, sort_indices]
             # calculate step
             step_func = (
                 particle_resolved_method.get_particle_resolved_coagulation_step
