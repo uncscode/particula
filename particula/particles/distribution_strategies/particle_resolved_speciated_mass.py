@@ -133,6 +133,9 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         # Handle charge defaults and validation.
         charge_added = added_charge
         if charge is not None:
+            # Handle scalar charge (e.g., charge=0) by converting to array
+            if not isinstance(charge, np.ndarray):
+                charge = np.full_like(concentration, charge, dtype=np.float64)
             if charge_added is None:
                 # Default new particle charges to zero when not provided.
                 charge_added = np.zeros_like(added_concentration)
