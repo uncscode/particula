@@ -39,7 +39,7 @@ jobs:
 
       - name: Execute notebooks (fast set)
         run: |
-          python3 .opencode/tool/run_notebook.py docs/Examples --recursive --timeout 600 --exclude "docs/Examples/Simulations/*" --no-backup
+          python3 .opencode/tool/run_notebook.py docs/Examples --recursive --timeout 600 --no-backup
 
       - name: Execute notebooks (Simulations)
         run: |
