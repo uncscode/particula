@@ -380,9 +380,9 @@ Categories with paired notebooks include:
 
 All paired files use the `.py:percent` format with `# %%` cell markers.
 
-#### LLM Editing Workflow
+#### Editing and Validation Workflow (Pre-commit + CI)
 
-When editing notebooks, LLMs should follow this workflow:
+Follow this order for any notebook change:
 
 ```
 1. EDIT the .py file (percent format)
@@ -398,15 +398,41 @@ When editing notebooks, LLMs should follow this workflow:
    - The .py is newer, so it overwrites the .ipynb
 
 4. EXECUTE .ipynb to validate code works AND generate outputs
-   run_notebook({notebookPath: 'path/to/file.ipynb'})
+   run_notebook({notebookPath: 'path/to/file.ipynb', noBackup: false})
    - If execution FAILS: the .py edit broke something, fix it
    - If execution PASSES: outputs (graphs, tables) are now in .ipynb
-   - Creates .ipynb.bak backup automatically
+   - Creates .ipynb.bak backup by default (remove locally if needed)
 
-5. COMMIT both files
+5. CHECK SYNC drift (CI and local sanity)
+   validate_notebook({notebookPath: 'docs/Examples', recursive: true, checkSync: true})
+
+6. COMMIT both files
    - .py for development (source of truth for code)
    - .ipynb for users/docs (with outputs for website)
 ```
+
+#### Pre-commit Hook Behavior
+
+- Runs on changed `docs/Examples/*.py` (excluding `docs/Examples/Simulations/**`).
+- Sequence: lint → sync → execute → stage `.py` and `.ipynb`.
+- Simulation notebooks are **excluded** from the hook due to long runtimes.
+
+#### CI Notebook Validation
+
+CI enforces notebook health on PRs, pushes, and merge queues:
+
+- **Sync check (fast):** `python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --check-sync`
+- **Fast execution:** `python3 .opencode/tool/run_notebook.py docs/Examples --recursive --timeout 600 --exclude "docs/Examples/Simulations/*" --no-backup`
+- **Simulation execution:** `python3 .opencode/tool/run_notebook.py docs/Examples/Simulations --recursive --timeout 1200 --no-backup`
+- Job-level timeout: 20 minutes to cover slow notebooks.
+- Any sync drift or execution error fails CI; timeouts respect the specified
+  limits (no silent skips).
+
+#### Backup Behavior (`.ipynb.bak`)
+
+- `run_notebook` creates `.ipynb.bak` by default; CI passes `--no-backup` to
+  avoid residue.
+- Clean up local backups with `find docs/Examples -name "*.ipynb.bak" -delete`.
 
 #### Why This Order Matters
 
@@ -415,6 +441,7 @@ When editing notebooks, LLMs should follow this workflow:
 | Lint first | Catches syntax errors before sync |
 | Sync before execute | Transfers .py edits into .ipynb |
 | Execute after sync | Validates code AND generates website outputs |
+| Check-sync | Prevents drift between `.py` and `.ipynb` |
 
 If you execute before syncing, you're testing the OLD code, not your edits!
 
@@ -465,7 +492,7 @@ import particula as par
 # %% [markdown]
 # ## Section 1
 #
-# Explanation text...
+# # Explanation text...
 
 # %%
 # Code cell
@@ -562,6 +589,7 @@ format in the M4 maintenance plan. Key notes:
 See [Maintenance Plan M4](dev-plans/maintenance/M4-jupytext-full-migration.md)
 for migration details and [M3](dev-plans/maintenance/M3-jupytext-notebook-sync.md)
 for the pilot workflow.
+
 
 ### Feature Documentation Structure
 
