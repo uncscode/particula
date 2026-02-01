@@ -13,21 +13,6 @@
 # ---
 
 # %% [markdown]
-# # Cloud Chamber Single Cycle (split from Cloud_Chamber_Cycles.ipynb)
-#
-# This notebook covers **sections 1–8** of the original combined tutorial.
-# It focuses on one activation–deactivation cycle that fits within CI time constraints.
-# For multi-cycle comparisons, see the companion [Cloud_Chamber_Multi_Cycle.ipynb](Cloud_Chamber_Multi_Cycle.ipynb).
-#
-# **Learning objectives:**
-# - Configure chamber geometry and wall-loss settings.
-# - Define hygroscopic seeds with kappa-theory.
-# - Build a particle-resolved aerosol with speciated mass.
-# - Run a single activation and deactivation cycle.
-# - Visualize droplet growth/shrinkage and verify mass conservation.
-#
-
-# %% [markdown]
 # # Cloud Chamber Activation-Deactivation Cycle (Single Run)
 #
 # Welcome! This beginner-friendly notebook shows how to simulate one cloud activation-deactivation cycle in a rectangular cloud chamber using **Particula**. You will:

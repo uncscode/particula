@@ -13,22 +13,7 @@
 # ---
 
 # %% [markdown]
-# # Cloud Chamber Multi Cycle (split from Cloud_Chamber_Cycles.ipynb)
-#
-# This notebook covers **sections 9+** of the original combined tutorial.
-# It runs four activation–deactivation cycles across multiple seed scenarios.
-# Start with the single-cycle foundation in [Cloud_Chamber_Single_Cycle.ipynb](Cloud_Chamber_Single_Cycle.ipynb).
-#
-# **Learning objectives:**
-# - Reuse the single-cycle setup for multi-cycle runs.
-# - Compare hygroscopicity across ammonium sulfate, sucrose, and mixed seeds.
-# - Analyze activation timing, water uptake, and mass retention over cycles.
-#
-
-# %% [markdown]
-# ---
-#
-# # Part 2: Multi-Cycle Simulation with Multiple Scenarios
+# # Cloud Chamber Multi-Cycle Simulation
 #
 # This section extends the single-cycle simulation to run **4 complete activation-deactivation cycles** and implements **three seed composition scenarios** to demonstrate kappa-dependent activation behavior:
 #
@@ -646,7 +631,7 @@ print(aerosol_mixed)
 
 
 # %% [markdown]
-# ## 12.5. Run Multi-Cycle Simulations
+# ## 13. Run Multi-Cycle Simulations
 #
 # Execute 4 activation-deactivation cycles for each scenario using the framework defined above.
 
@@ -704,7 +689,7 @@ print("\nAll simulations completed successfully!")
 
 
 # %% [markdown]
-# ## 13. Particle Size Trajectories Over 4 Cycles
+# ## 14. Particle Size Trajectories Over 4 Cycles
 #
 # Visualize particle diameter evolution for all three scenarios, showing the periodic activation-deactivation pattern.
 
@@ -814,7 +799,7 @@ plt.show()
 
 
 # %% [markdown]
-# ## 14. Activated Fraction vs Dry Diameter
+# ## 15. Activated Fraction vs Dry Diameter
 #
 # Compare activation behavior across scenarios. Particles are considered "activated" if their diameter exceeds 1 um during the humid phase.
 
@@ -907,7 +892,7 @@ plt.show()
 
 
 # %% [markdown]
-# ## 15. Water Mass Fraction Over Cycles
+# ## 16. Water Mass Fraction Over Cycles
 #
 # Track mean water mass fraction over time, showing periodic water uptake during humid phases.
 
@@ -1004,7 +989,7 @@ print("  - Periodic pattern reflects activation-deactivation cycles")
 
 
 # %% [markdown]
-# ## 16. Mass Accumulation Over Successive Cycles
+# ## 17. Mass Accumulation Over Successive Cycles
 #
 # Track relative dry mass (non-water) retention for each size bin across cycles. Due to dilution and wall loss, overall mass decreases, but we examine relative retention.
 
@@ -1103,7 +1088,7 @@ print("  - Dilution coefficient affects mass retention rate")
 
 
 # %% [markdown]
-# ## 17. Comparing Activation Behavior Across Scenarios
+# ## 18. Comparing Activation Behavior Across Scenarios
 #
 # Overlay plot showing mean diameter evolution for all three scenarios, highlighting kappa-dependent activation timing.
 
@@ -1206,7 +1191,7 @@ plt.show()
 
 
 # %% [markdown]
-# ## 18. Internal Validation
+# ## 19. Internal Validation
 #
 # Comprehensive validation checks to verify the multi-cycle simulation results.
 
@@ -1490,7 +1475,7 @@ print("=" * 60)
 
 
 # %% [markdown]
-# ## 19. Wall Loss Analysis
+# ## 20. Wall Loss Analysis
 #
 # Size-dependent wall loss using existing histories and the configured rectangular strategy.
 
@@ -1589,7 +1574,7 @@ plt.show()
 
 
 # %% [markdown]
-# ## 20. Summary Comparison Gallery (4 panels)
+# ## 21. Summary Comparison Gallery (4 panels)
 #
 # A quick gallery contrasting activation, size evolution, mass balance, and water uptake for the three scenarios.
 
@@ -1713,7 +1698,7 @@ plt.show()
 
 
 # %% [markdown]
-# ## 21. Water Mass Fraction Evolution
+# ## 22. Water Mass Fraction Evolution
 #
 # Water mass fraction over time for each scenario, with cycle boundaries marked.
 
@@ -1763,7 +1748,7 @@ plt.show()
 
 
 # %% [markdown]
-# ## 24. What You Learned
+# ## 23. What You Learned
 #
 # - Supersaturation drives activation when RH exceeds 100%.
 # - Size matters: larger particles have lower critical supersaturation.
@@ -1774,7 +1759,7 @@ plt.show()
 # - Particle-resolved tracking captures per-particle activation history.
 
 # %% [markdown]
-# ## 25. Summary and Conclusions
+# ## 24. Summary and Conclusions
 #
 # This notebook has demonstrated:
 #
