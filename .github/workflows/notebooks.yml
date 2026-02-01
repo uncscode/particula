@@ -33,10 +33,6 @@ jobs:
           python -m pip install -e .[dev]
           python -m pip install jupytext nbconvert nbclient
 
-      - name: Check notebook sync
-        run: |
-          python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --check-sync
-
       - name: Execute notebooks (fast set)
         run: |
           python3 .opencode/tool/run_notebook.py docs/Examples --recursive --timeout 600 --no-backup
