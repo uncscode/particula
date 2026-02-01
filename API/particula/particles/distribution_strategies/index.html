@@ -14294,7 +14294,13 @@ divide-by-zero.</p>
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
-<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=R0801</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=R0801</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -14340,6 +14346,12 @@ divide-by-zero.</p>
 
     <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># Handle scalar charge (e.g., charge=0) by converting to array</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
+            <span class="n">original_concentration</span><span class="p">,</span> <span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">original_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
@@ -14515,13 +14527,7 @@ where particles are represented by fixed mass bins with concentrations.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/distribution_strategies/mass_based_moving_bin.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
@@ -14545,7 +14551,13 @@ where particles are represented by fixed mass bins with concentrations.</p>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
-<span class="normal">178</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -14873,7 +14885,10 @@ otherwise charge is passed through as None to preserve compatibility.</p>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
-<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches  # noqa: C901</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches  # noqa: C901</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -14924,6 +14939,9 @@ otherwise charge is passed through as None to preserve compatibility.</p>
     <span class="c1"># Handle charge defaults and validation.</span>
     <span class="n">charge_added</span> <span class="o">=</span> <span class="n">added_charge</span>
     <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Handle scalar charge (e.g., charge=0) by converting to array</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">concentration</span><span class="p">,</span> <span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">charge_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Default new particle charges to zero when not provided.</span>
             <span class="n">charge_added</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">added_concentration</span><span class="p">)</span>
@@ -15145,10 +15163,7 @@ summed during collisions. If None, charge handling is skipped.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/distribution_strategies/particle_resolved_speciated_mass.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">179</span>
 <span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
@@ -15206,7 +15221,10 @@ summed during collisions. If None, charge handling is skipped.</p>
 <span class="normal">234</span>
 <span class="normal">235</span>
 <span class="normal">236</span>
-<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -15562,7 +15580,13 @@ to avoid divide-by-zero.</p>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
-<span class="normal">152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -15608,6 +15632,12 @@ to avoid divide-by-zero.</p>
 
     <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># Handle scalar charge (e.g., charge=0) by converting to array</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
+            <span class="n">original_concentration</span><span class="p">,</span> <span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">original_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
@@ -15796,13 +15826,7 @@ concentrations.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/distribution_strategies/radii_based_moving_bin.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">160</span>
 <span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
@@ -15825,7 +15849,13 @@ concentrations.</p>
 <span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
-<span class="normal">183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -16145,7 +16175,13 @@ raise <code>ValueError</code> to mirror sibling strategies.</p>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
-<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=R0801</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_concentration</span><span class="p">(</span>  <span class="c1"># pylint: disable=R0801</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -16192,6 +16228,12 @@ raise <code>ValueError</code> to mirror sibling strategies.</p>
 
     <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># Handle scalar charge (e.g., charge=0) by converting to array</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
+            <span class="n">original_concentration</span><span class="p">,</span> <span class="n">charge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">charge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">original_concentration</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
@@ -16384,13 +16426,7 @@ concentrations.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/distribution_strategies/speciated_mass_moving_bin.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
@@ -16415,7 +16451,13 @@ concentrations.</p>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
-<span class="normal">195</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collide_pairs</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-positional-arguments</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
