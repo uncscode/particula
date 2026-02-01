@@ -458,7 +458,7 @@ condensation_sub_step = 50_000
 
 time_step = total_time / total_steps
 
-for step in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
+for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
     # execute condensation process, this is the slowest computationally
     # feel free to comment this out to see the effect of coagulation only
     # aerosol_process = condensation_process.execute(
