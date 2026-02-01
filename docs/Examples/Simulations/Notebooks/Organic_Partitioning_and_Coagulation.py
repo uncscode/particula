@@ -29,12 +29,12 @@
 #  5. Run isothermal condensation (20 s)
 #  6. Add Brownian coagulation and continue for 10 min
 #  7. Visualise & discuss results
-#  
+#
 #
 #  > **Concept – Secondary Organic Aerosol (SOA):** particles that originate when low-volatility organic vapours condense onto pre-existing seeds.
-#  
+#
 #  > **Concept – Partitioning:** the reversible transfer of a compound between the gas phase and the particle phase until thermodynamic equilibrium is reached.
-#  
+#
 #  > **Concept – Brownian Coagulation:** random collisions driven by thermal motion that merge individual particles into larger ones, reducing number concentration while conserving mass.
 
 # %% [markdown]
@@ -51,14 +51,15 @@
 
 # %%
 
-import numpy as np
-from tqdm import tqdm
 import copy
+
 import matplotlib.pyplot as plt
+import numpy as np
 import particula as par
 
-# move to particle properties and update to API style.
-from particula.activity.species_density import organic_array
+# Organic density estimation for species
+from particula.particles import get_organic_density_array
+from tqdm import tqdm
 
 # plot settings
 TAILWIND = par.util.colors.TAILWIND
@@ -66,7 +67,6 @@ base_color = TAILWIND["gray"]["600"]
 plt.rcParams.update(
     {
         "text.color": base_color,
-        "axes.labelcolor": base_color,
         "figure.figsize": (5, 4),
         "font.size": 14,
         "axes.edgecolor": base_color,
@@ -80,10 +80,10 @@ plt.rcParams.update(
 
 # %% [markdown]
 #  ## Physicochemical inputs
-#  
+#
 #  Molecular weight, O:C & H:C ratios, saturation concentrations and
 #  total gas-phase concentrations gathered from the literature.
-#  
+#
 #  >
 #  > **O:C ratio (oxygen-to-carbon):** proxy for oxidation state – a
 #  > higher ratio usually implies higher polarity and lower volatility.
@@ -109,11 +109,11 @@ HC_ratio = np.array(
 )
 
 
-density_organics_g_cm3 = organic_array(
+density_organics_kg_m3 = get_organic_density_array(
     molar_mass=M_gmol,
     oxygen2carbon=OC_ratio,
     hydrogen2carbon=HC_ratio,
-)  # g/cm^3
+)  # kg/m^3
 
 c_total_ug_per_m3 = (
     np.array([8.79, 3.98, 1.13, 4.07, 0.628, 0.919, 0.766, 1.02, 0.399, 0.313])
@@ -162,8 +162,8 @@ temperature_K = 298.15
 #  can evaluate temperature-dependent properties on the fly.
 #  Note: the saturation-concentration builder is a convenient wrapper
 #  converting **μg m⁻³ → Pa**.
-#  
-#  
+#
+#
 #  > **Strategy pattern:** every species owns a *strategy* object that
 #  > knows how to compute its pure vapour pressure – we can switch
 #  > correlations without touching core logic.
@@ -265,7 +265,7 @@ sulfate_mass_distribution = sulfate_volume_distribution * sulfate_density
 
 organic_mass_distribution = np.zeros(
     (len(sulfate_mass_distribution), len(M_gmol)), dtype=float
-) 
+)
 
 mass_distribution = np.concatenate(
     (sulfate_mass_distribution[:, np.newaxis], organic_mass_distribution),
@@ -274,7 +274,7 @@ mass_distribution = np.concatenate(
 
 particle_molar_mass = np.append(sulfate_molar_mass, M_gmol)
 particle_densities = np.append(
-    sulfate_density, density_organics_g_cm3 * 1000
+    sulfate_density, density_organics_kg_m3
 )  # kg/m^3
 activity_strategies = (
     par.particles.ActivityIdealMolarBuilder()
@@ -375,9 +375,9 @@ aerosol_soa = copy.deepcopy(aerosol)
 
 # %% [markdown]
 #  ### Single 20 s condensation pulse
-#  
+#
 #  Useful for inspecting how much SOA forms before coagulation starts.
-#  
+#
 #  > We pick a very small internal sub-step
 #  > (`Δt_sub = 20 s / 100 000 ≈ 2×10⁻⁴ s`) to capture the rapid initial
 #  > uptake of vapours onto nano-particles.
@@ -416,7 +416,7 @@ fig.tight_layout()
 #  available and can be swapped by changing the builder called.
 #
 #  > **Brownian kernel:** collision frequency determined solely by random
-#  > thermal motion; other kernels 
+#  > thermal motion; other kernels
 #  > can be swapped by changing a single builder call.
 
 # %%
@@ -437,8 +437,8 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 #  stable while minimising overhead.
 #
 # Experiment: toggle condensation on to see if coagulation+condensation changes the particle size distribution.
-#  
-#  
+#
+#
 #  > We loop over 60 outer steps of 10 s each to reach 10 min.  Inside
 #  > every step we *could* run condensation with many sub-steps while
 #  > keeping coagulation coarse – a trade-off between accuracy and
@@ -459,7 +459,6 @@ condensation_sub_step = 50_000
 time_step = total_time / total_steps
 
 for step in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
-
     # execute condensation process, this is the slowest computationally
     # feel free to comment this out to see the effect of coagulation only
     # aerosol_process = condensation_process.execute(
