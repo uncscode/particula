@@ -7,7 +7,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.17.3
 #   kernelspec:
-#     display_name: .venv
+#     display_name: particula
 #     language: python
 #     name: python3
 # ---
@@ -223,7 +223,7 @@ for chem, props in chemical_dict.items():
 np.random.seed(100)
 
 # 🔢 Simulation settings
-number_of_samples = 10_000  # Number of particles to simulate
+number_of_samples = 1_000  # Number of particles to simulate
 total_number_per_cm3 = 1e-4  # Particle number concentration [#/cm³]
 simulation_volume = (
     number_of_samples / total_number_per_cm3 * 1e-6
@@ -280,7 +280,6 @@ surface_tension_array = np.array(
 # Finally, we construct the atmosphere with temperature, pressure, and link the gas-phase species. This environment will be used to govern **evaporation/condensation dynamics** during the simulation.
 #
 
-# %%
 # %% Step 2: Define gas-phase concentrations and thermodynamic environment
 
 # 💨 Initialize gas-phase concentrations near zero
@@ -348,7 +347,6 @@ atmosphere = (
 #
 # This sets up the full simulation-ready aerosol system.
 
-# %%
 # %% Step 3: Define particle composition and create aerosol object
 
 # 💠 3a. Lognormal size distributions for cough droplet modes
@@ -452,7 +450,6 @@ print(aerosol)
 # * Plot a histogram to show how particle sizes are distributed
 #
 
-# %%
 # %% Step 4: Plot initial particle size distribution
 
 fig, ax = plt.subplots()
@@ -526,8 +523,8 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 # ### ⚙️ Simulation Settings
 #
 # * **Duration:** 120 seconds
-# * **Steps:** 200
-# * **Condensation sub-steps:** 100 (to improve resolution for fast vapor interactions)
+# * **Steps:** 120
+# * **Condensation sub-steps:** 10 (to improve resolution for fast vapor interactions)
 # * **Coagulation sub-steps:** 1 (low priority here due to low concentration)
 #
 # ```python
@@ -559,7 +556,6 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 # These are included as commented lines in the code and easy to turn on/off.
 #
 
-# %%
 # %% Step 6: Run the simulation loop
 
 print(aerosol)  # print system state before simulation
@@ -568,10 +564,10 @@ print(aerosol)  # print system state before simulation
 aerosol_process = copy.deepcopy(aerosol)
 
 # Simulation parameters
-total_time = 120  # seconds
+total_time = 20  # seconds
 total_steps = 200
 
-condensation_sub_step = 100
+condensation_sub_step = 10
 coagulation_sub_step = 1
 
 time_step = total_time / total_steps
@@ -651,7 +647,6 @@ print(aerosol_process)
 # * In this case, we observe a **leftward shift** for larger particles, consistent with **net evaporation**
 #
 
-# %%
 # %% Step 7: Plot initial vs final size distributions
 
 fig, ax = plt.subplots(figsize=(7, 5))
@@ -720,7 +715,6 @@ plt.show()
 #
 # This is typical in **low mass-loading regimes**, such as indoor air with sparse respiratory aerosols.
 
-# %%
 # %% Step 8: Plot water vapor saturation ratio over time
 
 fig, ax = plt.subplots(figsize=(7, 5))
@@ -733,7 +727,7 @@ ax.plot(
     label="Vapor Saturation Ratio (Water)",
 )
 
-ax.set_ylim(0, 1.1)
+ax.set_ylim(bottom=0.3)
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Vapor Saturation Ratio")
 ax.set_title("Vapor Saturation Ratio for Water Over Time")
@@ -756,7 +750,6 @@ plt.show()
 # This plot illustrates **size-dependent evaporation timescales**: larger droplets lose water more slowly due to lower surface-area-to-volume ratios.
 #
 
-# %%
 # %% Step 9: Plot particle mass fraction evolution
 
 # Compute total mass fraction over time
@@ -821,7 +814,6 @@ plt.show()
 # This plot captures the **transient drying behavior** of cough droplets in a controlled environment.
 #
 
-# %%
 # %% Step 10: Contour plot of particle size distribution over time
 
 fig, ax = plt.subplots(figsize=(7, 5))
