@@ -9,13 +9,13 @@ updates in particula.
 |----|-------|--------|----------|
 | [M2](M2-notebook-api-migration.md) | Jupyter Notebook API Migration | Planning | P2 |
 | [M3](M3-jupytext-notebook-sync.md) | Jupytext Notebook Sync Migration (Pilot) | Planning | P2 |
-| [M4](M4-jupytext-full-migration.md) | Jupytext Notebook Sync - Full Migration | In Progress (P9 completed, 35/35 notebooks) | P2 |
 
 ## Completed Maintenance
 
 | ID | Title | Status | Priority |
 |----|-------|--------|----------|
 | [M1](M1-add-concentration-charge-support.md) | Add Charge Support to add_concentration | Shipped | P2 |
+| [M4](M4-jupytext-full-migration.md) | Jupytext Notebook Sync - Full Migration | Shipped | P2 |
 
 ## Next Available ID
 
