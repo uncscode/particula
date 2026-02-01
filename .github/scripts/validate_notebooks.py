@@ -152,7 +152,7 @@ def execute_notebook(
         # Extract relevant error message
         error_lines = stderr.strip().split("\n")
         # Find the actual error (usually near the end)
-        error_msg = "\n".join(error_lines[-20:]) if error_lines else "Unknown"
+        error_msg = "\n".join(error_lines[-50:]) if error_lines else "Unknown"
         return False, error_msg, False
 
     except subprocess.TimeoutExpired:
@@ -233,10 +233,10 @@ def print_result(result: ValidationResult) -> None:
     elif result.execution_valid is False:
         print(f"  FAIL: {notebook_name} (execution error)")
         if result.execution_error:
-            # Truncate long error messages
-            error_preview = result.execution_error[:500]
-            if len(result.execution_error) > 500:
-                error_preview += "..."
+            # Truncate long error messages (2000 chars for better debugging)
+            error_preview = result.execution_error[:2000]
+            if len(result.execution_error) > 2000:
+                error_preview += "\n        ... (truncated)"
             for line in error_preview.split("\n"):
                 print(f"        {line}")
 

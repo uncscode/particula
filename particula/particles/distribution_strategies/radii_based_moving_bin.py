@@ -116,6 +116,12 @@ class RadiiBasedMovingBin(DistributionStrategy):
         if charge is None:
             return distribution, concentration, None
 
+        # Handle scalar charge (e.g., charge=0) by converting to array
+        if not isinstance(charge, np.ndarray):
+            charge = np.full_like(
+                original_concentration, charge, dtype=np.float64
+            )
+
         if charge.shape != original_concentration.shape:
             message = (
                 "When adding concentration with charge, charge must match "
