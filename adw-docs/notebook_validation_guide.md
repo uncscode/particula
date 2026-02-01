@@ -1,7 +1,7 @@
 # Notebook Validation Guide
 
 **Version:** 1.0.0
-**Last Updated:** 2026-01-23
+**Last Updated:** 2026-02-01
 
 ## Overview
 
@@ -76,6 +76,8 @@ Use Jupytext to enable type checking and linting on notebook code.
   validate_notebook notebooks/ --check-sync --recursive
   ```
 
+- Avoid backup spam in CI: pass `--no-backup` when executing in workflows.
+
 ## Validation Errors
 
 | Error type | Description |
@@ -110,15 +112,50 @@ Exit codes:
 
 ## CI Integration
 
-Minimal CI job to validate and enforce sync:
+### Full-tree validation (GitHub Actions)
+
+Use the dedicated `notebook-validation` job to enforce sync and execution on PRs,
+pushes to `main`, and merge queues:
 
 ```yaml
-- name: Validate notebooks
-  run: validate_notebook notebooks/ --recursive --output json
+name: Notebook Validation
 
-- name: Enforce Jupytext sync
-  run: validate_notebook notebooks/ --check-sync --recursive
+on:
+  pull_request:
+    paths:
+      - 'docs/Examples/**'
+      - '.github/workflows/notebooks.yml'
+      - '.opencode/tool/validate_notebook.py'
+      - '.opencode/tool/run_notebook.py'
+  push:
+    branches: [ main ]
+  merge_group:
+
+jobs:
+  notebook-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -e .[dev]
+      - name: Check Jupytext sync
+        run: python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --check-sync
+      - name: Execute notebooks (fast)
+        run: python3 .opencode/tool/run_notebook.py docs/Examples --recursive --timeout 600 --exclude "docs/Examples/Simulations/*" --no-backup
+      - name: Execute simulations (slow)
+        run: python3 .opencode/tool/run_notebook.py docs/Examples/Simulations --recursive --timeout 1200 --no-backup
 ```
+
+Key points:
+- **Full tree:** All notebooks are validated, not just changed files.
+- **Two execution passes:** fast notebooks (600s) and Simulation notebooks (1200s).
+- **No backups in CI:** `--no-backup` avoids `.ipynb.bak` artifacts.
+- **Timeouts enforced:** Job-level timeout set to 20 minutes; step timeouts follow
+  `--timeout` values.
 
 ## Troubleshooting
 

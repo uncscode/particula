@@ -834,7 +834,7 @@ Use ATX-style headings with proper hierarchy:
 
 Always specify language for syntax highlighting:
 
-````markdown
+```markdown
 ```python
 import particula as par
 ```
@@ -847,8 +847,7 @@ pytest --cov=particula
 [tool.ruff]
 line-length = 80
 ```
-````
-
+```
 ### Tables
 
 Use consistent table formatting:
