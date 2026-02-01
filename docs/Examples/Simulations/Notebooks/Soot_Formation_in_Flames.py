@@ -7,7 +7,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.17.3
 #   kernelspec:
-#     display_name: .venv
+#     display_name: particula
 #     language: python
 #     name: python3
 # ---
@@ -293,7 +293,7 @@ for chem, props in chemical_dict.items():
 np.random.seed(100)
 
 # Simulation parameters
-number_of_samples = 25_000  # Simulated particles
+number_of_samples = 5_000  # Simulated particles
 total_number_per_cm3 = 10_000_000  # #/cm³
 simulation_volume = number_of_samples / total_number_per_cm3 * 1e-6  # m³
 
@@ -727,8 +727,8 @@ aerosol_process = copy.deepcopy(aerosol)
 total_time = 20  # seconds
 total_steps = 500
 
+condensation_sub_step = 100
 coagulation_sub_step = 1
-condensation_sub_step = 50
 
 time_step = total_time / total_steps
 time_array = np.linspace(0, total_time, total_steps)
