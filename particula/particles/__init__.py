@@ -39,6 +39,9 @@ from particula.particles.activity_factories import (
 from particula.particles.representation import (
     ParticleRepresentation,
 )
+from particula.particles.particle_data import (
+    ParticleData,
+)
 from particula.particles.representation_builders import (
     ParticleMassRepresentationBuilder,
     ParticleRadiusRepresentationBuilder,
