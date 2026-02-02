@@ -1,9 +1,7 @@
-"""Batched particle data container for multi-box CFD simulations.
+"""Provide a batched particle data container for multi-box CFD simulations.
 
-This module provides the ParticleData dataclass, a simple data container
-that isolates particle data from behavior. All per-particle arrays have
-a batch dimension (n_boxes) built-in from the start to support multi-box
-CFD simulations.
+ParticleData isolates per-particle arrays from behavior while embedding the
+batch dimension required for CFD experiments spanning multiple boxes.
 
 Example:
     Single-box simulation (n_boxes=1)::
@@ -129,7 +127,6 @@ class ParticleData:
         Returns:
             The size of the batch dimension (n_boxes).
         """
-
         return self.masses.shape[0]
 
     @property
@@ -139,7 +136,6 @@ class ParticleData:
         Returns:
             The number of particles (n_particles).
         """
-
         return self.masses.shape[1]
 
     @property
@@ -149,7 +145,6 @@ class ParticleData:
         Returns:
             The number of species (n_species).
         """
-
         return self.masses.shape[2]
 
     @property
@@ -159,7 +154,6 @@ class ParticleData:
         Returns:
             Radii in meters with shape (n_boxes, n_particles).
         """
-
         volumes_per_species = self.masses / self.density
         total_volume = np.sum(volumes_per_species, axis=-1)
         # r = (3V / 4π)^(1/3) for a sphere
@@ -172,7 +166,6 @@ class ParticleData:
         Returns:
             Total mass in kilograms with shape (n_boxes, n_particles).
         """
-
         return np.sum(self.masses, axis=-1)
 
     @property
@@ -182,7 +175,6 @@ class ParticleData:
         Returns:
             Effective density in kg/m^3 with shape (n_boxes, n_particles).
         """
-
         volumes_per_species = self.masses / self.density
         total_volume = np.sum(volumes_per_species, axis=-1)
         return np.divide(
@@ -199,7 +191,6 @@ class ParticleData:
         Returns:
             Mass fractions with shape (n_boxes, n_particles, n_species).
         """
-
         total = self.total_mass[..., np.newaxis]
         return np.divide(
             self.masses,
@@ -214,7 +205,6 @@ class ParticleData:
         Returns:
             A new ParticleData instance with copied arrays.
         """
-
         return ParticleData(
             masses=np.copy(self.masses),
             concentration=np.copy(self.concentration),
