@@ -11,6 +11,7 @@ Example:
     ... )
     >>> strategy = MassBasedMovingBin()
     >>> strategy.get_name()
+    "MassBasedMovingBin"
 """
 
 import logging
