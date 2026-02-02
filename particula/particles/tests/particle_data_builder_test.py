@@ -8,7 +8,9 @@ import numpy as np
 import pytest
 from particula.particles.particle_data import ParticleData
 from particula.particles.particle_data_builder import ParticleDataBuilder
-from pint.errors import UndefinedUnitError
+
+# pint is optional; skip tests that require it if not installed
+pint = pytest.importorskip("pint")
 
 
 class TestParticleDataBuilderBasics:
@@ -240,7 +242,7 @@ class TestParticleDataBuilderValidation:
 
     def test_invalid_unit_raises(self) -> None:
         builder = ParticleDataBuilder()
-        with pytest.raises(UndefinedUnitError):
+        with pytest.raises(pint.errors.UndefinedUnitError):
             builder.set_masses(np.array([[1.0]]), units="invalid")
 
 
