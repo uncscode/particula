@@ -33,6 +33,16 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.particles.activity_strategies import ActivityStrategy
+from particula.particles.distribution_strategies import (
+    MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
+    SpeciatedMassMovingBin,
+)
+from particula.particles.representation import ParticleRepresentation
+from particula.particles.surface_strategies import SurfaceStrategy
+
 
 @dataclass
 class ParticleData:
@@ -214,3 +224,130 @@ class ParticleData:
             density=np.copy(self.density),
             volume=np.copy(self.volume),
         )
+
+
+def from_representation(
+    representation: ParticleRepresentation,
+    n_boxes: int = 1,
+) -> ParticleData:
+    """Convert a ParticleRepresentation to batched ParticleData.
+
+    Uses raw concentration and charge arrays (no volume scaling) to avoid
+    double-division for ParticleResolved strategies. Per-species masses are
+    tiled across boxes to match the ParticleData batch dimension.
+
+    Example:
+        >>> data = from_representation(rep, n_boxes=2)
+        >>> data.masses.shape
+        (2, rep.get_species_mass().shape[0], rep.get_species_mass().shape[1])
+
+    Args:
+        representation: Source representation with per-species mass and
+            concentration/charge arrays.
+        n_boxes: Number of boxes to replicate the representation across.
+
+    Returns:
+        ParticleData: Batched masses, concentration, charge, density, and
+        volume.
+    """
+    masses_raw = representation.get_species_mass(clone=True)
+    density = np.atleast_1d(representation.density)
+
+    if masses_raw.ndim == 1:
+        if density.size == masses_raw.size:
+            masses = np.tile(masses_raw, (masses_raw.size, 1))
+        else:
+            masses = masses_raw[:, np.newaxis]
+    elif masses_raw.ndim == 2:
+        masses = masses_raw
+    else:
+        raise ValueError(
+            "representation.get_species_mass() must be 1D or 2D; "
+            f"got ndim={masses_raw.ndim}"
+        )
+
+    concentration = np.asarray(representation.concentration)
+    charge = np.asarray(representation.charge)
+    volume = np.full((n_boxes,), representation.volume)
+
+    if masses.shape[1] != density.shape[0]:
+        raise ValueError(
+            "n_species mismatch: representation masses and density must "
+            f"align, got masses n_species={masses.shape[1]} and "
+            f"density n_species={density.shape[0]}"
+        )
+
+    masses = np.tile(masses[np.newaxis, ...], (n_boxes, 1, 1))
+    concentration = np.tile(concentration[np.newaxis, ...], (n_boxes, 1))
+    charge = np.tile(charge[np.newaxis, ...], (n_boxes, 1))
+
+    return ParticleData(
+        masses=masses,
+        concentration=concentration,
+        charge=charge,
+        density=density,
+        volume=volume,
+    )
+
+
+def to_representation(
+    data: ParticleData,
+    strategy: MassBasedMovingBin
+    | RadiiBasedMovingBin
+    | SpeciatedMassMovingBin
+    | ParticleResolvedSpeciatedMass,
+    activity: ActivityStrategy,
+    surface: SurfaceStrategy,
+    box_index: int = 0,
+) -> ParticleRepresentation:
+    """Convert ParticleData back to a ParticleRepresentation for one box.
+
+    Args:
+        data: Batched particle data.
+        strategy: Distribution strategy to use for the reconstructed
+            representation.
+        activity: Activity strategy.
+        surface: Surface strategy.
+        box_index: Index of the box to extract.
+
+    Returns:
+        ParticleRepresentation: Representation for the selected box.
+
+    Raises:
+        ValueError: If box_index is out of range.
+    """
+    if box_index < 0 or box_index >= data.n_boxes:
+        raise ValueError(
+            f"box_index {box_index} out of range for {data.n_boxes} boxes"
+        )
+
+    masses = data.masses[box_index]
+    concentration = data.concentration[box_index]
+    charge = data.charge[box_index]
+    volume = float(data.volume[box_index])
+    density = data.density
+
+    if isinstance(strategy, MassBasedMovingBin):
+        distribution = masses.sum(axis=1)
+    elif isinstance(strategy, RadiiBasedMovingBin):
+        distribution = data.radii[box_index]
+    elif isinstance(strategy, SpeciatedMassMovingBin):
+        distribution = masses
+    elif isinstance(strategy, ParticleResolvedSpeciatedMass):
+        distribution = masses
+    else:
+        raise TypeError(
+            "Unsupported distribution strategy type: "
+            f"{strategy.__class__.__name__}"
+        )
+
+    return ParticleRepresentation(
+        strategy=strategy,
+        activity=activity,
+        surface=surface,
+        distribution=distribution,
+        density=density,
+        concentration=concentration,
+        charge=charge,
+        volume=volume,
+    )
