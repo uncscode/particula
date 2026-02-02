@@ -1,4 +1,17 @@
-"""Mass-based moving bin strategy."""
+"""Mass-based moving bin distribution strategy.
+
+This module defines :class:`MassBasedMovingBin`, a
+:class:`~.base.DistributionStrategy` implementation that keeps total mass per
+bin and replicates species-aware interfaces when the underlying data is not
+per-species.
+
+Example:
+    >>> from particula.particles.distribution_strategies import (
+    ...     MassBasedMovingBin,
+    ... )
+    >>> strategy = MassBasedMovingBin()
+    >>> strategy.get_name()
+"""
 
 import logging
 from typing import Optional
@@ -12,33 +25,40 @@ logger = logging.getLogger("particula")
 
 
 class MassBasedMovingBin(DistributionStrategy):
-    """Strategy for particles represented by their mass distribution.
+    """Mass-based moving bin distribution strategy.
 
-    Calculates particle mass, radius, and total mass based on the
-    particle mass, number concentration, and density. This moving-bin
-    approach adjusts mass bins on mass addition events.
+    This strategy stores the total mass per bin but exposes per-species
+    interfaces to downstream consumers that expect (n_particles, n_species)
+    inputs. Mass additions and concentration updates always operate on the
+    bin-level mass, while helpers replicate or average values when species are
+    involved.
 
-    Methods:
-    - get_name : Return the type of the distribution strategy.
-    - get_species_mass : Calculate the mass per species.
-    - get_mass : Calculate the mass of the particles or bin.
-    - get_total_mass : Calculate the total mass of particles.
-    - get_radius : Calculate the radius of particles.
-    - add_mass : Add mass to the particle distribution.
-    - add_concentration : Add concentration to the distribution.
+    Attributes:
+        logger: Module-scoped logger that records strategy warnings.
+
+    Example:
+        >>> strategy = MassBasedMovingBin()
+        >>> strategy.get_name()
+        "MassBasedMovingBin"
     """
 
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculate the mass per species for the distribution.
+        """Calculate the mass assigned to each species.
 
-        The mass-based strategy stores total mass per bin. When a density
-        array describes multiple species, replicate the total mass across each
-        species to satisfy the (n_particles, n_species) shape consumers expect.
+        The mass-based strategy stores the total mass per bin. When the density
+        array includes multiple species, the total mass is duplicated across
+        species so hungry consumers receive (n_particles, n_species) arrays.
+
+        Args:
+            distribution: Total mass per bin array with either one or two axes.
+            density: Species density array determining the replicating axis
+                when the species count exceeds one.
 
         Returns:
-            Mass per species array with shape (n_particles, n_species).
+            An array shaped (n_particles, n_species) representing per-species
+            mass values.
         """
         distribution_arr = np.asarray(distribution, dtype=np.float64)
         if distribution_arr.ndim == 1:
@@ -48,13 +68,41 @@ class MassBasedMovingBin(DistributionStrategy):
             return np.tile(species_axis, (1, density.size))
         return distribution_arr
 
+    def get_mass(
+        self, distribution: NDArray[np.float64], density: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """Return the mass for each particle in the bin strategy.
+
+        When the distribution is one-dimensional, each entry already represents
+        the per-particle mass and can be returned directly. If a second axis
+        exists, delegate to :meth:`DistributionStrategy.get_mass` to sum across
+        species and preserve existing behavior.
+
+        Args:
+            distribution: Mass distribution array that may include species.
+            density: Density array used by the base implementation when a
+                species axis must be collapsed.
+
+        Returns:
+            A one-dimensional array of mass per particle values.
+        """
+        distribution_arr = np.asarray(distribution, dtype=np.float64)
+        if distribution_arr.ndim == 1:
+            return distribution_arr
+        return super().get_mass(distribution_arr, density)
+
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculate particle radius from mass and density.
+        """Calculate particle radius from individual mass values.
+
+        Args:
+            distribution: Mass distribution array used to infer volume.
+            density: Density array used to convert mass to volume.
 
         Returns:
-            Particle radius in meters.
+            Particle radius array in meters computed from the mass-to-volume
+            relationship.
         """
         volumes = distribution / density
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
@@ -66,10 +114,22 @@ class MassBasedMovingBin(DistributionStrategy):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Add mass to the particle distribution.
+        """Add mass to the distribution bins and keep the concentration.
+
+        This strategy increases the total mass per bin, leaving concentration
+        untouched because the moving bin already represents mass-based
+        concentrations.
+
+        Args:
+            distribution: Existing mass distribution per bin.
+            concentration: Particle number concentration per bin.
+            density: Species density array (unused but included for interface
+                compatibility).
+            added_mass: Mass increments to add to each bin.
 
         Returns:
-            Updated distribution and concentration arrays.
+            A tuple containing the updated distribution and concentration
+            arrays.
         """
         return distribution + added_mass, concentration
 
@@ -86,16 +146,22 @@ class MassBasedMovingBin(DistributionStrategy):
         NDArray[np.float64],
         Optional[NDArray[np.float64]],
     ]:
-        """Add concentration to the distribution with optional charge.
+        """Add concentration to the bins while optionally averaging charge.
 
-        Charge follows concentration-weighted averaging when both ``charge``
-        and ``added_charge`` are provided. If ``charge`` is ``None`` it is
-        returned as ``None``. When ``added_charge`` is ``None`` the existing
-        charge is preserved. Empty bins fall back to ``added_charge`` to avoid
-        divide-by-zero.
+        Args:
+            distribution: Current mass distribution per bin.
+            concentration: Existing concentration per bin.
+            added_distribution: Mass distribution for the added material.
+            added_concentration: Concentration associated with the addition.
+            charge: Optional charge to average over concentration-weighted bins.
+            added_charge: Optional charge attached to the added material.
 
         Returns:
-            Updated distribution, concentration, and charge arrays.
+            A tuple of updated distribution, concentration, and charge arrays.
+
+        Raises:
+            ValueError: When distribution or concentration shapes mismatch the
+                added arrays, or when charge shapes disagree with concentration.
         """
         if (distribution.shape != added_distribution.shape) or (
             not np.allclose(distribution, added_distribution, rtol=1e-6)
@@ -171,21 +237,18 @@ class MassBasedMovingBin(DistributionStrategy):
     ) -> tuple[
         NDArray[np.float64], NDArray[np.float64], Optional[NDArray[np.float64]]
     ]:
-        """Collide particle pairs (not implemented for this strategy).
-
-        This method is not implemented for MassBasedMovingBin because particle
-        pair collisions are not physically meaningful for bin-based strategies
-        where particles are represented by fixed mass bins with concentrations.
+        """Indicate that pairwise collisions are unsupported.
 
         Arguments:
-            - distribution : The mass distribution array.
-            - concentration : The concentration array.
-            - density : The density array.
-            - indices : Collision pair indices array of shape (K, 2).
-            - charge : Optional charge array (unused in this strategy).
+            distribution: Mass distribution array.
+            concentration: Concentration array for the bins.
+            density: Density array used for radius/mass conversions.
+            indices: Pairwise collision indices of shape (K, 2).
+            charge: Optional charge array involved in the collision.
 
         Raises:
-            NotImplementedError: Always raised as method is not applicable.
+            NotImplementedError: Always raised since MassBasedMovingBin does not
+                represent discrete particles but aggregate mass bins.
         """
         message = (
             "Colliding pairs in MassBasedMovingBin is not physically meaningful"
