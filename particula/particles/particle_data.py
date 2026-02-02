@@ -121,3 +121,104 @@ class ParticleData:
                 f"n_species mismatch: masses has {n_species} species, "
                 f"but density has {self.density.shape[0]} species"
             )
+
+    @property
+    def n_boxes(self) -> int:
+        """Number of simulation boxes.
+
+        Returns:
+            The size of the batch dimension (n_boxes).
+        """
+
+        return self.masses.shape[0]
+
+    @property
+    def n_particles(self) -> int:
+        """Number of particles per box.
+
+        Returns:
+            The number of particles (n_particles).
+        """
+
+        return self.masses.shape[1]
+
+    @property
+    def n_species(self) -> int:
+        """Number of chemical species.
+
+        Returns:
+            The number of species (n_species).
+        """
+
+        return self.masses.shape[2]
+
+    @property
+    def radii(self) -> NDArray[np.float64]:
+        """Particle radii derived from mass and density.
+
+        Returns:
+            Radii in meters with shape (n_boxes, n_particles).
+        """
+
+        volumes_per_species = self.masses / self.density
+        total_volume = np.sum(volumes_per_species, axis=-1)
+        # r = (3V / 4π)^(1/3) for a sphere
+        return np.cbrt(3.0 * total_volume / (4.0 * np.pi))
+
+    @property
+    def total_mass(self) -> NDArray[np.float64]:
+        """Total mass per particle.
+
+        Returns:
+            Total mass in kilograms with shape (n_boxes, n_particles).
+        """
+
+        return np.sum(self.masses, axis=-1)
+
+    @property
+    def effective_density(self) -> NDArray[np.float64]:
+        """Volume-weighted effective density per particle.
+
+        Returns:
+            Effective density in kg/m^3 with shape (n_boxes, n_particles).
+        """
+
+        volumes_per_species = self.masses / self.density
+        total_volume = np.sum(volumes_per_species, axis=-1)
+        return np.divide(
+            self.total_mass,
+            total_volume,
+            where=total_volume > 0,
+            out=np.zeros_like(total_volume),
+        )
+
+    @property
+    def mass_fractions(self) -> NDArray[np.float64]:
+        """Mass fractions per species for each particle.
+
+        Returns:
+            Mass fractions with shape (n_boxes, n_particles, n_species).
+        """
+
+        total = self.total_mass[..., np.newaxis]
+        return np.divide(
+            self.masses,
+            total,
+            where=total > 0,
+            out=np.zeros_like(self.masses),
+        )
+
+    def copy(self) -> "ParticleData":
+        """Create a deep copy of this ParticleData.
+
+        Returns:
+            A new ParticleData instance with copied arrays.
+        """
+
+        return ParticleData(
+            masses=np.copy(self.masses),
+            concentration=np.copy(self.concentration),
+            charge=np.copy(self.charge),
+            density=np.copy(self.density),
+            volume=np.copy(self.volume),
+        )
