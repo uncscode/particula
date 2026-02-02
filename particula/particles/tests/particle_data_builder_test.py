@@ -169,7 +169,7 @@ class TestParticleDataBuilderBatch:
             ParticleDataBuilder()
             .set_masses(masses, units="kg")
             .set_density(np.array([1000.0]), units="kg/m^3")
-            .set_volume(2.0, units="m^3")
+            .set_volume(np.array([2.0]), units="m^3")
             .build()
         )
         np.testing.assert_allclose(data.volume, np.array([2.0, 2.0]))
@@ -252,11 +252,11 @@ class TestParticleDataBuilderDtype:
     def test_numeric_outputs_are_float64(self) -> None:
         data = (
             ParticleDataBuilder()
-            .set_masses(np.array([[1]], dtype=np.int64), units="kg")
-            .set_density(np.array([1000], dtype=np.int64), units="kg/m^3")
-            .set_concentration(np.array([1], dtype=np.int32))
-            .set_charge(np.array([0], dtype=np.int32))
-            .set_volume(np.array([1], dtype=np.int32), units="m^3")
+            .set_masses(np.array([[1.0]]), units="kg")
+            .set_density(np.array([1000.0]), units="kg/m^3")
+            .set_concentration(np.array([1.0]))
+            .set_charge(np.array([0.0]))
+            .set_volume(np.array([1.0]), units="m^3")
             .build()
         )
         assert data.masses.dtype == np.float64
