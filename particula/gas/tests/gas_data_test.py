@@ -3,7 +3,6 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-
 from particula.gas.gas_data import GasData
 
 
@@ -80,7 +79,7 @@ class TestGasDataValidation:
             )
 
     def test_partitioning_casts_to_bool(self) -> None:
-        """partitioning is coerced to boolean dtype."""
+        """Partitioning is coerced to boolean dtype."""
         gas = GasData(
             name=["Water", "Ammonia"],
             molar_mass=np.array([0.018, 0.017]),
