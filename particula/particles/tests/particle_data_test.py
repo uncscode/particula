@@ -290,7 +290,7 @@ class TestParticleDataProperties:
         assert data.effective_density.shape == (1, 1)
 
     def test_effective_density_multi_species(self) -> None:
-        """Effective density is mass divided by total volume across species."""
+        """Effective density is mass-weighted average density across species."""
         masses = np.array([[[1e-18, 2e-18, 3e-18]]])
         density = np.array([1000.0, 1200.0, 800.0])
         data = ParticleData(
@@ -300,9 +300,11 @@ class TestParticleDataProperties:
             density=density,
             volume=np.array([1e-6]),
         )
-        volumes_per_species = masses / density
-        total_volume = np.sum(volumes_per_species, axis=-1)
-        expected_density = np.sum(masses, axis=-1) / total_volume
+        # Match ParticleRepresentation.get_effective_density formula:
+        # sum(mass_i * density_i) / sum(mass_i)
+        mass_weighted_density = np.sum(masses * density, axis=-1)
+        total_mass = np.sum(masses, axis=-1)
+        expected_density = mass_weighted_density / total_mass
         np.testing.assert_allclose(data.effective_density, expected_density)
         assert data.effective_density.shape == (1, 1)
 
@@ -358,15 +360,28 @@ class TestParticleDataCopy:
         )
         copied = original.copy()
 
+        # Mutate each field in the original to verify independence
         original.masses[0, 0, 0] = 10.0
+        original.concentration[0, 0] = 5.0
+        original.charge[0, 0] = 3.0
+        original.density[0] = 2000.0
+        original.volume[0] = 2e-6
 
+        # Verify copied arrays are unchanged
         assert copied.masses[0, 0, 0] == 1.0
-        np.testing.assert_array_equal(
+        assert copied.concentration[0, 0] == 1.0
+        assert copied.charge[0, 0] == 0.0
+        assert copied.density[0] == 1000.0
+        assert copied.volume[0] == 1e-6
+
+        # Verify no shared memory for all arrays
+        assert not np.shares_memory(copied.masses, original.masses)
+        assert not np.shares_memory(
             copied.concentration, original.concentration
         )
-        np.testing.assert_array_equal(copied.charge, original.charge)
-        np.testing.assert_array_equal(copied.density, original.density)
-        np.testing.assert_array_equal(copied.volume, original.volume)
+        assert not np.shares_memory(copied.charge, original.charge)
+        assert not np.shares_memory(copied.density, original.density)
+        assert not np.shares_memory(copied.volume, original.volume)
 
     def test_copy_preserves_values(self) -> None:
         """copy() preserves all values."""
