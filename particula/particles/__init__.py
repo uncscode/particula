@@ -41,6 +41,8 @@ from particula.particles.representation import (
 )
 from particula.particles.particle_data import (
     ParticleData,
+    from_representation,
+    to_representation,
 )
 from particula.particles.particle_data_builder import (
     ParticleDataBuilder,

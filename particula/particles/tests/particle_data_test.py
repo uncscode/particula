@@ -6,8 +6,22 @@ shape mismatches.
 """
 
 import numpy as np
+import numpy.testing as npt
 import pytest
-from particula.particles.particle_data import ParticleData
+from particula.particles.activity_strategies import ActivityIdealMass
+from particula.particles.distribution_strategies import (
+    MassBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
+    RadiiBasedMovingBin,
+    SpeciatedMassMovingBin,
+)
+from particula.particles.particle_data import (
+    ParticleData,
+    from_representation,
+    to_representation,
+)
+from particula.particles.representation import ParticleRepresentation
+from particula.particles.surface_strategies import SurfaceStrategyMass
 
 
 class TestParticleDataInstantiation:
@@ -402,3 +416,307 @@ class TestParticleDataCopy:
         np.testing.assert_array_equal(copied.charge, original.charge)
         np.testing.assert_array_equal(copied.density, original.density)
         np.testing.assert_array_equal(copied.volume, original.volume)
+
+
+class TestConversionFromRepresentation:
+    """Tests for from_representation converter."""
+
+    def _make_representation(
+        self,
+        strategy,
+        distribution,
+        density,
+        concentration,
+        charge,
+        volume,
+    ) -> ParticleRepresentation:
+        return ParticleRepresentation(
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=volume,
+        )
+
+    def test_mass_based(self) -> None:
+        """MassBasedMovingBin maps species mass and preserves raw fields."""
+        strategy = MassBasedMovingBin()
+        distribution = np.array([1.0, 2.0])
+        density = np.array([1000.0, 1200.0])
+        concentration = np.array([3.0, 4.0])
+        charge = np.array([0.0, 1.0])
+        rep = self._make_representation(
+            strategy=strategy,
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=2.0,
+        )
+
+        data = from_representation(rep)
+
+        assert data.masses.shape == (1, 2, 2)
+        npt.assert_allclose(data.masses[0], rep.get_species_mass())
+        npt.assert_allclose(data.concentration[0], concentration)
+        npt.assert_allclose(data.charge[0], charge)
+        assert data.volume.shape == (1,)
+        assert data.volume[0] == pytest.approx(2.0)
+
+    def test_radii_based(self) -> None:
+        """RadiiBasedMovingBin uses per-particle radii derived from masses."""
+        strategy = RadiiBasedMovingBin()
+        distribution = np.array([1e-18, 2e-18, 3e-18])
+        density = np.array([1000.0])
+        concentration = np.array([1.0, 2.0, 3.0])
+        charge = np.array([0.0, -1.0, 2.0])
+        rep = self._make_representation(
+            strategy=strategy,
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=1.5,
+        )
+
+        data = from_representation(rep)
+
+        assert data.masses.shape == (1, 3, 1)
+        species_mass = rep.get_species_mass()
+        if species_mass.ndim == 1:
+            species_mass = species_mass[:, np.newaxis]
+        npt.assert_allclose(data.masses[0], species_mass)
+        npt.assert_allclose(data.concentration[0], concentration)
+        npt.assert_allclose(data.charge[0], charge)
+        npt.assert_allclose(data.density, density)
+        npt.assert_allclose(data.volume, np.array([1.5]))
+
+    def test_speciated_mass(self) -> None:
+        """SpeciatedMassMovingBin preserves per-species masses and tiling."""
+        strategy = SpeciatedMassMovingBin()
+        distribution = np.array([[1.0, 0.5], [0.1, 0.9]])
+        density = np.array([900.0, 1100.0])
+        concentration = np.array([2.0, 3.0])
+        charge = np.array([0.5, -0.5])
+        rep = self._make_representation(
+            strategy=strategy,
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=0.75,
+        )
+
+        data = from_representation(rep, n_boxes=2)
+
+        assert data.masses.shape == (2, 2, 2)
+        npt.assert_allclose(data.masses[0], distribution)
+        npt.assert_allclose(data.masses[1], distribution)
+        npt.assert_allclose(data.concentration[0], concentration)
+        npt.assert_allclose(data.concentration[1], concentration)
+        npt.assert_allclose(data.charge[0], charge)
+        npt.assert_allclose(data.charge[1], charge)
+        npt.assert_allclose(data.density, density)
+        npt.assert_allclose(data.volume, np.array([0.75, 0.75]))
+
+    def test_particle_resolved(self) -> None:
+        """ParticleResolvedSpeciatedMass preserves per-particle masses."""
+        strategy = ParticleResolvedSpeciatedMass()
+        distribution = np.array([[1.0, 0.2], [0.3, 0.7]])
+        density = np.array([1000.0, 800.0])
+        concentration = np.array([1.0, 1.0])
+        charge = np.array([0.0, 0.0])
+        rep = self._make_representation(
+            strategy=strategy,
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=0.5,
+        )
+
+        data = from_representation(rep)
+
+        assert data.masses.shape == (1, 2, 2)
+        npt.assert_allclose(data.masses[0], distribution)
+        npt.assert_allclose(data.concentration[0], concentration)
+        npt.assert_allclose(data.charge[0], charge)
+        npt.assert_allclose(data.density, density)
+        npt.assert_allclose(data.volume, np.array([0.5]))
+
+    def test_multi_box_replication(self) -> None:
+        """n_boxes>1 replicates masses/concentration/charge across boxes."""
+        strategy = SpeciatedMassMovingBin()
+        distribution = np.array([[1.0, 0.5], [0.3, 0.7]])
+        density = np.array([900.0, 1100.0])
+        concentration = np.array([2.0, 3.0])
+        charge = np.array([0.5, -0.5])
+        rep = self._make_representation(
+            strategy=strategy,
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=1.2,
+        )
+
+        data = from_representation(rep, n_boxes=3)
+
+        assert data.masses.shape == (3, 2, 2)
+        for idx in range(3):
+            npt.assert_allclose(data.masses[idx], distribution)
+            npt.assert_allclose(data.concentration[idx], concentration)
+            npt.assert_allclose(data.charge[idx], charge)
+        npt.assert_allclose(data.volume, np.array([1.2, 1.2, 1.2]))
+
+
+class TestConversionToRepresentation:
+    """Tests for to_representation converter."""
+
+    def _make_data(self) -> ParticleData:
+        return ParticleData(
+            masses=np.array(
+                [
+                    [[1.0, 0.5], [0.2, 0.8]],
+                    [[2.0, 1.0], [0.4, 1.6]],
+                ]
+            ),
+            concentration=np.array([[1.0, 2.0], [0.5, 0.7]]),
+            charge=np.array([[0.0, 1.0], [0.1, -0.2]]),
+            density=np.array([900.0, 1100.0]),
+            volume=np.array([1.0, 2.0]),
+        )
+
+    def test_speciated_mass_basic(self) -> None:
+        """SpeciatedMassMovingBin preserves masses/concentration/charge."""
+        data = self._make_data()
+        strategy = SpeciatedMassMovingBin()
+        rep = to_representation(
+            data=data,
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            box_index=0,
+        )
+
+        assert rep.get_strategy_name() == strategy.get_name()
+        npt.assert_allclose(rep.distribution, data.masses[0])
+        npt.assert_allclose(rep.concentration, data.concentration[0])
+        npt.assert_allclose(rep.charge, data.charge[0])
+        assert rep.volume == pytest.approx(1.0)
+
+    def test_box_index_selection(self) -> None:
+        """Selects non-zero box index and preserves values."""
+        data = self._make_data()
+        strategy = SpeciatedMassMovingBin()
+        rep = to_representation(
+            data=data,
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            box_index=1,
+        )
+
+        npt.assert_allclose(rep.distribution, data.masses[1])
+        npt.assert_allclose(rep.concentration, data.concentration[1])
+        npt.assert_allclose(rep.charge, data.charge[1])
+        assert rep.volume == pytest.approx(2.0)
+
+    def test_box_index_out_of_range(self) -> None:
+        """Raises ValueError when box_index is invalid."""
+        data = self._make_data()
+        strategy = SpeciatedMassMovingBin()
+        with pytest.raises(ValueError, match="box_index 2 out of range"):
+            to_representation(
+                data=data,
+                strategy=strategy,
+                activity=ActivityIdealMass(),
+                surface=SurfaceStrategyMass(),
+                box_index=2,
+            )
+
+    def test_mass_based_distribution(self) -> None:
+        """MassBasedMovingBin uses total mass per particle as distribution."""
+        data = self._make_data()
+        strategy = MassBasedMovingBin()
+        rep = to_representation(
+            data=data,
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            box_index=0,
+        )
+
+        expected_distribution = data.masses[0].sum(axis=1)
+        npt.assert_allclose(rep.distribution, expected_distribution)
+        npt.assert_allclose(rep.concentration, data.concentration[0])
+        npt.assert_allclose(rep.charge, data.charge[0])
+
+    def test_radii_based_distribution(self) -> None:
+        """RadiiBasedMovingBin uses radii for distribution."""
+        data = self._make_data()
+        strategy = RadiiBasedMovingBin()
+        rep = to_representation(
+            data=data,
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            box_index=0,
+        )
+
+        expected_distribution = data.radii[0]
+        npt.assert_allclose(rep.distribution, expected_distribution)
+        npt.assert_allclose(rep.concentration, data.concentration[0])
+        npt.assert_allclose(rep.charge, data.charge[0])
+
+    def test_particle_resolved_distribution(self) -> None:
+        """ParticleResolvedSpeciatedMass preserves per-particle per-species."""
+        data = self._make_data()
+        strategy = ParticleResolvedSpeciatedMass()
+        rep = to_representation(
+            data=data,
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            box_index=1,
+        )
+
+        npt.assert_allclose(rep.distribution, data.masses[1])
+        npt.assert_allclose(rep.concentration, data.concentration[1])
+        npt.assert_allclose(rep.charge, data.charge[1])
+        assert rep.volume == pytest.approx(2.0)
+
+    def test_round_trip(self) -> None:
+        """Round trip rep -> data -> rep preserves masses and charge."""
+        strategy = SpeciatedMassMovingBin()
+        density = np.array([1000.0, 1200.0])
+        distribution = np.array([[1.0, 0.2], [0.3, 0.7]])
+        concentration = np.array([1.0, 2.0])
+        charge = np.array([0.0, 1.0])
+        rep = ParticleRepresentation(
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=1.0,
+        )
+
+        data = from_representation(rep, n_boxes=1)
+        rebuilt = to_representation(
+            data=data,
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            box_index=0,
+        )
+
+        npt.assert_allclose(rebuilt.distribution, distribution)
+        npt.assert_allclose(rebuilt.concentration, concentration)
+        npt.assert_allclose(rebuilt.charge, charge)
+        assert rebuilt.volume == pytest.approx(1.0)

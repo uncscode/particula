@@ -33,10 +33,20 @@ class MassBasedMovingBin(DistributionStrategy):
     ) -> NDArray[np.float64]:
         """Calculate the mass per species for the distribution.
 
+        The mass-based strategy stores total mass per bin. When a density
+        array describes multiple species, replicate the total mass across each
+        species to satisfy the (n_particles, n_species) shape consumers expect.
+
         Returns:
-            Mass per species array.
+            Mass per species array with shape (n_particles, n_species).
         """
-        return distribution
+        distribution_arr = np.asarray(distribution, dtype=np.float64)
+        if distribution_arr.ndim == 1:
+            species_axis = distribution_arr[:, np.newaxis]
+            if density.size == 1:
+                return species_axis
+            return np.tile(species_axis, (1, density.size))
+        return distribution_arr
 
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
