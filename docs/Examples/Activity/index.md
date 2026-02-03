@@ -15,7 +15,7 @@ Activity determines how species partition between gas and particle phases and co
 
 <div class="grid cards" markdown>
 
--   __[Ideal Activity](ideal_activity_example.py)__
+-   __[Ideal Activity](ideal_activity_example.ipynb)__
 
     ---
 
@@ -23,7 +23,7 @@ Activity determines how species partition between gas and particle phases and co
     `ActivityIdealMolar`. Good starting point for understanding
     the activity API.
 
--   __[BAT Model Activity](bat_activity_example.py)__
+-   __[BAT Model Activity](bat_activity_example.ipynb)__
 
     ---
 
@@ -31,7 +31,7 @@ Activity determines how species partition between gas and particle phases and co
     model with `ActivityNonIdealBinary`. Compares ideal vs. non-ideal
     activity for organic-water mixtures.
 
--   __[Kappa Parameter Activity](kappa_activity_example.py)__
+-   __[Kappa Parameter Activity](kappa_activity_example.ipynb)__
 
     ---
 
@@ -39,7 +39,7 @@ Activity determines how species partition between gas and particle phases and co
     `ActivityKappaParameter`. Demonstrates water activity at
     different compositions for inorganic aerosols.
 
--   __[Equilibria Partitioning](equilibria_example.py)__
+-   __[Equilibria Partitioning](equilibria_example.ipynb)__
 
     ---
 

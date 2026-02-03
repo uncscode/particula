@@ -11,6 +11,8 @@
 #     language: python
 #     name: python3
 # ---
+
+# %%
 # M3-P3 workflow validation - edit-lint-sync-execute cycle verified
 
 # %% [markdown]
