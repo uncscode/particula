@@ -165,11 +165,11 @@ def from_species(species: "GasSpecies", n_boxes: int = 1) -> GasData:
         1
     """
     # Handle single vs multi-species names
-    names = species.get_name()
-    if isinstance(names, str):
-        names = [names]
+    raw_names = species.get_name()
+    if isinstance(raw_names, str):
+        names: list[str] = [raw_names]
     else:
-        names = list(names)
+        names = list(raw_names)
 
     # Handle single vs multi-species molar mass
     molar_mass = species.get_molar_mass()
@@ -250,8 +250,9 @@ def to_species(
     from particula.gas.species import GasSpecies
 
     if len(vapor_pressure_strategies) != data.n_species:
+        n_strategies = len(vapor_pressure_strategies)
         raise ValueError(
-            f"vapor_pressure_strategies length {len(vapor_pressure_strategies)} "
+            f"vapor_pressure_strategies length {n_strategies} "
             f"doesn't match n_species {data.n_species}"
         )
 
@@ -263,8 +264,9 @@ def to_species(
     # Validate uniform partitioning (GasSpecies requires single bool for all)
     unique_partitioning = np.unique(data.partitioning)
     if len(unique_partitioning) > 1:
+        part_list = data.partitioning.tolist()
         raise ValueError(
-            f"GasData has mixed partitioning values {data.partitioning.tolist()}, "
+            f"GasData has mixed partitioning values {part_list}, "
             "but GasSpecies requires uniform partitioning for all species"
         )
     partitioning_value = bool(unique_partitioning[0])
