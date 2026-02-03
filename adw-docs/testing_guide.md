@@ -528,6 +528,13 @@ def test_conservation_law():
     npt.assert_allclose(initial_mass, final_mass, rtol=1e-10)
 ```
 
+### Testing NVIDIA Warp Kernels
+
+For testing GPU-accelerated code using NVIDIA Warp, see the **[NVIDIA Warp Guide](../docs/Theory/nvidia-warp/index.md)** for kernel testing patterns. Key considerations:
+- Use `wp.synchronize()` before assertions to ensure GPU operations complete
+- Compare CPU and GPU results for validation
+- Test with various device targets (`"cpu"` and `"cuda"`)
+
 ## Test Organization Best Practices
 
 ### One Test, One Assertion (When Possible)
