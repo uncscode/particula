@@ -23,9 +23,8 @@ from numpy.typing import NDArray
 
 if TYPE_CHECKING:
     from particula.gas.gas_data import GasData
-    from particula.particles.particle_data import ParticleData
-
     from particula.gpu.warp_types import WarpGasData, WarpParticleData
+    from particula.particles.particle_data import ParticleData
 
 
 def _ensure_warp_available():

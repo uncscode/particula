@@ -346,8 +346,6 @@ class TestMultiBoxScenarios:
         """Test n_boxes = 1 edge case for GasData."""
         from particula.gas.gas_data import GasData
 
-        n_boxes, n_species = 1, 2
-
         data = GasData(
             name=["Water", "CO2"],
             molar_mass=np.array([0.018, 0.044]),
