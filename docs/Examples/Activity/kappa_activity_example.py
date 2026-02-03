@@ -49,7 +49,7 @@ densities = np.array([1000.0, 1770.0])  # kg/m^3
 molar_masses = np.array([18.015e-3, 132.14e-3])  # kg/mol
 
 print("=== Species Properties ===")
-print(f"Species: water, ammonium sulfate")
+print("Species: water, ammonium sulfate")
 print(f"Kappa values: {kappa_values}")
 print(f"Densities: {densities} kg/m^3")
 print(f"Molar masses: {molar_masses * 1e3} g/mol")
