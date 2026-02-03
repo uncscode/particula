@@ -353,6 +353,10 @@
          <lastmod>2026-02-03</lastmod>
     </url>
     <url>
+         <loc>https://uncscode.github.io/particula/API/particula/gas/gas_data_builder/</loc>
+         <lastmod>2026-02-03</lastmod>
+    </url>
+    <url>
          <loc>https://uncscode.github.io/particula/API/particula/gas/properties/</loc>
          <lastmod>2026-02-03</lastmod>
     </url>
@@ -1058,6 +1062,26 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Theory/Technical/Properties/mean_free_path/</loc>
+         <lastmod>2026-02-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/nvidia-warp/</loc>
+         <lastmod>2026-02-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/nvidia-warp/datastructures/</loc>
+         <lastmod>2026-02-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/nvidia-warp/kernels/</loc>
+         <lastmod>2026-02-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/nvidia-warp/examples/fluids/</loc>
+         <lastmod>2026-02-03</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Theory/nvidia-warp/examples/geometry/</loc>
          <lastmod>2026-02-03</lastmod>
     </url>
     <url>
