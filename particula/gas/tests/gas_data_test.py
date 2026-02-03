@@ -3,7 +3,12 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-from particula.gas.gas_data import GasData
+from particula.gas.gas_data import GasData, from_species, to_species
+from particula.gas.species import GasSpecies
+from particula.gas.vapor_pressure_strategies import (
+    ConstantVaporPressureStrategy,
+)
+from particula.util.constants import AVOGADRO_NUMBER
 
 
 class TestGasDataInstantiation:
@@ -193,3 +198,310 @@ class TestGasDataCopy:
         gas.name[0] = "Changed"
 
         assert gas_copy.name[0] == "Water"
+
+
+class TestFromSpecies:
+    """Tests for from_species() conversion utility."""
+
+    def test_single_species_conversion(self) -> None:
+        """Convert single-species GasSpecies to GasData."""
+        vapor_pressure = ConstantVaporPressureStrategy(2330.0)
+        species = GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=vapor_pressure,
+            partitioning=True,
+            concentration=1e-6,  # kg/m^3
+        )
+
+        gas_data = from_species(species)
+
+        assert gas_data.n_boxes == 1
+        assert gas_data.n_species == 1
+        assert gas_data.name == ["Water"]
+        npt.assert_allclose(gas_data.molar_mass, np.array([0.018]))
+        assert gas_data.concentration.shape == (1, 1)
+        np.testing.assert_array_equal(gas_data.partitioning, np.array([True]))
+
+    def test_multi_species_conversion(self) -> None:
+        """Convert multi-species GasSpecies (built with +=) to GasData."""
+        vp1 = ConstantVaporPressureStrategy(2330.0)
+        vp2 = ConstantVaporPressureStrategy(1000.0)
+
+        species1 = GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=vp1,
+            partitioning=True,
+            concentration=1e-6,
+        )
+        species2 = GasSpecies(
+            name="Ammonia",
+            molar_mass=0.017,
+            vapor_pressure_strategy=vp2,
+            partitioning=True,
+            concentration=2e-6,
+        )
+        species1 += species2
+
+        gas_data = from_species(species1)
+
+        assert gas_data.n_boxes == 1
+        assert gas_data.n_species == 2
+        assert gas_data.name == ["Water", "Ammonia"]
+        npt.assert_allclose(gas_data.molar_mass, np.array([0.018, 0.017]))
+        assert gas_data.concentration.shape == (1, 2)
+        np.testing.assert_array_equal(
+            gas_data.partitioning, np.array([True, True])
+        )
+
+    def test_n_boxes_replication(self) -> None:
+        """from_species with n_boxes>1 replicates concentration correctly."""
+        vapor_pressure = ConstantVaporPressureStrategy(2330.0)
+        species = GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=vapor_pressure,
+            partitioning=True,
+            concentration=1e-6,
+        )
+
+        gas_data = from_species(species, n_boxes=5)
+
+        assert gas_data.n_boxes == 5
+        assert gas_data.n_species == 1
+        assert gas_data.concentration.shape == (5, 1)
+        # All boxes should have the same concentration
+        for i in range(5):
+            npt.assert_allclose(
+                gas_data.concentration[i, :], gas_data.concentration[0, :]
+            )
+
+    def test_concentration_unit_conversion(self) -> None:
+        """Verify kg/m^3 -> molecules/m^3 conversion is correct."""
+        molar_mass = 0.018  # kg/mol (water)
+        concentration_kg = 1e-6  # kg/m^3
+
+        vapor_pressure = ConstantVaporPressureStrategy(2330.0)
+        species = GasSpecies(
+            name="Water",
+            molar_mass=molar_mass,
+            vapor_pressure_strategy=vapor_pressure,
+            partitioning=True,
+            concentration=concentration_kg,
+        )
+
+        gas_data = from_species(species)
+
+        # Expected: molecules/m^3 = (kg/m^3 / kg/mol) * molecules/mol
+        expected_molecules = (concentration_kg / molar_mass) * AVOGADRO_NUMBER
+        npt.assert_allclose(
+            gas_data.concentration[0, 0], expected_molecules, rtol=1e-10
+        )
+
+
+class TestToSpecies:
+    """Tests for to_species() conversion utility."""
+
+    def test_single_species_conversion(self) -> None:
+        """Convert GasData to single-species GasSpecies."""
+        gas_data = GasData(
+            name=["Water"],
+            molar_mass=np.array([0.018]),
+            concentration=np.array([[1e20]]),  # molecules/m^3
+            partitioning=np.array([True]),
+        )
+        strategy = ConstantVaporPressureStrategy(2330.0)
+
+        species = to_species(gas_data, [strategy])
+
+        assert species.get_name() == "Water"
+        npt.assert_allclose(species.get_molar_mass(), 0.018)
+        assert species.get_partitioning() is True
+        # Verify concentration is converted back to kg/m^3
+        expected_kg = (1e20 * 0.018) / AVOGADRO_NUMBER
+        npt.assert_allclose(
+            species.get_concentration(), expected_kg, rtol=1e-10
+        )
+
+    def test_multi_species_conversion(self) -> None:
+        """Convert GasData to multi-species GasSpecies."""
+        gas_data = GasData(
+            name=["Water", "Ammonia"],
+            molar_mass=np.array([0.018, 0.017]),
+            concentration=np.array([[1e20, 2e20]]),  # molecules/m^3
+            partitioning=np.array([True, True]),
+        )
+        strategies = [
+            ConstantVaporPressureStrategy(2330.0),
+            ConstantVaporPressureStrategy(1000.0),
+        ]
+
+        species = to_species(gas_data, strategies)
+
+        assert len(species) == 2
+        np.testing.assert_array_equal(
+            species.get_name(), np.array(["Water", "Ammonia"])
+        )
+        npt.assert_allclose(species.get_molar_mass(), np.array([0.018, 0.017]))
+        assert species.get_partitioning() is True
+
+    def test_box_index_selection(self) -> None:
+        """Verify box_index parameter selects correct concentration."""
+        gas_data = GasData(
+            name=["Water"],
+            molar_mass=np.array([0.018]),
+            concentration=np.array([[1e20], [2e20], [3e20]]),  # 3 boxes
+            partitioning=np.array([True]),
+        )
+        strategy = ConstantVaporPressureStrategy(2330.0)
+
+        species_box0 = to_species(gas_data, [strategy], box_index=0)
+        species_box1 = to_species(gas_data, [strategy], box_index=1)
+        species_box2 = to_species(gas_data, [strategy], box_index=2)
+
+        # Each species should have different concentration
+        expected_kg_0 = (1e20 * 0.018) / AVOGADRO_NUMBER
+        expected_kg_1 = (2e20 * 0.018) / AVOGADRO_NUMBER
+        expected_kg_2 = (3e20 * 0.018) / AVOGADRO_NUMBER
+
+        npt.assert_allclose(
+            species_box0.get_concentration(), expected_kg_0, rtol=1e-10
+        )
+        npt.assert_allclose(
+            species_box1.get_concentration(), expected_kg_1, rtol=1e-10
+        )
+        npt.assert_allclose(
+            species_box2.get_concentration(), expected_kg_2, rtol=1e-10
+        )
+
+    def test_strategy_length_mismatch_raises(self) -> None:
+        """ValueError when strategies length doesn't match n_species."""
+        gas_data = GasData(
+            name=["Water", "Ammonia"],
+            molar_mass=np.array([0.018, 0.017]),
+            concentration=np.array([[1e20, 2e20]]),
+            partitioning=np.array([True, True]),
+        )
+        strategy = ConstantVaporPressureStrategy(2330.0)
+
+        with pytest.raises(ValueError, match="doesn't match n_species"):
+            to_species(gas_data, [strategy])  # Only 1 strategy for 2 species
+
+    def test_box_index_out_of_range_raises(self) -> None:
+        """IndexError when box_index >= n_boxes."""
+        gas_data = GasData(
+            name=["Water"],
+            molar_mass=np.array([0.018]),
+            concentration=np.array([[1e20], [2e20]]),  # 2 boxes
+            partitioning=np.array([True]),
+        )
+        strategy = ConstantVaporPressureStrategy(2330.0)
+
+        with pytest.raises(IndexError, match="out of range"):
+            to_species(gas_data, [strategy], box_index=2)  # Only 0, 1 valid
+
+    def test_mixed_partitioning_raises(self) -> None:
+        """ValueError when GasData has mixed partitioning values."""
+        gas_data = GasData(
+            name=["Water", "Ammonia"],
+            molar_mass=np.array([0.018, 0.017]),
+            concentration=np.array([[1e20, 2e20]]),
+            partitioning=np.array([True, False]),  # Mixed!
+        )
+        strategies = [
+            ConstantVaporPressureStrategy(2330.0),
+            ConstantVaporPressureStrategy(1000.0),
+        ]
+
+        with pytest.raises(ValueError, match="mixed partitioning"):
+            to_species(gas_data, strategies)
+
+
+class TestRoundTrip:
+    """Tests for round-trip conversion GasSpecies -> GasData -> GasSpecies."""
+
+    def test_round_trip_single_species(self) -> None:
+        """Round-trip conversion preserves data within precision."""
+        vapor_pressure = ConstantVaporPressureStrategy(2330.0)
+        original = GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=vapor_pressure,
+            partitioning=True,
+            concentration=1e-6,  # kg/m^3
+        )
+
+        # Convert to GasData and back
+        gas_data = from_species(original)
+        recovered = to_species(gas_data, [vapor_pressure])
+
+        assert recovered.get_name() == original.get_name()
+        npt.assert_allclose(
+            recovered.get_molar_mass(), original.get_molar_mass(), rtol=1e-10
+        )
+        npt.assert_allclose(
+            recovered.get_concentration(),
+            original.get_concentration(),
+            rtol=1e-10,
+        )
+        assert recovered.get_partitioning() == original.get_partitioning()
+
+    def test_round_trip_multi_species(self) -> None:
+        """Round-trip preserves data for multi-species."""
+        vp1 = ConstantVaporPressureStrategy(2330.0)
+        vp2 = ConstantVaporPressureStrategy(1000.0)
+
+        species1 = GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=vp1,
+            partitioning=True,
+            concentration=1e-6,
+        )
+        species2 = GasSpecies(
+            name="Ammonia",
+            molar_mass=0.017,
+            vapor_pressure_strategy=vp2,
+            partitioning=True,
+            concentration=2e-6,
+        )
+        original = species1 + species2  # Creates new combined species
+
+        # Convert to GasData and back
+        gas_data = from_species(original)
+        recovered = to_species(gas_data, [vp1, vp2])
+
+        assert len(recovered) == len(original)
+        np.testing.assert_array_equal(recovered.get_name(), original.get_name())
+        npt.assert_allclose(
+            recovered.get_molar_mass(), original.get_molar_mass(), rtol=1e-10
+        )
+        npt.assert_allclose(
+            recovered.get_concentration(),
+            original.get_concentration(),
+            rtol=1e-10,
+        )
+        assert recovered.get_partitioning() == original.get_partitioning()
+
+    def test_round_trip_with_different_partitioning(self) -> None:
+        """Test round-trip with partitioning=False (uniform)."""
+        vapor_pressure = ConstantVaporPressureStrategy(2330.0)
+        original = GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=vapor_pressure,
+            partitioning=False,  # Different from True
+            concentration=1e-6,
+        )
+
+        # Convert to GasData and back
+        gas_data = from_species(original)
+        recovered = to_species(gas_data, [vapor_pressure])
+
+        assert recovered.get_partitioning() is False
+        npt.assert_allclose(
+            recovered.get_concentration(),
+            original.get_concentration(),
+            rtol=1e-10,
+        )
