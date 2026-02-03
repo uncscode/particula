@@ -70,11 +70,11 @@ class WarpParticleData:
         >>> data.volume = wp.array([1e-3, 1e-3], dtype=wp.float64)
     """
 
-    masses: wp.array3d(dtype=wp.float64)
-    concentration: wp.array2d(dtype=wp.float64)
-    charge: wp.array2d(dtype=wp.float64)
-    density: wp.array(dtype=wp.float64)
-    volume: wp.array(dtype=wp.float64)
+    masses: wp.array3d(dtype=wp.float64)  # type: ignore[valid-type]
+    concentration: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
+    charge: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
+    density: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
+    volume: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
 
 
 @wp.struct
@@ -128,7 +128,7 @@ class WarpGasData:
         >>> gas.partitioning = wp.array([1, 1, 0], dtype=wp.int32)
     """
 
-    molar_mass: wp.array(dtype=wp.float64)
-    concentration: wp.array2d(dtype=wp.float64)
-    vapor_pressure: wp.array2d(dtype=wp.float64)
-    partitioning: wp.array(dtype=wp.int32)
+    molar_mass: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
+    concentration: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
+    vapor_pressure: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
+    partitioning: wp.array(dtype=wp.int32)  # type: ignore[valid-type]

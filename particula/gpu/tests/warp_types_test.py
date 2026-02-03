@@ -9,14 +9,14 @@ import pytest
 
 wp = pytest.importorskip("warp")
 
-from particula.gpu.warp_types import WarpGasData, WarpParticleData
+from particula.gpu.warp_types import WarpGasData, WarpParticleData  # noqa: E402
 
 
 class TestWarpParticleDataCreation:
     """Tests for WarpParticleData struct instantiation."""
 
     def test_warp_particle_data_creation(self) -> None:
-        """Verify WarpParticleData struct can be instantiated with valid inputs."""
+        """Verify WarpParticleData struct can be instantiated."""
         n_boxes, n_particles, n_species = 2, 100, 3
 
         data = WarpParticleData()
@@ -216,7 +216,7 @@ class TestWarpGasDataCreation:
         assert gas.partitioning.shape == (3,)
 
     def test_gas_data_field_dtypes(self) -> None:
-        """Verify array dtypes: float64 for numerical, int32 for partitioning."""
+        """Verify array dtypes: float64 numerical, int32 partitioning."""
         n_boxes, n_species = 2, 2
 
         gas = WarpGasData()
