@@ -576,6 +576,144 @@ activity/
 
 ## Best Practices
 
+### GPU Acceleration with NVIDIA Warp
+
+For performance-critical code that can benefit from GPU acceleration, consider using NVIDIA Warp. See the **[NVIDIA Warp Guide](../docs/Theory/nvidia-warp/index.md)** for details on:
+- Writing `@wp.kernel` functions for parallel execution
+- Creating reusable `@wp.func` functions
+- Using Warp data structures (arrays, vectors, matrices)
+
+### NVIDIA Warp Type Hints and LSP Compatibility
+
+Warp's runtime type system doesn't map cleanly to Python's static type checkers (mypy, Pyright). Use these approved patterns to maintain LSP compatibility.
+
+#### 1. Use `Any` for Warp Array Parameters
+
+For functions accepting Warp arrays, use `Any` type hint and document the expected type:
+
+```python
+from typing import Any
+
+def compute_coagulation_rates(
+    particles: Any,
+    temperature: float,
+) -> tuple[float, float]:
+    """Compute coagulation rates for particle population.
+
+    Args:
+        particles: Warp array of Particle structs (wp.array(dtype=Particle)).
+        temperature: Temperature in K.
+
+    Returns:
+        Coagulation rate coefficients (K_ij, K_ji) in m³/s.
+    """
+    # Implementation
+    ...
+```
+
+#### 2. Duck-Type Warp Array Detection
+
+Never use `isinstance(obj, wp.array)`. Instead, use duck-typing with `hasattr`:
+
+```python
+# CORRECT: Duck-type detection
+def to_numpy(particles: Any) -> np.ndarray:
+    """Convert Warp or NumPy array to NumPy."""
+    if hasattr(particles, "numpy") and callable(particles.numpy):
+        return particles.numpy()  # Warp array
+    return np.asarray(particles)  # NumPy array
+
+# CORRECT: Check dtype attribute for Warp arrays
+def is_warp_particle_array(particles: Any) -> bool:
+    """Check if input is a Warp array with Particle dtype."""
+    return hasattr(particles, "dtype") and particles.dtype == Particle
+```
+
+#### 3. Suppress Specific LSP Errors with `type: ignore`
+
+When Warp-specific code triggers unavoidable LSP errors, use targeted suppression:
+
+```python
+from particula.dynamics.types import Particle
+
+def to_warp_array(particles: Any) -> Any:
+    """Convert input to Warp array with Particle dtype."""
+    if hasattr(particles, "dtype") and particles.dtype == Particle:
+        return particles  # Already a Warp array
+    return wp.array(particles, dtype=Particle)  # type: ignore[arg-type]
+```
+
+#### 4. Kernel Parameter Annotations
+
+Warp kernel parameters use Warp's annotation syntax, which LSP doesn't understand. These are acceptable as-is since kernels are compiled by Warp, not type-checked by Python:
+
+```python
+@wp.kernel
+def condensation_kernel(
+    particles: wp.array(dtype=Particle),  # Warp annotation syntax (not Python)
+    vapor_pressure: wp.array(dtype=float),
+    growth_rates: wp.array(dtype=float),
+):
+    """Compute condensation growth rates for each particle."""
+    tid = wp.tid()
+    # ... kernel code
+```
+
+#### 5. Return Type Annotations
+
+For functions returning Warp arrays, use `Any` or document in docstring:
+
+```python
+# Option 1: Use Any (preferred for internal functions)
+def create_particle_array(n_particles: int) -> Any:
+    """Create empty Particle Warp array."""
+    return wp.zeros(n_particles, dtype=Particle)  # type: ignore[arg-type]
+
+# Option 2: Document in docstring (preferred for public APIs)
+def initialize_aerosol(
+    diameters: NDArray[np.float64],
+    concentrations: NDArray[np.float64],
+) -> Any:
+    """Initialize aerosol particle population on GPU.
+
+    Returns:
+        wp.array(dtype=Particle): Warp array of particles with
+        diameters, masses, and concentrations initialized.
+    """
+    ...
+```
+
+#### Common LSP Errors and Fixes
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `Expected class but received "(ptr: ...)` | Using `wp.array` as type hint | Use `Any` instead |
+| `isinstance() second argument must be a class` | `isinstance(x, wp.array)` | Use `hasattr(x, "numpy")` |
+| `No overloads for "zeros" match` | `wp.zeros(n_particles, ...)` | Add `# type: ignore[arg-type]` |
+| `Argument missing for parameter "shape"` | `wp.array(data, dtype=Particle)` | Add `# type: ignore[arg-type]` |
+
+#### Type Checker Configuration
+
+Both mypy and Pyright can be configured in `pyproject.toml` with relaxed settings for Warp-heavy modules:
+
+**mypy** (`[[tool.mypy.overrides]]`):
+```toml
+disable_error_code = ["arg-type", "valid-type", ...]
+```
+
+**Pyright** (`[tool.pyright]`):
+```toml
+typeCheckingMode = "basic"
+reportGeneralTypeIssues = "warning"
+reportArgumentType = "warning"
+ignore = ["particula/dynamics/gpu/*.py", ...]
+```
+
+These settings ensure that:
+- CI doesn't fail on Warp-related type issues
+- LSP servers show warnings (not errors) for Warp code
+- Developers aren't blocked by unsolvable type errors
+
 ### Use Numpy for Numerical Computations
 
 ```python

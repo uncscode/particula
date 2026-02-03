@@ -35,6 +35,7 @@ This directory contains documentation guides for ADW (AI Developer Workflow) age
 | **[Architecture Reference](architecture/architecture_guide.md)** | Architecture documentation | Module structure, design decisions |
 | **[Notebook Validation Guide](notebook_validation_guide.md)** | Notebook tooling | validate_notebook, run_notebook, Jupytext |
 | **[Conditional Docs](conditional_docs.md)** | Task-driven documentation | When to read each guide |
+| **[NVIDIA Warp](../docs/Theory/nvidia-warp/index.md)** | GPU acceleration framework | Kernels, JIT compilation, CUDA |
 
 ## Repository Information
 
