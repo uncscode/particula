@@ -48,6 +48,9 @@ if WARP_AVAILABLE:
     from particula.gpu.conversion import (
         to_warp_particle_data,
         to_warp_gas_data,
+        from_warp_particle_data,
+        from_warp_gas_data,
+        gpu_context,
     )
 
 __all__ = [
@@ -56,4 +59,7 @@ __all__ = [
     "WarpGasData",
     "to_warp_particle_data",
     "to_warp_gas_data",
+    "from_warp_particle_data",
+    "from_warp_gas_data",
+    "gpu_context",
 ]

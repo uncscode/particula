@@ -238,3 +238,173 @@ def to_warp_gas_data(
         )
 
     return gpu_data
+
+
+def from_warp_particle_data(
+    gpu_data: "WarpParticleData",
+    sync: bool = True,
+) -> "ParticleData":
+    """Transfer WarpParticleData back to CPU.
+
+    Use this to transfer GPU-resident particle data back to CPU after
+    GPU simulation steps. The returned ParticleData can be used for
+    checkpointing, analysis, or continuing with CPU-based operations.
+
+    Args:
+        gpu_data: GPU-resident WarpParticleData container.
+        sync: If True (default), synchronize device before transfer
+            to ensure all GPU operations have completed. Set False
+            only if you've already synchronized manually (e.g., for
+            batched transfers).
+
+    Returns:
+        CPU-side ParticleData with NumPy arrays.
+
+    Example:
+        >>> # After GPU simulation
+        >>> result = from_warp_particle_data(gpu_data)
+        >>>
+        >>> # Batched transfers with manual sync (advanced)
+        >>> import warp as wp
+        >>> wp.synchronize()
+        >>> data1 = from_warp_particle_data(gpu_data1, sync=False)
+        >>> data2 = from_warp_particle_data(gpu_data2, sync=False)
+    """
+    wp = _ensure_warp_available()
+
+    if sync:
+        wp.synchronize()
+
+    from particula.particles.particle_data import ParticleData
+
+    return ParticleData(
+        masses=gpu_data.masses.numpy(),
+        concentration=gpu_data.concentration.numpy(),
+        charge=gpu_data.charge.numpy(),
+        density=gpu_data.density.numpy(),
+        volume=gpu_data.volume.numpy(),
+    )
+
+
+def from_warp_gas_data(
+    gpu_data: "WarpGasData",
+    name: list | None = None,
+    sync: bool = True,
+) -> "GasData":
+    """Transfer WarpGasData back to CPU.
+
+    Use this to transfer GPU-resident gas data back to CPU after
+    GPU simulation steps. The returned GasData can be used for
+    checkpointing, analysis, or continuing with CPU-based operations.
+
+    Note:
+        The 'vapor_pressure' field from WarpGasData is not transferred
+        as GasData does not have this field. If you need vapor pressure
+        values, access them directly from gpu_data before calling this.
+
+        Species names must be provided since WarpGasData does not store
+        string data. If not provided, placeholder names are generated.
+
+    Args:
+        gpu_data: GPU-resident WarpGasData container.
+        name: Species names. If None, generates placeholder names
+            ["species_0", "species_1", ...].
+        sync: If True (default), synchronize device before transfer
+            to ensure all GPU operations have completed. Set False
+            only if you've already synchronized manually.
+
+    Returns:
+        CPU-side GasData with NumPy arrays.
+
+    Raises:
+        ValueError: If name length doesn't match n_species.
+
+    Example:
+        >>> # With original names preserved
+        >>> result = from_warp_gas_data(gpu_data, name=["Water", "H2SO4"])
+        >>>
+        >>> # With placeholder names
+        >>> result = from_warp_gas_data(gpu_data)
+        >>> print(result.name)  # ["species_0", "species_1"]
+    """
+    wp = _ensure_warp_available()
+
+    if sync:
+        wp.synchronize()
+
+    # Determine n_species from molar_mass shape
+    n_species = gpu_data.molar_mass.shape[0]
+
+    # Handle name parameter
+    if name is None:
+        name = [f"species_{i}" for i in range(n_species)]
+    elif len(name) != n_species:
+        raise ValueError(
+            f"name length {len(name)} does not match n_species {n_species}"
+        )
+
+    # Convert partitioning from int32 to bool
+    partitioning_bool = gpu_data.partitioning.numpy().astype(bool)
+
+    from particula.gas.gas_data import GasData
+
+    return GasData(
+        name=name,
+        molar_mass=gpu_data.molar_mass.numpy(),
+        concentration=gpu_data.concentration.numpy(),
+        partitioning=partitioning_bool,
+    )
+
+
+class gpu_context:
+    """Context manager for scoped GPU-resident simulation.
+
+    Transfers ParticleData to GPU on entry. User is responsible for
+    calling from_warp_particle_data() when ready to transfer back
+    (typically inside the context or after exit).
+
+    This is a convenience wrapper for simple GPU simulation patterns.
+    For complex workflows with multiple data containers or explicit
+    sync control, use to_warp_particle_data()/from_warp_particle_data()
+    directly.
+
+    Args:
+        data: CPU-side ParticleData to transfer to GPU.
+        device: Target GPU device ("cuda", "cuda:0", "cpu").
+
+    Yields:
+        WarpParticleData on the specified device.
+
+    Example:
+        >>> # Transfer back inside context
+        >>> with gpu_context(particles) as gpu_data:
+        ...     for _ in range(1000):
+        ...         gpu_data = physics_step(gpu_data, dt)
+        ...     result = from_warp_particle_data(gpu_data)
+        >>>
+        >>> # Or transfer back after context (data still valid)
+        >>> with gpu_context(particles) as gpu_data:
+        ...     for _ in range(1000):
+        ...         gpu_data = physics_step(gpu_data, dt)
+        >>> result = from_warp_particle_data(gpu_data)
+    """
+
+    def __init__(self, data: "ParticleData", device: str = "cuda"):
+        """Initialize gpu_context.
+
+        Args:
+            data: CPU-side ParticleData to transfer to GPU.
+            device: Target GPU device ("cuda", "cuda:0", "cpu").
+        """
+        self.data = data
+        self.device = device
+        self.gpu_data = None
+
+    def __enter__(self) -> "WarpParticleData":
+        """Transfer data to GPU and return GPU-resident data."""
+        self.gpu_data = to_warp_particle_data(self.data, device=self.device)
+        return self.gpu_data
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit context. No automatic transfer back."""
+        return False
