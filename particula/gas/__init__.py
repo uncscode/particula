@@ -1,5 +1,18 @@
-"""Import all the gas classes and functions, so they can be accessed from
-particula.next import gas
+"""Gas phase module for particula.
+
+This module provides classes and functions for gas phase modeling,
+including vapor pressure strategies, gas species, and atmosphere builders.
+
+Example:
+    >>> from particula.gas import GasDataBuilder, GasData
+    >>> gas = (
+    ...     GasDataBuilder()
+    ...     .set_names(["Water"])
+    ...     .set_molar_mass([18], units="g/mol")
+    ...     .set_concentration([1e15], units="1/m^3")
+    ...     .set_partitioning([True])
+    ...     .build()
+    ... )
 """
 
 # pylint: disable=unused-import
