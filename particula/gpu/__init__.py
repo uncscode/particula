@@ -45,9 +45,15 @@ WARP_AVAILABLE = _check_warp_available()
 # Lazy import for optional dependency handling
 if WARP_AVAILABLE:
     from particula.gpu.warp_types import WarpGasData, WarpParticleData
+    from particula.gpu.conversion import (
+        to_warp_particle_data,
+        to_warp_gas_data,
+    )
 
 __all__ = [
     "WARP_AVAILABLE",
     "WarpParticleData",
     "WarpGasData",
+    "to_warp_particle_data",
+    "to_warp_gas_data",
 ]
