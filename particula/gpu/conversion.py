@@ -16,7 +16,8 @@ Example:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Generator
 
 import numpy as np
 from numpy.typing import NDArray
@@ -356,7 +357,11 @@ def from_warp_gas_data(
     )
 
 
-class gpu_context:
+@contextmanager
+def gpu_context(
+    data: "ParticleData",
+    device: str = "cuda",
+) -> Generator["WarpParticleData", None, None]:
     """Context manager for scoped GPU-resident simulation.
 
     Transfers ParticleData to GPU on entry. User is responsible for
@@ -388,23 +393,5 @@ class gpu_context:
         ...         gpu_data = physics_step(gpu_data, dt)
         >>> result = from_warp_particle_data(gpu_data)
     """
-
-    def __init__(self, data: "ParticleData", device: str = "cuda"):
-        """Initialize gpu_context.
-
-        Args:
-            data: CPU-side ParticleData to transfer to GPU.
-            device: Target GPU device ("cuda", "cuda:0", "cpu").
-        """
-        self.data = data
-        self.device = device
-        self.gpu_data = None
-
-    def __enter__(self) -> "WarpParticleData":
-        """Transfer data to GPU and return GPU-resident data."""
-        self.gpu_data = to_warp_particle_data(self.data, device=self.device)
-        return self.gpu_data
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Exit context. No automatic transfer back."""
-        return False
+    gpu_data = to_warp_particle_data(data, device=device)
+    yield gpu_data

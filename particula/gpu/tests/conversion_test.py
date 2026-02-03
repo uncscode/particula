@@ -11,11 +11,11 @@ import pytest
 wp = pytest.importorskip("warp")
 
 from particula.gpu.conversion import (  # noqa: E402
-    to_warp_gas_data,
-    to_warp_particle_data,
     from_warp_gas_data,
     from_warp_particle_data,
     gpu_context,
+    to_warp_gas_data,
+    to_warp_particle_data,
 )
 
 
