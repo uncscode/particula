@@ -25,7 +25,7 @@ Examples:
             .set_n_boxes(100)
             .set_names(["Water", "Ammonia"])
             .set_molar_mass([0.018, 0.017], units="kg/mol")
-            .set_concentration([1e15, 1e12], units="1/m^3")  # Broadcast to 100 boxes
+            .set_concentration([1e15, 1e12])  # Broadcast to 100 boxes
             .set_partitioning([True, True])
             .build()
         )

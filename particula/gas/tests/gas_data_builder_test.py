@@ -260,7 +260,7 @@ class TestGasDataBuilderDtype:
         assert data.concentration.dtype == np.float64
 
     def test_partitioning_is_bool(self) -> None:
-        """partitioning should be bool_."""
+        """Partitioning should be bool_."""
         data = (
             GasDataBuilder()
             .set_names(["H2O"])
@@ -280,7 +280,7 @@ class TestGasDataBuilderDtype:
             .set_concentration(
                 np.array([1000000000], dtype=np.int64), units="1/cm^3"
             )
-            .set_partitioning([1])  # truthy int
+            .set_partitioning([True])  # truthy value
             .build()
         )
         assert data.molar_mass.dtype == np.float64
