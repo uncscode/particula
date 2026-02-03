@@ -82,7 +82,7 @@ __all__ = [
     "get_clausius_clapeyron_vapor_pressure",
 ]
 
-# particla.gas.properties
+# particula.gas.properties
 from particula.gas.properties.concentration_function import (
     get_concentration_from_pressure,
 )
