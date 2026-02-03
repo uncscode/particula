@@ -26,6 +26,7 @@ from particula.gas.vapor_pressure_builders import (
 )
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.gas_data import GasData
+from particula.gas.gas_data_builder import GasDataBuilder
 from particula.gas.species import GasSpecies
 
 from particula.gas.species_builders import (
@@ -39,6 +40,7 @@ from particula.gas.atmosphere_builders import AtmosphereBuilder
 
 __all__ = [
     "GasData",
+    "GasDataBuilder",
     "GasSpecies",
     "GasSpeciesBuilder",
     "PresetGasSpeciesBuilder",
