@@ -25,8 +25,8 @@ from particula.gas.vapor_pressure_builders import (
     TableVaporPressureBuilder,
 )
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
-from particula.gas.species import GasSpecies
 from particula.gas.gas_data import GasData
+from particula.gas.species import GasSpecies
 
 from particula.gas.species_builders import (
     GasSpeciesBuilder,
