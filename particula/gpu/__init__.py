@@ -7,18 +7,33 @@ The GPU module enables:
 - GPU-resident particle and gas data via Warp structs
 - Efficient multi-box CFD simulations with batch dimensions
 - Manual transfer control between CPU and GPU (to_warp/from_warp)
-- GPU kernels for condensation and coagulation (future phases)
+- GPU kernels for condensation (particle-resolved mass transfer)
+
+Available GPU kernels:
+- condensation_mass_transfer_kernel: Computes dm/dt for each particle
+- apply_mass_transfer_kernel: Applies mass changes with clamping
+- condensation_step_gpu: High-level function for one condensation timestep
 
 Example:
     >>> import warp as wp
-    >>> from particula.gpu import WarpParticleData, WarpGasData
+    >>> from particula.gpu import (
+    ...     to_warp_particle_data,
+    ...     to_warp_gas_data,
+    ...     condensation_step_gpu,
+    ... )
     >>> wp.init()
-    >>> # Create particle data for 2 boxes, 100 particles, 3 species
-    >>> data = WarpParticleData()
-    >>> data.masses = wp.zeros((2, 100, 3), dtype=wp.float64)
+    >>> # Transfer data to GPU and run condensation
+    >>> gpu_particles = to_warp_particle_data(particles, device="cuda")
+    >>> gpu_gas = to_warp_gas_data(gas, device="cuda")
+    >>> for _ in range(1000):
+    ...     gpu_particles = condensation_step_gpu(
+    ...         gpu_particles, gpu_gas,
+    ...         temperature=298.15, dt=0.001
+    ...     )
 
 References:
     NVIDIA Warp documentation: https://nvidia.github.io/warp/
+    Seinfeld & Pandis (2016): Atmospheric Chemistry and Physics
 """
 
 # pylint: disable=unused-import
@@ -52,6 +67,11 @@ if WARP_AVAILABLE:
         from_warp_gas_data,
         gpu_context,
     )
+    from particula.gpu.kernels import (
+        condensation_mass_transfer_kernel,
+        apply_mass_transfer_kernel,
+        condensation_step_gpu,
+    )
 
 __all__ = [
     "WARP_AVAILABLE",
@@ -62,4 +82,8 @@ __all__ = [
     "from_warp_particle_data",
     "from_warp_gas_data",
     "gpu_context",
+    # GPU kernels
+    "condensation_mass_transfer_kernel",
+    "apply_mass_transfer_kernel",
+    "condensation_step_gpu",
 ]
