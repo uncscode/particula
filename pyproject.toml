@@ -134,4 +134,6 @@ max-args = 10
 exclude = [
     "docs/.assets/.*",
     "trees/.*",
+    # Warp GPU kernels use a DSL that mypy doesn't understand
+    "particula/gpu/kernels/.*",
 ]
