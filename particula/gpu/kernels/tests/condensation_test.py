@@ -723,7 +723,7 @@ class TestGpuVsCpuEquivalence:
 
         result_high = mass_transfer_high.numpy()
 
-        # With high vapor pressure (supersaturation), expect positive mass transfer
+        # With high VP (supersaturation), expect positive mass transfer
         assert np.all(result_high > 0), (
             "High VP should give positive mass transfer (condensation)"
         )
@@ -760,7 +760,7 @@ class TestGpuVsCpuEquivalence:
 
         result_low = mass_transfer_low.numpy()
 
-        # With low vapor pressure (undersaturation), expect negative mass transfer
+        # With low VP (undersaturation), expect negative mass transfer
         assert np.all(result_low < 0), (
             "Low VP should give negative mass transfer (evaporation)"
         )

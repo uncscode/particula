@@ -7,8 +7,8 @@ particle-species pair.
 
 Physics Equations:
     1. Knudsen number: Kn = mean_free_path / radius
-    2. Fuchs-Sutugin correction:
-       f(Kn, alpha) = 0.75*alpha*(1+Kn) / [Kn^2 + Kn + 0.283*alpha*Kn + 0.75*alpha]
+    2. Fuchs-Sutugin correction: f(Kn, alpha) =
+       0.75*alpha*(1+Kn) / [Kn^2 + Kn + 0.283*alpha*Kn + 0.75*alpha]
     3. First-order transport: K = 4*pi * r * D * f(Kn, alpha)
     4. Mass transfer rate: dm/dt = K * delta_p * M / (R * T)
     5. Mass change: delta_m = dm/dt * dt
@@ -64,15 +64,15 @@ def compute_fuchs_sutugin(
 
 
 @wp.kernel
-def condensation_mass_transfer_kernel(
+def condensation_mass_transfer_kernel(  # noqa: C901
     # Particle arrays
-    masses: wp.array3d(dtype=wp.float64),  # (n_boxes, n_particles, n_species)
-    concentration: wp.array2d(dtype=wp.float64),  # (n_boxes, n_particles)
-    density: wp.array(dtype=wp.float64),  # (n_species,)
+    masses: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
+    concentration: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+    density: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
     # Gas arrays
-    gas_concentration: wp.array2d(dtype=wp.float64),  # (n_boxes, n_species)
-    vapor_pressure: wp.array2d(dtype=wp.float64),  # (n_boxes, n_species)
-    molar_mass: wp.array(dtype=wp.float64),  # (n_species,)
+    gas_concentration: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+    vapor_pressure: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+    molar_mass: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
     # Scalar parameters
     temperature: wp.float64,
     diffusion_coefficient: wp.float64,
@@ -80,9 +80,7 @@ def condensation_mass_transfer_kernel(
     mass_accommodation: wp.float64,
     dt: wp.float64,
     # Output
-    mass_transfer: wp.array3d(
-        dtype=wp.float64
-    ),  # (n_boxes, n_particles, n_species)
+    mass_transfer: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
 ):
     """Compute mass transfer for particle-resolved condensation.
 
@@ -95,9 +93,10 @@ def condensation_mass_transfer_kernel(
     Negative mass_transfer indicates evaporation (mass loss).
 
     Args:
-        masses: Per-species masses in kg. Shape: (n_boxes, n_particles, n_species).
-        concentration: Particle number concentration. Shape: (n_boxes, n_particles).
-            Value of 0 indicates inactive particle.
+        masses: Per-species masses in kg.
+            Shape: (n_boxes, n_particles, n_species).
+        concentration: Particle number concentration.
+            Shape: (n_boxes, n_particles). Value of 0 indicates inactive.
         density: Material densities in kg/m^3. Shape: (n_species,).
         gas_concentration: Gas concentrations in molecules/m^3.
             Shape: (n_boxes, n_species).
@@ -183,9 +182,10 @@ def condensation_mass_transfer_kernel(
         m_s = molar_mass[s]
 
         # Pressure difference (driving force)
-        # delta_p = p_sat - p_gas (condensation if positive, evaporation if negative)
+        # delta_p = p_sat - p_gas
+        # Condensation if positive, evaporation if negative
         # For particle at saturation: p_particle = p_sat * activity
-        # Simplified: delta_p = p_sat - (c_gas * R * T / M) where c_gas in mol/m^3
+        # Simplified: delta_p = p_sat - (c_gas * R * T / M)
         # Since gas_concentration is molecules/m^3, convert:
         # c_gas_molar = gas_concentration / Na
         # But this requires Avogadro's number. For GPU kernels, we assume
@@ -212,11 +212,9 @@ def condensation_mass_transfer_kernel(
 
 @wp.kernel
 def apply_mass_transfer_kernel(
-    masses: wp.array3d(dtype=wp.float64),  # (n_boxes, n_particles, n_species)
-    mass_transfer: wp.array3d(
-        dtype=wp.float64
-    ),  # (n_boxes, n_particles, n_species)
-    concentration: wp.array2d(dtype=wp.float64),  # (n_boxes, n_particles)
+    masses: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
+    mass_transfer: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
+    concentration: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
 ):
     """Apply computed mass transfer to particle masses.
 
