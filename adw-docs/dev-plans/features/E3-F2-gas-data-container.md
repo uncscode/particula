@@ -1,10 +1,10 @@
 # Feature E3-F2: Gas Data Container
 
 **Parent Epic**: [E3: Data Representation Refactor](../epics/E3-data-representation-refactor.md)
-**Status**: Planning
+**Status**: In Progress
 **Priority**: P1
 **Start Date**: TBD
-**Last Updated**: 2026-01-19
+**Last Updated**: 2026-02-14
 
 ## Summary
 
@@ -49,7 +49,7 @@ class GasData:
     Attributes:
         name: Species names. List of strings, length n_species.
         molar_mass: Molar masses in kg/mol. Shape: (n_species,)
-        concentration: Number concentrations in molecules/m^3.
+        concentration: Mass concentrations in kg/m^3.
             Shape: (n_boxes, n_species)
         partitioning: Whether each species can partition to particles.
             Shape: (n_species,) - shared across boxes
@@ -60,7 +60,7 @@ class GasData:
         gas = GasData(
             name=["Water", "Ammonia", "H2SO4"],
             molar_mass=np.array([0.018, 0.017, 0.098]),
-            concentration=np.array([[1e15, 1e12, 1e10]]),  # (1, 3)
+            concentration=np.array([[1e-3, 1e-6, 1e-8]]),  # kg/m^3, (1, 3)
             partitioning=np.array([True, True, True]),
         )
         
@@ -68,7 +68,7 @@ class GasData:
         cfd_gas = GasData(
             name=["Water", "Ammonia", "H2SO4"],
             molar_mass=np.array([0.018, 0.017, 0.098]),
-            concentration=np.zeros((100, 3)),  # Different per box
+            concentration=np.zeros((100, 3)),  # kg/m^3, different per box
             partitioning=np.array([True, True, True]),
         )
         ```
@@ -140,7 +140,7 @@ class GasDataBuilder:
         builder = GasDataBuilder()
         builder.set_names(["Water", "Ammonia"])
         builder.set_molar_mass([18, 17], units="g/mol")
-        builder.set_concentration([1e15, 1e12], units="1/m^3")
+        builder.set_concentration([1e-3, 1e-6], units="kg/m^3")
         builder.set_partitioning([True, True])
         gas = builder.build()
         
@@ -149,7 +149,7 @@ class GasDataBuilder:
         builder.set_n_boxes(100)
         builder.set_names(["Water", "Ammonia"])
         builder.set_molar_mass([18, 17], units="g/mol")
-        builder.set_concentration(np.zeros((100, 2)))  # Already batched
+        builder.set_concentration(np.zeros((100, 2)))  # kg/m^3, already batched
         builder.set_partitioning([True, True])
         gas = builder.build()
         ```
@@ -175,14 +175,15 @@ class GasDataBuilder:
         return self
     
     def set_concentration(
-        self, concentration, units: str = "1/m^3"
+        self, concentration, units: str = "kg/m^3"
     ) -> "GasDataBuilder":
         """Set concentrations with unit conversion.
         
         Args:
             concentration: Concentration values. If 1D (n_species,),
                 batch dimension added. If 2D (n_boxes, n_species), used as-is.
-            units: Input units (default "1/m^3" for number concentration)
+            units: Input units (default "kg/m^3" for mass concentration,
+                matching GasSpecies convention)
         """
         ...
         return self
@@ -247,8 +248,8 @@ def to_species(
 
 ## Phase Checklist
 
-- [ ] **E3-F2-P1**: Define `GasData` dataclass with batched fields
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F2-P1**: Define `GasData` dataclass with batched fields
+  - Issue: TBD | Size: M | Status: Shipped
   - Create `particula/gas/gas_data.py`
   - Define dataclass with name, molar_mass, concentration, partitioning
   - Shape convention: (n_boxes, n_species) for concentration
@@ -257,8 +258,8 @@ def to_species(
   - Write `particula/gas/tests/gas_data_test.py`
   - Tests for instantiation, validation errors, properties
 
-- [ ] **E3-F2-P2**: Create `GasDataBuilder` with validation
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F2-P2**: Create `GasDataBuilder` with validation
+  - Issue: TBD | Size: M | Status: Shipped
   - Create `particula/gas/gas_data_builder.py`
   - Implement setter methods with unit conversion
   - Auto-add batch dimension if 1D concentration provided
@@ -266,13 +267,74 @@ def to_species(
   - Write `particula/gas/tests/gas_data_builder_test.py`
   - Tests for valid builds, unit conversion, validation errors
 
-- [ ] **E3-F2-P3**: Add conversion utilities
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F2-P3**: Add conversion utilities
+  - Issue: TBD | Size: M | Status: Shipped
   - Implement `from_species()` in gas_data.py
   - Implement `to_species()` in gas_data.py
   - Handle single and multi-species cases
   - Extend test file with conversion round-trip tests
   - Tests for single/multi species conversion, multi-box
+
+- [ ] **E3-F2-P4**: Revise concentration units from molecules/m³ to kg/m³
+  - Issue: TBD | Size: M | Status: Not Started
+  - **Rationale**: Align `GasData.concentration` with `GasSpecies` convention
+    (kg/m³). The current molecules/m³ introduces unnecessary Avogadro
+    scaling in `from_species()`/`to_species()` and mismatches the rest
+    of the codebase where gas concentration is universally kg/m³
+    (e.g., `GasSpeciesBuilder.set_concentration(..., "kg/m^3")`).
+  - **`particula/gas/gas_data.py`** — 5 changes:
+    1. Remove `from particula.util.constants import AVOGADRO_NUMBER`
+       (line 36 — no longer needed)
+    2. Update `GasData` docstring (line 57): change
+       `"Number concentrations in molecules/m^3"` →
+       `"Mass concentrations in kg/m^3"`
+    3. Update module-level examples (lines 16, 25): change `1e15, 1e12,
+       1e10` to realistic kg/m³ values (e.g., `1e-3, 1e-6, 1e-8`)
+    4. `from_species()` (lines 181–190): Remove Avogadro conversion.
+       Currently does `concentration_molecules = (concentration_kg / molar_mass) * AVOGADRO_NUMBER`.
+       Replace with direct passthrough: just reshape
+       `species.get_concentration()` (already kg/m³) into (n_boxes, n_species).
+       Update docstring (line 143–144) to say "direct copy" not "converted".
+    5. `to_species()` (lines 275–281): Remove Avogadro back-conversion.
+       Currently does `concentration_kg = (concentration_molecules * molar_mass) / AVOGADRO_NUMBER`.
+       Replace with direct passthrough: `concentration_kg = data.concentration[box_index, :]`.
+       Update docstring (line 221) to say "direct copy" not "converted".
+  - **`particula/gas/gas_data_builder.py`** — 3 changes:
+    1. Change `set_concentration()` default (line 108):
+       `units: str = "1/m^3"` → `units: str = "kg/m^3"`
+    2. Change conversion target (lines 131–133):
+       `"1/m^3"` → `"kg/m^3"` in the `get_unit_conversion()` call
+    3. Update module docstring examples (lines 16, 28):
+       `units="1/m^3"` → `units="kg/m^3"` and values to kg/m³
+  - **`particula/gas/__init__.py`** — 1 change:
+    - Update module docstring example (line 12):
+      `.set_concentration([1e15], units="1/m^3")` →
+      `.set_concentration([1e-3], units="kg/m^3")`
+  - **`particula/gas/tests/gas_data_test.py`** — 4 areas:
+    1. Remove `from particula.util.constants import AVOGADRO_NUMBER` (line 11)
+    2. `TestGasDataInstantiation` + `TestGasDataCopy` + `TestGasDataProperties`:
+       Change concentration values from molecules/m³ (`1e15, 1e12, 1e10,
+       1e20, 2e20, 3e20`) to kg/m³ (`1e-3, 1e-6, 1e-8`) — the exact values
+       don't matter for shape/validation tests, just need to be realistic
+    3. `TestFromSpecies.test_concentration_unit_conversion()` (lines 280–300):
+       Remove Avogadro assertion — assert that `gas_data.concentration[0, 0]`
+       equals `concentration_kg` directly (1e-6 kg/m³ in, 1e-6 kg/m³ out)
+    4. `TestToSpecies` (lines 303–418): Change test values from molecules/m³
+       (`1e20, 2e20, 3e20`) to kg/m³ (`1e-6, 2e-6, 3e-6`), remove Avogadro
+       back-conversion expectations — assert species concentration equals
+       the GasData value directly
+  - **`particula/gas/tests/gas_data_builder_test.py`** — 2 areas:
+    1. `TestGasDataBuilderBasics.test_build_valid_single_box()` (line 24):
+       Change `units="1/m^3"` → `units="kg/m^3"` (or omit since it's default)
+    2. `TestGasDataBuilderUnits.test_concentration_units()` (lines 90–109):
+       Replace `"1/cm^3" → "1/m^3"` parametrized test with
+       `"g/m^3" → "kg/m^3"` parametrized test
+  - **`particula/gpu/warp_types.py`** — 1 change:
+    - Update `WarpGasData.concentration` docstring (line 104):
+      `"Number concentrations in molecules/m^3"` →
+      `"Mass concentrations in kg/m^3"`
+  - **Tests must pass**: All existing gas module tests plus updated tests
+  - **No new files**: This is a revision of existing implementation
 
 ## Testing Strategy
 
@@ -282,16 +344,16 @@ Location: `particula/gas/tests/`
 
 | Test File | Coverage Target |
 |-----------|----------------|
-| `gas_data_test.py` | GasData class, validation, properties |
-| `gas_data_builder_test.py` | Builder validation, unit conversion |
+| `gas_data_test.py` | GasData class, validation, properties, from/to_species |
+| `gas_data_builder_test.py` | Builder validation, unit conversion (kg/m³ default) |
 
 ### Test Cases
 
-1. **Instantiation**: Valid inputs, shape validation failures
+1. **Instantiation**: Valid inputs with kg/m³ values, shape validation failures
 2. **Batch Dimension**: Single box (n_boxes=1), multi-box (n_boxes>1)
 3. **Properties**: n_boxes, n_species
-4. **Builder**: Unit conversion, auto batch dim, validation
-5. **Conversion**: Round-trip with GasSpecies
+4. **Builder**: Unit conversion (kg/m³ default, g/m³ supported), auto batch dim, validation
+5. **Conversion**: Round-trip with GasSpecies (direct kg/m³ passthrough, no Avogadro scaling)
 
 ## Dependencies
 
@@ -311,9 +373,10 @@ Location: `particula/gas/tests/`
 
 1. `GasData` instantiation works with batch dimension
 2. Validation catches shape mismatches with clear errors
-3. Builder converts units and validates inputs
-4. Conversion to/from `GasSpecies` is lossless
-5. All tests pass with 80%+ coverage
+3. Builder converts units and validates inputs (kg/m³ default)
+4. Conversion to/from `GasSpecies` is lossless (direct kg/m³, no Avogadro scaling)
+5. `GasData.concentration` uses kg/m³ matching `GasSpecies` convention
+6. All tests pass with 80%+ coverage
 
 ## Change Log
 
@@ -321,3 +384,5 @@ Location: `particula/gas/tests/`
 |------|--------|--------|
 | 2026-01-19 | Initial feature document | ADW |
 | 2026-01-19 | Simplified: added batch dimension, removed array-like operations | ADW |
+| 2026-02-14 | Marked P1–P3 shipped; added P4 revision to change concentration from molecules/m³ to kg/m³ | ADW |
+| 2026-02-14 | P4 revised with exact line references from code review; added WarpGasData docstring fix | ADW |

@@ -14,9 +14,9 @@ Coagulation is the process where particles collide and merge. For aerosols, Brow
 import warp as wp
 import numpy as np
 
-# Physical constants
-K_B = 1.380649e-23  # Boltzmann constant (J/K)
-PI = 3.14159265359
+# Physical constants — in practice, pass from particula.util.constants
+# as kernel parameters. Module-level constants shown here for brevity.
+PI = 3.141592653589793  # matches math.pi exactly
 
 @wp.func
 def cunningham_correction(diameter: float, mean_free_path: float) -> float:
@@ -31,10 +31,11 @@ def diffusion_coefficient(
     temperature: float,
     viscosity: float,
     mean_free_path: float,
+    k_boltzmann: float,  # from particula.util.constants.BOLTZMANN_CONSTANT
 ) -> float:
     """Stokes-Einstein diffusion coefficient with slip correction."""
     Cc = cunningham_correction(diameter, mean_free_path)
-    return (K_B * temperature * Cc) / (3.0 * PI * viscosity * diameter)
+    return (k_boltzmann * temperature * Cc) / (3.0 * PI * viscosity * diameter)
 
 @wp.func
 def brownian_coagulation_kernel(
@@ -226,14 +227,15 @@ def kelvin_factor(
     molar_mass: float,
     density: float,
     temperature: float,
+    gas_constant: float,  # from particula.util.constants.GAS_CONSTANT
 ) -> float:
     """Kelvin effect: increased vapor pressure over curved surface.
     
     Important for particles < 100 nm.
+    gas_constant passed from particula.util.constants.GAS_CONSTANT.
     """
-    R = 8.314  # Universal gas constant (J/mol/K)
     exponent = (4.0 * surface_tension * molar_mass) / \
-               (R * temperature * density * diameter)
+               (gas_constant * temperature * density * diameter)
     return wp.exp(exponent)
 
 @wp.func
@@ -296,6 +298,7 @@ def compute_condensation_rates(
     water_density: float,
     kappa: float,
     accommodation: float,
+    gas_constant: float,  # from particula.util.constants.GAS_CONSTANT
 ):
     """Compute diameter growth rate dd/dt for each particle."""
     tid = wp.tid()
@@ -321,9 +324,8 @@ def compute_condensation_rates(
     p_sat = saturation_vapor_pressure_water(temperature)
     
     # Growth rate: dd/dt = (k_m * M_w * p_sat * delta_S) / (rho_w * R * T * d)
-    R = 8.314
     growth_rates[tid] = (k_m * molar_mass * p_sat * delta_S) / \
-                        (water_density * R * temperature * d)
+                        (water_density * gas_constant * temperature * d)
 
 @wp.kernel
 def integrate_condensation(

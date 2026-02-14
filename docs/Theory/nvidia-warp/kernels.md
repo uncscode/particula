@@ -13,6 +13,8 @@ Kernels are Python functions decorated with `@wp.kernel`:
 ```python
 import warp as wp
 
+PI = 3.141592653589793  # matches math.pi exactly — never truncate
+
 @wp.kernel
 def compute_particle_masses(
     diameters: wp.array(dtype=float),
@@ -24,7 +26,7 @@ def compute_particle_masses(
     
     # Volume of sphere: (4/3) * pi * r^3
     radius = diameters[tid] * 0.5
-    volume = (4.0 / 3.0) * 3.14159265359 * radius * radius * radius
+    volume = (4.0 / 3.0) * PI * radius * radius * radius
     
     masses[tid] = densities[tid] * volume
 ```
@@ -102,6 +104,7 @@ def compute_coagulation_kernel_matrix(
     kernel_matrix: wp.array2d(dtype=float),
     temperature: float,
     viscosity: float,
+    k_boltzmann: float,  # from particula.util.constants.BOLTZMANN_CONSTANT
 ):
     """Compute coagulation kernel K(i,j) for all particle pairs."""
     i, j = wp.tid()
@@ -109,17 +112,18 @@ def compute_coagulation_kernel_matrix(
     d_i = diameters[i]
     d_j = diameters[j]
     
-    # Brownian coagulation kernel (simplified)
-    k_B = 1.380649e-23  # Boltzmann constant
-    coag_kernel = (2.0 * k_B * temperature / (3.0 * viscosity)) * \
+    # Brownian coagulation kernel
+    coag_kernel = (2.0 * k_boltzmann * temperature / (3.0 * viscosity)) * \
                   (d_i + d_j) * (1.0/d_i + 1.0/d_j)
     
     kernel_matrix[i, j] = coag_kernel
 
-# Launch with 2D dimensions
+# Launch with constants from particula.util.constants
+from particula.util.constants import BOLTZMANN_CONSTANT
 wp.launch(compute_coagulation_kernel_matrix, 
           dim=(n_particles, n_particles), 
-          inputs=[diameters, kernel_matrix, temperature, viscosity])
+          inputs=[diameters, kernel_matrix, temperature, viscosity,
+                  float(BOLTZMANN_CONSTANT)])
 ```
 
 ### Conditional Logic
@@ -171,26 +175,41 @@ def compute_total_mass(
 
 ### Example: Optimized Condensation Kernel
 
+Physical constants are passed as kernel parameters from
+`particula.util.constants` — never hardcoded in kernel code. This ensures
+exact parity with the Python/NumPy implementations and a single source of
+truth for all constants.
+
 ```python
 @wp.func
-def saturation_vapor_pressure(temperature: float) -> float:
-    """Clausius-Clapeyron equation for water vapor."""
-    # Reference: T0 = 273.15 K, P0 = 611.2 Pa
-    L_v = 2.5e6  # Latent heat of vaporization (J/kg)
-    R_v = 461.5  # Gas constant for water vapor (J/kg/K)
-    T0 = 273.15
-    P0 = 611.2
+def saturation_vapor_pressure(
+    temperature: float,
+    latent_heat: float,      # passed from Python side
+    gas_constant_vapor: float,  # passed from Python side
+    ref_temperature: float,  # passed from Python side
+    ref_pressure: float,     # passed from Python side
+) -> float:
+    """Clausius-Clapeyron equation for water vapor.
     
-    return P0 * wp.exp((L_v / R_v) * (1.0/T0 - 1.0/temperature))
+    Must match the Python equivalent exactly — no approximations.
+    """
+    return ref_pressure * wp.exp(
+        (latent_heat / gas_constant_vapor)
+        * (1.0 / ref_temperature - 1.0 / temperature)
+    )
 
 @wp.func
-def kelvin_effect(diameter: float, surface_tension: float, 
-                  molar_mass: float, density: float, 
-                  temperature: float) -> float:
+def kelvin_effect(
+    diameter: float,
+    surface_tension: float, 
+    molar_mass: float,
+    density: float, 
+    temperature: float,
+    gas_constant: float,  # from particula.util.constants.GAS_CONSTANT
+) -> float:
     """Kelvin effect correction for small droplets."""
-    R = 8.314  # Universal gas constant
     exponent = (4.0 * surface_tension * molar_mass) / \
-               (R * temperature * density * diameter)
+               (gas_constant * temperature * density * diameter)
     return wp.exp(exponent)
 
 @wp.kernel
@@ -202,8 +221,17 @@ def compute_condensation_rates(
     surface_tension: float,
     molar_mass: float,
     density: float,
+    diffusion_coeff: float,
+    gas_constant: float,  # from particula.util.constants.GAS_CONSTANT
+    latent_heat: float,
+    gas_constant_vapor: float,
+    ref_temperature: float,
+    ref_pressure: float,
 ):
-    """Compute condensation growth rate for each particle."""
+    """Compute condensation growth rate for each particle.
+    
+    All physical constants passed as parameters — see launch call below.
+    """
     tid = wp.tid()
     
     # Load particle properties once
@@ -212,17 +240,30 @@ def compute_condensation_rates(
     p_vapor = vapor_pressures[tid]
     
     # Compute equilibrium vapor pressure with Kelvin effect
-    p_sat = saturation_vapor_pressure(T)
-    kelvin = kelvin_effect(d, surface_tension, molar_mass, density, T)
+    p_sat = saturation_vapor_pressure(
+        T, latent_heat, gas_constant_vapor, ref_temperature, ref_pressure
+    )
+    kelvin = kelvin_effect(d, surface_tension, molar_mass, density, T,
+                           gas_constant)
     p_eq = p_sat * kelvin
     
     # Supersaturation
     S = p_vapor / p_eq - 1.0
     
-    # Growth rate (simplified Maxwell equation)
-    D_v = 2.5e-5  # Diffusion coefficient of water vapor (m²/s)
-    growth_rates[tid] = (2.0 * D_v * molar_mass * p_eq * S) / \
-                        (density * 8.314 * T * d)
+    # Growth rate (Maxwell equation)
+    growth_rates[tid] = (2.0 * diffusion_coeff * molar_mass * p_eq * S) / \
+                        (density * gas_constant * T * d)
+
+# Launch with constants from particula.util.constants
+from particula.util.constants import GAS_CONSTANT
+wp.launch(
+    compute_condensation_rates,
+    dim=n_particles,
+    inputs=[diameters, temperatures, vapor_pressures, growth_rates,
+            surface_tension, molar_mass, density, diffusion_coeff,
+            float(GAS_CONSTANT), latent_heat, gas_constant_vapor,
+            ref_temperature, ref_pressure],
+)
 ```
 
 ## Debugging Kernels
@@ -277,17 +318,22 @@ def compute_moments(
 ### Diffusion Coefficient Calculation
 
 ```python
+PI = 3.141592653589793  # matches math.pi exactly
+
 @wp.func
 def stokes_einstein_diffusion(
     diameter: float,
     temperature: float,
     viscosity: float,
     slip_correction: float,
+    k_boltzmann: float,  # from particula.util.constants.BOLTZMANN_CONSTANT
 ) -> float:
-    """Stokes-Einstein diffusion coefficient with slip correction."""
-    k_B = 1.380649e-23  # Boltzmann constant
-    return (k_B * temperature * slip_correction) / \
-           (3.0 * 3.14159265359 * viscosity * diameter)
+    """Stokes-Einstein diffusion coefficient with slip correction.
+    
+    Must match the Python equivalent exactly — no approximations.
+    """
+    return (k_boltzmann * temperature * slip_correction) / \
+           (3.0 * PI * viscosity * diameter)
 
 @wp.kernel
 def compute_diffusion_coefficients(
@@ -296,13 +342,98 @@ def compute_diffusion_coefficients(
     diffusion_coeffs: wp.array(dtype=float),
     temperature: float,
     viscosity: float,
+    k_boltzmann: float,  # from particula.util.constants.BOLTZMANN_CONSTANT
 ):
     """Compute diffusion coefficient for each particle."""
     tid = wp.tid()
     diffusion_coeffs[tid] = stokes_einstein_diffusion(
-        diameters[tid], temperature, viscosity, slip_corrections[tid]
+        diameters[tid], temperature, viscosity, slip_corrections[tid],
+        k_boltzmann
     )
+
+# Launch with constants from particula.util.constants
+from particula.util.constants import BOLTZMANN_CONSTANT
+wp.launch(
+    compute_diffusion_coefficients,
+    dim=n_particles,
+    inputs=[diameters, slip_corrections, diffusion_coeffs,
+            temperature, viscosity, float(BOLTZMANN_CONSTANT)],
+)
 ```
+
+## Testing Warp Kernels
+
+### Principle: Exact Parity with Python/NumPy
+
+Every `@wp.func` and `@wp.kernel` must produce **numerically identical**
+results to the equivalent Python/NumPy function in particula. There are no
+approximations or shortcuts in the GPU version.
+
+### Pattern: Lightweight Wrapper Kernels
+
+Test each `@wp.func` by writing a small `@wp.kernel` in the test file that
+calls the function and writes results to an output array:
+
+```python
+import numpy as np
+import numpy.testing as npt
+import pytest
+
+wp = pytest.importorskip("warp")
+
+from particula.util.constants import BOLTZMANN_CONSTANT
+
+
+@wp.kernel
+def _test_diffusion_kernel(
+    diameters: wp.array(dtype=float),
+    slip_corrections: wp.array(dtype=float),
+    results: wp.array(dtype=float),
+    temperature: float,
+    viscosity: float,
+    k_boltzmann: float,
+):
+    """Lightweight test wrapper for stokes_einstein_diffusion."""
+    tid = wp.tid()
+    results[tid] = stokes_einstein_diffusion(
+        diameters[tid], slip_corrections[tid],
+        temperature, viscosity, k_boltzmann,
+    )
+
+
+def test_diffusion_gpu_matches_numpy():
+    """GPU diffusion matches Python/NumPy implementation exactly."""
+    diameters = np.array([1e-7, 1e-6, 1e-5], dtype=np.float64)
+    slips = np.array([1.15, 1.02, 1.001], dtype=np.float64)
+    temp, visc = 298.15, 1.81e-5
+
+    # Python reference
+    from particula.particles.properties import get_diffusion_coefficient
+    expected = get_diffusion_coefficient(diameters, temp, visc, slips)
+
+    # GPU
+    results_wp = wp.zeros(3, dtype=float)
+    wp.launch(
+        _test_diffusion_kernel, dim=3,
+        inputs=[wp.array(diameters), wp.array(slips), results_wp,
+                temp, visc, float(BOLTZMANN_CONSTANT)],
+    )
+    wp.synchronize()
+
+    npt.assert_allclose(results_wp.numpy(), expected, rtol=1e-10)
+```
+
+### Checklist
+
+1. **`pytest.importorskip("warp")`** — skip entire test file if Warp unavailable
+2. **Wrapper kernel per function** — one small `@wp.kernel` per `@wp.func`
+3. **Compare against Python** — `npt.assert_allclose(..., rtol=1e-10)`
+4. **Constants as parameters** — never hardcode; pass from `util.constants`
+5. **Both devices** — test `"cpu"` always, `"cuda"` if available
+6. **`wp.synchronize()`** — always call before `.numpy()`
+
+For full details, see the
+[Testing Guide](../../../adw-docs/testing_guide.md#testing-nvidia-warp-kernels).
 
 ## See Also
 
