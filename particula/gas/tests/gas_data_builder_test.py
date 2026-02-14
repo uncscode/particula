@@ -21,7 +21,7 @@ class TestGasDataBuilderBasics:
             GasDataBuilder()
             .set_names(["Water", "Ammonia"])
             .set_molar_mass(np.array([0.018, 0.017]), units="kg/mol")
-            .set_concentration(np.array([1e15, 1e12]), units="1/m^3")
+            .set_concentration(np.array([1e-6, 5e-9]), units="kg/m^3")
             .set_partitioning(np.array([True, False]))
             .build()
         )
@@ -32,7 +32,7 @@ class TestGasDataBuilderBasics:
         assert data.molar_mass.shape == (2,)
         assert data.partitioning.shape == (2,)
         npt.assert_allclose(data.molar_mass, np.array([0.018, 0.017]))
-        npt.assert_allclose(data.concentration, np.array([[1e15, 1e12]]))
+        npt.assert_allclose(data.concentration, np.array([[1e-6, 5e-9]]))
 
     def test_fluent_chaining(self) -> None:
         """All setters return self for chaining."""
@@ -40,7 +40,7 @@ class TestGasDataBuilderBasics:
             GasDataBuilder()
             .set_names(["H2O"])
             .set_molar_mass([0.018])
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
             .set_partitioning([True])
             .build()
         )
@@ -49,7 +49,7 @@ class TestGasDataBuilderBasics:
 
     def test_multi_box_build(self) -> None:
         """Builder with 2D concentration array creates multi-box GasData."""
-        concentration_2d = np.array([[1e15, 1e12], [2e15, 2e12]])
+        concentration_2d = np.array([[1e-6, 5e-9], [2e-6, 1e-8]])
         data = (
             GasDataBuilder()
             .set_names(["Water", "Ammonia"])
@@ -81,23 +81,24 @@ class TestGasDataBuilderUnits:
             GasDataBuilder()
             .set_names(["H2O"])
             .set_molar_mass(value, units=units)
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
             .set_partitioning([True])
             .build()
         )
+
         npt.assert_allclose(data.molar_mass[0], expected, rtol=1e-6)
 
     @pytest.mark.parametrize(
         "value, units, expected",
         [
-            (np.array([1e9]), "1/cm^3", 1e15),
-            (np.array([1e15]), "1/m^3", 1e15),
+            (np.array([1.0]), "g/m^3", 1e-3),
+            (np.array([1e-6]), "kg/m^3", 1e-6),
         ],
     )
     def test_concentration_units(
         self, value: np.ndarray, units: str, expected: float
     ) -> None:
-        """Concentration conversion from 1/cm^3 to 1/m^3."""
+        """Concentration conversion from g/m^3 to kg/m^3."""
         data = (
             GasDataBuilder()
             .set_names(["H2O"])
@@ -118,7 +119,7 @@ class TestGasDataBuilderBatch:
             GasDataBuilder()
             .set_names(["Water", "Ammonia"])
             .set_molar_mass([0.018, 0.017])
-            .set_concentration([1e15, 1e12])
+            .set_concentration([1e-6, 5e-9])
             .set_partitioning([True, True])
             .build()
         )
@@ -126,7 +127,7 @@ class TestGasDataBuilderBatch:
 
     def test_2d_concentration_unchanged(self) -> None:
         """2D concentration array used as-is."""
-        concentration_2d = np.array([[1e15, 1e12], [2e15, 2e12]])
+        concentration_2d = np.array([[1e-6, 5e-9], [2e-6, 1e-8]])
         data = (
             GasDataBuilder()
             .set_names(["Water", "Ammonia"])
@@ -144,7 +145,7 @@ class TestGasDataBuilderBatch:
             .set_n_boxes(100)
             .set_names(["Water", "Ammonia"])
             .set_molar_mass([0.018, 0.017])
-            .set_concentration([1e15, 1e12])
+            .set_concentration([1e-6, 5e-9])
             .set_partitioning([True, True])
             .build()
         )
@@ -161,7 +162,7 @@ class TestGasDataBuilderValidation:
         builder = (
             GasDataBuilder()
             .set_molar_mass([0.018])
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
             .set_partitioning([True])
         )
         with pytest.raises(ValueError, match="names is required"):
@@ -172,7 +173,7 @@ class TestGasDataBuilderValidation:
         builder = (
             GasDataBuilder()
             .set_names(["H2O"])
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
             .set_partitioning([True])
         )
         with pytest.raises(ValueError, match="molar_mass is required"):
@@ -195,7 +196,7 @@ class TestGasDataBuilderValidation:
             GasDataBuilder()
             .set_names(["H2O"])
             .set_molar_mass([0.018])
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
         )
         with pytest.raises(ValueError, match="partitioning is required"):
             builder.build()
@@ -216,7 +217,7 @@ class TestGasDataBuilderValidation:
         """ValueError when concentration is negative."""
         builder = GasDataBuilder()
         with pytest.raises(ValueError, match="non-negative"):
-            builder.set_concentration([-1e15])
+            builder.set_concentration([-1e-6])
 
     def test_molar_mass_not_1d_raises(self) -> None:
         """ValueError when molar_mass is 2D."""
@@ -252,7 +253,7 @@ class TestGasDataBuilderDtype:
             GasDataBuilder()
             .set_names(["H2O"])
             .set_molar_mass([0.018])
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
             .set_partitioning([True])
             .build()
         )
@@ -265,7 +266,7 @@ class TestGasDataBuilderDtype:
             GasDataBuilder()
             .set_names(["H2O"])
             .set_molar_mass([0.018])
-            .set_concentration([1e15])
+            .set_concentration([1e-6])
             .set_partitioning([True])
             .build()
         )
@@ -277,9 +278,7 @@ class TestGasDataBuilderDtype:
             GasDataBuilder()
             .set_names(["H2O"])
             .set_molar_mass(np.array([1], dtype=np.int32), units="g/mol")
-            .set_concentration(
-                np.array([1000000000], dtype=np.int64), units="1/cm^3"
-            )
+            .set_concentration(np.array([1000], dtype=np.int64), units="g/m^3")
             .set_partitioning([True])  # truthy value
             .build()
         )

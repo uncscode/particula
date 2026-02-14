@@ -101,7 +101,7 @@ class WarpGasData:
         molar_mass: Molar masses in kg/mol.
             Shape: (n_species,)
             Shared across all boxes - not batched.
-        concentration: Number concentrations in molecules/m^3.
+        concentration: Mass concentrations in kg/m^3.
             Shape: (n_boxes, n_species)
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)

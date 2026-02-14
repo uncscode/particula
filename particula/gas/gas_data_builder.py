@@ -13,7 +13,7 @@ Examples:
             GasDataBuilder()
             .set_names(["Water", "Ammonia"])
             .set_molar_mass([18, 17], units="g/mol")
-            .set_concentration([1e15, 1e12], units="1/m^3")
+            .set_concentration([1e-6, 5e-9], units="kg/m^3")
             .set_partitioning([True, True])
             .build()
         )
@@ -25,7 +25,7 @@ Examples:
             .set_n_boxes(100)
             .set_names(["Water", "Ammonia"])
             .set_molar_mass([0.018, 0.017], units="kg/mol")
-            .set_concentration([1e15, 1e12])  # Broadcast to 100 boxes
+            .set_concentration([1e-6, 5e-9])  # Broadcast to 100 boxes
             .set_partitioning([True, True])
             .build()
         )
@@ -105,15 +105,15 @@ class GasDataBuilder:
     def set_concentration(
         self,
         concentration: Union[list[float], NDArray[np.float64]],
-        units: str = "1/m^3",
+        units: str = "kg/m^3",
     ) -> "GasDataBuilder":
         """Set concentrations with unit conversion and auto batch dimension.
 
         Args:
             concentration: Concentration values. If 1D (n_species,),
                 batch dimension added. If 2D (n_boxes, n_species), used as-is.
-            units: Units of the provided concentration. Supported: 1/m^3,
-                1/cm^3.
+            units: Units of the provided concentration. Supported: kg/m^3,
+                g/m^3.
 
         Returns:
             Self for fluent chaining.
@@ -128,9 +128,9 @@ class GasDataBuilder:
         elif concentration_array.ndim != 2:
             raise ValueError("concentration must be 1D or 2D")
 
-        if units != "1/m^3":
+        if units != "kg/m^3":
             concentration_array = concentration_array * get_unit_conversion(
-                units, "1/m^3"
+                units, "kg/m^3"
             )
 
         if np.any(concentration_array < 0):
