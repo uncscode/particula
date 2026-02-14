@@ -8,7 +8,6 @@ from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
 )
-from particula.util.constants import AVOGADRO_NUMBER
 
 
 class TestGasDataInstantiation:
@@ -19,7 +18,7 @@ class TestGasDataInstantiation:
         gas = GasData(
             name=["Water", "Ammonia", "H2SO4"],
             molar_mass=np.array([0.018, 0.017, 0.098]),
-            concentration=np.array([[1e15, 1e12, 1e10]]),
+            concentration=np.array([[1e-6, 5e-9, 2e-10]]),
             partitioning=np.array([True, True, True]),
         )
 
@@ -49,7 +48,7 @@ class TestGasDataInstantiation:
         gas = GasData(
             name=["Water"],
             molar_mass=np.array([0.018]),
-            concentration=np.array([[1e12], [2e12]]),
+            concentration=np.array([[1e-7], [2e-7]]),
             partitioning=np.array([True]),
         )
 
@@ -160,7 +159,7 @@ class TestGasDataCopy:
         gas = GasData(
             name=["Water", "Ammonia"],
             molar_mass=np.array([0.018, 0.017]),
-            concentration=np.array([[1e15, 1e12], [2e15, 2e12]]),
+            concentration=np.array([[1e-6, 5e-9], [2e-6, 1e-8]]),
             partitioning=np.array([True, False]),
         )
 
@@ -175,7 +174,7 @@ class TestGasDataCopy:
         gas = GasData(
             name=["Water", "Ammonia", "H2SO4"],
             molar_mass=np.array([0.018, 0.017, 0.098]),
-            concentration=np.array([[1e15, 1e12, 1e10]]),
+            concentration=np.array([[1e-6, 5e-9, 2e-10]]),
             partitioning=np.array([True, False, True]),
         )
 
@@ -190,7 +189,7 @@ class TestGasDataCopy:
         gas = GasData(
             name=["Water", "Ammonia"],
             molar_mass=np.array([0.018, 0.017]),
-            concentration=np.array([[1e15, 1e12]]),
+            concentration=np.array([[1e-6, 5e-9]]),
             partitioning=np.array([True, False]),
         )
 
@@ -277,8 +276,8 @@ class TestFromSpecies:
                 gas_data.concentration[i, :], gas_data.concentration[0, :]
             )
 
-    def test_concentration_unit_conversion(self) -> None:
-        """Verify kg/m^3 -> molecules/m^3 conversion is correct."""
+    def test_concentration_passthrough(self) -> None:
+        """Verify kg/m^3 concentrations are copied without conversion."""
         molar_mass = 0.018  # kg/mol (water)
         concentration_kg = 1e-6  # kg/m^3
 
@@ -293,11 +292,7 @@ class TestFromSpecies:
 
         gas_data = from_species(species)
 
-        # Expected: molecules/m^3 = (kg/m^3 / kg/mol) * molecules/mol
-        expected_molecules = (concentration_kg / molar_mass) * AVOGADRO_NUMBER
-        npt.assert_allclose(
-            gas_data.concentration[0, 0], expected_molecules, rtol=1e-10
-        )
+        npt.assert_allclose(gas_data.concentration[0, 0], concentration_kg)
 
 
 class TestToSpecies:
@@ -308,7 +303,7 @@ class TestToSpecies:
         gas_data = GasData(
             name=["Water"],
             molar_mass=np.array([0.018]),
-            concentration=np.array([[1e20]]),  # molecules/m^3
+            concentration=np.array([[1e-6]]),  # kg/m^3
             partitioning=np.array([True]),
         )
         strategy = ConstantVaporPressureStrategy(2330.0)
@@ -318,18 +313,14 @@ class TestToSpecies:
         assert species.get_name() == "Water"
         npt.assert_allclose(species.get_molar_mass(), 0.018)
         assert species.get_partitioning() is True
-        # Verify concentration is converted back to kg/m^3
-        expected_kg = (1e20 * 0.018) / AVOGADRO_NUMBER
-        npt.assert_allclose(
-            species.get_concentration(), expected_kg, rtol=1e-10
-        )
+        npt.assert_allclose(species.get_concentration(), 1e-6, rtol=1e-10)
 
     def test_multi_species_conversion(self) -> None:
         """Convert GasData to multi-species GasSpecies."""
         gas_data = GasData(
             name=["Water", "Ammonia"],
             molar_mass=np.array([0.018, 0.017]),
-            concentration=np.array([[1e20, 2e20]]),  # molecules/m^3
+            concentration=np.array([[1e-6, 2e-6]]),  # kg/m^3
             partitioning=np.array([True, True]),
         )
         strategies = [
@@ -351,7 +342,7 @@ class TestToSpecies:
         gas_data = GasData(
             name=["Water"],
             molar_mass=np.array([0.018]),
-            concentration=np.array([[1e20], [2e20], [3e20]]),  # 3 boxes
+            concentration=np.array([[1e-6], [2e-6], [3e-6]]),  # 3 boxes
             partitioning=np.array([True]),
         )
         strategy = ConstantVaporPressureStrategy(2330.0)
@@ -360,27 +351,16 @@ class TestToSpecies:
         species_box1 = to_species(gas_data, [strategy], box_index=1)
         species_box2 = to_species(gas_data, [strategy], box_index=2)
 
-        # Each species should have different concentration
-        expected_kg_0 = (1e20 * 0.018) / AVOGADRO_NUMBER
-        expected_kg_1 = (2e20 * 0.018) / AVOGADRO_NUMBER
-        expected_kg_2 = (3e20 * 0.018) / AVOGADRO_NUMBER
-
-        npt.assert_allclose(
-            species_box0.get_concentration(), expected_kg_0, rtol=1e-10
-        )
-        npt.assert_allclose(
-            species_box1.get_concentration(), expected_kg_1, rtol=1e-10
-        )
-        npt.assert_allclose(
-            species_box2.get_concentration(), expected_kg_2, rtol=1e-10
-        )
+        npt.assert_allclose(species_box0.get_concentration(), 1e-6, rtol=1e-10)
+        npt.assert_allclose(species_box1.get_concentration(), 2e-6, rtol=1e-10)
+        npt.assert_allclose(species_box2.get_concentration(), 3e-6, rtol=1e-10)
 
     def test_strategy_length_mismatch_raises(self) -> None:
         """ValueError when strategies length doesn't match n_species."""
         gas_data = GasData(
             name=["Water", "Ammonia"],
             molar_mass=np.array([0.018, 0.017]),
-            concentration=np.array([[1e20, 2e20]]),
+            concentration=np.array([[1e-6, 2e-6]]),
             partitioning=np.array([True, True]),
         )
         strategy = ConstantVaporPressureStrategy(2330.0)
@@ -393,7 +373,7 @@ class TestToSpecies:
         gas_data = GasData(
             name=["Water"],
             molar_mass=np.array([0.018]),
-            concentration=np.array([[1e20], [2e20]]),  # 2 boxes
+            concentration=np.array([[1e-6], [2e-6]]),  # 2 boxes
             partitioning=np.array([True]),
         )
         strategy = ConstantVaporPressureStrategy(2330.0)
@@ -406,7 +386,7 @@ class TestToSpecies:
         gas_data = GasData(
             name=["Water", "Ammonia"],
             molar_mass=np.array([0.018, 0.017]),
-            concentration=np.array([[1e20, 2e20]]),
+            concentration=np.array([[1e-6, 2e-6]]),
             partitioning=np.array([True, False]),  # Mixed!
         )
         strategies = [

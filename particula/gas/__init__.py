@@ -9,7 +9,7 @@ Example:
     ...     GasDataBuilder()
     ...     .set_names(["Water"])
     ...     .set_molar_mass([18], units="g/mol")
-    ...     .set_concentration([1e15], units="1/m^3")
+    ...     .set_concentration([1e-6], units="kg/m^3")
     ...     .set_partitioning([True])
     ...     .build()
     ... )
