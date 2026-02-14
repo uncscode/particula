@@ -530,10 +530,133 @@ def test_conservation_law():
 
 ### Testing NVIDIA Warp Kernels
 
-For testing GPU-accelerated code using NVIDIA Warp, see the **[NVIDIA Warp Guide](../docs/Theory/nvidia-warp/index.md)** for kernel testing patterns. Key considerations:
-- Use `wp.synchronize()` before assertions to ensure GPU operations complete
-- Compare CPU and GPU results for validation
-- Test with various device targets (`"cpu"` and `"cuda"`)
+GPU-accelerated code using NVIDIA Warp requires a specific testing pattern to
+ensure correctness and parity with the Python/NumPy reference implementations.
+
+See the **[NVIDIA Warp Guide](../docs/Theory/nvidia-warp/index.md)** for
+general kernel patterns.
+
+#### Core Principle: Exact Parity with Python/NumPy
+
+**Every `@wp.kernel` and `@wp.func` must produce numerically identical results
+to the equivalent Python/NumPy function.** There are no approximations or
+shortcuts in the Warp GPU versions compared to the Python versions.
+
+- If a Python function computes `radius_from_mass(mass, density)`, the Warp
+  kernel must produce the same result to within float64 precision (`rtol=1e-10`).
+- If the Python version uses Fuchs-Sutugin transition regime physics, the Warp
+  kernel uses the same physics — not a simplified or approximated version.
+
+#### Test Pattern: Lightweight Wrapper Kernel
+
+Test each `@wp.func` by writing a **lightweight test kernel** that calls the
+function and writes results to an output array, then compare against the
+Python/NumPy equivalent:
+
+```python
+import numpy as np
+import numpy.testing as npt
+import pytest
+
+wp = pytest.importorskip("warp")
+
+from particula.util.constants import BOLTZMANN_CONSTANT
+from particula.gpu.kernels.condensation import radius_from_mass_wp
+from particula.particles.properties import radius_from_mass  # NumPy version
+
+
+@wp.kernel
+def _test_radius_kernel(
+    masses: wp.array(dtype=wp.float64),
+    densities: wp.array(dtype=wp.float64),
+    radii_out: wp.array(dtype=wp.float64),
+):
+    """Lightweight test kernel that wraps the @wp.func under test."""
+    tid = wp.tid()
+    radii_out[tid] = radius_from_mass_wp(masses[tid], densities[tid])
+
+
+def test_radius_from_mass_gpu_matches_numpy():
+    """Warp kernel produces identical results to NumPy version."""
+    masses = np.array([1e-18, 5e-17, 1e-15], dtype=np.float64)
+    densities = np.array([1000.0, 1200.0, 800.0], dtype=np.float64)
+
+    # Python/NumPy reference
+    expected = radius_from_mass(masses, densities)
+
+    # Warp GPU computation
+    masses_wp = wp.array(masses, dtype=wp.float64)
+    densities_wp = wp.array(densities, dtype=wp.float64)
+    radii_wp = wp.zeros(len(masses), dtype=wp.float64)
+
+    wp.launch(_test_radius_kernel, dim=len(masses),
+              inputs=[masses_wp, densities_wp, radii_wp])
+    wp.synchronize()
+
+    result = radii_wp.numpy()
+    npt.assert_allclose(result, expected, rtol=1e-10)
+```
+
+#### Constants: Use `particula.util.constants`, Never Hardcode
+
+**Never write literal constant values in `@wp.kernel` or `@wp.func` code.**
+Always import from `particula.util.constants` and pass as kernel parameters
+or define Warp-side constants from the same source:
+
+```python
+# WRONG — hardcoded constants
+@wp.func
+def diffusion_coeff_wrong(diameter: float, temp: float, visc: float) -> float:
+    k_B = 1.380649e-23  # ❌ hardcoded Boltzmann constant
+    return (k_B * temp) / (3.0 * 3.14159265359 * visc * diameter)  # ❌ hardcoded pi
+
+# CORRECT — constants passed as parameters from util.constants
+@wp.func
+def diffusion_coeff(
+    diameter: float,
+    temp: float,
+    visc: float,
+    k_boltzmann: float,  # passed from particula.util.constants.BOLTZMANN_CONSTANT
+) -> float:
+    PI = 3.141592653589793  # wp.constant or passed; matches math.pi exactly
+    return (k_boltzmann * temp) / (3.0 * PI * visc * diameter)
+```
+
+When launching kernels, pass constants from the Python side:
+
+```python
+from particula.util.constants import BOLTZMANN_CONSTANT
+
+wp.launch(
+    kernel=physics_kernel,
+    dim=n_particles,
+    inputs=[..., float(BOLTZMANN_CONSTANT)],
+)
+```
+
+This ensures:
+- Single source of truth for physical constants
+- Constants in Warp match the Python/NumPy versions exactly
+- Easier auditing and updating of constant values
+
+#### Test Checklist for Warp Code
+
+1. **Skip if no Warp**: All GPU tests use `pytest.importorskip("warp")`
+2. **Wrap functions in test kernels**: Each `@wp.func` gets a lightweight
+   `@wp.kernel` wrapper in the test file that calls it and writes to an
+   output array
+3. **Compare against Python/NumPy**: Every test asserts `npt.assert_allclose`
+   between GPU output and the equivalent Python function, with `rtol=1e-10`
+4. **No approximations**: GPU code must implement the same physics as
+   Python — no simplified formulas, no reduced-order models, no shortcuts
+5. **Constants from `util.constants`**: Verify no literal constants appear
+   in kernel code (except trivial values like `0.0`, `1.0`, `2.0`, `3.0`,
+   `4.0` that are part of formulas, not physical constants)
+6. **Test both devices**: Run on `"cpu"` (always available) and `"cuda"`
+   (skip if unavailable)
+7. **Synchronize before assertions**: Always call `wp.synchronize()` before
+   reading results back with `.numpy()`
+8. **Multi-box coverage**: Test with `n_boxes > 1` to verify batch dimensions
 
 ## Test Organization Best Practices
 

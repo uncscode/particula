@@ -1,10 +1,10 @@
 # Feature E3-F1: Particle Data Container
 
 **Parent Epic**: [E3: Data Representation Refactor](../epics/E3-data-representation-refactor.md)
-**Status**: Planning
+**Status**: Shipped
 **Priority**: P1
 **Start Date**: TBD
-**Last Updated**: 2026-01-19
+**Last Updated**: 2026-02-14
 
 ## Summary
 
@@ -370,42 +370,43 @@ def to_representation(
 
 ## Phase Checklist
 
-- [ ] **E3-F1-P1**: Define `ParticleData` dataclass with batched fields
-  - Issue: TBD | Size: M | Status: Not Started
-  - Create `particula/particles/particle_data.py`
-  - Define dataclass with masses, concentration, charge, density, volume
+- [x] **E3-F1-P1**: Define `ParticleData` dataclass with batched fields
+  - Issue: TBD | Size: M | Status: Shipped
+  - Created `particula/particles/particle_data.py`
+  - Defined dataclass with masses, concentration, charge, density, volume
   - Shape convention: (n_boxes, n_particles, ...) for batch dimension
-  - Add `__post_init__` validation for shape consistency
-  - Add type hints using numpy.typing
-  - Write `particula/particles/tests/particle_data_test.py`
+  - `__post_init__` validation for shape consistency
+  - Type hints using numpy.typing
+  - Written `particula/particles/tests/particle_data_test.py`
   - Tests for instantiation, validation errors, shape checking
 
-- [ ] **E3-F1-P2**: Add computed properties
-  - Issue: TBD | Size: S | Status: Not Started
-  - Add n_boxes, n_particles, n_species properties
-  - Add radii property (computed from mass/density)
-  - Add total_mass, effective_density, mass_fractions properties
-  - Add copy() method for deep copying
-  - Extend test file with property tests
+- [x] **E3-F1-P2**: Add computed properties
+  - Issue: TBD | Size: S | Status: Shipped
+  - Added n_boxes, n_particles, n_species properties
+  - Added radii property (computed from mass/density)
+  - Added total_mass, effective_density, mass_fractions properties
+  - Added copy() method for deep copying
+  - Extended test file with property tests
   - Tests for computed values, edge cases (zero mass, etc.)
 
-- [ ] **E3-F1-P3**: Create `ParticleDataBuilder` with validation
-  - Issue: TBD | Size: M | Status: Not Started
-  - Create `particula/particles/particle_data_builder.py`
-  - Implement setter methods with unit conversion
+- [x] **E3-F1-P3**: Create `ParticleDataBuilder` with validation
+  - Issue: TBD | Size: M | Status: Shipped
+  - Created `particula/particles/particle_data_builder.py`
+  - Implemented setter methods with unit conversion (via pint)
   - Auto-add batch dimension if 2D arrays provided
-  - Add validation for positive values, shape compatibility
+  - Validation for positive values, shape compatibility
   - Support zero-initialization via set_n_boxes/particles/species
-  - Write `particula/particles/tests/particle_data_builder_test.py`
+  - Written `particula/particles/tests/particle_data_builder_test.py`
   - Tests for valid builds, unit conversion, validation errors
 
-- [ ] **E3-F1-P4**: Add conversion utilities
-  - Issue: TBD | Size: M | Status: Not Started
-  - Implement `from_representation()` in particle_data.py
-  - Implement `to_representation()` in particle_data.py
-  - Handle all distribution strategy types
-  - Extend test file with conversion round-trip tests
-  - Tests for each strategy type conversion
+- [x] **E3-F1-P4**: Add conversion utilities
+  - Issue: TBD | Size: M | Status: Shipped
+  - Implemented `from_representation()` in particle_data.py
+  - Implemented `to_representation()` in particle_data.py
+  - Handles all 4 distribution strategy types (MassBasedMovingBin,
+    RadiiBasedMovingBin, SpeciatedMassMovingBin,
+    ParticleResolvedSpeciatedMass)
+  - Extended test file with conversion round-trip tests
 
 ## Testing Strategy
 
@@ -456,3 +457,4 @@ Location: `particula/particles/tests/`
 |------|--------|--------|
 | 2026-01-19 | Initial feature document | ADW |
 | 2026-01-19 | Simplified: dropped dataclass_array, added batch dimension, removed array ops | ADW |
+| 2026-02-14 | Marked all phases (P1–P4) shipped after verifying implementation | ADW |

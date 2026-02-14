@@ -139,6 +139,7 @@ def build_coagulation_matrix(
     kernel_matrix: wp.array2d(dtype=float),
     temperature: float,
     viscosity: float,
+    k_boltzmann: float,  # from particula.util.constants.BOLTZMANN_CONSTANT
 ):
     """Build pairwise coagulation kernel matrix K[i,j]."""
     i, j = wp.tid()
@@ -147,8 +148,7 @@ def build_coagulation_matrix(
     d_j = diameters[j]
     
     # Brownian coagulation kernel
-    k_B = 1.380649e-23
-    K_ij = (2.0 * k_B * temperature / (3.0 * viscosity)) * \
+    K_ij = (2.0 * k_boltzmann * temperature / (3.0 * viscosity)) * \
            (d_i + d_j) * (1.0/d_i + 1.0/d_j)
     
     kernel_matrix[i, j] = K_ij

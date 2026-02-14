@@ -9,9 +9,9 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 
 | ID | Name | Status | Priority | Phases |
 |----|------|--------|----------|--------|
-| E3-F1 | [Particle Data Container](E3-F1-particle-data-container.md) | Planning | P1 | 4 |
-| E3-F2 | [Gas Data Container](E3-F2-gas-data-container.md) | Planning | P1 | 3 |
-| E3-F3 | [Warp Integration and GPU Kernels](E3-F3-backend-warp-integration.md) | Planning | P2 | 6 |
+| E3-F1 | [Particle Data Container](E3-F1-particle-data-container.md) | Shipped | P1 | 4 |
+| E3-F2 | [Gas Data Container](E3-F2-gas-data-container.md) | In Progress | P1 | 4 |
+| E3-F3 | [Warp Integration and GPU Kernels](E3-F3-backend-warp-integration.md) | In Progress | P2 | 11 |
 | E3-F4 | [Facade and Migration](E3-F4-facade-migration.md) | Planning | P1 | 5 |
 
 ### Standalone Features (Wall Loss)

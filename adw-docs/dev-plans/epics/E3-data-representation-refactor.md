@@ -5,8 +5,8 @@
 **Owners**: TBD
 **Start Date**: 2026-01-19
 **Target Date**: TBD
-**Last Updated**: 2026-01-19
-**Size**: Large (4 features, ~20 phases)
+**Last Updated**: 2026-02-14
+**Size**: Large (4 features, ~26 phases)
 
 ## Vision
 
@@ -82,8 +82,8 @@ GasSpecies
 │  class GasData:                                                         │
 │      """Batched gas species data - simple container."""                 │
 │      name: list[str]                    # n_species names               │
-│      molar_mass: NDArray[np.float64]    # (n_species,)                  │
-│      concentration: NDArray[np.float64] # (n_boxes, n_species)          │
+│      molar_mass: NDArray[np.float64]    # (n_species,) kg/mol           │
+│      concentration: NDArray[np.float64] # (n_boxes, n_species) kg/m^3   │
 │      partitioning: NDArray[np.bool_]    # (n_species,)                  │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -238,34 +238,37 @@ result = from_warp(gpu_boxes)
 
 | ID | Name | Priority | Phases | Status |
 |----|------|----------|--------|--------|
-| E3-F1 | [Particle Data Container](../features/E3-F1-particle-data-container.md) | P1 | 4 | Planning |
-| E3-F2 | [Gas Data Container](../features/E3-F2-gas-data-container.md) | P1 | 3 | Planning |
-| E3-F3 | [Warp Integration and GPU Kernels](../features/E3-F3-backend-warp-integration.md) | P2 | 6 | Planning |
+| E3-F1 | [Particle Data Container](../features/E3-F1-particle-data-container.md) | P1 | 4 | Shipped |
+| E3-F2 | [Gas Data Container](../features/E3-F2-gas-data-container.md) | P1 | 4 | In Progress |
+| E3-F3 | [Warp Integration and GPU Kernels](../features/E3-F3-backend-warp-integration.md) | P2 | 11 | In Progress |
 | E3-F4 | [Facade and Migration](../features/E3-F4-facade-migration.md) | P1 | 5 | Planning |
 
 ## Phase Overview
 
-### E3-F1: Particle Data Container (4 phases)
+### E3-F1: Particle Data Container (4 phases) ✅ Shipped
 
 - **E3-F1-P1**: Define `ParticleData` dataclass with batched array fields
   (masses, concentration, charge, density, volume) and `__post_init__`
-  validation with tests
+  validation with tests ✅
 - **E3-F1-P2**: Add computed properties (n_boxes, n_particles, n_species,
-  radii, total_mass, effective_density) with tests
+  radii, total_mass, effective_density) with tests ✅
 - **E3-F1-P3**: Create `ParticleDataBuilder` with validation and unit conversion
-  with tests
+  with tests ✅
 - **E3-F1-P4**: Add conversion utilities `from_representation()` and
-  `to_representation()` with tests
+  `to_representation()` with tests ✅
 
-### E3-F2: Gas Data Container (3 phases)
+### E3-F2: Gas Data Container (4 phases)
 
 - **E3-F2-P1**: Define `GasData` dataclass with batched fields (name, molar_mass,
-  concentration, partitioning) and validation with tests
-- **E3-F2-P2**: Create `GasDataBuilder` with validation with tests
+  concentration, partitioning) and validation with tests ✅
+- **E3-F2-P2**: Create `GasDataBuilder` with validation with tests ✅
 - **E3-F2-P3**: Add conversion utilities `from_species()` and `to_species()`
-  with tests
+  with tests ✅
+- **E3-F2-P4**: Revise concentration units from molecules/m³ to kg/m³ — align
+  with GasSpecies convention, remove Avogadro conversion layer, update all
+  code and tests
 
-### E3-F3: Warp Integration and GPU Kernels (6 phases)
+### E3-F3: Warp Integration and GPU Kernels (11 phases, bottom-up)
 
 - **E3-F3-P1**: Define `@wp.struct WarpParticleData` and `WarpGasData` with
   Warp array types matching batch dimensions with tests
@@ -273,9 +276,23 @@ result = from_warp(gpu_boxes)
   with tests
 - **E3-F3-P3**: Implement `from_warp()` with sync option and `gpu_context()`
   helper with tests
-- **E3-F3-P4**: Create GPU kernel for particle-resolved condensation with tests
-- **E3-F3-P5**: Create GPU kernel for Brownian coagulation with tests
-- **E3-F3-P6**: Benchmark and optimize GPU kernels with performance tests
+- **E3-F3-P4**: Port shared gas/particle property functions to `@wp.func`
+  (viscosity, mean free path, Knudsen, slip correction, mobility, thermal
+  speed, friction factor) with parity tests vs Python equivalents
+- **E3-F3-P5**: Port condensation-specific property functions to `@wp.func`
+  (Fuchs-Sutugin, Kelvin effect, pressure delta) with parity tests
+- **E3-F3-P6**: Port condensation composite functions to `@wp.func`
+  (mass transport coefficient, mass transfer rate, diffusion coefficient)
+  with chained parity test vs CondensationIsothermal
+- **E3-F3-P7**: Port coagulation composite functions to `@wp.func`
+  (Brownian diffusivity, particle mean free path, g-collection term,
+  per-pair Brownian kernel) with chained parity test
+- **E3-F3-P8**: Assemble batched condensation kernel from tested `@wp.func`s
+  with end-to-end test vs CPU condensation
+- **E3-F3-P9**: Assemble batched coagulation kernel from tested `@wp.func`s
+  with end-to-end test vs CPU coagulation
+- **E3-F3-P10**: Benchmark and optimize GPU kernels with performance tests
+- **E3-F3-P11**: Update development documentation
 
 ### E3-F4: Facade and Migration (5 phases)
 
@@ -296,6 +313,22 @@ result = from_warp(gpu_boxes)
 - **Test-First Completion**: Tests pass before phase completion
 - **Backward Compatibility**: All existing tests must continue passing
 - **Performance Benchmarks**: GPU kernels must demonstrate speedup over CPU
+
+### GPU/Warp-Specific Testing Rules
+
+- **Exact Parity**: Every `@wp.kernel` and `@wp.func` must produce numerically
+  identical results to the equivalent Python/NumPy function (`rtol=1e-10`).
+  No approximations, no simplified formulas, no shortcuts.
+- **Lightweight Wrapper Kernels**: Each `@wp.func` is tested by writing a
+  small `@wp.kernel` in the test file that calls it and writes to an output
+  array, then compares against the Python equivalent.
+- **No Hardcoded Constants**: Physical constants (Boltzmann, Avogadro, gas
+  constant, etc.) must be passed as kernel parameters from
+  `particula.util.constants` — never written as literal values in kernel code.
+- **Skip if No Warp**: All GPU tests use `pytest.importorskip("warp")`.
+- **Dual Device**: Test on `"cpu"` (always) and `"cuda"` (skip if unavailable).
+- See the [Testing Guide](../../adw-docs/testing_guide.md#testing-nvidia-warp-kernels)
+  for the full pattern and checklist.
 
 ## Testing Strategy
 
@@ -430,6 +463,10 @@ def gpu_context(data: ParticleData, device: str = "cuda"):
 
 ### GPU Kernel Example (Batched Condensation)
 
+**Note:** Physical constants are passed as kernel parameters from
+`particula.util.constants` — never hardcoded. The GPU physics must exactly
+match the Python/NumPy implementation (no approximations).
+
 ```python
 @wp.kernel
 def condensation_step_kernel(
@@ -437,9 +474,11 @@ def condensation_step_kernel(
     masses: wp.array3d(dtype=wp.float64),         # (n_boxes, n_particles, n_species)
     concentration: wp.array2d(dtype=wp.float64),  # (n_boxes, n_particles)
     density: wp.array(dtype=wp.float64),          # (n_species,)
-    # Gas data
-    gas_concentration: wp.array2d(dtype=wp.float64),  # (n_boxes, n_species)
+    # Gas data (concentration in kg/m^3, matching GasData convention)
+    gas_concentration: wp.array2d(dtype=wp.float64),  # (n_boxes, n_species) kg/m^3
     vapor_pressure: wp.array(dtype=wp.float64),       # (n_species,)
+    # Physical constants — from particula.util.constants
+    k_boltzmann: float,  # BOLTZMANN_CONSTANT
     # Parameters
     temperature: float,
     dt: float,
@@ -454,14 +493,16 @@ def condensation_step_kernel(
         return
     
     # Compute radius from mass and density
+    PI = 3.141592653589793  # matches math.pi exactly
     total_volume = 0.0
     for s in range(masses.shape[2]):
         total_volume += masses[box_idx, particle_idx, s] / density[s]
-    radius = wp.pow(3.0 * total_volume / (4.0 * 3.14159265359), 1.0/3.0)
+    radius = wp.pow(3.0 * total_volume / (4.0 * PI), 1.0/3.0)
     
     # Compute mass transfer for each species
+    # Must match particula.dynamics.condensation Python implementation exactly
     for s in range(masses.shape[2]):
-        # ... condensation physics ...
+        # ... condensation physics (same as Python version) ...
         mass_transfer[box_idx, particle_idx, s] = computed_transfer
 ```
 
@@ -577,3 +618,7 @@ This matches patterns in production GPU simulation codes.
 |------|--------|--------|
 | 2026-01-19 | Initial epic creation from collaborative research | ADW |
 | 2026-01-19 | Dropped `dataclass_array` pattern, added batch dimension, manual transfer control | ADW |
+| 2026-02-14 | E3-F2 P1–P3 shipped; added P4 revision (concentration kg/m³); updated E3-F3 gas units | ADW |
+| 2026-02-14 | Added GPU testing rules: exact parity, no hardcoded constants, wrapper kernel testing | ADW |
+| 2026-02-14 | E3-F3 expanded from 6→11 phases: bottom-up @wp.func porting before kernel assembly | ADW |
+| 2026-02-14 | E3-F1 marked Shipped (all 4 phases verified); E3-F3 P1–P3 marked Shipped | ADW |

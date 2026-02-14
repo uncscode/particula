@@ -180,8 +180,9 @@ Wall loss is the deposition of particles on chamber surfaces due to diffusion, s
 ### Diffusion-Limited Wall Loss
 
 ```python
-K_B = 1.380649e-23  # Boltzmann constant
-PI = 3.14159265359
+# Physical constants — in practice, pass from particula.util.constants
+# as kernel parameters. Module-level constants shown here for brevity.
+PI = 3.141592653589793  # matches math.pi exactly
 
 @wp.func
 def diffusion_wall_loss_rate_sphere(
