@@ -13764,6 +13764,7 @@
     <span class="n">kernel_matrix</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array2d</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build pairwise coagulation kernel matrix K[i,j].&quot;&quot;&quot;</span>
     <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
@@ -13772,8 +13773,7 @@
     <span class="n">d_j</span> <span class="o">=</span> <span class="n">diameters</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
     <span class="c1"># Brownian coagulation kernel</span>
-    <span class="n">k_B</span> <span class="o">=</span> <span class="mf">1.380649e-23</span>
-    <span class="n">K_ij</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">k_B</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">viscosity</span><span class="p">))</span> <span class="o">*</span> \
+    <span class="n">K_ij</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">k_boltzmann</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">viscosity</span><span class="p">))</span> <span class="o">*</span> \
            <span class="p">(</span><span class="n">d_i</span> <span class="o">+</span> <span class="n">d_j</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">d_i</span> <span class="o">+</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">d_j</span><span class="p">)</span>
 
     <span class="n">kernel_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">K_ij</span>

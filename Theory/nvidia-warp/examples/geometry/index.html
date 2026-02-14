@@ -13628,8 +13628,9 @@
 <h2 id="wall-loss-rate-calculations">Wall Loss Rate Calculations<a class="headerlink" href="#wall-loss-rate-calculations" title="Permanent link">&para;</a></h2>
 <p>Wall loss is the deposition of particles on chamber surfaces due to diffusion, settling, and electrostatic effects.</p>
 <h3 id="diffusion-limited-wall-loss">Diffusion-Limited Wall Loss<a class="headerlink" href="#diffusion-limited-wall-loss" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">K_B</span> <span class="o">=</span> <span class="mf">1.380649e-23</span>  <span class="c1"># Boltzmann constant</span>
-<span class="n">PI</span> <span class="o">=</span> <span class="mf">3.14159265359</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Physical constants — in practice, pass from particula.util.constants</span>
+<span class="c1"># as kernel parameters. Module-level constants shown here for brevity.</span>
+<span class="n">PI</span> <span class="o">=</span> <span class="mf">3.141592653589793</span>  <span class="c1"># matches math.pi exactly</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">diffusion_wall_loss_rate_sphere</span><span class="p">(</span>

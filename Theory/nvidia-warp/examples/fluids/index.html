@@ -13428,9 +13428,9 @@
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warp</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">wp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="c1"># Physical constants</span>
-<span class="n">K_B</span> <span class="o">=</span> <span class="mf">1.380649e-23</span>  <span class="c1"># Boltzmann constant (J/K)</span>
-<span class="n">PI</span> <span class="o">=</span> <span class="mf">3.14159265359</span>
+<span class="c1"># Physical constants — in practice, pass from particula.util.constants</span>
+<span class="c1"># as kernel parameters. Module-level constants shown here for brevity.</span>
+<span class="n">PI</span> <span class="o">=</span> <span class="mf">3.141592653589793</span>  <span class="c1"># matches math.pi exactly</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">cunningham_correction</span><span class="p">(</span><span class="n">diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -13445,10 +13445,11 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">k_boltzmann</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.BOLTZMANN_CONSTANT</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stokes-Einstein diffusion coefficient with slip correction.&quot;&quot;&quot;</span>
     <span class="n">Cc</span> <span class="o">=</span> <span class="n">cunningham_correction</span><span class="p">(</span><span class="n">diameter</span><span class="p">,</span> <span class="n">mean_free_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">K_B</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">Cc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">viscosity</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">k_boltzmann</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">Cc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">*</span> <span class="n">viscosity</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_coagulation_kernel</span><span class="p">(</span>
@@ -13628,14 +13629,15 @@
     <span class="n">molar_mass</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">gas_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.GAS_CONSTANT</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Kelvin effect: increased vapor pressure over curved surface.</span>
 
 <span class="sd">    Important for particles &lt; 100 nm.</span>
+<span class="sd">    gas_constant passed from particula.util.constants.GAS_CONSTANT.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="mf">8.314</span>  <span class="c1"># Universal gas constant (J/mol/K)</span>
     <span class="n">exponent</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">surface_tension</span> <span class="o">*</span> <span class="n">molar_mass</span><span class="p">)</span> <span class="o">/</span> \
-               <span class="p">(</span><span class="n">R</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">density</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
+               <span class="p">(</span><span class="n">gas_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">density</span> <span class="o">*</span> <span class="n">diameter</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exponent</span><span class="p">)</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
@@ -13695,6 +13697,7 @@
     <span class="n">water_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">kappa</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">accommodation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">gas_constant</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from particula.util.constants.GAS_CONSTANT</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute diameter growth rate dd/dt for each particle.&quot;&quot;&quot;</span>
     <span class="n">tid</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">tid</span><span class="p">()</span>
@@ -13720,9 +13723,8 @@
     <span class="n">p_sat</span> <span class="o">=</span> <span class="n">saturation_vapor_pressure_water</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
 
     <span class="c1"># Growth rate: dd/dt = (k_m * M_w * p_sat * delta_S) / (rho_w * R * T * d)</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="mf">8.314</span>
     <span class="n">growth_rates</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_m</span> <span class="o">*</span> <span class="n">molar_mass</span> <span class="o">*</span> <span class="n">p_sat</span> <span class="o">*</span> <span class="n">delta_S</span><span class="p">)</span> <span class="o">/</span> \
-                        <span class="p">(</span><span class="n">water_density</span> <span class="o">*</span> <span class="n">R</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
+                        <span class="p">(</span><span class="n">water_density</span> <span class="o">*</span> <span class="n">gas_constant</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
 
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">integrate_condensation</span><span class="p">(</span>
