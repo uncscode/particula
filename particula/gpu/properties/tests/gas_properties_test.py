@@ -66,7 +66,7 @@ def _mean_free_path_kernel(
     temperatures: Any,
     pressures: Any,
     dynamic_viscosities: Any,
-    gas_constant: float,
+    gas_constant: Any,
     result: Any,
 ) -> None:
     """Compute mean free path for each gas sample.
@@ -94,7 +94,7 @@ def _partial_pressure_kernel(
     concentrations: Any,
     molar_masses: Any,
     temperatures: Any,
-    gas_constant: float,
+    gas_constant: Any,
     result: Any,
 ) -> None:
     """Compute partial pressure for each gas sample.
