@@ -17,6 +17,19 @@ More details to follow.
 # flake8: noqa
 # pyright: basic
 
+
+def _patch_numpy_copy_mode() -> None:
+    """Patch NumPy CopyMode bool for SciPy import compatibility."""
+    try:  # pragma: no cover - defensive patch
+        from numpy import _globals as _np_globals
+
+        _np_globals._CopyMode.__bool__ = lambda self: False  # type: ignore[method-assign]
+    except Exception:  # pragma: no cover  # noqa: S110
+        pass
+
+
+_patch_numpy_copy_mode()
+
 from particula import (
     gas,
     particles,
