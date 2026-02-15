@@ -121,3 +121,111 @@ def friction_factor_wp(
     return (
         wp.float64(6.0) * pi_value * dynamic_viscosity * particle_radius
     ) / slip_correction
+
+
+@wp.func
+def vapor_transition_correction_wp(
+    knudsen_number: wp.float64,
+    mass_accommodation: wp.float64,
+) -> wp.float64:
+    """Calculate the vapor transition correction factor.
+
+    Port of
+    ``particula.particles.properties.vapor_correction_module.get_vapor_transition_correction``.
+
+    Args:
+        knudsen_number: Knudsen number (dimensionless).
+        mass_accommodation: Mass accommodation coefficient (dimensionless).
+
+    Returns:
+        Vapor transition correction factor (dimensionless).
+    """
+    numerator = (
+        wp.float64(0.75)  # Fuchs-Sutugin model coefficient.
+        * mass_accommodation
+        * (wp.float64(1.0) + knudsen_number)
+    )
+    denominator = (
+        knudsen_number * knudsen_number
+        + knudsen_number
+        + wp.float64(0.283)  # Fuchs-Sutugin model coefficient.
+        * mass_accommodation
+        * knudsen_number
+        + wp.float64(0.75) * mass_accommodation
+    )
+    return numerator / denominator
+
+
+@wp.func
+def kelvin_radius_wp(
+    effective_surface_tension: wp.float64,
+    effective_density: wp.float64,
+    molar_mass: wp.float64,
+    temperature: wp.float64,
+    gas_constant: wp.float64,
+) -> wp.float64:
+    """Calculate the Kelvin radius.
+
+    Port of
+    ``particula.particles.properties.kelvin_effect_module.get_kelvin_radius``.
+
+    Args:
+        effective_surface_tension: Effective surface tension [N/m].
+        effective_density: Effective density [kg/m³].
+        molar_mass: Molar mass [kg/mol].
+        temperature: Temperature [K].
+        gas_constant: Gas constant [J/(mol·K)].
+
+    Returns:
+        Kelvin radius [m].
+    """
+    numerator = wp.float64(2.0) * effective_surface_tension * molar_mass
+    denominator = gas_constant * temperature * effective_density
+    return numerator / denominator
+
+
+@wp.func
+def kelvin_term_wp(
+    particle_radius: wp.float64,
+    kelvin_radius_value: wp.float64,
+) -> wp.float64:
+    """Calculate the Kelvin term with safe clamping.
+
+    Port of ``particula.particles.properties.kelvin_effect_module``
+    ``.get_kelvin_term``.
+
+    Args:
+        particle_radius: Particle radius [m].
+        kelvin_radius_value: Kelvin radius [m].
+
+    Returns:
+        Kelvin term (dimensionless).
+    """
+    ratio = kelvin_radius_value / particle_radius
+    clamped_ratio = wp.min(
+        ratio,
+        wp.float64(100.0),  # Matches MAX_KELVIN_RATIO in Python module.
+    )
+    return wp.exp(clamped_ratio)
+
+
+@wp.func
+def partial_pressure_delta_wp(
+    partial_pressure_gas: wp.float64,
+    partial_pressure_particle: wp.float64,
+    kelvin_term: wp.float64,
+) -> wp.float64:
+    """Calculate the partial pressure delta.
+
+    Port of
+    ``particula.particles.properties.partial_pressure_module.get_partial_pressure_delta``.
+
+    Args:
+        partial_pressure_gas: Gas-phase partial pressure [Pa].
+        partial_pressure_particle: Particle-phase partial pressure [Pa].
+        kelvin_term: Kelvin term (dimensionless).
+
+    Returns:
+        Partial pressure delta [Pa].
+    """
+    return partial_pressure_gas - partial_pressure_particle * kelvin_term
