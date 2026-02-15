@@ -19,8 +19,7 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
@@ -494,24 +493,12 @@ def parse(data):
 
 ### 3.4: Create the PR
 
-**Base branch:** Use `target_branch` from state if set, otherwise `"main"`.
+**Base branch:** Auto-resolved by `platform_operations` when `adw_id` is provided.
 
-**Determine base branch selection:**
-```python
-target_branch_result = adw_spec({
-  "command": "read",
-  "adw_id": "{adw_id}",
-  "field": "target_branch",
-})
-
-# Use target_branch from state when set; otherwise default to main
-base_branch = target_branch_result if target_branch_result else "main"
-
-if target_branch_result:
-  print(f"Creating PR targeting {base_branch}")
-else:
-  print("target_branch missing or empty; defaulting PR base to main")
-```
+The `platform_operations create-pr` command automatically reads `target_branch` from
+workflow state when `base` is omitted and `adw_id` is provided. This enables:
+- PR stacking: Issues with `[branch:xxx]` prefix automatically target that branch
+- Simplified shipper logic: No manual target_branch lookup needed
 
 **Create PR:**
 ```python
@@ -519,7 +506,18 @@ platform_operations({
   "command": "create-pr",
   "title": "<type>: #<issue_number> - <issue_title>",
   "head": "<branch_name>",
-  "base": "<base_branch>",
+  "adw_id": "<adw_id>",  # Auto-resolves base from state.target_branch
+  "body": "<pr_body_markdown>"
+})
+```
+
+**Or with explicit base (overrides state):**
+```python
+platform_operations({
+  "command": "create-pr",
+  "title": "<type>: #<issue_number> - <issue_title>",
+  "head": "<branch_name>",
+  "base": "main",  # Explicit base overrides state lookup
   "body": "<pr_body_markdown>"
 })
 ```
@@ -828,6 +826,31 @@ git_operations({
 **Cause:** Branch not pushed, or PR already exists.
 
 **Fix:** Verify branch exists on remote. Check if PR already open for this branch.
+
+## "PR targeted wrong base branch (main instead of stacked branch)"
+
+**Cause:** Shipper didn't pass `adw_id` to `platform_operations create-pr`, so it couldn't auto-resolve `target_branch` from state.
+
+**Symptoms:**
+- Issue title has `[branch:xxx]` prefix indicating PR stacking
+- PR was created targeting `main` instead of the stacked branch
+- `target_branch` was correctly set in workflow state during workspace creation
+
+**Fix:** Always pass `adw_id` to `platform_operations create-pr`:
+```python
+platform_operations({
+  "command": "create-pr",
+  "title": "...",
+  "head": "<branch_name>",
+  "adw_id": "<adw_id>",  # Enables auto-resolution of target_branch
+  "body": "..."
+})
+```
+
+The `platform_operations` tool will:
+1. Read `target_branch` from `agents/{adw_id}/adw_state.json`
+2. Use it as the PR base if found
+3. Fall back to `main` only if `target_branch` is not set
 
 # References
 

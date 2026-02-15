@@ -18,8 +18,7 @@ tools:
   write: true
   move: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: false

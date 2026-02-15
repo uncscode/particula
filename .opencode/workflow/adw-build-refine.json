@@ -1,0 +1,21 @@
+{
+  "name": "adw-build-refine",
+  "version": "1.0.0",
+  "description": "Refine implementation by diffing against the plan and closing gaps.",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Refine Implementation",
+      "agent": "adw-build-refine",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 3600,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 10.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

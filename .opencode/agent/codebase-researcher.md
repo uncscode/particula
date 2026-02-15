@@ -15,14 +15,14 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
-  task: true
+  task: false
   adw: false
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: false
@@ -127,7 +127,7 @@ todowrite({
     },
     {
       "id": "2",
-      "content": "Search for relevant files using glob/grep",
+      "content": "Search for relevant files using ripgrep",
       "status": "pending",
       "priority": "high"
     },
@@ -169,22 +169,22 @@ From the issue, extract:
 
 ## Step 4: Search for Relevant Files
 
-### 4.1: Use Glob for File Patterns
+### 4.1: Use Ripgrep for File Patterns
 
 ```python
-glob({
+ripgrep({
   "pattern": "**/*.py",
   "path": "{worktree_path}/adw"
 })
 ```
 
-### 4.2: Use Grep for Content Search
+### 4.2: Use Ripgrep for Content Search
 
 ```python
-grep({
-  "pattern": "{keyword}",
-  "path": "{worktree_path}",
-  "include": "*.py"
+ripgrep({
+  "contentPattern": "{keyword}",
+  "pattern": "**/*.py",
+  "path": "{worktree_path}"
 })
 ```
 

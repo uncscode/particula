@@ -1,0 +1,21 @@
+{
+  "name": "adw-polish",
+  "version": "1.0.0",
+  "description": "Polish code after build-refine using the adw-polish agent.",
+  "workflow_type": "custom",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Polish Code",
+      "agent": "adw-polish",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "light",
+      "timeout": 1800,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 10.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

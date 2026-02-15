@@ -17,30 +17,25 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
-  task: true
-  adw: true
+  task: false
+  adw: false
   adw_spec: false
   create_workspace: false
   workflow_builder: false
-  git_operations: true
-  platform_operations: true
-  run_pytest: true
-  run_linters: true
+  git_operations: false
+  platform_operations: false
+  run_pytest: false
+  run_linters: false
   get_datetime: true
   get_version: true
-  webfetch: true
-  websearch: true
-  codesearch: true
+  webfetch: false
+  websearch: false
+  codesearch: false
   bash: false
-permission:
-  webfetch: ask
-  websearch: ask
-  codesearch: ask
 ---
 
 # Development Plan Creator Subagent

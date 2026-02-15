@@ -29,6 +29,12 @@ AVAILABLE COMMANDS:
   Usage: { command: "diff", worktree_path: "./trees/abc" }
   Usage: { command: "diff", stat: true, worktree_path: "./trees/abc" }
   Usage: { command: "diff", base: "main", stat: true, worktree_path: "./trees/abc" }
+  Usage: { command: "diff", base: "main", target: "feature", stat: true, worktree_path: "./trees/abc" }
+• log: Show git log output with optional formatting
+  Usage: { command: "log", ref: "main", max_count: 5, oneline: true, worktree_path: "./trees/abc" }
+• show: Show git object content (commit or file at ref)
+  Usage: { command: "show", ref: "main", stat: true, worktree_path: "./trees/abc" }
+  Usage: { command: "show", ref: "main", path: "src/app.py", worktree_path: "./trees/abc" }
 • add: Stage changes (mutually exclusive stage_all vs files)
   Usage: { command: "add", stage_all: true, worktree_path: "./trees/abc" }
   Usage: { command: "add", files: ["file1.py", "file2.py"], worktree_path: "./trees/abc" }
@@ -44,6 +50,8 @@ AVAILABLE COMMANDS:
   Usage: { command: "sync", source: "upstream", target: "develop", worktree_path: "./trees/abc" }
 • abort: Abort in-progress merge or rebase
   Usage: { command: "abort", worktree_path: "./trees/abc" }
+• continue: Continue an in-progress merge or rebase after resolving conflicts
+  Usage: { command: "continue", worktree_path: "./trees/abc" }
 • reset: Reset to specified ref (requires ref)
   Usage: { command: "reset", ref: "HEAD~1", hard: true, worktree_path: "./trees/abc" }
 • push-force-with-lease: Safe force push for rebased branches (requires branch; blocks main/master)
@@ -73,17 +81,21 @@ REQUIRED PARAMETERS BY COMMAND:
 • fetch: remote optional (default origin), branch optional, prune optional, worktree_path optional
 • sync: source optional (default origin), target optional, worktree_path optional
 • abort: no required params; worktree_path optional
+• continue: no required params; worktree_path optional
 • reset: ref required; hard optional (default false); worktree_path optional
 • push-force-with-lease: branch required; blocks main/master; worktree_path optional
 • status: none (porcelain, worktree_path optional)
-• diff: none (stat, base, worktree_path optional)
+• diff: none (stat, base, target, worktree_path optional)
+• log: none (ref, max_count, oneline, stat, worktree_path optional)
+• show: ref required (path, stat, worktree_path optional)
 • add: exactly one of stage_all or files (worktree_path optional)
 • restore: none required (staged, files, worktree_path optional)
 • worktree-list: none required
 • worktree-prune: none required
 • worktree-remove: adw_id required (force optional)
 
-Set help: true to bypass validation and return CLI help.`,
+Set help: true to bypass validation and return CLI help.`
+,
 
   args: {
     command: tool.schema
@@ -92,6 +104,8 @@ Set help: true to bypass validation and return CLI help.`,
         "push",
         "status",
         "diff",
+        "log",
+        "show",
         "add",
         "restore",
         "merge",
@@ -99,6 +113,7 @@ Set help: true to bypass validation and return CLI help.`,
         "fetch",
         "sync",
         "abort",
+        "continue",
         "reset",
         "push-force-with-lease",
         "worktree-list",
@@ -106,8 +121,9 @@ Set help: true to bypass validation and return CLI help.`,
         "worktree-prune",
       ])
       .describe(`Git command to execute. Use help: true to see CLI usage.
-
+ 
 REQUIRED PARAMETERS BY COMMAND:
+
 • commit: summary (description, adw_id, worktree_path, stage_all, max_retries optional)
 • push: branch (worktree_path optional)
 • merge: source required; target optional (--into), no_ff optional (--no-ff), abort_on_conflict optional (default true)
@@ -118,7 +134,9 @@ REQUIRED PARAMETERS BY COMMAND:
 • reset: ref required; hard optional (default false); worktree_path optional
 • push-force-with-lease: branch required; blocks main/master; worktree_path optional
 • status: none (porcelain, worktree_path optional)
-• diff: none (stat, base, worktree_path optional)
+• diff: none (stat, base, target, worktree_path optional)
+• log: none (ref, max_count, oneline, stat, worktree_path optional)
+• show: ref required (path, stat, worktree_path optional)
 • add: exactly one of stage_all or files (worktree_path optional)
 • restore: none required (staged, files, worktree_path optional)
 • worktree-list: none required
@@ -233,10 +251,10 @@ Example: { command: "merge", source: "main" }`),
     target: tool.schema
       .string()
       .optional()
-      .describe(`Target branch for merge or sync (defaults to current branch).
+      .describe(`Target branch for merge, sync, or diff (defaults to current branch or HEAD).
 
-Applies to: merge (maps to --into), sync
-Mapped flag: --into (merge), --target (sync)
+Applies to: merge (maps to --into), sync, diff
+Mapped flag: --into (merge), --target (sync, diff)
 
 Example: { command: "merge", source: "main", target: "develop" }`),
 
@@ -313,9 +331,10 @@ Example: { command: "fetch", prune: true }`),
     ref: tool.schema
       .string()
       .optional()
-      .describe(`Git ref to reset to.
+      .describe(`Git ref to reset to or inspect.
 
-Required for: reset
+Required for: reset, show
+Optional for: log (default: current branch)
 Mapped flag: --ref
 
 Example: { command: "reset", ref: "HEAD~1" }`),
@@ -344,9 +363,9 @@ Example: { command: "status", porcelain: true }`),
     stat: tool.schema
       .boolean()
       .optional()
-      .describe(`Include file change statistics (insertions/deletions per file) in diff output.
+      .describe(`Include file change statistics (insertions/deletions per file) in diff or show output.
 
-Applies to: diff
+Applies to: diff, show
 Mapped flag: --stat
 
 Example: { command: "diff", stat: true }`),
@@ -367,6 +386,38 @@ Examples:
 • "origin/main" - Compare against remote main branch
 
 Usage: { command: "diff", base: "main", stat: true }`),
+
+    max_count: tool.schema
+      .number()
+      .optional()
+      .describe(`Maximum number of commits to show in log output.
+
+Applies to: log
+Mapped flag: --max-count
+Default: 10
+
+Example: { command: "log", max_count: 5 }`),
+
+    oneline: tool.schema
+      .boolean()
+      .optional()
+      .describe(`Use --oneline format for log output.
+
+Applies to: log
+Mapped flag: --oneline
+Default: false
+
+Example: { command: "log", oneline: true }`),
+
+    path: tool.schema
+      .string()
+      .optional()
+      .describe(`File path to show at a ref.
+
+Applies to: show
+Mapped flag: --path
+
+Example: { command: "show", ref: "main", path: "src/app.py" }`),
 
     files: tool.schema
       .array(tool.schema.string())
@@ -430,6 +481,9 @@ Example: { command: "diff", help: true }`),
       porcelain,
       stat,
       base,
+      max_count,
+      oneline,
+      path,
       files,
       staged,
       help,
@@ -615,6 +669,48 @@ Example: { command: "diff", help: true }`),
           }
           if (base) {
             cmdParts.push("--base", base);
+          }
+          if (target) {
+            cmdParts.push("--target", target);
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "log": {
+          cmdParts.push("log");
+          if (ref) {
+            cmdParts.push("--ref", ref);
+          }
+          const maxCount = max_count ?? 10;
+          cmdParts.push("--max-count", maxCount.toString());
+          if (oneline) {
+            cmdParts.push("--oneline");
+          }
+          if (stat) {
+            cmdParts.push("--stat");
+          }
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
+        case "show": {
+          cmdParts.push("show");
+          if (!skipValidation && (!ref || !ref.trim())) {
+            return "ERROR: 'show' command requires 'ref'.";
+          }
+          if (ref && ref.trim()) {
+            cmdParts.push("--ref", ref);
+          }
+          if (path) {
+            cmdParts.push("--path", path);
+          }
+          if (stat) {
+            cmdParts.push("--stat");
           }
           if (worktree_path) {
             cmdParts.push("--worktree-path", worktree_path);

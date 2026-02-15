@@ -70,6 +70,8 @@ The router handles authentication and API differences between platforms.
 AVAILABLE COMMANDS:
 • create-pr: Create a pull request (or merge request on GitLab)
   Usage: { command: "create-pr", title: "feat: add feature", head: "feature-123", base: "main" }
+  Auto-resolve base: { command: "create-pr", title: "...", head: "...", adw_id: "abc12345" }
+  When base is omitted and adw_id is provided, reads target_branch from workflow state.
 
 • fetch-issue: Get issue details with optional JSON output
   Usage: { command: "fetch-issue", issue_number: "123", output_format: "json" }
@@ -153,7 +155,7 @@ COMMAND DESCRIPTIONS:
 • pr-comments - Fetch review comments for a pull request
 
 REQUIRED PARAMETERS BY COMMAND:
-• create-pr: title, head, base (required), optional: body, draft
+• create-pr: title, head (required), optional: base (auto-resolved), body, draft, adw_id
 • fetch-issue: issue_number (required), optional: output_format, prefer_scope
 • create-issue: title (required), optional: body, labels, output_format
 • update-issue: issue_number (required), at least one of: title, body, state, labels
@@ -212,11 +214,34 @@ EXAMPLE: head: "feature-issue-123-add-auth"`),
       .optional()
       .describe(`Target branch for pull request.
 
-REQUIRED FOR: create-pr
+OPTIONAL FOR: create-pr (auto-resolved when omitted)
 
-Usually "main" or "master".
+When omitted, the CLI resolves target branch in this order:
+1. Read target_branch from ADW state (if adw_id provided)
+2. Fall back to "main"
 
-EXAMPLE: base: "main"`),
+This enables PR stacking: issues with [branch:xxx] prefix in title
+automatically target that branch without manual specification.
+
+Usually "main" or "master" when specified explicitly.
+
+EXAMPLE: base: "main"
+EXAMPLE: (omitted) - auto-resolves from state or defaults to main`),
+
+    adw_id: tool.schema
+      .string()
+      .optional()
+      .describe(`ADW workflow ID for state lookup.
+
+OPTIONAL FOR: create-pr
+
+When provided with create-pr and base is omitted, the CLI reads
+target_branch from the workflow state file (agents/{adw_id}/adw_state.json).
+
+This enables automatic PR targeting for stacked PRs where the issue
+title contains [branch:xxx] prefix.
+
+EXAMPLE: adw_id: "abc12345"`),
 
     draft: tool.schema
       .boolean()
@@ -338,11 +363,18 @@ EXAMPLE: { command: "create-issue", help: true }`),
         if (!args.head) {
           return buildMissingArgMessage("'head' is required for command 'create-pr'");
         }
-        if (!args.base) {
-          return buildMissingArgMessage("'base' is required for command 'create-pr'");
-        }
 
-        cmdParts.push("--title", args.title, "--head", args.head, "--base", args.base);
+        cmdParts.push("--title", args.title, "--head", args.head);
+        
+        // Base is optional - CLI will resolve from state or default to main
+        if (args.base) {
+          cmdParts.push("--base", args.base);
+        }
+        
+        // Pass adw_id to CLI for state-based target_branch lookup when base is omitted
+        if (args.adw_id) {
+          cmdParts.push("--adw-id", args.adw_id);
+        }
         if (args.body) {
           cmdParts.push("--body", args.body);
         }

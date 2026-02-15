@@ -14,8 +14,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -300,8 +299,8 @@ Ensure feature doc links to:
 ## Step 6: Validate Markdown Links
 
 Check all links:
-```bash
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' docs/Features/{feature}.md
+```text
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "docs/Features/{feature}.md"})
 ```
 
 ## Step 7: Report Completion

@@ -208,6 +208,7 @@ def test_run_cmake_invalid_preset_name(preset_file: Tuple[Path, Path]) -> None:
     )
     assert exit_code == 1
     assert "Preset 'nonexistent' not found" in output
+    assert "CMakeUserPresets.json" in output
 
 
 def test_run_cmake_missing_preset_file(tmp_path: Path) -> None:
@@ -222,6 +223,121 @@ def test_run_cmake_missing_preset_file(tmp_path: Path) -> None:
     )
     assert exit_code == 1
     assert "CMakePresets.json" in output
+
+
+def test_load_presets_missing_user_file(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {
+        "version": 3,
+        "configurePresets": [
+            {"name": "debug", "binaryDir": "build"},
+        ],
+    }
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+
+    loaded = module._load_presets(str(source_dir))
+    names = [item["name"] for item in loaded.get("configurePresets", [])]
+    assert names == ["debug"]
+
+
+def test_load_presets_merges_user_presets(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {
+        "version": 3,
+        "configurePresets": [
+            {"name": "debug", "binaryDir": "build"},
+        ],
+    }
+    user_presets = {
+        "version": 3,
+        "configurePresets": [
+            {"name": "user", "binaryDir": "build-user"},
+        ],
+    }
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text(json.dumps(user_presets))
+
+    loaded = module._load_presets(str(source_dir))
+    names = [item["name"] for item in loaded.get("configurePresets", [])]
+    assert names == ["debug", "user"]
+
+
+def test_validate_preset_name_accepts_user_preset(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {"version": 3, "configurePresets": []}
+    user_presets = {
+        "version": 3,
+        "configurePresets": [
+            {"name": "user", "binaryDir": "build-user"},
+        ],
+    }
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text(json.dumps(user_presets))
+
+    loaded = module._load_presets(str(source_dir))
+    module._validate_preset_name("user", loaded)
+
+
+def test_load_presets_skips_malformed_user_file(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {"version": 3, "configurePresets": [{"name": "debug"}]}
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text("{bad json")
+
+    loaded = module._load_presets(str(source_dir))
+    names = [item["name"] for item in loaded.get("configurePresets", [])]
+    assert names == ["debug"]
+
+
+def test_load_presets_skips_missing_user_configure_presets(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {"version": 3, "configurePresets": [{"name": "debug"}]}
+    user_presets = {"version": 3}
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text(json.dumps(user_presets))
+
+    loaded = module._load_presets(str(source_dir))
+    names = [item["name"] for item in loaded.get("configurePresets", [])]
+    assert names == ["debug"]
+
+
+def test_load_presets_none_user_configure_presets(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {"version": 3, "configurePresets": [{"name": "debug"}]}
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text(
+        json.dumps({"version": 3, "configurePresets": None})
+    )
+
+    loaded = module._load_presets(str(source_dir))
+    names = [item["name"] for item in loaded.get("configurePresets", [])]
+    assert names == ["debug"]
+
+
+def test_load_presets_invalid_user_configure_presets(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {"version": 3, "configurePresets": [{"name": "debug"}]}
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text(
+        json.dumps({"version": 3, "configurePresets": {"name": "user"}})
+    )
+
+    with pytest.raises(TypeError, match="CMakeUserPresets.json configurePresets"):
+        module._load_presets(str(source_dir))
 
 
 def test_run_cmake_preset_not_supported(

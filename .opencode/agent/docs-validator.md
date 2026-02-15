@@ -15,8 +15,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -168,12 +167,12 @@ Categorize files:
 ### 4.1: Extract All Links
 
 For each markdown file:
-```bash
+```text
 # Extract markdown links
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' {file}
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "{file}"})
 
 # Extract just the paths
-grep -oE '\]\(([^)]+)\)' {file} | sed 's/](\|)//g'
+ripgrep({"contentPattern": "\\]\\(([^)]+)\\)", "pattern": "{file}"})
 ```
 
 ### 4.2: Validate Internal Links
@@ -202,9 +201,9 @@ Track:
 
 For links starting with `http://` or `https://`:
 
-```bash
-# Basic URL format validation
-echo "{url}" | grep -qE '^https?://[^/]+\.[^/]+' && echo "VALID_FORMAT" || echo "INVALID_FORMAT"
+```text
+# Basic URL format validation (pattern check only)
+# Use ripgrep against a literal string value if needed.
 ```
 
 **Note:** Do NOT make HTTP requests to validate URLs (too slow, may fail). Just check format and note for manual review.
@@ -215,9 +214,9 @@ For links with `#anchor`:
 
 ### 6.1: Extract Anchors from File
 
-```bash
+```text
 # Extract headers (which become anchors)
-grep -E '^#{1,6} ' {file} | sed 's/^#* //'
+ripgrep({"contentPattern": "^#{1,6} ", "pattern": "{file}"})
 ```
 
 ### 6.2: Convert Headers to Anchor Format
@@ -236,18 +235,15 @@ Check if anchor link target exists in file.
 
 ### 7.1: Check Common Issues
 
-```bash
+```text
 # Check for broken code blocks (odd number of ```)
-grep -c '```' {file}  # Should be even
+ripgrep({"contentPattern": "```", "pattern": "{file}"})  # Count matches in output
 
 # Check for unclosed links
-grep -E '\[.*\]\([^)]*$' {file}
+ripgrep({"contentPattern": "\\[.*\\]\\([^)]*$", "pattern": "{file}"})
 
 # Check for empty links
-grep -E '\[\]\(\)' {file}
-
-# Check line length (warning only)
-awk 'length > 120' {file}
+ripgrep({"contentPattern": "\\[\\]\\(\\)", "pattern": "{file}"})
 ```
 
 ### 7.2: Check Required Elements

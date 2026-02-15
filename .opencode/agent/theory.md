@@ -16,8 +16,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -348,8 +347,8 @@ Ensure theory docs link to practical examples:
 ## Step 7: Validate Markdown Links
 
 Check all links:
-```bash
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' docs/Theory/{concept}.md
+```text
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "docs/Theory/{concept}.md"})
 ```
 
 Verify:

@@ -36,7 +36,7 @@ async function copyTranscriptToChat(
     }
 
     // Write to session-specific chat.json
-    const logDir = join("logs", sessionId);
+    const logDir = join("agents", "_default", sessionId);
     const chatFile = join(logDir, "chat.json");
     await writeFile(chatFile, JSON.stringify(chatData, null, 2));
   } catch (error) {

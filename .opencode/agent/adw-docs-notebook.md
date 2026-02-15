@@ -22,24 +22,14 @@ description: 'Subagent that handles Jupyter notebook creation, editing, validati
   - Edit existing notebook: safely modify cells using Jupytext workflow
   - Fix corrupted notebook: validate, diagnose, and repair JSON issues
   - Convert for type checking: convert notebooks to .py for mypy validation
-  - Batch validation: validate all notebooks in a directory
-
-  CRITICAL WORKFLOW ORDER for editing:
-  1. Edit .py file (Jupytext percent format)
-  2. Lint .py file (catch syntax errors early)
-  3. Sync .py to .ipynb (transfer edits to notebook)
-  4. Execute .ipynb (validates code AND generates outputs for website)
-
-  Why execute after sync: MkDocs renders with execute=False, so outputs must be
-  stored in .ipynb. Execution also validates your code works.'
+  - Batch validation: validate all notebooks in a directory'
 mode: subagent
 tools:
   read: true
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -307,15 +297,10 @@ run_notebook({
 | `outputMode` | string | `summary`, `full`, or `json` |
 
 **Default Behavior:**
-- Overwrites source notebook with executed version (outputs saved for website)
+- Overwrites source notebook with executed version
 - Creates `.ipynb.bak` backup of original
 - Validates notebook before execution
 - 600 second timeout per notebook
-
-**IMPORTANT:** Default behavior (overwrite) is correct for most cases because:
-- MkDocs renders with `execute: False`
-- Outputs must be stored in `.ipynb` for website display
-- Use `noOverwrite: true` only for validation-only testing
 
 ## Standard File Tools
 
@@ -350,23 +335,20 @@ write({
 })
 ```
 
-### glob
+### ripgrep
 
 Find notebooks by pattern:
 
 ```python
-glob({"pattern": "docs/Examples/**/*.ipynb"})
+ripgrep({"pattern": "docs/Examples/**/*.ipynb"})
 ```
-
-### grep
 
 Search notebook contents:
 
 ```python
-grep({
-  "pattern": "import pandas",
-  "include": "*.ipynb",
-  "path": "docs/Examples/"
+ripgrep({
+  "contentPattern": "import pandas",
+  "pattern": "docs/Examples/**/*.ipynb"
 })
 ```
 
@@ -734,25 +716,20 @@ validate_notebook({
 
 ### Task: EXECUTE
 
-Run the notebook to validate code works AND generate outputs for the website.
-
-**IMPORTANT:** Execution serves TWO purposes:
-1. **Validation** - If execution fails, your code is broken
-2. **Output generation** - Graphs, tables, print statements are stored in `.ipynb`
-
-MkDocs renders notebooks with `execute: False`, so outputs must be pre-stored.
+Run the notebook and verify it completes:
 
 ```python
-# Execute with default settings (overwrites source with outputs, creates .bak backup)
+# Execute with default settings (overwrites source, creates backup)
 run_notebook({
   "notebookPath": "{notebook_full_path}",
   "timeout": 300
 })
 
-# Execute without modifying source (validation only, no outputs saved)
+# Execute without modifying source
 run_notebook({
   "notebookPath": "{notebook_full_path}",
-  "noOverwrite": true
+  "noOverwrite": true,
+  "writeExecuted": "{notebook_full_path.replace('.ipynb', '-executed.ipynb')}"
 })
 
 # Execute with output validation
@@ -762,17 +739,13 @@ run_notebook({
 })
 ```
 
-**When to use each mode:**
-- **Default (overwrite)**: After editing, to save outputs for website
-- **noOverwrite**: Just to test if code runs, without saving outputs
-
 ### Task: BATCH-VALIDATE
 
 Validate all notebooks in a directory:
 
 ```python
 # Find all notebooks
-notebooks = glob({"pattern": "{directory}/**/*.ipynb"})
+notebooks = ripgrep({"pattern": "{directory}/**/*.ipynb"})
 
 # Validate each notebook
 results = []
@@ -878,64 +851,45 @@ If validation fails after modification:
 todowrite({"todos": [{"id": "3", "status": "completed", ...}]})
 ```
 
-## Step 6: Execution (Required for Website Outputs)
+## Step 6: Optional Execution Test
 
-Execute the notebook to validate code works AND generate outputs for the website.
+If the task requested execution verification or if creating/editing a tutorial:
 
-**CRITICAL:** MkDocs renders with `execute: False`, so graphs/tables must be stored
-in the `.ipynb` file. Execution is NOT optional if you want outputs on the website.
-
-### 6.1: Run Notebook (With Outputs)
+### 6.1: Run Notebook
 
 ```python
 todowrite({"todos": [{"id": "4", "status": "in_progress", ...}]})
 
-# Default: overwrites source with executed outputs, creates .bak backup
 run_notebook({
   "notebookPath": "{notebook_full_path}",
   "timeout": 300,
+  "noOverwrite": true,  # Don't modify the notebook
   "outputMode": "full"
 })
 ```
 
-**Execution serves two purposes:**
-1. **Validates your code** - If it fails, your edit broke something
-2. **Generates outputs** - Graphs, tables, print statements stored in `.ipynb`
-
-### 6.2: Validate Expected Outputs (Optional)
+### 6.2: Validate Expected Outputs
 
 If `expectOutput` patterns were specified:
 
 ```python
 run_notebook({
   "notebookPath": "{notebook_full_path}",
-  "expectOutput": ["DataFrame", "Success", "{pattern}"]
+  "expectOutput": ["DataFrame", "Success", "{pattern}"],
+  "noOverwrite": true
 })
 ```
 
 ### 6.3: Handle Execution Failures
 
 If notebook execution fails:
-- **Your .py edit broke something** - go back and fix it
 - Check for missing dependencies
 - Check for syntax errors in code cells
-- Check for timeout issues (increase timeout for complex notebooks)
+- Check for timeout issues
 - Report specific cell that failed
 
 ```python
 todowrite({"todos": [{"id": "4", "status": "completed", ...}]})
-```
-
-### 6.4: When to Skip Outputs (Validation Only)
-
-Use `noOverwrite: true` ONLY when you just want to test if code runs
-without saving outputs (e.g., during iterative debugging):
-
-```python
-run_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "noOverwrite": true  # Just test, don't save outputs
-})
 ```
 
 ## Step 7: Report Completion
@@ -1303,12 +1257,7 @@ For complex edits, always use the Jupytext workflow:
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│ 4. LINT → Catch syntax errors before sync               │
-│    (Use ruff or run_linters on the .py file)            │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ 5. SYNC → Transfer .py edits back to .ipynb             │
+│ 4. SYNC → Convert back to .ipynb                         │
 │    validate_notebook({                                   │
 │      notebookPath: "notebook.ipynb",                     │
 │      sync: true                                          │
@@ -1316,36 +1265,24 @@ For complex edits, always use the Jupytext workflow:
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
-│ 6. EXECUTE → Validate code works AND generate outputs   │
+│ 5. VALIDATE → Confirm notebook is still valid            │
+│    validate_notebook({notebookPath: "notebook.ipynb"})   │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ 6. RUN (Optional) → Execute to verify code works         │
 │    run_notebook({                                        │
-│      notebookPath: "notebook.ipynb"                      │
+│      notebookPath: "notebook.ipynb",                     │
+│      noOverwrite: true                                   │
 │    })                                                    │
-│    - If FAILS: your .py edit broke something, fix it    │
-│    - If PASSES: outputs (graphs, tables) stored in      │
-│      .ipynb for website display                         │
 └─────────────────────────────────────────────────────────┘
 ```
-
-**CRITICAL: Why this order matters**
-
-| Step | Purpose |
-|------|---------|
-| Lint first | Catches syntax errors before sync |
-| Sync before execute | Transfers .py edits into .ipynb |
-| Execute after sync | Validates code AND generates website outputs |
-
-**If you execute before syncing, you're testing the OLD code, not your edits!**
 
 **Why Jupytext is safer:**
 - Python files are plain text - easier to edit
 - Git diffs are readable
 - Merge conflicts are easier to resolve
-- Syntax errors are caught by Python linter, not JSON parser
-
-**Why execution is required:**
-- MkDocs renders notebooks with `execute: False`
-- Outputs (graphs, tables) must be stored in `.ipynb`
-- Execution also validates your code works
+- Syntax errors are caught by Python, not JSON parser
 
 ## Notebook Templates
 
@@ -1594,7 +1531,7 @@ Check that outputs include "Success" and "DataFrame".
 - General Python development (use implementor)
 - Markdown documentation updates (use docs agent)
 - Code review tasks (use reviewer agents)
-- Running pytest tests (use tester agent)
+- Running pytest tests (use adw-tester subagent)
 - Editing Python files that aren't notebooks (use standard edit)
 
 # Quality Checklist
@@ -1604,15 +1541,10 @@ Before reporting completion, verify:
 - [ ] **Structure valid**: `validate_notebook` passes
 - [ ] **Cells complete**: All cells have required fields
 - [ ] **Metadata present**: kernelspec and language_info included
-- [ ] **Code runs**: Notebook executes without errors
-- [ ] **Outputs saved**: Graphs/tables stored in `.ipynb` (required for website)
+- [ ] **Outputs clean**: Cleared for edited code cells (or fresh from execution)
 - [ ] **Source format consistent**: All cells use same format (list preferred)
+- [ ] **Code runs**: Notebook executes without errors (if tested)
 - [ ] **Expected outputs present**: Required patterns found (if specified)
-
-**CRITICAL for website display:**
-- MkDocs renders with `execute: False`
-- If outputs are missing, users see empty cells on the website
-- Always run `run_notebook` (without `noOverwrite`) after editing
 
 # Quick Reference
 
@@ -1636,23 +1568,16 @@ Before reporting completion, verify:
 
 **Standard Tools:**
 - `read`, `edit`, `write` - File operations
-- `glob`, `grep` - Search notebooks
+- `ripgrep` - Search notebooks
 - `list`, `move` - File management
 - `todoread`, `todowrite` - Task tracking
 
 **Safety Rules:**
 - Always validate before AND after changes
 - Use Jupytext for complex edits (>3 cells)
+- Clear outputs when editing code cells
 - Preserve source format (string vs list)
 - Never edit notebooks outside allowed paths
-
-**Workflow Order (CRITICAL):**
-1. Edit `.py` file
-2. Lint `.py` file (catch syntax errors)
-3. Sync `.py` → `.ipynb` (transfer edits)
-4. Execute `.ipynb` (validate code + generate outputs)
-
-**Why execution after sync:** If you execute before syncing, you test the OLD code!
 
 **Retries:** 3 attempts for recoverable errors
 

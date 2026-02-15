@@ -8,14 +8,14 @@ tools:
   edit: true
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
   task: false
   adw: false
   adw_spec: false
+  feedback_log: true
   create_workspace: false
   workflow_builder: true
   git_operations: false

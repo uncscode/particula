@@ -19,12 +19,11 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
-  task: true
+  task: false
   adw: false
   adw_spec: true
   create_workspace: false
@@ -49,7 +48,7 @@ Generate initial implementation plan and write to spec_content.
 
 Create the first draft of an implementation plan by:
 1. Reading issue details from workflow state
-2. Invoking codebase-researcher for context
+2. Researching the codebase directly (using read, ripgrep, list)
 3. Generating structured implementation plan
 4. Writing plan to `spec_content` in adw_state.json
 5. Verifying write succeeded
@@ -102,28 +101,64 @@ Extract from issue:
 - Issue type (`/bug`, `/feature`, `/chore`)
 - Acceptance criteria from issue body
 
-## Step 2: Invoke Codebase Researcher
+## Step 2: Research Codebase Directly
+
+Use your `read`, `ripgrep`, and `list` tools to gather context. Do NOT invoke
+subagents — perform all research yourself.
+
+### 2.1: Identify Search Terms
+
+From the issue, extract:
+- **Keywords**: Class names, function names, module names mentioned
+- **Concepts**: What functionality is being discussed
+- **File hints**: Any paths or file names mentioned in the issue body
+- **Error messages**: If bug, any stack traces or error text
+
+### 2.2: Search for Relevant Files
+
+Use `ripgrep` in both file-discovery and content-search modes:
 
 ```python
-research_context = task({
-  "description": "Research codebase for planning",
-  "prompt": f"""Research codebase for implementation planning.
+# Find files by name pattern
+ripgrep({"pattern": "**/*{keyword}*.py", "path": "{worktree_path}/adw"})
 
-Arguments: adw_id={adw_id}
-
-Issue Summary: {issue_title}
-{issue_body_summary}
-
-Research Focus:
-- Find files related to {affected_areas}
-- Identify existing patterns for {relevant_patterns}
-- Map module structure for {affected_modules}
-""",
-  "subagent_type": "codebase-researcher"
-})
+# Search file contents for keywords
+ripgrep({"contentPattern": "{keyword}", "pattern": "**/*.py", "path": "{worktree_path}"})
 ```
 
-Store the research output - it will be used to create the plan.
+Prioritize results:
+1. Files directly mentioned in issue
+2. Files matching multiple search terms
+3. Files in likely affected modules
+4. Test files for affected code
+
+**Limit to 10-15 most relevant files** to avoid context overload.
+
+### 2.3: Extract Code Snippets
+
+For each relevant file, read key sections with line numbers:
+
+```python
+read({"filePath": "{worktree_path}/{file_path}", "offset": start_line, "limit": num_lines})
+```
+
+### 2.4: Map Module Structure
+
+Use `list` and `ripgrep` to understand the module layout around affected areas:
+
+```python
+ripgrep({"pattern": "**/*.py", "path": "{worktree_path}/adw/{module}"})
+```
+
+### 2.5: Identify Patterns and Conventions
+
+Note observed patterns in the codebase:
+- Error handling approach (exception hierarchy)
+- Data model patterns (Pydantic BaseModel usage)
+- Test naming and location conventions (`*_test.py` in `tests/` dirs)
+- Import organization
+
+Compile your research findings — they feed directly into Step 3.
 
 ## Step 3: Generate Implementation Plan
 

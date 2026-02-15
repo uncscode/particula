@@ -17,8 +17,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -504,8 +503,8 @@ edit({
 ## Step 9: Validate Markdown Links
 
 Check all links in created files:
-```bash
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' docs/Examples/{feature}*.md
+```text
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "docs/Examples/{feature}*.md"})
 ```
 
 Verify internal and external links are valid.

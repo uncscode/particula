@@ -17,8 +17,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -115,10 +114,10 @@ Extract `worktree_path` and move to worktree.
 
 ### 2.1: Get Changed Python Files
 
-From input or git diff:
-```bash
-cd {worktree_path}
-git diff main...HEAD --name-only -- "*.py" | grep -v "_test.py"
+From input or git diff (tool-based):
+```text
+ripgrep({"pattern": "**/*.py"})
+# Filter out *_test.py in analysis
 ```
 
 ### 2.2: Categorize Files

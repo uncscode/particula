@@ -6,8 +6,7 @@
 - [x] write
 - [x] move
 - [x] list
-- [x] glob
-- [x] grep
+- [x] ripgrep
 - [x] git_operations
 - [x] platform_operations
 - [x] todoread

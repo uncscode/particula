@@ -242,19 +242,68 @@ def format_summary(metrics: Dict[str, Any], source_dir: str, build_dir: str) -> 
 
 
 def _load_presets(source_dir: str) -> Dict[str, Any]:
+    """Load configure presets from CMake preset files.
+
+    Args:
+        source_dir: Directory containing CMakePresets.json and optional CMakeUserPresets.json.
+
+    Returns:
+        Parsed preset data with merged ``configurePresets`` entries from both files.
+
+    Raises:
+        FileNotFoundError: If CMakePresets.json is missing.
+        json.JSONDecodeError: If CMakePresets.json is not valid JSON.
+        TypeError: If either configurePresets value is not a list.
+    """
     presets_path = Path(source_dir) / "CMakePresets.json"
     if not presets_path.exists():
         raise FileNotFoundError(f"CMakePresets.json not found at {presets_path}")
-    return json.loads(presets_path.read_text())
+    preset_data = json.loads(presets_path.read_text())
+
+    configure_presets = preset_data.get("configurePresets")
+    if configure_presets is None:
+        configure_presets = []
+    if not isinstance(configure_presets, list):
+        raise TypeError("CMakePresets.json configurePresets is not a list")
+
+    user_presets_path = Path(source_dir) / "CMakeUserPresets.json"
+    if user_presets_path.exists():
+        # CMake convention: merge user configure presets into the standard preset list.
+        try:
+            user_data = json.loads(user_presets_path.read_text())
+        except json.JSONDecodeError:
+            user_data = None
+
+        if isinstance(user_data, dict):
+            user_configure_presets = user_data.get("configurePresets")
+            if user_configure_presets is None:
+                user_configure_presets = []
+            if not isinstance(user_configure_presets, list):
+                raise TypeError("CMakeUserPresets.json configurePresets is not a list")
+            configure_presets.extend(user_configure_presets)
+
+    preset_data["configurePresets"] = configure_presets
+    return preset_data
 
 
 def _validate_preset_name(preset: str, preset_data: Dict[str, Any]) -> None:
+    """Validate a configure preset name across merged preset files.
+
+    Args:
+        preset: Preset name to validate.
+        preset_data: Preset data returned by ``_load_presets``.
+
+    Raises:
+        ValueError: If the preset name is not present in merged configure presets.
+    """
     configure_presets = preset_data.get("configurePresets") or []
     names = {
         item.get("name") for item in configure_presets if isinstance(item, dict) and "name" in item
     }
     if preset not in names:
-        raise ValueError(f"Preset '{preset}' not found in configurePresets")
+        raise ValueError(
+            f"Preset '{preset}' not found in CMakePresets.json or CMakeUserPresets.json"
+        )
 
 
 def run_cmake(
@@ -301,7 +350,7 @@ def run_cmake(
                 else:
                     ninja_requested = False
         cmd.extend(cmake_args)
-    except (FileNotFoundError, ValueError) as exc:
+    except (FileNotFoundError, ValueError, TypeError) as exc:
         metrics = parse_cmake_output("", exit_code=1)
         metrics["success"] = False
         metrics["errors"] = metrics.get("errors", 0) + 1

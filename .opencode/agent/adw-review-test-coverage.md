@@ -16,14 +16,14 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
   task: false
   adw: false
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: false
@@ -107,11 +107,11 @@ Tests:  src/simulation/tests/particle_test.cpp
    or:  tests/simulation/particle_test.cpp
 ```
 
-Use `glob` and `grep` to find test files:
+Use `ripgrep` to find test files:
 ```python
-glob({"pattern": "**/*_test.py"})
-glob({"pattern": "**/test_*.py"})
-grep({"pattern": "def test_.*{function_name}", "include": "*_test.py"})
+ripgrep({"pattern": "**/*_test.py"})
+ripgrep({"pattern": "**/test_*.py"})
+ripgrep({"contentPattern": "def test_.*{function_name}", "pattern": "**/*_test.py"})
 ```
 
 ## Step 3: Analyze Test Coverage

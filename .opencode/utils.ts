@@ -5,10 +5,11 @@
 import { join } from "path";
 
 /**
- * Base directory for all logs
- * Default is 'logs' in the current working directory
+ * Base directory for all plugin logs.
+ * Defaults to 'agents/_default' to align with the unified logging layout
+ * introduced in F21 (all runtime artifacts live under agents/).
  */
-const LOG_BASE_DIR = process.env.OPENCODE_HOOKS_LOG_DIR || "logs";
+const LOG_BASE_DIR = process.env.OPENCODE_HOOKS_LOG_DIR || join("agents", "_default");
 
 /**
  * Get the log directory for a specific session

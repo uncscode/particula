@@ -16,8 +16,7 @@ tools:
   edit: true
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -318,7 +317,7 @@ DEV_PLAN_UPDATE_FAILED
 Error: Document not found
 Path: {file_path}
 
-Recommendation: Verify file path. Use glob to search:
+Recommendation: Verify file path. Use ripgrep to search:
 - adw-docs/dev-plans/features/*{partial_name}*.md
 ```
 

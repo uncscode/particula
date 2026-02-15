@@ -20,13 +20,13 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
   adw: false
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: false
@@ -95,20 +95,22 @@ This subagent focuses on **fast tests** to provide quick feedback. See `adw-docs
 **Test Execution Command:**
 ```python
 run_pytest({
-  "pytestArgs": ["{scope_path}", "-m", "not slow and not performance"],
+  "pytestArgs": ["{test_path}", "-m", "not slow and not performance"],
   "outputMode": "full",
   "minTests": 1,
   "coverage": true,
-  "coverageSource": "{source_module}",
+  "coverageSource": "{source_module_a},{source_module_b}",
   "coverageThreshold": 80,
-  "failFast": true
+  "failFast": true,
+  "cwd": "{worktree_path}"
 })
+
 ```
 
 **Tool Options:**
 - `minTests: 1` - Set for scoped tests to validate at least 1 test runs
 - `coverage: true` - Enable coverage reporting (default)
-- `coverageSource: "{source_module}"` - Module to measure (e.g., "adw/utils")
+- `coverageSource: "{source_module_a},{source_module_b}"` - Modules to measure (e.g., "adw/core,adw/utils"); whitespace is trimmed
 - `coverageThreshold: 80` - Fail if coverage below 80%
 - `failFast: true` - Stop on first failure for quick feedback
 - `cwd: "{worktree_path}"` - Use when running in worktree
@@ -193,7 +195,7 @@ adw/core/models.py::DataModel
 ### 3.1: Find Test Files
 
 ```python
-glob({"pattern": "{module}/tests/*_test.py"})
+ripgrep({"pattern": "{module}/tests/*_test.py"})
 ```
 
 ### 3.2: Analyze Test Coverage
@@ -340,7 +342,7 @@ run_pytest({
 **Tool Options Explained:**
 - `minTests: 1` - Validates at least 1 test ran for scoped tests
 - `coverage: true` - Enable coverage measurement
-- `coverageSource: "{source_module}"` - Measure coverage for the changed module (e.g., "adw/utils")
+- `coverageSource: "{source_module_a},{source_module_b}"` - Measure coverage for the changed modules (e.g., "adw/core,adw/utils")
 - `coverageThreshold: 80` - Validation fails if coverage < 80%
 - `failFast: true` - Stop on first failure (`-x` flag) for faster feedback
 - `cwd: "{worktree_path}"` - Optional, use when running in isolated worktree

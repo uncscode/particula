@@ -34,15 +34,16 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
   task: true
   adw: true
-  adw_spec: false
+  adw_spec: true
+  feedback_log: true
   create_workspace: false
+
   workflow_builder: false
   git_operations: true
   platform_operations: false

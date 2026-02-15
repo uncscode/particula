@@ -6,8 +6,6 @@ tools:
   edit: false
   write: false
   list: false
-  glob: false
-  grep: false
   move: false
   todoread: true
   todowrite: true
