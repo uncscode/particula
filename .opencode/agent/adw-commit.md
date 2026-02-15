@@ -4,14 +4,17 @@ description: 'Subagent that commits changes with pre-commit hook handling and pu
 
   This subagent: - Analyzes git diff to understand changes - Generates conventional
   commit message - Stages all changes - Runs commit with pre-commit hooks - Fixes
-  pre-commit hook failures (3 internal retries) - Pushes to remote (skips main/master
-  branches) - Reports commit hash or failure details
+  pre-commit hook failures (3 internal retries) - If linter errors persist after
+  retries, commits anyway (downstream agents handle remaining lint) - Pushes to
+  remote (skips main/master branches) - Reports commit hash or failure details
 
   Invoked by: any primary agent, to commit changes to repo.
 
   Examples:
   - After validation: stage changes, generate message, commit with hooks, push to remote
   - Pre-commit fails: fix issues (formatting, linting), retry commit
+  - If linter errors persist after 3 retries, commits anyway so downstream
+    agents (e.g., adw-polish) can address remaining issues
   - Returns commit hash on success or detailed failure report
   - Skips push for main/master branches (safety guard)'
 mode: subagent
@@ -55,6 +58,7 @@ Create a clean git commit by:
 - Staging all relevant changes
 - Running commit with pre-commit hooks
 - Fixing pre-commit failures (3 internal retries)
+- If linter errors persist after retries, committing anyway (downstream agents handle remaining lint)
 - Reporting commit hash or detailed failure
 
 # Input Format
@@ -302,7 +306,7 @@ Confirm all intended files are staged, including:
 
 ## Step 5: Commit (With Retries)
 
-### Retry Loop (3 attempts max)
+### Retry Loop (3 attempts max, then force commit)
 
 ```
 attempt = 1
@@ -310,6 +314,10 @@ while attempt <= 3:
     try commit
     if success: break
     else: fix pre-commit issues, attempt += 1
+
+if all 3 attempts failed due to linter errors:
+    stage all changes and commit with --no-verify
+    (downstream agents like adw-polish will address remaining lint)
 ```
 
 ### 5.1: Attempt Commit
@@ -381,7 +389,37 @@ git_operations({
 })
 ```
 
-### 5.4: Verify Commit
+### 5.4: Force Commit After Exhausted Retries
+
+If all 3 retry attempts fail due to persistent linter errors, **commit the changes anyway** using `max_retries: 0` to skip pre-commit hooks:
+
+```python
+git_operations({"command": "add", "stage_all": true, "worktree_path": worktree_path})
+git_operations({
+  "command": "commit",
+  "summary": "<commit message>",
+  "description": optional_body + "\n\nNote: committed with outstanding linter issues (to be addressed by downstream agents)",
+  "worktree_path": worktree_path,
+  "adw_id": adw_id,
+  "max_retries": 0
+})
+```
+
+**Why this is safe:**
+- Downstream agents (e.g., `adw-polish`) are specifically designed to fix linting issues
+- Blocking the commit prevents the entire pipeline from progressing
+- The linter issues are noted in the commit description for visibility
+- It is better to commit imperfect code and let the pipeline fix it than to stall completely
+
+**When to force commit:**
+- Only after all 3 retry attempts have been exhausted
+- Only when the failures are linter/formatting errors (not structural issues like invalid syntax)
+
+**When NOT to force commit:**
+- If the failure is a non-linter issue (e.g., merge conflict, permission error)
+- If there are no actual changes to commit
+
+### 5.5: Verify Commit
 
 ```python
 git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
@@ -536,7 +574,36 @@ This is not an error - the implementation may have been
 committed in a previous step or no changes were needed.
 ```
 
-### Failure Case (After 3 Retries)
+### Success Case (Force Committed With Outstanding Lint)
+
+When linter errors persist after 3 retries but the commit was force-committed:
+
+```
+ADW_COMMIT_SUCCESS (outstanding lint)
+
+Commit: {short_hash}
+Message: {first line of commit message}
+
+Files changed: {count}
+Insertions: +{lines}
+Deletions: -{lines}
+
+Changed files:
+- adw/utils/parser.py
+- adw/utils/tests/parser_test.py
+
+Pre-commit hooks: Failed after 3 attempts - committed with --no-verify
+Outstanding linter issues:
+- {hook_name}: {brief error summary}
+
+Push: Synced to origin/{branch_name}
+
+Note: Remaining linter issues will be addressed by downstream agents (e.g., adw-polish).
+```
+
+### Failure Case (Non-Linter Errors After 3 Retries)
+
+Only report `ADW_COMMIT_FAILED` for non-linter issues (e.g., merge conflicts, permission errors, invalid syntax) that cannot be bypassed:
 
 ```
 ADW_COMMIT_FAILED: {reason}
@@ -676,7 +743,8 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 2. Use `run_linters` with `autoFix: true` to fix what can be fixed
 3. For manual fixes, edit files directly
 4. Re-stage and retry
-5. After 3 failures, report ADW_COMMIT_FAILED with details
+5. After 3 failures with **linter/formatting errors**: force commit with `max_retries: 0` to skip hooks — downstream agents (e.g., `adw-polish`) will address remaining lint issues
+6. After 3 failures with **non-linter errors** (merge conflicts, invalid syntax, permission issues): report ADW_COMMIT_FAILED with details
 
 ## ".trash/ folder not being tracked"
 
@@ -738,20 +806,22 @@ git push origin <branch_name>
 - **Multiple types of changes**: Use primary type, mention others in body
 - **Large commit**: Consider if should be split (note in body)
 - **Breaking changes**: Add `!` after type: `feat!: remove deprecated API`
-- **Pre-commit keeps failing**: Document specific error for manual intervention
+- **Pre-commit keeps failing (linter errors)**: After 3 retries, force commit with `max_retries: 0` — downstream agents will fix remaining lint
+- **Pre-commit keeps failing (non-linter errors)**: Document specific error for manual intervention
 
 # Quick Reference
 
 **Output Signals:**
 - `ADW_COMMIT_SUCCESS` → Commit created successfully
+- `ADW_COMMIT_SUCCESS (outstanding lint)` → Committed with remaining linter issues (downstream agents will fix)
 - `ADW_COMMIT_SKIPPED` → No changes to commit (not an error)
-- `ADW_COMMIT_FAILED` → Could not commit after 3 retries
+- `ADW_COMMIT_FAILED` → Could not commit after 3 retries (non-linter errors only)
 
 **Commit Format:** `<type>(<scope>): <description>`
 
 **Common Types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 
-**Pre-Commit Handling:** 3 retry attempts with auto-fix
+**Pre-Commit Handling:** 3 retry attempts with auto-fix, then force commit for linter errors (downstream agents fix remaining)
 
 **Permissions:**
 - ✅ git add, commit, status, diff, log
