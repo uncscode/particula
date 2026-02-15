@@ -191,8 +191,8 @@ def kelvin_term_wp(
 ) -> wp.float64:
     """Calculate the Kelvin term with safe clamping.
 
-    Port of ``particula.particles.properties.kelvin_effect_module``
-    ``.get_kelvin_term``.
+    Port of
+    ``particula.particles.properties.kelvin_effect_module.get_kelvin_term``.
 
     Args:
         particle_radius: Particle radius [m].
