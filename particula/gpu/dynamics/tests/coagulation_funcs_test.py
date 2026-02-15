@@ -15,12 +15,6 @@ from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel,
     get_brownian_kernel_via_system_state,
 )
-from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
-    get_dynamic_viscosity,
-)
-from particula.gas.properties.mean_free_path import (  # noqa: E402
-    get_molecule_mean_free_path,
-)
 from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
@@ -36,18 +30,6 @@ from particula.gpu.properties.particle_properties import (  # noqa: E402
     cunningham_slip_correction_wp,
     knudsen_number_wp,
     mean_thermal_speed_wp,
-)
-from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
-    get_aerodynamic_mobility,
-)
-from particula.particles.properties.knudsen_number_module import (  # noqa: E402
-    get_knudsen_number,
-)
-from particula.particles.properties.mean_thermal_speed_module import (  # noqa: E402
-    get_mean_thermal_speed,
-)
-from particula.particles.properties.slip_correction_module import (  # noqa: E402
-    get_cunningham_slip_correction,
 )
 from particula.util.constants import (  # noqa: E402
     BOLTZMANN_CONSTANT,

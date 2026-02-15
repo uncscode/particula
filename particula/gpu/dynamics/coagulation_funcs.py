@@ -15,15 +15,18 @@ def brownian_diffusivity_wp(
 ) -> wp.float64:
     """Calculate Brownian diffusivity via Stokes-Einstein scaling.
 
-    Port of ``particula.dynamics.coagulation.brownian_kernel._brownian_diffusivity``.
+    Port of
+    ``particula.dynamics.coagulation.brownian_kernel._brownian_diffusivity``
+    using ``D = boltzmann_constant * temperature * aerodynamic_mobility``.
 
     Args:
-        temperature: Gas temperature [K].
-        aerodynamic_mobility: Aerodynamic mobility [m²/s].
-        boltzmann_constant: Boltzmann constant [J/K].
+        temperature: Gas temperature in kelvin.
+        aerodynamic_mobility: Aerodynamic mobility with units consistent
+            with the Stokes-Einstein relation.
+        boltzmann_constant: Boltzmann constant in joules per kelvin.
 
     Returns:
-        Brownian diffusivity [m²/s].
+        Brownian diffusivity in square meters per second.
     """
     return boltzmann_constant * temperature * aerodynamic_mobility
 
@@ -35,14 +38,16 @@ def particle_mean_free_path_wp(
 ) -> wp.float64:
     """Calculate the particle mean free path for coagulation.
 
-    Port of ``particula.dynamics.coagulation.brownian_kernel._mean_free_path_l``.
+    Port of ``particula.dynamics.coagulation.brownian_kernel._mean_free_path_l``
+    using ``lambda = 8 * diffusivity_particle / (pi * mean_thermal_speed)``.
 
     Args:
-        diffusivity_particle: Particle diffusivity [m²/s].
-        mean_thermal_speed_particle: Particle mean thermal speed [m/s].
+        diffusivity_particle: Particle diffusivity in square meters per second.
+        mean_thermal_speed_particle: Particle mean thermal speed in meters per
+            second.
 
     Returns:
-        Particle mean free path [m].
+        Particle mean free path in meters.
     """
     pi_value = wp.float64(3.141592653589793)
     return (
@@ -59,14 +64,16 @@ def g_collection_term_wp(
 ) -> wp.float64:
     """Calculate the Brownian coagulation collection term ``g``.
 
-    Port of ``particula.dynamics.coagulation.brownian_kernel._g_collection_term``.
+    Port of
+    ``particula.dynamics.coagulation.brownian_kernel._g_collection_term`` using
+    the Fuchs form for the collection enhancement term.
 
     Args:
-        mean_free_path_particle: Particle mean free path [m].
-        particle_radius: Particle radius [m].
+        mean_free_path_particle: Particle mean free path in meters.
+        particle_radius: Particle radius in meters.
 
     Returns:
-        Collection term ``g`` (dimensionless).
+        Collection term ``g`` as a dimensionless quantity.
     """
     two_radius = wp.float64(2.0) * particle_radius
     numerator = wp.pow(
@@ -95,22 +102,23 @@ def brownian_kernel_pair_wp(
 ) -> wp.float64:
     """Calculate the scalar Brownian coagulation kernel for a pair.
 
-    Port of ``particula.dynamics.coagulation.brownian_kernel.get_brownian_kernel``
-    for a scalar particle pair.
+    Port of
+    ``particula.dynamics.coagulation.brownian_kernel.get_brownian_kernel`` for
+    a scalar particle pair using the Fuchs correction to the continuum kernel.
 
     Args:
-        radius_i: Particle radius i [m].
-        radius_j: Particle radius j [m].
-        diff_i: Particle diffusivity i [m²/s].
-        diff_j: Particle diffusivity j [m²/s].
-        g_i: Collection term i (dimensionless).
-        g_j: Collection term j (dimensionless).
-        speed_i: Mean thermal speed i [m/s].
-        speed_j: Mean thermal speed j [m/s].
+        radius_i: Particle radius for particle i in meters.
+        radius_j: Particle radius for particle j in meters.
+        diff_i: Particle diffusivity for particle i in square meters per second.
+        diff_j: Particle diffusivity for particle j in square meters per second.
+        g_i: Collection term for particle i (dimensionless).
+        g_j: Collection term for particle j (dimensionless).
+        speed_i: Mean thermal speed for particle i in meters per second.
+        speed_j: Mean thermal speed for particle j in meters per second.
         alpha: Collision efficiency (dimensionless).
 
     Returns:
-        Brownian coagulation kernel for the pair [m³/s].
+        Brownian coagulation kernel for the pair in cubic meters per second.
     """
     pi_value = wp.float64(3.141592653589793)
     sum_radius = radius_i + radius_j
