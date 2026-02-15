@@ -6,9 +6,11 @@ orchestration API. Kernel launches operate on GPU-resident Warp
 arrays and update particle masses in-place.
 """
 
-# ruff: noqa
-# pyright: ignore
-# mypy: ignore-errors
+# pyright: basic
+# pyright: reportArgumentType=false
+# pyright: reportAssignmentType=false
+# pyright: reportGeneralTypeIssues=false
+# pyright: reportOperatorIssue=false
 
 from typing import Any
 
@@ -22,17 +24,17 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
         "Install with: pip install warp-lang"
     ) from exc
 
+from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
+from particula.gas.properties.mean_free_path import (
+    get_molecule_mean_free_path,
+)
 from particula.gpu.dynamics.condensation_funcs import (
     diffusion_coefficient_wp,
     first_order_mass_transport_k_wp,
     mass_transfer_rate_wp,
     particle_radius_from_volume_wp,
 )
-from particula.gpu.properties.gas_properties import (
-    dynamic_viscosity_wp,
-    molecule_mean_free_path_wp,
-    partial_pressure_wp,
-)
+from particula.gpu.properties.gas_properties import partial_pressure_wp
 from particula.gpu.properties.particle_properties import (
     aerodynamic_mobility_wp,
     cunningham_slip_correction_wp,
@@ -61,14 +63,11 @@ def condensation_mass_transfer_kernel(
     surface_tension: Any,
     mass_accommodation: Any,
     diffusion_coefficient_vapor: Any,
-    ref_viscosity: Any,
-    ref_temperature: Any,
-    sutherland_constant: Any,
+    dynamic_viscosity: Any,
+    mean_free_path: Any,
     gas_constant: Any,
     boltzmann_constant: Any,
-    molecular_weight_air: Any,
     temperature: Any,
-    pressure: Any,
     time_step: Any,
     mass_transfer: Any,
 ) -> None:
@@ -98,19 +97,6 @@ def condensation_mass_transfer_kernel(
     if effective_density <= wp.float64(0.0):
         effective_density = density[0]
 
-    dynamic_viscosity = dynamic_viscosity_wp(
-        temperature,
-        ref_viscosity,
-        ref_temperature,
-        sutherland_constant,
-    )
-    mean_free_path = molecule_mean_free_path_wp(
-        molecular_weight_air,
-        temperature,
-        pressure,
-        dynamic_viscosity,
-        gas_constant,
-    )
     knudsen_number = knudsen_number_wp(mean_free_path, radius)
     slip_correction = cunningham_slip_correction_wp(knudsen_number)
     mobility = aerodynamic_mobility_wp(
@@ -202,6 +188,8 @@ def _validate_species_array(
     Raises:
         ValueError: If the array length or device mismatches expectations.
     """
+    if len(array.shape) != 1:
+        raise ValueError(f"{name} must be a 1D array")
     if array.shape[0] != n_species:
         raise ValueError(
             f"{name} length {array.shape[0]} does not match n_species "
@@ -228,6 +216,59 @@ def _validate_mass_transfer_buffer(
         raise ValueError(
             "mass_transfer buffer device does not match particle device"
         )
+
+
+def _validate_particle_arrays(
+    particles: Any,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+) -> None:
+    """Validate particle array shapes and lengths."""
+    if particles.density.shape[0] != n_species:
+        raise ValueError("particle density length does not match n_species")
+    if particles.concentration.shape != (n_boxes, n_particles):
+        raise ValueError(
+            "particle concentration shape does not match (n_boxes, n_particles)"
+        )
+
+
+def _validate_gas_arrays(
+    gas: Any,
+    n_boxes: int,
+    n_species: int,
+) -> None:
+    """Validate gas array shapes and lengths."""
+    if gas.molar_mass.shape[0] != n_species:
+        raise ValueError(
+            "n_species mismatch between particle masses and gas molar mass"
+        )
+    if gas.concentration.shape != (n_boxes, n_species):
+        raise ValueError(
+            "gas concentration shape does not match (n_boxes, n_species)"
+        )
+    if gas.vapor_pressure.shape != (n_boxes, n_species):
+        raise ValueError(
+            "vapor pressure shape does not match (n_boxes, n_species)"
+        )
+
+
+def _validate_device_match(name: str, array: Any, expected_device: Any) -> None:
+    """Validate that a Warp array is on the expected device."""
+    device = getattr(array, "device", None)
+    if device is None or str(device) != str(expected_device):
+        raise ValueError(f"{name} device mismatch")
+
+
+def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
+    """Validate particle and gas arrays share the same Warp device."""
+    _validate_device_match(
+        "particle concentration", particles.concentration, device
+    )
+    _validate_device_match("particle density", particles.density, device)
+    _validate_device_match("gas molar mass", gas.molar_mass, device)
+    _validate_device_match("gas concentration", gas.concentration, device)
+    _validate_device_match("gas vapor pressure", gas.vapor_pressure, device)
 
 
 def condensation_step_gpu(
@@ -267,20 +308,11 @@ def condensation_step_gpu(
         rollback should copy masses before invoking this function.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
-    if gas.molar_mass.shape[0] != n_species:
-        raise ValueError(
-            "n_species mismatch between particle masses and gas molar mass"
-        )
-    if gas.concentration.shape != (n_boxes, n_species):
-        raise ValueError(
-            "gas concentration shape does not match (n_boxes, n_species)"
-        )
-    if gas.vapor_pressure.shape != (n_boxes, n_species):
-        raise ValueError(
-            "vapor pressure shape does not match (n_boxes, n_species)"
-        )
+    _validate_gas_arrays(gas, n_boxes, n_species)
+    _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
     device = particles.masses.device
+    _validate_device_arrays(particles, gas, device)
 
     if surface_tension is None:
         surface_tension = wp.full(
@@ -337,6 +369,18 @@ def condensation_step_gpu(
     else:
         _validate_mass_transfer_buffer(mass_transfer, expected_shape, device)
 
+    dynamic_viscosity = get_dynamic_viscosity(
+        temperature,
+        reference_viscosity=constants.REF_VISCOSITY_AIR_STP,
+        reference_temperature=constants.REF_TEMPERATURE_STP,
+    )
+    mean_free_path = get_molecule_mean_free_path(
+        molar_mass=constants.MOLECULAR_WEIGHT_AIR,
+        temperature=temperature,
+        pressure=pressure,
+        dynamic_viscosity=dynamic_viscosity,
+    )
+
     wp.launch(
         condensation_mass_transfer_kernel,
         dim=(n_boxes, n_particles),
@@ -350,14 +394,11 @@ def condensation_step_gpu(
             surface_tension,
             mass_accommodation,
             diffusion_coefficient_vapor,
-            wp.float64(constants.REF_VISCOSITY_AIR_STP),
-            wp.float64(constants.REF_TEMPERATURE_STP),
-            wp.float64(constants.SUTHERLAND_CONSTANT),
+            wp.float64(dynamic_viscosity),
+            wp.float64(mean_free_path),
             wp.float64(constants.GAS_CONSTANT),
             wp.float64(constants.BOLTZMANN_CONSTANT),
-            wp.float64(constants.MOLECULAR_WEIGHT_AIR),
             wp.float64(temperature),
-            wp.float64(pressure),
             wp.float64(time_step),
             mass_transfer,
         ],
