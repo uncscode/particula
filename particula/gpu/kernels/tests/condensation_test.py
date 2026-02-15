@@ -249,8 +249,10 @@ def _run_gpu_step(
         diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         mass_transfer=mass_transfer,
     )
-    wp.synchronize()
-    return from_warp_particle_data(gpu_particles), mass_transfer_buffer
+    return (
+        from_warp_particle_data(gpu_particles, sync=True),
+        mass_transfer_buffer,
+    )
 
 
 def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
@@ -482,8 +484,6 @@ def test_condensation_step_gpu_reuses_mass_transfer_buffer(
         time_step=time_step,
         mass_transfer=mass_transfer,
     )
-    wp.synchronize()
-
     assert returned_buffer is mass_transfer
     assert np.any(returned_buffer.numpy() != 0.0)
 
@@ -540,6 +540,13 @@ def test_validate_species_array_rejects_device_mismatch(device: str) -> None:
         )
 
 
+def test_validate_species_array_rejects_rank_mismatch(device: str) -> None:
+    """Validation helper rejects arrays with more than one dimension."""
+    array = wp.zeros((1, 2), dtype=wp.float64, device=device)
+    with pytest.raises(ValueError, match="must be a 1D array"):
+        _validate_species_array("surface_tension", array, 2, array.device)
+
+
 def test_validate_mass_transfer_buffer_rejects_shape(device: str) -> None:
     """Validation helper rejects mass transfer buffers with bad shape."""
     buffer = wp.zeros((1, 2, 3), dtype=wp.float64, device=device)
@@ -558,6 +565,314 @@ def test_validate_mass_transfer_buffer_rejects_device(device: str) -> None:
             buffer,
             (1, 2, 2),
             wp.get_device(wrong_device),
+        )
+
+
+def test_condensation_step_gpu_rejects_particle_length_mismatch(
+    device: str,
+) -> None:
+    """Condensation rejects particle arrays with incorrect lengths."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    bad_density = wp.zeros(3, dtype=wp.float64, device=device)
+    gpu_particles.density = bad_density
+
+    with pytest.raises(ValueError, match="particle density length"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_particle_concentration_shape(
+    device: str,
+) -> None:
+    """Condensation rejects particle concentration shape mismatches."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    gpu_particles.concentration = wp.zeros(
+        (1, 3),
+        dtype=wp.float64,
+        device=device,
+    )
+
+    with pytest.raises(ValueError, match="particle concentration shape"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_gas_molar_mass_length(
+    device: str,
+) -> None:
+    """Condensation rejects gas molar mass length mismatches."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    gpu_gas.molar_mass = wp.zeros(3, dtype=wp.float64, device=device)
+
+    with pytest.raises(ValueError, match="n_species mismatch"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_gas_concentration_shape(
+    device: str,
+) -> None:
+    """Condensation rejects gas concentration shape mismatches."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    gpu_gas.concentration = wp.zeros(
+        (1, 3),
+        dtype=wp.float64,
+        device=device,
+    )
+
+    with pytest.raises(ValueError, match="gas concentration shape"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_vapor_pressure_shape(
+    device: str,
+) -> None:
+    """Condensation rejects vapor pressure shape mismatches."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    gpu_gas.vapor_pressure = wp.zeros(
+        (1, 3),
+        dtype=wp.float64,
+        device=device,
+    )
+
+    with pytest.raises(ValueError, match="vapor pressure shape"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_gas_device_mismatch(
+    device: str,
+) -> None:
+    """Condensation rejects gas arrays on a different device."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not wp.is_cuda_available():
+        pytest.skip("CUDA not available for mismatch test")
+
+    gpu_gas.molar_mass = wp.zeros(2, dtype=wp.float64, device=wrong_device)
+
+    with pytest.raises(ValueError, match="gas molar mass device mismatch"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
+    device: str,
+) -> None:
+    """Condensation rejects particle concentration on wrong device."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not wp.is_cuda_available():
+        pytest.skip("CUDA not available for mismatch test")
+
+    gpu_particles.concentration = wp.zeros(
+        (1, 2),
+        dtype=wp.float64,
+        device=wrong_device,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="particle concentration device mismatch",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_particle_density_device_mismatch(
+    device: str,
+) -> None:
+    """Condensation rejects particle density on wrong device."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not wp.is_cuda_available():
+        pytest.skip("CUDA not available for mismatch test")
+
+    gpu_particles.density = wp.zeros(2, dtype=wp.float64, device=wrong_device)
+
+    with pytest.raises(ValueError, match="particle density device mismatch"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_gas_concentration_device_mismatch(
+    device: str,
+) -> None:
+    """Condensation rejects gas concentration on wrong device."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not wp.is_cuda_available():
+        pytest.skip("CUDA not available for mismatch test")
+
+    gpu_gas.concentration = wp.zeros(
+        (1, 2),
+        dtype=wp.float64,
+        device=wrong_device,
+    )
+
+    with pytest.raises(ValueError, match="gas concentration device mismatch"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+        )
+
+
+def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
+    device: str,
+) -> None:
+    """Condensation rejects vapor pressure on wrong device."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not wp.is_cuda_available():
+        pytest.skip("CUDA not available for mismatch test")
+
+    gpu_gas.vapor_pressure = wp.zeros(
+        (1, 2),
+        dtype=wp.float64,
+        device=wrong_device,
+    )
+
+    with pytest.raises(ValueError, match="gas vapor pressure device mismatch"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
         )
 
 
