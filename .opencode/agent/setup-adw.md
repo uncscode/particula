@@ -29,8 +29,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -309,10 +308,10 @@ Look for language indicators:
 
 ```python
 # Check for project configuration files
-glob({"pattern": "pyproject.toml"})
-glob({"pattern": "Cargo.toml"})
-glob({"pattern": "package.json"})
-glob({"pattern": "go.mod"})
+ripgrep({"pattern": "pyproject.toml"})
+ripgrep({"pattern": "Cargo.toml"})
+ripgrep({"pattern": "package.json"})
+ripgrep({"pattern": "go.mod"})
 ```
 
 Report findings to user:
@@ -438,7 +437,7 @@ adw setup template apply --check
 If placeholders remain:
 
 ```python
-grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": ".opencode"})
+ripgrep({"contentPattern": "\\{\\{[A-Z_]+\\}\\}", "pattern": ".opencode/**"})
 ```
 
 ## Phase 4: Customization
@@ -448,8 +447,8 @@ grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": ".opencode"})
 Search for ADW-specific paths that need updating:
 
 ```python
-grep({"pattern": "adw/", "path": ".opencode"})
-grep({"pattern": "pytest adw", "path": ".opencode"})
+ripgrep({"contentPattern": "adw/", "pattern": ".opencode/**"})
+ripgrep({"contentPattern": "pytest adw", "pattern": ".opencode/**"})
 ```
 
 Replace with actual source directory if needed.
@@ -476,7 +475,7 @@ Based on detected language, check and update:
 If the repository has `adw-docs/` guides:
 
 ```python
-grep({"pattern": "\\{\\{[A-Z_]+\\}\\}", "path": "adw-docs"})
+ripgrep({"contentPattern": "\\{\\{[A-Z_]+\\}\\}", "pattern": "adw-docs/**"})
 ```
 
 Replace any remaining placeholders with repository-specific values, or use:

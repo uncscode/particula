@@ -14,13 +14,14 @@ EXAMPLES:
 - Full test suite: run_pytest({minTests: 1700})
 - Scoped tests: run_pytest({pytestArgs: ['adw/core/tests/'], minTests: 1})
 - With coverage threshold: run_pytest({coverage: true, coverageThreshold: 80})
-- Override coverage source: run_pytest({coverageSource: 'adw'})
+- Override coverage source: run_pytest({coverageSource: 'adw.core,adw.utils'})
 - Use pyproject.toml config: run_pytest({}) or run_pytest({coverageSource: 'all'})
 - Fail fast: run_pytest({failFast: true, pytestArgs: ['adw/core/tests/']})
 - In worktree: run_pytest({cwd: '/path/to/worktree', pytestArgs: ['adw/']})
 - Skip slow tests: run_pytest({pytestArgs: ['-m', 'not slow and not performance'], minTests: 1})
 - Show slowest tests: run_pytest({durations: 10, minTests: 1})
 - Show all test durations: run_pytest({durations: 0, minTests: 1})
+- JSON with durations: run_pytest({durations: 10, outputMode: 'json', minTests: 1})
 
 IMPORTANT: For scoped/targeted tests, always set minTests: 1 (default expects full suite).
 NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
@@ -48,7 +49,9 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
     coverageSource: tool.schema
       .string()
       .optional()
-      .describe("Source module/path for coverage measurement. If omitted or 'all', uses pyproject.toml [tool.coverage.run].source config. Examples: 'adw', 'src/my_package'"),
+      .describe(
+        "Source module/path for coverage measurement. Comma-separated values are supported (e.g., 'adw.core,adw.utils'). If omitted or 'all', uses pyproject.toml [tool.coverage.run].source config. Examples: 'adw', 'src/my_package'",
+      ),
     coverageThreshold: tool.schema
       .number()
       .optional()
@@ -73,6 +76,10 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
       .number()
       .optional()
       .describe("Minimum duration in seconds for inclusion in slowest list (default: 0.005). Only applies when durations is set."),
+    overrideIni: tool.schema
+      .array(tool.schema.string())
+      .optional()
+      .describe("Override ini options passed to pytest (--override-ini). Example: ['addopts=']"),
   },
   async execute(args) {
     const outputMode = args.outputMode || "summary";
@@ -87,6 +94,7 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
     const covReport = args.covReport || ["term-missing"];
     const durations = args.durations;
     const durationsMin = args.durationsMin;
+    const overrideIni = args.overrideIni || [];
 
     // Build command
     const cmdParts = [
@@ -97,18 +105,25 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
       `--timeout=${timeout}`,
     ];
 
-    // Coverage options
-    if (coverage) {
-      cmdParts.push("--coverage");
-      // Only pass --coverage-source if explicitly provided and not 'all'
-      // Otherwise let pytest-cov use pyproject.toml [tool.coverage.run].source
-      if (coverageSource && coverageSource !== "all") {
-        cmdParts.push(`--coverage-source=${coverageSource}`);
-      }
-      cmdParts.push(`--cov-report=${covReport.join(",")}`);
-    } else {
-      cmdParts.push("--no-coverage");
-    }
+     // Coverage options
+     if (coverage) {
+       cmdParts.push("--coverage");
+       // Only pass --coverage-source if explicitly provided and not 'all'
+       // Otherwise let pytest-cov use pyproject.toml [tool.coverage.run].source
+       if (coverageSource && coverageSource !== "all") {
+         const sources = coverageSource
+           .split(",")
+           .map((source) => source.trim())
+           .filter((source) => source.length > 0);
+         sources.forEach((source) => {
+           cmdParts.push(`--coverage-source=${source}`);
+         });
+       }
+       cmdParts.push(`--cov-report=${covReport.join(",")}`);
+     } else {
+       cmdParts.push("--no-coverage");
+     }
+
 
     if (coverageThreshold !== undefined) {
       cmdParts.push(`--coverage-threshold=${coverageThreshold}`);
@@ -130,6 +145,13 @@ NOTE: -v and --tb=short are always included. Do NOT pass these in pytestArgs.`,
       if (durationsMin !== undefined) {
         cmdParts.push(`--durations-min=${durationsMin}`);
       }
+    }
+
+    // Ini overrides
+    if (overrideIni.length > 0) {
+      overrideIni.forEach((entry) => {
+        cmdParts.push(`--override-ini=${entry}`);
+      });
     }
 
     // Add pytest arguments

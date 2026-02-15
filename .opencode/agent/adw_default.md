@@ -10,20 +10,20 @@ description: 'General-purpose ADW workflow agent that handles custom slash comma
   - Workflow phase needs general implementation without specialized logic - Reading
   implementation plans from adw_state.json via adw_spec - Updating workflow state
   during execution - Fallback for any ADW task not handled by specialized agents'
-mode: all
+mode: primary
 tools:
   read: true
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
   task: true
   adw: true
   adw_spec: true
+  feedback_log: true
   create_workspace: true
   workflow_builder: true
   git_operations: true
@@ -77,7 +77,7 @@ This agent uses repository base permissions from `.opencode` configuration. It h
 - **run_linters**: Run linting/formatting via repository configuration
 - **get_version**: Get project version information
 - **get_datetime**: Get current date/time for timestamps (UTC by default, America/Denver when `localtime` is true)
-- **Core tool-only set**: read/edit/write/list/glob/grep/todoread/todowrite/create_workspace/workflow_builder/git_operations/platform_operations
+- **Core tool-only set**: read/edit/write/list/ripgrep/todoread/todowrite/create_workspace/workflow_builder/git_operations/platform_operations
 - **Denied**: webfetch, websearch, codesearch, bash
 
 ## Repository Context

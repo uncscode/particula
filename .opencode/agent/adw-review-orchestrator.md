@@ -20,14 +20,14 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
   task: true
   adw: false
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: true

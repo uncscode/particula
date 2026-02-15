@@ -24,8 +24,7 @@ tools:
   write: true
   move: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: true
@@ -544,7 +543,7 @@ Next Steps:
 - Existing file IDs (would break references)
 
 ## Tools Available
-- `read`, `write`, `edit`, `move`, `list`, `glob`, `grep` - File operations
+- `read`, `write`, `edit`, `move`, `list`, `ripgrep` - File operations
 - `task` - Invoke subagents
 - `get_datetime` - For timestamps
 - `todoread`, `todowrite` - Task tracking

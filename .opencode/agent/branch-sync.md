@@ -9,14 +9,14 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
   task: true
   adw: false
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: true
@@ -42,7 +42,7 @@ Guides interactive branch synchronization, rebase, and conflict resolution with 
 - Enforce safety: protected branches, force-with-lease only, confirmations before destructive actions
 
 ## Tools Available
-- **read/list/glob/grep**: Inspect files, including conflicted files
+- **read/list/ripgrep**: Inspect files, including conflicted files
 - **edit/write**: Resolve conflicts directly in files
 - **git_operations**: fetch, merge, rebase, sync, abort, reset, push-force-with-lease, worktree utilities
 - **platform_operations**: Update issues/PRs when needed
@@ -80,7 +80,7 @@ Guides interactive branch synchronization, rebase, and conflict resolution with 
 
 ## Conflict Resolution Workflow
 1. Detect conflicts (git_operations merge/rebase output or status)
-2. Read conflicted files with `read`/`grep` to understand both sides
+2. Read conflicted files with `read`/`ripgrep` to understand both sides
 3. Edit/write to resolve markers; stage via git_operations add (implicit in resolution flow)
 4. Continue rebase/merge or abort per user choice
 5. Summarize resolved files and next steps (commit or continue)

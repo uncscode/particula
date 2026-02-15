@@ -15,12 +15,12 @@ tools:
   write: true
   read: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todowrite: true
   todoread: true
   adw_spec: true
+  feedback_log: true
   run_linters: true
   webfetch: false
   websearch: false

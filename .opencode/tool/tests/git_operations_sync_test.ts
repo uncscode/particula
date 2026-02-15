@@ -179,6 +179,57 @@ describe("git_operations tool - sync commands", () => {
     ]);
   });
 
+  it("forwards max_count and oneline for log", async () => {
+    await gitOperationsTool.execute({ command: "log", max_count: 3, oneline: true });
+
+    const cmd = calls[0][1] as string[];
+    assert.deepEqual(cmd, [
+      "uv",
+      "run",
+      "adw",
+      "git",
+      "log",
+      "--max-count",
+      "3",
+      "--oneline",
+    ]);
+  });
+
+  it("defaults max_count and omits oneline when not set", async () => {
+    await gitOperationsTool.execute({ command: "log" });
+
+    const cmd = calls[0][1] as string[];
+    const maxCountIndex = cmd.indexOf("--max-count");
+    assert.ok(maxCountIndex > -1);
+    assert.equal(cmd[maxCountIndex + 1], "10");
+    assert.equal(cmd.includes("--oneline"), false);
+  });
+
+  it("includes --path when provided for show", async () => {
+    await gitOperationsTool.execute({ command: "show", ref: "HEAD", path: "README.md" });
+
+    const cmd = calls[0][1] as string[];
+    assert.deepEqual(cmd, [
+      "uv",
+      "run",
+      "adw",
+      "git",
+      "show",
+      "--ref",
+      "HEAD",
+      "--path",
+      "README.md",
+    ]);
+  });
+
+  it("omits --path when not provided for show", async () => {
+    await gitOperationsTool.execute({ command: "show", ref: "HEAD" });
+
+    const cmd = calls[0][1] as string[];
+    assert.ok(cmd.includes("--ref"));
+    assert.equal(cmd.includes("--path"), false);
+  });
+
   it("appends --help when help flag is set and bypasses validation", async () => {
     await gitOperationsTool.execute({ command: "merge", help: true });
 

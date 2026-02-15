@@ -33,8 +33,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: true
@@ -234,7 +233,7 @@ Use available tools to detect context and pre-populate values:
 
 **Check for existing .env:**
 ```python
-glob({"pattern": ".env*"})
+ripgrep({"pattern": ".env*"})
 read({"filePath": ".env"})  # If exists, to understand current state
 ```
 
@@ -908,7 +907,7 @@ Enter 1 or 2:
 
 **Check if .env exists:**
 ```python
-glob({"pattern": ".env"})
+ripgrep({"pattern": ".env"})
 ```
 
 **If .env exists, read it first:**

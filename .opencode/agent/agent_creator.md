@@ -21,8 +21,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   # Task Management
   todoread: true
@@ -137,8 +136,7 @@ tools:
   edit: true           # Edit existing files (find/replace)
   write: true          # Write/create new files
   list: true           # List directory contents
-  glob: true           # Find files by pattern
-  grep: true           # Search file contents with regex
+  ripgrep: true        # Search files/contents (glob + content modes)
   # Task Management
   todoread: true       # Read todo list
   todowrite: true      # Write/update todo list
@@ -186,8 +184,7 @@ Agent instructions and guidelines go here in markdown format.
 | | `edit` | Edit existing files (find/replace) |
 | | `write` | Write/create new files |
 | | `list` | List directory contents |
-| | `glob` | Find files by pattern |
-| | `grep` | Search file contents with regex |
+| | `ripgrep` | File discovery + content search |
 | **Task Management** | `todoread` | Read todo list |
 | | `todowrite` | Write/update todo list |
 | | `task` | Launch subagents (omit session_id on retries) |
@@ -307,7 +304,7 @@ Use these question templates to begin the dialogue:
 
 **Available Tools** (show full list):
 ```
-File Operations: read, edit, write, list, glob, grep
+File Operations: read, edit, write, list, ripgrep
 Task Management: todoread, todowrite, task (subagent invocation)
 ADW Workflow: adw, adw_spec, create_workspace, workflow_builder
 Git & Platform: git_operations, platform_operations
@@ -424,8 +421,7 @@ tools:
   edit: false      # Cannot modify files
   write: false     # Cannot create files
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: false
@@ -452,8 +448,7 @@ tools:
   edit: true       # Can modify existing files
   write: true      # Can create new files
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: false
@@ -480,8 +475,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: false
@@ -508,8 +502,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: false
@@ -536,8 +529,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   todoread: true
   todowrite: true
   task: true              # Can invoke subagents (omit session_id on retries to see filesystem changes)
@@ -619,8 +611,7 @@ When designing an agent, go through each tool and decide if it's needed:
 **Always Enabled (most agents need these):**
 - `read` - Read files (almost always needed)
 - `list` - List directories
-- `glob` - Find files by pattern
-- `grep` - Search content
+- `ripgrep` - File discovery + content search
 - `todoread` / `todowrite` - Task tracking
 - `adw_spec` - Workflow state access
 - `get_datetime` / `get_version` - Utility info
@@ -676,8 +667,7 @@ tools:
   edit: [true/false based on agent needs]
   write: [true/false based on agent needs]
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   # Task Management
   todoread: true
   todowrite: true
@@ -901,8 +891,7 @@ The agent will consult these files:
 | edit | [✅/❌] | [Why] |
 | write | [✅/❌] | [Why] |
 | list | ✅ | [Directory navigation] |
-| glob | ✅ | [File discovery] |
-| grep | ✅ | [Content search] |
+| ripgrep | ✅ | [File discovery + content search] |
 | todoread | ✅ | [Task tracking] |
 | todowrite | ✅ | [Task tracking] |
 | task | [✅/❌] | [Only if primary agent] |
@@ -1103,13 +1092,13 @@ After generating, offer to:
 - Design architecture and technical plans
 - Create specifications and roadmaps
 - Read-only or limited write (for docs)
-- **Key tools**: `read`, `glob`, `grep` (disable `edit`, `write`, `git_operations`)
+- **Key tools**: `read`, `ripgrep` (disable `edit`, `write`, `git_operations`)
 
 ## 3. Review Agents
 - Analyze code quality and standards
 - Produce review reports
 - Identify issues and improvements
-- **Key tools**: `read`, `glob`, `grep` (disable `edit`, `write`, `git_operations`)
+- **Key tools**: `read`, `ripgrep` (disable `edit`, `write`, `git_operations`)
 
 ## 4. Documentation Agents
 - Update README, guides, and docs
@@ -1173,29 +1162,29 @@ When creating an agent, produce:
    - **Context**: `adw-docs/security_guide.md`, OWASP guidelines
    - **Tool Configuration**:
      ```yaml
-     tools:
-       read: true        # Read code for analysis
-       edit: false       # No modifications
-       write: false      # No file creation
-       list: true        # Directory navigation
-       glob: true        # File discovery
-       grep: true        # Pattern search
-       todoread: true    # Task tracking
-       todowrite: true   # Task tracking
-       task: false       # Not a primary agent
-       adw: false        # No workflow commands
-       adw_spec: true    # Workflow state access
-       create_workspace: false
-       workflow_builder: false
-       git_operations: false  # No git operations
-       platform_operations: false  # No GitHub/GitLab API
-       run_pytest: false
-       run_linters: false
-       get_datetime: true
-       get_version: true
+      tools:
+        read: true        # Read code for analysis
+        edit: false       # No modifications
+        write: false      # No file creation
+        list: true        # Directory navigation
+        ripgrep: true     # File discovery + content search
+        todoread: true    # Task tracking
+        todowrite: true   # Task tracking
+        task: false       # Not a primary agent
+        adw: false        # No workflow commands
+        adw_spec: true    # Workflow state access
+        create_workspace: false
+        workflow_builder: false
+        git_operations: false  # No git operations
+        platform_operations: false  # No GitHub/GitLab API
+        run_pytest: false
+        run_linters: false
+        get_datetime: true
+        get_version: true
   webfetch: ask
   websearch: false
   codesearch: ask
+
        bash: false       # Always disabled
      ```
 
@@ -1476,7 +1465,7 @@ AGENT DESIGN SUMMARY
 | File Ops | read | ✅ | [reason] |
 | | edit | [✅/❌] | [reason] |
 | | write | [✅/❌] | [reason] |
-| | list, glob, grep | ✅ | Standard discovery |
+| | list, ripgrep | ✅ | Standard discovery |
 | Task Mgmt | todoread/write | ✅ | Task tracking |
 | | task | [✅/❌] | [Only if primary] |
 | ADW | adw | [✅/❌] | [reason] |

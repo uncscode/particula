@@ -240,7 +240,7 @@ This command is designed to work with the ADW generate workflow:
 
 This command uses the following tools:
 - `read` - Read epic and feature plan files
-- `glob` - Discover feature plan files
+- `ripgrep` - Discover feature plan files
 - `platform_operations` - Create GitHub issues
 
 ## See Also

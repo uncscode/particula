@@ -17,8 +17,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -221,9 +220,9 @@ edit({
 ### 4.4: Validate Links
 
 Check all links in updated sections:
-```bash
+```text
 # Find markdown links
-grep -oE '\[([^\]]+)\]\(([^)]+)\)' {file}
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "{file}"})
 ```
 
 Verify:

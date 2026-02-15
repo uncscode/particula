@@ -2,20 +2,32 @@
   "$schema": "https://opencode.ai/config.json",
   "theme": "opencode",
   "autoupdate": false,
+   "tools": {
+    "grep": false,
+    "glob": false
+  }, 
   "permission": {
     "read": {
       "{env:ADW_PROJECT_ROOT}/src/**": "allow",
       "{env:ADW_PROJECT_ROOT}/lib/**": "allow",
       "{env:ADW_PROJECT_ROOT}/tests/**": "allow",
       "{env:ADW_PROJECT_ROOT}/docs/**": "allow",
-      "{env:ADW_PROJECT_ROOT}/.opencode/**": "allow"
+      "{env:ADW_PROJECT_ROOT}/.opencode/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/adw/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/scripts/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/agents/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/trees/**": "allow"
     },
     "write": {
       "{env:ADW_PROJECT_ROOT}/src/**": "allow",
       "{env:ADW_PROJECT_ROOT}/lib/**": "allow",
       "{env:ADW_PROJECT_ROOT}/tests/**": "allow",
       "{env:ADW_PROJECT_ROOT}/docs/**": "allow",
-      "{env:ADW_PROJECT_ROOT}/.opencode/**": "allow"
+      "{env:ADW_PROJECT_ROOT}/.opencode/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/adw/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/scripts/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/agents/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/trees/**": "allow"
     },
     "edit": "allow",
     "webfetch": "ask",

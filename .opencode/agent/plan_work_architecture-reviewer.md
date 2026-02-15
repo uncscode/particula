@@ -18,12 +18,11 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
-  task: true
+  task: false
   adw: false
   adw_spec: true
   create_workspace: false

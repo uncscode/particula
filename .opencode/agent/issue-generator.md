@@ -22,8 +22,7 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
@@ -251,7 +250,7 @@ Before creating an issue, gather comprehensive context about:
 - **todowrite**: Track issue creation progress
 - **todoread**: Check current progress
 - **read**: Read feature documents and plans
-- **grep/glob/list**: Locate relevant files for context
+- **ripgrep/list**: Locate relevant files for context
 
 ## Write Access
 - **NONE** - This agent does NOT write files or create issues directly

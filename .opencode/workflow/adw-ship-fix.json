@@ -1,0 +1,21 @@
+{
+  "name": "adw-ship-fix",
+  "version": "1.0.0",
+  "description": "Ship fix workflow changes to existing PR branch with summary comment.",
+  "workflow_type": "complete",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Ship Fix",
+      "agent": "adw-ship-fix",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "light",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 1.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

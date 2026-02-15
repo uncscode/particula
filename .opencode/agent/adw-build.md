@@ -2,13 +2,12 @@
 description: 'Primary agent that orchestrates implementation with spot-check testing.
   
   Executes implementation plans by converting steps to todos, implementing code with
-  spot-check testing during build, then running comprehensive tests before commit.
+  spot-check testing during build, then running comprehensive tests before completion.
 
   This agent: - Reads plan from spec_content via adw_spec tool - Moves to isolated
   worktree - Converts plan steps to todo list - Implements tasks with spot-check tests
-  during build - Calls adw-build-tests for comprehensive test validation - Calls
-  adw-commit for commit with pre-commit hooks - Operates fully autonomously with no
-  user input
+  during build - Calls adw-build-tests for comprehensive test validation - Operates
+  fully autonomously with no user input
 
   NOTE: Validation against spec is handled by adw-validate agent in a separate workflow
   step. Docstrings and linting are handled separately by adw-format agent.
@@ -20,14 +19,14 @@ tools:
   edit: true
   write: true
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: true
   todoread: true
   todowrite: true
   task: true
   adw: true
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: true
@@ -59,8 +58,7 @@ Execute implementation plans by:
 2. Converting steps to executable todos
 3. Implementing tasks with **spot-check tests during build**
 4. Running **fast module/function tests** at the end
-5. Committing with pre-commit hook handling
-6. Operating with **zero human interaction**
+5. Operating with **zero human interaction**
 
 **NOTE:** This agent focuses on implementation and test validation only.
 Validation against spec intent is handled by `adw-validate` agent in a separate workflow step.
@@ -83,12 +81,11 @@ You are running in **completely autonomous mode** with:
 
 # Subagents
 
-This agent orchestrates subagents for testing and committing:
+This agent orchestrates subagents for testing:
 
 | Subagent | Purpose | When Called |
 |----------|---------|-------------|
 | `adw-build-tests` | Validate/write tests, run fast tests, fix failures | After ALL implementation completes |
-| `adw-commit` | Commit with pre-commit hooks | After tests pass |
 
 ## Related Subagents (Documentation Phase)
 
@@ -135,13 +132,7 @@ The following subagents are invoked during the documentation workflow (`adw work
                               |
                               v
 +-----------------------------------------------------------------+
-| Step 8: Commit                                                  |
-|   Call adw-commit (handles pre-commit hooks)                    |
-+-----------------------------------------------------------------+
-                              |
-                              v
-+-----------------------------------------------------------------+
-| Step 9: Output completion signal                                |
+| Step 8: Output completion signal                                |
 +-----------------------------------------------------------------+
 ```
 
@@ -343,31 +334,7 @@ task({
 - **Attempt 2:** Adjust implementation if tests reveal issues
 - **Attempt 3:** Minimal viable tests to achieve coverage
 
-## Step 8: Commit Changes
-
-After tests pass, commit all changes:
-
-```python
-# Do not pass session_id on retries - subagents must be fresh to see filesystem changes
-task({
-  "description": "Commit implementation changes",
-  "prompt": f"Commit changes.\n\nArguments: adw_id={adw_id}",
-  "subagent_type": "adw-commit"
-})
-```
-
-**Parse output:**
-- `ADW_COMMIT_SUCCESS` -> Proceed to completion report
-- `ADW_COMMIT_SKIPPED` -> No changes (acceptable, report as complete)
-- `ADW_COMMIT_FAILED` -> Report failure with commit details
-
-**What adw-commit does:**
-- Analyzes git diff for commit message
-- Generates conventional commit message
-- Stages and commits changes
-- Handles pre-commit hook failures (3 retries)
-
-## Step 9: Output Completion Signal
+## Step 8: Output Completion Signal
 
 ### Success Case
 
@@ -389,10 +356,9 @@ Testing:
 - Comprehensive tests: All passed
 - Coverage: {percentage}%
 
-Commit: {commit_hash} - {commit_message}
 Files changed: {count} (+{insertions}/-{deletions})
 
-NOTE: Run adw-validate next to verify spec intent, then adw-format for docstrings and linting
+NOTE: Run adw-validate next to verify spec intent, then adw-polish to add docstrings, lint, and commit
 ```
 
 ### Failure Case
@@ -515,10 +481,7 @@ Notebooks are fully validated during the documentation workflow:
 **Step 7:** Comprehensive testing:
 - Call adw-build-tests -> SUCCESS (all tests pass, 85% coverage)
 
-**Step 8:** Commit:
-- Call adw-commit -> SUCCESS (commit a1b2c3d)
-
-**Step 9:** Output:
+**Step 8:** Output:
 ```
 ADW_BUILD_COMPLETE
 
@@ -536,10 +499,9 @@ Testing:
 - Comprehensive tests: All passed
 - Coverage: 85%
 
-Commit: a1b2c3d - feat(parser): add input validation for data integrity
 Files changed: 3 (+95/-5)
 
-NOTE: Run adw-validate next to verify spec intent, then adw-format for docstrings and linting
+NOTE: Run adw-validate next to verify spec intent, then adw-polish to add docstrings, lint, and commit
 ```
 
 You are committed to delivering focused implementations with comprehensive test validation. Spec validation is handled by the adw-validate agent. Docstrings and linting are handled by the adw-format agent.

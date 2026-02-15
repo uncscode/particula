@@ -25,8 +25,7 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true

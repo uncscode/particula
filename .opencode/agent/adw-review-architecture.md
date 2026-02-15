@@ -15,14 +15,14 @@ tools:
   edit: false
   write: false
   list: true
-  glob: true
-  grep: true
+  ripgrep: true
   move: false
   todoread: true
   todowrite: true
   task: false
   adw: false
   adw_spec: true
+  feedback_log: true
   create_workspace: false
   workflow_builder: false
   git_operations: false
@@ -115,8 +115,8 @@ For each changed file, analyze imports:
 
 ```python
 # Check imports don't violate layering
-grep({"pattern": "^from adw\\.", "include": "*.py"})
-grep({"pattern": "^import adw\\.", "include": "*.py"})
+ripgrep({"contentPattern": "^from adw\\.", "pattern": "**/*.py"})
+ripgrep({"contentPattern": "^import adw\\.", "pattern": "**/*.py"})
 ```
 
 **Violation Examples:**
@@ -209,7 +209,7 @@ def update_status(dispatcher=None):
 **Function:** `create_agent(name, config=None)` → `create_agent(name, config)`
 **Change:** `config` parameter changed from optional to required.
 **Impact:** All existing callers passing only `name` will break.
-**Affected Callers:** (search with grep)
+**Affected Callers:** (search with ripgrep)
 - `adw/workflows/dispatcher.py:45`
 - `adw/triggers/cron.py:78`
 **Suggested Fix:**
