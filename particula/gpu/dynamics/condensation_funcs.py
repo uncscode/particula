@@ -87,3 +87,19 @@ def mass_transfer_rate_wp(
         * molar_mass
         / (gas_constant * temperature)
     )
+
+
+@wp.func
+def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
+    """Compute particle radius from total volume.
+
+    Args:
+        total_volume: Particle total volume [m^3].
+
+    Returns:
+        Particle radius [m].
+    """
+    pi_value = wp.float64(3.141592653589793)
+    numerator = wp.float64(3.0) * total_volume
+    denominator = wp.float64(4.0) * pi_value
+    return wp.pow(numerator / denominator, wp.float64(1.0) / wp.float64(3.0))
