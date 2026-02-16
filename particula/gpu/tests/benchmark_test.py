@@ -13,24 +13,39 @@ executes to inspect memory access patterns and kernel launch metrics.
 
 from __future__ import annotations
 
-from contextlib import contextmanager
 import os
 import time
+from contextlib import contextmanager
 from typing import Any, cast
 
 import numpy as np
-from numpy.typing import NDArray
 import pytest
+from numpy.typing import NDArray
 
-wp = pytest.importorskip("warp")
+RUN_GPU_BENCHMARKS = os.getenv("RUN_GPU_BENCHMARKS") == "1"
+
+if not RUN_GPU_BENCHMARKS:
+    pytest.skip(
+        "GPU benchmarks skipped unless RUN_GPU_BENCHMARKS=1",
+        allow_module_level=True,
+    )
+
+wp = pytest.importorskip("warp", reason="warp required for GPU benchmarks")
+
+if not wp.is_cuda_available():
+    pytest.skip("CUDA not available", allow_module_level=True)
 
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel_via_system_state,
 )
-from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (  # noqa: E402
-    get_particle_resolved_coagulation_step,
-    get_particle_resolved_update_step,
+from particula.dynamics.coagulation.particle_resolved_step import (  # noqa: E402
+    particle_resolved_method as pr_method,
 )
+
+get_particle_resolved_coagulation_step = (
+    pr_method.get_particle_resolved_coagulation_step
+)
+get_particle_resolved_update_step = pr_method.get_particle_resolved_update_step
 from particula.dynamics.condensation.mass_transfer import (  # noqa: E402
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
@@ -103,13 +118,25 @@ MAX_COLLISIONS = 256
 
 
 def _skip_if_no_cuda() -> None:
+    """Skip benchmarks when CUDA is unavailable.
+
+    Raises:
+        pytest.SkipTest: When a CUDA device is not present.
+    """
     if not wp.is_cuda_available():
         pytest.skip("CUDA not available")
 
 
 @contextmanager
 def _warp_profiled(tag: str):
-    """Optionally enable Warp capture/profiling when WARP_PROFILE=1."""
+    """Optionally enable Warp capture/profiling when WARP_PROFILE=1.
+
+    Args:
+        tag: Label to identify the profiled region.
+
+    Yields:
+        Iterator context that wraps optional profiling.
+    """
     if os.getenv("WARP_PROFILE", "0") != "1":
         yield
         return
@@ -136,7 +163,16 @@ def _warp_profiled(tag: str):
 
 
 def _time_gpu_loop(step_fn, steps: int, warmup: int) -> float:
-    """Time a GPU loop with a single synchronize before/after."""
+    """Time a GPU loop with a single synchronize before/after.
+
+    Args:
+        step_fn: Callable that performs one GPU step.
+        steps: Number of timed iterations to execute.
+        warmup: Number of warmup iterations executed before timing.
+
+    Returns:
+        Elapsed time in seconds for the timed iterations.
+    """
     for _ in range(warmup):
         step_fn()
     wp.synchronize()
@@ -148,7 +184,16 @@ def _time_gpu_loop(step_fn, steps: int, warmup: int) -> float:
 
 
 def _time_cpu_loop(step_fn, steps: int, warmup: int) -> float:
-    """Time a CPU loop with warmup iterations."""
+    """Time a CPU loop with warmup iterations.
+
+    Args:
+        step_fn: Callable that performs one CPU step.
+        steps: Number of timed iterations to execute.
+        warmup: Number of warmup iterations executed before timing.
+
+    Returns:
+        Elapsed time in seconds for the timed iterations.
+    """
     for _ in range(warmup):
         step_fn()
     start = time.perf_counter()
@@ -158,6 +203,18 @@ def _time_cpu_loop(step_fn, steps: int, warmup: int) -> float:
 
 
 def _compute_speedup(cpu_time: float, gpu_time: float) -> float:
+    """Compute CPU/GPU speedup ratio.
+
+    Args:
+        cpu_time: Elapsed CPU time in seconds.
+        gpu_time: Elapsed GPU time in seconds.
+
+    Returns:
+        Ratio of CPU time to GPU time.
+
+    Raises:
+        pytest.SkipTest: If either timing is non-positive.
+    """
     if cpu_time <= 0.0 or gpu_time <= 0.0:
         pytest.skip("Invalid timing data")
     return cpu_time / gpu_time
@@ -169,7 +226,17 @@ def _make_particle_data(
     n_species: int,
     concentration_scale: float = 1.0,
 ) -> ParticleData:
-    """Create deterministic particle data for benchmarks."""
+    """Create deterministic particle data for benchmarks.
+
+    Args:
+        n_boxes: Number of spatial boxes to populate.
+        n_particles: Number of particles per box.
+        n_species: Number of condensible species per particle.
+        concentration_scale: Scale factor applied to concentrations.
+
+    Returns:
+        ParticleData with masses, concentration, charge, density, and volume.
+    """
     base_masses = np.linspace(1.0e-18, 3.0e-18, n_species, dtype=np.float64)
     masses = np.empty((n_boxes, n_particles, n_species), dtype=np.float64)
     for box_idx in range(n_boxes):
@@ -192,7 +259,15 @@ def _make_particle_data(
 
 
 def _make_gas_data(n_boxes: int, n_species: int) -> GasData:
-    """Create deterministic gas data for benchmarks."""
+    """Create deterministic gas data for benchmarks.
+
+    Args:
+        n_boxes: Number of spatial boxes.
+        n_species: Number of condensible species.
+
+    Returns:
+        GasData with molar mass, concentration, partitioning, and names.
+    """
     molar_mass = np.linspace(0.018, 0.05, n_species, dtype=np.float64)
     concentration = np.empty((n_boxes, n_species), dtype=np.float64)
     for box_idx in range(n_boxes):
@@ -208,7 +283,15 @@ def _make_gas_data(n_boxes: int, n_species: int) -> GasData:
 
 
 def _make_vapor_pressure(n_boxes: int, n_species: int) -> np.ndarray:
-    """Create deterministic vapor pressure array."""
+    """Create deterministic vapor pressure array.
+
+    Args:
+        n_boxes: Number of spatial boxes.
+        n_species: Number of condensible species.
+
+    Returns:
+        Vapor pressure array shaped (n_boxes, n_species).
+    """
     vapor_pressure = np.empty((n_boxes, n_species), dtype=np.float64)
     for box_idx in range(n_boxes):
         vapor_pressure[box_idx, :] = 800.0 + 50.0 * box_idx
@@ -227,7 +310,23 @@ def _cpu_mass_transfer(
     time_step: float,
     out: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Compute CPU mass transfer matching GPU kernel physics."""
+    """Compute CPU mass transfer matching GPU kernel physics.
+
+    Args:
+        particles: Particle state with masses, density, charge, and volume.
+        gas: Gas state with molar masses and concentrations.
+        vapor_pressure: Vapor pressure per box and species.
+        surface_tension: Surface tension per species.
+        mass_accommodation: Mass accommodation coefficient per species.
+        diffusion_coefficient_vapor: Vapor diffusion coefficient per species.
+        temperature: Gas temperature in kelvin.
+        pressure: Gas pressure in pascals.
+        time_step: Time step duration in seconds.
+        out: Optional buffer to reuse for mass transfer outputs.
+
+    Returns:
+        Mass transfer array shaped like particle masses.
+    """
     n_boxes, n_particles, n_species = particles.masses.shape
     if out is None:
         mass_transfer = np.zeros_like(particles.masses)
@@ -332,7 +431,20 @@ def _cpu_condensation_step(
     time_step: float,
     mass_transfer_buffer: np.ndarray,
 ) -> None:
-    """Update particle masses via CPU mass transfer."""
+    """Update particle masses via CPU mass transfer.
+
+    Args:
+        particles: Particle state to update in-place.
+        gas: Gas state corresponding to each box.
+        vapor_pressure: Vapor pressure per box and species.
+        surface_tension: Surface tension per species.
+        mass_accommodation: Mass accommodation coefficient per species.
+        diffusion_coefficient_vapor: Vapor diffusion coefficient per species.
+        temperature: Gas temperature in kelvin.
+        pressure: Gas pressure in pascals.
+        time_step: Time step duration in seconds.
+        mass_transfer_buffer: Scratch buffer reused across iterations.
+    """
     mass_transfer = _cpu_mass_transfer(
         particles,
         gas,
@@ -349,7 +461,14 @@ def _cpu_condensation_step(
 
 
 def _build_kernel_radius(radii: np.ndarray) -> np.ndarray:
-    """Build interpolation radii for particle-resolved coagulation."""
+    """Build interpolation radii for particle-resolved coagulation.
+
+    Args:
+        radii: Particle radii array.
+
+    Returns:
+        Interpolation radii grid spanning the observed radius range.
+    """
     valid = radii[radii > 0.0]
     if valid.size == 0:
         return np.linspace(1.0e-9, 1.0e-6, 32)
@@ -366,7 +485,16 @@ def _cpu_coagulation_step(
     rng: np.random.Generator,
     kernel_radius: np.ndarray,
 ) -> None:
-    """Update particle masses via particle-resolved CPU coagulation."""
+    """Update particle masses via particle-resolved CPU coagulation.
+
+    Args:
+        particles: Particle state to update in-place.
+        temperature: Gas temperature in kelvin.
+        pressure: Gas pressure in pascals.
+        time_step: Time step duration in seconds.
+        rng: Random number generator for collision sampling.
+        kernel_radius: Interpolation radii grid for kernel evaluation.
+    """
     n_boxes, n_particles, _ = particles.masses.shape
     for box_idx in range(n_boxes):
         masses_box = particles.masses[box_idx]
@@ -421,7 +549,13 @@ def _cpu_coagulation_step(
 
 
 def _print_timing(label: str, gpu_time: float, cpu_time: float) -> None:
-    """Print timing summary for benchmark output."""
+    """Print timing summary for benchmark output.
+
+    Args:
+        label: Description of the benchmark case.
+        gpu_time: GPU elapsed time in seconds.
+        cpu_time: CPU elapsed time in seconds.
+    """
     speedup = cpu_time / gpu_time if gpu_time > 0 else np.nan
     print(
         f"{label}: GPU {gpu_time:.4f}s | CPU {cpu_time:.4f}s | "
@@ -996,16 +1130,32 @@ def test_wp_func_benchmarks() -> None:
     gpu_brownian_kernel_time = time.perf_counter() - start
 
     kernel_calls = kernel_sample * kernel_sample
-    print(
-        "@wp.func timings (per call, microseconds):\n"
-        f"  diffusion_coefficient_wp: CPU {cpu_diffusion_time / n_evals * 1e6:.4f} | "
-        f"GPU {gpu_diffusion_time / n_evals * 1e6:.4f}\n"
-        f"  mass_transfer_rate_wp: CPU {cpu_mass_transfer_time / n_evals * 1e6:.4f} | "
-        f"GPU {gpu_mass_transfer_time / n_evals * 1e6:.4f}\n"
-        f"  particle_radius_from_volume_wp: CPU {cpu_radius_time / n_evals * 1e6:.4f} | "
-        f"GPU {gpu_radius_time / n_evals * 1e6:.4f}\n"
-        f"  brownian_diffusivity_wp: CPU {cpu_brownian_diffusivity_time / n_evals * 1e6:.4f} | "
-        f"GPU {gpu_brownian_diffusivity_time / n_evals * 1e6:.4f}\n"
-        f"  brownian_kernel_pair_wp: CPU {cpu_brownian_kernel_time / kernel_calls * 1e6:.4f} | "
-        f"GPU {gpu_brownian_kernel_time / n_evals * 1e6:.4f}"
-    )
+    timing_lines = [
+        "@wp.func timings (per call, microseconds):",
+        (
+            "  diffusion_coefficient_wp: "
+            f"CPU {cpu_diffusion_time / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_diffusion_time / n_evals * 1e6:.4f}"
+        ),
+        (
+            "  mass_transfer_rate_wp: "
+            f"CPU {cpu_mass_transfer_time / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_mass_transfer_time / n_evals * 1e6:.4f}"
+        ),
+        (
+            "  particle_radius_from_volume_wp: "
+            f"CPU {cpu_radius_time / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_radius_time / n_evals * 1e6:.4f}"
+        ),
+        (
+            "  brownian_diffusivity_wp: "
+            f"CPU {cpu_brownian_diffusivity_time / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_brownian_diffusivity_time / n_evals * 1e6:.4f}"
+        ),
+        (
+            "  brownian_kernel_pair_wp: "
+            f"CPU {cpu_brownian_kernel_time / kernel_calls * 1e6:.4f} | "
+            f"GPU {gpu_brownian_kernel_time / n_evals * 1e6:.4f}"
+        ),
+    ]
+    print("\n".join(timing_lines))
