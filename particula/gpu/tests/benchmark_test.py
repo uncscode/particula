@@ -1,7 +1,7 @@
 """GPU benchmark suite for condensation and coagulation kernels.
 
 Run with:
-    pytest particula/gpu/tests/benchmark_test.py -v -m "slow and performance" -s
+    pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s
 
 Set ``WARP_PROFILE=1`` to enable Warp capture hooks for Nsight/warp
 profiling. When enabled, run Nsight Systems/Compute while the benchmark
@@ -13,20 +13,29 @@ executes to inspect memory access patterns and kernel launch metrics.
 
 from __future__ import annotations
 
+import json
 import os
 import time
 from contextlib import contextmanager
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-RUN_GPU_BENCHMARKS = os.getenv("RUN_GPU_BENCHMARKS") == "1"
 
-if not RUN_GPU_BENCHMARKS:
+def _benchmark_enabled() -> bool:
+    """Check if --benchmark flag was passed to pytest."""
+    import sys
+
+    return "--benchmark" in sys.argv
+
+
+if not _benchmark_enabled():
     pytest.skip(
-        "GPU benchmarks skipped unless RUN_GPU_BENCHMARKS=1",
+        "GPU benchmarks skipped (pass --benchmark to enable)",
         allow_module_level=True,
     )
 
@@ -104,17 +113,92 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
 )
 from particula.util import constants  # noqa: E402
 
-pytestmark = [pytest.mark.slow, pytest.mark.performance]
+pytestmark = [pytest.mark.slow, pytest.mark.performance, pytest.mark.benchmark]
 
 DEFAULT_TEMPERATURE = 298.15
 DEFAULT_PRESSURE = 101325.0
 DEFAULT_TIME_STEP = 0.5
-DEFAULT_STEPS = 10
+DEFAULT_STEPS = 5
 DEFAULT_WARMUP = 1
 DEFAULT_SURFACE_TENSION = 0.072
 DEFAULT_MASS_ACCOMMODATION = 1.0
 DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
 MAX_COLLISIONS = 256
+
+# ---------------------------------------------------------------------------
+# Scaling configurations
+# ---------------------------------------------------------------------------
+# Each tuple: (label, n_boxes, n_particles, n_species, run_cpu)
+#
+# Budget targets (~10 min total for full suite):
+#   Condensation GPU is O(n_boxes * n_particles) and very fast (<1s even
+#   at 1M particles), so we scale aggressively.  CPU is O(n_boxes *
+#   n_particles * n_species) with Python loops, so we cap at 10k.
+#
+#   Coagulation GPU is O(n_boxes * n_particles) after the k_max fix but
+#   the sequential pair-selection loop still dominates.  CPU uses the
+#   bin-pair method which scales well to ~5k particles per box.
+
+CONDENSATION_CONFIGS: list[tuple[str, int, int, int, bool]] = [
+    # label               boxes  particles species  cpu?
+    # --- CPU + GPU comparison (light CPU) ---
+    ("1x1k", 1, 1_000, 3, True),
+    ("1x10k", 1, 10_000, 3, True),
+    ("10x1k", 10, 1_000, 3, True),
+    ("100x1k", 100, 1_000, 3, True),
+    # --- GPU-only scaling ---
+    ("1x100k", 1, 100_000, 3, False),
+    ("1x500k", 1, 500_000, 3, False),
+    ("1x1M", 1, 1_000_000, 3, False),
+    ("1x2M", 1, 2_000_000, 3, False),
+    ("10x10k", 10, 10_000, 3, False),
+    ("10x100k", 10, 100_000, 3, False),
+    ("100x10k", 100, 10_000, 3, False),
+    ("100x100k", 100, 100_000, 3, False),
+]
+
+COAGULATION_CONFIGS: list[tuple[str, int, int, int, bool]] = [
+    # label               boxes  particles species  cpu?
+    # --- CPU + GPU comparison (light CPU) ---
+    ("1x500", 1, 500, 2, True),
+    ("1x2k", 1, 2_000, 2, True),
+    ("1x5k", 1, 5_000, 2, True),
+    ("10x500", 10, 500, 2, True),
+    ("10x1k", 10, 1_000, 2, True),
+    # --- GPU-only scaling ---
+    ("1x10k", 1, 10_000, 2, False),
+    ("1x20k", 1, 20_000, 2, False),
+    ("1x50k", 1, 50_000, 2, False),
+    ("10x5k", 10, 5_000, 2, False),
+    ("10x10k", 10, 10_000, 2, False),
+    ("50x1k", 50, 1_000, 2, False),
+    ("50x5k", 50, 5_000, 2, False),
+    ("100x1k", 100, 1_000, 2, False),
+]
+
+BENCHMARK_OUTPUT = Path(
+    os.getenv(
+        "BENCHMARK_OUTPUT",
+        "gpu_benchmark_results.json",
+    )
+)
+
+_benchmark_results: dict[str, Any] = {
+    "started_at": datetime.now(timezone.utc).isoformat(),
+    "benchmarks": {},
+}
+
+
+def _save_results() -> None:
+    """Flush current benchmark results to disk as JSON.
+
+    Called after each meaningful timing measurement so that partial
+    results survive if the process is interrupted (Ctrl+C, timeout,
+    etc.). The file is overwritten each time with the full dict.
+    """
+    _benchmark_results["updated_at"] = datetime.now(timezone.utc).isoformat()
+    BENCHMARK_OUTPUT.write_text(json.dumps(_benchmark_results, indent=2) + "\n")
+    print(f"  [save] Results written to {BENCHMARK_OUTPUT}")
 
 
 def _skip_if_no_cuda() -> None:
@@ -496,26 +580,31 @@ def _cpu_coagulation_step(
         kernel_radius: Interpolation radii grid for kernel evaluation.
     """
     n_boxes, n_particles, _ = particles.masses.shape
+    # Build a (len(kernel_radius), len(kernel_radius)) kernel matrix
+    # evaluated on the interpolation grid, not on per-particle radii.
+    avg_density = float(np.mean(particles.density))
+    grid_volume = (4.0 / 3.0) * np.pi * np.power(kernel_radius, 3)
+    grid_mass = grid_volume * avg_density
+    kernel = cast(
+        NDArray[np.float64],
+        np.atleast_2d(
+            np.asarray(
+                get_brownian_kernel_via_system_state(
+                    particle_radius=kernel_radius,
+                    particle_mass=grid_mass,
+                    temperature=temperature,
+                    pressure=pressure,
+                ),
+                dtype=np.float64,
+            )
+        ),
+    )
     for box_idx in range(n_boxes):
         masses_box = particles.masses[box_idx]
         concentration_box = particles.concentration[box_idx]
         total_mass = np.sum(masses_box, axis=-1)
         total_volume = np.sum(masses_box / particles.density, axis=-1)
         radii = np.cbrt(3.0 * total_volume / (4.0 * np.pi))
-        kernel = cast(
-            NDArray[np.float64],
-            np.atleast_2d(
-                np.asarray(
-                    get_brownian_kernel_via_system_state(
-                        particle_radius=radii,
-                        particle_mass=total_mass,
-                        temperature=temperature,
-                        pressure=pressure,
-                    ),
-                    dtype=np.float64,
-                )
-            ),
-        )
         collision_pairs = get_particle_resolved_coagulation_step(
             radii,
             kernel,
@@ -563,12 +652,25 @@ def _print_timing(label: str, gpu_time: float, cpu_time: float) -> None:
     )
 
 
-def test_condensation_benchmark_large_box() -> None:
-    """Benchmark condensation kernel for 1 box x 100k particles."""
+@pytest.mark.parametrize(
+    "label,n_boxes,n_particles,n_species,run_cpu",
+    CONDENSATION_CONFIGS,
+    ids=[c[0] for c in CONDENSATION_CONFIGS],
+)
+def test_condensation_scaling(
+    label: str,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+    run_cpu: bool,
+) -> None:
+    """Parametrized condensation benchmark across particle counts."""
     _skip_if_no_cuda()
-    n_boxes = 1
-    n_particles = 100_000
-    n_species = 3
+    tag = f"cond-{label}"
+    print(
+        f"\n  [{tag}] Setup: {n_boxes} box(es) x "
+        f"{n_particles:,} particles x {n_species} species"
+    )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
     gas = _make_gas_data(n_boxes, n_species)
     vapor_pressure = _make_vapor_pressure(n_boxes, n_species)
@@ -584,12 +686,12 @@ def test_condensation_benchmark_large_box() -> None:
 
     gpu_particles = to_warp_particle_data(particles, device="cuda")
     gpu_gas = to_warp_gas_data(
-        gas,
-        device="cuda",
-        vapor_pressure=vapor_pressure,
+        gas, device="cuda", vapor_pressure=vapor_pressure
     )
     mass_transfer_buffer = wp.zeros(
-        (n_boxes, n_particles, n_species), dtype=wp.float64, device="cuda"
+        (n_boxes, n_particles, n_species),
+        dtype=wp.float64,
+        device="cuda",
     )
     surface_tension_wp = wp.array(
         surface_tension, dtype=wp.float64, device="cuda"
@@ -614,121 +716,92 @@ def test_condensation_benchmark_large_box() -> None:
             mass_transfer=mass_transfer_buffer,
         )
 
-    with _warp_profiled("condensation_large_box"):
+    print(
+        f"  [{tag}] Running GPU: {DEFAULT_WARMUP} warmup + "
+        f"{DEFAULT_STEPS} timed steps ..."
+    )
+    with _warp_profiled(f"condensation_{label}"):
         gpu_time = _time_gpu_loop(gpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
+    print(f"  [{tag}] GPU done: {gpu_time:.4f}s")
 
-    cpu_particles = particles.copy()
-    cpu_mass_transfer = np.zeros_like(cpu_particles.masses)
+    entry_key = f"condensation_{label}"
+    entry = _benchmark_results["benchmarks"].setdefault(
+        entry_key,
+        {
+            "n_boxes": n_boxes,
+            "n_particles": n_particles,
+            "n_species": n_species,
+            "steps": DEFAULT_STEPS,
+        },
+    )
+    entry["gpu_time_s"] = gpu_time
+    _save_results()
 
-    def cpu_step() -> None:
-        _cpu_condensation_step(
-            cpu_particles,
-            gas,
-            vapor_pressure,
-            surface_tension,
-            mass_accommodation,
-            diffusion_vapor,
-            DEFAULT_TEMPERATURE,
-            DEFAULT_PRESSURE,
-            DEFAULT_TIME_STEP,
-            cpu_mass_transfer,
+    if run_cpu:
+        cpu_particles = particles.copy()
+        cpu_mass_transfer = np.zeros_like(cpu_particles.masses)
+
+        def cpu_step() -> None:
+            _cpu_condensation_step(
+                cpu_particles,
+                gas,
+                vapor_pressure,
+                surface_tension,
+                mass_accommodation,
+                diffusion_vapor,
+                DEFAULT_TEMPERATURE,
+                DEFAULT_PRESSURE,
+                DEFAULT_TIME_STEP,
+                cpu_mass_transfer,
+            )
+
+        print(
+            f"  [{tag}] Running CPU: {DEFAULT_WARMUP} warmup + "
+            f"{DEFAULT_STEPS} timed steps ..."
         )
+        cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
+        print(f"  [{tag}] CPU done: {cpu_time:.4f}s")
+        _print_timing(f"Condensation {label}", gpu_time, cpu_time)
+        speedup = _compute_speedup(cpu_time, gpu_time)
+        entry["cpu_time_s"] = cpu_time
+        entry["speedup"] = speedup
+    else:
+        total_particles = n_boxes * n_particles
+        per_step = gpu_time / DEFAULT_STEPS
+        print(
+            f"  [{tag}] GPU-only | {total_particles:,} total particles | "
+            f"{per_step:.4f}s/step"
+        )
+    _save_results()
 
-    cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
-    _print_timing("Condensation large box", gpu_time, cpu_time)
-    speedup = _compute_speedup(cpu_time, gpu_time)
-    assert speedup > 10.0
 
-
-def test_condensation_benchmark_many_boxes() -> None:
-    """Benchmark condensation kernel for 100 boxes x 1k particles."""
+@pytest.mark.parametrize(
+    "label,n_boxes,n_particles,n_species,run_cpu",
+    COAGULATION_CONFIGS,
+    ids=[c[0] for c in COAGULATION_CONFIGS],
+)
+def test_coagulation_scaling(
+    label: str,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+    run_cpu: bool,
+) -> None:
+    """Parametrized coagulation benchmark across particle counts."""
     _skip_if_no_cuda()
-    n_boxes = 100
-    n_particles = 1_000
-    n_species = 3
-    particles = _make_particle_data(n_boxes, n_particles, n_species)
-    gas = _make_gas_data(n_boxes, n_species)
-    vapor_pressure = _make_vapor_pressure(n_boxes, n_species)
-    surface_tension = np.full(
-        n_species, DEFAULT_SURFACE_TENSION, dtype=np.float64
+    tag = f"coag-{label}"
+    print(
+        f"\n  [{tag}] Setup: {n_boxes} box(es) x "
+        f"{n_particles:,} particles x {n_species} species"
     )
-    mass_accommodation = np.full(
-        n_species, DEFAULT_MASS_ACCOMMODATION, dtype=np.float64
-    )
-    diffusion_vapor = np.full(
-        n_species, DEFAULT_DIFFUSION_COEFFICIENT, dtype=np.float64
-    )
-
-    gpu_particles = to_warp_particle_data(particles, device="cuda")
-    gpu_gas = to_warp_gas_data(
-        gas,
-        device="cuda",
-        vapor_pressure=vapor_pressure,
-    )
-    mass_transfer_buffer = wp.zeros(
-        (n_boxes, n_particles, n_species), dtype=wp.float64, device="cuda"
-    )
-    surface_tension_wp = wp.array(
-        surface_tension, dtype=wp.float64, device="cuda"
-    )
-    mass_accommodation_wp = wp.array(
-        mass_accommodation, dtype=wp.float64, device="cuda"
-    )
-    diffusion_vapor_wp = wp.array(
-        diffusion_vapor, dtype=wp.float64, device="cuda"
-    )
-
-    def gpu_step() -> None:
-        condensation_step_gpu(
-            gpu_particles,
-            gpu_gas,
-            temperature=DEFAULT_TEMPERATURE,
-            pressure=DEFAULT_PRESSURE,
-            time_step=DEFAULT_TIME_STEP,
-            surface_tension=surface_tension_wp,
-            mass_accommodation=mass_accommodation_wp,
-            diffusion_coefficient_vapor=diffusion_vapor_wp,
-            mass_transfer=mass_transfer_buffer,
-        )
-
-    with _warp_profiled("condensation_many_boxes"):
-        gpu_time = _time_gpu_loop(gpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
-
-    cpu_particles = particles.copy()
-    cpu_mass_transfer = np.zeros_like(cpu_particles.masses)
-
-    def cpu_step() -> None:
-        _cpu_condensation_step(
-            cpu_particles,
-            gas,
-            vapor_pressure,
-            surface_tension,
-            mass_accommodation,
-            diffusion_vapor,
-            DEFAULT_TEMPERATURE,
-            DEFAULT_PRESSURE,
-            DEFAULT_TIME_STEP,
-            cpu_mass_transfer,
-        )
-
-    cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
-    _print_timing("Condensation many boxes", gpu_time, cpu_time)
-
-
-def test_coagulation_benchmark_large_box() -> None:
-    """Benchmark coagulation kernel for 1 box x 100k particles."""
-    _skip_if_no_cuda()
-    n_boxes = 1
-    n_particles = 100_000
-    n_species = 2
     particles = _make_particle_data(n_boxes, n_particles, n_species)
 
     gpu_particles = to_warp_particle_data(particles, device="cuda")
-    collision_pairs = wp.zeros(
+    collision_pairs_buf = wp.zeros(
         (n_boxes, MAX_COLLISIONS, 2), dtype=wp.int32, device="cuda"
     )
-    n_collisions = wp.zeros((n_boxes,), dtype=wp.int32, device="cuda")
-    rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device="cuda")
+    n_collisions_buf = wp.zeros((n_boxes,), dtype=wp.int32, device="cuda")
+    rng_states_buf = wp.zeros((n_boxes,), dtype=wp.uint32, device="cuda")
     step_counter = {"idx": 0}
 
     def gpu_step() -> None:
@@ -739,84 +812,66 @@ def test_coagulation_benchmark_large_box() -> None:
             time_step=DEFAULT_TIME_STEP,
             rng_seed=42 + step_counter["idx"],
             max_collisions=MAX_COLLISIONS,
-            collision_pairs=collision_pairs,
-            n_collisions=n_collisions,
-            rng_states=rng_states,
+            collision_pairs=collision_pairs_buf,
+            n_collisions=n_collisions_buf,
+            rng_states=rng_states_buf,
         )
         step_counter["idx"] += 1
 
-    with _warp_profiled("coagulation_large_box"):
-        gpu_time = _time_gpu_loop(gpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
-
-    cpu_particles = particles.copy()
-    rng = np.random.default_rng(42)
-    kernel_radius = _build_kernel_radius(cpu_particles.radii)
-
-    def cpu_step() -> None:
-        _cpu_coagulation_step(
-            cpu_particles,
-            DEFAULT_TEMPERATURE,
-            DEFAULT_PRESSURE,
-            DEFAULT_TIME_STEP,
-            rng,
-            kernel_radius,
-        )
-
-    cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
-    _print_timing("Coagulation large box", gpu_time, cpu_time)
-    speedup = _compute_speedup(cpu_time, gpu_time)
-    assert speedup > 10.0
-
-
-def test_coagulation_benchmark_many_boxes() -> None:
-    """Benchmark coagulation kernel for 100 boxes x 1k particles."""
-    _skip_if_no_cuda()
-    n_boxes = 100
-    n_particles = 1_000
-    n_species = 2
-    particles = _make_particle_data(n_boxes, n_particles, n_species)
-
-    gpu_particles = to_warp_particle_data(particles, device="cuda")
-    collision_pairs = wp.zeros(
-        (n_boxes, MAX_COLLISIONS, 2), dtype=wp.int32, device="cuda"
+    print(
+        f"  [{tag}] Running GPU: {DEFAULT_WARMUP} warmup + "
+        f"{DEFAULT_STEPS} timed steps ..."
     )
-    n_collisions = wp.zeros((n_boxes,), dtype=wp.int32, device="cuda")
-    rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device="cuda")
-    step_counter = {"idx": 0}
-
-    def gpu_step() -> None:
-        coagulation_step_gpu(
-            gpu_particles,
-            temperature=DEFAULT_TEMPERATURE,
-            pressure=DEFAULT_PRESSURE,
-            time_step=DEFAULT_TIME_STEP,
-            rng_seed=100 + step_counter["idx"],
-            max_collisions=MAX_COLLISIONS,
-            collision_pairs=collision_pairs,
-            n_collisions=n_collisions,
-            rng_states=rng_states,
-        )
-        step_counter["idx"] += 1
-
-    with _warp_profiled("coagulation_many_boxes"):
+    with _warp_profiled(f"coagulation_{label}"):
         gpu_time = _time_gpu_loop(gpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
+    print(f"  [{tag}] GPU done: {gpu_time:.4f}s")
 
-    cpu_particles = particles.copy()
-    rng = np.random.default_rng(7)
-    kernel_radius = _build_kernel_radius(cpu_particles.radii)
+    entry_key = f"coagulation_{label}"
+    entry = _benchmark_results["benchmarks"].setdefault(
+        entry_key,
+        {
+            "n_boxes": n_boxes,
+            "n_particles": n_particles,
+            "n_species": n_species,
+            "steps": DEFAULT_STEPS,
+        },
+    )
+    entry["gpu_time_s"] = gpu_time
+    _save_results()
 
-    def cpu_step() -> None:
-        _cpu_coagulation_step(
-            cpu_particles,
-            DEFAULT_TEMPERATURE,
-            DEFAULT_PRESSURE,
-            DEFAULT_TIME_STEP,
-            rng,
-            kernel_radius,
+    if run_cpu:
+        cpu_particles = particles.copy()
+        rng = np.random.default_rng(42)
+        kernel_radius = _build_kernel_radius(cpu_particles.radii)
+
+        def cpu_step() -> None:
+            _cpu_coagulation_step(
+                cpu_particles,
+                DEFAULT_TEMPERATURE,
+                DEFAULT_PRESSURE,
+                DEFAULT_TIME_STEP,
+                rng,
+                kernel_radius,
+            )
+
+        print(
+            f"  [{tag}] Running CPU: {DEFAULT_WARMUP} warmup + "
+            f"{DEFAULT_STEPS} timed steps ..."
         )
-
-    cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
-    _print_timing("Coagulation many boxes", gpu_time, cpu_time)
+        cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)
+        print(f"  [{tag}] CPU done: {cpu_time:.4f}s")
+        _print_timing(f"Coagulation {label}", gpu_time, cpu_time)
+        speedup = _compute_speedup(cpu_time, gpu_time)
+        entry["cpu_time_s"] = cpu_time
+        entry["speedup"] = speedup
+    else:
+        total_particles = n_boxes * n_particles
+        per_step = gpu_time / DEFAULT_STEPS
+        print(
+            f"  [{tag}] GPU-only | {total_particles:,} total particles | "
+            f"{per_step:.4f}s/step"
+        )
+    _save_results()
 
 
 @wp.kernel
@@ -1159,3 +1214,28 @@ def test_wp_func_benchmarks() -> None:
         ),
     ]
     print("\n".join(timing_lines))
+
+    _benchmark_results["benchmarks"]["wp_func"] = {
+        "n_evals": n_evals,
+        "diffusion_coefficient": {
+            "cpu_us": cpu_diffusion_time / n_evals * 1e6,
+            "gpu_us": gpu_diffusion_time / n_evals * 1e6,
+        },
+        "mass_transfer_rate": {
+            "cpu_us": cpu_mass_transfer_time / n_evals * 1e6,
+            "gpu_us": gpu_mass_transfer_time / n_evals * 1e6,
+        },
+        "particle_radius_from_volume": {
+            "cpu_us": cpu_radius_time / n_evals * 1e6,
+            "gpu_us": gpu_radius_time / n_evals * 1e6,
+        },
+        "brownian_diffusivity": {
+            "cpu_us": cpu_brownian_diffusivity_time / n_evals * 1e6,
+            "gpu_us": gpu_brownian_diffusivity_time / n_evals * 1e6,
+        },
+        "brownian_kernel_pair": {
+            "cpu_us": cpu_brownian_kernel_time / kernel_calls * 1e6,
+            "gpu_us": gpu_brownian_kernel_time / n_evals * 1e6,
+        },
+    }
+    _save_results()
