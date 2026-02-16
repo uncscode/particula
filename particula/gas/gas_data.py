@@ -264,36 +264,19 @@ def to_species(
         )
     partitioning_value = bool(unique_partitioning[0])
 
-    # Extract concentration for specified box
-    concentration = data.concentration[box_index, :]
+    concentration = data.concentration[box_index, :].reshape(1, -1)
+    single_box_data = GasData(
+        name=list(data.name),
+        molar_mass=np.copy(data.molar_mass),
+        concentration=concentration,
+        partitioning=np.full(
+            data.n_species, partitioning_value, dtype=np.bool_
+        ),
+    )
 
-    # Create GasSpecies
-    # For single species, use scalars; for multi-species, build by appending
     if data.n_species == 1:
-        return GasSpecies(
-            name=data.name[0],
-            molar_mass=float(data.molar_mass[0]),
-            vapor_pressure_strategy=vapor_pressure_strategies[0],
-            partitioning=partitioning_value,
-            concentration=float(concentration[0]),
-        )
+        vapor_pressure_strategy = vapor_pressure_strategies[0]
     else:
-        # Build multi-species by creating first then appending rest
-        first_species = GasSpecies(
-            name=data.name[0],
-            molar_mass=float(data.molar_mass[0]),
-            vapor_pressure_strategy=vapor_pressure_strategies[0],
-            partitioning=partitioning_value,
-            concentration=float(concentration[0]),
-        )
-        for i in range(1, data.n_species):
-            next_species = GasSpecies(
-                name=data.name[i],
-                molar_mass=float(data.molar_mass[i]),
-                vapor_pressure_strategy=vapor_pressure_strategies[i],
-                partitioning=partitioning_value,
-                concentration=float(concentration[i]),
-            )
-            first_species += next_species
+        vapor_pressure_strategy = list(vapor_pressure_strategies)
 
-        return first_species
+    return GasSpecies.from_data(single_box_data, vapor_pressure_strategy)
