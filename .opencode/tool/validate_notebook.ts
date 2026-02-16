@@ -18,6 +18,7 @@ EXAMPLES:
 - Validation: validate_notebook({notebookPath: 'notebook.ipynb'})
 - Convert: validate_notebook({notebookPath: 'notebook.ipynb', convertToPy: true})
 - Convert with output dir: validate_notebook({notebookPath: 'docs/Examples', recursive: true, convertToPy: true, outputDir: 'scripts'})
+- Convert to notebook: validate_notebook({notebookPath: 'script.py', convertToIpynb: true})
 - Sync: validate_notebook({notebookPath: 'notebook.ipynb', sync: true})
 - Check-sync (CI): validate_notebook({notebookPath: 'docs/Examples', recursive: true, checkSync: true})
 
@@ -42,6 +43,10 @@ Exit codes: 0=success, 1=functional failure (invalid/out-of-sync/convert failure
       .boolean()
       .optional()
       .describe("Convert notebooks to .py:percent format"),
+    convertToIpynb: tool.schema
+      .boolean()
+      .optional()
+      .describe("Convert py:percent scripts to .ipynb notebooks"),
     sync: tool.schema
       .boolean()
       .optional()
@@ -53,7 +58,7 @@ Exit codes: 0=success, 1=functional failure (invalid/out-of-sync/convert failure
     outputDir: tool.schema
       .string()
       .optional()
-      .describe("Output directory for converted files (only with convertToPy)"),
+      .describe("Output directory for converted files (only with convertToPy or convertToIpynb)"),
   },
   async execute(args) {
     const notebookPath = args.notebookPath as string;
@@ -61,6 +66,7 @@ Exit codes: 0=success, 1=functional failure (invalid/out-of-sync/convert failure
     const outputMode = args.outputMode || "summary";
     const skipSyntax = args.skipSyntax || false;
     const convertToPy = args.convertToPy || false;
+    const convertToIpynb = args.convertToIpynb || false;
     const sync = args.sync || false;
     const checkSync = args.checkSync || false;
     const outputDir = args.outputDir;
@@ -74,6 +80,9 @@ Exit codes: 0=success, 1=functional failure (invalid/out-of-sync/convert failure
     if (convertToPy) {
       cmdParts.push("--convert-to-py");
     }
+    if (convertToIpynb) {
+      cmdParts.push("--convert-to-ipynb");
+    }
     if (sync) {
       cmdParts.push("--sync");
     }
@@ -84,7 +93,7 @@ Exit codes: 0=success, 1=functional failure (invalid/out-of-sync/convert failure
       cmdParts.push("--output-dir", outputDir);
     }
 
-    const usesValidationOnlyFlags = !convertToPy && !sync && !checkSync;
+    const usesValidationOnlyFlags = !convertToPy && !convertToIpynb && !sync && !checkSync;
 
     if (usesValidationOnlyFlags) {
       cmdParts.push(`--output=${outputMode}`);

@@ -17,6 +17,7 @@ Examples:
   # Conversion
   python3 .opencode/tool/validate_notebook.py notebook.ipynb --convert-to-py
   python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --convert-to-py --output-dir scripts
+  python3 .opencode/tool/validate_notebook.py script.py --convert-to-ipynb
   # Sync
   python3 .opencode/tool/validate_notebook.py notebook.ipynb --sync
   # Check-sync (read-only)
@@ -89,6 +90,36 @@ def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
         raise ValidationToolError(f"No notebooks found under {target}")
 
     return sorted(notebooks)
+
+
+def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
+    """Collect script paths from a file or directory.
+
+    Skips hidden paths and returns deterministically sorted list.
+    Hidden paths are defined by any segment starting with a dot.
+    """
+
+    if target.is_file() and target.suffix == ".py":
+        return [target]
+
+    if not target.exists():
+        raise ValidationToolError(f"Path not found: {target}")
+
+    if not target.is_dir():
+        raise ValidationToolError(f"Path must be .py file or directory: {target}")
+
+    candidates: Iterable[Path]
+    if recursive:
+        candidates = target.rglob("*.py")
+    else:
+        candidates = target.glob("*.py")
+
+    scripts = [p for p in candidates if not _is_hidden(p)]
+
+    if not scripts:
+        raise ValidationToolError(f"No Python scripts found under {target}")
+
+    return sorted(scripts)
 
 
 def _truncate(text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT) -> tuple[str, bool]:
@@ -228,13 +259,15 @@ def _format_json(results: List[NotebookValidationResult], skip_syntax: bool) -> 
 
 
 def _validate_output_dir_usage(args: argparse.Namespace) -> None:
-    if args.output_dir and not args.convert_to_py:
-        raise ValidationToolError("--output-dir is only allowed with --convert-to-py")
+    if args.output_dir and not (args.convert_to_py or args.convert_to_ipynb):
+        raise ValidationToolError(
+            "--output-dir is only allowed with --convert-to-py or --convert-to-ipynb"
+        )
 
 
 def _ensure_validation_only_flags(args: argparse.Namespace) -> None:
     if (args.output != "summary" or args.skip_syntax) and (
-        args.convert_to_py or args.sync or args.check_sync
+        args.convert_to_py or args.convert_to_ipynb or args.sync or args.check_sync
     ):
         raise ValidationToolError(
             "--output/--skip-syntax can only be used with validation (omit convert/sync flags)"
@@ -268,18 +301,67 @@ def _handle_convert(args: argparse.Namespace) -> int:
     return 0
 
 
+def _handle_convert_to_ipynb(args: argparse.Namespace) -> int:
+    """Convert py:percent scripts to .ipynb notebooks.
+
+    Args:
+        args: Parsed CLI arguments.
+
+    Returns:
+        Exit code (0 for success, 1 for conversion failures).
+
+    Raises:
+        ValidationToolError: If the input path is invalid or no scripts are found.
+    """
+
+    from adw.utils.notebook_jupytext import SyncResult, script_to_notebook
+
+    target = Path(args.notebook_path)
+    scripts = _collect_scripts(target, recursive=args.recursive)
+    output_dir = Path(args.output_dir) if args.output_dir else None
+    if output_dir:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+    failures: list[SyncResult] = []
+    for script in scripts:
+        output_path = None
+        if output_dir:
+            output_path = output_dir / script.with_suffix(".ipynb").name
+        result = script_to_notebook(script, output_path)
+        status = "✓" if result.success else "✗"
+        action = result.action
+        message = f"{status} {script} -> {result.target_path} ({action})"
+        if result.error_message:
+            message = f"{message}: {result.error_message}"
+        print(message)
+        if not result.success:
+            failures.append(result)
+
+    if failures:
+        return 1
+    return 0
+
+
 def _handle_sync(args: argparse.Namespace) -> int:
     from adw.utils.notebook_jupytext import SyncResult, sync_notebook_script
 
     if args.output_dir:
-        raise ValidationToolError("--output-dir is only allowed with --convert-to-py")
+        raise ValidationToolError(
+            "--output-dir is only allowed with --convert-to-py or --convert-to-ipynb"
+        )
 
     target = Path(args.notebook_path)
-    notebooks = _collect_notebooks(target, recursive=args.recursive)
+    notebooks: Sequence[Path]
+    script: Optional[Path] = None
+    if target.is_file() and target.suffix == ".py":
+        notebooks = [target.with_suffix(".ipynb")]
+        script = target
+    else:
+        notebooks = _collect_notebooks(target, recursive=args.recursive)
 
     failures: list[SyncResult] = []
     for notebook in notebooks:
-        result = sync_notebook_script(notebook)
+        result = sync_notebook_script(notebook, script)
         status = "✓" if result.success else "✗"
         message = f"{status} {notebook} -> {result.target_path} ({result.action})"
         if result.error_message:
@@ -295,7 +377,9 @@ def _handle_sync(args: argparse.Namespace) -> int:
 
 def _handle_check_sync(args: argparse.Namespace) -> int:
     if args.output_dir:
-        raise ValidationToolError("--output-dir is only allowed with --convert-to-py")
+        raise ValidationToolError(
+            "--output-dir is only allowed with --convert-to-py or --convert-to-ipynb"
+        )
 
     target = Path(args.notebook_path)
     notebooks = _collect_notebooks(target, recursive=args.recursive)
@@ -346,6 +430,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "  # Conversion\n"
             "  python3 .opencode/tool/validate_notebook.py notebook.ipynb --convert-to-py\n"
             "  python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --convert-to-py --output-dir scripts\n"
+            "  python3 .opencode/tool/validate_notebook.py script.py --convert-to-ipynb\n"
             "\n"
             "  # Sync\n"
             "  python3 .opencode/tool/validate_notebook.py notebook.ipynb --sync\n"
@@ -380,6 +465,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="Convert notebooks to .py:percent format",
     )
     action_group.add_argument(
+        "--convert-to-ipynb",
+        dest="convert_to_ipynb",
+        action="store_true",
+        help="Convert py:percent scripts to .ipynb notebooks",
+    )
+    action_group.add_argument(
         "--sync",
         action="store_true",
         help="Bidirectional sync between notebook and script (newer file wins)",
@@ -394,7 +485,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "--output-dir",
         type=str,
-        help="Output directory for converted files (only with --convert-to-py)",
+        help=(
+            "Output directory for converted files (only with --convert-to-py or --convert-to-ipynb)"
+        ),
     )
 
     try:
@@ -409,6 +502,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
         if args.convert_to_py:
             return _handle_convert(args)
+        if args.convert_to_ipynb:
+            return _handle_convert_to_ipynb(args)
         if args.sync:
             return _handle_sync(args)
         if args.check_sync:
