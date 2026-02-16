@@ -5,7 +5,6 @@ from __future__ import annotations
 import numpy as np
 import numpy.testing as npt
 import pytest
-
 from particula.gas.gas_data import GasData
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (

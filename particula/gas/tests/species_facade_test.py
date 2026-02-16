@@ -9,7 +9,6 @@ from typing import cast
 import numpy as np
 import numpy.testing as npt
 import pytest
-
 from particula.gas.gas_data import GasData
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (
@@ -47,7 +46,7 @@ def test_init_deprecation_warning() -> None:
 
 
 def test_data_property_returns_gas_data() -> None:
-    """data property returns the wrapped GasData instance."""
+    """Data property returns the wrapped GasData instance."""
     data = _make_single_box_data("Water", 0.018, 1e-6)
     strategy = ConstantVaporPressureStrategy(2330.0)
     species = GasSpecies.from_data(data, strategy)
@@ -123,7 +122,7 @@ def test_set_concentration_updates_internal_data() -> None:
 
 
 def test_concentration_property_setter_updates_internal_data() -> None:
-    """concentration property setter updates the internal GasData."""
+    """Concentration property setter updates the internal GasData."""
     data = _make_single_box_data("Water", 0.018, 1e-6)
     strategy = ConstantVaporPressureStrategy(2330.0)
     species = GasSpecies.from_data(data, strategy)
@@ -138,7 +137,7 @@ def test_concentration_property_setter_updates_internal_data() -> None:
 
 
 def test_append_updates_internal_data() -> None:
-    """append updates GasData and extends strategies."""
+    """Append updates GasData and extends strategies."""
     data1 = _make_single_box_data("Water", 0.018, 1e-6)
     data2 = _make_single_box_data("Ammonia", 0.017, 2e-6)
     strategy1 = ConstantVaporPressureStrategy(2330.0)
@@ -163,7 +162,7 @@ def test_append_updates_internal_data() -> None:
 
 
 def test_append_mismatched_box_counts_raises() -> None:
-    """append raises when both species have different box counts."""
+    """Append raises when both species have different box counts."""
     data1 = GasData(
         name=["Water"],
         molar_mass=np.array([0.018]),

@@ -12,11 +12,11 @@ from typing import Optional, Union
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.gas.gas_data import GasData
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     VaporPressureStrategy,
 )
-from particula.gas.gas_data import GasData
 from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
@@ -124,7 +124,7 @@ class GasSpecies:
         concentration_array, concentration_mode = self._normalize_concentration(
             concentration, n_species
         )
-        concentration_array: NDArray[np.float64] = np.asarray(
+        concentration_array = np.asarray(
             self._check_if_negative_concentration(concentration_array),
             dtype=np.float64,
         )
@@ -190,7 +190,7 @@ class GasSpecies:
 
     @property
     def name(self) -> Union[str, NDArray[np.str_]]:
-        """Return the gas species name(s)."""
+        """Gas species name(s)."""  # noqa: D402
         if (
             self._data.n_species == 1
             and self._single_species_name_mode == "str"
@@ -679,39 +679,56 @@ class GasSpecies:
         """Normalize concentration input to GasData shape."""
         conc_array = np.asarray(concentration, dtype=np.float64)
         if conc_array.ndim == 0:
-            if n_species == 1:
-                conc_array = np.array([conc_array.item()], dtype=np.float64)
-                return conc_array.reshape(1, 1), "scalar"
-            conc_array = np.full(n_species, conc_array.item(), dtype=np.float64)
-            return conc_array.reshape(1, -1), None
+            return self._normalize_concentration_scalar(conc_array, n_species)
         if conc_array.ndim == 1:
-            conc_array = conc_array.reshape(-1)
-            if n_species == 1:
-                if conc_array.size == 1:
-                    return conc_array.reshape(1, 1), "array"
-                return conc_array.reshape(-1, 1), "array"
-            if conc_array.size == 1:
-                conc_array = np.full(
-                    n_species, conc_array.item(), dtype=np.float64
-                )
-            if conc_array.size != n_species:
-                raise ValueError(
-                    "concentration length does not match number of species: "
-                    f"got {conc_array.size}, expected {n_species}"
-                )
-            return conc_array.reshape(1, -1), None
+            return self._normalize_concentration_vector(conc_array, n_species)
         if conc_array.ndim == 2:
-            if conc_array.shape[1] != n_species:
-                raise ValueError(
-                    "concentration shape does not match number of species: "
-                    f"got {conc_array.shape[1]}, expected {n_species}"
-                )
-            if n_species > 1 and conc_array.shape[0] != 1:
-                raise ValueError(
-                    "GasSpecies only supports a single box for multi-species"
-                )
-            return conc_array, "array" if n_species == 1 else None
+            return self._normalize_concentration_matrix(conc_array, n_species)
         raise ValueError("concentration must be scalar, 1D, or 2D")
+
+    def _normalize_concentration_scalar(
+        self, conc_array: NDArray[np.float64], n_species: int
+    ) -> tuple[NDArray[np.float64], Optional[str]]:
+        """Normalize scalar concentration inputs."""
+        value = conc_array.item()
+        if n_species == 1:
+            scalar = np.array([value], dtype=np.float64)
+            return scalar.reshape(1, 1), "scalar"
+        filled = np.full(n_species, value, dtype=np.float64)
+        return filled.reshape(1, -1), None
+
+    def _normalize_concentration_vector(
+        self, conc_array: NDArray[np.float64], n_species: int
+    ) -> tuple[NDArray[np.float64], Optional[str]]:
+        """Normalize 1D concentration inputs."""
+        conc_array = conc_array.reshape(-1)
+        if n_species == 1:
+            if conc_array.size == 1:
+                return conc_array.reshape(1, 1), "array"
+            return conc_array.reshape(-1, 1), "array"
+        if conc_array.size == 1:
+            conc_array = np.full(n_species, conc_array.item(), dtype=np.float64)
+        if conc_array.size != n_species:
+            raise ValueError(
+                "concentration length does not match number of species: "
+                f"got {conc_array.size}, expected {n_species}"
+            )
+        return conc_array.reshape(1, -1), None
+
+    def _normalize_concentration_matrix(
+        self, conc_array: NDArray[np.float64], n_species: int
+    ) -> tuple[NDArray[np.float64], Optional[str]]:
+        """Normalize 2D concentration inputs."""
+        if conc_array.shape[1] != n_species:
+            raise ValueError(
+                "concentration shape does not match number of species: "
+                f"got {conc_array.shape[1]}, expected {n_species}"
+            )
+        if n_species > 1 and conc_array.shape[0] != 1:
+            raise ValueError(
+                "GasSpecies only supports a single box for multi-species"
+            )
+        return conc_array, "array" if n_species == 1 else None
 
     def _normalize_partitioning(
         self, partitioning: bool, n_species: int
@@ -726,7 +743,7 @@ class GasSpecies:
         concentration_array, concentration_mode = self._normalize_concentration(
             new_concentration, self._data.n_species
         )
-        concentration_array: NDArray[np.float64] = np.asarray(
+        concentration_array = np.asarray(
             self._check_if_negative_concentration(concentration_array),
             dtype=np.float64,
         )
@@ -742,7 +759,10 @@ class GasSpecies:
     def _species_arrays_for_strategy(
         self,
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Return concentration and molar mass arrays for strategy evaluation."""
+        """Return concentration and molar mass arrays for strategy.
+
+        The arrays are shaped for vapor-pressure strategy evaluation.
+        """
         if self._data.n_species == 1:
             concentration = np.array(
                 [self._data.concentration[0, 0]], dtype=np.float64
