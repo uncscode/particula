@@ -32,16 +32,19 @@ def test_mass_based_build():
         "concentration_units": "1/m^3",
         "charge": 1.0,
     }
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "mass", parameters
-    )
+    with pytest.warns(DeprecationWarning):
+        particle_rep = ParticleRepresentationFactory().get_strategy(
+            "mass", parameters
+        )
     assert isinstance(particle_rep, ParticleRepresentation)
     assert np.array_equal(particle_rep.get_distribution(), parameters["mass"])
     assert np.array_equal(particle_rep.get_density(), parameters["density"])
     assert np.array_equal(
         particle_rep.get_concentration(), parameters["concentration"]
     )
-    assert particle_rep.get_charge() == parameters["charge"]
+    charge = particle_rep.get_charge()
+    assert charge is not None
+    np.testing.assert_allclose(charge, parameters["charge"])
 
 
 def test_radii_based_build():
@@ -58,22 +61,29 @@ def test_radii_based_build():
         "concentration_units": "1/m^3",
         "charge": np.array([1.0, 2.0, 3.0]),
     }
-    strategy = ParticleRepresentationFactory().get_strategy(
-        "radius", parameters
-    )
+    with pytest.warns(DeprecationWarning):
+        strategy = ParticleRepresentationFactory().get_strategy(
+            "radius", parameters
+        )
     assert isinstance(strategy, ParticleRepresentation)
     assert np.array_equal(strategy.get_distribution(), parameters["radius"])
     assert np.array_equal(strategy.get_density(), parameters["density"])
     assert np.array_equal(
         strategy.get_concentration(), parameters["concentration"]
     )
-    assert np.array_equal(strategy.get_charge(), parameters["charge"])
+    charge = strategy.get_charge()
+    assert charge is not None
+    charge_array = np.asarray(charge, dtype=np.float64)
+    assert np.array_equal(charge_array, parameters["charge"])
 
 
 def test_limited_radius_build():
     """Test factory and build for LimitedRadiusParticleBuilder."""
     # default values
-    particle_rep = ParticleRepresentationFactory().get_strategy("preset_radius")
+    with pytest.warns(DeprecationWarning):
+        particle_rep = ParticleRepresentationFactory().get_strategy(
+            "preset_radius"
+        )
     assert isinstance(particle_rep, ParticleRepresentation)
 
     # set values
@@ -84,9 +94,10 @@ def test_limited_radius_build():
         "number_concentration": np.array([1e3, 1e3]),
         "number_concentration_units": "1/m^3",
     }
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "preset_radius", parameters
-    )
+    with pytest.warns(DeprecationWarning):
+        particle_rep = ParticleRepresentationFactory().get_strategy(
+            "preset_radius", parameters
+        )
     assert isinstance(particle_rep, ParticleRepresentation)
 
 
@@ -104,22 +115,26 @@ def test_resolved_mass_build():
         "volume": 1,
         "volume_units": "m^3",
     }
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "resolved_mass", parameters
-    )
+    with pytest.warns(DeprecationWarning):
+        particle_rep = ParticleRepresentationFactory().get_strategy(
+            "resolved_mass", parameters
+        )
     assert isinstance(particle_rep, ParticleRepresentation)
     assert np.array_equal(particle_rep.get_distribution(), parameters["mass"])
     assert np.array_equal(particle_rep.get_density(), parameters["density"])
-    assert particle_rep.get_charge() == parameters["charge"]
+    charge = particle_rep.get_charge()
+    assert charge is not None
+    np.testing.assert_allclose(charge, parameters["charge"])
     assert particle_rep.get_volume() == parameters["volume"]
 
 
 def test_preset_resolved_mass_build():
     """Test factory and build for PresetResolvedMassParticleBuilder."""
     # default values
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "preset_resolved_mass"
-    )
+    with pytest.warns(DeprecationWarning):
+        particle_rep = ParticleRepresentationFactory().get_strategy(
+            "preset_resolved_mass"
+        )
     assert isinstance(particle_rep, ParticleRepresentation)
 
     parameters = {
@@ -132,9 +147,10 @@ def test_preset_resolved_mass_build():
         "number_concentration_units": "1/m^3",
         "particle_resolved_count": 1000,
     }
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "preset_resolved_mass", parameters
-    )
+    with pytest.warns(DeprecationWarning):
+        particle_rep = ParticleRepresentationFactory().get_strategy(
+            "preset_resolved_mass", parameters
+        )
     assert isinstance(particle_rep, ParticleRepresentation)
     assert particle_rep.get_volume() == parameters["volume"]
 

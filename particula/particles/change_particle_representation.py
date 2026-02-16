@@ -117,6 +117,8 @@ def get_speciated_mass_representation_from_particle_resolved(
     # add the charge by bin_indexes
     new_charge = np.zeros(len(bin_radius))
     old_charge = particle.get_charge()
+    if old_charge is None:
+        old_charge = np.zeros_like(old_concentration)
     if np.shape(old_charge) != np.shape(old_concentration):
         old_charge = np.zeros_like(old_concentration) + old_charge
 
@@ -149,12 +151,19 @@ def get_speciated_mass_representation_from_particle_resolved(
 
     # filter out the nans and zeros
     if new_distribution.ndim == 1:
-        new_particle.distribution = new_distribution[~mask_nan_zeros]
-        new_particle.charge = new_charge[~mask_nan_zeros]
-        new_particle.concentration = new_concentration[~mask_nan_zeros]
-        return new_particle
-    mask_nan_zeros = np.any(mask_nan_zeros, axis=1)
-    new_particle.distribution = new_distribution[~mask_nan_zeros, :]
-    new_particle.charge = new_charge[~mask_nan_zeros]
-    new_particle.concentration = new_concentration[~mask_nan_zeros]
+        mask_nan_zeros = ~mask_nan_zeros
+        filtered_distribution = new_distribution[mask_nan_zeros]
+        filtered_charge = new_charge[mask_nan_zeros]
+        filtered_concentration = new_concentration[mask_nan_zeros]
+    else:
+        mask_nan_zeros = ~np.any(mask_nan_zeros, axis=1)
+        filtered_distribution = new_distribution[mask_nan_zeros, :]
+        filtered_charge = new_charge[mask_nan_zeros]
+        filtered_concentration = new_concentration[mask_nan_zeros]
+    new_particle._charge_is_none = False
+    new_particle._update_state(
+        distribution=filtered_distribution,
+        concentration=filtered_concentration,
+        charge_array=filtered_charge,
+    )
     return new_particle
