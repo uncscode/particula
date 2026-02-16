@@ -33,6 +33,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: true
+  feedback_log: true
   get_datetime: true
   get_version: true
   webfetch: false
@@ -78,8 +79,7 @@ You are running as an **orchestrator** that:
 |----------|---------|-------|
 | **docstring** | Update Python docstrings | `*.py` files |
 | **docs** | Update general documentation | `adw-docs/*.md`, `README.md`, `docs/*.md` |
-| **docs-feature** | Update feature documentation | `adw-docs/dev-plans/features/*.md` |
-| **docs-maintenance** | Update maintenance docs | `adw-docs/dev-plans/maintenance/*.md` |
+| **docs-feature** | Update all dev-plans documentation | `adw-docs/dev-plans/**/*.md` |
 | **examples** | Create/update examples | `docs/Examples/*.md`, `.py`, `.ipynb` |
 | **architecture** | ADRs and architecture outline | `adw-docs/architecture/*.md` |
 | **theory** | Conceptual documentation | `docs/Theory/*.md` |
@@ -162,7 +162,7 @@ From `spec_content`, identify:
 | New module/component | **architecture** |
 | New design pattern | **theory** |
 | Major feature | **features** |
-| Bug fix only | **docs-maintenance** (release notes) |
+| Bug fix / deprecation / migration | **docs-feature** (release notes, maintenance plans) |
 | ALWAYS | **docs-validator** |
 | ALWAYS | **adw-commit** |
 
@@ -257,17 +257,20 @@ Update README.md, adw-docs/*.md guides, docs/index.md as needed.
 
 ### 6.3: Docs-Feature Subagent
 
-**When:** `issue_class == /feature`
+**When:** `issue_class == /feature` OR bug fix / deprecation / migration
 
 ```python
 task({
-  "description": "Update feature documentation",
-  "prompt": f"""Document feature in adw-docs/dev-plans/features/.
+  "description": "Update dev-plans documentation",
+  "prompt": f"""Update adw-docs/dev-plans/ documentation.
 
 Arguments: adw_id={adw_id}
 
+Issue class: {issue_class}
 Feature: {issue_title}
 Details: {issue_body}
+
+Update feature docs, epic rollups, maintenance plans, and README index as needed.
 """,
   "subagent_type": "docs-feature"
 })
@@ -275,27 +278,7 @@ Details: {issue_body}
 
 **Expected:** `DOCS_FEATURE_UPDATE_COMPLETE`
 
-### 6.4: Docs-Maintenance Subagent
-
-**When:** Bug fix, deprecation, migration
-
-```python
-task({
-  "description": "Update maintenance documentation",
-  "prompt": f"""Update maintenance docs.
-
-Arguments: adw_id={adw_id}
-
-Change type: {issue_class}
-Details: {summary}
-""",
-  "subagent_type": "docs-maintenance"
-})
-```
-
-**Expected:** `DOCS_MAINTENANCE_UPDATE_COMPLETE`
-
-### 6.5: Examples Subagent
+### 6.4: Examples Subagent
 
 **When:** New user-facing feature
 
@@ -317,7 +300,7 @@ Create markdown guide and Jupyter notebook (.ipynb preferred).
 
 **Expected:** `EXAMPLES_UPDATE_COMPLETE`
 
-### 6.5.1: ADW-Docs-Notebook Subagent
+### 6.4.1: ADW-Docs-Notebook Subagent
 
 **When:** Need to create, edit, validate, or fix Jupyter notebooks
 
@@ -413,7 +396,7 @@ Details: Notebook fails to open, diagnose and repair
 - Has specialized tools: `validate_notebook` and `run_notebook`
 - Retries up to 3 times for recoverable errors
 
-### 6.6: Architecture Subagent
+### 6.5: Architecture Subagent
 
 **When:** New module/component OR architectural change
 
@@ -435,7 +418,7 @@ Create ADR if significant decision, update outline with new modules.
 
 **Expected:** `ARCHITECTURE_UPDATE_COMPLETE`
 
-### 6.7: Theory Subagent
+### 6.6: Theory Subagent
 
 **When:** New conceptual pattern
 
@@ -454,7 +437,7 @@ New concepts: {conceptual_changes}
 
 **Expected:** `THEORY_UPDATE_COMPLETE`
 
-### 6.8: Features Subagent
+### 6.7: Features Subagent
 
 **When:** Major user-facing feature
 
@@ -474,7 +457,7 @@ Impact: {user_impact}
 
 **Expected:** `FEATURES_UPDATE_COMPLETE`
 
-### 6.9: Docs-Validator Subagent
+### 6.8: Docs-Validator Subagent
 
 **When:** ALWAYS (after all other subagents)
 
@@ -493,7 +476,7 @@ Check all markdown links, formatting, and cross-references.
 
 **Expected:** `DOCS_VALIDATION_COMPLETE`
 
-### 6.10: ADW-Commit Subagent
+### 6.9: ADW-Commit Subagent
 
 **When:** ALWAYS (final step)
 
@@ -544,7 +527,7 @@ Updates:
 - Architecture: {adrs_created}, outline updated
 - Theory: {theory_docs}
 - Features: {feature_docs}
-- Maintenance: {maintenance_docs}
+- Dev Plans: {dev_plan_docs}
 
 Validation: {links_checked} links, {broken_links} broken
 Commit: {commit_hash} - docs: {description}
@@ -594,14 +577,11 @@ IF .py files changed:
 ALWAYS:
     → docs subagent (README, general guides)
 
-IF issue_class == /feature:
-    → docs-feature subagent
-    → examples subagent (if user-facing)
+IF issue_class == /feature OR /bug OR deprecation OR migration:
+    → docs-feature subagent (features, epics, maintenance, archive, README)
+    → examples subagent (if user-facing feature)
     → adw-docs-notebook subagent (if interactive tutorial needed)
-    → features subagent (if major)
-
-IF issue_class == /bug OR deprecation:
-    → docs-maintenance subagent
+    → features subagent (if major user-facing feature)
 
 IF new module/component:
     → architecture subagent

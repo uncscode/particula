@@ -95,8 +95,7 @@ task({
 
 **EXCLUDED (handled by other subagents):**
 - ❌ `adw-docs/architecture/` - architecture subagent
-- ❌ `adw-docs/dev-plans/features/` - docs-feature subagent
-- ❌ `adw-docs/dev-plans/maintenance/` - docs-maintenance subagent
+- ❌ `adw-docs/dev-plans/` - docs-feature subagent (entire dev-plans tree)
 - ❌ `docs/Examples/` - examples subagent
 - ❌ `docs/Theory/` - theory subagent
 - ❌ `docs/Features/` - features subagent

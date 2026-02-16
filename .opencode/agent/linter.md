@@ -11,17 +11,26 @@ description: 'Subagent that runs linters and auto-fixes code quality issues foll
   - Read/write code files: ALLOW - Modify linter config: DENY'
 mode: subagent
 tools:
+  read: true
   edit: true
   write: true
-  read: true
   list: true
   ripgrep: true
   move: true
-  todowrite: true
   todoread: true
+  todowrite: true
+  task: false
+  adw: false
   adw_spec: true
   feedback_log: true
+  create_workspace: false
+  workflow_builder: false
+  git_operations: false
+  platform_operations: false
+  run_pytest: false
   run_linters: true
+  get_datetime: true
+  get_version: true
   webfetch: false
   websearch: false
   codesearch: false
