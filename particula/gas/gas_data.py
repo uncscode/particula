@@ -28,7 +28,7 @@ Example:
 """
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Sequence, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -274,6 +274,9 @@ def to_species(
         ),
     )
 
+    vapor_pressure_strategy: Union[
+        "VaporPressureStrategy", list["VaporPressureStrategy"]
+    ]
     if data.n_species == 1:
         vapor_pressure_strategy = vapor_pressure_strategies[0]
     else:
