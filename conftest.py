@@ -1,13 +1,15 @@
-"""Pytest configuration for particula test suite.
+"""Pytest bootstrap patches for NumPy/SciPy compatibility.
 
-This file registers custom markers and configures pytest options.
-Having markers here ensures they are registered even in environments
-where pyproject.toml configuration may not be read (e.g., conda-build).
+Applied at repository root so it runs before package imports. This avoids
+SciPy import errors triggered by NumPy copy-mode behavior in some test
+environments.
 """
 
 from __future__ import annotations
 
-import pytest
+import sys
+import types
+import warnings
 
 
 def _patch_numpy_copy_mode() -> None:
@@ -36,8 +38,6 @@ def _patch_scipy_stats() -> None:
         scipy = None
 
     try:  # pragma: no cover - defensive patch
-        import sys
-        import types
 
         class _StubLogNorm:
             """Stub of scipy.stats.lognorm that raises when used in tests."""
@@ -62,36 +62,26 @@ def _patch_scipy_stats() -> None:
         pass
 
 
+warnings.filterwarnings(
+    "ignore",
+    message="The NumPy module was reloaded.*",
+    category=UserWarning,
+)
+warnings.filterwarnings(
+    "ignore",
+    message="GasSpecies is deprecated.*",
+    category=DeprecationWarning,
+)
+
 _patch_numpy_copy_mode()
 _patch_scipy_stats()
 
 
-def pytest_addoption(parser: pytest.Parser) -> None:
-    """Register custom command-line options."""
-    parser.addoption(
-        "--benchmark",
-        action="store_true",
-        default=False,
-        help="Enable GPU benchmark tests.",
-    )
-
-
-def pytest_configure(config: pytest.Config) -> None:
-    """Register custom markers for the test suite."""
-    config.addinivalue_line(
-        "filterwarnings",
-        "ignore:GasSpecies is deprecated.*:DeprecationWarning",
-    )
-    config.addinivalue_line(
-        "markers",
-        "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    )
-    config.addinivalue_line(
-        "markers",
-        "performance: marks tests as performance-intensive "
-        "(deselect with '-m \"not performance\"')",
-    )
-    config.addinivalue_line(
-        "markers",
-        "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
+def pytest_runtest_setup(item) -> None:
+    """Ensure deprecation warnings are filtered even under -Werror."""
+    warnings.filterwarnings(
+        "ignore",
+        message="GasSpecies is deprecated.*",
+        category=DeprecationWarning,
+        append=False,
     )
