@@ -178,7 +178,73 @@ def test_convert_requires_flag_for_output_dir(tmp_path: Path) -> None:
     proc = _run_cli([str(nb_path), "--output-dir", "scripts"])
 
     assert proc.returncode == 2
-    assert "--output-dir is only allowed with --convert-to-py" in proc.stdout
+    assert "--output-dir is only allowed with --convert-to-py or --convert-to-ipynb" in proc.stdout
+
+
+def test_convert_to_ipynb_creates_notebook_sibling(tmp_path: Path) -> None:
+    script_path = tmp_path / "nb.py"
+    script_path.write_text("# %%\nprint('hello')\n", encoding="utf-8")
+
+    proc = _run_cli([str(script_path), "--convert-to-ipynb"])
+
+    assert proc.returncode == 0
+    nb_path = script_path.with_suffix(".ipynb")
+    assert nb_path.exists()
+    assert "✓" in proc.stdout
+
+
+def test_convert_to_ipynb_respects_output_dir(tmp_path: Path) -> None:
+    script_path = tmp_path / "nb.py"
+    out_dir = tmp_path / "notebooks"
+    script_path.write_text("# %%\nprint('hello')\n", encoding="utf-8")
+
+    proc = _run_cli([str(script_path), "--convert-to-ipynb", "--output-dir", str(out_dir)])
+
+    assert proc.returncode == 0
+    nb_path = out_dir / "nb.ipynb"
+    assert nb_path.exists()
+    assert "✓" in proc.stdout
+
+
+def test_convert_to_ipynb_missing_script_exit_two(tmp_path: Path) -> None:
+    script_path = tmp_path / "missing.py"
+
+    proc = _run_cli([str(script_path), "--convert-to-ipynb"])
+
+    assert proc.returncode == 2
+    assert "Path not found" in proc.stdout
+
+
+def test_convert_to_ipynb_invalid_script_exit_one(tmp_path: Path) -> None:
+    script_path = tmp_path / "bad.py"
+    script_path.write_text("# %%\nfor\n", encoding="utf-8")
+
+    proc = _run_cli([str(script_path), "--convert-to-ipynb"])
+
+    assert proc.returncode == 1
+    assert "✗" in proc.stdout
+
+
+def test_convert_to_ipynb_recursive_discovers_scripts(tmp_path: Path) -> None:
+    nested = tmp_path / "nested" / "deeper"
+    nested.mkdir(parents=True)
+    script_path = nested / "deep.py"
+    script_path.write_text("# %%\nprint('deep')\n", encoding="utf-8")
+
+    proc = _run_cli([str(tmp_path), "--recursive", "--convert-to-ipynb"])
+
+    assert proc.returncode == 0
+    assert script_path.with_suffix(".ipynb").exists()
+
+
+def test_sync_accepts_py_input(tmp_path: Path) -> None:
+    script_path = tmp_path / "only.py"
+    script_path.write_text("# %%\nprint('sync')\n", encoding="utf-8")
+
+    proc = _run_cli([str(script_path), "--sync"])
+
+    assert proc.returncode == 0
+    assert script_path.with_suffix(".ipynb").exists()
 
 
 def test_sync_updates_newer_notebook(tmp_path: Path) -> None:
@@ -297,12 +363,27 @@ def test_mutual_exclusion_and_validation_only_flags(tmp_path: Path) -> None:
     proc_output_dir_without_convert = _run_cli([str(nb_path), "--output-dir", "scripts"])
     assert proc_output_dir_without_convert.returncode == 2
     assert (
-        "--output-dir is only allowed with --convert-to-py"
+        "--output-dir is only allowed with --convert-to-py or --convert-to-ipynb"
         in proc_output_dir_without_convert.stdout
     )
 
     # multiple action flags should be blocked by argparse mutual exclusion (exit 2)
     proc_conflict = _run_cli([str(nb_path), "--convert-to-py", "--sync"])
+    assert proc_conflict.returncode == 2
+
+
+def test_convert_to_ipynb_mutual_exclusion(tmp_path: Path) -> None:
+    script_path = tmp_path / "script.py"
+    script_path.write_text("# %%\nprint('conflict')\n", encoding="utf-8")
+
+    proc_conflict = _run_cli(
+        [
+            str(script_path),
+            "--convert-to-ipynb",
+            "--convert-to-py",
+        ]
+    )
+
     assert proc_conflict.returncode == 2
 
 
