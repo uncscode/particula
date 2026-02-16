@@ -123,7 +123,13 @@ class ParticleData:
                 f"got shape {self.density.shape}"
             )
 
-        # Validate n_species matches between masses and density
+        # Broadcast scalar density to match n_species, then validate
+        if self.density.shape[0] == 1 and n_species > 1:
+            self.density = np.broadcast_to(self.density, (n_species,)).copy()
+        elif self.density.shape[0] == 0 and n_species > 0:
+            # Empty density with non-zero species (e.g., zero particles):
+            # fill with zeros so shapes are consistent.
+            self.density = np.zeros(n_species, dtype=self.density.dtype)
         if self.density.shape[0] != n_species:
             raise ValueError(
                 f"n_species mismatch: masses has {n_species} species, "
