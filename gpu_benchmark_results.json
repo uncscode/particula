@@ -1,0 +1,222 @@
+{
+  "started_at": "2026-02-16T14:44:32.702909+00:00",
+  "benchmarks": {
+    "condensation_1x1k": {
+      "n_boxes": 1,
+      "n_particles": 1000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.000856489990837872,
+      "cpu_time_s": 0.011470252997241914,
+      "speedup": 13.392162336913005
+    },
+    "condensation_1x10k": {
+      "n_boxes": 1,
+      "n_particles": 10000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0007656110101379454,
+      "cpu_time_s": 0.10841175398672931,
+      "speedup": 141.6016130269548
+    },
+    "condensation_10x1k": {
+      "n_boxes": 10,
+      "n_particles": 1000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0007732150261290371,
+      "cpu_time_s": 0.10885456600226462,
+      "speedup": 140.7817519367485
+    },
+    "condensation_100x1k": {
+      "n_boxes": 100,
+      "n_particles": 1000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0007740569999441504,
+      "cpu_time_s": 1.0891872210195288,
+      "speedup": 1407.1150071611207
+    },
+    "condensation_1x100k": {
+      "n_boxes": 1,
+      "n_particles": 100000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0007892349967733026
+    },
+    "condensation_1x500k": {
+      "n_boxes": 1,
+      "n_particles": 500000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0015782999980729073
+    },
+    "condensation_1x1M": {
+      "n_boxes": 1,
+      "n_particles": 1000000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0033463319996371865
+    },
+    "condensation_1x2M": {
+      "n_boxes": 1,
+      "n_particles": 2000000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.006624326983001083
+    },
+    "condensation_10x10k": {
+      "n_boxes": 10,
+      "n_particles": 10000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0008240290044341236
+    },
+    "condensation_10x100k": {
+      "n_boxes": 10,
+      "n_particles": 100000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0033638940076343715
+    },
+    "condensation_100x10k": {
+      "n_boxes": 100,
+      "n_particles": 10000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.0033719099883455783
+    },
+    "condensation_100x100k": {
+      "n_boxes": 100,
+      "n_particles": 100000,
+      "n_species": 3,
+      "steps": 5,
+      "gpu_time_s": 0.032730208011344075
+    },
+    "coagulation_1x500": {
+      "n_boxes": 1,
+      "n_particles": 500,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.03418292501010001,
+      "cpu_time_s": 0.11027854200801812,
+      "speedup": 3.2261294776685783
+    },
+    "coagulation_1x2k": {
+      "n_boxes": 1,
+      "n_particles": 2000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.13544681199709885,
+      "cpu_time_s": 0.341691156005254,
+      "speedup": 2.522696185810359
+    },
+    "coagulation_1x5k": {
+      "n_boxes": 1,
+      "n_particles": 5000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.33849193700007163,
+      "cpu_time_s": 0.48053830000571907,
+      "speedup": 1.4196447462369461
+    },
+    "coagulation_10x500": {
+      "n_boxes": 10,
+      "n_particles": 500,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.034211037011118606,
+      "cpu_time_s": 1.0313019400055055,
+      "speedup": 30.145299006000073
+    },
+    "coagulation_10x1k": {
+      "n_boxes": 10,
+      "n_particles": 1000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.06813606200739741,
+      "cpu_time_s": 1.8370926060015336,
+      "speedup": 26.962118911452258
+    },
+    "coagulation_1x10k": {
+      "n_boxes": 1,
+      "n_particles": 10000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.6766552509798203
+    },
+    "coagulation_1x20k": {
+      "n_boxes": 1,
+      "n_particles": 20000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 1.3529756600037217
+    },
+    "coagulation_1x50k": {
+      "n_boxes": 1,
+      "n_particles": 50000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 3.3813166040054057
+    },
+    "coagulation_10x5k": {
+      "n_boxes": 10,
+      "n_particles": 5000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.37543058302253485
+    },
+    "coagulation_10x10k": {
+      "n_boxes": 10,
+      "n_particles": 10000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.678576862992486
+    },
+    "coagulation_50x1k": {
+      "n_boxes": 50,
+      "n_particles": 1000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.06933242199011147
+    },
+    "coagulation_50x5k": {
+      "n_boxes": 50,
+      "n_particles": 5000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.3453934940043837
+    },
+    "coagulation_100x1k": {
+      "n_boxes": 100,
+      "n_particles": 1000,
+      "n_species": 2,
+      "steps": 5,
+      "gpu_time_s": 0.07503974600695074
+    },
+    "wp_func": {
+      "n_evals": 100000,
+      "diffusion_coefficient": {
+        "cpu_us": 0.0033722599619068205,
+        "gpu_us": 0.0008441598038189113
+      },
+      "mass_transfer_rate": {
+        "cpu_us": 0.002354769967496395,
+        "gpu_us": 0.0007737299893051386
+      },
+      "particle_radius_from_volume": {
+        "cpu_us": 0.001103950198739767,
+        "gpu_us": 0.001027100079227239
+      },
+      "brownian_diffusivity": {
+        "cpu_us": 0.0002554702223278582,
+        "gpu_us": 0.0008270301623269916
+      },
+      "brownian_kernel_pair": {
+        "cpu_us": 0.013696228151616197,
+        "gpu_us": 0.0010917300824075937
+      }
+    }
+  },
+  "updated_at": "2026-02-16T14:45:47.818440+00:00"
+}

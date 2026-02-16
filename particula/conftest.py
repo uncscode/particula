@@ -53,6 +53,16 @@ _patch_numpy_copy_mode()
 _patch_scipy_stats()
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Register custom command-line options."""
+    parser.addoption(
+        "--benchmark",
+        action="store_true",
+        default=False,
+        help="Enable GPU benchmark tests.",
+    )
+
+
 def pytest_configure(config: pytest.Config) -> None:
     """Register custom markers for the test suite."""
     config.addinivalue_line(
@@ -63,4 +73,8 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers",
         "performance: marks tests as performance-intensive "
         "(deselect with '-m \"not performance\"')",
+    )
+    config.addinivalue_line(
+        "markers",
+        "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
     )

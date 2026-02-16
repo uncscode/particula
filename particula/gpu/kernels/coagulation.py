@@ -183,26 +183,49 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    k_max = wp.float64(0.0)
-    for idx_i in range(n_particles):
-        if active_flags[box_idx, idx_i] == wp.int32(0):
+    # Find particles with min/max radius to compute a k_max upper bound.
+    # The Brownian kernel is maximized at the greatest size disparity
+    # (small particle has high diffusivity, large particle has large
+    # cross-section), so K(r_min, r_max) bounds all pairwise values.
+    # This replaces the previous O(n^2) all-pairs scan with O(n).
+    r_min = wp.float64(1.0e30)
+    r_max = wp.float64(0.0)
+    idx_min = wp.int32(-1)
+    idx_max = wp.int32(-1)
+    for p_idx in range(n_particles):
+        if active_flags[box_idx, p_idx] == wp.int32(0):
             continue
-        for idx_j in range(idx_i + 1, n_particles):
-            if active_flags[box_idx, idx_j] == wp.int32(0):
-                continue
-            kernel_value = brownian_kernel_pair_wp(
-                radii[box_idx, idx_i],
-                radii[box_idx, idx_j],
-                diffusivities[box_idx, idx_i],
-                diffusivities[box_idx, idx_j],
-                g_terms[box_idx, idx_i],
-                g_terms[box_idx, idx_j],
-                speeds[box_idx, idx_i],
-                speeds[box_idx, idx_j],
-                wp.float64(1.0),
-            )
-            if kernel_value > k_max:
-                k_max = kernel_value
+        r_p = radii[box_idx, p_idx]
+        if r_p < r_min:
+            r_min = r_p
+            idx_min = wp.int32(p_idx)
+        if r_p > r_max:
+            r_max = r_p
+            idx_max = wp.int32(p_idx)
+
+    k_max = wp.float64(0.0)
+    if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
+        if idx_min == idx_max:
+            # All active particles have the same radius; use self-pair
+            # kernel which is symmetric, so pick any two active indices.
+            for p_idx in range(n_particles):
+                if (
+                    active_flags[box_idx, p_idx] == wp.int32(1)
+                    and wp.int32(p_idx) != idx_min
+                ):
+                    idx_max = wp.int32(p_idx)
+                    break
+        k_max = brownian_kernel_pair_wp(
+            radii[box_idx, idx_min],
+            radii[box_idx, idx_max],
+            diffusivities[box_idx, idx_min],
+            diffusivities[box_idx, idx_max],
+            g_terms[box_idx, idx_min],
+            g_terms[box_idx, idx_max],
+            speeds[box_idx, idx_min],
+            speeds[box_idx, idx_max],
+            wp.float64(1.0),
+        )
 
     if k_max <= wp.float64(0.0):
         n_collisions[box_idx] = wp.int32(0)

@@ -24,7 +24,7 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
    - A Python API for data-parallel C-style kernels, especially suited for physics and graphics simulations.  
    - Pros: Easy dispatch to multicore CPUs or CUDA GPUs, familiar C-like syntax.  
    - Cons: Niche use cases, less mature ecosystem than CUDA or Taichi.
-   - Example: Not yet available.
+   - Example: [GPU Benchmarks](../nvidia-warp/examples/gpu_benchmarks.ipynb) -- condensation & coagulation scaling results.
 
 ### **Cython (PyPy)**  
    - A superset of Python that compiles to C, enabling static type declarations and direct C-API calls.  
