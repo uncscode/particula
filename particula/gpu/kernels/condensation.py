@@ -71,8 +71,27 @@ def condensation_mass_transfer_kernel(
     time_step: Any,
     mass_transfer: Any,
 ) -> None:
-    """Compute per-species condensation mass transfer for each particle."""  # type: ignore
-    box_idx, particle_idx = wp.tid()
+    """Compute condensation mass transfer for each particle species.
+
+    Args:
+        masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
+        concentration: Particle number concentration array.
+        density: Per-species particle density array.
+        gas_concentration: Gas concentrations array.
+        vapor_pressure: Gas-phase vapor pressure array.
+        molar_mass: Gas-phase molar mass array.
+        surface_tension: Per-species surface tension array.
+        mass_accommodation: Per-species mass accommodation coefficients.
+        diffusion_coefficient_vapor: Per-species vapor diffusion coefficients.
+        dynamic_viscosity: Gas dynamic viscosity [Pa·s].
+        mean_free_path: Gas mean free path [m].
+        gas_constant: Universal gas constant [J/(mol·K)].
+        boltzmann_constant: Boltzmann constant [J/K].
+        temperature: Gas temperature [K].
+        time_step: Condensation time step [s].
+        mass_transfer: Output mass transfer array.
+    """  # type: ignore
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
 
     if concentration[box_idx, particle_idx] == wp.float64(0.0):
         for species_idx in range(masses.shape[2]):
@@ -87,7 +106,7 @@ def condensation_mass_transfer_kernel(
         total_mass += species_mass
         total_volume += species_mass / density[species_idx]
 
-    if total_volume <= wp.float64(0.0):
+    if total_volume <= wp.float64(0.0):  # type: ignore[operator]
         for species_idx in range(n_species):
             mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
         return
@@ -158,8 +177,13 @@ def apply_mass_transfer_kernel(
     masses: Any,
     mass_transfer: Any,
 ) -> None:
-    """Apply mass transfer with non-negative clamping."""
-    box_idx, particle_idx = wp.tid()
+    """Apply condensation mass transfer and clamp masses to non-negative.
+
+    Args:
+        masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
+        mass_transfer: Mass transfer array matching ``masses`` shape.
+    """
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     n_species = masses.shape[2]
     for species_idx in range(n_species):
         updated_mass = (
@@ -205,7 +229,16 @@ def _validate_mass_transfer_buffer(
     expected_shape: tuple[int, int, int],
     expected_device: str,
 ) -> None:
-    """Validate mass transfer buffer shape and device."""
+    """Validate mass transfer buffer shape and device.
+
+    Args:
+        mass_transfer: Mass transfer array allocated on the GPU.
+        expected_shape: Expected ``(n_boxes, n_particles, n_species)`` shape.
+        expected_device: Expected Warp device name.
+
+    Raises:
+        ValueError: If the shape or device does not match expectations.
+    """
     if mass_transfer.shape != expected_shape:
         raise ValueError(
             f"mass_transfer shape {mass_transfer.shape} does not match "
@@ -224,7 +257,17 @@ def _validate_particle_arrays(
     n_particles: int,
     n_species: int,
 ) -> None:
-    """Validate particle array shapes and lengths."""
+    """Validate particle array shapes and lengths.
+
+    Args:
+        particles: Particle data containing density and concentration arrays.
+        n_boxes: Expected number of spatial boxes.
+        n_particles: Expected number of particles per box.
+        n_species: Expected number of particle species.
+
+    Raises:
+        ValueError: If particle array shapes do not match expectations.
+    """
     if particles.density.shape[0] != n_species:
         raise ValueError("particle density length does not match n_species")
     if particles.concentration.shape != (n_boxes, n_particles):
@@ -238,7 +281,16 @@ def _validate_gas_arrays(
     n_boxes: int,
     n_species: int,
 ) -> None:
-    """Validate gas array shapes and lengths."""
+    """Validate gas array shapes and lengths.
+
+    Args:
+        gas: Gas data containing molar mass, concentration, and vapor pressure.
+        n_boxes: Expected number of spatial boxes.
+        n_species: Expected number of gas species.
+
+    Raises:
+        ValueError: If gas array shapes do not match expectations.
+    """
     if gas.molar_mass.shape[0] != n_species:
         raise ValueError(
             "n_species mismatch between particle masses and gas molar mass"
@@ -254,14 +306,32 @@ def _validate_gas_arrays(
 
 
 def _validate_device_match(name: str, array: Any, expected_device: Any) -> None:
-    """Validate that a Warp array is on the expected device."""
+    """Validate that a Warp array is on the expected device.
+
+    Args:
+        name: Array label for error messages.
+        array: Warp array to validate.
+        expected_device: Expected Warp device.
+
+    Raises:
+        ValueError: If the array is not on the expected device.
+    """
     device = getattr(array, "device", None)
     if device is None or str(device) != str(expected_device):
         raise ValueError(f"{name} device mismatch")
 
 
 def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
-    """Validate particle and gas arrays share the same Warp device."""
+    """Validate particle and gas arrays share the same Warp device.
+
+    Args:
+        particles: Particle data with GPU-backed arrays.
+        gas: Gas data with GPU-backed arrays.
+        device: Expected Warp device.
+
+    Raises:
+        ValueError: If any particle or gas array is on a different device.
+    """
     _validate_device_match(
         "particle concentration", particles.concentration, device
     )
