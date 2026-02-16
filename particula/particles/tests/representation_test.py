@@ -1,8 +1,7 @@
 """Test Building ParticleRepresentation properties."""
 
-from typing import Any
-
 import warnings
+from typing import Any
 
 import numpy as np
 from particula.particles.activity_strategies import ActivityIdealMass

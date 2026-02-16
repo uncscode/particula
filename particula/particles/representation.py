@@ -93,7 +93,6 @@ class ParticleRepresentation:
         deprecation warning and stores state in a ParticleData container.
         """
         _warn_deprecated(stacklevel=2)
-        from particula.particles.particle_data import ParticleData
 
         self.strategy = strategy
         self.activity = activity
