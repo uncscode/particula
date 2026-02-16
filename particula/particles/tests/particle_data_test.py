@@ -5,6 +5,8 @@ single particle, single species), and validation error cases for
 shape mismatches.
 """
 
+import warnings
+
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -430,16 +432,18 @@ class TestConversionFromRepresentation:
         charge,
         volume,
     ) -> ParticleRepresentation:
-        return ParticleRepresentation(
-            strategy=strategy,
-            activity=ActivityIdealMass(),
-            surface=SurfaceStrategyMass(),
-            distribution=distribution,
-            density=density,
-            concentration=concentration,
-            charge=charge,
-            volume=volume,
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            return ParticleRepresentation(
+                strategy=strategy,
+                activity=ActivityIdealMass(),
+                surface=SurfaceStrategyMass(),
+                distribution=distribution,
+                density=density,
+                concentration=concentration,
+                charge=charge,
+                volume=volume,
+            )
 
     def test_mass_based(self) -> None:
         """MassBasedMovingBin maps species mass and preserves raw fields."""
@@ -605,7 +609,9 @@ class TestConversionToRepresentation:
         assert rep.get_strategy_name() == strategy.get_name()
         npt.assert_allclose(rep.distribution, data.masses[0])
         npt.assert_allclose(rep.concentration, data.concentration[0])
-        npt.assert_allclose(rep.charge, data.charge[0])
+        charge = rep.charge
+        assert charge is not None
+        npt.assert_allclose(charge, data.charge[0])
         assert rep.volume == pytest.approx(1.0)
 
     def test_box_index_selection(self) -> None:
@@ -622,7 +628,9 @@ class TestConversionToRepresentation:
 
         npt.assert_allclose(rep.distribution, data.masses[1])
         npt.assert_allclose(rep.concentration, data.concentration[1])
-        npt.assert_allclose(rep.charge, data.charge[1])
+        charge = rep.charge
+        assert charge is not None
+        npt.assert_allclose(charge, data.charge[1])
         assert rep.volume == pytest.approx(2.0)
 
     def test_box_index_out_of_range(self) -> None:
@@ -653,7 +661,9 @@ class TestConversionToRepresentation:
         expected_distribution = data.masses[0].sum(axis=1)
         npt.assert_allclose(rep.distribution, expected_distribution)
         npt.assert_allclose(rep.concentration, data.concentration[0])
-        npt.assert_allclose(rep.charge, data.charge[0])
+        charge = rep.charge
+        assert charge is not None
+        npt.assert_allclose(charge, data.charge[0])
 
     def test_radii_based_distribution(self) -> None:
         """RadiiBasedMovingBin uses radii for distribution."""
@@ -670,7 +680,9 @@ class TestConversionToRepresentation:
         expected_distribution = data.radii[0]
         npt.assert_allclose(rep.distribution, expected_distribution)
         npt.assert_allclose(rep.concentration, data.concentration[0])
-        npt.assert_allclose(rep.charge, data.charge[0])
+        charge = rep.charge
+        assert charge is not None
+        npt.assert_allclose(charge, data.charge[0])
 
     def test_particle_resolved_distribution(self) -> None:
         """ParticleResolvedSpeciatedMass preserves per-particle per-species."""
@@ -686,7 +698,9 @@ class TestConversionToRepresentation:
 
         npt.assert_allclose(rep.distribution, data.masses[1])
         npt.assert_allclose(rep.concentration, data.concentration[1])
-        npt.assert_allclose(rep.charge, data.charge[1])
+        charge = rep.charge
+        assert charge is not None
+        npt.assert_allclose(charge, data.charge[1])
         assert rep.volume == pytest.approx(2.0)
 
     def test_round_trip(self) -> None:
@@ -696,16 +710,18 @@ class TestConversionToRepresentation:
         distribution = np.array([[1.0, 0.2], [0.3, 0.7]])
         concentration = np.array([1.0, 2.0])
         charge = np.array([0.0, 1.0])
-        rep = ParticleRepresentation(
-            strategy=strategy,
-            activity=ActivityIdealMass(),
-            surface=SurfaceStrategyMass(),
-            distribution=distribution,
-            density=density,
-            concentration=concentration,
-            charge=charge,
-            volume=1.0,
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            rep = ParticleRepresentation(
+                strategy=strategy,
+                activity=ActivityIdealMass(),
+                surface=SurfaceStrategyMass(),
+                distribution=distribution,
+                density=density,
+                concentration=concentration,
+                charge=charge,
+                volume=1.0,
+            )
 
         data = from_representation(rep, n_boxes=1)
         rebuilt = to_representation(
@@ -718,5 +734,7 @@ class TestConversionToRepresentation:
 
         npt.assert_allclose(rebuilt.distribution, distribution)
         npt.assert_allclose(rebuilt.concentration, concentration)
-        npt.assert_allclose(rebuilt.charge, charge)
+        rebuilt_charge = rebuilt.charge
+        assert rebuilt_charge is not None
+        npt.assert_allclose(rebuilt_charge, charge)
         assert rebuilt.volume == pytest.approx(1.0)

@@ -2,6 +2,8 @@
 
 from typing import Any
 
+import warnings
+
 import numpy as np
 from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import (
@@ -32,15 +34,17 @@ def setup_particle(
     - concentration : Concentration array for particles
     - charge : Charge of particles
     """
-    return ParticleRepresentation(
-        strategy=strategy,
-        activity=activity,
-        surface=surface,
-        distribution=distribution,
-        density=np.atleast_1d(np.asarray(density, dtype=np.float64)),
-        concentration=concentration,
-        charge=np.atleast_1d(np.asarray(charge, dtype=np.float64)),
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        return ParticleRepresentation(
+            strategy=strategy,
+            activity=activity,
+            surface=surface,
+            distribution=distribution,
+            density=np.atleast_1d(np.asarray(density, dtype=np.float64)),
+            concentration=concentration,
+            charge=np.atleast_1d(np.asarray(charge, dtype=np.float64)),
+        )
 
 
 def setup_particle_resolved() -> ParticleRepresentation:
