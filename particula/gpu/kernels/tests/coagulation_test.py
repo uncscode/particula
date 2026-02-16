@@ -12,7 +12,6 @@ from __future__ import annotations
 # pyright: reportAssignmentType=false
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
-
 from typing import Any
 
 import numpy as np
@@ -677,7 +676,7 @@ def test_coagulation_validation_rejects_device_mismatch(device: str) -> None:
 
 
 def test_coagulation_validate_device_arrays(device: str) -> None:
-    """Device array validation passes for matching devices and fails otherwise."""
+    """Device validation passes when devices match and fails otherwise."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
 

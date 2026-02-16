@@ -59,7 +59,7 @@ def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
 
 @wp.kernel
 # type: ignore[misc]
-def brownian_coagulation_kernel(
+def brownian_coagulation_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
     density: Any,
@@ -102,8 +102,9 @@ def brownian_coagulation_kernel(
         diffusivities: Output diffusivities ``(n_boxes, n_particles)``.
         g_terms: Output collection terms ``(n_boxes, n_particles)``.
         speeds: Output mean thermal speeds ``(n_boxes, n_particles)``.
-        active_flags: Output active particle flags ``(n_boxes, n_particles)``.
-        collision_pairs: Output collision indices ``(n_boxes, max_collisions, 2)``.
+        active_flags: Output active flags ``(n_boxes, n_particles)``.
+        collision_pairs: Output collision indices
+            ``(n_boxes, max_collisions, 2)``.
         n_collisions: Output collision counts ``(n_boxes,)``.
         rng_states: RNG states ``(n_boxes,)``.
     """  # type: ignore
@@ -290,7 +291,8 @@ def apply_coagulation_kernel(
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
         concentration: Particle concentrations ``(n_boxes, n_particles)``.
-        collision_pairs: Collision index buffer ``(n_boxes, max_collisions, 2)``.
+        collision_pairs: Collision index buffer
+            ``(n_boxes, max_collisions, 2)``.
         n_collisions: Collision counts ``(n_boxes,)``.
     """  # type: ignore
     box_idx, collision_idx = wp.tid()  # type: ignore[misc]
