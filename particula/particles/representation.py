@@ -1,4 +1,8 @@
-"""Particle representation for a collection of particles."""
+"""Legacy particle representation facade.
+
+Provides a deprecated facade over :class:`ParticleData` while preserving the
+legacy API for distribution strategies, activities, and surfaces.
+"""
 
 import logging
 import warnings
@@ -99,7 +103,16 @@ class ParticleRepresentation:
         self.surface = surface
 
         self._distribution = np.asarray(distribution, dtype=np.float64)
-        density_array = np.atleast_1d(np.asarray(density, dtype=np.float64))
+        density_array = np.asarray(density, dtype=np.float64)
+        if density_array.ndim == 0:
+            density_array = np.atleast_1d(density_array)
+        elif density_array.ndim > 1:
+            if density_array.size == 0:
+                density_array = np.zeros(0, dtype=np.float64)
+            else:
+                density_array = np.asarray(
+                    density_array[0], dtype=np.float64
+                ).reshape(-1)
         concentration_array = np.asarray(concentration, dtype=np.float64)
         if concentration_array.ndim == 0:
             concentration_array = np.atleast_1d(concentration_array)
