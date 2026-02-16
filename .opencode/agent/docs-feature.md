@@ -1,16 +1,15 @@
 ---
-description: 'Subagent that manages feature documentation in adw-docs/dev-plans/features/.
-  Invoked by the documentation primary agent to create and update feature documentation
-  following the established template format.
+description: 'Subagent that manages all development plan documentation in adw-docs/dev-plans/.
+  Invoked by the documentation primary agent to create and update feature docs, epic
+  rollups, maintenance plans, templates, and the dev-plans index.
 
   This subagent: - Loads workflow context from adw_spec tool - Creates new feature
   docs following template-feature.md format - Updates existing feature docs when features
-  change - Archives completed/deprecated feature docs to archive/features/ - Maintains
-  adw-docs/dev-plans/README.md index - Ensures feature docs stay current
-  with implementation - Validates markdown links
+  change - Updates epic rollup docs (phase status, feature links) - Updates maintenance
+  plans and archives - Maintains adw-docs/dev-plans/README.md index - Ensures all
+  dev-plans docs stay current with implementation - Validates markdown links
 
-  Write permissions: - adw-docs/dev-plans/features/*.md: ALLOW - adw-docs/dev-plans/archive/features/*.md:
-  ALLOW'
+  Write permissions: - adw-docs/dev-plans/**/*.md: ALLOW (entire dev-plans tree)'
 mode: subagent
 tools:
   read: true
@@ -80,12 +79,10 @@ task({
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `adw-docs/dev-plans/features/*.md` - Create and update feature docs
-- ✅ `adw-docs/dev-plans/README.md` - Update index
-- ✅ `adw-docs/dev-plans/archive/features/*.md` - Archive completed/deprecated features
+- ✅ `adw-docs/dev-plans/**/*.md` - Entire dev-plans tree (features, epics, maintenance, archive, templates, README)
 
 **DENIED:**
-- ❌ All other directories
+- ❌ All directories outside `adw-docs/dev-plans/`
 
 # Process
 
@@ -482,7 +479,7 @@ Links validated: 8 links checked, all valid
 
 **Output Signal:** `DOCS_FEATURE_UPDATE_COMPLETE` or `DOCS_FEATURE_UPDATE_FAILED`
 
-**Scope:** `adw-docs/dev-plans/features/*.md` only
+**Scope:** `adw-docs/dev-plans/**/*.md` (entire dev-plans tree)
 
 **Template:** Follow `adw-docs/dev-plans/template-feature.md` structure
 
