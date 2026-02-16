@@ -5,8 +5,6 @@ single particle, single species), and validation error cases for
 shape mismatches.
 """
 
-import warnings
-
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -432,18 +430,16 @@ class TestConversionFromRepresentation:
         charge,
         volume,
     ) -> ParticleRepresentation:
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return ParticleRepresentation(
-                strategy=strategy,
-                activity=ActivityIdealMass(),
-                surface=SurfaceStrategyMass(),
-                distribution=distribution,
-                density=density,
-                concentration=concentration,
-                charge=charge,
-                volume=volume,
-            )
+        return ParticleRepresentation(
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=volume,
+        )
 
     def test_mass_based(self) -> None:
         """MassBasedMovingBin maps species mass and preserves raw fields."""
@@ -710,18 +706,16 @@ class TestConversionToRepresentation:
         distribution = np.array([[1.0, 0.2], [0.3, 0.7]])
         concentration = np.array([1.0, 2.0])
         charge = np.array([0.0, 1.0])
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            rep = ParticleRepresentation(
-                strategy=strategy,
-                activity=ActivityIdealMass(),
-                surface=SurfaceStrategyMass(),
-                distribution=distribution,
-                density=density,
-                concentration=concentration,
-                charge=charge,
-                volume=1.0,
-            )
+        rep = ParticleRepresentation(
+            strategy=strategy,
+            activity=ActivityIdealMass(),
+            surface=SurfaceStrategyMass(),
+            distribution=distribution,
+            density=density,
+            concentration=concentration,
+            charge=charge,
+            volume=1.0,
+        )
 
         data = from_representation(rep, n_boxes=1)
         rebuilt = to_representation(

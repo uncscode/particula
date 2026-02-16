@@ -1,6 +1,5 @@
 """Test Building ParticleRepresentation properties."""
 
-import warnings
 from typing import Any
 
 import numpy as np
@@ -33,17 +32,15 @@ def setup_particle(
     - concentration : Concentration array for particles
     - charge : Charge of particles
     """
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=DeprecationWarning)
-        return ParticleRepresentation(
-            strategy=strategy,
-            activity=activity,
-            surface=surface,
-            distribution=distribution,
-            density=np.atleast_1d(np.asarray(density, dtype=np.float64)),
-            concentration=concentration,
-            charge=np.atleast_1d(np.asarray(charge, dtype=np.float64)),
-        )
+    return ParticleRepresentation(
+        strategy=strategy,
+        activity=activity,
+        surface=surface,
+        distribution=distribution,
+        density=np.atleast_1d(np.asarray(density, dtype=np.float64)),
+        concentration=concentration,
+        charge=np.atleast_1d(np.asarray(charge, dtype=np.float64)),
+    )
 
 
 def setup_particle_resolved() -> ParticleRepresentation:

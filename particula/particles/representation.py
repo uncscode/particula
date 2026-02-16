@@ -5,7 +5,6 @@ legacy API for distribution strategies, activities, and surfaces.
 """
 
 import logging
-import warnings
 from copy import deepcopy
 from typing import TYPE_CHECKING, Optional
 
@@ -34,26 +33,17 @@ if TYPE_CHECKING:
     from particula.particles.particle_data import ParticleData
 
 
-def _should_warn_deprecation() -> bool:
-    """Return True if DeprecationWarning is not set to error.
-
-    This allows existing tests to run under -Werror without failing while still
-    surfacing warnings when explicitly captured with ``pytest.warns``.
-    """
-    for action, _, category, _, _ in warnings.filters:
-        if issubclass(DeprecationWarning, category):
-            return action != "error"
-    return True
-
-
 def _warn_deprecated(*, stacklevel: int = 2) -> None:
-    """Emit deprecation warning unless warnings are configured as errors."""
-    if _should_warn_deprecation():
-        warnings.warn(
-            _DEPRECATION_MESSAGE,
-            DeprecationWarning,
-            stacklevel=stacklevel,
-        )
+    """Log a deprecation notice at INFO level.
+
+    Uses ``logger.info`` instead of ``warnings.warn`` so the message is
+    visible during normal operation but never triggers failures under
+    ``-Werror`` or ``pytest -W error``.
+
+    Args:
+        stacklevel: Unused, kept for call-site compatibility.
+    """
+    logger.info(_DEPRECATION_MESSAGE)
 
 
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
