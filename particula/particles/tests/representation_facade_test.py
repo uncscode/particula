@@ -4,7 +4,6 @@ import warnings
 
 import numpy as np
 import pytest
-
 from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
@@ -14,8 +13,8 @@ from particula.particles.distribution_strategies import (
 )
 from particula.particles.particle_data import ParticleData, to_representation
 from particula.particles.representation import (
-    ParticleRepresentation,
     _DEPRECATION_MESSAGE,
+    ParticleRepresentation,
     _should_warn_deprecation,
     _warn_deprecated,
 )
@@ -134,7 +133,7 @@ def test_mutation_deprecation_warnings(method_name):
 
 
 def test_data_property_returns_particle_data():
-    """data property exposes ParticleData."""
+    """Data property exposes ParticleData."""
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         rep = _make_representation(
