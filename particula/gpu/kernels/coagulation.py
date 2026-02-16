@@ -11,17 +11,20 @@ produce collision pairs that are applied to merge particle masses in-place.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from typing import Any
+from typing import TYPE_CHECKING, Any, no_type_check
 
 import particula.util.constants as constants
 
-try:
+if TYPE_CHECKING:  # pragma: no cover - import for typing only
     import warp as wp
-except ImportError as exc:  # pragma: no cover - handled via import guards
-    raise ImportError(
-        "Warp is required for GPU coagulation kernels. "
-        "Install with: pip install warp-lang"
-    ) from exc
+else:  # pragma: no cover - runtime import with helpful error
+    try:
+        import warp as wp
+    except ImportError as exc:
+        raise ImportError(
+            "Warp is required for GPU coagulation kernels. "
+            "Install with: pip install warp-lang"
+        ) from exc
 
 from particula.gpu.dynamics.coagulation_funcs import (
     brownian_diffusivity_wp,
@@ -44,6 +47,7 @@ from particula.gpu.properties.particle_properties import (
 )
 
 
+@no_type_check
 @wp.kernel
 # type: ignore[misc]
 def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
@@ -57,6 +61,7 @@ def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
     rng_states[box_idx] = wp.rand_init(wp.int32(seed), wp.int32(box_idx))
 
 
+@no_type_check
 @wp.kernel
 # type: ignore[misc]
 def brownian_coagulation_kernel(  # noqa: C901
@@ -278,6 +283,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     rng_states[box_idx] = state
 
 
+@no_type_check
 @wp.kernel
 # type: ignore[misc]
 def apply_coagulation_kernel(
@@ -473,7 +479,7 @@ def _ensure_volume_array(
         _validate_device_match("volume", volume, device)
         return volume
 
-    return wp.full(
+    return wp.full(  # type: ignore[arg-type]
         n_boxes,
         wp.float64(volume),
         dtype=wp.float64,
