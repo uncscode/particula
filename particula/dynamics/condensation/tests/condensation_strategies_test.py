@@ -10,7 +10,6 @@ import unittest
 
 import numpy as np
 import particula as par  # new – we will build real objects
-from particula.gas.gas_data import GasData, from_species
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
@@ -21,6 +20,7 @@ from particula.dynamics.condensation.condensation_strategies import (
     _unwrap_gas,
     _unwrap_particle,
 )
+from particula.gas.gas_data import GasData, from_species
 from particula.particles.particle_data import ParticleData, from_representation
 
 
@@ -133,7 +133,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertIsNotNone(result)
 
     def test_unwrap_helpers_accept_legacy_and_data(self):
-        """unwrap helpers return data and legacy flags for valid inputs."""
+        """Unwrap helpers return data and legacy flags for valid inputs."""
         particle_data = from_representation(self.particle)
         gas_data = from_species(self.gas_species)
 
@@ -152,7 +152,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertFalse(gas_is_legacy)
 
     def test_unwrap_helpers_invalid_type_raises(self):
-        """unwrap helpers raise TypeError for unsupported types."""
+        """Unwrap helpers raise TypeError for unsupported types."""
         with self.assertRaises(TypeError):
             _unwrap_particle("not a particle")
         with self.assertRaises(TypeError):

@@ -1499,7 +1499,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         time_step: float,
     ) -> Tuple[ParticleData, GasData]: ...
 
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleRepresentation | ParticleData,
         gas_species: GasSpecies | GasData,

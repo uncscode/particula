@@ -10,7 +10,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from particula.gas.gas_data import GasData
-from particula.gas.species import GasSpecies, _DEPRECATION_MESSAGE
+from particula.gas.species import _DEPRECATION_MESSAGE, GasSpecies
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     VaporPressureStrategy,
