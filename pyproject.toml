@@ -96,7 +96,6 @@ convention = "google"          # accepts "google", "numpy", or "pep257"
 testpaths = ["particula"]
 norecursedirs = ["trees", ".git", "dist", "build", "particula/dynamics/wall_loss/tests"]
 filterwarnings = [
-    "ignore:GasSpecies is deprecated.*:DeprecationWarning",
     "ignore:The NumPy module was reloaded.*:UserWarning",
 ]
 markers = [

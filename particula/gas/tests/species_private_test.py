@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -138,14 +140,22 @@ def test_species_arrays_for_strategy_single_and_multi() -> None:
     npt.assert_allclose(molar, np.array([0.018, 0.017]))
 
 
-def test_check_if_negative_concentration_clamps_and_warns() -> None:
-    """_check_if_negative_concentration clamps to zero and warns."""
-    species = _make_facade_single()
+def test_check_if_negative_concentration_clamps_and_warns(
+    caplog,
+) -> None:
+    """_check_if_negative_concentration clamps to zero and logs warning."""
+    particula_logger = logging.getLogger("particula")
+    old_propagate = particula_logger.propagate
+    particula_logger.propagate = True
+    caplog.set_level(logging.WARNING, logger="particula")
 
-    with pytest.warns(UserWarning, match="Negative concentration"):
-        values = species._check_if_negative_concentration(np.array([-1.0, 2.0]))
+    species = _make_facade_single()
+    caplog.clear()
+    values = species._check_if_negative_concentration(np.array([-1.0, 2.0]))
 
     npt.assert_allclose(values, np.array([0.0, 2.0]))
+    assert "Negative concentration" in caplog.text
+    particula_logger.propagate = old_propagate
 
 
 def test_check_non_positive_value_raises() -> None:

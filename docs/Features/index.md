@@ -42,6 +42,15 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](wall_loss_strategy_system.md)
 
+-   __[Particle & Gas Data Migration](particle-data-migration.md)__
+
+    ---
+
+    Migration guide from legacy APIs (ParticleRepresentation, GasSpecies)
+    to the new data containers (ParticleData, GasData).
+
+    [:octicons-arrow-right-24: Learn more](particle-data-migration.md)
+
 </div>
 
 ## Design Patterns
