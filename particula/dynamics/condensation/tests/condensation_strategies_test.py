@@ -10,10 +10,18 @@ import unittest
 
 import numpy as np
 import particula as par  # new – we will build real objects
+from particula.gas.gas_data import GasData, from_species
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
+    _partial_pressure_from_strategy,
+    _pure_vapor_pressure_from_strategy,
+    _require_matching_types,
+    _require_single_box,
+    _unwrap_gas,
+    _unwrap_particle,
 )
+from particula.particles.particle_data import ParticleData, from_representation
 
 
 # pylint: disable=too-many-instance-attributes
@@ -93,6 +101,29 @@ class TestCondensationIsothermal(unittest.TestCase):
             .set_volume(1e-6, "m^3")  # 1 cm³ parcel
             .build()
         )
+        self.activity_strategy = activity
+        self.surface_strategy = surface
+        self.vapor_pressure_strategy = (
+            self.gas_species.pure_vapor_pressure_strategy
+        )
+
+    def _make_data_strategy(self) -> CondensationIsothermal:
+        """Return CondensationIsothermal configured for data-only inputs."""
+        return CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+        )
+
+    def _make_data_inputs(self) -> tuple[ParticleData, GasData]:
+        """Return ParticleData and GasData versions of fixtures."""
+        return (
+            from_representation(self.particle),
+            from_species(self.gas_species),
+        )
 
     def test_mean_free_path(self):
         """Test the mean free path call."""
@@ -100,6 +131,115 @@ class TestCondensationIsothermal(unittest.TestCase):
             temperature=self.temperature, pressure=self.pressure
         )
         self.assertIsNotNone(result)
+
+    def test_unwrap_helpers_accept_legacy_and_data(self):
+        """unwrap helpers return data and legacy flags for valid inputs."""
+        particle_data = from_representation(self.particle)
+        gas_data = from_species(self.gas_species)
+
+        particle_unwrapped, particle_is_legacy = _unwrap_particle(self.particle)
+        gas_unwrapped, gas_is_legacy = _unwrap_gas(self.gas_species)
+        self.assertIsInstance(particle_unwrapped, ParticleData)
+        self.assertIsInstance(gas_unwrapped, GasData)
+        self.assertTrue(particle_is_legacy)
+        self.assertTrue(gas_is_legacy)
+
+        particle_unwrapped, particle_is_legacy = _unwrap_particle(particle_data)
+        gas_unwrapped, gas_is_legacy = _unwrap_gas(gas_data)
+        self.assertIsInstance(particle_unwrapped, ParticleData)
+        self.assertIsInstance(gas_unwrapped, GasData)
+        self.assertFalse(particle_is_legacy)
+        self.assertFalse(gas_is_legacy)
+
+    def test_unwrap_helpers_invalid_type_raises(self):
+        """unwrap helpers raise TypeError for unsupported types."""
+        with self.assertRaises(TypeError):
+            _unwrap_particle("not a particle")
+        with self.assertRaises(TypeError):
+            _unwrap_gas(123)
+
+    def test_require_matching_types_raises_on_mismatch(self):
+        """require_matching_types rejects mixed legacy/data inputs."""
+        with self.assertRaises(TypeError):
+            _require_matching_types(True, False)
+
+    def test_require_single_box_raises_for_multi_box(self):
+        """require_single_box rejects multi-box inputs."""
+        with self.assertRaises(ValueError):
+            _require_single_box(2, "ParticleData")
+
+    def test_vapor_pressure_helpers_handle_sequence_and_single(self):
+        """Vapor-pressure helpers accept sequences and single strategies."""
+        temperature = self.temperature
+        strategy_sequence = self.vapor_pressure_strategy
+        strategy_single = strategy_sequence[0]
+
+        pure_sequence = _pure_vapor_pressure_from_strategy(
+            strategy_sequence, temperature
+        )
+        pure_single = _pure_vapor_pressure_from_strategy(
+            strategy_single, temperature
+        )
+        self.assertEqual(pure_sequence.shape[0], len(strategy_sequence))
+        self.assertEqual(pure_single.shape, ())
+
+        gas_data = from_species(self.gas_species)
+        concentration = gas_data.concentration[0]
+        molar_mass = gas_data.molar_mass
+        partial_sequence = _partial_pressure_from_strategy(
+            strategy_sequence,
+            concentration=concentration,
+            molar_mass=molar_mass,
+            temperature=temperature,
+        )
+        partial_single = _partial_pressure_from_strategy(
+            strategy_single,
+            concentration=concentration[0],
+            molar_mass=molar_mass[0],
+            temperature=temperature,
+        )
+        self.assertEqual(partial_sequence.shape[0], len(strategy_sequence))
+        self.assertIsInstance(partial_single, np.ndarray)
+        self.assertEqual(partial_single.shape, ())
+
+    def test_data_only_requires_strategy_configuration(self):
+        """Data-only inputs require strategies on the condensation strategy."""
+        particle_data, gas_data = self._make_data_inputs()
+        strategy = CondensationIsothermal(molar_mass=self.molar_mass)
+        with self.assertRaises(TypeError):
+            strategy.calculate_pressure_delta(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                radius=particle_data.radii[0],
+            )
+
+    def test_data_only_missing_vapor_pressure_strategy_raises(self):
+        """GasData requires a vapor_pressure_strategy on the strategy."""
+        particle_data, gas_data = self._make_data_inputs()
+        strategy = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+        )
+        with self.assertRaises(TypeError):
+            strategy.calculate_pressure_delta(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                radius=particle_data.radii[0],
+            )
+
+    def test_rate_rejects_mixed_legacy_and_data_inputs(self):
+        """rate() raises TypeError when legacy/data inputs are mixed."""
+        particle_data, _ = self._make_data_inputs()
+        with self.assertRaises(TypeError):
+            self.strategy.rate(
+                particle=particle_data,
+                gas_species=self.gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
 
     def test_knudsen_number(self):
         """Test the Knudsen number call."""
@@ -230,6 +370,88 @@ class TestCondensationIsothermal(unittest.TestCase):
         expected_2d = np.tile(np.array([0.0, 1.0, 0.0, 3.0]), (2, 1))
         np.testing.assert_array_equal(array_2d, expected_2d)
 
+    def test_isothermal_step_with_particle_data_gas_data(self):
+        """step() supports ParticleData and GasData inputs."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        particle_new, gas_new = strategy.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsInstance(particle_new, ParticleData)
+        self.assertIsInstance(gas_new, GasData)
+        self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)
+
+    def test_isothermal_step_returns_matching_types(self):
+        """step() returns matching types for legacy and data-only inputs."""
+        particle_legacy, gas_legacy = self.strategy.step(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsInstance(
+            particle_legacy, par.particles.ParticleRepresentation
+        )
+        self.assertIsInstance(gas_legacy, par.gas.GasSpecies)
+
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        particle_new, gas_new = strategy.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsInstance(particle_new, ParticleData)
+        self.assertIsInstance(gas_new, GasData)
+
+    def test_isothermal_rate_with_particle_data(self):
+        """rate() supports ParticleData inputs."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        rate = strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertIsInstance(rate, np.ndarray)
+        self.assertEqual(rate.shape, particle_data.masses[0].shape)
+
+    def test_isothermal_mass_transfer_rate_with_particle_data(self):
+        """mass_transfer_rate() supports ParticleData inputs."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        mass_rate = strategy.mass_transfer_rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertIsInstance(mass_rate, np.ndarray)
+        self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)
+
+    def test_calculate_pressure_delta_with_particle_data(self):
+        """calculate_pressure_delta() works with data containers."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        radius = particle_data.radii[0]
+        pressure_delta = strategy.calculate_pressure_delta(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            radius=radius,
+        )
+        self.assertIsInstance(pressure_delta, np.ndarray)
+        self.assertEqual(pressure_delta.shape[0], radius.shape[0])
+        self.assertTrue(np.all(np.isfinite(pressure_delta)))
+
 
 class TestCondensationIsothermalStaggered(unittest.TestCase):
     """Test class for the CondensationIsothermalStaggered strategy."""
@@ -244,6 +466,25 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.time_step = 0.1
         self.particle = base.particle
         self.gas_species = base.gas_species
+        self.activity_strategy = base.activity_strategy
+        self.surface_strategy = base.surface_strategy
+        self.vapor_pressure_strategy = base.vapor_pressure_strategy
+
+    def _make_data_strategy(self) -> CondensationIsothermalStaggered:
+        """Return staggered strategy configured for data-only inputs."""
+        return CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+        )
+
+    def _make_data_inputs(self) -> tuple[ParticleData, GasData]:
+        """Return ParticleData and GasData versions of fixtures."""
+        return (
+            from_representation(self.particle),
+            from_species(self.gas_species),
+        )
 
     def test_defaults(self):
         """Defaults stored correctly for staggered strategy."""
@@ -724,6 +965,77 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         self.assertIsNotNone(particle_new)
         self.assertIsNotNone(gas_new)
+
+    def test_staggered_step_with_particle_data_gas_data(self):
+        """Staggered step supports ParticleData and GasData inputs."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        particle_new, gas_new = strategy.step(
+            particle_data,
+            gas_data,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsInstance(particle_new, ParticleData)
+        self.assertIsInstance(gas_new, GasData)
+        self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)
+
+    def test_staggered_step_returns_matching_types(self):
+        """Staggered step returns matching types for legacy and data inputs."""
+        particle_legacy, gas_legacy = CondensationIsothermalStaggered(
+            molar_mass=self.molar_mass
+        ).step(
+            self.particle,
+            self.gas_species,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsInstance(
+            particle_legacy, par.particles.ParticleRepresentation
+        )
+        self.assertIsInstance(gas_legacy, par.gas.GasSpecies)
+
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        particle_new, gas_new = strategy.step(
+            particle_data,
+            gas_data,
+            self.temperature,
+            self.pressure,
+            time_step=self.time_step,
+        )
+        self.assertIsInstance(particle_new, ParticleData)
+        self.assertIsInstance(gas_new, GasData)
+
+    def test_staggered_rate_with_particle_data(self):
+        """rate() supports ParticleData inputs for staggered strategy."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        rate = strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertIsInstance(rate, np.ndarray)
+        self.assertEqual(rate.shape, particle_data.masses[0].shape)
+        self.assertTrue(np.all(np.isfinite(rate)))
+
+    def test_staggered_mass_transfer_rate_with_particle_data(self):
+        """mass_transfer_rate() supports ParticleData inputs for staggered."""
+        strategy = self._make_data_strategy()
+        particle_data, gas_data = self._make_data_inputs()
+        mass_rate = strategy.mass_transfer_rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        self.assertIsInstance(mass_rate, np.ndarray)
+        self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)
+        self.assertTrue(np.all(np.isfinite(mass_rate)))
 
     def test_step_random_mode_produces_valid_output(self):
         """Step with theta_mode='random' returns updated particle and gas."""
