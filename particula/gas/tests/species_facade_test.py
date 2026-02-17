@@ -1,16 +1,16 @@
 """Tests for GasSpecies facade over GasData.
 
-Validates deprecation warnings, delegation, and internal data updates.
+Validates deprecation log messages, delegation, and internal data updates.
 """
 
-import warnings
+import logging
 from typing import cast
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 from particula.gas.gas_data import GasData
-from particula.gas.species import GasSpecies
+from particula.gas.species import GasSpecies, _DEPRECATION_MESSAGE
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     VaporPressureStrategy,
@@ -32,17 +32,29 @@ def _make_single_box_data(
     )
 
 
-def test_init_deprecation_warning() -> None:
-    """GasSpecies construction emits a DeprecationWarning."""
+@pytest.fixture()
+def _enable_particula_log_capture(caplog):
+    """Allow caplog to capture the 'particula' logger (propagate=False)."""
+    particula_logger = logging.getLogger("particula")
+    old_propagate = particula_logger.propagate
+    particula_logger.propagate = True
+    caplog.set_level(logging.INFO, logger="particula")
+    yield caplog
+    particula_logger.propagate = old_propagate
+
+
+def test_init_deprecation_log(_enable_particula_log_capture) -> None:
+    """GasSpecies construction logs a deprecation info message."""
+    caplog = _enable_particula_log_capture
     strategy = ConstantVaporPressureStrategy(2330.0)
-    with pytest.warns(DeprecationWarning, match="GasSpecies is deprecated"):
-        GasSpecies(
-            name="Water",
-            molar_mass=0.018,
-            vapor_pressure_strategy=strategy,
-            partitioning=True,
-            concentration=1e-6,
-        )
+    GasSpecies(
+        name="Water",
+        molar_mass=0.018,
+        vapor_pressure_strategy=strategy,
+        partitioning=True,
+        concentration=1e-6,
+    )
+    assert _DEPRECATION_MESSAGE in caplog.text
 
 
 def test_data_property_returns_gas_data() -> None:
@@ -54,17 +66,16 @@ def test_data_property_returns_gas_data() -> None:
     assert isinstance(species.data, GasData)
 
 
-def test_from_data_no_deprecation_warning() -> None:
-    """from_data() does not emit the deprecation warning."""
+def test_from_data_no_deprecation_log(
+    _enable_particula_log_capture,
+) -> None:
+    """from_data() does not emit the deprecation log message."""
+    caplog = _enable_particula_log_capture
     data = _make_single_box_data("Water", 0.018, 1e-6)
     strategy = ConstantVaporPressureStrategy(2330.0)
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        _ = GasSpecies.from_data(data, strategy)
-
-    assert not any(
-        issubclass(warning.category, DeprecationWarning) for warning in caught
-    )
+    caplog.clear()
+    _ = GasSpecies.from_data(data, strategy)
+    assert _DEPRECATION_MESSAGE not in caplog.text
 
 
 def test_facade_delegation_get_name() -> None:

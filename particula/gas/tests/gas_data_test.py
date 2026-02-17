@@ -1,12 +1,12 @@
 """Tests for the GasData dataclass."""
 
-import warnings
+import logging
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 from particula.gas.gas_data import GasData, from_species, to_species
-from particula.gas.species import GasSpecies
+from particula.gas.species import GasSpecies, _DEPRECATION_MESSAGE
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
 )
@@ -383,8 +383,13 @@ class TestToSpecies:
         with pytest.raises(IndexError, match="out of range"):
             to_species(gas_data, [strategy], box_index=2)  # Only 0, 1 valid
 
-    def test_to_species_no_deprecation_warning(self) -> None:
-        """to_species uses from_data and emits no DeprecationWarning."""
+    def test_to_species_no_deprecation_log(self, caplog) -> None:
+        """to_species uses from_data and emits no deprecation log."""
+        particula_logger = logging.getLogger("particula")
+        old_propagate = particula_logger.propagate
+        particula_logger.propagate = True
+        caplog.set_level(logging.INFO, logger="particula")
+
         gas_data = GasData(
             name=["Water"],
             molar_mass=np.array([0.018]),
@@ -393,14 +398,11 @@ class TestToSpecies:
         )
         strategy = ConstantVaporPressureStrategy(2330.0)
 
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            _ = to_species(gas_data, [strategy])
+        caplog.clear()
+        _ = to_species(gas_data, [strategy])
 
-        assert not any(
-            issubclass(warning.category, DeprecationWarning)
-            for warning in caught
-        )
+        assert _DEPRECATION_MESSAGE not in caplog.text
+        particula_logger.propagate = old_propagate
 
     def test_mixed_partitioning_raises(self) -> None:
         """ValueError when GasData has mixed partitioning values."""

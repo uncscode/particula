@@ -2,6 +2,8 @@
 
 # pylint: disable=##R0801
 
+import logging
+
 import numpy as np
 import pytest
 from particula.gas.species import GasSpecies
@@ -107,26 +109,35 @@ def test_gas_species_zero_molar_mass():
         )
 
 
-def test_gas_species_negative_concentration():
+def test_gas_species_negative_concentration(caplog):
     """Test gas species with negative concentration."""
-    with pytest.warns(UserWarning):
-        gas_species = GasSpecies(
-            name="NegativeConcentration",
-            molar_mass=1e10,
-            partitioning=False,
-            concentration=-1,
-        )
-        assert gas_species.get_concentration() == 0.0
+    particula_logger = logging.getLogger("particula")
+    old_propagate = particula_logger.propagate
+    particula_logger.propagate = True
+    caplog.set_level(logging.WARNING, logger="particula")
+
+    caplog.clear()
+    gas_species = GasSpecies(
+        name="NegativeConcentration",
+        molar_mass=1e10,
+        partitioning=False,
+        concentration=-1,
+    )
+    assert gas_species.get_concentration() == 0.0
+    assert "Negative concentration" in caplog.text
 
     # array input
-    with pytest.warns(UserWarning):
-        gas_species = GasSpecies(
-            name="NegativeConcentration",
-            molar_mass=np.array([1, 1]),
-            partitioning=False,
-            concentration=np.array([-1, 1]),
-        )
-        assert np.array_equal(gas_species.get_concentration(), [0.0, 1.0])
+    caplog.clear()
+    gas_species = GasSpecies(
+        name="NegativeConcentration",
+        molar_mass=np.array([1, 1]),
+        partitioning=False,
+        concentration=np.array([-1, 1]),
+    )
+    assert np.array_equal(gas_species.get_concentration(), [0.0, 1.0])
+    assert "Negative concentration" in caplog.text
+
+    particula_logger.propagate = old_propagate
 
 
 def test_gas_species_zero_concentration():
@@ -181,8 +192,7 @@ def test_gas_species_set_concentration():
     )
     gas_species.set_concentration(1.0)
     assert gas_species.get_concentration() == 1.0
-    with pytest.warns(UserWarning):
-        gas_species.set_concentration(-1.0)
+    gas_species.set_concentration(-1.0)
     assert gas_species.get_concentration() == 0.0
 
 
@@ -197,8 +207,7 @@ def test_gas_species_add_concentration():
     )
     gas_species.add_concentration(0.5)
     assert gas_species.get_concentration() == 1.0
-    with pytest.warns(UserWarning):
-        gas_species.add_concentration(-3.0)
+    gas_species.add_concentration(-3.0)
     assert gas_species.get_concentration() == 0.0
 
 

@@ -25,7 +25,7 @@ logger = logging.getLogger("particula")
 
 _DEPRECATION_MESSAGE = (
     "ParticleRepresentation is deprecated. Use ParticleData instead. "
-    "See migration guide: docs/migration/particle-data.md"
+    "See migration guide: docs/Features/particle-data-migration.md"
 )
 
 

@@ -335,7 +335,7 @@ new_data = add_mass(data, added_mass)
 
 - [ ] **E3-F4-P5**: Documentation and migration guide
   - Issue: TBD | Size: M | Status: Not Started
-  - Create `docs/migration/particle-data.md`
+  - Create `docs/Features/particle-data-migration.md`
   - Document new APIs in docstrings
   - Add examples showing both old and new patterns
   - Update `adw-docs/` with architecture changes

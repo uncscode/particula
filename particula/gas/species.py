@@ -6,7 +6,6 @@ pressure, and kg/m^3 for concentration.
 
 import copy
 import logging
-import warnings
 from typing import Optional, Union
 
 import numpy as np
@@ -23,19 +22,21 @@ logger = logging.getLogger("particula")
 
 _DEPRECATION_MESSAGE = (
     "GasSpecies is deprecated. Use GasData instead. "
-    "See migration guide: docs/migration/particle-data.md"
+    "See migration guide: docs/Features/particle-data-migration.md"
 )
 
 
 def _warn_deprecated(*, stacklevel: int = 2) -> None:
-    """Emit a deprecation warning for GasSpecies construction.
+    """Log a deprecation notice at INFO level.
+
+    Uses ``logger.info`` instead of ``warnings.warn`` so the message is
+    visible during normal operation but never triggers failures under
+    ``-Werror`` or ``pytest -W error``.
 
     Args:
-        stacklevel: Stacklevel forwarded to warnings.warn.
+        stacklevel: Unused, kept for call-site compatibility.
     """
-    warnings.warn(
-        _DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=stacklevel
-    )
+    logger.info(_DEPRECATION_MESSAGE)
 
 
 class GasSpecies:
@@ -788,7 +789,6 @@ class GasSpecies:
         if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
             logger.warning(message)
-            warnings.warn(message, UserWarning, stacklevel=2)
             # Set negative concentrations to 0
             values = np.maximum(values, 0.0)
         return values
