@@ -10960,6 +10960,8 @@
       
         
       
+        
+      
     
     
     
@@ -11085,6 +11087,34 @@
     
   
     Condensation Strategy System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../Features/particle-data-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Particle and Gas Data Migration Guide
   
 
     
@@ -14532,21 +14562,7 @@ species = to_species(gas_data, [strategy])</p>
 <span class="normal">282</span>
 <span class="normal">283</span>
 <span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_species</span><span class="p">(</span>
+<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_species</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">GasData</span><span class="p">,</span>
     <span class="n">vapor_pressure_strategies</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;VaporPressureStrategy&quot;</span><span class="p">],</span>
     <span class="n">box_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -14608,39 +14624,25 @@ species = to_species(gas_data, [strategy])</p>
         <span class="p">)</span>
     <span class="n">partitioning_value</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">unique_partitioning</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="c1"># Extract concentration for specified box</span>
-    <span class="n">concentration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="n">box_index</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">concentration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="n">box_index</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">single_box_data</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+        <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">),</span>
+        <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span>
+        <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">n_species</span><span class="p">,</span> <span class="n">partitioning_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Create GasSpecies</span>
-    <span class="c1"># For single species, use scalars; for multi-species, build by appending</span>
+    <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="s2">&quot;VaporPressureStrategy&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;VaporPressureStrategy&quot;</span><span class="p">]</span>
+    <span class="p">]</span>
     <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">n_species</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">GasSpecies</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">molar_mass</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">partitioning</span><span class="o">=</span><span class="n">partitioning_value</span><span class="p">,</span>
-            <span class="n">concentration</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-        <span class="p">)</span>
+        <span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Build multi-species by creating first then appending rest</span>
-        <span class="n">first_species</span> <span class="o">=</span> <span class="n">GasSpecies</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">molar_mass</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategies</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">partitioning</span><span class="o">=</span><span class="n">partitioning_value</span><span class="p">,</span>
-            <span class="n">concentration</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">n_species</span><span class="p">):</span>
-            <span class="n">next_species</span> <span class="o">=</span> <span class="n">GasSpecies</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="n">molar_mass</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
-                <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="n">partitioning</span><span class="o">=</span><span class="n">partitioning_value</span><span class="p">,</span>
-                <span class="n">concentration</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">concentration</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
-            <span class="p">)</span>
-            <span class="n">first_species</span> <span class="o">+=</span> <span class="n">next_species</span>
+        <span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">first_species</span>
+    <span class="k">return</span> <span class="n">GasSpecies</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span><span class="n">single_box_data</span><span class="p">,</span> <span class="n">vapor_pressure_strategy</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
