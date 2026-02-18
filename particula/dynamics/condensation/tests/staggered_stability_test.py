@@ -20,38 +20,6 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-# Work around SciPy 1.14 + NumPy 2.x docstring generation bug
-# where scipy.stats import triggers `_CopyMode.IF_NEEDED is neither True nor
-# False`. Patch the internal bool to keep imports viable for tests.
-try:  # pragma: no cover - defensive patch
-    from numpy import _globals as _np_globals
-
-    _np_globals._CopyMode.__bool__ = lambda self: False  # type: ignore[method-assign]
-except Exception:  # pragma: no cover  # noqa: S110
-    pass  # Silently ignore if NumPy internals changed; patch is optional
-
-# Stub scipy.stats.lognorm to avoid SciPy import-time failures under NumPy 2.x;
-# tests in this module do not rely on SciPy distributions.
-try:  # pragma: no cover - defensive patch
-    import sys
-    import types
-
-    import scipy as _real_scipy
-
-    class _StubLogNorm:
-        def pdf(self, *args, **kwargs):
-            raise RuntimeError("scipy.stats.lognorm stubbed for tests")
-
-        def rvs(self, *args, **kwargs):
-            raise RuntimeError("scipy.stats.lognorm stubbed for tests")
-
-    _scipy_stats_stub = types.ModuleType("scipy.stats")
-    _scipy_stats_stub.lognorm = _StubLogNorm()  # type: ignore[attr-defined]
-    sys.modules["scipy.stats"] = _scipy_stats_stub
-    _real_scipy.stats = _scipy_stats_stub  # type: ignore[attr-defined]
-except Exception:  # pragma: no cover  # noqa: S110
-    pass  # Silently ignore if SciPy internals changed; stub is optional
-
 from particula.dynamics.condensation import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,

@@ -22,7 +22,7 @@ keywords = [
 ]
 
 dependencies = [
-    "numpy>=2.0.0", "scipy>=1.12", "typing_extensions>=4.0.0",
+    "numpy>=2.0.0", "scipy>=1.14.0", "typing_extensions>=4.0.0",
     "warp-lang",
 ]
 
@@ -35,8 +35,8 @@ repository = "https://github.com/uncscode/particula"
 
 [project.optional-dependencies]
 dev = [
-    "pylint", "pytest", "pytest-cov", "autopep8", "jupyterlab",
-    "build", "flake8", "jupyter-book", "ghp-import",
+    "pytest", "pytest-cov", "jupyterlab",
+    "build", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
     "griffe", "openai", "GitPython", "ruff", "mypy",
@@ -135,7 +135,11 @@ good-names = ["i", "j", "k", "n", "m", "x", "y", "z", "t", "p", "T", "P", "df", 
 max-args = 10
 
 [tool.mypy]
+packages = ["particula"]
+ignore_missing_imports = true
 exclude = [
-    "docs/.assets/.*",
-    "trees/.*",
+    "docs/",
+    "trees/",
+    "build/",
+    "dist/",
 ]

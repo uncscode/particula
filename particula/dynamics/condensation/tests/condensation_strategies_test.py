@@ -411,6 +411,76 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertIsInstance(particle_new, ParticleData)
         self.assertIsInstance(gas_new, GasData)
 
+    def test_isothermal_step_numerical_parity(self):
+        """step() data-only path matches legacy path numerically."""
+        # Use the same strategy (with all strategies set) for both
+        # paths so the only difference is input types.
+        strategy = self._make_data_strategy()
+
+        # Run legacy path
+        particle_legacy = copy.deepcopy(self.particle)
+        gas_legacy = copy.deepcopy(self.gas_species)
+        particle_legacy, gas_legacy = strategy.step(
+            particle=particle_legacy,
+            gas_species=gas_legacy,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        legacy_mass = particle_legacy.get_species_mass()
+        legacy_gas = gas_legacy.get_concentration()
+
+        # Run data-only path
+        particle_data, gas_data = self._make_data_inputs()
+        particle_data_new, gas_data_new = strategy.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        data_mass = particle_data_new.masses[0]
+        data_gas = gas_data_new.concentration[0]
+
+        np.testing.assert_allclose(
+            data_mass,
+            legacy_mass,
+            rtol=1e-10,
+            err_msg="Particle mass diverges between legacy and data paths",
+        )
+        np.testing.assert_allclose(
+            data_gas,
+            legacy_gas,
+            rtol=1e-10,
+            err_msg="Gas concentration diverges between legacy and data paths",
+        )
+
+    def test_isothermal_rate_numerical_parity(self):
+        """rate() data-only path matches legacy path numerically."""
+        # Use the same strategy for both paths
+        strategy = self._make_data_strategy()
+        legacy_rate = strategy.rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        particle_data, gas_data = self._make_data_inputs()
+        data_rate = strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(
+            data_rate,
+            legacy_rate,
+            rtol=1e-10,
+            err_msg="rate() diverges between legacy and data paths",
+        )
+
     def test_isothermal_rate_with_particle_data(self):
         """rate() supports ParticleData inputs."""
         strategy = self._make_data_strategy()
@@ -1008,6 +1078,79 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         self.assertIsInstance(particle_new, ParticleData)
         self.assertIsInstance(gas_new, GasData)
+
+    def test_staggered_step_numerical_parity(self):
+        """Staggered step() data-only path matches legacy numerically."""
+        # Use the same strategy for both paths so the only
+        # difference is input type (facade vs data container).
+        strategy = self._make_data_strategy()
+
+        particle_legacy = copy.deepcopy(self.particle)
+        gas_legacy = copy.deepcopy(self.gas_species)
+        particle_legacy, gas_legacy = strategy.step(
+            particle=particle_legacy,
+            gas_species=gas_legacy,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        legacy_mass = particle_legacy.get_species_mass()
+        legacy_gas = gas_legacy.get_concentration()
+
+        particle_data, gas_data = self._make_data_inputs()
+        particle_data_new, gas_data_new = strategy.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=self.time_step,
+        )
+        data_mass = particle_data_new.masses[0]
+        data_gas = gas_data_new.concentration[0]
+
+        np.testing.assert_allclose(
+            data_mass,
+            legacy_mass,
+            rtol=1e-10,
+            err_msg=(
+                "Staggered particle mass diverges between legacy and data paths"
+            ),
+        )
+        np.testing.assert_allclose(
+            data_gas,
+            legacy_gas,
+            rtol=1e-10,
+            err_msg=(
+                "Staggered gas concentration diverges between legacy "
+                "and data paths"
+            ),
+        )
+
+    def test_staggered_rate_numerical_parity(self):
+        """Staggered rate() data-only path matches legacy numerically."""
+        # Use the same strategy for both paths
+        strategy = self._make_data_strategy()
+        legacy_rate = strategy.rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        particle_data, gas_data = self._make_data_inputs()
+        data_rate = strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(
+            data_rate,
+            legacy_rate,
+            rtol=1e-10,
+            err_msg="Staggered rate() diverges between legacy and data paths",
+        )
 
     def test_staggered_rate_with_particle_data(self):
         """rate() supports ParticleData inputs for staggered strategy."""
