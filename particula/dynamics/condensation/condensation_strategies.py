@@ -37,7 +37,7 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_rate,
 )
 from particula.gas import get_molecule_mean_free_path
-from particula.gas.gas_data import GasData, from_species
+from particula.gas.gas_data import GasData
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import VaporPressureStrategy
 from particula.particles import (
@@ -77,9 +77,16 @@ def _unwrap_particle(
 def _unwrap_gas(
     gas_species: GasSpecies | GasData,
 ) -> tuple[GasData, bool]:
-    """Return GasData and legacy flag for supported gas inputs."""
+    """Return GasData and legacy flag for supported gas inputs.
+
+    When *gas_species* is a :class:`GasSpecies` facade the underlying
+    :pyattr:`GasSpecies.data` is returned directly instead of rebuilding
+    a ``GasData`` via :func:`from_species`.  This preserves the true
+    ``n_boxes`` and avoids an unnecessary copy that could misinterpret
+    multi-box single-species concentrations as a species axis.
+    """
     if isinstance(gas_species, GasSpecies):
-        return from_species(gas_species), True
+        return gas_species.data, True
     if isinstance(gas_species, GasData):
         return gas_species, False
     raise TypeError(
@@ -866,12 +873,16 @@ class CondensationIsothermal(CondensationStrategy):
             pressure=pressure,
         )
 
-        # Step 2: Reshape the particle concentration if necessary
-        # Type guard: ensure mass_rate is an array before checking ndim
+        # Step 2: Reshape the particle concentration if necessary.
+        # The legacy path used particle.concentration (raw counts from
+        # ParticleData.concentration[0]) — not get_concentration() which
+        # divides by volume. We preserve that convention here so that
+        # both paths produce identical rates.
+        raw_conc = particle_data.concentration[0]
         if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
-            concentration = particle_data.concentration[0][:, np.newaxis]
+            concentration = raw_conc[:, np.newaxis]
         else:
-            concentration = particle_data.concentration[0]
+            concentration = raw_conc
 
         # Step 3: Calculate the overall condensation rate by scaling
         # mass rate by particle concentration
@@ -966,12 +977,17 @@ class CondensationIsothermal(CondensationStrategy):
         gas_mass_array: NDArray[np.float64] = np.atleast_1d(
             np.asarray(gas_data.concentration[0], dtype=np.float64)
         )
+        # Volume-normalise concentration to #/m^3 so that the
+        # particle_concentration argument matches the legacy
+        # ParticleRepresentation.get_concentration() semantics.
+        volume = particle_data.volume[0]
+        norm_conc = particle_data.concentration[0] / volume
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=time_step,
             gas_mass=gas_mass_array,
             particle_mass=particle_data.masses[0],
-            particle_concentration=particle_data.concentration[0],
+            particle_concentration=norm_conc,
         )
         species_mass = particle_data.masses[0]
         # Handle both 1D (single species) and 2D (multi-species) arrays
@@ -988,10 +1004,26 @@ class CondensationIsothermal(CondensationStrategy):
                 mass_transfer, (mass_transfer.shape[0], species_count)
             )
         # apply the mass change
+        # mass_transfer is concentration-scaled (kg/m³ · #/m³ · s = kg total).
+        # The legacy add_mass() divides by #/m³ concentration internally so
+        # that per-particle masses are updated correctly. For the data path
+        # we must do the same division explicitly.
         if particle_is_legacy:
             particle.add_mass(added_mass=mass_transfer)  # type: ignore[union-attr]
         else:
-            particle_data.masses[0] += mass_transfer
+            per_particle = np.divide(
+                mass_transfer,
+                norm_conc[:, np.newaxis]
+                if mass_transfer.ndim == 2
+                else norm_conc,
+                out=np.zeros_like(mass_transfer),
+                where=norm_conc[:, np.newaxis] != 0
+                if mass_transfer.ndim == 2
+                else norm_conc != 0,
+            )
+            particle_data.masses[0] = np.maximum(
+                particle_data.masses[0] + per_particle, 0.0
+            )
         if self.update_gases:
             # remove mass from gas phase concentration
             if gas_is_legacy:
@@ -1328,10 +1360,14 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             pressure=pressure,
         )
 
+        # The legacy path used particle.concentration (raw counts from
+        # ParticleData.concentration[0]). We preserve that convention.
+        raw_conc = particle_data.concentration[0]
+
         if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
-            concentration = particle_data.concentration[0][:, np.newaxis]
+            concentration = raw_conc[:, np.newaxis]
         else:
-            concentration = particle_data.concentration[0]
+            concentration = raw_conc
 
         rates_raw = mass_rate * concentration
         rates = (
@@ -1395,6 +1431,9 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         )
 
         particle_mass = particle_data.masses[0][particle_index]
+        # The legacy path used particle.concentration[i] (raw counts
+        # from ParticleData.concentration) — not the volume-normalised
+        # value from get_concentration(). We preserve that convention.
         particle_concentration = np.asarray(
             particle_data.concentration[0][particle_index]
         )
@@ -1622,10 +1661,28 @@ class CondensationIsothermalStaggered(CondensationStrategy):
             )
 
         mass_changes = self._apply_skip_partitioning(mass_changes)
+        # mass_changes is concentration-scaled (see
+        # _calculate_single_particle_transfer → get_mass_transfer).  The
+        # legacy add_mass() divides by volume-normalised concentration
+        # internally; the data path must replicate that division.
         if particle_is_legacy:
             particle.add_mass(added_mass=mass_changes)  # type: ignore[union-attr]
         else:
-            particle_data.masses[0] += mass_changes
+            volume = particle_data.volume[0]
+            norm_conc = particle_data.concentration[0] / volume
+            per_particle = np.divide(
+                mass_changes,
+                norm_conc[:, np.newaxis]
+                if mass_changes.ndim == 2
+                else norm_conc,
+                out=np.zeros_like(mass_changes),
+                where=norm_conc[:, np.newaxis] != 0
+                if mass_changes.ndim == 2
+                else norm_conc != 0,
+            )
+            particle_data.masses[0] = np.maximum(
+                particle_data.masses[0] + per_particle, 0.0
+            )
         if self.update_gases:
             if gas_is_legacy:
                 gas_species.add_concentration(  # type: ignore[union-attr]
