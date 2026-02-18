@@ -899,7 +899,7 @@ class CondensationIsothermal(CondensationStrategy):
         return rates
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
-    @overload
+    @overload  # type: ignore[override]
     def step(
         self,
         particle: ParticleRepresentation,
@@ -1518,7 +1518,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         return mass_to_change.squeeze()
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
-    @overload
+    @overload  # type: ignore[override]
     def step(
         self,
         particle: ParticleRepresentation,
