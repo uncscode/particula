@@ -2,11 +2,13 @@
 Includes, condensation (and evaporation), coagulation, and deposition.
 """
 
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
 from particula.aerosol import Aerosol
+from particula.gas.species import GasSpecies
+from particula.particles.representation import ParticleRepresentation
 
 # Particula imports
 from particula.runnable import RunnableABC
@@ -87,15 +89,15 @@ class MassCondensation(RunnableABC):
         """
         for _ in range(sub_steps):
             # calculate the condensation step for strategy
-            aerosol.particles, aerosol.atmosphere.partitioning_species = (
-                self.condensation_strategy.step(
-                    particle=aerosol.particles,
-                    gas_species=aerosol.atmosphere.partitioning_species,
-                    temperature=aerosol.atmosphere.temperature,
-                    pressure=aerosol.atmosphere.total_pressure,
-                    time_step=time_step / sub_steps,
-                )
+            particles_out, gas_out = self.condensation_strategy.step(
+                particle=aerosol.particles,
+                gas_species=aerosol.atmosphere.partitioning_species,
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
+                time_step=time_step / sub_steps,
             )
+            aerosol.particles = cast(ParticleRepresentation, particles_out)
+            aerosol.atmosphere.partitioning_species = cast(GasSpecies, gas_out)
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:

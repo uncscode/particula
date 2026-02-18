@@ -66,6 +66,12 @@ class RadiiBasedMovingBin(DistributionStrategy):
         )
         initial_volumes = (4 / 3) * np.pi * np.power(distribution, 3)
         new_volumes = initial_volumes + mass_per_particle / density
+        # Clamp volumes to a small positive floor so that
+        # evaporation cannot produce negative volumes (and NaN
+        # radii).  The floor is the volume of a 1-fm-radius
+        # sphere, effectively zero for any physical particle.
+        min_volume = (4 / 3) * np.pi * (1e-15) ** 3
+        new_volumes = np.maximum(new_volumes, min_volume)
         new_radii = np.power(3 * new_volumes / (4 * np.pi), 1 / 3)
         return new_radii, concentration
 
