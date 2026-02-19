@@ -45,7 +45,7 @@ jobs:
         ruff format particula/
         ruff check particula/
 
-    - name: Commit ruff fixes
+    - name: Create PR for ruff fixes
       if: ${{ matrix.linter == 'ruff' && github.event_name == 'push' }}
       uses: peter-evans/create-pull-request@v7
       with:
