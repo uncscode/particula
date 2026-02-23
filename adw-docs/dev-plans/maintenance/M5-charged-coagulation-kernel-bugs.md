@@ -108,9 +108,13 @@ forbid it.
 
 ## Phases
 
-### Phase 1: Write reproducer tests (M5-P1)
+Each phase writes tests AND fixes the bug together so that every commit
+leaves the test suite green. No failing tests are committed to the repo.
 
-**Scope:** Create pytest cases that reproduce both bugs as failing tests.
+### Phase 1: Fix NaN kernel for monodisperse particles (M5-P1)
+
+**Scope:** Investigate, reproduce, and fix Bug 1 (NaN kernel) in one phase.
+Write passing tests that verify the fix.
 
 **Size:** M (~100-150 LOC)
 
@@ -118,35 +122,6 @@ forbid it.
 
 - [ ] Create test file
       `particula/dynamics/coagulation/tests/charged_kernel_bugs_test.py`
-- [ ] Test 1: Monodisperse NaN -- create identical-radius particles with
-      opposite charges, assert kernel computation does not produce NaN,
-      assert coagulation step completes without error
-- [ ] Test 2: Same-sign repulsion -- create calcite-only population
-      (charge -6), run coagulation step, assert zero coagulation events
-      (no mergers between same-sign repulsive particles)
-- [ ] Test 3: Spurious coagulation -- create calcite (50nm, charge -6) +
-      ions (5nm, charge +1), run coagulation step, assert calcite-calcite
-      mergers are zero or negligible (only ion-calcite mergers should occur)
-- [ ] Test 4: Conservation -- for any coagulation step, assert total mass
-      and total charge are conserved
-
-**Acceptance Criteria:**
-
-- [ ] Test 1 fails with `ValueError: cannot convert float NaN to integer`
-- [ ] Test 2 passes (confirms same-sign repulsion works without ions)
-- [ ] Test 3 fails (exposes spurious calcite-calcite coagulation)
-- [ ] Test 4 passes (conservation holds regardless of bugs)
-
-### Phase 2: Investigate root cause of NaN and fix (M5-P2)
-
-**Scope:** Trace the NaN through the kernel computation chain and implement
-the fix. The likely root cause is `kinetic_enhance → 0` causing inf in the
-diffusive Knudsen number (see Technical Approach section).
-
-**Size:** M (~50-100 LOC fixes + tests)
-
-**Tasks:**
-
 - [ ] Confirm the NaN chain: `coulomb_potential_ratio → -200` →
       `kinetic_enhance = exp(-200) ≈ 0` → `Kn_d = inf` → `kernel = NaN`
 - [ ] Check `get_diffusive_knudsen_number()` -- does the denominator
@@ -158,21 +133,31 @@ diffusive Knudsen number (see Technical Approach section).
       diffusive Knudsen number calculation, OR clamp inf/NaN kernel values
       to zero (self-interaction of same-sign particles should produce zero
       coagulation rate, which is physically correct)
-- [ ] Update Phase 1 reproducer tests to pass with the fix
+- [ ] Write passing test: Monodisperse NaN -- create identical-radius
+      particles with opposite charges, assert kernel computation does not
+      produce NaN, assert coagulation step completes without error
+- [ ] Write passing test: Same-sign repulsion -- create calcite-only
+      population (charge -6), run coagulation step, assert zero coagulation
+      events (no mergers between same-sign repulsive particles)
+- [ ] Write passing test: Full kernel matrix contains no NaN/Inf for any
+      particle population tested
+- [ ] Verify no regression in existing coagulation tests
 
 **Acceptance Criteria:**
 
 - [ ] Root cause documented with specific function and line number
-- [ ] Test 1 from Phase 1 now passes
-- [ ] Full kernel matrix contains no NaN/Inf for any particle population
-- [ ] No regression in existing coagulation tests
+- [ ] Monodisperse NaN test passes (kernel is finite, step completes)
+- [ ] Same-sign repulsion test passes (zero mergers)
+- [ ] Full kernel matrix contains no NaN/Inf
+- [ ] All existing coagulation tests still pass
+- [ ] All committed tests are green
 
-### Phase 3: Investigate and fix spurious same-sign coagulation (M5-P3)
+### Phase 2: Fix spurious same-sign coagulation (M5-P2)
 
-**Scope:** Determine why the presence of small ions causes calcite-calcite
-mergers and fix the bin-pair iteration logic.
+**Scope:** Investigate and fix Bug 2 (spurious calcite-calcite mergers when
+small ions are present). Write passing tests that verify the fix.
 
-**Size:** M (~50-100 LOC fixes)
+**Size:** M (~100-150 LOC)
 
 **Tasks:**
 
@@ -199,19 +184,26 @@ mergers and fix the bin-pair iteration logic.
     entries due to the kinetic_enhance→0 issue, does the interpolator
     propagate these into non-NaN bins?
 - [ ] Implement fix for the identified root cause
-- [ ] Verify: calcite-only still produces zero mergers
+- [ ] Write passing test: Spurious coagulation -- create calcite
+      (50nm, charge -6) + ions (5nm, charge +1), run coagulation step,
+      assert calcite-calcite mergers are zero or negligible (only
+      ion-calcite mergers should occur)
+- [ ] Write passing test: Conservation -- for any coagulation step, assert
+      total mass and total charge are conserved
+- [ ] Verify: calcite-only still produces zero mergers (Phase 1 test)
 - [ ] Verify: calcite + ions produces only ion-calcite mergers, not
       calcite-calcite mergers
 
 **Acceptance Criteria:**
 
-- [ ] Test 3 from Phase 1 now passes
 - [ ] Calcite-calcite coagulation rate is zero (or negligible) when all
       calcite particles carry same-sign charge
 - [ ] Ion-calcite coagulation still works correctly
-- [ ] No regression in existing coagulation tests
+- [ ] Mass and charge conservation test passes
+- [ ] All existing coagulation tests still pass
+- [ ] All committed tests are green
 
-### Phase 4: Documentation and cleanup (M5-P4)
+### Phase 3: Documentation and cleanup (M5-P3)
 
 **Scope:** Update dev docs, clean up duplicate code, ensure all tests pass.
 
@@ -224,7 +216,7 @@ mergers and fix the bin-pair iteration logic.
     in `get_hard_sphere_kernel_via_system_state` (lines 190-202)
   - Remove unreachable duplicate `return get_dimensional_kernel(...)` in
     `get_coulomb_kernel_dyachkov2007_via_system_state` (lines 278-284)
-- [ ] Remove any diagnostic logging added in Phases 2-3
+- [ ] Remove any diagnostic logging added in Phases 1-2
 - [ ] Update this maintenance document status to Shipped
 - [ ] Run full test suite (`pytest --cov=particula`)
 - [ ] Ensure no coverage regression
@@ -353,3 +345,4 @@ kinetic_enhance → 0 issue from Bug 1.
 |------|--------|--------|
 | 2026-02-23 | Initial maintenance plan created | ADW Workflow |
 | 2026-02-23 | Corrected root cause analysis (kinetic_enhance→0, not reduced_mass→0); upgraded P2 to size M; added kernel NaN/Inf success criterion; strengthened P3 investigation on charge-blind interpolation; added duplicate code cleanup to P4 | ADW Review |
+| 2026-02-23 | Restructured phases: merged test-writing into fix phases so no failing tests are committed. P1 = fix NaN + tests, P2 = fix spurious coagulation + tests, P3 = cleanup. Removed standalone reproducer-tests phase. | Manual |
