@@ -16,7 +16,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -378,13 +377,8 @@ mv adw-docs/architecture/decisions/ADR-{old}.md adw-docs/architecture/decisions/
 
 ### 5.3: Update Superseded ADR Status
 
-```python
-edit({
-  "filePath": "{worktree_path}/adw-docs/architecture/decisions/archive/ADR-{old}.md",
-  "oldString": "**Status:** Accepted",
-  "newString": "**Status:** Superseded by ADR-{new}"
-})
-```
+Edit the archived ADR you just moved to mark it superseded:
+- Replace `**Status:** Accepted` with `**Status:** Superseded by ADR-{new}`
 
 ## Step 6: Update Architecture Outline
 

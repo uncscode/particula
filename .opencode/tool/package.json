@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "tsx --test __tests__/get_datetime.test.ts"
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/node": "^22.7.4",

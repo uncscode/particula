@@ -14,11 +14,9 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
-  todowrite: true
   task: false
   adw: false
   adw_spec: true
@@ -28,6 +26,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: false
+  build_mkdocs: true
   get_datetime: true
   get_version: true
   webfetch: false
@@ -70,6 +69,19 @@ task({
 })
 ```
 
+## MkDocs Build Validation
+
+Use MkDocs validation to catch broken references and configuration errors without modifying
+the documentation. Prefer strict validation to surface warnings as failures.
+
+```python
+# Strict validation without writing build artifacts
+build_mkdocs({"strict": True, "validateOnly": True})
+```
+
+Review the output for broken cross-references, missing pages, or plugin errors and report
+any issues in the validation summary.
+
 # Required Reading
 
 - @adw-docs/documentation_guide.md - Documentation standards
@@ -99,50 +111,15 @@ adw_spec({
 
 Extract `worktree_path` and move to worktree.
 
-## Step 2: Create Todo List
+## Step 2: Create Validation Checklist
 
-```python
-todowrite({
-  "todos": [
-    {
-      "id": "1",
-      "content": "Collect all markdown files to validate",
-      "status": "pending",
-      "priority": "high"
-    },
-    {
-      "id": "2",
-      "content": "Check internal markdown links",
-      "status": "pending",
-      "priority": "high"
-    },
-    {
-      "id": "3",
-      "content": "Check external links (basic validation)",
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "id": "4",
-      "content": "Validate markdown formatting",
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "id": "5",
-      "content": "Check anchor links",
-      "status": "pending",
-      "priority": "medium"
-    },
-    {
-      "id": "6",
-      "content": "Compile validation report",
-      "status": "pending",
-      "priority": "high"
-    }
-  ]
-})
-```
+Maintain a short checklist in your final response (no tool call), covering:
+- Collect all markdown files to validate
+- Check internal markdown links
+- Check external links (basic validation)
+- Validate markdown formatting
+- Check anchor links
+- Compile validation report
 
 ## Step 3: Collect Markdown Files
 

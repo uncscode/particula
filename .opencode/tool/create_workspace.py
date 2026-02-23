@@ -33,7 +33,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict
 
 
 def find_project_root() -> Path:
@@ -139,6 +138,8 @@ def create_workspace_cli(
 
         # Workspace created successfully
         # Load state to get full details
+        assert result_adw_id is not None  # guaranteed when error is None
+
         from adw.state.manager import ADWState
         from adw.utils.logging import get_logger
 
@@ -169,7 +170,7 @@ def create_workspace_cli(
             lines.append("WORKSPACE CREATED SUCCESSFULLY")
             lines.append("=" * 60)
             lines.append(f"\n✅ ADW ID: {result_adw_id}")
-            lines.append(f"\nWorkspace Details:")
+            lines.append("\nWorkspace Details:")
             lines.append(f"  Issue: #{issue_number}")
             lines.append(f"  Workflow Type: {workflow_type}")
             lines.append(f"  Branch: {state.get('branch_name')}")
@@ -177,8 +178,8 @@ def create_workspace_cli(
             if state.get("parent_issue_number"):
                 lines.append(f"  Parent Issue: #{state.get('parent_issue_number')}")
             lines.append(f"  Triggered By: {triggered_by}")
-            lines.append(f"\nNext Steps:")
-            lines.append(f"  1. Generate implementation plan using /plan or build_plan()")
+            lines.append("\nNext Steps:")
+            lines.append("  1. Generate implementation plan using /plan or build_plan()")
             lines.append(f"  2. The workspace is ready at: {state.get('worktree_path')}")
             lines.append(f"  3. State file: agents/{result_adw_id}/adw_state.json")
             lines.append("\n" + "=" * 60)
@@ -193,15 +194,15 @@ def create_workspace_cli(
             lines.append("WORKSPACE CREATED SUCCESSFULLY")
             lines.append("=" * 60)
             lines.append(f"\n✅ ADW ID: {result_adw_id}")
-            lines.append(f"\nWorkspace Details:")
+            lines.append("\nWorkspace Details:")
             lines.append(f"  Issue: #{issue_number}")
             lines.append(f"  Workflow Type: {workflow_type}")
             lines.append(f"  Branch: {state.get('branch_name')}")
             lines.append(f"  Worktree: {state.get('worktree_path')}")
             if state.get("parent_issue_number"):
                 lines.append(f"  Parent Issue: #{state.get('parent_issue_number')}")
-            lines.append(f"\nNext Steps:")
-            lines.append(f"  1. Generate implementation plan using /plan or build_plan()")
+            lines.append("\nNext Steps:")
+            lines.append("  1. Generate implementation plan using /plan or build_plan()")
             lines.append(f"  2. The workspace is ready at: {state.get('worktree_path')}")
             lines.append("\n" + "=" * 60)
             output = "\n".join(lines)
@@ -279,7 +280,7 @@ Examples:
         type=str,
         choices=["summary", "full", "json"],
         default="summary",
-        help="Output mode: summary (default, key details), full (complete state), json (structured)",
+        help="Output mode: summary (default), full (complete state), json",
     )
 
     args = parser.parse_args()

@@ -59,7 +59,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 
 def find_project_root() -> Path:
@@ -291,7 +290,8 @@ def workflow_builder_tool(
                 )
             else:
                 if success:
-                    output = f"✅ Workflow JSON is valid\n\nParsed workflow:\n{json.dumps(parsed_data, indent=2)}"
+                    parsed_json = json.dumps(parsed_data, indent=2)
+                    output = f"Workflow JSON is valid\n\nParsed workflow:\n{parsed_json}"
                 else:
                     output = f"❌ Validation failed:\n{error_msg}"
 
@@ -300,7 +300,8 @@ def workflow_builder_tool(
         else:
             return (
                 1,
-                f"ERROR: Unknown command '{command}'. Valid commands: create, add_step, remove_step, get, list, update, validate",
+                f"ERROR: Unknown command '{command}'. "
+                "Valid: create, add_step, remove_step, get, list, update, validate",
             )
 
     except ImportError as e:

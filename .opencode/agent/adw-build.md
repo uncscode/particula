@@ -18,9 +18,9 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
+  refactor_astgrep: true
   todoread: true
   todowrite: true
   task: true
@@ -173,7 +173,7 @@ Use the `worktree_path` for all operations and validate location with tools (no 
 ```python
 git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
-list({"path": worktree_path})
+ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
 These checks confirm you are operating in the isolated worktree and on the correct branch without invoking bash.

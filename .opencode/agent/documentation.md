@@ -19,7 +19,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -33,6 +32,7 @@ tools:
   platform_operations: false
   run_pytest: false
   run_linters: true
+  build_mkdocs: true
   feedback_log: true
   get_datetime: true
   get_version: true
@@ -67,6 +67,25 @@ You are running as an **orchestrator** that:
 - **Commits all changes** - via adw-commit subagent
 - **Reports completion** - with summary of all updates
 
+## Documentation Build Validation
+
+Use the `build_mkdocs` tool to validate MkDocs output when documentation changes may
+affect site builds. Prefer running validation against the isolated worktree when available.
+
+```python
+# Quick build check
+build_mkdocs({})
+
+# Strict build (treat warnings as errors)
+build_mkdocs({"strict": true})
+
+# Validate without producing build artifacts
+build_mkdocs({"validateOnly": true})
+
+# Run inside an isolated worktree
+build_mkdocs({"cwd": worktree_path})
+```
+
 # Required Reading
 
 - @adw-docs/documentation_guide.md - Documentation standards
@@ -89,7 +108,7 @@ You are running as an **orchestrator** that:
 | **adw-commit** | Commit changes | Git operations |
 | **linter** | Code quality validation | Python files |
 
-**Safety:** Never invoke `git_operations` with any push command or flags. Pushing is prohibited; the adw-commit subagent handles commits without pushing.
+**Safety:** Avoid calling `git_operations` with any push command or flags. The `adw-commit` subagent handles commit **and** push on non-protected branches; prefer delegating commit and push to `adw-commit`, and only use direct pushes when a workflow explicitly requires them.
 
 # Execution Steps
 

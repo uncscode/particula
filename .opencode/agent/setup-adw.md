@@ -28,7 +28,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -291,9 +290,9 @@ ADW not found. Install it with:
 Analyze the repository to understand what exists:
 
 ```python
-list({"path": "."})
-list({"path": ".opencode"})  # May not exist yet
-list({"path": "adw-docs"})   # May not exist yet
+ripgrep({"pattern": "**/*", "path": "."})
+ripgrep({"pattern": ".opencode/**", "path": "."})  # May not exist yet
+ripgrep({"pattern": "adw-docs/**", "path": "."})   # May not exist yet
 ```
 
 Determine:

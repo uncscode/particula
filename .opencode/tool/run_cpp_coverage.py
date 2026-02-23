@@ -240,12 +240,10 @@ def format_summary(
     lines.append(
         f"  Lines:     {metrics.lines_covered}/{metrics.lines_total} ({metrics.line_percent:.1f}%)"
     )
-    lines.append(
-        f"  Branches:  {metrics.branches_covered}/{metrics.branches_total} ({metrics.branch_percent:.1f}%)"
-    )
-    lines.append(
-        f"  Functions: {metrics.functions_covered}/{metrics.functions_total} ({metrics.function_percent:.1f}%)"
-    )
+    branch_pct = f"{metrics.branch_percent:.1f}%"
+    lines.append(f"  Branches:  {metrics.branches_covered}/{metrics.branches_total} ({branch_pct})")
+    func_pct = f"{metrics.function_percent:.1f}%"
+    lines.append(f"  Functions: {metrics.functions_covered}/{metrics.functions_total} ({func_pct})")
 
     if threshold is not None:
         threshold_status = "PASSED" if metrics.line_percent >= threshold else "FAILED"

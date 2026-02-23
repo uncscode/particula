@@ -617,6 +617,14 @@ Example: { command: "diff", help: true }`),
           return undefined;
         }
 
+        case "continue": {
+          cmdParts.push("continue");
+          if (worktree_path) {
+            cmdParts.push("--worktree-path", worktree_path);
+          }
+          return undefined;
+        }
+
         case "reset": {
           cmdParts.push("reset");
           if (!skipValidation && (!ref || !ref.trim())) {

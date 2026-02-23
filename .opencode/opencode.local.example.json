@@ -95,7 +95,7 @@
     "./README.md",
     "./AGENTS.md"
   ],
-  "share": "manual",
+  "share": "disabled",
   "tui": {
     "scroll_speed": 1,
     "scroll_acceleration": {

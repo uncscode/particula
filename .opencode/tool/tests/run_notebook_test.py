@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import logging
+import subprocess
 import sys
 import uuid
 from pathlib import Path
@@ -18,13 +20,12 @@ from typing import Callable
 import nbformat
 import pytest
 
+import adw.utils.notebook_validation as validation_module
 from adw.utils.notebook import NotebookExecutionResult
 from adw.utils.notebook_validation import (
     NotebookValidationError,
     NotebookValidationResult,
-    validate_notebook_json,
 )
-import adw.utils.notebook_validation as validation_module
 
 RUN_NOTEBOOK_PATH = Path(__file__).resolve().parent.parent / "run_notebook.py"
 
@@ -34,11 +35,30 @@ def write_notebook(path: Path, cells: list[str]) -> None:
     nbformat.write(nb, path)
 
 
+def write_script(path: Path, contents: str) -> None:
+    path.write_text(contents, encoding="utf-8")
+
+
+def fake_subprocess_run(
+    *,
+    returncode: int = 0,
+    stdout: str = "",
+    stderr: str = "",
+) -> Callable[..., subprocess.CompletedProcess[str]]:
+    def _run(args: list[str], *_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(
+            args=args, returncode=returncode, stdout=stdout, stderr=stderr
+        )
+
+    return _run
+
+
 def load_module() -> ModuleType:
     module_name = f"run_notebook_test_{uuid.uuid4().hex}"
     spec = importlib.util.spec_from_file_location(module_name, RUN_NOTEBOOK_PATH)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -581,3 +601,319 @@ def test_expect_output_uses_validation_temp_when_no_overwrite_and_no_write_execu
     assert exit_code == 0
     assert executed == [str(notebook)]
     assert not (tmp_path / "nb.ipynb.bak").exists()
+
+
+def test_script_auto_detect_executes(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    module = load_module()
+    script = tmp_path / "hello.py"
+    write_script(script, "print('hello')")
+    calls: list[list[str]] = []
+
+    def fake_run(args: list[str], *_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        calls.append(args)
+        return subprocess.CompletedProcess(args=args, returncode=0, stdout="hello", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code = module.main([str(script), "--output", "summary"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "SCRIPT EXECUTION SUMMARY" in output
+    assert calls
+    assert calls[0][0] == sys.executable
+    assert calls[0][1] == str(script)
+
+
+def test_script_flag_collects_directory_scripts(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    module = load_module()
+    script_one = tmp_path / "one.py"
+    script_two = tmp_path / "two.py"
+    write_script(script_one, "print('one')")
+    write_script(script_two, "print('two')")
+    write_notebook(tmp_path / "skip.ipynb", ["print('skip')"])
+
+    calls: list[str] = []
+
+    def fake_run(args: list[str], *_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        calls.append(args[1])
+        return subprocess.CompletedProcess(args=args, returncode=0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code = module.main([str(tmp_path), "--script", "--output", "summary"])
+    _ = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert sorted(calls) == sorted([str(script_one), str(script_two)])
+
+
+def test_script_expect_output_uses_stdout_only(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    script = tmp_path / "stdout_only.py"
+    write_script(script, "print('ok')")
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        fake_subprocess_run(returncode=0, stdout="needle", stderr="needle-in-stderr"),
+    )
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=["needle"],
+        output_mode="summary",
+    )
+
+    assert exit_code == 0
+    assert "VALIDATION: PASSED" in output
+
+
+def test_script_expect_output_missing_yields_validation_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    script = tmp_path / "missing.py"
+    write_script(script, "print('ok')")
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        fake_subprocess_run(returncode=0, stdout="", stderr="needle"),
+    )
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=["needle"],
+        output_mode="summary",
+    )
+
+    assert exit_code == 1
+    assert "Validation Errors" in output
+
+
+def test_script_nonzero_exit_code_marks_failure(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    script = tmp_path / "exit_code.py"
+    write_script(script, "print('fail')")
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        fake_subprocess_run(returncode=2, stdout="", stderr="boom"),
+    )
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="json",
+    )
+
+    payload = json.loads(output)
+    assert exit_code == 1
+    assert payload["results"][0]["success"] is False
+    assert payload["results"][0]["exit_code"] == 2
+
+
+def test_script_timeout_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    script = tmp_path / "timeout.py"
+    write_script(script, "print('slow')")
+
+    def fake_run(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        raise subprocess.TimeoutExpired(cmd=[sys.executable, str(script)], timeout=1, output="out")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="json",
+    )
+
+    payload = json.loads(output)
+    assert exit_code == 1
+    assert "timed out" in payload["results"][0]["error_message"].lower()
+
+
+def test_script_oserror_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    script = tmp_path / "oserror.py"
+    write_script(script, "print('oops')")
+
+    def fake_run(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        raise PermissionError("denied")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="json",
+    )
+
+    payload = json.loads(output)
+    assert exit_code == 1
+    assert "denied" in payload["results"][0]["error_message"]
+
+
+def test_script_skip_validation_bypasses_ast_parse(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    script = tmp_path / "invalid.py"
+    write_script(script, "def broken(:\n    pass")
+    called: list[str] = []
+
+    def fake_run(args: list[str], *_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        called.append(args[1])
+        return subprocess.CompletedProcess(args=args, returncode=0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code, _ = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="summary",
+        skip_validation=True,
+    )
+
+    assert exit_code == 0
+    assert called == [str(script)]
+
+
+def test_script_validation_catches_syntax_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    script = tmp_path / "syntax_error.py"
+    write_script(script, "def broken(:\n    pass")
+    called = False
+
+    def fake_run(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+        nonlocal called
+        called = True
+        return subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="summary",
+        skip_validation=False,
+    )
+
+    assert exit_code == 1
+    assert "Syntax error" in output
+    assert called is False
+
+
+def test_script_collect_invalid_path_raises(tmp_path: Path) -> None:
+    module = load_module()
+    missing = tmp_path / "missing.py"
+
+    with pytest.raises(module.NotebookToolError):
+        module._collect_scripts(missing, recursive=False)
+
+
+def test_script_collect_empty_dir_raises(tmp_path: Path) -> None:
+    module = load_module()
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
+
+    with pytest.raises(module.NotebookToolError):
+        module._collect_scripts(empty_dir, recursive=False)
+
+
+def test_script_summary_full_json_outputs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    script = tmp_path / "output.py"
+    write_script(script, "print('hi')")
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        fake_subprocess_run(returncode=0, stdout="hi", stderr=""),
+    )
+
+    exit_code, summary = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="summary",
+    )
+    assert exit_code == 0
+    assert "SCRIPT EXECUTION SUMMARY" in summary
+
+    exit_code, full = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="full",
+    )
+    assert exit_code == 0
+    assert "Script:" in full
+    assert "Stdout:" in full
+
+    exit_code, output = module.run_scripts(
+        scripts=[script],
+        timeout=1,
+        expect_output=[],
+        output_mode="json",
+    )
+    payload = json.loads(output)
+    assert exit_code == 0
+    assert payload["results"][0]["script"] == str(script)
+    assert "stdout" in payload["results"][0]
+    assert "stderr" in payload["results"][0]
+
+
+def test_script_mode_warns_on_notebook_flags(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    module = load_module()
+    script = tmp_path / "flagged.py"
+    write_script(script, "print('hi')")
+    caplog.set_level(logging.WARNING)
+
+    monkeypatch.setattr(
+        module.subprocess,
+        "run",
+        fake_subprocess_run(returncode=0, stdout="hi", stderr=""),
+    )
+
+    exit_code = module.main(
+        [
+            str(tmp_path),
+            "--script",
+            "--write-executed",
+            str(tmp_path / "executed"),
+            "--no-overwrite",
+            "--no-backup",
+        ]
+    )
+    _ = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "--write-executed is ignored in script mode" in caplog.text
+    assert "--no-overwrite is ignored in script mode" in caplog.text
+    assert "--no-backup is ignored in script mode" in caplog.text

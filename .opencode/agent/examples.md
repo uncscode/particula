@@ -79,7 +79,7 @@ task({
 
 - @docs/Examples/index.md - Examples index and structure
 - @adw-docs/documentation_guide.md - Documentation standards
-- @docs/Examples/basic-workflow.md - Example of good tutorial
+- @docs/Examples/workflows/basic-workflow.md - Example of good tutorial
 
 # Write Permissions
 
@@ -302,7 +302,7 @@ Create interactive notebook for exploration.
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Examples/{feature-name}-tutorial.ipynb",
+  "filePath": "{worktree_path}/docs/Examples/**/{feature-name}-tutorial.ipynb",
   "content": """{
  "cells": [
   {
@@ -415,7 +415,7 @@ If Jupyter notebook not appropriate, create standalone Python script:
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Examples/{feature}_example.py",
+  "filePath": "{worktree_path}/docs/Examples/**/{example_name}.py",
   "content": """#!/usr/bin/env python3
 \"""
 {Feature Name} Example Script
@@ -520,7 +520,7 @@ Created examples for: {feature_name}
 
 Files created:
 - docs/Examples/{feature-name}.md (markdown tutorial)
-- docs/Examples/{feature-name}-tutorial.ipynb (Jupyter notebook)
+- docs/Examples/**/{feature-name}-tutorial.ipynb (Jupyter notebook)
 - docs/Examples/{feature}_example.py (Python script)
 
 Validation:

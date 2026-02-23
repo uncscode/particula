@@ -14,11 +14,9 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
-  todowrite: true
   task: true
   adw: false
   adw_spec: true

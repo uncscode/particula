@@ -11,7 +11,7 @@ import json
 import subprocess
 from pathlib import Path
 from types import ModuleType
-from typing import Tuple
+from typing import Any, Tuple
 
 import pytest
 
@@ -82,7 +82,7 @@ def test_parse_cmake_output_truncates_targets(run_cmake_module: ModuleType) -> N
 
 
 def test_format_summary_handles_missing_fields(run_cmake_module: ModuleType) -> None:
-    metrics = {
+    metrics: dict[str, Any] = {
         "success": False,
         "generator": None,
         "build_type": None,

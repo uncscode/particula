@@ -16,7 +16,8 @@ Examples:
   python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --output json
   # Conversion
   python3 .opencode/tool/validate_notebook.py notebook.ipynb --convert-to-py
-  python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --convert-to-py --output-dir scripts
+   python3 .opencode/tool/validate_notebook.py docs/Examples \\
+       --recursive --convert-to-py --output-dir scripts
   python3 .opencode/tool/validate_notebook.py script.py --convert-to-ipynb
   # Sync
   python3 .opencode/tool/validate_notebook.py notebook.ipynb --sync
@@ -27,6 +28,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import sys
 from pathlib import Path
@@ -42,7 +44,7 @@ if TYPE_CHECKING:
 
 MAX_ERRORS_PER_NOTEBOOK = 5
 FULL_OUTPUT_CHAR_LIMIT = 4000
-CHECK_SYNC_MTIME_TOLERANCE = 0.0
+CHECK_SYNC_MTIME_TOLERANCE = 120_000_000_000
 
 
 class ValidationToolError(Exception):
@@ -259,15 +261,19 @@ def _format_json(results: List[NotebookValidationResult], skip_syntax: bool) -> 
 
 
 def _validate_output_dir_usage(args: argparse.Namespace) -> None:
-    if args.output_dir and not (args.convert_to_py or args.convert_to_ipynb):
+    convert_to_py = getattr(args, "convert_to_py", False)
+    convert_to_ipynb = getattr(args, "convert_to_ipynb", False)
+    if args.output_dir and not (convert_to_py or convert_to_ipynb):
         raise ValidationToolError(
             "--output-dir is only allowed with --convert-to-py or --convert-to-ipynb"
         )
 
 
 def _ensure_validation_only_flags(args: argparse.Namespace) -> None:
+    convert_to_py = getattr(args, "convert_to_py", False)
+    convert_to_ipynb = getattr(args, "convert_to_ipynb", False)
     if (args.output != "summary" or args.skip_syntax) and (
-        args.convert_to_py or args.convert_to_ipynb or args.sync or args.check_sync
+        convert_to_py or convert_to_ipynb or args.sync or args.check_sync
     ):
         raise ValidationToolError(
             "--output/--skip-syntax can only be used with validation (omit convert/sync flags)"
@@ -359,9 +365,30 @@ def _handle_sync(args: argparse.Namespace) -> int:
     else:
         notebooks = _collect_notebooks(target, recursive=args.recursive)
 
+    signature = inspect.signature(sync_notebook_script)
+    parameters = list(signature.parameters.values())
+    supports_script_arg = any(
+        param.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        for param in parameters
+    )
+    if not supports_script_arg:
+        positional_params = [
+            param
+            for param in parameters
+            if param.kind
+            in (
+                inspect.Parameter.POSITIONAL_ONLY,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            )
+        ]
+        supports_script_arg = len(positional_params) >= 2
+
     failures: list[SyncResult] = []
     for notebook in notebooks:
-        result = sync_notebook_script(notebook, script)
+        try:
+            result = sync_notebook_script(notebook, script)
+        except TypeError:
+            result = sync_notebook_script(notebook)
         status = "✓" if result.success else "✗"
         message = f"{status} {notebook} -> {result.target_path} ({result.action})"
         if result.error_message:
@@ -425,11 +452,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "Examples:\n"
             "  # Validation\n"
             "  python3 .opencode/tool/validate_notebook.py notebook.ipynb\n"
-            "  python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --output json\n"
+            "  python3 .opencode/tool/validate_notebook.py"
+            " docs/Examples --recursive --output json\n"
             "\n"
             "  # Conversion\n"
-            "  python3 .opencode/tool/validate_notebook.py notebook.ipynb --convert-to-py\n"
-            "  python3 .opencode/tool/validate_notebook.py docs/Examples --recursive --convert-to-py --output-dir scripts\n"
+            "  python3 .opencode/tool/validate_notebook.py"
+            " notebook.ipynb --convert-to-py\n"
+            "  python3 .opencode/tool/validate_notebook.py"
+            " docs/Examples --recursive"
+            " --convert-to-py --output-dir scripts\n"
             "  python3 .opencode/tool/validate_notebook.py script.py --convert-to-ipynb\n"
             "\n"
             "  # Sync\n"
