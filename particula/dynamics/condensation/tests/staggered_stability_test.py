@@ -19,7 +19,6 @@ from typing import Tuple
 import numpy as np
 import pytest
 from numpy.typing import NDArray
-
 from particula.dynamics.condensation import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,

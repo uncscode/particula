@@ -10,6 +10,8 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.util.validate_inputs import validate_inputs
 
+KINETIC_ENHANCE_MIN = 1e-80
+
 
 @validate_inputs(
     {
@@ -121,6 +123,13 @@ def get_diffusive_knudsen_number(
         np.sqrt(temperature * BOLTZMANN_CONSTANT * reduced_mass)
         / reduced_friction_factor
     )
-    denominator = sum_of_radii * continuum_enhance / kinetic_enhance
+    # Guard for same-sign repulsion; see coulomb_enhancement.py:83-97 and
+    # diffusive_knudsen_module.py:119-126 (issue #1087).
+    denominator = np.divide(
+        sum_of_radii * continuum_enhance,
+        kinetic_enhance,
+        out=np.full_like(sum_of_radii, np.inf, dtype=np.float64),
+        where=kinetic_enhance >= KINETIC_ENHANCE_MIN,
+    )
 
     return numerator / denominator
