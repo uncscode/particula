@@ -179,7 +179,7 @@ When breaking changes or API changes occur:
 
 ```python
 write({
-  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{feature}_migration_guide.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{plan_id}.md",
   "content": """# Migration Guide: {Feature/Change Name}
 
 **Version:** {from_version} → {to_version}
@@ -269,7 +269,7 @@ get_datetime({"format": "date"})
 
 ```python
 write({
-  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/release-notes-{version}.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{plan_id}.md",
   "content": """# Release Notes: v{version}
 
 **Release Date:** {current_date}
@@ -363,7 +363,7 @@ See [GitHub Releases](https://github.com/Gorkowski/Agent/releases/tag/v{version}
 
 ```python
 write({
-  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{feature}_deprecation.md",
+  "filePath": "{worktree_path}/adw-docs/dev-plans/maintenance/{plan_id}.md",
   "content": """# Deprecation Notice: {Feature/Function Name}
 
 **Status:** Deprecated

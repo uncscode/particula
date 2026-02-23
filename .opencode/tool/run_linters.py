@@ -39,7 +39,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 
 class LinterResult:
@@ -447,7 +447,7 @@ Examples:
         "--output",
         choices=["summary", "full", "json"],
         default="summary",
-        help="Output mode: summary (default, human-readable), full (complete output), json (structured)",
+        help="Output mode: summary (default), full (complete output), json",
     )
     parser.add_argument(
         "--target-dir",
@@ -493,7 +493,7 @@ Examples:
 
     args = parser.parse_args()
 
-    linters = [l.strip() for l in args.linters.split(",")]
+    linters = [name.strip() for name in args.linters.split(",")]
 
     exit_code, output = run_linters(
         target_dir=args.target_dir,

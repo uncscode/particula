@@ -216,10 +216,7 @@ def test_cppcheck_parses_warnings_and_errors(
     monkeypatch.setattr(run_cpp_linters_module, "check_linter_available", lambda *_: True)
 
     def fake_run(*_: object, **__: object) -> Tuple[int, str, str, bool, str | None]:
-        stderr = (
-            f"{files[0]}:10: (warning) thing\n"
-            f"{files[0]}:12: (error) boom"
-        )
+        stderr = f"{files[0]}:10: (warning) thing\n{files[0]}:12: (error) boom"
         return 1, "", stderr, False, None
 
     monkeypatch.setattr(run_cpp_linters_module, "_run_subprocess", fake_run)
@@ -432,9 +429,7 @@ def test_auto_fix_flags_passed(
     build_dir = tmp_path / "build"
     build_dir.mkdir()
     (build_dir / "compile_commands.json").write_text("[]")
-    run_cpp_linters_module.run_clang_tidy(
-        files, build_dir=str(build_dir), auto_fix=True, timeout=5
-    )
+    run_cpp_linters_module.run_clang_tidy(files, build_dir=str(build_dir), auto_fix=True, timeout=5)
 
     assert any("-i" in cmd for cmd in commands)
     assert any("--fix" in cmd for cmd in commands)

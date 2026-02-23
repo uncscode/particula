@@ -7,7 +7,8 @@ description: >-
   Formats comments for readability - Handles rate limits and posting errors -
   Works with both GitHub and GitLab
 
-  Invoked by: adw-review-orchestrator after consolidation completes
+  Invoked by: adw-review-orchestrator after consolidation completes via the
+  `pr-review` command output
 mode: subagent
 tools:
   read: true

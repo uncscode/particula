@@ -1,9 +1,9 @@
 ---
 description: >-
   Use this agent to maintain ADW templates by syncing changes from live files
-  back into template files. This agent manages TWO sync relationships:
-  1. adw-docs/ ↔ adw/templates/Agent/ (documentation)
-  2. .opencode/ ↔ adw/templates/opencode_config/ (OpenCode configuration)
+  back into template files. This agent manages TWO maintenance workflows:
+  1. adw-docs/ → adw/templates/docs_stubs/*/adw-docs/ (documentation scaffolds)
+  2. .opencode/ refreshed via `adw setup pull-opencode` (OpenCode configuration)
   
   This agent should be invoked when:
   - Live documentation in adw-docs/ has been updated and templates need syncing
@@ -18,7 +18,7 @@ description: >-
     Assistant: "I'll run adw setup template extract to sync changes from live docs to templates."
   
   - User: "Sync the agent files to templates"
-    Assistant: "I'll compare .opencode/agent/ with adw/templates/opencode_config/agent/ and sync any differences."
+    Assistant: "I'll refresh .opencode/ with adw setup pull-opencode and reconcile local agent changes."
   
   - User: "A file was moved to legacy, update templates"
     Assistant: "I'll move the file from templates root to templates legacy folder."
@@ -33,7 +33,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -69,27 +68,24 @@ Maintain the bidirectional sync between live files and their template counterpar
 
 | Live Location | Template Location | Content Type |
 |---------------|-------------------|--------------|
-| `adw-docs/` | `adw/templates/Agent/` | Documentation guides (tokenized with `{{PLACEHOLDERS}}`) |
-| `.opencode/` | `adw/templates/opencode_config/` | OpenCode configuration (agents, commands, workflows) |
+| `adw-docs/` | `adw/templates/docs_stubs/*/adw-docs/` | Documentation scaffolds (tokenized with `{{PLACEHOLDERS}}`) |
+| `.opencode/` | _(managed via `adw setup pull-opencode`)_ | OpenCode configuration (agents, commands, workflows) |
 
 ### Detailed Structure
 
-**Documentation (`adw-docs/` ↔ `adw/templates/Agent/`):**
-- `adw-docs/*.md` → `adw/templates/Agent/*.md`
-- `adw-docs/agents/*.md` → `adw/templates/Agent/agents/*.md`
-- `adw-docs/architecture/*.md` → `adw/templates/Agent/architecture/*.md`
-- `adw-docs/architecture/decisions/*.md` → `adw/templates/Agent/architecture/decisions/*.md`
-- `adw-docs/dev-plans/**/*.md` → `adw/templates/Agent/dev-plans/**/*.md`
-- `adw-docs/security/*.md` → `adw/templates/Agent/security/*.md`
+**Documentation (`adw-docs/` → `adw/templates/docs_stubs/*/adw-docs/`):**
+- `adw-docs/*.md` → `adw/templates/docs_stubs/common/adw-docs/*.md`
+- `adw-docs/agents/*.md` → `adw/templates/docs_stubs/common/adw-docs/agents/*.md`
+- `adw-docs/architecture/*.md` → `adw/templates/docs_stubs/common/adw-docs/architecture/*.md`
+- `adw-docs/architecture/decisions/*.md` → `adw/templates/docs_stubs/common/adw-docs/architecture/decisions/*.md`
+- `adw-docs/dev-plans/**/*.md` → `adw/templates/docs_stubs/common/adw-docs/dev-plans/**/*.md`
+- `adw-docs/security/*.md` → `adw/templates/docs_stubs/common/adw-docs/security/*.md`
 
-**OpenCode Configuration (`.opencode/` ↔ `adw/templates/opencode_config/`):**
-- `.opencode/agent/*.md` → `adw/templates/opencode_config/agent/*.md`
-- `.opencode/agent/legacy/*.md` → `adw/templates/opencode_config/agent/legacy/*.md`
-- `.opencode/command/*.md` → `adw/templates/opencode_config/command/*.md`
-- `.opencode/workflow/*.json` → `adw/templates/opencode_config/workflow/*.json`
-- `.opencode/config.yaml` → `adw/templates/opencode_config/config.yaml`
+**OpenCode Configuration (`.opencode/` managed in place):**
+- `.opencode/` is refreshed via `adw setup pull-opencode`
+- Maintain local changes directly under `.opencode/`
 
-**Important:** Files in `legacy/` folders are deprecated agents kept for backward compatibility. When a file is moved to `legacy/` in live, it must also be moved to `legacy/` in templates (and removed from the root if it exists there).
+**Important:** `adw/templates/Agent/` and `adw/templates/opencode_config/` were removed. Use docs stubs under `adw/templates/docs_stubs/` and refresh `.opencode/` via `adw setup pull-opencode`.
 
 # When to Use This Agent
 
@@ -107,8 +103,8 @@ Maintain the bidirectional sync between live files and their template counterpar
 This agent runs **inside the ADW repository** where templates are maintained. It requires:
 - Manifest mode set to `live` for extraction operations
 - Access to all tracked folder pairs:
-  - `adw-docs/` ↔ `adw/templates/Agent/`
-  - `.opencode/` ↔ `adw/templates/opencode_config/`
+  - `adw-docs/` → `adw/templates/docs_stubs/*/adw-docs/`
+  - `.opencode/` refreshed via `adw setup pull-opencode`
 
 # Required Reading
 
@@ -206,41 +202,41 @@ Perform manual sync when:
 ### Step 1: Compare Directory Structures
 
 ```python
-# List live agent files
-list({"path": ".opencode/agent"})
-list({"path": ".opencode/agent/legacy"})
+# List live docs files
+ripgrep({"pattern": "**/*", "path": "adw-docs"})
+ripgrep({"pattern": "**/*", "path": "adw-docs/agents"})
 
-# List template agent files
-list({"path": "adw/templates/opencode_config/agent"})
-list({"path": "adw/templates/opencode_config/agent/legacy"})
+# List docs stub files
+ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/adw-docs"})
+ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/adw-docs/agents"})
 ```
 
 ### Step 2: Identify Discrepancies
 
 Look for:
-- **Files in templates root that should only be in legacy**: If a file exists in `.opencode/agent/legacy/` but also exists in `adw/templates/opencode_config/agent/` (root), the root copy should be removed
-- **Missing legacy files in templates**: If a file exists in `.opencode/agent/legacy/` but not in `adw/templates/opencode_config/agent/legacy/`
+- **Files in docs stubs root that should only be in agents/**: If a file exists in `adw-docs/agents/` but also exists in `adw/templates/docs_stubs/common/adw-docs/` (root), the root copy should be removed
+- **Missing agent docs in stubs**: If a file exists in `adw-docs/agents/` but not in `adw/templates/docs_stubs/common/adw-docs/agents/`
 - **Extra files in templates**: Files that exist in templates but not in live (may be intentionally removed)
 - **Missing new files**: Files added to live that don't have template versions yet
 
 ### Step 3: Fix Structure Issues
 
-**Move file from templates root to legacy:**
+**Move file from docs stub root to archive:**
 ```python
-move({"source": "adw/templates/opencode_config/agent/old-agent.md", "destination": "", "trash": true})
+move({"source": "adw/templates/docs_stubs/common/adw-docs/old-guide.md", "destination": "", "trash": true})
 ```
 
-**Copy missing file to templates (after reading from live):**
+**Copy missing docs file to stubs (after reading from live):**
 ```python
 # Read the live file first
-read({"filePath": ".opencode/agent/legacy/missing-agent.md"})
-# Then write to templates location
-write({"filePath": "adw/templates/opencode_config/agent/legacy/missing-agent.md", "content": "..."})
+read({"filePath": "adw-docs/{missing_doc}.md"})
+# Then write to docs stubs location
+write({"filePath": "adw/templates/docs_stubs/common/adw-docs/{missing_doc}.md", "content": "..."})
 ```
 
-**Remove orphaned template file:**
+**Remove orphaned docs stub file:**
 ```python
-move({"source": "adw/templates/opencode_config/agent/removed-agent.md", "destination": "", "trash": true})
+move({"source": "adw/templates/docs_stubs/common/adw-docs/removed-guide.md", "destination": "", "trash": true})
 ```
 
 ### Step 4: Verify Sync
@@ -248,19 +244,21 @@ move({"source": "adw/templates/opencode_config/agent/removed-agent.md", "destina
 After manual changes, verify both directories match:
 
 ```python
-# Should show identical structure
-list({"path": ".opencode/agent"})
-list({"path": "adw/templates/opencode_config/agent"})
+# Should show expected structures
+ripgrep({"pattern": "**/*", "path": ".opencode/agent"})
+ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/adw-docs"})
 ```
 
 ## Common Structural Issues
 
 | Issue | Live Location | Templates Location | Fix |
 |-------|---------------|-------------------|-----|
-| Deprecated agent in wrong location | `legacy/agent.md` | `agent.md` (root) | Move to trash: `adw/templates/.../agent.md` |
-| Missing legacy file | `legacy/agent.md` | (missing) | Copy from live to `adw/templates/.../legacy/agent.md` |
-| Orphaned template | (deleted) | `agent.md` | Move to trash |
-| New file needs template | `new-agent.md` | (missing) | Copy from live to templates |
+| Deprecated doc in wrong location | `adw-docs/<deprecated_doc>.md` | `adw/templates/docs_stubs/common/adw-docs/<deprecated_doc>.md` | Move to trash |
+| Missing doc stub | `adw-docs/<new_doc>.md` | (missing) | Copy from live to docs stubs |
+| Orphaned doc stub | (deleted) | `adw/templates/docs_stubs/common/adw-docs/<deprecated_doc>.md` | Move to trash |
+
+Angle-bracket placeholders (for example, `<deprecated_doc>`) represent the actual document name
+you are evaluating; substitute the real filename when performing the maintenance steps.
 
 # Interactive Process
 
@@ -415,9 +413,9 @@ Validation: ✓ All placeholders defined
 
 Git Status:
 - Modified: adw/templates/keyword_manifest.yaml
-- Modified: adw/templates/Agent/testing_guide.md
-- Modified: adw/templates/Agent/code_style.md
-- Added: adw/templates/Agent/new_guide.md
+- Modified: adw/templates/docs_stubs/common/adw-docs/testing_guide.md
+- Modified: adw/templates/docs_stubs/common/adw-docs/code_style.md
+- Added: adw/templates/docs_stubs/common/adw-docs/<new_guide>.md
 
 Ready to commit? [Y/n]
 ```
@@ -528,8 +526,8 @@ User: "Y"
 Agent: "Running: adw setup template extract --dry-run
 
 Would modify:
-- adw/templates/Agent/testing_guide.md
-- adw/templates/Agent/code_style.md
+- adw/templates/docs_stubs/common/adw-docs/testing_guide.md
+- adw/templates/docs_stubs/common/adw-docs/code_style.md
 
 Confirm extraction? [Y/n]"
 
@@ -544,49 +542,29 @@ Git status shows 2 modified template files.
 Ready to commit? [Y/n]"
 ```
 
-## Example 2: OpenCode Agent Structure Sync
+## Example 2: Docs Stub Structure Sync
 
 ```
-User: "Some agents were moved to legacy, sync the templates"
+User: "Some agent docs were added, sync the stubs"
 
-Agent: "I'll compare the live and template directory structures...
+Agent: "I'll compare the live and stub directory structures...
 
-Listing .opencode/agent/:
-- adw-build.md
-- adw-commit.md
-- tester.md
-- legacy/
-  - adw-setup.md
-  - execute-plan.md
-  - git-commit.md
+Listing adw-docs/agents/:
+- adw-setup.md
+- setup-update.md
+- README.md
 
-Listing adw/templates/opencode_config/agent/:
-- adw-build.md
-- adw-commit.md
-- adw-setup.md        ← Should be in legacy/
-- execute-plan.md     ← Should be in legacy/
-- git-commit.md       ← Should be in legacy/
-- tester.md
-- legacy/
-  - (missing adw-setup.md)
-  - execute-plan.md
-  - git-commit.md
+Listing adw/templates/docs_stubs/common/adw-docs/agents/:
+- adw-setup.md
+- README.md
 
 STRUCTURE ISSUES FOUND:
 
-Files in templates ROOT that should ONLY be in legacy:
-1. adw-setup.md - exists in both root AND legacy in templates, but only in legacy in live
-2. execute-plan.md - exists in both root AND legacy in templates, but only in legacy in live
-3. git-commit.md - exists in both root AND legacy in templates, but only in legacy in live
-
-Missing in templates legacy/:
-1. legacy/adw-setup.md - exists in live legacy but not in templates legacy
+Missing in docs stubs agents/:
+1. setup-update.md - exists in live docs but not in docs stubs
 
 Plan:
-1. Move adw-setup.md from templates root to trash (legacy copy exists)
-2. Move execute-plan.md from templates root to trash (legacy copy exists)
-3. Move git-commit.md from templates root to trash (legacy copy exists)
-4. Copy adw-setup.md to templates legacy folder
+1. Copy setup-update.md to docs stubs agents folder
 
 Proceed? [Y/n]"
 
@@ -594,13 +572,10 @@ User: "Y"
 
 Agent: "Executing structural sync...
 
-✓ Moved adw/templates/opencode_config/agent/adw-setup.md to .trash/
-✓ Moved adw/templates/opencode_config/agent/execute-plan.md to .trash/
-✓ Moved adw/templates/opencode_config/agent/git-commit.md to .trash/
-✓ Copied .opencode/agent/legacy/adw-setup.md to adw/templates/opencode_config/agent/legacy/
+✓ Copied adw-docs/agents/setup-update.md to adw/templates/docs_stubs/common/adw-docs/agents/
 
 Verifying structure match...
-✓ .opencode/agent/ structure matches adw/templates/opencode_config/agent/
+✓ adw-docs/agents/ structure matches adw/templates/docs_stubs/common/adw-docs/agents/
 
 Git status shows 4 changes (3 moves to trash, 1 new file).
 Ready to commit? [Y/n]"

@@ -15,7 +15,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -338,13 +337,8 @@ mv adw-docs/dev-plans/features/{old-feature}.md adw-docs/dev-plans/archive/featu
 ```
 
 Update the archived doc's status:
-```python
-edit({
-  "filePath": "{worktree_path}/adw-docs/dev-plans/archive/features/{old-feature}.md",
-  "oldString": "**Status:** In Progress",
-  "newString": "**Status:** Completed (Archived)"
-})
-```
+Update the archived file you just moved:
+- Replace `**Status:** In Progress` with `**Status:** Completed (Archived)`
 
 Update README.md to move link to archived section or remove.
 

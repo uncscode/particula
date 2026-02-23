@@ -10,7 +10,7 @@ import { tool } from "@opencode-ai/plugin";
 const MISSING_SCRIPT_HINT = "Missing backing script .opencode/tool/run_notebook.py (dependency #1466).";
 
 export default tool({
-  description: `Execute Jupyter notebooks with validation and structured outputs.
+  description: `Execute Jupyter notebooks and Python scripts with validation and structured outputs.
 
 BREAKING CHANGE: Default behavior overwrites the source notebook and creates a .ipynb.bak backup. Use noOverwrite to keep the source unchanged or noBackup to skip backups. writeExecuted can still be combined with default overwrite.
 
@@ -22,9 +22,19 @@ EXAMPLES:
 - With timeout: run_notebook({notebookPath: 'notebook.ipynb', timeout: 300})
 - JSON output: run_notebook({notebookPath: 'notebook.ipynb', outputMode: 'json'})
 - Validate output: run_notebook({notebookPath: 'notebook.ipynb', expectOutput: ['DataFrame', 'plot']})
+- Single script (auto-detected): run_notebook({notebookPath: 'examples/demo.py'})
+- Scripts in directory: run_notebook({notebookPath: 'examples/', script: true, recursive: true})
+- Script with output validation: run_notebook({notebookPath: 'script.py', expectOutput: ['result']})
 
-IMPORTANT: Requires nbconvert and nbclient packages (dev dependencies).
-NOTE: Default timeout is 600 seconds per notebook.`,
+py:percent SCRIPTS:
+Pass a py:percent (.py) file directly to execute it and get stdout/stderr/errors back.
+The # %% cell markers are plain comments to Python, so the script runs top-to-bottom.
+- Run py:percent script: run_notebook({notebookPath: 'docs/Examples/panel-methods/regime-selection.py', outputMode: 'full', timeout: 300})
+- Run all py:percent scripts in dir: run_notebook({notebookPath: 'docs/Examples/panel-methods/', script: true, recursive: true})
+Use outputMode 'full' to see stdout/stderr per script, or 'json' for structured results.
+
+IMPORTANT: Requires nbconvert and nbclient packages (dev dependencies) for notebook execution.
+NOTE: Default timeout is 600 seconds per notebook/script. Scripts run via sys.executable (same Python/venv as the tool).`,
   args: {
     outputMode: tool.schema
       .enum(["summary", "full", "json"])
@@ -39,6 +49,12 @@ NOTE: Default timeout is 600 seconds per notebook.`,
       .boolean()
       .optional()
       .describe("If notebookPath is a directory, search recursively (default: false)"),
+    script: tool.schema
+      .boolean()
+      .optional()
+      .describe(
+        "When notebookPath is a directory, collect .py scripts instead of .ipynb notebooks. Single .py files are auto-detected without this flag.",
+      ),
     timeout: tool.schema
       .number()
       .optional()
@@ -83,6 +99,7 @@ NOTE: Default timeout is 600 seconds per notebook.`,
     const noOverwrite = args.noOverwrite || false;
     const noBackup = args.noBackup || false;
     const skipValidation = args.skipValidation || false;
+    const script = args.script || false;
 
     const cmdParts: (string | number)[] = [
       "python3",
@@ -102,6 +119,10 @@ NOTE: Default timeout is 600 seconds per notebook.`,
 
     if (recursive) {
       cmdParts.push("--recursive");
+    }
+
+    if (script) {
+      cmdParts.push("--script");
     }
 
     if (expectOutput.length > 0) {

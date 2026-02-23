@@ -17,7 +17,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -29,6 +28,7 @@ tools:
   create_workspace: false
   workflow_builder: false
   git_operations: true
+  build_mkdocs: true
   platform_operations: false
   run_pytest: false
   run_linters: true
@@ -144,7 +144,7 @@ Use the `worktree_path` for all operations:
 
 ```python
 git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
-list({"path": worktree_path})
+ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
 Confirm you are operating in the isolated worktree.

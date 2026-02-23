@@ -50,7 +50,7 @@ import sys
 import tempfile
 import tomllib
 from pathlib import Path
-from typing import Dict, List, Optional, Pattern, Tuple
+from typing import Any, Dict, List, Optional, Pattern, Tuple, Union
 
 SECTION_HEADER_PATTERN = re.compile(r"^=+\s*.+\s*=+\s*$")
 DURATIONS_HEADER_PATTERN = re.compile(
@@ -251,7 +251,7 @@ def parse_pytest_output(output: str) -> Dict:
             - failed_tests/error_tests: Lists of test names
             - exit_code: Will be set by caller
     """
-    result = {
+    result: Dict[str, Any] = {
         "passed": 0,
         "failed": 0,
         "errors": 0,
@@ -572,7 +572,7 @@ def run_pytest(
     cwd: Optional[str] = None,
     timeout: int = 600,
     coverage: bool = True,
-    coverage_source: Optional[object] = None,
+    coverage_source: Optional[Union[str, List[str]]] = None,
     coverage_threshold: Optional[int] = None,
     cov_report: str = "term-missing",
     fail_fast: bool = False,

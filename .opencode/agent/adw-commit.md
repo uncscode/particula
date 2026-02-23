@@ -22,7 +22,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -275,7 +274,7 @@ If files were soft-deleted using the `move` tool with `trash: true`, they are mo
 
 **Check for .trash/ folder:**
 ```python
-list({"path": ".trash"})  # Check if .trash/ exists
+ripgrep({"pattern": "**/*", "path": ".trash"})  # Check if .trash/ exists
 ```
 
 **If .trash/ exists, explicitly stage it:**
@@ -756,7 +755,7 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 - PR diff shows deletions rather than moves to `.trash/`
 
 **Solution:**
-1. Check if `.trash/` exists: `list({"path": ".trash"})`
+1. Check if `.trash/` exists: `ripgrep({"pattern": "**/*", "path": ".trash"})`
 2. Explicitly stage the folder: `git_operations({"command": "add", "files": [".trash/"]})`
 3. Verify status shows renames (R) not deletions (D)
 4. Include note in commit message about soft-deleted files

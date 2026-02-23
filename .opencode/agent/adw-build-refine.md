@@ -24,9 +24,9 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
+  refactor_astgrep: true
   todoread: true
   todowrite: true
   task: true
@@ -36,6 +36,7 @@ tools:
   create_workspace: false
   workflow_builder: false
   git_operations: true
+  build_mkdocs: true
   platform_operations: false
   run_pytest: true
   run_linters: true
@@ -188,7 +189,7 @@ Use the `worktree_path` for all operations and validate location with tools (no 
 ```python
 git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
-list({"path": worktree_path})
+ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
 **IMPORTANT: Expect uncommitted changes.** The preceding `adw-build` step implements

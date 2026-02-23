@@ -311,9 +311,13 @@ def test_check_sync_out_of_sync_states(tmp_path: Path) -> None:
     _make_notebook(nb_path, [nbformat.v4.new_code_cell("x = 1")])
     py_path.write_text("# script\n", encoding="utf-8")
 
-    # Make script newer by explicitly setting a future mtime
+    module = _load_cli_module()
+    tolerance = getattr(module, "CHECK_SYNC_MTIME_TOLERANCE", 0)
+
+    # Make script newer by explicitly setting a future mtime beyond tolerance
     nb_mtime_ns = nb_path.stat().st_mtime_ns
-    os.utime(py_path, ns=(nb_mtime_ns + 1000000, nb_mtime_ns + 1000000))
+    out_of_sync_delta = tolerance + 1000
+    os.utime(py_path, ns=(nb_mtime_ns + out_of_sync_delta, nb_mtime_ns + out_of_sync_delta))
 
     proc = _run_cli([str(nb_path), "--check-sync"])
 

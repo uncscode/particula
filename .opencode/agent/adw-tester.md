@@ -21,11 +21,9 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
-  todowrite: true
   adw: false
   adw_spec: true
   create_workspace: false
@@ -269,30 +267,15 @@ Categorize each failure as:
 1. **Spec-related**: Failures in new code, new tests, or code directly modified by the implementation
 2. **Unrelated**: Failures in pre-existing code that was NOT part of the implementation plan
 
-### Step 2.2: Create Prioritized Fix Todo List
+### Step 2.2: Create Prioritized Fix Checklist
 
 - Read `adw-docs/testing_guide.md` to understand test framework, commands, and conventions
 
-Use `todowrite` to create a prioritized fix list:
+Maintain a prioritized fix checklist in your response (no tool call), for example:
 
 ```
-todowrite({
-  todos: [
-    {
-      id: "1",
-      content: "[SPEC-RELATED] [Specific fix for test failure]",
-      status: "pending",
-      priority: "high"
-    },
-    {
-      id: "2", 
-      content: "[UNRELATED - 1 FIX ATTEMPT] [Specific fix for pre-existing failure]",
-      status: "pending",
-      priority: "low"
-    },
-    // ... add ALL fixes needed
-  ]
-})
+1. [SPEC-RELATED] [Specific fix for test failure] (pending)
+2. [UNRELATED - 1 FIX ATTEMPT] [Specific fix for pre-existing failure] (pending)
 ```
 
 **Todo List Requirements for Fixes:**
@@ -321,9 +304,9 @@ todowrite({
 
 ### Step 3.1: Fix SPEC-RELATED Failures First (MUST FIX)
 
-For EACH **[SPEC-RELATED]** task in your fix todo list:
+For EACH **[SPEC-RELATED]** item in your fix checklist:
 
-1. **Mark as in_progress** using `todowrite`
+1. **Mark as in_progress** in your checklist
 2. **Execute the fix**:
    - Analyze the error and identify root cause
    - Make minimal, targeted fix to resolve issue
@@ -331,7 +314,7 @@ For EACH **[SPEC-RELATED]** task in your fix todo list:
 3. **Verify the fix**:
    - Re-run the specific failed test using `run_pytest`
    - Confirm test now passes
-4. **Mark as completed** using `todowrite`
+4. **Mark as completed** in your checklist
 5. **Move to next fix**
 
 **CRITICAL for SPEC-RELATED fixes**: 
@@ -341,9 +324,9 @@ For EACH **[SPEC-RELATED]** task in your fix todo list:
 
 ### Step 3.2: Attempt UNRELATED Failures (ONE FIX ATTEMPT ONLY)
 
-For EACH **[UNRELATED - 1 FIX ATTEMPT]** task:
+For EACH **[UNRELATED - 1 FIX ATTEMPT]** item:
 
-1. **Mark as in_progress** using `todowrite`
+1. **Mark as in_progress** in your checklist
 2. **Assess if fix is minimal** (< 10 lines of code changes):
    - If YES: Attempt the fix
    - If NO: Skip immediately, mark as completed with note "Skipped - requires non-trivial changes"
@@ -391,8 +374,8 @@ After all fixes are complete, re-run `run_pytest` to confirm:
 - Document remaining unrelated failures in your output
 - The workflow can proceed - these are pre-existing issues
 
-### Step 4.3: Verify Todo Completion
-If a fix todo list was created, use `todoread()` to confirm ALL fixes are marked "completed" (including skipped unrelated ones with notes)
+### Step 4.3: Verify Checklist Completion
+Ensure your fix checklist shows ALL items marked "completed" (including skipped unrelated ones with notes)
 
 # Validation Success Criteria
 

@@ -199,6 +199,8 @@ Example: { command: "${command}", adw_id: "abc12345" }`;
         if (field) {
           cmdParts.push("--field", field);
         }
+        // Preserve CLI formatting by default so help panels and rich output remain intact.
+        // Callers that need raw content should pass the explicit --raw flag.
         if (raw) {
           cmdParts.push("--raw");
         }
@@ -243,34 +245,27 @@ Note: Protected fields (adw_id, issue_number) cannot be deleted.`;
     }
 
     try {
-      // Execute the ADW spec CLI command using Bun's shell API
-      const result = await Bun.$`${cmdParts}`.text();
+      // Execute the ADW spec CLI command using Bun's process API
+      const result = Bun.spawnSync({
+        cmd: cmdParts,
+        stdout: "pipe",
+        stderr: "pipe",
+      });
+      const decoder = new TextDecoder();
+      const stdout = result.stdout ? decoder.decode(result.stdout) : "";
+      const stderr = result.stderr ? decoder.decode(result.stderr) : "";
 
-      // Check for common error patterns
-      if (result.includes("ERROR:") || result.includes("Error:")) {
-        return `ADW Spec Command Failed:\n${result}`;
+      if (result.exitCode !== 0) {
+        const errorOutput = stderr || stdout || `Exit code ${result.exitCode}`;
+        return `ADW Spec Command Failed (exit ${result.exitCode}):\n${errorOutput}`;
       }
 
-      // Success - return the output
-      return `ADW Spec Command: ${command}\n\n${result}`;
-
+      return `ADW Spec Command: ${command}\n\n${stdout}`;
     } catch (error: any) {
-      // Handle execution errors
-      const errorOutput = error.stdout ? error.stdout.toString() : "";
-      const errorMsg = error.stderr ? error.stderr.toString() : error.message;
-
-      // Try to extract meaningful error information
-      if (errorOutput && errorOutput.includes("ERROR")) {
-        return `ADW Spec Command Failed:\n${errorOutput}`;
-      }
-
-      if (errorMsg) {
-        return `ADW Spec Execution Error:\n${errorMsg}${
-          errorOutput ? `\n\nOutput:\n${errorOutput}` : ""
-        }`;
-      }
-
-      return `ADW Spec Command Failed: ${command}\nError: ${error.message}`;
+      const errorOutput = error?.stdout ? error.stdout.toString() : "";
+      const errorMsg = error?.stderr ? error.stderr.toString() : error?.message;
+      const fallback = errorMsg || errorOutput || "Unknown execution error";
+      return `ADW Spec Execution Error:\n${fallback}`;
     }
   },
 });

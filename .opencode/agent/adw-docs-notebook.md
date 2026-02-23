@@ -28,7 +28,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -82,7 +81,7 @@ Jupyter notebooks are JSON files that are easy to corrupt with direct editing. T
 Arguments: adw_id=<workflow-id>
 
 Task: <create|edit|validate|convert|execute|batch-validate|fix>
-Notebook: <path/to/notebook.ipynb or directory for batch operations>
+Notebook: <docs/Examples/{notebook_name}.ipynb or directory for batch operations>
 Details: <specific instructions>
 ```
 
@@ -127,7 +126,7 @@ task({
 # Required Reading
 
 - @adw-docs/documentation_guide.md - Documentation standards and conventions
-- @docs/Examples/index.md - Examples structure and organization
+- @adw-docs/notebook_validation_guide.md - Notebook validation guide
 - @adw-docs/code_style.md - Code conventions for notebook code cells
 
 # Write Permissions
@@ -309,7 +308,7 @@ run_notebook({
 Read notebook JSON to examine structure:
 
 ```python
-read({"filePath": "docs/Examples/tutorial.ipynb"})
+read({"filePath": "adw-docs/notebook_validation_guide.md"})
 ```
 
 ### edit
@@ -318,7 +317,7 @@ Modify notebook content (use carefully - prefer Jupytext for complex edits):
 
 ```python
 edit({
-  "filePath": "docs/Examples/tutorial.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"source": [\n     "# Old title"',
   "newString": '"source": [\n     "# New title"'
 })
@@ -330,7 +329,7 @@ Create new notebook with complete JSON structure:
 
 ```python
 write({
-  "filePath": "docs/Examples/new-tutorial.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "content": "{...notebook JSON...}"
 })
 ```
@@ -352,12 +351,12 @@ ripgrep({
 })
 ```
 
-### list
+### Directory listing (ripgrep)
 
-List directory contents:
+List directory contents with ripgrep:
 
 ```python
-list({"path": "docs/Examples/"})
+ripgrep({"pattern": "**/*", "path": "docs/Examples/"})
 ```
 
 ### move
@@ -1109,10 +1108,10 @@ The `source` field can be either format:
 **Fix:**
 ```python
 # Read raw file and look for JSON errors
-read({"filePath": "notebook.ipynb"})
+read({"filePath": "adw-docs/notebook_validation_guide.md"})
 # Fix the specific syntax error
 edit({
-  "filePath": "notebook.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"He said "hello""',
   "newString": '"He said \\"hello\\""'
 })
@@ -1135,7 +1134,7 @@ edit({
 ```python
 # Add missing fields
 edit({
-  "filePath": "notebook.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"cell_type": "code",\n   "source"',
   "newString": '"cell_type": "code",\n   "execution_count": null,\n   "metadata": {},\n   "outputs": [],\n   "source"'
 })
@@ -1155,7 +1154,7 @@ edit({
 
 # Ensure each line (except last) ends with \n
 edit({
-  "filePath": "notebook.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"source": "line1\\nline2"',
   "newString": '"source": ["line1\\n", "line2"]'
 })
@@ -1168,13 +1167,13 @@ edit({
 **Fix:** Clear outputs when editing code cells
 ```python
 edit({
-  "filePath": "notebook.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"outputs": [{...complex output...}]',
   "newString": '"outputs": []'
 })
 # Also reset execution count
 edit({
-  "filePath": "notebook.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"execution_count": 5',
   "newString": '"execution_count": null'
 })
@@ -1203,7 +1202,7 @@ edit({
 ```python
 # Add missing kernelspec
 edit({
-  "filePath": "notebook.ipynb",
+  "filePath": "adw-docs/notebook_validation_guide.md",
   "oldString": '"metadata": {}',
   "newString": '"metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python", "version": "3.12.0"}}'
 })
@@ -1224,7 +1223,7 @@ edit({
 
 # Option 2: Use Jupytext to regenerate from .py
 validate_notebook({
-  "notebookPath": "notebook.ipynb",
+  "notebookPath": "docs/Examples/{notebook_name}.ipynb",
   "sync": true  # Regenerate from paired .py file
 })
 ```
@@ -1236,13 +1235,13 @@ For complex edits, always use the Jupytext workflow:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 1. VALIDATE → Check notebook is currently valid          │
-│    validate_notebook({notebookPath: "notebook.ipynb"})   │
+│    validate_notebook({notebookPath: "docs/Examples/{notebook_name}.ipynb"}) │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 2. CONVERT → Convert to .py script via Jupytext         │
 │    validate_notebook({                                   │
-│      notebookPath: "notebook.ipynb",                     │
+│      notebookPath: "docs/Examples/{notebook_name}.ipynb", │
 │      convertToPy: true                                   │
 │    })                                                    │
 └─────────────────────────────────────────────────────────┘
@@ -1250,7 +1249,7 @@ For complex edits, always use the Jupytext workflow:
 ┌─────────────────────────────────────────────────────────┐
 │ 3. EDIT → Make changes in the .py file (much safer)     │
 │    edit({                                                │
-│      filePath: "notebook.py",                            │
+│      filePath: "adw-docs/notebook_validation_guide.md",        │
 │      oldString: "old_code",                              │
 │      newString: "new_code"                               │
 │    })                                                    │
@@ -1259,20 +1258,20 @@ For complex edits, always use the Jupytext workflow:
 ┌─────────────────────────────────────────────────────────┐
 │ 4. SYNC → Convert back to .ipynb                         │
 │    validate_notebook({                                   │
-│      notebookPath: "notebook.ipynb",                     │
+│      notebookPath: "docs/Examples/{notebook_name}.ipynb", │
 │      sync: true                                          │
 │    })                                                    │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 5. VALIDATE → Confirm notebook is still valid            │
-│    validate_notebook({notebookPath: "notebook.ipynb"})   │
+│    validate_notebook({notebookPath: "docs/Examples/{notebook_name}.ipynb"}) │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 6. RUN (Optional) → Execute to verify code works         │
 │    run_notebook({                                        │
-│      notebookPath: "notebook.ipynb",                     │
+│      notebookPath: "docs/Examples/{notebook_name}.ipynb", │
 │      noOverwrite: true                                   │
 │    })                                                    │
 └─────────────────────────────────────────────────────────┘

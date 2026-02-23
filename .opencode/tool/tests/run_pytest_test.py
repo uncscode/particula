@@ -80,7 +80,7 @@ def test_parse_pytest_output_extracts_counts(run_pytest_module: ModuleType) -> N
 
 
 def test_validate_results_flags_all_issues(run_pytest_module: ModuleType) -> None:
-    metrics = {
+    metrics: dict[str, Any] = {
         "passed": 0,
         "failed": 1,
         "errors": 1,
@@ -536,7 +536,7 @@ def test_format_summary_includes_slowest_tests(run_pytest_module: ModuleType) ->
 
 
 def test_format_summary_omits_slowest_tests_when_empty(run_pytest_module: ModuleType) -> None:
-    metrics = {
+    metrics: dict[str, Any] = {
         "passed": 1,
         "failed": 0,
         "errors": 0,

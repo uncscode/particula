@@ -22,7 +22,6 @@ tools:
   read: true
   edit: true
   write: true
-  list: true
   ripgrep: true
   move: true
   todoread: true
@@ -195,7 +194,7 @@ Use tools to verify you're operating in the correct worktree:
 
 ```python
 # Verify worktree exists and is accessible
-list({"path": worktree_path})
+ripgrep({"pattern": "**/*", "path": worktree_path})
 
 # Check git status in worktree
 git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})

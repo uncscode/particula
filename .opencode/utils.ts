@@ -129,32 +129,37 @@ export function isDangerousRmCommand(command: string): boolean {
  * Check if a tool is trying to access .env files
  */
 export function isEnvFileAccess(toolName: string, toolInput: any): boolean {
-  const fileAccessTools = ["Read", "Edit", "MultiEdit", "Write", "Bash"];
+  const normalizedTool = toolName.toLowerCase();
+  const fileAccessTools = ["read", "edit", "multiedit", "write", "bash"];
 
-  if (!fileAccessTools.includes(toolName)) {
+  if (!fileAccessTools.includes(normalizedTool)) {
     return false;
   }
 
+  // Template files are safe — they contain no secrets
+  const safeEnvSuffixes = [".env.sample", ".env.example", ".envrc.example"];
+
   // Check file paths for file-based tools
-  if (["Read", "Edit", "MultiEdit", "Write"].includes(toolName)) {
-    const filePath = toolInput?.file_path || "";
-    if (filePath.includes(".env") && !filePath.endsWith(".env.sample")) {
+  if (["read", "edit", "multiedit", "write"].includes(normalizedTool)) {
+    const filePath = toolInput?.file_path || toolInput?.filePath || "";
+    const isSafe = safeEnvSuffixes.some((suffix) => filePath.endsWith(suffix));
+    if (filePath.includes(".env") && !isSafe) {
       return true;
     }
   }
 
   // Check bash commands for .env file access
-  if (toolName === "Bash") {
+  if (normalizedTool === "bash") {
     const command = toolInput?.command || "";
 
-    // Patterns to detect .env file access (but allow .env.sample)
+    // Patterns to detect .env file access (but allow template files)
     const envPatterns = [
-      /\b\.env\b(?!\.sample)/,  // .env but not .env.sample
-      /cat\s+.*\.env\b(?!\.sample)/,  // cat .env
-      /echo\s+.*>\s*\.env\b(?!\.sample)/,  // echo > .env
-      /touch\s+.*\.env\b(?!\.sample)/,  // touch .env
-      /cp\s+.*\.env\b(?!\.sample)/,  // cp .env
-      /mv\s+.*\.env\b(?!\.sample)/,  // mv .env
+      /\b\.env\b(?!\.(sample|example))/,  // .env but not .env.sample or .env.example
+      /cat\s+.*\.env\b(?!\.(sample|example))/,  // cat .env
+      /echo\s+.*>\s*\.env\b(?!\.(sample|example))/,  // echo > .env
+      /touch\s+.*\.env\b(?!\.(sample|example))/,  // touch .env
+      /cp\s+.*\.env\b(?!\.(sample|example))/,  // cp .env
+      /mv\s+.*\.env\b(?!\.(sample|example))/,  // mv .env
     ];
 
     for (const pattern of envPatterns) {

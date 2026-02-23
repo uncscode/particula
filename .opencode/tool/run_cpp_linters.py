@@ -10,7 +10,8 @@ Usage:
     python3 .opencode/tool/run_cpp_linters.py --source-dir example_cpp_dev
     python3 .opencode/tool/run_cpp_linters.py --source-dir src --auto-fix
     python3 .opencode/tool/run_cpp_linters.py --source-dir src --linters clang-format
-    python3 .opencode/tool/run_cpp_linters.py --source-dir src --build-dir build --linters clang-tidy
+    python3 .opencode/tool/run_cpp_linters.py --source-dir src \\
+        --build-dir build --linters clang-tidy
     python3 .opencode/tool/run_cpp_linters.py --source-dir src --output json
 """
 
@@ -247,9 +248,7 @@ def run_clang_tidy(
 
     if not build_dir:
         result.success = False
-        result.error_message = (
-            "--build-dir with compile_commands.json is required for clang-tidy"
-        )
+        result.error_message = "--build-dir with compile_commands.json is required for clang-tidy"
         return result
 
     compile_commands = Path(build_dir) / "compile_commands.json"
@@ -525,7 +524,7 @@ def run_cpp_linters(
         Tuple of exit code (0 on success) and formatted output string.
     """
 
-    normalized_linters = [l.strip() for l in linters if l.strip()]
+    normalized_linters = [name.strip() for name in linters if name.strip()]
     if not normalized_linters:
         normalized_linters = ["clang-format", "clang-tidy", "cppcheck"]
 

@@ -38,10 +38,11 @@ const PreToolUsePlugin: Plugin = async ({ project, directory, worktree }) => {
         }
 
         // Check for .env file access (blocks access to sensitive environment files)
-        if (toolName === "read" && toolInput.filePath?.includes(".env") && !toolInput.filePath?.endsWith(".env.sample")) {
+        // Allow template files (.env.example, .env.sample) — they contain no secrets
+        if (isEnvFileAccess(toolName, toolInput)) {
           throw new Error(
             "BLOCKED: Access to .env files containing sensitive data is prohibited. " +
-            "Use .env.sample for template files instead."
+            "Use .env.example or .env.sample for template files instead."
           );
         }
 

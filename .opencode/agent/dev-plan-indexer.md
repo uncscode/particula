@@ -17,7 +17,6 @@ tools:
   edit: true
   write: true
   move: true
-  list: true
   ripgrep: true
   todoread: true
   todowrite: true
@@ -377,7 +376,8 @@ To build an accurate index from scratch:
 
 ```python
 # List all files in the type folder
-list({
+ripgrep({
+  "pattern": "**/*",
   "path": "adw-docs/dev-plans/{type}"
 })
 

@@ -213,7 +213,7 @@ Agent instructions and guidelines go here in markdown format.
 
 Agent files should be placed in:
 - **Active**: `.opencode/agent/`
-- If in Agent repo place **Templates**: `adw/templates/opencode_config/agent/`
+- **Template source**: `.opencode/agent/` (fetched via `adw setup pull-opencode`)
 
 # Repository Context
 

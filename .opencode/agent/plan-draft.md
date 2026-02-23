@@ -1,12 +1,12 @@
 ---
 description: >
   Subagent that generates initial implementation plans and writes to spec_content.
-  First step in the planning pipeline - invokes codebase-researcher, drafts plan,
-  and persists to adw_state.json.
+  First step in the planning pipeline - researches the codebase directly, drafts
+  the plan, and persists to adw_state.json.
 
   This subagent:
   - Reads issue from adw_state.json
-  - Invokes codebase-researcher for context
+  - Researches the codebase directly for context
   - Generates initial implementation plan
   - Writes plan to spec_content (GUARANTEED)
   - Returns success/failure status
@@ -20,6 +20,7 @@ tools:
   write: false
   list: true
   ripgrep: true
+  refactor_astgrep: true
   move: false
   todoread: true
   todowrite: true
@@ -103,8 +104,10 @@ Extract from issue:
 
 ## Step 2: Research Codebase Directly
 
-Use your `read`, `ripgrep`, and `list` tools to gather context. Do NOT invoke
-subagents — perform all research yourself.
+Issues are typically already well scoped and researched, so treat the issue
+details as the primary starting point and only expand your search as needed.
+Use `refactor_astgrep`, `ripgrep`, `read`, and `list` to gather context quickly.
+Do NOT invoke subagents — perform all research yourself.
 
 ### 2.1: Identify Search Terms
 
@@ -116,9 +119,19 @@ From the issue, extract:
 
 ### 2.2: Search for Relevant Files
 
-Use `ripgrep` in both file-discovery and content-search modes:
+Start with fast AST-level lookups for symbol references, then fall back to
+`ripgrep` for keyword and path discovery.
 
 ```python
+# AST-aware symbol search (fast reference discovery)
+refactor_astgrep({
+  "pattern": "{symbol}($$$ARGS)",
+  "rewrite": "{symbol}($$$ARGS)",
+  "lang": "python",
+  "path": "{worktree_path}",
+  "dryRun": true
+})
+
 # Find files by name pattern
 ripgrep({"pattern": "**/*{keyword}*.py", "path": "{worktree_path}/adw"})
 
@@ -160,6 +173,70 @@ Note observed patterns in the codebase:
 
 Compile your research findings — they feed directly into Step 3.
 
+## Rule of Thumb: AST vs ripgrep
+
+- Use `refactor_astgrep` when you have a concrete symbol name (function, class,
+  method) and want precise references fast.
+- Use `ripgrep` for broad keyword discovery, error strings, or when symbols are
+  unknown/ambiguous.
+- Use `read` once you have 3-5 likely files; avoid scanning large files without
+  a target.
+
+## Targeted Snippets (Avoid Full-File Reads)
+
+Both `ripgrep` and `read` can return focused chunks so you do not have to load
+an entire file. Use context flags on `ripgrep`, then `read` only the relevant
+line ranges.
+
+Example:
+
+```python
+# Search with context lines (keeps output tight)
+ripgrep({
+  "contentPattern": "sync_todos",
+  "pattern": "**/*.py",
+  "path": "{worktree_path}",
+  "contextLines": 2
+})
+
+# Read only the surrounding lines once you find a match
+read({
+  "filePath": "{worktree_path}/adw/workflows/operations/todo_sync.py",
+  "offset": 120,
+  "limit": 80
+})
+```
+
+## Step 2 Example (Faster Research)
+
+Scenario: issue mentions `TodoSyncer` and a failing `sync_todos` call.
+
+```python
+# 1) AST search for method calls and definitions
+refactor_astgrep({
+  "pattern": "sync_todos($$$ARGS)",
+  "rewrite": "sync_todos($$$ARGS)",
+  "lang": "python",
+  "path": "{worktree_path}",
+  "dryRun": true
+})
+refactor_astgrep({
+  "pattern": "class TodoSyncer($$$BASES): $$$BODY",
+  "rewrite": "class TodoSyncer($$$BASES): $$$BODY",
+  "lang": "python",
+  "path": "{worktree_path}",
+  "dryRun": true
+})
+
+# 2) Content search for log/error strings
+ripgrep({"contentPattern": "TodoSyncer", "pattern": "**/*.py", "path": "{worktree_path}"})
+ripgrep({"contentPattern": "sync_todos", "pattern": "**/*.py", "path": "{worktree_path}"})
+
+# 3) Read the most relevant files
+read({"filePath": "{worktree_path}/adw/workflows/operations/todo_sync.py"})
+read({"filePath": "{worktree_path}/adw/utils/tests/todo_sync_test.py"})
+```
+
 ## Step 3: Generate Implementation Plan
 
 Using the issue and research context, create the plan:
@@ -195,6 +272,8 @@ Using the issue and research context, create the plan:
 [Additional steps as needed...]
 
 ## Tests to Write
+- Follow @adw-docs/testing_guide.md for test locations and naming conventions.
+- Prefer guide references over repo-specific file paths in agent docs.
 - `{module}/tests/{name}_test.py`: {test_description}
 - [Additional tests...]
 
