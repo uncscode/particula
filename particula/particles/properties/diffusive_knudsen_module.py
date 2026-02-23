@@ -10,7 +10,7 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.util.validate_inputs import validate_inputs
 
-KINETIC_ENHANCE_MIN = 1e-80
+KINETIC_ENHANCE_MIN = 1e-80  # Minimum kinetic enhancement to avoid underflow/NaN when exp(phi) → 0 for extreme same-sign repulsion
 
 
 @validate_inputs(
