@@ -80,3 +80,17 @@ def test_invalid_inputs():
             0.5,  # valid coulomb potential ratio
             298.15,  # valid temperature
         )
+
+
+def test_near_zero_kinetic_enhancement_guard() -> None:
+    """Ensure extreme negative potentials yield finite near-zero values."""
+    result = get_diffusive_knudsen_number(
+        particle_radius=100e-9,
+        particle_mass=1e-24,
+        friction_factor=1.0,
+        coulomb_potential_ratio=-200.0,
+        temperature=298.15,
+    )
+
+    assert np.isfinite(result)
+    assert result <= 1e-30
