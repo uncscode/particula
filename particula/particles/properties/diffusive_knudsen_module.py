@@ -124,7 +124,7 @@ def get_diffusive_knudsen_number(
         / reduced_friction_factor
     )
     # Guard for same-sign repulsion; see coulomb_enhancement.py:83-97 and
-    # diffusive_knudsen_module.py:119-126 (issue #1087).
+    # diffusive_knudsen_module.py:113-119 (issue #1087).
     denominator = np.divide(
         sum_of_radii * continuum_enhance,
         kinetic_enhance,
