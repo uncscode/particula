@@ -66,6 +66,9 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
             [NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]
         ]
     ] = None,
+    kernel_index_func: Optional[
+        Callable[[NDArray[np.int64], NDArray[np.int64]], NDArray[np.float64]]
+    ] = None,
 ) -> NDArray[np.int64]:
     """Perform one stochastic coagulation step for a particle population.
 
@@ -83,6 +86,10 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
         kernel_func: Optional callable for direct kernel evaluation. When
             provided, it is called with ``(r_small, r_large)`` inputs and
             should return a 1D array of kernel values.
+        kernel_index_func: Optional callable for direct kernel evaluation
+            using particle indices. When provided, it is called with
+            ``(small_index, large_index)`` arrays and should return a 1D
+            array of kernel values. Takes precedence over ``kernel_func``.
 
     Returns:
         Array of shape ``(n, 2)`` with ``[small_index, large_index]`` pairs
@@ -98,7 +105,7 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
     # Step 3: Interpolate the coagulation kernel for efficient lookups during
     # the coagulation process (unless a direct kernel callable is provided)
     interp_kernel: Optional[RegularGridInterpolator] = None
-    if kernel_func is None:
+    if kernel_func is None and kernel_index_func is None:
         interp_kernel = _interpolate_kernel(kernel, kernel_radius)
 
     # Create output arrays to store the indices of small and large particles
@@ -128,7 +135,19 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
         # Step 5: Retrieve the maximum kernel value for the current bin pair
         small_sample = np.min(particle_radius[small_indices])
         large_sample = np.max(particle_radius[large_indices])
-        if kernel_func is None:
+        if kernel_index_func is not None:
+            small_ref = small_indices[np.argmin(particle_radius[small_indices])]
+            large_ref = large_indices[np.argmax(particle_radius[large_indices])]
+            kernel_values = np.atleast_1d(
+                np.asarray(
+                    kernel_index_func(
+                        np.asarray([small_ref], dtype=np.int64),
+                        np.asarray([large_ref], dtype=np.int64),
+                    ),
+                    dtype=np.float64,
+                )
+            )
+        elif kernel_func is None:
             if interp_kernel is None:
                 raise ValueError("Kernel interpolator is not initialized.")
             kernel_values = interp_kernel(
@@ -171,7 +190,17 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
         large_index = random_generator.choice(large_indices, tests)
 
         # Step 9: Calculate the kernel value for the selected particle pairs
-        if kernel_func is None:
+        if kernel_index_func is not None:
+            kernel_value = np.atleast_1d(
+                np.asarray(
+                    kernel_index_func(
+                        small_index.astype(np.int64, copy=False),
+                        large_index.astype(np.int64, copy=False),
+                    ),
+                    dtype=np.float64,
+                )
+            )
+        elif kernel_func is None:
             if interp_kernel is None:
                 raise ValueError("Kernel interpolator is not initialized.")
             kernel_value = interp_kernel(
