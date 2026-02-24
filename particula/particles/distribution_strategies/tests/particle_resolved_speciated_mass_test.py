@@ -430,3 +430,140 @@ def test_collide_pairs_1d_distribution_with_charge():
     )
     assert result_charge is not None
     np.testing.assert_allclose(result_charge, expected_charge)
+
+
+def test_collide_pairs_duplicate_large_index():
+    """Test duplicate large indices conserve mass and zero small bins."""
+    distribution = np.array(
+        [
+            [1.0, 2.0],
+            [3.0, 4.0],
+            [5.0, 6.0],
+            [7.0, 8.0],
+            [9.0, 10.0],
+        ],
+        dtype=np.float64,
+    )
+    densities = np.array([1.0, 1.0], dtype=np.float64)
+    concentration = np.ones(5, dtype=np.float64)
+    pairs = np.array([[0, 3], [1, 3]], dtype=np.int64)
+
+    total_before = np.sum(distribution)
+    result_mass, result_conc, _ = particle_resolved_strategy.collide_pairs(
+        distribution, concentration, densities, pairs
+    )
+    total_after = np.sum(result_mass)
+
+    np.testing.assert_allclose(total_after, total_before, rtol=1e-10)
+    np.testing.assert_allclose(result_mass[0], 0.0)
+    np.testing.assert_allclose(result_mass[1], 0.0)
+    np.testing.assert_allclose(result_conc[0], 0.0)
+    np.testing.assert_allclose(result_conc[1], 0.0)
+
+
+def test_collide_pairs_duplicate_large_mass_conservation():
+    """Test mass conservation with duplicate large indices."""
+    rng = np.random.default_rng(seed=123)
+    distribution = rng.uniform(1.0, 10.0, size=20).astype(np.float64)
+    densities = np.array([1.0], dtype=np.float64)
+    concentration = np.ones(20, dtype=np.float64)
+    small_index = rng.choice(20, size=10, replace=False).astype(np.int64)
+    large_index = rng.integers(0, 20, size=10, dtype=np.int64)
+    large_index[:3] = large_index[0]
+    pairs = np.stack([small_index, large_index], axis=1)
+
+    total_before = np.sum(distribution)
+    result_mass, _result_conc, _ = particle_resolved_strategy.collide_pairs(
+        distribution, concentration, densities, pairs
+    )
+    total_after = np.sum(result_mass)
+
+    np.testing.assert_allclose(total_after, total_before, rtol=1e-10)
+
+
+def test_collide_pairs_duplicate_large_charge_conservation():
+    """Test charge conservation with duplicate large indices."""
+    rng = np.random.default_rng(seed=456)
+    distribution = rng.uniform(1.0, 10.0, size=15).astype(np.float64)
+    densities = np.array([1.0], dtype=np.float64)
+    concentration = np.ones(15, dtype=np.float64)
+    charge = rng.uniform(-5.0, 5.0, size=15).astype(np.float64)
+    small_index = rng.choice(15, size=8, replace=False).astype(np.int64)
+    large_index = rng.integers(0, 15, size=8, dtype=np.int64)
+    large_index[:2] = large_index[0]
+    pairs = np.stack([small_index, large_index], axis=1)
+
+    charge_before = np.sum(charge)
+    _result_mass, _result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+
+    assert result_charge is not None
+    charge_after = np.sum(result_charge)
+    np.testing.assert_allclose(charge_after, charge_before, rtol=1e-10)
+
+
+def test_collide_pairs_empty_indices_noop():
+    """Test empty indices leave arrays unchanged."""
+    distribution = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    densities = np.array([1.0], dtype=np.float64)
+    concentration = np.array([1.0, 1.0, 1.0], dtype=np.float64)
+    charge = np.array([0.5, -0.5, 1.0], dtype=np.float64)
+    pairs = np.empty((0, 2), dtype=np.int64)
+
+    expected_distribution = distribution.copy()
+    expected_concentration = concentration.copy()
+    expected_charge = charge.copy()
+
+    result_mass, result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+
+    np.testing.assert_allclose(result_mass, expected_distribution)
+    np.testing.assert_allclose(result_conc, expected_concentration)
+    assert result_charge is not None
+    np.testing.assert_allclose(result_charge, expected_charge)
+
+
+def test_collide_pairs_chain_merge_snapshot():
+    """Test snapshot-before-zero behavior for chain merges."""
+    distribution = np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float64)
+    densities = np.array([1.0], dtype=np.float64)
+    concentration = np.ones(4, dtype=np.float64)
+    charge = np.array([0.5, -0.5, 1.5, -1.5], dtype=np.float64)
+    small_index = np.array([1, 2], dtype=np.int64)
+    large_index = np.array([2, 3], dtype=np.int64)
+    pairs = np.stack([small_index, large_index], axis=1)
+
+    expected_mass = distribution.copy()
+    small_mass = expected_mass[small_index].copy()
+    expected_mass[small_index] = 0
+    np.add.at(expected_mass, large_index, small_mass)
+
+    expected_charge = charge.copy()
+    small_charge = expected_charge[small_index].copy()
+    expected_charge[small_index] = 0
+    np.add.at(expected_charge, large_index, small_charge)
+
+    total_mass_before = np.sum(distribution)
+    total_charge_before = np.sum(charge)
+
+    result_mass, _result_conc, result_charge = (
+        particle_resolved_strategy.collide_pairs(
+            distribution, concentration, densities, pairs, charge
+        )
+    )
+
+    np.testing.assert_allclose(result_mass, expected_mass, rtol=1e-10)
+    assert result_charge is not None
+    np.testing.assert_allclose(result_charge, expected_charge, rtol=1e-10)
+    np.testing.assert_allclose(
+        np.sum(result_mass), total_mass_before, rtol=1e-10
+    )
+    np.testing.assert_allclose(
+        np.sum(result_charge), total_charge_before, rtol=1e-10
+    )

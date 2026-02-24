@@ -36,25 +36,18 @@ def get_particle_resolved_update_step(
     Returns:
         Updated particle radii, loss, and gain arrays after coagulation.
     """
-    # Step 1: Calculate the summed volumes of the smaller and larger particles
-    # The volumes are obtained by cubing the radii of the particles.
-    sum_radii_cubed = np.power(
-        particle_radius[small_index], 3, dtype=np.float64
-    ) + np.power(particle_radius[large_index], 3, dtype=np.float64)
+    # Step 1: Calculate base volumes from pre-update radii.
+    base_volume = np.power(particle_radius, 3, dtype=np.float64)
+    small_volume = base_volume[small_index].copy()
+    base_volume[small_index] = 0
+    np.add.at(base_volume, large_index, small_volume)
 
-    # Step 2: Calculate the new radii formed by the coagulation events
-    # The new radius is the cube root of the summed volumes.
-    new_radii = np.cbrt(sum_radii_cubed)
-
-    # Step 3: Save out the loss and gain of particles
+    # Step 2: Save out the loss and gain of particles before modifying radii.
     loss[small_index] = particle_radius[small_index]
     gain[large_index] = particle_radius[large_index]
 
-    # Step 4: Remove the small particles as they coagulated to the larger ones
-    particle_radius[small_index] = 0
-
-    # Step 5: Increase the radii of the large particles to the new radii
-    particle_radius[large_index] = new_radii
+    # Step 3: Recompute all radii from accumulated volumes.
+    particle_radius[:] = np.cbrt(base_volume)
 
     return particle_radius, loss, gain
 

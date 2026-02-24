@@ -126,6 +126,50 @@ def test_particle_resolved_update_step():
     assert updated_gain[1] == 2.0
 
 
+def test_update_step_duplicate_large_volume_conservation():
+    """Test volume conservation with duplicate large indices."""
+    particle_radius = np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float64)
+    loss = np.zeros_like(particle_radius)
+    gain = np.zeros_like(particle_radius)
+    small_index = np.array([0, 1], dtype=np.int64)
+    large_index = np.array([3, 3], dtype=np.int64)
+
+    total_volume_before = np.sum(particle_radius**3)
+    updated_radius, _updated_loss, _updated_gain = (
+        get_particle_resolved_update_step(
+            particle_radius, loss, gain, small_index, large_index
+        )
+    )
+    total_volume_after = np.sum(updated_radius**3)
+
+    np.testing.assert_allclose(
+        total_volume_after, total_volume_before, rtol=1e-10
+    )
+
+
+def test_update_step_empty_indices_noop():
+    """Test empty indices leave arrays unchanged."""
+    particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    loss = np.zeros_like(particle_radius)
+    gain = np.zeros_like(particle_radius)
+    small_index = np.array([], dtype=np.int64)
+    large_index = np.array([], dtype=np.int64)
+
+    expected_radius = particle_radius.copy()
+    expected_loss = loss.copy()
+    expected_gain = gain.copy()
+
+    updated_radius, updated_loss, updated_gain = (
+        get_particle_resolved_update_step(
+            particle_radius, loss, gain, small_index, large_index
+        )
+    )
+
+    np.testing.assert_allclose(updated_radius, expected_radius, rtol=1e-10)
+    np.testing.assert_allclose(updated_loss, expected_loss, rtol=1e-10)
+    np.testing.assert_allclose(updated_gain, expected_gain, rtol=1e-10)
+
+
 def test_particle_resolved_coagulation_step():
     """Test the particle_resolved_coagulation_step function."""
     particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)
