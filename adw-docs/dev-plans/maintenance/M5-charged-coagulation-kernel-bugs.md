@@ -2,8 +2,8 @@
 
 **ID:** M5
 **Priority:** P1
-**Status:** Planning
-**Last Updated:** 2026-02-23
+**Status:** Shipped
+**Last Updated:** 2026-02-24
 
 ## Vision
 
@@ -346,3 +346,4 @@ kinetic_enhance → 0 issue from Bug 1.
 | 2026-02-23 | Initial maintenance plan created | ADW Workflow |
 | 2026-02-23 | Corrected root cause analysis (kinetic_enhance→0, not reduced_mass→0); upgraded P2 to size M; added kernel NaN/Inf success criterion; strengthened P3 investigation on charge-blind interpolation; added duplicate code cleanup to P4 | ADW Review |
 | 2026-02-23 | Restructured phases: merged test-writing into fix phases so no failing tests are committed. P1 = fix NaN + tests, P2 = fix spurious coagulation + tests, P3 = cleanup. Removed standalone reproducer-tests phase. | Manual |
+| 2026-02-24 | Shipped P3 cleanup (removed dead code, verified no diagnostic logging). | ADW Workflow |
