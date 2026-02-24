@@ -21,9 +21,8 @@ import logging
 import sys
 
 import numpy as np
-import pytest
-
 import particula as par
+import pytest
 
 
 def _run_coagulation(
@@ -42,14 +41,14 @@ def _run_coagulation(
     np.random.seed(seed)
 
     # -- parameters --
-    Nn = int(1e4)  # calcite particles
-    Nd = 100  # ions (more to make effect visible)
+    nn = int(1e4)  # calcite particles
+    nd = 100  # ions (more to make effect visible)
     calcite_charge = -6.0
     calcite_density = 2710.0  # kg/m^3
     ions_density = 1500.0  # kg/m^3
 
     # Scale volume to maintain concentration
-    volume = 1e-9 * (Nn / 6.705e5)  # m^3
+    volume = 1e-9 * (nn / 6.705e5)  # m^3
 
     atmosphere = (
         par.gas.AtmosphereBuilder()
@@ -59,20 +58,20 @@ def _run_coagulation(
     )
 
     # -- particles (fixed radii, no randomness) --
-    calcite_r = np.full(Nn, 100e-9)  # 100nm radius = 200nm diameter
-    ions_r = np.full(Nd, 50e-9)  # 50nm radius = 100nm diameter
+    calcite_r = np.full(nn, 100e-9)  # 100nm radius = 200nm diameter
+    ions_r = np.full(nd, 50e-9)  # 50nm radius = 100nm diameter
 
     mass_calcite = (4.0 / 3.0) * np.pi * calcite_r**3 * calcite_density
     mass_ions = (4.0 / 3.0) * np.pi * ions_r**3 * ions_density
 
     # Two species: column 0 = calcite, column 1 = ions
-    mass_speciation = np.zeros((Nn + Nd, 2), dtype=float)
-    mass_speciation[:Nn, 0] = mass_calcite
-    mass_speciation[Nn:, 1] = mass_ions
+    mass_speciation = np.zeros((nn + nd, 2), dtype=float)
+    mass_speciation[:nn, 0] = mass_calcite
+    mass_speciation[nn:, 1] = mass_ions
 
-    charge_array = np.zeros(Nn + Nd, dtype=float)
-    charge_array[:Nn] = calcite_charge
-    charge_array[Nn:] = ion_charge
+    charge_array = np.zeros(nn + nd, dtype=float)
+    charge_array[:nn] = calcite_charge
+    charge_array[nn:] = ion_charge
 
     total_mass_before = np.sum(mass_speciation)
     total_charge_before = charge_array.sum()
@@ -124,6 +123,8 @@ def _run_coagulation(
     dist = aerosol.particles.distribution
     charges = aerosol.particles.get_charge(clone=True)
     masses = aerosol.particles.get_mass(clone=True)
+    assert charges is not None, "charges should not be None"
+    assert masses is not None, "masses should not be None"
 
     alive = dist.sum(axis=1) > 0
     is_pure_calcite = (dist[:, 0] > 0) & (dist[:, 1] == 0)
@@ -140,18 +141,18 @@ def _run_coagulation(
     return {
         "ion_charge": ion_charge,
         "dt": dt,
-        "Nn": Nn,
-        "Nd": Nd,
+        "nn": nn,
+        "nd": nd,
         "alive": int(alive.sum()),
         "pure_calcite": int(is_pure_calcite.sum()),
         "pure_ion": int(is_pure_ion.sum()),
         "mixed": int(is_mixed.sum()),
-        "calcite_calcite_mergers": Nn
+        "calcite_calcite_mergers": nn
         - int(is_pure_calcite.sum())
         - int(is_mixed.sum()),
         "ion_calcite_mergers": int(is_mixed.sum()),
         "ions_remaining": int(is_pure_ion.sum()),
-        "charge_breakdown": dict(zip(unique_q, counts_q)),
+        "charge_breakdown": dict(zip(unique_q, counts_q, strict=False)),
         "mass_delta": total_mass_after - total_mass_before,
         "charge_delta": total_charge_after - total_charge_before,
     }
