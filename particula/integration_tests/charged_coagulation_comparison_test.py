@@ -283,24 +283,15 @@ def test_charge_coagulation_comparison():
     assert r_pos["ion_calcite_mergers"] > r_zero["ion_calcite_mergers"]
 
     # ---------------------------------------------------------
-    # BUG (M6-P1): Charge is NOT conserved.
+    # BUG (M6-P1) — FIXED: Charge must be conserved.
     #
-    # Root cause: collide_pairs() uses numpy fancy-index +=,
-    # which is buffered.  When a large particle absorbs multiple
-    # smalls in one step (duplicate large_index), only the LAST
-    # charge addition takes effect.  The other charges vanish.
-    #
-    # The q=-6 case is trivially conserved because almost
-    # nothing merges.  The q=0 and q=+6 cases lose charge.
-    #
-    # WRONG (current broken behavior) — passes today:
-    assert r_neg["charge_delta"] == 0.0  # trivially OK
-    assert r_zero["charge_delta"] != 0.0  # BUG: charge lost
-    assert r_pos["charge_delta"] != 0.0  # BUG: charge lost
-    # CORRECT (after M6-P1 fix) — flip to these:
-    #   assert r_neg["charge_delta"] == 0.0
-    #   assert r_zero["charge_delta"] == 0.0
-    #   assert r_pos["charge_delta"] == 0.0
+    # Previously, collide_pairs() used buffered fancy-index `+=`,
+    # so duplicate large_index entries lost charge.  After switching
+    # to np.add.at with snapshot-before-zeroing, charge is conserved
+    # across all ion charge scenarios.
+    assert r_neg["charge_delta"] == 0.0
+    assert r_zero["charge_delta"] == 0.0
+    assert r_pos["charge_delta"] == 0.0
     # ---------------------------------------------------------
 
     # ---------------------------------------------------------
