@@ -218,13 +218,15 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         small_index = indices[:, 0]
         large_index = indices[:, 1]
 
-        # Handle mass (existing logic)
+        # Handle mass with unbuffered accumulation for duplicate indices.
         if distribution.ndim == 1:
-            distribution[large_index] += distribution[small_index]
+            small_mass = distribution[small_index].copy()
             distribution[small_index] = 0
+            np.add.at(distribution, large_index, small_mass)
         else:
-            distribution[large_index, :] += distribution[small_index, :]
+            small_mass = distribution[small_index, :].copy()
             distribution[small_index, :] = 0
+            np.add.at(distribution, large_index, small_mass)
         concentration[small_index] = 0
 
         # Handle charge if present as numpy array and non-zero
@@ -234,7 +236,8 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             if np.any(charge[small_index] != 0) or np.any(
                 charge[large_index] != 0
             ):
-                charge[large_index] += charge[small_index]
+                small_charge = charge[small_index].copy()
                 charge[small_index] = 0
+                np.add.at(charge, large_index, small_charge)
 
         return distribution, concentration, charge
