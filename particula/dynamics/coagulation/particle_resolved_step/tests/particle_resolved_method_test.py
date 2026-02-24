@@ -25,6 +25,25 @@ def test_interpolate_kernel():
     assert isinstance(interp_func, RegularGridInterpolator)
 
 
+def test_interpolate_kernel_out_of_bounds_returns_zero() -> None:
+    """Out-of-bounds interpolation should return zero values."""
+    kernel = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+    kernel_radius = np.array([1.0, 2.0], dtype=np.float64)
+    interp_func = _interpolate_kernel(kernel, kernel_radius)
+
+    query_points = np.array(
+        [
+            [0.5, 1.5],
+            [2.5, 1.5],
+            [1.5, 2.5],
+            [0.5, 2.5],
+        ],
+        dtype=np.float64,
+    )
+    values = interp_func(query_points)
+    np.testing.assert_allclose(values, 0.0)
+
+
 def test_calculate_probabilities():
     """Test the calculate_probabilities function."""
     kernel_values = np.array([1.0, 2.0], dtype=np.float64)
