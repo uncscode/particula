@@ -26,6 +26,90 @@ from particula.particles.representation import ParticleRepresentation
 logger = logging.getLogger("particula")
 
 
+def _resolve_radius_indices(
+    particle_radius: NDArray[np.float64],
+    lookup_values: NDArray[np.float64],
+) -> NDArray[np.int64]:
+    """Resolve radius values to unique particle indices.
+
+    Args:
+        particle_radius: Available particle radii.
+        lookup_values: Radii to resolve against particle_radius.
+
+    Returns:
+        Index array aligned with lookup_values.
+
+    Raises:
+        ValueError: If a lookup value has zero or multiple matches.
+    """
+    indices = np.empty(lookup_values.size, dtype=np.int64)
+    for idx, value in enumerate(lookup_values):
+        matches = np.flatnonzero(np.isclose(particle_radius, value))
+        if matches.size == 0:
+            raise ValueError(f"Direct kernel lookup failed for radius {value}.")
+        if matches.size > 1:
+            raise ValueError(
+                "Direct kernel lookup ambiguous for radius "
+                f"{value}; {matches.size} matches found."
+            )
+        indices[idx] = matches[0]
+    return indices
+
+
+def _build_direct_kernel_index_func(
+    particle_radius: NDArray[np.float64],
+    particle_mass: NDArray[np.float64],
+    particle_charge: NDArray[np.float64],
+    kernel_builder: Callable[..., NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> Callable[[NDArray[np.int64], NDArray[np.int64]], NDArray[np.float64]]:
+    """Build an index-based kernel function for particle-resolved sampling."""
+
+    def direct_kernel_index_func(
+        small_index: NDArray[np.int64],
+        large_index: NDArray[np.int64],
+    ) -> NDArray[np.float64]:
+        small_arr, large_arr = np.broadcast_arrays(
+            np.atleast_1d(small_index), np.atleast_1d(large_index)
+        )
+        small_flat = small_arr.ravel().astype(np.int64)
+        large_flat = large_arr.ravel().astype(np.int64)
+        kernel_values = np.empty(small_flat.shape, dtype=np.float64)
+        for i, (small_idx, large_idx) in enumerate(
+            zip(small_flat, large_flat, strict=True)
+        ):
+            kernel_matrix = kernel_builder(
+                particle_radius=np.array(
+                    [
+                        particle_radius[small_idx],
+                        particle_radius[large_idx],
+                    ],
+                    dtype=np.float64,
+                ),
+                particle_mass=np.array(
+                    [
+                        particle_mass[small_idx],
+                        particle_mass[large_idx],
+                    ],
+                    dtype=np.float64,
+                ),
+                particle_charge=np.array(
+                    [
+                        particle_charge[small_idx],
+                        particle_charge[large_idx],
+                    ],
+                    dtype=np.float64,
+                ),
+                temperature=temperature,
+                pressure=pressure,
+            )
+            kernel_values[i] = kernel_matrix[0, 1]
+        return kernel_values.reshape(small_arr.shape)
+
+    return direct_kernel_index_func
+
+
 class CoagulationStrategyABC(ABC):
     """Abstract base class for defining a coagulation strategy.
 
@@ -363,6 +447,12 @@ class CoagulationStrategyABC(ABC):
                     NDArray[np.float64],
                 ]
             ] = None
+            kernel_index_func: Optional[
+                Callable[
+                    [NDArray[np.int64], NDArray[np.int64]],
+                    NDArray[np.float64],
+                ]
+            ] = None
             if self.use_direct_kernel:
                 kernel_strategy = getattr(self, "kernel_strategy", None)
                 kernel_mapping = {
@@ -405,68 +495,14 @@ class CoagulationStrategyABC(ABC):
                             particle_radius, dtype=np.float64
                         )
                     charge_array = np.asarray(particle_charge, dtype=np.float64)
-
-                    def _find_indices(
-                        values: NDArray[np.float64],
-                    ) -> NDArray[np.int64]:
-                        indices = np.empty(values.size, dtype=np.int64)
-                        for idx, value in enumerate(values):
-                            matches = np.flatnonzero(
-                                np.isclose(particle_radius, value)
-                            )
-                            if matches.size == 0:
-                                raise ValueError(
-                                    "Direct kernel lookup failed for radius."
-                                )
-                            indices[idx] = matches[0]
-                        return indices
-
-                    def direct_kernel_func(
-                        r_small: NDArray[np.float64],
-                        r_large: NDArray[np.float64],
-                    ) -> NDArray[np.float64]:
-                        r_small_arr, r_large_arr = np.broadcast_arrays(
-                            np.atleast_1d(r_small), np.atleast_1d(r_large)
-                        )
-                        r_small_flat = r_small_arr.ravel().astype(np.float64)
-                        r_large_flat = r_large_arr.ravel().astype(np.float64)
-                        small_indices = _find_indices(r_small_flat)
-                        large_indices = _find_indices(r_large_flat)
-                        kernel_values = np.empty(
-                            r_small_flat.shape, dtype=np.float64
-                        )
-                        for i, (small_index, large_index) in enumerate(
-                            zip(small_indices, large_indices, strict=True)
-                        ):
-                            kernel_matrix = kernel_builder(
-                                particle_radius=np.array(
-                                    [
-                                        particle_radius[small_index],
-                                        particle_radius[large_index],
-                                    ],
-                                    dtype=np.float64,
-                                ),
-                                particle_mass=np.array(
-                                    [
-                                        particle_mass[small_index],
-                                        particle_mass[large_index],
-                                    ],
-                                    dtype=np.float64,
-                                ),
-                                particle_charge=np.array(
-                                    [
-                                        charge_array[small_index],
-                                        charge_array[large_index],
-                                    ],
-                                    dtype=np.float64,
-                                ),
-                                temperature=temperature,
-                                pressure=pressure,
-                            )
-                            kernel_values[i] = kernel_matrix[0, 1]
-                        return kernel_values.reshape(r_small_arr.shape)
-
-                    kernel_func = direct_kernel_func
+                    kernel_index_func = _build_direct_kernel_index_func(
+                        particle_radius=particle_radius,
+                        particle_mass=particle_mass,
+                        particle_charge=charge_array,
+                        kernel_builder=kernel_builder,
+                        temperature=temperature,
+                        pressure=pressure,
+                    )
 
             loss_gain_indices = step_func(
                 particle_radius=particle.get_radius(),
@@ -476,6 +512,7 @@ class CoagulationStrategyABC(ABC):
                 time_step=time_step,
                 random_generator=self.random_generator,
                 kernel_func=kernel_func,
+                kernel_index_func=kernel_index_func,
             )
             particle.collide_pairs(loss_gain_indices)
             return particle
