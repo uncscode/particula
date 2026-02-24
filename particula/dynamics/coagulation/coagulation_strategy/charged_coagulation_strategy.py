@@ -63,6 +63,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         self,
         distribution_type: str,
         kernel_strategy: ChargedKernelStrategyABC,
+        use_direct_kernel: bool = False,
     ):
         """Initialize the ChargedCoagulationStrategy.
 
@@ -71,13 +72,18 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
             particles are tracked (e.g., "discrete", "continuous_pdf",
             or "particle_resolved").
             kernel_strategy : A ChargedKernelStrategyABC instance used to
-            calculate dimensionless/dimensioned kernels for charged
-            coagulation.
+                calculate dimensionless/dimensioned kernels for charged
+                coagulation.
+            use_direct_kernel: Whether to compute kernel values directly for
+                particle-resolved coagulation instead of using interpolation.
 
         Returns:
             None
         """
-        super().__init__(distribution_type=distribution_type)
+        super().__init__(
+            distribution_type=distribution_type,
+            use_direct_kernel=use_direct_kernel,
+        )
         self.kernel_strategy = kernel_strategy
 
     def dimensionless_kernel(

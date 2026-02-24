@@ -6,13 +6,17 @@ coagulation processes in aerosol simulations.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional, Union, cast
+from typing import Callable, Optional, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 from particula import gas, particles
-from particula.dynamics.coagulation import coagulation_rate
+from particula.dynamics.coagulation import (
+    charged_dimensional_kernel,
+    charged_kernel_strategy,
+    coagulation_rate,
+)
 from particula.dynamics.coagulation.particle_resolved_step import (
     particle_resolved_method,
 )
@@ -32,6 +36,8 @@ class CoagulationStrategyABC(ABC):
     Attributes:
         - distribution_type : The type of distribution to be used, one of
           ("discrete", "continuous_pdf", or "particle_resolved").
+        - use_direct_kernel : Whether to compute pairwise kernels directly
+          for particle-resolved coagulation.
 
     Methods:
     - dimensionless_kernel : Calculate the dimensionless coagulation kernel.
@@ -65,6 +71,7 @@ class CoagulationStrategyABC(ABC):
         particle_resolved_kernel_radius: Optional[NDArray[np.float64]] = None,
         particle_resolved_kernel_bins_number: Optional[int] = None,
         particle_resolved_kernel_bins_per_decade: int = 10,
+        use_direct_kernel: bool = False,
     ):
         """Initialize the coagulation strategy.
 
@@ -77,6 +84,8 @@ class CoagulationStrategyABC(ABC):
                 particle-resolved kernel.
             particle_resolved_kernel_bins_per_decade: Bins per decade for
                 particle-resolved kernel (default 10).
+            use_direct_kernel: Whether to compute kernel values directly for
+                particle-resolved coagulation instead of using interpolation.
 
         Raises:
             ValueError: If distribution_type is not valid.
@@ -100,6 +109,7 @@ class CoagulationStrategyABC(ABC):
         self.particle_resolved_bins_per_decade = (
             particle_resolved_kernel_bins_per_decade
         )
+        self.use_direct_kernel = use_direct_kernel
 
     @abstractmethod
     def dimensionless_kernel(
@@ -264,7 +274,7 @@ class CoagulationStrategyABC(ABC):
         gain_rate = self.gain_rate(particle=particle, kernel=kernel_arr)
         return gain_rate - loss_rate
 
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleRepresentation,
         temperature: float,
@@ -347,6 +357,117 @@ class CoagulationStrategyABC(ABC):
             step_func = (
                 particle_resolved_method.get_particle_resolved_coagulation_step
             )
+            kernel_func: Optional[
+                Callable[
+                    [NDArray[np.float64], NDArray[np.float64]],
+                    NDArray[np.float64],
+                ]
+            ] = None
+            if self.use_direct_kernel:
+                kernel_strategy = getattr(self, "kernel_strategy", None)
+                kernel_mapping = {
+                    charged_kernel_strategy.HardSphereKernelStrategy: (
+                        charged_dimensional_kernel.get_hard_sphere_kernel_via_system_state
+                    ),
+                    charged_kernel_strategy.CoulombDyachkov2007KernelStrategy: (
+                        charged_dimensional_kernel.get_coulomb_kernel_dyachkov2007_via_system_state
+                    ),
+                    charged_kernel_strategy.CoulombGatti2008KernelStrategy: (
+                        charged_dimensional_kernel.get_coulomb_kernel_gatti2008_via_system_state
+                    ),
+                    (
+                        charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy
+                    ): (
+                        charged_dimensional_kernel.get_coulomb_kernel_gopalakrishnan2012_via_system_state
+                    ),
+                    charged_kernel_strategy.CoulumbChahl2019KernelStrategy: (
+                        charged_dimensional_kernel.get_coulomb_kernel_chahl2019_via_system_state
+                    ),
+                }
+                kernel_builder = None
+                if kernel_strategy is not None:
+                    kernel_builder = kernel_mapping.get(type(kernel_strategy))
+                if kernel_builder is None:
+                    logger.warning(
+                        "Direct kernel disabled for unsupported kernel "
+                        "strategy."
+                    )
+                else:
+                    particle_radius = np.asarray(
+                        particle.get_radius(), dtype=np.float64
+                    )
+                    particle_mass = np.asarray(
+                        particle.get_mass(), dtype=np.float64
+                    )
+                    particle_charge = particle.get_charge()
+                    if particle_charge is None:
+                        particle_charge = np.zeros_like(
+                            particle_radius, dtype=np.float64
+                        )
+                    charge_array = np.asarray(particle_charge, dtype=np.float64)
+
+                    def _find_indices(
+                        values: NDArray[np.float64],
+                    ) -> NDArray[np.int64]:
+                        indices = np.empty(values.size, dtype=np.int64)
+                        for idx, value in enumerate(values):
+                            matches = np.flatnonzero(
+                                np.isclose(particle_radius, value)
+                            )
+                            if matches.size == 0:
+                                raise ValueError(
+                                    "Direct kernel lookup failed for radius."
+                                )
+                            indices[idx] = matches[0]
+                        return indices
+
+                    def direct_kernel_func(
+                        r_small: NDArray[np.float64],
+                        r_large: NDArray[np.float64],
+                    ) -> NDArray[np.float64]:
+                        r_small_arr, r_large_arr = np.broadcast_arrays(
+                            np.atleast_1d(r_small), np.atleast_1d(r_large)
+                        )
+                        r_small_flat = r_small_arr.ravel().astype(np.float64)
+                        r_large_flat = r_large_arr.ravel().astype(np.float64)
+                        small_indices = _find_indices(r_small_flat)
+                        large_indices = _find_indices(r_large_flat)
+                        kernel_values = np.empty(
+                            r_small_flat.shape, dtype=np.float64
+                        )
+                        for i, (small_index, large_index) in enumerate(
+                            zip(small_indices, large_indices, strict=True)
+                        ):
+                            kernel_matrix = kernel_builder(
+                                particle_radius=np.array(
+                                    [
+                                        particle_radius[small_index],
+                                        particle_radius[large_index],
+                                    ],
+                                    dtype=np.float64,
+                                ),
+                                particle_mass=np.array(
+                                    [
+                                        particle_mass[small_index],
+                                        particle_mass[large_index],
+                                    ],
+                                    dtype=np.float64,
+                                ),
+                                particle_charge=np.array(
+                                    [
+                                        charge_array[small_index],
+                                        charge_array[large_index],
+                                    ],
+                                    dtype=np.float64,
+                                ),
+                                temperature=temperature,
+                                pressure=pressure,
+                            )
+                            kernel_values[i] = kernel_matrix[0, 1]
+                        return kernel_values.reshape(r_small_arr.shape)
+
+                    kernel_func = direct_kernel_func
+
             loss_gain_indices = step_func(
                 particle_radius=particle.get_radius(),
                 kernel=kernel_arr,
@@ -354,6 +475,7 @@ class CoagulationStrategyABC(ABC):
                 volume=particle.get_volume(),
                 time_step=time_step,
                 random_generator=self.random_generator,
+                kernel_func=kernel_func,
             )
             particle.collide_pairs(loss_gain_indices)
             return particle

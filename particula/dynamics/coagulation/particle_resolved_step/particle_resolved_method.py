@@ -1,6 +1,6 @@
 """Particle-resolved coagulation helpers with bounded kernel interpolation."""
 
-from typing import Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -54,13 +54,18 @@ def get_particle_resolved_update_step(
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
 # pylint: disable=too-many-locals
-def get_particle_resolved_coagulation_step(
+def get_particle_resolved_coagulation_step(  # noqa: C901
     particle_radius: NDArray[np.float64],
     kernel: NDArray[np.float64],
     kernel_radius: NDArray[np.float64],
     volume: float,
     time_step: float,
     random_generator: np.random.Generator,
+    kernel_func: Optional[
+        Callable[
+            [NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]
+        ]
+    ] = None,
 ) -> NDArray[np.int64]:
     """Perform one stochastic coagulation step for a particle population.
 
@@ -75,6 +80,9 @@ def get_particle_resolved_coagulation_step(
         volume: System volume in cubic meters.
         time_step: Duration of the coagulation step in seconds.
         random_generator: NumPy random generator used for sampling.
+        kernel_func: Optional callable for direct kernel evaluation. When
+            provided, it is called with ``(r_small, r_large)`` inputs and
+            should return a 1D array of kernel values.
 
     Returns:
         Array of shape ``(n, 2)`` with ``[small_index, large_index]`` pairs
@@ -88,8 +96,10 @@ def get_particle_resolved_coagulation_step(
     pair_indices = _get_bin_pairs(bin_indices=bin_indices)
 
     # Step 3: Interpolate the coagulation kernel for efficient lookups during
-    # the coagulation process
-    interp_kernel = _interpolate_kernel(kernel, kernel_radius)
+    # the coagulation process (unless a direct kernel callable is provided)
+    interp_kernel: Optional[RegularGridInterpolator] = None
+    if kernel_func is None:
+        interp_kernel = _interpolate_kernel(kernel, kernel_radius)
 
     # Create output arrays to store the indices of small and large particles
     # involved in coagulation events
@@ -118,7 +128,22 @@ def get_particle_resolved_coagulation_step(
         # Step 5: Retrieve the maximum kernel value for the current bin pair
         small_sample = np.min(particle_radius[small_indices])
         large_sample = np.max(particle_radius[large_indices])
-        kernel_values = interp_kernel(np.array([[small_sample, large_sample]]))
+        if kernel_func is None:
+            if interp_kernel is None:
+                raise ValueError("Kernel interpolator is not initialized.")
+            kernel_values = interp_kernel(
+                np.array([[small_sample, large_sample]])
+            )
+        else:
+            kernel_values = np.atleast_1d(
+                np.asarray(
+                    kernel_func(
+                        np.asarray([small_sample], dtype=np.float64),
+                        np.asarray([large_sample], dtype=np.float64),
+                    ),
+                    dtype=np.float64,
+                )
+            )
 
         # Step 6: Calculate the number of possible coagulation events
         # between small and large particles
@@ -146,11 +171,27 @@ def get_particle_resolved_coagulation_step(
         large_index = random_generator.choice(large_indices, tests)
 
         # Step 9: Calculate the kernel value for the selected particle pairs
-        kernel_value = interp_kernel(
-            np.column_stack(
-                (particle_radius[small_index], particle_radius[large_index])
+        if kernel_func is None:
+            if interp_kernel is None:
+                raise ValueError("Kernel interpolator is not initialized.")
+            kernel_value = interp_kernel(
+                np.column_stack(
+                    (
+                        particle_radius[small_index],
+                        particle_radius[large_index],
+                    )
+                )
             )
-        )
+        else:
+            kernel_value = np.atleast_1d(
+                np.asarray(
+                    kernel_func(
+                        particle_radius[small_index],
+                        particle_radius[large_index],
+                    ),
+                    dtype=np.float64,
+                )
+            )
 
         # Handle diagonal elements if necessary (for single pair coagulation)
         if kernel_value.ndim > 1:

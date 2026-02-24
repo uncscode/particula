@@ -18,12 +18,16 @@ from ..coagulation_strategy.charged_coagulation_strategy import (
 from ..coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from .coagulation_builder_mixin import BuilderDistributionTypeMixin
+from .coagulation_builder_mixin import (
+    BuilderDistributionTypeMixin,
+    BuilderUseDirectKernelMixin,
+)
 
 
 class ChargedCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
+    BuilderUseDirectKernelMixin,
 ):
     """Charged Coagulation builder class.
 
@@ -70,6 +74,7 @@ class ChargedCoagulationBuilder(
         ]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)
+        BuilderUseDirectKernelMixin.__init__(self)
         self.charged_kernel_strategy = None
 
     def set_charged_kernel_strategy(
@@ -131,4 +136,5 @@ class ChargedCoagulationBuilder(
         return ChargedCoagulationStrategy(
             distribution_type=self.distribution_type,
             kernel_strategy=self.charged_kernel_strategy,
+            use_direct_kernel=self.use_direct_kernel,
         )

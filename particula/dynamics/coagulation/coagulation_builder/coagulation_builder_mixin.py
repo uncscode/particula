@@ -97,6 +97,42 @@ class BuilderDistributionTypeMixin:
         return self
 
 
+class BuilderUseDirectKernelMixin:
+    """Mixin class for direct kernel evaluation in coagulation strategies.
+
+    Attributes:
+        - use_direct_kernel : Whether to compute particle-resolved kernels
+          directly instead of using interpolation.
+
+    Methods:
+    - set_use_direct_kernel : Set the direct kernel evaluation flag.
+    """
+
+    def __init__(self):
+        """Initialize the direct kernel mixin."""
+        self.use_direct_kernel = False
+
+    def set_use_direct_kernel(self, value: bool):
+        """Set the direct kernel evaluation flag.
+
+        Args:
+            value: True to compute direct pairwise kernels for
+                particle-resolved coagulation.
+
+        Returns:
+            The instance with the updated ``use_direct_kernel`` value.
+
+        Raises:
+            ValueError: If value is not a boolean.
+        """
+        if not isinstance(value, bool):
+            message = f"Direct kernel flag must be bool, got {value}."
+            logger.error(message)
+            raise ValueError(message)
+        self.use_direct_kernel = value
+        return self
+
+
 class BuilderTurbulentDissipationMixin:
     """Mixin class for turbulent shear parameters.
 
