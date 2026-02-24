@@ -189,18 +189,6 @@ def get_hard_sphere_kernel_via_system_state(
     # Ensure dimensionless_kernel is an array
     dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
 
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
-    # Ensure dimensionless_kernel is an array
-    dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
-
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
         coulomb_potential_ratio=coulomb_potential_ratio,
@@ -268,13 +256,6 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
     # Ensure dimensionless_kernel is an array
     dimensionless_kernel = np.atleast_1d(dimensionless_kernel_raw)
 
-    return get_dimensional_kernel(
-        dimensionless_kernel=dimensionless_kernel,
-        coulomb_potential_ratio=coulomb_potential_ratio,
-        sum_of_radii=sum_of_radii,
-        reduced_mass=reduced_mass,
-        reduced_friction_factor=reduced_friction_factor,
-    )
     return get_dimensional_kernel(
         dimensionless_kernel=dimensionless_kernel,
         coulomb_potential_ratio=coulomb_potential_ratio,
