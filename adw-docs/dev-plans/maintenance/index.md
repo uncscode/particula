@@ -7,7 +7,8 @@ updates in particula.
 
 | ID | Title | Status | Priority |
 |----|-------|--------|----------|
-| [M5](M5-charged-coagulation-kernel-bugs.md) | Charged Coagulation Kernel Bugs | Planning | P1 |
+| [M5](M5-charged-coagulation-kernel-bugs.md) | Charged Coagulation Kernel Bugs | Shipped | P1 |
+| [M6](M6-particle-resolved-coagulation-fixes.md) | Particle-Resolved Coagulation Fixes | Planning | P1 |
 | [M2](M2-notebook-api-migration.md) | Jupyter Notebook API Migration | Planning | P2 |
 | [M3](M3-jupytext-notebook-sync.md) | Jupytext Notebook Sync Migration (Pilot) | Planning | P2 |
 
@@ -20,7 +21,7 @@ updates in particula.
 
 ## Next Available ID
 
-**M6**
+**M7**
 
 ## Maintenance Categories
 

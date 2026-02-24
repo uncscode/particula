@@ -119,6 +119,12 @@ and rollout.
     format. Implement pre-commit hooks and CI validation.
   - Progress: 10/15 phases completed (all notebook conversions done; P14-P15 remain)
 
+- [Particle-Resolved Coagulation Fixes][plan-coag-fixes] — Status:
+  Planning (P1)
+  - Scope: Fix duplicate-index mass/charge loss in `collide_pairs()` and
+    `get_particle_resolved_update_step()`. Add opt-in direct kernel evaluation
+    to bypass charge-blind interpolation. Move diagnostic tests into repo.
+
 ## References
 
 - Parent wall loss epic: [#72](https://github.com/uncscode/particula/issues/72)
@@ -167,3 +173,4 @@ and rollout.
 [plan-charge-add-concentration]: maintenance/M1-add-concentration-charge-support.md
 [plan-jupytext-pilot]: maintenance/M3-jupytext-notebook-sync.md
 [plan-jupytext-full]: maintenance/M4-jupytext-full-migration.md
+[plan-coag-fixes]: maintenance/M6-particle-resolved-coagulation-fixes.md
