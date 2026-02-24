@@ -25,7 +25,6 @@ Known issue documented by scenarios 5 and 6 (M6-P2):
 """
 
 import numpy as np
-
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
@@ -54,7 +53,6 @@ from particula.particles.properties.slip_correction_module import (
     get_cunningham_slip_correction,
 )
 from particula.util.reduced_quantity import get_reduced_self_broadcast
-
 
 # -- shared constants --
 TEMPERATURE = 216.65  # K
@@ -216,7 +214,8 @@ def _run_scenario(
 # =============================================================
 def test_wide_opposite_charge():
     """Bin 0 = +1 (ion), bins 1-3 = -6 (calcite).
-    Large attraction."""
+    Large attraction.
+    """
     _run_scenario(
         label="SCENARIO 1: Wide opposite charge (+1 vs -6)",
         bin_charges=np.array([1.0, -6.0, -6.0, -6.0]),
@@ -242,7 +241,8 @@ def test_wide_opposite_charge():
 # =============================================================
 def test_same_sign_charge():
     """All bins = +1. No cross-charge attraction, all
-    repulsive."""
+    repulsive.
+    """
     _run_scenario(
         label="SCENARIO 2: Same sign charge (+1 vs +1)",
         bin_charges=np.array([1.0, 1.0, 1.0, 1.0]),
@@ -428,7 +428,8 @@ def test_coag_same_sign_repulsive():
 # =============================================================
 def test_coag_neutral_ions():
     """Ion charge = 0, calcite charge = -6. Mixed charge
-    grid."""
+    grid.
+    """
     _run_coag_scenario(
         label=("SCENARIO 5: Calcite(-6) + Ion(0) -- neutral ions"),
         bin_charges=np.array([0.0, -6.0, -6.0, -6.0]),
@@ -462,7 +463,8 @@ def test_coag_neutral_ions():
 # =============================================================
 def test_coag_opposite_sign_attractive():
     """Ion charge = +6, calcite charge = -6. Strong
-    attraction."""
+    attraction.
+    """
     _run_coag_scenario(
         label=("SCENARIO 6: Calcite(-6) + Ion(+6) -- attractive"),
         bin_charges=np.array([6.0, -6.0, -6.0, -6.0]),
