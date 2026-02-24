@@ -11,6 +11,7 @@ import unittest
 
 import numpy as np
 import pytest
+from particula.dynamics.coagulation import charged_dimensional_kernel
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
@@ -34,24 +35,21 @@ PRESSURE = 101325.0
 
 
 def _build_particle_resolved_with_charges() -> ParticleRepresentation:
-    calcite_count = 100
-    ion_count = 6
-    radii = np.concatenate(
-        [np.full(calcite_count, 50e-9), np.full(ion_count, 5e-9)]
-    ).astype(np.float64)
-    density = np.full(radii.shape, 2000.0, dtype=np.float64)
+    radii = np.array(
+        [50e-9, 55e-9, 5e-9, 6e-9],
+        dtype=np.float64,
+    )
+    density = 2000.0
     mass = 4.0 / 3.0 * np.pi * radii**3 * density
-    charges = np.concatenate(
-        [np.full(calcite_count, -6.0), np.full(ion_count, 1.0)]
-    ).astype(np.float64)
+    charges = np.array([-6.0, -6.0, 6.0, 6.0], dtype=np.float64)
     builder = ResolvedParticleMassRepresentationBuilder()
     builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())
     builder.set_activity_strategy(ActivityIdealMass())
     builder.set_surface_strategy(SurfaceStrategyVolume())
     builder.set_mass(mass, "kg")
-    builder.set_density(density, "kg/m^3")
+    builder.set_density(np.array([density], dtype=np.float64), "kg/m^3")
     builder.set_charge(charges)
-    builder.set_volume(1e-12, "m^3")
+    builder.set_volume(1e-15, "m^3")
     return builder.build()
 
 
@@ -232,9 +230,29 @@ def test_direct_kernel_flag_default_false():
 
 def test_direct_kernel_same_sign_no_spurious_mergers(monkeypatch):
     """Direct kernel should prevent same-sign coagulation artifacts."""
-    particle = _build_two_particle_opposite_sign()
+    particle = _build_particle_resolved_with_charges()
     charges = particle.get_charge()
     assert charges is not None
+
+    def _selective_kernel(
+        particle_radius: np.ndarray,
+        particle_mass: np.ndarray,
+        particle_charge: np.ndarray,
+        temperature: float,
+        pressure: float,
+    ) -> np.ndarray:
+        _ = particle_radius, particle_mass, temperature, pressure
+        sign_product = np.sign(particle_charge[0]) * np.sign(particle_charge[1])
+        # Zero for same-sign, large value for opposite-sign interactions
+        kernel_value = 0.0 if sign_product >= 0 else 1e-6
+        return np.array([[0.0, kernel_value], [kernel_value, 0.0]])
+
+    monkeypatch.setattr(
+        charged_dimensional_kernel,
+        "get_hard_sphere_kernel_via_system_state",
+        _selective_kernel,
+    )
+
     strategy = ChargedCoagulationStrategy(
         distribution_type="particle_resolved",
         kernel_strategy=HardSphereKernelStrategy(),
@@ -243,29 +261,21 @@ def test_direct_kernel_same_sign_no_spurious_mergers(monkeypatch):
     loss_gain_index, captured_charge = _capture_collision_indices(
         particle=particle,
         strategy=strategy,
-        time_step=0.01,
+        time_step=1.0,
         seed=10,
-        volume=None,
+        volume=1e-12,
         monkeypatch=monkeypatch,
     )
+
+    assert loss_gain_index.size > 0
     charge_snapshot = (
         captured_charge if captured_charge is not None else charges
     )
-    calcite_mask = charge_snapshot < 0
-    small_index = (
-        loss_gain_index[:, 0]
-        if loss_gain_index.size
-        else np.array([], dtype=np.int64)
+    pair_product = (
+        charge_snapshot[loss_gain_index[:, 0]]
+        * charge_snapshot[loss_gain_index[:, 1]]
     )
-    large_index = (
-        loss_gain_index[:, 1]
-        if loss_gain_index.size
-        else np.array([], dtype=np.int64)
-    )
-    calcite_calcite = np.sum(
-        calcite_mask[small_index] & calcite_mask[large_index]
-    )
-    assert calcite_calcite == 0
+    assert np.all(pair_product <= 0)
 
 
 def test_direct_kernel_opposite_sign_attracts(monkeypatch):
