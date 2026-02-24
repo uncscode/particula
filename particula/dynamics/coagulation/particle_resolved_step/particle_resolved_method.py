@@ -269,11 +269,12 @@ def _interpolate_kernel(
     kernel_radius: NDArray[np.float64],
 ) -> RegularGridInterpolator:
     """Create an interpolation function for the coagulation kernel with
-    out-of-bounds handling.
+    explicit out-of-bounds handling.
 
     This function returns a RegularGridInterpolator that performs linear
-    interpolation for values within the domain of the kernel and clamps to the
-    nearest value outside of it.
+    interpolation for values within the domain of the kernel and returns zero
+    outside the bounds. The zero-fill prevents charge-blind extrapolation from
+    neighboring bins when radii fall outside the kernel grid.
 
     Arguments:
         - kernel : 2D coagulation kernel values.
@@ -297,14 +298,15 @@ def _interpolate_kernel(
         ```
     """
     grid = (kernel_radius, kernel_radius)
-    # Using linear interpolation inside domain; clamp to boundary
-    # out-of-bound points.
+    cleaned_kernel = np.where(np.isfinite(kernel), kernel, 0.0)
+    # Using linear interpolation inside domain; return zero for out-of-bound
+    # points to avoid extrapolating charge-dependent values across bins.
     return RegularGridInterpolator(
         points=grid,
-        values=kernel,
+        values=cleaned_kernel,
         method="linear",
         bounds_error=False,
-        fill_value=None,  # type: ignore  # None uses nearest neighbor
+        fill_value=0.0,
     )
 
 
