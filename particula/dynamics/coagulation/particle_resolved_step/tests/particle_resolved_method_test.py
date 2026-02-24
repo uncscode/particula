@@ -190,6 +190,33 @@ def test_particle_resolved_coagulation_step():
     assert np.all(loss_gain_index[:, 0] < loss_gain_index[:, 1])
 
 
+def test_particle_resolved_coagulation_step_with_kernel_func():
+    """Test direct kernel callable path in particle-resolved coagulation."""
+    particle_radius = np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float64)
+    kernel = np.zeros((10, 10), dtype=np.float64)
+    kernel_radius = np.linspace(0, 5, 10)
+    volume = 100.0
+    time_step = 1.0
+    random_generator = np.random.default_rng(seed=42)
+    call_args = []
+
+    def kernel_func(r_small: np.ndarray, r_large: np.ndarray) -> np.ndarray:
+        call_args.append((r_small.copy(), r_large.copy()))
+        return np.full_like(r_small, 1e-6, dtype=np.float64)
+
+    loss_gain_index = get_particle_resolved_coagulation_step(
+        particle_radius,
+        kernel,
+        kernel_radius,
+        volume,
+        time_step,
+        random_generator,
+        kernel_func=kernel_func,
+    )
+    assert call_args
+    assert loss_gain_index.shape[1] == 2
+
+
 def test_particle_resolved_coagulation_step_empty_array():
     """Test particle_resolved_coagulation_step function with empty array."""
     particle_radius = np.array([], dtype=np.float64)
