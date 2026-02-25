@@ -31,7 +31,7 @@ from particula.runnable import RunnableSequence
 
 from particula.logger_setup import setup
 
-__version__ = "0.2.11"
+__version__ = "0.2.12"
 
 # setup the logger
 logger = setup()
