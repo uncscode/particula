@@ -11,7 +11,6 @@ Each case asserts mass/charge conservation and physical merger behavior.
 
 import numpy as np
 import numpy.testing as npt
-
 import particula as par
 
 
@@ -51,10 +50,12 @@ def _run_coagulation(
     # Scale volume to maintain concentration
     volume = 1e-9 * (nn / 6.705e5)  # m^3
 
+    temperature_k = 216.65
+    pressure_pa = 5066.25
     atmosphere = (
         par.gas.AtmosphereBuilder()
-        .set_temperature(-56.5, temperature_units="degC")
-        .set_pressure(0.05, pressure_units="atm")
+        .set_temperature(temperature_k)
+        .set_pressure(pressure_pa, "Pa")
         .build()
     )
 
@@ -195,14 +196,14 @@ def test_same_sign_ions_no_mergers():
 
 
 def test_neutral_ions_brownian_baseline():
-    """Neutral ions and neutral calcite follow Brownian baseline."""
+    """Neutral ions and charged calcite follow Brownian baseline."""
     results = _run_coagulation(
         ion_charge=0.0,
         use_direct_kernel=False,
         n_steps=5,
         calcite_count=120,
         ion_count=40,
-        calcite_charge=0.0,
+        calcite_charge=-6.0,
         seed=42,
     )
 
