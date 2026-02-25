@@ -97,11 +97,21 @@ and rollout.
 
 ## Maintenance Plans
 
+### Active Maintenance
+
 - [Jupyter Notebook API Migration][plan-notebook-migration] — Status: Planning
   (P2)
   - Scope: Migrate all 46 documentation Jupyter notebooks to current API
     patterns (builders, factories, `get_*` methods). Update descriptions and
     validate with `run_notebook` tool.
+
+- [Jupytext Notebook Sync - Full Migration][plan-jupytext-full] — Status:
+  In Progress (P2)
+  - Scope: Complete migration of remaining ~35 notebooks to Jupytext paired sync
+    format. Implement pre-commit hooks and CI validation.
+  - Progress: 10/15 phases completed (all notebook conversions done; P14-P15 remain)
+
+### Completed Maintenance
 
 - [Add Charge Support to add_concentration][plan-charge-add-concentration] —
   Status: Shipped (P2)
@@ -113,14 +123,8 @@ and rollout.
   - Scope: Pilot migration of 4 notebooks (Activity, Gas_Phase) to Jupytext
     paired sync format (`.py:percent`). Validate workflow with ADW tools.
 
-- [Jupytext Notebook Sync - Full Migration][plan-jupytext-full] — Status:
-  In Progress (P2)
-  - Scope: Complete migration of remaining ~35 notebooks to Jupytext paired sync
-    format. Implement pre-commit hooks and CI validation.
-  - Progress: 10/15 phases completed (all notebook conversions done; P14-P15 remain)
-
 - [Particle-Resolved Coagulation Fixes][plan-coag-fixes] — Status:
-  Planning (P1)
+  Shipped (P1)
   - Scope: Fix duplicate-index mass/charge loss in `collide_pairs()` and
     `get_particle_resolved_update_step()`. Add opt-in direct kernel evaluation
     to bypass charge-blind interpolation. Move diagnostic tests into repo.
