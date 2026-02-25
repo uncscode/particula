@@ -2,7 +2,7 @@
 
 **ID:** M6
 **Priority:** P1
-**Status:** Planning
+**Status:** Shipped
 **Last Updated:** 2026-02-24
 
 ## Vision
@@ -134,35 +134,35 @@ regression tests that fail before the fix and pass after.
 
 **Tasks:**
 
-- [ ] Fix `collide_pairs()`: replace `distribution[large_index] +=
+- [x] Fix `collide_pairs()`: replace `distribution[large_index] +=
   distribution[small_index]` with `np.add.at(distribution, large_index,
   distribution[small_index])` for both 1D and 2D cases
-- [ ] Fix `collide_pairs()`: replace `charge[large_index] +=
+- [x] Fix `collide_pairs()`: replace `charge[large_index] +=
   charge[small_index]` with `np.add.at(charge, large_index,
   charge[small_index])`
-- [ ] Fix `get_particle_resolved_update_step()`: handle duplicate
+- [x] Fix `get_particle_resolved_update_step()`: handle duplicate
   `large_index` in the radius cubed summation. Pre-compute `new_radii`
   correctly using `np.add.at` on the cubed-radius accumulation
-- [ ] Add test: `test_collide_pairs_duplicate_large_index` -- two small
+- [x] Add test: `test_collide_pairs_duplicate_large_index` -- two small
   particles merge into the same large particle, verify mass is sum of
   all three, charge is sum of all three
-- [ ] Add test: `test_collide_pairs_duplicate_large_mass_conservation` --
+- [x] Add test: `test_collide_pairs_duplicate_large_mass_conservation` --
   generate random pairs with known duplicates, assert total mass before
   equals total mass after
-- [ ] Add test: `test_collide_pairs_duplicate_large_charge_conservation` --
+- [x] Add test: `test_collide_pairs_duplicate_large_charge_conservation` --
   same as above for charge
-- [ ] Add test: `test_update_step_duplicate_large_volume_conservation` --
+- [x] Add test: `test_update_step_duplicate_large_volume_conservation` --
   verify `get_particle_resolved_update_step` conserves volume when
   `large_index` has duplicates
-- [ ] Run existing tests, verify no regressions
+- [x] Run existing tests, verify no regressions
 
 **Acceptance Criteria:**
 
-- [ ] `np.add.at` used in all three locations (mass, charge, radius)
-- [ ] All new tests pass
-- [ ] All existing `collide_pairs` tests pass
-- [ ] Total mass and charge conserved for duplicate-index scenarios
-- [ ] All committed tests are green
+- [x] `np.add.at` used in all three locations (mass, charge, radius)
+- [x] All new tests pass
+- [x] All existing `collide_pairs` tests pass
+- [x] Total mass and charge conserved for duplicate-index scenarios
+- [x] All committed tests are green
 
 ### Phase 2: Add opt-in direct kernel evaluation (M6-P2)
 
@@ -187,42 +187,42 @@ of using the binned kernel matrix + interpolator.
 
 **Tasks:**
 
-- [ ] Add `use_direct_kernel: bool = False` parameter to
+- [x] Add `use_direct_kernel: bool = False` parameter to
   `CoagulationStrategyABC.__init__()`
-- [ ] Add `set_use_direct_kernel(value: bool)` to the builder mixin
-- [ ] Wire through `ChargedCoagulationBuilder`
-- [ ] In `CoagulationStrategyABC.step()`, when `use_direct_kernel=True`
+- [x] Add `set_use_direct_kernel(value: bool)` to the builder mixin
+- [x] Wire through `ChargedCoagulationBuilder`
+- [x] In `CoagulationStrategyABC.step()`, when `use_direct_kernel=True`
   and `distribution_type == "particle_resolved"`:
   - Still bin particles and select pairs using the same binning logic
   - Instead of interpolating kernel from the matrix, call
     `self.kernel()` directly for each sampled (small, large) pair
   - This requires building a mini 2-particle representation for each
     pair, or passing a kernel callable to the step function
-- [ ] Alternative approach: pass a `kernel_func(radius_pairs) -> values`
+- [x] Alternative approach: pass a `kernel_func(radius_pairs) -> values`
   callable to `get_particle_resolved_coagulation_step()` that replaces
   the interpolator. When `use_direct_kernel=True`, this callable
   evaluates the full charged kernel for each pair. When `False`, it
   uses the existing interpolator. This minimizes changes to the step
   function signature.
-- [ ] Add test: `test_direct_kernel_same_sign_no_spurious_mergers` --
+- [x] Add test: `test_direct_kernel_same_sign_no_spurious_mergers` --
   calcite(-6) + ions(+6), `use_direct_kernel=True`, verify
   calcite-calcite mergers are zero
-- [ ] Add test: `test_direct_kernel_opposite_sign_attracts` -- verify
+- [x] Add test: `test_direct_kernel_opposite_sign_attracts` -- verify
   ion-calcite mergers still occur with direct kernel
-- [ ] Add test: `test_direct_kernel_flag_default_false` -- verify
+- [x] Add test: `test_direct_kernel_flag_default_false` -- verify
   default behavior is unchanged
-- [ ] Run full test suite
+- [x] Run full test suite
 
 **Acceptance Criteria:**
 
-- [ ] `use_direct_kernel=True` produces correct charge-aware kernel values
+- [x] `use_direct_kernel=True` produces correct charge-aware kernel values
   for all particle pairs
-- [ ] Calcite-calcite mergers are zero (or negligible) when all calcite
+- [x] Calcite-calcite mergers are zero (or negligible) when all calcite
   has same-sign charge, even with ions present
-- [ ] Ion-calcite coagulation still works correctly
-- [ ] Default behavior (`use_direct_kernel=False`) unchanged
-- [ ] Builder supports setting the flag
-- [ ] All committed tests are green
+- [x] Ion-calcite coagulation still works correctly
+- [x] Default behavior (`use_direct_kernel=False`) unchanged
+- [x] Builder supports setting the flag
+- [x] All committed tests are green
 
 ### Phase 3: Move diagnostics into repo and add integration tests (M6-P3)
 
@@ -241,28 +241,28 @@ test that validates physical behavior end-to-end.
 
 **Tasks:**
 
-- [ ] Move `charge_coagulation_comparison_test.py` logic into
+- [x] Move `charge_coagulation_comparison_test.py` logic into
   `particula/integration_tests/charged_coagulation_comparison_test.py`
   as a proper pytest test with assertions (not just print output)
-- [ ] Move `kernel_interpolation_diagnostic_test.py` scenarios 4-6 into
+- [x] Move `kernel_interpolation_diagnostic_test.py` scenarios 4-6 into
   `particula/dynamics/coagulation/tests/kernel_interpolation_diagnostic_test.py`
   with assertions validating kernel values
-- [ ] Add assertions for physical expectations:
+- [x] Add assertions for physical expectations:
   - Same-sign ions: zero ion-calcite mergers, zero calcite-calcite mergers
   - Neutral ions: some ion-calcite mergers, some calcite-calcite mergers
     (Brownian baseline)
   - Opposite-sign ions (with `use_direct_kernel=True`): many ion-calcite
     mergers, zero calcite-calcite mergers, charge conserved
-- [ ] Add mass and charge conservation assertions to all integration tests
-- [ ] Run full test suite
+- [x] Add mass and charge conservation assertions to all integration tests
+- [x] Run full test suite
 
 **Acceptance Criteria:**
 
-- [ ] Integration tests pass with assertions (not just print diagnostics)
-- [ ] Charge conservation verified in all scenarios
-- [ ] Mass conservation verified in all scenarios
-- [ ] Physical behavior matches expectations for all three charge cases
-- [ ] All committed tests are green
+- [x] Integration tests pass with assertions (not just print diagnostics)
+- [x] Charge conservation verified in all scenarios
+- [x] Mass conservation verified in all scenarios
+- [x] Physical behavior matches expectations for all three charge cases
+- [x] All committed tests are green
 
 ### Phase 4: Update development documentation (M6-P4)
 
@@ -272,11 +272,11 @@ test that validates physical behavior end-to-end.
 
 **Tasks:**
 
-- [ ] Update `adw-docs/dev-plans/maintenance/index.md` with final status
-- [ ] Update `adw-docs/dev-plans/README.md` if needed
-- [ ] Add completion notes to this document
-- [ ] Run full test suite (`pytest --cov=particula`)
-- [ ] Ensure no coverage regression
+- [x] Update `adw-docs/dev-plans/maintenance/index.md` with final status
+- [x] Update `adw-docs/dev-plans/README.md` if needed
+- [x] Add completion notes to this document
+- [x] Run full test suite (`pytest --cov=particula`)
+- [x] Ensure no coverage regression
 
 ## Technical Approach
 
@@ -386,14 +386,21 @@ else:
 
 ## Success Criteria
 
-- [ ] Mass conserved in all coagulation scenarios (including duplicate
+- [x] Mass conserved in all coagulation scenarios (including duplicate
   large indices)
-- [ ] Charge conserved in all coagulation scenarios
-- [ ] `use_direct_kernel=True` eliminates spurious same-sign mergers
-- [ ] Default behavior (`use_direct_kernel=False`) unchanged
-- [ ] Integration tests validate physical correctness for three charge cases
-- [ ] All existing tests pass
-- [ ] Coverage >= 80% on changed code
+- [x] Charge conserved in all coagulation scenarios
+- [x] `use_direct_kernel=True` eliminates spurious same-sign mergers
+- [x] Default behavior (`use_direct_kernel=False`) unchanged
+- [x] Integration tests validate physical correctness for three charge cases
+- [x] All existing tests pass
+- [x] Coverage >= 80% on changed code
+
+## Completion Notes
+
+- Shipped all four phases with regression coverage for duplicate-index
+  conservation and charge-aware kernel behavior.
+- M6-P4 documentation updates completed for maintenance index and dev-plans
+  README.
 
 ## References
 
@@ -410,3 +417,4 @@ else:
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-02-24 | Initial maintenance plan created from investigation | ADW |
+| 2026-02-24 | Shipped M6 (P1-P4 complete), added completion notes | ADW Workflow |
