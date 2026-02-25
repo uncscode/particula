@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../../../../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
     
     
       
@@ -13748,7 +13748,7 @@ valid, flexible modeling of charged aerosol aggregation.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            BuilderABC (particula.abc_builder.BuilderABC)" href="../../../../abc_builder/#particula.abc_builder.BuilderABC">BuilderABC</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderDistributionTypeMixin (particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderDistributionTypeMixin)" href="../coagulation_builder_mixin/#particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderDistributionTypeMixin">BuilderDistributionTypeMixin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            BuilderABC (particula.abc_builder.BuilderABC)" href="../../../../abc_builder/#particula.abc_builder.BuilderABC">BuilderABC</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderDistributionTypeMixin (particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderDistributionTypeMixin)" href="../coagulation_builder_mixin/#particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderDistributionTypeMixin">BuilderDistributionTypeMixin</a></code>, <code><a class="autorefs autorefs-internal" title="            BuilderUseDirectKernelMixin (particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderUseDirectKernelMixin)" href="../coagulation_builder_mixin/#particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderUseDirectKernelMixin">BuilderUseDirectKernelMixin</a></code></p>
 
 
 
@@ -13816,11 +13816,7 @@ charged kernel strategy.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
@@ -13829,7 +13825,12 @@ charged kernel strategy.</p>
 <span class="normal">70</span>
 <span class="normal">71</span>
 <span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Charged coagulation builder.</span>
 
 <span class="sd">    Sets up the builder with required parameters for creating a</span>
@@ -13842,6 +13843,7 @@ charged kernel strategy.</p>
     <span class="p">]</span>
     <span class="n">BuilderABC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">)</span>
     <span class="n">BuilderDistributionTypeMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">BuilderUseDirectKernelMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">charged_kernel_strategy</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
@@ -13904,12 +13906,7 @@ charged coagulation strategy.</li>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
@@ -13929,7 +13926,13 @@ charged coagulation strategy.</li>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
-<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and return the ChargedCoagulationStrategy object.</span>
 
 <span class="sd">    This method checks whether all required parameters have been</span>
@@ -13954,6 +13957,7 @@ charged coagulation strategy.</li>
     <span class="k">return</span> <span class="n">ChargedCoagulationStrategy</span><span class="p">(</span>
         <span class="n">distribution_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
         <span class="n">kernel_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charged_kernel_strategy</span><span class="p">,</span>
+        <span class="n">use_direct_kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_direct_kernel</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -14013,12 +14017,7 @@ are unsupported.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 80</span>
 <span class="normal"> 81</span>
 <span class="normal"> 82</span>
 <span class="normal"> 83</span>
@@ -14045,7 +14044,12 @@ are unsupported.</p>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
-<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_charged_kernel_strategy</span><span class="p">(</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_charged_kernel_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">charged_kernel_strategy</span><span class="p">:</span> <span class="n">ChargedKernelStrategyABC</span><span class="p">,</span>
     <span class="n">charged_kernel_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

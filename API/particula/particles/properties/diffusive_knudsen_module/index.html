@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../../../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
     
     
       
@@ -13800,11 +13800,7 @@ zero if no charge.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/properties/diffusive_knudsen_module.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
-<span class="normal"> 15</span>
-<span class="normal"> 16</span>
-<span class="normal"> 17</span>
-<span class="normal"> 18</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
 <span class="normal"> 21</span>
@@ -13912,7 +13908,18 @@ zero if no charge.</p>
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
         <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
@@ -14022,7 +14029,14 @@ zero if no charge.</p>
         <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">temperature</span> <span class="o">*</span> <span class="n">BOLTZMANN_CONSTANT</span> <span class="o">*</span> <span class="n">reduced_mass</span><span class="p">)</span>
         <span class="o">/</span> <span class="n">reduced_friction_factor</span>
     <span class="p">)</span>
-    <span class="n">denominator</span> <span class="o">=</span> <span class="n">sum_of_radii</span> <span class="o">*</span> <span class="n">continuum_enhance</span> <span class="o">/</span> <span class="n">kinetic_enhance</span>
+    <span class="c1"># Guard for same-sign repulsion; see coulomb_enhancement.py:83-97 and</span>
+    <span class="c1"># diffusive_knudsen_module.py:113-119 (issue #1087).</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+        <span class="n">sum_of_radii</span> <span class="o">*</span> <span class="n">continuum_enhance</span><span class="p">,</span>
+        <span class="n">kinetic_enhance</span><span class="p">,</span>
+        <span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sum_of_radii</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+        <span class="n">where</span><span class="o">=</span><span class="n">kinetic_enhance</span> <span class="o">&gt;=</span> <span class="n">KINETIC_ENHANCE_MIN</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span>
 </code></pre></div></td></tr></table></div>

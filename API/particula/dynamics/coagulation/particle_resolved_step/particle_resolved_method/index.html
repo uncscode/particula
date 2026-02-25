@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../../../../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
     
     
       
@@ -2725,34 +2725,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_particle_resolved_coagulation_step">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--event_pairs-contains-the-pairs-of-small-large-indices-that" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        event_pairs contains the pairs of [small, large] indices that
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--coagulated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        coagulated.
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2763,23 +2735,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get_particle_resolved_update_step">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step--updated_r-now-has-coagulated-radii-lost_r-and-gained_r-are-tracked" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        updated_r now has coagulated radii, lost_r and gained_r are tracked.
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -13664,34 +13619,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_particle_resolved_coagulation_step">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--event_pairs-contains-the-pairs-of-small-large-indices-that" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        event_pairs contains the pairs of [small, large] indices that
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--coagulated" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        coagulated.
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -13702,23 +13629,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get_particle_resolved_update_step">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step--updated_r-now-has-coagulated-radii-lost_r-and-gained_r-are-tracked" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        updated_r now has coagulated radii, lost_r and gained_r are tracked.
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -13765,7 +13675,7 @@
 
     <div class="doc doc-contents first">
 
-        <p>Particle resolved method for coagulation.</p>
+        <p>Particle-resolved coagulation helpers with bounded kernel interpolation.</p>
 
 
 
@@ -13795,72 +13705,90 @@
 
 
 <a href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_particle_resolved_coagulation_step</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">kernel_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">random_generator</span><span class="p">:</span> <span class="n">Generator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_particle_resolved_coagulation_step</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">kernel_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">random_generator</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">kernel_index_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">int64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">int64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Perform a single step of particle coagulation, updating particle radii
-with a stochastic approach.</p>
-<p>This function models collisions between particles based on a given
-coagulation kernel. It identifies potential collision pairs, randomly
-selects which collisions occur according to a probability derived from the
-kernel value, and then tracks which particles have coagulated.</p>
-<p>The main calculation for the probability of coagulation is:</p>
-<ul>
-<li>Probability = K × Δt × (possible collisions) / (tests × volume)<ul>
-<li>K is the interpolated kernel value,</li>
-<li>Δt is the timestep,</li>
-<li>volume is the system volume.</li>
-</ul>
-</li>
-</ul>
+        <p>Perform one stochastic coagulation step for a particle population.</p>
+<p>Particles are binned by radius, kernel values are interpolated for each
+bin pair, and random trials determine which collisions occur. Returned
+indices describe which small particles merged into which large particles.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- particle_radius </code></b>
+            <b><code>particle_radius</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Array of particle radii.</p>
+            <p>Radii of particles that may coagulate.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- kernel </code></b>
+            <b><code>kernel</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>2D coagulation kernel matrix matching the size of
-kernel_radius.</p>
+            <p>Two-dimensional coagulation kernel aligned to <code>kernel_radius</code>.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- kernel_radius </code></b>
+            <b><code>kernel_radius</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Radii used to index or interpolate the kernel.</p>
+            <p>Radii that define kernel grid points.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- volume </code></b>
+            <b><code>volume</code></b>
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
-            <p>Volume of the system in m³.</p>
+            <p>System volume in cubic meters.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- time_step </code></b>
+            <b><code>time_step</code></b>
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
-            <p>Time step for each coagulation iteration in seconds.</p>
+            <p>Duration of the coagulation step in seconds.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- random_generator </code></b>
+            <b><code>random_generator</code></b>
+              (<code><span title="numpy.random.Generator">Generator</span></code>)
           –
           <div class="doc-md-description">
-            <p>Random number generator for the stochastic
-approach.</p>
+            <p>NumPy random generator used for sampling.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>kernel_func</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Callable">Callable</span>[[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional callable for direct kernel evaluation. When
+provided, it is called with <code>(r_small, r_large)</code> inputs and
+should return a 1D array of kernel values.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>kernel_index_func</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Callable">Callable</span>[[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int64">int64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int64">int64</span>]], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional callable for direct kernel evaluation
+using particle indices. When provided, it is called with
+<code>(small_index, large_index)</code> arrays and should return a 1D
+array of kernel values. Takes precedence over <code>kernel_func</code>.</p>
           </div>
         </li>
     </ul>
@@ -13872,50 +13800,53 @@ approach.</p>
               <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int64">int64</span>]</code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>An array of shape (N, 2), where each row contains
-[small_index, large_index] for coagulation events.</li>
-</ul>
+            <p>Array of shape <code>(n, 2)</code> with <code>[small_index, large_index]</code> pairs</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int64">int64</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>describing coagulation events.</p>
           </div>
         </li>
     </ul>
 
 
-<p><span class="doc-section-title">Examples:</span></p>
-    <p>```py title="Example Usage"
-import numpy as np
-from particula.dynamics.coagulation.particle_resolved_step import
-    particle_resolved_method</p>
-<p>r = np.array([1e-9, 2e-9, 3e-9])
-kernel_values = np.ones((50, 50))
-kernel_r = np.linspace(1e-10, 1e-7, 50)
-vol = 1e-3
-dt = 0.01
-rng = np.random.default_rng(42)
-event_pairs =
-particle_resolved_method.get_particle_resolved_coagulation_step(
-    particle_radius=r,
-    kernel=kernel_values,
-    kernel_radius=kernel_r,
-    volume=vol,
-    time_step=dt,
-    random_generator=rng
-)</p>
-<h4 id="particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--event_pairs-contains-the-pairs-of-small-large-indices-that">event_pairs contains the pairs of [small, large] indices that<a class="headerlink" href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--event_pairs-contains-the-pairs-of-small-large-indices-that" title="Permanent link">&para;</a></h4>
-<h4 id="particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--coagulated">coagulated.<a class="headerlink" href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step--coagulated" title="Permanent link">&para;</a></h4>
-
-
-<details class="references" open>
-  <summary>References</summary>
-  <ul>
-<li>Seinfeld, J. H., &amp; Pandis, S. N. <em>Atmospheric Chemistry and Physics</em>,
-  Wiley, 2016.</li>
-</ul>
-</details>
-
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
 <span class="normal"> 89</span>
 <span class="normal"> 90</span>
 <span class="normal"> 91</span>
@@ -14091,70 +14022,46 @@ particle_resolved_method.get_particle_resolved_coagulation_step(
 <span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
-<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_coagulation_step</span><span class="p">(</span>
+<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_coagulation_step</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">kernel_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">random_generator</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span>
+    <span class="n">kernel_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+        <span class="n">Callable</span><span class="p">[</span>
+            <span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">kernel_index_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+        <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform a single step of particle coagulation, updating particle radii</span>
-<span class="sd">    with a stochastic approach.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform one stochastic coagulation step for a particle population.</span>
 
-<span class="sd">    This function models collisions between particles based on a given</span>
-<span class="sd">    coagulation kernel. It identifies potential collision pairs, randomly</span>
-<span class="sd">    selects which collisions occur according to a probability derived from the</span>
-<span class="sd">    kernel value, and then tracks which particles have coagulated.</span>
+<span class="sd">    Particles are binned by radius, kernel values are interpolated for each</span>
+<span class="sd">    bin pair, and random trials determine which collisions occur. Returned</span>
+<span class="sd">    indices describe which small particles merged into which large particles.</span>
 
-<span class="sd">    The main calculation for the probability of coagulation is:</span>
-
-<span class="sd">    - Probability = K × Δt × (possible collisions) / (tests × volume)</span>
-<span class="sd">        - K is the interpolated kernel value,</span>
-<span class="sd">        - Δt is the timestep,</span>
-<span class="sd">        - volume is the system volume.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        - particle_radius : Array of particle radii.</span>
-<span class="sd">        - kernel : 2D coagulation kernel matrix matching the size of</span>
-<span class="sd">            kernel_radius.</span>
-<span class="sd">        - kernel_radius : Radii used to index or interpolate the kernel.</span>
-<span class="sd">        - volume : Volume of the system in m³.</span>
-<span class="sd">        - time_step : Time step for each coagulation iteration in seconds.</span>
-<span class="sd">        - random_generator : Random number generator for the stochastic</span>
-<span class="sd">            approach.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        particle_radius: Radii of particles that may coagulate.</span>
+<span class="sd">        kernel: Two-dimensional coagulation kernel aligned to ``kernel_radius``.</span>
+<span class="sd">        kernel_radius: Radii that define kernel grid points.</span>
+<span class="sd">        volume: System volume in cubic meters.</span>
+<span class="sd">        time_step: Duration of the coagulation step in seconds.</span>
+<span class="sd">        random_generator: NumPy random generator used for sampling.</span>
+<span class="sd">        kernel_func: Optional callable for direct kernel evaluation. When</span>
+<span class="sd">            provided, it is called with ``(r_small, r_large)`` inputs and</span>
+<span class="sd">            should return a 1D array of kernel values.</span>
+<span class="sd">        kernel_index_func: Optional callable for direct kernel evaluation</span>
+<span class="sd">            using particle indices. When provided, it is called with</span>
+<span class="sd">            ``(small_index, large_index)`` arrays and should return a 1D</span>
+<span class="sd">            array of kernel values. Takes precedence over ``kernel_func``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - An array of shape (N, 2), where each row contains</span>
-<span class="sd">            [small_index, large_index] for coagulation events.</span>
-
-<span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example Usage&quot;</span>
-<span class="sd">        import numpy as np</span>
-<span class="sd">        from particula.dynamics.coagulation.particle_resolved_step import</span>
-<span class="sd">            particle_resolved_method</span>
-
-<span class="sd">        r = np.array([1e-9, 2e-9, 3e-9])</span>
-<span class="sd">        kernel_values = np.ones((50, 50))</span>
-<span class="sd">        kernel_r = np.linspace(1e-10, 1e-7, 50)</span>
-<span class="sd">        vol = 1e-3</span>
-<span class="sd">        dt = 0.01</span>
-<span class="sd">        rng = np.random.default_rng(42)</span>
-<span class="sd">        event_pairs =</span>
-<span class="sd">        particle_resolved_method.get_particle_resolved_coagulation_step(</span>
-<span class="sd">            particle_radius=r,</span>
-<span class="sd">            kernel=kernel_values,</span>
-<span class="sd">            kernel_radius=kernel_r,</span>
-<span class="sd">            volume=vol,</span>
-<span class="sd">            time_step=dt,</span>
-<span class="sd">            random_generator=rng</span>
-<span class="sd">        )</span>
-<span class="sd">        # event_pairs contains the pairs of [small, large] indices that</span>
-<span class="sd">        # coagulated.</span>
-
-<span class="sd">    References:</span>
-<span class="sd">        - Seinfeld, J. H., &amp; Pandis, S. N. *Atmospheric Chemistry and Physics*,</span>
-<span class="sd">          Wiley, 2016.</span>
+<span class="sd">        Array of shape ``(n, 2)`` with ``[small_index, large_index]`` pairs</span>
+<span class="sd">        describing coagulation events.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Step 1: Bin the particles based on their radii into corresponding kernel</span>
     <span class="c1"># bins</span>
@@ -14164,8 +14071,10 @@ particle_resolved_method.get_particle_resolved_coagulation_step(
     <span class="n">pair_indices</span> <span class="o">=</span> <span class="n">_get_bin_pairs</span><span class="p">(</span><span class="n">bin_indices</span><span class="o">=</span><span class="n">bin_indices</span><span class="p">)</span>
 
     <span class="c1"># Step 3: Interpolate the coagulation kernel for efficient lookups during</span>
-    <span class="c1"># the coagulation process</span>
-    <span class="n">interp_kernel</span> <span class="o">=</span> <span class="n">_interpolate_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">kernel_radius</span><span class="p">)</span>
+    <span class="c1"># the coagulation process (unless a direct kernel callable is provided)</span>
+    <span class="n">interp_kernel</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegularGridInterpolator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">kernel_func</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">kernel_index_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">interp_kernel</span> <span class="o">=</span> <span class="n">_interpolate_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">kernel_radius</span><span class="p">)</span>
 
     <span class="c1"># Create output arrays to store the indices of small and large particles</span>
     <span class="c1"># involved in coagulation events</span>
@@ -14194,7 +14103,34 @@ particle_resolved_method.get_particle_resolved_coagulation_step(
         <span class="c1"># Step 5: Retrieve the maximum kernel value for the current bin pair</span>
         <span class="n">small_sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">small_indices</span><span class="p">])</span>
         <span class="n">large_sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">large_indices</span><span class="p">])</span>
-        <span class="n">kernel_values</span> <span class="o">=</span> <span class="n">interp_kernel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">small_sample</span><span class="p">,</span> <span class="n">large_sample</span><span class="p">]]))</span>
+        <span class="k">if</span> <span class="n">kernel_index_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">small_ref</span> <span class="o">=</span> <span class="n">small_indices</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">small_indices</span><span class="p">])]</span>
+            <span class="n">large_ref</span> <span class="o">=</span> <span class="n">large_indices</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">large_indices</span><span class="p">])]</span>
+            <span class="n">kernel_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                    <span class="n">kernel_index_func</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">small_ref</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">large_ref</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kernel_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">interp_kernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kernel interpolator is not initialized.&quot;</span><span class="p">)</span>
+            <span class="n">kernel_values</span> <span class="o">=</span> <span class="n">interp_kernel</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">small_sample</span><span class="p">,</span> <span class="n">large_sample</span><span class="p">]])</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kernel_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                    <span class="n">kernel_func</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">small_sample</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">large_sample</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="c1"># Step 6: Calculate the number of possible coagulation events</span>
         <span class="c1"># between small and large particles</span>
@@ -14222,11 +14158,37 @@ particle_resolved_method.get_particle_resolved_coagulation_step(
         <span class="n">large_index</span> <span class="o">=</span> <span class="n">random_generator</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">large_indices</span><span class="p">,</span> <span class="n">tests</span><span class="p">)</span>
 
         <span class="c1"># Step 9: Calculate the kernel value for the selected particle pairs</span>
-        <span class="n">kernel_value</span> <span class="o">=</span> <span class="n">interp_kernel</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-                <span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">small_index</span><span class="p">],</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">large_index</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">kernel_index_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kernel_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                    <span class="n">kernel_index_func</span><span class="p">(</span>
+                        <span class="n">small_index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                        <span class="n">large_index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">kernel_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">interp_kernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Kernel interpolator is not initialized.&quot;</span><span class="p">)</span>
+            <span class="n">kernel_value</span> <span class="o">=</span> <span class="n">interp_kernel</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="n">particle_radius</span><span class="p">[</span><span class="n">small_index</span><span class="p">],</span>
+                        <span class="n">particle_radius</span><span class="p">[</span><span class="n">large_index</span><span class="p">],</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kernel_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                    <span class="n">kernel_func</span><span class="p">(</span>
+                        <span class="n">particle_radius</span><span class="p">[</span><span class="n">small_index</span><span class="p">],</span>
+                        <span class="n">particle_radius</span><span class="p">[</span><span class="n">large_index</span><span class="p">],</span>
+                    <span class="p">),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="c1"># Handle diagonal elements if necessary (for single pair coagulation)</span>
         <span class="k">if</span> <span class="n">kernel_value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -14287,56 +14249,53 @@ particle_resolved_method.get_particle_resolved_coagulation_step(
 
     <div class="doc doc-contents ">
 
-        <p>Update particle radii and track lost/gained particles after coagulation
-events.</p>
-<p>This function simulates the immediate effect of coagulation on particle
-radii, marking smaller particles as lost and updating the larger particles
-to the new radius computed from volume conservation. The calculation is:</p>
-<ul>
-<li>r_new = cbrt(r_small³ + r_large³)<ul>
-<li>r_new is the new radius in meters,</li>
-<li>r_small is the smaller particle's radius in meters,</li>
-<li>r_large is the larger particle's radius in meters.</li>
-</ul>
-</li>
-</ul>
+        <p>Update particle radii and track losses and gains from coagulation.</p>
+<p>Smaller particles indexed by <code>small_index</code> are removed and their radii
+recorded in <code>loss</code>. The corresponding larger particles indexed by
+<code>large_index</code> grow to conserve volume, and their original radii are
+stored in <code>gain</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>- particle_radius </code></b>
+            <b><code>particle_radius</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Array of particle radii.</p>
+            <p>Radii of all particles. Modified in place.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- loss </code></b>
+            <b><code>loss</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Array to store lost particle radii.</p>
+            <p>Array that records radii of particles removed by coagulation.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- gain </code></b>
+            <b><code>gain</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Array to store gained particle radii.</p>
+            <p>Array that records radii of particles that absorbed others.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- small_index </code></b>
+            <b><code>small_index</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int64">int64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Indices of smaller particles.</p>
+            <p>Indices of smaller particles in each coagulation pair.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>- large_index </code></b>
+            <b><code>large_index</code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int64">int64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Indices of larger particles.</p>
+            <p>Indices of larger particles in each coagulation pair.</p>
           </div>
         </li>
     </ul>
@@ -14345,50 +14304,13 @@ to the new radius computed from volume conservation. The calculation is:</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+              <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
           –
           <div class="doc-md-description">
-            <ul>
-<li>Updated array of particle radii after coagulation events.</li>
-</ul>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          –
-          <div class="doc-md-description">
-            <ul>
-<li>Updated array for the radii of particles that were lost.</li>
-</ul>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          –
-          <div class="doc-md-description">
-            <ul>
-<li>Updated array for the radii of particles that were gained.</li>
-</ul>
+            <p>Updated particle radii, loss, and gain arrays after coagulation.</p>
           </div>
         </li>
     </ul>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <p>```py title="Example Usage"
-import numpy as np
-from particula.dynamics.coagulation.particle_resolved_step import
-    particle_resolved_method</p>
-<p>r = np.array([1e-9, 2e-9, 3e-9, 1e-9])
-lost = np.zeros_like&reg;
-gained = np.zeros_like&reg;
-s_idx = np.array([0, 1])
-l_idx = np.array([2, 3])
-updated_r, lost_r, gained_r = (
-    particle_resolved_method.get_particle_resolved_update_step(
-        r, lost, gained, s_idx, l_idx
-    ))</p>
-<h4 id="particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step--updated_r-now-has-coagulated-radii-lost_r-and-gained_r-are-tracked">updated_r now has coagulated radii, lost_r and gained_r are tracked.<a class="headerlink" href="#particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step--updated_r-now-has-coagulated-radii-lost_r-and-gained_r-are-tracked" title="Permanent link">&para;</a></h4>
 
 
             <details class="mkdocstrings-source">
@@ -14430,104 +14352,42 @@ updated_r, lost_r, gained_r = (
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_update_step</span><span class="p">(</span>
+<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_update_step</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">loss</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gain</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">small_index</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
     <span class="n">large_index</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update particle radii and track lost/gained particles after coagulation</span>
-<span class="sd">    events.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update particle radii and track losses and gains from coagulation.</span>
 
-<span class="sd">    This function simulates the immediate effect of coagulation on particle</span>
-<span class="sd">    radii, marking smaller particles as lost and updating the larger particles</span>
-<span class="sd">    to the new radius computed from volume conservation. The calculation is:</span>
+<span class="sd">    Smaller particles indexed by ``small_index`` are removed and their radii</span>
+<span class="sd">    recorded in ``loss``. The corresponding larger particles indexed by</span>
+<span class="sd">    ``large_index`` grow to conserve volume, and their original radii are</span>
+<span class="sd">    stored in ``gain``.</span>
 
-<span class="sd">    - r_new = cbrt(r_small³ + r_large³)</span>
-<span class="sd">        - r_new is the new radius in meters,</span>
-<span class="sd">        - r_small is the smaller particle&#39;s radius in meters,</span>
-<span class="sd">        - r_large is the larger particle&#39;s radius in meters.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        - particle_radius : Array of particle radii.</span>
-<span class="sd">        - loss : Array to store lost particle radii.</span>
-<span class="sd">        - gain : Array to store gained particle radii.</span>
-<span class="sd">        - small_index : Indices of smaller particles.</span>
-<span class="sd">        - large_index : Indices of larger particles.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        particle_radius: Radii of all particles. Modified in place.</span>
+<span class="sd">        loss: Array that records radii of particles removed by coagulation.</span>
+<span class="sd">        gain: Array that records radii of particles that absorbed others.</span>
+<span class="sd">        small_index: Indices of smaller particles in each coagulation pair.</span>
+<span class="sd">        large_index: Indices of larger particles in each coagulation pair.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        - Updated array of particle radii after coagulation events.</span>
-<span class="sd">        - Updated array for the radii of particles that were lost.</span>
-<span class="sd">        - Updated array for the radii of particles that were gained.</span>
-
-<span class="sd">    Examples:</span>
-<span class="sd">        ```py title=&quot;Example Usage&quot;</span>
-<span class="sd">        import numpy as np</span>
-<span class="sd">        from particula.dynamics.coagulation.particle_resolved_step import</span>
-<span class="sd">            particle_resolved_method</span>
-
-<span class="sd">        r = np.array([1e-9, 2e-9, 3e-9, 1e-9])</span>
-<span class="sd">        lost = np.zeros_like(r)</span>
-<span class="sd">        gained = np.zeros_like(r)</span>
-<span class="sd">        s_idx = np.array([0, 1])</span>
-<span class="sd">        l_idx = np.array([2, 3])</span>
-<span class="sd">        updated_r, lost_r, gained_r = (</span>
-<span class="sd">            particle_resolved_method.get_particle_resolved_update_step(</span>
-<span class="sd">                r, lost, gained, s_idx, l_idx</span>
-<span class="sd">            ))</span>
-<span class="sd">        # updated_r now has coagulated radii, lost_r and gained_r are tracked.</span>
+<span class="sd">        Updated particle radii, loss, and gain arrays after coagulation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Step 1: Calculate the summed volumes of the smaller and larger particles</span>
-    <span class="c1"># The volumes are obtained by cubing the radii of the particles.</span>
-    <span class="n">sum_radii_cubed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
-        <span class="n">particle_radius</span><span class="p">[</span><span class="n">small_index</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span>
-    <span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">[</span><span class="n">large_index</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="c1"># Step 1: Calculate base volumes from pre-update radii.</span>
+    <span class="n">base_volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">small_volume</span> <span class="o">=</span> <span class="n">base_volume</span><span class="p">[</span><span class="n">small_index</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">base_volume</span><span class="p">[</span><span class="n">small_index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">base_volume</span><span class="p">,</span> <span class="n">large_index</span><span class="p">,</span> <span class="n">small_volume</span><span class="p">)</span>
 
-    <span class="c1"># Step 2: Calculate the new radii formed by the coagulation events</span>
-    <span class="c1"># The new radius is the cube root of the summed volumes.</span>
-    <span class="n">new_radii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cbrt</span><span class="p">(</span><span class="n">sum_radii_cubed</span><span class="p">)</span>
-
-    <span class="c1"># Step 3: Save out the loss and gain of particles</span>
+    <span class="c1"># Step 2: Save out the loss and gain of particles before modifying radii.</span>
     <span class="n">loss</span><span class="p">[</span><span class="n">small_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">small_index</span><span class="p">]</span>
     <span class="n">gain</span><span class="p">[</span><span class="n">large_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">large_index</span><span class="p">]</span>
 
-    <span class="c1"># Step 4: Remove the small particles as they coagulated to the larger ones</span>
-    <span class="n">particle_radius</span><span class="p">[</span><span class="n">small_index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="c1"># Step 5: Increase the radii of the large particles to the new radii</span>
-    <span class="n">particle_radius</span><span class="p">[</span><span class="n">large_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_radii</span>
+    <span class="c1"># Step 3: Recompute all radii from accumulated volumes.</span>
+    <span class="n">particle_radius</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cbrt</span><span class="p">(</span><span class="n">base_volume</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">particle_radius</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">gain</span>
 </code></pre></div></td></tr></table></div>

@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
     
     
       
@@ -13966,14 +13966,14 @@ describing how particles collide and combine.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
 <span class="normal">162</span>
-<span class="normal">163</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coagulation_strategy</span><span class="p">:</span> <span class="n">CoagulationStrategyABC</span><span class="p">):</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coagulation_strategy</span><span class="p">:</span> <span class="n">CoagulationStrategyABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Coagulation process.</span>
 
 <span class="sd">    Arguments:</span>
@@ -14064,9 +14064,7 @@ calculation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">167</span>
 <span class="normal">168</span>
 <span class="normal">169</span>
 <span class="normal">170</span>
@@ -14095,7 +14093,9 @@ calculation.</p>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
-<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform the coagulation process over a given time step.</span>
@@ -14184,9 +14184,7 @@ in units related to particle collisions per unit time.</li>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
 <span class="normal">201</span>
 <span class="normal">202</span>
 <span class="normal">203</span>
@@ -14208,7 +14206,9 @@ in units related to particle collisions per unit time.</li>
 <span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
-<span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the coagulation rate for each particle in the aerosol.</span>
 
 <span class="sd">    Arguments:</span>
@@ -14339,9 +14339,7 @@ responsible for calculating mass transfer.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span>
@@ -14349,7 +14347,9 @@ responsible for calculating mass transfer.</p>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
-<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condensation_strategy</span><span class="p">:</span> <span class="n">CondensationStrategy</span><span class="p">):</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condensation_strategy</span><span class="p">:</span> <span class="n">CondensationStrategy</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the MassCondensation process.</span>
 
 <span class="sd">    Arguments:</span>
@@ -14442,39 +14442,39 @@ responsible for calculating mass transfer.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span>
-<span class="normal">96</span>
-<span class="normal">97</span>
-<span class="normal">98</span>
-<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform the mass condensation process over a given time step.</span>
@@ -14497,15 +14497,15 @@ responsible for calculating mass transfer.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sub_steps</span><span class="p">):</span>
         <span class="c1"># calculate the condensation step for strategy</span>
-        <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">condensation_strategy</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-                <span class="n">particle</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
-                <span class="n">gas_species</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="p">,</span>
-                <span class="n">temperature</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
-                <span class="n">pressure</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">total_pressure</span><span class="p">,</span>
-                <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span> <span class="o">/</span> <span class="n">sub_steps</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="n">particles_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">condensation_strategy</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+            <span class="n">particle</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">,</span>
+            <span class="n">gas_species</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">total_pressure</span><span class="p">,</span>
+            <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span> <span class="o">/</span> <span class="n">sub_steps</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">particles_out</span><span class="p">)</span>
+        <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">partitioning_species</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">GasSpecies</span><span class="p">,</span> <span class="n">gas_out</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">aerosol</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -14564,9 +14564,7 @@ in units of mass per unit time.</li>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
@@ -14585,7 +14583,9 @@ in units of mass per unit time.</li>
 <span class="normal">119</span>
 <span class="normal">120</span>
 <span class="normal">121</span>
-<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute mass condensation rates for each particle.</span>
 
 <span class="sd">    Arguments:</span>
@@ -14691,15 +14691,15 @@ distribution type.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">248</span>
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wall_loss_strategy</span><span class="p">:</span> <span class="n">WallLossStrategy</span><span class="p">):</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wall_loss_strategy</span><span class="p">:</span> <span class="n">WallLossStrategy</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a wall loss runnable.</span>
 
 <span class="sd">    Args:</span>
@@ -14787,9 +14787,7 @@ sub-step.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
 <span class="normal">272</span>
 <span class="normal">273</span>
 <span class="normal">274</span>
@@ -14811,7 +14809,9 @@ sub-step.</p>
 <span class="normal">290</span>
 <span class="normal">291</span>
 <span class="normal">292</span>
-<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply wall loss over the provided time step.</span>
@@ -14885,9 +14885,7 @@ sub-step.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/particle_process.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">297</span>
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
@@ -14898,7 +14896,9 @@ sub-step.</p>
 <span class="normal">305</span>
 <span class="normal">306</span>
 <span class="normal">307</span>
-<span class="normal">308</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the wall loss rate for the aerosol particles.</span>
 
 <span class="sd">    Args:</span>
