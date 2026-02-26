@@ -9,10 +9,14 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
-from particula.particles.representation import ParticleRepresentation
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 
-from .coagulation_strategy_abc import CoagulationStrategyABC
+from .coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+    ParticleLike,
+    _get_mass,
+    _get_radius,
+)
 
 logger = logging.getLogger("particula")
 
@@ -121,7 +125,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: ParticleRepresentation,
+        particle: ParticleLike,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -132,7 +136,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         radii of particles, reduced mass, and friction factors.
 
         Arguments:
-            - particle : A ParticleRepresentation instance containing
+            - particle : Particle data containing
               distribution, density, and concentration data.
             - temperature : Float specifying the system temperature (K).
             - pressure : Float specifying the system pressure (Pa).
@@ -168,10 +172,10 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
             particle=particle, temperature=temperature, pressure=pressure
         )
         # Calculate the pairwise sum of radii
-        radius = particle.get_radius()
+        radius = _get_radius(particle)
         sum_of_radii = radius[:, np.newaxis] + radius
         # square matrix of mass
-        reduced_mass = get_reduced_self_broadcast(particle.get_mass())
+        reduced_mass = get_reduced_self_broadcast(_get_mass(particle))
         # square matrix of friction factor
         reduced_friction_factor = get_reduced_self_broadcast(friction_factor)
 

@@ -11,12 +11,15 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
-
 from ..sedimentation_kernel import (
     get_sedimentation_kernel_sp2016_via_system_state as get_kernel_sp2016,
 )
-from .coagulation_strategy_abc import CoagulationStrategyABC
+from .coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+    ParticleLike,
+    _get_mean_effective_density,
+    _get_radius,
+)
 
 logger = logging.getLogger("particula")
 
@@ -94,7 +97,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: ParticleRepresentation,
+        particle: ParticleLike,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -104,7 +107,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         `get_sedimentation_kernel_sp2016_via_system_state`.
 
         Arguments:
-            - particle : The ParticleRepresentation providing particle radius
+            - particle : Particle data providing particle radius
               and density.
             - temperature : The system temperature [K].
             - pressure : The system pressure [Pa].
@@ -121,8 +124,10 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
             ```
         """
         return get_kernel_sp2016(
-            particle_radius=particle.get_radius(),
-            particle_density=particle.get_mean_effective_density(),
+            particle_radius=_get_radius(particle),
+            particle_density=np.full_like(
+                _get_radius(particle), _get_mean_effective_density(particle)
+            ),
             temperature=temperature,
             pressure=pressure,
             calculate_collision_efficiency=False,

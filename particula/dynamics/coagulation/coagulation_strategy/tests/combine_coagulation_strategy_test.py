@@ -22,6 +22,7 @@ from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagula
 
 # pylint: disable=line-too-long
 from particula.particles import PresetParticleRadiusBuilder
+from particula.particles.particle_data import ParticleData
 
 
 # pylint: disable=too-many-instance-attributes
@@ -54,6 +55,21 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
         # Combine strategies
         self.combined_strategy = CombineCoagulationStrategy(
             strategies=[self.turbulent_shear_strategy, self.brownian_strategy]
+        )
+        self.particle_data = ParticleData(
+            masses=np.array(
+                [
+                    [
+                        [1e-18, 1e-18],
+                        [2e-18, 2e-18],
+                        [3e-18, 3e-18],
+                    ]
+                ]
+            ),
+            concentration=np.array([[1e6, 2e6, 1.5e6]]),
+            charge=np.array([[0.0, 1.0, -1.0]]),
+            density=np.array([1000.0, 1200.0]),
+            volume=np.array([1.0]),
         )
 
     def test_kernel_combination(self):
@@ -96,4 +112,25 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
         updated_concentration = self.particle.get_concentration()
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
+        )
+
+    def test_kernel_combination_with_particle_data(self):
+        """Test combined kernel calculation with ParticleData inputs."""
+        kernel_combined = self.combined_strategy.kernel(
+            particle=self.particle_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        kernel_turbulent_shear = self.turbulent_shear_strategy.kernel(
+            particle=self.particle_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        kernel_brownian = self.brownian_strategy.kernel(
+            particle=self.particle_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        np.testing.assert_array_almost_equal(
+            kernel_combined, kernel_turbulent_shear + kernel_brownian
         )

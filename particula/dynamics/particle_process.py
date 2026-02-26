@@ -194,7 +194,7 @@ class Coagulation(RunnableABC):
                 temperature=aerosol.atmosphere.temperature,
                 pressure=aerosol.atmosphere.total_pressure,
                 time_step=time_step / sub_steps,
-            )
+            )  # type: ignore[assignment]
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:

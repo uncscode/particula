@@ -9,9 +9,13 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.brownian_kernel import (
     get_brownian_kernel_via_system_state,
 )
-from particula.particles.representation import ParticleRepresentation
 
-from .coagulation_strategy_abc import CoagulationStrategyABC
+from .coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+    ParticleLike,
+    _get_mass,
+    _get_radius,
+)
 
 logger = logging.getLogger("particula")
 
@@ -94,7 +98,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: ParticleRepresentation,
+        particle: ParticleLike,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -105,7 +109,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         and pressure. The kernel typically has units of volume per time.
 
         Arguments:
-            - particle : ParticleRepresentation containing the distribution
+            - particle : Particle data containing the distribution
               and density or mass data needed for the kernel calculation.
             - temperature : System temperature in Kelvin.
             - pressure : System pressure in Pascals.
@@ -120,8 +124,8 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
             ```
         """
         return get_brownian_kernel_via_system_state(
-            particle_radius=particle.get_radius(),
-            particle_mass=particle.get_mass(),
+            particle_radius=_get_radius(particle),
+            particle_mass=_get_mass(particle),
             temperature=temperature,
             pressure=pressure,
         )
