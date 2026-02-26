@@ -129,18 +129,23 @@ def _get_particle_resolved_kernel_radius_data(
     if bin_radius is not None:
         return bin_radius
     particle_radius = data.radii[0]
+    if not np.all(np.isfinite(particle_radius)):
+        raise ValueError(
+            "Particle radius must be finite. Check for non-finite or zero "
+            "values before computing the kernel."
+        )
     positive_mask = particle_radius > 0
     if not np.any(positive_mask):
         raise ValueError(
-            "Particle radius must be finite. Check the particles,"
-            "they may all be zero and the kernel cannot be calculated."
+            "Particle radius must be finite. Check for non-finite or zero "
+            "values before computing the kernel."
         )
     min_radius = np.min(particle_radius[positive_mask]) * 0.5
     max_radius = np.max(particle_radius[positive_mask]) * 2
     if not np.isfinite(min_radius) or not np.isfinite(max_radius):
         raise ValueError(
-            "Particle radius must be finite. Check the particles,"
-            "they may all be zero and the kernel cannot be calculated."
+            "Particle radius must be finite. Check for non-finite or zero "
+            "values before computing the kernel."
         )
     if min_radius == 0:
         min_radius = np.float64(1e-10)

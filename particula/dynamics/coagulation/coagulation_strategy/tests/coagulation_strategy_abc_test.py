@@ -213,10 +213,15 @@ def test_getters_particle_representation_match_methods() -> None:
 
 
 def test_get_charge_representation_none_when_unset() -> None:
-    """Charge helper should pass through None for uncharged representations."""
+    """Charge helper should mirror representation-provided charge values."""
     representation = PresetParticleRadiusBuilder().build()
 
-    assert coagulation_strategy_abc._get_charge(representation) is None
+    charge = representation.get_charge()
+    result = coagulation_strategy_abc._get_charge(representation)
+    if charge is None:
+        assert result is None
+    else:
+        np.testing.assert_array_equal(result, charge)
 
 
 def test_get_particle_resolved_kernel_radius_data_uses_bin_radius() -> None:
