@@ -15,9 +15,7 @@ from typing import List, Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
-
-from .coagulation_strategy_abc import CoagulationStrategyABC
+from .coagulation_strategy_abc import CoagulationStrategyABC, ParticleLike
 
 logger = logging.getLogger("particula")
 
@@ -119,7 +117,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: ParticleRepresentation,
+        particle: ParticleLike,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -127,7 +125,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         underlying strategies.
 
         Arguments:
-            - particle : The ParticleRepresentation instance containing
+            - particle : The particle data instance containing
               particle data (radii, distribution, etc.).
             - temperature : The temperature in Kelvin [K].
             - pressure : The pressure in Pascals [Pa].

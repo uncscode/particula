@@ -12,12 +12,15 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.representation import ParticleRepresentation
-
 from ..turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
     get_turbulent_dns_kernel_ao2008_via_system_state,
 )
-from .coagulation_strategy_abc import CoagulationStrategyABC
+from .coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+    ParticleLike,
+    _get_mean_effective_density,
+    _get_radius,
+)
 
 logger = logging.getLogger("particula")
 
@@ -186,7 +189,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: ParticleRepresentation,
+        particle: ParticleLike,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -198,7 +201,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         and relative velocity.
 
         Arguments:
-            - particle : The ParticleRepresentation whose radii and density
+            - particle : The particle data whose radii and density
               are needed.
             - temperature : The temperature of the system [K].
             - pressure : The system pressure [Pa] (unused here, but included
@@ -225,8 +228,8 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
           [DOI](https://doi.org/10.1088/1367-2630/10/7/075016)
         """
         return get_turbulent_dns_kernel_ao2008_via_system_state(
-            particle_radius=particle.get_radius(),
-            particle_density=particle.get_mean_effective_density(),
+            particle_radius=_get_radius(particle),
+            particle_density=_get_mean_effective_density(particle),
             fluid_density=self.fluid_density,
             turbulent_dissipation=self.turbulent_dissipation,
             re_lambda=self.reynolds_lambda,

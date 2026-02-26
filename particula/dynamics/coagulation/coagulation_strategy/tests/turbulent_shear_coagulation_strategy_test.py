@@ -19,6 +19,7 @@ from particula.particles import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
 )
+from particula.particles.particle_data import ParticleData
 
 
 class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
@@ -56,6 +57,21 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
             distribution_type="particle_resolved",
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,
+        )
+        self.particle_data = ParticleData(
+            masses=np.array(
+                [
+                    [
+                        [1e-18, 1e-18],
+                        [2e-18, 2e-18],
+                        [3e-18, 3e-18],
+                    ]
+                ]
+            ),
+            concentration=np.array([[1e6, 2e6, 1.5e6]]),
+            charge=np.array([[0.0, 1.0, -1.0]]),
+            density=np.array([1000.0, 1200.0]),
+            volume=np.array([1.0]),
         )
 
     def test_kernel_discrete(self):
@@ -101,6 +117,17 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
             pressure=self.pressure,
         )
         self.assertIsInstance(kernel, np.ndarray)
+
+    def test_kernel_with_particle_data(self):
+        """Test kernel calculation with ParticleData inputs."""
+        kernel = self.strategy_discrete.kernel(
+            particle=self.particle_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        kernel = np.asarray(kernel)
+        particle_count = self.particle_data.radii[0].size
+        self.assertEqual(kernel.shape, (particle_count, particle_count))
 
     def test_step_continuous_pdf(self):
         """Test the step method for continuous_pdf distribution.

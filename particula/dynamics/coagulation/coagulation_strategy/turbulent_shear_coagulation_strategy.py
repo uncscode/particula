@@ -18,9 +18,12 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
     get_turbulent_shear_kernel_st1956_via_system_state,
 )
-from particula.particles.representation import ParticleRepresentation
 
-from .coagulation_strategy_abc import CoagulationStrategyABC
+from .coagulation_strategy_abc import (
+    CoagulationStrategyABC,
+    ParticleLike,
+    _get_radius,
+)
 
 logger = logging.getLogger("particula")
 
@@ -149,7 +152,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: ParticleRepresentation,
+        particle: ParticleLike,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -160,7 +163,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         fluid density, and particle radius.
 
         Arguments:
-            - particle : The ParticleRepresentation instance to retrieve
+            - particle : The particle data instance to retrieve
               particle radii.
             - temperature : The system temperature [K].
             - pressure : The system pressure [Pa].
@@ -185,7 +188,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
               https://doi.org/10.1017/S0022112056000020
         """
         return get_turbulent_shear_kernel_st1956_via_system_state(
-            particle_radius=particle.get_radius(),
+            particle_radius=_get_radius(particle),
             turbulent_dissipation=self.turbulent_dissipation,
             temperature=temperature,
             fluid_density=self.fluid_density,

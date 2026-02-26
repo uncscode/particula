@@ -27,6 +27,7 @@ from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import (
     ParticleResolvedSpeciatedMass,
 )
+from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
@@ -138,6 +139,22 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             distribution_type="particle_resolved",
             kernel_strategy=self.kernel_strategy,
         )
+        self.particle_data = ParticleData(
+            masses=np.array(
+                [
+                    [
+                        [1e-18, 1e-18],
+                        [2e-18, 2e-18],
+                        [3e-18, 3e-18],
+                        [4e-18, 4e-18],
+                    ]
+                ]
+            ),
+            concentration=np.array([[1e6, 2e6, 1.5e6, 0.8e6]]),
+            charge=np.array([[0.0, 1.0, -1.0, 0.0]]),
+            density=np.array([1000.0, 1200.0]),
+            volume=np.array([1.0]),
+        )
 
     def test_kernel_discrete(self):
         """Test the kernel calculation for discrete distribution.
@@ -198,6 +215,17 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             pressure=self.pressure,
         )
         self.assertIsInstance(kernel, np.ndarray)
+
+    def test_kernel_with_particle_data(self):
+        """Test kernel calculation with ParticleData inputs."""
+        kernel = self.strategy_discrete.kernel(
+            particle=self.particle_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        kernel = np.asarray(kernel)
+        particle_count = self.particle_data.radii[0].size
+        self.assertEqual(kernel.shape, (particle_count, particle_count))
 
     def test_step_continuous_pdf(self):
         """Test the step method for continuous_pdf distribution.
