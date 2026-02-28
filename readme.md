@@ -36,6 +36,15 @@ process = par.dynamics.Condensation(strategy) | par.dynamics.Coagulation(strateg
 aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
 ```
 
+## Migration / What's New
+
+Particula now provides data-first containers for particle and gas state:
+`ParticleData` and `GasData`. The legacy facades (`ParticleRepresentation`,
+`GasSpecies`) remain available but are deprecated as of v0.3.0.
+
+See the migration guide for updated examples and API mappings:
+[ParticleData and GasData Migration Guide](./docs/migration/particle-data.md)
+
 ## Code Structure
 
 ```
@@ -75,7 +84,10 @@ particula/
 
 - [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
 
-- [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Cycles.ipynb) — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across 3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), showing how hygroscopicity affects activation at different supersaturations.
+- [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)
+  — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across
+  3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), showing how
+  hygroscopicity affects activation at different supersaturations.
 
 ## Features
 
