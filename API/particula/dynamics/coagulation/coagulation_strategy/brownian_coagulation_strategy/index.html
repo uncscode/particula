@@ -13824,14 +13824,14 @@ as temperature, pressure, and particle radius.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the BrownianCoagulationStrategy.</span>
 
 <span class="sd">    Arguments:</span>
@@ -13906,11 +13906,7 @@ Brownian kernels are not defined here.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
@@ -13929,7 +13925,11 @@ Brownian kernels are not defined here.</p>
 <span class="normal">90</span>
 <span class="normal">91</span>
 <span class="normal">92</span>
-<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless_kernel</span><span class="p">(</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dimensionless_kernel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -13967,7 +13967,7 @@ Brownian kernels are not defined here.</p>
 
 
 <a href="#particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy.BrownianCoagulationStrategy.kernel" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">kernel</span><span class="p">(</span><span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">kernel</span><span class="p">(</span><span class="n">particle</span><span class="p">:</span> <span class="n">ParticleLike</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -13984,7 +13984,7 @@ and pressure. The kernel typically has units of volume per time.</p>
             <b><code>- particle </code></b>
           –
           <div class="doc-md-description">
-            <p>ParticleRepresentation containing the distribution
+            <p>Particle data containing the distribution
 and density or mass data needed for the kernel calculation.</p>
           </div>
         </li>
@@ -14027,11 +14027,7 @@ underlying distribution.</li>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
@@ -14059,9 +14055,13 @@ underlying distribution.</li>
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
-<span class="normal">127</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kernel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
+    <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleLike</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
@@ -14072,7 +14072,7 @@ underlying distribution.</li>
 <span class="sd">    and pressure. The kernel typically has units of volume per time.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        - particle : ParticleRepresentation containing the distribution</span>
+<span class="sd">        - particle : Particle data containing the distribution</span>
 <span class="sd">          and density or mass data needed for the kernel calculation.</span>
 <span class="sd">        - temperature : System temperature in Kelvin.</span>
 <span class="sd">        - pressure : System pressure in Pascals.</span>
@@ -14087,8 +14087,8 @@ underlying distribution.</li>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
-        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span>
-        <span class="n">particle_mass</span><span class="o">=</span><span class="n">particle</span><span class="o">.</span><span class="n">get_mass</span><span class="p">(),</span>
+        <span class="n">particle_radius</span><span class="o">=</span><span class="n">_get_radius</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
+        <span class="n">particle_mass</span><span class="o">=</span><span class="n">_get_mass</span><span class="p">(</span><span class="n">particle</span><span class="p">),</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
         <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
     <span class="p">)</span>

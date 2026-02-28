@@ -14125,7 +14125,7 @@ calculation.</p>
             <span class="n">temperature</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
             <span class="n">pressure</span><span class="o">=</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">total_pressure</span><span class="p">,</span>
             <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span> <span class="o">/</span> <span class="n">sub_steps</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
     <span class="k">return</span> <span class="n">aerosol</span>
 </code></pre></div></td></tr></table></div>
             </details>
