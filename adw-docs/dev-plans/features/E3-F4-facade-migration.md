@@ -1,10 +1,10 @@
 # Feature E3-F4: Facade and Migration
 
 **Parent Epic**: [E3: Data Representation Refactor](../epics/E3-data-representation-refactor.md)
-**Status**: Planning
+**Status**: Shipped
 **Priority**: P1
 **Start Date**: TBD
-**Last Updated**: 2026-01-19
+**Last Updated**: 2026-02-28
 
 ## Summary
 
@@ -227,7 +227,7 @@ class CondensationIsothermal(CondensationStrategy):
 
 ### Migration Guide Structure
 
-```markdown
+````markdown
 # Migration Guide: ParticleRepresentation to ParticleData
 
 ## Overview
@@ -260,7 +260,7 @@ rep = ParticleRepresentation(
     charge=charge,
 )
 rep.add_mass(added_mass)  # Mutates in place
-```
+````
 
 ### After (New)
 ```python
@@ -295,8 +295,8 @@ new_data = add_mass(data, added_mass)
 
 ## Phase Checklist
 
-- [ ] **E3-F4-P1**: Create `ParticleRepresentation` facade
-  - Issue: TBD | Size: L | Status: Not Started
+- [x] **E3-F4-P1**: Create `ParticleRepresentation` facade
+  - Issue: #1068 | Size: L | Status: Shipped
   - Refactor `particula/particles/representation.py`
   - Wrap `ParticleData` internally
   - Delegate all methods to data container
@@ -305,8 +305,8 @@ new_data = add_mass(data, added_mass)
   - Write `particula/particles/tests/representation_facade_test.py`
   - Tests for facade behavior, deprecation warnings
 
-- [ ] **E3-F4-P2**: Create `GasSpecies` facade
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F4-P2**: Create `GasSpecies` facade
+  - Issue: #1069 | Size: M | Status: Shipped
   - Refactor `particula/gas/species.py`
   - Wrap `GasData` internally
   - Delegate all methods to data container
@@ -315,8 +315,8 @@ new_data = add_mass(data, added_mass)
   - Write `particula/gas/tests/species_facade_test.py`
   - Tests for facade behavior, deprecation warnings
 
-- [ ] **E3-F4-P3**: Update `CondensationIsothermal` for dual-type support
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F4-P3**: Update `CondensationIsothermal` for dual-type support
+  - Issue: #1070 | Size: M | Status: Shipped
   - Update `particula/dynamics/condensation/condensation_strategies.py`
   - Add overloaded `step()` signatures
   - Implement type detection and conversion
@@ -324,8 +324,8 @@ new_data = add_mass(data, added_mass)
   - Add tests for new data type inputs
   - Write tests in `condensation_strategies_test.py`
 
-- [ ] **E3-F4-P4**: Update `Coagulation` for dual-type support
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F4-P4**: Update `Coagulation` for dual-type support
+  - Issue: #1071 | Size: M | Status: Shipped
   - Update `particula/dynamics/coagulation/` strategies
   - Add overloaded signatures where appropriate
   - Implement type detection and conversion
@@ -333,8 +333,8 @@ new_data = add_mass(data, added_mass)
   - Add tests for new data type inputs
   - Write tests in coagulation test files
 
-- [ ] **E3-F4-P5**: Documentation and migration guide
-  - Issue: TBD | Size: M | Status: Not Started
+- [x] **E3-F4-P5**: Documentation and migration guide
+  - Issue: #1072 | Size: M | Status: Shipped
   - Create `docs/Features/particle-data-migration.md`
   - Document new APIs in docstrings
   - Add examples showing both old and new patterns
@@ -391,3 +391,4 @@ All existing tests in these locations must continue passing:
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-01-19 | Initial feature document | ADW |
+| 2026-02-28 | Marked phases shipped and updated status | ADW |

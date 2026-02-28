@@ -2,7 +2,7 @@
 
 **Project:** particula
 **Version:** 0.2.6
-**Last Updated:** 2025-12-02
+**Last Updated:** 2026-02-28
 
 ## Overview
 
@@ -100,7 +100,7 @@ Particula follows a layered architecture where physical processes operate on aer
 │         Aerosol (Central State)             │
 │  ┌────────────┐        ┌─────────────────┐  │
 │  │ Atmosphere │        │ Particles       │  │
-│  │ (Gas)      │        │ (Representation)│  │
+│  │ (Gas)      │        │ (Facade)        │  │
 │  └────────────┘        └─────────────────┘  │
 └─────────────────────────────────────────────┘
                     │
@@ -120,6 +120,12 @@ Particula follows a layered architecture where physical processes operate on aer
 │  - Unit Conversion - Properties Calculation │
 └─────────────────────────────────────────────┘
 ```
+
+**Note:** `ParticleRepresentation` and `GasSpecies` act as facades over the
+`ParticleData` and `GasData` containers. The containers hold array-backed
+state, while strategies and dynamics provide behavior. Dynamics processes
+accept either facade or data-container inputs and return the same type
+provided by the caller.
 
 ### Module Organization
 
@@ -150,12 +156,28 @@ particula/
 └── runnable.py             # Process chaining framework
 ```
 
+### Dual-Type Dynamics Support
+
+Condensation and coagulation processes support both legacy facades and the new
+data containers:
+
+- **Accepted inputs:** `ParticleRepresentation`/`GasSpecies` *or*
+  `ParticleData`/`GasData`.
+- **Internal handling:** Processes normalize inputs to containers when
+  calculating rates or applying updates.
+- **Return type:** The same type passed by the caller is returned (facade in,
+  facade out; container in, container out) to support incremental migration.
+
+This compatibility layer ensures existing workflows continue to work while new
+code can operate directly on the container types.
+
 #### gas/
 
 **Purpose:** Represents the gas phase including vapor pressure, gas species, and atmospheric conditions.
 
 **Key Components:**
 - `GasSpecies`: Individual gas species with properties
+- `GasData`: Array-backed gas state container
 - `Atmosphere`: Collection of gas species with state (T, P)
 - `VaporPressureStrategy`: Strategy pattern for vapor pressure calculations
 - `GasSpeciesBuilder`, `AtmosphereBuilder`: Builders for complex objects
@@ -168,6 +190,7 @@ particula/
 
 **Key Components:**
 - `ParticleRepresentation`: Main particle state representation
+- `ParticleData`: Array-backed particle state container
 - Distribution strategies: `MassBasedMovingBin`, `RadiiBasedMovingBin`, `ParticleResolvedSpeciatedMass`
 - `ActivityStrategy`: Calculates water activity using different models
 - `SurfaceStrategy`: Calculates surface properties
@@ -278,6 +301,52 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
 - Activity strategies: `ActivityIdealMass`, `ActivityIdealMolar`, `ActivityKappaParameter`
 - Surface strategies: `SurfaceStrategyVolume`, `SurfaceStrategyMass`, `SurfaceStrategyMolar`
 - Wall loss strategies: `WallLossStrategy`, `SphericalWallLossStrategy`
+
+### Facade Pattern
+
+**When to Use:** Preserving a stable public API while introducing new internal
+data structures.
+
+**Implementation:**
+```python
+from particula.particles import ParticleRepresentation
+from particula.particles import ParticleData
+from particula.gas import GasSpecies
+from particula.gas import GasData
+
+particles = ParticleRepresentation(...)
+particle_data = particles.data  # facade access to container
+
+species = GasSpecies(...)
+gas_data = species.data  # facade access to container
+```
+
+**Examples in Codebase:**
+- `ParticleRepresentation` is a backward-compatible facade over `ParticleData`
+- `GasSpecies` is a backward-compatible facade over `GasData`
+- Conversion helpers: `ParticleData.from_representation`,
+  `ParticleData.to_representation`, `GasData.from_species`,
+  `GasData.to_species`
+
+### Data Container Pattern
+
+**When to Use:** Maintaining array-backed state with minimal behavior so that
+algorithms and strategies remain decoupled from data storage.
+
+**Implementation:**
+```python
+from particula.particles import ParticleData
+
+data = ParticleData(
+    radii=radii,
+    total_mass=total_mass,
+    distribution_type="discrete",
+)
+```
+
+**Examples in Codebase:**
+- `ParticleData` and `GasData` store typed arrays and shape metadata
+- Dynamics and strategies operate on containers or facades, not raw arrays
 
 ### Factory Pattern
 
