@@ -25,7 +25,7 @@
     
     
       
-        <title>Particle and Gas Data Migration Guide - Particula</title>
+        <title>ParticleData and GasData Migration - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#particle-and-gas-data-migration-guide" class="md-skip">
+        <a href="#particledata-and-gasdata-migration-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Particle and Gas Data Migration Guide
+              ParticleData and GasData Migration
             
           </span>
         </div>
@@ -350,6 +350,28 @@
     
   
   Contribute
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../migration/particle-data/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Migration
 
         </a>
       </li>
@@ -10963,7 +10985,7 @@
   <span class="md-ellipsis">
     
   
-    Particle and Gas Data Migration Guide
+    ParticleData and GasData Migration
   
 
     
@@ -10981,7 +11003,7 @@
   <span class="md-ellipsis">
     
   
-    Particle and Gas Data Migration Guide
+    ParticleData and GasData Migration
   
 
     
@@ -11021,10 +11043,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-mapping" class="md-nav__link">
+  <a href="#why-migrate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Mapping
+        Why migrate
       
     </span>
   </a>
@@ -11032,22 +11054,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gasspecies-gasdata" class="md-nav__link">
+  <a href="#quick-migration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GasSpecies → GasData
+        Quick migration
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GasSpecies → GasData">
+    <nav class="md-nav" aria-label="Quick migration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preferred-new-construction" class="md-nav__link">
+  <a href="#particle-data-before-after" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Preferred (new) construction
+        Particle data (before → after)
       
     </span>
   </a>
@@ -11055,21 +11077,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#backward-compatible-facade" class="md-nav__link">
+  <a href="#gas-data-before-after" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backward-compatible facade
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conversion-helpers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conversion helpers
+        Gas data (before → after)
       
     </span>
   </a>
@@ -11090,13 +11101,80 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="ParticleRepresentation → ParticleData">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#propertymethod-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Property/method mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#handling-deprecation-warnings" class="md-nav__link">
+  <a href="#gasspecies-gasdata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handling Deprecation Warnings
+        GasSpecies → GasData
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GasSpecies → GasData">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-mapping_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#propertymethod-mapping_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Property/method mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gradual-migration-with-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gradual migration with .data
       
     </span>
   </a>
@@ -11104,10 +11182,93 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#additional-notes" class="md-nav__link">
+  <a href="#using-particledatagasdata-in-dynamics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Additional Notes
+        Using ParticleData/GasData in dynamics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conversion-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversion helpers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecation-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecation timeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shape-mismatches-when-creating-data-containers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shape mismatches when creating data containers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecation-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecation logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#single-box-vs-multi-box-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single-box vs multi-box data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related references
       
     </span>
   </a>
@@ -13624,6 +13785,97 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Migration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migration/particle-data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ParticleData and GasData Migration (Redirect)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -13665,10 +13917,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-mapping" class="md-nav__link">
+  <a href="#why-migrate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Mapping
+        Why migrate
       
     </span>
   </a>
@@ -13676,22 +13928,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gasspecies-gasdata" class="md-nav__link">
+  <a href="#quick-migration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GasSpecies → GasData
+        Quick migration
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GasSpecies → GasData">
+    <nav class="md-nav" aria-label="Quick migration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preferred-new-construction" class="md-nav__link">
+  <a href="#particle-data-before-after" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Preferred (new) construction
+        Particle data (before → after)
       
     </span>
   </a>
@@ -13699,21 +13951,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#backward-compatible-facade" class="md-nav__link">
+  <a href="#gas-data-before-after" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backward-compatible facade
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conversion-helpers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conversion helpers
+        Gas data (before → after)
       
     </span>
   </a>
@@ -13734,13 +13975,80 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="ParticleRepresentation → ParticleData">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#propertymethod-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Property/method mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#handling-deprecation-warnings" class="md-nav__link">
+  <a href="#gasspecies-gasdata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handling Deprecation Warnings
+        GasSpecies → GasData
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GasSpecies → GasData">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-mapping_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constructor mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#propertymethod-mapping_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Property/method mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gradual-migration-with-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gradual migration with .data
       
     </span>
   </a>
@@ -13748,10 +14056,93 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#additional-notes" class="md-nav__link">
+  <a href="#using-particledatagasdata-in-dynamics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Additional Notes
+        Using ParticleData/GasData in dynamics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conversion-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversion helpers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecation-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecation timeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shape-mismatches-when-creating-data-containers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shape mismatches when creating data containers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecation-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecation logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#single-box-vs-multi-box-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single-box vs multi-box data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related references
       
     </span>
   </a>
@@ -13781,47 +14172,75 @@
   
 
 
-<h1 id="particle-and-gas-data-migration-guide">Particle and Gas Data Migration Guide<a class="headerlink" href="#particle-and-gas-data-migration-guide" title="Permanent link">&para;</a></h1>
-<p>This guide describes how to migrate legacy APIs (<code>ParticleRepresentation</code>,
-<code>GasSpecies</code>) to the new data containers (<code>ParticleData</code>, <code>GasData</code>). The
-facades remain available for backward compatibility but emit
-<code>DeprecationWarning</code> to encourage the new data-first workflow.</p>
+<h1 id="particledata-and-gasdata-migration-guide">ParticleData and GasData Migration Guide<a class="headerlink" href="#particledata-and-gasdata-migration-guide" title="Permanent link">&para;</a></h1>
+<p>This guide explains how to migrate from the legacy facades
+(<code>ParticleRepresentation</code>, <code>GasSpecies</code>) to the new data containers
+(<code>ParticleData</code>, <code>GasData</code>). The facades remain available for backward
+compatibility, but they are deprecated and emit log warnings to guide you
+toward the data-first workflow.</p>
+<p>If you arrived here from the legacy path <code>docs/migration/particle-data.md</code>,
+that page now redirects to this canonical guide.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The new containers separate <strong>data</strong> from <strong>behavior</strong>:</p>
+<p>The migration moves <strong>data</strong> into dedicated containers and leaves <strong>behavior</strong>
+in strategies and runnables:</p>
 <ul>
-<li><code>ParticleData</code> stores particle state in a batch-friendly layout.</li>
+<li><code>ParticleData</code> stores per-particle arrays with an explicit batch dimension.</li>
 <li><code>GasData</code> stores gas species arrays with an explicit box dimension.</li>
-<li><code>ParticleRepresentation</code> and <code>GasSpecies</code> remain as facades that wrap the
-  new containers while preserving the legacy API surface.</li>
+<li><code>ParticleRepresentation</code> and <code>GasSpecies</code> remain as facades so existing
+  workflows keep working while you migrate.</li>
 </ul>
-<p>The facades are deprecated. Existing code continues to work, but new code
-should construct and pass the data containers directly.</p>
-<h2 id="quick-mapping">Quick Mapping<a class="headerlink" href="#quick-mapping" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Legacy API</th>
-<th>New API</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>ParticleRepresentation</code></td>
-<td><code>ParticleData</code></td>
-<td>Behavior stays in strategies/runnables</td>
-</tr>
-<tr>
-<td><code>GasSpecies</code></td>
-<td><code>GasData</code></td>
-<td>Vapor-pressure strategies stay on the facade</td>
-</tr>
-</tbody>
-</table>
-<h2 id="gasspecies-gasdata">GasSpecies → GasData<a class="headerlink" href="#gasspecies-gasdata" title="Permanent link">&para;</a></h2>
-<h3 id="preferred-new-construction">Preferred (new) construction<a class="headerlink" href="#preferred-new-construction" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.gas_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">GasData</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<h2 id="why-migrate">Why migrate<a class="headerlink" href="#why-migrate" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Clear data/behavior split</strong>: data containers keep state, strategies keep
+  physics.</li>
+<li><strong>Multi-box ready</strong>: batch dimensions make CFD and multi-box simulations
+  first-class.</li>
+<li><strong>Fewer implicit conversions</strong>: attributes are explicit arrays rather than
+  getter methods.</li>
+</ul>
+<h2 id="quick-migration">Quick migration<a class="headerlink" href="#quick-migration" title="Permanent link">&para;</a></h2>
+<h3 id="particle-data-before-after">Particle data (before → after)<a class="headerlink" href="#particle-data-before-after" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="c1"># Legacy facade</span>
+<span class="n">rep</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentation</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">MassBasedMovingBin</span><span class="p">(),</span>
+    <span class="n">activity</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">(),</span>
+    <span class="n">surface</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMass</span><span class="p">(),</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-18</span><span class="p">,</span> <span class="mf">2e-18</span><span class="p">,</span> <span class="mf">3e-18</span><span class="p">]),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1200.0</span><span class="p">]),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e5</span><span class="p">,</span> <span class="mf">1e5</span><span class="p">,</span> <span class="mf">1e5</span><span class="p">]),</span>
+    <span class="n">charge</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+    <span class="n">volume</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># New data container</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.particle_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParticleData</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">ParticleData</span><span class="p">(</span>
+    <span class="c1"># (n_boxes, n_particles, n_species)</span>
+    <span class="n">masses</span><span class="o">=</span><span class="n">rep</span><span class="o">.</span><span class="n">get_species_mass</span><span class="p">()[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">rep</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">charge</span><span class="o">=</span><span class="n">rep</span><span class="o">.</span><span class="n">get_charge</span><span class="p">()[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">rep</span><span class="o">.</span><span class="n">get_density</span><span class="p">(),</span>
+    <span class="n">volume</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rep</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()]),</span>
+<span class="p">)</span>
+</code></pre></div>
+<h3 id="gas-data-before-after">Gas data (before → after)<a class="headerlink" href="#gas-data-before-after" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="c1"># Legacy facade</span>
+<span class="n">species</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Water&quot;</span><span class="p">,</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
+    <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># New data container</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.gas_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">GasData</span>
 
 <span class="n">gas_data</span> <span class="o">=</span> <span class="n">GasData</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Water&quot;</span><span class="p">],</span>
@@ -13830,53 +14249,295 @@ should construct and pass the data containers directly.</p>
     <span class="n">partitioning</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">True</span><span class="p">]),</span>
 <span class="p">)</span>
 </code></pre></div>
-<h3 id="backward-compatible-facade">Backward-compatible facade<a class="headerlink" href="#backward-compatible-facade" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.species</span><span class="w"> </span><span class="kn">import</span> <span class="n">GasSpecies</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.vapor_pressure_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantVaporPressureStrategy</span>
-
-<span class="n">species</span> <span class="o">=</span> <span class="n">GasSpecies</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Water&quot;</span><span class="p">,</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
-    <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">),</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>The facade emits a <code>DeprecationWarning</code>. To access the data container from a
-facade:</p>
-<div class="highlight"><pre><span></span><code><span class="n">gas_data</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">data</span>
-</code></pre></div>
-<h3 id="conversion-helpers">Conversion helpers<a class="headerlink" href="#conversion-helpers" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.gas_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_species</span><span class="p">,</span> <span class="n">to_species</span>
-
-<span class="n">gas_data</span> <span class="o">=</span> <span class="n">from_species</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="n">n_boxes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">species</span> <span class="o">=</span> <span class="n">to_species</span><span class="p">(</span><span class="n">gas_data</span><span class="p">,</span> <span class="p">[</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">)])</span>
-</code></pre></div>
 <h2 id="particlerepresentation-particledata">ParticleRepresentation → ParticleData<a class="headerlink" href="#particlerepresentation-particledata" title="Permanent link">&para;</a></h2>
-<p>The particle facade uses the same pattern. Construct <code>ParticleData</code> directly
-for new code and use the <code>ParticleRepresentation</code> facade for legacy code.</p>
-<h2 id="handling-deprecation-warnings">Handling Deprecation Warnings<a class="headerlink" href="#handling-deprecation-warnings" title="Permanent link">&para;</a></h2>
-<p>If you need to silence deprecation warnings while migrating, filter them
-explicitly in your application code:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
-    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;ParticleRepresentation is deprecated.*&quot;</span><span class="p">,</span>
-    <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+<h3 id="constructor-mapping">Constructor mapping<a class="headerlink" href="#constructor-mapping" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Legacy input</th>
+<th>ParticleData field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>distribution</code></td>
+<td><code>masses</code></td>
+<td>Convert to per-species masses.</td>
+</tr>
+<tr>
+<td><code>density</code></td>
+<td><code>density</code></td>
+<td>1D array of species densities.</td>
+</tr>
+<tr>
+<td><code>concentration</code></td>
+<td><code>concentration</code></td>
+<td>Shape <code>(n_boxes, n_particles)</code>.</td>
+</tr>
+<tr>
+<td><code>charge</code></td>
+<td><code>charge</code></td>
+<td>Shape <code>(n_boxes, n_particles)</code>.</td>
+</tr>
+<tr>
+<td><code>volume</code></td>
+<td><code>volume</code></td>
+<td>Shape <code>(n_boxes,)</code>.</td>
+</tr>
+<tr>
+<td><code>strategy</code></td>
+<td><em>behavior</em></td>
+<td>Keep strategy separate from data.</td>
+</tr>
+<tr>
+<td><code>activity</code></td>
+<td><em>behavior</em></td>
+<td>Remains in activity strategies.</td>
+</tr>
+<tr>
+<td><code>surface</code></td>
+<td><em>behavior</em></td>
+<td>Remains in surface strategies.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="propertymethod-mapping">Property/method mapping<a class="headerlink" href="#propertymethod-mapping" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Legacy API</th>
+<th>ParticleData equivalent</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get_radius()</code></td>
+<td><code>data.radii</code></td>
+<td>Computed from mass and density.</td>
+</tr>
+<tr>
+<td><code>get_mass()</code></td>
+<td><code>data.total_mass</code></td>
+<td>Total per particle.</td>
+</tr>
+<tr>
+<td><code>get_species_mass()</code></td>
+<td><code>data.masses</code></td>
+<td>Per-species masses.</td>
+</tr>
+<tr>
+<td><code>get_density()</code></td>
+<td><code>data.density</code></td>
+<td>Density per species.</td>
+</tr>
+<tr>
+<td><code>get_concentration()</code></td>
+<td><code>data.concentration</code></td>
+<td>2D array by box.</td>
+</tr>
+<tr>
+<td><code>get_charge()</code></td>
+<td><code>data.charge</code></td>
+<td>2D array by box.</td>
+</tr>
+<tr>
+<td><code>get_volume()</code></td>
+<td><code>data.volume</code></td>
+<td>Per-box volume.</td>
+</tr>
+<tr>
+<td><code>get_effective_density()</code></td>
+<td><code>data.effective_density</code></td>
+<td>Mass-weighted density.</td>
+</tr>
+<tr>
+<td><code>get_total_concentration()</code></td>
+<td><code>data.concentration.sum(axis=1)</code></td>
+<td>Per box.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>ParticleData</code> keeps the batch dimension. If you used a single-box facade,
+index <code>data.concentration[0]</code> or <code>data.radii[0]</code> to get the legacy shape.</p>
+</div>
+<h2 id="gasspecies-gasdata">GasSpecies → GasData<a class="headerlink" href="#gasspecies-gasdata" title="Permanent link">&para;</a></h2>
+<h3 id="constructor-mapping_1">Constructor mapping<a class="headerlink" href="#constructor-mapping_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Legacy input</th>
+<th>GasData field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>name</code></td>
+<td>List of species names.</td>
+</tr>
+<tr>
+<td><code>molar_mass</code></td>
+<td><code>molar_mass</code></td>
+<td>1D array of molar masses.</td>
+</tr>
+<tr>
+<td><code>concentration</code></td>
+<td><code>concentration</code></td>
+<td>Shape <code>(n_boxes, n_species)</code>.</td>
+</tr>
+<tr>
+<td><code>partitioning</code></td>
+<td><code>partitioning</code></td>
+<td>1D boolean array.</td>
+</tr>
+<tr>
+<td><code>vapor_pressure_strategy</code></td>
+<td><em>behavior</em></td>
+<td>Remains on the facade.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="propertymethod-mapping_1">Property/method mapping<a class="headerlink" href="#propertymethod-mapping_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Legacy API</th>
+<th>GasData equivalent</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get_name()</code></td>
+<td><code>data.name</code></td>
+<td>List of names.</td>
+</tr>
+<tr>
+<td><code>get_molar_mass()</code></td>
+<td><code>data.molar_mass</code></td>
+<td>1D array.</td>
+</tr>
+<tr>
+<td><code>get_concentration()</code></td>
+<td><code>data.concentration[box_index]</code></td>
+<td>Select a box.</td>
+</tr>
+<tr>
+<td><code>get_partitioning()</code></td>
+<td><code>data.partitioning</code></td>
+<td>Boolean mask by species.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Vapor pressure calculations remain on <code>GasSpecies</code>. Use the facade when
+you need strategy-driven behavior, and pass <code>GasData</code> where only data is
+required.</p>
+</div>
+<h2 id="gradual-migration-with-data">Gradual migration with <code>.data</code><a class="headerlink" href="#gradual-migration-with-data" title="Permanent link">&para;</a></h2>
+<p>Both legacy facades expose their underlying data containers:</p>
+<div class="highlight"><pre><span></span><code><span class="n">particle_data</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">data</span>
+<span class="n">gas_data</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">data</span>
+</code></pre></div>
+<p>If you need to wrap data without emitting deprecation logs, use the class
+methods provided by each facade:</p>
+<div class="highlight"><pre><span></span><code><span class="n">rep</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentation</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">MassBasedMovingBin</span><span class="p">(),</span>
+    <span class="n">activity</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">(),</span>
+    <span class="n">surface</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMass</span><span class="p">(),</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">particle_data</span><span class="o">.</span><span class="n">total_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
-    <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;GasSpecies is deprecated.*&quot;</span><span class="p">,</span>
-    <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+
+<span class="n">species</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
+    <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">),</span>
 <span class="p">)</span>
 </code></pre></div>
-<h2 id="additional-notes">Additional Notes<a class="headerlink" href="#additional-notes" title="Permanent link">&para;</a></h2>
+<h2 id="using-particledatagasdata-in-dynamics">Using ParticleData/GasData in dynamics<a class="headerlink" href="#using-particledatagasdata-in-dynamics" title="Permanent link">&para;</a></h2>
+<p>Condensation and coagulation strategies accept both legacy facades and the new
+data containers. The return type matches the input type.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
+<span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMass</span><span class="p">()</span>
+<span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">(</span><span class="mf">2330.0</span><span class="p">)</span>
+
+<span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
+    <span class="n">activity_strategy</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
+    <span class="n">surface_strategy</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
+    <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategy</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
+    <span class="n">gas_species</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
+    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span>
+<span class="p">)</span>
+<span class="n">particle_out</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">particle_out</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="conversion-helpers">Conversion helpers<a class="headerlink" href="#conversion-helpers" title="Permanent link">&para;</a></h2>
+<p>Use the conversion helpers when you need to bridge old and new APIs:</p>
 <ul>
-<li>The facades assume a <strong>single-box</strong> view of data; <code>GasData</code> stores multiple
-  boxes explicitly via its leading dimension.</li>
-<li>Vapor pressure strategies remain attached to the <code>GasSpecies</code> facade (they
-  are behavior, not data). If you need to construct a facade from data without
-  emitting a warning, use <code>GasSpecies.from_data(...)</code>.</li>
+<li><a href="https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py"><code>from_representation</code></a>
+  and <a href="https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py"><code>to_representation</code></a>
+  for particle data.</li>
+<li><a href="https://github.com/uncscode/particula/blob/main/particula/gas/gas_data.py"><code>from_species</code></a>
+  and <a href="https://github.com/uncscode/particula/blob/main/particula/gas/gas_data.py"><code>to_species</code></a>
+  for gas data.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.particle_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_representation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.gas_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_species</span>
+
+<span class="n">particle_data</span> <span class="o">=</span> <span class="n">from_representation</span><span class="p">(</span><span class="n">rep</span><span class="p">,</span> <span class="n">n_boxes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gas_data</span> <span class="o">=</span> <span class="n">from_species</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="n">n_boxes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="deprecation-timeline">Deprecation timeline<a class="headerlink" href="#deprecation-timeline" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>v0.3.0</strong>: <code>ParticleRepresentation</code> and <code>GasSpecies</code> are deprecated and
+  emit log warnings.</li>
+<li><strong>v1.0</strong>: planned removal of the legacy facades.</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="shape-mismatches-when-creating-data-containers">Shape mismatches when creating data containers<a class="headerlink" href="#shape-mismatches-when-creating-data-containers" title="Permanent link">&para;</a></h3>
+<p><code>ParticleData</code> expects <code>(n_boxes, n_particles, n_species)</code> for masses and
+<code>(n_boxes, n_particles)</code> for concentration/charge. Use <code>np.newaxis</code> or
+<code>np.tile</code> to add the batch dimension.</p>
+<h3 id="deprecation-logs">Deprecation logs<a class="headerlink" href="#deprecation-logs" title="Permanent link">&para;</a></h3>
+<p>The facades log at INFO level to avoid <code>-Werror</code> failures. To reduce noise,
+prefer <code>ParticleData</code>/<code>GasData</code> directly or wrap with <code>from_data</code> methods.</p>
+<h3 id="single-box-vs-multi-box-data">Single-box vs multi-box data<a class="headerlink" href="#single-box-vs-multi-box-data" title="Permanent link">&para;</a></h3>
+<p>Legacy facades assume a single box. For data containers, index the first box
+when you need legacy-shaped arrays:</p>
+<div class="highlight"><pre><span></span><code><span class="n">radii_single_box</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">concentration_single_box</span> <span class="o">=</span> <span class="n">gas_data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+<h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>ParticleData</code> source:
+  <a href="https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py">particula/particles/particle_data.py</a></li>
+<li><code>GasData</code> source:
+  <a href="https://github.com/uncscode/particula/blob/main/particula/gas/gas_data.py">particula/gas/gas_data.py</a></li>
+<li>Legacy facades:
+  <a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py">particula/particles/representation.py</a>,
+  <a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py">particula/gas/species.py</a></li>
 </ul>
 
 
