@@ -1,8 +1,8 @@
 # Architecture Guide
 
 **Project:** particula
-**Version:** 0.2.6
-**Last Updated:** 2026-02-28
+**Version:** 0.2.12
+**Last Updated:** 2026-03-01
 
 ## Overview
 
@@ -100,7 +100,7 @@ Particula follows a layered architecture where physical processes operate on aer
 │         Aerosol (Central State)             │
 │  ┌────────────┐        ┌─────────────────┐  │
 │  │ Atmosphere │        │ Particles       │  │
-│  │ (Gas)      │        │ (Facade)        │  │
+│  │ (Gas)      │        │ (Representation)│  │
 │  └────────────┘        └─────────────────┘  │
 └─────────────────────────────────────────────┘
                     │
@@ -155,21 +155,6 @@ particula/
 ├── aerosol_builder.py      # Builder for Aerosol
 └── runnable.py             # Process chaining framework
 ```
-
-### Dual-Type Dynamics Support
-
-Condensation and coagulation processes support both legacy facades and the new
-data containers:
-
-- **Accepted inputs:** `ParticleRepresentation`/`GasSpecies` *or*
-  `ParticleData`/`GasData`.
-- **Internal handling:** Processes normalize inputs to containers when
-  calculating rates or applying updates.
-- **Return type:** The same type passed by the caller is returned (facade in,
-  facade out; container in, container out) to support incremental migration.
-
-This compatibility layer ensures existing workflows continue to work while new
-code can operate directly on the container types.
 
 #### gas/
 
@@ -324,9 +309,11 @@ gas_data = species.data  # facade access to container
 **Examples in Codebase:**
 - `ParticleRepresentation` is a backward-compatible facade over `ParticleData`
 - `GasSpecies` is a backward-compatible facade over `GasData`
-- Conversion helpers: `ParticleData.from_representation`,
-  `ParticleData.to_representation`, `GasData.from_species`,
-  `GasData.to_species`
+- Conversion helpers (module-level functions):
+  `particula.particles.particle_data.from_representation`,
+  `particula.particles.particle_data.to_representation`,
+  `particula.gas.gas_data.from_species`,
+  `particula.gas.gas_data.to_species`
 
 ### Data Container Pattern
 
@@ -336,11 +323,14 @@ algorithms and strategies remain decoupled from data storage.
 **Implementation:**
 ```python
 from particula.particles import ParticleData
+import numpy as np
 
 data = ParticleData(
-    radii=radii,
-    total_mass=total_mass,
-    distribution_type="discrete",
+    masses=np.random.rand(1, 1000, 3) * 1e-18,
+    concentration=np.ones((1, 1000)),
+    charge=np.zeros((1, 1000)),
+    density=np.array([1000.0, 1200.0, 800.0]),
+    volume=np.array([1e-6]),
 )
 ```
 
