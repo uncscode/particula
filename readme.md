@@ -38,12 +38,9 @@ aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
 
 ## Migration / What's New
 
-Particula now provides data-first containers for particle and gas state:
-`ParticleData` and `GasData`. The legacy facades (`ParticleRepresentation`,
-`GasSpecies`) remain available but are deprecated as of v0.3.0.
-
-See the migration guide for updated examples and API mappings:
-[ParticleData and GasData Migration Guide](./docs/migration/particle-data.md)
+For migration details and updated API mappings, see the canonical guide:
+[ParticleData and GasData Migration Guide](./docs/Features/particle-data-migration.md).
+Legacy facades remain available, with deprecation planned for v0.3.0.
 
 ## Code Structure
 
