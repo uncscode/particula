@@ -38,7 +38,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 OUTPUT_LINE_LIMIT = 500
 OUTPUT_BYTE_LIMIT = 50_000
@@ -284,22 +284,37 @@ def run_ctest(
     if parallel > 0:
         cmd.extend(["-j", str(parallel)])
 
+    def _to_text(value: Optional[Union[str, bytes]]) -> str:
+        if value is None:
+            return ""
+        if isinstance(value, bytes):
+            return value.decode("utf-8", errors="replace")
+        return str(value)
+
     try:
         process = subprocess.run(
             cmd,
             cwd=str(build_path),
             capture_output=True,
-            text=True,
+            text=False,
             timeout=timeout,
         )
-        combined_output = "".join([process.stdout or "", process.stderr or ""])
+        stdout_decoded = _to_text(process.stdout)
+        stderr_decoded = _to_text(process.stderr)
+        combined_output = stdout_decoded + stderr_decoded
         metrics.update(parse_ctest_output(combined_output))
         metrics["exit_code"] = process.returncode
         validation_errors = validate_results(metrics, min_test_count=min_test_count)
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
+        partial_out = _to_text(exc.stdout)
+        partial_err = _to_text(exc.stderr)
+        timeout_message = f"ERROR: CTest timed out after {timeout} seconds"
+        combined_output = "\n".join(
+            part for part in [partial_out.strip(), partial_err.strip(), timeout_message] if part
+        )
+        metrics.update(parse_ctest_output(combined_output))
         metrics["timeout"] = True
         metrics["exit_code"] = 1
-        combined_output = f"ERROR: CTest timed out after {timeout} seconds"
         validation_errors = validate_results(metrics, min_test_count=min_test_count)
     except FileNotFoundError:
         metrics["ctest_missing"] = True

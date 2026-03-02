@@ -32,10 +32,23 @@ def run_cmake_module() -> ModuleType:
 
 
 class DummyResult:
-    def __init__(self, returncode: int = 0, stdout: str = "", stderr: str = "") -> None:
+    def __init__(
+        self,
+        returncode: int = 0,
+        stdout: bytes | str | None = b"",
+        stderr: bytes | str | None = b"",
+    ) -> None:
         self.returncode = returncode
-        self.stdout = stdout
-        self.stderr = stderr
+        self.stdout = self._coerce_bytes(stdout)
+        self.stderr = self._coerce_bytes(stderr)
+
+    @staticmethod
+    def _coerce_bytes(value: bytes | str | None) -> bytes | None:
+        if value is None:
+            return None
+        if isinstance(value, bytes):
+            return value
+        return value.encode("utf-8")
 
 
 def test_parse_cmake_output_success(run_cmake_module: ModuleType) -> None:
@@ -72,6 +85,26 @@ CMake Error at CMakeLists.txt:20 (find_package):
     assert len(metrics["error_messages"]) == 1
 
 
+def test_parse_compiler_errors(run_cmake_module: ModuleType) -> None:
+    output = """
+src/main.cc:10: error: missing include
+src/lib.cc:5: Fatal Error: header not found
+"""
+    metrics = run_cmake_module.parse_cmake_output(output, exit_code=1)
+    assert metrics["errors"] == 2
+    assert any("missing include" in msg for msg in metrics["error_messages"])
+    assert any("header not found" in msg for msg in metrics["error_messages"])
+
+
+def test_parse_compiler_warnings(run_cmake_module: ModuleType) -> None:
+    output = """
+src/main.cc:20: Warning: unused variable
+"""
+    metrics = run_cmake_module.parse_cmake_output(output, exit_code=0)
+    assert metrics["warnings"] == 1
+    assert any("unused variable" in msg for msg in metrics["warning_messages"])
+
+
 def test_parse_cmake_output_truncates_targets(run_cmake_module: ModuleType) -> None:
     targets = "\n".join([f"Target target_{i} (EXECUTABLE)" for i in range(60)])
     metrics = run_cmake_module.parse_cmake_output(targets, exit_code=0)
@@ -79,6 +112,13 @@ def test_parse_cmake_output_truncates_targets(run_cmake_module: ModuleType) -> N
     assert metrics["truncated_targets"] is True
     summary = run_cmake_module.format_summary(metrics, "src", "build")
     assert "truncated" in summary
+
+
+def test_bounded_append_limits_list(run_cmake_module: ModuleType) -> None:
+    items: list[str] = []
+    run_cmake_module._bounded_append(items, "first", limit=1)
+    run_cmake_module._bounded_append(items, "second", limit=1)
+    assert items == ["first"]
 
 
 def test_format_summary_handles_missing_fields(run_cmake_module: ModuleType) -> None:
@@ -95,6 +135,29 @@ def test_format_summary_handles_missing_fields(run_cmake_module: ModuleType) -> 
     summary = run_cmake_module.format_summary(metrics, "src", "build")
     assert "Configuration: Failed" in summary
     assert "VALIDATION: FAILED" in summary
+
+
+def test_build_arg_parser_defaults(run_cmake_module: ModuleType) -> None:
+    parser = run_cmake_module.build_arg_parser()
+    args = parser.parse_args([])
+    assert args.output == "summary"
+    assert args.preset is None
+    assert args.source_dir == "."
+    assert args.build_dir == "build"
+    assert args.ninja is False
+    assert args.timeout == 300
+    assert args.build is False
+    assert args.jobs == 0
+    assert args.build_timeout == 1800
+    assert args.cmake_args == []
+
+
+def test_cli_build_args(run_cmake_module: ModuleType) -> None:
+    parser = run_cmake_module.build_arg_parser()
+    args = parser.parse_args(["--build", "--jobs", "8", "--build-timeout", "3600"])
+    assert args.build is True
+    assert args.jobs == 8
+    assert args.build_timeout == 3600
 
 
 @pytest.fixture()
@@ -123,6 +186,7 @@ def test_run_cmake_with_preset_builds_command(
     def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
         assert "--preset" in cmd
         assert "debug" in cmd
+        assert text is False
         return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
@@ -148,6 +212,7 @@ def test_run_cmake_ninja_fallback(monkeypatch: pytest.MonkeyPatch, tmp_path: Pat
     def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
         # Ensure -G Ninja not present when fallback triggered
         assert "-G" not in cmd
+        assert text is False
         return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
 
     monkeypatch.setattr(module.shutil, "which", fake_which)
@@ -171,6 +236,31 @@ def test_run_cmake_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
 
     def fake_run(*_, **__):
         raise subprocess.TimeoutExpired(cmd="cmake", timeout=1, output="partial", stderr="late")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        timeout=1,
+        output_mode="summary",
+    )
+    assert exit_code == 1
+    assert "timed out" in output.lower()
+
+
+def test_binary_timeout_handling(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+
+    def fake_run(*_, **__):
+        raise subprocess.TimeoutExpired(
+            cmd="cmake",
+            timeout=1,
+            output=b"partial\xff",
+            stderr=None,
+        )
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
     exit_code, output = module.run_cmake(
@@ -208,7 +298,28 @@ def test_run_cmake_invalid_preset_name(preset_file: Tuple[Path, Path]) -> None:
     )
     assert exit_code == 1
     assert "Preset 'nonexistent' not found" in output
+    assert "CMakePresets.json" in output
     assert "CMakeUserPresets.json" in output
+    assert "checked both files" in output
+
+
+def test_binary_output_decode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+
+    def fake_run(*_, **__):
+        return DummyResult(returncode=0, stdout=None, stderr=b"warn\xfe")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        output_mode="full",
+    )
+    assert exit_code == 0
+    assert "\ufffd" in output
 
 
 def test_run_cmake_missing_preset_file(tmp_path: Path) -> None:
@@ -264,6 +375,27 @@ def test_load_presets_merges_user_presets(tmp_path: Path) -> None:
     loaded = module._load_presets(str(source_dir))
     names = [item["name"] for item in loaded.get("configurePresets", [])]
     assert names == ["debug", "user"]
+
+
+def test_load_presets_merges_build_presets(tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    presets = {
+        "version": 3,
+        "configurePresets": [{"name": "debug", "binaryDir": "build"}],
+        "buildPresets": [{"name": "build-debug", "configurePreset": "debug"}],
+    }
+    user_presets = {
+        "version": 3,
+        "buildPresets": [{"name": "build-user", "configurePreset": "debug"}],
+    }
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+    (source_dir / "CMakeUserPresets.json").write_text(json.dumps(user_presets))
+
+    loaded = module._load_presets(str(source_dir))
+    build_names = [item["name"] for item in loaded.get("buildPresets", [])]
+    assert build_names == ["build-debug", "build-user"]
 
 
 def test_validate_preset_name_accepts_user_preset(tmp_path: Path) -> None:
@@ -338,6 +470,293 @@ def test_load_presets_invalid_user_configure_presets(tmp_path: Path) -> None:
 
     with pytest.raises(TypeError, match="CMakeUserPresets.json configurePresets"):
         module._load_presets(str(source_dir))
+
+
+def test_build_cmake_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = load_module()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        assert cmd[:2] == ["cmake", "--build"]
+        assert text is False
+        return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output, metrics = module.build_cmake(build_dir="build", output_mode="summary")
+    assert exit_code == 0
+    assert metrics["success"] is True
+    assert "BUILD SUMMARY" in output
+
+
+def test_build_cmake_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = load_module()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        assert cmd[:2] == ["cmake", "--build"]
+        return DummyResult(returncode=1, stdout="", stderr="src/main.cc: error: fail")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output, metrics = module.build_cmake(build_dir="build", output_mode="summary")
+    assert exit_code == 1
+    assert metrics["success"] is False
+    assert "Errors: 1" in output
+
+
+def test_build_cmake_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = load_module()
+
+    def fake_run(*_, **__):
+        raise subprocess.TimeoutExpired(cmd="cmake --build", timeout=1, output="partial")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output, metrics = module.build_cmake(build_dir="build", build_timeout=1)
+    assert exit_code == 1
+    assert metrics["timeout"] is True
+    assert "timed out" in output.lower()
+
+
+def test_build_cmake_parallel_jobs(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = load_module()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        assert ["--parallel", "4"] in [cmd[i : i + 2] for i in range(len(cmd) - 1)]
+        return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, _, _ = module.build_cmake(build_dir="build", jobs=4)
+    assert exit_code == 0
+
+
+def test_build_cmake_no_parallel(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = load_module()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        assert "--parallel" not in cmd
+        return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, _, _ = module.build_cmake(build_dir="build", jobs=0)
+    assert exit_code == 0
+
+
+def test_build_cmake_uses_preset(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = load_module()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        assert cmd[:4] == ["cmake", "--build", "--preset", "release"]
+        assert "build" not in cmd
+        return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, _, _ = module.build_cmake(build_dir="build", build_preset="release")
+    assert exit_code == 0
+
+
+def test_resolve_build_dir_direct(run_cmake_module: ModuleType) -> None:
+    preset_data = {"configurePresets": [{"name": "debug", "binaryDir": "build"}]}
+    resolved = run_cmake_module._resolve_build_dir_from_preset("debug", preset_data)
+    assert resolved == "build"
+
+
+def test_resolve_build_dir_inherited(run_cmake_module: ModuleType) -> None:
+    preset_data = {
+        "configurePresets": [
+            {"name": "base", "binaryDir": "build"},
+            {"name": "child", "inherits": "base"},
+        ]
+    }
+    resolved = run_cmake_module._resolve_build_dir_from_preset("child", preset_data)
+    assert resolved == "build"
+
+
+def test_resolve_build_dir_missing_binary_dir(run_cmake_module: ModuleType) -> None:
+    preset_data = {"configurePresets": [{"name": "debug"}]}
+    resolved = run_cmake_module._resolve_build_dir_from_preset("debug", preset_data)
+    assert resolved is None
+
+
+def test_resolve_build_dir_cycle_returns_none(run_cmake_module: ModuleType) -> None:
+    preset_data = {
+        "configurePresets": [
+            {"name": "A", "inherits": "B"},
+            {"name": "B", "inherits": "A"},
+        ]
+    }
+    resolved = run_cmake_module._resolve_build_dir_from_preset("A", preset_data)
+    assert resolved is None
+
+
+def test_find_build_preset_match(run_cmake_module: ModuleType) -> None:
+    preset_data = {
+        "buildPresets": [
+            {"name": "build-debug", "configurePreset": "debug"},
+            {"name": "build-release", "configurePreset": "release"},
+        ]
+    }
+    match = run_cmake_module._find_build_preset("debug", preset_data)
+    assert match == "build-debug"
+
+
+def test_find_build_preset_no_match(run_cmake_module: ModuleType) -> None:
+    preset_data = {"buildPresets": [{"name": "build-release", "configurePreset": "release"}]}
+    match = run_cmake_module._find_build_preset("debug", preset_data)
+    assert match is None
+
+
+def test_build_summary_format(run_cmake_module: ModuleType) -> None:
+    metrics = {
+        "success": False,
+        "warnings": 2,
+        "errors": 1,
+        "warning_messages": ["warn1", "warn2"],
+        "error_messages": ["err1"],
+        "timeout": False,
+        "duration": 1.2,
+    }
+    summary = run_cmake_module.format_build_summary(metrics, "build")
+    assert "BUILD SUMMARY" in summary
+    assert "Warnings: 2" in summary
+    assert "Errors: 1" in summary
+
+
+def test_run_cmake_with_build(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+
+    calls: list[list[str]] = []
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        calls.append(cmd)
+        if "--build" in cmd:
+            return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        build=True,
+        output_mode="summary",
+    )
+    assert exit_code == 0
+    assert any("--build" in cmd for cmd in calls)
+    assert "BUILD SUMMARY" in output
+
+
+def test_run_cmake_build_uses_build_preset(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+    presets = {
+        "version": 3,
+        "configurePresets": [{"name": "debug", "binaryDir": "build"}],
+        "buildPresets": [{"name": "build-debug", "configurePreset": "debug"}],
+    }
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        if "--build" in cmd:
+            assert "--preset" in cmd
+            assert "build-debug" in cmd
+            return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+        assert "--preset" in cmd
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        preset="debug",
+        build=True,
+        output_mode="summary",
+    )
+    assert exit_code == 0
+    assert "BUILD SUMMARY" in output
+
+
+def test_run_cmake_build_skipped_on_config_failure(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        assert "--build" not in cmd
+        return DummyResult(returncode=1, stdout="", stderr="CMake Error: fail")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        build=True,
+        output_mode="summary",
+    )
+    assert exit_code == 1
+    assert "BUILD SUMMARY" not in output
+
+
+def test_run_cmake_build_dir_fallback_when_binary_dir_missing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+    presets = {
+        "version": 3,
+        "configurePresets": [
+            {"name": "debug"},
+        ],
+    }
+    (source_dir / "CMakePresets.json").write_text(json.dumps(presets))
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        if "--build" in cmd:
+            assert str(build_dir) in cmd
+            return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+        assert "--preset" in cmd
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        preset="debug",
+        build=True,
+        output_mode="summary",
+    )
+    assert exit_code == 0
+    assert "BUILD SUMMARY" in output
+
+
+def test_run_cmake_json_includes_build_metrics(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    source_dir = tmp_path / "src"
+    build_dir = tmp_path / "build"
+    source_dir.mkdir()
+
+    def fake_run(cmd: list, capture_output: bool, text: bool, timeout: int) -> DummyResult:  # type: ignore[override]
+        if "--build" in cmd:
+            return DummyResult(returncode=0, stdout="Built target app\n", stderr="")
+        return DummyResult(returncode=0, stdout="-- Configuring done\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    exit_code, output = module.run_cmake(
+        source_dir=str(source_dir),
+        build_dir=str(build_dir),
+        build=True,
+        output_mode="json",
+    )
+    assert exit_code == 0
+    payload = json.loads(output)
+    assert payload["build_metrics"]["success"] is True
+    assert payload.get("build_output") is not None
 
 
 def test_run_cmake_preset_not_supported(

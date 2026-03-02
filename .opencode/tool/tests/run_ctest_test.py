@@ -28,7 +28,12 @@ def run_ctest_module() -> ModuleType:
 
 
 class DummyProcess:
-    def __init__(self, stdout: str = "", stderr: str = "", returncode: int = 0) -> None:
+    def __init__(
+        self,
+        stdout: bytes | None = b"",
+        stderr: bytes | None = b"",
+        returncode: int = 0,
+    ) -> None:
         self.stdout = stdout
         self.stderr = stderr
         self.returncode = returncode
@@ -131,8 +136,8 @@ def test_run_ctest_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
             "1/1 Test #1: sample ................   Passed    0.01 sec\n\n"
             "100% tests passed, 0 tests failed out of 1\n\n"
             "Total Test time (real) =   0.02 sec"
-        )
-        return DummyProcess(stdout=stdout, stderr="", returncode=0)
+        ).encode("utf-8")
+        return DummyProcess(stdout=stdout, stderr=b"", returncode=0)
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
@@ -165,6 +170,73 @@ def test_run_ctest_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
 
     assert exit_code == 1
     assert "timed out" in output.lower()
+
+
+def test_run_ctest_binary_output_decodes_with_replace(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    (build_dir / "CTestTestfile.cmake").write_text("# dummy")
+
+    def fake_run(*_: object, **__: object) -> DummyProcess:  # type: ignore[override]
+        stdout = b"1/1 Test #1: sample .... Passed 0.01 sec\n\xff\n"
+        stderr = b"binary-error\xfe"
+        return DummyProcess(stdout=stdout, stderr=stderr, returncode=0)
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code, output = module.run_ctest(build_dir=build_dir, output_mode="json")
+
+    payload = json.loads(output)
+    assert exit_code == 1  # validation fails because total=0
+    assert "\ufffd" in payload["output"]
+
+
+def test_run_ctest_binary_output_none_handling(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    (build_dir / "CTestTestfile.cmake").write_text("# dummy")
+
+    def fake_run(*_: object, **__: object) -> DummyProcess:  # type: ignore[override]
+        return DummyProcess(stdout=None, stderr=None, returncode=0)
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    exit_code, output = module.run_ctest(build_dir=build_dir, output_mode="json")
+
+    payload = json.loads(output)
+    assert exit_code == 1  # validation fails because total=0
+    assert payload["output"] == ""
+
+
+def test_run_ctest_timeout_binary_partial_output(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = load_module()
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    (build_dir / "CTestTestfile.cmake").write_text("# dummy")
+
+    def raise_timeout(*_: object, **__: object) -> None:  # type: ignore[override]
+        raise subprocess.TimeoutExpired(
+            cmd="ctest",
+            timeout=1,
+            output=b"partial\xff",
+            stderr=b"stderr\xfe",
+        )
+
+    monkeypatch.setattr(module.subprocess, "run", raise_timeout)
+
+    exit_code, output = module.run_ctest(build_dir=build_dir, timeout=1, output_mode="full")
+
+    assert exit_code == 1
+    assert "timed out" in output.lower()
+    assert "\ufffd" in output
 
 
 def test_run_ctest_missing_command(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -208,7 +280,7 @@ def test_run_ctest_full_and_json_truncate(monkeypatch: pytest.MonkeyPatch, tmp_p
     long_output = "\n".join([f"line {i}" for i in range(700)])
 
     def fake_run(*_: object, **__: object) -> DummyProcess:  # type: ignore[override]
-        return DummyProcess(stdout=long_output, stderr="", returncode=0)
+        return DummyProcess(stdout=long_output.encode("utf-8"), stderr=b"", returncode=0)
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
@@ -232,7 +304,7 @@ def test_run_ctest_min_test_enforced(monkeypatch: pytest.MonkeyPatch, tmp_path: 
 
     def fake_run(*_: object, **__: object) -> DummyProcess:  # type: ignore[override]
         stdout = "100% tests passed, 0 tests failed out of 1\nTotal Test time (real) =   0.01 sec"
-        return DummyProcess(stdout=stdout, stderr="", returncode=0)
+        return DummyProcess(stdout=stdout.encode("utf-8"), stderr=b"", returncode=0)
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
 
@@ -240,6 +312,38 @@ def test_run_ctest_min_test_enforced(monkeypatch: pytest.MonkeyPatch, tmp_path: 
 
     assert exit_code == 1
     assert "Expected at least 3 tests" in output
+
+
+def test_parse_args_accepts_overrides(tmp_path: Path) -> None:
+    module = load_module()
+    build_dir = tmp_path / "build"
+
+    parsed = module._parse_args(
+        [
+            "--build-dir",
+            str(build_dir),
+            "-R",
+            "include",
+            "-E",
+            "exclude",
+            "-j",
+            "2",
+            "--timeout",
+            "42",
+            "--min-tests",
+            "3",
+            "--output",
+            "full",
+        ]
+    )
+
+    assert parsed.build_dir == build_dir
+    assert parsed.include == "include"
+    assert parsed.exclude == "exclude"
+    assert parsed.parallel == 2
+    assert parsed.timeout == 42
+    assert parsed.min_tests == 3
+    assert parsed.output == "full"
 
 
 def test_main_wires_cli_arguments(

@@ -8,7 +8,7 @@
       "type": "agent",
       "name": "Interpret Issue",
       "agent": "issue-generator",
-      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
       "model": "heavy",
       "timeout": 1800,
       "retry": {

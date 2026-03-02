@@ -1,16 +1,16 @@
 {
-  "name": "review-request",
+  "name": "review",
   "version": "1.0.0",
   "description": "Multi-agent code review for PRs: parallel specialized reviewers → consolidation → PR feedback",
   "description_long": "Comprehensive code review workflow that dispatches specialized reviewer agents in parallel (code quality, correctness, C++ performance, Python performance, security), consolidates findings to remove duplicates and rank by severity, then posts structured feedback to the PR as overview and inline comments.",
-  "workflow_type": "custom",
+  "workflow_type": "review",
   "steps": [
     {
       "type": "agent",
       "name": "Review",
       "description": "Multi-agent code review: parallel specialized reviewers → consolidation → feedback posting",
       "agent": "adw-review-orchestrator",
-      "prompt": "Review PR for code quality, correctness, performance, and security.\n\nArguments: $ARGUMENTS\n\nPerform comprehensive multi-agent code review:\n1. Analyze changed files (identify C++ and Python files)\n2. Dispatch specialized reviewers in parallel\n3. Consolidate findings (dedupe, rank, filter)\n4. Post overview comment and inline comments to PR",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id} --pr-number ${pr_number}",
       "model": "base",
       "timeout": 1800,
       "retry": {

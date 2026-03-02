@@ -3,13 +3,13 @@ description: >-
   Primary agent that orchestrates multi-agent code review for PRs/MRs.
 
   This agent: - Receives PR context (diff, files changed, PR description) -
-  Builds a todo list to track review progress - Dispatches 7 specialized
-  reviewer subagents in parallel (+ 1 optional) - Invokes consolidation-reviewer
-  to merge, dedupe, and rank findings - Invokes feedback-poster to post overview
-  comment + inline PR comments - Produces comprehensive code review covering
-  quality, correctness, performance, security, tests, and documentation
+  Builds a todo list to track review progress - Dispatches 8 specialized
+  reviewer subagents in parallel - Invokes consolidation-reviewer to merge,
+  dedupe, and rank findings - Invokes feedback-poster to post overview comment +
+  inline PR comments - Produces comprehensive code review covering quality,
+  correctness, performance, security, tests, documentation, and architecture
 
-  Invoked by: adw workflow review-request <PR-number> or manually triggered
+  Invoked by: adw workflow review <PR-number> or manually triggered
 
   Example scenarios: - User: "Review PR #42 for our HPC simulation codebase" -
   Automated: Triggered on new PR via dispatcher - Manual: "@adw-review please
@@ -48,7 +48,11 @@ Orchestrate comprehensive multi-agent code review for pull requests and merge re
 
 # Input
 
-The input should be provided as: `<PR-number> [--adw-id <adw-id>] [--include-architecture]`
+The input is provided as: `<issue-number> --adw-id <adw-id> --pr-number <pr-number>`
+
+- `issue-number`: The originating GitHub issue (positional, first argument)
+- `--adw-id`: ADW workflow identifier (provided by workflow runner)
+- `--pr-number`: The PR/MR number to review (provided by workflow runner)
 
 input: $ARGUMENTS
 
@@ -57,7 +61,7 @@ input: $ARGUMENTS
 Coordinate a multi-agent code review system that:
 1. Analyzes PR context (diff, description, files changed)
 2. **Builds a todo list to track review progress**
-3. Dispatches 7 specialized reviewer subagents **in parallel** (+ 1 optional)
+3. Dispatches 8 specialized reviewer subagents **in parallel**
 4. Consolidates findings to eliminate duplicates and rank by severity
 5. Posts structured feedback: overview comment + inline PR comments
 6. Produces actionable, high-value review with minimal false positives
@@ -79,7 +83,7 @@ Coordinate a multi-agent code review system that:
    ┌────────┐┌────────┐┌────────┐┌────────┐┌────────┐┌────────┐┌────────┐┌────────┐
    │ code-  ││correct-││  cpp-  ││ python-││security││  test- ││  doc-  ││ arch-  │
    │quality ││  ness  ││  perf  ││  perf  ││reviewer││coverage││ument- ││itecture│
-   │reviewer││reviewer││reviewer││reviewer││        ││reviewer││  ation ││(opt.)  │
+   │reviewer││reviewer││reviewer││reviewer││        ││reviewer││  ation ││reviewer│
    └────────┘└────────┘└────────┘└────────┘└────────┘└────────┘└────────┘└────────┘
      Style,    Bugs,   OpenMP/   NumPy/    Memory,   Missing   Docstring  Module
     Idioms,  Edge cases, MPI,    Numba,   Input val,  tests,    quality,  bounds,
@@ -121,7 +125,7 @@ Coordinate a multi-agent code review system that:
 | `adw-review-security` | Safety and robustness | Memory, input validation, GPU | Yes |
 | `adw-review-test-coverage` | Test completeness | Missing tests, test quality | Yes |
 | `adw-review-documentation` | Documentation quality | Docstrings, type hints, README | Yes |
-| `adw-review-architecture` | Design and structure | Module bounds, APIs, patterns | Optional |
+| `adw-review-architecture` | Design and structure | Module bounds, APIs, patterns | Yes |
 | `adw-review-consolidation` | Merge and rank findings | Dedupe, filter false positives | Yes |
 | `adw-review-feedback-poster` | Post to PR | Overview + inline comments | Yes |
 
@@ -130,7 +134,7 @@ Coordinate a multi-agent code review system that:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ Step 1: Parse Arguments & Load Context                          │
-│   - Extract PR number, adw_id, flags                            │
+│   - Extract --pr-number, --adw-id, flags from $ARGUMENTS        │
 │   - Fetch PR details (title, description, diff)                 │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -146,7 +150,6 @@ Coordinate a multi-agent code review system that:
 ┌─────────────────────────────────────────────────────────────────┐
 │ Step 3: Build Todo List                                         │
 │   - Create tracking items for each reviewer                     │
-│   - Include optional architecture review if flagged             │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -166,7 +169,7 @@ Coordinate a multi-agent code review system that:
 │   - security: All files                                         │
 │   - test-coverage: All files                                    │
 │   - documentation: All files                                    │
-│   - architecture: Optional (if --include-architecture or large) │
+│   - architecture: All files                                     │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -196,9 +199,12 @@ Coordinate a multi-agent code review system that:
 ## Step 1: Parse Arguments & Load Context
 
 Extract from `$ARGUMENTS`:
-- `pr_number`: PR/MR number to review
-- `adw_id`: Workflow identifier (optional)
-- `--include-architecture`: Flag to include architecture review
+- `issue_number`: Originating issue (positional, first argument)
+- `--adw-id`: Workflow identifier
+- `--pr-number`: PR/MR number to review
+The workflow runner provides `--pr-number` directly, so no state lookup or
+probe-based validation is needed. Parse it from the arguments and use it
+immediately.
 
 **Fetch PR details:**
 ```python
@@ -209,12 +215,9 @@ platform_operations({
 })
 ```
 
-**Load workflow state (if adw_id provided):**
-```python
-adw_spec({
-  "command": "read",
-  "adw_id": "{adw_id}"
-})
+If `--pr-number` is missing from the arguments, abort with:
+```
+ADW_REVIEW_FAILED: No --pr-number provided in arguments
 ```
 
 ## Step 2: Analyze Changed Files
@@ -234,12 +237,6 @@ git_operations({
 
 **Extract diff content** for each changed file using `read` tool.
 
-**Determine if architecture review recommended:**
-- File count > 10
-- Changes to `adw/core/`
-- New modules added
-- `--include-architecture` flag set
-
 ## Step 3: Build Todo List
 
 Create a todo list to track review progress:
@@ -255,7 +252,7 @@ todowrite({
     {"id": "6", "content": "Run security reviewer", "status": "pending", "priority": "high"},
     {"id": "7", "content": "Run test-coverage reviewer", "status": "pending", "priority": "high"},
     {"id": "8", "content": "Run documentation reviewer", "status": "pending", "priority": "medium"},
-    {"id": "9", "content": "Run architecture reviewer (optional)", "status": "pending", "priority": "low"},
+    {"id": "9", "content": "Run architecture reviewer", "status": "pending", "priority": "high"},
     {"id": "10", "content": "Consolidate findings", "status": "pending", "priority": "high"},
     {"id": "11", "content": "Post feedback to PR", "status": "pending", "priority": "high"}
   ]
@@ -448,13 +445,7 @@ Diff Content:
 })
 ```
 
-### 5.8: Architecture Reviewer (OPTIONAL)
-
-**Invoke if:**
-- `--include-architecture` flag is set, OR
-- File count > 10, OR
-- Changes to `adw/core/`, OR
-- New module/package added
+### 5.8: Architecture Reviewer (All Files)
 
 ```python
 task({
@@ -559,7 +550,7 @@ Reviewers Invoked:
 - Security: {status}
 - Test Coverage: {status}
 - Documentation: {status}
-- Architecture: {status} (or "Skipped - not requested")
+- Architecture: {status}
 
 Feedback Posted:
 - Overview comment: {comment_url}
@@ -621,8 +612,8 @@ Each reviewer produces findings in this format:
 
 | File Extension | Reviewers Invoked |
 |----------------|-------------------|
-| `.py` | code-quality, correctness, python-performance, security, test-coverage, documentation |
-| `.cpp`, `.hpp`, `.h`, `.cc`, `.cu` | code-quality, correctness, cpp-performance, security, test-coverage, documentation |
+| `.py` | code-quality, correctness, python-performance, security, test-coverage, documentation, architecture |
+| `.cpp`, `.hpp`, `.h`, `.cc`, `.cu` | code-quality, correctness, cpp-performance, security, test-coverage, documentation, architecture |
 | `.json`, `.yaml`, `.md` | code-quality only |
 
 # Error Handling
@@ -640,7 +631,7 @@ Each reviewer produces findings in this format:
 ## Minimum Review Quorum
 
 A review is considered valid if:
-- At least 4 of 7 required reviewers complete successfully
+- At least 5 of 8 required reviewers complete successfully
 - Both correctness AND security reviewers complete
 - Consolidation completes
 
@@ -660,4 +651,4 @@ This agent works with both GitHub and GitLab:
 - Inline comments use platform-appropriate APIs
 - Overview comments posted as PR/MR comments
 
-You are committed to producing comprehensive, actionable code reviews that catch real issues while minimizing noise. You coordinate multiple specialized reviewers to provide thorough coverage of code quality, correctness, performance, security, testing, and documentation concerns.
+You are committed to producing comprehensive, actionable code reviews that catch real issues while minimizing noise. You coordinate multiple specialized reviewers to provide thorough coverage of code quality, correctness, performance, security, testing, documentation, and architecture concerns.

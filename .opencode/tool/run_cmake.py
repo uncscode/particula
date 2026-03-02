@@ -143,13 +143,23 @@ def parse_cmake_output(output: str, exit_code: Optional[int] = None) -> Dict[str
             else:
                 metrics["truncated_targets"] = True
 
-        if stripped.lower().startswith("cmake warning"):
+        lowered = stripped.lower()
+
+        if lowered.startswith("cmake warning"):
             metrics["warnings"] += 1
             _bounded_append(warning_messages, stripped, MESSAGE_CAPTURE_LIMIT)
 
-        if stripped.lower().startswith("cmake error"):
+        if lowered.startswith("cmake error"):
             metrics["errors"] += 1
             _bounded_append(error_messages, stripped, MESSAGE_CAPTURE_LIMIT)
+
+        if ": fatal error:" in lowered or ": error:" in lowered:
+            metrics["errors"] += 1
+            _bounded_append(error_messages, stripped, MESSAGE_CAPTURE_LIMIT)
+
+        if ": warning:" in lowered:
+            metrics["warnings"] += 1
+            _bounded_append(warning_messages, stripped, MESSAGE_CAPTURE_LIMIT)
 
         if metrics["duration"] is None:
             dur_match = duration_pattern.search(stripped)
@@ -241,19 +251,198 @@ def format_summary(metrics: Dict[str, Any], source_dir: str, build_dir: str) -> 
     return "\n".join(lines)
 
 
+def format_build_summary(metrics: Dict[str, Any], build_dir: str) -> str:
+    """Format human-readable summary of CMake build output.
+
+    Args:
+        metrics: Parsed metrics dictionary produced by ``parse_cmake_output``.
+        build_dir: Build directory passed to CMake.
+
+    Returns:
+        A formatted multi-line string summarizing build results, warnings, errors, and
+        validation status.
+    """
+    lines: List[str] = []
+    lines.append("=" * 60)
+    lines.append("BUILD SUMMARY")
+    lines.append("=" * 60)
+
+    status = "Success" if metrics.get("success") else "Failed"
+    lines.append(f"\nBuild: {status}")
+    lines.append(f"Build Dir: {build_dir}")
+
+    if metrics.get("timeout"):
+        lines.append("Timeout: Yes")
+
+    lines.append(f"\nWarnings: {metrics.get('warnings', 0)}")
+    lines.append(f"Errors: {metrics.get('errors', 0)}")
+
+    warning_messages = metrics.get("warning_messages") or []
+    if warning_messages:
+        lines.append("\nWarning Messages:")
+        for message in warning_messages[:5]:
+            lines.append(f"  - {message}")
+        if len(warning_messages) > 5:
+            lines.append(f"  ... and {len(warning_messages) - 5} more")
+
+    error_messages = metrics.get("error_messages") or []
+    if error_messages:
+        lines.append("\nError Messages:")
+        for message in error_messages[:5]:
+            lines.append(f"  - {message}")
+        if len(error_messages) > 5:
+            lines.append(f"  ... and {len(error_messages) - 5} more")
+
+    if metrics.get("duration") is not None:
+        lines.append(f"\nDuration: {metrics['duration']:.2f}s")
+
+    lines.append("\n" + "=" * 60)
+    validation = "PASSED" if metrics.get("success") and metrics.get("errors", 0) == 0 else "FAILED"
+    lines.append(f"VALIDATION: {validation}")
+    lines.append("=" * 60)
+
+    return "\n".join(lines)
+
+
+def build_cmake(
+    build_dir: str,
+    jobs: int = 0,
+    build_timeout: int = 1800,
+    output_mode: str = "summary",
+    build_preset: Optional[str] = None,
+) -> Tuple[int, str, Dict[str, Any]]:
+    """Run ``cmake --build`` with optional parallelism and output formatting.
+
+    Args:
+        build_dir: Build directory passed to ``cmake --build`` when no preset is used.
+        jobs: Number of parallel jobs; omit ``--parallel`` when ``jobs`` is 0.
+        build_timeout: Timeout in seconds for the build command.
+        output_mode: Output format, one of ``summary``, ``full``, or ``json``.
+        build_preset: Optional build preset name for ``cmake --build --preset``.
+
+    Returns:
+        Tuple of (exit_code, output_text, metrics) describing build execution.
+    """
+    if build_preset:
+        cmd: List[str] = ["cmake", "--build", "--preset", build_preset]
+    else:
+        cmd = ["cmake", "--build", build_dir]
+    if jobs > 0:
+        cmd.extend(["--parallel", str(jobs)])
+
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=False,
+            timeout=build_timeout,
+        )
+        stdout_decoded = (result.stdout or b"").decode("utf-8", errors="replace")
+        stderr_decoded = (result.stderr or b"").decode("utf-8", errors="replace")
+        combined_output = stdout_decoded + ("\n" + stderr_decoded if stderr_decoded else "")
+        metrics = parse_cmake_output(combined_output, exit_code=result.returncode)
+
+        truncated_output, was_truncated, notice = _truncate_output(combined_output)
+        if output_mode == "summary":
+            output_text = format_build_summary(metrics, build_dir)
+        elif output_mode == "full":
+            parts = [truncated_output]
+            if was_truncated and notice:
+                parts.append(notice)
+            parts.append("")
+            parts.append(format_build_summary(metrics, build_dir))
+            output_text = "\n".join(part for part in parts if part)
+        elif output_mode == "json":
+            payload = {
+                "metrics": metrics,
+                "output": truncated_output,
+                "truncated": was_truncated,
+                "truncation_notice": notice,
+            }
+            output_text = json.dumps(payload, indent=2)
+        else:
+            raise ValueError(f"Unsupported output mode: {output_mode}")
+
+        exit_code = 0 if metrics.get("success") else 1
+        return exit_code, output_text, metrics
+    except subprocess.TimeoutExpired as exc:
+        raw_out = exc.stdout or b""
+        raw_err = exc.stderr or b""
+        if isinstance(raw_out, bytes):
+            partial_out = raw_out.decode("utf-8", errors="replace")
+        else:
+            partial_out = str(raw_out)
+        if isinstance(raw_err, bytes):
+            partial_err = raw_err.decode("utf-8", errors="replace")
+        else:
+            partial_err = str(raw_err)
+        combined = (partial_out + "\n" + partial_err).strip()
+        metrics = parse_cmake_output(combined, exit_code=1)
+        metrics["success"] = False
+        metrics["timeout"] = True
+        metrics["errors"] = metrics.get("errors", 0) + 1
+        _bounded_append(
+            cast(List[str], metrics["error_messages"]),
+            f"CMake build timed out after {build_timeout} seconds",
+            MESSAGE_CAPTURE_LIMIT,
+        )
+        truncated_output, was_truncated, notice = _truncate_output(combined)
+        if output_mode == "json":
+            payload = {
+                "metrics": metrics,
+                "output": truncated_output,
+                "truncated": was_truncated,
+                "truncation_notice": notice,
+            }
+            return 1, json.dumps(payload, indent=2), metrics
+        output_text = format_build_summary(metrics, build_dir)
+        return 1, output_text, metrics
+    except FileNotFoundError:
+        message = "ERROR: cmake command not found. Is CMake installed?"
+        metrics = parse_cmake_output("", exit_code=1)
+        metrics["success"] = False
+        metrics["errors"] = metrics.get("errors", 0) + 1
+        _bounded_append(cast(List[str], metrics["error_messages"]), message, MESSAGE_CAPTURE_LIMIT)
+        if output_mode == "json":
+            payload = {
+                "metrics": metrics,
+                "output": message,
+                "truncated": False,
+                "truncation_notice": "",
+            }
+            return 1, json.dumps(payload, indent=2), metrics
+        return 1, format_build_summary(metrics, build_dir), metrics
+    except Exception as exc:  # pragma: no cover - safety net
+        message = f"ERROR: {exc}"
+        metrics = parse_cmake_output("", exit_code=1)
+        metrics["success"] = False
+        metrics["errors"] = metrics.get("errors", 0) + 1
+        _bounded_append(cast(List[str], metrics["error_messages"]), message, MESSAGE_CAPTURE_LIMIT)
+        if output_mode == "json":
+            payload = {
+                "metrics": metrics,
+                "output": message,
+                "truncated": False,
+                "truncation_notice": "",
+            }
+            return 1, json.dumps(payload, indent=2), metrics
+        return 1, format_build_summary(metrics, build_dir), metrics
+
+
 def _load_presets(source_dir: str) -> Dict[str, Any]:
-    """Load configure presets from CMake preset files.
+    """Load configure and build presets from CMake preset files.
 
     Args:
         source_dir: Directory containing CMakePresets.json and optional CMakeUserPresets.json.
 
     Returns:
-        Parsed preset data with merged ``configurePresets`` entries from both files.
+        Parsed preset data with merged ``configurePresets`` and ``buildPresets`` entries
+        from both files.
 
     Raises:
         FileNotFoundError: If CMakePresets.json is missing.
         json.JSONDecodeError: If CMakePresets.json is not valid JSON.
-        TypeError: If either configurePresets value is not a list.
+        TypeError: If either configurePresets or buildPresets value is not a list.
     """
     presets_path = Path(source_dir) / "CMakePresets.json"
     if not presets_path.exists():
@@ -265,6 +454,12 @@ def _load_presets(source_dir: str) -> Dict[str, Any]:
         configure_presets = []
     if not isinstance(configure_presets, list):
         raise TypeError("CMakePresets.json configurePresets is not a list")
+
+    build_presets = preset_data.get("buildPresets")
+    if build_presets is None:
+        build_presets = []
+    if not isinstance(build_presets, list):
+        raise TypeError("CMakePresets.json buildPresets is not a list")
 
     user_presets_path = Path(source_dir) / "CMakeUserPresets.json"
     if user_presets_path.exists():
@@ -282,7 +477,15 @@ def _load_presets(source_dir: str) -> Dict[str, Any]:
                 raise TypeError("CMakeUserPresets.json configurePresets is not a list")
             configure_presets.extend(user_configure_presets)
 
+            user_build_presets = user_data.get("buildPresets")
+            if user_build_presets is None:
+                user_build_presets = []
+            if not isinstance(user_build_presets, list):
+                raise TypeError("CMakeUserPresets.json buildPresets is not a list")
+            build_presets.extend(user_build_presets)
+
     preset_data["configurePresets"] = configure_presets
+    preset_data["buildPresets"] = build_presets
     return preset_data
 
 
@@ -302,8 +505,78 @@ def _validate_preset_name(preset: str, preset_data: Dict[str, Any]) -> None:
     }
     if preset not in names:
         raise ValueError(
-            f"Preset '{preset}' not found in CMakePresets.json or CMakeUserPresets.json"
+            f"Preset '{preset}' not found in CMakePresets.json or CMakeUserPresets.json "
+            "(checked both files)"
         )
+
+
+def _resolve_build_dir_from_preset(preset_name: str, preset_data: Dict[str, Any]) -> Optional[str]:
+    """Resolve the build directory from a configure preset inheritance chain.
+
+    Args:
+        preset_name: Configure preset name to resolve.
+        preset_data: Preset data returned by ``_load_presets``.
+
+    Returns:
+        The resolved ``binaryDir`` value if found, otherwise ``None``.
+    """
+    configure_presets = preset_data.get("configurePresets") or []
+    preset_map = {
+        item.get("name"): item
+        for item in configure_presets
+        if isinstance(item, dict) and item.get("name")
+    }
+    visited: set[str] = set()
+
+    def resolve(name: str) -> Optional[str]:
+        if name in visited:
+            return None
+        visited.add(name)
+        preset = preset_map.get(name)
+        if not preset:
+            return None
+        binary_dir = preset.get("binaryDir")
+        if binary_dir:
+            return binary_dir
+
+        inherits = preset.get("inherits")
+        if not inherits:
+            return None
+        if isinstance(inherits, str):
+            inherits_list = [inherits]
+        elif isinstance(inherits, list):
+            inherits_list = [item for item in inherits if isinstance(item, str)]
+        else:
+            inherits_list = []
+        for parent in inherits_list:
+            resolved = resolve(parent)
+            if resolved:
+                return resolved
+        return None
+
+    return resolve(preset_name)
+
+
+def _find_build_preset(configure_preset: str, preset_data: Dict[str, Any]) -> Optional[str]:
+    """Find the build preset name matching a configure preset.
+
+    Args:
+        configure_preset: Configure preset name to match.
+        preset_data: Preset data returned by ``_load_presets``.
+
+    Returns:
+        The matching build preset name, or ``None`` if not found.
+    """
+    build_presets = preset_data.get("buildPresets") or []
+    for item in build_presets:
+        if not isinstance(item, dict):
+            continue
+        if item.get("configurePreset") != configure_preset:
+            continue
+        name = item.get("name")
+        if name:
+            return str(name)
+    return None
 
 
 def run_cmake(
@@ -314,6 +587,9 @@ def run_cmake(
     cmake_args: Optional[List[str]] = None,
     timeout: int = 300,
     output_mode: str = "summary",
+    build: bool = False,
+    jobs: int = 0,
+    build_timeout: int = 1800,
 ) -> Tuple[int, str]:
     """Run CMake configuration with preset and Ninja support.
 
@@ -325,6 +601,9 @@ def run_cmake(
         cmake_args: Additional arguments forwarded to the CMake invocation.
         timeout: Timeout in seconds for the CMake process.
         output_mode: Output format, one of ``summary``, ``full``, or ``json``.
+        build: Whether to run ``cmake --build`` after configuration succeeds.
+        jobs: Number of parallel jobs for the build step; ignored when ``build`` is False.
+        build_timeout: Timeout in seconds for the build command.
 
     Returns:
         A tuple of (exit_code, output_text) where ``output_text`` is formatted according
@@ -335,6 +614,11 @@ def run_cmake(
     metrics: Dict[str, Any]
     preset_data: Optional[Dict[str, Any]] = None
     ninja_requested = bool(preset is None and ninja)
+    build_metrics: Optional[Dict[str, Any]] = None
+    build_output_text: Optional[str] = None
+    build_output: Optional[str] = None
+    build_truncated = False
+    build_truncation_notice = ""
 
     try:
         if preset:
@@ -362,10 +646,12 @@ def run_cmake(
         result = subprocess.run(
             cmd,
             capture_output=True,
-            text=True,
+            text=False,
             timeout=timeout,
         )
-        combined_output = result.stdout + ("\n" + result.stderr if result.stderr else "")
+        stdout_decoded = (result.stdout or b"").decode("utf-8", errors="replace")
+        stderr_decoded = (result.stderr or b"").decode("utf-8", errors="replace")
+        combined_output = stdout_decoded + ("\n" + stderr_decoded if stderr_decoded else "")
         metrics = parse_cmake_output(combined_output, exit_code=result.returncode)
 
         if ninja and not ninja_requested:
@@ -377,8 +663,8 @@ def run_cmake(
                 MESSAGE_CAPTURE_LIMIT,
             )
 
-        if preset and result.stderr:
-            lower_err = result.stderr.lower()
+        if preset and stderr_decoded:
+            lower_err = stderr_decoded.lower()
             if "preset" in lower_err and "not supported" in lower_err:
                 metrics["success"] = False
                 metrics["errors"] = metrics.get("errors", 0) + 1
@@ -390,8 +676,47 @@ def run_cmake(
 
         truncated_output, was_truncated, notice = _truncate_output(combined_output)
 
+        if build and metrics.get("success"):
+            build_dir_resolved = build_dir
+            build_preset = None
+            if preset and preset_data:
+                resolved_dir = _resolve_build_dir_from_preset(preset, preset_data)
+                if resolved_dir:
+                    build_dir_resolved = resolved_dir
+                build_preset = _find_build_preset(preset, preset_data)
+
+            if output_mode == "json":
+                build_exit_code, build_output_text, build_metrics = build_cmake(
+                    build_dir=build_dir_resolved,
+                    jobs=jobs,
+                    build_timeout=build_timeout,
+                    output_mode="json",
+                    build_preset=build_preset,
+                )
+                try:
+                    build_payload = json.loads(build_output_text)
+                except json.JSONDecodeError:
+                    build_payload = {
+                        "output": build_output_text,
+                        "truncated": False,
+                        "truncation_notice": "",
+                    }
+                build_output = build_payload.get("output")
+                build_truncated = bool(build_payload.get("truncated"))
+                build_truncation_notice = build_payload.get("truncation_notice", "")
+            else:
+                build_exit_code, build_output_text, build_metrics = build_cmake(
+                    build_dir=build_dir_resolved,
+                    jobs=jobs,
+                    build_timeout=build_timeout,
+                    output_mode=output_mode,
+                    build_preset=build_preset,
+                )
+
         if output_mode == "summary":
             output_text = format_summary(metrics, source_dir, build_dir)
+            if build_output_text:
+                output_text = f"{output_text}\n\n{build_output_text}"
         elif output_mode == "full":
             parts = [truncated_output]
             if was_truncated and notice:
@@ -399,6 +724,8 @@ def run_cmake(
             parts.append("")
             parts.append(format_summary(metrics, source_dir, build_dir))
             output_text = "\n".join(part for part in parts if part)
+            if build_output_text:
+                output_text = f"{output_text}\n\n{build_output_text}"
         elif output_mode == "json":
             payload = {
                 "metrics": metrics,
@@ -406,16 +733,31 @@ def run_cmake(
                 "truncated": was_truncated,
                 "truncation_notice": notice,
             }
+            if build_metrics is not None:
+                payload["build_metrics"] = build_metrics
+                payload["build_output"] = build_output
+                payload["build_truncated"] = build_truncated
+                payload["build_truncation_notice"] = build_truncation_notice
             output_text = json.dumps(payload, indent=2)
         else:
             raise ValueError(f"Unsupported output mode: {output_mode}")
 
         exit_code = 0 if metrics.get("success") else 1
+        if build and metrics.get("success") and build_metrics is not None:
+            exit_code = 0 if build_metrics.get("success") else 1
         return exit_code, output_text
 
     except subprocess.TimeoutExpired as exc:
-        partial_out = str(exc.stdout or "")
-        partial_err = str(exc.stderr or "")
+        raw_out = exc.stdout or b""
+        raw_err = exc.stderr or b""
+        if isinstance(raw_out, bytes):
+            partial_out = raw_out.decode("utf-8", errors="replace")
+        else:
+            partial_out = str(raw_out)
+        if isinstance(raw_err, bytes):
+            partial_err = raw_err.decode("utf-8", errors="replace")
+        else:
+            partial_err = str(raw_err)
         combined = (partial_out + "\n" + partial_err).strip()
         metrics = parse_cmake_output(combined, exit_code=1)
         metrics["success"] = False
@@ -491,6 +833,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--build-dir", type=str, default="build", help="Build directory")
     parser.add_argument("--ninja", action="store_true", help="Use Ninja generator")
     parser.add_argument("--timeout", type=int, default=300, help="Timeout in seconds")
+    parser.add_argument("--build", action="store_true", help="Run cmake --build after config")
+    parser.add_argument("--jobs", type=int, default=0, help="Parallel build jobs (0=auto)")
+    parser.add_argument("--build-timeout", type=int, default=1800, help="Build timeout in seconds")
     parser.add_argument("cmake_args", nargs="*", help="Additional CMake arguments")
     return parser
 
@@ -512,6 +857,9 @@ def main(argv: Optional[List[str]] = None) -> None:
         cmake_args=args.cmake_args,
         timeout=args.timeout,
         output_mode=args.output,
+        build=args.build,
+        jobs=args.jobs,
+        build_timeout=args.build_timeout,
     )
 
     print(output)

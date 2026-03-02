@@ -43,6 +43,11 @@
       "type": "workflow",
       "name": "Ship",
       "workflow_name": "ship"
+    },
+    {
+      "type": "workflow",
+      "name": "Review",
+      "workflow_name": "review"
     }
   ]
 }

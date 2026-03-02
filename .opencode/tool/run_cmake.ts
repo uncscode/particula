@@ -18,6 +18,9 @@ EXAMPLES:
 - Configure with Ninja: run_cmake({ ninja: true, sourceDir: "example_cpp_dev" })
 - Custom build dir: run_cmake({ sourceDir: ".", buildDir: "build/debug" })
 - With timeout: run_cmake({ preset: "default", timeout: 600 })
+- Configure and build: run_cmake({ preset: "debug", build: true })
+- Build with parallel jobs: run_cmake({ preset: "debug", build: true, jobs: 8 })
+- Custom build timeout: run_cmake({ preset: "release", build: true, buildTimeout: 3600 })
 - Full output: run_cmake({ preset: "debug", outputMode: "full" })
 - JSON output: run_cmake({ preset: "debug", outputMode: "json" })
 - Custom args: run_cmake({ cmakeArgs: ["-DCMAKE_BUILD_TYPE=Release"] })
@@ -46,6 +49,18 @@ Dependency: Backing script .opencode/tool/run_cmake.py from #1352 must be presen
       .boolean()
       .optional()
       .describe("Use Ninja generator (default: false). Ignored when preset is provided."),
+    build: tool.schema
+      .boolean()
+      .optional()
+      .describe("Run cmake --build after configuration (default: false)."),
+    jobs: tool.schema
+      .number()
+      .optional()
+      .describe("Parallel build jobs (default: 0 = auto). Only used when build is true."),
+    buildTimeout: tool.schema
+      .number()
+      .optional()
+      .describe("Build timeout in seconds (default: 1800 = 30 minutes). Only used when build is true."),
     timeout: tool.schema
       .number()
       .optional()
@@ -61,11 +76,35 @@ Dependency: Backing script .opencode/tool/run_cmake.py from #1352 must be presen
     const sourceDir = args.sourceDir || ".";
     const buildDir = args.buildDir || "build";
     const ninja = args.ninja || false;
-    const timeout = args.timeout || 300;
+    const timeout = args.timeout ?? 300;
+    const build = args.build || false;
+    const jobs = args.jobs ?? 0;
+    const buildTimeout = args.buildTimeout ?? 1800;
+    const buildTimeoutProvided = args.buildTimeout !== undefined;
     const cmakeArgs = args.cmakeArgs || [];
 
     if (timeout <= 0) {
       return `ERROR: Timeout must be positive (received ${timeout}).`;
+    }
+
+    const isFiniteInteger = (value: number) => Number.isFinite(value) && Number.isInteger(value);
+
+    if (build) {
+      if (!isFiniteInteger(jobs)) {
+        return `ERROR: jobs must be a finite integer (received ${jobs}).`;
+      }
+
+      if (jobs < 0) {
+        return `ERROR: jobs must be non-negative (received ${jobs}).`;
+      }
+
+      if (!isFiniteInteger(buildTimeout)) {
+        return `ERROR: buildTimeout must be a finite integer (received ${buildTimeout}).`;
+      }
+
+      if (buildTimeout <= 0) {
+        return `ERROR: buildTimeout must be positive (received ${buildTimeout}).`;
+      }
     }
 
     const cmdParts = [
@@ -86,7 +125,19 @@ Dependency: Backing script .opencode/tool/run_cmake.py from #1352 must be presen
     }
 
     if (cmakeArgs.length > 0) {
-      cmdParts.push(...cmakeArgs);
+      cmdParts.push("--", ...cmakeArgs);
+    }
+
+    if (build) {
+      cmdParts.push("--build");
+    }
+
+    if (build && jobs > 0) {
+      cmdParts.push(`--jobs=${jobs}`);
+    }
+
+    if (build && (buildTimeoutProvided || buildTimeout !== 1800)) {
+      cmdParts.push(`--build-timeout=${buildTimeout}`);
     }
 
     try {

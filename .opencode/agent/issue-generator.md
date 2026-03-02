@@ -72,10 +72,51 @@ testing policy.
 
 ## Step 1: Parse Input
 
+### Workflow Invocation (type:generate)
+
+When invoked by the `generate` workflow, the agent receives only the issue number
+plus flags (e.g., `1826 --adw-id <id>`). Detect workflow mode when there is
+exactly one non-flag argument and it is numeric, and all other arguments are
+flags. If any non-flag argument is a path, URL, or inline text, use the direct
+invocation flow below.
+
+1. Fetch the issue body via `platform_operations`:
+
+   ```python
+   platform_operations({
+     "command": "fetch-issue",
+     "issue_number": "<issue_number>",
+     "output_format": "json"
+   })
+   ```
+
+2. Parse the issue body using the expected `type:generate` template format
+   (see `.opencode/agent/epic-to-issues.md` for the canonical structure):
+
+   - Locate the `## Feature Plan` section and extract the backticked path from
+     the line that starts with `**Document:** ` and includes the document path.
+   - Locate the `## Phases to Generate` table and count **data rows only**
+     (exclude header and separator rows). Treat any row with a non-empty Phase ID
+     column as a data row.
+
+3. Set values explicitly: `source = <document_path>` and `total = <phase_count>`.
+   Then continue to Step 2 unchanged.
+
+4. Validate:
+   - Use `read` to confirm the document path exists (repo-relative path).
+   - Require `phase_count > 0`.
+
+5. On parsing or validation failure, report a clear error that includes the
+   issue number and issue URL (from the JSON payload, e.g., `html_url`), then
+   halt.
+
 - Accept input as a source path, URL, or inline text.
 - Determine total issues to create (from checklist or explicit count).
 - Optional `--adw-id` enables resume. If provided, read `batch-summary` and skip
   completed stages based on batch metadata.
+
+When workflow invocation is detected, `source` and `total` are derived from the
+fetched issue body, then the same Step 2 batch-init path applies.
 
 ## Step 2: Initialize Batch
 

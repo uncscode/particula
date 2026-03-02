@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { beforeEach, describe, it, mock } from "node:test";
+import { afterEach, beforeEach, describe, it, mock } from "bun:test";
 
 const createSchema = (kind: string, extras: Record<string, unknown> = {}) => {
   return {
@@ -33,6 +33,8 @@ let executionBehavior: { kind: "success"; output?: string } | { kind: "error"; e
   kind: "success",
 };
 let lastCommand: (string | number)[] = [];
+const bunGlobal = (globalThis as any).Bun as { $?: unknown } | undefined;
+const originalDollar = bunGlobal?.$;
 
 const setExecutionSuccess = (output?: string) => {
   executionBehavior = { kind: "success", output };
@@ -42,8 +44,9 @@ const setExecutionError = (error: any) => {
   executionBehavior = { kind: "error", error };
 };
 
-(globalThis as any).Bun = {
-  $: (_strings: TemplateStringsArray, ...values: unknown[]) => {
+const mockBunDollar = () => {
+  const bun = (globalThis as any).Bun as { $?: unknown } | undefined;
+  const replacement = (_strings: TemplateStringsArray, ...values: unknown[]) => {
     const parts = (values[0] || []) as (string | number)[];
     lastCommand = parts;
     return {
@@ -57,7 +60,47 @@ const setExecutionError = (error: any) => {
         return parts.join(" ");
       },
     };
-  },
+  };
+
+  if (!bun) {
+    (globalThis as any).Bun = { $: replacement };
+    return;
+  }
+
+  try {
+    bun.$ = replacement;
+  } catch (error) {
+    try {
+      Object.defineProperty(bun, "$", {
+        value: replacement,
+        configurable: true,
+        writable: true,
+      });
+    } catch (innerError) {
+      throw error ?? innerError;
+    }
+  }
+};
+
+const restoreBunDollar = () => {
+  const bun = (globalThis as any).Bun as { $?: unknown } | undefined;
+  if (!bun || originalDollar === undefined) {
+    return;
+  }
+
+  try {
+    bun.$ = originalDollar;
+  } catch {
+    try {
+      Object.defineProperty(bun, "$", {
+        value: originalDollar,
+        configurable: true,
+        writable: true,
+      });
+    } catch {
+      // Ignore restore failures; tests only rely on the mocked behavior.
+    }
+  }
 };
 
 const runCmakeTool = (await import("../run_cmake")).default as {
@@ -70,12 +113,18 @@ describe("run_cmake tool", () => {
   beforeEach(() => {
     setExecutionSuccess();
     lastCommand = [];
+    mockBunDollar();
+  });
+
+  afterEach(() => {
+    restoreBunDollar();
   });
 
   it("includes key description notes and examples", () => {
     assert.ok(runCmakeTool.description.includes("CMake"));
     assert.ok(runCmakeTool.description.includes("EXAMPLES"));
     assert.ok(runCmakeTool.description.includes("IMPORTANT"));
+    assert.ok(runCmakeTool.description.includes("build"));
     assert.ok(runCmakeTool.description.includes("Ninja"));
     assert.ok(runCmakeTool.description.includes("Dependency"));
   });
@@ -88,8 +137,14 @@ describe("run_cmake tool", () => {
     assert.ok(args.sourceDir);
     assert.ok(args.buildDir);
     assert.ok(args.ninja);
+    assert.ok(args.build);
+    assert.ok(args.jobs);
+    assert.ok(args.buildTimeout);
     assert.ok(args.timeout);
     assert.ok(String(args.timeout.description || "").toLowerCase().includes("positive"));
+    assert.ok(String(args.build.description || "").toLowerCase().includes("build"));
+    assert.ok(String(args.jobs.description || "").toLowerCase().includes("jobs"));
+    assert.ok(String(args.buildTimeout.description || "").toLowerCase().includes("build"));
     assert.ok(args.cmakeArgs);
   });
 
@@ -109,6 +164,7 @@ describe("run_cmake tool", () => {
     assert.ok(lastCommand.includes("--source-dir=src"));
     assert.ok(lastCommand.includes("--build-dir=build-dir"));
     assert.ok(lastCommand.includes("--ninja"));
+    assert.ok(lastCommand.includes("--"));
     assert.ok(lastCommand.includes("-DTEST=ON"));
     assert.ok(!lastCommand.some((part) => String(part).startsWith("--preset=")));
   });
@@ -135,6 +191,20 @@ describe("run_cmake tool", () => {
     assert.ok(!lastCommand.some((part) => String(part).startsWith("--source-dir")));
     assert.ok(!lastCommand.some((part) => String(part).startsWith("--build-dir")));
     assert.ok(!lastCommand.includes("--ninja"));
+  });
+
+  it("includes build flags when requested", async () => {
+    await runCmakeTool.execute({ preset: "debug", build: true, jobs: 8, buildTimeout: 3600 });
+
+    assert.ok(lastCommand.includes("--build"));
+    assert.ok(lastCommand.includes("--jobs=8"));
+    assert.ok(lastCommand.includes("--build-timeout=3600"));
+  });
+
+  it("omits jobs when build is false", async () => {
+    await runCmakeTool.execute({ preset: "debug", build: false, jobs: 12 });
+
+    assert.ok(!lastCommand.some((part) => String(part).startsWith("--jobs=")));
   });
 
   it("returns fallback message when stdout is empty", async () => {
@@ -185,6 +255,34 @@ describe("run_cmake tool", () => {
     const result = await runCmakeTool.execute({ timeout: 0 });
 
     assert.ok(result.includes("Timeout must be positive"));
+    assert.equal(lastCommand.length, 0);
+  });
+
+  it("rejects non-integer jobs", async () => {
+    const result = await runCmakeTool.execute({ build: true, jobs: 1.5 });
+
+    assert.ok(result.includes("jobs must be a finite integer"));
+    assert.equal(lastCommand.length, 0);
+  });
+
+  it("rejects negative jobs", async () => {
+    const result = await runCmakeTool.execute({ build: true, jobs: -1 });
+
+    assert.ok(result.includes("jobs must be non-negative"));
+    assert.equal(lastCommand.length, 0);
+  });
+
+  it("rejects non-positive build timeout", async () => {
+    const result = await runCmakeTool.execute({ build: true, buildTimeout: 0 });
+
+    assert.ok(result.includes("buildTimeout must be positive"));
+    assert.equal(lastCommand.length, 0);
+  });
+
+  it("rejects non-integer build timeout", async () => {
+    const result = await runCmakeTool.execute({ build: true, buildTimeout: 12.5 });
+
+    assert.ok(result.includes("buildTimeout must be a finite integer"));
     assert.equal(lastCommand.length, 0);
   });
 });

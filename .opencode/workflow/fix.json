@@ -1,16 +1,16 @@
 {
-  "name": "pr-fix",
+  "name": "fix",
   "version": "2.0.0",
   "description": "PR Fix workflow: analyze comments -> build -> validate -> polish -> test -> format -> ship-fix",
   "description_long": "Direct PR fix workflow triggered by request:fix label. Analyzes actionable review comments, generates fix plan, implements changes, validates, polishes, tests, formats, and ships fixes without creating intermediate GitHub issues.",
-  "workflow_type": "custom",
+  "workflow_type": "fix",
   "steps": [
     {
       "type": "agent",
       "name": "Analyze PR Comments",
       "description": "Analyze actionable PR review comments and generate implementation plan",
       "agent": "pr-comment-analyzer",
-      "prompt": "Analyze PR review comments and generate fix plan.\n\npr_number=$ARGUMENTS\nadw_id=${adw_id}\n\nSteps:\n1. Fetch actionable comments via platform pr-comments\n2. Group by file/line with reviewer attribution\n3. Generate implementation plan\n4. Write to spec_content",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id} --pr-number ${pr_number}",
       "model": "base",
       "timeout": 600,
       "retry": {

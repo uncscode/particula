@@ -57,6 +57,10 @@ Take consolidated review findings and:
 ```
 Arguments: pr_number={pr_number}
 
+Note: `pr_number` is the orchestrator-resolved PR number and may differ from the
+original argument when workflow state provides a PR. The probe only validates
+that the provided number is already a PR; it does not map an issue to a PR.
+
 Consolidated Findings:
 {consolidated_review_output}
 
