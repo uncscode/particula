@@ -22,6 +22,18 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 | F2 | [Rectangular Wall Loss Strategy](rectangular-wall-loss-strategy.md) | In Progress | P2 | 1 |
 | F3 | [Charged/Electrostatic Wall Loss Strategy](charged-wall-loss-strategy.md) | In Progress | P1 | 2 |
 
+### Epic E5: Non-Isothermal Condensation with Latent Heat
+
+| ID | Name | Status | Priority | Phases |
+|----|------|--------|----------|--------|
+| E5-F1 | Latent Heat Strategy Pattern | Planning | P1 | 4 |
+| E5-F2 | Non-Isothermal Mass Transfer Functions | Planning | P1 | 3 |
+| E5-F3 | CondensationLatentHeat Strategy Class | Planning | P1 | 5 |
+| E5-F4 | Builder, Factory, and Exports | Planning | P1 | 2 |
+| E5-F5 | Validation and Integration Tests | Planning | P1 | 2 |
+| E5-F6 | Documentation and Examples | Planning | P2 | 3 |
+| E5-F7 | Warp/GPU Translation (Follow-on) | Planning | P2 | 3 |
+
 ### Standalone Features (End-to-End Simulation Notebooks)
 
 | ID | Name | Status | Priority | Phases |

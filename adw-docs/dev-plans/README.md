@@ -39,6 +39,16 @@ and rollout.
   - Features: [E4-F1][e4-f1], [E4-F2][e4-f2], [E4-F3][e4-f3], [E4-F4][e4-f4],
     [E4-F5][e4-f5], [E4-F6][e4-f6], [E4-F7][e4-f7], [E4-F8][e4-f8], [E4-F9][e4-f9]
 
+- [E5: Non-Isothermal Condensation with Latent Heat][epic-e5]
+  — Status: Planning
+  - Scope: Non-isothermal condensation strategy accounting for latent heat of
+    vaporization during mass transfer. Includes latent heat strategy pattern
+    (constant, linear, power-law), thermal resistance correction on mass
+    transfer rate, energy tracking to gas phase, and builder/factory
+    integration. Python-native first, Warp/GPU follow-on.
+  - Features: [E5-F1][e5-f1], [E5-F2][e5-f2], [E5-F3][e5-f3], [E5-F4][e5-f4],
+    [E5-F5][e5-f5], [E5-F6][e5-f6], [E5-F7][e5-f7]
+
 ## Feature Plans
 
 ### Epic E1: Staggered Condensation Features
@@ -57,6 +67,29 @@ and rollout.
   - Scope: Benchmark tests for stability and performance characteristics (P2 performance benchmarks landed; issue #137).
 - [E1-F6: Documentation and Examples][e1-f6] — Status: Completed (P3)
   - Scope: Docstrings, Jupyter notebook examples, and dev-docs updates.
+
+### Epic E5: Non-Isothermal Condensation Features
+
+- [E5-F1: Latent Heat Strategy Pattern][e5-f1] — Status: Planning
+  - Scope: `LatentHeatStrategy` ABC with constant, linear, and power-law
+    implementations plus builder/factory integration.
+- [E5-F2: Non-Isothermal Mass Transfer Functions][e5-f2] — Status: Planning
+  - Scope: Thermal resistance factor and non-isothermal mass transfer rate
+    pure functions with energy tracking.
+- [E5-F3: CondensationLatentHeat Strategy Class][e5-f3] — Status: Planning
+  - Scope: New condensation strategy with latent heat correction and energy
+    diagnostics.
+- [E5-F4: Builder, Factory, and Exports][e5-f4] — Status: Planning
+  - Scope: Builder, factory registration, and namespace exports for latent
+    heat condensation.
+- [E5-F5: Validation and Integration Tests][e5-f5] — Status: Planning
+  - Scope: Mass conservation, isothermal parity, and physical validation
+    tests.
+- [E5-F6: Documentation and Examples][e5-f6] — Status: Planning
+  - Scope: Docstrings, notebook examples, and dev-docs updates.
+- [E5-F7: Warp/GPU Translation][e5-f7] — Status: Planning
+  - Scope: GPU kernel translation of latent heat functions and condensation
+    step.
 
 ### Standalone Features (Wall Loss)
 
@@ -137,6 +170,7 @@ and rollout.
 [epic-e1]: epics/completed/E1-staggered-condensation-stepping.md
 [epic-e3]: epics/E3-data-representation-refactor.md
 [epic-e4]: epics/E4-probabilistic-particle-resolved.md
+[epic-e5]: epics/E5-non-isothermal-condensation.md
 
 <!-- E3 Feature Links -->
 [e3-f1]: features/E3-F1-particle-data-container.md
@@ -162,6 +196,15 @@ and rollout.
 [e4-f7]: features/E4-F7-builder-factory.md
 [e4-f8]: features/E4-F8-representation-conversion.md
 [e4-f9]: features/E4-F9-documentation-examples.md
+
+<!-- E5 Feature Links -->
+[e5-f1]: features/E5-F1-latent-heat-strategy.md
+[e5-f2]: features/E5-F2-non-isothermal-mass-transfer.md
+[e5-f3]: features/E5-F3-condensation-latent-heat-strategy.md
+[e5-f4]: features/E5-F4-builder-factory-exports.md
+[e5-f5]: features/E5-F5-validation-integration-tests.md
+[e5-f6]: features/E5-F6-documentation-examples.md
+[e5-f7]: features/E5-F7-warp-gpu-translation.md
 
 <!-- Standalone Feature Links -->
 [plan-wall-loss-builders]: features/wall-loss-builders-factory.md

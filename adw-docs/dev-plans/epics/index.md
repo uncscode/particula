@@ -9,6 +9,7 @@ maintenance tasks toward a larger goal.
 |----|------|--------|----------|----------|
 | E3 | [Data Representation Refactor for Extensibility and GPU Backends](E3-data-representation-refactor.md) | Planning | P1 | 4 |
 | E4 | [Probabilistic Particle-Resolved Representation](E4-probabilistic-particle-resolved.md) | Planning | P1 | 9 |
+| E5 | [Non-Isothermal Condensation with Latent Heat](E5-non-isothermal-condensation.md) | Planning | P1 | 7 |
 
 ## Completed Epics
 
@@ -19,4 +20,4 @@ maintenance tasks toward a larger goal.
 
 ## Next Available ID
 
-**E5**
+**E6**
