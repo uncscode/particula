@@ -39,6 +39,14 @@ def test_constant_type_consistency():
     assert isinstance(array_result, np.ndarray)
 
 
+def test_constant_zero_dimensional_array_returns_scalar():
+    """Return float for 0-D NumPy array input."""
+    strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
+    result = strategy.latent_heat(np.array(298.15))
+    assert isinstance(result, float)
+    assert result == pytest.approx(2.26e6)
+
+
 @pytest.mark.parametrize("latent_heat_ref", [2.26e6, 8.46e5])
 def test_constant_different_values(latent_heat_ref):
     """Support different constant latent heat values."""
@@ -52,3 +60,10 @@ def test_constant_edge_cases_empty_and_zero_temperature():
     empty_result = strategy.latent_heat(np.array([]))
     npt.assert_array_equal(empty_result, np.array([], dtype=np.float64))
     assert strategy.latent_heat(0.0) == pytest.approx(2.26e6)
+
+
+@pytest.mark.parametrize("latent_heat_ref", [0.0, -1.0, np.nan, np.inf])
+def test_constant_latent_heat_ref_validation(latent_heat_ref):
+    """Reject non-positive or non-finite latent heat references."""
+    with pytest.raises(ValueError, match="latent_heat_ref"):
+        ConstantLatentHeat(latent_heat_ref=latent_heat_ref)

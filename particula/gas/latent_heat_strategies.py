@@ -10,6 +10,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.util.validate_inputs import validate_inputs
+
 
 class LatentHeatStrategy(ABC):
     """Abstract base class for latent heat calculations.
@@ -38,15 +40,26 @@ class ConstantLatentHeat(LatentHeatStrategy):
     Attributes:
         latent_heat_ref: Reference latent heat in J/kg returned by the
             strategy.
+
+    Examples:
+        ```py title="ConstantLatentHeat usage example"
+        import numpy as np
+        from particula.gas.latent_heat_strategies import ConstantLatentHeat
+
+        strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
+        print(strategy.latent_heat(298.15))
+        print(strategy.latent_heat(np.array([280.0, 300.0])))
+        ```
     """
 
+    @validate_inputs({"latent_heat_ref": "positive"})
     def __init__(self, latent_heat_ref: float) -> None:
         """Initialize the constant latent heat strategy.
 
         Args:
             latent_heat_ref: Reference latent heat in J/kg.
         """
-        self.latent_heat_ref = latent_heat_ref
+        self.latent_heat_ref: float = latent_heat_ref
 
     def latent_heat(
         self, temperature: float | NDArray[np.float64]
@@ -61,10 +74,11 @@ class ConstantLatentHeat(LatentHeatStrategy):
             Latent heat in J/kg. Returns a scalar for scalar input or an array
             matching the input shape.
         """
-        if np.isscalar(temperature):
+        temperature_array = np.asarray(temperature, dtype=np.float64)
+        if temperature_array.shape == ():
             return float(self.latent_heat_ref)
         return np.full_like(
-            np.asarray(temperature, dtype=np.float64),
+            temperature_array,
             self.latent_heat_ref,
             dtype=np.float64,
         )
