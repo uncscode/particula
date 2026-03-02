@@ -1,7 +1,8 @@
 """Latent heat strategies for gas species.
 
 Latent heat values are expressed in J/kg for per-species mass-based
-calculations.
+calculations. Strategies return scalars for scalar temperature inputs and
+arrays matching the input shape for array temperature inputs.
 """
 
 from abc import ABC, abstractmethod
@@ -14,7 +15,7 @@ class LatentHeatStrategy(ABC):
     """Abstract base class for latent heat calculations.
 
     Subclasses implement :meth:`latent_heat` to return the latent heat of
-    vaporization for the specified temperature input.
+    vaporization in J/kg for scalar or array temperature inputs.
     """
 
     @abstractmethod
@@ -27,12 +28,17 @@ class LatentHeatStrategy(ABC):
             temperature: Temperature in Kelvin.
 
         Returns:
-            Latent heat of vaporization in J/kg.
+            Latent heat of vaporization in J/kg with shape matching the input.
         """
 
 
 class ConstantLatentHeat(LatentHeatStrategy):
-    """Latent heat strategy that returns a constant value."""
+    """Latent heat strategy that returns a constant value.
+
+    Attributes:
+        latent_heat_ref: Reference latent heat in J/kg returned by the
+            strategy.
+    """
 
     def __init__(self, latent_heat_ref: float) -> None:
         """Initialize the constant latent heat strategy.
@@ -48,10 +54,12 @@ class ConstantLatentHeat(LatentHeatStrategy):
         """Return a constant latent heat value.
 
         Args:
-            temperature: Temperature in Kelvin.
+            temperature: Temperature in Kelvin. Accepted for interface
+                consistency.
 
         Returns:
-            Latent heat in J/kg with scalar or array shape matching input.
+            Latent heat in J/kg. Returns a scalar for scalar input or an array
+            matching the input shape.
         """
         if np.isscalar(temperature):
             return float(self.latent_heat_ref)

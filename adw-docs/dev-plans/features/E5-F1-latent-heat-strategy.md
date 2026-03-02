@@ -1,12 +1,12 @@
 # Feature E5-F1: Latent Heat Strategy Pattern
 
 **Parent Epic**: [E5: Non-Isothermal Condensation with Latent Heat](../epics/E5-non-isothermal-condensation.md)
-**Status**: Planning
+**Status**: In Progress
 **Priority**: P1
 **Owners**: @Gorkowski
-**Start Date**: TBD
+**Start Date**: 2026-03-01
 **Target Date**: TBD
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-01
 **Size**: Medium (4 phases)
 
 ## Summary
@@ -95,9 +95,9 @@ get_builders() -> {
 
 ## Phase Checklist
 
-- [ ] **E5-F1-P1**: Create `LatentHeatStrategy` ABC and `ConstantLatentHeat`
+- [x] **E5-F1-P1**: Create `LatentHeatStrategy` ABC and `ConstantLatentHeat`
   with tests
-  - Issue: TBD | Size: S (~60 LOC) | Status: Not Started
+  - Issue: #1122 | Size: S (~60 LOC) | Status: Complete
   - File: `particula/gas/latent_heat_strategies.py`
   - ABC: `LatentHeatStrategy` with abstract method
     `latent_heat(temperature) -> float | NDArray`
@@ -200,3 +200,4 @@ get_builders() -> {
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
+| 2026-03-01 | Completed E5-F1-P1 (ABC + constant strategy + tests) | ADW |

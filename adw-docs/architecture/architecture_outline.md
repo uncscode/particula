@@ -2,7 +2,7 @@
 
 **Project:** particula
 **Version:** 0.2.6
-**Last Updated:** 2025-12-02
+**Last Updated:** 2026-03-02
 
 ## Purpose
 
@@ -172,6 +172,7 @@ particula/
 │   ├── species.py          # GasSpecies class
 │   ├── species_builders.py
 │   ├── species_factories.py
+│   ├── latent_heat_strategies.py    # Strategy pattern for latent heat
 │   ├── vapor_pressure_strategies.py  # Strategy pattern for vapor pressure
 │   ├── vapor_pressure_builders.py
 │   └── vapor_pressure_factories.py

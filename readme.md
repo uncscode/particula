@@ -93,6 +93,9 @@ particula/
 - **Flexible Representations** — Discrete bins, continuous PDF, particle-resolved
 - **Builder Pattern** — Clean, validated object construction with unit conversion
 - **Composable Processes** — Chain runnables with `|` operator
+- **Latent Heat Strategies** — Gas-phase latent heat strategies
+  (constant) available via `particula.gas.latent_heat_strategies`
+  for upcoming non-isothermal workflows
 
 ## Citation
 
