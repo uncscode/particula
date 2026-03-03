@@ -5,7 +5,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-02
 **Target Date**: TBD
-**Last Updated**: 2026-03-03
+**Last Updated**: 2026-03-02
 **Size**: Medium (7 features, ~22 phases)
 
 ## Vision
@@ -134,9 +134,8 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
   - Tests: `particula/gas/tests/latent_heat_strategies_test.py`
   - Test constant returns correct value, array broadcasting, type consistency
 
-- [x] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
+- [ ] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
   with tests
-  - Issue: #1123 | Size: M (~80 LOC) | Status: Complete
   - `LinearLatentHeat(latent_heat_ref, slope, temperature_ref)`:
     `L(T) = L_ref - slope * (T - T_ref)`
   - `PowerLawLatentHeat(latent_heat_ref, critical_temperature, beta)`:
@@ -146,7 +145,6 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
   - Tests: array input, scalar input, edge cases
 
 - [ ] **E5-F1-P3**: Add latent heat builders with tests
-  - Issue: #1124 | Size: M (~90 LOC) | Status: In Progress
   - File: `particula/gas/latent_heat_builders.py`
   - Follow `VaporPressureBuilder` pattern (see
     `particula/gas/vapor_pressure_builders.py` for reference)
