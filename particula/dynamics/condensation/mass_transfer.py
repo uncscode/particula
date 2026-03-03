@@ -207,18 +207,18 @@ def get_thermal_resistance_factor(
     molar mass M [kg/mol]. When latent_heat is zero, the factor
     reduces to r_specific * temperature.
 
-    Args:
-        diffusion_coefficient: The vapor diffusion coefficient D [m²/s].
-        latent_heat: Latent heat of vaporization L [J/kg].
-        vapor_pressure_surface: Equilibrium vapor pressure at the
+    Arguments:
+        - diffusion_coefficient : The vapor diffusion coefficient D [m²/s].
+        - latent_heat : Latent heat of vaporization L [J/kg].
+        - vapor_pressure_surface : Equilibrium vapor pressure at the
             surface [Pa].
-        thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
-        temperature: Temperature T [K].
-        molar_mass: Molar mass M [kg/mol].
+        - thermal_conductivity : Gas thermal conductivity kappa [W/(m·K)].
+        - temperature : Temperature T [K].
+        - molar_mass : Molar mass M [kg/mol].
 
     Returns:
-        Thermal resistance factor for non-isothermal mass transfer,
-        matching the broadcasted input shape.
+        Thermal resistance factor for non-isothermal mass transfer
+        [J/kg], matching the broadcasted input shape.
 
     Raises:
         ValueError: If any validated inputs violate positive/nonnegative
@@ -228,16 +228,27 @@ def get_thermal_resistance_factor(
         - Topping, D., & Bane, M. (2022). Introduction to Aerosol
           Modelling. Equation 2.36.
     """
+    diffusion_coefficient = np.asarray(diffusion_coefficient)
+    latent_heat = np.asarray(latent_heat)
+    vapor_pressure_surface = np.asarray(vapor_pressure_surface)
+    thermal_conductivity = np.asarray(thermal_conductivity)
+    temperature = np.asarray(temperature)
+    molar_mass = np.asarray(molar_mass)
+
+    inv_temperature = 1.0 / temperature
     r_specific = GAS_CONSTANT / molar_mass
-    thermal_factor = (
+    diffusion_term = (
         diffusion_coefficient
         * latent_heat
         * vapor_pressure_surface
-        / (thermal_conductivity * temperature)
-    ) * (latent_heat / (r_specific * temperature) - 1.0) + (
+        * inv_temperature
+        / thermal_conductivity
+    )
+    correction_term = latent_heat * inv_temperature / r_specific - 1.0
+    thermal_factor = diffusion_term * correction_term + (
         r_specific * temperature
     )
-    return np.array(thermal_factor, dtype=np.float64)
+    return np.asarray(thermal_factor, dtype=np.float64)
 
 
 @validate_inputs(

@@ -8,7 +8,7 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_of_multiple_species,
     get_mass_transfer_of_single_species,
     get_mass_transfer_rate,
-    get_radius_transfer_rate,  # Import the function to be tested
+    get_radius_transfer_rate,
     get_thermal_resistance_factor,
 )
 from particula.util.constants import GAS_CONSTANT
@@ -107,6 +107,26 @@ def test_thermal_resistance_factor_water_293k():
     np.testing.assert_allclose(result, expected, rtol=1e-6)
 
 
+def test_thermal_resistance_factor_reference_value():
+    """Lock a reference value to confirm sign and scale behavior."""
+    diffusion_coefficient = 1.0
+    latent_heat = 1.0
+    vapor_pressure_surface = 1.0
+    thermal_conductivity = 1.0
+    temperature = 1.0
+    molar_mass = 1.0
+    expected = 7.43473497315324
+    result = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    np.testing.assert_allclose(result, expected, rtol=1e-9)
+
+
 def test_thermal_resistance_factor_array_broadcasting():
     """Verify array inputs broadcast and preserve shape."""
     diffusion_coefficient = 2.5e-5
@@ -136,6 +156,25 @@ def test_thermal_resistance_factor_array_broadcasting():
         molar_mass=molar_mass,
     )
     assert np.asarray(result_2d).shape == latent_heat_2d.shape
+
+
+def test_thermal_resistance_factor_temperature_molar_mass_broadcasting():
+    """Ensure temperature and molar mass arrays broadcast correctly."""
+    diffusion_coefficient = 2.5e-5
+    latent_heat = 2.454e6
+    vapor_pressure_surface = 2339.0
+    thermal_conductivity = 0.0257
+    temperature = np.array([285.0, 293.0])
+    molar_mass = np.array([[0.018015], [0.02897]])
+    result = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    assert np.asarray(result).shape == (2, 2)
 
 
 @pytest.mark.parametrize("latent_heat", [1.0e6, 2.0e6, 2.454e6])
