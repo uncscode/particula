@@ -32,6 +32,19 @@ const JSON_CAPABLE_COMMANDS = new Set([
   "rate-limit",
 ]);
 
+const PREFER_SCOPE_COMMANDS = [
+  "fetch-issue",
+  "update-issue",
+  "add-labels",
+  "remove-labels",
+  "comment",
+  "pr-comments",
+  "rate-limit",
+] as const;
+
+const PREFER_SCOPE_COMMAND_SET = new Set(PREFER_SCOPE_COMMANDS);
+const PREFER_SCOPE_COMMAND_LIST = PREFER_SCOPE_COMMANDS.join(", ");
+
  type PlatformCommand =
    | "create-pr"
    | "fetch-issue"
@@ -159,6 +172,7 @@ REQUIRED PARAMETERS BY COMMAND:
 • fetch-issue: issue_number (required), optional: output_format, prefer_scope
 • create-issue: title (required), optional: body, labels, output_format
 • update-issue: issue_number (required), at least one of: title, body, state, labels
+  (required), optional: prefer_scope (routing hint, not an update field)
 • add-labels: issue_number, labels (required), optional: output_format
 • remove-labels: issue_number, labels (required), optional: output_format
 • comment: issue_number, body (required)
@@ -288,7 +302,7 @@ EXAMPLE: output_format: "json"`),
       .optional()
       .describe(`Repository scope preference.
 
-APPLIES TO: fetch-issue, pr-comments, rate-limit
+APPLIES TO: ${PREFER_SCOPE_COMMAND_LIST}
 
 For fork workflows where issues live upstream but PRs are on fork.
 
@@ -334,9 +348,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
       }
     }
 
-    if (args.prefer_scope && !["fetch-issue", "pr-comments", "rate-limit"].includes(command)) {
+    if (args.prefer_scope && !PREFER_SCOPE_COMMAND_SET.has(command)) {
       return buildMissingArgMessage(
-        "'prefer_scope' is only supported for 'fetch-issue', 'pr-comments', and 'rate-limit' commands"
+        `'prefer_scope' is only supported for ${PREFER_SCOPE_COMMAND_LIST} commands`
       );
     }
 
@@ -408,6 +422,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
         if (labelsProvided) {
           cmdParts.push("--labels", args.labels as string);
         }
+        if (args.prefer_scope) {
+          cmdParts.push("--prefer-scope", args.prefer_scope);
+        }
         if (args.output_format) {
           cmdParts.push("--format", outputFormat);
         }
@@ -448,6 +465,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
           return buildMissingArgMessage("'labels' is required and must contain at least one label (comma-separated)");
         }
         cmdParts.push(args.issue_number as string, "--labels", args.labels as string);
+        if (args.prefer_scope) {
+          cmdParts.push("--prefer-scope", args.prefer_scope);
+        }
         if (args.output_format) {
           cmdParts.push("--format", outputFormat);
         }
@@ -459,6 +479,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
           return buildMissingArgMessage("'labels' is required and must contain at least one label (comma-separated)");
         }
         cmdParts.push(args.issue_number as string, "--labels", args.labels as string);
+        if (args.prefer_scope) {
+          cmdParts.push("--prefer-scope", args.prefer_scope);
+        }
         if (args.output_format) {
           cmdParts.push("--format", outputFormat);
         }
@@ -470,6 +493,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
           return buildMissingArgMessage("'body' is required for command 'comment'");
         }
         cmdParts.push(args.issue_number as string, "--body", args.body);
+        if (args.prefer_scope) {
+          cmdParts.push("--prefer-scope", args.prefer_scope);
+        }
         break;
       }
 

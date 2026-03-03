@@ -112,15 +112,21 @@ invocation flow below.
 
 - Accept input as a source path, URL, or inline text.
 - Determine total issues to create (from checklist or explicit count).
-- Optional `--adw-id` enables resume. If provided, read `batch-summary` and skip
-  completed stages based on batch metadata.
+- Optional `--adw-id` enables resume. If provided, call `batch-read` first to
+  determine whether a batch exists and is populated; use `batch-summary` only
+  after batch existence is confirmed to inspect progress.
 
 When workflow invocation is detected, `source` and `total` are derived from the
 fetched issue body, then the same Step 2 batch-init path applies.
 
 ## Step 2: Initialize Batch
 
-Call `adw_issues_spec` to initialize batch state and capture the returned `adw_id`:
+Decide whether to initialize based on `batch-read` results. Do not initialize on
+generic read errors; only initialize when the batch is explicitly missing or
+empty.
+
+**No `adw_id` provided:** run `batch-init` without `adw_id` and capture the
+returned/generated id for subsequent steps.
 
 ```python
 adw_issues_spec({
@@ -130,7 +136,17 @@ adw_issues_spec({
 })
 ```
 
-When resuming with an existing `adw_id`, skip this step.
+**`adw_id` provided:** call `batch-read` first to determine state:
+
+- **Populated batch:** at least one issue entry contains non-empty metadata or
+  any section content. Treat this as resume and **skip `batch-init`**.
+- **Empty batch:** issues exist but all entries are empty (no metadata and no
+  section content). Run `batch-init` **with the provided `adw_id`** and proceed
+  with the normal pipeline.
+- **Missing batch error:** run `batch-init` **with the provided `adw_id`** and
+  proceed with the normal pipeline.
+- **Other errors:** stop and report the error; do not auto-init on generic
+  failures.
 
 ## Step 3: Draft Issues
 
@@ -400,12 +416,23 @@ Resume issue creation for adw_id=f28a1b2c
 ```
 
 **Process:**
-1. Call `batch-summary` to check state
-2. See that draft is complete, all 5 reviews are complete, issues 1-2 created, issue 3 pending
-3. Skip steps 2-4 entirely
-4. Skip creating issues 1-2 (already have `github_issue_number`)
-5. Create issue 3 only
-6. Verify and report
+1. Call `batch-read` to determine whether the batch exists and is populated.
+2. **If populated:** call `batch-summary` to inspect state.
+   - See that draft is complete, all 5 reviews are complete, issues 1-2 created,
+     issue 3 pending.
+   - Skip steps 2-4 entirely.
+   - Skip creating issues 1-2 (already have `github_issue_number`).
+   - Create issue 3 only.
+   - Verify and report.
+3. **If empty or missing:** run `batch-init` with the provided `adw_id`, then
+   continue the normal pipeline from Step 3.
+
+# Validation Script Coverage Note
+
+- This change only updates prompt text. The wrapper
+  `scripts/validate_agent_references.sh` is not modified here, so any smoke test
+  additions for that script are deferred to a future PR that changes the
+  wrapper itself.
 
 # Quality Standards
 
