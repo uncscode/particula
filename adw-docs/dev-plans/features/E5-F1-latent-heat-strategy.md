@@ -6,7 +6,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-01
 **Target Date**: TBD
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-03
 **Size**: Medium (4 phases)
 
 ## Summary
@@ -145,7 +145,7 @@ get_builders() -> {
   - Tests: array input, scalar input, edge cases
 
 - [ ] **E5-F1-P3**: Add latent heat builders with tests
-  - Issue: TBD | Size: M (~90 LOC) | Status: Not Started
+  - Issue: #1124 | Size: M (~90 LOC) | Status: In Progress
   - File: `particula/gas/latent_heat_builders.py`
   - Follow `VaporPressureBuilder` pattern (see
     `particula/gas/vapor_pressure_builders.py`, 517 lines, for reference)
@@ -227,3 +227,4 @@ get_builders() -> {
 |------|--------|--------|
 | 2026-03-01 | Initial feature document created from E5 epic | ADW |
 | 2026-03-02 | Completed E5-F1-P1 (ABC + constant strategy + tests) | ADW |
+| 2026-03-03 | Started E5-F1-P3 (latent heat builders + tests) | ADW |

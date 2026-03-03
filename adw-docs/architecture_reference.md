@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Version:** 0.2.6
-**Last Updated:** 2025-12-02
+**Last Updated:** 2026-03-02
 
 ## Overview
 
@@ -42,6 +42,19 @@ adw-docs/architecture/
 - Tests are mirrored in `particula/dynamics/wall_loss/tests/` and
   `particula/dynamics/tests/` to cover strategies, builders, and factory
   export paths.
+
+## Gas latent heat strategies
+
+- Implementations live in
+  `particula/gas/latent_heat_strategies.py`.
+- Builders live in `particula/gas/latent_heat_builders.py` and follow
+  `BuilderABC` patterns (`pre_build_check`, `set_parameters`, unit conversion
+  via `get_unit_conversion`).
+- Available builders: `ConstantLatentHeatBuilder`,
+  `LinearLatentHeatBuilder`, and `PowerLawLatentHeatBuilder` with unit-aware
+  `set_*` methods.
+- Tests live in `particula/gas/tests/latent_heat_builders_test.py` and mirror
+  the vapor pressure builder coverage patterns.
 
 ## Quick Navigation
 
