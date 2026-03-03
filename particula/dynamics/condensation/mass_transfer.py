@@ -273,23 +273,22 @@ def get_mass_transfer_rate_latent_heat(
     vapor_pressure_surface: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Calculate the non-isothermal mass transfer rate.
+    """Calculate non-isothermal mass transfer rate with latent heat.
 
-    This function applies the thermal resistance correction from
-    get_thermal_resistance_factor to the isothermal mass transfer rate. When
-    latent_heat is zero, the thermal correction reduces to unity and the
+    Applies the thermal resistance factor to the isothermal mass transfer
+    rate. When latent heat is zero, the correction equals unity and the
     result matches get_mass_transfer_rate.
 
-    Arguments:
-        - pressure_delta : Difference in partial pressure [Pa].
-        - first_order_mass_transport : Mass transport coefficient K [m³/s].
-        - temperature : Temperature T [K].
-        - molar_mass : Molar mass M [kg/mol].
-        - latent_heat : Latent heat of vaporization L [J/kg].
-        - thermal_conductivity : Gas thermal conductivity kappa [W/(m·K)].
-        - vapor_pressure_surface : Equilibrium vapor pressure at the surface
+    Args:
+        pressure_delta: Difference in partial pressure [Pa].
+        first_order_mass_transport: Mass transport coefficient K [m³/s].
+        temperature: Temperature T [K].
+        molar_mass: Molar mass M [kg/mol].
+        latent_heat: Latent heat of vaporization L [J/kg].
+        thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
+        vapor_pressure_surface: Equilibrium vapor pressure at the surface
             [Pa].
-        - diffusion_coefficient : Vapor diffusion coefficient D [m²/s].
+        diffusion_coefficient: Vapor diffusion coefficient D [m²/s].
 
     Returns:
         Non-isothermal mass transfer rate [kg/s], matching the broadcasted

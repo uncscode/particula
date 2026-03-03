@@ -28,6 +28,8 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 - **Providing a Python-based API** for reproducible and modular simulations.
 - **Building gas-phase properties** with builder/factory patterns (vapor
   pressure and latent heat) that support unit-aware setters and exports.
+- **Supporting non-isothermal condensation** with thermal resistance and
+  latent-heat mass transfer rate utilities.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 
