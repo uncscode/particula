@@ -28,6 +28,12 @@ from particula.gas.vapor_pressure_strategies import (
     LiquidClausiusHybridStrategy,
     TableVaporPressureStrategy,
 )
+from particula.gas.latent_heat_strategies import (
+    LatentHeatStrategy,
+    ConstantLatentHeat,
+    LinearLatentHeat,
+    PowerLawLatentHeat,
+)
 
 from particula.gas.vapor_pressure_builders import (
     ConstantVaporPressureBuilder,
@@ -37,7 +43,13 @@ from particula.gas.vapor_pressure_builders import (
     SaturationConcentrationVaporPressureBuilder,
     TableVaporPressureBuilder,
 )
+from particula.gas.latent_heat_builders import (
+    ConstantLatentHeatBuilder,
+    LinearLatentHeatBuilder,
+    PowerLawLatentHeatBuilder,
+)
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
+from particula.gas.latent_heat_factories import LatentHeatFactory
 from particula.gas.gas_data import GasData, from_species, to_species
 from particula.gas.gas_data_builder import GasDataBuilder
 from particula.gas.species import GasSpecies
@@ -76,6 +88,14 @@ __all__ = [
     "SaturationConcentrationVaporPressureBuilder",
     "TableVaporPressureBuilder",
     "VaporPressureFactory",
+    "LatentHeatStrategy",
+    "ConstantLatentHeat",
+    "LinearLatentHeat",
+    "PowerLawLatentHeat",
+    "ConstantLatentHeatBuilder",
+    "LinearLatentHeatBuilder",
+    "PowerLawLatentHeatBuilder",
+    "LatentHeatFactory",
     "get_concentration_from_pressure",
     "get_dynamic_viscosity",
     "get_fluid_rms_velocity",
