@@ -52,6 +52,8 @@ def test_factory_linear():
         parameters=parameters,
     )
     assert isinstance(strategy, LinearLatentHeat)
+    expected = 2.26e6 - 1200.0 * (300.0 - 298.15)
+    assert strategy.latent_heat(300.0) == pytest.approx(expected)
 
 
 def test_factory_power_law():
@@ -68,6 +70,8 @@ def test_factory_power_law():
         parameters=parameters,
     )
     assert isinstance(strategy, PowerLawLatentHeat)
+    expected = 2.26e6 * (1.0 - 300.0 / 647.096) ** 0.38
+    assert strategy.latent_heat(300.0) == pytest.approx(expected)
 
 
 def test_factory_invalid_type():
