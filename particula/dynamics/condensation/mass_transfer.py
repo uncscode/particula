@@ -182,6 +182,59 @@ def get_mass_transfer_rate(
 
 @validate_inputs(
     {
+        "diffusion_coefficient": "nonnegative",
+        "latent_heat": "nonnegative",
+        "vapor_pressure_surface": "nonnegative",
+        "thermal_conductivity": "positive",
+        "temperature": "positive",
+        "molar_mass": "positive",
+    }
+)
+def get_thermal_resistance_factor(
+    diffusion_coefficient: Union[float, NDArray[np.float64]],
+    latent_heat: Union[float, NDArray[np.float64]],
+    vapor_pressure_surface: Union[float, NDArray[np.float64]],
+    thermal_conductivity: Union[float, NDArray[np.float64]],
+    temperature: Union[float, NDArray[np.float64]],
+    molar_mass: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Calculate the thermal resistance factor for mass transfer.
+
+    This uses the non-isothermal correction from Topping & Bane (2022),
+    Equation 2.36. Inputs include diffusion coefficient D [m²/s], latent heat
+    L [J/kg], vapor pressure at the surface p_surf [Pa], thermal conductivity
+    kappa [W/(m·K)], temperature T [K], and molar mass M [kg/mol]. The result
+    has units of [J/(kg·K)] equivalent to the denominator factor.
+
+    Args:
+        diffusion_coefficient: The vapor diffusion coefficient D [m²/s].
+        latent_heat: Latent heat of vaporization L [J/kg].
+        vapor_pressure_surface: Equilibrium vapor pressure at the surface [Pa].
+        thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
+        temperature: Temperature T [K].
+        molar_mass: Molar mass M [kg/mol].
+
+    Returns:
+        Thermal resistance factor for non-isothermal mass transfer.
+
+    References:
+        - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling.
+          Equation 2.36.
+    """
+    r_specific = GAS_CONSTANT / molar_mass
+    thermal_factor = (
+        diffusion_coefficient
+        * latent_heat
+        * vapor_pressure_surface
+        / (thermal_conductivity * temperature)
+    ) * (latent_heat / (r_specific * temperature) - 1.0) + (
+        r_specific * temperature
+    )
+    return np.array(thermal_factor, dtype=np.float64)
+
+
+@validate_inputs(
+    {
         "mass_rate": "finite",
         "particle_radius": "nonnegative",
         "density": "positive",
