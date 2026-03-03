@@ -1,11 +1,11 @@
 # Epic E5: Non-Isothermal Condensation with Latent Heat
 
-**Status**: In Progress
+**Status**: Planning
 **Priority**: P1
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-02
 **Target Date**: TBD
-**Last Updated**: 2026-03-03
+**Last Updated**: 2026-03-02
 **Size**: Medium (7 features, ~22 phases)
 
 ## Vision
@@ -173,7 +173,7 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
 
 ### Feature E5-F2: Non-Isothermal Mass Transfer Functions
 
-- [x] **E5-F2-P1**: Add thermal resistance factor function with tests
+- [ ] **E5-F2-P1**: Add thermal resistance factor function with tests
   - File: `particula/dynamics/condensation/mass_transfer.py` (extend existing
     file, currently 461 lines with 6 functions)
   - Function: `get_thermal_resistance_factor(diffusion_coefficient,
@@ -620,4 +620,3 @@ class CondensationLatentHeat(CondensationStrategy):
 |------|--------|--------|
 | 2026-03-02 | Initial epic creation | ADW |
 | 2026-03-02 | Split E5-F1-P3 into P3 (builders) + P4 (factory+exports); split E5-F3-P3 into P3 (particle-resolved step) + P4 (discrete+continuous) + P5 (data-only parity); added missing details: function signatures, file references, thermal conductivity source, vapor_pressure_surface parameter, test tolerances, literature targets | ADW |
-| 2026-03-03 | Marked E5-F2-P1 complete (thermal resistance factor + tests) | ADW |

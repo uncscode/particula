@@ -1,12 +1,12 @@
 # Feature E5-F2: Non-Isothermal Mass Transfer Functions
 
 **Parent Epic**: [E5: Non-Isothermal Condensation with Latent Heat](../epics/E5-non-isothermal-condensation.md)
-**Status**: In Progress
+**Status**: Planning
 **Priority**: P1
 **Owners**: @Gorkowski
-**Start Date**: 2026-03-03
+**Start Date**: TBD
 **Target Date**: TBD
-**Last Updated**: 2026-03-03
+**Last Updated**: 2026-03-02
 **Size**: Small (3 phases)
 
 ## Summary
@@ -94,8 +94,8 @@ negative dm (evaporation) = heat absorbed (Q < 0).
 
 ## Phase Checklist
 
-- [x] **E5-F2-P1**: Add thermal resistance factor function with tests
-  - Issue: #1134 | Size: S (~50 LOC) | Status: Complete
+- [ ] **E5-F2-P1**: Add thermal resistance factor function with tests
+  - Issue: TBD | Size: S (~50 LOC) | Status: Not Started
   - File: `particula/dynamics/condensation/mass_transfer.py` (extend existing
     file, currently 461 lines with 6 functions)
   - Function: `get_thermal_resistance_factor(diffusion_coefficient,
@@ -194,4 +194,3 @@ negative dm (evaporation) = heat absorbed (Q < 0).
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
-| 2026-03-03 | Marked E5-F2-P1 complete (thermal resistance factor + tests) | ADW |
