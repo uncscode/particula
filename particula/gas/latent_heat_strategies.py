@@ -97,6 +97,13 @@ class LinearLatentHeat(LatentHeatStrategy):
         temperature_ref: Reference temperature in Kelvin.
     """
 
+    @validate_inputs(
+        {
+            "latent_heat_ref": "positive",
+            "slope": "finite",
+            "temperature_ref": "positive",
+        }
+    )
     def __init__(
         self,
         latent_heat_ref: float,
@@ -133,6 +140,7 @@ class LinearLatentHeat(LatentHeatStrategy):
         latent_heat_value = self.latent_heat_ref - self.slope * (
             temperature_array - self.temperature_ref
         )
+        latent_heat_value = np.maximum(latent_heat_value, 0.0)
         if temperature_array.shape == ():
             return float(latent_heat_value)
         return latent_heat_value
@@ -151,6 +159,13 @@ class PowerLawLatentHeat(LatentHeatStrategy):
         beta: Power-law exponent (dimensionless).
     """
 
+    @validate_inputs(
+        {
+            "latent_heat_ref": "positive",
+            "critical_temperature": "positive",
+            "beta": "nonnegative",
+        }
+    )
     def __init__(
         self,
         latent_heat_ref: float,
@@ -184,11 +199,21 @@ class PowerLawLatentHeat(LatentHeatStrategy):
             matching the input shape.
         """
         temperature_array = np.asarray(temperature, dtype=np.float64)
-        ratio = temperature_array / self.critical_temperature
-        clipped_ratio = np.clip(ratio, 0.0, 1.0)
-        latent_heat_value = (
-            self.latent_heat_ref * (1.0 - clipped_ratio) ** self.beta
-        )
         if temperature_array.shape == ():
-            return float(latent_heat_value)
+            temperature_value = float(temperature_array)
+            if temperature_value >= self.critical_temperature:
+                return 0.0
+            ratio = temperature_value / self.critical_temperature
+            ratio = float(np.clip(ratio, 0.0, 1.0))
+            return float(self.latent_heat_ref * (1.0 - ratio) ** self.beta)
+        latent_heat_value = np.zeros_like(temperature_array, dtype=np.float64)
+        below_critical = temperature_array < self.critical_temperature
+        if np.any(below_critical):
+            ratio_array = (
+                temperature_array[below_critical] / self.critical_temperature
+            )
+            ratio_array = np.clip(ratio_array, 0.0, 1.0)
+            latent_heat_value[below_critical] = (
+                self.latent_heat_ref * (1.0 - ratio_array) ** self.beta
+            )
         return latent_heat_value

@@ -109,6 +109,51 @@ def test_linear_array_broadcast():
     npt.assert_allclose(results, expected)
 
 
+def test_linear_type_consistency():
+    """Ensure scalar returns float and array returns NDArray."""
+    strategy = LinearLatentHeat(
+        latent_heat_ref=2.501e6,
+        slope=2.3e3,
+        temperature_ref=273.15,
+    )
+    scalar_result = strategy.latent_heat(300.0)
+    array_result = strategy.latent_heat(np.array([300.0, 310.0]))
+    assert isinstance(scalar_result, float)
+    assert isinstance(array_result, np.ndarray)
+
+
+def test_linear_zero_dimensional_array_returns_scalar():
+    """Return float for 0-D NumPy array input."""
+    strategy = LinearLatentHeat(
+        latent_heat_ref=2.501e6,
+        slope=2.3e3,
+        temperature_ref=273.15,
+    )
+    result = strategy.latent_heat(np.array(300.0))
+    assert isinstance(result, float)
+
+
+@pytest.mark.parametrize(
+    "latent_heat_ref,slope,temperature_ref",
+    [
+        (0.0, 2.3e3, 273.15),
+        (-1.0, 2.3e3, 273.15),
+        (2.501e6, np.nan, 273.15),
+        (2.501e6, np.inf, 273.15),
+        (2.501e6, 2.3e3, 0.0),
+        (2.501e6, 2.3e3, -10.0),
+    ],
+)
+def test_linear_constructor_validation(latent_heat_ref, slope, temperature_ref):
+    """Reject non-positive or non-finite linear strategy inputs."""
+    with pytest.raises(ValueError):
+        LinearLatentHeat(
+            latent_heat_ref=latent_heat_ref,
+            slope=slope,
+            temperature_ref=temperature_ref,
+        )
+
+
 def test_power_law_scalar():
     """Compute a scalar latent heat using the power law model."""
     strategy = PowerLawLatentHeat(
@@ -178,3 +223,46 @@ def test_power_law_type_consistency():
     array_result = strategy.latent_heat(np.array([373.15, 400.0]))
     assert isinstance(scalar_result, float)
     assert isinstance(array_result, np.ndarray)
+
+
+def test_power_law_zero_dimensional_array_returns_scalar():
+    """Return float for 0-D NumPy array input."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    result = strategy.latent_heat(np.array(373.15))
+    assert isinstance(result, float)
+
+
+def test_power_law_beta_zero_at_critical_temperature():
+    """Return zero at the critical temperature when beta is zero."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.0,
+    )
+    assert strategy.latent_heat(647.1) == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    "latent_heat_ref,critical_temperature,beta",
+    [
+        (0.0, 647.1, 0.38),
+        (-1.0, 647.1, 0.38),
+        (2.257e6, 0.0, 0.38),
+        (2.257e6, -10.0, 0.38),
+        (2.257e6, 647.1, -0.1),
+    ],
+)
+def test_power_law_constructor_validation(
+    latent_heat_ref, critical_temperature, beta
+):
+    """Reject invalid power-law strategy inputs."""
+    with pytest.raises(ValueError):
+        PowerLawLatentHeat(
+            latent_heat_ref=latent_heat_ref,
+            critical_temperature=critical_temperature,
+            beta=beta,
+        )
