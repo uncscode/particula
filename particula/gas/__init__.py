@@ -1,7 +1,8 @@
 """Gas phase module for particula.
 
 This module provides classes and functions for gas phase modeling,
-including vapor pressure strategies, gas species, and atmosphere builders.
+including vapor pressure and latent heat strategies, gas species, and
+atmosphere builders.
 
 Example:
     >>> from particula.gas import GasDataBuilder, GasData

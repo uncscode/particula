@@ -1,5 +1,7 @@
-"""Factory module to create a concrete LatentHeatStrategy object using
-builders.
+"""Factories for latent heat strategies.
+
+This module exposes :class:`LatentHeatFactory`, which builds constant,
+linear, and power-law latent heat strategies via their respective builders.
 """
 
 from typing import Union
@@ -17,67 +19,53 @@ from particula.gas.latent_heat_strategies import (
     PowerLawLatentHeat,
 )
 
+LatentHeatBuilderType = Union[
+    ConstantLatentHeatBuilder,
+    LinearLatentHeatBuilder,
+    PowerLawLatentHeatBuilder,
+]
+
+LatentHeatStrategyType = Union[
+    LatentHeatStrategy,
+    ConstantLatentHeat,
+    LinearLatentHeat,
+    PowerLawLatentHeat,
+]
+
 
 class LatentHeatFactory(
-    StrategyFactoryABC[
-        Union[
-            ConstantLatentHeatBuilder,
-            LinearLatentHeatBuilder,
-            PowerLawLatentHeatBuilder,
-        ],
-        Union[
-            LatentHeatStrategy,
-            ConstantLatentHeat,
-            LinearLatentHeat,
-            PowerLawLatentHeat,
-        ],
-    ]
+    StrategyFactoryABC[LatentHeatBuilderType, LatentHeatStrategyType]
 ):
-    """Factory class to create latent heat strategy builders.
+    """Factory for latent heat strategies.
 
-    This class provides a way to generate multiple latent heat calculation
-    strategies (e.g., constant, linear, or power-law) by commissioning the
-    appropriate builder. It is useful for scenarios requiring a flexible way
-    to switch or extend latent heat calculation methods.
-
-    Attributes:
-        - None
-
-    Methods:
-    - get_builders : Returns the mapping of strategy types to builder
-      instances.
-    - get_strategy : Returns the selected latent heat strategy, given a
-      strategy type and parameters.
+    The factory builds constant, linear, or power-law latent heat strategies
+    by delegating to the corresponding builder class.
 
     Examples:
-        ```py title="Example LatentHeatFactory usage"
-        import particula as par
-
-        factory = par.gas.LatentHeatFactory()
-        strategy = factory.get_strategy(
-            "constant",
-            {"latent_heat_ref": 2.26e6, "latent_heat_ref_units": "J/kg"},
-        )
-        # strategy is an instance of ConstantLatentHeat
-        ```
+        >>> from particula.gas import LatentHeatFactory
+        >>> factory = LatentHeatFactory()
+        >>> factory.get_strategy(
+        ...     "constant",
+        ...     {
+        ...         "latent_heat_ref": 2.26e6,
+        ...         "latent_heat_ref_units": "J/kg",
+        ...     },
+        ... ).latent_heat(300.0)
+        2260000.0
     """
 
-    def get_builders(self):
-        """Return a dictionary mapping strategy types to builder instances.
+    def get_builders(self) -> dict[str, LatentHeatBuilderType]:
+        """Return latent heat builders keyed by strategy name.
 
         Returns:
-            dict:
-                - "constant": ConstantLatentHeatBuilder
-                - "linear": LinearLatentHeatBuilder
-                - "power_law": PowerLawLatentHeatBuilder
+            dict[str, LatentHeatBuilderType]: Builder instances keyed by
+                strategy type.
 
         Examples:
-            ```py
-            import particula as par
-            builders_dict = par.gas.LatentHeatFactory().get_builders()
-            builder = builders_dict["constant"]
-            # builder is an instance of ConstantLatentHeatBuilder
-            ```
+            >>> from particula.gas import LatentHeatFactory
+            >>> builders = LatentHeatFactory().get_builders()
+            >>> isinstance(builders["constant"], ConstantLatentHeatBuilder)
+            True
         """
         return {
             "constant": ConstantLatentHeatBuilder(),
