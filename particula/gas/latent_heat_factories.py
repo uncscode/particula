@@ -4,8 +4,6 @@ This module exposes :class:`LatentHeatFactory`, which builds constant,
 linear, and power-law latent heat strategies via their respective builders.
 """
 
-from typing import Union
-
 from particula.abc_factory import StrategyFactoryABC
 from particula.gas.latent_heat_builders import (
     ConstantLatentHeatBuilder,
@@ -14,23 +12,19 @@ from particula.gas.latent_heat_builders import (
 )
 from particula.gas.latent_heat_strategies import (
     ConstantLatentHeat,
-    LatentHeatStrategy,
     LinearLatentHeat,
     PowerLawLatentHeat,
 )
 
-LatentHeatBuilderType = Union[
-    ConstantLatentHeatBuilder,
-    LinearLatentHeatBuilder,
-    PowerLawLatentHeatBuilder,
-]
+LatentHeatBuilderType = (
+    ConstantLatentHeatBuilder
+    | LinearLatentHeatBuilder
+    | PowerLawLatentHeatBuilder
+)
 
-LatentHeatStrategyType = Union[
-    LatentHeatStrategy,
-    ConstantLatentHeat,
-    LinearLatentHeat,
-    PowerLawLatentHeat,
-]
+LatentHeatStrategyType = (
+    ConstantLatentHeat | LinearLatentHeat | PowerLawLatentHeat
+)
 
 
 class LatentHeatFactory(
@@ -58,8 +52,7 @@ class LatentHeatFactory(
         """Return latent heat builders keyed by strategy name.
 
         Returns:
-            dict[str, LatentHeatBuilderType]: Builder instances keyed by
-                strategy type.
+            Builder instances keyed by strategy type.
 
         Examples:
             >>> from particula.gas import LatentHeatFactory
