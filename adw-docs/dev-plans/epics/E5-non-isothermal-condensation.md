@@ -134,8 +134,9 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
   - Tests: `particula/gas/tests/latent_heat_strategies_test.py`
   - Test constant returns correct value, array broadcasting, type consistency
 
-- [ ] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
+- [x] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
   with tests
+  - Issue: #1123 | Status: Complete
   - `LinearLatentHeat(latent_heat_ref, slope, temperature_ref)`:
     `L(T) = L_ref - slope * (T - T_ref)`
   - `PowerLawLatentHeat(latent_heat_ref, critical_temperature, beta)`:
@@ -159,6 +160,7 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
   - Tests: build with valid params, missing-param errors, round-trip values
 
 - [ ] **E5-F1-P4**: Add latent heat factory and gas exports with tests
+  - Issue: #1125 | Status: In Progress
   - File: `particula/gas/latent_heat_factories.py`
   - `LatentHeatFactory` extends `StrategyFactoryABC` (from
     `particula/abc_factory.py`, 111 lines — same pattern as

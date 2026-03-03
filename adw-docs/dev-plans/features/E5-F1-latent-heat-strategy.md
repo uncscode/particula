@@ -6,7 +6,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-01
 **Target Date**: TBD
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-03
 **Size**: Medium (4 phases)
 
 ## Summary
@@ -160,7 +160,7 @@ get_builders() -> {
   - Tests: build with valid params, missing-param errors, round-trip values
 
 - [ ] **E5-F1-P4**: Add latent heat factory and gas exports with tests
-  - Issue: TBD | Size: S (~60 LOC) | Status: Not Started
+  - Issue: #1125 | Size: S (~60 LOC) | Status: In Progress
   - File: `particula/gas/latent_heat_factories.py`
   - `LatentHeatFactory` extends `StrategyFactoryABC` (from
     `particula/abc_factory.py`, 111 lines -- same pattern as
@@ -227,3 +227,4 @@ get_builders() -> {
 |------|--------|--------|
 | 2026-03-01 | Initial feature document created from E5 epic | ADW |
 | 2026-03-02 | Completed E5-F1-P1 (ABC + constant strategy + tests) | ADW |
+| 2026-03-03 | Started E5-F1-P4 (latent heat factory + exports) | ADW |

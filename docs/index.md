@@ -26,8 +26,8 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 
 - **Harnessing ChatGPT integration** for real-time guidance, troubleshooting, and Q&A, [**here**](https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant).
 - **Providing a Python-based API** for reproducible and modular simulations.
-- **Building gas-phase properties** with builder patterns (vapor pressure and
-  latent heat) that support unit-aware setters.
+- **Building gas-phase properties** with builder/factory patterns (vapor
+  pressure and latent heat) that support unit-aware setters and exports.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 
