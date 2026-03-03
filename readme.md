@@ -102,6 +102,3 @@ particula/
 If you use Particula in your research, please cite:
 > Particula [Computer software]. DOI: [10.5281/zenodo.6634653](https://doi.org/10.5281/zenodo.6634653)
 
-## License
-
-MIT
