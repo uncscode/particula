@@ -93,6 +93,8 @@ particula/
 - **Flexible Representations** — Discrete bins, continuous PDF, particle-resolved
 - **Builder Pattern** — Clean, validated object construction with unit conversion
 - **Composable Processes** — Chain runnables with `|` operator
+- **Condensation Utilities** — Non-isothermal thermal resistance helper via
+  `particula.dynamics.get_thermal_resistance_factor`
 - **Latent Heat Factories** — Build constant, linear, and power-law latent heat
   strategies via `particula.gas.LatentHeatFactory` with unit-aware builders and
   gas-phase exports for upcoming non-isothermal workflows
