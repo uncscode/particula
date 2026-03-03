@@ -172,7 +172,6 @@ particula/
 │   ├── species.py          # GasSpecies class
 │   ├── species_builders.py
 │   ├── species_factories.py
-│   ├── latent_heat_builders.py      # Builders for latent heat strategies
 │   ├── latent_heat_strategies.py    # Strategy pattern for latent heat
 │   ├── vapor_pressure_strategies.py  # Strategy pattern for vapor pressure
 │   ├── vapor_pressure_builders.py

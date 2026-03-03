@@ -1,5 +1,7 @@
 """Tests for latent heat builder classes."""
 
+import logging
+
 import numpy as np
 import pytest
 from particula.abc_builder import BuilderABC
@@ -186,6 +188,13 @@ def test_unit_conversion_temperature_ref() -> None:
     assert builder.temperature_ref == pytest.approx(274.15)
 
 
+def test_unit_conversion_temperature_ref_zero_offset_units() -> None:
+    """Zero degC converts to a positive Kelvin temperature."""
+    pytest.importorskip("pint")
+    builder = LinearLatentHeatBuilder().set_temperature_ref(0.0, "degC")
+    assert builder.temperature_ref == pytest.approx(273.15)
+
+
 def test_unit_conversion_invalid_units_raises() -> None:
     """Invalid units raise pint UndefinedUnitError when pint is available."""
     pint = pytest.importorskip("pint")
@@ -219,3 +228,26 @@ def test_unit_conversion_power_law_builder_values() -> None:
     )
     assert builder.latent_heat_ref == pytest.approx(2500.0)
     assert builder.critical_temperature == pytest.approx(373.15)
+
+
+def test_unit_conversion_power_law_builder_zero_offset_temperature() -> None:
+    """Zero degC converts before validation of critical temperature."""
+    pytest.importorskip("pint")
+    builder = PowerLawLatentHeatBuilder().set_critical_temperature(0.0, "degC")
+    assert builder.critical_temperature == pytest.approx(273.15)
+
+
+def test_power_law_beta_units_warning_emitted(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Power-law builder logs a warning when beta units are provided."""
+    builder = PowerLawLatentHeatBuilder()
+    logger = logging.getLogger("particula")
+    original_propagate = logger.propagate
+    logger.propagate = True
+    try:
+        with caplog.at_level(logging.WARNING):
+            builder.set_beta(0.5, "dimensionless")
+    finally:
+        logger.propagate = original_propagate
+    assert "Ignoring units for beta" in caplog.text

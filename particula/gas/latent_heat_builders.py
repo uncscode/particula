@@ -16,9 +16,33 @@ from particula.gas.latent_heat_strategies import (
     PowerLawLatentHeat,
 )
 from particula.util import get_unit_conversion
-from particula.util.validate_inputs import validate_inputs
+from particula.util.validate_inputs import (
+    validate_finite,
+    validate_inputs,
+    validate_positive,
+)
 
 logger = logging.getLogger("particula")
+
+LATENT_HEAT_UNIT = "J/kg"
+SLOPE_UNIT = "J/(kg*K)"
+TEMPERATURE_UNIT = "K"
+
+
+def _convert_value(value: float, unit: str, target_unit: str) -> float:
+    """Convert a value to the target unit using unit conversion factors."""
+    return float(value * get_unit_conversion(unit, target_unit))
+
+
+def _to_kelvin(temperature: float, units: str) -> float:
+    """Convert a temperature to Kelvin with offset-unit support."""
+    return float(get_unit_conversion(units, TEMPERATURE_UNIT, temperature))
+
+
+def _validate_temperature(name: str, temperature: float) -> None:
+    """Validate temperature is positive and finite after conversion."""
+    validate_positive(temperature, name)
+    validate_finite(temperature, name)
 
 
 class ConstantLatentHeatBuilder(BuilderABC):
@@ -58,15 +82,14 @@ class ConstantLatentHeatBuilder(BuilderABC):
             pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is
                 invalid and pint is available.
         """
-        if latent_heat_ref_units is None or latent_heat_ref_units == "J/kg":
+        if (
+            latent_heat_ref_units is None
+            or latent_heat_ref_units == LATENT_HEAT_UNIT
+        ):
             self.latent_heat_ref = latent_heat_ref
             return self
-        self.latent_heat_ref = float(
-            latent_heat_ref
-            * get_unit_conversion(
-                latent_heat_ref_units,
-                "J/kg",
-            )
+        self.latent_heat_ref = _convert_value(
+            latent_heat_ref, latent_heat_ref_units, LATENT_HEAT_UNIT
         )
         return self
 
@@ -125,15 +148,14 @@ class LinearLatentHeatBuilder(BuilderABC):
             pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is
                 invalid and pint is available.
         """
-        if latent_heat_ref_units is None or latent_heat_ref_units == "J/kg":
+        if (
+            latent_heat_ref_units is None
+            or latent_heat_ref_units == LATENT_HEAT_UNIT
+        ):
             self.latent_heat_ref = latent_heat_ref
             return self
-        self.latent_heat_ref = float(
-            latent_heat_ref
-            * get_unit_conversion(
-                latent_heat_ref_units,
-                "J/kg",
-            )
+        self.latent_heat_ref = _convert_value(
+            latent_heat_ref, latent_heat_ref_units, LATENT_HEAT_UNIT
         )
         return self
 
@@ -157,19 +179,13 @@ class LinearLatentHeatBuilder(BuilderABC):
             pint.errors.UndefinedUnitError: If ``slope_units`` is invalid and
                 pint is available.
         """
-        if slope_units is None or slope_units == "J/(kg*K)":
+        if slope_units is None or slope_units == SLOPE_UNIT:
             self.slope = slope
             return self
-        self.slope = float(
-            slope
-            * get_unit_conversion(
-                slope_units,
-                "J/(kg*K)",
-            )
-        )
+        self.slope = _convert_value(slope, slope_units, SLOPE_UNIT)
         return self
 
-    @validate_inputs({"temperature_ref": "positive"})
+    @validate_inputs({"temperature_ref": "finite"})
     def set_temperature_ref(
         self,
         temperature_ref: float,
@@ -189,16 +205,17 @@ class LinearLatentHeatBuilder(BuilderABC):
             pint.errors.UndefinedUnitError: If ``temperature_ref_units`` is
                 invalid and pint is available.
         """
-        if temperature_ref_units is None or temperature_ref_units == "K":
-            self.temperature_ref = temperature_ref
-            return self
-        self.temperature_ref = float(
-            get_unit_conversion(
-                temperature_ref_units,
-                "K",
-                temperature_ref,
+        if (
+            temperature_ref_units is None
+            or temperature_ref_units == TEMPERATURE_UNIT
+        ):
+            temperature_ref_converted = temperature_ref
+        else:
+            temperature_ref_converted = _to_kelvin(
+                temperature_ref, temperature_ref_units
             )
-        )
+        _validate_temperature("temperature_ref", temperature_ref_converted)
+        self.temperature_ref = temperature_ref_converted
         return self
 
     def build(self) -> LinearLatentHeat:
@@ -262,19 +279,18 @@ class PowerLawLatentHeatBuilder(BuilderABC):
             pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is
                 invalid and pint is available.
         """
-        if latent_heat_ref_units is None or latent_heat_ref_units == "J/kg":
+        if (
+            latent_heat_ref_units is None
+            or latent_heat_ref_units == LATENT_HEAT_UNIT
+        ):
             self.latent_heat_ref = latent_heat_ref
             return self
-        self.latent_heat_ref = float(
-            latent_heat_ref
-            * get_unit_conversion(
-                latent_heat_ref_units,
-                "J/kg",
-            )
+        self.latent_heat_ref = _convert_value(
+            latent_heat_ref, latent_heat_ref_units, LATENT_HEAT_UNIT
         )
         return self
 
-    @validate_inputs({"critical_temperature": "positive"})
+    @validate_inputs({"critical_temperature": "finite"})
     def set_critical_temperature(
         self,
         critical_temperature: float,
@@ -297,17 +313,17 @@ class PowerLawLatentHeatBuilder(BuilderABC):
         """
         if (
             critical_temperature_units is None
-            or critical_temperature_units == "K"
+            or critical_temperature_units == TEMPERATURE_UNIT
         ):
-            self.critical_temperature = critical_temperature
-            return self
-        self.critical_temperature = float(
-            get_unit_conversion(
-                critical_temperature_units,
-                "K",
-                critical_temperature,
+            critical_temperature_converted = critical_temperature
+        else:
+            critical_temperature_converted = _to_kelvin(
+                critical_temperature, critical_temperature_units
             )
+        _validate_temperature(
+            "critical_temperature", critical_temperature_converted
         )
+        self.critical_temperature = critical_temperature_converted
         return self
 
     @validate_inputs({"beta": "nonnegative"})
