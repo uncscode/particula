@@ -4216,6 +4216,62 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.LinearLatentHeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;LinearLatentHeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" LinearLatentHeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.LinearLatentHeat.latent_heat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;latent_heat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.PowerLawLatentHeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PowerLawLatentHeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" PowerLawLatentHeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.PowerLawLatentHeat.latent_heat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;latent_heat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -13839,6 +13895,62 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.LinearLatentHeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;LinearLatentHeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" LinearLatentHeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.LinearLatentHeat.latent_heat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;latent_heat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.PowerLawLatentHeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PowerLawLatentHeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" PowerLawLatentHeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.latent_heat_strategies.PowerLawLatentHeat.latent_heat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;latent_heat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14223,6 +14335,556 @@ vaporization in J/kg for scalar or array temperature inputs.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        Latent heat of vaporization in J/kg with shape matching the input.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="particula.gas.latent_heat_strategies.LinearLatentHeat" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">LinearLatentHeat</span>
+
+
+<a href="#particula.gas.latent_heat_strategies.LinearLatentHeat" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">LinearLatentHeat</span><span class="p">(</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            LatentHeatStrategy (particula.gas.latent_heat_strategies.LatentHeatStrategy)" href="#particula.gas.latent_heat_strategies.LatentHeatStrategy">LatentHeatStrategy</a></code></p>
+
+
+
+        <p>Latent heat strategy using a linear temperature dependence.</p>
+<p>Computes a linear relation for each temperature:
+:math:<code>L(T) = L_{ref} - slope * (T - T_{ref})</code>.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.latent_heat_strategies.LinearLatentHeat.latent_heat_ref">latent_heat_ref</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Reference latent heat in J/kg at the reference
+temperature.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.latent_heat_strategies.LinearLatentHeat.slope">slope</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Linear temperature slope in J/(kg·K).</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.latent_heat_strategies.LinearLatentHeat.temperature_ref">temperature_ref</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Reference temperature in Kelvin.</p>
+          </div>
+        </li>
+    </ul>
+
+        <p>Initialize the linear latent heat strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>latent_heat_ref</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Reference latent heat in J/kg.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>slope</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Linear slope in J/(kg·K).</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>temperature_ref</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Reference temperature in Kelvin.</p>
+          </div>
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>particula/gas/latent_heat_strategies.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;slope&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;temperature_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">slope</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">temperature_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the linear latent heat strategy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latent_heat_ref: Reference latent heat in J/kg.</span>
+<span class="sd">        slope: Linear slope in J/(kg·K).</span>
+<span class="sd">        temperature_ref: Reference temperature in Kelvin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">latent_heat_ref</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">slope</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">temperature_ref</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.gas.latent_heat_strategies.LinearLatentHeat.latent_heat" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">latent_heat</span>
+
+
+<a href="#particula.gas.latent_heat_strategies.LinearLatentHeat.latent_heat" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">latent_heat</span><span class="p">(</span><span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the latent heat for the given temperature.</p>
+<p>Uses the linear relation
+:math:<code>L(T) = L_{ref} - slope * (T - T_{ref})</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Temperature in Kelvin.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>Latent heat in J/kg. Returns a scalar for scalar input or an array</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>matching the input shape.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/gas/latent_heat_strategies.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">latent_heat</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the latent heat for the given temperature.</span>
+
+<span class="sd">    Uses the linear relation</span>
+<span class="sd">    :math:`L(T) = L_{ref} - slope * (T - T_{ref})`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        temperature: Temperature in Kelvin.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Latent heat in J/kg. Returns a scalar for scalar input or an array</span>
+<span class="sd">        matching the input shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">latent_heat_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">slope</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="n">temperature_array</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature_ref</span>
+    <span class="p">)</span>
+    <span class="n">latent_heat_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">latent_heat_value</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">temperature_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">latent_heat_value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">latent_heat_value</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="particula.gas.latent_heat_strategies.PowerLawLatentHeat" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PowerLawLatentHeat</span>
+
+
+<a href="#particula.gas.latent_heat_strategies.PowerLawLatentHeat" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PowerLawLatentHeat</span><span class="p">(</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">critical_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            LatentHeatStrategy (particula.gas.latent_heat_strategies.LatentHeatStrategy)" href="#particula.gas.latent_heat_strategies.LatentHeatStrategy">LatentHeatStrategy</a></code></p>
+
+
+
+        <p>Latent heat strategy using a power-law temperature dependence.</p>
+<p>Computes a power-law relation:
+:math:<code>L(T) = L_{ref} * (1 - T / T_c)^{beta}</code>.
+The ratio is clipped to [0, 1] to enforce non-negative latent heat values.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.latent_heat_strategies.PowerLawLatentHeat.latent_heat_ref">latent_heat_ref</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Reference latent heat in J/kg.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.latent_heat_strategies.PowerLawLatentHeat.critical_temperature">critical_temperature</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Critical temperature in Kelvin.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.latent_heat_strategies.PowerLawLatentHeat.beta">beta</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Power-law exponent (dimensionless).</p>
+          </div>
+        </li>
+    </ul>
+
+        <p>Initialize the power-law latent heat strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>latent_heat_ref</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Reference latent heat in J/kg.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>critical_temperature</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Critical temperature in Kelvin.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>beta</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Power-law exponent (dimensionless).</p>
+          </div>
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>particula/gas/latent_heat_strategies.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;latent_heat_ref&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;critical_temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">critical_temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the power-law latent heat strategy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latent_heat_ref: Reference latent heat in J/kg.</span>
+<span class="sd">        critical_temperature: Critical temperature in Kelvin.</span>
+<span class="sd">        beta: Power-law exponent (dimensionless).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">latent_heat_ref</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">critical_temperature</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">beta</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.gas.latent_heat_strategies.PowerLawLatentHeat.latent_heat" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">latent_heat</span>
+
+
+<a href="#particula.gas.latent_heat_strategies.PowerLawLatentHeat.latent_heat" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">latent_heat</span><span class="p">(</span><span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the latent heat for the given temperature.</p>
+<p>Temperatures are normalized by the critical temperature and clipped
+to the range [0, 1], ensuring latent heat values stay non-negative.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Temperature in Kelvin.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>Latent heat in J/kg. Returns a scalar for scalar input or an array</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>matching the input shape.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/gas/latent_heat_strategies.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">latent_heat</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the latent heat for the given temperature.</span>
+
+<span class="sd">    Temperatures are normalized by the critical temperature and clipped</span>
+<span class="sd">    to the range [0, 1], ensuring latent heat values stay non-negative.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        temperature: Temperature in Kelvin.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Latent heat in J/kg. Returns a scalar for scalar input or an array</span>
+<span class="sd">        matching the input shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">temperature_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">temperature_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
+        <span class="n">temperature_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">temperature_array</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">temperature_value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">temperature_value</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">ratio</span><span class="p">)</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
+    <span class="n">latent_heat_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">temperature_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">below_critical</span> <span class="o">=</span> <span class="n">temperature_array</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">below_critical</span><span class="p">):</span>
+        <span class="n">ratio_array</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">temperature_array</span><span class="p">[</span><span class="n">below_critical</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">critical_temperature</span>
+        <span class="p">)</span>
+        <span class="n">ratio_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ratio_array</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">latent_heat_value</span><span class="p">[</span><span class="n">below_critical</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_ref</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">ratio_array</span><span class="p">)</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">latent_heat_value</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
