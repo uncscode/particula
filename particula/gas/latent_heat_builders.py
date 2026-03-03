@@ -1,8 +1,9 @@
 """Builder classes for latent heat strategy objects.
 
 These builders mirror the vapor pressure builder pattern. They validate
-required parameters, optionally convert units, and construct latent heat
-strategies that return J/kg values.
+required parameters, optionally convert units via
+:func:`get_unit_conversion`, and construct latent heat strategies that return
+J/kg values.
 """
 
 import logging
@@ -21,10 +22,13 @@ logger = logging.getLogger("particula")
 
 
 class ConstantLatentHeatBuilder(BuilderABC):
-    """Builder for ConstantLatentHeat strategies.
+    """Build ConstantLatentHeat strategies with validated inputs.
 
     Use :meth:`set_latent_heat_ref` to set the reference latent heat in J/kg
     before calling :meth:`build`.
+
+    Attributes:
+        latent_heat_ref: Reference latent heat in J/kg once set.
     """
 
     def __init__(self) -> None:
@@ -48,6 +52,11 @@ class ConstantLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``latent_heat_ref`` is not positive.
+            pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is
+                invalid and pint is available.
         """
         if latent_heat_ref_units is None or latent_heat_ref_units == "J/kg":
             self.latent_heat_ref = latent_heat_ref
@@ -62,7 +71,14 @@ class ConstantLatentHeatBuilder(BuilderABC):
         return self
 
     def build(self) -> ConstantLatentHeat:
-        """Validate parameters and build the ConstantLatentHeat strategy."""
+        """Validate parameters and build the ConstantLatentHeat strategy.
+
+        Returns:
+            The configured ConstantLatentHeat strategy.
+
+        Raises:
+            ValueError: If required parameters are missing.
+        """
         self.pre_build_check()
         return ConstantLatentHeat(
             latent_heat_ref=cast(float, self.latent_heat_ref)
@@ -70,9 +86,14 @@ class ConstantLatentHeatBuilder(BuilderABC):
 
 
 class LinearLatentHeatBuilder(BuilderABC):
-    """Builder for LinearLatentHeat strategies.
+    """Build LinearLatentHeat strategies with validated inputs.
 
     Requires a reference latent heat, linear slope, and reference temperature.
+
+    Attributes:
+        latent_heat_ref: Reference latent heat in J/kg once set.
+        slope: Linear slope in J/(kg*K) once set.
+        temperature_ref: Reference temperature in K once set.
     """
 
     def __init__(self) -> None:
@@ -98,6 +119,11 @@ class LinearLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``latent_heat_ref`` is not positive.
+            pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is
+                invalid and pint is available.
         """
         if latent_heat_ref_units is None or latent_heat_ref_units == "J/kg":
             self.latent_heat_ref = latent_heat_ref
@@ -125,6 +151,11 @@ class LinearLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``slope`` is not finite.
+            pint.errors.UndefinedUnitError: If ``slope_units`` is invalid and
+                pint is available.
         """
         if slope_units is None or slope_units == "J/(kg*K)":
             self.slope = slope
@@ -152,6 +183,11 @@ class LinearLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``temperature_ref`` is not positive.
+            pint.errors.UndefinedUnitError: If ``temperature_ref_units`` is
+                invalid and pint is available.
         """
         if temperature_ref_units is None or temperature_ref_units == "K":
             self.temperature_ref = temperature_ref
@@ -166,7 +202,14 @@ class LinearLatentHeatBuilder(BuilderABC):
         return self
 
     def build(self) -> LinearLatentHeat:
-        """Validate parameters and build the LinearLatentHeat strategy."""
+        """Validate parameters and build the LinearLatentHeat strategy.
+
+        Returns:
+            The configured LinearLatentHeat strategy.
+
+        Raises:
+            ValueError: If required parameters are missing.
+        """
         self.pre_build_check()
         return LinearLatentHeat(
             latent_heat_ref=cast(float, self.latent_heat_ref),
@@ -176,9 +219,14 @@ class LinearLatentHeatBuilder(BuilderABC):
 
 
 class PowerLawLatentHeatBuilder(BuilderABC):
-    """Builder for PowerLawLatentHeat strategies.
+    """Build PowerLawLatentHeat strategies with validated inputs.
 
     Requires a reference latent heat, critical temperature, and exponent.
+
+    Attributes:
+        latent_heat_ref: Reference latent heat in J/kg once set.
+        critical_temperature: Critical temperature in K once set.
+        beta: Power-law exponent (dimensionless) once set.
     """
 
     def __init__(self) -> None:
@@ -208,6 +256,11 @@ class PowerLawLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``latent_heat_ref`` is not positive.
+            pint.errors.UndefinedUnitError: If ``latent_heat_ref_units`` is
+                invalid and pint is available.
         """
         if latent_heat_ref_units is None or latent_heat_ref_units == "J/kg":
             self.latent_heat_ref = latent_heat_ref
@@ -236,6 +289,11 @@ class PowerLawLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``critical_temperature`` is not positive.
+            pint.errors.UndefinedUnitError: If ``critical_temperature_units``
+                is invalid and pint is available.
         """
         if (
             critical_temperature_units is None
@@ -266,6 +324,9 @@ class PowerLawLatentHeatBuilder(BuilderABC):
 
         Returns:
             The builder instance for method chaining.
+
+        Raises:
+            ValueError: If ``beta`` is negative.
         """
         if beta_units is not None:
             logger.warning("Ignoring units for beta: '%s'.", beta_units)
@@ -273,7 +334,14 @@ class PowerLawLatentHeatBuilder(BuilderABC):
         return self
 
     def build(self) -> PowerLawLatentHeat:
-        """Validate parameters and build the PowerLawLatentHeat strategy."""
+        """Validate parameters and build the PowerLawLatentHeat strategy.
+
+        Returns:
+            The configured PowerLawLatentHeat strategy.
+
+        Raises:
+            ValueError: If required parameters are missing.
+        """
         self.pre_build_check()
         return PowerLawLatentHeat(
             latent_heat_ref=cast(float, self.latent_heat_ref),
