@@ -6,16 +6,8 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-01
 **Target Date**: TBD
-**Last Updated**: 2026-03-03
+**Last Updated**: 2026-03-02
 **Size**: Medium (4 phases)
-
-## Overview
-
-Define a latent heat strategy pattern that mirrors vapor pressure strategy
-injection, providing an ABC with interchangeable temperature-dependent
-implementations. P2 extends the baseline constant strategy with linear and
-power-law parametrizations, plus tests that validate scalar/array behavior and
-edge-case clamping near critical temperature.
 
 ## Summary
 
@@ -81,6 +73,32 @@ class PowerLawLatentHeat(LatentHeatStrategy):
         ...
 ```
 
+### Examples
+
+```python
+import numpy as np
+from particula.gas.latent_heat_strategies import (
+    LinearLatentHeat,
+    PowerLawLatentHeat,
+)
+
+linear = LinearLatentHeat(
+    latent_heat_ref=2.501e6,
+    slope=2.3e3,
+    temperature_ref=273.15,
+)
+print(linear.latent_heat(293.15))
+print(linear.latent_heat(np.array([273.15, 313.15])))
+
+power_law = PowerLawLatentHeat(
+    latent_heat_ref=2.257e6,
+    critical_temperature=647.1,
+    beta=0.38,
+)
+print(power_law.latent_heat(373.15))
+print(power_law.latent_heat(np.array([373.15, 647.1])))
+```
+
 ### Builders
 
 Each builder follows the `VaporPressureBuilder` pattern from
@@ -115,9 +133,9 @@ get_builders() -> {
   - Tests: `particula/gas/tests/latent_heat_strategies_test.py`
   - Test constant returns correct value, array broadcasting, type consistency
 
-- [ ] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
+- [x] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
   with tests
-  - Issue: #1123 | Size: M (~80 LOC) | Status: In Progress
+  - Issue: #1123 | Size: M (~80 LOC) | Status: Complete
   - `LinearLatentHeat(latent_heat_ref, slope, temperature_ref)`:
     `L(T) = L_ref - slope * (T - T_ref)`
   - `PowerLawLatentHeat(latent_heat_ref, critical_temperature, beta)`:
@@ -209,4 +227,3 @@ get_builders() -> {
 |------|--------|--------|
 | 2026-03-01 | Initial feature document created from E5 epic | ADW |
 | 2026-03-02 | Completed E5-F1-P1 (ABC + constant strategy + tests) | ADW |
-| 2026-03-03 | Started E5-F1-P2 (linear + power-law strategies/tests) | ADW |

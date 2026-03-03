@@ -70,7 +70,7 @@ and rollout.
 
 ### Epic E5: Non-Isothermal Condensation Features
 
-- [E5-F1: Latent Heat Strategy Pattern][e5-f1] — Status: In Progress (P2, #1123)
+- [E5-F1: Latent Heat Strategy Pattern][e5-f1] — Status: Completed (P2, #1123)
   - Scope: `LatentHeatStrategy` ABC with constant, linear, and power-law
     implementations plus builder/factory integration.
 - [E5-F2: Non-Isothermal Mass Transfer Functions][e5-f2] — Status: Planning
