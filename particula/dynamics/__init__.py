@@ -64,6 +64,7 @@ from particula.dynamics.condensation.condensation_factories import (
 from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_rate,
     get_first_order_mass_transport_k,
+    get_thermal_resistance_factor,
     get_radius_transfer_rate,
     get_mass_transfer,
     get_mass_transfer_of_single_species,

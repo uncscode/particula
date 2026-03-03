@@ -1,6 +1,7 @@
 """Test the Condensation module."""
 
 import numpy as np
+import pytest
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer,
@@ -8,7 +9,9 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_of_single_species,
     get_mass_transfer_rate,
     get_radius_transfer_rate,  # Import the function to be tested
+    get_thermal_resistance_factor,
 )
+from particula.util.constants import GAS_CONSTANT
 
 
 def test_first_order_mass_transport_k():
@@ -62,6 +65,126 @@ def test_mass_transfer_mulit_particle_rate():
         pressure_delta, first_order_mass_transport, temperature, molar_mass
     )
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
+
+
+def test_thermal_resistance_factor_isothermal_limit():
+    """Ensure latent heat of zero returns the isothermal limit."""
+    diffusion_coefficient = 2.5e-5
+    latent_heat = 0.0
+    vapor_pressure_surface = 2339.0
+    thermal_conductivity = 0.0257
+    temperature = 293.0
+    molar_mass = 0.018015
+    expected = GAS_CONSTANT / molar_mass * temperature
+    result = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    np.testing.assert_allclose(result, expected, rtol=1e-15)
+
+
+def test_thermal_resistance_factor_water_293k():
+    """Check known water-in-air values at 293 K."""
+    diffusion_coefficient = 2.5e-5
+    latent_heat = 2.454e6
+    vapor_pressure_surface = 2339.0
+    thermal_conductivity = 0.0257
+    temperature = 293.0
+    molar_mass = 0.018015
+    expected = 461992.50781411503
+    result = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    np.testing.assert_allclose(result, expected, rtol=1e-6)
+
+
+def test_thermal_resistance_factor_array_broadcasting():
+    """Verify array inputs broadcast and preserve shape."""
+    diffusion_coefficient = 2.5e-5
+    latent_heat = np.array([0.0, 1.0e6])
+    vapor_pressure_surface = np.array([1000.0, 2000.0])
+    thermal_conductivity = 0.0257
+    temperature = 293.0
+    molar_mass = 0.018015
+    result = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    assert np.asarray(result).shape == latent_heat.shape
+
+    latent_heat_2d = np.array([[0.0, 1.0e6], [2.0e6, 3.0e6]])
+    vapor_pressure_2d = np.array([[1000.0, 1500.0], [2000.0, 2500.0]])
+    result_2d = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat_2d,
+        vapor_pressure_surface=vapor_pressure_2d,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    assert np.asarray(result_2d).shape == latent_heat_2d.shape
+
+
+@pytest.mark.parametrize("latent_heat", [1.0e6, 2.0e6, 2.454e6])
+def test_thermal_resistance_factor_positive_vs_baseline(latent_heat):
+    """Thermal factor should be no less than the isothermal baseline."""
+    diffusion_coefficient = 2.5e-5
+    vapor_pressure_surface = 2339.0
+    thermal_conductivity = 0.0257
+    temperature = 293.0
+    molar_mass = 0.018015
+    baseline = GAS_CONSTANT / molar_mass * temperature
+    result = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    assert result >= baseline
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("diffusion_coefficient", -1.0),
+        ("latent_heat", -1.0),
+        ("vapor_pressure_surface", -1.0),
+        ("thermal_conductivity", 0.0),
+        ("thermal_conductivity", -1.0),
+        ("temperature", 0.0),
+        ("temperature", -1.0),
+        ("molar_mass", 0.0),
+        ("molar_mass", -1.0),
+    ],
+)
+def test_thermal_resistance_factor_rejects_invalid_inputs(field, value):
+    """Invalid inputs should raise ValueError from validation."""
+    kwargs = {
+        "diffusion_coefficient": 2.5e-5,
+        "latent_heat": 2.454e6,
+        "vapor_pressure_surface": 2339.0,
+        "thermal_conductivity": 0.0257,
+        "temperature": 293.0,
+        "molar_mass": 0.018015,
+    }
+    kwargs[field] = value
+    with pytest.raises(ValueError, match="positive|nonnegative"):
+        get_thermal_resistance_factor(**kwargs)
 
 
 def test_multi_species_mass_transfer_rate():
