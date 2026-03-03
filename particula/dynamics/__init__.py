@@ -2,11 +2,12 @@
 
 Re-exports wall loss, dilution, condensation, and coagulation utilities,
 strategies, builders, factories, and runnable processes for access through
-:mod:`particula.dynamics`. Includes neutral and charged wall loss for
-spherical and rectangular chambers. Charged wall loss adds image-charge
-enhancement even when wall potential is zero and optional
-electric-field drift. Also provides ``MassCondensation``, ``Coagulation``,
-and ``WallLoss`` runnables.
+:mod:`particula.dynamics`. Condensation exports include mass-transfer
+helpers such as the thermal resistance factor. Includes neutral and
+charged wall loss for spherical and rectangular chambers. Charged wall
+loss adds image-charge enhancement even when wall potential is zero and
+optional electric-field drift. Also provides ``MassCondensation``,
+``Coagulation``, and ``WallLoss`` runnables.
 """
 
 

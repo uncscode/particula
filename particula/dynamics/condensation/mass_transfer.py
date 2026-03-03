@@ -200,26 +200,33 @@ def get_thermal_resistance_factor(
 ) -> Union[float, NDArray[np.float64]]:
     """Calculate the thermal resistance factor for mass transfer.
 
-    This uses the non-isothermal correction from Topping & Bane (2022),
-    Equation 2.36. Inputs include diffusion coefficient D [m²/s], latent heat
-    L [J/kg], vapor pressure at the surface p_surf [Pa], thermal conductivity
-    kappa [W/(m·K)], temperature T [K], and molar mass M [kg/mol]. The result
-    has units of [J/(kg·K)] equivalent to the denominator factor.
+    Uses the non-isothermal correction from Topping & Bane (2022),
+    Equation 2.36. Inputs include diffusion coefficient D [m²/s],
+    latent heat L [J/kg], vapor pressure at the surface p_surf [Pa],
+    thermal conductivity kappa [W/(m·K)], temperature T [K], and
+    molar mass M [kg/mol]. When latent_heat is zero, the factor
+    reduces to r_specific * temperature.
 
     Args:
         diffusion_coefficient: The vapor diffusion coefficient D [m²/s].
         latent_heat: Latent heat of vaporization L [J/kg].
-        vapor_pressure_surface: Equilibrium vapor pressure at the surface [Pa].
+        vapor_pressure_surface: Equilibrium vapor pressure at the
+            surface [Pa].
         thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
         temperature: Temperature T [K].
         molar_mass: Molar mass M [kg/mol].
 
     Returns:
-        Thermal resistance factor for non-isothermal mass transfer.
+        Thermal resistance factor for non-isothermal mass transfer,
+        matching the broadcasted input shape.
+
+    Raises:
+        ValueError: If any validated inputs violate positive/nonnegative
+            constraints.
 
     References:
-        - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling.
-          Equation 2.36.
+        - Topping, D., & Bane, M. (2022). Introduction to Aerosol
+          Modelling. Equation 2.36.
     """
     r_specific = GAS_CONSTANT / molar_mass
     thermal_factor = (
