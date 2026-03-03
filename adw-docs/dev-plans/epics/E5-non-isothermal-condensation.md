@@ -5,7 +5,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-02
 **Target Date**: TBD
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-03
 **Size**: Medium (7 features, ~22 phases)
 
 ## Vision
@@ -207,6 +207,7 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
   - Note: needs `vapor_pressure_surface` to pass through to
     `get_thermal_resistance_factor()`. This is the equilibrium vapor pressure
     at the droplet surface (activity × pure_vapor_pressure × kelvin_term).
+  - Issue: #1135 | Size: S (~50 LOC) | Status: In Progress
   - When `latent_heat = 0`, the thermal_factor reduces to `R_specific * T`
     and the full expression reduces exactly to `get_mass_transfer_rate()`
     (isothermal limit). This MUST be tested to machine precision.
