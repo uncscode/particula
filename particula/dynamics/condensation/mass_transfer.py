@@ -253,6 +253,82 @@ def get_thermal_resistance_factor(
 
 @validate_inputs(
     {
+        "pressure_delta": "finite",
+        "first_order_mass_transport": "finite",
+        "temperature": "positive",
+        "molar_mass": "positive",
+        "latent_heat": "nonnegative",
+        "thermal_conductivity": "positive",
+        "vapor_pressure_surface": "nonnegative",
+        "diffusion_coefficient": "nonnegative",
+    }
+)
+def get_mass_transfer_rate_latent_heat(
+    pressure_delta: Union[float, NDArray[np.float64]],
+    first_order_mass_transport: Union[float, NDArray[np.float64]],
+    temperature: Union[float, NDArray[np.float64]],
+    molar_mass: Union[float, NDArray[np.float64]],
+    latent_heat: Union[float, NDArray[np.float64]],
+    thermal_conductivity: Union[float, NDArray[np.float64]],
+    vapor_pressure_surface: Union[float, NDArray[np.float64]],
+    diffusion_coefficient: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Calculate the non-isothermal mass transfer rate.
+
+    This function applies the thermal resistance correction from
+    get_thermal_resistance_factor to the isothermal mass transfer rate. When
+    latent_heat is zero, the thermal correction reduces to unity and the
+    result matches get_mass_transfer_rate.
+
+    Arguments:
+        - pressure_delta : Difference in partial pressure [Pa].
+        - first_order_mass_transport : Mass transport coefficient K [m³/s].
+        - temperature : Temperature T [K].
+        - molar_mass : Molar mass M [kg/mol].
+        - latent_heat : Latent heat of vaporization L [J/kg].
+        - thermal_conductivity : Gas thermal conductivity kappa [W/(m·K)].
+        - vapor_pressure_surface : Equilibrium vapor pressure at the surface
+            [Pa].
+        - diffusion_coefficient : Vapor diffusion coefficient D [m²/s].
+
+    Returns:
+        Non-isothermal mass transfer rate [kg/s], matching the broadcasted
+        input shape.
+
+    Raises:
+        ValueError: If any validated inputs violate positive/nonnegative
+            constraints.
+    """
+    pressure_delta = np.asarray(pressure_delta)
+    first_order_mass_transport = np.asarray(first_order_mass_transport)
+    temperature = np.asarray(temperature)
+    molar_mass = np.asarray(molar_mass)
+    latent_heat = np.asarray(latent_heat)
+    thermal_conductivity = np.asarray(thermal_conductivity)
+    vapor_pressure_surface = np.asarray(vapor_pressure_surface)
+    diffusion_coefficient = np.asarray(diffusion_coefficient)
+
+    thermal_factor = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    r_specific = GAS_CONSTANT / molar_mass
+    correction = thermal_factor / (r_specific * temperature)
+    isothermal_rate = get_mass_transfer_rate(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    return np.array(isothermal_rate / correction, dtype=np.float64)
+
+
+@validate_inputs(
+    {
         "mass_rate": "finite",
         "particle_radius": "nonnegative",
         "density": "positive",

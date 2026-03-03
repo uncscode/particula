@@ -8,6 +8,7 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_of_multiple_species,
     get_mass_transfer_of_single_species,
     get_mass_transfer_rate,
+    get_mass_transfer_rate_latent_heat,
     get_radius_transfer_rate,
     get_thermal_resistance_factor,
 )
@@ -224,6 +225,191 @@ def test_thermal_resistance_factor_rejects_invalid_inputs(field, value):
     kwargs[field] = value
     with pytest.raises(ValueError, match="positive|nonnegative"):
         get_thermal_resistance_factor(**kwargs)
+
+
+def test_mass_transfer_rate_latent_heat_isothermal_parity():
+    """Latent heat of zero should match the isothermal rate (scalar)."""
+    pressure_delta = 23.39
+    first_order_mass_transport = 1.5e-14
+    temperature = 293.0
+    molar_mass = 0.018015
+    result = get_mass_transfer_rate_latent_heat(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+        latent_heat=0.0,
+        thermal_conductivity=0.0257,
+        vapor_pressure_surface=2339.0,
+        diffusion_coefficient=2.5e-5,
+    )
+    expected = get_mass_transfer_rate(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    np.testing.assert_allclose(result, expected, rtol=1e-15)
+
+
+def test_mass_transfer_rate_latent_heat_isothermal_parity_array():
+    """Latent heat of zero should match isothermal rate (arrays)."""
+    pressure_delta = np.array([10.0, 15.0])
+    first_order_mass_transport = np.array([1e-17, 2e-17])
+    temperature = np.array([300.0, 310.0])
+    molar_mass = np.array([0.02897, 0.018015])
+    result = get_mass_transfer_rate_latent_heat(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+        latent_heat=0.0,
+        thermal_conductivity=0.0257,
+        vapor_pressure_surface=2339.0,
+        diffusion_coefficient=2.5e-5,
+    )
+    expected = get_mass_transfer_rate(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    np.testing.assert_allclose(result, expected, rtol=1e-15)
+
+
+def test_mass_transfer_rate_latent_heat_rate_reduction():
+    """Non-isothermal rate magnitude should be reduced when latent heat > 0."""
+    pressure_delta = np.array([23.39, -23.39])
+    first_order_mass_transport = 1.5e-14
+    temperature = 293.0
+    molar_mass = 0.018015
+    latent_heat = 2.454e6
+    thermal_conductivity = 0.0257
+    vapor_pressure_surface = 2339.0
+    diffusion_coefficient = 2.5e-5
+    non_isothermal = get_mass_transfer_rate_latent_heat(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+        latent_heat=latent_heat,
+        thermal_conductivity=thermal_conductivity,
+        vapor_pressure_surface=vapor_pressure_surface,
+        diffusion_coefficient=diffusion_coefficient,
+    )
+    isothermal = get_mass_transfer_rate(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    assert np.all(np.abs(non_isothermal) < np.abs(isothermal))
+
+
+def test_mass_transfer_rate_latent_heat_water_293k():
+    """Check water-in-air values at 293 K with latent heat correction."""
+    pressure_delta = 23.39
+    first_order_mass_transport = 1.5e-14
+    temperature = 293.0
+    molar_mass = 0.018015
+    latent_heat = 2.454e6
+    thermal_conductivity = 0.0257
+    vapor_pressure_surface = 2339.0
+    diffusion_coefficient = 2.5e-5
+    thermal_factor = get_thermal_resistance_factor(
+        diffusion_coefficient=diffusion_coefficient,
+        latent_heat=latent_heat,
+        vapor_pressure_surface=vapor_pressure_surface,
+        thermal_conductivity=thermal_conductivity,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    expected = first_order_mass_transport * pressure_delta / thermal_factor
+    result = get_mass_transfer_rate_latent_heat(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+        latent_heat=latent_heat,
+        thermal_conductivity=thermal_conductivity,
+        vapor_pressure_surface=vapor_pressure_surface,
+        diffusion_coefficient=diffusion_coefficient,
+    )
+    isothermal_rate = get_mass_transfer_rate(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=molar_mass,
+    )
+    assert result > 0.0
+    assert expected < isothermal_rate
+    np.testing.assert_allclose(result, expected, rtol=1e-12)
+
+
+def test_mass_transfer_rate_latent_heat_array_shapes():
+    """Mix scalar and array inputs to confirm broadcasting."""
+    pressure_delta = np.array([[10.0], [15.0]])
+    first_order_mass_transport = np.array(
+        [[1e-17, 2e-17, 3e-17], [1.1e-17, 2.1e-17, 3.1e-17]]
+    )
+    temperature = np.array([[290.0], [300.0]])
+    result = get_mass_transfer_rate_latent_heat(
+        pressure_delta=pressure_delta,
+        first_order_mass_transport=first_order_mass_transport,
+        temperature=temperature,
+        molar_mass=0.02897,
+        latent_heat=2.454e6,
+        thermal_conductivity=0.0257,
+        vapor_pressure_surface=2339.0,
+        diffusion_coefficient=2.5e-5,
+    )
+    assert np.asarray(result).shape == (2, 3)
+    assert np.all(np.isfinite(result))
+
+
+def test_mass_transfer_rate_latent_heat_validation_negative_latent_heat():
+    """Negative latent heat should raise a validation error."""
+    with pytest.raises(ValueError, match="latent_heat"):
+        get_mass_transfer_rate_latent_heat(
+            pressure_delta=10.0,
+            first_order_mass_transport=1e-17,
+            temperature=293.0,
+            molar_mass=0.018015,
+            latent_heat=-1.0,
+            thermal_conductivity=0.0257,
+            vapor_pressure_surface=2339.0,
+            diffusion_coefficient=2.5e-5,
+        )
+
+
+def test_mass_transfer_rate_latent_heat_validation_zero_temperature():
+    """Zero temperature should raise a validation error."""
+    with pytest.raises(ValueError, match="temperature"):
+        get_mass_transfer_rate_latent_heat(
+            pressure_delta=10.0,
+            first_order_mass_transport=1e-17,
+            temperature=0.0,
+            molar_mass=0.018015,
+            latent_heat=2.454e6,
+            thermal_conductivity=0.0257,
+            vapor_pressure_surface=2339.0,
+            diffusion_coefficient=2.5e-5,
+        )
+
+
+def test_mass_transfer_rate_latent_heat_validation_negative_molar_mass():
+    """Negative molar mass should raise a validation error."""
+    with pytest.raises(ValueError, match="molar_mass"):
+        get_mass_transfer_rate_latent_heat(
+            pressure_delta=10.0,
+            first_order_mass_transport=1e-17,
+            temperature=293.0,
+            molar_mass=-0.01,
+            latent_heat=2.454e6,
+            thermal_conductivity=0.0257,
+            vapor_pressure_surface=2339.0,
+            diffusion_coefficient=2.5e-5,
+        )
 
 
 def test_multi_species_mass_transfer_rate():
