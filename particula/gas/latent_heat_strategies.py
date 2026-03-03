@@ -87,7 +87,8 @@ class ConstantLatentHeat(LatentHeatStrategy):
 class LinearLatentHeat(LatentHeatStrategy):
     """Latent heat strategy using a linear temperature dependence.
 
-    Computes :math:`L(T) = L_{ref} - slope * (T - T_{ref})`.
+    Computes a linear relation for each temperature:
+    :math:`L(T) = L_{ref} - slope * (T - T_{ref})`.
 
     Attributes:
         latent_heat_ref: Reference latent heat in J/kg at the reference
@@ -118,6 +119,9 @@ class LinearLatentHeat(LatentHeatStrategy):
     ) -> float | NDArray[np.float64]:
         """Return the latent heat for the given temperature.
 
+        Uses the linear relation
+        :math:`L(T) = L_{ref} - slope * (T - T_{ref})`.
+
         Args:
             temperature: Temperature in Kelvin.
 
@@ -137,8 +141,9 @@ class LinearLatentHeat(LatentHeatStrategy):
 class PowerLawLatentHeat(LatentHeatStrategy):
     """Latent heat strategy using a power-law temperature dependence.
 
-    Computes :math:`L(T) = L_{ref} * (1 - T / T_c)^{beta}` with the ratio
-    clipped to the range [0, 1] to enforce non-negative latent heat values.
+    Computes a power-law relation:
+    :math:`L(T) = L_{ref} * (1 - T / T_c)^{beta}`.
+    The ratio is clipped to [0, 1] to enforce non-negative latent heat values.
 
     Attributes:
         latent_heat_ref: Reference latent heat in J/kg.
@@ -167,6 +172,9 @@ class PowerLawLatentHeat(LatentHeatStrategy):
         self, temperature: float | NDArray[np.float64]
     ) -> float | NDArray[np.float64]:
         """Return the latent heat for the given temperature.
+
+        Temperatures are normalized by the critical temperature and clipped
+        to the range [0, 1], ensuring latent heat values stay non-negative.
 
         Args:
             temperature: Temperature in Kelvin.
