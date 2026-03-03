@@ -6,8 +6,16 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-01
 **Target Date**: TBD
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-03
 **Size**: Medium (4 phases)
+
+## Overview
+
+Define a latent heat strategy pattern that mirrors vapor pressure strategy
+injection, providing an ABC with interchangeable temperature-dependent
+implementations. P2 extends the baseline constant strategy with linear and
+power-law parametrizations, plus tests that validate scalar/array behavior and
+edge-case clamping near critical temperature.
 
 ## Summary
 
@@ -109,7 +117,7 @@ get_builders() -> {
 
 - [ ] **E5-F1-P2**: Add `LinearLatentHeat` and `PowerLawLatentHeat` strategies
   with tests
-  - Issue: TBD | Size: M (~80 LOC) | Status: Not Started
+  - Issue: #1123 | Size: M (~80 LOC) | Status: In Progress
   - `LinearLatentHeat(latent_heat_ref, slope, temperature_ref)`:
     `L(T) = L_ref - slope * (T - T_ref)`
   - `PowerLawLatentHeat(latent_heat_ref, critical_temperature, beta)`:
@@ -201,3 +209,4 @@ get_builders() -> {
 |------|--------|--------|
 | 2026-03-01 | Initial feature document created from E5 epic | ADW |
 | 2026-03-02 | Completed E5-F1-P1 (ABC + constant strategy + tests) | ADW |
+| 2026-03-03 | Started E5-F1-P2 (linear + power-law strategies/tests) | ADW |
