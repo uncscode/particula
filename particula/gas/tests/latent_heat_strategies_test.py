@@ -6,13 +6,15 @@ import pytest
 from particula.gas.latent_heat_strategies import (
     ConstantLatentHeat,
     LatentHeatStrategy,
+    LinearLatentHeat,
+    PowerLawLatentHeat,
 )
 
 
 def test_abc_cannot_instantiate():
     """Ensure the abstract strategy cannot be instantiated."""
     with pytest.raises(TypeError):
-        LatentHeatStrategy()
+        LatentHeatStrategy()  # type: ignore[abstract]
 
 
 def test_constant_scalar_return():
@@ -67,3 +69,112 @@ def test_constant_latent_heat_ref_validation(latent_heat_ref):
     """Reject non-positive or non-finite latent heat references."""
     with pytest.raises(ValueError, match="latent_heat_ref"):
         ConstantLatentHeat(latent_heat_ref=latent_heat_ref)
+
+
+def test_linear_scalar_return():
+    """Return reference latent heat at the reference temperature."""
+    strategy = LinearLatentHeat(
+        latent_heat_ref=2.501e6,
+        slope=2.3e3,
+        temperature_ref=273.15,
+    )
+    result = strategy.latent_heat(273.15)
+    assert result == pytest.approx(2.501e6)
+
+
+def test_linear_known_water_values():
+    """Match water reference values across common temperatures."""
+    strategy = LinearLatentHeat(
+        latent_heat_ref=2.501e6,
+        slope=2.3e3,
+        temperature_ref=273.15,
+    )
+    temperatures = np.array([273.15, 293.15, 313.15])
+    expected_values = np.array([2.501e6, 2.455e6, 2.409e6])
+    results = strategy.latent_heat(temperatures)
+    npt.assert_allclose(results, expected_values, rtol=1e-3)
+
+
+def test_linear_array_broadcast():
+    """Broadcast the linear model for array input."""
+    strategy = LinearLatentHeat(
+        latent_heat_ref=2.501e6,
+        slope=2.3e3,
+        temperature_ref=273.15,
+    )
+    temperatures = np.array([273.15, 293.15, 313.15])
+    expected = 2.501e6 - 2.3e3 * (temperatures - 273.15)
+    results = np.asarray(strategy.latent_heat(temperatures))
+    assert results.shape == temperatures.shape
+    npt.assert_allclose(results, expected)
+
+
+def test_power_law_scalar():
+    """Compute a scalar latent heat using the power law model."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    temperature = 373.15
+    expected = 2.257e6 * (1 - temperature / 647.1) ** 0.38
+    result = strategy.latent_heat(temperature)
+    assert result == pytest.approx(expected)
+
+
+def test_power_law_at_critical_temp():
+    """Clamp latent heat to zero at the critical temperature."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    assert strategy.latent_heat(647.1) == pytest.approx(0.0)
+
+
+def test_power_law_above_critical_temp():
+    """Clamp latent heat to zero above the critical temperature."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    assert strategy.latent_heat(700.0) == pytest.approx(0.0)
+
+
+def test_power_law_negative_temperature_clips():
+    """Clamp negative temperatures to the reference latent heat."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    assert strategy.latent_heat(-10.0) == pytest.approx(2.257e6)
+
+
+def test_power_law_array_broadcast():
+    """Broadcast the power law model for array input."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    temperatures = np.array([273.15, 373.15, 647.1])
+    ratio = np.clip(temperatures / 647.1, 0.0, 1.0)
+    expected = 2.257e6 * (1 - ratio) ** 0.38
+    results = np.asarray(strategy.latent_heat(temperatures))
+    assert results.shape == temperatures.shape
+    npt.assert_allclose(results, expected)
+
+
+def test_power_law_type_consistency():
+    """Ensure scalar returns float and array returns NDArray."""
+    strategy = PowerLawLatentHeat(
+        latent_heat_ref=2.257e6,
+        critical_temperature=647.1,
+        beta=0.38,
+    )
+    scalar_result = strategy.latent_heat(373.15)
+    array_result = strategy.latent_heat(np.array([373.15, 400.0]))
+    assert isinstance(scalar_result, float)
+    assert isinstance(array_result, np.ndarray)
