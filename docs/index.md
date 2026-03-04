@@ -29,8 +29,9 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 - **Building gas-phase properties** with builder/factory patterns (vapor
   pressure and latent heat) that support unit-aware setters and exports.
 - **Supporting non-isothermal condensation** with thermal resistance,
-  latent-heat mass transfer rate utilities, and latent-heat energy release
-  bookkeeping.
+  latent-heat mass transfer rate utilities, latent-heat energy release
+  bookkeeping, and the `CondensationLatentHeat` strategy scaffold
+  (latent-heat strategy resolution with a constant fallback).
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 

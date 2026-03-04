@@ -1706,7 +1706,13 @@ class CondensationLatentHeat(CondensationStrategy):
     """Condensation strategy with latent heat configuration.
 
     This class mirrors the base condensation setup while deferring the
-    non-isothermal mass-transfer implementation to later phases.
+    non-isothermal mass-transfer implementation to later phases. It resolves
+    latent heat either from a provided strategy or a scalar fallback value.
+
+    Attributes:
+        latent_heat_strategy_input: Strategy input provided at initialization.
+        latent_heat_input: Raw latent heat value provided at initialization.
+        last_latent_heat_energy: Diagnostic latent heat energy tracker.
     """
 
     # pylint: disable=R0913, R0917
@@ -1726,7 +1732,22 @@ class CondensationLatentHeat(CondensationStrategy):
         latent_heat_strategy: LatentHeatStrategy | None = None,
         latent_heat: float | NDArray[np.float64] = 0.0,
     ):
-        """Initialize the CondensationLatentHeat strategy."""
+        """Initialize the CondensationLatentHeat strategy.
+
+        Args:
+            molar_mass: Molar mass of the species [kg/mol].
+            diffusion_coefficient: Diffusion coefficient [m^2/s].
+            accommodation_coefficient: Mass accommodation coefficient.
+            update_gases: Whether to update gas concentrations on update.
+            skip_partitioning_indices: Species indices that should skip
+                partitioning.
+            activity_strategy: Activity strategy used for ParticleData inputs.
+            surface_strategy: Surface strategy used for ParticleData inputs.
+            vapor_pressure_strategy: Vapor pressure strategy used for GasData
+                inputs.
+            latent_heat_strategy: Optional latent heat strategy to use.
+            latent_heat: Scalar latent heat fallback [J/kg].
+        """
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
@@ -1750,6 +1771,19 @@ class CondensationLatentHeat(CondensationStrategy):
         latent_heat_strategy: LatentHeatStrategy | None,
         latent_heat: float | NDArray[np.float64],
     ) -> LatentHeatStrategy | None:
+        """Resolve the latent heat strategy from inputs.
+
+        Prefers an explicit strategy, otherwise converts scalar latent heat
+        values into a constant strategy. Array-like or negative latent heat
+        values log a warning and fall back to isothermal behavior.
+
+        Args:
+            latent_heat_strategy: Optional strategy to use directly.
+            latent_heat: Scalar or array-like latent heat input [J/kg].
+
+        Returns:
+            Resolved latent heat strategy, or None for isothermal fallback.
+        """
         if latent_heat_strategy is not None:
             return latent_heat_strategy
 
@@ -1779,7 +1813,23 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """Return the mass transfer rate (stub)."""
+        """Return the mass transfer rate (stub).
+
+        Args:
+            particle: Particle representation providing radius and activity
+                information.
+            gas_species: Gas species supplying vapor properties and
+                concentrations.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            dynamic_viscosity: Optional dynamic viscosity override.
+
+        Returns:
+            Mass transfer rate per particle and per species in kg/s.
+
+        Raises:
+            NotImplementedError: Implemented in E5-F3-P2/P3.
+        """
         raise NotImplementedError("Implemented in E5-F3-P2/P3")
 
     def rate(
@@ -1790,7 +1840,23 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> NDArray[np.float64]:
-        """Return the condensation rate (stub)."""
+        """Return the condensation rate (stub).
+
+        Args:
+            particle: Particle representation providing radius and activity
+                information.
+            gas_species: Gas species supplying vapor properties and
+                concentrations.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            dynamic_viscosity: Optional dynamic viscosity override.
+
+        Returns:
+            Condensation rate per particle and per species in kg/s.
+
+        Raises:
+            NotImplementedError: Implemented in E5-F3-P2/P3.
+        """
         raise NotImplementedError("Implemented in E5-F3-P2/P3")
 
     def step(
@@ -1804,5 +1870,20 @@ class CondensationLatentHeat(CondensationStrategy):
     ) -> (
         Tuple[ParticleRepresentation, GasSpecies] | Tuple[ParticleData, GasData]
     ):
-        """Advance one condensation step (stub)."""
+        """Advance one condensation step (stub).
+
+        Args:
+            particle: Particle representation to update.
+            gas_species: Gas species object providing vapor properties.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            time_step: Integration timestep in seconds.
+            dynamic_viscosity: Optional dynamic viscosity override.
+
+        Returns:
+            Tuple containing updated particle and gas species objects.
+
+        Raises:
+            NotImplementedError: Implemented in E5-F3-P2/P3.
+        """
         raise NotImplementedError("Implemented in E5-F3-P2/P3")
