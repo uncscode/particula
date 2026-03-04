@@ -97,9 +97,9 @@ particula/
   `particula.dynamics.get_thermal_resistance_factor`,
   `particula.dynamics.get_mass_transfer_rate_latent_heat`, and
   `particula.dynamics.get_latent_heat_energy_released`
-- **Condensation Strategies** — `CondensationIsothermal` plus the
-  `CondensationLatentHeat` scaffold (latent-heat strategy resolution with a
-  constant fallback; rate/step implementation pending)
+- **Condensation Strategies** — `CondensationIsothermal` plus
+  `CondensationLatentHeat` with latent-heat-corrected
+  `mass_transfer_rate()`/`rate()` (step integration pending)
 - **Latent Heat Factories** — Build constant, linear, and power-law latent heat
   strategies via `particula.gas.LatentHeatFactory` with unit-aware builders and
   gas-phase exports for upcoming non-isothermal workflows

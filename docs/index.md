@@ -30,8 +30,9 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   pressure and latent heat) that support unit-aware setters and exports.
 - **Supporting non-isothermal condensation** with thermal resistance,
   latent-heat mass transfer rate utilities, latent-heat energy release
-  bookkeeping, and the `CondensationLatentHeat` strategy scaffold
-  (latent-heat strategy resolution with a constant fallback).
+  bookkeeping, and the `CondensationLatentHeat` strategy with
+  latent-heat-corrected `mass_transfer_rate()`/`rate()` (step integration
+  pending).
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 
