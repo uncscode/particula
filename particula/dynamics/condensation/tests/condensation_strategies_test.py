@@ -375,6 +375,30 @@ class TestCondensationIsothermal(unittest.TestCase):
         expected_2d = np.tile(np.array([0.0, 1.0, 0.0, 3.0]), (2, 1))
         np.testing.assert_array_equal(array_2d, expected_2d)
 
+    def test_apply_skip_partitioning_rejects_non_integer_indices(self):
+        """_apply_skip_partitioning rejects non-integer indices."""
+        strategy = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            skip_partitioning_indices=[0.5],
+        )
+
+        with self.assertRaises(TypeError):
+            strategy._apply_skip_partitioning(np.arange(3.0))
+
+    def test_apply_skip_partitioning_out_of_bounds_raises(self):
+        """_apply_skip_partitioning rejects out-of-range indices."""
+        strategy = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            skip_partitioning_indices=[3],
+        )
+
+        with self.assertRaises(IndexError):
+            strategy._apply_skip_partitioning(np.arange(3.0))
+
     def test_isothermal_step_with_particle_data_gas_data(self):
         """step() supports ParticleData and GasData inputs."""
         strategy = self._make_data_strategy()
@@ -2086,8 +2110,29 @@ class TestCondensationLatentHeat(unittest.TestCase):
 
         self.assertTrue(np.all(rates[:, 1] == 0.0))
 
+    def test_rate_skip_partitioning_out_of_bounds_raises(self):
+        """Out-of-bounds skip indices raise an error."""
+        particle_data, gas_data = self._make_data_inputs()
+        strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            skip_partitioning_indices=[5],
+        )
+
+        with self.assertRaises(IndexError):
+            strategy.rate(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+
     def test_nonfinite_pressure_delta_sanitized(self):
-        """Non-finite pressure deltas are sanitized to zero."""
+        """Non-finite pressure deltas raise an error."""
         gas_species, particle, _, _ = self._build_single_species_fixture(
             n_particles=3
         )
@@ -2098,14 +2143,78 @@ class TestCondensationLatentHeat(unittest.TestCase):
             "calculate_pressure_delta",
             return_value=np.array([np.nan, np.inf, -np.inf]),
         ):
-            rates = cond.mass_transfer_rate(
+            with self.assertRaises(ValueError):
+                cond.mass_transfer_rate(
+                    particle=particle,
+                    gas_species=gas_species,
+                    temperature=self.temperature,
+                    pressure=self.pressure,
+                )
+
+    def test_nonfinite_latent_heat_raises(self):
+        """Non-finite latent heat raises an error."""
+        gas_species, particle, _, _ = self._build_single_species_fixture()
+
+        class NonFiniteLatentHeat:
+            """Latent heat strategy returning non-finite value."""
+
+            def latent_heat(self, temperature: float) -> float:
+                return float("nan")
+
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            latent_heat_strategy=NonFiniteLatentHeat(),
+        )
+
+        with self.assertRaises(ValueError):
+            cond.mass_transfer_rate(
                 particle=particle,
                 gas_species=gas_species,
                 temperature=self.temperature,
                 pressure=self.pressure,
             )
 
-        np.testing.assert_array_equal(rates, np.zeros_like(rates))
+    def test_nonfinite_thermal_conductivity_raises(self):
+        """Non-finite thermal conductivity raises an error."""
+        gas_species, particle, _, _ = self._build_single_species_fixture()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        with patch(
+            "particula.dynamics.condensation.condensation_strategies."
+            "get_thermal_conductivity",
+            return_value=np.nan,
+        ):
+            with self.assertRaises(ValueError):
+                cond.mass_transfer_rate(
+                    particle=particle,
+                    gas_species=gas_species,
+                    temperature=self.temperature,
+                    pressure=self.pressure,
+                )
+
+    def test_nonfinite_vapor_pressure_surface_raises(self):
+        """Non-finite surface vapor pressure raises an error."""
+        gas_species, particle, _, surface = self._build_single_species_fixture()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        with patch.object(
+            surface,
+            "kelvin_term",
+            return_value=np.array([np.nan]),
+        ):
+            with self.assertRaises(ValueError):
+                cond.mass_transfer_rate(
+                    particle=particle,
+                    gas_species=gas_species,
+                    temperature=self.temperature,
+                    pressure=self.pressure,
+                )
 
     def test_inherited_methods_work(self):
         """Base class helpers remain available."""
