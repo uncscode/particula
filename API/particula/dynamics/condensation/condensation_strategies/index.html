@@ -3333,6 +3333,56 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;CondensationLatentHeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" CondensationLatentHeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.mass_transfer_rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;mass_transfer_rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.dynamics.condensation.condensation_strategies.CondensationStrategy" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14084,6 +14134,56 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;CondensationLatentHeat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" CondensationLatentHeat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.mass_transfer_rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;mass_transfer_rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;step
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.dynamics.condensation.condensation_strategies.CondensationStrategy" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14446,11 +14546,7 @@ inputs.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">723</span>
-<span class="normal">724</span>
-<span class="normal">725</span>
-<span class="normal">726</span>
-<span class="normal">727</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">727</span>
 <span class="normal">728</span>
 <span class="normal">729</span>
 <span class="normal">730</span>
@@ -14482,7 +14578,11 @@ inputs.</p>
 <span class="normal">756</span>
 <span class="normal">757</span>
 <span class="normal">758</span>
-<span class="normal">759</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-5</span><span class="p">,</span>
@@ -14635,11 +14735,7 @@ order transport calculation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">761</span>
-<span class="normal">762</span>
-<span class="normal">763</span>
-<span class="normal">764</span>
-<span class="normal">765</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">765</span>
 <span class="normal">766</span>
 <span class="normal">767</span>
 <span class="normal">768</span>
@@ -14707,7 +14803,11 @@ order transport calculation.</p>
 <span class="normal">830</span>
 <span class="normal">831</span>
 <span class="normal">832</span>
-<span class="normal">833</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -14871,11 +14971,7 @@ matching the particle inventory shape.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span>
-<span class="normal">839</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">839</span>
 <span class="normal">840</span>
 <span class="normal">841</span>
 <span class="normal">842</span>
@@ -14935,7 +15031,11 @@ matching the particle inventory shape.</p>
 <span class="normal">896</span>
 <span class="normal">897</span>
 <span class="normal">898</span>
-<span class="normal">899</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -15115,11 +15215,7 @@ inventory limits.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 922</span>
-<span class="normal"> 923</span>
-<span class="normal"> 924</span>
-<span class="normal"> 925</span>
-<span class="normal"> 926</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 926</span>
 <span class="normal"> 927</span>
 <span class="normal"> 928</span>
 <span class="normal"> 929</span>
@@ -15233,7 +15329,11 @@ inventory limits.</p>
 <span class="normal">1037</span>
 <span class="normal">1038</span>
 <span class="normal">1039</span>
-<span class="normal">1040</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span>
+<span class="normal">1043</span>
+<span class="normal">1044</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -15618,11 +15718,7 @@ less than 1.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1092</span>
-<span class="normal">1093</span>
-<span class="normal">1094</span>
-<span class="normal">1095</span>
-<span class="normal">1096</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1096</span>
 <span class="normal">1097</span>
 <span class="normal">1098</span>
 <span class="normal">1099</span>
@@ -15688,7 +15784,11 @@ less than 1.</p>
 <span class="normal">1159</span>
 <span class="normal">1160</span>
 <span class="normal">1161</span>
-<span class="normal">1162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">1162</span>
+<span class="normal">1163</span>
+<span class="normal">1164</span>
+<span class="normal">1165</span>
+<span class="normal">1166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">theta_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;half&quot;</span><span class="p">,</span>
@@ -15874,11 +15974,7 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1275</span>
-<span class="normal">1276</span>
-<span class="normal">1277</span>
-<span class="normal">1278</span>
-<span class="normal">1279</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1279</span>
 <span class="normal">1280</span>
 <span class="normal">1281</span>
 <span class="normal">1282</span>
@@ -15928,7 +16024,11 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
 <span class="normal">1326</span>
 <span class="normal">1327</span>
 <span class="normal">1328</span>
-<span class="normal">1329</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
+<span class="normal">1329</span>
+<span class="normal">1330</span>
+<span class="normal">1331</span>
+<span class="normal">1332</span>
+<span class="normal">1333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -16073,11 +16173,7 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1331</span>
-<span class="normal">1332</span>
-<span class="normal">1333</span>
-<span class="normal">1334</span>
-<span class="normal">1335</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1335</span>
 <span class="normal">1336</span>
 <span class="normal">1337</span>
 <span class="normal">1338</span>
@@ -16120,7 +16216,11 @@ non-finite deltas are zeroed to avoid propagating NaNs or infinities.</p>
 <span class="normal">1375</span>
 <span class="normal">1376</span>
 <span class="normal">1377</span>
-<span class="normal">1378</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
+<span class="normal">1378</span>
+<span class="normal">1379</span>
+<span class="normal">1380</span>
+<span class="normal">1381</span>
+<span class="normal">1382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -16298,11 +16398,7 @@ True.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1541</span>
-<span class="normal">1542</span>
-<span class="normal">1543</span>
-<span class="normal">1544</span>
-<span class="normal">1545</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1545</span>
 <span class="normal">1546</span>
 <span class="normal">1547</span>
 <span class="normal">1548</span>
@@ -16455,7 +16551,11 @@ True.</p>
 <span class="normal">1695</span>
 <span class="normal">1696</span>
 <span class="normal">1697</span>
-<span class="normal">1698</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">1698</span>
+<span class="normal">1699</span>
+<span class="normal">1700</span>
+<span class="normal">1701</span>
+<span class="normal">1702</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -16613,6 +16713,786 @@ True.</p>
             <span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">),</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasData</span><span class="p">],</span> <span class="p">(</span><span class="n">particle_data</span><span class="p">,</span> <span class="n">gas_data</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">CondensationLatentHeat</span>
+
+
+<a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CondensationLatentHeat</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-05</span><span class="p">,</span> <span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activity_strategy</span><span class="p">:</span> <span class="n">ActivityStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">surface_strategy</span><span class="p">:</span> <span class="n">SurfaceStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">VaporPressureStrategy</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">latent_heat_strategy</span><span class="p">:</span> <span class="n">LatentHeatStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            CondensationStrategy (particula.dynamics.condensation.condensation_strategies.CondensationStrategy)" href="#particula.dynamics.condensation.condensation_strategies.CondensationStrategy">CondensationStrategy</a></code></p>
+
+
+
+        <p>Condensation strategy with latent heat configuration.</p>
+<p>This class mirrors the base condensation setup while deferring the
+non-isothermal mass-transfer implementation to later phases. It resolves
+latent heat either from a provided strategy or a scalar fallback value.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.latent_heat_strategy_input">latent_heat_strategy_input</span></code></b>
+          –
+          <div class="doc-md-description">
+            <p>Strategy input provided at initialization.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.latent_heat_input">latent_heat_input</span></code></b>
+          –
+          <div class="doc-md-description">
+            <p>Raw latent heat value provided at initialization.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.last_latent_heat_energy">last_latent_heat_energy</span></code></b>
+          –
+          <div class="doc-md-description">
+            <p>Diagnostic latent heat energy tracker.</p>
+          </div>
+        </li>
+    </ul>
+
+        <p>Initialize the CondensationLatentHeat strategy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>molar_mass</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Molar mass of the species [kg/mol].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>diffusion_coefficient</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>, default:
+                  <code>2e-05</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Diffusion coefficient [m^2/s].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>accommodation_coefficient</code></b>
+              (<code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>, default:
+                  <code>1.0</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Mass accommodation coefficient.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>update_gases</code></b>
+              (<code><span title="bool">bool</span></code>, default:
+                  <code>True</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Whether to update gas concentrations on update.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>skip_partitioning_indices</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Sequence">Sequence</span>[<span title="int">int</span>]]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Species indices that should skip
+partitioning.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>activity_strategy</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ActivityStrategy (particula.particles.activity_strategies.ActivityStrategy)" href="../../../particles/activity_strategies/#particula.particles.activity_strategies.ActivityStrategy">ActivityStrategy</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Activity strategy used for ParticleData inputs.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>surface_strategy</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            SurfaceStrategy (particula.particles.surface_strategies.SurfaceStrategy)" href="../../../particles/surface_strategies/#particula.particles.surface_strategies.SurfaceStrategy">SurfaceStrategy</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Surface strategy used for ParticleData inputs.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>vapor_pressure_strategy</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            VaporPressureStrategy (particula.gas.vapor_pressure_strategies.VaporPressureStrategy)" href="../../../gas/vapor_pressure_strategies/#particula.gas.vapor_pressure_strategies.VaporPressureStrategy">VaporPressureStrategy</a> | <span title="typing.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="            VaporPressureStrategy (particula.gas.vapor_pressure_strategies.VaporPressureStrategy)" href="../../../gas/vapor_pressure_strategies/#particula.gas.vapor_pressure_strategies.VaporPressureStrategy">VaporPressureStrategy</a>] | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Vapor pressure strategy used for GasData
+inputs.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>latent_heat_strategy</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            LatentHeatStrategy (particula.gas.latent_heat_strategies.LatentHeatStrategy)" href="../../../gas/latent_heat_strategies/#particula.gas.latent_heat_strategies.LatentHeatStrategy">LatentHeatStrategy</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional latent heat strategy to use.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>latent_heat</code></b>
+              (<code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>, default:
+                  <code>0.0</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Scalar latent heat fallback [J/kg].</p>
+          </div>
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1719</span>
+<span class="normal">1720</span>
+<span class="normal">1721</span>
+<span class="normal">1722</span>
+<span class="normal">1723</span>
+<span class="normal">1724</span>
+<span class="normal">1725</span>
+<span class="normal">1726</span>
+<span class="normal">1727</span>
+<span class="normal">1728</span>
+<span class="normal">1729</span>
+<span class="normal">1730</span>
+<span class="normal">1731</span>
+<span class="normal">1732</span>
+<span class="normal">1733</span>
+<span class="normal">1734</span>
+<span class="normal">1735</span>
+<span class="normal">1736</span>
+<span class="normal">1737</span>
+<span class="normal">1738</span>
+<span class="normal">1739</span>
+<span class="normal">1740</span>
+<span class="normal">1741</span>
+<span class="normal">1742</span>
+<span class="normal">1743</span>
+<span class="normal">1744</span>
+<span class="normal">1745</span>
+<span class="normal">1746</span>
+<span class="normal">1747</span>
+<span class="normal">1748</span>
+<span class="normal">1749</span>
+<span class="normal">1750</span>
+<span class="normal">1751</span>
+<span class="normal">1752</span>
+<span class="normal">1753</span>
+<span class="normal">1754</span>
+<span class="normal">1755</span>
+<span class="normal">1756</span>
+<span class="normal">1757</span>
+<span class="normal">1758</span>
+<span class="normal">1759</span>
+<span class="normal">1760</span>
+<span class="normal">1761</span>
+<span class="normal">1762</span>
+<span class="normal">1763</span>
+<span class="normal">1764</span>
+<span class="normal">1765</span>
+<span class="normal">1766</span>
+<span class="normal">1767</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-5</span><span class="p">,</span>
+    <span class="n">accommodation_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">update_gases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">skip_partitioning_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">activity_strategy</span><span class="p">:</span> <span class="n">ActivityStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">surface_strategy</span><span class="p">:</span> <span class="n">SurfaceStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vapor_pressure_strategy</span><span class="p">:</span> <span class="n">VaporPressureStrategy</span>
+    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">VaporPressureStrategy</span><span class="p">]</span>
+    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">latent_heat_strategy</span><span class="p">:</span> <span class="n">LatentHeatStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the CondensationLatentHeat strategy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        molar_mass: Molar mass of the species [kg/mol].</span>
+<span class="sd">        diffusion_coefficient: Diffusion coefficient [m^2/s].</span>
+<span class="sd">        accommodation_coefficient: Mass accommodation coefficient.</span>
+<span class="sd">        update_gases: Whether to update gas concentrations on update.</span>
+<span class="sd">        skip_partitioning_indices: Species indices that should skip</span>
+<span class="sd">            partitioning.</span>
+<span class="sd">        activity_strategy: Activity strategy used for ParticleData inputs.</span>
+<span class="sd">        surface_strategy: Surface strategy used for ParticleData inputs.</span>
+<span class="sd">        vapor_pressure_strategy: Vapor pressure strategy used for GasData</span>
+<span class="sd">            inputs.</span>
+<span class="sd">        latent_heat_strategy: Optional latent heat strategy to use.</span>
+<span class="sd">        latent_heat: Scalar latent heat fallback [J/kg].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="n">diffusion_coefficient</span><span class="p">,</span>
+        <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="n">accommodation_coefficient</span><span class="p">,</span>
+        <span class="n">update_gases</span><span class="o">=</span><span class="n">update_gases</span><span class="p">,</span>
+        <span class="n">skip_partitioning_indices</span><span class="o">=</span><span class="n">skip_partitioning_indices</span><span class="p">,</span>
+        <span class="n">activity_strategy</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
+        <span class="n">surface_strategy</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
+        <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategy</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_strategy_input</span> <span class="o">=</span> <span class="n">latent_heat_strategy</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">latent_heat_input</span> <span class="o">=</span> <span class="n">latent_heat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_latent_heat_strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_latent_heat_strategy</span><span class="p">(</span>
+        <span class="n">latent_heat_strategy</span><span class="o">=</span><span class="n">latent_heat_strategy</span><span class="p">,</span>
+        <span class="n">latent_heat</span><span class="o">=</span><span class="n">latent_heat</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">last_latent_heat_energy</span> <span class="o">=</span> <span class="mf">0.0</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.mass_transfer_rate" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">mass_transfer_rate</span>
+
+
+<a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.mass_transfer_rate" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">mass_transfer_rate</span><span class="p">(</span><span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the mass transfer rate (stub).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particle</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ParticleRepresentation (particula.particles.representation.ParticleRepresentation)" href="../../../particles/representation/#particula.particles.representation.ParticleRepresentation">ParticleRepresentation</a> | <a class="autorefs autorefs-internal" title="            ParticleData
+
+
+  
+      dataclass
+   (particula.particles.particle_data.ParticleData)" href="../../../particles/particle_data/#particula.particles.particle_data.ParticleData">ParticleData</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle representation providing radius and activity
+information.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gas_species</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            GasSpecies (particula.gas.species.GasSpecies)" href="../../../gas/species/#particula.gas.species.GasSpecies">GasSpecies</a> | <a class="autorefs autorefs-internal" title="            GasData
+
+
+  
+      dataclass
+   (particula.gas.gas_data.GasData)" href="../../../gas/gas_data/#particula.gas.gas_data.GasData">GasData</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Gas species supplying vapor properties and
+concentrations.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>System temperature in Kelvin.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>pressure</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>System pressure in Pascals.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>dynamic_viscosity</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional dynamic viscosity override.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+          –
+          <div class="doc-md-description">
+            <p>Mass transfer rate per particle and per species in kg/s.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="NotImplementedError">NotImplementedError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>Implemented in E5-F3-P2/P3.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1808</span>
+<span class="normal">1809</span>
+<span class="normal">1810</span>
+<span class="normal">1811</span>
+<span class="normal">1812</span>
+<span class="normal">1813</span>
+<span class="normal">1814</span>
+<span class="normal">1815</span>
+<span class="normal">1816</span>
+<span class="normal">1817</span>
+<span class="normal">1818</span>
+<span class="normal">1819</span>
+<span class="normal">1820</span>
+<span class="normal">1821</span>
+<span class="normal">1822</span>
+<span class="normal">1823</span>
+<span class="normal">1824</span>
+<span class="normal">1825</span>
+<span class="normal">1826</span>
+<span class="normal">1827</span>
+<span class="normal">1828</span>
+<span class="normal">1829</span>
+<span class="normal">1830</span>
+<span class="normal">1831</span>
+<span class="normal">1832</span>
+<span class="normal">1833</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
+    <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the mass transfer rate (stub).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particle: Particle representation providing radius and activity</span>
+<span class="sd">            information.</span>
+<span class="sd">        gas_species: Gas species supplying vapor properties and</span>
+<span class="sd">            concentrations.</span>
+<span class="sd">        temperature: System temperature in Kelvin.</span>
+<span class="sd">        pressure: System pressure in Pascals.</span>
+<span class="sd">        dynamic_viscosity: Optional dynamic viscosity override.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Mass transfer rate per particle and per species in kg/s.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NotImplementedError: Implemented in E5-F3-P2/P3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implemented in E5-F3-P2/P3&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.rate" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">rate</span>
+
+
+<a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.rate" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">rate</span><span class="p">(</span><span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the condensation rate (stub).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particle</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ParticleRepresentation (particula.particles.representation.ParticleRepresentation)" href="../../../particles/representation/#particula.particles.representation.ParticleRepresentation">ParticleRepresentation</a> | <a class="autorefs autorefs-internal" title="            ParticleData
+
+
+  
+      dataclass
+   (particula.particles.particle_data.ParticleData)" href="../../../particles/particle_data/#particula.particles.particle_data.ParticleData">ParticleData</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle representation providing radius and activity
+information.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gas_species</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            GasSpecies (particula.gas.species.GasSpecies)" href="../../../gas/species/#particula.gas.species.GasSpecies">GasSpecies</a> | <a class="autorefs autorefs-internal" title="            GasData
+
+
+  
+      dataclass
+   (particula.gas.gas_data.GasData)" href="../../../gas/gas_data/#particula.gas.gas_data.GasData">GasData</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Gas species supplying vapor properties and
+concentrations.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>System temperature in Kelvin.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>pressure</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>System pressure in Pascals.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>dynamic_viscosity</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional dynamic viscosity override.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+          –
+          <div class="doc-md-description">
+            <p>Condensation rate per particle and per species in kg/s.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="NotImplementedError">NotImplementedError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>Implemented in E5-F3-P2/P3.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1835</span>
+<span class="normal">1836</span>
+<span class="normal">1837</span>
+<span class="normal">1838</span>
+<span class="normal">1839</span>
+<span class="normal">1840</span>
+<span class="normal">1841</span>
+<span class="normal">1842</span>
+<span class="normal">1843</span>
+<span class="normal">1844</span>
+<span class="normal">1845</span>
+<span class="normal">1846</span>
+<span class="normal">1847</span>
+<span class="normal">1848</span>
+<span class="normal">1849</span>
+<span class="normal">1850</span>
+<span class="normal">1851</span>
+<span class="normal">1852</span>
+<span class="normal">1853</span>
+<span class="normal">1854</span>
+<span class="normal">1855</span>
+<span class="normal">1856</span>
+<span class="normal">1857</span>
+<span class="normal">1858</span>
+<span class="normal">1859</span>
+<span class="normal">1860</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
+    <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the condensation rate (stub).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particle: Particle representation providing radius and activity</span>
+<span class="sd">            information.</span>
+<span class="sd">        gas_species: Gas species supplying vapor properties and</span>
+<span class="sd">            concentrations.</span>
+<span class="sd">        temperature: System temperature in Kelvin.</span>
+<span class="sd">        pressure: System pressure in Pascals.</span>
+<span class="sd">        dynamic_viscosity: Optional dynamic viscosity override.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Condensation rate per particle and per species in kg/s.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NotImplementedError: Implemented in E5-F3-P2/P3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implemented in E5-F3-P2/P3&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.step" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">step</span>
+
+
+<a href="#particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.step" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">step</span><span class="p">(</span><span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">GasSpecies</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasData</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Advance one condensation step (stub).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>particle</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ParticleRepresentation (particula.particles.representation.ParticleRepresentation)" href="../../../particles/representation/#particula.particles.representation.ParticleRepresentation">ParticleRepresentation</a> | <a class="autorefs autorefs-internal" title="            ParticleData
+
+
+  
+      dataclass
+   (particula.particles.particle_data.ParticleData)" href="../../../particles/particle_data/#particula.particles.particle_data.ParticleData">ParticleData</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle representation to update.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gas_species</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            GasSpecies (particula.gas.species.GasSpecies)" href="../../../gas/species/#particula.gas.species.GasSpecies">GasSpecies</a> | <a class="autorefs autorefs-internal" title="            GasData
+
+
+  
+      dataclass
+   (particula.gas.gas_data.GasData)" href="../../../gas/gas_data/#particula.gas.gas_data.GasData">GasData</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Gas species object providing vapor properties.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>System temperature in Kelvin.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>pressure</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>System pressure in Pascals.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>time_step</code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Integration timestep in seconds.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>dynamic_viscosity</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional dynamic viscosity override.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="            ParticleRepresentation (particula.particles.representation.ParticleRepresentation)" href="../../../particles/representation/#particula.particles.representation.ParticleRepresentation">ParticleRepresentation</a>, <a class="autorefs autorefs-internal" title="            GasSpecies (particula.gas.species.GasSpecies)" href="../../../gas/species/#particula.gas.species.GasSpecies">GasSpecies</a>] | <span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="            ParticleData
+
+
+  
+      dataclass
+   (particula.particles.particle_data.ParticleData)" href="../../../particles/particle_data/#particula.particles.particle_data.ParticleData">ParticleData</a>, <a class="autorefs autorefs-internal" title="            GasData
+
+
+  
+      dataclass
+   (particula.gas.gas_data.GasData)" href="../../../gas/gas_data/#particula.gas.gas_data.GasData">GasData</a>]</code>
+          –
+          <div class="doc-md-description">
+            <p>Tuple containing updated particle and gas species objects.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="NotImplementedError">NotImplementedError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>Implemented in E5-F3-P2/P3.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1862</span>
+<span class="normal">1863</span>
+<span class="normal">1864</span>
+<span class="normal">1865</span>
+<span class="normal">1866</span>
+<span class="normal">1867</span>
+<span class="normal">1868</span>
+<span class="normal">1869</span>
+<span class="normal">1870</span>
+<span class="normal">1871</span>
+<span class="normal">1872</span>
+<span class="normal">1873</span>
+<span class="normal">1874</span>
+<span class="normal">1875</span>
+<span class="normal">1876</span>
+<span class="normal">1877</span>
+<span class="normal">1878</span>
+<span class="normal">1879</span>
+<span class="normal">1880</span>
+<span class="normal">1881</span>
+<span class="normal">1882</span>
+<span class="normal">1883</span>
+<span class="normal">1884</span>
+<span class="normal">1885</span>
+<span class="normal">1886</span>
+<span class="normal">1887</span>
+<span class="normal">1888</span>
+<span class="normal">1889</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
+    <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">GasSpecies</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ParticleData</span><span class="p">,</span> <span class="n">GasData</span><span class="p">]</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Advance one condensation step (stub).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        particle: Particle representation to update.</span>
+<span class="sd">        gas_species: Gas species object providing vapor properties.</span>
+<span class="sd">        temperature: System temperature in Kelvin.</span>
+<span class="sd">        pressure: System pressure in Pascals.</span>
+<span class="sd">        time_step: Integration timestep in seconds.</span>
+<span class="sd">        dynamic_viscosity: Optional dynamic viscosity override.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple containing updated particle and gas species objects.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NotImplementedError: Implemented in E5-F3-P2/P3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implemented in E5-F3-P2/P3&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16817,11 +17697,7 @@ strategies used when GasData inputs are provided.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
@@ -16863,7 +17739,11 @@ strategies used when GasData inputs are provided.</p>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
-<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
@@ -17006,11 +17886,7 @@ between the gas and particle phases.</li>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">467</span>
 <span class="normal">468</span>
 <span class="normal">469</span>
 <span class="normal">470</span>
@@ -17091,7 +17967,11 @@ between the gas and particle phases.</li>
 <span class="normal">545</span>
 <span class="normal">546</span>
 <span class="normal">547</span>
-<span class="normal">548</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_pressure_delta</span><span class="p">(</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_pressure_delta</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
     <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span> <span class="o">|</span> <span class="n">GasData</span><span class="p">,</span>
@@ -17266,11 +18146,7 @@ not provided, it will be calculated based on the temperature</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">379</span>
 <span class="normal">380</span>
 <span class="normal">381</span>
 <span class="normal">382</span>
@@ -17319,7 +18195,11 @@ not provided, it will be calculated based on the temperature</p>
 <span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
-<span class="normal">428</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">first_order_mass_transport</span><span class="p">(</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">first_order_mass_transport</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -17461,11 +18341,7 @@ the particle radius.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">336</span>
 <span class="normal">337</span>
 <span class="normal">338</span>
 <span class="normal">339</span>
@@ -17502,7 +18378,11 @@ the particle radius.</p>
 <span class="normal">370</span>
 <span class="normal">371</span>
 <span class="normal">372</span>
-<span class="normal">373</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">knudsen_number</span><span class="p">(</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">knudsen_number</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -17643,11 +18523,7 @@ concentration, etc.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">582</span>
 <span class="normal">583</span>
 <span class="normal">584</span>
 <span class="normal">585</span>
@@ -17682,7 +18558,11 @@ concentration, etc.</p>
 <span class="normal">614</span>
 <span class="normal">615</span>
 <span class="normal">616</span>
-<span class="normal">617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">mass_transfer_rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
@@ -17796,11 +18676,7 @@ not provided, it will be calculated based on the temperature</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">300</span>
 <span class="normal">301</span>
 <span class="normal">302</span>
 <span class="normal">303</span>
@@ -17830,7 +18706,11 @@ not provided, it will be calculated based on the temperature</p>
 <span class="normal">327</span>
 <span class="normal">328</span>
 <span class="normal">329</span>
-<span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_free_path</span><span class="p">(</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_free_path</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -17950,11 +18830,7 @@ concentration.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">623</span>
 <span class="normal">624</span>
 <span class="normal">625</span>
 <span class="normal">626</span>
@@ -17979,7 +18855,11 @@ concentration.</p>
 <span class="normal">645</span>
 <span class="normal">646</span>
 <span class="normal">647</span>
-<span class="normal">648</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
@@ -18120,11 +19000,7 @@ both the particle mass and the gas concentration
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_strategies.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span>
-<span class="normal">654</span>
-<span class="normal">655</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">655</span>
 <span class="normal">656</span>
 <span class="normal">657</span>
 <span class="normal">658</span>
@@ -18152,7 +19028,11 @@ both the particle mass and the gas concentration
 <span class="normal">680</span>
 <span class="normal">681</span>
 <span class="normal">682</span>
-<span class="normal">683</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span> <span class="o">|</span> <span class="n">ParticleData</span><span class="p">,</span>
