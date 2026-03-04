@@ -361,9 +361,39 @@ def get_latent_heat_energy_released(
     Returns:
         Latent heat energy released or absorbed [J].
 
+    Examples:
+        ```py title="Condensation releases heat"
+        import particula as par
+
+        par.dynamics.get_latent_heat_energy_released(
+            mass_transfer=1.0e-15,
+            latent_heat=2.454e6,
+        )
+        # Output: 2.454e-09
+        ```
+
+        ```py title="Evaporation absorbs heat"
+        import particula as par
+
+        par.dynamics.get_latent_heat_energy_released(
+            mass_transfer=-1.0e-15,
+            latent_heat=2.454e6,
+        )
+        # Output: -2.454e-09
+        ```
+
     Raises:
         ValueError: If mass_transfer is non-finite or latent_heat is negative.
+
+    Notes:
+        Large magnitudes may overflow following NumPy's float64 behavior.
     """
+    mass_transfer = np.asarray(mass_transfer, dtype=np.float64)
+    latent_heat = np.asarray(latent_heat, dtype=np.float64)
+    if not np.all(np.isfinite(latent_heat)):
+        raise ValueError(
+            "Argument 'latent_heat' must be finite (no inf or NaN)."
+        )
     return np.asarray(mass_transfer * latent_heat, dtype=np.float64)
 
 

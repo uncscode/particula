@@ -1,6 +1,7 @@
 """Test the Condensation module."""
 
 import numpy as np
+import particula as par
 import pytest
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
@@ -522,12 +523,36 @@ def test_latent_heat_energy_released_array_shapes():
     np.testing.assert_allclose(result_2d, expected_2d, rtol=1e-14)
 
 
+def test_latent_heat_energy_released_list_inputs():
+    """List inputs should coerce to arrays before multiplication."""
+    mass_transfer = [1.0e-15, -2.0e-15]
+    latent_heat = [2.454e6, 1.8e6]
+    result = get_latent_heat_energy_released(
+        mass_transfer=mass_transfer,
+        latent_heat=latent_heat,
+    )
+    expected = np.asarray(mass_transfer) * np.asarray(latent_heat)
+    np.testing.assert_allclose(result, expected, rtol=1e-14)
+
+
 def test_latent_heat_energy_released_validation_negative_latent_heat():
     """Negative latent heat should raise validation error."""
     with pytest.raises(ValueError, match="latent_heat"):
         get_latent_heat_energy_released(
             mass_transfer=1.0e-15,
             latent_heat=-1.0,
+        )
+
+
+@pytest.mark.parametrize("latent_heat", [np.nan, np.inf])
+def test_latent_heat_energy_released_validation_nonfinite_latent_heat(
+    latent_heat,
+):
+    """Non-finite latent heat should raise validation error."""
+    with pytest.raises(ValueError, match="latent_heat"):
+        get_latent_heat_energy_released(
+            mass_transfer=1.0e-15,
+            latent_heat=latent_heat,
         )
 
 
@@ -541,6 +566,15 @@ def test_latent_heat_energy_released_validation_nonfinite_mass_transfer(
             mass_transfer=mass_transfer,
             latent_heat=2.454e6,
         )
+
+
+def test_latent_heat_energy_released_public_reexport():
+    """Public API should re-export the latent heat helper."""
+    result = par.dynamics.get_latent_heat_energy_released(
+        mass_transfer=1.0e-15,
+        latent_heat=2.454e6,
+    )
+    assert result == pytest.approx(2.454e-9)
 
 
 def test_multi_species_mass_transfer_rate():
