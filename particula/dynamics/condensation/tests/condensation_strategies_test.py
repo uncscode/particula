@@ -22,6 +22,7 @@ from particula.dynamics.condensation.condensation_strategies import (
     _unwrap_gas,
     _unwrap_particle,
 )
+from particula.dynamics.condensation.mass_transfer import get_mass_transfer
 from particula.gas.gas_data import GasData, from_species
 from particula.gas.latent_heat_strategies import ConstantLatentHeat
 from particula.gas.species import GasSpecies
@@ -1914,13 +1915,6 @@ class TestCondensationLatentHeat(unittest.TestCase):
         self.assertEqual(cond.accommodation_coefficient, 0.7)
         self.assertFalse(cond.update_gases)
 
-    def test_stubs_raise_not_implemented(self):
-        """step() remains stubbed for latent heat strategy."""
-        cond = CondensationLatentHeat(molar_mass=0.018)
-
-        with self.assertRaises(NotImplementedError):
-            cond.step(None, None, 298.15, 101325, time_step=1.0)
-
     def test_mass_transfer_rate_isothermal_parity(self):
         """Latent heat strategy falls back to isothermal rates."""
         latent_cond = CondensationLatentHeat(
@@ -2229,3 +2223,385 @@ class TestCondensationLatentHeat(unittest.TestCase):
 
         self.assertGreater(mean_free_path, 0.0)
         self.assertGreater(knudsen_number, 0.0)
+
+    def test_step_mass_conservation_single_species(self):
+        """Single-species step conserves total mass."""
+        gas_species, particle, _, _ = self._build_single_species_fixture()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = (
+            particle.get_mass_concentration()
+            + gas_species.get_concentration().sum()
+        )
+        particle_new, gas_new = cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = (
+            particle_new.get_mass_concentration()
+            + gas_new.get_concentration().sum()
+        )
+
+        relative_error = abs(final_mass - initial_mass) / initial_mass
+        self.assertLess(relative_error, 1e-12)
+
+    def test_step_mass_conservation_multi_species(self):
+        """Multi-species step conserves total mass."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = (
+            particle.get_mass_concentration()
+            + gas_species.get_concentration().sum()
+        )
+        particle_new, gas_new = cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = (
+            particle_new.get_mass_concentration()
+            + gas_new.get_concentration().sum()
+        )
+
+        relative_error = abs(final_mass - initial_mass) / initial_mass
+        self.assertLess(relative_error, 1e-12)
+
+    def test_step_mass_conservation_data_only(self):
+        """Data-only step conserves total mass."""
+        particle_data, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = np.sum(
+            particle_data.masses[0]
+            * particle_data.concentration[0][:, np.newaxis]
+            / particle_data.volume[0]
+        ) + np.sum(gas_data.concentration[0])
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = np.sum(
+            particle_new.masses[0]
+            * particle_new.concentration[0][:, np.newaxis]
+            / particle_new.volume[0]
+        ) + np.sum(gas_new.concentration[0])
+
+        relative_error = abs(final_mass - initial_mass) / initial_mass
+        self.assertLess(relative_error, 1e-12)
+
+    def test_step_energy_tracking_matches_dm_times_l(self):
+        """Latent heat energy matches dm × L for a step."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        particle_data, _ = _unwrap_particle(particle)
+        gas_data, _ = _unwrap_gas(gas_species)
+        mass_rate = cond.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        mass_rate_array = (
+            np.array([mass_rate])
+            if isinstance(mass_rate, (int, float))
+            else mass_rate
+        )
+        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate_array,
+            time_step=1.0,
+            gas_mass=np.asarray(gas_data.concentration[0], dtype=np.float64),
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+
+        cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        latent_heat = cond._latent_heat_strategy.latent_heat(self.temperature)
+
+        np.testing.assert_allclose(
+            cond.last_latent_heat_energy,
+            np.sum(mass_transfer * latent_heat),
+            rtol=1e-14,
+        )
+
+    def test_step_energy_sign_convention(self):
+        """Condensation is positive energy; evaporation is negative."""
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        gas_species, particle, _, _ = self._build_single_species_fixture()
+
+        cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        self.assertGreater(cond.last_latent_heat_energy, 0.0)
+
+        vp_water = par.gas.VaporPressureFactory().get_strategy("water_buck")
+        mm_water = 18.015e-3
+        gas_sub = (
+            par.gas.GasSpeciesBuilder()
+            .set_name("H2O")
+            .set_molar_mass(np.array([mm_water]), "kg/mol")
+            .set_vapor_pressure_strategy([vp_water])
+            .set_concentration(np.array([1e-30]), "kg/m^3")
+            .set_partitioning(True)
+            .build()
+        )
+        particle_evap = copy.deepcopy(particle)
+        cond.step(
+            particle=particle_evap,
+            gas_species=gas_sub,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        self.assertLess(cond.last_latent_heat_energy, 0.0)
+
+    def test_step_isothermal_parity(self):
+        """Latent heat fallback matches isothermal step outputs."""
+        particle_latent = copy.deepcopy(self.particle)
+        gas_latent = copy.deepcopy(self.gas_species)
+        particle_iso = copy.deepcopy(self.particle)
+        gas_iso = copy.deepcopy(self.gas_species)
+        latent_cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+        iso_cond = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+
+        particle_out, gas_out = latent_cond.step(
+            particle=particle_latent,
+            gas_species=gas_latent,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        particle_iso_out, gas_iso_out = iso_cond.step(
+            particle=particle_iso,
+            gas_species=gas_iso,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            particle_out.get_mass(), particle_iso_out.get_mass(), rtol=1e-15
+        )
+        np.testing.assert_allclose(
+            gas_out.get_concentration(),
+            gas_iso_out.get_concentration(),
+            rtol=1e-15,
+        )
+        self.assertEqual(latent_cond.last_latent_heat_energy, 0.0)
+
+    def test_step_returns_correct_types_legacy(self):
+        """Legacy inputs return legacy types."""
+        cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+
+        particle_new, gas_new = cond.step(
+            particle=copy.deepcopy(self.particle),
+            gas_species=copy.deepcopy(self.gas_species),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        self.assertIsInstance(particle_new, ParticleRepresentation)
+        self.assertIsInstance(gas_new, GasSpecies)
+
+    def test_step_returns_correct_types_data(self):
+        """Data-only inputs return data types."""
+        particle_data, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+        )
+
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        self.assertIsInstance(particle_new, ParticleData)
+        self.assertIsInstance(gas_new, GasData)
+
+    def test_step_updates_gas_when_enabled(self):
+        """Gas concentrations decrease by mass transfer when enabled."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+            update_gases=True,
+        )
+
+        particle_data, _ = _unwrap_particle(particle)
+        gas_data, _ = _unwrap_gas(gas_species)
+        mass_rate = cond.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        mass_rate_array = (
+            np.array([mass_rate])
+            if isinstance(mass_rate, (int, float))
+            else mass_rate
+        )
+        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        expected_mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate_array,
+            time_step=1.0,
+            gas_mass=np.asarray(gas_data.concentration[0], dtype=np.float64),
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+        expected_gas = (
+            gas_species.get_concentration() - expected_mass_transfer.sum(axis=0)
+        )
+
+        _, gas_new = cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            gas_new.get_concentration(), expected_gas, rtol=1e-15
+        )
+
+    def test_step_dynamic_viscosity_pass_through(self):
+        """Dynamic viscosity override is forwarded to mass_transfer_rate."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+        override = 1.23e-5
+
+        with patch.object(
+            cond, "mass_transfer_rate", wraps=cond.mass_transfer_rate
+        ) as spy:
+            cond.step(
+                particle=particle,
+                gas_species=gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+                dynamic_viscosity=override,
+            )
+
+        self.assertEqual(spy.call_args.kwargs["dynamic_viscosity"], override)
+
+    def test_step_mass_condensation_runnable_compatibility(self):
+        """MassCondensation executes with latent heat strategies."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        atmosphere = par.gas.Atmosphere(
+            temperature=self.temperature,
+            total_pressure=self.pressure,
+            partitioning_species=gas_species,
+            gas_only_species=[],
+        )
+        aerosol = par.Aerosol(atmosphere=atmosphere, particles=particle)
+
+        cond_latent = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        condensation = par.dynamics.MassCondensation(
+            condensation_strategy=cond_latent
+        )
+        aerosol_out = condensation.execute(aerosol, time_step=1.0)
+
+        self.assertIsInstance(aerosol_out.particles, ParticleRepresentation)
+        self.assertIsInstance(
+            aerosol_out.atmosphere.partitioning_species, GasSpecies
+        )
+
+        aerosol_iso = par.Aerosol(
+            atmosphere=copy.deepcopy(atmosphere),
+            particles=copy.deepcopy(self.particle),
+        )
+        cond_iso = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+        condensation_iso = par.dynamics.MassCondensation(
+            condensation_strategy=cond_iso
+        )
+        aerosol_iso_out = condensation_iso.execute(aerosol_iso, time_step=1.0)
+
+        self.assertIsInstance(aerosol_iso_out.particles, ParticleRepresentation)
+        self.assertIsInstance(
+            aerosol_iso_out.atmosphere.partitioning_species, GasSpecies
+        )

@@ -33,6 +33,7 @@ from numpy.typing import NDArray
 
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
+    get_latent_heat_energy_released,
     get_mass_transfer,
     get_mass_transfer_rate,
     get_mass_transfer_rate_latent_heat,
@@ -2036,6 +2037,47 @@ class CondensationLatentHeat(CondensationStrategy):
         rates = self._apply_skip_partitioning(rates)
         return rates
 
+    def _update_latent_heat_energy(
+        self, mass_transfer: NDArray[np.float64], temperature: float
+    ) -> None:
+        """Store latent heat energy released for the current step."""
+        if self._latent_heat_strategy is None:
+            self.last_latent_heat_energy = 0.0
+            return
+
+        latent_heat = self._latent_heat_strategy.latent_heat(temperature)
+        self.last_latent_heat_energy = float(
+            np.sum(
+                get_latent_heat_energy_released(
+                    mass_transfer,
+                    latent_heat,
+                )
+            )
+        )
+
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
+    @overload  # type: ignore[override]
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        gas_species: GasSpecies,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+        dynamic_viscosity: Optional[float] = None,
+    ) -> Tuple[ParticleRepresentation, GasSpecies]: ...
+
+    @overload
+    def step(
+        self,
+        particle: ParticleData,
+        gas_species: GasData,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+        dynamic_viscosity: Optional[float] = None,
+    ) -> Tuple[ParticleData, GasData]: ...
+
     def step(
         self,
         particle: ParticleRepresentation | ParticleData,
@@ -2047,7 +2089,13 @@ class CondensationLatentHeat(CondensationStrategy):
     ) -> (
         Tuple[ParticleRepresentation, GasSpecies] | Tuple[ParticleData, GasData]
     ):
-        """Advance one condensation step (stub).
+        """Advance one condensation step with latent-heat diagnostics.
+
+        The mass transfer rate is computed, optional skip-partitioning applied,
+        and both the particle and gas states are updated while respecting
+        inventory limits. The per-step latent-heat energy release is stored in
+        ``last_latent_heat_energy`` (positive for condensation, negative for
+        evaporation) and overwritten on every call.
 
         Args:
             particle: Particle representation to update.
@@ -2059,11 +2107,83 @@ class CondensationLatentHeat(CondensationStrategy):
 
         Returns:
             Tuple containing updated particle and gas species objects.
-
-        Raises:
-            NotImplementedError: Step is not implemented for latent-heat
-                condensation.
         """
-        raise NotImplementedError(
-            "CondensationLatentHeat.step is not implemented."
+        particle_data, particle_is_legacy = _unwrap_particle(particle)
+        gas_data, gas_is_legacy = _unwrap_gas(gas_species)
+        _require_matching_types(particle_is_legacy, gas_is_legacy)
+        _require_single_box(particle_data.n_boxes, "ParticleData")
+        _require_single_box(gas_data.n_boxes, "GasData")
+
+        mass_rate = self.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=temperature,
+            pressure=pressure,
+            dynamic_viscosity=dynamic_viscosity,
         )
+
+        if isinstance(mass_rate, (int, float)):
+            mass_rate_array = np.array([mass_rate])
+        else:
+            mass_rate_array = mass_rate
+
+        mass_rate_array = self._apply_skip_partitioning(mass_rate_array)
+
+        gas_mass_array: NDArray[np.float64] = np.atleast_1d(
+            np.asarray(gas_data.concentration[0], dtype=np.float64)
+        )
+        volume = particle_data.volume[0]
+        norm_conc = particle_data.concentration[0] / volume
+        mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate_array,
+            time_step=time_step,
+            gas_mass=gas_mass_array,
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+
+        self._update_latent_heat_energy(mass_transfer, temperature)
+
+        species_mass = particle_data.masses[0]
+        if species_mass.ndim == 1:
+            species_count = 1
+        else:
+            species_count = species_mass.shape[1]
+        if mass_transfer.ndim == 1:
+            mass_transfer = mass_transfer.reshape(-1, species_count)
+        elif mass_transfer.shape[1] > species_count:
+            mass_transfer = mass_transfer[:, :species_count]
+        elif mass_transfer.shape[1] < species_count:
+            mass_transfer = np.broadcast_to(
+                mass_transfer, (mass_transfer.shape[0], species_count)
+            )
+
+        if particle_is_legacy:
+            particle.add_mass(added_mass=mass_transfer)  # type: ignore[union-attr]
+        else:
+            per_particle = np.divide(
+                mass_transfer,
+                norm_conc[:, np.newaxis]
+                if mass_transfer.ndim == 2
+                else norm_conc,
+                out=np.zeros_like(mass_transfer),
+                where=norm_conc[:, np.newaxis] != 0
+                if mass_transfer.ndim == 2
+                else norm_conc != 0,
+            )
+            particle_data.masses[0] = np.maximum(
+                particle_data.masses[0] + per_particle, 0.0
+            )
+        if self.update_gases:
+            if gas_is_legacy:
+                gas_species.add_concentration(  # type: ignore[union-attr]
+                    added_concentration=-mass_transfer.sum(axis=0)
+                )
+            else:
+                gas_data.concentration[0] -= mass_transfer.sum(axis=0)
+        if particle_is_legacy:
+            return cast(
+                Tuple[ParticleRepresentation, GasSpecies],
+                (particle, gas_species),
+            )
+        return cast(Tuple[ParticleData, GasData], (particle_data, gas_data))
