@@ -13,6 +13,7 @@ import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
+    CondensationLatentHeat,
     _partial_pressure_from_strategy,
     _pure_vapor_pressure_from_strategy,
     _require_matching_types,
@@ -21,6 +22,7 @@ from particula.dynamics.condensation.condensation_strategies import (
     _unwrap_particle,
 )
 from particula.gas.gas_data import GasData, from_species
+from particula.gas.latent_heat_strategies import ConstantLatentHeat
 from particula.particles.particle_data import ParticleData, from_representation
 
 
@@ -1652,3 +1654,116 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         batches = self._assert_no_clipping_log(strategy._make_batches, 0)
         self.assertEqual(batches, [])
+
+
+class TestCondensationLatentHeat(unittest.TestCase):
+    """Test class for the CondensationLatentHeat strategy."""
+
+    def test_instantiation_with_strategy(self):
+        """Latent heat strategy is used when provided."""
+        strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
+        cond = CondensationLatentHeat(
+            molar_mass=0.018,
+            latent_heat_strategy=strategy,
+        )
+
+        self.assertIs(cond._latent_heat_strategy, strategy)
+
+    def test_instantiation_with_constant_fallback(self):
+        """Constant latent heat fallback wraps in ConstantLatentHeat."""
+        cond = CondensationLatentHeat(molar_mass=0.018, latent_heat=2.26e6)
+
+        self.assertIsInstance(cond._latent_heat_strategy, ConstantLatentHeat)
+        assert cond._latent_heat_strategy is not None
+        self.assertEqual(cond._latent_heat_strategy.latent_heat_ref, 2.26e6)
+
+    def test_instantiation_isothermal_fallback(self):
+        """Default latent heat uses isothermal fallback without warnings."""
+        cond = CondensationLatentHeat(molar_mass=0.018)
+
+        self.assertIsNone(cond._latent_heat_strategy)
+
+    def test_resolution_priority_strategy_over_constant(self):
+        """Strategy takes precedence over constant latent heat."""
+        strategy = ConstantLatentHeat(latent_heat_ref=1.0e6)
+        cond = CondensationLatentHeat(
+            molar_mass=0.018,
+            latent_heat_strategy=strategy,
+            latent_heat=2.0e6,
+        )
+
+        self.assertIs(cond._latent_heat_strategy, strategy)
+
+    def test_resolution_with_array_latent_heat_logs_and_falls_back(self):
+        """Array latent heat logs warning and falls back to isothermal."""
+        with self.assertLogs("particula", level="WARNING") as cm:
+            cond = CondensationLatentHeat(
+                molar_mass=0.018,
+                latent_heat=np.array([2.26e6, 1.5e6]),
+            )
+
+        self.assertIsNone(cond._latent_heat_strategy)
+        self.assertTrue(
+            any(
+                "Array-like latent_heat" in record.getMessage()
+                for record in cm.records
+            )
+        )
+
+    def test_resolution_with_negative_latent_heat_logs_and_falls_back(self):
+        """Negative latent heat logs warning and falls back to isothermal."""
+        with self.assertLogs("particula", level="WARNING") as cm:
+            cond = CondensationLatentHeat(molar_mass=0.018, latent_heat=-1.0)
+
+        self.assertIsNone(cond._latent_heat_strategy)
+        self.assertTrue(
+            any(
+                "Negative latent_heat" in record.getMessage()
+                for record in cm.records
+            )
+        )
+
+    def test_last_latent_heat_energy_initialized(self):
+        """Diagnostic latent heat energy starts at zero."""
+        cond = CondensationLatentHeat(molar_mass=0.018)
+
+        self.assertEqual(cond.last_latent_heat_energy, 0.0)
+
+    def test_base_class_params_forwarded(self):
+        """Base parameters are forwarded to the parent class."""
+        cond = CondensationLatentHeat(
+            molar_mass=0.02,
+            diffusion_coefficient=1.5e-5,
+            accommodation_coefficient=0.7,
+            update_gases=False,
+        )
+
+        self.assertEqual(cond.molar_mass, 0.02)
+        self.assertEqual(cond.diffusion_coefficient, 1.5e-5)
+        self.assertEqual(cond.accommodation_coefficient, 0.7)
+        self.assertFalse(cond.update_gases)
+
+    def test_stubs_raise_not_implemented(self):
+        """Stubbed methods raise NotImplementedError."""
+        cond = CondensationLatentHeat(molar_mass=0.018)
+
+        with self.assertRaises(NotImplementedError):
+            cond.mass_transfer_rate(None, None, 298.15, 101325)
+        with self.assertRaises(NotImplementedError):
+            cond.rate(None, None, 298.15, 101325)
+        with self.assertRaises(NotImplementedError):
+            cond.step(None, None, 298.15, 101325, time_step=1.0)
+
+    def test_inherited_methods_work(self):
+        """Base class helpers remain available."""
+        cond = CondensationLatentHeat(molar_mass=0.018)
+
+        mean_free_path = cond.mean_free_path(
+            temperature=298.15, pressure=101325
+        )
+        knudsen_number = cond.knudsen_number(
+            radius=1e-7, temperature=298.15, pressure=101325
+        )
+
+        self.assertGreater(mean_free_path, 0.0)
+        self.assertGreater(knudsen_number, 0.0)

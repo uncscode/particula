@@ -52,6 +52,7 @@ from particula.dynamics.properties.wall_loss_coefficient import (
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
+    CondensationLatentHeat,
 )
 from particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder import (
     CondensationIsothermalBuilder,

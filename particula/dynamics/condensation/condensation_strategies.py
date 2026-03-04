@@ -38,6 +38,10 @@ from particula.dynamics.condensation.mass_transfer import (
 )
 from particula.gas import get_molecule_mean_free_path
 from particula.gas.gas_data import GasData
+from particula.gas.latent_heat_strategies import (
+    ConstantLatentHeat,
+    LatentHeatStrategy,
+)
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import VaporPressureStrategy
 from particula.particles import (
@@ -1696,3 +1700,109 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 (particle, gas_species),
             )
         return cast(Tuple[ParticleData, GasData], (particle_data, gas_data))
+
+
+class CondensationLatentHeat(CondensationStrategy):
+    """Condensation strategy with latent heat configuration.
+
+    This class mirrors the base condensation setup while deferring the
+    non-isothermal mass-transfer implementation to later phases.
+    """
+
+    # pylint: disable=R0913, R0917
+    def __init__(
+        self,
+        molar_mass: Union[float, NDArray[np.float64]],
+        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
+        accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
+        update_gases: bool = True,
+        skip_partitioning_indices: Optional[Sequence[int]] = None,
+        activity_strategy: ActivityStrategy | None = None,
+        surface_strategy: SurfaceStrategy | None = None,
+        vapor_pressure_strategy: VaporPressureStrategy
+        | Sequence[VaporPressureStrategy]
+        | None = None,
+        *,
+        latent_heat_strategy: LatentHeatStrategy | None = None,
+        latent_heat: float | NDArray[np.float64] = 0.0,
+    ):
+        """Initialize the CondensationLatentHeat strategy."""
+        super().__init__(
+            molar_mass=molar_mass,
+            diffusion_coefficient=diffusion_coefficient,
+            accommodation_coefficient=accommodation_coefficient,
+            update_gases=update_gases,
+            skip_partitioning_indices=skip_partitioning_indices,
+            activity_strategy=activity_strategy,
+            surface_strategy=surface_strategy,
+            vapor_pressure_strategy=vapor_pressure_strategy,
+        )
+        self.latent_heat_strategy_input = latent_heat_strategy
+        self.latent_heat_input = latent_heat
+        self._latent_heat_strategy = self._resolve_latent_heat_strategy(
+            latent_heat_strategy=latent_heat_strategy,
+            latent_heat=latent_heat,
+        )
+        self.last_latent_heat_energy = 0.0
+
+    def _resolve_latent_heat_strategy(
+        self,
+        latent_heat_strategy: LatentHeatStrategy | None,
+        latent_heat: float | NDArray[np.float64],
+    ) -> LatentHeatStrategy | None:
+        if latent_heat_strategy is not None:
+            return latent_heat_strategy
+
+        latent_heat_array = np.asarray(latent_heat, dtype=np.float64)
+        if latent_heat_array.shape == ():
+            latent_heat_value = float(latent_heat_array)
+            if latent_heat_value > 0:
+                return ConstantLatentHeat(latent_heat_value)
+            if latent_heat_value < 0:
+                logger.warning(
+                    "Negative latent_heat provided; falling back to "
+                    "isothermal behavior."
+                )
+            return None
+
+        logger.warning(
+            "Array-like latent_heat provided; use a LatentHeatStrategy "
+            "for per-species values."
+        )
+        return None
+
+    def mass_transfer_rate(
+        self,
+        particle: ParticleRepresentation | ParticleData,
+        gas_species: GasSpecies | GasData,
+        temperature: float,
+        pressure: float,
+        dynamic_viscosity: Optional[float] = None,
+    ) -> Union[float, NDArray[np.float64]]:
+        """Return the mass transfer rate (stub)."""
+        raise NotImplementedError("Implemented in E5-F3-P2/P3")
+
+    def rate(
+        self,
+        particle: ParticleRepresentation | ParticleData,
+        gas_species: GasSpecies | GasData,
+        temperature: float,
+        pressure: float,
+        dynamic_viscosity: Optional[float] = None,
+    ) -> NDArray[np.float64]:
+        """Return the condensation rate (stub)."""
+        raise NotImplementedError("Implemented in E5-F3-P2/P3")
+
+    def step(
+        self,
+        particle: ParticleRepresentation | ParticleData,
+        gas_species: GasSpecies | GasData,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+        dynamic_viscosity: Optional[float] = None,
+    ) -> (
+        Tuple[ParticleRepresentation, GasSpecies] | Tuple[ParticleData, GasData]
+    ):
+        """Advance one condensation step (stub)."""
+        raise NotImplementedError("Implemented in E5-F3-P2/P3")
