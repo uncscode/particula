@@ -512,22 +512,17 @@ class CondensationStrategy(ABC):
                 particle, gas_species, particle_is_legacy, gas_is_legacy
             )
         )
-
-        mass_concentration_in_particle = particle_data.masses[0]
-        pure_vapor_pressure = _pure_vapor_pressure_from_strategy(
-            vapor_pressure_strategy, temperature
+        (
+            partial_pressure_particle,
+            kelvin_term,
+        ) = self._get_particle_partial_pressure_and_kelvin(
+            particle_data=particle_data,
+            activity_strategy=activity_strategy,
+            surface_strategy=surface_strategy,
+            vapor_pressure_strategy=vapor_pressure_strategy,
+            temperature=temperature,
+            radius=radius,
         )
-        partial_pressure_particle = np.asarray(
-            activity_strategy.partial_pressure(
-                pure_vapor_pressure=pure_vapor_pressure,
-                mass_concentration=mass_concentration_in_particle,
-            )
-        )
-        if (
-            partial_pressure_particle.ndim == 2
-            and partial_pressure_particle.shape[1] == 1
-        ):
-            partial_pressure_particle = partial_pressure_particle[:, 0]
 
         gas_concentration = np.asarray(gas_data.concentration[0])
         molar_mass = np.asarray(gas_data.molar_mass)
@@ -535,12 +530,6 @@ class CondensationStrategy(ABC):
             vapor_pressure_strategy,
             concentration=gas_concentration,
             molar_mass=molar_mass,
-            temperature=temperature,
-        )
-        kelvin_term = surface_strategy.kelvin_term(
-            radius=radius,
-            molar_mass=self.molar_mass,
-            mass_concentration=mass_concentration_in_particle,
             temperature=temperature,
         )
 
@@ -554,6 +543,44 @@ class CondensationStrategy(ABC):
         if isinstance(pressure_delta, (int, float)):
             return np.array([pressure_delta])
         return pressure_delta
+
+    def _get_particle_partial_pressure_and_kelvin(
+        self,
+        particle_data: ParticleData,
+        activity_strategy: ActivityStrategy,
+        surface_strategy: SurfaceStrategy,
+        vapor_pressure_strategy: VaporPressureStrategy
+        | Sequence[VaporPressureStrategy],
+        temperature: float,
+        radius: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Compute the particle-side partial pressure and Kelvin term."""
+        mass_concentration_in_particle = particle_data.masses[0]
+        pure_vapor_pressure = _pure_vapor_pressure_from_strategy(
+            vapor_pressure_strategy, temperature
+        )
+        partial_pressure_particle = np.asarray(
+            activity_strategy.partial_pressure(
+                pure_vapor_pressure=pure_vapor_pressure,
+                mass_concentration=mass_concentration_in_particle,
+            ),
+            dtype=np.float64,
+        )
+        if (
+            partial_pressure_particle.ndim == 2
+            and partial_pressure_particle.shape[1] == 1
+        ):
+            partial_pressure_particle = partial_pressure_particle[:, 0]
+
+        kelvin_term = surface_strategy.kelvin_term(
+            radius=radius,
+            molar_mass=self.molar_mass,
+            mass_concentration=mass_concentration_in_particle,
+            temperature=temperature,
+        )
+        return partial_pressure_particle, np.asarray(
+            kelvin_term, dtype=np.float64
+        )
 
     def _apply_skip_partitioning(
         self, array: NDArray[np.float64]
@@ -577,10 +604,25 @@ class CondensationStrategy(ABC):
         """
         if self.skip_partitioning_indices is None:
             return array
+        indices = np.asarray(self.skip_partitioning_indices)
+        if indices.size == 0:
+            return array
+        if not np.issubdtype(indices.dtype, np.integer):
+            raise TypeError(
+                "skip_partitioning_indices must contain integer indices."
+            )
+        max_index = int(indices.max())
+        min_index = int(indices.min())
+        max_allowed = array.shape[1] if array.ndim == 2 else array.shape[0]
+        if min_index < 0 or max_index >= max_allowed:
+            raise IndexError(
+                "skip_partitioning_indices must be within the species range "
+                f"[0, {max_allowed - 1}], got {indices.tolist()}."
+            )
         if array.ndim == 2:
-            array[:, self.skip_partitioning_indices] = 0.0
+            array[:, indices.tolist()] = 0.0
         else:
-            array[self.skip_partitioning_indices] = 0.0
+            array[indices.tolist()] = 0.0
         return array
 
     @abstractmethod
@@ -1713,7 +1755,8 @@ class CondensationLatentHeat(CondensationStrategy):
     latent-heat correction to the mass-transfer rate. When a latent heat
     strategy is supplied, the correction uses thermal resistance and the vapor
     pressure at the particle surface. Without a strategy, the behavior matches
-    the isothermal implementation.
+    the isothermal implementation. Negative or array-like latent heat inputs
+    log warnings and fall back to the isothermal path.
 
     Attributes:
         latent_heat_strategy_input: Strategy input provided at initialization.
@@ -1829,6 +1872,9 @@ class CondensationLatentHeat(CondensationStrategy):
         Returns:
             Vapor pressure at the particle surface with the same species shape
             as the activity strategy output.
+
+        Raises:
+            ValueError: If the computed surface vapor pressure is non-finite.
         """
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
@@ -1841,32 +1887,25 @@ class CondensationLatentHeat(CondensationStrategy):
                 particle, gas_species, particle_is_legacy, gas_is_legacy
             )
         )
-
-        mass_concentration_in_particle = particle_data.masses[0]
-        pure_vapor_pressure = _pure_vapor_pressure_from_strategy(
-            vapor_pressure_strategy, temperature
-        )
-        partial_pressure_particle = np.asarray(
-            activity_strategy.partial_pressure(
-                pure_vapor_pressure=pure_vapor_pressure,
-                mass_concentration=mass_concentration_in_particle,
-            )
-        )
-        if (
-            partial_pressure_particle.ndim == 2
-            and partial_pressure_particle.shape[1] == 1
-        ):
-            partial_pressure_particle = partial_pressure_particle[:, 0]
-
-        kelvin_term = surface_strategy.kelvin_term(
-            radius=radius,
-            molar_mass=self.molar_mass,
-            mass_concentration=mass_concentration_in_particle,
+        (
+            partial_pressure_particle,
+            kelvin_term,
+        ) = self._get_particle_partial_pressure_and_kelvin(
+            particle_data=particle_data,
+            activity_strategy=activity_strategy,
+            surface_strategy=surface_strategy,
+            vapor_pressure_strategy=vapor_pressure_strategy,
             temperature=temperature,
+            radius=radius,
         )
-        return np.asarray(
+        vapor_pressure_surface = np.asarray(
             partial_pressure_particle * kelvin_term, dtype=np.float64
         )
+        if not np.all(np.isfinite(vapor_pressure_surface)):
+            raise ValueError(
+                "Non-finite vapor_pressure_surface computed from Kelvin term."
+            )
+        return vapor_pressure_surface
 
     def mass_transfer_rate(
         self,
@@ -1878,9 +1917,9 @@ class CondensationLatentHeat(CondensationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Compute the non-isothermal mass transfer rate per particle.
 
-        This mirrors the isothermal workflow, sanitizing non-finite pressure
-        deltas and optionally applying the latent-heat correction when a latent
-        heat strategy is configured.
+        This mirrors the isothermal workflow and optionally applies the
+        latent-heat correction when a latent heat strategy is configured.
+        Non-finite inputs raise errors to avoid masked outputs.
 
         Args:
             particle: Particle representation providing radii and masses.
@@ -1891,6 +1930,9 @@ class CondensationLatentHeat(CondensationStrategy):
 
         Returns:
             Mass transfer rate per particle and species in kg/s.
+
+        Raises:
+            ValueError: If pressure deltas or latent-heat inputs are non-finite.
         """
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
@@ -1910,9 +1952,11 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure_delta = self.calculate_pressure_delta(
             particle, gas_species, temperature, radius_with_fill
         )
-        pressure_delta = np.nan_to_num(
-            pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
-        )
+        if not np.all(np.isfinite(pressure_delta)):
+            raise ValueError(
+                "Non-finite pressure_delta computed for latent-heat "
+                "condensation."
+            )
 
         if self._latent_heat_strategy is None:
             return get_mass_transfer_rate(
@@ -1923,7 +1967,11 @@ class CondensationLatentHeat(CondensationStrategy):
             )
 
         latent_heat = self._latent_heat_strategy.latent_heat(temperature)
+        if not np.all(np.isfinite(latent_heat)):
+            raise ValueError("latent_heat must be finite.")
         thermal_conductivity = get_thermal_conductivity(temperature)
+        if not np.all(np.isfinite(thermal_conductivity)):
+            raise ValueError("thermal_conductivity must be finite.")
         vapor_pressure_surface = self._get_vapor_pressure_surface(
             particle, gas_species, temperature, radius_with_fill
         )
@@ -1944,7 +1992,6 @@ class CondensationLatentHeat(CondensationStrategy):
         gas_species: GasSpecies | GasData,
         temperature: float,
         pressure: float,
-        dynamic_viscosity: Optional[float] = None,
     ) -> NDArray[np.float64]:
         """Compute the condensation rate per particle or bin.
 
@@ -1956,7 +2003,6 @@ class CondensationLatentHeat(CondensationStrategy):
             gas_species: Gas species supplying vapor properties.
             temperature: System temperature in Kelvin.
             pressure: System pressure in Pascals.
-            dynamic_viscosity: Optional dynamic viscosity for transport.
 
         Returns:
             Condensation rate in kg/s per particle or bin.
@@ -1972,7 +2018,6 @@ class CondensationLatentHeat(CondensationStrategy):
             gas_species=gas_species,
             temperature=temperature,
             pressure=pressure,
-            dynamic_viscosity=dynamic_viscosity,
         )
 
         raw_conc = particle_data.concentration[0]
@@ -2016,6 +2061,9 @@ class CondensationLatentHeat(CondensationStrategy):
             Tuple containing updated particle and gas species objects.
 
         Raises:
-            NotImplementedError: Implemented in E5-F3-P2/P3.
+            NotImplementedError: Step is not implemented for latent-heat
+                condensation.
         """
-        raise NotImplementedError("Implemented in E5-F3-P2/P3")
+        raise NotImplementedError(
+            "CondensationLatentHeat.step is not implemented."
+        )
