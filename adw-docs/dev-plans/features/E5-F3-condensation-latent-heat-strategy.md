@@ -146,9 +146,9 @@ additions:
   - Tests: numerical parity with `CondensationIsothermal` when L=0 (< 1e-15
     relative), reduced rate when L > 0, array shapes for single/multi-species
 
-- [ ] **E5-F3-P3**: Implement `step()` for particle-resolved with energy
+- [x] **E5-F3-P3**: Implement `step()` for particle-resolved with energy
   tracking and tests
-  - Issue: TBD | Size: M (~100 LOC) | Status: Not Started
+  - Issue: #1141 | Size: M (~100 LOC) | Status: Complete
   - `step()` follows `CondensationIsothermal.step()` flow (lines 922-1040)
     with two additions:
     1. Uses `mass_transfer_rate` from P2 (includes thermal correction)
@@ -241,3 +241,4 @@ additions:
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
 | 2026-03-04 | Marked P1 in progress for issue #1139 | ADW |
+| 2026-03-04 | Completed P3 step() implementation and tests (issue #1141) | ADW |

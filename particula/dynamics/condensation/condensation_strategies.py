@@ -1762,7 +1762,9 @@ class CondensationLatentHeat(CondensationStrategy):
     Attributes:
         latent_heat_strategy_input: Strategy input provided at initialization.
         latent_heat_input: Raw latent heat value provided at initialization.
-        last_latent_heat_energy: Diagnostic latent heat energy tracker.
+        last_latent_heat_energy: Net latent heat energy released in the most
+            recent step [J]. Positive values indicate condensation and
+            negative values indicate evaporation. Overwritten each call.
     """
 
     # pylint: disable=R0913, R0917
@@ -2040,7 +2042,12 @@ class CondensationLatentHeat(CondensationStrategy):
     def _update_latent_heat_energy(
         self, mass_transfer: NDArray[np.float64], temperature: float
     ) -> None:
-        """Store latent heat energy released for the current step."""
+        """Store latent heat energy released for the current step.
+
+        Args:
+            mass_transfer: Per-particle mass transfer in kg for this step.
+            temperature: System temperature in Kelvin.
+        """
         if self._latent_heat_strategy is None:
             self.last_latent_heat_energy = 0.0
             return
@@ -2093,7 +2100,7 @@ class CondensationLatentHeat(CondensationStrategy):
 
         The mass transfer rate is computed, optional skip-partitioning applied,
         and both the particle and gas states are updated while respecting
-        inventory limits. The per-step latent-heat energy release is stored in
+        inventory limits. The per-step latent heat release is stored in
         ``last_latent_heat_energy`` (positive for condensation, negative for
         evaporation) and overwritten on every call.
 
@@ -2103,7 +2110,8 @@ class CondensationLatentHeat(CondensationStrategy):
             temperature: System temperature in Kelvin.
             pressure: System pressure in Pascals.
             time_step: Integration timestep in seconds.
-            dynamic_viscosity: Optional dynamic viscosity override.
+            dynamic_viscosity: Optional dynamic viscosity override used in the
+                mass-transfer calculation.
 
         Returns:
             Tuple containing updated particle and gas species objects.
