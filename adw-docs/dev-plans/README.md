@@ -73,7 +73,7 @@ and rollout.
 - [E5-F1: Latent Heat Strategy Pattern][e5-f1] — Status: Completed (P2, #1123)
   - Scope: `LatentHeatStrategy` ABC with constant, linear, and power-law
     implementations plus builder/factory integration.
-- [E5-F2: Non-Isothermal Mass Transfer Functions][e5-f2] — Status: In Progress
+- [E5-F2: Non-Isothermal Mass Transfer Functions][e5-f2] — Status: Planning
   - Scope: Thermal resistance factor and non-isothermal mass transfer rate
     pure functions with energy tracking.
 - [E5-F3: CondensationLatentHeat Strategy Class][e5-f3] — Status: Planning

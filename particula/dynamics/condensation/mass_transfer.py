@@ -207,22 +207,23 @@ def get_thermal_resistance_factor(
     molar mass M [kg/mol]. When latent_heat is zero, the factor
     reduces to r_specific * temperature.
 
-    Arguments:
-        - diffusion_coefficient : The vapor diffusion coefficient D [m²/s].
-        - latent_heat : Latent heat of vaporization L [J/kg].
-        - vapor_pressure_surface : Equilibrium vapor pressure at the
-            surface [Pa].
-        - thermal_conductivity : Gas thermal conductivity kappa [W/(m·K)].
-        - temperature : Temperature T [K].
-        - molar_mass : Molar mass M [kg/mol].
+    Args:
+        diffusion_coefficient: Vapor diffusion coefficient D [m²/s].
+        latent_heat: Latent heat of vaporization L [J/kg].
+        vapor_pressure_surface: Equilibrium vapor pressure at the surface
+            [Pa].
+        thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
+        temperature: Temperature T [K].
+        molar_mass: Molar mass M [kg/mol].
 
     Returns:
-        Thermal resistance factor for non-isothermal mass transfer
-        [J/kg], matching the broadcasted input shape.
+        Thermal resistance factor for non-isothermal mass transfer [J/kg],
+        matching the broadcasted input shape.
 
     Raises:
         ValueError: If any validated inputs violate positive/nonnegative
             constraints.
+        ValueError: If the thermal resistance factor is non-positive.
 
     References:
         - Topping, D., & Bane, M. (2022). Introduction to Aerosol
@@ -248,6 +249,10 @@ def get_thermal_resistance_factor(
     thermal_factor = diffusion_term * correction_term + (
         r_specific * temperature
     )
+    if np.any(thermal_factor <= 0):
+        raise ValueError(
+            "Thermal resistance factor must be positive; check inputs."
+        )
     return np.asarray(thermal_factor, dtype=np.float64)
 
 
@@ -279,24 +284,24 @@ def get_mass_transfer_rate_latent_heat(
     rate. When latent heat is zero, the correction equals unity and the
     result matches get_mass_transfer_rate.
 
-    Args:
-        pressure_delta: Difference in partial pressure [Pa].
-        first_order_mass_transport: Mass transport coefficient K [m³/s].
-        temperature: Temperature T [K].
-        molar_mass: Molar mass M [kg/mol].
-        latent_heat: Latent heat of vaporization L [J/kg].
-        thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
-        vapor_pressure_surface: Equilibrium vapor pressure at the surface
-            [Pa].
-        diffusion_coefficient: Vapor diffusion coefficient D [m²/s].
+    Arguments:
+        - pressure_delta : Difference in partial pressure [Pa].
+        - first_order_mass_transport : Mass transport coefficient K [m³/s].
+        - temperature : Temperature T [K].
+        - molar_mass : Molar mass M [kg/mol].
+        - latent_heat : Latent heat of vaporization L [J/kg].
+        - thermal_conductivity : Gas thermal conductivity kappa [W/(m·K)].
+        - vapor_pressure_surface : Equilibrium vapor pressure at the
+            surface [Pa].
+        - diffusion_coefficient : Vapor diffusion coefficient D [m²/s].
 
     Returns:
-        Non-isothermal mass transfer rate [kg/s], matching the broadcasted
-        input shape.
+        - Non-isothermal mass transfer rate [kg/s], matching the broadcasted
+          input shape.
 
     Raises:
-        ValueError: If any validated inputs violate positive/nonnegative
-            constraints.
+        - ValueError : If any validated inputs violate positive/nonnegative
+          constraints.
     """
     pressure_delta = np.asarray(pressure_delta)
     first_order_mass_transport = np.asarray(first_order_mass_transport)
@@ -323,7 +328,7 @@ def get_mass_transfer_rate_latent_heat(
         temperature=temperature,
         molar_mass=molar_mass,
     )
-    return np.array(isothermal_rate / correction, dtype=np.float64)
+    return np.asarray(isothermal_rate / correction, dtype=np.float64)
 
 
 @validate_inputs(

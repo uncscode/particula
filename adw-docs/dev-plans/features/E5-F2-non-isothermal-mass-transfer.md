@@ -1,12 +1,12 @@
 # Feature E5-F2: Non-Isothermal Mass Transfer Functions
 
 **Parent Epic**: [E5: Non-Isothermal Condensation with Latent Heat](../epics/E5-non-isothermal-condensation.md)
-**Status**: In Progress (P2)
+**Status**: Planning
 **Priority**: P1
 **Owners**: @Gorkowski
-**Start Date**: 2026-03-03
+**Start Date**: TBD
 **Target Date**: TBD
-**Last Updated**: 2026-03-03
+**Last Updated**: 2026-03-02
 **Size**: Small (3 phases)
 
 ## Summary
@@ -113,7 +113,7 @@ negative dm (evaporation) = heat absorbed (Q < 0).
     `R_specific * T`), dimensional consistency, array broadcasting
 
 - [ ] **E5-F2-P2**: Add non-isothermal mass transfer rate function with tests
-  - Issue: #1135 | Size: S (~50 LOC) | Status: In Progress
+  - Issue: TBD | Size: S (~50 LOC) | Status: Not Started
   - File: `particula/dynamics/condensation/mass_transfer.py` (extend)
   - Function: `get_mass_transfer_rate_latent_heat(pressure_delta,
     first_order_mass_transport, temperature, molar_mass, latent_heat,
@@ -128,8 +128,6 @@ negative dm (evaporation) = heat absorbed (Q < 0).
   - Tests: isothermal parity (L=0 matches `get_mass_transfer_rate` to
     < 1e-15 relative), known cloud droplet growth rate for water at S=1.01
     (1% supersaturation), multi-species array shapes (1D and 2D)
-  - Exports: re-export `get_mass_transfer_rate_latent_heat` from
-    `particula.dynamics`
 
 - [ ] **E5-F2-P3**: Add latent heat energy release tracking function with tests
   - Issue: TBD | Size: XS (~30 LOC) | Status: Not Started
@@ -196,4 +194,3 @@ negative dm (evaporation) = heat absorbed (Q < 0).
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
-| 2026-03-03 | Start E5-F2-P2 for latent heat mass transfer rate | ADW |
