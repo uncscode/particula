@@ -15,8 +15,10 @@ def test_imports_from_dynamics_namespace():
         CondensationIsothermalBuilder,
         CondensationIsothermalStaggered,
         CondensationIsothermalStaggeredBuilder,
+        CondensationLatentHeat,
     )
 
+    assert CondensationLatentHeat is PAR_DYNAMICS.CondensationLatentHeat
     assert CondensationIsothermal is PAR_DYNAMICS.CondensationIsothermal
     assert (
         CondensationIsothermalStaggered
@@ -42,9 +44,11 @@ def test_imports_from_condensation_subpackage():
         CondensationIsothermalBuilder,
         CondensationIsothermalStaggered,
         CondensationIsothermalStaggeredBuilder,
+        CondensationLatentHeat,
         CondensationStrategy,
     )
 
+    assert CondensationLatentHeat is condensation.CondensationLatentHeat
     assert CondensationIsothermal is condensation.CondensationIsothermal
     assert (
         CondensationIsothermalStaggered
@@ -66,12 +70,15 @@ def test_condensation_exports_available_via_par_dynamics():
     """Shorthand namespace exposes staggered condensation symbols."""
     assert hasattr(PAR_DYNAMICS, "CondensationIsothermalStaggered")
     assert hasattr(PAR_DYNAMICS, "CondensationIsothermalStaggeredBuilder")
+    assert hasattr(PAR_DYNAMICS, "CondensationLatentHeat")
 
     strategy = PAR_DYNAMICS.CondensationIsothermalStaggered
     builder = PAR_DYNAMICS.CondensationIsothermalStaggeredBuilder
+    latent = PAR_DYNAMICS.CondensationLatentHeat
 
     assert strategy.__name__ == "CondensationIsothermalStaggered"
     assert builder.__name__ == "CondensationIsothermalStaggeredBuilder"
+    assert latent.__name__ == "CondensationLatentHeat"
 
 
 def test_condensation_export_memberships():
@@ -83,6 +90,7 @@ def test_condensation_export_memberships():
     assert "CondensationFactory" in condensation.__all__
     assert "CondensationIsothermal" in condensation.__all__
     assert "CondensationIsothermalBuilder" in condensation.__all__
+    assert "CondensationLatentHeat" in condensation.__all__
     assert "CondensationStrategy" in condensation.__all__
 
     assert "CondensationIsothermalStaggered" in PAR_DYNAMICS.__all__
@@ -90,3 +98,4 @@ def test_condensation_export_memberships():
     assert "CondensationFactory" in PAR_DYNAMICS.__all__
     assert "CondensationIsothermal" in PAR_DYNAMICS.__all__
     assert "CondensationIsothermalBuilder" in PAR_DYNAMICS.__all__
+    assert "CondensationLatentHeat" in PAR_DYNAMICS.__all__
