@@ -7,6 +7,7 @@ import logging
 import logging.handlers
 import types
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import particula as par  # new – we will build real objects
@@ -23,7 +24,9 @@ from particula.dynamics.condensation.condensation_strategies import (
 )
 from particula.gas.gas_data import GasData, from_species
 from particula.gas.latent_heat_strategies import ConstantLatentHeat
+from particula.gas.species import GasSpecies
 from particula.particles.particle_data import ParticleData, from_representation
+from particula.particles.representation import ParticleRepresentation
 
 
 # pylint: disable=too-many-instance-attributes
@@ -1659,6 +1662,150 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
 class TestCondensationLatentHeat(unittest.TestCase):
     """Test class for the CondensationLatentHeat strategy."""
 
+    def setUp(self):
+        """Set up latent heat condensation strategy fixtures."""
+        self.molar_mass = 0.018
+        self.diffusion_coefficient = 2e-5
+        self.accommodation_coefficient = 1.0
+        self.temperature = 298.15
+        self.pressure = 101325
+
+        vp_water = par.gas.VaporPressureFactory().get_strategy("water_buck")
+        vp_constant = par.gas.VaporPressureFactory().get_strategy(
+            "constant", {"vapor_pressure": 1e-24, "vapor_pressure_units": "Pa"}
+        )
+
+        mm_water = 18.015e-3
+        mm_core = 132.14e-3
+        water_sat = vp_water.saturation_concentration(
+            mm_water, self.temperature
+        )
+        water_conc = water_sat * 1.02
+
+        self.gas_species = (
+            par.gas.GasSpeciesBuilder()
+            .set_name(["H2O", "NH4HSO4"])
+            .set_molar_mass(np.array([mm_water, mm_core]), "kg/mol")
+            .set_vapor_pressure_strategy([vp_water, vp_constant])
+            .set_concentration(np.array([water_conc, 1e-30]), "kg/m^3")
+            .set_partitioning(True)
+            .build()
+        )
+
+        density_core = 1.77e3
+        r = np.array([100e-9])
+        mass_core = 4 / 3 * np.pi * r**3 * density_core
+        mass_spec = np.column_stack([mass_core * 0, mass_core])
+        densities = np.array([1e3, density_core])
+
+        self.activity_strategy = (
+            par.particles.ActivityKappaParameterBuilder()
+            .set_density(densities, "kg/m^3")
+            .set_kappa(np.array([0.0, 0.61]))
+            .set_molar_mass(np.array([mm_water, mm_core]), "kg/mol")
+            .set_water_index(0)
+            .build()
+        )
+        self.surface_strategy = (
+            par.particles.SurfaceStrategyVolumeBuilder()
+            .set_density(densities, "kg/m^3")
+            .set_surface_tension(np.array([0.072, 0.092]), "N/m")
+            .build()
+        )
+        self.particle = (
+            par.particles.ResolvedParticleMassRepresentationBuilder()
+            .set_distribution_strategy(
+                par.particles.ParticleResolvedSpeciatedMass()
+            )
+            .set_activity_strategy(self.activity_strategy)
+            .set_surface_strategy(self.surface_strategy)
+            .set_mass(mass_spec, "kg")
+            .set_density(densities, "kg/m^3")
+            .set_charge(0)
+            .set_volume(1e-6, "m^3")
+            .build()
+        )
+
+        self.vapor_pressure_strategy = (
+            self.gas_species.pure_vapor_pressure_strategy
+        )
+        self.data_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+        )
+
+    def _make_data_inputs(self) -> tuple[ParticleData, GasData]:
+        """Return ParticleData and GasData versions of fixtures."""
+        return (
+            from_representation(self.particle),
+            from_species(self.gas_species),
+        )
+
+    def _build_single_species_fixture(
+        self, n_particles: int = 1
+    ) -> tuple[
+        GasSpecies,
+        ParticleRepresentation,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Build single-species particle/gas fixtures for shape tests."""
+        vp_water = par.gas.VaporPressureFactory().get_strategy("water_buck")
+        mm_water = 18.015e-3
+        water_sat = vp_water.saturation_concentration(
+            mm_water, self.temperature
+        )
+        water_conc = water_sat * 1.02
+
+        gas_species = (
+            par.gas.GasSpeciesBuilder()
+            .set_name("H2O")
+            .set_molar_mass(np.array([mm_water]), "kg/mol")
+            .set_vapor_pressure_strategy([vp_water])
+            .set_concentration(np.array([water_conc]), "kg/m^3")
+            .set_partitioning(True)
+            .build()
+        )
+
+        density = np.array([1e3])
+        r = np.full(n_particles, 100e-9)
+        mass = 4 / 3 * np.pi * r**3 * density[0]
+        mass_spec = mass[:, np.newaxis]
+
+        activity = (
+            par.particles.ActivityKappaParameterBuilder()
+            .set_density(density, "kg/m^3")
+            .set_kappa(np.array([0.0]))
+            .set_molar_mass(np.array([mm_water]), "kg/mol")
+            .set_water_index(0)
+            .build()
+        )
+        surface = (
+            par.particles.SurfaceStrategyVolumeBuilder()
+            .set_density(density, "kg/m^3")
+            .set_surface_tension(np.array([0.072]), "N/m")
+            .build()
+        )
+        particle = (
+            par.particles.ResolvedParticleMassRepresentationBuilder()
+            .set_distribution_strategy(
+                par.particles.ParticleResolvedSpeciatedMass()
+            )
+            .set_activity_strategy(activity)
+            .set_surface_strategy(surface)
+            .set_mass(mass_spec, "kg")
+            .set_density(density, "kg/m^3")
+            .set_charge(0)
+            .set_volume(1e-6, "m^3")
+            .build()
+        )
+
+        return gas_species, particle, activity, surface
+
     def test_instantiation_with_strategy(self):
         """Latent heat strategy is used when provided."""
         strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
@@ -1744,15 +1891,221 @@ class TestCondensationLatentHeat(unittest.TestCase):
         self.assertFalse(cond.update_gases)
 
     def test_stubs_raise_not_implemented(self):
-        """Stubbed methods raise NotImplementedError."""
+        """step() remains stubbed for latent heat strategy."""
         cond = CondensationLatentHeat(molar_mass=0.018)
 
         with self.assertRaises(NotImplementedError):
-            cond.mass_transfer_rate(None, None, 298.15, 101325)
-        with self.assertRaises(NotImplementedError):
-            cond.rate(None, None, 298.15, 101325)
-        with self.assertRaises(NotImplementedError):
             cond.step(None, None, 298.15, 101325, time_step=1.0)
+
+    def test_mass_transfer_rate_isothermal_parity(self):
+        """Latent heat strategy falls back to isothermal rates."""
+        latent_cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+        iso_cond = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+
+        latent_rate = latent_cond.mass_transfer_rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        iso_rate = iso_cond.mass_transfer_rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(latent_rate, iso_rate, rtol=1e-15)
+
+    def test_rate_isothermal_parity(self):
+        """rate() matches isothermal strategy when latent heat is absent."""
+        latent_cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+        iso_cond = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+
+        latent_rate = latent_cond.rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        iso_rate = iso_cond.rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(latent_rate, iso_rate, rtol=1e-15)
+
+    def test_mass_transfer_rate_reduced_with_latent_heat(self):
+        """Latent heat correction reduces mass transfer magnitude."""
+        latent_cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        iso_cond = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+
+        latent_rate = latent_cond.mass_transfer_rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        iso_rate = iso_cond.mass_transfer_rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        self.assertTrue(np.all(np.abs(latent_rate) <= np.abs(iso_rate) + 1e-30))
+
+    def test_mass_transfer_rate_single_species(self):
+        """Single-species output is a 1D array."""
+        gas_species, particle, _, _ = self._build_single_species_fixture()
+        cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+
+        rate = cond.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        self.assertEqual(rate.shape, (1,))
+
+    def test_get_vapor_pressure_surface_single_species(self):
+        """Surface vapor pressure returns 1D array for single species."""
+        gas_species, particle, _, _ = self._build_single_species_fixture(
+            n_particles=3
+        )
+        cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+
+        vapor_pressure_surface = cond._get_vapor_pressure_surface(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            radius=particle.get_radius(),
+        )
+
+        self.assertEqual(vapor_pressure_surface.shape, (3,))
+        self.assertTrue(np.all(np.isfinite(vapor_pressure_surface)))
+
+    def test_mass_transfer_rate_multi_species(self):
+        """Multi-species output preserves particle/species shape."""
+        cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+
+        rate = cond.mass_transfer_rate(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        self.assertEqual(rate.shape, (1, 2))
+
+    def test_get_vapor_pressure_surface_multi_species(self):
+        """Surface vapor pressure preserves particle/species shape."""
+        cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+
+        vapor_pressure_surface = cond._get_vapor_pressure_surface(
+            particle=self.particle,
+            gas_species=self.gas_species,
+            temperature=self.temperature,
+            radius=self.particle.get_radius(),
+        )
+
+        self.assertEqual(vapor_pressure_surface.shape, (1, 2))
+        self.assertTrue(np.all(np.isfinite(vapor_pressure_surface)))
+
+    def test_rate_scales_by_concentration(self):
+        """Condensation rate scales linearly with concentration."""
+        particle_data, gas_data = self._make_data_inputs()
+
+        base_rate = self.data_strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        particle_data_double = copy.deepcopy(particle_data)
+        particle_data_double.concentration[0] = (
+            particle_data_double.concentration[0] * 2.0
+        )
+        double_rate = self.data_strategy.rate(
+            particle=particle_data_double,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(double_rate, base_rate * 2.0, rtol=1e-15)
+
+    def test_rate_respects_skip_partitioning(self):
+        """Skip-partitioning indices zero out selected species."""
+        particle_data, gas_data = self._make_data_inputs()
+        strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            skip_partitioning_indices=[1],
+        )
+
+        rates = strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        self.assertTrue(np.all(rates[:, 1] == 0.0))
+
+    def test_nonfinite_pressure_delta_sanitized(self):
+        """Non-finite pressure deltas are sanitized to zero."""
+        gas_species, particle, _, _ = self._build_single_species_fixture(
+            n_particles=3
+        )
+        cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+
+        with patch.object(
+            CondensationLatentHeat,
+            "calculate_pressure_delta",
+            return_value=np.array([np.nan, np.inf, -np.inf]),
+        ):
+            rates = cond.mass_transfer_rate(
+                particle=particle,
+                gas_species=gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+
+        np.testing.assert_array_equal(rates, np.zeros_like(rates))
 
     def test_inherited_methods_work(self):
         """Base class helpers remain available."""

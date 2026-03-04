@@ -35,12 +35,16 @@ from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer,
     get_mass_transfer_rate,
+    get_mass_transfer_rate_latent_heat,
 )
 from particula.gas import get_molecule_mean_free_path
 from particula.gas.gas_data import GasData
 from particula.gas.latent_heat_strategies import (
     ConstantLatentHeat,
     LatentHeatStrategy,
+)
+from particula.gas.properties.thermal_conductivity import (
+    get_thermal_conductivity,
 )
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import VaporPressureStrategy
@@ -1805,6 +1809,52 @@ class CondensationLatentHeat(CondensationStrategy):
         )
         return None
 
+    def _get_vapor_pressure_surface(
+        self,
+        particle: ParticleRepresentation | ParticleData,
+        gas_species: GasSpecies | GasData,
+        temperature: float,
+        radius: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        """Compute equilibrium vapor pressure at the particle surface."""
+        particle_data, particle_is_legacy = _unwrap_particle(particle)
+        gas_data, gas_is_legacy = _unwrap_gas(gas_species)
+        _require_matching_types(particle_is_legacy, gas_is_legacy)
+        _require_single_box(particle_data.n_boxes, "ParticleData")
+        _require_single_box(gas_data.n_boxes, "GasData")
+
+        activity_strategy, surface_strategy, vapor_pressure_strategy = (
+            self._resolve_strategies(
+                particle, gas_species, particle_is_legacy, gas_is_legacy
+            )
+        )
+
+        mass_concentration_in_particle = particle_data.masses[0]
+        pure_vapor_pressure = _pure_vapor_pressure_from_strategy(
+            vapor_pressure_strategy, temperature
+        )
+        partial_pressure_particle = np.asarray(
+            activity_strategy.partial_pressure(
+                pure_vapor_pressure=pure_vapor_pressure,
+                mass_concentration=mass_concentration_in_particle,
+            )
+        )
+        if (
+            partial_pressure_particle.ndim == 2
+            and partial_pressure_particle.shape[1] == 1
+        ):
+            partial_pressure_particle = partial_pressure_particle[:, 0]
+
+        kelvin_term = surface_strategy.kelvin_term(
+            radius=radius,
+            molar_mass=self.molar_mass,
+            mass_concentration=mass_concentration_in_particle,
+            temperature=temperature,
+        )
+        return np.asarray(
+            partial_pressure_particle * kelvin_term, dtype=np.float64
+        )
+
     def mass_transfer_rate(
         self,
         particle: ParticleRepresentation | ParticleData,
@@ -1813,24 +1863,52 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """Return the mass transfer rate (stub).
+        """Compute the non-isothermal mass transfer rate per particle."""
+        particle_data, particle_is_legacy = _unwrap_particle(particle)
+        gas_data, gas_is_legacy = _unwrap_gas(gas_species)
+        _require_matching_types(particle_is_legacy, gas_is_legacy)
+        _require_single_box(particle_data.n_boxes, "ParticleData")
+        _require_single_box(gas_data.n_boxes, "GasData")
 
-        Args:
-            particle: Particle representation providing radius and activity
-                information.
-            gas_species: Gas species supplying vapor properties and
-                concentrations.
-            temperature: System temperature in Kelvin.
-            pressure: System pressure in Pascals.
-            dynamic_viscosity: Optional dynamic viscosity override.
+        radius_with_fill = self._fill_zero_radius(particle_data.radii[0])
+        radius_with_fill = np.maximum(radius_with_fill, MIN_PARTICLE_RADIUS_M)
 
-        Returns:
-            Mass transfer rate per particle and per species in kg/s.
+        first_order_mass_transport = self.first_order_mass_transport(
+            particle_radius=radius_with_fill,
+            temperature=temperature,
+            pressure=pressure,
+            dynamic_viscosity=dynamic_viscosity,
+        )
+        pressure_delta = self.calculate_pressure_delta(
+            particle, gas_species, temperature, radius_with_fill
+        )
+        pressure_delta = np.nan_to_num(
+            pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
+        )
 
-        Raises:
-            NotImplementedError: Implemented in E5-F3-P2/P3.
-        """
-        raise NotImplementedError("Implemented in E5-F3-P2/P3")
+        if self._latent_heat_strategy is None:
+            return get_mass_transfer_rate(
+                pressure_delta=pressure_delta,
+                first_order_mass_transport=first_order_mass_transport,
+                temperature=temperature,
+                molar_mass=self.molar_mass,
+            )
+
+        latent_heat = self._latent_heat_strategy.latent_heat(temperature)
+        thermal_conductivity = get_thermal_conductivity(temperature)
+        vapor_pressure_surface = self._get_vapor_pressure_surface(
+            particle, gas_species, temperature, radius_with_fill
+        )
+        return get_mass_transfer_rate_latent_heat(
+            pressure_delta=pressure_delta,
+            first_order_mass_transport=first_order_mass_transport,
+            temperature=temperature,
+            molar_mass=self.molar_mass,
+            latent_heat=latent_heat,
+            thermal_conductivity=thermal_conductivity,
+            vapor_pressure_surface=vapor_pressure_surface,
+            diffusion_coefficient=self.diffusion_coefficient,
+        )
 
     def rate(
         self,
@@ -1840,24 +1918,36 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> NDArray[np.float64]:
-        """Return the condensation rate (stub).
+        """Compute the condensation rate per particle or bin."""
+        particle_data, particle_is_legacy = _unwrap_particle(particle)
+        gas_data, gas_is_legacy = _unwrap_gas(gas_species)
+        _require_matching_types(particle_is_legacy, gas_is_legacy)
+        _require_single_box(particle_data.n_boxes, "ParticleData")
+        _require_single_box(gas_data.n_boxes, "GasData")
 
-        Args:
-            particle: Particle representation providing radius and activity
-                information.
-            gas_species: Gas species supplying vapor properties and
-                concentrations.
-            temperature: System temperature in Kelvin.
-            pressure: System pressure in Pascals.
-            dynamic_viscosity: Optional dynamic viscosity override.
+        mass_rate = self.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=temperature,
+            pressure=pressure,
+            dynamic_viscosity=dynamic_viscosity,
+        )
 
-        Returns:
-            Condensation rate per particle and per species in kg/s.
+        raw_conc = particle_data.concentration[0]
+        if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
+            concentration = raw_conc[:, np.newaxis]
+        else:
+            concentration = raw_conc
 
-        Raises:
-            NotImplementedError: Implemented in E5-F3-P2/P3.
-        """
-        raise NotImplementedError("Implemented in E5-F3-P2/P3")
+        rates_raw = mass_rate * concentration
+
+        if not isinstance(rates_raw, np.ndarray):
+            rates = np.asarray(rates_raw)
+        else:
+            rates = rates_raw
+
+        rates = self._apply_skip_partitioning(rates)
+        return rates
 
     def step(
         self,

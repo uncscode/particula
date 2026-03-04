@@ -28,7 +28,7 @@ work, typically ~100 LOC per phase, that deliver user-facing functionality.
 |----|------|--------|----------|--------|
 | E5-F1 | [Latent Heat Strategy Pattern](E5-F1-latent-heat-strategy.md) | In Progress | P1 | 4 |
 | E5-F2 | [Non-Isothermal Mass Transfer Functions](E5-F2-non-isothermal-mass-transfer.md) | Planning | P1 | 3 |
-| E5-F3 | [CondensationLatentHeat Strategy Class](E5-F3-condensation-latent-heat-strategy.md) | In Progress | P1 | 5 |
+| E5-F3 | [CondensationLatentHeat Strategy Class](E5-F3-condensation-latent-heat-strategy.md) | Planning | P1 | 5 |
 | E5-F4 | [Builder, Factory, and Exports](E5-F4-builder-factory-exports.md) | Planning | P1 | 2 |
 | E5-F5 | [Validation and Integration Tests](E5-F5-validation-integration-tests.md) | Planning | P1 | 2 |
 | E5-F6 | [Documentation and Examples](E5-F6-documentation-examples.md) | Planning | P2 | 3 |
