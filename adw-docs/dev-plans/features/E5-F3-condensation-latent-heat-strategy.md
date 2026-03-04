@@ -1,12 +1,12 @@
 # Feature E5-F3: CondensationLatentHeat Strategy Class
 
 **Parent Epic**: [E5: Non-Isothermal Condensation with Latent Heat](../epics/E5-non-isothermal-condensation.md)
-**Status**: In Progress
+**Status**: Planning
 **Priority**: P1
 **Owners**: @Gorkowski
-**Start Date**: 2026-03-04
+**Start Date**: TBD
 **Target Date**: TBD
-**Last Updated**: 2026-03-04
+**Last Updated**: 2026-03-02
 **Size**: Large (5 phases)
 
 ## Summary
@@ -105,7 +105,7 @@ additions:
 ## Phase Checklist
 
 - [ ] **E5-F3-P1**: Create `CondensationLatentHeat` class skeleton with tests
-  - Issue: #1139 | Size: M (~80 LOC) | Status: In Progress
+  - Issue: TBD | Size: M (~80 LOC) | Status: Not Started
   - File: `particula/dynamics/condensation/condensation_strategies.py` (extend
     existing file, currently 1699 lines)
   - Extends `CondensationStrategy` (inherits all base methods including
@@ -118,14 +118,11 @@ additions:
     1. If `latent_heat_strategy` provided -> use it directly
     2. Else if `latent_heat > 0` -> wrap in `ConstantLatentHeat(latent_heat)`
     3. Else (both zero/None) -> store None, behave as isothermal
-    4. If `latent_heat` is array-like, log warning and fall back to None
-    5. If `latent_heat` is negative, log warning and fall back to None
   - Instance attribute: `last_latent_heat_energy: float = 0.0` (diagnostic)
   - Tests: `particula/dynamics/condensation/tests/
     condensation_strategies_test.py` (extend existing, currently 1655 lines)
   - Tests: instantiation with all param combos, strategy resolution priority,
-    fallback to isothermal when L=0, logging for array/negative latent heat,
-    stub methods raise `NotImplementedError`
+    fallback to isothermal when L=0, type errors for bad inputs
 
 - [ ] **E5-F3-P2**: Implement `mass_transfer_rate()` and `rate()` with tests
   - Issue: TBD | Size: M (~100 LOC) | Status: Not Started
@@ -240,4 +237,3 @@ additions:
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
-| 2026-03-04 | Marked P1 in progress for issue #1139 | ADW |
