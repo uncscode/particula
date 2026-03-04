@@ -12,12 +12,20 @@ into runnable pipelines. You can choose simultaneous isothermal updates or
 staggered two-pass Gauss-Seidel sweeps with theta-controlled first-pass
 fractions, batch partitioning, and gas-field updates for stability.
 
+CondensationLatentHeat mirrors the isothermal workflow for particle-resolved
+runs while adding latent-heat-aware mass transfer and per-step energy
+diagnostics. The step now supports a `dynamic_viscosity` override and records
+`last_latent_heat_energy` for parity with the isothermal API plus energy
+tracking.
+
 This feature is built around user-facing APIs exposed via `particula.dynamics`:
 
 - `CondensationStrategy` – abstract base defining `rate` / `step`.
 - `CondensationIsothermal` – simultaneous isothermal mass transfer.
 - `CondensationIsothermalStaggered` – two-pass staggered (Gauss-Seidel) update
   with theta modes (`"half"`, `"random"`, `"batch"`) and batching.
+- `CondensationLatentHeat` – latent-heat-corrected rate with per-step energy
+  diagnostics.
 - `CondensationIsothermalBuilder`, `CondensationIsothermalStaggeredBuilder` –
   fluent builders with validation and unit handling.
 - `CondensationFactory` – factory selecting a condensation strategy by name.
@@ -38,6 +46,8 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
   fields are depleted.
 - **Pipeline-ready**: Use `MassCondensation` with `sub_steps` for tight coupling
   to other runnables in a single pipeline.
+- **Latent heat diagnostics**: Track per-step energy release for
+  particle-resolved runs with `CondensationLatentHeat`.
 
 ## Who It's For
 
@@ -65,6 +75,7 @@ par.dynamics.CondensationStrategy
 # Concrete implementations
 par.dynamics.CondensationIsothermal
 par.dynamics.CondensationIsothermalStaggered
+par.dynamics.CondensationLatentHeat
 
 # Builders and factory
 par.dynamics.CondensationIsothermalBuilder
@@ -130,6 +141,36 @@ particle, gas = iso.step(
     time_step=1.0,
 )
 ```
+
+### CondensationLatentHeat (energy diagnostics)
+
+`CondensationLatentHeat` mirrors the isothermal step but applies a latent-heat
+correction when a latent heat strategy (or scalar fallback) is provided. It
+records `last_latent_heat_energy` each step (positive for condensation,
+negative for evaporation) and accepts a `dynamic_viscosity` override for
+particle-resolved workflows.
+
+```python
+latent = par.dynamics.CondensationLatentHeat(
+    molar_mass=0.018,
+    diffusion_coefficient=2e-5,
+    accommodation_coefficient=1.0,
+    latent_heat=2.4e6,  # J/kg fallback
+)
+particle, gas = latent.step(
+    particle=particle,
+    gas_species=gas,
+    temperature=298.15,
+    pressure=101325.0,
+    time_step=1.0,
+    dynamic_viscosity=1.8e-5,
+)
+energy_released = latent.last_latent_heat_energy
+```
+
+When no latent heat strategy is configured (or a nonpositive scalar is
+provided), the step follows the isothermal path and reports
+`last_latent_heat_energy = 0.0`.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
@@ -476,6 +517,8 @@ aerosol, gas = selective.step(
 | `accommodation_coefficient` | Mass accommodation coefficient (unitless). | `1.0` |
 | `update_gases` | Whether to deplete gas concentrations during step. | `True` |
 | `skip_partitioning_indices` | Species indices to exclude from partitioning. | `None` |
+| `latent_heat_strategy` | Optional latent heat strategy. | `None` |
+| `latent_heat` | Scalar fallback latent heat [J/kg]. | `0.0` |
 | `theta_mode` | Staggered theta selection: `"half"`, `"random"`, `"batch"`. | `"half"` (staggered) |
 | `num_batches` | Gauss-Seidel batch count (clipped to particle count). | `1` |
 | `shuffle_each_step` | Shuffle particle order each step (staggered). | `True` |
@@ -500,7 +543,7 @@ aerosol, gas = selective.step(
 
 - Staggered solver is Gauss-Seidel only; other solvers are not exposed.
 - Factory supports `"isothermal"` and `"isothermal_staggered"` only.
-- No latent-heat or temperature feedback; condensation is isothermal.
+- No temperature feedback; latent heat is diagnostic only.
 - Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.
 
