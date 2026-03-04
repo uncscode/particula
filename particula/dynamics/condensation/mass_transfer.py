@@ -333,6 +333,42 @@ def get_mass_transfer_rate_latent_heat(
 
 @validate_inputs(
     {
+        "mass_transfer": "finite",
+        "latent_heat": "nonnegative",
+    }
+)
+def get_latent_heat_energy_released(
+    mass_transfer: Union[float, NDArray[np.float64]],
+    latent_heat: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Calculate latent heat energy released during phase change.
+
+    This diagnostic function converts the mass transferred in a time step into
+    energy released to (or absorbed from) the gas phase:
+
+    - Q = dm × L
+        - Q : Latent heat energy [J].
+        - dm : Mass transferred per step [kg].
+        - L : Latent heat of vaporization [J/kg].
+
+    Positive mass transfer (condensation) yields Q > 0, while negative mass
+    transfer (evaporation) yields Q < 0.
+
+    Args:
+        mass_transfer: Mass transferred per step [kg].
+        latent_heat: Latent heat of vaporization [J/kg].
+
+    Returns:
+        Latent heat energy released or absorbed [J].
+
+    Raises:
+        ValueError: If mass_transfer is non-finite or latent_heat is negative.
+    """
+    return np.asarray(mass_transfer * latent_heat, dtype=np.float64)
+
+
+@validate_inputs(
+    {
         "mass_rate": "finite",
         "particle_radius": "nonnegative",
         "density": "positive",

@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
+    get_latent_heat_energy_released,
     get_mass_transfer,
     get_mass_transfer_of_multiple_species,
     get_mass_transfer_of_single_species,
@@ -451,6 +452,95 @@ def test_mass_transfer_rate_latent_heat_validation_additional_inputs(
     kwargs[field] = value
     with pytest.raises(ValueError, match=field):
         get_mass_transfer_rate_latent_heat(**kwargs)
+
+
+def test_latent_heat_energy_released_precision():
+    """Check latent heat energy calculation at high precision."""
+    mass_transfer = 1.5e-15
+    latent_heat = 2.454e6
+    expected = 3.681e-9
+    result = get_latent_heat_energy_released(
+        mass_transfer=mass_transfer,
+        latent_heat=latent_heat,
+    )
+    np.testing.assert_allclose(result, expected, rtol=1e-14)
+
+
+def test_latent_heat_energy_released_sign_convention():
+    """Positive mass transfer releases heat; negative absorbs heat."""
+    latent_heat = 2.454e6
+    positive_result = get_latent_heat_energy_released(
+        mass_transfer=1.0e-15,
+        latent_heat=latent_heat,
+    )
+    negative_result = get_latent_heat_energy_released(
+        mass_transfer=-1.0e-15,
+        latent_heat=latent_heat,
+    )
+    assert positive_result > 0.0
+    assert negative_result < 0.0
+
+
+def test_latent_heat_energy_released_zero_latent_heat():
+    """Zero latent heat returns exact zero."""
+    result = get_latent_heat_energy_released(
+        mass_transfer=1.0e-15,
+        latent_heat=0.0,
+    )
+    assert result == 0.0
+
+
+def test_latent_heat_energy_released_zero_mass_transfer():
+    """Zero mass transfer returns exact zero."""
+    result = get_latent_heat_energy_released(
+        mass_transfer=0.0,
+        latent_heat=2.454e6,
+    )
+    assert result == 0.0
+
+
+def test_latent_heat_energy_released_array_shapes():
+    """Broadcast scalar and array inputs and preserve shapes."""
+    mass_transfer_1d = np.array([1.0e-15, -2.0e-15])
+    latent_heat_scalar = 2.454e6
+    result_1d = get_latent_heat_energy_released(
+        mass_transfer=mass_transfer_1d,
+        latent_heat=latent_heat_scalar,
+    )
+    expected_1d = mass_transfer_1d * latent_heat_scalar
+    assert np.asarray(result_1d).shape == mass_transfer_1d.shape
+    np.testing.assert_allclose(result_1d, expected_1d, rtol=1e-14)
+
+    mass_transfer_2d = np.array([[1.0e-15, -1.0e-15], [2.0e-15, 3.0e-15]])
+    latent_heat_1d = np.array([2.454e6, 1.8e6])
+    result_2d = get_latent_heat_energy_released(
+        mass_transfer=mass_transfer_2d,
+        latent_heat=latent_heat_1d,
+    )
+    expected_2d = mass_transfer_2d * latent_heat_1d
+    assert np.asarray(result_2d).shape == mass_transfer_2d.shape
+    np.testing.assert_allclose(result_2d, expected_2d, rtol=1e-14)
+
+
+def test_latent_heat_energy_released_validation_negative_latent_heat():
+    """Negative latent heat should raise validation error."""
+    with pytest.raises(ValueError, match="latent_heat"):
+        get_latent_heat_energy_released(
+            mass_transfer=1.0e-15,
+            latent_heat=-1.0,
+        )
+
+
+@pytest.mark.parametrize("mass_transfer", [np.nan, np.inf])
+def test_latent_heat_energy_released_validation_nonfinite_mass_transfer(
+    mass_transfer,
+):
+    """Non-finite mass transfer should raise validation error."""
+    with pytest.raises(ValueError, match="mass_transfer"):
+        get_latent_heat_energy_released(
+            mass_transfer=mass_transfer,
+            latent_heat=2.454e6,
+        )
 
 
 def test_multi_species_mass_transfer_rate():
