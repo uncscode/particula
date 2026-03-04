@@ -40,7 +40,7 @@ and rollout.
     [E4-F5][e4-f5], [E4-F6][e4-f6], [E4-F7][e4-f7], [E4-F8][e4-f8], [E4-F9][e4-f9]
 
 - [E5: Non-Isothermal Condensation with Latent Heat][epic-e5]
-  — Status: Planning
+  — Status: In Progress
   - Scope: Non-isothermal condensation strategy accounting for latent heat of
     vaporization during mass transfer. Includes latent heat strategy pattern
     (constant, linear, power-law), thermal resistance correction on mass
@@ -76,7 +76,7 @@ and rollout.
 - [E5-F2: Non-Isothermal Mass Transfer Functions][e5-f2] — Status: Planning
   - Scope: Thermal resistance factor and non-isothermal mass transfer rate
     pure functions with energy tracking.
-- [E5-F3: CondensationLatentHeat Strategy Class][e5-f3] — Status: Planning
+- [E5-F3: CondensationLatentHeat Strategy Class][e5-f3] — Status: In Progress
   - Scope: New condensation strategy with latent heat correction and energy
     diagnostics.
 - [E5-F4: Builder, Factory, and Exports][e5-f4] — Status: Planning

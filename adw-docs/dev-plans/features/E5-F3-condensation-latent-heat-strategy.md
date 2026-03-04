@@ -1,12 +1,12 @@
 # Feature E5-F3: CondensationLatentHeat Strategy Class
 
 **Parent Epic**: [E5: Non-Isothermal Condensation with Latent Heat](../epics/E5-non-isothermal-condensation.md)
-**Status**: Planning
+**Status**: In Progress
 **Priority**: P1
 **Owners**: @Gorkowski
 **Start Date**: TBD
 **Target Date**: TBD
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-03
 **Size**: Large (5 phases)
 
 ## Summary
@@ -124,8 +124,8 @@ additions:
   - Tests: instantiation with all param combos, strategy resolution priority,
     fallback to isothermal when L=0, type errors for bad inputs
 
-- [ ] **E5-F3-P2**: Implement `mass_transfer_rate()` and `rate()` with tests
-  - Issue: TBD | Size: M (~100 LOC) | Status: Not Started
+- [x] **E5-F3-P2**: Implement `mass_transfer_rate()` and `rate()` with tests
+  - Issue: #1140 | Size: M (~100 LOC) | Status: Complete
   - `mass_transfer_rate()` follows `CondensationIsothermal.mass_transfer_rate()`
     flow (lines 761-833) but replaces the final `get_mass_transfer_rate()` call
     with `get_mass_transfer_rate_latent_heat()`:
@@ -237,3 +237,4 @@ additions:
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
+| 2026-03-03 | Mark E5-F3-P2 complete (rates + tests) | ADW |

@@ -1707,11 +1707,13 @@ class CondensationIsothermalStaggered(CondensationStrategy):
 
 
 class CondensationLatentHeat(CondensationStrategy):
-    """Condensation strategy with latent heat configuration.
+    """Condensation strategy with optional latent-heat corrections.
 
-    This class mirrors the base condensation setup while deferring the
-    non-isothermal mass-transfer implementation to later phases. It resolves
-    latent heat either from a provided strategy or a scalar fallback value.
+    This strategy mirrors the isothermal workflow while optionally applying a
+    latent-heat correction to the mass-transfer rate. When a latent heat
+    strategy is supplied, the correction uses thermal resistance and the vapor
+    pressure at the particle surface. Without a strategy, the behavior matches
+    the isothermal implementation.
 
     Attributes:
         latent_heat_strategy_input: Strategy input provided at initialization.
@@ -1816,7 +1818,18 @@ class CondensationLatentHeat(CondensationStrategy):
         temperature: float,
         radius: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Compute equilibrium vapor pressure at the particle surface."""
+        """Compute equilibrium vapor pressure at the particle surface.
+
+        Args:
+            particle: Particle representation or data container.
+            gas_species: Gas species facade or data container.
+            temperature: System temperature in Kelvin.
+            radius: Particle radii used for the Kelvin term.
+
+        Returns:
+            Vapor pressure at the particle surface with the same species shape
+            as the activity strategy output.
+        """
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -1863,7 +1876,22 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        """Compute the non-isothermal mass transfer rate per particle."""
+        """Compute the non-isothermal mass transfer rate per particle.
+
+        This mirrors the isothermal workflow, sanitizing non-finite pressure
+        deltas and optionally applying the latent-heat correction when a latent
+        heat strategy is configured.
+
+        Args:
+            particle: Particle representation providing radii and masses.
+            gas_species: Gas species supplying vapor properties.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            dynamic_viscosity: Optional dynamic viscosity for transport.
+
+        Returns:
+            Mass transfer rate per particle and species in kg/s.
+        """
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
@@ -1918,7 +1946,21 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> NDArray[np.float64]:
-        """Compute the condensation rate per particle or bin."""
+        """Compute the condensation rate per particle or bin.
+
+        Mass transfer rates are scaled by the raw particle concentration and
+        the configured skip-partitioning indices are applied.
+
+        Args:
+            particle: Particle representation providing concentration data.
+            gas_species: Gas species supplying vapor properties.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
+            dynamic_viscosity: Optional dynamic viscosity for transport.
+
+        Returns:
+            Condensation rate in kg/s per particle or bin.
+        """
         particle_data, particle_is_legacy = _unwrap_particle(particle)
         gas_data, gas_is_legacy = _unwrap_gas(gas_species)
         _require_matching_types(particle_is_legacy, gas_is_legacy)
