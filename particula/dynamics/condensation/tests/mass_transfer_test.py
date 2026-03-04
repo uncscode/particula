@@ -227,6 +227,19 @@ def test_thermal_resistance_factor_rejects_invalid_inputs(field, value):
         get_thermal_resistance_factor(**kwargs)
 
 
+def test_thermal_resistance_factor_rejects_nonpositive_result():
+    """Non-positive thermal factors should raise a ValueError."""
+    with pytest.raises(ValueError, match="Thermal resistance factor"):
+        get_thermal_resistance_factor(
+            diffusion_coefficient=1.0e6,
+            latent_heat=1.0,
+            vapor_pressure_surface=1.0e6,
+            thermal_conductivity=1.0,
+            temperature=1.0,
+            molar_mass=0.08314,
+        )
+
+
 def test_mass_transfer_rate_latent_heat_isothermal_parity():
     """Latent heat of zero should match the isothermal rate (scalar)."""
     pressure_delta = 23.39
@@ -410,6 +423,34 @@ def test_mass_transfer_rate_latent_heat_validation_negative_molar_mass():
             vapor_pressure_surface=2339.0,
             diffusion_coefficient=2.5e-5,
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("diffusion_coefficient", -1.0),
+        ("thermal_conductivity", 0.0),
+        ("thermal_conductivity", -1.0),
+        ("vapor_pressure_surface", -1.0),
+    ],
+)
+def test_mass_transfer_rate_latent_heat_validation_additional_inputs(
+    field, value
+):
+    """Additional validated inputs should reject invalid values."""
+    kwargs = {
+        "pressure_delta": 10.0,
+        "first_order_mass_transport": 1e-17,
+        "temperature": 293.0,
+        "molar_mass": 0.018015,
+        "latent_heat": 2.454e6,
+        "thermal_conductivity": 0.0257,
+        "vapor_pressure_surface": 2339.0,
+        "diffusion_coefficient": 2.5e-5,
+    }
+    kwargs[field] = value
+    with pytest.raises(ValueError, match=field):
+        get_mass_transfer_rate_latent_heat(**kwargs)
 
 
 def test_multi_species_mass_transfer_rate():
