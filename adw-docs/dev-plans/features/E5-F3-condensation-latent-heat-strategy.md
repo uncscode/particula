@@ -6,7 +6,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-04
 **Target Date**: TBD
-**Last Updated**: 2026-03-04
+**Last Updated**: 2026-03-05
 **Size**: Large (5 phases)
 
 ## Summary
@@ -174,7 +174,7 @@ additions:
     when L=0
 
 - [ ] **E5-F3-P5**: Add data-only path support and parity tests
-  - Issue: TBD | Size: S (~50 LOC) | Status: Not Started
+  - Issue: #1143 | Size: S (~50 LOC) | Status: In Progress
   - Ensure `ParticleData` + `GasData` input path works identically to
     `ParticleRepresentation` + `GasSpecies` legacy path
   - Follow the same pattern as `CondensationIsothermal.step()` lines
@@ -241,3 +241,4 @@ additions:
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
 | 2026-03-04 | Marked P1 in progress for issue #1139 | ADW |
+| 2026-03-05 | Noted P5 parity tests issue #1143 | ADW |
