@@ -284,7 +284,7 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
     relative), reduced rate when L > 0 (thermal resistance always slows
     condensation), array shapes for single and multi-species
 
-- [x] **E5-F3-P3**: Implement `step()` for particle-resolved with energy
+- [ ] **E5-F3-P3**: Implement `step()` for particle-resolved with energy
   tracking and tests
   - `step()` follows `CondensationIsothermal.step()` flow (lines 922-1040)
     with two additions:
@@ -623,4 +623,3 @@ class CondensationLatentHeat(CondensationStrategy):
 | 2026-03-02 | Initial epic creation | ADW |
 | 2026-03-02 | Split E5-F1-P3 into P3 (builders) + P4 (factory+exports); split E5-F3-P3 into P3 (particle-resolved step) + P4 (discrete+continuous) + P5 (data-only parity); added missing details: function signatures, file references, thermal conductivity source, vapor_pressure_surface parameter, test tolerances, literature targets | ADW |
 | 2026-03-04 | Noted E5-F3-P1 issue #1139 and logging expectations | ADW |
-| 2026-03-04 | Marked E5-F3-P3 complete for issue #1141 | ADW |

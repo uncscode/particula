@@ -2126,7 +2126,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             )
 
     def test_nonfinite_pressure_delta_sanitized(self):
-        """Non-finite pressure deltas raise an error."""
+        """Non-finite pressure deltas are sanitized to zero."""
         gas_species, particle, _, _ = self._build_single_species_fixture(
             n_particles=3
         )
@@ -2137,13 +2137,50 @@ class TestCondensationLatentHeat(unittest.TestCase):
             "calculate_pressure_delta",
             return_value=np.array([np.nan, np.inf, -np.inf]),
         ):
-            with self.assertRaises(ValueError):
-                cond.mass_transfer_rate(
-                    particle=particle,
-                    gas_species=gas_species,
-                    temperature=self.temperature,
-                    pressure=self.pressure,
-                )
+            rates = cond.mass_transfer_rate(
+                particle=particle,
+                gas_species=gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+        self.assertTrue(np.all(np.isfinite(rates)))
+        self.assertTrue(np.allclose(rates, 0.0))
+
+    def test_nonfinite_pressure_delta_matches_isothermal(self):
+        """Latent heat sanitization mirrors isothermal behavior."""
+        gas_species, particle, _, _ = self._build_single_species_fixture(
+            n_particles=3
+        )
+        latent_cond = CondensationLatentHeat(molar_mass=self.molar_mass)
+        iso_cond = CondensationIsothermal(molar_mass=self.molar_mass)
+        nonfinite = np.array([np.nan, np.inf, -np.inf])
+
+        with (
+            patch.object(
+                CondensationLatentHeat,
+                "calculate_pressure_delta",
+                return_value=nonfinite,
+            ),
+            patch.object(
+                CondensationIsothermal,
+                "calculate_pressure_delta",
+                return_value=nonfinite,
+            ),
+        ):
+            latent_rates = latent_cond.mass_transfer_rate(
+                particle=particle,
+                gas_species=gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+            iso_rates = iso_cond.mass_transfer_rate(
+                particle=particle,
+                gas_species=gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+
+        np.testing.assert_allclose(latent_rates, iso_rates, rtol=1e-14)
 
     def test_nonfinite_latent_heat_raises(self):
         """Non-finite latent heat raises an error."""
@@ -2315,6 +2352,40 @@ class TestCondensationLatentHeat(unittest.TestCase):
         relative_error = abs(final_mass - initial_mass) / initial_mass
         self.assertLess(relative_error, 1e-12)
 
+    def test_step_rejects_nonpositive_volume(self):
+        """Step rejects nonpositive volumes for norm_conc."""
+        particle_data, gas_data = self._make_data_inputs()
+        particle_data.volume[0] = 0.0
+
+        with self.assertRaisesRegex(ValueError, "volume must be finite"):
+            self.data_strategy.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
+
+    def test_step_rejects_invalid_concentration_for_norm_conc(self):
+        """Step rejects non-finite or negative concentrations for norm_conc."""
+        particle_data, gas_data = self._make_data_inputs()
+
+        for bad_value in (-1.0, np.nan):
+            with self.subTest(bad_value=bad_value):
+                particle_copy = copy.deepcopy(particle_data)
+                particle_copy.concentration[0][0] = bad_value
+
+                with self.assertRaisesRegex(
+                    ValueError, "concentration must be finite"
+                ):
+                    self.data_strategy.step(
+                        particle=particle_copy,
+                        gas_species=gas_data,
+                        temperature=self.temperature,
+                        pressure=self.pressure,
+                        time_step=1.0,
+                    )
+
     def test_step_energy_tracking_matches_dm_times_l(self):
         """Latent heat energy matches dm × L for a step."""
         particle = copy.deepcopy(self.particle)
@@ -2334,11 +2405,10 @@ class TestCondensationLatentHeat(unittest.TestCase):
             temperature=self.temperature,
             pressure=self.pressure,
         )
-        mass_rate_array = (
-            np.array([mass_rate])
-            if isinstance(mass_rate, (int, float))
-            else mass_rate
-        )
+        if isinstance(mass_rate, (int, float)):
+            mass_rate_array = np.array([mass_rate])
+        else:
+            mass_rate_array = mass_rate
         mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
         norm_conc = particle_data.concentration[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
@@ -2358,6 +2428,185 @@ class TestCondensationLatentHeat(unittest.TestCase):
         )
         latent_heat = cond._latent_heat_strategy.latent_heat(self.temperature)
 
+        np.testing.assert_allclose(
+            cond.last_latent_heat_energy,
+            np.sum(mass_transfer * latent_heat),
+            rtol=1e-14,
+        )
+
+    def test_step_energy_tracking_update_gases_false(self):
+        """Energy tracking works when gas updates are disabled."""
+        gas_species, particle, _, _ = self._build_single_species_fixture()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+            update_gases=False,
+        )
+
+        particle_data, _ = _unwrap_particle(particle)
+        gas_data, _ = _unwrap_gas(gas_species)
+        mass_rate = cond.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        if isinstance(mass_rate, (int, float)):
+            mass_rate_array = np.array([mass_rate])
+        else:
+            mass_rate_array = mass_rate
+        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate_array,
+            time_step=1.0,
+            gas_mass=np.asarray(gas_data.concentration[0], dtype=np.float64),
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+        species_mass = particle_data.masses[0]
+        species_count = 1 if species_mass.ndim == 1 else species_mass.shape[1]
+        if mass_transfer.ndim == 1:
+            mass_transfer = mass_transfer.reshape(-1, species_count)
+        elif mass_transfer.shape[1] > species_count:
+            mass_transfer = mass_transfer[:, :species_count]
+        elif mass_transfer.shape[1] < species_count:
+            mass_transfer = np.broadcast_to(
+                mass_transfer, (mass_transfer.shape[0], species_count)
+            )
+        initial_conc = gas_species.get_concentration().copy()
+
+        cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            gas_species.get_concentration(), initial_conc, rtol=1e-15
+        )
+        latent_heat = cond._latent_heat_strategy.latent_heat(self.temperature)
+        np.testing.assert_allclose(
+            cond.last_latent_heat_energy,
+            np.sum(mass_transfer * latent_heat),
+            rtol=1e-14,
+        )
+
+    def test_step_energy_tracking_data_inputs(self):
+        """Latent heat energy tracks on data container inputs."""
+        particle_data, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        mass_rate = cond.mass_transfer_rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        if isinstance(mass_rate, (int, float)):
+            mass_rate_array = np.array([mass_rate])
+        else:
+            mass_rate_array = mass_rate
+        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate_array,
+            time_step=1.0,
+            gas_mass=np.asarray(gas_data.concentration[0], dtype=np.float64),
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+        species_mass = particle_data.masses[0]
+        species_count = 1 if species_mass.ndim == 1 else species_mass.shape[1]
+        if mass_transfer.ndim == 1:
+            mass_transfer = mass_transfer.reshape(-1, species_count)
+        elif mass_transfer.shape[1] > species_count:
+            mass_transfer = mass_transfer[:, :species_count]
+        elif mass_transfer.shape[1] < species_count:
+            mass_transfer = np.broadcast_to(
+                mass_transfer, (mass_transfer.shape[0], species_count)
+            )
+
+        cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        latent_heat = cond._latent_heat_strategy.latent_heat(self.temperature)
+        np.testing.assert_allclose(
+            cond.last_latent_heat_energy,
+            np.sum(mass_transfer * latent_heat),
+            rtol=1e-14,
+        )
+
+    def test_step_energy_tracking_skip_partitioning(self):
+        """Skip-partitioning affects latent heat bookkeeping."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+            skip_partitioning_indices=[1],
+        )
+
+        particle_data, _ = _unwrap_particle(particle)
+        gas_data, _ = _unwrap_gas(gas_species)
+        mass_rate = cond.mass_transfer_rate(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        if isinstance(mass_rate, (int, float)):
+            mass_rate_array = np.array([mass_rate])
+        else:
+            mass_rate_array = mass_rate
+        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate_array,
+            time_step=1.0,
+            gas_mass=np.asarray(gas_data.concentration[0], dtype=np.float64),
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+        species_mass = particle_data.masses[0]
+        species_count = 1 if species_mass.ndim == 1 else species_mass.shape[1]
+        if mass_transfer.ndim == 1:
+            mass_transfer = mass_transfer.reshape(-1, species_count)
+        elif mass_transfer.shape[1] > species_count:
+            mass_transfer = mass_transfer[:, :species_count]
+        elif mass_transfer.shape[1] < species_count:
+            mass_transfer = np.broadcast_to(
+                mass_transfer, (mass_transfer.shape[0], species_count)
+            )
+
+        cond.step(
+            particle=particle,
+            gas_species=gas_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        latent_heat = cond._latent_heat_strategy.latent_heat(self.temperature)
         np.testing.assert_allclose(
             cond.last_latent_heat_energy,
             np.sum(mass_transfer * latent_heat),
@@ -2533,6 +2782,36 @@ class TestCondensationLatentHeat(unittest.TestCase):
         np.testing.assert_allclose(
             gas_new.get_concentration(), expected_gas, rtol=1e-15
         )
+
+    def test_step_clamps_gas_concentration_nonnegative(self):
+        """Gas concentrations are clamped to nonnegative values."""
+        particle_data, gas_data = self._make_data_inputs()
+        gas_data.concentration[0] = np.array([1e-12, 2e-12])
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        mass_transfer = np.full_like(particle_data.masses[0], 1.0)
+
+        with patch(
+            "particula.dynamics.condensation.condensation_strategies."
+            "get_mass_transfer",
+            return_value=mass_transfer,
+        ):
+            _, gas_new = cond.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
+
+        np.testing.assert_allclose(gas_new.concentration[0], 0.0, rtol=1e-15)
 
     def test_step_dynamic_viscosity_pass_through(self):
         """Dynamic viscosity override is forwarded to mass_transfer_rate."""

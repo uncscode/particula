@@ -165,12 +165,15 @@ particle, gas = latent.step(
     time_step=1.0,
     dynamic_viscosity=1.8e-5,
 )
-energy_released = latent.last_latent_heat_energy
+energy_released = latent.last_latent_heat_energy  # total energy [J]
 ```
 
 When no latent heat strategy is configured (or a nonpositive scalar is
 provided), the step follows the isothermal path and reports
 `last_latent_heat_energy = 0.0`.
+
+`last_latent_heat_energy` records the total latent heat released per step
+(sum of dm × L), not an energy density.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
