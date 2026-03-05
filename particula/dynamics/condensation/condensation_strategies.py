@@ -1762,7 +1762,7 @@ class CondensationLatentHeat(CondensationStrategy):
     Attributes:
         latent_heat_strategy_input: Strategy input provided at initialization.
         latent_heat_input: Raw latent heat value provided at initialization.
-        last_latent_heat_energy: Net latent heat energy released in the most
+        last_latent_heat_energy: Total latent heat energy released in the most
             recent step [J]. Positive values indicate condensation and
             negative values indicate evaporation. Overwritten each call.
     """
@@ -1955,11 +1955,9 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure_delta = self.calculate_pressure_delta(
             particle, gas_species, temperature, radius_with_fill
         )
-        if not np.all(np.isfinite(pressure_delta)):
-            raise ValueError(
-                "Non-finite pressure_delta computed for latent-heat "
-                "condensation."
-            )
+        pressure_delta = np.nan_to_num(
+            pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
+        )
 
         if self._latent_heat_strategy is None:
             return get_mass_transfer_rate(
@@ -2062,6 +2060,98 @@ class CondensationLatentHeat(CondensationStrategy):
             )
         )
 
+    def _calculate_norm_conc(
+        self, volume: float, concentration: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """Validate inputs and compute normalized concentration.
+
+        Args:
+            volume: Particle volume for the single box [m^3].
+            concentration: Particle concentration array.
+
+        Returns:
+            Normalized concentration (concentration / volume).
+
+        Raises:
+            ValueError: If volume or concentration inputs are invalid.
+        """
+        if not np.isfinite(volume) or volume <= 0.0:
+            raise ValueError("volume must be finite and positive.")
+        if not np.all(np.isfinite(concentration)) or np.any(
+            concentration < 0.0
+        ):
+            raise ValueError(
+                "concentration must be finite and nonnegative for norm_conc."
+            )
+        return concentration / volume
+
+    def _normalize_mass_transfer_shape(
+        self,
+        mass_transfer: NDArray[np.float64],
+        species_mass: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        """Normalize mass transfer shape to match species count.
+
+        Args:
+            mass_transfer: Per-particle mass transfer array.
+            species_mass: Particle mass array used to infer species count.
+
+        Returns:
+            Mass transfer array with consistent species dimension.
+        """
+        species_count = 1 if species_mass.ndim == 1 else species_mass.shape[1]
+        if mass_transfer.ndim == 1:
+            return mass_transfer.reshape(-1, species_count)
+        if mass_transfer.shape[1] > species_count:
+            return mass_transfer[:, :species_count]
+        if mass_transfer.shape[1] < species_count:
+            return np.broadcast_to(
+                mass_transfer, (mass_transfer.shape[0], species_count)
+            )
+        return mass_transfer
+
+    def _apply_mass_transfer_to_particles(
+        self,
+        particle_data: ParticleData,
+        mass_transfer: NDArray[np.float64],
+        norm_conc: NDArray[np.float64],
+    ) -> None:
+        """Apply mass transfer to particle data in place."""
+        if mass_transfer.ndim == 2:
+            nonzero_mask = norm_conc != 0
+            denom = norm_conc[:, np.newaxis]
+            where_mask = nonzero_mask[:, np.newaxis]
+        else:
+            denom = norm_conc
+            where_mask = norm_conc != 0
+        per_particle = np.divide(
+            mass_transfer,
+            denom,
+            out=np.zeros_like(mass_transfer),
+            where=where_mask,
+        )
+        np.add(
+            particle_data.masses[0],
+            per_particle,
+            out=particle_data.masses[0],
+        )
+        np.maximum(particle_data.masses[0], 0.0, out=particle_data.masses[0])
+
+    def _apply_mass_transfer_to_gas(
+        self, gas_data: GasData, mass_transfer: NDArray[np.float64]
+    ) -> None:
+        """Apply mass transfer to gas concentrations in place."""
+        np.subtract(
+            gas_data.concentration[0],
+            mass_transfer.sum(axis=0),
+            out=gas_data.concentration[0],
+        )
+        np.maximum(
+            gas_data.concentration[0],
+            0.0,
+            out=gas_data.concentration[0],
+        )
+
     # pylint: disable=too-many-positional-arguments, too-many-arguments
     @overload  # type: ignore[override]
     def step(
@@ -2101,8 +2191,8 @@ class CondensationLatentHeat(CondensationStrategy):
         The mass transfer rate is computed, optional skip-partitioning applied,
         and both the particle and gas states are updated while respecting
         inventory limits. The per-step latent heat release is stored in
-        ``last_latent_heat_energy`` (positive for condensation, negative for
-        evaporation) and overwritten on every call.
+        ``last_latent_heat_energy`` [J] (positive for condensation, negative
+        for evaporation) and overwritten on every call.
 
         Args:
             particle: Particle representation to update.
@@ -2130,10 +2220,7 @@ class CondensationLatentHeat(CondensationStrategy):
             dynamic_viscosity=dynamic_viscosity,
         )
 
-        if isinstance(mass_rate, (int, float)):
-            mass_rate_array = np.array([mass_rate])
-        else:
-            mass_rate_array = mass_rate
+        mass_rate_array = np.atleast_1d(np.asarray(mass_rate, dtype=np.float64))
 
         mass_rate_array = self._apply_skip_partitioning(mass_rate_array)
 
@@ -2141,7 +2228,8 @@ class CondensationLatentHeat(CondensationStrategy):
             np.asarray(gas_data.concentration[0], dtype=np.float64)
         )
         volume = particle_data.volume[0]
-        norm_conc = particle_data.concentration[0] / volume
+        concentration = particle_data.concentration[0]
+        norm_conc = self._calculate_norm_conc(volume, concentration)
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=time_step,
@@ -2150,37 +2238,20 @@ class CondensationLatentHeat(CondensationStrategy):
             particle_concentration=norm_conc,
         )
 
-        self._update_latent_heat_energy(mass_transfer, temperature)
+        mass_transfer = self._normalize_mass_transfer_shape(
+            mass_transfer,
+            particle_data.masses[0],
+        )
 
-        species_mass = particle_data.masses[0]
-        if species_mass.ndim == 1:
-            species_count = 1
-        else:
-            species_count = species_mass.shape[1]
-        if mass_transfer.ndim == 1:
-            mass_transfer = mass_transfer.reshape(-1, species_count)
-        elif mass_transfer.shape[1] > species_count:
-            mass_transfer = mass_transfer[:, :species_count]
-        elif mass_transfer.shape[1] < species_count:
-            mass_transfer = np.broadcast_to(
-                mass_transfer, (mass_transfer.shape[0], species_count)
-            )
+        self._update_latent_heat_energy(mass_transfer, temperature)
 
         if particle_is_legacy:
             particle.add_mass(added_mass=mass_transfer)  # type: ignore[union-attr]
         else:
-            per_particle = np.divide(
+            self._apply_mass_transfer_to_particles(
+                particle_data,
                 mass_transfer,
-                norm_conc[:, np.newaxis]
-                if mass_transfer.ndim == 2
-                else norm_conc,
-                out=np.zeros_like(mass_transfer),
-                where=norm_conc[:, np.newaxis] != 0
-                if mass_transfer.ndim == 2
-                else norm_conc != 0,
-            )
-            particle_data.masses[0] = np.maximum(
-                particle_data.masses[0] + per_particle, 0.0
+                norm_conc,
             )
         if self.update_gases:
             if gas_is_legacy:
@@ -2188,7 +2259,7 @@ class CondensationLatentHeat(CondensationStrategy):
                     added_concentration=-mass_transfer.sum(axis=0)
                 )
             else:
-                gas_data.concentration[0] -= mass_transfer.sum(axis=0)
+                self._apply_mass_transfer_to_gas(gas_data, mass_transfer)
         if particle_is_legacy:
             return cast(
                 Tuple[ParticleRepresentation, GasSpecies],
