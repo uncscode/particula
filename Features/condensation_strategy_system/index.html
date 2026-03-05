@@ -11172,6 +11172,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#condensationlatentheat-energy-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CondensationLatentHeat (energy diagnostics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#condensationisothermalstaggered-two-pass-gauss-seidel" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14251,6 +14262,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#condensationlatentheat-energy-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CondensationLatentHeat (energy diagnostics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#condensationisothermalstaggered-two-pass-gauss-seidel" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14628,12 +14650,19 @@ Strategies expose <code>rate</code> and <code>step</code>, work with <code>Parti
 into runnable pipelines. You can choose simultaneous isothermal updates or
 staggered two-pass Gauss-Seidel sweeps with theta-controlled first-pass
 fractions, batch partitioning, and gas-field updates for stability.</p>
+<p>CondensationLatentHeat mirrors the isothermal workflow for particle-resolved
+runs while adding latent-heat-aware mass transfer and per-step energy
+diagnostics. The step now supports a <code>dynamic_viscosity</code> override and records
+<code>last_latent_heat_energy</code> for parity with the isothermal API plus energy
+tracking.</p>
 <p>This feature is built around user-facing APIs exposed via <code>particula.dynamics</code>:</p>
 <ul>
 <li><code>CondensationStrategy</code> – abstract base defining <code>rate</code> / <code>step</code>.</li>
 <li><code>CondensationIsothermal</code> – simultaneous isothermal mass transfer.</li>
 <li><code>CondensationIsothermalStaggered</code> – two-pass staggered (Gauss-Seidel) update
   with theta modes (<code>"half"</code>, <code>"random"</code>, <code>"batch"</code>) and batching.</li>
+<li><code>CondensationLatentHeat</code> – latent-heat-corrected rate with per-step energy
+  diagnostics.</li>
 <li><code>CondensationIsothermalBuilder</code>, <code>CondensationIsothermalStaggeredBuilder</code> –
   fluent builders with validation and unit handling.</li>
 <li><code>CondensationFactory</code> – factory selecting a condensation strategy by name.</li>
@@ -14654,6 +14683,8 @@ fractions, batch partitioning, and gas-field updates for stability.</p>
   fields are depleted.</li>
 <li><strong>Pipeline-ready</strong>: Use <code>MassCondensation</code> with <code>sub_steps</code> for tight coupling
   to other runnables in a single pipeline.</li>
+<li><strong>Latent heat diagnostics</strong>: Track per-step energy release for
+  particle-resolved runs with <code>CondensationLatentHeat</code>.</li>
 </ul>
 <h2 id="who-its-for">Who It's For<a class="headerlink" href="#who-its-for" title="Permanent link">&para;</a></h2>
 <p>This feature is designed for:</p>
@@ -14676,6 +14707,7 @@ fractions, batch partitioning, and gas-field updates for stability.</p>
 <span class="c1"># Concrete implementations</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggered</span>
+<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeat</span>
 
 <span class="c1"># Builders and factory</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalBuilder</span>
@@ -14732,6 +14764,33 @@ mass is optionally depleted (<code>update_gases=True</code>).</p>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
+<h3 id="condensationlatentheat-energy-diagnostics">CondensationLatentHeat (energy diagnostics)<a class="headerlink" href="#condensationlatentheat-energy-diagnostics" title="Permanent link">&para;</a></h3>
+<p><code>CondensationLatentHeat</code> mirrors the isothermal step but applies a latent-heat
+correction when a latent heat strategy (or scalar fallback) is provided. It
+records <code>last_latent_heat_energy</code> each step (positive for condensation,
+negative for evaporation) and accepts a <code>dynamic_viscosity</code> override for
+particle-resolved workflows.</p>
+<div class="highlight"><pre><span></span><code><span class="n">latent</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeat</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
+    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
+    <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">latent_heat</span><span class="o">=</span><span class="mf">2.4e6</span><span class="p">,</span>  <span class="c1"># J/kg fallback</span>
+<span class="p">)</span>
+<span class="n">particle</span><span class="p">,</span> <span class="n">gas</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
+    <span class="n">gas_species</span><span class="o">=</span><span class="n">gas</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="mf">1.8e-5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">energy_released</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">last_latent_heat_energy</span>  <span class="c1"># total energy [J]</span>
+</code></pre></div>
+<p>When no latent heat strategy is configured (or a nonpositive scalar is
+provided), the step follows the isothermal path and reports
+<code>last_latent_heat_energy = 0.0</code>.</p>
+<p><code>last_latent_heat_energy</code> records the total latent heat released per step
+(sum of dm × L), not an energy density.</p>
 <h3 id="condensationisothermalstaggered-two-pass-gauss-seidel">CondensationIsothermalStaggered (two-pass Gauss-Seidel)<a class="headerlink" href="#condensationisothermalstaggered-two-pass-gauss-seidel" title="Permanent link">&para;</a></h3>
 <p><code>CondensationIsothermalStaggered</code> splits each timestep into two passes. Theta
 controls the first-pass fraction; batches are clipped to the particle count and
@@ -15050,6 +15109,16 @@ condensing species.</p>
 <td><code>None</code></td>
 </tr>
 <tr>
+<td><code>latent_heat_strategy</code></td>
+<td>Optional latent heat strategy.</td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>latent_heat</code></td>
+<td>Scalar fallback latent heat [J/kg].</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
 <td><code>theta_mode</code></td>
 <td>Staggered theta selection: <code>"half"</code>, <code>"random"</code>, <code>"batch"</code>.</td>
 <td><code>"half"</code> (staggered)</td>
@@ -15094,7 +15163,7 @@ condensing species.</p>
 <ul>
 <li>Staggered solver is Gauss-Seidel only; other solvers are not exposed.</li>
 <li>Factory supports <code>"isothermal"</code> and <code>"isothermal_staggered"</code> only.</li>
-<li>No latent-heat or temperature feedback; condensation is isothermal.</li>
+<li>No temperature feedback; latent heat is diagnostic only.</li>
 <li>Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.</li>
 </ul>
