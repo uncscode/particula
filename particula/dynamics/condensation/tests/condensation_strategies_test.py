@@ -2593,7 +2593,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
         )
 
     def test_step_continuous_isothermal_parity(self):
-        """Continuous binned step matches isothermal when latent heat is zero."""
+        """Continuous bins match isothermal when latent heat is zero."""
         particle, particle_data, gas_species, gas_data = (
             self._build_binned_representation("pdf", 50)
         )
