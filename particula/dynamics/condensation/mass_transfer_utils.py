@@ -49,9 +49,20 @@ def calc_mass_to_change(
         - "Mass transfer",
           [Wikipedia](https://en.wikipedia.org/wiki/Mass_transfer)
     """
+    time_step_arr = np.asarray(time_step, dtype=np.float64)
     if mass_rate.ndim == 2:
-        return mass_rate * time_step * particle_concentration[:, None]
-    return mass_rate * time_step * particle_concentration
+        if time_step_arr.ndim == 0:
+            time_step_broadcast = time_step_arr
+        elif time_step_arr.shape == (mass_rate.shape[0],):
+            # Per-particle timestep: align with the first axis
+            time_step_broadcast = time_step_arr[:, None]
+        elif time_step_arr.shape == (mass_rate.shape[1],):
+            # Per-species timestep fallback for backward compatibility
+            time_step_broadcast = time_step_arr[None, :]
+        else:
+            time_step_broadcast = time_step_arr
+        return mass_rate * time_step_broadcast * particle_concentration[:, None]
+    return mass_rate * time_step_arr * particle_concentration
 
 
 def apply_condensation_limit(
