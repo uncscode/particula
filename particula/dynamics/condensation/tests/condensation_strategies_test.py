@@ -22,7 +22,10 @@ from particula.dynamics.condensation.condensation_strategies import (
     _unwrap_gas,
     _unwrap_particle,
 )
-from particula.dynamics.condensation.mass_transfer import get_mass_transfer
+from particula.dynamics.condensation.mass_transfer import (
+    get_latent_heat_energy_released,
+    get_mass_transfer,
+)
 from particula.gas.gas_data import GasData, from_species
 from particula.gas.latent_heat_strategies import ConstantLatentHeat
 from particula.gas.species import GasSpecies
@@ -1831,6 +1834,94 @@ class TestCondensationLatentHeat(unittest.TestCase):
 
         return gas_species, particle, activity, surface
 
+    def _build_binned_representation(
+        self,
+        distribution_type: str,
+        n_bins: int,
+        densities: np.ndarray | None = None,
+    ) -> tuple[ParticleRepresentation, ParticleData, GasSpecies, GasData]:
+        """Build a binned particle/gas fixture for discrete or PDF bins."""
+        if densities is None:
+            densities = np.array([1.0e3, 1.77e3, 1.2e3])
+
+        molar_mass = np.array([18.015e-3, 132.14e-3, 150.0e-3])
+        vp_water = par.gas.VaporPressureFactory().get_strategy("water_buck")
+        vp_constant = par.gas.VaporPressureFactory().get_strategy(
+            "constant", {"vapor_pressure": 1e-24, "vapor_pressure_units": "Pa"}
+        )
+        water_sat = vp_water.saturation_concentration(
+            molar_mass[0], self.temperature
+        )
+        water_conc = water_sat * 1.02
+        gas_species = (
+            par.gas.GasSpeciesBuilder()
+            .set_name(np.array(["H2O", "NH4HSO4", "ORG"]))
+            .set_molar_mass(molar_mass, "kg/mol")
+            .set_vapor_pressure_strategy([vp_water, vp_constant, vp_constant])
+            .set_concentration(np.array([water_conc, 1e-30, 1e-30]), "kg/m^3")
+            .set_partitioning(True)
+            .build()
+        )
+
+        activity = (
+            par.particles.ActivityKappaParameterBuilder()
+            .set_density(densities, "kg/m^3")
+            .set_kappa(np.array([0.0, 0.61, 0.2]))
+            .set_molar_mass(molar_mass, "kg/mol")
+            .set_water_index(0)
+            .build()
+        )
+        surface = (
+            par.particles.SurfaceStrategyVolumeBuilder()
+            .set_density(densities, "kg/m^3")
+            .set_surface_tension(np.array([0.072, 0.092, 0.08]), "N/m")
+            .build()
+        )
+
+        radius_bins = np.logspace(-9, -6, n_bins)
+        mode = np.array([100e-9])
+        gsd = np.array([1.4])
+        number_concentration = np.array([1e4]) * 1e6
+        base_particle = (
+            par.particles.PresetParticleRadiusBuilder()
+            .set_distribution_type(distribution_type)
+            .set_radius_bins(radius_bins, "m")
+            .set_mode(mode, "m")
+            .set_geometric_standard_deviation(gsd)
+            .set_number_concentration(number_concentration, "1/m^3")
+            .set_charge(np.zeros_like(radius_bins))
+            .build()
+        )
+        concentration = base_particle.get_concentration()
+        volume_bins = 4 / 3 * np.pi * radius_bins**3
+        fractions = np.array([0.4, 0.3, 0.3])
+        masses = volume_bins[:, np.newaxis] * densities * fractions
+        particle = ParticleRepresentation(
+            strategy=par.particles.SpeciatedMassMovingBin(),
+            activity=activity,
+            surface=surface,
+            distribution=masses,
+            density=densities,
+            concentration=concentration,
+            charge=np.zeros_like(concentration),
+            volume=1.0,
+        )
+        return (
+            particle,
+            from_representation(particle),
+            gas_species,
+            from_species(gas_species),
+        )
+
+    def _total_mass_binned(
+        self, particle_data: ParticleData, gas_data: GasData
+    ) -> float:
+        """Return total mass using concentration-weighted binned masses."""
+        masses = particle_data.masses[0]
+        concentration = particle_data.concentration[0]
+        particle_mass = np.sum(masses * concentration[:, np.newaxis], axis=0)
+        return float(particle_mass.sum() + gas_data.concentration[0].sum())
+
     def test_instantiation_with_strategy(self):
         """Latent heat strategy is used when provided."""
         strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
@@ -2351,6 +2442,380 @@ class TestCondensationLatentHeat(unittest.TestCase):
 
         relative_error = abs(final_mass - initial_mass) / initial_mass
         self.assertLess(relative_error, 1e-12)
+
+    def test_step_discrete_10_bins_mass_conservation(self):
+        """Discrete binned step conserves mass for 10 bins."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 10)
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = self._total_mass_binned(particle_data, gas_data)
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = self._total_mass_binned(particle_new, gas_new)
+        np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)
+
+    def test_step_discrete_50_bins_mass_conservation(self):
+        """Discrete binned step conserves mass for 50 bins."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 50)
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = self._total_mass_binned(particle_data, gas_data)
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = self._total_mass_binned(particle_new, gas_new)
+        np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)
+
+    def test_step_discrete_100_bins_mass_conservation(self):
+        """Discrete binned step conserves mass for 100 bins."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 100)
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = self._total_mass_binned(particle_data, gas_data)
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = self._total_mass_binned(particle_new, gas_new)
+        np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)
+
+    def test_step_continuous_distribution_mass_conservation(self):
+        """Continuous binned step conserves total mass."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pdf", 50)
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        initial_mass = self._total_mass_binned(particle_data, gas_data)
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        final_mass = self._total_mass_binned(particle_new, gas_new)
+        np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)
+
+    def test_step_discrete_isothermal_parity(self):
+        """Discrete binned step matches isothermal when latent heat is zero."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 50)
+        )
+        latent_cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat=0.0,
+        )
+        iso_cond = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+        )
+
+        latent_particle, latent_gas = latent_cond.step(
+            particle=copy.deepcopy(particle_data),
+            gas_species=copy.deepcopy(gas_data),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        iso_particle, iso_gas = iso_cond.step(
+            particle=copy.deepcopy(particle_data),
+            gas_species=copy.deepcopy(gas_data),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            latent_particle.masses[0], iso_particle.masses[0], rtol=1e-15
+        )
+        np.testing.assert_allclose(
+            latent_gas.concentration[0], iso_gas.concentration[0], rtol=1e-15
+        )
+
+    def test_step_continuous_isothermal_parity(self):
+        """Continuous binned step matches isothermal when latent heat is zero."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pdf", 50)
+        )
+        latent_cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat=0.0,
+        )
+        iso_cond = CondensationIsothermal(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+        )
+
+        latent_particle, latent_gas = latent_cond.step(
+            particle=copy.deepcopy(particle_data),
+            gas_species=copy.deepcopy(gas_data),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        iso_particle, iso_gas = iso_cond.step(
+            particle=copy.deepcopy(particle_data),
+            gas_species=copy.deepcopy(gas_data),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            latent_particle.masses[0], iso_particle.masses[0], rtol=1e-15
+        )
+        np.testing.assert_allclose(
+            latent_gas.concentration[0], iso_gas.concentration[0], rtol=1e-15
+        )
+
+    def test_step_discrete_energy_tracking(self):
+        """Latent heat energy tracking matches mass transfer for binned data."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 50)
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        mass_rate = cond.mass_transfer_rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        volume = particle_data.volume[0]
+        norm_conc = particle_data.concentration[0] / volume
+        mass_transfer = get_mass_transfer(
+            mass_rate=mass_rate,
+            time_step=1.0,
+            gas_mass=gas_data.concentration[0],
+            particle_mass=particle_data.masses[0],
+            particle_concentration=norm_conc,
+        )
+        latent_heat = cond._latent_heat_strategy.latent_heat(self.temperature)
+        expected_energy = np.sum(
+            get_latent_heat_energy_released(mass_transfer, latent_heat)
+        )
+
+        cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            cond.last_latent_heat_energy, expected_energy, rtol=1e-14
+        )
+
+    def test_step_discrete_2d_mass_shapes(self):
+        """Binned discrete step preserves 2D mass shapes."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 10)
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+        )
+
+        particle_new, _ = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        self.assertEqual(
+            particle_new.masses[0].shape,
+            (
+                particle_data.masses[0].shape[0],
+                particle_data.masses[0].shape[1],
+            ),
+        )
+
+    def test_rate_discrete_shape(self):
+        """rate() returns binned shape for discrete and continuous inputs."""
+        for distribution_type in ("pmf", "pdf"):
+            with self.subTest(distribution_type=distribution_type):
+                particle, particle_data, gas_species, gas_data = (
+                    self._build_binned_representation(distribution_type, 10)
+                )
+                cond = CondensationLatentHeat(
+                    molar_mass=self.molar_mass,
+                    diffusion_coefficient=self.diffusion_coefficient,
+                    accommodation_coefficient=self.accommodation_coefficient,
+                    activity_strategy=particle.activity,
+                    surface_strategy=particle.surface,
+                    vapor_pressure_strategy=(
+                        gas_species.pure_vapor_pressure_strategy
+                    ),
+                )
+
+                rate = cond.rate(
+                    particle=particle_data,
+                    gas_species=gas_data,
+                    temperature=self.temperature,
+                    pressure=self.pressure,
+                )
+                self.assertEqual(rate.shape, particle_data.masses[0].shape)
+
+    def test_mass_transfer_rate_discrete_shape(self):
+        """mass_transfer_rate returns binned shape for discrete/continuous."""
+        for distribution_type in ("pmf", "pdf"):
+            with self.subTest(distribution_type=distribution_type):
+                particle, particle_data, gas_species, gas_data = (
+                    self._build_binned_representation(distribution_type, 10)
+                )
+                cond = CondensationLatentHeat(
+                    molar_mass=self.molar_mass,
+                    diffusion_coefficient=self.diffusion_coefficient,
+                    accommodation_coefficient=self.accommodation_coefficient,
+                    activity_strategy=particle.activity,
+                    surface_strategy=particle.surface,
+                    vapor_pressure_strategy=(
+                        gas_species.pure_vapor_pressure_strategy
+                    ),
+                )
+
+                mass_rate = cond.mass_transfer_rate(
+                    particle=particle_data,
+                    gas_species=gas_data,
+                    temperature=self.temperature,
+                    pressure=self.pressure,
+                )
+                self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)
+
+    def test_mass_transfer_rate_rejects_nonfinite_latent_heat(self):
+        """mass_transfer_rate rejects non-finite latent heat values."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 10)
+        )
+
+        class NonFiniteLatentHeat:
+            """Latent heat strategy returning non-finite values."""
+
+            def latent_heat(self, temperature: float) -> float:
+                return float("nan")
+
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            latent_heat_strategy=NonFiniteLatentHeat(),
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+        )
+
+        with self.assertRaisesRegex(ValueError, "latent_heat"):
+            cond.mass_transfer_rate(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+
+    def test_step_rejects_nonpositive_concentration(self):
+        """Binned step rejects nonpositive concentrations."""
+        particle, particle_data, gas_species, gas_data = (
+            self._build_binned_representation("pmf", 10)
+        )
+        particle_data.concentration[0][0] = -1.0
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=particle.activity,
+            surface_strategy=particle.surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+        )
+
+        with self.assertRaisesRegex(ValueError, "concentration must be finite"):
+            cond.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
 
     def test_step_rejects_nonpositive_volume(self):
         """Step rejects nonpositive volumes for norm_conc."""
