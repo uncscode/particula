@@ -876,6 +876,19 @@ class CondensationIsothermal(CondensationStrategy):
             pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
         )
 
+        first_order_mass_transport = np.asarray(
+            first_order_mass_transport, dtype=np.float64
+        )
+        if pressure_delta.ndim == 2:
+            if first_order_mass_transport.ndim == 0:
+                first_order_mass_transport = np.full(
+                    (pressure_delta.shape[0], 1),
+                    float(first_order_mass_transport),
+                    dtype=np.float64,
+                )
+            elif first_order_mass_transport.ndim == 1:
+                first_order_mass_transport = first_order_mass_transport[:, None]
+
         return get_mass_transfer_rate(
             pressure_delta=pressure_delta,
             first_order_mass_transport=first_order_mass_transport,
@@ -1958,6 +1971,19 @@ class CondensationLatentHeat(CondensationStrategy):
         pressure_delta = np.nan_to_num(
             pressure_delta, posinf=0.0, neginf=0.0, nan=0.0
         )
+
+        first_order_mass_transport = np.asarray(
+            first_order_mass_transport, dtype=np.float64
+        )
+        if pressure_delta.ndim == 2:
+            if first_order_mass_transport.ndim == 0:
+                first_order_mass_transport = np.full(
+                    (pressure_delta.shape[0], 1),
+                    float(first_order_mass_transport),
+                    dtype=np.float64,
+                )
+            elif first_order_mass_transport.ndim == 1:
+                first_order_mass_transport = first_order_mass_transport[:, None]
 
         if self._latent_heat_strategy is None:
             return get_mass_transfer_rate(
