@@ -14505,7 +14505,7 @@ guard follows the global gas and inventory scaling steps.</p>
 
 
 <a href="#particula.dynamics.condensation.mass_transfer_utils.calc_mass_to_change" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">calc_mass_to_change</span><span class="p">(</span><span class="n">mass_rate</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">calc_mass_to_change</span><span class="p">(</span><span class="n">mass_rate</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -14530,10 +14530,10 @@ species)</code> pair in kg s⁻¹.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>time_step</code></b>
-              (<code><span title="float">float</span></code>)
+              (<code><span title="float">float</span> | <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
           –
           <div class="doc-md-description">
-            <p>Time step Δt in seconds.</p>
+            <p>Time step Δt in seconds (scalar or per-particle array).</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14617,7 +14617,7 @@ species)</code> pair in kg s⁻¹.</p>
 <span class="normal">53</span>
 <span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calc_mass_to_change</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-    <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">particle_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the requested mass change for every particle/species pair.</span>
@@ -14631,7 +14631,7 @@ species)</code> pair in kg s⁻¹.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        mass_rate: Mass transfer rate (ṁ) for each particle or ``(particle,</span>
 <span class="sd">            species)`` pair in kg s⁻¹.</span>
-<span class="sd">        time_step: Time step Δt in seconds.</span>
+<span class="sd">        time_step: Time step Δt in seconds (scalar or per-particle array).</span>
 <span class="sd">        particle_concentration: Number concentration C in m⁻³.</span>
 
 <span class="sd">    Returns:</span>
