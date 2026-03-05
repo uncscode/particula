@@ -519,6 +519,8 @@ class CondensationStrategy(ABC):
             filled = self._fill_zero_radius(r)
             ```
         """
+        if radius.size == 0:
+            return radius
         if np.max(radius) == 0.0:
             message = (
                 "All radius values are zero, radius set to 1 m for "

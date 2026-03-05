@@ -12,9 +12,11 @@ from unittest.mock import patch
 import numpy as np
 import particula as par  # new – we will build real objects
 from particula.dynamics.condensation.condensation_strategies import (
+    MIN_PARTICLE_RADIUS_M,
     CondensationIsothermal,
     CondensationIsothermalStaggered,
     CondensationLatentHeat,
+    _get_mass_transfer_variable_time_step,
     _normalize_first_order_mass_transport,
     _partial_pressure_from_strategy,
     _pure_vapor_pressure_from_strategy,
@@ -286,6 +288,29 @@ class TestCondensationIsothermal(unittest.TestCase):
         )
 
         self.assertEqual(normalized.shape, (3, 1))
+
+    def test_get_mass_transfer_variable_time_step_applies_per_particle(self):
+        """Variable time step uses per-particle values without scaling."""
+        mass_rate = np.array([[1e-15, 2e-15], [3e-15, 4e-15]])
+        time_step = np.array([0.5, 2.0])
+        gas_mass = np.array([1.0, 1.0])
+        particle_mass = np.full_like(mass_rate, 1.0e-3)
+        particle_concentration = np.array([1.0e6, 1.0e6])
+
+        expected = (
+            mass_rate
+            * time_step[:, np.newaxis]
+            * particle_concentration[:, None]
+        )
+        result = _get_mass_transfer_variable_time_step(
+            mass_rate=mass_rate,
+            time_step=time_step,
+            gas_mass=gas_mass,
+            particle_mass=particle_mass,
+            particle_concentration=particle_concentration,
+        )
+
+        np.testing.assert_allclose(result, expected, rtol=1e-15)
 
     def test_step_rejects_invalid_time_step(self):
         """step() rejects non-finite or negative timesteps."""
@@ -584,6 +609,46 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.assertIsInstance(pressure_delta, np.ndarray)
         self.assertEqual(pressure_delta.shape[0], radius.shape[0])
         self.assertTrue(np.all(np.isfinite(pressure_delta)))
+
+    def test_get_particle_partial_pressure_and_kelvin_finite(self):
+        """Particle partial pressure and Kelvin term are finite."""
+        strategy = self._make_data_strategy()
+        particle_data, _ = self._make_data_inputs()
+
+        partial_pressure, kelvin_term = (
+            strategy._get_particle_partial_pressure_and_kelvin(
+                particle_data=particle_data,
+                activity_strategy=self.activity_strategy,
+                surface_strategy=self.surface_strategy,
+                vapor_pressure_strategy=self.vapor_pressure_strategy,
+                temperature=self.temperature,
+                radius=particle_data.radii[0],
+            )
+        )
+
+        self.assertEqual(partial_pressure.shape, particle_data.masses[0].shape)
+        self.assertTrue(np.all(np.isfinite(partial_pressure)))
+        self.assertTrue(np.all(np.isfinite(kelvin_term)))
+
+    def test_get_particle_partial_pressure_and_kelvin_nonfinite_raises(self):
+        """Non-finite Kelvin term triggers ValueError."""
+        strategy = self._make_data_strategy()
+        particle_data, _ = self._make_data_inputs()
+
+        with patch.object(
+            self.surface_strategy,
+            "kelvin_term",
+            return_value=np.array([np.nan]),
+        ):
+            with self.assertRaises(ValueError):
+                strategy._get_particle_partial_pressure_and_kelvin(
+                    particle_data=particle_data,
+                    activity_strategy=self.activity_strategy,
+                    surface_strategy=self.surface_strategy,
+                    vapor_pressure_strategy=self.vapor_pressure_strategy,
+                    temperature=self.temperature,
+                    radius=particle_data.radii[0],
+                )
 
 
 class TestCondensationIsothermalStaggered(unittest.TestCase):
@@ -3234,6 +3299,384 @@ class TestCondensationLatentHeat(unittest.TestCase):
         self.assertIsInstance(particle_new, ParticleData)
         self.assertIsInstance(gas_new, GasData)
 
+    def test_latent_heat_step_with_particle_data_gas_data(self):
+        """Data-only latent heat step runs and returns expected types."""
+        particle_data, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        self.assertIsInstance(particle_new, ParticleData)
+        self.assertIsInstance(gas_new, GasData)
+
+    def test_latent_heat_step_numerical_parity(self):
+        """Legacy and data-only step outputs match numerically."""
+        legacy_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        data_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        particle_legacy = copy.deepcopy(self.particle)
+        gas_legacy = copy.deepcopy(self.gas_species)
+        particle_data, gas_data = self._make_data_inputs()
+
+        legacy_particle, legacy_gas = legacy_strategy.step(
+            particle=particle_legacy,
+            gas_species=gas_legacy,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        data_particle, data_gas = data_strategy.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            data_particle.masses[0],
+            legacy_particle.get_species_mass(),
+            rtol=1e-10,
+        )
+        np.testing.assert_allclose(
+            data_gas.concentration[0],
+            legacy_gas.get_concentration(),
+            rtol=1e-10,
+        )
+
+    def test_latent_heat_rate_numerical_parity(self):
+        """Legacy and data-only rate() outputs match."""
+        legacy_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        data_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        particle_data, gas_data = self._make_data_inputs()
+
+        legacy_rate = legacy_strategy.rate(
+            particle=copy.deepcopy(self.particle),
+            gas_species=copy.deepcopy(self.gas_species),
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        data_rate = data_strategy.rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(data_rate, legacy_rate, rtol=1e-10)
+
+    def test_latent_heat_mass_transfer_rate_numerical_parity(self):
+        """Legacy and data-only mass_transfer_rate outputs match."""
+        legacy_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        data_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        particle_data, gas_data = self._make_data_inputs()
+
+        legacy_rate = legacy_strategy.mass_transfer_rate(
+            particle=copy.deepcopy(self.particle),
+            gas_species=copy.deepcopy(self.gas_species),
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        data_rate = data_strategy.mass_transfer_rate(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+
+        np.testing.assert_allclose(data_rate, legacy_rate, rtol=1e-10)
+
+    def test_latent_heat_energy_parity(self):
+        """last_latent_heat_energy matches between paths."""
+        legacy_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        data_strategy = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        particle_data, gas_data = self._make_data_inputs()
+
+        legacy_strategy.step(
+            particle=copy.deepcopy(self.particle),
+            gas_species=copy.deepcopy(self.gas_species),
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+        data_strategy.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            data_strategy.last_latent_heat_energy,
+            legacy_strategy.last_latent_heat_energy,
+            rtol=1e-14,
+        )
+
+    def test_latent_heat_zero_particles_no_crash(self):
+        """Zero-particle steps return inputs unchanged and zero energy."""
+        gas_species, particle, activity, surface = (
+            self._build_single_species_fixture(n_particles=0)
+        )
+        particle_data = from_representation(particle)
+        gas_data = from_species(gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=activity,
+            surface_strategy=surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        np.testing.assert_allclose(
+            particle_new.masses[0], particle_data.masses[0], rtol=1e-15
+        )
+        np.testing.assert_allclose(
+            gas_new.concentration[0], gas_data.concentration[0], rtol=1e-15
+        )
+        self.assertEqual(cond.last_latent_heat_energy, 0.0)
+
+    def test_latent_heat_single_species_data_only(self):
+        """Single-species data-only path preserves shapes and finiteness."""
+        gas_species, particle, activity, surface = (
+            self._build_single_species_fixture(n_particles=3)
+        )
+        particle_data = from_representation(particle)
+        gas_data = from_species(gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=activity,
+            surface_strategy=surface,
+            vapor_pressure_strategy=gas_species.pure_vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        self.assertEqual(particle_new.masses[0].shape[1], 1)
+        self.assertEqual(gas_new.concentration[0].shape, (1,))
+        self.assertTrue(np.all(np.isfinite(particle_new.masses[0])))
+        self.assertTrue(np.all(np.isfinite(gas_new.concentration[0])))
+
+    def test_latent_heat_very_small_particles_no_nan(self):
+        """Very small particles are clipped and produce finite outputs."""
+        particle_data, gas_data = self._make_data_inputs()
+        particle_data.radii[0] = np.full(
+            particle_data.radii[0].shape, MIN_PARTICLE_RADIUS_M * 0.1
+        )
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        particle_new, gas_new = cond.step(
+            particle=particle_data,
+            gas_species=gas_data,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1.0,
+        )
+
+        self.assertTrue(np.all(np.isfinite(particle_new.masses[0])))
+        self.assertTrue(np.all(np.isfinite(gas_new.concentration[0])))
+
+    def test_latent_heat_zero_concentration_particles(self):
+        """Zero-concentration particles receive zero mass change."""
+        particle_data, gas_data = self._make_data_inputs()
+        particle_data.concentration[0][0] = 0.0
+        initial_masses = particle_data.masses[0].copy()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+        mass_transfer = np.ones_like(particle_data.masses[0])
+
+        with patch(
+            "particula.dynamics.condensation.condensation_strategies."
+            "get_mass_transfer",
+            return_value=mass_transfer,
+        ):
+            particle_new, _ = cond.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
+
+        np.testing.assert_allclose(
+            particle_new.masses[0][0], initial_masses[0], rtol=1e-15
+        )
+
+    def test_latent_heat_data_only_missing_activity_strategy_raises(self):
+        """Data-only step requires activity strategy configuration."""
+        particle_data, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        with self.assertRaises(TypeError):
+            cond.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
+
+    def test_latent_heat_data_only_missing_vapor_pressure_strategy_raises(self):
+        """Data-only step requires vapor pressure strategy configuration."""
+        particle_data, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        with self.assertRaises(TypeError):
+            cond.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
+
+    def test_latent_heat_mixed_legacy_data_raises(self):
+        """Mixed legacy/data inputs raise a TypeError."""
+        _, gas_data = self._make_data_inputs()
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+            activity_strategy=self.activity_strategy,
+            surface_strategy=self.surface_strategy,
+            vapor_pressure_strategy=self.vapor_pressure_strategy,
+            latent_heat_strategy=ConstantLatentHeat(latent_heat_ref=2.26e6),
+        )
+
+        with self.assertRaises(TypeError):
+            cond.step(
+                particle=self.particle,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=1.0,
+            )
+
     def test_step_updates_gas_when_enabled(self):
         """Gas concentrations decrease by mass transfer when enabled."""
         particle = copy.deepcopy(self.particle)
@@ -3325,6 +3768,74 @@ class TestCondensationLatentHeat(unittest.TestCase):
 
         self.assertTrue(np.all(norm_conc >= 0.0))
         self.assertEqual(norm_conc[1], 0.0)
+
+    def test_normalize_mass_transfer_shape_single_species(self):
+        """_normalize_mass_transfer_shape reshapes single-species inputs."""
+        _, particle, _, _ = self._build_single_species_fixture(n_particles=3)
+        particle_data = from_representation(particle)
+        mass_transfer = np.array([1.0, 2.0, 3.0])
+
+        normalized = self.data_strategy._normalize_mass_transfer_shape(
+            mass_transfer, particle_data.masses[0]
+        )
+
+        self.assertEqual(normalized.shape, (3, 1))
+        np.testing.assert_allclose(normalized[:, 0], mass_transfer, rtol=0.0)
+
+    def test_normalize_mass_transfer_shape_broadcasts_and_truncates(self):
+        """_normalize_mass_transfer_shape adapts to species dimension."""
+        particle_data, _ = self._make_data_inputs()
+        mass_transfer = np.array([[1.0]])
+
+        normalized = self.data_strategy._normalize_mass_transfer_shape(
+            mass_transfer, particle_data.masses[0]
+        )
+
+        self.assertEqual(normalized.shape, (1, 2))
+        np.testing.assert_allclose(normalized, np.array([[1.0, 1.0]]))
+
+        mass_transfer_extra = np.array([[1.0, 2.0, 3.0]])
+        normalized_extra = self.data_strategy._normalize_mass_transfer_shape(
+            mass_transfer_extra, particle_data.masses[0]
+        )
+
+        self.assertEqual(normalized_extra.shape, (1, 2))
+        np.testing.assert_allclose(normalized_extra, np.array([[1.0, 2.0]]))
+
+    def test_apply_mass_transfer_to_particles_respects_zero_conc(self):
+        """_apply_mass_transfer_to_particles skips zero concentration bins."""
+        _, particle, _, _ = self._build_single_species_fixture(n_particles=2)
+        particle_data = from_representation(particle)
+        initial_mass = particle_data.masses[0].copy()
+        norm_conc = np.array([0.0, 2.0])
+        mass_transfer = np.array([[1.0], [1.0]])
+
+        self.data_strategy._apply_mass_transfer_to_particles(
+            particle_data, mass_transfer, norm_conc
+        )
+
+        np.testing.assert_allclose(
+            particle_data.masses[0][0], initial_mass[0], rtol=1e-15
+        )
+        np.testing.assert_allclose(
+            particle_data.masses[0][1], initial_mass[1] + 0.5, rtol=1e-15
+        )
+
+        negative_transfer = np.array([[-5.0], [-5.0]])
+        self.data_strategy._apply_mass_transfer_to_particles(
+            particle_data, negative_transfer, np.array([1.0, 1.0])
+        )
+        self.assertTrue(np.all(particle_data.masses[0] >= 0.0))
+
+    def test_apply_mass_transfer_to_gas_clamps_nonnegative(self):
+        """_apply_mass_transfer_to_gas clamps concentrations at zero."""
+        _, gas_data = self._make_data_inputs()
+        gas_data.concentration[0] = np.array([1.0, 2.0])
+        mass_transfer = np.array([[3.0, 0.5], [0.5, 2.0]])
+
+        self.data_strategy._apply_mass_transfer_to_gas(gas_data, mass_transfer)
+
+        np.testing.assert_allclose(gas_data.concentration[0], 0.0, rtol=0.0)
 
     def test_step_rejects_invalid_time_step(self):
         """step() rejects non-finite or negative timesteps."""
