@@ -38,6 +38,12 @@ from particula.dynamics.condensation.mass_transfer import (
     get_mass_transfer_rate,
     get_mass_transfer_rate_latent_heat,
 )
+from particula.dynamics.condensation.mass_transfer_utils import (
+    apply_condensation_limit,
+    apply_evaporation_limit,
+    apply_per_bin_limit,
+    calc_mass_to_change,
+)
 from particula.gas import get_molecule_mean_free_path
 from particula.gas.gas_data import GasData
 from particula.gas.latent_heat_strategies import (
@@ -128,6 +134,37 @@ def _validate_time_step(time_step: float) -> None:
     """Validate that the timestep is finite and nonnegative."""
     if not np.isfinite(time_step) or time_step < 0.0:
         raise ValueError("time_step must be finite and nonnegative.")
+
+
+def _get_mass_transfer_variable_time_step(
+    mass_rate: NDArray[np.float64],
+    time_step: NDArray[np.float64],
+    gas_mass: NDArray[np.float64],
+    particle_mass: NDArray[np.float64],
+    particle_concentration: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Compute mass transfer for vectorized per-particle time steps."""
+    mass_to_change = calc_mass_to_change(
+        mass_rate=mass_rate,
+        time_step=time_step,
+        particle_concentration=particle_concentration,
+    )
+    mass_to_change, evap_sum, neg_mask = apply_condensation_limit(
+        mass_to_change=mass_to_change,
+        gas_mass=gas_mass,
+    )
+    mass_to_change = apply_evaporation_limit(
+        mass_to_change=mass_to_change,
+        particle_mass=particle_mass,
+        particle_concentration=particle_concentration,
+        evap_sum=evap_sum,
+        neg_mask=neg_mask,
+    )
+    return apply_per_bin_limit(
+        mass_to_change=mass_to_change,
+        particle_mass=particle_mass,
+        particle_concentration=particle_concentration,
+    )
 
 
 def _pure_vapor_pressure_from_strategy(
@@ -1619,7 +1656,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         gas_concentration: NDArray[np.float64],
         temperature: float,
         pressure: float,
-        dt_local: float,
+        dt_local: float | NDArray[np.float64],
         radii: NDArray[np.float64],
         first_order_mass_transport: Optional[NDArray[np.float64]] = None,
         dynamic_viscosity: Optional[float] = None,
@@ -1701,9 +1738,19 @@ class CondensationIsothermalStaggered(CondensationStrategy):
         if particle_mass.ndim == 2 and mass_rate_array.ndim == 1:
             mass_rate_array = mass_rate_array[:, None]
 
-        return get_mass_transfer(
+        dt_local_array = np.asarray(dt_local, dtype=np.float64)
+        if dt_local_array.shape == ():
+            return get_mass_transfer(
+                mass_rate=mass_rate_array,
+                time_step=float(dt_local_array),
+                gas_mass=np.atleast_1d(gas_mass),
+                particle_mass=particle_mass,
+                particle_concentration=particle_concentration,
+            )
+
+        return _get_mass_transfer_variable_time_step(
             mass_rate=mass_rate_array,
-            time_step=dt_local,
+            time_step=dt_local_array,
             gas_mass=np.atleast_1d(gas_mass),
             particle_mass=particle_mass,
             particle_concentration=particle_concentration,
@@ -1825,7 +1872,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 continue
             batch_indices = batch_indices[active_mask]
             dt_local = dt_local[active_mask]
-            use_vectorized = np.allclose(dt_local, dt_local[0]) and getattr(
+            use_vectorized = getattr(
                 self._calculate_single_particle_transfer, "__func__", None
             ) is (
                 CondensationIsothermalStaggered._calculate_single_particle_transfer
@@ -1881,7 +1928,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 continue
             batch_indices = batch_indices[active_mask]
             dt_local = dt_local[active_mask]
-            use_vectorized = np.allclose(dt_local, dt_local[0]) and getattr(
+            use_vectorized = getattr(
                 self._calculate_single_particle_transfer, "__func__", None
             ) is (
                 CondensationIsothermalStaggered._calculate_single_particle_transfer
