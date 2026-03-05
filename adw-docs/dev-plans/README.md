@@ -77,7 +77,7 @@ and rollout.
   - Scope: Thermal resistance factor and non-isothermal mass transfer rate
     pure functions with energy tracking.
 - [E5-F3: CondensationLatentHeat Strategy Class][e5-f3] — Status: In Progress
-  (P1, #1139)
+  (P1, #1139; P5, #1143)
   - Scope: New condensation strategy with latent heat correction and energy
     diagnostics.
 - [E5-F4: Builder, Factory, and Exports][e5-f4] — Status: Planning
