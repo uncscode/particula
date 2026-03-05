@@ -16,7 +16,7 @@ from numpy.typing import NDArray
 
 def calc_mass_to_change(
     mass_rate: NDArray[np.float64],
-    time_step: float,
+    time_step: float | NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Calculate the requested mass change for every particle/species pair.
@@ -30,7 +30,7 @@ def calc_mass_to_change(
     Args:
         mass_rate: Mass transfer rate (ṁ) for each particle or ``(particle,
             species)`` pair in kg s⁻¹.
-        time_step: Time step Δt in seconds.
+        time_step: Time step Δt in seconds (scalar or per-particle array).
         particle_concentration: Number concentration C in m⁻³.
 
     Returns:
