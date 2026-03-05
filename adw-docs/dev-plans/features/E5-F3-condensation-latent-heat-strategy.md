@@ -6,7 +6,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-04
 **Target Date**: TBD
-**Last Updated**: 2026-03-04
+**Last Updated**: 2026-03-05
 **Size**: Large (5 phases)
 
 ## Summary
@@ -162,7 +162,7 @@ additions:
     * L) to machine precision, sign conventions, single and multi-species
 
 - [ ] **E5-F3-P4**: Add discrete and continuous distribution support with tests
-  - Issue: TBD | Size: S (~60 LOC) | Status: Not Started
+  - Issue: #1142 | Size: S (~60 LOC) | Status: In Progress
   - Extend `step()` to handle discrete (binned) and continuous (PDF)
     distribution types
   - Uses same `get_mass_transfer()` routing as isothermal -- the only
@@ -241,3 +241,4 @@ additions:
 |------|--------|--------|
 | 2026-03-02 | Initial feature document created from E5 epic | ADW |
 | 2026-03-04 | Marked P1 in progress for issue #1139 | ADW |
+| 2026-03-05 | Linked P4 to issue #1142 | ADW |
