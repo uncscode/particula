@@ -5,7 +5,7 @@
 **Owners**: @Gorkowski
 **Start Date**: 2026-03-02
 **Target Date**: TBD
-**Last Updated**: 2026-03-05
+**Last Updated**: 2026-03-04
 **Size**: Medium (7 features, ~22 phases)
 
 ## Vision
@@ -306,7 +306,6 @@ L -> 0 as T -> T_c. Used in engineering thermodynamics and EOS-based models.
     single-species and multi-species particle-resolved cases
 
 - [ ] **E5-F3-P4**: Add discrete and continuous distribution support with tests
-  - Issue: #1142 | Status: In Progress
   - Extend `step()` to handle discrete (binned) and continuous (PDF)
     distribution types
   - These use the same `get_mass_transfer()` routing (single vs multiple
@@ -624,4 +623,3 @@ class CondensationLatentHeat(CondensationStrategy):
 | 2026-03-02 | Initial epic creation | ADW |
 | 2026-03-02 | Split E5-F1-P3 into P3 (builders) + P4 (factory+exports); split E5-F3-P3 into P3 (particle-resolved step) + P4 (discrete+continuous) + P5 (data-only parity); added missing details: function signatures, file references, thermal conductivity source, vapor_pressure_surface parameter, test tolerances, literature targets | ADW |
 | 2026-03-04 | Noted E5-F3-P1 issue #1139 and logging expectations | ADW |
-| 2026-03-05 | Linked E5-F3-P4 to issue #1142 | ADW |

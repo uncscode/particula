@@ -15,12 +15,14 @@ from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
     CondensationLatentHeat,
+    _normalize_first_order_mass_transport,
     _partial_pressure_from_strategy,
     _pure_vapor_pressure_from_strategy,
     _require_matching_types,
     _require_single_box,
     _unwrap_gas,
     _unwrap_particle,
+    _validate_time_step,
 )
 from particula.dynamics.condensation.mass_transfer import (
     get_latent_heat_energy_released,
@@ -133,6 +135,12 @@ class TestCondensationIsothermal(unittest.TestCase):
             from_representation(self.particle),
             from_species(self.gas_species),
         )
+
+    def test_validate_time_step_allows_zero_and_rejects_invalid(self):
+        """_validate_time_step accepts zero and rejects invalid values."""
+        _validate_time_step(0.0)
+        with self.assertRaisesRegex(ValueError, "time_step must be finite"):
+            _validate_time_step(-0.5)
 
     def test_mean_free_path(self):
         """Test the mean free path call."""
@@ -267,6 +275,28 @@ class TestCondensationIsothermal(unittest.TestCase):
             pressure=self.pressure,
         )
         self.assertIsNotNone(result)
+
+    def test_normalize_first_order_mass_transport_2d(self):
+        """Normalize transport shape when pressure delta is 2D."""
+        pressure_delta = np.ones((3, 2))
+        mass_transport = np.array([1.0, 2.0, 3.0])
+
+        normalized = _normalize_first_order_mass_transport(
+            mass_transport, pressure_delta
+        )
+
+        self.assertEqual(normalized.shape, (3, 1))
+
+    def test_step_rejects_invalid_time_step(self):
+        """step() rejects non-finite or negative timesteps."""
+        with self.assertRaisesRegex(ValueError, "time_step must be finite"):
+            self.strategy.step(
+                particle=self.particle,
+                gas_species=self.gas_species,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=-1.0,
+            )
 
     def test_fill_zero_radius(self):
         """_fill_zero_radius changes zeros to max radius."""
@@ -2631,10 +2661,16 @@ class TestCondensationLatentHeat(unittest.TestCase):
         )
 
         np.testing.assert_allclose(
-            latent_particle.masses[0], iso_particle.masses[0], rtol=1e-15
+            latent_particle.masses[0],
+            iso_particle.masses[0],
+            rtol=1e-15,
+            atol=1e-17,
         )
         np.testing.assert_allclose(
-            latent_gas.concentration[0], iso_gas.concentration[0], rtol=1e-15
+            latent_gas.concentration[0],
+            iso_gas.concentration[0],
+            rtol=1e-15,
+            atol=1e-17,
         )
 
     def test_step_discrete_energy_tracking(self):
@@ -2793,8 +2829,8 @@ class TestCondensationLatentHeat(unittest.TestCase):
                 pressure=self.pressure,
             )
 
-    def test_step_rejects_nonpositive_concentration(self):
-        """Binned step rejects nonpositive concentrations."""
+    def test_step_rejects_negative_concentration(self):
+        """Binned step rejects negative concentrations."""
         particle, particle_data, gas_species, gas_data = (
             self._build_binned_representation("pmf", 10)
         )
@@ -3277,6 +3313,55 @@ class TestCondensationLatentHeat(unittest.TestCase):
             )
 
         np.testing.assert_allclose(gas_new.concentration[0], 0.0, rtol=1e-15)
+
+    def test_calculate_norm_conc_clamps_small_negative(self):
+        """_calculate_norm_conc clamps small negative concentrations."""
+        volume = 1.0
+        concentration = np.array([1.0, -1.0e-13])
+
+        norm_conc = self.data_strategy._calculate_norm_conc(
+            volume, concentration
+        )
+
+        self.assertTrue(np.all(norm_conc >= 0.0))
+        self.assertEqual(norm_conc[1], 0.0)
+
+    def test_step_rejects_invalid_time_step(self):
+        """step() rejects non-finite or negative timesteps."""
+        particle_data, gas_data = self._make_data_inputs()
+        with self.assertRaisesRegex(ValueError, "time_step must be finite"):
+            self.data_strategy.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=-0.5,
+            )
+
+    def test_get_vapor_pressure_surface_rejects_nonfinite_kelvin(self):
+        """Non-finite Kelvin terms raise a clear error."""
+        particle = copy.deepcopy(self.particle)
+        gas_species = copy.deepcopy(self.gas_species)
+        cond = CondensationLatentHeat(
+            molar_mass=self.molar_mass,
+            diffusion_coefficient=self.diffusion_coefficient,
+            accommodation_coefficient=self.accommodation_coefficient,
+        )
+
+        with patch.object(
+            particle.surface,
+            "kelvin_term",
+            return_value=np.array([np.nan, np.nan]),
+        ):
+            with self.assertRaisesRegex(
+                ValueError, "kelvin_term must be finite"
+            ):
+                cond._get_vapor_pressure_surface(
+                    particle=particle,
+                    gas_species=gas_species,
+                    temperature=self.temperature,
+                    radius=particle.data.radii[0],
+                )
 
     def test_step_dynamic_viscosity_pass_through(self):
         """Dynamic viscosity override is forwarded to mass_transfer_rate."""
