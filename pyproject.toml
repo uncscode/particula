@@ -97,6 +97,7 @@ testpaths = ["particula"]
 norecursedirs = ["trees", ".git", "dist", "build", "particula/dynamics/wall_loss/tests"]
 filterwarnings = [
     "ignore:The NumPy module was reloaded.*:UserWarning",
+    "ignore:Due to '_pack_', the 'APICLaunchParamRecord' Structure.*:DeprecationWarning",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
