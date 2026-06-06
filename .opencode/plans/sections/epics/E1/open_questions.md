@@ -1,18 +1,9 @@
-<!-- TEMPLATE: Replace this entire file with unresolved questions -->
-
-Track unresolved decisions, scope ambiguities, or intent-alignment questions
-that need clarification before or during implementation.
-
-Review agents append pivotal questions here during plan review passes.
-The questions surfacer summarizes and posts them to the planning PR for
-human review.
-
 Mark questions as resolved with dates when answers are found.
+Present active questions in sequential order so follow-up reviews can refer to
+stable question numbers.
 
-**Example:**
-- [ ] Should child feature plans share a single tracking branch or use separate branches?
-  - Resolved 2026-04-01: Separate branches per feature, accumulated into the epic branch
-- [ ] How should cross-epic dependencies be tracked when two epics share a feature?
-  - Open: Needs decision on whether to use plan-level or phase-level dependency links
-- [ ] Is the migration path backward-compatible with existing plan artifacts?
-  - Open: Validate via dry-run comparison before committing migration output
+1. [ ] Should this epic keep the remaining work split into additional child
+   plans for validation, documentation, and acceleration readiness, or is the
+   intent to deliver those scopes inside `E1-F1`? (reviewer: plan-review-architecture)
+   - Open: The answer changes dependency tracking, sequencing clarity, and how
+     much architecture detail belongs in the single existing feature plan.

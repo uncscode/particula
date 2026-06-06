@@ -1,16 +1,9 @@
-<!-- TEMPLATE: Replace this entire file with milestones -->
-
-Track major milestones with planned and actual dates.
+Track major milestones in delivery order so the epic sequencing is reviewable
+even while dates remain TBD.
 
 | Milestone | Planned Date | Actual Date | Status | Notes |
 |-----------|--------------|-------------|--------|-------|
-| Milestone 1 | YYYY-MM-DD | - | Not Started | Child plan reference |
-
-**Example (E17):**
-| Milestone | Planned Date | Actual Date | Status | Notes |
-|-----------|--------------|-------------|--------|-------|
-| Models & Schema shipped | 2026-04-01 | 2026-04-02 | Shipped | E17-F1 |
-| CLI core operational | 2026-04-08 | 2026-04-10 | Shipped | E17-F3 |
-| Migration complete | 2026-04-15 | 2026-04-14 | Shipped | E17-F5 |
-| Auto-update hook live | 2026-04-22 | - | In Progress | E17-F6 |
-| Analytics pipeline live | 2026-05-01 | - | In Progress | E17-F7, E17-M1 |
+| Latent-heat builder shipped | TBD | - | Not Started | `E1-F1-P1` adds `CondensationLatentHeatBuilder` and builder exports |
+| Factory registration shipped | TBD | - | Not Started | `E1-F1-P2` wires `CondensationFactory.get_strategy("latent_heat", ...)` |
+| Public namespace and docs shipped | TBD | - | Not Started | `E1-F1-P3` and `E1-F1-P4` export the builder through `particula.dynamics` and update condensation docs |
+| Remaining epic validation, documentation, and acceleration-readiness scope explicitly split or descoped | TBD | - | Blocked | Epic title still implies follow-on work beyond E1-F1; requires additional child plans or an epic-scope reduction |
