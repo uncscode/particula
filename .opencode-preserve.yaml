@@ -1,0 +1,13 @@
+preserve:
+  - .opencode/guides/README.md
+  - .opencode/guides/index.md
+  - .opencode/guides/architecture_reference.md
+  - .opencode/guides/code_culture.md
+  - .opencode/guides/code_style.md
+  - .opencode/guides/commit_conventions.md
+  - .opencode/guides/docstring_guide.md
+  - .opencode/guides/documentation_guide.md
+  - .opencode/guides/linting_guide.md
+  - .opencode/guides/pr_conventions.md
+  - .opencode/guides/review_guide.md
+  - .opencode/guides/testing_guide.md

@@ -1,64 +1,52 @@
-# Code Review Guide
+# Review Guide
 
-**Version:** 2.1.0
-**Last Updated:** 2025-11-14
+**Project:** particula  
+**Last Updated:** 2026-06-06
 
-## Overview
+Review particula changes for scientific correctness first, then behavior,
+maintainability, tests, and documentation.
 
-This guide documents code review standards and criteria for the adw repository.
-
-### Repository Structure
-
-```
-adw/
-├── adw/                # Source code directory (core package)
-├── tests/              # Test files (*_test.py, test_*.py)
-├── docs/               # Documentation files
-└── pyproject.toml      # Project configuration and dependencies
-```
-
-### Validation Commands
-
-Before submitting code for review, run:
+## Validation Commands
 
 ```bash
-# Tests
-pytest adw/tests/
-
-# Linting
-ruff check adw/ --fix
-ruff format adw/
-
-# Type checking
-mypy adw/ --ignore-missing-imports
+pytest
+pytest --cov=particula --cov-report=term-missing
+ruff check particula/ --fix
+ruff format particula/
+ruff check particula/
+mypy particula/ --ignore-missing-imports
 ```
 
-### Review Checklist
+Run targeted tests for small changes and broader tests for cross-module or
+scientific-model changes.
 
-- [ ] Tests pass: `pytest adw/tests/`
-- [ ] Linting passes: `ruff check adw/ && ruff format --check adw/`
-- [ ] Type checking passes: `mypy adw/ --ignore-missing-imports`
-- [ ] Documentation updated (if applicable)
-- [ ] No hardcoded secrets or credentials
-- [ ] Error handling is appropriate
-- [ ] Code follows existing patterns and conventions
+## Review Checklist
 
-### Issue Severity
+- Scientific formulas match source references and preserve units.
+- Numerical methods use appropriate tolerances and avoid avoidable warnings.
+- Public functions validate inputs with `validate_inputs` where applicable.
+- NumPy vectorization is used where practical for array-heavy calculations.
+- Edge cases are covered, including zeros, empty arrays, invalid inputs, and
+  scalar-versus-array behavior.
+- Tests are co-located in `tests/` directories and named `*_test.py`.
+- CI-warning behavior is respected; code and tests should pass under `pytest -Werror`.
+- New public APIs have type hints and Google-style docstrings.
+- Documentation or examples are updated when user-facing behavior changes.
 
-- **Blocker**: Critical issues that prevent the code from running or cause data loss/corruption. Must be fixed before merge.
-- **Major**: Significant issues that impact functionality, security, or maintainability. Should be fixed before merge unless approved by maintainer.
-- **Minor**: Style issues, non-critical bugs, or suggestions for improvement. Can be addressed in follow-up PRs.
+## Performance-Sensitive Code
 
-## Integration with ADW
+For condensation, coagulation, wall-loss, or GPU/Warp changes, check algorithmic
+complexity and memory behavior. Avoid Python loops over large arrays unless the
+method is intentionally sequential, such as staggered Gauss-Seidel stepping.
 
-ADW review commands use this guide to validate:
-- Code passes all validation commands
-- Review criteria are met
-- Issue severity is appropriately assessed
+## Wall Loss Changes
 
-## See Also
+Wall loss changes should preserve both direct module behavior and exported
+package behavior. Review spherical and rectangular chamber paths, distribution
+types, zero concentration handling, and helper-function parity.
 
-- **docs/ai_docs/testing_guide.md**: Test execution and validation
-- **docs/ai_docs/linting_guide.md**: Linting requirements
-- **docs/ai_docs/code_style.md**: Code style conventions
-- **docs/ai_docs/architecture_reference.md**: Architectural constraints
+## Notebook Changes
+
+For `docs/Examples/` notebooks, review the paired `.py` source and `.ipynb`.
+The `.py` should be linted, synced to the notebook, and the notebook executed
+when feasible.

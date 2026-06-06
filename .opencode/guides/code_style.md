@@ -1,117 +1,174 @@
 # Code Style Guide
 
-**Version:** 2.1.0
-**Last Updated:** 2025-11-14
+**Project:** particula  
+**Last Updated:** 2026-06-06
 
-## Overview
+This guide captures the particula-specific Python style rules migrated from
+`adw-docs/code_style.md`.
 
-This guide documents Python-specific coding standards for the adw repository.
+## Python Version
 
-> **See Also:** [Code Culture](code_culture.md) - Development philosophy, code review practices, and the "smooth is safe, safe is fast" principle including the 100-line rule for PRs.
+- Minimum supported Python version: 3.12.
+- Prefer Python 3.12+ syntax, including built-in generics and `|` unions.
 
-### Language Version
+## Naming
 
-**Minimum Version**: 3.12+
+- Functions and methods: `snake_case`, for example `calculate_density`.
+- Variables: `snake_case`, with clear scientific meaning and units when useful.
+- Classes: `PascalCase`, for example `Aerosol` and `AerosolBuilder`.
+- Constants: `UPPER_CASE`, for example `BOLTZMANN_CONSTANT`.
+- Modules and packages: `snake_case`.
+- Private helpers: `_leading_underscore`.
 
-## Naming Conventions
+Avoid abbreviations unless they are standard in the domain, such as `rh` for
+relative humidity.
 
-### Functions/Methods: `snake_case`
+## Formatting
 
-**Example:**
+- Maximum line length: 80 characters.
+- Indentation: 4 spaces, never tabs.
+- String quote preference: double quotes.
+- Use trailing commas in multi-line literals and function signatures.
+- Use two blank lines between top-level functions/classes and one blank line
+  between methods.
+
+## Imports
+
+Group imports in this order:
+
+1. Standard library
+2. Third-party libraries
+3. Local particula imports
+
 ```python
-def calculate_total_cost(items: list) -> float:
-    pass
+from typing import TYPE_CHECKING
+
+import numpy as np
+from numpy.typing import NDArray
+
+from particula.util.constants import BOLTZMANN_CONSTANT
+from particula.util.validate_inputs import validate_inputs
 ```
 
-### Variables: `snake_case`
+Use absolute imports for particula modules. Prefer `TYPE_CHECKING` imports for
+types that would otherwise create import cycles or unnecessary runtime imports.
 
-**Example:**
+## Type Hints
+
+Use type hints for public APIs and complex internal functions.
+
 ```python
-user_name = "John Doe"
-total_count = 42
+from numpy.typing import NDArray
+import numpy as np
+
+
+def calculate_density(
+    mass: float | NDArray[np.float64],
+    volume: float | NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Calculate density from mass and volume."""
+    return mass / volume
 ```
 
-### Classes/Types: `PascalCase`
+Use `NDArray[np.float64]` for NumPy arrays where dtype matters. Add types
+incrementally, prioritizing public APIs.
 
-**Example:**
+## Docstrings
+
+Use Google-style docstrings. Module docstrings should describe the module and
+include citations for scientific methods when applicable.
+
 ```python
-class WorkflowManager:
-    pass
+"""Activity coefficients for organic-water mixtures.
 
-class UserProfile:
-    pass
+Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
+Relative-humidity-dependent organic aerosol thermodynamics via an efficient
+reduced-complexity model.
+Atmospheric Chemistry and Physics.
+https://doi.org/10.5194/acp-19-13383-2019
+"""
 ```
 
-### Constants: `UPPER_SNAKE_CASE`
+## Comments
 
-**Example:**
+Use comments sparingly. Comments should explain why something is done, cite a
+source, or clarify units.
+
 ```python
-MAX_RETRIES = 3
-DEFAULT_TIMEOUT = 30
-API_BASE_URL = "https://api.example.com"
+# From Gorkowski et al. (2019), Equation 7.
+blending_weight = (1.0 + np.exp(-s * (x - x0))) ** (-1)
+
+temperature = 298.15  # K
+pressure = 101325.0  # Pa
 ```
 
-## Type System
+Do not comment obvious operations.
 
-### Type Hints/Annotations
+## Scientific Code
 
-**Policy**: Recommended for public APIs and complex functions
+Prefer vectorized NumPy operations for array calculations.
 
-**Example:**
 ```python
-def process_workflow(
-    workflow_id: str,
-    config: dict[str, Any],
-    timeout: int = 30
-) -> WorkflowResult:
-    pass
+def calculate_all(values: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Calculate values using vectorized NumPy operations."""
+    return values**2 + 2 * values + 1
 ```
 
-## Line Length
+Use constants from `particula.util.constants` instead of hardcoding physical
+constant values.
 
-**Maximum Line Length**: 100 characters
+## Input Validation
 
-## Import Organization
+Use `@validate_inputs` for public functions that require numerical constraints.
 
-Organize imports in three groups:
-1. Standard library imports
-2. Third-party imports
-3. Local application imports
-
-Use blank lines to separate groups. Sort alphabetically within each group.
-
-**Example:**
 ```python
-# Standard library
-import os
-from pathlib import Path
+from particula.util.validate_inputs import validate_inputs
 
-# Third-party
-import click
-from pydantic import BaseModel
 
-# Local
-from adw.core.models import Workflow
-from adw.workflows.operations import execute_workflow
+@validate_inputs({"mass": "positive", "volume": "positive"})
+def calculate_density(mass: float, volume: float) -> float:
+    """Calculate density from positive mass and volume."""
+    return mass / volume
 ```
 
-## Design Patterns
+Supported validators include `"positive"`, `"nonnegative"`, and `"finite"`.
 
-### Pattern 1: Pydantic Models for Data Validation
+## NVIDIA Warp Notes
 
-**When to use:** For API requests, configuration objects, and data structures that need validation
+For Warp-heavy code, use `Any` for Warp arrays when static type checkers cannot
+represent Warp runtime types. Detect Warp arrays by duck typing, not
+`isinstance(obj, wp.array)`.
 
-**Example:**
 ```python
-from pydantic import BaseModel, Field
+from typing import Any
 
-class WorkflowConfig(BaseModel):
-    workflow_id: str = Field(..., min_length=1)
-    timeout: int = Field(default=30, ge=0)
-    retry_count: int = Field(default=3, ge=0, le=10)
+import numpy as np
+
+
+def to_numpy(values: Any) -> np.ndarray:
+    """Convert Warp-like or array-like values to NumPy."""
+    if hasattr(values, "numpy") and callable(values.numpy):
+        return values.numpy()
+    return np.asarray(values)
 ```
 
-## See Also
+GPU implementations must match the Python/NumPy reference physics. Do not use
+reduced-order approximations unless the model explicitly requires them.
 
-- **docs/ai_docs/linting_guide.md**: Linting tools that enforce these conventions
-- **docs/ai_docs/docstring_guide.md**: Documentation standards
+## Anti-Patterns
+
+- Do not use mutable default arguments.
+- Do not use `from numpy import *` or broad wildcard imports.
+- Do not hardcode physical constants that already exist in `util.constants`.
+- Do not bury domain equations in uncommented code.
+- Do not rely on Python loops for large numerical arrays when vectorization is practical.
+
+## Summary
+
+- Python 3.12+.
+- 80-character lines.
+- Google-style docstrings.
+- `snake_case` functions/modules and `PascalCase` classes.
+- NumPy for scientific computation.
+- Explicit units and citations for physical calculations.
+- `validate_inputs` for public numerical validation.

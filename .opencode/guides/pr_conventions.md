@@ -1,80 +1,53 @@
 # Pull Request Conventions
 
-**Version:** 2.1.0
-**Last Updated:** 2025-11-14
+**Project:** particula  
+**Last Updated:** 2026-06-06
 
-## Overview
+Keep PRs focused, reviewable, and backed by targeted validation.
 
-This guide documents pull request format and conventions for the adw repository.
+## Title Format
 
-### PR Title Format
+Use a short conventional title:
 
-**Format:**
-```
-<type>: <description>
-```
-
-**Example:**
-```
-feat: add patch workflow support
+```text
+<type>: <summary>
 ```
 
-### PR Body Structure
+Examples:
 
-All PRs must include:
-
-```markdown
-## Summary
-Brief description of what this PR does and why.
-
-## Changes
-- Bullet list of specific changes made
-- Keep it concise and focused
-
-## Testing
-How was this tested? What test cases were added or updated?
+```text
+fix: correct charged wall-loss zero-field behavior
+test: add staggered condensation regression cases
+docs: update Jupytext notebook workflow
 ```
 
-### Branch Naming
+## PR Body
 
-**Format**: `<type>/<short-description>` or `issue-<number>-<description>`
+Include:
 
-**Examples:**
-- `feat/patch-workflow`
-- `fix/error-handling`
-- `issue-123-add-authentication`
+- Summary of behavior or documentation changed.
+- Scientific or architectural context when relevant.
+- Tests and lint commands run.
+- Known limitations or follow-up work.
 
-### Platform Commands
+## Validation
 
-**GitHub** (using `gh` CLI):
+Common validation commands:
+
 ```bash
-gh pr create --title "feat: add patch workflow support" --body "..."
+pytest
+pytest --cov=particula --cov-report=term-missing
+ruff check particula/ --fix
+ruff format particula/
+ruff check particula/
+mypy particula/ --ignore-missing-imports
 ```
 
-**ADW** (platform router):
-```bash
-adw platform create-pr --title "feat: add patch workflow support" --body "..." \
-  --head feature/patch-workflow --base main
-```
+For notebook PRs, include Jupytext sync and notebook execution status. For
+performance-sensitive changes, include targeted benchmark results or explain why
+the benchmark was not run.
 
-`adw platform create-pr` applies the default PR labels (`agent`, `blocked`,
-`request:fix`) unless `--no-default-labels` is provided. Remove `request:fix` or
-add `blocked` when you want to pause the automated fix cycle.
+## Scope
 
-### Issue Linking
-
-**Format**: Reference issue number in PR body using `Fixes #<issue-number>` or `Closes #<issue-number>`
-
-**Example**: `Fixes #123`
-
-## Integration with ADW
-
-ADW PR commands use this guide to:
-- Format PR titles and bodies
-- Create PRs using correct platform commands
-- Link PRs to issues appropriately
-
-## See Also
-
-- **docs/ai_docs/commit_conventions.md**: Commit message format
-- **docs/ai_docs/review_guide.md**: Review process and criteria
+Prefer small PRs. If a change spans multiple modules or introduces a new model,
+include architecture notes and focused tests for each affected module.

@@ -1,104 +1,75 @@
 # Docstring Guide
 
-**Version:** 2.1.0
-**Last Updated:** 2025-11-14
+**Project:** particula  
+**Last Updated:** 2026-06-06
 
-## Overview
+Use Google-style docstrings for modules, public functions, classes, and methods.
+Docstrings should be accurate, concise, and useful to future scientific-code
+maintainers.
 
-This guide documents the documentation style conventions for the adw repository. All functions, classes, methods, and modules should follow **Google-style** format.
+## Module Docstrings
 
-### Documentation Style
-
-adw uses **Google-style** as the standard documentation format for Python docstrings.
-
-### Integration with ADW
-
-This guide is referenced by ADW commands to understand repository-specific docstring requirements.
-
-## Format Structure
-
-### Python Example: Google-Style
+Module docstrings should state the purpose of the module and include citations
+when the module implements a published method or equation.
 
 ```python
-def function_name(param1: str, param2: int) -> bool:
-    """Brief description of what the function does.
+"""Activity coefficients for organic-water mixtures.
 
-    Longer description explaining the purpose and methodology.
-    Multiple paragraphs can be used for complex functions.
+Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
+Relative-humidity-dependent organic aerosol thermodynamics via an efficient
+reduced-complexity model.
+Atmospheric Chemistry and Physics.
+https://doi.org/10.5194/acp-19-13383-2019
+"""
+```
+
+## Function Docstrings
+
+```python
+def calculate_density(mass: float, volume: float) -> float:
+    """Calculate density from mass and volume.
 
     Args:
-        param1: Description of param1.
-        param2: Description of param2.
+        mass: Particle mass in kg.
+        volume: Particle volume in m^3.
 
     Returns:
-        Description of the return value.
+        Density in kg/m^3.
 
     Raises:
-        ValueError: Condition that raises this exception.
-        RuntimeError: Another condition that raises exception.
-
-    Examples:
-        >>> function_name("test", 42)
-        True
+        ValueError: If mass or volume is not positive.
     """
-    pass
+    return mass / volume
 ```
 
-## Required Sections
+## Class Docstrings
 
-### For Functions
+Class docstrings should describe the role of the class and any important
+construction constraints.
 
-- **Brief description**: One-line summary
-- **Args**: List all parameters with type and description
-- **Returns**: Describe return value with type
-- **Raises** (optional): List exceptions/errors with conditions
-- **Examples** (optional but recommended): Usage examples with doctests
-
-### For Classes
-
-- **Brief description**: One-line summary
-- **Attributes**: List all public attributes with type and description
-- **Examples** (optional): Usage examples
-
-**Class Example:**
 ```python
-class WorkflowManager:
-    """Manages workflow execution and state.
-
-    The WorkflowManager coordinates workflow phases, tracks state,
-    and handles error recovery.
-
-    Attributes:
-        workflow_id: Unique identifier for the workflow.
-        current_phase: Current execution phase name.
-        state: Current workflow state dictionary.
-
-    Examples:
-        >>> manager = WorkflowManager("wf-123")
-        >>> manager.execute_phase("plan")
-    """
-    pass
+class AerosolBuilder:
+    """Build aerosol objects from gas and particle representations."""
 ```
 
-## Line Length
+## Scientific Documentation Rules
 
-**Docstring Line Length**: 100 characters
+- Include units for physical quantities.
+- Cite equations, models, and parameterizations when they come from literature.
+- Explain assumptions that affect scientific validity.
+- Do not duplicate obvious type information unless units or semantics need clarification.
+- Keep examples short and executable when included.
 
-Wrap docstring lines at 100 characters for consistency with code line length.
+## Style Rules
 
-## Quick Reference
+- First line is a short summary.
+- Use `Args:`, `Returns:`, `Raises:`, and `Examples:` sections as needed.
+- Use imperative or direct wording.
+- Keep line length to 80 characters.
+- Keep docstrings synchronized with implementation changes.
 
-### Checklist for New Documentation
+## Tests
 
-- [ ] Brief description (one line)
-- [ ] Detailed description (if non-trivial)
-- [ ] Args section (all parameters documented)
-- [ ] Returns section (return value described)
-- [ ] Raises section (if function raises exceptions)
-- [ ] Examples section (recommended for public APIs)
-- [ ] Line lengths ≤ 100 characters
-
-## See Also
-
-- **docs/ai_docs/linting_guide.md**: Docstring linting rules
-- **docs/ai_docs/code_style.md**: General coding standards
+Test functions should also have short docstrings when the behavior is not fully
+obvious from the test name. Prefer docstrings that state the behavior being
+validated, not the mechanics of the test.
