@@ -1,27 +1,34 @@
-<!-- TEMPLATE: Replace this entire file with the implementation strategy -->
+This epic should keep the non-isothermal condensation work split along existing
+package boundaries rather than introducing a new top-level subsystem. Pure
+thermodynamic helpers belong in `particula/dynamics/condensation/mass_transfer.py`,
+runtime strategy behavior belongs in
+`particula/dynamics/condensation/condensation_strategies.py`, public
+construction surfaces belong in
+`particula/dynamics/condensation/condensation_builder/` and
+`condensation_factories.py`, and species-specific latent-heat parameterization
+stays in `particula/gas/` beside the existing vapor-pressure strategy family.
 
-Summarize the architectural approach, key design decisions, and testing
-strategy that span the entire epic. Link to detailed specs or ADRs.
+The architectural goal is to make latent-heat-aware condensation feel like a
+natural extension of the current `CondensationStrategy` and `MassCondensation`
+workflow. Child features should reuse the established strategy, builder, and
+factory patterns already used in condensation, vapor pressure, wall loss, and
+coagulation so the public API remains consistent through `particula.dynamics`
+and `particula.gas` re-exports. Validation and diagnostics should remain close
+to public constructors and pure helper functions, while stateful step execution
+continues to live in strategy objects that work with existing particle/gas data
+paths.
 
-**Required elements:**
-- Architecture overview (how the system is structured)
-- Key data ownership rules (what lives where, who updates it)
-- Reusable patterns from the codebase
-- Testing requirements (the standard coverage policy)
+Data ownership should stay explicit: gas latent-heat strategies own latent-heat
+parameter evaluation, condensation strategies own rate and step orchestration,
+and tests own regression proof for parity with isothermal behavior, mass
+conservation, and public import stability. Documentation and acceleration-readiness
+work should build on the same Python reference implementation instead of adding
+alternate physics paths first, because the architecture reference requires GPU
+or future acceleration code to match the Python/NumPy behavior.
 
-**Testing Requirements (include verbatim):**
+Testing requirements for every child feature in this epic are:
 1. Test coverage thresholds must NEVER be lowered
 2. Each phase must include self-contained tests
 3. Tests are committed in the same PR as the implementation
 4. Test files use `*_test.py` suffix in module-level `tests/` directories
 5. Minimum 80% coverage (configured in `pyproject.toml`)
-
-**Example (E17):**
-The system follows a two-layer architecture:
-- **Layer 1 -- Canonical Source:** One JSON per plan + section markdown files
-  under `.opencode/plans/`, validated by Pydantic models and JSON Schema
-- **Layer 2 -- Direct Consumption:** Agents and operators read section files
-  directly from `.opencode/plans/sections/`
-
-Key patterns reused: Click groups from `adw/commands/spec.py`, Pydantic models
-from `adw/automode/manifest.py`, JSON Schema generation from `model_json_schema()`.

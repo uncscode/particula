@@ -1,42 +1,42 @@
-<!-- TEMPLATE: Replace this entire file with your architecture details -->
-
-Describe the high-level design, data/API changes, and security considerations.
-
-**Required subsections:**
-
 ### High-Level Design
-How does this feature fit into the existing system? Include a flow diagram
-or ASCII art showing the data/control flow.
+This feature should expose latent-heat-aware condensation through the same
+construction path users already follow for isothermal strategies: a builder in
+`particula/dynamics/condensation/condensation_builder/`, factory registration
+in `condensation_factories.py`, and re-exports from
+`particula.dynamics.condensation` plus `particula.dynamics`. The builder should
+wrap the existing `CondensationLatentHeat` strategy rather than reimplementing
+physics, while consuming optional latent-heat strategy objects from
+`particula.gas` or a constant latent-heat fallback value.
 
-### Data / API / Workflow Changes
-- **Data Model:** What models or schemas change?
-- **API Surface:** New or modified endpoints, CLI commands, or tool interfaces?
-- **Workflow Hooks:** How does this integrate with existing workflows?
-
-### Security & Compliance
-Any security reviews, permissions changes, or compliance requirements?
-
-**Example (E16-F6):**
-
-### High-Level Design
-```
-Scheduler returns AllComplete for accumulate-mode manifest
-  -> P1: ship-auto-final workflow (summary handoff only)
-    -> shipper-auto-final agent
-      -> gather cumulative diff stat
-      -> compose implementation summary
-      -> persist summary fields for downstream finalization
-  -> P2: runtime dispatcher finalization
-    -> open_final_pr() / router.create_pr(head=source_branch, base=target_branch)
-    -> check idempotency, post safety comment, record "final_pr_opened"
+```text
+User config
+  -> CondensationLatentHeatBuilder
+    -> validates molar_mass, diffusion_coefficient, accommodation_coefficient
+    -> optionally accepts latent_heat_strategy or latent_heat constant
+  -> CondensationFactory("latent_heat", params)
+    -> builds CondensationLatentHeat
+  -> particula.dynamics export surface
+    -> MassCondensation / direct strategy use with existing particle+gas flows
 ```
 
 ### Data / API / Workflow Changes
-- **Data Model:** Reads `manifest.source_branch`, `manifest.target_branch`,
-  manifest checkpoints, and slice completion states
-- **API Surface:** New `ship-auto-final.json` workflow and `shipper-auto-final`
-  agent; reuses existing `router.create_pr()` and `router.create_issue_comment()`
+- **Data Model:** No new persisted data model is required. The feature only adds
+  constructor-time parameters that are forwarded into `CondensationLatentHeat`,
+  which already owns runtime state such as latent-heat diagnostics.
+- **API Surface:** Add `CondensationLatentHeatBuilder`, register the strategy in
+  `CondensationFactory`, and ensure namespace exports make the builder and
+  strategy importable from `particula.dynamics` and its condensation subpackage.
+  The API should mirror existing condensation builder signatures so users can
+  switch from isothermal to latent-heat-aware construction with minimal code
+  changes.
+- **Workflow Hooks:** This integrates with the existing builder/factory testing
+  workflow by extending condensation factory tests and import smoke tests rather
+  than creating new execution paths or developer tooling.
 
 ### Security & Compliance
-The final PR/MR must always require manual merge. No auto-merge or auto-conflict
-resolution may be implied by comments or workflow steps.
+This feature does not introduce permissions, network calls, or external state,
+so the main compliance concern is API safety and validation quality. Builder
+setters should validate units and required parameters consistently with the rest
+of particula, and factory registration should fail deterministically on unknown
+strategy types so invalid user configuration does not silently select the wrong
+physics path.

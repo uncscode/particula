@@ -1,7 +1,3 @@
-<!-- TEMPLATE: Add entries as the plan evolves -->
-
-Record significant changes to this plan document.
-
 | Date | Change | Author |
 |------|--------|--------|
-| YYYY-MM-DD | Initial plan created | @author |
+| 2026-06-06 | Replaced template completeness sections with measurable success criteria, implementation-grounded risks, and a bounded open question set. | plan-review-completeness |
