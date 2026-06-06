@@ -1,8 +1,9 @@
 ---
+
 description: 'Primary agent that validates implementation against spec intent and fixes
   any gaps found.
 
-  This agent: - Reads spec_content and compares against actual changes in worktree
+  This agent: - Reads spec_content (or fix_spec_content during fix validation) and compares against actual changes in worktree
   - Validates general INTENT of each spec step (not line-by-line agreement) - Acknowledges
   that build may have discovered dependencies or corrections - Fixes ALL gap types:
   code, tests, lint, type issues - Runs scoped tests on affected modules only - Commits
@@ -18,30 +19,33 @@ description: 'Primary agent that validates implementation against spec intent an
   IMPORTANT: This agent validates INTENT not literal spec compliance. The build step
   may have discovered code dependencies or made corrections not in the original plan.'
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: false
-  run_pytest: true
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: allow
+  platform_operations: deny
+  run_pytest: allow
+  run_bun_test: allow
+  run_validate_agent_references: allow
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Validate Agent
@@ -61,7 +65,7 @@ Validate implementation against spec intent, fix gaps, and commit fixes.
 # Core Mission
 
 Ensure implementation achieves the **intent** of the spec by:
-1. Reading spec_content and extracting step intents
+1. Reading the active plan field and extracting step intents
 2. Comparing actual worktree changes against intended outcomes
 3. Fixing ALL gaps found (code, tests, lint, types)
 4. Running scoped tests to verify fixes
@@ -84,11 +88,37 @@ ALL file operations MUST use the `worktree_path` from workflow state. This agent
 - Runs tests in the worktree
 - Commits changes in the worktree
 
+For TypeScript wrapper validation under `.opencode/tools/`, use `run_bun_test` as the
+approved path instead of raw `bun test` shell access. When `cwd` is `{worktree_path}`,
+keep `testPath` repo-relative.
+
+```python
+run_bun_test({
+  "testPath": ".opencode/tools/__tests__/run_bun_test.test.ts",
+  "timeout": 120,
+  "minTests": 1,
+  "cwd": "{worktree_path}"
+})
+```
+
+For repository agent-reference validation, use `run_validate_agent_references` instead of
+direct shell/script execution. This permission is intentionally limited to `adw-validate`
+and `docs-validator`.
+
+```python
+run_validate_agent_references({
+  "cwd": "{worktree_path}"
+})
+```
+
+The wrapper is root-scoped and trust-gated: `cwd` must equal the active worktree root, and
+the call fails closed if `scripts/validate_agent_references.py` has local uncommitted edits.
+
 # Required Reading
 
-- @adw-docs/code_style.md - Coding conventions
-- @adw-docs/testing_guide.md - Testing framework and patterns
-- @adw-docs/linting_guide.md - Code quality standards
+- @.opencode/guides/code_style.md - Coding conventions
+- @.opencode/guides/testing_guide.md - Testing framework and patterns
+- @.opencode/guides/linting_guide.md - Code quality standards
 
 # Execution Flow
 
@@ -181,12 +211,18 @@ adw_spec({
 
 Extract from `adw_state.json`:
 - `worktree_path` - CRITICAL: isolated workspace location
-- `spec_content` - Implementation plan with step intents
+- `current_step` - Used to detect fix validation mode
+- `request_fix` - Used to detect fix validation mode
+- `spec_content` - Original implementation plan with step intents
+- `fix_spec_content` - Dedicated fix-pass plan when validating `Fix-*` steps
 - `issue_number`, `issue_title`, `branch_name` - Context
 
 **Validation:**
 - If `worktree_path` missing: `ADW_VALIDATE_FAILED: No worktree found`
-- If `spec_content` missing: `ADW_VALIDATE_FAILED: No implementation plan found`
+- Select the plan source before validation:
+  - If `current_step` starts with `Fix` and `request_fix is True`, validate against `fix_spec_content`
+  - Otherwise validate against `spec_content`
+- If the selected plan field is missing: `ADW_VALIDATE_FAILED: No implementation plan found`
 
 ## Step 3: Verify Worktree (CRITICAL)
 
@@ -205,13 +241,13 @@ git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path}
 
 **CRITICAL:** All subsequent file operations MUST use paths relative to or within `worktree_path`.
 
-## Step 4: Extract Spec Intent
+## Step 4: Extract Plan Intent
 
-Parse `spec_content` to extract the **intent** of each step:
+Parse the selected plan (`spec_content` or `fix_spec_content`) to extract the **intent** of each step:
 
 ### 4.1: Identify Steps
 
-Look for step structure in spec_content:
+Look for step structure in the selected plan field:
 ```markdown
 ### Step 1: {Title}
 **Files:** {paths}
@@ -727,4 +763,4 @@ Small issues that don't affect functionality.
 - Fixes are committed via adw-commit subagent
 - No changes = no commit (just report success)
 
-**References:** `adw_spec` for workflow state, `adw-docs/testing_guide.md`, `adw-docs/linting_guide.md`
+**References:** `adw_spec` for workflow state, `.opencode/guides/testing_guide.md`, `.opencode/guides/linting_guide.md`

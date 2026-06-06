@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that handles Jupyter notebook creation, editing, validation,
   execution, and conversion. Provides expert knowledge about notebook JSON structure,
   validation workflows, Jupytext conversion, and safe notebook editing patterns.
@@ -24,31 +25,32 @@ description: 'Subagent that handles Jupyter notebook creation, editing, validati
   - Convert for type checking: convert notebooks to .py for mypy validation
   - Batch validation: validate all notebooks in a directory'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
-  validate_notebook: true
-  run_notebook: true
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
+  validate_notebook: allow
+  run_notebook: allow
 ---
 
 # ADW Docs Notebook Subagent
@@ -125,9 +127,9 @@ task({
 
 # Required Reading
 
-- @adw-docs/documentation_guide.md - Documentation standards and conventions
-- @adw-docs/notebook_validation_guide.md - Notebook validation guide
-- @adw-docs/code_style.md - Code conventions for notebook code cells
+- @.opencode/guides/documentation_guide.md - Documentation standards and conventions
+- @.opencode/guides/notebook_validation_guide.md - Notebook validation guide
+- @.opencode/guides/code_style.md - Code conventions for notebook code cells
 
 # Write Permissions
 
@@ -308,7 +310,7 @@ run_notebook({
 Read notebook JSON to examine structure:
 
 ```python
-read({"filePath": "adw-docs/notebook_validation_guide.md"})
+read({"filePath": ".opencode/guides/notebook_validation_guide.md"})
 ```
 
 ### edit
@@ -317,7 +319,7 @@ Modify notebook content (use carefully - prefer Jupytext for complex edits):
 
 ```python
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"source": [\n     "# Old title"',
   "newString": '"source": [\n     "# New title"'
 })
@@ -329,7 +331,7 @@ Create new notebook with complete JSON structure:
 
 ```python
 write({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "content": "{...notebook JSON...}"
 })
 ```
@@ -1108,10 +1110,10 @@ The `source` field can be either format:
 **Fix:**
 ```python
 # Read raw file and look for JSON errors
-read({"filePath": "adw-docs/notebook_validation_guide.md"})
+read({"filePath": ".opencode/guides/notebook_validation_guide.md"})
 # Fix the specific syntax error
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"He said "hello""',
   "newString": '"He said \\"hello\\""'
 })
@@ -1134,7 +1136,7 @@ edit({
 ```python
 # Add missing fields
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"cell_type": "code",\n   "source"',
   "newString": '"cell_type": "code",\n   "execution_count": null,\n   "metadata": {},\n   "outputs": [],\n   "source"'
 })
@@ -1154,7 +1156,7 @@ edit({
 
 # Ensure each line (except last) ends with \n
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"source": "line1\\nline2"',
   "newString": '"source": ["line1\\n", "line2"]'
 })
@@ -1167,13 +1169,13 @@ edit({
 **Fix:** Clear outputs when editing code cells
 ```python
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"outputs": [{...complex output...}]',
   "newString": '"outputs": []'
 })
 # Also reset execution count
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"execution_count": 5',
   "newString": '"execution_count": null'
 })
@@ -1202,7 +1204,7 @@ edit({
 ```python
 # Add missing kernelspec
 edit({
-  "filePath": "adw-docs/notebook_validation_guide.md",
+  "filePath": ".opencode/guides/notebook_validation_guide.md",
   "oldString": '"metadata": {}',
   "newString": '"metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"}, "language_info": {"name": "python", "version": "3.12.0"}}'
 })
@@ -1249,7 +1251,7 @@ For complex edits, always use the Jupytext workflow:
 ┌─────────────────────────────────────────────────────────┐
 │ 3. EDIT → Make changes in the .py file (much safer)     │
 │    edit({                                                │
-│      filePath: "adw-docs/notebook_validation_guide.md",        │
+│      filePath: ".opencode/guides/notebook_validation_guide.md", │
 │      oldString: "old_code",                              │
 │      newString: "new_code"                               │
 │    })                                                    │
@@ -1583,5 +1585,5 @@ Before reporting completion, verify:
 **References:**
 - `validate_notebook` tool documentation
 - `run_notebook` tool documentation  
-- `adw-docs/documentation_guide.md`
+- `.opencode/guides/documentation_guide.md`
 - `docs/Examples/index.md`

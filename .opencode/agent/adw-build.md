@@ -1,4 +1,5 @@
 ---
+
 description: 'Primary agent that orchestrates implementation with spot-check testing.
   
   Executes implementation plans by converting steps to todos, implementing code with
@@ -10,35 +11,36 @@ description: 'Primary agent that orchestrates implementation with spot-check tes
   fully autonomously with no user input
 
   NOTE: Validation against spec is handled by adw-validate agent in a separate workflow
-  step. Docstrings and linting are handled separately by adw-format agent.
+  step. Docstrings and linting are handled separately by adw-polish agent.
 
   Invoked by: adw workflow run build <issue-number> --adw-id <id>'
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  refactor_astgrep: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: true
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: false
-  run_pytest: true
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  refactor_astgrep: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: allow
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  platform_operations: deny
+  run_pytest: allow
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Build Agent
@@ -62,7 +64,7 @@ Execute implementation plans by:
 
 **NOTE:** This agent focuses on implementation and test validation only.
 Validation against spec intent is handled by `adw-validate` agent in a separate workflow step.
-Docstrings and linting are handled by the `adw-format` agent which runs after build.
+Docstrings and linting are handled by the `adw-polish` agent which runs after build.
 
 **CRITICAL: FULLY AUTOMATED NON-INTERACTIVE MODE**
 
@@ -75,9 +77,9 @@ You are running in **completely autonomous mode** with:
 
 # Required Reading
 
-- @adw-docs/code_style.md - Coding conventions
-- @adw-docs/testing_guide.md - Testing framework, patterns, and **test duration tiers**
-- @adw-docs/architecture_reference.md - Architecture patterns
+- @.opencode/guides/code_style.md - Coding conventions
+- @.opencode/guides/testing_guide.md - Testing framework, patterns, and **test duration tiers**
+- @.opencode/guides/architecture_reference.md - Architecture patterns
 
 # Subagents
 
@@ -101,9 +103,9 @@ The following subagents are invoked during the documentation workflow (`adw work
 # Execution Flow
 
 ```
-+-----------------------------------------------------------------+
-| Step 1-4: Setup (parse args, load context, move to worktree)    |
-+-----------------------------------------------------------------+
++-------------------------------------------------------------+
+| Step 1-3: Setup (args, context, worktree validation)        |
++-------------------------------------------------------------+
                               |
                               v
 +-----------------------------------------------------------------+
@@ -153,7 +155,7 @@ Extract from `$ARGUMENTS`:
 ```python
 adw_spec({
   "command": "read",
-  "adw_id": "{adw_id}"
+  "adw_id": adw_id
 })
 ```
 
@@ -166,6 +168,11 @@ Extract from `adw_state.json`:
 - If `worktree_path` missing: `ADW_BUILD_FAILED: No worktree found`
 - If `spec_content` missing: `ADW_BUILD_FAILED: No implementation plan found`
 
+**Scope note:**
+- `adw-build` executes the original implementation plan from `spec_content`.
+- Trailing auto-workflow fix passes use `adw-build-fix`, which reads persisted
+  review state and `fix_spec_content` instead of reusing this agent.
+
 ## Step 3: Move to Worktree (CRITICAL)
 
 Use the `worktree_path` for all operations and validate location with tools (no shell navigation):
@@ -177,6 +184,12 @@ ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
 These checks confirm you are operating in the isolated worktree and on the correct branch without invoking bash.
+
+**Root-boundary guardrail (fail closed):**
+- Canonicalize `worktree_path` before use (e.g., resolve symlinks/relative segments).
+- Confirm the canonical path remains under the repository root.
+- If canonicalization fails, or the resolved path escapes the repository root, stop immediately with:
+  `ADW_BUILD_FAILED: Invalid worktree_path (outside repository root)`.
 
 ## Step 4: Parse Implementation Plan
 
@@ -419,7 +432,7 @@ Recommendation: {specific fix suggestion}
 - **Fast Tests:** Focus on tests that run in <=1 second
 
 **NOTE:** Spec validation is handled by `adw-validate` agent.
-Docstrings and linting are handled by `adw-format` agent.
+Docstrings and linting are handled by `adw-polish` agent.
 
 # Notebook Handling
 
@@ -504,4 +517,4 @@ Files changed: 3 (+95/-5)
 NOTE: Run adw-validate next to verify spec intent, then adw-polish to add docstrings, lint, and commit
 ```
 
-You are committed to delivering focused implementations with comprehensive test validation. Spec validation is handled by the adw-validate agent. Docstrings and linting are handled by the adw-format agent.
+You are committed to delivering focused implementations with comprehensive test validation. Spec validation is handled by the adw-validate agent. Docstrings and linting are handled by the adw-polish agent.

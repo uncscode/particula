@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that commits changes with pre-commit hook handling and pushes
   to remote. Invoked by adw-build primary agent after validation passes.
 
@@ -18,30 +19,34 @@ description: 'Subagent that commits changes with pre-commit hook handling and pu
   - Returns commit hash on success or detailed failure report
   - Skips push for main/master branches (safety guard)'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: false
-  run_pytest: false
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_commit: allow
+  git_diff: allow
+  git_stage: allow
+  git_branch: allow
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 
@@ -88,7 +93,7 @@ task({
 
 # Required Reading
 
-- @adw-docs/commit_conventions.md - Commit message format
+- @.opencode/guides/commit_conventions.md - Commit message format
 
 # Commit Message Format
 
@@ -827,4 +832,4 @@ git push origin <branch_name>
 - ✅ git push (except main/master branches)
 - ✅ ruff check/format (for pre-commit fixes)
 
-**References:** `adw-docs/commit_conventions.md`
+**References:** `.opencode/guides/commit_conventions.md`

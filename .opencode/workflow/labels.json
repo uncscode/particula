@@ -1,0 +1,59 @@
+{
+  "version": "1",
+  "groups": {
+    "workflow_type": [
+      {"name": "type:complete", "color": "4f46e5", "description": "Full complete workflow (plan → build → test → review → document → ship)"},
+      {"name": "type:patch", "color": "6366f1", "description": "Quick patch workflow (plan → build → ship)"},
+      {"name": "type:complete-auto", "color": "3730a3", "description": "Auto-mode complete workflow (accumulate shipping, no per-slice PRs)"},
+      {"name": "type:patch-auto", "color": "4338ca", "description": "Auto-mode patch workflow (accumulate shipping, no per-slice PRs)"},
+      {"name": "type:document", "color": "818cf8", "description": "Documentation workflow - generate or update documentation"},
+      {"name": "type:document-auto", "color": "5b21b6", "description": "Auto-mode documentation workflow (accumulate shipping, no per-slice PRs)"},
+      {"name": "type:generate", "color": "c204c2", "description": "Generation workflow - create new issues, code, or artifacts"},
+      {"name": "type:generate-auto", "color": "a21caf", "description": "Auto-mode generation workflow for opt-in generate automation"},
+      {"name": "type:planner", "color": "a855f7", "description": "Planner workflow - rough scope intake and planning automation"}
+    ],
+    "model": [
+      {"name": "model:default", "color": "7dd3fc", "description": "Use base/sonnet tier (workflow default)"},
+      {"name": "model:light", "color": "38bdf8", "description": "Use light/fast model set (haiku) for simple issues"},
+      {"name": "model:base", "color": "0ea5e9", "description": "Use base model set (sonnet) for processing"},
+      {"name": "model:heavy", "color": "0284c7", "description": "Use heavy/slow model set (opus) for complex issues"}
+    ],
+    "category": [
+      {"name": "maintenance", "color": "64748b", "description": "Maintenance work - refactoring, technical debt, testing"},
+      {"name": "feature", "color": "8b5cf6", "description": "New feature or significant enhancement"},
+      {"name": "bug-fix", "color": "ef4444", "description": "Bug fix or error correction"},
+      {"name": "docs", "color": "06b6d4", "description": "Documentation improvements or additions"},
+      {"name": "testing", "color": "14b8a6", "description": "Test coverage or testing improvements"},
+      {"name": "refactor", "color": "eab308", "description": "Code refactoring without functionality changes"},
+      {"name": "enhancement", "color": "3b82f6", "description": "Enhancement to existing functionality"}
+    ],
+    "agent": [
+      {"name": "agent", "color": "9333ea", "description": "Created or managed by ADW automation"},
+      {"name": "blocked", "color": "a855f7", "description": "Blocked - review required before ADW can process"},
+      {"name": "adw:in-progress", "color": "d946ef", "description": "ADW workflow actively processing - remove to re-trigger"}
+    ],
+    "shutdown": [
+      {"name": "adw:shutdown", "color": "4b5563", "description": "Remote workflow shutdown requested"},
+      {"name": "adw:shutdown-system", "color": "1f2937", "description": "System-level shutdown - terminates all workflows and exits cron"}
+    ],
+    "auto_mode": [
+      {"name": "auto:enabled", "color": "f59e0b", "description": "Auto-mode eligible - scheduler will dispatch this issue"},
+      {"name": "auto:pause", "color": "d97706", "description": "Auto-mode paused - operator signal for paused issues"}
+    ],
+    "pr_request": [
+      {"name": "request:review", "color": "0ea5e9", "description": "Request AI code review (no code changes)"},
+      {"name": "request:fix", "color": "f97316", "description": "Request AI to implement review suggestions"},
+      {"name": "request:plan-fix", "color": "fb923c", "description": "Request AI to apply follow-up fixes for planner output"}
+    ],
+    "branch": [
+      {"name": "branch:develop", "color": "0e8a16", "description": "Target develop branch for integration workflows"},
+      {"name": "branch:epic", "color": "1d76db", "description": "Target epic branch for coordinated efforts"},
+      {"name": "branch:feature", "color": "5319e7", "description": "Target feature branch for focused changes"}
+    ],
+    "tier": [
+      {"name": "tier:develop", "color": "0e8a16", "description": "PR targets develop branch"},
+      {"name": "tier:epic", "color": "1d76db", "description": "PR targets epic branch"},
+      {"name": "tier:feature", "color": "5319e7", "description": "PR targets feature branch"}
+    ]
+  }
+}

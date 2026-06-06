@@ -1,0 +1,78 @@
+{
+  "$schema": "issue_template",
+  "plan_type": "maintenance",
+  "issue_sections": [
+    {
+      "name": "description",
+      "role": "description",
+      "display_name": "Description",
+      "purpose": "Summarize the maintenance objective, operator impact, and expected reliability gain.",
+      "format": "markdown",
+      "example": "- Objective: harden wrapper validation for malformed payloads\n- Impact: deterministic operator diagnostics"
+    },
+    {
+      "name": "context",
+      "role": "description",
+      "display_name": "Context",
+      "purpose": "Capture incident history, constraints, and operational background for maintainers.",
+      "format": "markdown"
+    },
+    {
+      "name": "scope",
+      "role": "scope",
+      "display_name": "Scope",
+      "purpose": "Define touched files, protected boundaries, and explicit non-goals for this maintenance slice.",
+      "format": "markdown"
+    },
+    {
+      "name": "acceptance_criteria",
+      "role": "scope",
+      "display_name": "Acceptance Criteria",
+      "purpose": "List deterministic completion checks for maintenance outcomes and compatibility.",
+      "format": "checklist"
+    },
+    {
+      "name": "technical_notes",
+      "role": "technical",
+      "display_name": "Technical Notes",
+      "purpose": "Record implementation choices, migration considerations, and fail-closed behavior.",
+      "format": "markdown"
+    },
+    {
+      "name": "testing_strategy",
+      "role": "testing",
+      "display_name": "Testing Strategy",
+      "purpose": "Specify fast validation commands and targeted tests that protect regressions.",
+      "format": "markdown",
+      "example": "pytest adw/plans/tests/issue_template_test.py -v"
+    },
+    {
+      "name": "edge_cases",
+      "role": "technical",
+      "display_name": "Edge Cases",
+      "purpose": "Enumerate malformed input, fallback, and error-reporting edge conditions.",
+      "format": "markdown"
+    },
+    {
+      "name": "example_usage",
+      "role": "technical",
+      "display_name": "Example Usage",
+      "purpose": "Provide concise operator-facing examples that clarify expected behavior.",
+      "format": "markdown"
+    },
+    {
+      "name": "references",
+      "role": "references",
+      "display_name": "References",
+      "purpose": "Link runbooks, issues, and source files needed for maintenance execution.",
+      "format": "markdown"
+    }
+  ],
+  "review_pipeline": [
+    "description",
+    "scope",
+    "technical",
+    "testing",
+    "completeness"
+  ]
+}

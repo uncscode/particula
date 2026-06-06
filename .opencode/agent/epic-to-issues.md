@@ -1,6 +1,8 @@
 ---
+
 description: >-
-  Subagent that reads an epic plan and its child feature plans, then creates
+  Subagent that resolves an epic plan and its child feature plans via adw_plans,
+  then creates
   type:generate GitHub issues for each feature directly via platform_operations.
   Use this agent when:
   - You have an epic plan with child feature tracks and need to spawn generate issues
@@ -18,31 +20,34 @@ description: >-
   - "Dry run: show what issues would be created for E3"
   - "Create generate issues for E5, skip E5-F1 (already shipped)"
 mode: subagent
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: false
-  adw_issues_spec: false
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: true
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: false
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: deny
+  adw_plans: allow
+  adw_issues_spec: deny
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: allow
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: deny
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Epic-to-Issues Subagent
@@ -53,7 +58,7 @@ spawns implementation issues for that feature's phases.
 
 # Core Mission
 
-Read an epic plan and its child feature plans, build dependency-aware
+Read an epic plan and its child feature plans through `adw_plans`, build dependency-aware
 `type:generate` issues from a fixed template, and create them via
 `platform_operations create-issue` in dependency order. Optionally preview
 with dry-run mode.
@@ -81,8 +86,8 @@ Create issues for E5 --skip F1,F2
 # Required Reading
 
 Before executing, consult these for context:
-- The epic plan document itself (primary input)
-- Each child feature plan (for phase details and dependencies)
+- The epic plan via `adw_plans show` (primary input)
+- Each child feature plan via `adw_plans show` / `adw_plans list-sections`
 
 # Todo Tracking (Required)
 
@@ -119,29 +124,23 @@ If `epic_id` is missing, report an error and stop.
 
 ## Step 2: Read Epic Plan
 
-Find the epic plan file:
-
-```
-adw-docs/dev-plans/epics/<epic_id>-*.md
-```
-
-Use `ripgrep` file discovery to locate the file:
+Resolve the epic plan via `adw_plans`.
 
 ```python
-ripgrep({"pattern": f"**/{epic_id}-*.md", "path": "adw-docs/dev-plans/epics"})
+adw_plans({"command": "show", "plan_id": epic_id, "json": true})
 ```
 
-Also check the completed directory:
+If richer section content is required, load populated sections:
 
 ```python
-ripgrep({"pattern": f"**/{epic_id}-*.md", "path": "adw-docs/dev-plans/epics/completed"})
+adw_plans({"command": "list-sections", "plan_id": epic_id, "json": true, "populate": true})
 ```
 
-Read the epic plan and extract:
+Read the epic plan payload and extract:
 
 1. **Epic title** from the `# Epic:` heading or first heading
 2. **Feature Tracks table** from Section 4 (Child Plans / Feature Tracks)
-   - Parse each row to get feature ID, name, status, and relative path
+   - Parse each row to get feature ID, name, status, and any referenced section/path metadata
 3. **Dependency Map** from Section 5 (shows execution waves and blockers)
 4. **Maintenance Tracks** (if any) from Section 4.2
 
@@ -150,28 +149,23 @@ requested. Apply `--feature` filter and `--skip` list.
 
 ## Step 3: Read Feature Plans
 
-For each feature to process, find and read its feature plan:
+For each feature or maintenance track to process, resolve the plan ID directly:
 
-```
-adw-docs/dev-plans/features/<epic_id>-F<n>-*.md
-```
-
-For maintenance tracks:
-
-```
-adw-docs/dev-plans/maintenance/<epic_id>-M<n>-*.md
+```python
+adw_plans({"command": "show", "plan_id": feature_id, "json": true})
+adw_plans({"command": "list-sections", "plan_id": feature_id, "json": true, "populate": true})
 ```
 
 From each feature plan, extract:
 
-1. **Feature title** from the heading
-2. **Feature ID** from the frontmatter (e.g., `E13-F2`)
+1. **Feature title** from structured plan metadata
+2. **Feature ID** from structured plan metadata (e.g., `E13-F2`)
 3. **Phase Checklist** - parse entries in format:
    ```
    - [ ] **E13-F2-P1:** Phase description
    ```
    Extract: phase ID, description, size (if noted), status
-4. **Dependencies** from the Related Features line or Dependencies section
+4. **Dependencies** from structured metadata or Dependencies section
 5. **Files to Create/Modify** section (list of affected modules)
 6. **Testing Strategy** section
 7. **Parent Epic** reference
@@ -194,7 +188,7 @@ Extract:
 
 Construct feature dependencies from:
 
-1. **Explicit dependencies** in each feature plan's frontmatter (`Related Features` line) and Dependencies section
+1. **Explicit dependencies** in each feature plan's structured metadata and Dependencies section
 2. **Epic's Dependency Map** (Section 5) showing waves and blockers
 3. **Epic's execution order** for sequential fallback
 
@@ -289,6 +283,15 @@ parsed feature plan data.
 [{feature_id}] Generate implementation issues for {feature_title}
 ```
 
+**Title prefix contract (plan-linked only):**
+- For plan-linked feature generate issues, require token-at-start format
+  `[{feature_id}] {rest_of_title}` with the token start at index 0.
+- Canonical issue titles for this agent are `[{feature_id}] Generate implementation issues for {feature_title}`.
+- Keep this contract compatible with `parse_title_prefix()` which assumes the
+  bracketed token is anchored at index 0.
+- This contract is scoped to plan-linked generation and does not globally constrain
+  non-plan-linked issue titles in other workflows.
+
 **Body template:**
 
 ````markdown
@@ -304,7 +307,7 @@ Generate implementation issues for feature **{feature_id}: {feature_title}**.
 
 ## Feature Plan
 
-**Document:** `{feature_plan_path}`
+**Plan ID:** `{feature_id}`
 
 **Parent Epic:** {epic_id}: {epic_title}
 
@@ -324,16 +327,17 @@ Generate implementation issues for feature **{feature_id}: {feature_title}**.
 ## ADW Instructions
 
 When processing this issue:
-1. Read the feature plan document: `{feature_plan_path}`
-2. Read the parent epic for context: `{epic_plan_path}`
-3. For each phase in the Phase Checklist ({phase_range}), create an implementation issue with:
+1. Resolve the feature plan via `adw_plans show {feature_id}`
+2. Load feature sections via `adw_plans list-sections {feature_id} --populate` when needed
+3. Resolve the parent epic via `adw_plans show {epic_id}`
+4. For each phase in the Phase Checklist ({phase_range}), create an implementation issue with:
    - Full technical details from the feature plan
    - Specific file paths from the feature plan's scope section
    - Test file paths (co-located in module `tests/` directories)
    - Co-located testing: tests ship with implementation in every phase
    - Coverage target: 80-85% per phase
-4. Set dependency chain: {phase_chain}
-5. Label all phases with `agent`, `blocked`, `type:complete`, `model:default`
+5. Set dependency chain: {phase_chain}
+6. Label all phases with `agent`, `blocked`, `type:complete`, `model:default`
 
 ## Files to Create/Modify
 
@@ -453,8 +457,7 @@ explicitly specifies a different dependency structure.
 
 # See Also
 
-- `adw-docs/dev-plans/epics/` - Epic plan documents
-- `adw-docs/dev-plans/features/` - Feature plan documents
-- `adw-docs/dev-plans/maintenance/` - Maintenance plan documents
+- `adw_plans` - Canonical epic/feature/maintenance plan lookup
+- `plans/` - Structured plan storage managed by `adw_plans`
 - `.opencode/agent/issue-generator.md` - Full multi-review issue pipeline (different use case)
 - `.opencode/agent/adw-issue-creator.md` - Batch issue creator (used by issue-generator)

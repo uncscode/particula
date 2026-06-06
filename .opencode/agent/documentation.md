@@ -1,4 +1,5 @@
 ---
+
 description: >
   Use this agent to orchestrate comprehensive documentation updates after
   implementation is complete. This primary agent coordinates specialized documentation
@@ -15,31 +16,31 @@ description: >
 
   Invoked by: uv run adw workflow run document <issue-number> --adw-id <id>
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: false
-  run_pytest: false
-  run_linters: true
-  build_mkdocs: true
-  feedback_log: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_spec: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  build_mkdocs: deny
+  feedback_log: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 
@@ -69,38 +70,25 @@ You are running as an **orchestrator** that:
 
 ## Documentation Build Validation
 
-Use the `build_mkdocs` tool to validate MkDocs output when documentation changes may
-affect site builds. Prefer running validation against the isolated worktree when available.
-
-```python
-# Quick build check
-build_mkdocs({})
-
-# Strict build (treat warnings as errors)
-build_mkdocs({"strict": true})
-
-# Validate without producing build artifacts
-build_mkdocs({"validateOnly": true})
-
-# Run inside an isolated worktree
-build_mkdocs({"cwd": worktree_path})
-```
+Do not call MkDocs wrappers directly from this orchestrator. Delegate documentation
+build validation to the `docs-validator` subagent, which is the only agent permitted
+to use `build_mkdocs_validate` (validation-only path).
 
 # Required Reading
 
-- @adw-docs/documentation_guide.md - Documentation standards
-- @adw-docs/docstring_guide.md - Docstring format
-- @adw-docs/architecture_reference.md - Architecture patterns
+- @.opencode/guides/documentation_guide.md - Documentation standards
+- @.opencode/guides/docstring_guide.md - Docstring format
+- @.opencode/guides/architecture_reference.md - Architecture patterns
 
 # Available Subagents
 
 | Subagent | Purpose | Scope |
 |----------|---------|-------|
 | **docstring** | Update Python docstrings | `*.py` files |
-| **docs** | Update general documentation | `adw-docs/*.md`, `README.md`, `docs/*.md` |
-| **docs-feature** | Update all dev-plans documentation | `adw-docs/dev-plans/**/*.md` |
+| **docs** | Update general documentation | `.opencode/guides/*.md`, `README.md`, `docs/*.md` |
+| **plan-update-full** | Update plan section content | `.opencode/plans/sections/**/*.md` via `adw_plans` |
 | **examples** | Create/update examples | `docs/Examples/*.md`, `.py`, `.ipynb` |
-| **architecture** | ADRs and architecture outline | `adw-docs/architecture/*.md` |
+| **architecture** | ADRs and architecture outline | `.opencode/guides/architecture/*.md` |
 | **theory** | Conceptual documentation | `docs/Theory/*.md` |
 | **features** | High-level feature docs | `docs/Features/*.md` |
 | **docs-validator** | Validate links and formatting | All docs (read-only) |
@@ -108,7 +96,7 @@ build_mkdocs({"cwd": worktree_path})
 | **adw-commit** | Commit changes | Git operations |
 | **linter** | Code quality validation | Python files |
 
-**Safety:** Avoid calling `git_operations` with any push command or flags. The `adw-commit` subagent handles commit **and** push on non-protected branches; prefer delegating commit and push to `adw-commit`, and only use direct pushes when a workflow explicitly requires them.
+**Safety:** Use atomic wrappers for git interactions. This orchestrator should use `git_diff` for read-only inspection and delegate all commit/push behavior to `adw-commit`.
 
 # Execution Steps
 
@@ -143,11 +131,11 @@ Extract from `adw_state.json`:
 
 ## Step 3: Move to Worktree
 
-Use `git_operations` to validate repository context (never call push):
+Use `git_diff` to validate repository context:
 
 ```python
-git_operations({"command": "status", "worktree_path": worktree_path, "porcelain": true})
-git_operations({"command": "diff", "worktree_path": worktree_path, "stat": true})
+git_diff({"command": "status", "worktree_path": worktree_path, "porcelain": true})
+git_diff({"command": "diff", "worktree_path": worktree_path, "stat": true})
 ```
 
 Use `branch_name` from `adw_spec` to confirm you are on the expected branch.
@@ -157,7 +145,7 @@ Use `branch_name` from `adw_spec` to confirm you are on the expected branch.
 ### 4.1: Get Git Diff
 
 ```python
-git_diff = git_operations({"command": "diff", "worktree_path": worktree_path, "stat": true})
+git_diff_result = git_diff({"command": "diff", "worktree_path": worktree_path, "stat": true})
 ```
 
 Use the diff output to derive changed files (names and stats).
@@ -176,12 +164,11 @@ From `spec_content`, identify:
 |-------------|---------------------|
 | `.py` files changed | **docstring** |
 | Any code changes | **docs** (README, guides) |
-| `issue_class == /feature` | **docs-feature** |
+| Issue tracked in a plan | **plan-update-full** (update section content) |
 | New user-facing feature | **examples**, **adw-docs-notebook** (for .ipynb) |
 | New module/component | **architecture** |
 | New design pattern | **theory** |
 | Major feature | **features** |
-| Bug fix / deprecation / migration | **docs-feature** (release notes, maintenance plans) |
 | ALWAYS | **docs-validator** |
 | ALWAYS | **adw-commit** |
 
@@ -266,7 +253,7 @@ Arguments: adw_id={adw_id}
 Changes made:
 {summary_of_implementation}
 
-Update README.md, adw-docs/*.md guides, docs/index.md as needed.
+Update README.md, `.opencode/guides/*.md` guides, docs/index.md as needed.
 """,
   "subagent_type": "docs"
 })
@@ -274,28 +261,24 @@ Update README.md, adw-docs/*.md guides, docs/index.md as needed.
 
 **Expected:** `DOCS_UPDATE_COMPLETE`
 
-### 6.3: Docs-Feature Subagent
+### 6.3: Plan Update Full Subagent
 
-**When:** `issue_class == /feature` OR bug fix / deprecation / migration
+**When:** Issue is tracked in a structured plan (has matching phase)
 
 ```python
 task({
-  "description": "Update dev-plans documentation",
-  "prompt": f"""Update adw-docs/dev-plans/ documentation.
+  "description": "Update plan sections",
+  "prompt": f"""Update plan section content for implementation changes.
 
 Arguments: adw_id={adw_id}
 
-Issue class: {issue_class}
-Feature: {issue_title}
-Details: {issue_body}
-
-Update feature docs, epic rollups, maintenance plans, and README index as needed.
+Context: {summary_of_implementation}
 """,
-  "subagent_type": "docs-feature"
+  "subagent_type": "plan-update-full"
 })
 ```
 
-**Expected:** `DOCS_FEATURE_UPDATE_COMPLETE`
+**Expected:** `PLAN_UPDATE_FULL_COMPLETE`
 
 ### 6.4: Examples Subagent
 
@@ -596,9 +579,11 @@ IF .py files changed:
 ALWAYS:
     → docs subagent (README, general guides)
 
-IF issue_class == /feature OR /bug OR deprecation OR migration:
-    → docs-feature subagent (features, epics, maintenance, archive, README)
-    → examples subagent (if user-facing feature)
+IF issue tracked in a plan:
+    → plan-update-full subagent (update section content)
+
+IF user-facing feature:
+    → examples subagent
     → adw-docs-notebook subagent (if interactive tutorial needed)
     → features subagent (if major user-facing feature)
 
@@ -635,11 +620,11 @@ ALWAYS (after all others):
 1. Parse args: `issue_number=456`, `adw_id=xyz789`
 2. Load context: `/feature` issue, new `adw/auth/` module
 3. Analyze: New `.py` files, new module, user-facing feature
-4. Create todos for: docstring, docs, docs-feature, examples, architecture
+4. Create todos for: docstring, docs, plan-update-full, examples, architecture
 5. Invoke subagents:
    - docstring → Updates `adw/auth/operations.py` docstrings
    - docs → Updates README with auth commands
-   - docs-feature → Creates `authentication-system.md`
+   - plan-update-full → Updates plan sections for authentication
    - examples → Creates `authentication-tutorial.ipynb`
    - architecture → Updates outline with auth module
    - docs-validator → Checks 52 links, all valid

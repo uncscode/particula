@@ -242,7 +242,12 @@
               "read",
               "edit",
               "write",
-              "git_operations",
+              "git_diff",
+              "git_stage",
+              "git_commit",
+              "git_branch",
+              "git_merge",
+              "git_worktree",
               "run_linters",
               "run_pytest"
             ]
@@ -283,6 +288,10 @@
           "description": "Name of the workflow definition to inline",
           "minLength": 1,
           "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "condition": {
+          "$ref": "#/definitions/Condition",
+          "description": "Optional condition controlling step execution"
         }
       },
       "additionalProperties": false

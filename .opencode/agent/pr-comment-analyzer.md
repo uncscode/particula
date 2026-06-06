@@ -1,31 +1,35 @@
 ---
+
 description: "Primary agent that analyzes actionable PR review comments and generates an adw-build-compatible implementation plan written to spec_content, skipping issue indirection. Fetches PR comments via platform pr-comments, groups by file/line with reviewer intent, and exits SUCCESS/NO_ACTIONABLE/FAILURE."
 mode: primary
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: true
-  platform: false
-  run_pytest: true
-  run_linters: true
-  get_datetime: true
-  get_version: false
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  platform_pr_read: allow
+  platform: deny
+  run_pytest: deny
+  run_pytest_basic: allow
+  run_linters: allow
+  get_datetime: allow
+  get_version: deny
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # PR Comment Analyzer (direct PR fix)
@@ -54,12 +58,13 @@ tools:
 
 ## Process
 1) **Parse arguments**: extract `pr_number` (required) and optional `prefer_scope`; if missing `pr_number` → FAILURE.
-2) **Fetch all comments**: call `platform_operations` with `pr-comments` command in JSON mode (pass `--prefer-scope` when provided). The response contains **three** top-level keys:
+2) **Fetch all comments**: call `platform_pr_read` with `pr-comments` command in JSON mode (pass `--prefer-scope` when provided). The response contains **three** top-level keys:
    - `response.pr` — PR metadata including `head_branch` (optional)
    - `response.comments` — code review comments (file/line-level)
    - `response.issue_comments` — general PR conversation comments (no file/line info)
-   
+    
    When `actionable_only` is set, only `response.comments` is filtered; `response.issue_comments` is always returned unfiltered.
+   If local git diff inspection is unavailable, stale, or missing PR-context files needed to understand comments, call `platform_pr_read` with `pr-diff --format json` as a read-only fallback to inspect changed files and available patch text.
 3) **Handle empty**: if both `comments` and `issue_comments` are empty → write minimal note ("No actionable comments for PR #<n>") and exit **NO_ACTIONABLE** (no steps/tests). If only `comments` is empty but `issue_comments` has entries, continue — conversation comments may contain actionable requests.
 4) **Group & classify review comments**: filter out resolved comments defensively. Group by `file -> line` (line may be null). Capture reviewer, body. Infer intent heuristic: bug (crash/incorrect/exception), test (add/assert/coverage), refactor (dup/cleanup), doc (comment/docstring), style (format/nit).
 5) **Classify conversation comments**: process `issue_comments` entries (each has `id`, `author.login`, `body`, `createdAt`). Scan body text for actionable requests vs informational notes. Infer intent using the same heuristic categories. Conversation comments lack file/line context, so group them separately under "Conversation Items".
@@ -76,6 +81,7 @@ tools:
 
 ## PR Comment Ingestion
 - Command: `platform pr-comments <PR#> --actionable-only --format json` (+ `--prefer-scope <scope>` when provided).
+- Fallback diff command when local worktree diff context is unavailable/stale: `platform pr-diff <PR#> --format json`.
 - Expected JSON response structure:
   ```json
   {
@@ -165,7 +171,7 @@ tools:
 
 ## Cross-References
 - Related agents: `.opencode/agent/fix-issue-generator.md` (superseded), `.opencode/agent/plan-draft.md`, `.opencode/agent/plan_work_multireview.md`.
-- Feature doc: `adw-docs/dev-plans/features/F18-direct-pr-fix-workflow.md`.
+- Related structured plan: `plans/features/F20.json`.
 - CLI reference: `platform pr-comments --actionable-only --format json [--prefer-scope <scope>]`.
 - JSON response includes `comments` (review) + `issue_comments` (conversation) — see `adw/commands/platform_cli.py:pr_comments_command`.
 

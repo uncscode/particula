@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that runs linters and auto-fixes code quality issues following
   repository conventions. Invoked by primary agents (execute-plan, implementor, etc.)
   to validate code quality before committing.
@@ -10,31 +11,31 @@ description: 'Subagent that runs linters and auto-fixes code quality issues foll
   Linter permissions: - ruff check --fix: ALLOW - ruff format: ALLOW - mypy: ALLOW
   - Read/write code files: ALLOW - Modify linter config: DENY'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Linter Subagent
@@ -208,4 +209,4 @@ Fixes applied: 5
 
 **Permissions:** ✅ Run linters, edit code | ❌ Modify config files
 
-**References:** `adw-docs/linting_guide.md`, `.github/workflows/lint.yml`
+**References:** `.opencode/guides/linting_guide.md`, `.github/workflows/lint.yml`

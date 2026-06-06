@@ -1,4 +1,5 @@
 ---
+
 description: "Use this agent to execute comprehensive test validation. This agent\
   \ should be invoked when:\n- Tests need to be run after implementing changes\n-\
   \ Validation of implementation quality is required\n- Test failures need to be diagnosed\
@@ -10,29 +11,30 @@ description: "Use this agent to execute comprehensive test validation. This agen
   \ and check for failures\"\n\n- User: \"Run tests and fix any failures\"\n  Assistant:\
   \ \"I'm going to use the tester agent to run tests and resolve any failures encountered\""
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  task: true
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: true
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  task: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: allow
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 You are the testing orchestrator responsible for coordinating comprehensive test validation across the repository. You delegate test execution to the `adw-tester` subagent and commit handling to `adw-commit`.
 

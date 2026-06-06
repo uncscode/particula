@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that manages theoretical and conceptual documentation in docs/Theory/.
   Invoked by the documentation primary agent to create and update high-level conceptual
   documentation explaining design patterns, architectural principles, and theoretical
@@ -11,30 +12,31 @@ description: 'Subagent that manages theoretical and conceptual documentation in 
 
   Write permissions: - docs/Theory/*.md: ALLOW - docs/Theory/**/*.md: ALLOW'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Theory Subagent
@@ -74,7 +76,7 @@ task({
 - @docs/Theory/index.md - Theory docs index
 - @docs/Theory/isolated-execution.md - Example theory doc
 - @docs/Theory/state-driven-architecture.md - Example theory doc
-- @adw-docs/documentation_guide.md - Documentation standards
+- @.opencode/guides/documentation_guide.md - Documentation standards
 
 # Write Permissions
 

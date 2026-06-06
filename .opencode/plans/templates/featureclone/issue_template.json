@@ -1,0 +1,138 @@
+{
+  "$schema": "issue_template",
+  "plan_type": "featureclone",
+  "issue_sections": [
+    {
+      "name": "overview",
+      "role": "technical",
+      "display_name": "Overview",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "scope",
+      "role": "scope",
+      "display_name": "Scope",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "infrastructure_reuse",
+      "role": "technical",
+      "display_name": "Infrastructure Reuse",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "phase_details",
+      "role": "technical",
+      "display_name": "Phase Details",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "architecture_design",
+      "role": "technical",
+      "display_name": "Architecture Design",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "implementation_tasks",
+      "role": "technical",
+      "display_name": "Implementation Tasks",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "dependencies",
+      "role": "technical",
+      "display_name": "Dependencies",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "testing_strategy",
+      "role": "testing",
+      "display_name": "Testing Strategy",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "documentation_updates",
+      "role": "technical",
+      "display_name": "Documentation Updates",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "success_criteria",
+      "role": "technical",
+      "display_name": "Success Criteria",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "open_questions",
+      "role": "technical",
+      "display_name": "Open Questions",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "change_log",
+      "role": "technical",
+      "display_name": "Change Log",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    }
+  ],
+  "metadata_fields": {
+    "phase": {
+      "type": "string",
+      "default": null
+    }
+  },
+  "review_pipeline": [
+    "technical",
+    "scope",
+    "testing",
+    "completeness"
+  ]
+}

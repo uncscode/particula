@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "wrappers": [
+    {
+      "name": "adw",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer focused adw_* split wrappers"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": ".opencode/workflow/*.json",
+          "classification": "active"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "git_operations",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer git_diff/git_stage/git_commit/git_branch/git_merge/git_worktree"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": ".opencode/workflow/*.json",
+          "classification": "active"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "run_pytest",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer run_pytest_basic/run_pytest_advanced when updating integrations"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": ".opencode/workflow/*.json",
+          "classification": "active"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "ripgrep",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer find_files/search_content/ripgrep_advanced split wrappers"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "platform_operations",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer platform_* split wrappers"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "run_cmake",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "run_sanitizers",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "validate_notebook",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer validate_notebook_readonly plus explicit convert/sync wrappers where possible"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    },
+    {
+      "name": "build_mkdocs",
+      "status": "exception_approved",
+      "contexts": [
+        {
+          "path_glob": ".opencode/agent/*.md",
+          "classification": "exception_approved",
+          "owner": "E20-F11",
+          "compatibility_window": "until-retirement-gates-met",
+          "replacement_guidance": "Prefer build_mkdocs_validate and build_mkdocs_build split wrappers"
+        },
+        {
+          "path_glob": ".opencode/tools/*.md",
+          "classification": "historical_deprecated"
+        },
+        {
+          "path_glob": "AGENTS.md",
+          "classification": "historical_deprecated"
+        }
+      ]
+    }
+  ]
+}

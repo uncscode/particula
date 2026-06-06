@@ -1,0 +1,22 @@
+{
+  "name": "ship-auto-final",
+  "version": "2.0.0",
+  "description": "Ship-auto-final workflow - prepares final accumulated implementation summary for PR handoff",
+  "description_long": "Builds and persists final accumulation summary context for downstream final PR creation flow",
+  "workflow_type": "complete",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Ship Auto Final Summary",
+      "agent": "shipper-auto-final",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "light",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 1.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

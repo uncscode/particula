@@ -1,0 +1,482 @@
+{
+  "$defs": {
+    "PhaseActuals": {
+      "additionalProperties": false,
+      "description": "Observed execution metrics for a single plan phase.\n\nAttributes:\n    duration_minutes: Measured runtime in minutes.\n    cost_usd: Measured execution cost in USD.\n    tokens_input: Total input token count consumed by the phase.\n    tokens_output: Total output token count produced by the phase.\n    tests_run: Number of tests executed during the phase.\n    tests_failed: Number of executed tests that failed.",
+      "properties": {
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Usd"
+        },
+        "duration_minutes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Minutes"
+        },
+        "tests_failed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tests Failed"
+        },
+        "tests_run": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tests Run"
+        },
+        "tokens_input": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tokens Input"
+        },
+        "tokens_output": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tokens Output"
+        }
+      },
+      "title": "PhaseActuals",
+      "type": "object"
+    },
+    "PhaseEstimates": {
+      "additionalProperties": false,
+      "description": "Estimated execution metrics for a single plan phase.\n\nAttributes:\n    expected_duration_minutes: Expected runtime in minutes when known.\n    expected_cost_usd: Expected execution cost in USD when known.",
+      "properties": {
+        "expected_cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Cost Usd"
+        },
+        "expected_duration_minutes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Duration Minutes"
+        }
+      },
+      "title": "PhaseEstimates",
+      "type": "object"
+    },
+    "PlanPhase": {
+      "additionalProperties": false,
+      "description": "Structured metadata for a single phase within a plan.\n\nAttributes:\n    id: Stable phase identifier (e.g. ``E17-F1-P1``).\n    title: Human-readable phase title.\n    status: Current phase status.\n    size: Relative implementation size.\n    issue_number: Linked issue number when available.\n    start_date: Phase start date (``YYYY-MM-DD``).\n    completion_date: Phase completion date (``YYYY-MM-DD``).\n    estimates: Optional estimate metadata.\n    actuals: Optional observed metadata.\n    notes_ref: Optional git-notes or reference key for detailed notes.\n    depends_on: Optional list of phase IDs this phase depends on.",
+      "properties": {
+        "actuals": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PhaseActuals"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "completion_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completion Date"
+        },
+        "depends_on": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depends On"
+        },
+        "estimates": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PhaseEstimates"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "issue_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Issue Number"
+        },
+        "notes_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes Ref"
+        },
+        "size": {
+          "enum": [
+            "XS",
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL"
+          ],
+          "title": "Size",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Date"
+        },
+        "status": {
+          "enum": [
+            "Not Started",
+            "In Progress",
+            "Blocked",
+            "Shipped",
+            "Cancelled"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "status",
+        "size"
+      ],
+      "title": "PlanPhase",
+      "type": "object"
+    },
+    "PlanTotals": {
+      "additionalProperties": false,
+      "description": "Aggregated metrics computed across all phases in a plan.\n\nAttributes:\n    total_duration_minutes: Total runtime in minutes.\n    total_cost_usd: Total cost in USD.\n    total_tokens_input: Total input token usage.\n    total_tokens_output: Total output token usage.\n    total_tests_run: Total number of tests run.\n    total_tests_failed: Total number of tests failed.\n    phases_total: Total number of phases.\n    phases_shipped: Number of shipped phases.",
+      "properties": {
+        "phases_shipped": {
+          "default": 0,
+          "title": "Phases Shipped",
+          "type": "integer"
+        },
+        "phases_total": {
+          "default": 0,
+          "title": "Phases Total",
+          "type": "integer"
+        },
+        "total_cost_usd": {
+          "default": 0,
+          "title": "Total Cost Usd",
+          "type": "number"
+        },
+        "total_duration_minutes": {
+          "default": 0,
+          "title": "Total Duration Minutes",
+          "type": "integer"
+        },
+        "total_tests_failed": {
+          "default": 0,
+          "title": "Total Tests Failed",
+          "type": "integer"
+        },
+        "total_tests_run": {
+          "default": 0,
+          "title": "Total Tests Run",
+          "type": "integer"
+        },
+        "total_tokens_input": {
+          "default": 0,
+          "title": "Total Tokens Input",
+          "type": "integer"
+        },
+        "total_tokens_output": {
+          "default": 0,
+          "title": "Total Tokens Output",
+          "type": "integer"
+        }
+      },
+      "title": "PlanTotals",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Maintenance plan model with recurring monitoring metadata.\n\nAttributes:\n    type: Discriminator fixed to ``\"maintenance\"``.\n    parent_id: Optional parent epic identifier; inherited shared validation\n        from ``PlanBase`` enforces trimmed non-empty text when provided.\n    phases: Ordered maintenance phases for recurring operational work.\n    totals: Optional aggregate totals persisted for the maintenance plan.\n    review_cadence: Optional recurring review cadence label (for example,\n        ``weekly``); inherited shared validation from ``PlanBase`` enforces\n        trimmed non-empty text when provided.\n    monitoring_signals: Monitoring indicators used to evaluate ongoing\n        health; inherited shared validation from ``PlanBase`` enforces\n        trimmed non-empty entries.",
+  "properties": {
+    "completion_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completion Date"
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Dependencies",
+      "type": "array"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "last_updated": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Updated"
+    },
+    "monitoring_signals": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Monitoring Signals",
+      "type": "array"
+    },
+    "owners": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Owners",
+      "type": "array"
+    },
+    "parent_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Id"
+    },
+    "phases": {
+      "items": {
+        "$ref": "#/$defs/PlanPhase"
+      },
+      "title": "Phases",
+      "type": "array"
+    },
+    "priority": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "Backlog"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "review_cadence": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Review Cadence"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "section_files": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Section Files",
+      "type": "object"
+    },
+    "size": {
+      "enum": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "title": "Size",
+      "type": "string"
+    },
+    "start_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Start Date"
+    },
+    "status": {
+      "enum": [
+        "Draft",
+        "Proposed",
+        "Ready",
+        "In Progress",
+        "Blocked",
+        "Monitoring",
+        "Shipped",
+        "Cancelled",
+        "Superseded"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "target_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Date"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "totals": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlanTotals"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "type": {
+      "const": "maintenance",
+      "default": "maintenance",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "status",
+    "priority",
+    "size"
+  ],
+  "title": "MaintenancePlan",
+  "type": "object"
+}

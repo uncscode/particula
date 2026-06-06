@@ -1,13 +1,16 @@
 ---
-description: >-
-  Primary agent that orchestrates multi-agent code review for PRs/MRs.
 
-  This agent: - Receives PR context (diff, files changed, PR description) -
-  Builds a todo list to track review progress - Dispatches 8 specialized
-  reviewer subagents in parallel - Invokes consolidation-reviewer to merge,
-  dedupe, and rank findings - Invokes feedback-poster to post overview comment +
-  inline PR comments - Produces comprehensive code review covering quality,
-  correctness, performance, security, tests, documentation, and architecture
+description: >-
+  Primary agent that orchestrates multi-agent code review for PRs/MRs and
+  state-only auto-review runs.
+
+  This agent: - Receives review context (diff, files changed, PR description
+  when available) - Builds a todo list to track review progress - Dispatches 8
+  specialized reviewer subagents in parallel - Invokes consolidation-reviewer
+  to merge, dedupe, and rank findings - Invokes review-state-writer to persist
+  review outputs - Invokes feedback-poster only when a PR/MR exists - Produces
+  comprehensive code review covering quality, correctness, performance,
+  security, tests, documentation, and architecture
 
   Invoked by: adw workflow review <PR-number> or manually triggered
 
@@ -15,44 +18,48 @@ description: >-
   Automated: Triggered on new PR via dispatcher - Manual: "@adw-review please
   review this PR"
 mode: primary
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: true
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: true
-  run_pytest: false
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  git_operations: deny
+  platform_issue_read: allow
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Review Orchestrator
 
-Orchestrate comprehensive multi-agent code review for pull requests and merge requests.
+Orchestrate comprehensive multi-agent code review for pull requests, merge requests,
+and no-PR auto workflow slices.
 
 # Input
 
-The input is provided as: `<issue-number> --adw-id <adw-id> --pr-number <pr-number>`
+The input is provided as: `<issue-number> --adw-id <adw-id> [--pr-number <pr-number>]`
 
 - `issue-number`: The originating GitHub issue (positional, first argument)
 - `--adw-id`: ADW workflow identifier (provided by workflow runner)
-- `--pr-number`: The PR/MR number to review (provided by workflow runner)
+- `--pr-number`: Optional PR/MR number to review and post feedback to
 
 input: $ARGUMENTS
 
@@ -63,8 +70,9 @@ Coordinate a multi-agent code review system that:
 2. **Builds a todo list to track review progress**
 3. Dispatches 8 specialized reviewer subagents **in parallel**
 4. Consolidates findings to eliminate duplicates and rank by severity
-5. Posts structured feedback: overview comment + inline PR comments
-6. Produces actionable, high-value review with minimal false positives
+5. Persists review control state (`request_fix`, `review_feedback`, `review_findings`) for downstream workflow gating and fix planning
+6. Posts structured feedback when a PR/MR number is available
+7. Produces actionable, high-value review with minimal false positives
 
 # Multi-Agent Architecture
 
@@ -110,9 +118,9 @@ Coordinate a multi-agent code review system that:
 
 # Required Reading
 
-- @adw-docs/code_style.md - Code conventions (Python & C++)
-- @adw-docs/review_guide.md - Review standards
-- @adw-docs/testing_guide.md - Test quality expectations
+- @.opencode/guides/code_style.md - Code conventions (Python & C++)
+- @.opencode/guides/review_guide.md - Review standards
+- @.opencode/guides/testing_guide.md - Test quality expectations
 
 # Subagents
 
@@ -127,7 +135,8 @@ Coordinate a multi-agent code review system that:
 | `adw-review-documentation` | Documentation quality | Docstrings, type hints, README | Yes |
 | `adw-review-architecture` | Design and structure | Module bounds, APIs, patterns | Yes |
 | `adw-review-consolidation` | Merge and rank findings | Dedupe, filter false positives | Yes |
-| `adw-review-feedback-poster` | Post to PR | Overview + inline comments | Yes |
+| `adw-review-state-writer` | Persist to state | `request_fix`, `review_feedback`, `review_findings` | Yes |
+| `adw-review-feedback-poster` | Post to PR | Overview + inline comments | Only if PR/MR exists |
 
 # Execution Flow
 
@@ -206,7 +215,7 @@ The workflow runner provides `--pr-number` directly, so no state lookup or
 probe-based validation is needed. Parse it from the arguments and use it
 immediately.
 
-**Fetch PR details:**
+**Fetch PR details when `pr_number` is available (sparse call — only required params):**
 ```python
 platform_operations({
   "command": "fetch-issue",
@@ -215,27 +224,118 @@ platform_operations({
 })
 ```
 
-If `--pr-number` is missing from the arguments, abort with:
+**Resolve worktree path from ADW state:**
+```python
+adw_spec({
+  "command": "read",
+  "adw_id": "{adw_id}",
+  "field": "worktree_path"
+})
 ```
-ADW_REVIEW_FAILED: No --pr-number provided in arguments
-```
+
+If `--pr-number` is missing or empty, do not fail. Instead:
+
+- continue with diff-based review using workflow state + worktree context
+- set `pr_title` to `"No PR context available"`
+- skip platform posting later in the flow
+- still persist consolidated review outputs to workflow state
 
 ## Step 2: Analyze Changed Files
 
-Use git operations to get the diff:
+Resolve the worktree path from ADW state first, then use `git_diff` with
+**only the parameters you need** — omit all others. The `base` parameter
+compares against the target branch (typically `main`).
+
+**Resolve base branch and diff target:** Derive the diff base and target from
+the PR context and workflow state.
+
 ```python
-git_operations({
+# Resolution order for base:
+# 1. PR target branch (from platform_operations fetch-issue response)
+# 2. Workflow state target_branch (if available)
+# 3. Fallback: "main"
+base_branch = pr_target_branch or "main"
+
+# Resolution order for target:
+# For accumulate-mode PRs (title starts with "Auto-mode: Merge"):
+#   The PR head branch (e.g. "accumulate/E20-F10") is the actual diff target.
+#   The worktree branch may track main and show an empty diff.
+#   Use "origin/{head_branch}" as the target.
+# For standard PRs:
+#   The worktree branch IS the diff target. Omit target (defaults to HEAD).
+```
+
+**IMPORTANT — Accumulate-mode PRs:** When the PR title indicates an
+accumulate-mode merge (e.g. "Auto-mode: Merge accumulate/E20-F10 into main"),
+the worktree branch may already be at `main` and produce an empty diff.
+Always resolve the PR head branch and use it as the explicit `target`:
+
+```python
+git_diff({
   "command": "diff",
+  "base": "{base_branch}",
+  "target": "origin/{head_branch}",
   "stat": true
 })
 ```
 
-**Categorize files:**
+**Get diffstat (changed file list + line counts) — standard PR:**
+```python
+git_diff({
+  "command": "diff",
+  "base": "{base_branch}",
+  "stat": true
+})
+```
+
+**Get diffstat — accumulate-mode PR (explicit target):**
+```python
+git_diff({
+  "command": "diff",
+  "base": "{base_branch}",
+  "target": "origin/{head_branch}",
+  "stat": true
+})
+```
+
+**Get full diff content (for reviewer prompts):**
+```python
+git_diff({
+  "command": "diff",
+  "base": "{base_branch}"
+})
+# Or with explicit target for accumulate-mode:
+git_diff({
+  "command": "diff",
+  "base": "{base_branch}",
+  "target": "origin/{head_branch}"
+})
+```
+
+**Empty diff fallback:** If the initial diff returns empty, check whether the
+PR is accumulate-mode and retry with the explicit `target` parameter. Fetch the
+remote branch first if needed:
+```python
+git_merge({
+  "command": "fetch",
+  "remote": "origin",
+  "branch": "{head_branch}"
+})
+```
+
+**IMPORTANT — Sparse call rule:** Only include parameters that are meaningful.
+Do NOT pass empty strings, dummy values like `"x"`, `false` defaults, or empty
+arrays for optional parameters. The tool treats omitted optional fields as
+absent. Passing junk values (e.g. `source: "x"`, `branch: "x"`) causes
+failures.
+
+**Categorize files from the diffstat output:**
 - **C++ files**: `.cpp`, `.hpp`, `.h`, `.cc`, `.cxx`, `.cu`, `.cuh`
 - **Python files**: `.py`
 - **Other**: Config, docs, etc. (quality review only)
 
-**Extract diff content** for each changed file using `read` tool.
+**Extract diff content** for each changed file using `read` tool from the
+worktree path, or use the full diff output from the diff call above.
 
 ## Step 3: Build Todo List
 
@@ -244,17 +344,17 @@ Create a todo list to track review progress:
 ```python
 todowrite({
   "todos": [
-    {"id": "1", "content": "Parse PR context and analyze files", "status": "completed", "priority": "high"},
-    {"id": "2", "content": "Run code-quality reviewer", "status": "pending", "priority": "high"},
-    {"id": "3", "content": "Run correctness reviewer", "status": "pending", "priority": "high"},
-    {"id": "4", "content": "Run cpp-performance reviewer", "status": "pending", "priority": "medium"},
-    {"id": "5", "content": "Run python-performance reviewer", "status": "pending", "priority": "medium"},
-    {"id": "6", "content": "Run security reviewer", "status": "pending", "priority": "high"},
-    {"id": "7", "content": "Run test-coverage reviewer", "status": "pending", "priority": "high"},
-    {"id": "8", "content": "Run documentation reviewer", "status": "pending", "priority": "medium"},
-    {"id": "9", "content": "Run architecture reviewer", "status": "pending", "priority": "high"},
-    {"id": "10", "content": "Consolidate findings", "status": "pending", "priority": "high"},
-    {"id": "11", "content": "Post feedback to PR", "status": "pending", "priority": "high"}
+    {"content": "Parse PR context and analyze files", "status": "completed", "priority": "high"},
+    {"content": "Run code-quality reviewer", "status": "pending", "priority": "high"},
+    {"content": "Run correctness reviewer", "status": "pending", "priority": "high"},
+    {"content": "Run cpp-performance reviewer", "status": "pending", "priority": "medium"},
+    {"content": "Run python-performance reviewer", "status": "pending", "priority": "medium"},
+    {"content": "Run security reviewer", "status": "pending", "priority": "high"},
+    {"content": "Run test-coverage reviewer", "status": "pending", "priority": "high"},
+    {"content": "Run documentation reviewer", "status": "pending", "priority": "medium"},
+    {"content": "Run architecture reviewer", "status": "pending", "priority": "high"},
+    {"content": "Consolidate findings", "status": "pending", "priority": "high"},
+    {"content": "Post feedback to PR", "status": "pending", "priority": "high"}
   ]
 })
 ```
@@ -508,9 +608,52 @@ Architecture Findings:
 
 **Expected output**: Ranked list of findings with duplicates removed and false positives filtered.
 
-## Step 7: Post Feedback
+## Step 7: Persist Review Control State (Fail-Closed)
 
-Post the consolidated review to the PR:
+Immediately after consolidation, persist review outputs to workflow state for
+downstream fix gating and fix planning. This state write always happens, whether
+or not a PR exists.
+
+- Parse structured output from consolidation result. The consolidation subagent
+  must include a deterministic JSON block in its output:
+  ```json
+  {"actionable_issues_found": true, "critical_count": 2, "warning_count": 5, "suggestion_count": 3}
+  ```
+  Extract `actionable_issues_found` from the JSON block to determine
+  `request_fix`. Do **not** rely on plain-text parsing of
+  `Actionable Issues Found: Yes|No`.
+- Invoke `adw-review-state-writer` to make the state contract explicit and reusable.
+- Persist the full `review_findings` payload from consolidation so downstream fix planning
+  does not depend on PR comments or truncated summaries.
+
+```python
+task({
+  "description": "Persist review results to workflow state",
+  "prompt": f"""Persist consolidated review outputs to state.
+
+adw_id={adw_id}
+
+Consolidated Findings:
+{consolidated_findings}
+
+Truncated Feedback:
+{truncated_feedback}
+""",
+  "subagent_type": "adw-review-state-writer"
+})
+```
+
+### Persistence Rules
+
+- `request_fix` is **control-plane critical**. If the state-writer cannot verify it,
+  terminate with `ADW_REVIEW_FAILED`.
+- Never silently continue when `request_fix` persistence fails.
+- `review_feedback` and `review_findings` are still expected on best effort, but the
+  orchestrator should continue once the control-plane gate is safely persisted.
+
+## Step 7.5: Post Feedback When a PR Exists
+
+If `pr_number` is present, post the consolidated review to the PR:
 
 ```python
 task({
@@ -528,6 +671,12 @@ PR Title: {pr_title}
 })
 ```
 
+If `pr_number` is missing or empty:
+
+- skip the feedback-poster subagent
+- report `Feedback Posted: skipped (no PR/MR available)` in the final summary
+- continue successfully because the authoritative review output already lives in state
+
 ## Step 8: Output Completion Signal
 
 ### Success Case
@@ -535,9 +684,10 @@ PR Title: {pr_title}
 ```
 ADW_REVIEW_COMPLETE
 
-PR: #{pr_number} - {pr_title}
+PR: #{pr_number or "(none)"} - {pr_title}
 
 Review Summary:
+- Actionable Issues Found: Yes|No
 - Critical Issues: {count}
 - Warnings: {count}
 - Suggestions: {count}
@@ -553,8 +703,8 @@ Reviewers Invoked:
 - Architecture: {status}
 
 Feedback Posted:
-- Overview comment: {comment_url}
-- Inline comments: {count}
+- Overview comment: {comment_url or "skipped (no PR/MR available)"}
+- Inline comments: {count or 0}
 
 Files Reviewed: {file_count}
 ```
@@ -564,7 +714,7 @@ Files Reviewed: {file_count}
 ```
 ADW_REVIEW_FAILED: {reason}
 
-PR: #{pr_number}
+PR: #{pr_number or "(none)"}
 
 Partial Results:
 {any_available_findings}
@@ -614,7 +764,7 @@ Each reviewer produces findings in this format:
 |----------------|-------------------|
 | `.py` | code-quality, correctness, python-performance, security, test-coverage, documentation, architecture |
 | `.cpp`, `.hpp`, `.h`, `.cc`, `.cu` | code-quality, correctness, cpp-performance, security, test-coverage, documentation, architecture |
-| `.json`, `.yaml`, `.md` | code-quality only |
+| `.json`, `.yaml`, `.md` | code-quality, documentation |
 
 # Error Handling
 
@@ -630,10 +780,25 @@ Each reviewer produces findings in this format:
 
 ## Minimum Review Quorum
 
+Quorum rules are conditional on the change type:
+
+### Code changes (`.py`, `.cpp`, `.hpp`, etc.)
 A review is considered valid if:
 - At least 5 of 8 required reviewers complete successfully
 - Both correctness AND security reviewers complete
 - Consolidation completes
+
+### Docs/config-only changes (`.json`, `.yaml`, `.md` only)
+A review is considered valid if:
+- code-quality reviewer completes
+- documentation reviewer completes (if invoked)
+- Consolidation completes
+
+Correctness and security reviewers are not mandatory for non-executable changes.
+
+### Mixed changes
+If a diff contains both code and docs/config files, use the **code changes**
+quorum (the stricter policy).
 
 If quorum not met, report partial review with clear indication of what's missing.
 

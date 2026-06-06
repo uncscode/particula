@@ -1,4 +1,5 @@
 ---
+
 description: 'Primary agent that refines implementation after the initial build step.
   
   Executes a diff-versus-spec refinement pass: inspects the uncommitted changes
@@ -20,32 +21,33 @@ description: 'Primary agent that refines implementation after the initial build 
 
   Invoked by: adw workflow run build-refine <issue-number> --adw-id <id>'
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  refactor_astgrep: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: true
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  build_mkdocs: true
-  platform_operations: false
-  run_pytest: true
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  refactor_astgrep: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: allow
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  build_mkdocs: deny
+  platform_operations: deny
+  run_pytest: allow
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Build Refine Agent
@@ -83,10 +85,10 @@ You are running in **completely autonomous mode** with:
 
 # Required Reading
 
-- @adw-docs/code_style.md - Coding conventions
-- @adw-docs/testing_guide.md - Testing framework, patterns, and **test duration tiers**
-- @adw-docs/linting_guide.md - Linting tools and auto-fix patterns
-- @adw-docs/architecture_reference.md - Architecture patterns
+- @.opencode/guides/code_style.md - Coding conventions
+- @.opencode/guides/testing_guide.md - Testing framework, patterns, and **test duration tiers**
+- @.opencode/guides/linting_guide.md - Linting tools and auto-fix patterns
+- @.opencode/guides/architecture_reference.md - Architecture patterns
 
 # Subagents
 

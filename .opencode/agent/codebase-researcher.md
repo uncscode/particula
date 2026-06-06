@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that researches the codebase to gather context for planning
   and review. Produces structured context with code snippets, file paths, and line
   numbers that other agents can use for quick reference.
@@ -10,31 +11,32 @@ description: 'Subagent that researches the codebase to gather context for planni
 
   Invoked by: plan_work_multireview primary agent or reviewer subagents'
 mode: subagent
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: allow
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Codebase Researcher Subagent
@@ -84,8 +86,41 @@ Research Focus:
 
 # Required Reading
 
-- @adw-docs/architecture_reference.md - Architecture overview
-- @adw-docs/code_style.md - Code conventions
+- @.opencode/guides/architecture_reference.md - Architecture overview
+- @.opencode/guides/code_style.md - Code conventions
+
+# Git Notes Read-Only Policy (for prior-design context)
+
+Allowed commands (contract-enforced): `notes-blame`, `log`, `show`
+
+Forbidden commands:
+- `add`
+- `restore`
+- `merge`
+- `rebase`
+- `checkout`
+- `commit`
+- `push`
+- `push-force-with-lease`
+- `reset`
+- `accumulate`
+- `sync`
+- `fetch`
+- `worktree-remove`
+
+Use `notes-blame` only on key issue-relevant files, not every scanned file.
+Prefer targeted file lookups with line-range selectors to keep history checks bounded.
+
+Path contract for `notes-blame`:
+- prefer repo-relative paths
+- normalize under `worktree_path`
+- reject out-of-worktree targets
+
+Notes behavior requirements:
+- If no notes exist for a file, continue normal research flow.
+- If a notes lookup fails for any reason, continue normally and rely on code/issue evidence.
+- notes are supplementary context only and never a required precondition.
+- When notes provide useful historical intent, integrate it into the existing sections.
 
 # Process
 
