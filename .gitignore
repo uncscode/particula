@@ -170,3 +170,4 @@ trees/
 # ADW (AI Developer Workflow) generated files
 logs/
 .opencode.backup.*/
+adforge_local/
