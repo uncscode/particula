@@ -23,6 +23,7 @@ from particula.gpu.properties.particle_properties import (  # noqa: E402
     partial_pressure_delta_wp,
     vapor_transition_correction_wp,
 )
+from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
 from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
     get_aerodynamic_mobility,
 )
@@ -245,7 +246,7 @@ def _partial_pressure_delta_kernel(
     )
 
 
-@pytest.fixture(params=["cpu"] + (["cuda"] if wp.is_cuda_available() else []))
+@pytest.fixture(params=warp_devices(wp))
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param

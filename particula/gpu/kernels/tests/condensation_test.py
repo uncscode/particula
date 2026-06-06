@@ -37,6 +37,10 @@ from particula.gpu.kernels.condensation import (  # noqa: E402
     _validate_species_array,
     condensation_step_gpu,
 )
+from particula.gpu.tests.cuda_availability import (  # noqa: E402
+    cuda_available,
+    warp_devices,
+)
 from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
     get_aerodynamic_mobility,
@@ -63,7 +67,7 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
 from particula.util import constants  # noqa: E402
 
 
-@pytest.fixture(params=["cpu"] + (["cuda"] if wp.is_cuda_available() else []))
+@pytest.fixture(params=warp_devices(wp))
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
@@ -529,7 +533,7 @@ def test_validate_species_array_rejects_device_mismatch(device: str) -> None:
     """Validation helper rejects arrays on a different device."""
     array = wp.zeros(2, dtype=wp.float64, device=device)
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
     with pytest.raises(ValueError, match="device does not match particle"):
         _validate_species_array(
@@ -558,7 +562,7 @@ def test_validate_mass_transfer_buffer_rejects_device(device: str) -> None:
     """Validation helper rejects mass transfer buffers on wrong device."""
     buffer = wp.zeros((1, 2, 2), dtype=wp.float64, device=device)
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
     with pytest.raises(ValueError, match="buffer device does not match"):
         _validate_mass_transfer_buffer(
@@ -726,7 +730,7 @@ def test_condensation_step_gpu_rejects_gas_device_mismatch(
     )
 
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_gas.molar_mass = wp.zeros(2, dtype=wp.float64, device=wrong_device)
@@ -756,7 +760,7 @@ def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
     )
 
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_particles.concentration = wp.zeros(
@@ -793,7 +797,7 @@ def test_condensation_step_gpu_rejects_particle_density_device_mismatch(
     )
 
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_particles.density = wp.zeros(2, dtype=wp.float64, device=wrong_device)
@@ -823,7 +827,7 @@ def test_condensation_step_gpu_rejects_gas_concentration_device_mismatch(
     )
 
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_gas.concentration = wp.zeros(
@@ -857,7 +861,7 @@ def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
     )
 
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_gas.vapor_pressure = wp.zeros(

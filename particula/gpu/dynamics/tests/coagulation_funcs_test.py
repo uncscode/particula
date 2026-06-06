@@ -31,6 +31,7 @@ from particula.gpu.properties.particle_properties import (  # noqa: E402
     knudsen_number_wp,
     mean_thermal_speed_wp,
 )
+from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
 from particula.util.constants import (  # noqa: E402
     BOLTZMANN_CONSTANT,
     GAS_CONSTANT,
@@ -245,7 +246,7 @@ def _brownian_chain_kernel(
     )
 
 
-@pytest.fixture(params=["cpu"] + (["cuda"] if wp.is_cuda_available() else []))
+@pytest.fixture(params=warp_devices(wp))
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
