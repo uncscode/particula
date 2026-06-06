@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "theme": "opencode",
   "autoupdate": false,
    "tools": {
     "grep": false,
@@ -105,5 +106,11 @@
     "./README.md",
     "./AGENTS.md"
   ],
-  "share": "disabled"
+  "share": "disabled",
+  "tui": {
+    "scroll_speed": 1,
+    "scroll_acceleration": {
+      "enabled": true
+    }
+  }
 }
