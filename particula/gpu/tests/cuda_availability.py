@@ -11,7 +11,7 @@ def cuda_available(wp: Any) -> bool:
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
-            message="Due to '_pack_', the 'APICLaunchParamRecord' Structure.*",
+            message="Due to '_pack_'.*",
             category=DeprecationWarning,
         )
         return bool(wp.is_cuda_available())
