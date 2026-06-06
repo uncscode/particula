@@ -26,6 +26,7 @@ from particula.gpu.properties.gas_properties import (  # noqa: E402
     molecule_mean_free_path_wp,
     partial_pressure_wp,
 )
+from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
 from particula.util.constants import (  # noqa: E402
     GAS_CONSTANT,
     REF_TEMPERATURE_STP,
@@ -115,7 +116,7 @@ def _partial_pressure_kernel(
     )
 
 
-@pytest.fixture(params=["cpu"] + (["cuda"] if wp.is_cuda_available() else []))
+@pytest.fixture(params=warp_devices(wp))
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param

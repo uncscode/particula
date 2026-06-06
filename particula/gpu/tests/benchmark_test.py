@@ -41,7 +41,9 @@ if not _benchmark_enabled():
 
 wp = pytest.importorskip("warp", reason="warp required for GPU benchmarks")
 
-if not wp.is_cuda_available():
+from particula.gpu.tests.cuda_availability import cuda_available  # noqa: E402
+
+if not cuda_available(wp):
     pytest.skip("CUDA not available", allow_module_level=True)
 
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
@@ -207,7 +209,7 @@ def _skip_if_no_cuda() -> None:
     Raises:
         pytest.SkipTest: When a CUDA device is not present.
     """
-    if not wp.is_cuda_available():
+    if not cuda_available(wp):
         pytest.skip("CUDA not available")
 
 

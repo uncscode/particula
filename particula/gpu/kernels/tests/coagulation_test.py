@@ -57,6 +57,10 @@ from particula.gpu.properties.particle_properties import (  # noqa: E402
     knudsen_number_wp,
     mean_thermal_speed_wp,
 )
+from particula.gpu.tests.cuda_availability import (  # noqa: E402
+    cuda_available,
+    warp_devices,
+)
 
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
@@ -66,7 +70,7 @@ from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.util import constants  # noqa: E402
 
 
-@pytest.fixture(params=["cpu"] + (["cuda"] if wp.is_cuda_available() else []))
+@pytest.fixture(params=warp_devices(wp))
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
@@ -640,7 +644,7 @@ def test_coagulation_validation_rejects_bad_shapes(device: str) -> None:
 def test_coagulation_validation_rejects_device_mismatch(device: str) -> None:
     """Validation helpers reject device mismatches."""
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
@@ -683,7 +687,7 @@ def test_coagulation_validate_device_arrays(device: str) -> None:
     _validate_device_arrays(gpu_particles, gpu_particles.masses.device)
 
     wrong_device = "cpu" if device == "cuda" else "cuda"
-    if wrong_device == "cuda" and not wp.is_cuda_available():
+    if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_particles.volume = wp.zeros((1,), dtype=wp.float64, device=wrong_device)
