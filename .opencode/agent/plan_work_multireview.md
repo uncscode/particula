@@ -1,4 +1,5 @@
 ---
+
 description: >
   Orchestrator agent that coordinates the multi-review planning pipeline.
   Invokes subagents sequentially and tracks progress via todolist.
@@ -20,30 +21,32 @@ description: >
 
   Workspace created by CLI before agent execution.
 mode: primary
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: true
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Plan-Work Multi-Review Orchestrator

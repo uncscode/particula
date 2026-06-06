@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that manages practical examples and tutorials in docs/Examples/.
   Invoked by the documentation primary agent to create and maintain working examples,
   tutorials, and Jupyter notebooks for ADW features.
@@ -12,30 +13,31 @@ description: 'Subagent that manages practical examples and tutorials in docs/Exa
   Write permissions: - docs/Examples/*.md: ALLOW - docs/Examples/**/*.py: ALLOW -
   docs/Examples/**/*.ipynb: ALLOW (preferred for interactive examples)'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Examples Subagent
@@ -78,7 +80,7 @@ task({
 # Required Reading
 
 - @docs/Examples/index.md - Examples index and structure
-- @adw-docs/documentation_guide.md - Documentation standards
+- @.opencode/guides/documentation_guide.md - Documentation standards
 - @docs/Examples/workflows/basic-workflow.md - Example of good tutorial
 
 # Write Permissions
@@ -282,9 +284,9 @@ if __name__ == "__main__":
 
 ## Next Steps
 
-- Learn about [Development Plan Features](../../adw-docs/dev-plans/README.md#feature-plans)
-- Read the [API Reference](../API/{module}.md)
-- See the [Architecture Guide](../../adw-docs/architecture/architecture_guide.md)
+- Learn about [Structured Plans](../../docs/Examples/setup/cli-reference.md#structured-plans)
+- Read the [Workflow Reference](../../docs/Examples/setup/workflow-reference.md)
+- See the [Architecture Reference](../guides/architecture_reference.md)
 
 ## See Also
 
@@ -643,7 +645,7 @@ Index updated: docs/Examples/index.md (+2 entries)
 - Check markdown links
 - Include prerequisites and expected output
 
-**References:** `docs/Examples/index.md`, `adw-docs/documentation_guide.md`
+**References:** `docs/Examples/index.md`, `.opencode/guides/documentation_guide.md`
 
 # Related Subagents
 

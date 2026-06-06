@@ -1,4 +1,5 @@
 ---
+
 description: >-
   Subagent that executes test suites, analyzes failures, and fixes test issues.
   Invoked by the tester primary agent after implementation changes.
@@ -17,27 +18,29 @@ description: >-
   - Scoped testing: run tests for a specific module or file
   - Worktree context: run tests inside an ADW worktree
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: true
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: allow
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Tester Subagent
@@ -65,7 +68,7 @@ The ADW workflow maintains metadata in `agents/{adw_id}/`:
 
 # Testing Guide Reference
 
-**IMPORTANT**: Before executing tests, read `adw-docs/testing_guide.md` to understand:
+**IMPORTANT**: Before executing tests, read `.opencode/guides/testing_guide.md` to understand:
 - Test framework name and version
 - Test discovery patterns and file naming conventions
 - Test execution commands and options
@@ -269,7 +272,7 @@ Categorize each failure as:
 
 ### Step 2.2: Create Prioritized Fix Checklist
 
-- Read `adw-docs/testing_guide.md` to understand test framework, commands, and conventions
+- Read `.opencode/guides/testing_guide.md` to understand test framework, commands, and conventions
 
 Maintain a prioritized fix checklist in your response (no tool call), for example:
 
@@ -436,7 +439,7 @@ Unrelated failures (not blocking):
 
 # Decision Making
 
-- If test framework is unclear, check `adw-docs/testing_guide.md` first
+- If test framework is unclear, check `.opencode/guides/testing_guide.md` first
 - If unsure about expected behavior, analyze the test assertions
 - If fix approach is ambiguous, choose the minimal change that addresses the error
 - If multiple tests fail, fix spec-related ones first, then attempt unrelated ones

@@ -1,12 +1,13 @@
 ---
+
 description: >-
   Use this agent to maintain ADW templates by syncing changes from live files
   back into template files. This agent manages TWO maintenance workflows:
-  1. adw-docs/ → adw/templates/docs_stubs/*/adw-docs/ (documentation scaffolds)
+  1. .opencode/guides/ → adw/templates/docs_stubs/*/.opencode/guides/ (documentation scaffolds)
   2. .opencode/ refreshed via `adw setup pull-opencode` (OpenCode configuration)
   
   This agent should be invoked when:
-  - Live documentation in adw-docs/ has been updated and templates need syncing
+  - Live documentation in `.opencode/guides/` has been updated and templates need syncing
   - OpenCode configuration in .opencode/ has changed (agents, commands, workflows)
   - New files have been added that need template versions
   - Files have been moved to legacy/ folders and templates need restructuring
@@ -29,31 +30,31 @@ description: >-
   - User: "Validate that all template placeholders are defined"
     Assistant: "I'll run adw setup template validate to check placeholder coverage."
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: true
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-
-  workflow_builder: false
-  git_operations: true
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: allow
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: allow
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Setup Maintainer Agent
@@ -68,18 +69,17 @@ Maintain the bidirectional sync between live files and their template counterpar
 
 | Live Location | Template Location | Content Type |
 |---------------|-------------------|--------------|
-| `adw-docs/` | `adw/templates/docs_stubs/*/adw-docs/` | Documentation scaffolds (tokenized with `{{PLACEHOLDERS}}`) |
+| `.opencode/guides/` | `adw/templates/docs_stubs/*/.opencode/guides/` | Documentation scaffolds (tokenized with `{{PLACEHOLDERS}}`) |
 | `.opencode/` | _(managed via `adw setup pull-opencode`)_ | OpenCode configuration (agents, commands, workflows) |
 
 ### Detailed Structure
 
-**Documentation (`adw-docs/` → `adw/templates/docs_stubs/*/adw-docs/`):**
-- `adw-docs/*.md` → `adw/templates/docs_stubs/common/adw-docs/*.md`
-- `adw-docs/agents/*.md` → `adw/templates/docs_stubs/common/adw-docs/agents/*.md`
-- `adw-docs/architecture/*.md` → `adw/templates/docs_stubs/common/adw-docs/architecture/*.md`
-- `adw-docs/architecture/decisions/*.md` → `adw/templates/docs_stubs/common/adw-docs/architecture/decisions/*.md`
-- `adw-docs/dev-plans/**/*.md` → `adw/templates/docs_stubs/common/adw-docs/dev-plans/**/*.md`
-- `adw-docs/security/*.md` → `adw/templates/docs_stubs/common/adw-docs/security/*.md`
+**Documentation (`.opencode/guides/` → `adw/templates/docs_stubs/*/.opencode/guides/`):**
+- `.opencode/guides/*.md` → `adw/templates/docs_stubs/common/.opencode/guides/*.md`
+- `.opencode/guides/agents/*.md` → `adw/templates/docs_stubs/common/.opencode/guides/agents/*.md`
+- `.opencode/guides/architecture/*.md` → `adw/templates/docs_stubs/common/.opencode/guides/architecture/*.md`
+- `.opencode/guides/architecture/decisions/*.md` → `adw/templates/docs_stubs/common/.opencode/guides/architecture/decisions/*.md`
+- `.opencode/guides/security/*.md` → `adw/templates/docs_stubs/common/.opencode/guides/security/*.md`
 
 **OpenCode Configuration (`.opencode/` managed in place):**
 - `.opencode/` is refreshed via `adw setup pull-opencode`
@@ -89,7 +89,7 @@ Maintain the bidirectional sync between live files and their template counterpar
 
 # When to Use This Agent
 
-- After updating documentation in `adw-docs/`
+- After updating documentation in `.opencode/guides/`
 - After updating OpenCode configuration in `.opencode/`
 - When adding new documentation files that need templates
 - When adding, modifying, or deprecating agent files
@@ -103,13 +103,13 @@ Maintain the bidirectional sync between live files and their template counterpar
 This agent runs **inside the ADW repository** where templates are maintained. It requires:
 - Manifest mode set to `live` for extraction operations
 - Access to all tracked folder pairs:
-  - `adw-docs/` → `adw/templates/docs_stubs/*/adw-docs/`
+  - `.opencode/guides/` → `adw/templates/docs_stubs/*/.opencode/guides/`
   - `.opencode/` refreshed via `adw setup pull-opencode`
 
 # Required Reading
 
 Before starting, consult:
-- `adw-docs/setup_guide.md` - Template synchronization section
+- `.opencode/guides/setup_guide.md` - Template synchronization section
 - `adw/templates/keyword_manifest.yaml` - Current keyword definitions
 - `adw/templates/README.md` - Template maintenance workflow
 
@@ -203,19 +203,19 @@ Perform manual sync when:
 
 ```python
 # List live docs files
-ripgrep({"pattern": "**/*", "path": "adw-docs"})
-ripgrep({"pattern": "**/*", "path": "adw-docs/agents"})
+ripgrep({"pattern": "**/*", "path": ".opencode/guides"})
+ripgrep({"pattern": "**/*", "path": ".opencode/guides/agents"})
 
 # List docs stub files
-ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/adw-docs"})
-ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/adw-docs/agents"})
+ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/.opencode/guides"})
+ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/.opencode/guides/agents"})
 ```
 
 ### Step 2: Identify Discrepancies
 
 Look for:
-- **Files in docs stubs root that should only be in agents/**: If a file exists in `adw-docs/agents/` but also exists in `adw/templates/docs_stubs/common/adw-docs/` (root), the root copy should be removed
-- **Missing agent docs in stubs**: If a file exists in `adw-docs/agents/` but not in `adw/templates/docs_stubs/common/adw-docs/agents/`
+- **Files in docs stubs root that should only be in agents/**: If a file exists in `.opencode/guides/agents/` but also exists in `adw/templates/docs_stubs/common/.opencode/guides/` (root), the root copy should be removed
+- **Missing agent docs in stubs**: If a file exists in `.opencode/guides/agents/` but not in `adw/templates/docs_stubs/common/.opencode/guides/agents/`
 - **Extra files in templates**: Files that exist in templates but not in live (may be intentionally removed)
 - **Missing new files**: Files added to live that don't have template versions yet
 
@@ -223,20 +223,20 @@ Look for:
 
 **Move file from docs stub root to archive:**
 ```python
-move({"source": "adw/templates/docs_stubs/common/adw-docs/old-guide.md", "destination": "", "trash": true})
+move({"source": "adw/templates/docs_stubs/common/.opencode/guides/old-guide.md", "destination": "", "trash": true})
 ```
 
 **Copy missing docs file to stubs (after reading from live):**
 ```python
 # Read the live file first
-read({"filePath": "adw-docs/{missing_doc}.md"})
+read({"filePath": ".opencode/guides/{missing_doc}.md"})
 # Then write to docs stubs location
-write({"filePath": "adw/templates/docs_stubs/common/adw-docs/{missing_doc}.md", "content": "..."})
+write({"filePath": "adw/templates/docs_stubs/common/.opencode/guides/{missing_doc}.md", "content": "..."})
 ```
 
 **Remove orphaned docs stub file:**
 ```python
-move({"source": "adw/templates/docs_stubs/common/adw-docs/removed-guide.md", "destination": "", "trash": true})
+move({"source": "adw/templates/docs_stubs/common/.opencode/guides/removed-guide.md", "destination": "", "trash": true})
 ```
 
 ### Step 4: Verify Sync
@@ -246,16 +246,16 @@ After manual changes, verify both directories match:
 ```python
 # Should show expected structures
 ripgrep({"pattern": "**/*", "path": ".opencode/agent"})
-ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/adw-docs"})
+ripgrep({"pattern": "**/*", "path": "adw/templates/docs_stubs/common/.opencode/guides"})
 ```
 
 ## Common Structural Issues
 
 | Issue | Live Location | Templates Location | Fix |
 |-------|---------------|-------------------|-----|
-| Deprecated doc in wrong location | `adw-docs/<deprecated_doc>.md` | `adw/templates/docs_stubs/common/adw-docs/<deprecated_doc>.md` | Move to trash |
-| Missing doc stub | `adw-docs/<new_doc>.md` | (missing) | Copy from live to docs stubs |
-| Orphaned doc stub | (deleted) | `adw/templates/docs_stubs/common/adw-docs/<deprecated_doc>.md` | Move to trash |
+| Deprecated doc in wrong location | `.opencode/guides/<deprecated_doc>.md` | `adw/templates/docs_stubs/common/.opencode/guides/<deprecated_doc>.md` | Move to trash |
+| Missing doc stub | `.opencode/guides/<new_doc>.md` | (missing) | Copy from live to docs stubs |
+| Orphaned doc stub | (deleted) | `adw/templates/docs_stubs/common/.opencode/guides/<deprecated_doc>.md` | Move to trash |
 
 Angle-bracket placeholders (for example, `<deprecated_doc>`) represent the actual document name
 you are evaluating; substitute the real filename when performing the maintenance steps.
@@ -413,9 +413,9 @@ Validation: ✓ All placeholders defined
 
 Git Status:
 - Modified: adw/templates/keyword_manifest.yaml
-- Modified: adw/templates/docs_stubs/common/adw-docs/testing_guide.md
-- Modified: adw/templates/docs_stubs/common/adw-docs/code_style.md
-- Added: adw/templates/docs_stubs/common/adw-docs/<new_guide>.md
+- Modified: adw/templates/docs_stubs/common/.opencode/guides/testing_guide.md
+- Modified: adw/templates/docs_stubs/common/.opencode/guides/code_style.md
+- Added: adw/templates/docs_stubs/common/.opencode/guides/<new_guide>.md
 
 Ready to commit? [Y/n]
 ```
@@ -510,8 +510,8 @@ Agent: "I'll check for drift between live docs and templates...
 Running: adw setup template extract --diff
 
 Found 2 files with content changes:
-- adw-docs/testing_guide.md (added new test patterns section)
-- adw-docs/code_style.md (updated import ordering)
+- .opencode/guides/testing_guide.md (added new test patterns section)
+- .opencode/guides/code_style.md (updated import ordering)
 
 No new files detected.
 No unknown placeholders found.
@@ -526,8 +526,8 @@ User: "Y"
 Agent: "Running: adw setup template extract --dry-run
 
 Would modify:
-- adw/templates/docs_stubs/common/adw-docs/testing_guide.md
-- adw/templates/docs_stubs/common/adw-docs/code_style.md
+- adw/templates/docs_stubs/common/.opencode/guides/testing_guide.md
+- adw/templates/docs_stubs/common/.opencode/guides/code_style.md
 
 Confirm extraction? [Y/n]"
 
@@ -549,12 +549,12 @@ User: "Some agent docs were added, sync the stubs"
 
 Agent: "I'll compare the live and stub directory structures...
 
-Listing adw-docs/agents/:
+Listing .opencode/guides/agents/:
 - adw-setup.md
 - setup-update.md
 - README.md
 
-Listing adw/templates/docs_stubs/common/adw-docs/agents/:
+Listing adw/templates/docs_stubs/common/.opencode/guides/agents/:
 - adw-setup.md
 - README.md
 
@@ -572,10 +572,10 @@ User: "Y"
 
 Agent: "Executing structural sync...
 
-✓ Copied adw-docs/agents/setup-update.md to adw/templates/docs_stubs/common/adw-docs/agents/
+✓ Copied .opencode/guides/agents/setup-update.md to adw/templates/docs_stubs/common/.opencode/guides/agents/
 
 Verifying structure match...
-✓ adw-docs/agents/ structure matches adw/templates/docs_stubs/common/adw-docs/agents/
+✓ .opencode/guides/agents/ structure matches adw/templates/docs_stubs/common/.opencode/guides/agents/
 
 Git status shows 4 changes (3 moves to trash, 1 new file).
 Ready to commit? [Y/n]"

@@ -1,0 +1,76 @@
+{
+  "$schema": "issue_template",
+  "plan_type": "feature",
+  "issue_sections": [
+    {
+      "name": "description",
+      "role": "description",
+      "display_name": "Description",
+      "purpose": "Summarize the feature objective, user impact, and expected outcome.",
+      "format": "markdown"
+    },
+    {
+      "name": "context",
+      "role": "description",
+      "display_name": "Context",
+      "purpose": "Capture constraints, dependencies, and historical context needed to implement safely.",
+      "format": "markdown"
+    },
+    {
+      "name": "scope",
+      "role": "scope",
+      "display_name": "Scope",
+      "purpose": "Define touched files, integration boundaries, and explicit non-goals for this feature slice.",
+      "format": "markdown"
+    },
+    {
+      "name": "acceptance_criteria",
+      "role": "scope",
+      "display_name": "Acceptance Criteria",
+      "purpose": "List deterministic completion checks for functional behavior and constraints.",
+      "format": "checklist"
+    },
+    {
+      "name": "technical_notes",
+      "role": "technical",
+      "display_name": "Technical Notes",
+      "purpose": "Record implementation choices, architecture constraints, and migration behavior.",
+      "format": "markdown"
+    },
+    {
+      "name": "testing_strategy",
+      "role": "testing",
+      "display_name": "Testing Strategy",
+      "purpose": "Specify targeted and integration tests that protect regressions for the feature.",
+      "format": "markdown"
+    },
+    {
+      "name": "edge_cases",
+      "role": "technical",
+      "display_name": "Edge Cases",
+      "purpose": "Enumerate malformed input, fallback, and boundary-condition handling.",
+      "format": "markdown"
+    },
+    {
+      "name": "example_usage",
+      "role": "technical",
+      "display_name": "Example Usage",
+      "purpose": "Provide concise operator/user-facing examples demonstrating expected behavior.",
+      "format": "markdown"
+    },
+    {
+      "name": "references",
+      "role": "references",
+      "display_name": "References",
+      "purpose": "Link source files, plans, and issues needed for implementation and review.",
+      "format": "markdown"
+    }
+  ],
+  "review_pipeline": [
+    "description",
+    "scope",
+    "technical",
+    "testing",
+    "completeness"
+  ]
+}

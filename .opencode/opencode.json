@@ -15,7 +15,9 @@
       "{env:ADW_PROJECT_ROOT}/adw/**": "allow",
       "{env:ADW_PROJECT_ROOT}/scripts/**": "allow",
       "{env:ADW_PROJECT_ROOT}/agents/**": "allow",
-      "{env:ADW_PROJECT_ROOT}/trees/**": "allow"
+      "{env:ADW_PROJECT_ROOT}/trees/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/plans/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/generated/**": "allow"
     },
     "write": {
       "{env:ADW_PROJECT_ROOT}/src/**": "allow",
@@ -26,7 +28,9 @@
       "{env:ADW_PROJECT_ROOT}/adw/**": "allow",
       "{env:ADW_PROJECT_ROOT}/scripts/**": "allow",
       "{env:ADW_PROJECT_ROOT}/agents/**": "allow",
-      "{env:ADW_PROJECT_ROOT}/trees/**": "allow"
+      "{env:ADW_PROJECT_ROOT}/trees/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/plans/**": "allow",
+      "{env:ADW_PROJECT_ROOT}/generated/**": "allow"
     },
     "edit": "allow",
     "webfetch": "ask",

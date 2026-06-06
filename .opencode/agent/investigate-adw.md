@@ -1,4 +1,5 @@
 ---
+
 description: >-
   Investigate ADW workflow issues by analyzing state, logs, and worktrees.
   Use this agent when:
@@ -16,30 +17,36 @@ description: >-
   - "Why did workflow xyz98765 fail?"
   - "Check what's wrong with adw id def11111"
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: true
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: true
-  run_pytest: true
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_status_health: allow
+  adw_workflow: allow
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  platform_issue_read: allow
+  platform_pr_read: allow
+  run_pytest: deny
+  run_pytest_basic: allow
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Investigate ADW
@@ -64,7 +71,7 @@ $ARGUMENTS
 
 Extract the `adw_id` (8-character hash). If not provided, help the user find it:
 ```python
-adw({"command": "status"})
+adw_status_health({"command": "status"})
 ```
 
 # Directory Structure
@@ -96,19 +103,19 @@ adw_spec({"command": "list", "adw_id": "{adw_id}", "json": true})
 ## Step 2: Check Worktree
 
 ```python
-git_operations({"command": "status", "worktree_path": "{worktree_path}", "porcelain": true})
-git_operations({"command": "diff", "worktree_path": "{worktree_path}", "stat": true})
+git_diff({"command": "status", "worktree_path": "{worktree_path}", "porcelain": true})
+git_diff({"command": "diff", "worktree_path": "{worktree_path}", "stat": true})
 ```
 
 ## Step 3: Check Platform Context
 
 ```python
-platform_operations({"command": "fetch-issue", "issue_number": "{issue_number}", "output_format": "json"})
+platform_issue_read({"command": "fetch-issue", "issue_number": "{issue_number}", "output_format": "json"})
 ```
 
 If PR exists:
 ```python
-platform_operations({"command": "pr-comments", "issue_number": "{pr_number}", "output_format": "json", "actionable_only": true})
+platform_pr_read({"command": "pr-comments", "issue_number": "{pr_number}", "output_format": "json", "actionable_only": true})
 ```
 
 ## Step 4: Diagnose

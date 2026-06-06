@@ -1,0 +1,152 @@
+{
+  "name": "forge-generate",
+  "version": "0.1.0",
+  "description": "Forge generate workflow: isolated primary-agent issue generation pipeline",
+  "workflow_type": "generate",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Build Issue Context",
+      "agent": "forge-issue-context-builder",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Initialize Batch",
+      "agent": "forge-issue-batch-initializer",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft Metadata",
+      "agent": "forge-issue-metadata-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft Description",
+      "agent": "forge-issue-description-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft Scope",
+      "agent": "forge-issue-scope-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft Technical",
+      "agent": "forge-issue-technical-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft Testing",
+      "agent": "forge-issue-testing-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft References",
+      "agent": "forge-issue-references-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Draft Custom Sections",
+      "agent": "forge-issue-generic-drafter",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Review Description",
+      "agent": "forge-issue-description-reviewer",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Review Scope",
+      "agent": "forge-issue-scope-reviewer",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Review Technical",
+      "agent": "forge-issue-technical-reviewer",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Review Testing",
+      "agent": "forge-issue-testing-reviewer",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Review Completeness",
+      "agent": "forge-issue-completeness-reviewer",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Create Issues",
+      "agent": "forge-issue-creator",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1800,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    },
+    {
+      "type": "agent",
+      "name": "Verify Created Issues",
+      "agent": "forge-issue-created-verifier",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    }
+  ]
+}

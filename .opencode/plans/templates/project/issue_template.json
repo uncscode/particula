@@ -1,0 +1,47 @@
+{
+  "$schema": "issue_template",
+  "plan_type": "project",
+  "issue_sections": [
+    {
+      "name": "overview",
+      "role": "technical",
+      "display_name": "Overview",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "implementation_tasks",
+      "role": "technical",
+      "display_name": "Implementation Tasks",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    },
+    {
+      "name": "testing_strategy",
+      "role": "testing",
+      "display_name": "Testing Strategy",
+      "purpose": "Document section details for implementation planning and issue generation context.",
+      "format": "markdown",
+      "required": true,
+      "example": null,
+      "agent": null
+    }
+  ],
+  "metadata_fields": {
+    "phase": {
+      "type": "string",
+      "default": null
+    }
+  },
+  "review_pipeline": [
+    "technical",
+    "testing",
+    "completeness"
+  ]
+}

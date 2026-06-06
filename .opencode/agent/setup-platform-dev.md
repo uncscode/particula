@@ -1,4 +1,5 @@
 ---
+
 description: >-
   Use this agent to interactively configure fork/upstream platform routing in your .env file.
   This agent guides developers through setting up ADW_TARGET_REPO, repository URLs, tokens,
@@ -28,29 +29,40 @@ description: >-
   - User: "I need to customize operation permissions"
     Assistant: "I'll show you the available operations and help you configure FORK_OPS and UPSTREAM_OPS."
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: true
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: true
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_setup: allow
+  adw_status_health: allow
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  git_branch: allow
+  git_merge: allow
+  platform_issue_read: allow
+  platform_issue_write: allow
+  platform_label_write: allow
+  platform_pr_read: allow
+  platform_pr_write: allow
+  platform_rate_limit_read: allow
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Platform Router Setup Agent
@@ -84,7 +96,7 @@ Generate a focused `.env` snippet with inline documentation. Offer to write dire
 This agent does NOT have shell/bash access. If users ask you to run shell commands:
 - Explain that you cannot execute shell commands directly
 - Provide the command they should run themselves
-- Use `platform_operations` and `git_operations` tools for API and git tasks
+- Use split platform wrappers (for example `platform_rate_limit_read`, `platform_issue_read`) and split git wrappers (`git_diff`, `git_branch`, `git_merge`) for API and git tasks
 - Use `read` tool to inspect files like `.git/config` and `.env`
 
 # Environment Variables Reference
@@ -978,7 +990,7 @@ TIPS:
 - Rotate tokens periodically
 
 DOCUMENTATION:
-- Full routing guide: adw-docs/backend_configuration.md
+- Full routing guide: .opencode/guides/backend_configuration.md
 - Platform router: docs/Features/platform-router.md
 ```
 

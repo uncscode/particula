@@ -10,7 +10,7 @@
       "name": "Run Tests",
       "agent": "tester",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
-      "model": "light",
+      "model": "base",
       "timeout": 1800,
       "retry": {
         "max_retries": 1,

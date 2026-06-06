@@ -1,4 +1,5 @@
 ---
+
 description: >-
   Subagent that consolidates findings from multiple reviewers into a final review.
 
@@ -10,31 +11,32 @@ description: >-
 
   Invoked by: adw-review-orchestrator after all reviewers complete
 mode: subagent
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Review - Consolidation
@@ -263,6 +265,8 @@ Move to overview if:
 
 ### Summary
 
+Actionable Issues Found: Yes|No
+
 | Severity | Count |
 |----------|-------|
 | Critical | {n} |
@@ -324,6 +328,17 @@ Inline Comments: {count}
 Duplicates Removed: {count}
 False Positives Filtered: {count}
 ```
+
+### Actionable Issues Signal Contract
+
+Always include exactly one canonical line in the final output summary:
+
+- `Actionable Issues Found: Yes` when there is at least one retained **CRITICAL** or
+  **WARNING** finding after dedupe/filtering.
+- `Actionable Issues Found: No` when no retained actionable findings remain.
+
+This line is consumed by the review orchestrator to persist `request_fix` in
+workflow state and gate downstream fix execution.
 
 # Quality Criteria for Final Review
 

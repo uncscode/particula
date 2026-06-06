@@ -14,31 +14,20 @@ description: >
   Invoked by: plan_work_multireview orchestrator
   Order: 1st step (before all reviewers)
 mode: subagent
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  refactor_astgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  list: allow
+  grep: allow
+  ripgrep: allow
+  todowrite: allow
+  refactor_astgrep: allow
+  adw_spec: allow
+  feedback_log: allow
+  git_diff: allow
+  get_datetime: allow
+  get_version: allow
 ---
 
 # Plan Draft Subagent
@@ -73,11 +62,47 @@ task({
 
 # Required Reading
 
-- @adw-docs/code_style.md - Coding conventions
-- @adw-docs/architecture_reference.md - Architecture patterns
-- @adw-docs/testing_guide.md - Testing patterns
+- @.opencode/guides/code_style.md - Coding conventions
+- @.opencode/guides/architecture_reference.md - Architecture patterns
+- @.opencode/guides/testing_guide.md - Testing patterns
 
 # Process
+
+# Git Notes Read-Only Policy (for prior-design intent)
+
+Allowed commands (contract-enforced): `log`, `show`
+
+Conditionally allowed command: `notes-blame` only when a notes-blame-capable
+path is available in the active tool surface
+
+Forbidden commands:
+- `add`
+- `restore`
+- `merge`
+- `rebase`
+- `checkout`
+- `commit`
+- `push`
+- `push-force-with-lease`
+- `reset`
+- `accumulate`
+- `sync`
+- `fetch`
+- `worktree-remove`
+
+Path contract for `notes-blame`:
+- prefer repo-relative paths
+- normalize under `worktree_path`
+- reject out-of-worktree targets
+
+Notes usage requirements:
+- Before drafting the final implementation plan, use targeted `notes-blame` checks on key files mentioned in issue scope only when a notes-blame-capable path is available in the active tool surface.
+- If notes access is unavailable, continue normal planning flow and proceed from issue details, direct repository research, workflow state, and referenced plan files.
+- Use notes-blame for focus on key files only, not full-repo history scans.
+- Prefer targeted line ranges to keep lookups bounded and relevant.
+- If no notes exist for a file, continue normal planning flow.
+- If notes lookup fails for any reason, continue normally and proceed from code + issue context.
+- notes are supplementary context and you must proceed even without notes.
 
 ## Step 1: Extract ADW ID and Load Issue
 
@@ -173,6 +198,8 @@ Note observed patterns in the codebase:
 
 Compile your research findings — they feed directly into Step 3.
 
+Integrate prior design intent directly into existing plan sections using clear rationale language.
+
 ## Rule of Thumb: AST vs ripgrep
 
 - Use `refactor_astgrep` when you have a concrete symbol name (function, class,
@@ -252,7 +279,7 @@ Using the issue and research context, create the plan:
 [1-2 paragraphs: what needs to be done and why]
 
 ## Research Context Summary
-[Key findings from codebase-researcher]
+[Key findings from direct Step 2 research]
 - Relevant files: {file:line references}
 - Patterns to follow: {observed patterns}
 - Integration points: {where to integrate}
@@ -272,7 +299,7 @@ Using the issue and research context, create the plan:
 [Additional steps as needed...]
 
 ## Tests to Write
-- Follow @adw-docs/testing_guide.md for test locations and naming conventions.
+- Follow @.opencode/guides/testing_guide.md for test locations and naming conventions.
 - Prefer guide references over repo-specific file paths in agent docs.
 - `{module}/tests/{name}_test.py`: {test_description}
 - [Additional tests...]

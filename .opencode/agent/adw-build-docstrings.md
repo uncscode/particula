@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that adds/updates docstrings and runs linting with auto-fix.
   Invoked by adw-format primary agent after implementation completes.
 
@@ -15,31 +16,32 @@ description: 'Subagent that adds/updates docstrings and runs linting with auto-f
   - After modifying existing code: update docstrings, ensure linting passes
   - Scope can be single file, module directory, or list of files'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_linters: true
-  run_pytest: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_linters: allow
+  run_pytest: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Build Docstrings Subagent
@@ -81,11 +83,11 @@ task({
 
 # Required Reading
 
-- @adw-docs/docstring_guide.md - Google-style docstring format
-- @adw-docs/docstring_function.md - Function docstring examples
-- @adw-docs/docstring_class.md - Class docstring examples
-- @adw-docs/linting_guide.md - Linting rules and configuration
-- @adw-docs/code_style.md - Code conventions
+- @.opencode/guides/docstring_guide.md - Google-style docstring format
+- @.opencode/guides/docstring_function.md - Function docstring examples
+- @.opencode/guides/docstring_class.md - Class docstring examples
+- @.opencode/guides/linting_guide.md - Linting rules and configuration
+- @.opencode/guides/code_style.md - Code conventions
 
 # Docstring Requirements
 
@@ -454,4 +456,4 @@ Context: Parser now uses new data models
 
 **Excluded:** Test files (`*_test.py`) don't require docstrings
 
-**References:** `adw-docs/docstring_guide.md`, `adw-docs/linting_guide.md`
+**References:** `.opencode/guides/docstring_guide.md`, `.opencode/guides/linting_guide.md`

@@ -1,0 +1,140 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "completion_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completion Date"
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Dependencies",
+      "type": "array"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "last_updated": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Updated"
+    },
+    "owners": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Owners",
+      "type": "array"
+    },
+    "priority": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "Backlog"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "section_files": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Section Files",
+      "type": "object"
+    },
+    "size": {
+      "enum": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "title": "Size",
+      "type": "string"
+    },
+    "start_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Start Date"
+    },
+    "status": {
+      "enum": [
+        "Draft",
+        "Proposed",
+        "Ready",
+        "In Progress",
+        "Blocked",
+        "Monitoring",
+        "Shipped",
+        "Cancelled",
+        "Superseded"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "target_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Date"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "const": "research",
+      "default": "research",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "status",
+    "priority",
+    "size"
+  ],
+  "title": "DynamicPlan_research",
+  "type": "object"
+}

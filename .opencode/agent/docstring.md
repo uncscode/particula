@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that updates and creates Python docstrings following Google-style
   format and repository conventions. Invoked by the documentation primary agent to
   ensure all Python code has proper documentation.
@@ -6,36 +7,37 @@ description: 'Subagent that updates and creates Python docstrings following Goog
   This subagent: - Loads workflow context from adw_spec tool - Analyzes changed Python
   files from git diff - Updates existing docstrings to reflect code changes - Adds
   missing docstrings for new functions, classes, and modules - Auto-fixes Google-style
-  compliance issues - Calls linter subagent to validate changes - Checks links in
+  compliance issues - Runs linters directly to validate changes - Checks links in
   docstrings - Excludes test files (just notes tests/ exists)
 
   Write permissions: - *.py files: ALLOW (all Python source code) - Test files: READ-ONLY
   (document existence, don''t modify)'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Docstring Subagent
@@ -74,17 +76,17 @@ task({
 
 # Required Reading
 
-- @adw-docs/docstring_guide.md - Google-style format
-- @adw-docs/docstring_function.md - Function docstring examples
-- @adw-docs/docstring_class.md - Class docstring examples
-- @adw-docs/code_style.md - Code conventions
+- @.opencode/guides/docstring_guide.md - Google-style format
+- @.opencode/guides/docstring_function.md - Function docstring examples
+- @.opencode/guides/docstring_class.md - Class docstring examples
+- @.opencode/guides/code_style.md - Code conventions
 
 # Write Permissions
 
 **ALLOWED:**
 - ✅ Edit `.py` files in `adw/` - Update/add docstrings
 - ✅ Read test files - Document existence
-- ✅ Run linter subagent - Validate changes
+- ✅ Run linters directly - Validate changes
 
 **DENIED:**
 - ❌ Modify test file content - Just note `tests/` exists
@@ -250,7 +252,7 @@ Check:
 ### 4.6: Check Links in Docstrings
 
 Look for references like:
-- `See: adw-docs/...`
+- `See: .opencode/guides/...`
 - URLs in docstrings
 - Cross-references to other modules
 
@@ -270,17 +272,18 @@ Note: Test coverage in `{module}/tests/` directory.
 
 ## Step 6: Run Linter Validation
 
+Run linters directly to validate docstring changes:
+
 ```python
-task({
-  "description": "Validate docstring changes",
-  "prompt": f"Lint code. Arguments: adw_id={adw_id}",
-  "subagent_type": "linter"
+run_linters({
+  "autoFix": true,
+  "targetDir": "{worktree_path}"
 })
 ```
 
 **Parse output:**
-- `LINTING_SUCCESS` → Continue to report
-- `LINTING_FAILED` → Fix issues and retry
+- All linters pass → Continue to report
+- Failures found → Review errors, fix fixable issues with `run_linters({"autoFix": true})`, report remaining
 
 ## Step 7: Report Completion
 
@@ -390,6 +393,6 @@ Test directories noted: adw/utils/tests/, adw/core/tests/
 
 **Permissions:** ✅ Edit .py files | ❌ Modify tests, change code logic
 
-**Validation:** Calls linter subagent before completion
+**Validation:** Runs linters directly before completion
 
-**References:** `adw-docs/docstring_guide.md`, `adw-docs/code_style.md`
+**References:** `.opencode/guides/docstring_guide.md`, `.opencode/guides/code_style.md`

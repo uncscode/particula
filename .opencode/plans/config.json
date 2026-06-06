@@ -1,0 +1,147 @@
+{
+  "plans_dir": ".opencode/plans",
+  "sections_dir": ".opencode/plans/sections",
+  "id_patterns": {
+    "epic": "E{n}",
+    "feature": "E{n}-F{m}|F{n}",
+    "maintenance": "E{n}-M{m}|M{n}",
+    "research": "E{n}-R{m}|R{n}"
+  },
+  "section_names": {
+    "feature": [
+      "overview",
+      "scope",
+      "infrastructure_reuse",
+      "phase_details",
+      "architecture_design",
+      "implementation_tasks",
+      "dependencies",
+      "testing_strategy",
+      "documentation_updates",
+      "success_criteria",
+      "risk_register",
+      "open_questions",
+      "change_log"
+    ],
+    "epic": [
+      "vision_problem",
+      "outcomes_guardrails",
+      "scope_constraints",
+      "child_plans",
+      "dependency_map",
+      "milestones_timeline",
+      "implementation_strategy",
+      "governance",
+      "risk_register",
+      "success_metrics",
+      "appendix",
+      "open_questions",
+      "change_log"
+    ],
+    "maintenance": [
+      "purpose_justification",
+      "scope",
+      "guidelines_requirements",
+      "success_criteria",
+      "phase_details",
+      "testing_requirements",
+      "example_tasks",
+      "dependencies",
+      "communication_reporting",
+      "open_questions",
+      "change_log"
+    ],
+    "research": [
+      "overview",
+      "scope",
+      "data_sources",
+      "methodology",
+      "evaluation_strategy",
+      "dependencies",
+      "success_criteria",
+      "risk_register",
+      "open_questions",
+      "change_log"
+    ]
+  },
+  "plan_types": {
+    "epic": {
+      "id_prefix": "E",
+      "directory": "epics",
+      "sections": [
+        "vision_problem",
+        "outcomes_guardrails",
+        "scope_constraints",
+        "child_plans",
+        "dependency_map",
+        "milestones_timeline",
+        "implementation_strategy",
+        "governance",
+        "risk_register",
+        "success_metrics",
+        "appendix",
+        "open_questions",
+        "change_log"
+      ],
+      "required_sections": []
+    },
+    "feature": {
+      "id_prefix": "F",
+      "directory": "features",
+      "sections": [
+        "overview",
+        "scope",
+        "infrastructure_reuse",
+        "phase_details",
+        "architecture_design",
+        "implementation_tasks",
+        "dependencies",
+        "testing_strategy",
+        "documentation_updates",
+        "success_criteria",
+        "risk_register",
+        "open_questions",
+        "change_log"
+      ],
+      "required_sections": []
+    },
+    "maintenance": {
+      "id_prefix": "M",
+      "directory": "maintenance",
+      "sections": [
+        "purpose_justification",
+        "scope",
+        "guidelines_requirements",
+        "success_criteria",
+        "phase_details",
+        "testing_requirements",
+        "example_tasks",
+        "dependencies",
+        "communication_reporting",
+        "open_questions",
+        "change_log"
+      ],
+      "required_sections": [
+        "phase_details",
+        "example_tasks"
+      ]
+    },
+    "research": {
+      "id_prefix": "R",
+      "directory": "research",
+      "sections": [
+        "overview",
+        "scope",
+        "data_sources",
+        "methodology",
+        "evaluation_strategy",
+        "dependencies",
+        "success_criteria",
+        "risk_register",
+        "open_questions",
+        "change_log"
+      ],
+      "required_sections": []
+    }
+  }
+}

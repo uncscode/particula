@@ -1,0 +1,76 @@
+{
+  "$schema": "issue_template",
+  "plan_type": "research",
+  "issue_sections": [
+    {
+      "name": "description",
+      "role": "description",
+      "display_name": "Description",
+      "purpose": "Summarize the research objective, hypothesis, and expected outcome.",
+      "format": "markdown"
+    },
+    {
+      "name": "context",
+      "role": "description",
+      "display_name": "Context",
+      "purpose": "Capture domain constraints, prior findings, and background needed for execution.",
+      "format": "markdown"
+    },
+    {
+      "name": "scope",
+      "role": "scope",
+      "display_name": "Scope",
+      "purpose": "Define impacted research assets, boundaries, and explicit non-goals for this slice.",
+      "format": "markdown"
+    },
+    {
+      "name": "acceptance_criteria",
+      "role": "scope",
+      "display_name": "Acceptance Criteria",
+      "purpose": "List deterministic completion checks for deliverables and research constraints.",
+      "format": "checklist"
+    },
+    {
+      "name": "technical_notes",
+      "role": "technical",
+      "display_name": "Technical Notes",
+      "purpose": "Record methodological choices, assumptions, and implementation details.",
+      "format": "markdown"
+    },
+    {
+      "name": "testing_strategy",
+      "role": "testing",
+      "display_name": "Testing Strategy",
+      "purpose": "Specify validation checks, reproducibility tests, and regression guards.",
+      "format": "markdown"
+    },
+    {
+      "name": "edge_cases",
+      "role": "technical",
+      "display_name": "Edge Cases",
+      "purpose": "Enumerate uncertain inputs, data anomalies, and boundary-condition handling.",
+      "format": "markdown"
+    },
+    {
+      "name": "example_usage",
+      "role": "technical",
+      "display_name": "Example Usage",
+      "purpose": "Provide concise examples showing expected experiment or tooling usage.",
+      "format": "markdown"
+    },
+    {
+      "name": "references",
+      "role": "references",
+      "display_name": "References",
+      "purpose": "Link relevant plans, datasets, code paths, and supporting sources.",
+      "format": "markdown"
+    }
+  ],
+  "review_pipeline": [
+    "description",
+    "scope",
+    "technical",
+    "testing",
+    "completeness"
+  ]
+}

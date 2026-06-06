@@ -1,8 +1,8 @@
 {
   "name": "review",
   "version": "1.0.0",
-  "description": "Multi-agent code review for PRs: parallel specialized reviewers → consolidation → PR feedback",
-  "description_long": "Comprehensive code review workflow that dispatches specialized reviewer agents in parallel (code quality, correctness, C++ performance, Python performance, security), consolidates findings to remove duplicates and rank by severity, then posts structured feedback to the PR as overview and inline comments.",
+  "description": "Multi-agent code review for PRs or state-only auto runs: parallel specialized reviewers → consolidation → state persistence → optional PR feedback",
+  "description_long": "Comprehensive code review workflow that dispatches specialized reviewer agents in parallel (code quality, correctness, C++ performance, Python performance, security), consolidates findings to remove duplicates and rank by severity, persists the canonical review result into workflow state for downstream fix planning, and posts structured feedback to the PR when PR context is available.",
   "workflow_type": "review",
   "steps": [
     {

@@ -1,0 +1,22 @@
+{
+  "name": "generate-auto",
+  "version": "1.0.0",
+  "description": "Generate-auto workflow: isolated issue generation pipeline plus auto-mode bootstrap",
+  "workflow_type": "generate",
+  "steps": [
+    {
+      "type": "workflow",
+      "name": "Forge Generate",
+      "workflow_name": "generate"
+    },
+    {
+      "type": "agent",
+      "name": "Bootstrap Auto-Mode",
+      "agent": "forge-issue-auto-manifest-bootstrapper",
+      "prompt": "${issue_number} --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1800,
+      "retry": {"max_retries": 1, "initial_delay": 5.0, "backoff": 2.0}
+    }
+  ]
+}

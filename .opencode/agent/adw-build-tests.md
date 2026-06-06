@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that validates test coverage and writes missing tests for changed
   code. Invoked by adw-build primary agent after implementation completes.
 
@@ -15,30 +16,32 @@ description: 'Subagent that validates test coverage and writes missing tests for
   - Focus on module/function level tests that run in <=1 second
   - Skip @pytest.mark.slow and @pytest.mark.performance tests'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: true
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: allow
+  run_bun_test: allow
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Build Tests Subagent
@@ -79,12 +82,12 @@ task({
 
 # Required Reading
 
-- @adw-docs/testing_guide.md - Test framework, patterns, conventions, **test duration tiers**
-- @adw-docs/code_style.md - Naming conventions for test files
+- @.opencode/guides/testing_guide.md - Test framework, patterns, conventions, **test duration tiers**
+- @.opencode/guides/code_style.md - Naming conventions for test files
 
 # Test Duration Tiers (IMPORTANT)
 
-This subagent focuses on **fast tests** to provide quick feedback. See `adw-docs/testing_guide.md` for complete details.
+This subagent focuses on **fast tests** to provide quick feedback. See `.opencode/guides/testing_guide.md` for complete details.
 
 | Tier | Duration | Run by this agent? |
 |------|----------|-------------------|
@@ -114,6 +117,20 @@ run_pytest({
 - `coverageThreshold: 80` - Fail if coverage below 80%
 - `failFast: true` - Stop on first failure for quick feedback
 - `cwd: "{worktree_path}"` - Use when running in worktree
+
+**TypeScript wrapper validation:**
+Use `run_bun_test` as the approved path for `.opencode/tools/` wrapper tests instead of
+raw `bun test` shell access. When `cwd` is `{worktree_path}`, keep `testPath`
+repo-relative.
+
+```python
+run_bun_test({
+  "testPath": ".opencode/tools/__tests__/adw_spec.test.ts",
+  "timeout": 120,
+  "minTests": 1,
+  "cwd": "{worktree_path}"
+})
+```
 
 # Test Requirements
 
@@ -484,4 +501,4 @@ Context: Parser now uses new data models
 
 **Retries:** 3 internal attempts before failing
 
-**References:** `adw-docs/testing_guide.md`, `adw-docs/code_style.md`
+**References:** `.opencode/guides/testing_guide.md`, `.opencode/guides/code_style.md`

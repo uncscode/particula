@@ -1,45 +1,47 @@
 ---
-description: 'Subagent that manages architecture documentation in adw-docs/architecture/.
+
+description: 'Subagent that manages architecture documentation in .opencode/guides/architecture/.
   Invoked by the documentation primary agent to create ADRs, update the architecture
   outline, and maintain architecture documentation.
 
   This subagent: - Loads workflow context from adw_spec tool - Creates Architecture
   Decision Records (ADRs) following template - Archives old ADRs when approaches are
   superseded - Updates architecture_outline.md when new modules added - Updates architecture_guide.md
-  for major changes - Maintains adw-docs/architecture/decisions/README.md - Excludes
+  for major changes - Maintains .opencode/guides/architecture/decisions/README.md - Excludes
   tests/ from outlines (just notes existence) - Validates markdown links
 
-  Write permissions: - adw-docs/architecture/*.md: ALLOW - adw-docs/architecture/decisions/*.md:
-  ALLOW - adw-docs/architecture/decisions/archive/*.md: ALLOW'
+  Write permissions: - .opencode/guides/architecture/*.md: ALLOW - .opencode/guides/architecture/decisions/*.md:
+  ALLOW - .opencode/guides/architecture/decisions/archive/*.md: ALLOW'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Architecture Subagent
 
-Create ADRs, update architecture outline, and maintain architecture documentation in adw-docs/architecture/.
+Create ADRs, update architecture outline, and maintain architecture documentation in .opencode/guides/architecture/.
 
 # Core Mission
 
@@ -60,7 +62,7 @@ Changes:
 - Modified components: <list_changed_components>
 
 Tasks:
-- Update adw-docs/architecture/architecture_outline.md with new modules (exclude tests/)
+- Update .opencode/guides/architecture/architecture_outline.md with new modules (exclude tests/)
 - Create ADR if significant architectural decision made
 - Archive old ADRs if approaches superseded
 ```
@@ -76,17 +78,17 @@ task({
 
 # Required Reading
 
-- @adw-docs/architecture/decisions/ADR-001-github-operations-consolidation.md - ADR template
-- @adw-docs/architecture/architecture_outline.md - Current structure
-- @adw-docs/architecture/architecture_guide.md - Architecture guide
-- @adw-docs/architecture_reference.md - Architecture reference
+- @.opencode/guides/architecture/decisions/ADR-001-github-operations-consolidation.md - ADR template
+- @.opencode/guides/architecture/architecture_outline.md - Current structure
+- @.opencode/guides/architecture/architecture_guide.md - Architecture guide
+- @.opencode/guides/architecture_reference.md - Architecture reference
 
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `adw-docs/architecture/*.md` - Architecture docs
-- ✅ `adw-docs/architecture/decisions/*.md` - ADRs
-- ✅ `adw-docs/architecture/decisions/archive/*.md` - Archived ADRs
+- ✅ `.opencode/guides/architecture/*.md` - Architecture docs
+- ✅ `.opencode/guides/architecture/decisions/*.md` - ADRs
+- ✅ `.opencode/guides/architecture/decisions/archive/*.md` - Archived ADRs
 
 **DENIED:**
 - ❌ All other directories
@@ -177,14 +179,14 @@ todowrite({
 ### 4.1: Determine Next ADR Number
 
 ```bash
-ls adw-docs/architecture/decisions/ADR-*.md | tail -1
+ls .opencode/guides/architecture/decisions/ADR-*.md | tail -1
 ```
 
 ### 4.2: Read ADR Template
 
 Use ADR-001 as template reference:
 ```python
-read({"filePath": "{worktree_path}/adw-docs/architecture/decisions/ADR-001-github-operations-consolidation.md"})
+read({"filePath": "{worktree_path}/.opencode/guides/architecture/decisions/ADR-001-github-operations-consolidation.md"})
 ```
 
 ### 4.3: Create New ADR
@@ -195,7 +197,7 @@ get_datetime({"format": "date"})
 
 ```python
 write({
-  "filePath": "{worktree_path}/adw-docs/architecture/decisions/ADR-{NNN}-{kebab-case-title}.md",
+  "filePath": "{worktree_path}/.opencode/guides/architecture/decisions/ADR-{NNN}-{kebab-case-title}.md",
   "content": """# ADR-{NNN}: {Decision Title}
 
 **Status:** Accepted
@@ -366,13 +368,13 @@ Files updated as part of this decision:
 ### 5.1: Create Archive Directory (if needed)
 
 ```bash
-mkdir -p adw-docs/architecture/decisions/archive
+mkdir -p .opencode/guides/architecture/decisions/archive
 ```
 
 ### 5.2: Move Superseded ADR
 
 ```bash
-mv adw-docs/architecture/decisions/ADR-{old}.md adw-docs/architecture/decisions/archive/
+mv .opencode/guides/architecture/decisions/ADR-{old}.md .opencode/guides/architecture/decisions/archive/
 ```
 
 ### 5.3: Update Superseded ADR Status
@@ -384,13 +386,13 @@ Edit the archived ADR you just moved to mark it superseded:
 
 Read current outline:
 ```python
-read({"filePath": "{worktree_path}/adw-docs/architecture/architecture_outline.md"})
+read({"filePath": "{worktree_path}/.opencode/guides/architecture/architecture_outline.md"})
 ```
 
 Add new modules to appropriate sections:
 ```python
 edit({
-  "filePath": "{worktree_path}/adw-docs/architecture/architecture_outline.md",
+  "filePath": "{worktree_path}/.opencode/guides/architecture/architecture_outline.md",
   "oldString": "{existing_module_section}",
   "newString": "{existing_module_section}\n\n### {new_module}/\n\n{Module description}\n\n**Key Components:**\n- `{component_1}.py` - {description}\n- `tests/` - Test coverage"
 })
@@ -414,7 +416,7 @@ Authentication and authorization module.
 Add new ADR to index:
 ```python
 edit({
-  "filePath": "{worktree_path}/adw-docs/architecture/decisions/README.md",
+  "filePath": "{worktree_path}/.opencode/guides/architecture/decisions/README.md",
   "oldString": "{last_adr_entry}",
   "newString": "{last_adr_entry}\n| ADR-{NNN} | {Title} | Accepted | {date} |"
 })
@@ -424,7 +426,7 @@ edit({
 
 Check all links in created/updated files:
 ```text
-ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "adw-docs/architecture/**/*.md"})
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": ".opencode/guides/architecture/**/*.md"})
 ```
 
 Verify all internal links are valid.
@@ -442,10 +444,10 @@ Actions:
 - Archive: Moved ADR-{old} to archive/ (superseded)
 
 Files modified:
-- adw-docs/architecture/decisions/ADR-{NNN}-{title}.md (new)
-- adw-docs/architecture/architecture_outline.md (updated)
-- adw-docs/architecture/decisions/README.md (updated)
-- adw-docs/architecture/decisions/archive/ADR-{old}.md (archived)
+- .opencode/guides/architecture/decisions/ADR-{NNN}-{title}.md (new)
+- .opencode/guides/architecture/architecture_outline.md (updated)
+- .opencode/guides/architecture/decisions/README.md (updated)
+- .opencode/guides/architecture/decisions/archive/ADR-{old}.md (archived)
 
 ADR Summary:
 - Decision: {brief decision}
@@ -546,9 +548,9 @@ Actions:
 - Outline updated: Added workflows/engine/ module
 
 Files modified:
-- adw-docs/architecture/decisions/ADR-008-workflow-engine-architecture.md (new)
-- adw-docs/architecture/architecture_outline.md (updated)
-- adw-docs/architecture/decisions/README.md (updated)
+- .opencode/guides/architecture/decisions/ADR-008-workflow-engine-architecture.md (new)
+- .opencode/guides/architecture/architecture_outline.md (updated)
+- .opencode/guides/architecture/decisions/README.md (updated)
 
 ADR Summary:
 - Decision: Implement declarative JSON-based workflow engine
@@ -566,7 +568,7 @@ Links validated: 15 links, all valid
 
 **Output Signal:** `ARCHITECTURE_UPDATE_COMPLETE` or `ARCHITECTURE_UPDATE_FAILED`
 
-**Scope:** `adw-docs/architecture/` only
+**Scope:** `.opencode/guides/architecture/` only
 
 **ADR Format:** Follow ADR-001 template exactly
 
@@ -576,4 +578,4 @@ Links validated: 15 links, all valid
 
 **Always:** Update README.md index, validate links
 
-**References:** `adw-docs/architecture/decisions/ADR-001-*.md` (template)
+**References:** `.opencode/guides/architecture/decisions/ADR-001-*.md` (template)

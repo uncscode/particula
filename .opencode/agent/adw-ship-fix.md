@@ -1,34 +1,39 @@
 ---
+
 description: >-
   Primary agent that ships PR fix workflow changes to an existing pull request.
   Delegates commit/push to adw-commit, summarizes changes, and posts a PR
   comment instead of creating a new PR.
 mode: primary
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: true
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  platform_operations: true
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_spec: deny
+  adw_spec_read: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  git_branch: allow
+  platform_operations: deny
+  platform_comment_write: allow
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Ship Fix Agent
@@ -37,7 +42,7 @@ Ships changes for PR-fix workflows by committing, pushing, and posting a summary
 
 # Core Mission
 
-1. **Load Context**: Read workflow state from `adw_spec`.
+1. **Load Context**: Read workflow state from `adw_spec_read`.
 2. **Commit + Push**: Delegate to `adw-commit` subagent.
 3. **Summarize Fixes**: Combine `spec_content` with `git diff --base` stats.
 4. **Comment on PR**: Post a summary comment to the existing PR.
@@ -60,7 +65,7 @@ def load_state(adw_id: str) -> dict:
     Returns:
         Parsed workflow state.
     """
-    return adw_spec({"command": "read", "adw_id": adw_id})
+    return adw_spec_read({"command": "read", "adw_id": adw_id})
 ```
 
 Required fields:
@@ -125,9 +130,9 @@ def get_diff_stat(worktree_path: str, base: str) -> dict:
         base: Base branch reference.
 
     Returns:
-        Diff stat output from git_operations.
+        Diff stat output from git_diff.
     """
-    return git_operations({
+    return git_diff({
         "command": "diff",
         "base": base,
         "stat": true,
@@ -174,7 +179,7 @@ def post_pr_comment(pr_number: int, body: str) -> dict:
     Returns:
         Platform operation response.
     """
-    return platform_operations({
+    return platform_comment_write({
         "command": "comment",
         "issue_number": pr_number,
         "body": body,

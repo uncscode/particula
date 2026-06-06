@@ -1,0 +1,123 @@
+{
+  "name": "complete-auto",
+  "version": "2.3.0",
+  "description": "Full development workflow for auto-mode dispatch. Includes documentation and ships via branch accumulation instead of per-slice PRs. Self-review persists canonical review results into workflow state, then if actionable issues are found, a dedicated state-driven fix pass runs with full re-validation before accumulating into the tracking branch.",
+  "workflow_type": "complete",
+  "steps": [
+    {
+      "type": "workflow",
+      "name": "Plan",
+      "workflow_name": "plan-work-multireview"
+    },
+    {
+      "type": "workflow",
+      "name": "Build",
+      "workflow_name": "adw-build"
+    },
+    {
+      "type": "workflow",
+      "name": "Build-Refine",
+      "workflow_name": "adw-build-refine"
+    },
+    {
+      "type": "workflow",
+      "name": "Polish",
+      "workflow_name": "adw-polish"
+    },
+    {
+      "type": "workflow",
+      "name": "Validate",
+      "workflow_name": "adw-validate"
+    },
+    {
+      "type": "workflow",
+      "name": "Test",
+      "workflow_name": "test"
+    },
+    {
+      "type": "workflow",
+      "name": "Format",
+      "workflow_name": "adw-format"
+    },
+    {
+      "type": "workflow",
+      "name": "Document",
+      "workflow_name": "documentation-update"
+    },
+    {
+      "type": "workflow",
+      "name": "Review",
+      "workflow_name": "review-auto"
+    },
+    {
+      "type": "agent",
+      "name": "Plan Fix",
+      "agent": "review-fix-planner",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      },
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "agent",
+      "name": "Fix",
+      "agent": "adw-build-fix",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 3600,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 10.0,
+        "backoff": 2.0
+      },
+      "condition": {
+        "if_condition": "state.request_fix == True",
+        "skip_if": "state.fix_completed == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Validate",
+      "workflow_name": "adw-validate",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Polish",
+      "workflow_name": "adw-polish",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Test",
+      "workflow_name": "test",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Format",
+      "workflow_name": "adw-format",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Ship",
+      "workflow_name": "ship-auto"
+    }
+  ]
+}

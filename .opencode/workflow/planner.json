@@ -1,0 +1,93 @@
+{
+  "name": "planner",
+  "version": "1.0.0",
+  "description": "Planner workflow: scope analysis, plan drafting, phase splitting, review, ship, and question surfacing",
+  "workflow_type": "planner",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Scope Analysis",
+      "agent": "plan-scope-analyzer",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Draft Orchestrator",
+      "agent": "plan-orchestrator",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Split Phases",
+      "agent": "plan-phase-splitter",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Review Architecture",
+      "agent": "plan-review-architecture",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Review Sizing",
+      "agent": "plan-review-sizing",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Review Testing",
+      "agent": "plan-review-testing",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Review Dependencies",
+      "agent": "plan-review-dependencies",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Review Completeness",
+      "agent": "plan-review-completeness",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Consistency Check",
+      "agent": "plan-consistency-reviewer",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "workflow",
+      "name": "Ship",
+      "workflow_name": "ship"
+    },
+    {
+      "type": "agent",
+      "name": "Surface Questions",
+      "agent": "plan-questions-surfacer",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id} --pr-number ${pr_number}",
+      "model": "base",
+      "timeout": 1800
+    }
+  ]
+}

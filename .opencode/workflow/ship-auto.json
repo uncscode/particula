@@ -1,0 +1,22 @@
+{
+  "name": "ship-auto",
+  "version": "2.0.0",
+  "description": "Ship-auto workflow - Branch accumulation shipping without PR creation",
+  "description_long": "Ships slice work by committing, pushing, and accumulating onto the tracking feature branch without creating per-slice PRs",
+  "workflow_type": "complete",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Ship Auto Implementation",
+      "agent": "shipper-auto",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "light",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 1.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

@@ -63,10 +63,10 @@ Each example demonstrates specific features:
 ## Documentation
 
 For detailed explanations and more examples, see:
-- **[Workflow Examples Guide](../../../docs/Agent/workflow-examples.md)** - Complete guide with 6 examples
-- **[Workflow Engine Guide](../../../docs/Agent/workflow-engine.md)** - Main workflow engine documentation
-- **[Workflow JSON Schema](../../../docs/Agent/workflow-json-schema.md)** - Complete schema reference
-- **[Workflow Conditionals](../../../docs/Agent/workflow-conditionals.md)** - Conditional syntax guide
+- **[Workflow Examples Guide](../../../docs/Examples/workflows/json-workflows.md#built-in-workflow-examples)** - Complete guide with built-in examples
+- **[Workflow Engine Guide](../../../docs/Examples/setup/workflow-reference.md)** - Main workflow engine documentation
+- **[Workflow JSON Schema](../../../docs/Examples/workflows/json-workflows.md#step-5-validate-schema)** - Complete schema reference
+- **[Workflow Conditionals](../../../docs/Examples/workflows/json-workflows.md#conditional-logic)** - Conditional syntax guide
 
 ## Best Practices
 
@@ -111,6 +111,6 @@ load_workflow('.opencode/workflow/examples/conditional-build.json')"
 ## Support
 
 For issues or questions:
-- Check [Troubleshooting Guide](../../../docs/Agent/workflow-engine.md#troubleshooting)
-- Review [Workflow Examples Guide](../../../docs/Agent/workflow-examples.md)
-- See [Migration Guide](../../../docs/Agent/workflow-migration-guide.md) for Python → JSON conversion
+- Check [Troubleshooting Guide](../../../docs/Examples/workflows/json-workflows.md#troubleshooting)
+- Review [Workflow Examples Guide](../../../docs/Examples/workflows/json-workflows.md)
+- See [Migration Guide](../../../docs/Examples/setup/migration-guide.md) for Python → JSON conversion

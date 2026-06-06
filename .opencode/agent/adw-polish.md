@@ -1,4 +1,5 @@
 ---
+
 description: 'Primary agent that polishes code after the build-refine phase by running
   linting with auto-fix and committing formatting changes when needed.
 
@@ -13,31 +14,32 @@ description: 'Primary agent that polishes code after the build-refine phase by r
   - After build-refine completes: lint and format code before validate
   - Standalone polish: run on any branch to clean up linting'
 mode: primary
-tools:
-  read: true
-  edit: true
-  write: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: true
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: true
-  build_mkdocs: true
-  platform_operations: false
-  run_pytest: false
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  ripgrep: allow
+  move: allow
+  todoread: allow
+  todowrite: allow
+  task: allow
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  build_mkdocs: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Polish Agent
@@ -68,8 +70,8 @@ You are running in **completely autonomous mode** with:
 
 # Required Reading
 
-- @adw-docs/linting_guide.md - Linting rules and configuration
-- @adw-docs/code_style.md - Code conventions
+- @.opencode/guides/linting_guide.md - Linting rules and configuration
+- @.opencode/guides/code_style.md - Code conventions
 
 # Subagents
 

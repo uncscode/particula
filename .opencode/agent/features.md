@@ -1,4 +1,5 @@
 ---
+
 description: 'Subagent that manages high-level feature documentation in docs/Features/.
   Invoked by the documentation primary agent to create and update user-facing feature
   documentation for major ADW capabilities.
@@ -9,30 +10,31 @@ description: 'Subagent that manages high-level feature documentation in docs/Fea
 
   Write permissions: - docs/Features/*.md: ALLOW'
 mode: subagent
-tools:
-  read: true
-  edit: true
-  write: true
-  list: true
-  ripgrep: true
-  move: true
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: false
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: allow
+  write: allow
+  list: allow
+  ripgrep: allow
+  move: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: deny
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # Features Subagent
@@ -69,7 +71,7 @@ task({
 # Required Reading
 
 - @docs/Features/ - Existing feature docs
-- @adw-docs/documentation_guide.md - Documentation standards
+- @.opencode/guides/documentation_guide.md - Documentation standards
 - @README.md - Feature overview in README
 
 # Write Permissions
@@ -257,7 +259,7 @@ The fastest way to use {feature}:
 
 ## Related Documentation
 
-- **Detailed Guide**: [adw-docs/{related-guide}.md](../../adw-docs/{guide}.md)
+- **Detailed Guide**: [.opencode/guides/{related-guide}.md](../guides/{guide}.md)
 - **Examples**: [docs/Examples/{feature}.md](../Examples/{feature}.md)
 - **Architecture**: [docs/Theory/{concept}.md](../Theory/{concept}.md)
 
@@ -291,10 +293,10 @@ Use `edit` to update capabilities, use cases, etc.
 ## Step 5: Link to Other Documentation
 
 Ensure feature doc links to:
-- Detailed guides in `adw-docs/`
+- Detailed guides in `.opencode/guides/`
 - Practical examples in `docs/Examples/`
 - Conceptual documentation in `docs/Theory/`
-- Architecture in `adw-docs/architecture/`
+- Architecture in `.opencode/guides/architecture/`
 
 ## Step 6: Validate Markdown Links
 

@@ -1,0 +1,23 @@
+{
+  "name": "review-auto",
+  "version": "1.0.0",
+  "description": "State-only multi-agent code review for auto workflows: parallel specialized reviewers -> consolidation -> workflow-state persistence with no PR dependency.",
+  "description_long": "Comprehensive code review workflow for auto-mode slices that have not opened a PR. Dispatches specialized reviewers in parallel, consolidates findings, persists canonical review outputs into workflow state for downstream fix planning, and intentionally skips PR feedback posting.",
+  "workflow_type": "review",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Review",
+      "description": "State-only auto review: parallel specialized reviewers -> consolidation -> state persistence",
+      "agent": "adw-review-auto-orchestrator",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 1800,
+      "retry": {
+        "max_retries": 2,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      }
+    }
+  ]
+}

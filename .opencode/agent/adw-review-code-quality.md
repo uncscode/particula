@@ -1,4 +1,5 @@
 ---
+
 description: >-
   Subagent that reviews code for style, readability, and maintainability.
 
@@ -10,31 +11,33 @@ description: >-
   Invoked by: adw-review-orchestrator (parallel with other reviewers) Languages:
   Python and C++
 mode: subagent
-tools:
-  read: true
-  edit: false
-  write: false
-  list: true
-  ripgrep: true
-  move: false
-  todoread: true
-  todowrite: true
-  task: false
-  adw: false
-  adw_spec: true
-  feedback_log: true
-  create_workspace: false
-  workflow_builder: false
-  git_operations: false
-  platform_operations: false
-  run_pytest: false
-  run_linters: true
-  get_datetime: true
-  get_version: true
-  webfetch: false
-  websearch: false
-  codesearch: false
-  bash: false
+permission:
+  "*": deny
+  read: allow
+  edit: deny
+  write: deny
+  list: allow
+  ripgrep: allow
+  move: deny
+  todoread: allow
+  todowrite: allow
+  task: deny
+  adw: deny
+  adw_spec: allow
+  feedback_log: allow
+  create_workspace: deny
+  workflow_builder: deny
+  git_diff: allow
+  git_operations: deny
+  platform_operations: deny
+  run_pytest: deny
+  run_linters: allow
+  get_datetime: allow
+  get_version: allow
+  webfetch: deny
+  websearch: deny
+  codesearch: deny
+  bash: deny
 ---
 
 # ADW Review - Code Quality
@@ -73,8 +76,8 @@ Linter Findings:
 
 # Required Reading
 
-- @adw-docs/code_style.md - Repository coding conventions
-- @adw-docs/docstring_guide.md - Documentation standards
+- @.opencode/guides/code_style.md - Repository coding conventions
+- @.opencode/guides/docstring_guide.md - Documentation standards
 
 # Review Process
 

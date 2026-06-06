@@ -1,0 +1,97 @@
+{
+  "name": "plan-fix",
+  "version": "1.0.0",
+  "description": "Plan-fix workflow: analyze comments -> revise plans -> re-review -> ship -> generate issues",
+  "workflow_type": "plan-fix",
+  "steps": [
+    {
+      "type": "agent",
+      "name": "Analyze Comments",
+      "agent": "plan-comment-analyzer",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id} --pr-number ${pr_number}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Revise Plans",
+      "agent": "plan-reviser",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "heavy",
+      "timeout": 1200
+    },
+    {
+      "type": "agent",
+      "name": "Re-split Phases",
+      "agent": "plan-phase-splitter",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Review Architecture",
+      "agent": "plan-review-architecture",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Review Sizing",
+      "agent": "plan-review-sizing",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Review Testing",
+      "agent": "plan-review-testing",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Review Dependencies",
+      "agent": "plan-review-dependencies",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Review Completeness",
+      "agent": "plan-review-completeness",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "agent",
+      "name": "Consistency Check",
+      "agent": "plan-consistency-reviewer",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600
+    },
+    {
+      "type": "workflow",
+      "name": "Ship Fix",
+      "workflow_name": "adw-ship-fix"
+    },
+    {
+      "type": "agent",
+      "name": "Generate Issues",
+      "agent": "plan-issue-generator",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 600,
+      "condition": {
+        "fail_if": "'Ship Fix' not in state.workflow_steps_completed",
+        "fail_message": "Generate Issues precondition failed: Ship Fix step must be completed before issue generation."
+      }
+    }
+  ]
+}

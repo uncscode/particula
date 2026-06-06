@@ -1,0 +1,301 @@
+{
+  "$defs": {
+    "ChildPlanRef": {
+      "additionalProperties": false,
+      "description": "Reference to a child feature or maintenance plan.\n\nAttributes:\n    id: Stable child plan identifier (for example, ``E16-F2`` or ``E16-M1``).\n    type: Child plan type. Only ``\"feature\"`` and ``\"maintenance\"`` are allowed.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "feature",
+            "maintenance"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "ChildPlanRef",
+      "type": "object"
+    },
+    "GovernanceEntry": {
+      "additionalProperties": false,
+      "description": "Decision-log entry for epic-level governance events.\n\nAttributes:\n    date: Decision date in ``YYYY-MM-DD`` format.\n    decision: Governance decision summary.\n    owner: Username or team responsible for the decision.",
+      "properties": {
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "owner": {
+          "title": "Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "decision",
+        "owner"
+      ],
+      "title": "GovernanceEntry",
+      "type": "object"
+    },
+    "Milestone": {
+      "additionalProperties": false,
+      "description": "Milestone metadata for epic progress tracking.\n\nAttributes:\n    name: Human-readable milestone name.\n    planned_date: Optional planned completion date (``YYYY-MM-DD``).\n    actual_date: Optional actual completion date (``YYYY-MM-DD``).\n    status: Current milestone state using the shared phase status vocabulary.",
+      "properties": {
+        "actual_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Actual Date"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "planned_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Planned Date"
+        },
+        "status": {
+          "enum": [
+            "Not Started",
+            "In Progress",
+            "Blocked",
+            "Shipped",
+            "Cancelled"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "status"
+      ],
+      "title": "Milestone",
+      "type": "object"
+    },
+    "RiskEntry": {
+      "additionalProperties": false,
+      "description": "Risk-register row used by epic plans.\n\nAttributes:\n    risk: Description of the identified risk.\n    likelihood: Qualitative likelihood label (for example, ``Low`` or ``Medium``).\n    impact: Qualitative impact label (for example, ``Medium`` or ``High``).\n    status: Current risk status value.",
+      "properties": {
+        "impact": {
+          "title": "Impact",
+          "type": "string"
+        },
+        "likelihood": {
+          "title": "Likelihood",
+          "type": "string"
+        },
+        "risk": {
+          "title": "Risk",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "risk",
+        "likelihood",
+        "impact",
+        "status"
+      ],
+      "title": "RiskEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Epic-level plan model with child references and governance metadata.\n\nAttributes:\n    type: Discriminator fixed to ``\"epic\"``.\n    child_plans: Child feature and maintenance plans tracked by the epic.\n    milestones: Epic milestones used for progress tracking.\n    governance_log: Chronological decision log for major epic governance events.\n    risk_register: Structured epic risk register entries.",
+  "properties": {
+    "child_plans": {
+      "items": {
+        "$ref": "#/$defs/ChildPlanRef"
+      },
+      "title": "Child Plans",
+      "type": "array"
+    },
+    "completion_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completion Date"
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Dependencies",
+      "type": "array"
+    },
+    "governance_log": {
+      "items": {
+        "$ref": "#/$defs/GovernanceEntry"
+      },
+      "title": "Governance Log",
+      "type": "array"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "last_updated": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Updated"
+    },
+    "milestones": {
+      "items": {
+        "$ref": "#/$defs/Milestone"
+      },
+      "title": "Milestones",
+      "type": "array"
+    },
+    "owners": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Owners",
+      "type": "array"
+    },
+    "priority": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "Backlog"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "risk_register": {
+      "items": {
+        "$ref": "#/$defs/RiskEntry"
+      },
+      "title": "Risk Register",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "section_files": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Section Files",
+      "type": "object"
+    },
+    "size": {
+      "enum": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "title": "Size",
+      "type": "string"
+    },
+    "start_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Start Date"
+    },
+    "status": {
+      "enum": [
+        "Draft",
+        "Proposed",
+        "Ready",
+        "In Progress",
+        "Blocked",
+        "Monitoring",
+        "Shipped",
+        "Cancelled",
+        "Superseded"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "target_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Date"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "const": "epic",
+      "default": "epic",
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "status",
+    "priority",
+    "size"
+  ],
+  "title": "EpicPlan",
+  "type": "object"
+}
