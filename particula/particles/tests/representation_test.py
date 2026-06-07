@@ -380,8 +380,9 @@ def test_normalize_density_array_handles_scalar_1d_and_empty_2d() -> None:
     )
 
 
-def test_normalize_charge_array_handles_scalar_empty_and_matching_shape(
-) -> None:
+def test_normalize_charge_array_handles_scalar_empty_and_matching_shape() -> (
+    None
+):
     """Charge normalization should match the concentration template shape."""
     template = np.array([1.0, 2.0, 3.0], dtype=np.float64)
 
@@ -414,8 +415,9 @@ def test_warn_deprecated_logs_message(monkeypatch: pytest.MonkeyPatch) -> None:
     assert "ParticleRepresentation is deprecated" in messages[0]
 
 
-def test_particle_representation_from_data_preserves_charge_without_warning(
-) -> None:
+def test_particle_representation_from_data_preserves_charge_without_warning() -> (
+    None
+):
     """from_data should wrap ParticleData without logging deprecation."""
     particle = setup_particle(charge=np.array([1.0, 2.0, 3.0]))
 
