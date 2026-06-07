@@ -339,12 +339,17 @@ class ParticleRepresentation:
         if charge_array is not None:
             charge_box = charge_array[np.newaxis, ...]
         if charge_box.shape != concentration_box.shape:
-            charge_box = np.full_like(
-                concentration_box,
-                np.asarray(charge_array, dtype=np.float64).item()
-                if charge_array is not None and charge_array.ndim == 0
-                else charge_box.mean(),
-            )
+            if charge_box.size == 0:
+                charge_box = np.zeros_like(concentration_box)
+            elif charge_box.size == concentration_box.size:
+                charge_box = np.reshape(charge_box, concentration_box.shape)
+            else:
+                charge_box = np.full_like(
+                    concentration_box,
+                    np.asarray(charge_array, dtype=np.float64).item()
+                    if charge_array is not None and charge_array.ndim == 0
+                    else charge_box.mean(),
+                )
         volume_array = np.asarray([volume_value], dtype=np.float64)
         return (
             ParticleData(
