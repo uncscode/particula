@@ -16,6 +16,7 @@ def test_imports_from_dynamics_namespace():
         CondensationIsothermalStaggered,
         CondensationIsothermalStaggeredBuilder,
         CondensationLatentHeat,
+        CondensationLatentHeatBuilder,
     )
 
     assert CondensationLatentHeat is PAR_DYNAMICS.CondensationLatentHeat
@@ -32,6 +33,10 @@ def test_imports_from_dynamics_namespace():
         CondensationIsothermalStaggeredBuilder
         is PAR_DYNAMICS.CondensationIsothermalStaggeredBuilder
     )
+    assert (
+        CondensationLatentHeatBuilder
+        is PAR_DYNAMICS.CondensationLatentHeatBuilder
+    )
     assert CondensationFactory is PAR_DYNAMICS.CondensationFactory
 
 
@@ -45,6 +50,7 @@ def test_imports_from_condensation_subpackage():
         CondensationIsothermalStaggered,
         CondensationIsothermalStaggeredBuilder,
         CondensationLatentHeat,
+        CondensationLatentHeatBuilder,
         CondensationStrategy,
     )
 
@@ -62,22 +68,33 @@ def test_imports_from_condensation_subpackage():
         CondensationIsothermalStaggeredBuilder
         is condensation.CondensationIsothermalStaggeredBuilder
     )
+    assert (
+        CondensationLatentHeatBuilder
+        is condensation.CondensationLatentHeatBuilder
+    )
     assert CondensationFactory is condensation.CondensationFactory
     assert CondensationStrategy is condensation.CondensationStrategy
+    assert (
+        PAR_DYNAMICS.CondensationLatentHeatBuilder
+        is condensation.CondensationLatentHeatBuilder
+    )
 
 
 def test_condensation_exports_available_via_par_dynamics():
     """Shorthand namespace exposes staggered condensation symbols."""
     assert hasattr(PAR_DYNAMICS, "CondensationIsothermalStaggered")
     assert hasattr(PAR_DYNAMICS, "CondensationIsothermalStaggeredBuilder")
+    assert hasattr(PAR_DYNAMICS, "CondensationLatentHeatBuilder")
     assert hasattr(PAR_DYNAMICS, "CondensationLatentHeat")
 
     strategy = PAR_DYNAMICS.CondensationIsothermalStaggered
     builder = PAR_DYNAMICS.CondensationIsothermalStaggeredBuilder
+    latent_builder = PAR_DYNAMICS.CondensationLatentHeatBuilder
     latent = PAR_DYNAMICS.CondensationLatentHeat
 
     assert strategy.__name__ == "CondensationIsothermalStaggered"
     assert builder.__name__ == "CondensationIsothermalStaggeredBuilder"
+    assert latent_builder.__name__ == "CondensationLatentHeatBuilder"
     assert latent.__name__ == "CondensationLatentHeat"
 
 
@@ -91,6 +108,7 @@ def test_condensation_export_memberships():
     assert "CondensationIsothermal" in condensation.__all__
     assert "CondensationIsothermalBuilder" in condensation.__all__
     assert "CondensationLatentHeat" in condensation.__all__
+    assert "CondensationLatentHeatBuilder" in condensation.__all__
     assert "CondensationStrategy" in condensation.__all__
 
     assert "CondensationIsothermalStaggered" in PAR_DYNAMICS.__all__
@@ -98,4 +116,5 @@ def test_condensation_export_memberships():
     assert "CondensationFactory" in PAR_DYNAMICS.__all__
     assert "CondensationIsothermal" in PAR_DYNAMICS.__all__
     assert "CondensationIsothermalBuilder" in PAR_DYNAMICS.__all__
+    assert "CondensationLatentHeatBuilder" in PAR_DYNAMICS.__all__
     assert "CondensationLatentHeat" in PAR_DYNAMICS.__all__

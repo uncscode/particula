@@ -54,11 +54,10 @@ from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermalStaggered,
     CondensationLatentHeat,
 )
-from particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder import (
+from particula.dynamics.condensation.condensation_builder import (
     CondensationIsothermalBuilder,
-)
-from particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder import (
     CondensationIsothermalStaggeredBuilder,
+    CondensationLatentHeatBuilder,
 )
 from particula.dynamics.condensation.condensation_factories import (
     CondensationFactory,
