@@ -3,6 +3,7 @@
 from typing import Any
 
 import numpy as np
+import pytest
 from particula.particles.activity_strategies import ActivityIdealMass
 from particula.particles.distribution_strategies import (
     ParticleResolvedSpeciatedMass,
@@ -37,9 +38,9 @@ def setup_particle(
         activity=activity,
         surface=surface,
         distribution=distribution,
-        density=np.atleast_1d(np.asarray(density, dtype=np.float64)),
+        density=density,
         concentration=concentration,
-        charge=np.atleast_1d(np.asarray(charge, dtype=np.float64)),
+        charge=charge,
     )
 
 
@@ -305,3 +306,55 @@ def test_add_concentration_charge_none_returns_none():
     )
 
     assert particle.get_charge() is None
+
+
+def test_particle_representation_rejects_multidimensional_density() -> None:
+    """Density inputs must be scalar or 1D arrays."""
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"density must be a scalar or 1D array, got array with "
+            r"shape \(2, 2\)"
+        ),
+    ):
+        setup_particle(density=np.array([[1000.0, 1000.0], [900.0, 900.0]]))
+
+
+def test_particle_representation_accepts_scalar_and_1d_density() -> None:
+    """Supported density forms should preserve existing normalization."""
+    scalar_particle = setup_particle(density=1000.0)
+    array_particle = setup_particle(density=np.array([1000.0]))
+
+    np.testing.assert_array_equal(
+        scalar_particle.get_density(), np.array([1000.0])
+    )
+    np.testing.assert_array_equal(
+        array_particle.get_density(), np.array([1000.0])
+    )
+
+
+def test_particle_representation_rejects_incompatible_charge_shapes() -> None:
+    """Charge arrays must be scalar, empty, or match concentration shape."""
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"charge must be a scalar, empty array, or array matching "
+            r"concentration shape \(3,\); got shape \(1, 3\)"
+        ),
+    ):
+        setup_particle(charge=np.array([[1.0, 2.0, 3.0]]))
+
+
+def test_particle_representation_accepts_matching_and_scalar_charge() -> None:
+    """Valid charge inputs should continue to work."""
+    array_particle = setup_particle(charge=np.array([1.0, 2.0, 3.0]))
+    scalar_particle = setup_particle(charge=2.0)
+
+    np.testing.assert_array_equal(
+        array_particle.get_charge(),
+        np.array([1.0, 2.0, 3.0]),
+    )
+    np.testing.assert_array_equal(
+        scalar_particle.get_charge(),
+        np.array([2.0, 2.0, 2.0]),
+    )

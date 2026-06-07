@@ -64,6 +64,12 @@ class CondensationLatentHeatBuilder(
         self.latent_heat: float | None = None
         self._latent_heat_explicitly_set = False
 
+    def _reset_optional_latent_heat_state(self) -> None:
+        """Clear optional latent-heat settings for a fresh parameter load."""
+        self.latent_heat_strategy = None
+        self.latent_heat = None
+        self._latent_heat_explicitly_set = False
+
     def set_parameters(
         self, parameters: dict[str, Any]
     ) -> "CondensationLatentHeatBuilder":
@@ -106,15 +112,22 @@ class CondensationLatentHeatBuilder(
             logger.error(error_message)
             raise ValueError(error_message)
 
+        self._reset_optional_latent_heat_state()
+
+        default_units = {
+            "molar_mass": "kg/mol",
+            "diffusion_coefficient": "m^2/s",
+            "accommodation_coefficient": None,
+        }
+
         for key in required:
             unit_key = f"{key}_units"
+            units = parameters.get(unit_key, default_units[key])
             if unit_key in parameters:
-                getattr(self, f"set_{key}")(
-                    parameters[key], parameters[unit_key]
-                )
+                getattr(self, f"set_{key}")(parameters[key], units)
             else:
                 logger.warning("Using default units for parameter: '%s'.", key)
-                getattr(self, f"set_{key}")(parameters[key])
+                getattr(self, f"set_{key}")(parameters[key], units)
 
         if "update_gases" in parameters:
             self.set_update_gases(parameters["update_gases"])
@@ -139,7 +152,18 @@ class CondensationLatentHeatBuilder(
 
         Notes:
             Passing ``None`` clears any previously stored strategy.
+
+        Raises:
+            TypeError: If ``latent_heat_strategy`` is not ``None`` and does not
+                implement :class:`LatentHeatStrategy`.
         """
+        if latent_heat_strategy is not None and not isinstance(
+            latent_heat_strategy, LatentHeatStrategy
+        ):
+            raise TypeError(
+                "latent_heat_strategy must be a LatentHeatStrategy or None, "
+                f"got {type(latent_heat_strategy).__name__}"
+            )
         self.latent_heat_strategy = latent_heat_strategy
         return self
 
