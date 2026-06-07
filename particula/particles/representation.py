@@ -32,7 +32,17 @@ _DEPRECATION_MESSAGE = (
 def _normalize_density_array(
     density: NDArray[np.float64] | float,
 ) -> NDArray[np.float64]:
-    """Normalize density input to a 1D float64 array."""
+    """Normalize density input to a 1D float64 array.
+
+    Args:
+        density: Density specified as a scalar or 1D array.
+
+    Returns:
+        Density as a 1D ``float64`` array.
+
+    Raises:
+        ValueError: If ``density`` cannot be reduced to a scalar or 1D array.
+    """
     density_array = np.asarray(density, dtype=np.float64)
     if density_array.ndim == 0:
         return np.atleast_1d(density_array)
@@ -50,7 +60,18 @@ def _normalize_charge_array(
     charge: NDArray[np.float64] | float,
     template: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Normalize charge input to exactly match the template shape."""
+    """Normalize charge input to exactly match the template shape.
+
+    Args:
+        charge: Charge specified as a scalar or array-like value.
+        template: Reference array defining the required output shape.
+
+    Returns:
+        Charge as a ``float64`` array matching ``template``.
+
+    Raises:
+        ValueError: If ``charge`` cannot be broadcast to ``template``.
+    """
     charge_array = np.asarray(charge, dtype=np.float64)
     if charge_array.ndim == 0:
         return np.full_like(template, float(charge_array), dtype=np.float64)
@@ -114,12 +135,21 @@ class ParticleRepresentation:
         charge: NDArray[np.float64] | float | None,
         volume: float = 1,
     ):  # pylint: disable=too-many-positional-arguments, too-many-arguments
-        """Initialize the ParticleRepresentation.
+        """Initialize the legacy particle representation facade.
 
-        Sets up the particle representation with required strategies and
-        properties including distribution, density, concentration, charge,
-        and volume for particle calculations. This legacy facade emits a
-        deprecation warning and stores state in a ParticleData container.
+        Args:
+            strategy: Distribution strategy for the representation.
+            activity: Activity strategy for particle-phase calculations.
+            surface: Surface strategy for surface-property calculations.
+            distribution: Distribution data interpreted by ``strategy``.
+            density: Particle density values.
+            concentration: Particle concentration values.
+            charge: Optional particle charge values.
+            volume: Simulation volume in m^3. Defaults to 1.
+
+        Notes:
+            This legacy facade emits a deprecation log message and stores its
+            state in an underlying :class:`ParticleData` container.
         """
         _warn_deprecated(stacklevel=2)
 
@@ -163,16 +193,11 @@ class ParticleRepresentation:
         )
 
     def __str__(self) -> str:
-        """Returns a string representation of the particle representation.
+        """Return a human-readable summary of the representation.
 
         Returns:
-            - A string representation of the particle representation.
-
-        Example:
-            ``` py title="Get String Representation"
-            str_rep = str(particle_representation)
-            print(str_rep)
-            ```
+            Multi-line string describing the configured strategies and bulk
+            concentrations.
         """
         return (
             f"Particle Representation:\n"
@@ -190,7 +215,15 @@ class ParticleRepresentation:
         value: NDArray[np.float64] | float,
         template: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Return a float64 array broadcast to the template shape."""
+        """Return a float64 array broadcast to the template shape.
+
+        Args:
+            value: Scalar or array-like value to normalize.
+            template: Reference array defining the required output shape.
+
+        Returns:
+            Normalized ``float64`` array matching ``template``.
+        """
         return _normalize_charge_array(value, template)
 
     @property
@@ -338,7 +371,20 @@ class ParticleRepresentation:
         volume_value: float,
         strategy: DistributionStrategy,
     ) -> tuple["ParticleData", bool, NDArray[np.float64] | None]:  # noqa: ANN201
-        """Create ParticleData for single-box representation."""
+        """Create particle data for a single-box representation.
+
+        Args:
+            distribution: Distribution data interpreted by ``strategy``.
+            density_array: Normalized species-density array.
+            concentration_array: Box concentration values.
+            charge_value: Optional charge values to normalize.
+            volume_value: Simulation volume in m^3.
+            strategy: Distribution strategy used to derive mass data.
+
+        Returns:
+            Tuple containing the constructed particle data, whether the source
+            species masses were 1D, and the normalized charge array.
+        """
         from particula.particles.particle_data import ParticleData
 
         masses, species_mass_is_1d = cls._build_masses(
@@ -377,7 +423,13 @@ class ParticleRepresentation:
         concentration: NDArray[np.float64],
         charge_array: NDArray[np.float64] | None,
     ) -> None:
-        """Update internal data from supplied arrays without warnings."""
+        """Update cached state from supplied arrays without warnings.
+
+        Args:
+            distribution: Updated distribution data.
+            concentration: Updated concentration values.
+            charge_array: Updated normalized charge data, if charge is tracked.
+        """
         (
             self._data,
             self._species_mass_is_1d,
@@ -779,20 +831,17 @@ class ParticleRepresentation:
     ) -> None:
         """Add concentration to the particle distribution.
 
-        Arguments:
-            - added_concentration : The concentration to be added per bin
-              (1/m^3).
-            - added_distribution : Optional distribution array to merge into
-              the existing distribution. If None, the current distribution
-              is reused.
-            - added_charge : Optional charge array for newly added particles.
-              Defaults to zeros when charge is tracked but no values are
-              provided. Ignored when charge is not tracked.
+        Args:
+            added_concentration: Concentration increment per distribution bin.
+            added_distribution: Optional distribution array to merge into the
+                current distribution. When omitted, the existing distribution is
+                reused.
+            added_charge: Optional charge array for newly added particles.
 
-        Example:
-            ``` py title="Add Concentration"
-            particle_representation.add_concentration(added_concentration)
-            ```
+        Raises:
+            ValueError: If charge tracking is disabled but the strategy returns
+                charge data, or if charge tracking is enabled but no updated
+                charge data is returned.
         """
         _warn_deprecated(stacklevel=2)
         # if added_distribution is None, then it will be calculated
@@ -832,7 +881,7 @@ class ParticleRepresentation:
         self._enforce_increasing_bins()
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
-        """Collide pairs of particles, used for ParticleResolved Strategies.
+        """Collide particle pairs for particle-resolved strategies.
 
         Performs coagulation between particle pairs by delegating to the
         distribution strategy's collide_pairs method. The smaller particle
@@ -844,14 +893,9 @@ class ParticleRepresentation:
         physically accurate charge conservation in particle-resolved
         coagulation simulations.
 
-        Arguments:
-            - indices : Array of particle pair indices to collide, shape
-                (K, 2) where each row is [small_index, large_index].
-
-        Example:
-            ``` py title="Collide Pairs"
-            particle_representation.collide_pairs(indices)
-            ```
+        Args:
+            indices: Array of particle pair indices with shape ``(K, 2)`` where
+                each row is ``[small_index, large_index]``.
         """
         _warn_deprecated(stacklevel=2)
         updated_distribution, updated_concentration, updated_charge = (

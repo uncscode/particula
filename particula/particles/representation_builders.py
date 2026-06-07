@@ -1,8 +1,8 @@
-"""Particle Representation Builders.
+"""Builders for legacy particle representations.
 
-Provides builder classes for creating ParticleRepresentation objects
-with specialized distribution, activity, and surface strategies for
-mass-based, radius-based, discrete, or lognormal representations.
+This module provides builder classes and normalization helpers for creating
+deprecated :class:`ParticleRepresentation` facades with mass-based,
+radius-based, and particle-resolved distributions.
 """
 
 import logging
@@ -53,7 +53,16 @@ def _normalize_resolved_density_input(
     density: float | NDArray[np.float64],
     mass: NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
-    """Normalize particle-resolved density input to species-shape form."""
+    """Normalize resolved density input to the expected species shape.
+
+    Args:
+        density: Density specified as a scalar or array-like value.
+        mass: Resolved mass array used as the target shape reference.
+
+    Returns:
+        A scalar density or 1D density array aligned with the species axis
+        expected by :class:`ParticleRepresentation`.
+    """
     density_array = np.asarray(density, dtype=np.float64)
     if density_array.ndim == 2 and density_array.shape == mass.shape:
         if mass.shape[0] == 0:
@@ -68,7 +77,16 @@ def _normalize_resolved_charge_input(
     charge: float | NDArray[np.float64] | None,
     mass: NDArray[np.float64],
 ) -> float | NDArray[np.float64] | None:
-    """Normalize particle-resolved charge input to particle-shape form."""
+    """Normalize resolved charge input to the expected particle shape.
+
+    Args:
+        charge: Charge specified as ``None``, a scalar, or an array-like value.
+        mass: Resolved mass array used as the target shape reference.
+
+    Returns:
+        ``None``, a scalar charge, or a 1D charge array aligned with the
+        particle axis expected by :class:`ParticleRepresentation`.
+    """
     if charge is None:
         return None
 
@@ -82,19 +100,10 @@ def _normalize_resolved_charge_input(
 
 # pylint: disable=too-few-public-methods
 class BuilderSurfaceStrategyMixin:
-    """Mixin class for setting the surface_strategy attribute.
-
-    Methods:
-    - set_surface_strategy : Assign the surface strategy controlling
-        surface tension or other surface-related properties.
-    """
+    """Mixin that stores a surface strategy for representation builders."""
 
     def __init__(self):
-        """Initialize the BuilderSurfaceStrategyMixin.
-
-        Sets up the mixin with surface_strategy attribute initialized to
-        None, ready for assignment via set_surface_strategy method.
-        """
+        """Initialize the mixin with no configured surface strategy."""
         self.surface_strategy = None
 
     def set_surface_strategy(
@@ -104,13 +113,13 @@ class BuilderSurfaceStrategyMixin:
     ):
         """Assign the surface strategy for the particle representation.
 
-        Arguments:
-            - surface_strategy : A SurfaceStrategy instance defining surface
-              tension or other surface-related properties.
-            - surface_strategy_units : Not used (for interface consistency).
+        Args:
+            surface_strategy: Strategy controlling surface properties.
+            surface_strategy_units: Unused units argument kept for builder
+                interface compatibility.
 
         Returns:
-            - self : For method chaining.
+            The builder instance for chaining.
         """
         if surface_strategy_units is not None:
             logger.warning("Ignoring units for surface strategy parameter.")
@@ -120,19 +129,10 @@ class BuilderSurfaceStrategyMixin:
 
 # pylint: disable=too-few-public-methods
 class BuilderDistributionStrategyMixin:
-    """Mixin class for setting the distribution_strategy attribute.
-
-    Methods:
-    - set_distribution_strategy : Assign the distribution strategy
-        (e.g., mass-based, radii-based).
-    """
+    """Mixin that stores a distribution strategy for builders."""
 
     def __init__(self):
-        """Initialize the BuilderDistributionStrategyMixin.
-
-        Sets up the mixin with distribution_strategy attribute initialized
-        to None, ready for assignment via set_distribution_strategy method.
-        """
+        """Initialize the mixin with no configured distribution strategy."""
         self.distribution_strategy = None
 
     def set_distribution_strategy(
@@ -142,14 +142,14 @@ class BuilderDistributionStrategyMixin:
     ):
         """Assign the distribution strategy for the particle representation.
 
-        Arguments:
-            - distribution_strategy : A DistributionStrategy instance
-              (e.g., mass-based bins, radius-based bins).
-            - distribution_strategy_units : Not used
-                (for interface consistency).
+        Args:
+            distribution_strategy: Strategy defining how the particle
+                distribution is interpreted.
+            distribution_strategy_units: Unused units argument kept for builder
+                interface compatibility.
 
         Returns:
-            - self : For method chaining.
+            The builder instance for chaining.
         """
         if distribution_strategy_units is not None:
             logger.warning(
@@ -161,19 +161,10 @@ class BuilderDistributionStrategyMixin:
 
 # pylint: disable=too-few-public-methods
 class BuilderActivityStrategyMixin:
-    """Mixin class for setting the activity_strategy attribute.
-
-    Methods:
-    - set_activity_strategy : Assign the activity strategy (e.g., ideal mass,
-        ideal molar, kappa-parameter).
-    """
+    """Mixin that stores an activity strategy for builders."""
 
     def __init__(self):
-        """Initialize the BuilderActivityStrategyMixin.
-
-        Sets up the mixin with activity_strategy attribute initialized to
-        None, ready for assignment via set_activity_strategy method.
-        """
+        """Initialize the mixin with no configured activity strategy."""
         self.activity_strategy = None
 
     def set_activity_strategy(
@@ -183,13 +174,13 @@ class BuilderActivityStrategyMixin:
     ):
         """Assign the activity strategy for the particle representation.
 
-        Arguments:
-            - activity_strategy : An ActivityStrategy instance (e.g.,
-              ActivityIdealMass, ActivityIdealMolar).
-            - activity_strategy_units : Not used (for interface consistency).
+        Args:
+            activity_strategy: Strategy defining particle-phase activities.
+            activity_strategy_units: Unused units argument kept for builder
+                interface compatibility.
 
         Returns:
-            - self : For method chaining.
+            The builder instance for chaining.
         """
         if activity_strategy_units is not None:
             logger.warning("Ignoring units for activity strategy parameter.")
@@ -207,37 +198,10 @@ class ParticleMassRepresentationBuilder(
     BuilderConcentrationMixin,
     BuilderChargeMixin,
 ):  # pylint: disable=too-many-ancestors
-    """Builder for ParticleRepresentation using mass distributions.
-
-    Attributes:
-        - distribution_strategy : The DistributionStrategy
-            (e.g., mass-based bins).
-        - activity_strategy : The ActivityStrategy (e.g., ideal mass).
-        - surface_strategy : The SurfaceStrategy
-            (e.g., surface tension calculations).
-        - mass : The total or per-bin mass of particles in kg.
-        - density : The particle density in kg/m^3.
-        - concentration : The number concentration in 1/m^3.
-        - charge : Number of charges per particle (dimensionless).
-
-    Methods:
-    - set_distribution_strategy : Assign the distribution strategy.
-    - set_activity_strategy : Assign the activity strategy.
-    - set_surface_strategy : Assign the surface strategy.
-    - set_mass : Assign the mass of the particles.
-    - set_density : Assign the density of the particles.
-    - set_concentration : Assign the number concentration.
-    - set_charge : Assign the charge of the particles.
-    - build : Validate and return a ParticleRepresentation with
-        mass-based distribution data.
-    """
+    """Build particle representations from mass-based distributions."""
 
     def __init__(self):
-        """Initialize the ParticleMassRepresentationBuilder.
-
-        Sets up the builder with required parameters for creating a
-        ParticleRepresentation using mass-based distributions.
-        """
+        """Initialize required fields for mass-based representations."""
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -257,12 +221,11 @@ class ParticleMassRepresentationBuilder(
         BuilderChargeMixin.__init__(self)
 
     def build(self) -> ParticleRepresentation:
-        """Validate all required parameters and return a ParticleRepresentation.
+        """Build a mass-based particle representation.
 
         Returns:
-            - ParticleRepresentation : An object configured to represent
-              mass-based particle distributions, activity, and surface
-              properties.
+            A particle representation configured with the stored distribution,
+            activity, surface, density, concentration, and charge data.
         """
         self.pre_build_check()
         return ParticleRepresentation(
@@ -286,38 +249,10 @@ class ParticleRadiusRepresentationBuilder(
     BuilderConcentrationMixin,
     BuilderChargeMixin,
 ):  # pylint: disable=too-many-ancestors
-    """Builder for ParticleRepresentation objects using radius-based
-    distributions.
-
-    Attributes:
-        - distribution_strategy : The DistributionStrategy (e.g.,
-            radius-based bins).
-        - activity_strategy : The ActivityStrategy (e.g., ideal mass).
-        - surface_strategy : The SurfaceStrategy (e.g., surface tension
-            calculations).
-        - radius : The radius of the particles in meters.
-        - density : The particle density in kg/m^3.
-        - concentration : The number concentration in 1/m^3.
-        - charge : Number of charges per particle (dimensionless).
-
-    Methods:
-    - set_distribution_strategy : Assign the distribution strategy.
-    - set_activity_strategy : Assign the activity strategy.
-    - set_surface_strategy : Assign the surface strategy.
-    - set_radius : Assign the radius of the particles.
-    - set_density : Assign the density of the particles.
-    - set_concentration : Assign the number concentration.
-    - set_charge : Assign the charge of the particles.
-    - build : Validate and return a ParticleRepresentation with
-      radius-based distribution data.
-    """
+    """Build particle representations from radius-based distributions."""
 
     def __init__(self):
-        """Initialize the ParticleRadiusRepresentationBuilder.
-
-        Sets up the builder with required parameters for creating a
-        ParticleRepresentation using radius-based distributions.
-        """
+        """Initialize required fields for radius-based representations."""
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -337,11 +272,12 @@ class ParticleRadiusRepresentationBuilder(
         BuilderChargeMixin.__init__(self)
 
     def build(self) -> ParticleRepresentation:
-        """Validate all required parameters and return a ParticleRepresentation.
+        """Build a radius-based particle representation.
 
         Returns:
-            - ParticleRepresentation : An object configured to represent
-              radius-based distributions, activity, and surface properties.
+            A particle representation configured with the stored radius,
+            strategy, activity, surface, density, concentration, and charge
+            data.
         """
         self.pre_build_check()
         return ParticleRepresentation(
@@ -366,34 +302,10 @@ class PresetParticleRadiusBuilder(
     BuilderChargeMixin,
     BuilderLognormalMixin,
 ):  # pylint: disable=too-many-ancestors
-    """Builder for ParticleRepresentation objects with radius-based bins
-    generated from a lognormal size distribution.
-
-    Attributes:
-        - mode : Mode(s) of the lognormal distribution in meters.
-        - geometric_standard_deviation : Geometric standard deviation(s).
-        - number_concentration : Number concentration(s) in 1/m^3.
-        - radius_bins : The array of radius bins in meters for the
-            distribution.
-        - distribution_type : The type of lognormal distribution
-            ("pdf" or "pmf").
-
-    Methods:
-    - set_distribution_strategy : Assign the distribution strategy.
-    - set_activity_strategy : Assign the activity strategy.
-    - set_surface_strategy : Assign the surface strategy.
-    - set_radius_bins : Assign radius bin edges in meters.
-    - set_distribution_type : Choose between "pdf" or "pmf".
-    - build : Generate the distribution and return a ParticleRepresentation.
-    """
+    """Build preset radius-bin representations from lognormal parameters."""
 
     def __init__(self):
-        """Initialize the PresetParticleRadiusBuilder.
-
-        Sets up the builder with default lognormal distribution parameters
-        and default strategies for creating radius-based particle
-        representations.
-        """
+        """Initialize defaults for preset radius-bin representations."""
         required_parameters = [
             "mode",
             "geometric_standard_deviation",
@@ -429,14 +341,17 @@ class PresetParticleRadiusBuilder(
         radius_bins: NDArray[np.float64],
         radius_bins_units: str = "m",
     ):
-        """Assign an array of radius bin edges.
+        """Assign the radius-bin grid used to generate the distribution.
 
-        Arguments:
-            - radius_bins : The radius bin edges in meters.
-            - radius_bins_units : The units of the radius bins. Default is "m".
+        Args:
+            radius_bins: Radius bin values.
+            radius_bins_units: Units for ``radius_bins``. Defaults to meters.
 
         Returns:
-            - self : For method chaining.
+            The builder instance for chaining.
+
+        Raises:
+            ValueError: If any radius bin is negative.
         """
         if np.any(radius_bins < 0):
             message = "The radius bins must be positive."
@@ -455,15 +370,18 @@ class PresetParticleRadiusBuilder(
         distribution_type: str,
         distribution_type_units: Optional[str] = None,
     ):
-        """Choose between "pdf" (probability density function) or "pmf"
-        (probability mass function) for the distribution.
+        """Choose whether the preset distribution is generated as a PDF or PMF.
 
-        Arguments:
-            - distribution_type : Must be either 'pdf' or 'pmf'.
-            - distribution_type_units : Not used (for interface consistency).
+        Args:
+            distribution_type: Either ``"pdf"`` or ``"pmf"``.
+            distribution_type_units: Unused units argument kept for builder
+                interface compatibility.
 
         Returns:
-            - self : For method chaining.
+            The builder instance for chaining.
+
+        Raises:
+            ValueError: If ``distribution_type`` is not supported.
         """
         if distribution_type not in ["pdf", "pmf"]:
             message = "The distribution type must be either 'pdf' or 'pmf'."
@@ -475,12 +393,14 @@ class PresetParticleRadiusBuilder(
         return self
 
     def build(self) -> ParticleRepresentation:
-        """Generate a lognormal distribution (PDF or PMF) based on
-        current parameters and return a ParticleRepresentation.
+        """Build a radius-bin representation from preset lognormal inputs.
 
         Returns:
-            - ParticleRepresentation : An object with radius-based lognormal
-              distribution, activity, and surface properties.
+            A particle representation containing the generated radius-bin
+            concentration distribution together with the configured strategies.
+
+        Raises:
+            ValueError: If the configured distribution type is unsupported.
         """
         if self.distribution_type == "pdf":
             number_concentration = get_lognormal_pdf_distribution(
@@ -523,39 +443,10 @@ class ResolvedParticleMassRepresentationBuilder(
     BuilderVolumeMixin,
     BuilderMassMixin,
 ):  # pylint: disable=too-many-ancestors
-    """Builder for ParticleRepresentation objects with fully resolved
-    particle masses (array-based).
-
-    Allows setting distribution strategy, mass, density, charge,
-    volume, etc. No default values are assumed.
-
-    Attributes:
-        - distribution_strategy : Strategy for the resolved mass distribution.
-        - activity_strategy : Activity strategy (e.g., ideal mass).
-        - surface_strategy : Surface strategy (e.g., tension).
-        - mass : Per-particle or resolved mass in kg.
-        - density : Particle density in kg/m^3.
-        - charge : Number of charges (dimensionless).
-        - volume : Volume of simulation in m^3.
-
-    Methods:
-    - set_distribution_strategy : Assign the distribution strategy.
-    - set_activity_strategy : Assign the activity strategy.
-    - set_surface_strategy : Assign the surface strategy.
-    - set_mass : Assign the mass of the particles.
-    - set_density : Assign the density of the particles.
-    - set_charge : Assign the charge of the particles.
-    - set_volume : Assign the volume of the particles.
-    - build : Validate all parameters and return
-        a ParticleRepresentation with resolved masses.
-    """
+    """Build particle-resolved representations from resolved mass arrays."""
 
     def __init__(self):
-        """Initialize the ResolvedParticleMassRepresentationBuilder.
-
-        Sets up the builder with required parameters for creating a
-        ParticleRepresentation with fully resolved particle masses.
-        """
+        """Initialize required fields for resolved-mass representations."""
         required_parameters = [
             "distribution_strategy",
             "activity_strategy",
@@ -575,12 +466,11 @@ class ResolvedParticleMassRepresentationBuilder(
         BuilderVolumeMixin.__init__(self)
 
     def build(self) -> ParticleRepresentation:
-        """Validate attributes and construct a ParticleRepresentation
-        with array-based, resolved masses.
+        """Build a particle-resolved representation from resolved masses.
 
         Returns:
-            - ParticleRepresentation : Configured with the specified
-              distribution, activity, and surface strategies.
+            A particle representation configured with per-particle masses,
+            normalized density and charge inputs, and the stored strategies.
         """
         number_concentration = np.ones_like(self.mass, dtype=np.float64)
         if number_concentration.ndim > 1:
@@ -613,32 +503,10 @@ class PresetResolvedParticleMassBuilder(
     BuilderVolumeMixin,
     BuilderParticleResolvedCountMixin,
 ):  # pylint: disable=too-many-ancestors
-    """Builder for ParticleRepresentation objects with preset parameters
-    for particle-resolved masses derived from a lognormal size distribution.
-
-    Generates random samples of particle radii (lognormal) and converts
-    them to per-particle masses. Includes defaults for mode, geometric
-    standard deviation, concentration, and total resolved count.
-
-    Attributes:
-        - mode : Lognormal mode(s) in meters.
-        - geometric_standard_deviation : GSD(s).
-        - number_concentration : Number concentration(s) in 1/m^3.
-        - particle_resolved_count : Number of resolved particles.
-        - volume : Volume in m^3 for the representation.
-
-    Methods:
-    - build : Sample radii from a lognormal distribution, convert to mass,
-        and create a ParticleRepresentation.
-    """
+    """Build preset particle-resolved representations from lognormal inputs."""
 
     def __init__(self):
-        """Initialize the PresetResolvedParticleMassBuilder.
-
-        Sets up the builder with default lognormal parameters and strategies
-        for creating particle-resolved mass representations from sampled
-        distributions.
-        """
+        """Initialize defaults for preset particle-resolved representations."""
         required_parameters = [
             "mode",
             "geometric_standard_deviation",
@@ -671,13 +539,11 @@ class PresetResolvedParticleMassBuilder(
         self.set_volume(1, "m^3")
 
     def build(self) -> ParticleRepresentation:
-        """Sample particle radii from a lognormal distribution, convert
-        to mass, and return a ParticleRepresentation with resolved
-        per-particle masses.
+        """Build a preset particle-resolved representation.
 
         Returns:
-            - ParticleRepresentation : Configured for particle-resolved
-              masses with the specified distribution, activity, and surface.
+            A particle representation whose per-particle masses are sampled
+            from the configured lognormal distribution.
         """
         resolved_radii = get_lognormal_sample_distribution(
             mode=self.mode,
@@ -692,7 +558,9 @@ class PresetResolvedParticleMassBuilder(
         if number_concentration.ndim > 1:
             number_concentration = number_concentration[:, 0]
 
-        density = _normalize_resolved_density_input(self.density, resolved_masses)
+        density = _normalize_resolved_density_input(
+            self.density, resolved_masses
+        )
         charge = _normalize_resolved_charge_input(self.charge, resolved_masses)
         if (
             isinstance(charge, np.ndarray)
