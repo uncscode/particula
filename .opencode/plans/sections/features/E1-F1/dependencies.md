@@ -12,7 +12,9 @@
 
 **Downstream:**
 - `CondensationFactory` users depend on this feature to create non-isothermal
-  strategies from configuration dictionaries instead of manual class wiring.
+  strategies from configuration dictionaries instead of manual class wiring; P2
+  now satisfies that builder-to-factory handoff for the final `"latent_heat"`
+  key.
 - Public imports in `particula.dynamics` and documentation/examples for
   non-isothermal condensation depend on this feature to expose the final builder
   and factory surface.
@@ -26,6 +28,9 @@
   should exercise the same parameters the builder already validates.
 - Update namespace exports and smoke tests last in the feature so the public API
   only expands after the builder and factory behavior are stable.
+- That ordering held in implementation: P1 stabilized the builder contract, and
+  P2 shipped factory registration without adding factory-specific parameter
+  remapping.
 
 **Explicit dependency edges:**
 - `E1-F1-P1 -> E1-F1-P2`: `CondensationFactory.get_strategy(...)` cannot be
@@ -44,6 +49,9 @@
 - P2 and P3 both touch the public API boundary in `particula.dynamics`; export
   smoke tests should verify that the registered factory path and namespace
   imports describe the same builder class.
+- P2 intentionally preserved the generic `StrategyFactoryABC` path so any future
+  export work in P3 references the same builder-driven parameter contract rather
+  than a separate factory shim.
 - P4 must reference the final public factory key chosen for P2. If the naming
   decision changes, docs and examples must be updated in the same release as the
   factory registration to avoid cross-document drift.
