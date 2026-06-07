@@ -47,12 +47,15 @@ def get_mole_fraction_from_mass(
          - Wikipedia contributors, "Mole fraction," Wikipedia,
            https://en.wikipedia.org/wiki/Mole_fraction.
     """
+    mass_concentrations = np.asarray(mass_concentrations, dtype=np.float64)
+    molar_masses = np.asarray(molar_masses, dtype=np.float64)
+
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
 
     # Handle 1D arrays
     if isinstance(moles, float) or moles.ndim == 1:
-        total_moles = np.sum(moles)
+        total_moles = np.add.reduce(moles)
         # If total moles are zero, return an array of zeros
         if total_moles == 0:
             return np.zeros_like(moles)
@@ -61,7 +64,7 @@ def get_mole_fraction_from_mass(
     # Handle 2D arrays
     if moles.ndim == 2:
         # Sum row-wise (shape: (n_rows, 1))
-        total_moles = moles.sum(axis=1, keepdims=True)
+        total_moles = np.add.reduce(moles, axis=1)[:, np.newaxis]
         # Prepare output array
         mole_fractions = np.zeros_like(moles)
 
@@ -126,12 +129,15 @@ def get_volume_fraction_from_mass(
         - Wikipedia contributors, "Volume fraction," Wikipedia,
           https://en.wikipedia.org/wiki/Volume_fraction.
     """
+    mass_concentrations = np.asarray(mass_concentrations, dtype=np.float64)
+    densities = np.asarray(densities, dtype=np.float64)
+
     # Calculate per-component volumes
     volumes = mass_concentrations / densities
 
     # Handle 1D arrays
     if volumes.ndim == 1:
-        total_volume = volumes.sum()
+        total_volume = np.add.reduce(volumes)
         # If total volume is zero, return all zeros
         if total_volume == 0:
             return np.zeros_like(volumes)
@@ -139,7 +145,7 @@ def get_volume_fraction_from_mass(
 
     # Handle 2D arrays
     if volumes.ndim == 2:
-        total_volume = volumes.sum(axis=1, keepdims=True)  # shape: (n_rows, 1)
+        total_volume = np.add.reduce(volumes, axis=1)[:, np.newaxis]
 
         # Prepare an output array of the same shape
         volume_fractions = np.zeros_like(volumes)
