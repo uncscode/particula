@@ -61,6 +61,26 @@ def test_mass_concentration_to_mole_fraction_zero_total_returns_zeros():
     )
 
 
+@pytest.mark.parametrize(
+    "mass_concentrations, molar_masses, expected",
+    [
+        (1.0, 0.5, 1.0),
+        (0.0, 0.5, 0.0),
+        ([100.0, 200.0], [10.0, 20.0], np.array([0.5, 0.5])),
+    ],
+)
+def test_mass_concentration_to_mole_fraction_accepts_scalar_and_list_inputs(
+    mass_concentrations, molar_masses, expected
+):
+    """Mole fraction helper accepts scalar and list-like public inputs."""
+    mole_fractions = convert_mass_concentration.get_mole_fraction_from_mass(
+        mass_concentrations,
+        molar_masses,
+    )
+
+    np.testing.assert_allclose(mole_fractions, expected, rtol=1e-5)
+
+
 def test_mass_concentration_to_mole_fraction_rejects_invalid_dimensions():
     """Three-dimensional mass concentrations are rejected explicitly."""
     with pytest.raises(
@@ -116,6 +136,26 @@ def test_mass_concentration_to_volume_fraction_zero_total_returns_zeros():
         np.array([[0.0, 0.0], [0.5, 0.5]]),
         rtol=1e-5,
     )
+
+
+@pytest.mark.parametrize(
+    "mass_concentrations, densities, expected",
+    [
+        (1.0, 0.5, 1.0),
+        (0.0, 0.5, 0.0),
+        ([100.0, 200.0], [10.0, 20.0], np.array([0.5, 0.5])),
+    ],
+)
+def test_mass_concentration_to_volume_fraction_accepts_scalar_and_list_inputs(
+    mass_concentrations, densities, expected
+):
+    """Volume fraction helper accepts scalar and list-like public inputs."""
+    volume_fractions = convert_mass_concentration.get_volume_fraction_from_mass(
+        mass_concentrations,
+        densities,
+    )
+
+    np.testing.assert_allclose(volume_fractions, expected, rtol=1e-5)
 
 
 def test_mass_concentration_to_volume_fraction_rejects_invalid_dimensions():
@@ -179,6 +219,34 @@ def test_error_handling_mass_to_volume(mass_concentrations, densities):
 )
 def test_mass_concentration_to_mass_fraction(mass_concentrations, expected):
     """Mass fractions are normalized across 1D and 2D inputs."""
+    mass_fractions = convert_mass_concentration.get_mass_fraction_from_mass(
+        mass_concentrations
+    )
+
+    np.testing.assert_allclose(mass_fractions, expected, rtol=1e-5)
+
+
+def test_mass_concentration_to_mass_fraction_zero_total_returns_zeros():
+    """Zero total mass returns zeros for one-dimensional inputs."""
+    mass_fractions = convert_mass_concentration.get_mass_fraction_from_mass(
+        np.array([0.0, 0.0])
+    )
+
+    np.testing.assert_array_equal(mass_fractions, np.array([0.0, 0.0]))
+
+
+@pytest.mark.parametrize(
+    "mass_concentrations, expected",
+    [
+        (1.0, 1.0),
+        (0.0, 0.0),
+        ([10.0, 30.0, 60.0], np.array([0.1, 0.3, 0.6])),
+    ],
+)
+def test_mass_concentration_to_mass_fraction_accepts_scalar_and_list_inputs(
+    mass_concentrations, expected
+):
+    """Mass fraction helper accepts scalar and list-like public inputs."""
     mass_fractions = convert_mass_concentration.get_mass_fraction_from_mass(
         mass_concentrations
     )

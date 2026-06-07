@@ -44,8 +44,13 @@ def get_mole_fraction_from_mass(
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
 
+    if moles.ndim == 0:
+        if moles == 0:
+            return np.zeros_like(moles)
+        return moles / moles
+
     # Handle 1D arrays
-    if isinstance(moles, float) or moles.ndim == 1:
+    if moles.ndim == 1:
         total_moles = np.add.reduce(moles)
         # If total moles are zero, return an array of zeros
         if total_moles == 0:
@@ -106,6 +111,11 @@ def get_volume_fraction_from_mass(
     # Calculate per-component volumes
     volumes = mass_concentrations / densities
 
+    if volumes.ndim == 0:
+        if volumes == 0:
+            return np.zeros_like(volumes)
+        return volumes / volumes
+
     # Handle 1D arrays
     if volumes.ndim == 1:
         total_volume = np.add.reduce(volumes)
@@ -161,6 +171,13 @@ def get_mass_fraction_from_mass(
     Raises:
         ValueError: If ``mass_concentrations`` is not one- or two-dimensional.
     """
+    mass_concentrations = np.asarray(mass_concentrations, dtype=np.float64)
+
+    if mass_concentrations.ndim == 0:
+        if mass_concentrations == 0:
+            return np.zeros_like(mass_concentrations)
+        return mass_concentrations / mass_concentrations
+
     # Handle 1D arrays
     if mass_concentrations.ndim == 1:
         total_mass = np.sum(mass_concentrations)
