@@ -136,8 +136,9 @@ def test_preset_resolved_mass_particle_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_normalize_resolved_density_input_handles_matching_and_empty_shapes(
-) -> None:
+def test_normalize_resolved_density_input_handles_matching_and_empty_shapes() -> (
+    None
+):
     """Resolved density normalization should reduce to the species axis."""
     mass = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
 
@@ -157,8 +158,9 @@ def test_normalize_resolved_density_input_handles_matching_and_empty_shapes(
     )
 
 
-def test_normalize_resolved_charge_input_handles_none_matching_and_singleton(
-) -> None:
+def test_normalize_resolved_charge_input_handles_none_matching_and_singleton() -> (
+    None
+):
     """Resolved charge normalization should reduce to the particle axis."""
     mass = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
 
