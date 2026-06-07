@@ -3,6 +3,7 @@
 from .condensation_builder import (
     CondensationIsothermalBuilder,
     CondensationIsothermalStaggeredBuilder,
+    CondensationLatentHeatBuilder,
 )
 from .condensation_factories import CondensationFactory
 from .condensation_strategies import (
@@ -19,5 +20,6 @@ __all__ = [
     "CondensationStrategy",
     "CondensationIsothermalBuilder",
     "CondensationIsothermalStaggeredBuilder",
+    "CondensationLatentHeatBuilder",
     "CondensationFactory",
 ]
