@@ -7,6 +7,7 @@ from particula.abc_factory import StrategyFactoryABC
 from .condensation_builder import (
     CondensationIsothermalBuilder,
     CondensationIsothermalStaggeredBuilder,
+    CondensationLatentHeatBuilder,
 )
 from .condensation_strategies import CondensationStrategy
 
@@ -14,6 +15,7 @@ from .condensation_strategies import CondensationStrategy
 class CondensationFactory(
     StrategyFactoryABC[
         Union[
+            CondensationLatentHeatBuilder,
             CondensationIsothermalBuilder,
             CondensationIsothermalStaggeredBuilder,
         ],
@@ -26,6 +28,7 @@ class CondensationFactory(
         - "isothermal": Standard isothermal condensation.
         - "isothermal_staggered": Staggered isothermal condensation with
           batch stepping for stability.
+        - "latent_heat": Condensation with latent-heat coupling.
     """
 
     def get_builders(
@@ -33,6 +36,7 @@ class CondensationFactory(
     ) -> Dict[
         str,
         Union[
+            CondensationLatentHeatBuilder,
             CondensationIsothermalBuilder,
             CondensationIsothermalStaggeredBuilder,
         ],
@@ -45,4 +49,5 @@ class CondensationFactory(
         return {
             "isothermal": CondensationIsothermalBuilder(),
             "isothermal_staggered": CondensationIsothermalStaggeredBuilder(),
+            "latent_heat": CondensationLatentHeatBuilder(),
         }
