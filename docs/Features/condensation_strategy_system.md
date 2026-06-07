@@ -26,8 +26,9 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
   with theta modes (`"half"`, `"random"`, `"batch"`) and batching.
 - `CondensationLatentHeat` – latent-heat-corrected rate with per-step energy
   diagnostics.
-- `CondensationIsothermalBuilder`, `CondensationIsothermalStaggeredBuilder` –
-  fluent builders with validation and unit handling.
+- `CondensationIsothermalBuilder`, `CondensationIsothermalStaggeredBuilder`,
+  `CondensationLatentHeatBuilder` – fluent builders with validation and unit
+  handling.
 - `CondensationFactory` – factory selecting a condensation strategy by name.
 - `MassCondensation` runnable – delegates to a condensation strategy, splits
   `time_step` across `sub_steps`, and composes in pipelines.
@@ -80,6 +81,7 @@ par.dynamics.CondensationLatentHeat
 # Builders and factory
 par.dynamics.CondensationIsothermalBuilder
 par.dynamics.CondensationIsothermalStaggeredBuilder
+par.dynamics.CondensationLatentHeatBuilder
 par.dynamics.CondensationFactory
 ```
 
@@ -259,6 +261,16 @@ staggered = (
     .build()
 )
 
+latent = (
+    par.dynamics.CondensationLatentHeatBuilder()
+    .set_molar_mass(0.018, "kg/mol")
+    .set_diffusion_coefficient(2e-5, "m^2/s")
+    .set_accommodation_coefficient(1.0)
+    .set_latent_heat(2.4e6)
+    .set_update_gases(True)
+    .build()
+)
+
 factory = par.dynamics.CondensationFactory()
 iso_factory = factory.get_strategy(
     strategy_type="isothermal",
@@ -266,6 +278,16 @@ iso_factory = factory.get_strategy(
         "molar_mass": 0.018,
         "diffusion_coefficient": 2e-5,
         "accommodation_coefficient": 1.0,
+        "update_gases": True,
+    },
+)
+latent_factory = factory.get_strategy(
+    strategy_type="latent_heat",
+    parameters={
+        "molar_mass": 0.018,
+        "diffusion_coefficient": 2e-5,
+        "accommodation_coefficient": 1.0,
+        "latent_heat": 2.4e6,
         "update_gases": True,
     },
 )
@@ -545,7 +567,8 @@ aerosol, gas = selective.step(
 ## Limitations
 
 - Staggered solver is Gauss-Seidel only; other solvers are not exposed.
-- Factory supports `"isothermal"` and `"isothermal_staggered"` only.
+- Factory supports `"isothermal"`, `"isothermal_staggered"`, and
+  `"latent_heat"` only.
 - No temperature feedback; latent heat is diagnostic only.
 - Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.

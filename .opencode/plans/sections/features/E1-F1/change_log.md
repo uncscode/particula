@@ -1,5 +1,7 @@
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-06-06 | Synchronized `E1-F1` sections with the completed documentation update: marked P4 shipped, recorded `docs/Features/condensation_strategy_system.md` as updated for `CondensationLatentHeatBuilder` and the `"latent_heat"` factory path, and cleared pending-doc drift called out by docs-validator. | plan-update-full |
+| 2026-06-06 | Updated `E1-F1` sections to reflect shipped phase `E1-F1-P3` / issue #1159: re-exported `CondensationLatentHeatBuilder` through `particula.dynamics.condensation` and `particula.dynamics`, added export smoke-test coverage for both namespaces, verified `__all__` membership, and recorded cross-namespace object identity coverage. | plan-update-full |
 | 2026-06-06 | Updated `E1-F1` sections to reflect shipped phase `E1-F1-P2` / issue #1158: registered `CondensationLatentHeatBuilder` in `CondensationFactory` under `"latent_heat"`, preserved the generic builder path, added latent-heat factory regression tests, and resolved the factory-key open question. | plan-update-full |
 | 2026-06-06 | Updated `E1-F1` sections to reflect shipped phase `E1-F1-P1` / issue #1157: new latent-heat builder module, builder-package export, focused builder tests, and deferred factory/top-level export work. | plan-update-full |
 | 2026-06-06 | Replaced template completeness sections with measurable success criteria, implementation-grounded risks, and a bounded open question set. | plan-review-completeness |

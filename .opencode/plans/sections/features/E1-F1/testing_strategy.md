@@ -20,13 +20,16 @@ land the builder/factory/export work.
   passthrough, optional `update_gases`, scalar latent-heat fallback,
   explicit-strategy precedence when both latent-heat inputs are supplied,
   builder error propagation, and the unchanged unknown-strategy failure path.
-- **E1-F1-P3 package exports:** extend
-  `particula/dynamics/tests/condensation_exports_test.py` with import smoke
-  tests and `__all__` assertions for `CondensationLatentHeatBuilder` from both
-  `particula.dynamics.condensation` and `particula.dynamics`.
-- **E1-F1-P4 documentation update:** this is a docs-only exception to adding a
-  brand-new test file, but the phase still reruns the touched condensation unit
-  tests so examples and public import paths stay aligned with the shipped API.
+- **E1-F1-P3 package exports:** shipped with
+  `particula/dynamics/tests/condensation_exports_test.py` coverage for import
+  smoke tests from both `particula.dynamics.condensation` and
+  `particula.dynamics`, `__all__` membership in both namespaces, and object
+  identity assertions proving both public imports resolve the same
+  `CondensationLatentHeatBuilder` class.
+- **E1-F1-P4 documentation update:** shipped as a docs-only exception to adding
+  a brand-new test file; the relevant consistency checks remain the existing
+  condensation export/factory coverage plus doc-to-API alignment for
+  `docs/Features/condensation_strategy_system.md`.
 
 ## Test types and assertions
 
@@ -38,8 +41,8 @@ land the builder/factory/export work.
   `CondensationLatentHeat` object without changing existing isothermal factory
   behavior.
 - Run tests with `pytest -Werror` so warning-producing paths fail before review;
-  this was used for the shipped P1 builder test file and the shipped P2 factory
-  coverage.
+  this was used for the shipped P1 builder test file, the shipped P2 factory
+  coverage, and the shipped P3 export smoke tests.
 
 ## Validation commands
 

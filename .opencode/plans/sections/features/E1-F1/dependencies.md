@@ -28,9 +28,10 @@
   should exercise the same parameters the builder already validates.
 - Update namespace exports and smoke tests last in the feature so the public API
   only expands after the builder and factory behavior are stable.
-- That ordering held in implementation: P1 stabilized the builder contract, and
-  P2 shipped factory registration without adding factory-specific parameter
-  remapping.
+- That ordering held in implementation: P1 stabilized the builder contract, P2
+  shipped factory registration without adding factory-specific parameter
+  remapping, and P3 then exposed the same builder through both public dynamics
+  namespaces with export smoke tests.
 
 **Explicit dependency edges:**
 - `E1-F1-P1 -> E1-F1-P2`: `CondensationFactory.get_strategy(...)` cannot be
@@ -39,8 +40,8 @@
 - `E1-F1-P2 -> E1-F1-P3`: namespace exports should only expose the builder after
   factory registration lands, so public imports and smoke tests cover the same
   supported construction path users will rely on.
-- `E1-F1-P3 -> E1-F1-P4`: documentation should be updated against the shipped
-  import paths and final factory key, not an intermediate export layout.
+- `E1-F1-P3 -> E1-F1-P4`: documentation was updated against the shipped import
+  paths and final factory key, not an intermediate export layout.
 
 **Integration points to keep aligned:**
 - P1 and P2 both depend on the latent-heat strategy objects from
@@ -52,9 +53,8 @@
 - P2 intentionally preserved the generic `StrategyFactoryABC` path so any future
   export work in P3 references the same builder-driven parameter contract rather
   than a separate factory shim.
-- P4 must reference the final public factory key chosen for P2. If the naming
-  decision changes, docs and examples must be updated in the same release as the
-  factory registration to avoid cross-document drift.
+- P4 now references the final public factory key chosen for P2, so the feature
+  docs and exported API are aligned on `"latent_heat"`.
 
 **Review notes:**
 - The scoped feature declares a linear dependency chain with no cycle. Any work
