@@ -7,11 +7,13 @@ land the builder/factory/export work.
 
 ## Per-phase coverage
 
-- **E1-F1-P1 builder implementation:** add
+- **E1-F1-P1 builder implementation:** shipped with
   `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py`
-  with unit tests for successful builds, required-setter failures,
-  `latent_heat_strategy` passthrough, scalar `latent_heat` validation, and
-  parity with existing condensation builder error behavior.
+  covering successful builds, missing required-parameter failures,
+  `latent_heat_strategy` passthrough, scalar `latent_heat` validation,
+  `update_gases` propagation, optional `set_parameters()` keys, constructor
+  precedence when both strategy and scalar inputs are set, and regression
+  coverage that unset scalar latent heat is not forwarded as `None`.
 - **E1-F1-P2 factory registration:** extend
   `particula/dynamics/condensation/tests/condensation_factories_test.py` with
   parametrized factory cases covering `"latent_heat"`, optional
@@ -33,7 +35,8 @@ land the builder/factory/export work.
 - Keep at least one regression-style assertion that the new builder produces a
   `CondensationLatentHeat` object without changing existing isothermal factory
   behavior.
-- Run tests with `pytest -Werror` so warning-producing paths fail before review.
+- Run tests with `pytest -Werror` so warning-producing paths fail before review;
+  this is the validation target for the shipped P1 builder test file.
 
 ## Validation commands
 

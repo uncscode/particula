@@ -21,15 +21,14 @@ def _make_builder() -> CondensationLatentHeatBuilder:
     )
 
 
-def test_build_with_latent_heat_strategy_returns_condensation_latent_heat(
-) -> None:
+def test_build_with_latent_heat_strategy_returns_condensation_latent_heat() -> (
+    None
+):
     """Builder returns CondensationLatentHeat when given a strategy."""
     latent_heat_strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
 
     strategy = (
-        _make_builder()
-        .set_latent_heat_strategy(latent_heat_strategy)
-        .build()
+        _make_builder().set_latent_heat_strategy(latent_heat_strategy).build()
     )
 
     assert isinstance(strategy, CondensationLatentHeat)
@@ -188,8 +187,9 @@ def test_set_parameters_rejects_unknown_keys() -> None:
         )
 
 
-def test_build_with_strategy_and_scalar_preserves_constructor_precedence(
-) -> None:
+def test_build_with_strategy_and_scalar_preserves_constructor_precedence() -> (
+    None
+):
     """Explicit strategy remains active when scalar latent heat is also set."""
     latent_heat_strategy = ConstantLatentHeat(latent_heat_ref=1.0e6)
     strategy = (
@@ -203,14 +203,13 @@ def test_build_with_strategy_and_scalar_preserves_constructor_precedence(
     assert strategy.latent_heat_input == pytest.approx(2.26e6)
 
 
-def test_unset_latent_heat_uses_constructor_default_without_none_passthrough(
-) -> None:
+def test_unset_latent_heat_uses_constructor_default_without_none_passthrough() -> (
+    None
+):
     """Unset scalar latent heat leaves constructor default state intact."""
     latent_heat_strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
     strategy = (
-        _make_builder()
-        .set_latent_heat_strategy(latent_heat_strategy)
-        .build()
+        _make_builder().set_latent_heat_strategy(latent_heat_strategy).build()
     )
 
     assert strategy._latent_heat_strategy is latent_heat_strategy
