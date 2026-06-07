@@ -1,9 +1,10 @@
 ### High-Level Design
-`E1-F1-P1` shipped only the builder slice of the broader feature. The new
-`CondensationLatentHeatBuilder` lives in
-`particula/dynamics/condensation/condensation_builder/` and wraps the existing
-`CondensationLatentHeat` strategy without changing condensation physics,
-factory registration, or broader package exports.
+`E1-F1-P1` and `E1-F1-P2` now ship the builder-plus-factory slices of the
+feature. `CondensationLatentHeatBuilder` lives in
+`particula/dynamics/condensation/condensation_builder/`, and
+`CondensationFactory` registers it under `"latent_heat"` through the existing
+generic `StrategyFactoryABC.get_strategy()` flow without changing condensation
+physics or broader package exports.
 
 ```text
 User code / tests
@@ -12,6 +13,10 @@ User code / tests
     -> optionally accepts latent_heat_strategy or positive scalar latent_heat
     -> optionally accepts update_gases
     -> forwards only explicitly provided latent_heat keyword
+  -> CondensationFactory.get_strategy("latent_heat", params)
+    -> looks up CondensationLatentHeatBuilder in get_builders()
+    -> passes the config dictionary through unchanged
+    -> relies on builder validation / build() behavior
   -> CondensationLatentHeat(...)
 ```
 
@@ -19,15 +24,17 @@ User code / tests
 - **Data Model:** No new persisted data model is required. The feature only adds
   constructor-time parameters that are forwarded into `CondensationLatentHeat`,
   which already owns runtime state such as latent-heat diagnostics.
-- **API Surface:** Shipped API changes are limited to
-  `CondensationLatentHeatBuilder` plus its export from the
-  `condensation_builder` package. The builder mirrors existing condensation
-  builder signatures, reuses shared mixins, adds latent-heat-specific setter
-  validation, and preserves `CondensationLatentHeat.__init__()` precedence by
-  forwarding both strategy and scalar inputs when both are set.
-- **Workflow Hooks:** P1 only extends the builder test surface with a dedicated
-  latent-heat builder test file. Factory coverage and broader namespace import
-  smoke tests remain deferred to later phases.
+- **API Surface:** Shipped API changes now include
+  `CondensationLatentHeatBuilder`, its `condensation_builder` package export,
+  and `CondensationFactory` support for `"latent_heat"`. The factory does not
+  add special latent-heat branching; it preserves the builder-defined parameter
+  contract for strategy-object passthrough, scalar fallback, explicit-strategy
+  precedence, and `update_gases` propagation.
+- **Workflow Hooks:** The feature now has dedicated builder tests plus factory
+  regression coverage for registration, passthrough, scalar fallback,
+  precedence, builder-error propagation, and the unchanged unknown-strategy
+  failure path. Broader namespace import smoke tests remain deferred to later
+  phases.
 
 ### Security & Compliance
 This feature does not introduce permissions, network calls, or external state,

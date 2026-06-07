@@ -14,11 +14,12 @@ land the builder/factory/export work.
   `update_gases` propagation, optional `set_parameters()` keys, constructor
   precedence when both strategy and scalar inputs are set, and regression
   coverage that unset scalar latent heat is not forwarded as `None`.
-- **E1-F1-P2 factory registration:** extend
-  `particula/dynamics/condensation/tests/condensation_factories_test.py` with
-  parametrized factory cases covering `"latent_heat"`, optional
-  `update_gases`, scalar latent-heat fallback input, and the unchanged
-  unknown-strategy failure path.
+- **E1-F1-P2 factory registration:** shipped with
+  `particula/dynamics/condensation/tests/condensation_factories_test.py`
+  coverage for `"latent_heat"` builder registration, strategy-object
+  passthrough, optional `update_gases`, scalar latent-heat fallback,
+  explicit-strategy precedence when both latent-heat inputs are supplied,
+  builder error propagation, and the unchanged unknown-strategy failure path.
 - **E1-F1-P3 package exports:** extend
   `particula/dynamics/tests/condensation_exports_test.py` with import smoke
   tests and `__all__` assertions for `CondensationLatentHeatBuilder` from both
@@ -30,13 +31,15 @@ land the builder/factory/export work.
 ## Test types and assertions
 
 - Prefer focused unit tests for builder setters and build-time validation.
-- Use parametrized tests where the same factory path is exercised with
-  `latent_heat_strategy` objects and scalar `latent_heat` values.
+- Use focused factory tests to exercise `latent_heat_strategy` objects, scalar
+  `latent_heat` values, explicit-strategy precedence, and invalid-parameter
+  failure propagation through the builder path.
 - Keep at least one regression-style assertion that the new builder produces a
   `CondensationLatentHeat` object without changing existing isothermal factory
   behavior.
 - Run tests with `pytest -Werror` so warning-producing paths fail before review;
-  this is the validation target for the shipped P1 builder test file.
+  this was used for the shipped P1 builder test file and the shipped P2 factory
+  coverage.
 
 ## Validation commands
 

@@ -12,8 +12,8 @@
   - Files: Shipped `particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder.py`, `particula/dynamics/condensation/condensation_builder/__init__.py`, and `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py`
   - Tests: Added coverage for required setters, `latent_heat_strategy` passthrough, scalar latent-heat acceptance/rejection, `update_gases` behavior, `set_parameters()` optional keys, constructor precedence, and unset-scalar default behavior
 
-- [ ] **E1-F1-P2:** Register the builder in `CondensationFactory`
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E1-F1-P2:** Register the builder in `CondensationFactory`
+  - Issue: #1158 | Size: S | Status: Shipped
   - Depends on: E1-F1-P1 shipped or at minimum functionally complete with final
     parameter names and passing builder tests
   - Goal: Make `CondensationFactory.get_strategy("latent_heat", params)`
@@ -22,8 +22,8 @@
   - Sequencing: Second phase. This is a forward-reference guardrail: do not wire
     the factory first, because the factory would otherwise freeze a config shape
     before the builder contract is stable.
-  - Files: `particula/dynamics/condensation/condensation_factories.py` (~15-30 LOC), `particula/dynamics/condensation/tests/condensation_factories_test.py` (~30-50 LOC)
-  - Tests: Add factory coverage for `"latent_heat"`, verify `update_gases` and optional latent-heat inputs propagate, and keep the unknown-strategy error path intact
+  - Files: Shipped `particula/dynamics/condensation/condensation_factories.py` and `particula/dynamics/condensation/tests/condensation_factories_test.py`
+  - Tests: Added factory coverage for `"latent_heat"` registration, latent-heat strategy-object passthrough, scalar `latent_heat` fallback, explicit-strategy precedence when both inputs are present, builder error propagation, and the unchanged unknown-strategy error path
 
 - [ ] **E1-F1-P3:** Re-export the new builder through condensation namespaces
   - Issue: TBD | Size: S | Status: Not Started
@@ -56,7 +56,7 @@
 
 - Declared phase graph: `P1 -> P2 -> P3 -> P4`.
 - No intra-feature cycle is currently implied by the checklist.
-- `E1-F1-P1` is complete; P2 remains the next required step before public
-  namespace export and documentation phases.
+- `E1-F1-P1` and `E1-F1-P2` are complete; P3 is now the next required step
+  before the feature can expose broader public imports and documentation.
 - Any attempt to start P3 or P4 before P2 resolves would create a forward
   reference to an incomplete public API surface.
