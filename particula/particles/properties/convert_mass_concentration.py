@@ -1,4 +1,9 @@
-"""Functions to convert mass concentrations to other concentration units."""
+"""Convert mass concentrations into mole, volume, and mass fractions.
+
+This module provides helpers for transforming component-wise mass
+concentrations into normalized composition fractions for one-dimensional and
+two-dimensional arrays.
+"""
 
 import numpy as np
 from numpy.typing import NDArray
@@ -15,37 +20,23 @@ from particula.util.validate_inputs import validate_inputs
 def get_mole_fraction_from_mass(
     mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Convert mass concentrations to mole fractions for N components.
+    """Convert mass concentrations to mole fractions.
 
-     The mole fraction is computed using:
+    The mole fraction of each component is computed from the component moles,
+    ``mass_concentrations / molar_masses``, normalized by the total moles in
+    each composition vector. One-dimensional inputs return a single mole
+    fraction vector, while two-dimensional inputs are normalized row by row.
 
-     - xᵢ = (mᵢ / Mᵢ) / Σⱼ(mⱼ / Mⱼ)
-         - xᵢ is the mole fraction of component i,
-         - mᵢ is the mass concentration of component i (kg/m³),
-         - Mᵢ is the molar mass of component i (kg/mol).
-
-    Arguments:
-         - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
-         - molar_masses : Molar masses (kg/mol). Must match dimensions of
-           mass_concentrations.
+    Args:
+        mass_concentrations: Component mass concentrations in kg/m^3.
+        molar_masses: Component molar masses in kg/mol.
 
     Returns:
-         - Mole fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-           mole fractions if input is 1D.
+        Mole fractions with the same shape as ``mass_concentrations``. If a
+        total mole sum is zero, the corresponding output vector is all zeros.
 
-    Examples:
-         ```py
-         import numpy as np
-         import particula as par
-         mass_conc = np.array([0.2, 0.8])  # kg/m³
-         mol_masses = np.array([0.018, 0.032])  # kg/mol
-         get_mole_fraction_from_mass(mass_conc, mol_masses))
-         # Output might be array([0.379..., 0.620...])
-         ```
-
-    References:
-         - Wikipedia contributors, "Mole fraction," Wikipedia,
-           https://en.wikipedia.org/wiki/Mole_fraction.
+    Raises:
+        ValueError: If ``mass_concentrations`` is not one- or two-dimensional.
     """
     mass_concentrations = np.asarray(mass_concentrations, dtype=np.float64)
     molar_masses = np.asarray(molar_masses, dtype=np.float64)
@@ -91,43 +82,23 @@ def get_mole_fraction_from_mass(
 def get_volume_fraction_from_mass(
     mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Convert mass concentrations to volume fractions for N components.
+    """Convert mass concentrations to volume fractions.
 
-    The volume fraction is determined by:
+    The volume fraction of each component is computed from component volumes,
+    ``mass_concentrations / densities``, normalized by the total volume in each
+    composition vector. One-dimensional inputs return a single volume fraction
+    vector, while two-dimensional inputs are normalized row by row.
 
-    - ϕᵢ = vᵢ / vₜₒₜₐₗ
-        - ϕᵢ is the volume fraction of component i (unitless),
-        - vᵢ is the volume of component i (m³),
-        - vₜₒₜₐₗ is the total volume of all components (m³).
-
-    Volumes computed from mass concentration (mᵢ) and density (ρᵢ) using:
-    - vᵢ = mᵢ / ρᵢ.
-
-    Arguments:
-        - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
-        - densities : Densities (kg/m³). Must match the shape of
-          mass_concentrations.
+    Args:
+        mass_concentrations: Component mass concentrations in kg/m^3.
+        densities: Component material densities in kg/m^3.
 
     Returns:
-        - Volume fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-          volume fractions if input is 1D.
+        Volume fractions with the same shape as ``mass_concentrations``. If a
+        total volume sum is zero, the corresponding output vector is all zeros.
 
-    Examples:
-        ```py
-        import numpy as np
-        import particula as par
-
-        mass_conc = np.array([[1.0, 2.0], [0.5, 0.5]])  # kg/m³
-        dens = np.array([1000.0, 800.0])               # kg/m³
-        par.get_volume_fraction_from_mass(mass_conc, dens))
-        # Output:
-        # array([[0.444..., 0.555...],
-        #        [0.5     , 0.5     ]])
-        ```
-
-    References:
-        - Wikipedia contributors, "Volume fraction," Wikipedia,
-          https://en.wikipedia.org/wiki/Volume_fraction.
+    Raises:
+        ValueError: If ``mass_concentrations`` is not one- or two-dimensional.
     """
     mass_concentrations = np.asarray(mass_concentrations, dtype=np.float64)
     densities = np.asarray(densities, dtype=np.float64)
@@ -173,35 +144,22 @@ def get_volume_fraction_from_mass(
 def get_mass_fraction_from_mass(
     mass_concentrations: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Convert mass concentrations to mass fractions for N components.
+    """Convert mass concentrations to mass fractions.
 
-    The mass fraction is computed by:
+    The mass fraction of each component is computed by normalizing each
+    composition vector by its total mass concentration. One-dimensional inputs
+    return a single mass fraction vector, while two-dimensional inputs are
+    normalized row by row.
 
-    - wᵢ = mᵢ / mₜₒₜₐₗ
-        - wᵢ is the mass fraction of component i (unitless),
-        - mᵢ is the mass concentration of component i (kg/m³),
-        - mₜₒₜₐₗ is the total mass concentration of all components (kg/m³).
-
-    Arguments:
-        - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+    Args:
+        mass_concentrations: Component mass concentrations in kg/m^3.
 
     Returns:
-        - Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-          mass fractions if input is 1D.
+        Mass fractions with the same shape as ``mass_concentrations``. If a
+        total mass sum is zero, the corresponding output vector is all zeros.
 
-    Examples:
-        ```py
-        import numpy as np
-        import particula as par
-
-        mass_conc = np.array([10.0, 30.0, 60.0])  # kg/m³
-        par.get_mass_fraction(mass_conc)
-        # Output might be array([0.1, 0.3, 0.6])
-        ```
-
-    References:
-        - Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
-          https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
+    Raises:
+        ValueError: If ``mass_concentrations`` is not one- or two-dimensional.
     """
     # Handle 1D arrays
     if mass_concentrations.ndim == 1:
