@@ -182,8 +182,9 @@ particle, gas = latent.step(
 energy_released = latent.last_latent_heat_energy  # total energy [J]
 ```
 
-When no latent heat strategy is configured, the step follows the isothermal
-path and reports `last_latent_heat_energy = 0.0`.
+When neither a `latent_heat_strategy` nor a positive scalar `latent_heat`
+fallback is configured, the step follows the isothermal path and reports
+`last_latent_heat_energy = 0.0`.
 
 `last_latent_heat_energy` records the total latent heat released per step
 (sum of dm × L), not an energy density.
