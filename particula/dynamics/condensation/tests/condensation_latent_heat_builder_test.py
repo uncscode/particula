@@ -211,6 +211,34 @@ def test_set_parameters_clears_omitted_optional_latent_heat_state() -> None:
     assert reset_strategy._latent_heat_strategy is not latent_heat_strategy
 
 
+def test_set_parameters_resets_omitted_update_gases_state() -> None:
+    """Reused builders should restore update_gases when it is omitted later."""
+    builder = CondensationLatentHeatBuilder().set_parameters(
+        {
+            "molar_mass": 0.018,
+            "molar_mass_units": "kg/mol",
+            "diffusion_coefficient": 2e-5,
+            "diffusion_coefficient_units": "m^2/s",
+            "accommodation_coefficient": 1.0,
+            "update_gases": False,
+        }
+    )
+
+    initial_strategy = builder.build()
+    reset_strategy = builder.set_parameters(
+        {
+            "molar_mass": 0.018,
+            "molar_mass_units": "kg/mol",
+            "diffusion_coefficient": 2e-5,
+            "diffusion_coefficient_units": "m^2/s",
+            "accommodation_coefficient": 1.0,
+        }
+    ).build()
+
+    assert initial_strategy.update_gases is False
+    assert reset_strategy.update_gases is True
+
+
 def test_set_latent_heat_strategy_rejects_invalid_objects() -> None:
     """Invalid latent heat strategies should fail fast at setter time."""
     invalid_strategy: Any = "not-a-strategy"
@@ -287,3 +315,18 @@ def test_builder_package_export_imports_cleanly() -> None:
     )
 
     assert ExportedBuilder is CondensationLatentHeatBuilder
+
+
+def test_reset_optional_latent_heat_state_clears_optional_fields() -> None:
+    """Internal reset helper should clear optional latent heat state."""
+    builder = _make_builder()
+    builder.set_latent_heat_strategy(ConstantLatentHeat(latent_heat_ref=2.26e6))
+    builder.set_latent_heat(2.26e6)
+    builder.set_update_gases(False)
+
+    builder._reset_optional_latent_heat_state()
+
+    assert builder.latent_heat_strategy is None
+    assert builder.latent_heat is None
+    assert builder._latent_heat_explicitly_set is False
+    assert builder.update_gases is True

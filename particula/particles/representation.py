@@ -49,7 +49,7 @@ def _normalize_density_array(
     if density_array.ndim == 1:
         return density_array
     if density_array.size == 0:
-        return np.zeros(0, dtype=np.float64)
+        return np.zeros(density_array.shape[-1], dtype=np.float64)
     raise ValueError(
         "density must be a scalar or 1D array, "
         f"got array with shape {density_array.shape}"

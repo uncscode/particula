@@ -11,6 +11,14 @@ from numpy.typing import NDArray
 from particula.util.validate_inputs import validate_inputs
 
 
+def _normalize_rows(values: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Normalize 2D rows while leaving zero-total rows as zeros."""
+    row_totals = np.add.reduce(values, axis=1, keepdims=True)
+    normalized = np.zeros_like(values)
+    np.divide(values, row_totals, out=normalized, where=row_totals != 0)
+    return normalized
+
+
 @validate_inputs(
     {
         "mass_concentrations": "nonnegative",
@@ -59,22 +67,7 @@ def get_mole_fraction_from_mass(
 
     # Handle 2D arrays
     if moles.ndim == 2:
-        # Sum row-wise (shape: (n_rows, 1))
-        total_moles = np.add.reduce(moles, axis=1)[:, np.newaxis]
-        # Prepare output array
-        mole_fractions = np.zeros_like(moles)
-
-        # Create a row mask for nonzero total moles
-        nonzero_rows = np.squeeze(total_moles != 0, axis=1)
-        # Get the row indices that are nonzero
-        row_indices = np.where(nonzero_rows)[0]
-
-        # Compute fractions only for rows with nonzero total moles
-        mole_fractions[row_indices, :] = (
-            moles[row_indices, :] / total_moles[row_indices, :]
-        )
-
-        return mole_fractions
+        return _normalize_rows(moles)
     raise ValueError("mass_concentrations must be either 1D or 2D")
 
 
@@ -126,23 +119,7 @@ def get_volume_fraction_from_mass(
 
     # Handle 2D arrays
     if volumes.ndim == 2:
-        total_volume = np.add.reduce(volumes, axis=1)[:, np.newaxis]
-
-        # Prepare an output array of the same shape
-        volume_fractions = np.zeros_like(volumes)
-
-        # We want a boolean array for which rows are nonzero
-        # Squeeze to (n_rows,) for simpler indexing
-        nonzero_rows = np.squeeze(total_volume != 0, axis=1)
-
-        # Option 1: Use integer row indices
-        # Identify the indices of the rows that have nonzero total volume
-        indices = np.where(nonzero_rows)[0]
-        # Divide row-by-row for those rows
-        volume_fractions[indices, :] = (
-            volumes[indices, :] / total_volume[indices, :]
-        )
-        return volume_fractions
+        return _normalize_rows(volumes)
     raise ValueError("mass_concentrations must be either 1D or 2D")
 
 
@@ -187,20 +164,5 @@ def get_mass_fraction_from_mass(
 
     # Handle 2D arrays
     if mass_concentrations.ndim == 2:
-        # Row-wise sum
-        total_mass = mass_concentrations.sum(axis=1, keepdims=True)
-        # Prepare output
-        mass_fractions = np.zeros_like(mass_concentrations)
-
-        # Identify rows where total_mass is nonzero
-        # Squeeze the mask to 1D so we can use row indices
-        nonzero_rows = np.squeeze(total_mass != 0, axis=1)
-        # Get actual row indices where total mass is nonzero
-        row_indices = np.where(nonzero_rows)[0]
-
-        # Compute fractions only for the nonzero rows
-        mass_fractions[row_indices, :] = (
-            mass_concentrations[row_indices, :] / total_mass[row_indices, :]
-        )
-        return mass_fractions
+        return _normalize_rows(mass_concentrations)
     raise ValueError("mass_concentrations must be either 1D or 2D")

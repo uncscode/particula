@@ -13,6 +13,12 @@ build `CondensationLatentHeat` through the same generic `StrategyFactoryABC`
 flow used by the existing condensation strategies and find matching docs for
 the shipped API surface.
 
+**Post-Ship Maintenance:** PR #1162 added targeted follow-up fixes after review:
+ reused `CondensationLatentHeatBuilder.set_parameters()` calls now reset
+ omitted `update_gases` state to the documented default, and adjacent particle
+ representation regressions/normalization refactors landed in the same fix pass
+ before merge to keep shipped behavior and validation notes aligned.
+
 **User Stories:**
 - As a developer, I want to construct `CondensationLatentHeat` through a fluent
   builder so latent-heat-specific inputs follow the same validated setup path as

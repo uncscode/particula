@@ -6,7 +6,7 @@ radius-based, and particle-resolved distributions.
 """
 
 import logging
-from typing import Optional
+from typing import Optional, Self, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -66,10 +66,10 @@ def _normalize_resolved_density_input(
     density_array = np.asarray(density, dtype=np.float64)
     if density_array.ndim == 2 and density_array.shape == mass.shape:
         if mass.shape[0] == 0:
-            return np.zeros(mass.shape[1], dtype=np.float64)
+            return np.zeros(mass.shape[-1], dtype=np.float64)
         return density_array[0, :]
     if density_array.ndim == 2 and 1 in density_array.shape:
-        return np.ravel(density_array[:1, :])
+        return np.ravel(density_array)
     return density
 
 
@@ -92,9 +92,11 @@ def _normalize_resolved_charge_input(
 
     charge_array = np.asarray(charge, dtype=np.float64)
     if charge_array.ndim == 2 and charge_array.shape == mass.shape:
+        if charge_array.shape[0] == 1:
+            return np.ravel(charge_array)
         return charge_array[:, 0]
     if charge_array.ndim == 2 and 1 in charge_array.shape:
-        return np.ravel(charge_array[:, :1])
+        return np.ravel(charge_array)
     return charge
 
 
@@ -102,7 +104,9 @@ def _normalize_resolved_charge_input(
 class BuilderSurfaceStrategyMixin:
     """Mixin that stores a surface strategy for representation builders."""
 
-    def __init__(self):
+    surface_strategy: SurfaceStrategy | None
+
+    def __init__(self) -> None:
         """Initialize the mixin with no configured surface strategy."""
         self.surface_strategy = None
 
@@ -110,7 +114,7 @@ class BuilderSurfaceStrategyMixin:
         self,
         surface_strategy: SurfaceStrategy,
         surface_strategy_units: Optional[str] = None,
-    ):
+    ) -> Self:
         """Assign the surface strategy for the particle representation.
 
         Args:
@@ -131,7 +135,9 @@ class BuilderSurfaceStrategyMixin:
 class BuilderDistributionStrategyMixin:
     """Mixin that stores a distribution strategy for builders."""
 
-    def __init__(self):
+    distribution_strategy: DistributionStrategy | None
+
+    def __init__(self) -> None:
         """Initialize the mixin with no configured distribution strategy."""
         self.distribution_strategy = None
 
@@ -139,7 +145,7 @@ class BuilderDistributionStrategyMixin:
         self,
         distribution_strategy: DistributionStrategy,
         distribution_strategy_units: Optional[str] = None,
-    ):
+    ) -> Self:
         """Assign the distribution strategy for the particle representation.
 
         Args:
@@ -163,7 +169,9 @@ class BuilderDistributionStrategyMixin:
 class BuilderActivityStrategyMixin:
     """Mixin that stores an activity strategy for builders."""
 
-    def __init__(self):
+    activity_strategy: ActivityStrategy | None
+
+    def __init__(self) -> None:
         """Initialize the mixin with no configured activity strategy."""
         self.activity_strategy = None
 
@@ -171,7 +179,7 @@ class BuilderActivityStrategyMixin:
         self,
         activity_strategy: ActivityStrategy,
         activity_strategy_units: Optional[str] = None,
-    ):
+    ) -> Self:
         """Assign the activity strategy for the particle representation.
 
         Args:
@@ -200,7 +208,7 @@ class ParticleMassRepresentationBuilder(
 ):  # pylint: disable=too-many-ancestors
     """Build particle representations from mass-based distributions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize required fields for mass-based representations."""
         required_parameters = [
             "distribution_strategy",
@@ -228,10 +236,15 @@ class ParticleMassRepresentationBuilder(
             activity, surface, density, concentration, and charge data.
         """
         self.pre_build_check()
+        distribution_strategy = cast(
+            DistributionStrategy, self.distribution_strategy
+        )
+        activity_strategy = cast(ActivityStrategy, self.activity_strategy)
+        surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
         return ParticleRepresentation(
-            strategy=self.distribution_strategy,
-            activity=self.activity_strategy,
-            surface=self.surface_strategy,
+            strategy=distribution_strategy,
+            activity=activity_strategy,
+            surface=surface_strategy,
             distribution=self.mass,
             density=self.density,
             concentration=self.concentration,  # type: ignore[arg-type]
@@ -251,7 +264,7 @@ class ParticleRadiusRepresentationBuilder(
 ):  # pylint: disable=too-many-ancestors
     """Build particle representations from radius-based distributions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize required fields for radius-based representations."""
         required_parameters = [
             "distribution_strategy",
@@ -280,10 +293,15 @@ class ParticleRadiusRepresentationBuilder(
             data.
         """
         self.pre_build_check()
+        distribution_strategy = cast(
+            DistributionStrategy, self.distribution_strategy
+        )
+        activity_strategy = cast(ActivityStrategy, self.activity_strategy)
+        surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
         return ParticleRepresentation(
-            strategy=self.distribution_strategy,
-            activity=self.activity_strategy,
-            surface=self.surface_strategy,
+            strategy=distribution_strategy,
+            activity=activity_strategy,
+            surface=surface_strategy,
             distribution=self.radius,
             density=self.density,
             concentration=self.concentration,  # type: ignore[arg-type]
@@ -304,7 +322,7 @@ class PresetParticleRadiusBuilder(
 ):  # pylint: disable=too-many-ancestors
     """Build preset radius-bin representations from lognormal parameters."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize defaults for preset radius-bin representations."""
         required_parameters = [
             "mode",
@@ -340,7 +358,7 @@ class PresetParticleRadiusBuilder(
         self,
         radius_bins: NDArray[np.float64],
         radius_bins_units: str = "m",
-    ):
+    ) -> Self:
         """Assign the radius-bin grid used to generate the distribution.
 
         Args:
@@ -369,7 +387,7 @@ class PresetParticleRadiusBuilder(
         self,
         distribution_type: str,
         distribution_type_units: Optional[str] = None,
-    ):
+    ) -> Self:
         """Choose whether the preset distribution is generated as a PDF or PMF.
 
         Args:
@@ -422,10 +440,15 @@ class PresetParticleRadiusBuilder(
             raise ValueError(message)
 
         self.pre_build_check()
+        distribution_strategy = cast(
+            DistributionStrategy, self.distribution_strategy
+        )
+        activity_strategy = cast(ActivityStrategy, self.activity_strategy)
+        surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
         return ParticleRepresentation(
-            strategy=self.distribution_strategy,
-            activity=self.activity_strategy,
-            surface=self.surface_strategy,
+            strategy=distribution_strategy,
+            activity=activity_strategy,
+            surface=surface_strategy,
             distribution=self.radius_bins,
             density=self.density,
             concentration=number_concentration,
@@ -445,7 +468,7 @@ class ResolvedParticleMassRepresentationBuilder(
 ):  # pylint: disable=too-many-ancestors
     """Build particle-resolved representations from resolved mass arrays."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize required fields for resolved-mass representations."""
         required_parameters = [
             "distribution_strategy",
@@ -472,18 +495,21 @@ class ResolvedParticleMassRepresentationBuilder(
             A particle representation configured with per-particle masses,
             normalized density and charge inputs, and the stored strategies.
         """
-        number_concentration = np.ones_like(self.mass, dtype=np.float64)
-        if number_concentration.ndim > 1:
-            number_concentration = number_concentration[:, 0]
+        number_concentration = np.ones(self.mass.shape[0], dtype=np.float64)
 
         density = _normalize_resolved_density_input(self.density, self.mass)
         charge = _normalize_resolved_charge_input(self.charge, self.mass)
 
         self.pre_build_check()
+        distribution_strategy = cast(
+            DistributionStrategy, self.distribution_strategy
+        )
+        activity_strategy = cast(ActivityStrategy, self.activity_strategy)
+        surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
         return ParticleRepresentation(
-            strategy=self.distribution_strategy,
-            activity=self.activity_strategy,
-            surface=self.surface_strategy,
+            strategy=distribution_strategy,
+            activity=activity_strategy,
+            surface=surface_strategy,
             distribution=self.mass,
             density=density,
             concentration=number_concentration,
@@ -505,7 +531,7 @@ class PresetResolvedParticleMassBuilder(
 ):  # pylint: disable=too-many-ancestors
     """Build preset particle-resolved representations from lognormal inputs."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize defaults for preset particle-resolved representations."""
         required_parameters = [
             "mode",
@@ -552,11 +578,14 @@ class PresetResolvedParticleMassBuilder(
             number_of_samples=self.particle_resolved_count,
         )
         # convert radii to masses
-        resolved_masses_calc = 4 / 3 * np.pi * resolved_radii**3 * self.density
-        resolved_masses = np.asarray(resolved_masses_calc, dtype=np.float64)
-        number_concentration = np.ones_like(resolved_masses, dtype=np.float64)
-        if number_concentration.ndim > 1:
-            number_concentration = number_concentration[:, 0]
+        resolved_masses = np.asarray(
+            4 / 3 * np.pi * resolved_radii**3 * self.density,
+            dtype=np.float64,
+        )
+        number_concentration = np.ones(
+            resolved_masses.shape[0],
+            dtype=np.float64,
+        )
 
         density = _normalize_resolved_density_input(
             self.density, resolved_masses
@@ -571,10 +600,15 @@ class PresetResolvedParticleMassBuilder(
             charge = np.zeros(number_concentration.size, dtype=np.float64)
 
         self.pre_build_check()
+        distribution_strategy = cast(
+            DistributionStrategy, self.distribution_strategy
+        )
+        activity_strategy = cast(ActivityStrategy, self.activity_strategy)
+        surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
         return ParticleRepresentation(
-            strategy=self.distribution_strategy,
-            activity=self.activity_strategy,
-            surface=self.surface_strategy,
+            strategy=distribution_strategy,
+            activity=activity_strategy,
+            surface=surface_strategy,
             distribution=resolved_masses,
             density=density,
             concentration=number_concentration,

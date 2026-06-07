@@ -13,6 +13,8 @@ from particula.particles.representation_builders import (
     PresetParticleRadiusBuilder,
     PresetResolvedParticleMassBuilder,
     ResolvedParticleMassRepresentationBuilder,
+    _normalize_resolved_charge_input,
+    _normalize_resolved_density_input,
 )
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
@@ -97,6 +99,26 @@ def test_resolved_mass_builder_flattens_singleton_density_and_charge() -> None:
     )
 
 
+def test_resolved_mass_builder_flattens_singleton_row_charge() -> None:
+    """Singleton-row charge arrays should flatten across all particles."""
+    builder = ResolvedParticleMassRepresentationBuilder()
+    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())
+    builder.set_activity_strategy(ActivityIdealMass())
+    builder.set_surface_strategy(SurfaceStrategyVolume())
+    builder.set_mass(np.array([[1.0], [2.0], [3.0]]), "kg")
+    builder.set_density(np.array([[1000.0], [1000.0], [1000.0]]), "kg/m^3")
+    builder.set_charge(np.array([[1.0, 2.0, 3.0]]))
+    builder.set_volume(1, "m^3")
+
+    particle_representation = builder.build()
+
+    assert isinstance(particle_representation, ParticleRepresentation)
+    np.testing.assert_array_equal(
+        particle_representation.get_charge(),
+        np.array([1.0, 2.0, 3.0]),
+    )
+
+
 def test_preset_resolved_mass_particle_builder():
     """Test PresetResolvedMassParticleBuilder Builds."""
     # default values
@@ -112,3 +134,46 @@ def test_preset_resolved_mass_particle_builder():
     builder.set_volume(1.0, "m^3")
     particle_representation = builder.build()
     assert isinstance(particle_representation, ParticleRepresentation)
+
+
+def test_normalize_resolved_density_input_handles_matching_and_empty_shapes(
+) -> None:
+    """Resolved density normalization should reduce to the species axis."""
+    mass = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+
+    np.testing.assert_array_equal(
+        _normalize_resolved_density_input(
+            np.array([[1000.0, 900.0], [1000.0, 900.0]]),
+            mass,
+        ),
+        np.array([1000.0, 900.0]),
+    )
+    np.testing.assert_array_equal(
+        _normalize_resolved_density_input(
+            np.zeros((0, 2), dtype=np.float64),
+            np.zeros((0, 2), dtype=np.float64),
+        ),
+        np.zeros(2, dtype=np.float64),
+    )
+
+
+def test_normalize_resolved_charge_input_handles_none_matching_and_singleton(
+) -> None:
+    """Resolved charge normalization should reduce to the particle axis."""
+    mass = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+
+    assert _normalize_resolved_charge_input(None, mass) is None
+    np.testing.assert_array_equal(
+        _normalize_resolved_charge_input(
+            np.array([[1.0, 9.0], [2.0, 8.0]]),
+            mass,
+        ),
+        np.array([1.0, 2.0]),
+    )
+    np.testing.assert_array_equal(
+        _normalize_resolved_charge_input(
+            np.array([[1.0], [2.0]]),
+            mass,
+        ),
+        np.array([1.0, 2.0]),
+    )
