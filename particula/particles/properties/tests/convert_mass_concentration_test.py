@@ -42,6 +42,36 @@ def test_mass_concentration_to_mole_fraction(
     np.testing.assert_allclose(mole_fractions, expected, rtol=1e-5)
 
 
+def test_mass_concentration_to_mole_fraction_zero_total_returns_zeros():
+    """Zero total moles return zeros for 1D and zero rows in 2D inputs."""
+    one_dimensional = convert_mass_concentration.get_mole_fraction_from_mass(
+        np.array([0.0, 0.0]),
+        np.array([10.0, 20.0]),
+    )
+    two_dimensional = convert_mass_concentration.get_mole_fraction_from_mass(
+        np.array([[0.0, 0.0], [10.0, 30.0]]),
+        np.array([10.0, 30.0]),
+    )
+
+    np.testing.assert_array_equal(one_dimensional, np.array([0.0, 0.0]))
+    np.testing.assert_allclose(
+        two_dimensional,
+        np.array([[0.0, 0.0], [0.5, 0.5]]),
+        rtol=1e-5,
+    )
+
+
+def test_mass_concentration_to_mole_fraction_rejects_invalid_dimensions():
+    """Three-dimensional mass concentrations are rejected explicitly."""
+    with pytest.raises(
+        ValueError, match="mass_concentrations must be either 1D or 2D"
+    ):
+        convert_mass_concentration.get_mole_fraction_from_mass(
+            np.ones((1, 1, 1)),
+            np.ones((1, 1, 1)),
+        )
+
+
 @pytest.mark.parametrize(
     "mass_concentrations, densities, expected",
     [
@@ -67,6 +97,36 @@ def test_mass_concentration_to_volume_fraction(
         mass_concentrations, densities
     )
     np.testing.assert_allclose(volume_fractions, expected, rtol=1e-5)
+
+
+def test_mass_concentration_to_volume_fraction_zero_total_returns_zeros():
+    """Zero total volume returns zeros for 1D and zero rows in 2D inputs."""
+    one_dimensional = convert_mass_concentration.get_volume_fraction_from_mass(
+        np.array([0.0, 0.0]),
+        np.array([10.0, 20.0]),
+    )
+    two_dimensional = convert_mass_concentration.get_volume_fraction_from_mass(
+        np.array([[0.0, 0.0], [10.0, 30.0]]),
+        np.array([10.0, 30.0]),
+    )
+
+    np.testing.assert_array_equal(one_dimensional, np.array([0.0, 0.0]))
+    np.testing.assert_allclose(
+        two_dimensional,
+        np.array([[0.0, 0.0], [0.5, 0.5]]),
+        rtol=1e-5,
+    )
+
+
+def test_mass_concentration_to_volume_fraction_rejects_invalid_dimensions():
+    """Three-dimensional mass concentrations are rejected explicitly."""
+    with pytest.raises(
+        ValueError, match="mass_concentrations must be either 1D or 2D"
+    ):
+        convert_mass_concentration.get_volume_fraction_from_mass(
+            np.ones((1, 1, 1)),
+            np.ones((1, 1, 1)),
+        )
 
 
 @pytest.mark.parametrize(
@@ -104,4 +164,41 @@ def test_error_handling_mass_to_volume(mass_concentrations, densities):
     with pytest.raises(Exception):  # noqa: B017
         convert_mass_concentration.get_volume_fraction_from_mass(
             mass_concentrations, densities
+        )
+
+
+@pytest.mark.parametrize(
+    "mass_concentrations, expected",
+    [
+        (np.array([10.0, 30.0, 60.0]), np.array([0.1, 0.3, 0.6])),
+        (
+            np.array([[10.0, 30.0], [0.0, 0.0]]),
+            np.array([[0.25, 0.75], [0.0, 0.0]]),
+        ),
+    ],
+)
+def test_mass_concentration_to_mass_fraction(mass_concentrations, expected):
+    """Mass fractions are normalized across 1D and 2D inputs."""
+    mass_fractions = convert_mass_concentration.get_mass_fraction_from_mass(
+        mass_concentrations
+    )
+
+    np.testing.assert_allclose(mass_fractions, expected, rtol=1e-5)
+
+
+def test_mass_concentration_to_mass_fraction_rejects_invalid_dimensions():
+    """Three-dimensional mass concentrations are rejected explicitly."""
+    with pytest.raises(
+        ValueError, match="mass_concentrations must be either 1D or 2D"
+    ):
+        convert_mass_concentration.get_mass_fraction_from_mass(
+            np.ones((1, 1, 1))
+        )
+
+
+def test_mass_concentration_to_mass_fraction_rejects_negative_values():
+    """Negative mass concentrations fail input validation."""
+    with pytest.raises(Exception):  # noqa: B017
+        convert_mass_concentration.get_mass_fraction_from_mass(
+            np.array([1.0, -1.0])
         )

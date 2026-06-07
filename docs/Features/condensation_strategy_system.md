@@ -30,8 +30,11 @@ This feature is built around user-facing APIs exposed via
   diagnostics.
 - `CondensationIsothermalBuilder`, `CondensationIsothermalStaggeredBuilder`,
   `CondensationLatentHeatBuilder` – fluent builders with validation and unit
-  handling.
-- `CondensationFactory` – factory selecting a condensation strategy by name.
+  handling, exported via both `particula.dynamics` and
+  `particula.dynamics.condensation`.
+- `CondensationFactory` – factory selecting a condensation strategy by name,
+  exported via both `particula.dynamics` and
+  `particula.dynamics.condensation`.
 - `MassCondensation` runnable – delegates to a condensation strategy, splits
   `time_step` across `sub_steps`, and composes in pipelines.
 - Mass-transfer helpers – `get_mass_transfer_rate`, `get_first_order_mass_
@@ -151,9 +154,14 @@ particle, gas = iso.step(
 ### CondensationLatentHeat (energy diagnostics)
 
 `CondensationLatentHeat` mirrors the isothermal step but applies a latent-heat
-correction when a latent heat strategy (or scalar fallback) is provided. It
-records `last_latent_heat_energy` each step (positive for condensation,
-negative for evaporation) and accepts a `dynamic_viscosity` override for
+correction when a latent heat strategy is provided. For direct manual
+construction, the constructor also accepts a positive scalar `latent_heat`
+compatibility fallback. Public user workflows should prefer the
+builder/factory path below, especially when you want validated parameter
+loading or a strategy object. When both `latent_heat_strategy` and
+`latent_heat` are supplied, the explicit strategy takes precedence. It records
+`last_latent_heat_energy` each step (positive for condensation, negative for
+evaporation) and accepts a `dynamic_viscosity` override for
 particle-resolved workflows.
 
 ```python
@@ -174,9 +182,8 @@ particle, gas = latent.step(
 energy_released = latent.last_latent_heat_energy  # total energy [J]
 ```
 
-When no latent heat strategy is configured (or a nonpositive scalar is
-provided), the step follows the isothermal path and reports
-`last_latent_heat_energy = 0.0`.
+When no latent heat strategy is configured, the step follows the isothermal
+path and reports `last_latent_heat_energy = 0.0`.
 
 `last_latent_heat_energy` records the total latent heat released per step
 (sum of dm × L), not an energy density.
@@ -237,11 +244,15 @@ rand = par.dynamics.CondensationIsothermalStaggered(
 
 ### Builder and factory workflow
 
-Builders provide validation, units, and consistent naming; the factory selects a
-strategy by string while reusing builder validation.
+Builders provide validation, units, and consistent naming; the factory selects
+a strategy by string while reusing builder validation. The public builder and
+factory entry points are available from either `particula.dynamics` or
+`particula.dynamics.condensation`, and the shipped latent-heat factory key is
+`"latent_heat"`.
 
 ```python
 import particula as par
+from particula.gas.latent_heat_strategies import ConstantLatentHeat
 
 iso = (
     par.dynamics.CondensationIsothermalBuilder()
@@ -265,12 +276,14 @@ staggered = (
     .build()
 )
 
+latent_strategy = ConstantLatentHeat(latent_heat_ref=2.4e6)
+
 latent = (
     par.dynamics.CondensationLatentHeatBuilder()
     .set_molar_mass(0.018, "kg/mol")
     .set_diffusion_coefficient(2e-5, "m^2/s")
     .set_accommodation_coefficient(1.0)
-    .set_latent_heat(2.4e6)
+    .set_latent_heat_strategy(latent_strategy)
     .set_update_gases(True)
     .build()
 )
@@ -296,6 +309,19 @@ latent_factory = factory.get_strategy(
     },
 )
 ```
+
+Use direct `CondensationLatentHeat(...)` construction when you want to wire the
+strategy manually. For the supported public workflow, prefer
+`CondensationLatentHeatBuilder` or
+`CondensationFactory().get_strategy("latent_heat", parameters=...)`. The
+builder/factory path supports both:
+
+- `latent_heat_strategy`: pass an explicit latent heat strategy object.
+- `latent_heat`: pass a positive scalar fallback that the builder forwards to
+  `CondensationLatentHeat`.
+
+If both are supplied, the explicit `latent_heat_strategy` remains active and
+the scalar value is preserved only as constructor input metadata.
 
 ### Skip-partitioning indices and gas updates
 
