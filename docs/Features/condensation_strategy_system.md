@@ -154,15 +154,15 @@ particle, gas = iso.step(
 ### CondensationLatentHeat (energy diagnostics)
 
 `CondensationLatentHeat` mirrors the isothermal step but applies a latent-heat
-correction when a latent heat strategy is provided. For direct manual
-construction, the constructor also accepts a positive scalar `latent_heat`
-compatibility fallback. Public user workflows should prefer the
-builder/factory path below, especially when you want validated parameter
-loading or a strategy object. When both `latent_heat_strategy` and
-`latent_heat` are supplied, the explicit strategy takes precedence. It records
-`last_latent_heat_energy` each step (positive for condensation, negative for
-evaporation) and accepts a `dynamic_viscosity` override for
-particle-resolved workflows.
+correction when a latent heat strategy is provided. Direct manual
+`CondensationLatentHeat(...)` construction is supported, and the constructor
+also accepts a positive scalar `latent_heat` compatibility fallback. For most
+public user workflows, prefer the builder/factory path below when you want
+validated parameter loading or a strategy object. When both
+`latent_heat_strategy` and `latent_heat` are supplied, the explicit strategy
+takes precedence. It records `last_latent_heat_energy` each step (positive for
+condensation, negative for evaporation) and accepts a `dynamic_viscosity`
+override for particle-resolved workflows.
 
 ```python
 latent = par.dynamics.CondensationLatentHeat(
@@ -246,9 +246,14 @@ rand = par.dynamics.CondensationIsothermalStaggered(
 
 Builders provide validation, units, and consistent naming; the factory selects
 a strategy by string while reusing builder validation. The public builder and
-factory entry points are available from either `particula.dynamics` or
-`particula.dynamics.condensation`, and the shipped latent-heat factory key is
-`"latent_heat"`.
+factory entry points are available from both import surfaces:
+
+- `particula.dynamics.CondensationLatentHeatBuilder`
+- `particula.dynamics.condensation.CondensationLatentHeatBuilder`
+- `particula.dynamics.CondensationFactory`
+- `particula.dynamics.condensation.CondensationFactory`
+
+The shipped latent-heat factory key is `"latent_heat"`.
 
 ```python
 import particula as par
@@ -289,6 +294,17 @@ latent = (
 )
 
 factory = par.dynamics.CondensationFactory()
+latent_factory_with_strategy = factory.get_strategy(
+    strategy_type="latent_heat",
+    parameters={
+        "molar_mass": 0.018,
+        "diffusion_coefficient": 2e-5,
+        "accommodation_coefficient": 1.0,
+        "latent_heat_strategy": latent_strategy,
+        "update_gases": True,
+    },
+)
+
 iso_factory = factory.get_strategy(
     strategy_type="isothermal",
     parameters={
@@ -314,7 +330,7 @@ Use direct `CondensationLatentHeat(...)` construction when you want to wire the
 strategy manually. For the supported public workflow, prefer
 `CondensationLatentHeatBuilder` or
 `CondensationFactory().get_strategy("latent_heat", parameters=...)`. The
-builder/factory path supports both:
+builder/factory path supports both documented latent-heat inputs:
 
 - `latent_heat_strategy`: pass an explicit latent heat strategy object.
 - `latent_heat`: pass a positive scalar fallback that the builder forwards to

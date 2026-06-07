@@ -27,9 +27,10 @@ land the builder/factory/export work.
   identity assertions proving both public imports resolve the same
   `CondensationLatentHeatBuilder` class.
 - **E1-F1-P4 documentation update:** shipped as a docs-only exception to adding
-  a brand-new test file; the relevant consistency checks remain the existing
-  condensation export/factory coverage plus doc-to-API alignment for
-  `docs/Features/condensation_strategy_system.md`.
+  a brand-new test file; validation reused the targeted condensation rerun set
+  from the plan so `docs/Features/condensation_strategy_system.md` stayed
+  aligned with the shipped direct-constructor, builder, factory, and export
+  contracts.
 
 ## Test types and assertions
 
@@ -49,6 +50,7 @@ land the builder/factory/export work.
 - `pytest -Werror particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py`
 - `pytest -Werror particula/dynamics/condensation/tests/condensation_factories_test.py`
 - `pytest -Werror particula/dynamics/tests/condensation_exports_test.py`
+- `pytest -Werror particula/dynamics/condensation/tests/condensation_strategies_test.py -v -k "latent_heat and (instantiation or resolution_priority or update_gases)"`
 
 If phase scope expands beyond these files, update the nearest module tests in
 the same phase rather than deferring coverage to a later PR.

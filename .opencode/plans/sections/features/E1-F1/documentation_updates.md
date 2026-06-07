@@ -15,5 +15,8 @@ latent-heat builder and factory path:
 - Updated `docs/Features/condensation_strategy_system.md` to list
   `CondensationLatentHeatBuilder` alongside the other public builders and to
   show the shipped `CondensationFactory.get_strategy("latent_heat", ...)` path
+  while distinguishing the preferred builder/factory workflow from direct
+  `CondensationLatentHeat(...)` construction and its scalar `latent_heat`
+  compatibility fallback
 - Updated `.opencode/plans/sections/features/E1-F1/` to reflect that the docs
   phase is complete and the plan now matches the shipped documentation state

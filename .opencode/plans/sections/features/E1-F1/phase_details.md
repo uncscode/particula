@@ -38,7 +38,7 @@
   - Tests: Added import smoke-test coverage for both namespaces, `__all__` membership checks, and cross-namespace object identity assertions for `CondensationLatentHeatBuilder`
 
 - [x] **E1-F1-P4:** Update development documentation
-  - Issue: docs sync | Size: XS | Status: Shipped
+  - Issue: #1160 | Size: XS | Status: Shipped
   - Depends on: E1-F1-P3 and final confirmation of the public factory key/name
     so docs do not publish stale import paths or configuration examples
   - Goal: Document the builder/factory entry point and show how latent-heat
@@ -48,8 +48,12 @@
     naming still under review. This phase is the required update dev-docs step
     before the feature can be considered complete.
   - Files: Shipped `docs/Features/condensation_strategy_system.md`
-  - Tests: Docs-only exception to adding a new test file; examples now align
-    with the shipped public imports and `CondensationFactory.get_strategy("latent_heat", ...)`
+  - Tests: Docs-only exception to adding a new test file; reran the targeted
+    condensation validation set from the plan (`condensation_latent_heat_builder_test.py`,
+    `condensation_factories_test.py`, `condensation_exports_test.py`, and
+    targeted latent-heat constructor coverage from
+    `condensation_strategies_test.py`) while aligning examples with the shipped
+    public imports and `CondensationFactory.get_strategy("latent_heat", ...)`
 
 ### Dependency Review Notes
 
