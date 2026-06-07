@@ -269,8 +269,7 @@ def test_build_with_strategy_and_scalar_preserves_constructor_precedence() -> (
     assert strategy.latent_heat_input == pytest.approx(2.26e6)
 
 
-def test_unset_latent_heat_uses_constructor_default_without_none_passthrough(
-) -> None:
+def test_unset_latent_heat_keeps_constructor_default() -> None:
     """Unset scalar latent heat leaves constructor default state intact."""
     latent_heat_strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
     strategy = (
