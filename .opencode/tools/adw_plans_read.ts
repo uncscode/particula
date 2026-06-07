@@ -1,9 +1,10 @@
 import { tool } from "@opencode-ai/plugin";
-import { existsSync, realpathSync, statSync } from "node:fs";
 
 import {
   buildCommandFailureError,
-  redactPathLikeText,
+  validatePlansCwdPath,
+  mergeParsedOptionField,
+  parseCommandOptionsString,
   sanitizeSuccessOutput,
   stripDefaultArgs,
   validateRequiredArgs,
@@ -11,16 +12,7 @@ import {
 
 // --- Inlined from adw_plans.ts ---
 
-const S_IFMT = 0o170000;
-const S_IFDIR = 0o040000;
-
-function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
-  if (typeof s.isDirectory === "function") return s.isDirectory();
-  if (typeof s.isDirectory === "boolean") return s.isDirectory;
-  return (((s as any).mode ?? 0) & S_IFMT) === S_IFDIR;
-}
-
-const COMMANDS = ["list", "show", "create", "update", "add-phase", "update-phase", "validate", "schema", "scaffold-sections", "list-sections"] as const;
+const COMMANDS = ["list", "show", "validate", "schema", "list-sections"] as const;
 
 const LIFECYCLES = ["active", "completed", "closed"] as const;
 const PLAN_STATUSES = [
@@ -44,13 +36,8 @@ const LONG_COMMAND_TIMEOUT_MS = 180_000;
 const COMMAND_TIMEOUTS: Record<PlanCommand, number> = {
   list: DEFAULT_TIMEOUT_MS,
   show: DEFAULT_TIMEOUT_MS,
-  create: DEFAULT_TIMEOUT_MS,
-  update: DEFAULT_TIMEOUT_MS,
-  "add-phase": DEFAULT_TIMEOUT_MS,
-  "update-phase": DEFAULT_TIMEOUT_MS,
   validate: LONG_COMMAND_TIMEOUT_MS,
   schema: LONG_COMMAND_TIMEOUT_MS,
-  "scaffold-sections": DEFAULT_TIMEOUT_MS,
   "list-sections": DEFAULT_TIMEOUT_MS,
 };
 
@@ -78,11 +65,11 @@ type IdentifierOptions = {
 };
 
 const COMMAND_GUIDE = `Commands:
-• list — Filters: type, lifecycle, parent, status, json
-• show — Required: plan_id; Optional: json
+• list — Filters: type, lifecycle, parent, status; Optional options: json
+• show — Required: plan_id; Optional options: json
 • validate — No additional parameters
-• schema — Optional: check
-• list-sections — Required: plan_id. Lists section files with repo-relative paths. Optional: json, populate.`;
+• schema — Optional options: check
+• list-sections — Required: plan_id. Lists section files with repo-relative paths. Optional options: json, populate.`;
 
 function buildError(message: string): string {
   return `ERROR: ${message}\n\n${COMMAND_GUIDE}`;
@@ -127,29 +114,6 @@ function normalizeCwd(raw: unknown): { value?: string; error?: string } {
   return normalized;
 }
 
-function validateCwdPath(cwdPath: string): string | undefined {
-  const redactedPath = redactPathLikeText(cwdPath);
-  if (!existsSync(cwdPath)) {
-    return `ERROR: cwd path does not exist: ${redactedPath}`;
-  }
-  let stats;
-  try {
-    stats = statSync(cwdPath);
-  } catch {
-    return `ERROR: cwd path does not exist: ${redactedPath}`;
-  }
-  if (!isStatDirectory(stats)) {
-    return `ERROR: cwd path is not a directory: ${redactedPath}`;
-  }
-
-  const canonical = realpathSync(cwdPath);
-  const gitMetadataPath = `${canonical}/.git`;
-  if (!existsSync(gitMetadataPath)) {
-    return `ERROR: cwd path is not a repository/worktree root: ${redactedPath} (missing .git metadata at ${redactPathLikeText(gitMetadataPath)})`;
-  }
-  return undefined;
-}
-
 const REQUIRED_ARGS = {
   show: [{ field: "plan_id", message: "show command requires 'plan_id'." }],
   "list-sections": [{ field: "plan_id", message: "list-sections command requires 'plan_id'." }],
@@ -187,11 +151,26 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
     lifecycle,
     parent,
     status,
-    json,
-    check,
-    populate,
+    options,
     cwd,
   } = normalized;
+
+  const parsedOptions = parseCommandOptionsString(String(command ?? ""), options, buildError);
+  if (parsedOptions.error) {
+    return parsedOptions.error;
+  }
+  const optionValues = parsedOptions.values ?? {};
+  const resolvedJson = mergeParsedOptionField(undefined, optionValues.json, "json", buildError);
+  if (resolvedJson.error) return resolvedJson.error;
+  const resolvedCheck = mergeParsedOptionField(undefined, optionValues.check, "check", buildError);
+  if (resolvedCheck.error) return resolvedCheck.error;
+  const resolvedPopulate = mergeParsedOptionField(
+    undefined,
+    optionValues.populate,
+    "populate",
+    buildError,
+  );
+  if (resolvedPopulate.error) return resolvedPopulate.error;
 
   const cmdParts = ["uv", "run", "adw", "plans"];
   const executedCommand = command as PlanCommand;
@@ -221,7 +200,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
       if (status) {
         cmdParts.push("--status", status);
       }
-      if (json) {
+      if (resolvedJson.value) {
         cmdParts.push("--json");
       }
       break;
@@ -237,7 +216,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
         return normalizedPlanId.error;
       }
       cmdParts.push("show", normalizedPlanId.value!);
-      if (json) {
+      if (resolvedJson.value) {
         cmdParts.push("--json");
       }
       break;
@@ -250,7 +229,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
 
     case "schema": {
       cmdParts.push("schema");
-      if (check) {
+      if (resolvedCheck.value) {
         cmdParts.push("--check");
       }
       break;
@@ -266,10 +245,10 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
         return normalizedPlanId.error;
       }
       cmdParts.push("list-sections", normalizedPlanId.value!);
-      if (json) {
+      if (resolvedJson.value) {
         cmdParts.push("--json");
       }
-      if (populate) {
+      if (resolvedPopulate.value) {
         cmdParts.push("--populate");
       }
       break;
@@ -286,7 +265,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
     return normalizedCwd.error;
   }
   if (normalizedCwd.value) {
-    const cwdValidationError = validateCwdPath(normalizedCwd.value);
+    const cwdValidationError = validatePlansCwdPath(normalizedCwd.value);
     if (cwdValidationError) {
       return cwdValidationError;
     }
@@ -361,15 +340,13 @@ Mutating commands are rejected; use adw_plans_mutate for writes.
 Contract parity note: successful and failed command output envelopes are delegated to adw_plans.`,
 
   args: {
-    command: tool.schema.enum(["list", "show", "validate", "schema", "list-sections", "create", "update", "add-phase", "update-phase", "scaffold-sections"]),
+    command: tool.schema.enum(["list", "show", "validate", "schema", "list-sections"]),
     plan_id: tool.schema.string().optional(),
     plan_type: tool.schema.string().optional(),
     lifecycle: tool.schema.enum(["active", "completed", "closed"]).optional(),
     parent: tool.schema.string().optional(),
     status: tool.schema.enum(["Draft", "Proposed", "Ready", "In Progress", "Blocked", "Monitoring", "Shipped", "Cancelled", "Superseded"]).optional(),
-    json: tool.schema.boolean().optional(),
-    check: tool.schema.boolean().optional(),
-    populate: tool.schema.boolean().optional(),
+    options: tool.schema.string().optional(),
     cwd: tool.schema.string().optional(),
   },
 

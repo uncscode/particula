@@ -8,8 +8,9 @@ description: >-
   - Browsing or querying plan status
   
   This agent is INTERACTIVE - it will ask clarifying questions before generating
-  documents. It uses the adw_plans tool directly for all plan CRUD operations
-  and writes section markdown files for rich content.
+  documents. It uses `adw_spec` to resolve `worktree_path`, uses the
+  adw_plans tool directly for plan CRUD operations, and writes section
+  markdown files for rich content.
   
   Example invocations:
   - "I need to create a new feature plan for dark mode"
@@ -30,7 +31,7 @@ permission:
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: deny
+  adw_spec: allow
   adw_plans: allow
   feedback_log: allow
   create_workspace: deny
@@ -223,13 +224,13 @@ Use the `adw_plans` tool to understand current state before creating or updating
 
 ```python
 # List all active features
-adw_plans({ command: "list", plan_type: "feature", lifecycle: "active", json: true })
+adw_plans({ command: "list", plan_type: "feature", lifecycle: "active", options: "json" })
 
 # List features under a specific epic
-adw_plans({ command: "list", plan_type: "feature", parent: "E17", json: true })
+adw_plans({ command: "list", plan_type: "feature", parent: "E17", options: "json" })
 
 # Show a specific plan
-adw_plans({ command: "show", plan_id: "E17-F1", json: true })
+adw_plans({ command: "show", plan_id: "E17-F1", options: "json" })
 
 # List all active epics
 adw_plans({ command: "list", plan_type: "epic", lifecycle: "active" })
@@ -245,13 +246,17 @@ adw_plans({ command: "list", plan_type: "feature", status: "In Progress" })
 The tool handles auto-ID generation, defaults (`status: Draft`, `priority: P2`, `size: M`),
 and writes the JSON file:
 
+Resolve `worktree_path` from `adw_spec read -> worktree_path` first and pass that exact value as
+`cwd` for every mutating `adw_plans` command below.
+
 ```python
 # Create epic-linked feature
 adw_plans({
   command: "create",
   plan_type: "feature",
   title: "Platform Rate Limiting",
-  parent: "E1"
+  parent: "E1",
+  cwd: worktree_path,
 })
 # Returns: created E1-F4 at .opencode/plans/features/E1-F4.json
 
@@ -259,7 +264,8 @@ adw_plans({
 adw_plans({
   command: "create",
   plan_type: "feature",
-  title: "Dark Mode Support"
+  title: "Dark Mode Support",
+  cwd: worktree_path,
 })
 # Returns: created F40 at .opencode/plans/features/F40.json
 
@@ -268,8 +274,8 @@ adw_plans({
   command: "create",
   plan_type: "epic",
   title: "Authentication Refactoring",
-  priority: "P1",
-  size: "XL"
+  options: "priority=P1 size=XL",
+  cwd: worktree_path,
 })
 # Returns: created E18 at .opencode/plans/epics/E18.json
 
@@ -278,7 +284,8 @@ adw_plans({
   command: "create",
   plan_type: "maintenance",
   title: "Quarterly Dependency Audit",
-  parent: "E17"
+  parent: "E17",
+  cwd: worktree_path,
 })
 ```
 
@@ -290,7 +297,8 @@ After creating the JSON, scaffold section markdown files from templates:
 adw_plans({
   command: "scaffold-sections",
   plan_id: "E15-F4",
-  plan_type: "feature"
+  plan_type: "feature",
+  cwd: worktree_path,
 })
 # Creates .opencode/plans/sections/features/E15-F4/{overview,scope,...}.md from templates
 ```
@@ -304,7 +312,8 @@ adw_plans({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Create rate limiter interface with unit tests",
-  size: "M"
+  options: "size=M",
+  cwd: worktree_path,
 })
 # Creates E15-F4-P1
 
@@ -312,7 +321,8 @@ adw_plans({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Implement token bucket algorithm with tests",
-  size: "M"
+  options: "size=M",
+  cwd: worktree_path,
 })
 # Creates E15-F4-P2
 
@@ -320,7 +330,8 @@ adw_plans({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Update development documentation",
-  size: "XS"
+  options: "size=XS",
+  cwd: worktree_path,
 })
 # Creates E15-F4-P3
 
@@ -329,8 +340,8 @@ adw_plans({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Add retry logic with integration tests",
-  size: "S",
-  after: "E15-F4-P2"
+  options: "size=S after=E15-F4-P2",
+  cwd: worktree_path,
 })
 ```
 
@@ -362,28 +373,32 @@ Use the `adw_plans` tool for metadata updates:
 adw_plans({
   command: "update",
   plan_id: "E17-F1",
-  status: "In Progress"
+  status: "In Progress",
+  cwd: worktree_path,
 })
 
 # Update priority
 adw_plans({
   command: "update",
   plan_id: "E17-F1",
-  priority: "P1"
+  options: "priority=P1",
+  cwd: worktree_path,
 })
 
 # Update size
 adw_plans({
   command: "update",
   plan_id: "E17-F1",
-  size: "L"
+  options: "size=L",
+  cwd: worktree_path,
 })
 
 # Update title
 adw_plans({
   command: "update",
   plan_id: "E17-F1",
-  title: "Pydantic Models & Schema Generation (revised)"
+  title: "Pydantic Models & Schema Generation (revised)",
+  cwd: worktree_path,
 })
 ```
 
@@ -397,7 +412,8 @@ adw_plans({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P1",
-  phase_status: "Shipped"
+  phase_status: "Shipped",
+  cwd: worktree_path,
 })
 # Auto-sets completion_date to today
 
@@ -406,7 +422,8 @@ adw_plans({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P2",
-  phase_status: "In Progress"
+  phase_status: "In Progress",
+  cwd: worktree_path,
 })
 # Auto-sets start_date to today
 
@@ -415,7 +432,8 @@ adw_plans({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P1",
-  issue_number: 2195
+  options: "issue=2195",
+  cwd: worktree_path,
 })
 
 # Update phase title and size
@@ -424,7 +442,8 @@ adw_plans({
   plan_id: "E17-F1",
   phase_id: "E17-F1-P2",
   title: "Revised phase title with tests",
-  size: "L"
+  options: "size=L",
+  cwd: worktree_path,
 })
 ```
 
@@ -437,8 +456,8 @@ adw_plans({
   command: "add-phase",
   plan_id: "E17-F1",
   title: "Add caching layer with tests",
-  size: "S",
-  after: "E17-F1-P2"
+  options: "size=S after=E17-F1-P2",
+  cwd: worktree_path,
 })
 ```
 
@@ -460,7 +479,8 @@ edit({
 adw_plans({
   command: "update",
   plan_id: "E17-F1",
-  status: "Shipped"
+  status: "Shipped",
+  cwd: worktree_path,
 })
 ```
 
@@ -622,7 +642,7 @@ Size: `XS`, `S`, `M`, `L`, `XL`, `XXL`
 If `adw_plans show` fails, the plan ID doesn't exist. List plans to find the correct ID:
 
 ```python
-adw_plans({ command: "list", plan_type: "feature", json: true })
+adw_plans({ command: "list", plan_type: "feature", options: "json" })
 ```
 
 ## Invalid Parent Epic

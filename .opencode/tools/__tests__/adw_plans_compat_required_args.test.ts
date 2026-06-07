@@ -11,7 +11,11 @@ import {
   setSpawnError,
   setSpawnResponse,
 } from "./helpers/mock-subprocess";
-import { loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
+import {
+  getCapturedToolDefinition,
+  loadToolExecute,
+  resetCapturedToolDefinition,
+} from "./helpers/tool_harness";
 
 const repoRoot = resolve(import.meta.dir, "../../..");
 
@@ -31,6 +35,24 @@ describe("adw_plans compatibility required-arg preflight", () => {
   afterEach(() => {
     restoreSubprocessMocks();
     resetCapturedToolDefinition();
+  });
+
+  it("exposes options in schema and omits trimmed deprecated aliases", async () => {
+    await loadToolExecute("../../adw_plans.ts");
+
+    const args = getCapturedToolDefinition()?.args ?? {};
+    expect(args).toHaveProperty("options");
+    expect(args).toHaveProperty("status");
+    expect(args).toHaveProperty("phase_status");
+    expect(args).toHaveProperty("patch");
+    expect(args).not.toHaveProperty("json");
+    expect(args).not.toHaveProperty("priority");
+    expect(args).not.toHaveProperty("size");
+    expect(args).not.toHaveProperty("check");
+    expect(args).not.toHaveProperty("populate");
+    expect(args).not.toHaveProperty("after");
+    expect(args).not.toHaveProperty("issue_number");
+    expect(args).not.toHaveProperty("clear_issue_number");
   });
 
   it("rejects whitespace-only required plan_id for show before spawn", async () => {
@@ -70,10 +92,243 @@ describe("adw_plans compatibility required-arg preflight", () => {
 
   it("omits optional blank parent while still spawning valid list command", async () => {
     const execute = await loadToolExecute("../../adw_plans.ts");
-    await execute({ command: "list", parent: "   ", json: true });
+    await execute({ command: "list", parent: "   ", options: "json" });
     const args = getInvocations().at(-1)?.args.join(" ") ?? "";
     expect(args).toContain("uv run adw plans list --json");
     expect(args).not.toContain("--parent");
+  });
+
+  it("parses list json option string in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({ command: "list", options: "json" });
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "adw", "plans", "list", "--json"]);
+  });
+
+  it("parses show json option string in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({ command: "show", plan_id: "E17-F1", options: "json" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "show",
+      "E17-F1",
+      "--json",
+    ]);
+  });
+
+  it("parses schema check option string in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({ command: "schema", options: "check" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "schema",
+      "--check",
+    ]);
+  });
+
+  it("parses list-sections json and populate option strings in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({ command: "list-sections", plan_id: "M25", options: "json populate" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "list-sections",
+      "M25",
+      "--json",
+      "--populate",
+    ]);
+  });
+
+  it("parses add-phase after and size options in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "add-phase",
+      plan_id: "M37",
+      title: "Core impl",
+      options: "after=M37-P1 size=M",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "add-phase",
+      "M37",
+      "--title",
+      "Core impl",
+      "--size",
+      "M",
+      "--after",
+      "M37-P1",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("parses update priority and size options while preserving direct patch", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "update",
+      plan_id: "M37",
+      options: "priority=P1 size=L",
+      patch: '{"status":"Ready"}',
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update",
+      "M37",
+      "--priority",
+      "P1",
+      "--size",
+      "L",
+      "--patch",
+      '{"status":"Ready"}',
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("dispatches create with bounded options string in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "create",
+      plan_type: "feature",
+      title: "Compat create",
+      options: "priority=P1 size=L",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "Compat create",
+      "--priority",
+      "P1",
+      "--size",
+      "L",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("parses status and phase-status options in compatibility wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "update",
+      plan_id: "M37",
+      options: "status=Ready priority=P1 size=L",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update",
+      "M37",
+      "--status",
+      "Ready",
+      "--priority",
+      "P1",
+      "--size",
+      "L",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      options: "phase-status=In Progress size=M issue=42",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--status",
+      "In Progress",
+      "--size",
+      "M",
+      "--issue",
+      "42",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("parses update-phase issue-link options while preserving direct phase status", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      phase_status: "In Progress",
+      options: "size=M issue=42",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--status",
+      "In Progress",
+      "--size",
+      "M",
+      "--issue",
+      "42",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("dispatches clear-issue-number through options for update-phase", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      options: "clear-issue-number",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--clear-issue-number",
+      "--cwd",
+      repoRoot,
+    ]);
   });
 
   it("redacts cwd path in preflight diagnostics", async () => {
@@ -123,16 +378,180 @@ describe("adw_plans compatibility required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toContain(repoRoot);
   });
 
-  it("rejects numeric zero issue_number in update-phase args before spawn", async () => {
+  it("preserves multi-word plan status values in compatibility wrapper invocations", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "create",
+      plan_type: "feature",
+      title: "x",
+      status: "In Progress",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status In Progress");
+  });
+
+  it("preserves multi-word phase status values in compatibility wrapper invocations", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({
+      command: "update-phase",
+      plan_id: "E1-F1",
+      phase_id: "E1-F1-P1",
+      phase_status: "Not Started",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status Not Started");
+  });
+
+  it("rejects numeric zero issue option in update-phase args before spawn", async () => {
     const execute = await loadToolExecute("../../adw_plans.ts");
     const result = await execute({
       command: "update-phase",
       plan_id: "E1-F1",
       phase_id: "E1-F1-P1",
-      issue_number: 0,
+      options: "issue=0",
       cwd: ".",
     });
-    assertContains(String(result), "'issue_number' must be a positive safe integer when provided.");
+    assertContains(String(result), "issue values must be positive safe integers");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects contradictory update-phase issue link arguments before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({
+      command: "update-phase",
+      plan_id: "E1-F1",
+      phase_id: "E1-F1-P1",
+      options: "issue=42 clear-issue-number",
+      cwd: repoRoot,
+    });
+    assertContains(
+      String(result),
+      "'issue_number' and 'clear_issue_number' are mutually exclusive for update-phase.",
+    );
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects unknown options tokens before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "list", options: "bogus" });
+    assertContains(String(result), "Invalid options token 'bogus' for 'list': token is not allowed for this command");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects missing-value options tokens before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "add-phase", plan_id: "M37", title: "x", options: "after=", cwd: repoRoot });
+    assertContains(String(result), "Invalid options token 'after=' for 'add-phase': token value must not be empty");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects extra-equals options tokens before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "schema", options: "check=yes=no" });
+    assertContains(String(result), "tokens must contain at most one '=' separator");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects conflicting duplicate options tokens before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "update", plan_id: "M37", options: "size=M size=L", cwd: repoRoot });
+    assertContains(String(result), "conflicting duplicate 'size=L'");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects invalid issue values parsed from options before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "update-phase", plan_id: "M37", phase_id: "M37-P2", options: "issue=0", cwd: repoRoot });
+    assertContains(String(result), "issue values must be positive safe integers");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("treats whitespace-only options as omitted without masking required-arg failures", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "show", plan_id: "   ", options: "   \n\t  " });
+    assertContains(String(result), "show command requires 'plan_id'.");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects direct and options conflicts for retained direct fields before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "update", plan_id: "M37", status: "Ready", options: "status=Blocked", cwd: repoRoot } as any);
+    assertContains(String(result), "'status' cannot conflict between direct input and options string.");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("accepts matching direct and options values for retained direct fields", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    await execute({ command: "update", plan_id: "M37", status: "Ready", options: "status=Ready", cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update",
+      "M37",
+      "--status",
+      "Ready",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("ignores whitespace-only patch for commands that do not use patch normalization", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = String(
+      await execute({ command: "create", plan_type: "feature", title: "x", patch: "   ", cwd: repoRoot } as any),
+    );
+    expect(result).toBe("ADW Plans Command: create\n\nok");
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "x",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("rejects oversized patch payloads before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const oversizedPatch = "x".repeat(65_537);
+    const result = await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      patch: oversizedPatch,
+      cwd: repoRoot,
+    });
+    assertContains(String(result), "'patch' exceeds maximum size (65536 bytes UTF-8)");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects cwd values that start with a dash before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({ command: "list", cwd: "-bad-path" });
+    assertContains(String(result), "'cwd' must not start with '-' to avoid CLI option confusion.");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects option tokens for scaffold-sections empty allowlist before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans.ts");
+    const result = await execute({
+      command: "scaffold-sections",
+      plan_id: "M37",
+      plan_type: "maintenance",
+      options: "json",
+      cwd: repoRoot,
+    });
+    assertContains(
+      String(result),
+      "Invalid options token 'json' for 'scaffold-sections': token is not allowed for this command",
+    );
     expect(getInvocations()).toHaveLength(0);
   });
 
@@ -310,9 +729,7 @@ describe("adw_plans compatibility required-arg preflight", () => {
       status: "Ready",
       phase_status: "In Progress",
       title: "Phase Title",
-      size: "M",
-      issue_number: 123,
-      clear_issue_number: true,
+      options: "size=M issue=123",
       patch: '{"owner":"team"}',
       cwd: repoRoot,
     } as any);
@@ -334,7 +751,6 @@ describe("adw_plans compatibility required-arg preflight", () => {
       "M",
       "--issue",
       "123",
-      "--clear-issue-number",
       "--patch",
       '{"owner":"team"}',
       "--cwd",

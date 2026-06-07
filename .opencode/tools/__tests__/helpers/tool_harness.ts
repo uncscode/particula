@@ -12,6 +12,7 @@ const makeSchemaNode = (): SchemaNode => ({
 });
 
 type ToolDefinition = {
+  args?: Record<string, unknown>;
   execute?: (args: Record<string, unknown>) => Promise<string> | string;
 };
 
@@ -40,6 +41,8 @@ mock.module("@opencode-ai/plugin", () => ({
 export const resetCapturedToolDefinition = (): void => {
   capturedDefinition = null;
 };
+
+export const getCapturedToolDefinition = (): ToolDefinition | null => capturedDefinition;
 
 /**
  * Loads a wrapper module and returns its registered execute handler.
