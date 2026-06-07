@@ -132,7 +132,7 @@ Validate each candidate plan ID via `adw_plans show`:
 adw_plans({
   "command": "show",
   "plan_id": "{candidate_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -176,7 +176,7 @@ Canonical source-of-truth policy:
   content. Do **not** require rendered markdown docs; use canonical structured
   plan files only.
 - `adw_plans show` provides plan metadata, phases, and status.
-- `adw_plans list-sections` (with `populate: true`) provides section content
+- `adw_plans list-sections` (with `options: "populate json"`) provides section content
   for richer issue bodies.
 
 For each target plan:
@@ -187,7 +187,7 @@ For each target plan:
    adw_plans({
      "command": "show",
      "plan_id": "{plan_id}",
-     "json": true,
+     "options": "json",
      "cwd": worktree_path
    })
    ```
@@ -201,8 +201,7 @@ For each target plan:
    adw_plans({
      "command": "list-sections",
      "plan_id": "{plan_id}",
-     "json": true,
-     "populate": true,
+     "options": "populate json",
      "cwd": worktree_path
    })
    ```
@@ -239,7 +238,7 @@ Missing/invalid plan behavior:
 Use the canonical payload shape:
 
 ```python
-platform_operations({
+platform_issue_write({
   "command": "create-issue",
   "title": "[{plan_id}] [type:generate] {Plan Title}",
   "body": issue_body,

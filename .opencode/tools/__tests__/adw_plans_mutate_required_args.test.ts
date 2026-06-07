@@ -11,7 +11,11 @@ import {
   setSpawnError,
   setSpawnResponse,
 } from "./helpers/mock-subprocess";
-import { loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
+import {
+  getCapturedToolDefinition,
+  loadToolExecute,
+  resetCapturedToolDefinition,
+} from "./helpers/tool_harness";
 
 const repoRoot = resolve(import.meta.dir, "../../..");
 
@@ -31,6 +35,23 @@ describe("adw_plans_mutate required-arg preflight", () => {
   afterEach(() => {
     restoreSubprocessMocks();
     resetCapturedToolDefinition();
+  });
+
+  it("exposes options in split-wrapper schema", async () => {
+    await loadToolExecute("../../adw_plans_mutate.ts");
+    const args = getCapturedToolDefinition()?.args ?? {};
+    expect(args).toHaveProperty("options");
+    expect(args).not.toHaveProperty("priority");
+    expect(args).not.toHaveProperty("size");
+    expect(args).not.toHaveProperty("after");
+    expect(args).not.toHaveProperty("issue_number");
+    expect(args).not.toHaveProperty("clear_issue_number");
+  });
+
+  it("keeps mutate-wrapper command schema source scoped to mutate commands", async () => {
+    const source = await Bun.file(resolve(import.meta.dir, "../adw_plans_mutate.ts")).text();
+    expect(source).toContain('tool.schema.enum(["create", "update", "add-phase", "update-phase", "scaffold-sections"])');
+    expect(source).not.toContain('tool.schema.enum(["create", "update", "add-phase", "update-phase", "scaffold-sections", "list"');
   });
 
   it("rejects whitespace-only required phase_id for update-phase before spawn", async () => {
@@ -134,6 +155,294 @@ describe("adw_plans_mutate required-arg preflight", () => {
     );
     expect(result).toBe("ADW Plans Command: create\n\nok");
     expect(getInvocations().at(-1)?.args).toContain(repoRoot);
+  });
+
+  it("parses bounded options for create/update/add-phase/update-phase in mutate wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+
+    await execute({
+      command: "create",
+      plan_type: "feature",
+      title: "x",
+      options: "status=Ready priority=P1 size=L",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "x",
+      "--priority",
+      "P1",
+      "--size",
+      "L",
+      "--status",
+      "Ready",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "update", plan_id: "M37", options: "status=Ready priority=P1 size=L", cwd: repoRoot });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update",
+      "M37",
+      "--status",
+      "Ready",
+      "--priority",
+      "P1",
+      "--size",
+      "L",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "add-phase", plan_id: "M37", title: "Core impl", options: "after=M37-P1 size=M", cwd: repoRoot });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "add-phase",
+      "M37",
+      "--title",
+      "Core impl",
+      "--size",
+      "M",
+      "--after",
+      "M37-P1",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({
+      command: "add-phase",
+      plan_id: "M37",
+      title: "Core impl",
+      options: "phase-status=Blocked size=M after=M37-P1",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "add-phase",
+      "M37",
+      "--title",
+      "Core impl",
+      "--size",
+      "M",
+      "--status",
+      "Blocked",
+      "--after",
+      "M37-P1",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "update-phase", plan_id: "M37", phase_id: "M37-P2", options: "phase-status=In Progress size=M issue=42", cwd: repoRoot });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--status",
+      "In Progress",
+      "--size",
+      "M",
+      "--issue",
+      "42",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("parses clear-issue-number and preserves direct patch while using options", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      options: "clear-issue-number",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--clear-issue-number",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      options: "phase-status=Blocked clear-issue-number",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--status",
+      "Blocked",
+      "--clear-issue-number",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      options: "phase-status=Blocked size=M issue=42",
+      patch: '{"actuals":"done"}',
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "update-phase",
+      "M37",
+      "M37-P2",
+      "--status",
+      "Blocked",
+      "--size",
+      "M",
+      "--issue",
+      "42",
+      "--patch",
+      '{"actuals":"done"}',
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("ignores whitespace-only options and merges identical direct values in mutate wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+
+    await execute({ command: "create", plan_type: "feature", title: "x", options: "   ", cwd: repoRoot });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "x",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      phase_status: "Blocked",
+      options: "phase-status=Blocked size=M issue=42",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args.filter((arg) => arg === "--status")).toHaveLength(1);
+  });
+
+  it("rejects option conflicts and still requires cwd in mutate wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+
+    const conflictResult = await execute({
+      command: "update",
+      plan_id: "M37",
+      status: "Ready",
+      options: "status=Blocked",
+      cwd: repoRoot,
+    });
+    assertContains(String(conflictResult), "'status' cannot conflict between direct input and options string.");
+
+    const issueConflictResult = await execute({
+      command: "update-phase",
+      plan_id: "M37",
+      phase_id: "M37-P2",
+      options: "issue=42 clear-issue-number",
+      cwd: repoRoot,
+    });
+    assertContains(String(issueConflictResult), "'issue_number' and 'clear_issue_number' are mutually exclusive for update-phase.");
+
+    const cwdResult = await execute({ command: "update", plan_id: "M37", options: "status=Ready priority=P1 size=L" });
+    assertContains(String(cwdResult), "update command requires 'cwd'.");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("preserves mutate command gate precedence when options are provided", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    const result = await execute({ command: "list", options: "json" } as any);
+    assertContains(String(result), "Unsupported command for adw_plans_mutate: list");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("preserves multi-word plan status values as direct wrapper arguments", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    await execute({
+      command: "create",
+      plan_type: "feature",
+      title: "x",
+      status: "In Progress",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status In Progress");
+  });
+
+  it("preserves multi-word phase status values as direct wrapper arguments", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    await execute({
+      command: "update-phase",
+      plan_id: "E1-F1",
+      phase_id: "E1-F1-P1",
+      phase_status: "Not Started",
+      cwd: repoRoot,
+    });
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status Not Started");
+  });
+
+  it("rejects contradictory update-phase issue-link options before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    const result = await execute({
+      command: "update-phase",
+      plan_id: "E1-F1",
+      phase_id: "E1-F1-P1",
+      options: "issue=42 clear-issue-number",
+      cwd: repoRoot,
+    });
+    assertContains(
+      String(result),
+      "'issue_number' and 'clear_issue_number' are mutually exclusive for update-phase.",
+    );
+    expect(getInvocations()).toHaveLength(0);
   });
 
   it("prefers stderr over stdout in command failure envelope", async () => {
@@ -268,16 +577,16 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(result).toBe("ADW Plans Command: create\n\nsections/root/path");
   });
 
-  it("rejects numeric zero issue_number in update-phase args before spawn", async () => {
+  it("rejects numeric zero issue option in update-phase args before spawn", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
     const result = await execute({
       command: "update-phase",
       plan_id: "E1-F1",
       phase_id: "E1-F1-P1",
-      issue_number: 0,
+      options: "issue=0",
       cwd: ".",
     });
-    assertContains(String(result), "'issue_number' must be a positive safe integer when provided.");
+    assertContains(String(result), "issue values must be positive safe integers");
     expect(getInvocations()).toHaveLength(0);
   });
 
@@ -322,9 +631,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
       status: "Ready",
       phase_status: "In Progress",
       title: "Phase Title",
-      size: "M",
-      issue_number: 123,
-      clear_issue_number: true,
+      options: "size=M issue=123",
       patch: '{"owner":"team"}',
       cwd: repoRoot,
     } as any);
@@ -346,7 +653,6 @@ describe("adw_plans_mutate required-arg preflight", () => {
       "M",
       "--issue",
       "123",
-      "--clear-issue-number",
       "--patch",
       '{"owner":"team"}',
       "--cwd",

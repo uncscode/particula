@@ -21,60 +21,69 @@ Full parameter reference for the adw_plans tool. For quick usage, see the tool d
 
 ```jsonc
 // List all active plans
-{ "command": "list", "lifecycle": "active", "json": true }
+{ "command": "list", "lifecycle": "active", "options": "json" }
 
 // List features for an epic
-{ "command": "list", "plan_type": "feature", "parent": "E17", "json": true }
+{ "command": "list", "plan_type": "feature", "parent": "E17", "options": "json" }
 
 // Show a plan
-{ "command": "show", "plan_id": "E17-F1", "json": true }
+{ "command": "show", "plan_id": "E17-F1", "options": "json" }
 
-// Create a feature plan (after resolving worktree_path from ADW state)
-{ "command": "create", "plan_type": "feature", "title": "Add Auth Module", "parent": "E17", "cwd": "/path/to/trees/<adw_id>" }
+// adw_spec read: get worktree_path from ADW state, then reuse that exact value as cwd
+adw_spec({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
+
+// Create a feature plan
+{ "command": "create", "plan_type": "feature", "title": "Add Auth Module", "parent": "E17", "cwd": "/path/to/trees/abc12345" }
 
 // Update plan status
-{ "command": "update", "plan_id": "E17-F8", "status": "Ready", "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "update", "plan_id": "E17-F8", "status": "Ready", "cwd": "/path/to/trees/abc12345" }
 
 // Add a phase
-{ "command": "add-phase", "plan_id": "E17-F1", "title": "Core implementation", "size": "M", "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "add-phase", "plan_id": "E17-F1", "title": "Core implementation", "options": "size=M", "cwd": "/path/to/trees/abc12345" }
 
 // Mark phase as shipped
-{ "command": "update-phase", "plan_id": "E17-F8", "phase_id": "E17-F8-P1", "phase_status": "Shipped", "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "update-phase", "plan_id": "E17-F8", "phase_id": "E17-F8-P1", "phase_status": "Shipped", "cwd": "/path/to/trees/abc12345" }
 ```
 
 ## Advanced Examples
 
 ```jsonc
 // List sections for a plan
-{ "command": "list-sections", "plan_id": "M25", "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "list-sections", "plan_id": "M25", "cwd": "/path/to/trees/abc12345" }
 
 // List sections with auto-populate
-{ "command": "list-sections", "plan_id": "M25", "populate": true, "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "list-sections", "plan_id": "M25", "options": "populate json", "cwd": "/path/to/trees/abc12345" }
 
 // Scaffold section templates
-{ "command": "scaffold-sections", "plan_id": "E17-F1", "plan_type": "feature", "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "scaffold-sections", "plan_id": "E17-F1", "plan_type": "feature", "cwd": "/path/to/trees/abc12345" }
 
-// Update phase with patch
-{ "command": "update-phase", "plan_id": "E17-F8", "phase_id": "E17-F8-P1", "patch": "{\"status\":\"Shipped\"}", "cwd": "/path/to/trees/<adw_id>" }
+// Update phase with bounded options plus direct patch
+{ "command": "update-phase", "plan_id": "E17-F8", "phase_id": "E17-F8-P1", "options": "phase-status=Blocked size=M issue=42", "patch": "{\"actuals\":\"split-wrapper parity complete\"}", "cwd": "/path/to/trees/abc12345" }
 
 // Update plan with patch
-{ "command": "update", "plan_id": "E17-F8", "patch": "{\"notes\":\"Updated\"}", "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "update", "plan_id": "E17-F8", "options": "priority=P1", "patch": "{\"notes\":\"Updated\"}", "cwd": "/path/to/trees/abc12345" }
 
 // Link issue to phase
-{ "command": "update-phase", "plan_id": "E17-F1", "phase_id": "E17-F1-P1", "issue_number": 42, "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "update-phase", "plan_id": "E17-F1", "phase_id": "E17-F1-P1", "options": "issue=42", "cwd": "/path/to/trees/abc12345" }
 
 // Clear issue link
-{ "command": "update-phase", "plan_id": "E17-F1", "phase_id": "E17-F1-P1", "clear_issue_number": true, "cwd": "/path/to/trees/<adw_id>" }
+{ "command": "update-phase", "plan_id": "E17-F1", "phase_id": "E17-F1-P1", "options": "clear-issue-number", "cwd": "/path/to/trees/abc12345" }
 
 // Validate all plans
 { "command": "validate" }
 
 // Check schema
-{ "command": "schema", "check": true }
+{ "command": "schema", "options": "check" }
 
 // Filter by status
-{ "command": "list", "plan_type": "feature", "status": "In Progress", "json": true }
+{ "command": "list", "plan_type": "feature", "status": "In Progress", "options": "json" }
 ```
+
+Preferred guidance for new calls: use bounded `options` tokens for optional wrapper aliases such as
+`json`, `check`, `populate`, `status=<value>`, `phase-status=<value>`, `priority=<value>`,
+`size=<value>`, `after=<phase_id>`, `issue=<n>`, and `clear-issue-number`. Keep direct fields for
+required identifiers, raw JSON `patch`, and any `status` / `phase_status` values where the explicit
+field is clearer.
 
 ## Parameter Reference
 
@@ -86,6 +95,11 @@ Full parameter reference for the adw_plans tool. For quick usage, see the tool d
 | `plan_id`  | string | —       | Plan identifier (e.g., E17-F1)           |
 | `plan_type`| string | —       | Runtime registry-driven plan type (for example epic, feature, maintenance, research) |
 | `cwd`      | string | —       | Repository/worktree root path            |
+| `options`  | string | —       | Bounded command-scoped wrapper tokens such as `json`, `check`, `populate`, `status=<value>`, `phase-status=<value>`, `priority=<value>`, `size=<value>`, `after=<phase_id>`, `issue=<n>`, or `clear-issue-number` |
+
+`options` is a wrapper convenience field, not a raw CLI passthrough. Use it for
+supported optional tokens only. Keep direct fields for required identifiers, raw JSON
+`patch`, and any `status` / `phase_status` values where the explicit field is clearer.
 
 ### List Filters
 
@@ -94,34 +108,26 @@ Full parameter reference for the adw_plans tool. For quick usage, see the tool d
 | `lifecycle` | enum    | active, completed, or closed             |
 | `parent`    | string  | Parent plan ID filter                    |
 | `status`    | enum    | Plan status filter                       |
-| `json`      | boolean | JSON output format                       |
 
 ### Create/Update
 
 | Parameter  | Type   | Description                              |
 |------------|--------|------------------------------------------|
 | `title`    | string | Plan title (required for create)         |
-| `priority` | enum   | P0, P1, P2, P3, or Backlog              |
-| `size`     | enum   | XS, S, M, L, XL, or XXL                 |
-| `status`   | enum   | Draft, Proposed, Ready, In Progress, etc.|
-| `patch`    | string | Raw JSON patch payload                   |
+| `status`   | enum   | Draft, Proposed, Ready, In Progress, etc.; direct field remains preferred for readability |
+| `patch`    | string | Raw JSON patch payload; keep this as a direct field |
 
 ### Phase Operations
 
 | Parameter            | Type    | Description                         |
 |----------------------|---------|-------------------------------------|
 | `phase_id`           | string  | Phase identifier (e.g., E17-F1-P1) |
-| `phase_status`       | enum    | Not Started, In Progress, Blocked, Shipped, Cancelled |
-| `after`              | string  | Insert phase after this phase ID    |
-| `issue_number`       | number  | Link GitHub issue to phase          |
-| `clear_issue_number` | boolean | Clear linked issue number           |
+| `phase_status`       | enum    | Not Started, In Progress, Blocked, Shipped, Cancelled; direct field remains valid |
 
 ### Schema/Sections
 
-| Parameter  | Type    | Description                              |
-|------------|---------|------------------------------------------|
-| `check`    | boolean | Run schema check (schema command)        |
-| `populate` | boolean | Persist section paths (list-sections)    |
+Use `options: "check"` for schema checks and `options: "populate"` for
+`list-sections` population.
 
 ## CWD Requirement
 
@@ -130,11 +136,11 @@ Full parameter reference for the adw_plans tool. For quick usage, see the tool d
 Resolve `worktree_path` from ADW state first, then pass that exact value as `cwd`:
 
 ```jsonc
-// 1) Read the isolated worktree path
-{ "command": "read", "adw_id": "abc12345", "field": "worktree_path" }
+// 1) adw_spec read: get the isolated worktree path
+adw_spec({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
 
 // 2) Pass that value into adw_plans mutating commands
-{ "command": "update", "plan_id": "E17-F8", "status": "Ready", "cwd": "/path/to/trees/abc12345" }
+{ "command": "update", "plan_id": "E17-F8", "status": "Ready", "options": "priority=P1", "cwd": "/path/to/trees/abc12345" }
 ```
 
 Read-only commands (`list`, `show`, `validate`, `schema`, `list-sections`) accept optional `cwd`.

@@ -4,9 +4,12 @@ import path from "node:path";
 
 import {
   buildCommandFailureError,
+  mergeParsedOptionField,
+  parseCommandOptionsString,
   redactPathLikeText,
   sanitizeSuccessOutput,
   stripDefaultArgs,
+  validateUpdatePhaseIssueLinkArgs,
   validateRequiredArgs,
 } from "./adw_plans_contract_shared";
 
@@ -59,8 +62,6 @@ const PLAN_STATUSES = [
   "Cancelled",
   "Superseded",
 ] as const;
-const PLAN_PRIORITIES = ["P0", "P1", "P2", "P3", "Backlog"] as const;
-const PLAN_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 const PHASE_STATUSES = ["Not Started", "In Progress", "Blocked", "Shipped", "Cancelled"] as const;
 const MAX_PATCH_PAYLOAD_BYTES = 65_536;
 
@@ -80,16 +81,16 @@ const MAX_PATCH_PAYLOAD_BYTES = 65_536;
  * Only `command` is preserved unconditionally (it's always required).
  */
 const COMMAND_GUIDE = `Commands:
-• list — Filters: type, lifecycle, parent, status, json
-• show — Required: plan_id; Optional: json
-• create — Required: plan_type, title; Optional: plan_id, parent, priority, size, status
-• update — Required: plan_id; Optional: status, priority, size, title, patch
-• add-phase — Required: plan_id, title; Optional: size, phase_status, after
-• update-phase — Required: plan_id, phase_id; Optional: phase_status, title, size, issue_number, clear_issue_number, patch
+• list — Filters: type, lifecycle, parent, status; Optional options: json
+• show — Required: plan_id; Optional options: json
+• create — Required: plan_type, title; Optional: plan_id, parent, status; Optional options: status=<value> priority=<value> size=<value>
+• update — Required: plan_id; Optional: status, title, patch; Optional options: status=<value> priority=<value> size=<value>
+• add-phase — Required: plan_id, title; Optional: phase_status; Optional options: phase-status=<value> size=<value> after=<phase_id>
+• update-phase — Required: plan_id, phase_id; Optional: phase_status, title, patch; Optional options: phase-status=<value> size=<value> issue=<n> clear-issue-number
 • validate — No additional parameters
-• schema — Optional: check
+• schema — Optional options: check
 • scaffold-sections — Required: plan_id, plan_type. Copies section templates for a plan.
-• list-sections — Required: plan_id. Lists section files with repo-relative paths. Optional: json, populate.`;
+• list-sections — Required: plan_id. Lists section files with repo-relative paths. Optional options: json populate.`;
 
 type PlanCommand = (typeof COMMANDS)[number];
 
@@ -254,8 +255,8 @@ export default tool({
 
 SIMPLE EXAMPLES (copy these patterns):
 
-  List plans:     { command: "list", lifecycle: "active", json: true }
-  Show plan:      { command: "show", plan_id: "E17-F1", json: true }
+  List plans:     { command: "list", lifecycle: "active", options: "json" }
+  Show plan:      { command: "show", plan_id: "E17-F1", options: "json" }
   Create plan:    { command: "create", plan_type: "feature", title: "Add Auth", parent: "E17", cwd: "./trees/abc" }
   Update status:  { command: "update", plan_id: "E17-F8", status: "Ready", cwd: "./trees/abc" }
   Add phase:      { command: "add-phase", plan_id: "E17-F1", title: "Core impl", cwd: "./trees/abc" }
@@ -300,35 +301,10 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
       .optional()
       .describe("Plan status filter or update value. Matches Click choices in adw_plans CLI."),
 
-    json: tool.schema
-      .boolean()
-      .optional()
-      .describe("When true, appends --json to list/show commands for compact output."),
-
     title: tool.schema
       .string()
       .optional()
       .describe("Plan title. Required when creating a plan; optional for update command."),
-
-    priority: tool.schema
-      .enum([...PLAN_PRIORITIES])
-      .optional()
-      .describe("Plan priority for create/update commands (P0, P1, P2, P3, Backlog)."),
-
-    size: tool.schema
-      .enum([...PLAN_SIZES])
-      .optional()
-      .describe("Plan size for create/update commands (XS through XXL)."),
-
-    check: tool.schema
-      .boolean()
-      .optional()
-      .describe("Schema command flag. When true, runs 'adw plans schema --check'."),
-
-    populate: tool.schema
-      .boolean()
-      .optional()
-      .describe("list-sections flag. When true, persists discovered section paths into the plan JSON."),
 
     phase_id: tool.schema
       .string()
@@ -340,20 +316,12 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
       .optional()
       .describe("Phase status for add-phase/update-phase (Not Started, In Progress, Blocked, Shipped, Cancelled)."),
 
-    after: tool.schema
+    options: tool.schema
       .string()
       .optional()
-      .describe("add-phase: Insert after this phase ID instead of appending at end."),
-
-    issue_number: tool.schema
-      .number()
-      .optional()
-      .describe("update-phase: Link a GitHub issue number to the phase."),
-
-    clear_issue_number: tool.schema
-      .boolean()
-      .optional()
-      .describe("update-phase: Clear any linked issue number via --clear-issue-number."),
+      .describe(
+        "Command-scoped bounded options string. Supported tokens include json, populate, check, status=<value>, phase-status=<value>, priority=<value>, size=<value>, after=<id>, issue=<n>, and clear-issue-number when allowlisted for the selected command.",
+      ),
 
     patch: tool.schema
       .string()
@@ -385,20 +353,55 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
       lifecycle,
       parent,
       status,
-      json,
       title,
-      priority,
-      size,
-      check,
-      populate,
       phase_id,
       phase_status,
-      after,
-      issue_number,
-      clear_issue_number,
+      options,
       patch,
       cwd,
     } = normalized;
+
+    const parsedOptions = parseCommandOptionsString(String(command ?? ""), options, buildError);
+    if (parsedOptions.error) {
+      return parsedOptions.error;
+    }
+    const optionValues = parsedOptions.values ?? {};
+
+    const resolvedJson = mergeParsedOptionField(undefined, optionValues.json, "json", buildError);
+    if (resolvedJson.error) return resolvedJson.error;
+    const resolvedStatus = mergeParsedOptionField(status, optionValues.status, "status", buildError);
+    if (resolvedStatus.error) return resolvedStatus.error;
+    const resolvedPriority = mergeParsedOptionField(undefined, optionValues.priority, "priority", buildError);
+    if (resolvedPriority.error) return resolvedPriority.error;
+    const resolvedSize = mergeParsedOptionField(undefined, optionValues.size, "size", buildError);
+    if (resolvedSize.error) return resolvedSize.error;
+    const resolvedCheck = mergeParsedOptionField(undefined, optionValues.check, "check", buildError);
+    if (resolvedCheck.error) return resolvedCheck.error;
+    const resolvedPopulate = mergeParsedOptionField(undefined, optionValues.populate, "populate", buildError);
+    if (resolvedPopulate.error) return resolvedPopulate.error;
+    const resolvedPhaseStatus = mergeParsedOptionField(
+      phase_status,
+      optionValues.phase_status,
+      "phase_status",
+      buildError,
+    );
+    if (resolvedPhaseStatus.error) return resolvedPhaseStatus.error;
+    const resolvedAfter = mergeParsedOptionField(undefined, optionValues.after, "after", buildError);
+    if (resolvedAfter.error) return resolvedAfter.error;
+    const resolvedIssueNumber = mergeParsedOptionField(
+      undefined,
+      optionValues.issue_number,
+      "issue_number",
+      buildError,
+    );
+    if (resolvedIssueNumber.error) return resolvedIssueNumber.error;
+    const resolvedClearIssueNumber = mergeParsedOptionField(
+      undefined,
+      optionValues.clear_issue_number,
+      "clear_issue_number",
+      buildError,
+    );
+    if (resolvedClearIssueNumber.error) return resolvedClearIssueNumber.error;
 
     // Defer patch normalization to command cases that use it (update,
     // update-phase) so that an empty/whitespace patch supplied alongside
@@ -430,10 +433,10 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
             cmdParts.push("--parent", normalizedParent.value);
           }
         }
-        if (status) {
-          cmdParts.push("--status", status);
+        if (resolvedStatus.value) {
+          cmdParts.push("--status", resolvedStatus.value);
         }
-        if (json) {
+        if (resolvedJson.value) {
           cmdParts.push("--json");
         }
         break;
@@ -449,7 +452,7 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
           return normalizedPlanId.error;
         }
         cmdParts.push("show", normalizedPlanId.value!);
-        if (json) {
+        if (resolvedJson.value) {
           cmdParts.push("--json");
         }
         break;
@@ -491,14 +494,14 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
             cmdParts.push("--parent", normalizedParent.value);
           }
         }
-        if (priority) {
-          cmdParts.push("--priority", priority);
+        if (resolvedPriority.value) {
+          cmdParts.push("--priority", resolvedPriority.value);
         }
-        if (size) {
-          cmdParts.push("--size", size);
+        if (resolvedSize.value) {
+          cmdParts.push("--size", resolvedSize.value);
         }
-        if (status) {
-          cmdParts.push("--status", status);
+        if (resolvedStatus.value) {
+          cmdParts.push("--status", resolvedStatus.value);
         }
         break;
       }
@@ -513,14 +516,14 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
           return normalizedPlanId.error;
         }
         cmdParts.push("update", normalizedPlanId.value!);
-        if (status) {
-          cmdParts.push("--status", status);
+        if (resolvedStatus.value) {
+          cmdParts.push("--status", resolvedStatus.value);
         }
-        if (priority) {
-          cmdParts.push("--priority", priority);
+        if (resolvedPriority.value) {
+          cmdParts.push("--priority", resolvedPriority.value);
         }
-        if (size) {
-          cmdParts.push("--size", size);
+        if (resolvedSize.value) {
+          cmdParts.push("--size", resolvedSize.value);
         }
         if (title !== undefined && title !== null) {
           const normalizedTitle = String(title).trim();
@@ -554,14 +557,14 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
           return buildError("add-phase command requires 'title'.");
         }
         cmdParts.push("add-phase", normalizedPlanId.value!, "--title", normalizedTitle);
-        if (size) {
-          cmdParts.push("--size", size);
+        if (resolvedSize.value) {
+          cmdParts.push("--size", resolvedSize.value);
         }
-        if (phase_status) {
-          cmdParts.push("--status", phase_status);
+        if (resolvedPhaseStatus.value) {
+          cmdParts.push("--status", resolvedPhaseStatus.value);
         }
-        if (after !== undefined && after !== null) {
-          const normalizedAfter = normalizeIdentifier(after, {
+        if (resolvedAfter.value !== undefined && resolvedAfter.value !== null) {
+          const normalizedAfter = normalizeIdentifier(resolvedAfter.value, {
             field: "after",
             required: false,
             emptyMessage: "'after' must not be empty when provided.",
@@ -593,9 +596,17 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
         if (normalizedPhaseId.error) {
           return normalizedPhaseId.error;
         }
+        const issueLinkValidationError = validateUpdatePhaseIssueLinkArgs(
+          resolvedIssueNumber.value,
+          resolvedClearIssueNumber.value,
+          buildError,
+        );
+        if (issueLinkValidationError) {
+          return issueLinkValidationError;
+        }
         cmdParts.push("update-phase", normalizedPlanId.value!, normalizedPhaseId.value!);
-        if (phase_status) {
-          cmdParts.push("--status", phase_status);
+        if (resolvedPhaseStatus.value) {
+          cmdParts.push("--status", resolvedPhaseStatus.value);
         }
         if (title !== undefined && title !== null) {
           const normalizedTitle = String(title).trim();
@@ -603,20 +614,20 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
             cmdParts.push("--title", normalizedTitle);
           }
         }
-        if (size) {
-          cmdParts.push("--size", size);
+        if (resolvedSize.value) {
+          cmdParts.push("--size", resolvedSize.value);
         }
-        if (issue_number !== undefined && issue_number !== null) {
+        if (resolvedIssueNumber.value !== undefined && resolvedIssueNumber.value !== null) {
           if (
-            typeof issue_number !== "number"
-            || !Number.isSafeInteger(issue_number)
-            || issue_number <= 0
+            typeof resolvedIssueNumber.value !== "number"
+            || !Number.isSafeInteger(resolvedIssueNumber.value)
+            || resolvedIssueNumber.value <= 0
           ) {
             return buildError("'issue_number' must be a positive safe integer when provided.");
           }
-          cmdParts.push("--issue", String(issue_number));
+          cmdParts.push("--issue", String(resolvedIssueNumber.value));
         }
-        if (clear_issue_number) {
+        if (resolvedClearIssueNumber.value) {
           cmdParts.push("--clear-issue-number");
         }
         {
@@ -638,7 +649,7 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
 
       case "schema": {
         cmdParts.push("schema");
-        if (check) {
+        if (resolvedCheck.value) {
           cmdParts.push("--check");
         }
         break;
@@ -670,10 +681,10 @@ See .opencode/tools/adw_plans.md for full parameter reference and advanced usage
           return normalizedPlanId.error;
         }
         cmdParts.push("list-sections", normalizedPlanId.value!);
-        if (json) {
+        if (resolvedJson.value) {
           cmdParts.push("--json");
         }
-        if (populate) {
+        if (resolvedPopulate.value) {
           cmdParts.push("--populate");
         }
         break;

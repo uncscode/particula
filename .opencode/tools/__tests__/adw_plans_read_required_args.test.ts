@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 
 import { assertContains } from "./helpers/assert-error-envelope";
 import {
@@ -8,7 +11,19 @@ import {
   setSpawnError,
   setSpawnResponse,
 } from "./helpers/mock-subprocess";
-import { loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
+import {
+  getCapturedToolDefinition,
+  loadToolExecute,
+  resetCapturedToolDefinition,
+} from "./helpers/tool_harness";
+
+const repoRoot = resolve(import.meta.dir, "../../..");
+
+function createOtherRepositoryRoot(): string {
+  const tempRoot = mkdtempSync(`${tmpdir()}/adw-plans-read-`);
+  writeFileSync(resolve(tempRoot, ".git"), "gitdir: /tmp/fake\n");
+  return tempRoot;
+}
 
 describe("adw_plans_read required-arg preflight", () => {
   beforeEach(() => {
@@ -20,6 +35,21 @@ describe("adw_plans_read required-arg preflight", () => {
   afterEach(() => {
     restoreSubprocessMocks();
     resetCapturedToolDefinition();
+  });
+
+  it("exposes options in split-wrapper schema", async () => {
+    await loadToolExecute("../../adw_plans_read.ts");
+    const args = getCapturedToolDefinition()?.args ?? {};
+    expect(args).toHaveProperty("options");
+    expect(args).not.toHaveProperty("json");
+    expect(args).not.toHaveProperty("check");
+    expect(args).not.toHaveProperty("populate");
+  });
+
+  it("keeps read-wrapper command schema source scoped to read-only commands", async () => {
+    const source = await Bun.file(resolve(import.meta.dir, "../adw_plans_read.ts")).text();
+    expect(source).toContain('tool.schema.enum(["list", "show", "validate", "schema", "list-sections"])');
+    expect(source).not.toContain('tool.schema.enum(["list", "show", "validate", "schema", "list-sections", "create"');
   });
 
   it("rejects whitespace-only required plan_id for list-sections before spawn", async () => {
@@ -78,6 +108,89 @@ describe("adw_plans_read required-arg preflight", () => {
     assertContains(String(result), "ERROR: cwd path is not a repository/worktree root: <path>");
     assertContains(String(result), "missing .git metadata at <path>");
     expect(String(result)).not.toContain("/tmp");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects read cwd values that resolve to a different repository/worktree root", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    const otherRepoRoot = createOtherRepositoryRoot();
+    const result = await execute({ command: "list", cwd: otherRepoRoot });
+    assertContains(String(result), "ERROR: cwd path resolves outside repository root: <path> (canonical: <path>)");
+    expect(getInvocations()).toHaveLength(0);
+    rmSync(otherRepoRoot, { recursive: true, force: true });
+  });
+
+  it("accepts current worktree root for read commands", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    const result = String(await execute({ command: "list", cwd: repoRoot }));
+    expect(result).toBe("ADW Plans Command: list\n\nok");
+    expect(getInvocations().at(-1)?.args).toContain(repoRoot);
+  });
+
+  it("preserves multi-word plan status values as direct wrapper arguments", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    await execute({ command: "list", status: "In Progress" });
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status In Progress");
+  });
+
+  it("parses list/show/schema/list-sections option strings in read wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+
+    await execute({ command: "list", options: "json" });
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "adw", "plans", "list", "--json"]);
+
+    await execute({ command: "show", plan_id: "M37", options: "json" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "show",
+      "M37",
+      "--json",
+    ]);
+
+    await execute({ command: "schema", options: "check" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "schema",
+      "--check",
+    ]);
+
+    await execute({ command: "list-sections", plan_id: "M37", options: "json populate" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "adw",
+      "plans",
+      "list-sections",
+      "M37",
+      "--json",
+      "--populate",
+    ]);
+  });
+
+  it("ignores whitespace-only options in read wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+
+    await execute({ command: "list", options: "   \n\t  " });
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "adw", "plans", "list"]);
+  });
+
+  it("rejects invalid option tokens in read wrapper before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    const result = await execute({ command: "list", options: "check" } as any);
+    assertContains(String(result), "token is not allowed for this command");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("preserves read-only command gate precedence when options are provided", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    const result = await execute({ command: "update", options: "status=Ready" } as any);
+    assertContains(String(result), "Unsupported command for adw_plans_read: update");
     expect(getInvocations()).toHaveLength(0);
   });
 

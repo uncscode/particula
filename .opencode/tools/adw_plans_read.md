@@ -16,20 +16,22 @@ Mutating commands are intentionally rejected. Use `adw_plans_mutate` for writes.
 ## Examples
 
 ```json
-{ "command": "list", "json": true }
+{ "command": "list", "options": "json" }
 ```
 
 ```json
-{ "command": "show", "plan_id": "E17-F1" }
+{ "command": "show", "plan_id": "E17-F1", "options": "json" }
 ```
 
 ```json
-{ "command": "list-sections", "plan_id": "E17-F1", "populate": true }
+{ "command": "list-sections", "plan_id": "E17-F1", "options": "json populate" }
 ```
 
 ## Notes
 
 - Optional `cwd` is accepted for read commands and validated when provided.
+- Prefer bounded `options` tokens for optional wrapper aliases in new docs (`json`, `check`,
+  `populate`), while direct multi-word `status` filters remain valid when they are clearer.
 - Success/failure envelopes are preserved via delegation to `adw_plans`.
 - Compatibility and split wrappers share the same spawned-command failure handling:
   - `stderr` -> `stdout` -> message/fallback precedence

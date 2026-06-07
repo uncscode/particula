@@ -1,27 +1,19 @@
 import { tool } from "@opencode-ai/plugin";
-import { existsSync, realpathSync, statSync } from "node:fs";
-import path from "node:path";
 
 import {
   buildCommandFailureError,
-  redactPathLikeText,
+  validatePlansCwdPath,
+  mergeParsedOptionField,
+  parseCommandOptionsString,
   sanitizeSuccessOutput,
   stripDefaultArgs,
+  validateUpdatePhaseIssueLinkArgs,
   validateRequiredArgs,
 } from "./adw_plans_contract_shared";
 
 // --- Inlined from adw_plans.ts ---
 
-const S_IFMT = 0o170000;
-const S_IFDIR = 0o040000;
-
-function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
-  if (typeof s.isDirectory === "function") return s.isDirectory();
-  if (typeof s.isDirectory === "boolean") return s.isDirectory;
-  return (((s as any).mode ?? 0) & S_IFMT) === S_IFDIR;
-}
-
-const COMMANDS = ["list", "show", "create", "update", "add-phase", "update-phase", "validate", "schema", "scaffold-sections", "list-sections"] as const;
+const COMMANDS = ["create", "update", "add-phase", "update-phase", "scaffold-sections"] as const;
 
 const MUTATING_COMMANDS = new Set<string>([
   "create",
@@ -42,8 +34,6 @@ const PLAN_STATUSES = [
   "Cancelled",
   "Superseded",
 ] as const;
-const PLAN_PRIORITIES = ["P0", "P1", "P2", "P3", "Backlog"] as const;
-const PLAN_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 const PHASE_STATUSES = ["Not Started", "In Progress", "Blocked", "Shipped", "Cancelled"] as const;
 const MAX_PATCH_PAYLOAD_BYTES = 65_536;
 
@@ -54,16 +44,11 @@ const DEFAULT_TIMEOUT_MS = 60_000;
 const LONG_COMMAND_TIMEOUT_MS = 180_000;
 
 const COMMAND_TIMEOUTS: Record<PlanCommand, number> = {
-  list: DEFAULT_TIMEOUT_MS,
-  show: DEFAULT_TIMEOUT_MS,
   create: DEFAULT_TIMEOUT_MS,
   update: DEFAULT_TIMEOUT_MS,
   "add-phase": DEFAULT_TIMEOUT_MS,
   "update-phase": DEFAULT_TIMEOUT_MS,
-  validate: LONG_COMMAND_TIMEOUT_MS,
-  schema: LONG_COMMAND_TIMEOUT_MS,
   "scaffold-sections": DEFAULT_TIMEOUT_MS,
-  "list-sections": DEFAULT_TIMEOUT_MS,
 };
 
 function sanitizedChildEnv(): Record<string, string> {
@@ -90,10 +75,10 @@ type IdentifierOptions = {
 };
 
 const COMMAND_GUIDE = `Commands:
-• create — Required: plan_type, title; Optional: plan_id, parent, priority, size, status
-• update — Required: plan_id; Optional: status, priority, size, title, patch
-• add-phase — Required: plan_id, title; Optional: size, phase_status, after
-• update-phase — Required: plan_id, phase_id; Optional: phase_status, title, size, issue_number, clear_issue_number, patch
+• create — Required: plan_type, title; Optional: plan_id, parent, status, patchless options: priority=<value> size=<value>
+• update — Required: plan_id; Optional: title, patch; Optional options: status=<value> priority=<value> size=<value>
+• add-phase — Required: plan_id, title; Optional options: phase-status=<value> size=<value> after=<phase_id>
+• update-phase — Required: plan_id, phase_id; Optional: title, patch; Optional options: phase-status=<value> size=<value> issue=<n> clear-issue-number
 • scaffold-sections — Required: plan_id, plan_type. Copies section templates for a plan.`;
 
 function buildError(message: string): string {
@@ -137,47 +122,6 @@ function normalizeCwd(raw: unknown): { value?: string; error?: string } {
     return normalized;
   }
   return normalized;
-}
-
-function findCurrentRepositoryRoot(): string {
-  let currentPath = realpathSync(process.cwd());
-  while (true) {
-    if (existsSync(path.join(currentPath, ".git"))) {
-      return currentPath;
-    }
-    const parentPath = path.dirname(currentPath);
-    if (parentPath === currentPath) {
-      return realpathSync(process.cwd());
-    }
-    currentPath = parentPath;
-  }
-}
-
-function validateCwdPath(cwdPath: string): string | undefined {
-  const redactedPath = redactPathLikeText(cwdPath);
-  if (!existsSync(cwdPath)) {
-    return `ERROR: cwd path does not exist: ${redactedPath}`;
-  }
-  let stats;
-  try {
-    stats = statSync(cwdPath);
-  } catch {
-    return `ERROR: cwd path does not exist: ${redactedPath}`;
-  }
-  if (!isStatDirectory(stats)) {
-    return `ERROR: cwd path is not a directory: ${redactedPath}`;
-  }
-
-  const canonical = realpathSync(cwdPath);
-  const gitMetadataPath = `${canonical}/.git`;
-  if (!existsSync(gitMetadataPath)) {
-    return `ERROR: cwd path is not a repository/worktree root: ${redactedPath} (missing .git metadata at ${redactPathLikeText(gitMetadataPath)})`;
-  }
-  const repoRoot = findCurrentRepositoryRoot();
-  if (canonical !== repoRoot) {
-    return `ERROR: cwd path resolves outside repository root: ${redactedPath} (canonical: ${redactPathLikeText(canonical)})`;
-  }
-  return undefined;
 }
 
 function normalizePatch(raw: unknown): { value?: string; error?: string } {
@@ -253,16 +197,47 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
     parent,
     status,
     title,
-    priority,
-    size,
     phase_id,
     phase_status,
-    after,
-    issue_number,
-    clear_issue_number,
+    options,
     patch,
     cwd,
   } = normalized;
+
+  const parsedOptions = parseCommandOptionsString(String(command ?? ""), options, buildError);
+  if (parsedOptions.error) {
+    return parsedOptions.error;
+  }
+  const optionValues = parsedOptions.values ?? {};
+  const resolvedStatus = mergeParsedOptionField(status, optionValues.status, "status", buildError);
+  if (resolvedStatus.error) return resolvedStatus.error;
+  const resolvedPriority = mergeParsedOptionField(undefined, optionValues.priority, "priority", buildError);
+  if (resolvedPriority.error) return resolvedPriority.error;
+  const resolvedSize = mergeParsedOptionField(undefined, optionValues.size, "size", buildError);
+  if (resolvedSize.error) return resolvedSize.error;
+  const resolvedPhaseStatus = mergeParsedOptionField(
+    phase_status,
+    optionValues.phase_status,
+    "phase_status",
+    buildError,
+  );
+  if (resolvedPhaseStatus.error) return resolvedPhaseStatus.error;
+  const resolvedAfter = mergeParsedOptionField(undefined, optionValues.after, "after", buildError);
+  if (resolvedAfter.error) return resolvedAfter.error;
+  const resolvedIssueNumber = mergeParsedOptionField(
+    undefined,
+    optionValues.issue_number,
+    "issue_number",
+    buildError,
+  );
+  if (resolvedIssueNumber.error) return resolvedIssueNumber.error;
+  const resolvedClearIssueNumber = mergeParsedOptionField(
+    undefined,
+    optionValues.clear_issue_number,
+    "clear_issue_number",
+    buildError,
+  );
+  if (resolvedClearIssueNumber.error) return resolvedClearIssueNumber.error;
 
   const lazyNormalizePatch = (): { value?: string; error?: string } => normalizePatch(patch);
 
@@ -306,14 +281,14 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
           cmdParts.push("--parent", normalizedParent.value);
         }
       }
-      if (priority) {
-        cmdParts.push("--priority", priority);
+      if (resolvedPriority.value) {
+        cmdParts.push("--priority", resolvedPriority.value);
       }
-      if (size) {
-        cmdParts.push("--size", size);
+      if (resolvedSize.value) {
+        cmdParts.push("--size", resolvedSize.value);
       }
-      if (status) {
-        cmdParts.push("--status", status);
+      if (resolvedStatus.value) {
+        cmdParts.push("--status", resolvedStatus.value);
       }
       break;
     }
@@ -328,14 +303,14 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
         return normalizedPlanId.error;
       }
       cmdParts.push("update", normalizedPlanId.value!);
-      if (status) {
-        cmdParts.push("--status", status);
+      if (resolvedStatus.value) {
+        cmdParts.push("--status", resolvedStatus.value);
       }
-      if (priority) {
-        cmdParts.push("--priority", priority);
+      if (resolvedPriority.value) {
+        cmdParts.push("--priority", resolvedPriority.value);
       }
-      if (size) {
-        cmdParts.push("--size", size);
+      if (resolvedSize.value) {
+        cmdParts.push("--size", resolvedSize.value);
       }
       if (title !== undefined && title !== null) {
         const normalizedTitle = String(title).trim();
@@ -369,14 +344,14 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
         return buildError("add-phase command requires 'title'.");
       }
       cmdParts.push("add-phase", normalizedPlanId.value!, "--title", normalizedTitle);
-      if (size) {
-        cmdParts.push("--size", size);
+      if (resolvedSize.value) {
+        cmdParts.push("--size", resolvedSize.value);
       }
-      if (phase_status) {
-        cmdParts.push("--status", phase_status);
+      if (resolvedPhaseStatus.value) {
+        cmdParts.push("--status", resolvedPhaseStatus.value);
       }
-      if (after !== undefined && after !== null) {
-        const normalizedAfter = normalizeIdentifier(after, {
+      if (resolvedAfter.value !== undefined && resolvedAfter.value !== null) {
+        const normalizedAfter = normalizeIdentifier(resolvedAfter.value, {
           field: "after",
           required: false,
           emptyMessage: "'after' must not be empty when provided.",
@@ -408,9 +383,17 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
       if (normalizedPhaseId.error) {
         return normalizedPhaseId.error;
       }
+      const issueLinkValidationError = validateUpdatePhaseIssueLinkArgs(
+        resolvedIssueNumber.value,
+        resolvedClearIssueNumber.value,
+        buildError,
+      );
+      if (issueLinkValidationError) {
+        return issueLinkValidationError;
+      }
       cmdParts.push("update-phase", normalizedPlanId.value!, normalizedPhaseId.value!);
-      if (phase_status) {
-        cmdParts.push("--status", phase_status);
+      if (resolvedPhaseStatus.value) {
+        cmdParts.push("--status", resolvedPhaseStatus.value);
       }
       if (title !== undefined && title !== null) {
         const normalizedTitle = String(title).trim();
@@ -418,20 +401,20 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
           cmdParts.push("--title", normalizedTitle);
         }
       }
-      if (size) {
-        cmdParts.push("--size", size);
+      if (resolvedSize.value) {
+        cmdParts.push("--size", resolvedSize.value);
       }
-      if (issue_number !== undefined && issue_number !== null) {
+      if (resolvedIssueNumber.value !== undefined && resolvedIssueNumber.value !== null) {
         if (
-          typeof issue_number !== "number"
-          || !Number.isSafeInteger(issue_number)
-          || issue_number < 1
+          typeof resolvedIssueNumber.value !== "number"
+          || !Number.isSafeInteger(resolvedIssueNumber.value)
+          || resolvedIssueNumber.value < 1
         ) {
           return buildError("'issue_number' must be a positive safe integer when provided.");
         }
-        cmdParts.push("--issue", String(issue_number));
+        cmdParts.push("--issue", String(resolvedIssueNumber.value));
       }
-      if (clear_issue_number) {
+      if (resolvedClearIssueNumber.value) {
         cmdParts.push("--clear-issue-number");
       }
       {
@@ -476,7 +459,7 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
     return buildError(`${executedCommand} command requires 'cwd'.`);
   }
   if (normalizedCwd.value) {
-    const cwdValidationError = validateCwdPath(normalizedCwd.value);
+    const cwdValidationError = validatePlansCwdPath(normalizedCwd.value);
     if (cwdValidationError) {
       return cwdValidationError;
     }
@@ -551,19 +534,15 @@ Read commands are rejected; use adw_plans_read for read-only operations.
 Contract parity note: command execution and envelopes are delegated to adw_plans.`,
 
   args: {
-    command: tool.schema.enum(["create", "update", "add-phase", "update-phase", "scaffold-sections", "list", "show", "validate", "schema", "list-sections"]),
+    command: tool.schema.enum(["create", "update", "add-phase", "update-phase", "scaffold-sections"]),
     plan_id: tool.schema.string().optional(),
     plan_type: tool.schema.string().optional(),
     title: tool.schema.string().optional(),
     parent: tool.schema.string().optional(),
     status: tool.schema.enum(["Draft", "Proposed", "Ready", "In Progress", "Blocked", "Monitoring", "Shipped", "Cancelled", "Superseded"]).optional(),
-    priority: tool.schema.enum(["P0", "P1", "P2", "P3", "Backlog"]).optional(),
-    size: tool.schema.enum(["XS", "S", "M", "L", "XL", "XXL"]).optional(),
+    options: tool.schema.string().optional(),
     phase_id: tool.schema.string().optional(),
     phase_status: tool.schema.enum(["Not Started", "In Progress", "Blocked", "Shipped", "Cancelled"]).optional(),
-    after: tool.schema.string().optional(),
-    issue_number: tool.schema.number().optional(),
-    clear_issue_number: tool.schema.boolean().optional(),
     patch: tool.schema.string().optional(),
     cwd: tool.schema.string().optional(),
   },
