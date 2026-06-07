@@ -18,9 +18,11 @@ diagnostics. The step now supports a `dynamic_viscosity` override and records
 `last_latent_heat_energy` for parity with the isothermal API plus energy
 tracking.
 
-This feature is built around user-facing APIs exposed via `particula.dynamics`:
+This feature is built around user-facing APIs exposed via
+`particula.dynamics` and `particula.dynamics.condensation`:
 
-- `CondensationStrategy` – abstract base defining `rate` / `step`.
+- `CondensationStrategy` – abstract base defining `rate` / `step`, exposed via
+  `particula.dynamics.condensation`.
 - `CondensationIsothermal` – simultaneous isothermal mass transfer.
 - `CondensationIsothermalStaggered` – two-pass staggered (Gauss-Seidel) update
   with theta modes (`"half"`, `"random"`, `"batch"`) and batching.
@@ -65,13 +67,15 @@ This feature is designed for:
 
 ### Unified condensation API in `particula.dynamics`
 
-Condensation is exported alongside other dynamics components:
+Concrete condensation implementations are exported alongside other dynamics
+components, while the abstract base interface remains available from the
+condensation subpackage:
 
 ```python
 import particula as par
 
 # Abstract interface
-par.dynamics.CondensationStrategy
+par.dynamics.condensation.CondensationStrategy
 
 # Concrete implementations
 par.dynamics.CondensationIsothermal
