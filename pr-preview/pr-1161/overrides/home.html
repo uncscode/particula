@@ -1,0 +1,152 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+  {{ super() }}
+
+  <!-- Hero Landing Page Overrides -->
+  <style>
+    /* Make the header static so it doesn't float over the hero */
+    .md-header {
+      position: initial;
+    }
+    /* Add or modify these rules to stack the buttons vertically */
+    .mdx-hero__content .md-button {
+      display: block;
+      width: fit-content;
+      /* margin-right: 0; */
+    }
+    /* Remove default spacing from the .md-main__inner container */
+    .md-main__inner {
+      margin: 0;
+    }
+    /* Hide the secondary Table of Contents */
+    @media screen and (min-width: 60em) {
+      .md-sidebar--secondary {
+        display: none;
+      }
+    }
+    /* Hide the primary navigation sidebar */
+    @media screen and (min-width: 76.25em) {
+      .md-sidebar--primary {
+        display: none;
+      }
+    }
+
+    /* Original wave + gradient transition */
+    .mdx-container {
+      padding-top: px2rem(20px);
+      padding-bottom: px2rem(20px);
+      background:
+        linear-gradient(
+          to bottom,
+          var(--md-primary-fg-color),
+          var(--md-primary-fg-color) 60%,
+          /* var(--md-default-bg-color) 95%, */
+          var(--md-default-bg-color) 99%
+        );
+    }
+
+    /* Horizontal hero layout */
+    .mdx-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 px2rem(16px);
+      color: var(--md-primary-bg-color);
+      flex-wrap: wrap; /* allow wrapping on smaller screens */
+      min-height: 50vh; /* viewport height on desktop */
+      margin-bottom: 16vh; /* space for the footer */
+    }
+    @media (max-width: 768px) {
+      .mdx-hero {
+        min-height: 100vh; /* full viewport height on narrow screens */
+      }
+    }
+    .mdx-hero__content {
+      flex: 1 1 80%;
+      /* text-align: left; */
+      padding: px2rem(10px);
+    }
+    .mdx-hero__image {
+      flex: 1 1 50%;
+      text-align: center;
+      padding: px2rem(20px);
+    }
+
+    /* Button styles */
+    .md-button {
+      margin-top: px2rem(10px);
+      margin-right: px2rem(10px);
+      color: var(--md-primary-bg-color);
+    }
+    .md-button:hover,
+    .md-button:focus {
+      color: var(--md-accent-bg-color);
+      background-color: var(--md-accent-fg-color);
+      border-color: var(--md-accent-fg-color);
+    }
+    .md-button--primary {
+      color: var(--md-accent-fg-color);
+      background-color: var(--md-primary-bg-color);
+      border-color: var(--md-primary-bg-color);
+    }
+
+    /* Main content container styling */
+    .main-content-container {
+      width: 80%;
+      margin: auto;
+      align-content: center;
+    }
+    @media (max-width: 1024px) {
+      .main-content-container {
+        width: 80%;
+      }
+    }
+  </style>
+
+  <!-- Hero Section -->
+  <section class="mdx-container">
+    <div class="md-grid md-typeset">
+      <div class="mdx-hero">
+        <!-- Text content on the left -->
+        <div class="mdx-hero__content">
+          <h1>Fast-Track Your Thesis — Cut through complexity, validate with ease, and publish sooner than you thought possible.</h1>
+          <h2><em>Particula's flexible, reproducible workflows keep pace with your changing research goals, accelerating every step of your journey.</em></h2>
+          <a
+            href="#get-started-with-particula"
+            title= "Get Started with Particula"
+            class="md-button md-button--primary"
+          >
+            Get Started
+          </a>
+          <a
+          href="https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant"
+          title="OpenAI GPTs Particula Assistant"
+          class="md-button md-button"
+          target="_blank"
+          rel="noopener noreferrer"
+          >
+            Particula Assistant Chat
+          </a>
+        </div>
+
+        <!-- Image on the right -->
+        <div class="mdx-hero__image">
+          <img
+            src="images/icon_dark_clear.svg"
+            alt="Particula icon"
+            width="500"
+            height="500"
+            draggable="false"
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <div class="main-content-container" style="max-width: 960px; margin: auto; text-align: left; padding: auto; padding-bottom: 20%;">
+    {{ super() }}
+  </div>
+{% endblock %}
