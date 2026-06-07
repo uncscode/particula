@@ -1,7 +1,7 @@
 ## Phase Checklist
 
-- [ ] **E1-F1-P1:** Add a fluent latent-heat condensation builder
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E1-F1-P1:** Add a fluent latent-heat condensation builder
+  - Issue: #1157 | Size: S | Status: Shipped
   - Depends on: Stable `CondensationLatentHeat` behavior in `condensation_strategies.py` and existing latent-heat strategy inputs from `particula/gas/latent_heat_*.py`
   - Goal: Create `CondensationLatentHeatBuilder` so callers can construct
     `CondensationLatentHeat` with the same validated builder flow used by the
@@ -9,8 +9,8 @@
   - Sequencing: First implementation phase. Do not start P2 until builder
     setter names, validation behavior, and `build()` semantics are fixed by
     tests.
-  - Files: `particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder.py` (~60-90 LOC), `particula/dynamics/condensation/condensation_builder/__init__.py` (~5-10 LOC)
-  - Tests: Add `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py` covering required setters, `latent_heat_strategy` passthrough, positive scalar `latent_heat`, and build-time missing-parameter failures
+  - Files: Shipped `particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder.py`, `particula/dynamics/condensation/condensation_builder/__init__.py`, and `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py`
+  - Tests: Added coverage for required setters, `latent_heat_strategy` passthrough, scalar latent-heat acceptance/rejection, `update_gases` behavior, `set_parameters()` optional keys, constructor precedence, and unset-scalar default behavior
 
 - [ ] **E1-F1-P2:** Register the builder in `CondensationFactory`
   - Issue: TBD | Size: S | Status: Not Started
@@ -56,5 +56,7 @@
 
 - Declared phase graph: `P1 -> P2 -> P3 -> P4`.
 - No intra-feature cycle is currently implied by the checklist.
+- `E1-F1-P1` is complete; P2 remains the next required step before public
+  namespace export and documentation phases.
 - Any attempt to start P3 or P4 before P2 resolves would create a forward
   reference to an incomplete public API surface.

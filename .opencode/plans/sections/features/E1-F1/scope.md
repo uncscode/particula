@@ -1,20 +1,21 @@
-<!-- TEMPLATE: Replace this entire file with your feature's scope -->
+`E1-F1` is a phased feature for latent-heat condensation construction support.
+The shipped `E1-F1-P1` slice is intentionally narrow: it adds the standalone
+`CondensationLatentHeatBuilder`, exports it from the
+`particula.dynamics.condensation.condensation_builder` package, and adds
+focused builder tests without widening the public factory or top-level import
+surface yet.
 
-One paragraph describing what this feature delivers, followed by explicit
-in-scope and out-of-scope lists.
+**In scope:**
+- `particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder.py`
+- Builder support for required shared transport inputs plus optional
+  `latent_heat_strategy`, optional validated scalar `latent_heat`, and optional
+  `update_gases`
+- Builder-package export in
+  `particula/dynamics/condensation/condensation_builder/__init__.py`
+- Focused tests in
+  `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py`
 
-**Required elements:**
-- Brief summary of the deliverable
-- **In scope:** Concrete items being built or changed
-- **Out of scope:** Items explicitly excluded to prevent scope creep
-
-**Example (E16-F6):**
-Add `ship-auto-final` workflow/agent for deterministic summary handoff, then
-wire runtime final PR/MR creation as a separate phase while keeping manual
-handoff guardrails explicit.
-
-**In scope:** `ship-auto-final.json` workflow, `shipper-auto-final` agent,
-summary persistence for downstream PR creation, final PR/MR wiring,
-idempotency checks, safety comments/guardrails.
-
-**Out of scope:** auto-merge, auto-approve, conflict resolution automation.
+**Out of scope:**
+- `CondensationFactory` registration and builder-union updates
+- Re-exports from `particula.dynamics.condensation` or `particula.dynamics`
+- User-facing docs/examples beyond these plan-section updates

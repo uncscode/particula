@@ -1,42 +1,37 @@
 ### High-Level Design
-This feature should expose latent-heat-aware condensation through the same
-construction path users already follow for isothermal strategies: a builder in
-`particula/dynamics/condensation/condensation_builder/`, factory registration
-in `condensation_factories.py`, and re-exports from
-`particula.dynamics.condensation` plus `particula.dynamics`. The builder should
-wrap the existing `CondensationLatentHeat` strategy rather than reimplementing
-physics, while consuming optional latent-heat strategy objects from
-`particula.gas` or a constant latent-heat fallback value.
+`E1-F1-P1` shipped only the builder slice of the broader feature. The new
+`CondensationLatentHeatBuilder` lives in
+`particula/dynamics/condensation/condensation_builder/` and wraps the existing
+`CondensationLatentHeat` strategy without changing condensation physics,
+factory registration, or broader package exports.
 
 ```text
-User config
+User code / tests
   -> CondensationLatentHeatBuilder
     -> validates molar_mass, diffusion_coefficient, accommodation_coefficient
-    -> optionally accepts latent_heat_strategy or latent_heat constant
-  -> CondensationFactory("latent_heat", params)
-    -> builds CondensationLatentHeat
-  -> particula.dynamics export surface
-    -> MassCondensation / direct strategy use with existing particle+gas flows
+    -> optionally accepts latent_heat_strategy or positive scalar latent_heat
+    -> optionally accepts update_gases
+    -> forwards only explicitly provided latent_heat keyword
+  -> CondensationLatentHeat(...)
 ```
 
 ### Data / API / Workflow Changes
 - **Data Model:** No new persisted data model is required. The feature only adds
   constructor-time parameters that are forwarded into `CondensationLatentHeat`,
   which already owns runtime state such as latent-heat diagnostics.
-- **API Surface:** Add `CondensationLatentHeatBuilder`, register the strategy in
-  `CondensationFactory`, and ensure namespace exports make the builder and
-  strategy importable from `particula.dynamics` and its condensation subpackage.
-  The API should mirror existing condensation builder signatures so users can
-  switch from isothermal to latent-heat-aware construction with minimal code
-  changes.
-- **Workflow Hooks:** This integrates with the existing builder/factory testing
-  workflow by extending condensation factory tests and import smoke tests rather
-  than creating new execution paths or developer tooling.
+- **API Surface:** Shipped API changes are limited to
+  `CondensationLatentHeatBuilder` plus its export from the
+  `condensation_builder` package. The builder mirrors existing condensation
+  builder signatures, reuses shared mixins, adds latent-heat-specific setter
+  validation, and preserves `CondensationLatentHeat.__init__()` precedence by
+  forwarding both strategy and scalar inputs when both are set.
+- **Workflow Hooks:** P1 only extends the builder test surface with a dedicated
+  latent-heat builder test file. Factory coverage and broader namespace import
+  smoke tests remain deferred to later phases.
 
 ### Security & Compliance
 This feature does not introduce permissions, network calls, or external state,
 so the main compliance concern is API safety and validation quality. Builder
-setters should validate units and required parameters consistently with the rest
-of particula, and factory registration should fail deterministically on unknown
-strategy types so invalid user configuration does not silently select the wrong
-physics path.
+setters now validate units and required parameters consistently with the rest of
+particula, and the new latent-heat scalar setter rejects `None`, array-like,
+non-finite, zero, and negative inputs before strategy construction.

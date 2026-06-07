@@ -1,4 +1,9 @@
-"""Builder for the CondensationLatentHeat strategy."""
+"""Builder for latent-heat-aware condensation strategies.
+
+This builder configures shared condensation transport properties together
+with either a latent heat strategy instance or a validated scalar latent
+heat fallback before constructing :class:`CondensationLatentHeat`.
+"""
 
 import logging
 from typing import Any, cast
@@ -29,10 +34,21 @@ class CondensationLatentHeatBuilder(
     BuilderAccommodationCoefficientMixin,
     BuilderUpdateGasesMixin,
 ):
-    """Fluent builder for :class:`CondensationLatentHeat`."""
+    """Fluent builder for :class:`CondensationLatentHeat`.
+
+    Attributes:
+        latent_heat_strategy: Optional latent heat strategy passed directly to
+            the constructed condensation strategy.
+        latent_heat: Optional positive scalar latent heat fallback in J/kg.
+    """
 
     def __init__(self) -> None:
-        """Initialize the builder with required shared parameters."""
+        """Initialize the builder with required shared parameters.
+
+        The builder starts with the common condensation transport inputs and
+        no latent heat override so :meth:`build` only forwards optional latent
+        heat configuration when it was explicitly provided.
+        """
         required_parameters = [
             "molar_mass",
             "diffusion_coefficient",
@@ -120,6 +136,9 @@ class CondensationLatentHeatBuilder(
 
         Returns:
             The builder instance for chaining.
+
+        Notes:
+            Passing ``None`` clears any previously stored strategy.
         """
         self.latent_heat_strategy = latent_heat_strategy
         return self
@@ -168,7 +187,16 @@ class CondensationLatentHeatBuilder(
         return self
 
     def build(self) -> CondensationLatentHeat:
-        """Validate parameters and create a latent-heat strategy."""
+        """Validate parameters and create a latent-heat strategy.
+
+        Returns:
+            A configured :class:`CondensationLatentHeat` instance.
+
+        Notes:
+            An explicit ``latent_heat_strategy`` is forwarded unchanged. A
+            scalar ``latent_heat`` is only passed when
+            :meth:`set_latent_heat` was called successfully.
+        """
         self.pre_build_check()
 
         build_kwargs: dict[str, Any] = {

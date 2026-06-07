@@ -1,18 +1,17 @@
-<!-- TEMPLATE: Replace this entire file with your feature's overview -->
+**Problem Statement:** `CondensationLatentHeat` already exists, but callers did
+not have the same fluent builder entry point that is available for isothermal
+condensation. That gap blocked consistent validated construction for latent-heat
+condensation inputs.
 
-Summarize the problem this feature solves and why it matters.
+**Value Proposition:** `E1-F1-P1` ships the first public construction step for
+latent-heat condensation by adding a dedicated builder module, exporting it from
+the `condensation_builder` package, and covering the builder contract with
+focused tests.
 
-**Required elements:**
-- **Problem Statement:** What specific pain point does this address?
-- **Value Proposition:** What does the user/system gain?
-- **User Stories:** 1-3 "As a... I want... so that..." statements
-
-**Example (E16-F6):**
-- **Problem Statement:** Once E16 removes per-slice PRs in accumulate mode,
-  final completion needs a dedicated handoff step that prepares the cumulative
-  implementation summary and creates the one allowed PR/MR.
-- **Value Proposition:** `ship-auto-final` isolates final-handoff concerns from
-  normal slice shipping and makes the manual merge boundary explicit.
-- **User Stories:**
-  - As an operator, I want one final PR/MR at manifest completion so I can review
-    the accumulated feature branch as a single unit.
+**User Stories:**
+- As a developer, I want to construct `CondensationLatentHeat` through a fluent
+  builder so latent-heat-specific inputs follow the same validated setup path as
+  existing condensation strategies.
+- As a maintainer, I want builder-specific tests for latent-heat inputs so
+  scalar validation and strategy passthrough behavior stay stable as follow-on
+  factory/export phases land.
