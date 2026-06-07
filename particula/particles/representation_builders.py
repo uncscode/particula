@@ -49,6 +49,37 @@ from particula.util.validate_inputs import validate_inputs
 logger = logging.getLogger("particula")
 
 
+def _normalize_resolved_density_input(
+    density: float | NDArray[np.float64],
+    mass: NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Normalize particle-resolved density input to species-shape form."""
+    density_array = np.asarray(density, dtype=np.float64)
+    if density_array.ndim == 2 and density_array.shape == mass.shape:
+        if mass.shape[0] == 0:
+            return np.zeros(mass.shape[1], dtype=np.float64)
+        return density_array[0, :]
+    if density_array.ndim == 2 and 1 in density_array.shape:
+        return np.ravel(density_array[:1, :])
+    return density
+
+
+def _normalize_resolved_charge_input(
+    charge: float | NDArray[np.float64] | None,
+    mass: NDArray[np.float64],
+) -> float | NDArray[np.float64] | None:
+    """Normalize particle-resolved charge input to particle-shape form."""
+    if charge is None:
+        return None
+
+    charge_array = np.asarray(charge, dtype=np.float64)
+    if charge_array.ndim == 2 and charge_array.shape == mass.shape:
+        return charge_array[:, 0]
+    if charge_array.ndim == 2 and 1 in charge_array.shape:
+        return np.ravel(charge_array[:, :1])
+    return charge
+
+
 # pylint: disable=too-few-public-methods
 class BuilderSurfaceStrategyMixin:
     """Mixin class for setting the surface_strategy attribute.
@@ -555,15 +586,18 @@ class ResolvedParticleMassRepresentationBuilder(
         if number_concentration.ndim > 1:
             number_concentration = number_concentration[:, 0]
 
+        density = _normalize_resolved_density_input(self.density, self.mass)
+        charge = _normalize_resolved_charge_input(self.charge, self.mass)
+
         self.pre_build_check()
         return ParticleRepresentation(
             strategy=self.distribution_strategy,
             activity=self.activity_strategy,
             surface=self.surface_strategy,
             distribution=self.mass,
-            density=self.density,
+            density=density,
             concentration=number_concentration,
-            charge=self.charge,
+            charge=charge,
             volume=self.volume,
         )
 
@@ -655,6 +689,18 @@ class PresetResolvedParticleMassBuilder(
         resolved_masses_calc = 4 / 3 * np.pi * resolved_radii**3 * self.density
         resolved_masses = np.asarray(resolved_masses_calc, dtype=np.float64)
         number_concentration = np.ones_like(resolved_masses, dtype=np.float64)
+        if number_concentration.ndim > 1:
+            number_concentration = number_concentration[:, 0]
+
+        density = _normalize_resolved_density_input(self.density, resolved_masses)
+        charge = _normalize_resolved_charge_input(self.charge, resolved_masses)
+        if (
+            isinstance(charge, np.ndarray)
+            and charge.ndim == 1
+            and charge.size != number_concentration.size
+            and np.all(charge == 0)
+        ):
+            charge = np.zeros(number_concentration.size, dtype=np.float64)
 
         self.pre_build_check()
         return ParticleRepresentation(
@@ -662,8 +708,8 @@ class PresetResolvedParticleMassBuilder(
             activity=self.activity_strategy,
             surface=self.surface_strategy,
             distribution=resolved_masses,
-            density=self.density,
+            density=density,
             concentration=number_concentration,
-            charge=self.charge,
+            charge=charge,
             volume=self.volume,
         )

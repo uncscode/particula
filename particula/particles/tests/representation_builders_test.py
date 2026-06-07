@@ -75,6 +75,28 @@ def test_resolved_mass_particle_representation_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
+def test_resolved_mass_builder_flattens_singleton_density_and_charge() -> None:
+    """Singleton 2D density/charge inputs should remain build-compatible."""
+    builder = ResolvedParticleMassRepresentationBuilder()
+    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())
+    builder.set_activity_strategy(ActivityIdealMass())
+    builder.set_surface_strategy(SurfaceStrategyVolume())
+    builder.set_mass(np.array([[1.0], [2.0], [3.0]]), "kg")
+    builder.set_density(np.full((3, 1), 1000.0), "kg/m^3")
+    builder.set_charge(np.zeros((3, 1)))
+    builder.set_volume(1, "m^3")
+
+    particle_representation = builder.build()
+
+    assert isinstance(particle_representation, ParticleRepresentation)
+    np.testing.assert_array_equal(
+        particle_representation.get_density(), np.array([1000.0])
+    )
+    np.testing.assert_array_equal(
+        particle_representation.get_charge(), np.zeros(3)
+    )
+
+
 def test_preset_resolved_mass_particle_builder():
     """Test PresetResolvedMassParticleBuilder Builds."""
     # default values
