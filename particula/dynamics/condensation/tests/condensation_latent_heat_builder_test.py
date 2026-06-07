@@ -1,5 +1,7 @@
 """Tests for the latent-heat condensation builder."""
 
+from typing import Any
+
 import numpy as np
 import pytest
 from particula.dynamics.condensation.condensation_builder import (
@@ -156,6 +158,70 @@ def test_set_parameters_accepts_optional_latent_heat_keys() -> None:
     assert strategy.update_gases is False
 
 
+def test_set_parameters_uses_default_units_when_unit_keys_are_omitted() -> None:
+    """set_parameters should apply default units for omitted unit keys."""
+    strategy = (
+        CondensationLatentHeatBuilder()
+        .set_parameters(
+            {
+                "molar_mass": 0.018,
+                "diffusion_coefficient": 2e-5,
+                "accommodation_coefficient": 1.0,
+                "latent_heat": 2.26e6,
+            }
+        )
+        .build()
+    )
+
+    assert strategy.molar_mass == pytest.approx(0.018)
+    assert strategy.diffusion_coefficient == pytest.approx(2e-5)
+    assert strategy.accommodation_coefficient == pytest.approx(1.0)
+    assert strategy.latent_heat_input == pytest.approx(2.26e6)
+
+
+def test_set_parameters_clears_omitted_optional_latent_heat_state() -> None:
+    """Reused builders should not leak latent heat state across calls."""
+    latent_heat_strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
+    builder = CondensationLatentHeatBuilder().set_parameters(
+        {
+            "molar_mass": 0.018,
+            "molar_mass_units": "kg/mol",
+            "diffusion_coefficient": 2e-5,
+            "diffusion_coefficient_units": "m^2/s",
+            "accommodation_coefficient": 1.0,
+            "latent_heat_strategy": latent_heat_strategy,
+            "latent_heat": 2.26e6,
+        }
+    )
+
+    initial_strategy = builder.build()
+    reset_strategy = builder.set_parameters(
+        {
+            "molar_mass": 0.018,
+            "molar_mass_units": "kg/mol",
+            "diffusion_coefficient": 2e-5,
+            "diffusion_coefficient_units": "m^2/s",
+            "accommodation_coefficient": 1.0,
+        }
+    ).build()
+
+    assert initial_strategy._latent_heat_strategy is latent_heat_strategy
+    assert initial_strategy.latent_heat_input == pytest.approx(2.26e6)
+    assert reset_strategy.latent_heat_input == 0.0
+    assert reset_strategy._latent_heat_strategy is not latent_heat_strategy
+
+
+def test_set_latent_heat_strategy_rejects_invalid_objects() -> None:
+    """Invalid latent heat strategies should fail fast at setter time."""
+    invalid_strategy: Any = "not-a-strategy"
+
+    with pytest.raises(
+        TypeError,
+        match="latent_heat_strategy must be a LatentHeatStrategy or None",
+    ):
+        _make_builder().set_latent_heat_strategy(invalid_strategy)
+
+
 def test_set_parameters_missing_required_key_raises_value_error() -> None:
     """set_parameters rejects missing required shared builder inputs."""
     with pytest.raises(
@@ -203,9 +269,8 @@ def test_build_with_strategy_and_scalar_preserves_constructor_precedence() -> (
     assert strategy.latent_heat_input == pytest.approx(2.26e6)
 
 
-def test_unset_latent_heat_uses_constructor_default_without_none_passthrough() -> (
-    None
-):
+def test_unset_latent_heat_uses_constructor_default_without_none_passthrough(
+) -> None:
     """Unset scalar latent heat leaves constructor default state intact."""
     latent_heat_strategy = ConstantLatentHeat(latent_heat_ref=2.26e6)
     strategy = (

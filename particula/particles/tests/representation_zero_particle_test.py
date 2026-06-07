@@ -1,9 +1,10 @@
 """Regression tests for zero-particle representations."""
 
 import numpy as np
-
 from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import ParticleResolvedSpeciatedMass
+from particula.particles.distribution_strategies import (
+    ParticleResolvedSpeciatedMass,
+)
 from particula.particles.representation_builders import (
     ResolvedParticleMassRepresentationBuilder,
 )

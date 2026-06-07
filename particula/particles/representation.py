@@ -29,6 +29,41 @@ _DEPRECATION_MESSAGE = (
 )
 
 
+def _normalize_density_array(
+    density: NDArray[np.float64] | float,
+) -> NDArray[np.float64]:
+    """Normalize density input to a 1D float64 array."""
+    density_array = np.asarray(density, dtype=np.float64)
+    if density_array.ndim == 0:
+        return np.atleast_1d(density_array)
+    if density_array.ndim == 1:
+        return density_array
+    if density_array.size == 0:
+        return np.zeros(0, dtype=np.float64)
+    raise ValueError(
+        "density must be a scalar or 1D array, "
+        f"got array with shape {density_array.shape}"
+    )
+
+
+def _normalize_charge_array(
+    charge: NDArray[np.float64] | float,
+    template: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Normalize charge input to exactly match the template shape."""
+    charge_array = np.asarray(charge, dtype=np.float64)
+    if charge_array.ndim == 0:
+        return np.full_like(template, float(charge_array), dtype=np.float64)
+    if charge_array.size == 0:
+        return np.zeros_like(template, dtype=np.float64)
+    if charge_array.shape == template.shape:
+        return charge_array
+    raise ValueError(
+        "charge must be a scalar, empty array, or array matching concentration "
+        f"shape {template.shape}; got shape {charge_array.shape}"
+    )
+
+
 if TYPE_CHECKING:
     from particula.particles.particle_data import ParticleData
 
@@ -93,16 +128,7 @@ class ParticleRepresentation:
         self.surface = surface
 
         self._distribution = np.asarray(distribution, dtype=np.float64)
-        density_array = np.asarray(density, dtype=np.float64)
-        if density_array.ndim == 0:
-            density_array = np.atleast_1d(density_array)
-        elif density_array.ndim > 1:
-            if density_array.size == 0:
-                density_array = np.zeros(0, dtype=np.float64)
-            else:
-                density_array = np.asarray(
-                    density_array[0], dtype=np.float64
-                ).reshape(-1)
+        density_array = _normalize_density_array(density)
         concentration_array = np.asarray(concentration, dtype=np.float64)
         if concentration_array.ndim == 0:
             concentration_array = np.atleast_1d(concentration_array)
@@ -165,10 +191,7 @@ class ParticleRepresentation:
         template: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         """Return a float64 array broadcast to the template shape."""
-        array = np.asarray(value, dtype=np.float64)
-        if array.ndim == 0:
-            return np.full_like(template, float(array), dtype=np.float64)
-        return array
+        return _normalize_charge_array(value, template)
 
     @property
     def data(self) -> "ParticleData":
@@ -328,28 +351,13 @@ class ParticleRepresentation:
         ]
         charge_array = None
         if charge_value is not None:
-            charge_array = np.asarray(charge_value, dtype=np.float64)
-            if charge_array.ndim == 0:
-                charge_array = np.full_like(
-                    concentration_array,
-                    float(charge_array),
-                    dtype=np.float64,
-                )
+            charge_array = _normalize_charge_array(
+                charge_value,
+                concentration_array,
+            )
         charge_box = np.zeros_like(concentration_box)
         if charge_array is not None:
             charge_box = charge_array[np.newaxis, ...]
-        if charge_box.shape != concentration_box.shape:
-            if charge_box.size == 0:
-                charge_box = np.zeros_like(concentration_box)
-            elif charge_box.size == concentration_box.size:
-                charge_box = np.reshape(charge_box, concentration_box.shape)
-            else:
-                charge_box = np.full_like(
-                    concentration_box,
-                    np.asarray(charge_array, dtype=np.float64).item()
-                    if charge_array is not None and charge_array.ndim == 0
-                    else charge_box.mean(),
-                )
         volume_array = np.asarray([volume_value], dtype=np.float64)
         return (
             ParticleData(
