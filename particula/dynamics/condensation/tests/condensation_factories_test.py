@@ -79,7 +79,10 @@ def test_get_builders_returns_expected_builder_instances() -> None:
         builder_map["isothermal_staggered"],
         CondensationIsothermalStaggeredBuilder,
     )
-    assert isinstance(builder_map["latent_heat"], CondensationLatentHeatBuilder)
+    assert isinstance(
+        builder_map["latent_heat"],
+        CondensationLatentHeatBuilder,
+    )
 
 
 def test_isothermal_staggered_condensation_defaults_via_factory():
@@ -205,7 +208,7 @@ def test_latent_heat_condensation_strategy_precedence_via_factory() -> None:
     assert strategy.latent_heat_input == pytest.approx(2.26e6)
 
 
-def test_latent_heat_condensation_invalid_parameters_propagate_builder_error(
+def test_latent_heat_condensation_invalid_parameters_propagate_builder_error(  # noqa: E501
 ) -> None:
     """Factory surfaces builder parameter validation failures unchanged."""
     factory = CondensationFactory()
