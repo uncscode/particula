@@ -9,7 +9,12 @@ from particula.particles.distribution_strategies import (
     ParticleResolvedSpeciatedMass,
     RadiiBasedMovingBin,
 )
-from particula.particles.representation import ParticleRepresentation
+from particula.particles.representation import (
+    ParticleRepresentation,
+    _normalize_charge_array,
+    _normalize_density_array,
+    _warn_deprecated,
+)
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
@@ -248,6 +253,20 @@ def test_get_effective_density_particle_resolved():
     np.testing.assert_allclose(effective_density, expected_density, rtol=1e-7)
 
 
+def test_zero_particle_resolved_density_preserves_species_shape() -> None:
+    """Zero-particle resolved densities should preserve species count."""
+    particle = setup_particle(
+        strategy=ParticleResolvedSpeciatedMass(),
+        distribution=np.zeros((0, 2), dtype=np.float64),
+        density=np.zeros((0, 2), dtype=np.float64),
+        concentration=np.zeros(0, dtype=np.float64),
+        charge=np.zeros(0, dtype=np.float64),
+    )
+
+    assert particle.get_species_mass().shape == (0, 2)
+    assert particle.get_density().shape == (2,)
+
+
 def test_bin_order_after_add_mass():
     """Bins should be ordered after mass addition."""
     particle = setup_particle(
@@ -343,6 +362,76 @@ def test_particle_representation_rejects_incompatible_charge_shapes() -> None:
         ),
     ):
         setup_particle(charge=np.array([[1.0, 2.0, 3.0]]))
+
+
+def test_normalize_density_array_handles_scalar_1d_and_empty_2d() -> None:
+    """Density normalization should support expected legacy input shapes."""
+    np.testing.assert_array_equal(
+        _normalize_density_array(1000.0),
+        np.array([1000.0]),
+    )
+    np.testing.assert_array_equal(
+        _normalize_density_array(np.array([900.0, 1000.0])),
+        np.array([900.0, 1000.0]),
+    )
+    np.testing.assert_array_equal(
+        _normalize_density_array(np.zeros((0, 2), dtype=np.float64)),
+        np.zeros(2, dtype=np.float64),
+    )
+
+
+def test_normalize_charge_array_handles_scalar_empty_and_matching_shape(
+) -> None:
+    """Charge normalization should match the concentration template shape."""
+    template = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+
+    np.testing.assert_array_equal(
+        _normalize_charge_array(2.0, template),
+        np.array([2.0, 2.0, 2.0]),
+    )
+    np.testing.assert_array_equal(
+        _normalize_charge_array(np.array([], dtype=np.float64), template),
+        np.zeros_like(template),
+    )
+    np.testing.assert_array_equal(
+        _normalize_charge_array(np.array([1.0, 2.0, 3.0]), template),
+        np.array([1.0, 2.0, 3.0]),
+    )
+
+
+def test_warn_deprecated_logs_message(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Deprecation helper should log instead of emitting warnings."""
+    messages: list[str] = []
+
+    monkeypatch.setattr(
+        "particula.particles.representation.logger.info",
+        messages.append,
+    )
+
+    _warn_deprecated()
+
+    assert messages
+    assert "ParticleRepresentation is deprecated" in messages[0]
+
+
+def test_particle_representation_from_data_preserves_charge_without_warning(
+) -> None:
+    """from_data should wrap ParticleData without logging deprecation."""
+    particle = setup_particle(charge=np.array([1.0, 2.0, 3.0]))
+
+    wrapped = ParticleRepresentation.from_data(
+        particle.data,
+        strategy=particle.get_strategy(),
+        activity=particle.get_activity(),
+        surface=particle.get_surface(),
+        distribution=particle.get_distribution(),
+        charge=particle.get_charge(),
+    )
+
+    np.testing.assert_array_equal(
+        wrapped.get_distribution(), particle.get_distribution()
+    )
+    np.testing.assert_array_equal(wrapped.get_charge(), particle.get_charge())
 
 
 def test_particle_representation_accepts_matching_and_scalar_charge() -> None:

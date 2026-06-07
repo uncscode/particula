@@ -5,6 +5,9 @@ import pytest
 from particula.particles.properties import (
     convert_mass_concentration,
 )
+from particula.particles.properties.convert_mass_concentration import (
+    _normalize_rows,
+)
 
 
 @pytest.mark.parametrize(
@@ -227,12 +230,20 @@ def test_mass_concentration_to_mass_fraction(mass_concentrations, expected):
 
 
 def test_mass_concentration_to_mass_fraction_zero_total_returns_zeros():
-    """Zero total mass returns zeros for one-dimensional inputs."""
+    """Zero total mass returns zeros for 1D inputs and zero rows in 2D."""
     mass_fractions = convert_mass_concentration.get_mass_fraction_from_mass(
         np.array([0.0, 0.0])
     )
+    two_dimensional = convert_mass_concentration.get_mass_fraction_from_mass(
+        np.array([[0.0, 0.0], [1.0, 3.0]])
+    )
 
     np.testing.assert_array_equal(mass_fractions, np.array([0.0, 0.0]))
+    np.testing.assert_allclose(
+        two_dimensional,
+        np.array([[0.0, 0.0], [0.25, 0.75]]),
+        rtol=1e-5,
+    )
 
 
 @pytest.mark.parametrize(
@@ -270,3 +281,15 @@ def test_mass_concentration_to_mass_fraction_rejects_negative_values():
         convert_mass_concentration.get_mass_fraction_from_mass(
             np.array([1.0, -1.0])
         )
+
+
+def test_normalize_rows_leaves_zero_rows_as_zeros() -> None:
+    """Row normalization should preserve zero-total rows."""
+    normalized = _normalize_rows(
+        np.array([[0.0, 0.0], [1.0, 3.0]], dtype=np.float64)
+    )
+
+    np.testing.assert_allclose(
+        normalized,
+        np.array([[0.0, 0.0], [0.25, 0.75]], dtype=np.float64),
+    )

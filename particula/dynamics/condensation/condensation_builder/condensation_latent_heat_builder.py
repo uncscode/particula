@@ -69,6 +69,7 @@ class CondensationLatentHeatBuilder(
         self.latent_heat_strategy = None
         self.latent_heat = None
         self._latent_heat_explicitly_set = False
+        self.update_gases = True
 
     def set_parameters(
         self, parameters: dict[str, Any]

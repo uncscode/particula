@@ -1,5 +1,6 @@
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-06-07 | Applied PR #1162 review follow-ups: documented the shipped `update_gases` builder-reset regression coverage, refreshed success/risk notes, and aligned the feature overview with the post-review maintenance pass. | adw-build |
 | 2026-06-07 | Refined `E1-F1` plan sections for issue #1160 / phase `E1-F1-P4`: recorded the shipped docs-only follow-up against `docs/Features/condensation_strategy_system.md`, corrected the phase issue reference, and captured the targeted condensation rerun set including latent-heat constructor coverage from `condensation_strategies_test.py`. | plan-update-full |
 | 2026-06-06 | Synchronized `E1-F1` sections with the completed documentation update: marked P4 shipped, recorded `docs/Features/condensation_strategy_system.md` as updated for `CondensationLatentHeatBuilder` and the `"latent_heat"` factory path, and cleared pending-doc drift called out by docs-validator. | plan-update-full |
 | 2026-06-06 | Updated `E1-F1` sections to reflect shipped phase `E1-F1-P3` / issue #1159: re-exported `CondensationLatentHeatBuilder` through `particula.dynamics.condensation` and `particula.dynamics`, added export smoke-test coverage for both namespaces, verified `__all__` membership, and recorded cross-namespace object identity coverage. | plan-update-full |

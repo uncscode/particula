@@ -7,6 +7,9 @@
 - [x] Export regression tests cover both public namespaces, `__all__`
   membership, and shared object identity with `pytest -Werror`.
 - [x] Documentation updates describe the shipped builder/factory path.
+- [x] Post-review fix pass verifies reused `CondensationLatentHeatBuilder`
+  instances do not leak optional `update_gases` state between
+  `set_parameters()` calls.
 
 **Metrics:**
 
@@ -16,3 +19,4 @@
 | Factory support | No public latent-heat factory registration | P2 shipped one stable supported key with regression coverage for passthrough, scalar fallback, precedence, and builder-error propagation | `particula/dynamics/condensation/tests/condensation_factories_test.py` |
 | Export stability | No public builder export | Builder appears in package import smoke tests, both `__all__` surfaces, and cross-namespace identity checks | `particula/dynamics/tests/condensation_exports_test.py` |
 | Docs/test alignment | Docs can drift from final API while feature is in flight | 0 known mismatches between docs examples and shipped import paths | Docs diff plus rerun of scoped `pytest -Werror` command from `phase_details.md` |
+| Post-review builder reuse | Optional flags could persist when a builder is reused | Reused `set_parameters()` calls restore documented defaults for omitted optional keys | `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py` |
