@@ -1,19 +1,25 @@
-<!-- TEMPLATE: Replace this entire file with existing code to reuse -->
-
-List existing functions, modules, patterns, and file paths that this feature
-should build on. Include file:line references where helpful.
-
-**Required elements:**
-- Existing functions/classes to call or extend
-- File paths with line numbers for key integration points
-- Patterns from the codebase to follow
-
-**Example (E16-F6):**
-- `open_final_pr()` in `adw/automode/scheduler.py:719` -- creates the
-  epic-to-main PR; reuse for final handoff PR creation
-- `create_pr()` in `adw/platforms/router.py:1523` -- platform-agnostic PR
-  creation; call from final handoff step
-- `create_issue_comment()` in `adw/platforms/router.py:1281` -- posts safety
-  banners; reuse for guardrail comment
-- `ManifestCheckpoint` in `adw/automode/manifest.py` -- records
-  `"final_pr_opened"` events for idempotency
+- `CondensationLatentHeatBuilder` in
+  `particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder.py:30`
+  reuses the existing builder stack (`BuilderABC`, `BuilderMolarMassMixin`,
+  `BuilderDiffusionCoefficientMixin`,
+  `BuilderAccommodationCoefficientMixin`, and `BuilderUpdateGasesMixin`) for
+  required-parameter validation, unit handling, and fluent setter behavior.
+- `CondensationFactory` in
+  `particula/dynamics/condensation/condensation_factories.py:15` reuses the
+  generic `StrategyFactoryABC.get_strategy()` flow from
+  `particula/abc_factory.py:69`, so the shipped latent-heat support only needed
+  builder registration under the existing `"latent_heat"` strategy map.
+- `particula/dynamics/condensation/condensation_builder/__init__.py:3` is the
+  canonical builder export surface. The public namespace wiring in
+  `particula/dynamics/condensation/__init__.py:3` and
+  `particula/dynamics/__init__.py:51` reuses the same import-and-re-export
+  pattern already used for `CondensationIsothermalBuilder` and
+  `CondensationIsothermalStaggeredBuilder`.
+- `particula/dynamics/tests/condensation_exports_test.py:10` reuses the
+  existing condensation export smoke-test pattern: import from both public
+  namespaces, assert object identity, and verify `__all__` membership rather
+  than introducing a new test harness.
+- `docs/Features/condensation_strategy_system.md:21` reuses the existing
+  user-facing condensation feature document as the documentation integration
+  point, extending the current builder/factory API listing instead of creating a
+  separate latent-heat builder guide.
