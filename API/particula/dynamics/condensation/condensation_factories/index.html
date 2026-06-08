@@ -3348,6 +3348,8 @@
       
         
       
+        
+      
     
     
     
@@ -3464,6 +3466,34 @@
     
   
     particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../condensation_builder/condensation_latent_heat_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder
   
 
     
@@ -13922,7 +13952,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            StrategyFactoryABC (particula.abc_factory.StrategyFactoryABC)" href="../../../abc_factory/#particula.abc_factory.StrategyFactoryABC">StrategyFactoryABC</a>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            CondensationIsothermalBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder">CondensationIsothermalBuilder</a>, <a class="autorefs autorefs-internal" title="            CondensationIsothermalStaggeredBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder">CondensationIsothermalStaggeredBuilder</a>], <a class="autorefs autorefs-internal" title="            CondensationStrategy (particula.dynamics.condensation.condensation_strategies.CondensationStrategy)" href="../condensation_strategies/#particula.dynamics.condensation.condensation_strategies.CondensationStrategy">CondensationStrategy</a>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            StrategyFactoryABC (particula.abc_factory.StrategyFactoryABC)" href="../../../abc_factory/#particula.abc_factory.StrategyFactoryABC">StrategyFactoryABC</a>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            CondensationLatentHeatBuilder (particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder">CondensationLatentHeatBuilder</a>, <a class="autorefs autorefs-internal" title="            CondensationIsothermalBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder">CondensationIsothermalBuilder</a>, <a class="autorefs autorefs-internal" title="            CondensationIsothermalStaggeredBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder">CondensationIsothermalStaggeredBuilder</a>], <a class="autorefs autorefs-internal" title="            CondensationStrategy (particula.dynamics.condensation.condensation_strategies.CondensationStrategy)" href="../condensation_strategies/#particula.dynamics.condensation.condensation_strategies.CondensationStrategy">CondensationStrategy</a>]</code></p>
 
 
 
@@ -13935,6 +13965,7 @@
 <li>"isothermal": Standard isothermal condensation.</li>
 <li>"isothermal_staggered": Staggered isothermal condensation with
   batch stepping for stability.</li>
+<li>"latent_heat": Condensation with latent-heat coupling.</li>
 </ul>
 </details>
 
@@ -13966,7 +13997,7 @@
 
 
 <a href="#particula.dynamics.condensation.condensation_factories.CondensationFactory.get_builders" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_builders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">CondensationIsothermalBuilder</span><span class="p">,</span> <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">]]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_builders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">CondensationLatentHeatBuilder</span><span class="p">,</span> <span class="n">CondensationIsothermalBuilder</span><span class="p">,</span> <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -13977,7 +14008,7 @@
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            CondensationIsothermalBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder">CondensationIsothermalBuilder</a>, <a class="autorefs autorefs-internal" title="            CondensationIsothermalStaggeredBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder">CondensationIsothermalStaggeredBuilder</a>]]</code>
+              <code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            CondensationLatentHeatBuilder (particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder">CondensationLatentHeatBuilder</a>, <a class="autorefs autorefs-internal" title="            CondensationIsothermalBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder">CondensationIsothermalBuilder</a>, <a class="autorefs autorefs-internal" title="            CondensationIsothermalStaggeredBuilder (particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder)" href="../condensation_builder/#particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder">CondensationIsothermalStaggeredBuilder</a>]]</code>
           –
           <div class="doc-md-description">
             <p>Dictionary mapping condensation strategy names to builders.</p>
@@ -13988,10 +14019,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/dynamics/condensation/condensation_factories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -14005,11 +14033,17 @@
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
-<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span>
     <span class="nb">str</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">[</span>
+        <span class="n">CondensationLatentHeatBuilder</span><span class="p">,</span>
         <span class="n">CondensationIsothermalBuilder</span><span class="p">,</span>
         <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">,</span>
     <span class="p">],</span>
@@ -14022,6 +14056,7 @@
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;isothermal&quot;</span><span class="p">:</span> <span class="n">CondensationIsothermalBuilder</span><span class="p">(),</span>
         <span class="s2">&quot;isothermal_staggered&quot;</span><span class="p">:</span> <span class="n">CondensationIsothermalStaggeredBuilder</span><span class="p">(),</span>
+        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="n">CondensationLatentHeatBuilder</span><span class="p">(),</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>

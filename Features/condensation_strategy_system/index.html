@@ -3236,6 +3236,8 @@
       
         
       
+        
+      
     
     
     
@@ -3352,6 +3354,34 @@
     
   
     particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder
   
 
     
@@ -14655,17 +14685,23 @@ runs while adding latent-heat-aware mass transfer and per-step energy
 diagnostics. The step now supports a <code>dynamic_viscosity</code> override and records
 <code>last_latent_heat_energy</code> for parity with the isothermal API plus energy
 tracking.</p>
-<p>This feature is built around user-facing APIs exposed via <code>particula.dynamics</code>:</p>
+<p>This feature is built around user-facing APIs exposed via
+<code>particula.dynamics</code> and <code>particula.dynamics.condensation</code>:</p>
 <ul>
-<li><code>CondensationStrategy</code> – abstract base defining <code>rate</code> / <code>step</code>.</li>
+<li><code>CondensationStrategy</code> – abstract base defining <code>rate</code> / <code>step</code>, exposed via
+  <code>particula.dynamics.condensation</code>.</li>
 <li><code>CondensationIsothermal</code> – simultaneous isothermal mass transfer.</li>
 <li><code>CondensationIsothermalStaggered</code> – two-pass staggered (Gauss-Seidel) update
   with theta modes (<code>"half"</code>, <code>"random"</code>, <code>"batch"</code>) and batching.</li>
 <li><code>CondensationLatentHeat</code> – latent-heat-corrected rate with per-step energy
   diagnostics.</li>
-<li><code>CondensationIsothermalBuilder</code>, <code>CondensationIsothermalStaggeredBuilder</code> –
-  fluent builders with validation and unit handling.</li>
-<li><code>CondensationFactory</code> – factory selecting a condensation strategy by name.</li>
+<li><code>CondensationIsothermalBuilder</code>, <code>CondensationIsothermalStaggeredBuilder</code>,
+  <code>CondensationLatentHeatBuilder</code> – fluent builders with validation and unit
+  handling, exported via both <code>particula.dynamics</code> and
+  <code>particula.dynamics.condensation</code>.</li>
+<li><code>CondensationFactory</code> – factory selecting a condensation strategy by name,
+  exported via both <code>particula.dynamics</code> and
+  <code>particula.dynamics.condensation</code>.</li>
 <li><code>MassCondensation</code> runnable – delegates to a condensation strategy, splits
   <code>time_step</code> across <code>sub_steps</code>, and composes in pipelines.</li>
 <li>Mass-transfer helpers – <code>get_mass_transfer_rate</code>, <code>get_first_order_mass_
@@ -14698,11 +14734,13 @@ tracking.</p>
 </ul>
 <h2 id="capabilities">Capabilities<a class="headerlink" href="#capabilities" title="Permanent link">&para;</a></h2>
 <h3 id="unified-condensation-api-in-particuladynamics">Unified condensation API in <code>particula.dynamics</code><a class="headerlink" href="#unified-condensation-api-in-particuladynamics" title="Permanent link">&para;</a></h3>
-<p>Condensation is exported alongside other dynamics components:</p>
+<p>Concrete condensation implementations are exported alongside other dynamics
+components, while the abstract base interface remains available from the
+condensation subpackage:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="c1"># Abstract interface</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationStrategy</span>
+<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">condensation</span><span class="o">.</span><span class="n">CondensationStrategy</span>
 
 <span class="c1"># Concrete implementations</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span>
@@ -14712,6 +14750,7 @@ tracking.</p>
 <span class="c1"># Builders and factory</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalBuilder</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalStaggeredBuilder</span>
+<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeatBuilder</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationFactory</span>
 </code></pre></div>
 <p>All strategies share a common shape: initialize with physical parameters (molar
@@ -14766,10 +14805,15 @@ mass is optionally depleted (<code>update_gases=True</code>).</p>
 </code></pre></div>
 <h3 id="condensationlatentheat-energy-diagnostics">CondensationLatentHeat (energy diagnostics)<a class="headerlink" href="#condensationlatentheat-energy-diagnostics" title="Permanent link">&para;</a></h3>
 <p><code>CondensationLatentHeat</code> mirrors the isothermal step but applies a latent-heat
-correction when a latent heat strategy (or scalar fallback) is provided. It
-records <code>last_latent_heat_energy</code> each step (positive for condensation,
-negative for evaporation) and accepts a <code>dynamic_viscosity</code> override for
-particle-resolved workflows.</p>
+correction when a latent heat strategy is provided. Direct manual
+<code>CondensationLatentHeat(...)</code> construction is supported, and the constructor
+also accepts a positive scalar <code>latent_heat</code> compatibility fallback. For most
+public user workflows, prefer the builder/factory path below when you want
+validated parameter loading or a strategy object. When both
+<code>latent_heat_strategy</code> and <code>latent_heat</code> are supplied, the explicit strategy
+takes precedence. It records <code>last_latent_heat_energy</code> each step (positive for
+condensation, negative for evaporation) and accepts a <code>dynamic_viscosity</code>
+override for particle-resolved workflows.</p>
 <div class="highlight"><pre><span></span><code><span class="n">latent</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeat</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
@@ -14786,8 +14830,8 @@ particle-resolved workflows.</p>
 <span class="p">)</span>
 <span class="n">energy_released</span> <span class="o">=</span> <span class="n">latent</span><span class="o">.</span><span class="n">last_latent_heat_energy</span>  <span class="c1"># total energy [J]</span>
 </code></pre></div>
-<p>When no latent heat strategy is configured (or a nonpositive scalar is
-provided), the step follows the isothermal path and reports
+<p>When neither a <code>latent_heat_strategy</code> nor a positive scalar <code>latent_heat</code>
+fallback is configured, the step follows the isothermal path and reports
 <code>last_latent_heat_energy = 0.0</code>.</p>
 <p><code>last_latent_heat_energy</code> records the total latent heat released per step
 (sum of dm × L), not an energy density.</p>
@@ -14840,9 +14884,18 @@ reduce lag. Radii are clamped and Δp is sanitized before computing dm/dt.</p>
 <span class="p">)</span>
 </code></pre></div>
 <h3 id="builder-and-factory-workflow">Builder and factory workflow<a class="headerlink" href="#builder-and-factory-workflow" title="Permanent link">&para;</a></h3>
-<p>Builders provide validation, units, and consistent naming; the factory selects a
-strategy by string while reusing builder validation.</p>
+<p>Builders provide validation, units, and consistent naming; the factory selects
+a strategy by string while reusing builder validation. The public builder and
+factory entry points are available from both import surfaces:</p>
+<ul>
+<li><code>particula.dynamics.CondensationLatentHeatBuilder</code></li>
+<li><code>particula.dynamics.condensation.CondensationLatentHeatBuilder</code></li>
+<li><code>particula.dynamics.CondensationFactory</code></li>
+<li><code>particula.dynamics.condensation.CondensationFactory</code></li>
+</ul>
+<p>The shipped latent-heat factory key is <code>"latent_heat"</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.latent_heat_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantLatentHeat</span>
 
 <span class="n">iso</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermalBuilder</span><span class="p">()</span>
@@ -14866,7 +14919,30 @@ strategy by string while reusing builder validation.</p>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
+<span class="n">latent_strategy</span> <span class="o">=</span> <span class="n">ConstantLatentHeat</span><span class="p">(</span><span class="n">latent_heat_ref</span><span class="o">=</span><span class="mf">2.4e6</span><span class="p">)</span>
+
+<span class="n">latent</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationLatentHeatBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">0.018</span><span class="p">,</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_diffusion_coefficient</span><span class="p">(</span><span class="mf">2e-5</span><span class="p">,</span> <span class="s2">&quot;m^2/s&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_accommodation_coefficient</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_latent_heat_strategy</span><span class="p">(</span><span class="n">latent_strategy</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_update_gases</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+
 <span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationFactory</span><span class="p">()</span>
+<span class="n">latent_factory_with_strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;latent_heat_strategy&quot;</span><span class="p">:</span> <span class="n">latent_strategy</span><span class="p">,</span>
+        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
 <span class="n">iso_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;isothermal&quot;</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
@@ -14876,7 +14952,29 @@ strategy by string while reusing builder validation.</p>
         <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
+<span class="n">latent_factory</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="mf">0.018</span><span class="p">,</span>
+        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="mf">2e-5</span><span class="p">,</span>
+        <span class="s2">&quot;accommodation_coefficient&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="mf">2.4e6</span><span class="p">,</span>
+        <span class="s2">&quot;update_gases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
 </code></pre></div>
+<p>Use direct <code>CondensationLatentHeat(...)</code> construction when you want to wire the
+strategy manually. For the supported public workflow, prefer
+<code>CondensationLatentHeatBuilder</code> or
+<code>CondensationFactory().get_strategy("latent_heat", parameters=...)</code>. The
+builder/factory path supports both documented latent-heat inputs:</p>
+<ul>
+<li><code>latent_heat_strategy</code>: pass an explicit latent heat strategy object.</li>
+<li><code>latent_heat</code>: pass a positive scalar fallback that the builder forwards to
+  <code>CondensationLatentHeat</code>.</li>
+</ul>
+<p>If both are supplied, the explicit <code>latent_heat_strategy</code> remains active and
+the scalar value is preserved only as constructor input metadata.</p>
 <h3 id="skip-partitioning-indices-and-gas-updates">Skip-partitioning indices and gas updates<a class="headerlink" href="#skip-partitioning-indices-and-gas-updates" title="Permanent link">&para;</a></h3>
 <p>Use <code>skip_partitioning_indices</code> to zero-out selected species during rate/step
 without touching others; combine with <code>update_gases</code> to control depletion.</p>
@@ -15162,7 +15260,8 @@ condensing species.</p>
 <h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Staggered solver is Gauss-Seidel only; other solvers are not exposed.</li>
-<li>Factory supports <code>"isothermal"</code> and <code>"isothermal_staggered"</code> only.</li>
+<li>Factory supports <code>"isothermal"</code>, <code>"isothermal_staggered"</code>, and
+  <code>"latent_heat"</code> only.</li>
 <li>No temperature feedback; latent heat is diagnostic only.</li>
 <li>Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.</li>
