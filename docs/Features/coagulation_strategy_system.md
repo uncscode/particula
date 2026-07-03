@@ -438,9 +438,6 @@ aerosol.particles = particle_resolved.step(
 
 ## Related Documentation
 
-- **Testing guide**: [adw-docs/testing_guide.md](../../adw-docs/testing_guide.md)
-- **Code style**: [adw-docs/code_style.md](../../adw-docs/code_style.md)
-- **Architecture reference**: [adw-docs/architecture_reference.md](../../adw-docs/architecture_reference.md)
 - **Wall loss strategies**: [wall_loss_strategy_system.md](./wall_loss_strategy_system.md)
 - **Condensation strategies**: [condensation_strategy_system.md](./condensation_strategy_system.md)
 

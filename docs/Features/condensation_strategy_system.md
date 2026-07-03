@@ -622,11 +622,9 @@ aerosol, gas = selective.step(
 
 ## Related Documentation
 
-- **Mass transfer helpers**: [adw-docs/architecture_reference.md](../../adw-docs/architecture_reference.md)
 - **Dynamics overview**: [Wall loss strategy system](./wall_loss_strategy_system.md)
 - **Examples**: [docs/Examples/Simulations/index.md](../Examples/Simulations/index.md)
 - **Theory**: [docs/Theory/index.md](../Theory/index.md)
-- **API reference**: [adw-docs/code_style.md](../../adw-docs/code_style.md)
 
 ## FAQ
 

@@ -56,6 +56,15 @@ dm/dt = [N × 4 × π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle sur
 
 This equation modifies the isothermal rate to include thermal effects due to latent heat. The denominator accounts for the additional resistance to mass transfer caused by the temperature gradient established from heat release or absorption during phase change.
 
+**Implementation status:**
+
+- The CPU implementation is available through `CondensationLatentHeat`,
+  `get_mass_transfer_rate_latent_heat`, and
+  `get_latent_heat_energy_released`.
+- A Warp-backed GPU implementation of this latent-heat equation is still
+  planned. Track this work in the
+  [Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md).
+
 
 ## Additional Parameters
 
@@ -253,5 +262,4 @@ By reviewing the equations and expanding on the descriptions, we enhance the und
 1. **Topping, D., & Bane, M. (2022).** *Introduction to Aerosol Modelling*. Wiley. DOI: [10.1002/9781119625728](https://doi.org/10.1002/9781119625728)
 
 2. **Seinfeld, J. H., & Pandis, S. N. (2016).** *Atmospheric Chemistry and Physics: From Air Pollution to Climate Change* (3rd ed.). Wiley.
-
 

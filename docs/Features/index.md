@@ -51,6 +51,15 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](particle-data-migration.md)
 
+-   __[Roadmap](Roadmap/index.md)__
+
+    ---
+
+    Current direction for Particula feature development, including active
+    systems, planned improvements, and contribution opportunities.
+
+    [:octicons-arrow-right-24: View roadmap](Roadmap/index.md)
+
 </div>
 
 ## Design Patterns
@@ -80,3 +89,4 @@ This pattern provides:
 - **Examples**: See [Examples Gallery](../Examples/index.md) for working code
 - **Theory**: See [Theory Documentation](../Theory/index.md) for scientific background
 - **Tutorials**: See [Tutorials](../Examples/index.md#tutorials) for step-by-step learning
+- **Roadmap**: See [Feature Roadmap](Roadmap/index.md) for planned feature direction
