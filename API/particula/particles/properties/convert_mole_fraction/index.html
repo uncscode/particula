@@ -11034,6 +11034,8 @@
       
         
       
+        
+      
     
     
     
@@ -11223,6 +11225,141 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../Features/Roadmap/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Roadmap
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Features/Roadmap/data-oriented-gpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data-Oriented Design and GPU Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Features/Roadmap/warp-autodiff-limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warp Autodiff: Limitations and Stochastic Process Handling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -12192,6 +12329,8 @@
       
         
       
+        
+      
     
     
     
@@ -12272,6 +12411,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../../../Theory/Technical/Dynamics/Nucleation_Equations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nucleation Discussion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../../../Theory/Technical/Dynamics/ionparticle_coagulation/" class="md-nav__link">
         
   
@@ -12331,7 +12498,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6_2_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6_2_4" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -12353,14 +12520,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5_6_2_3" id="__nav_5_6_2_3_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_5_6_2_4" id="__nav_5_6_2_4_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_6_2_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_6_2_3">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_6_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6_2_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14143,26 +14310,26 @@ mass fractions if input is 1D.</li>
     <span class="n">partial_masses</span> <span class="o">=</span> <span class="n">mole_fractions</span> <span class="o">*</span> <span class="n">molecular_weights</span>
 
     <span class="k">if</span> <span class="n">partial_masses</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">total_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">partial_masses</span><span class="p">)</span>
+        <span class="n">total_mass_scalar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">partial_masses</span><span class="p">)</span>
         <span class="c1"># Handle zero total mass by returning zeros</span>
-        <span class="k">if</span> <span class="n">total_mass</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">total_mass_scalar</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">partial_masses</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">partial_masses</span> <span class="o">/</span> <span class="n">total_mass</span>
+        <span class="k">return</span> <span class="n">partial_masses</span> <span class="o">/</span> <span class="n">total_mass_scalar</span>
 
     <span class="k">if</span> <span class="n">partial_masses</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="c1"># Sum across each row</span>
-        <span class="n">total_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">partial_masses</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">total_mass_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">partial_masses</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Prepare output array</span>
         <span class="n">mass_fractions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">partial_masses</span><span class="p">)</span>
 
         <span class="c1"># Rows that have a nonzero total</span>
-        <span class="n">nonzero_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">total_mass</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nonzero_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">total_mass_array</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># Index of those rows</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nonzero_rows</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">mass_fractions</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">partial_masses</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">total_mass</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">partial_masses</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">total_mass_array</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:]</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">mass_fractions</span>
 
