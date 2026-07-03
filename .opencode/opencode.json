@@ -9,10 +9,6 @@
       "disable": true
     }
   },
-  "tools": {
-    "grep": false,
-    "glob": false
-  },
   "permission": {
     "read": {
       "{env:ADW_PROJECT_ROOT}/src/**": "allow",
@@ -114,7 +110,7 @@
     }
   },
   "instructions": [
-    "./README.md",
+    "./readme.md",
     "./AGENTS.md"
   ],
   "share": "disabled"
