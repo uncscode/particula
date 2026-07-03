@@ -145,12 +145,15 @@ def apply_evaporation_limit(
         ```
     """
     if particle_mass.ndim == 2:
-        inventory = (particle_mass * particle_concentration[:, None]).sum(
-            axis=0
+        inventory_array = np.asarray(
+            (particle_mass * particle_concentration[:, None]).sum(axis=0),
+            dtype=np.float64,
         )
     else:
-        inventory = (particle_mass * particle_concentration).sum()
-    inventory_array = np.asarray(inventory, dtype=np.float64)
+        inventory_array = np.asarray(
+            (particle_mass * particle_concentration).sum(),
+            dtype=np.float64,
+        )
     evap_scale = np.ones_like(np.atleast_1d(evap_sum))
     if np.ndim(evap_sum) == 0:
         need_scale = -evap_sum > inventory_array

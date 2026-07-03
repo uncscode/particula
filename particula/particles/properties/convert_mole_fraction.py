@@ -67,26 +67,26 @@ def get_mass_fractions_from_moles(
     partial_masses = mole_fractions * molecular_weights
 
     if partial_masses.ndim == 1:
-        total_mass = np.sum(partial_masses)
+        total_mass_scalar = np.sum(partial_masses)
         # Handle zero total mass by returning zeros
-        if total_mass == 0:
+        if total_mass_scalar == 0:
             return np.zeros_like(partial_masses)
-        return partial_masses / total_mass
+        return partial_masses / total_mass_scalar
 
     if partial_masses.ndim == 2:
         # Sum across each row
-        total_mass = np.sum(partial_masses, axis=1, keepdims=True)
+        total_mass_array = np.sum(partial_masses, axis=1, keepdims=True)
 
         # Prepare output array
         mass_fractions = np.zeros_like(partial_masses)
 
         # Rows that have a nonzero total
-        nonzero_rows = np.squeeze(total_mass != 0, axis=1)
+        nonzero_rows = np.squeeze(total_mass_array != 0, axis=1)
         # Index of those rows
         indices = np.where(nonzero_rows)[0]
 
         mass_fractions[indices, :] = (
-            partial_masses[indices, :] / total_mass[indices, :]
+            partial_masses[indices, :] / total_mass_array[indices, :]
         )
         return mass_fractions
 
