@@ -41,6 +41,11 @@ eggs/
 .eggs/
 lib/
 lib64/
+# Do not ignore ADW/OpenCode custom tool shared modules. The broad "lib/" rule
+# above (Python packaging) otherwise hides .opencode/tools/lib/, which breaks
+# agents in git worktrees (missing modules -> tool registry crash).
+!.opencode/tools/lib/
+!.opencode/tools/lib/**
 parts/
 sdist/
 var/
