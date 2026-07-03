@@ -1,6 +1,7 @@
 # Platform Operations Tool Reference
 
-`platform_operations` is a compatibility/delegation path.
+`platform_operations` is a compatibility/delegation path retained for legacy
+callers until retirement gates are met.
 Use split wrappers for migrated commands.
 
 ## Split Wrapper Mapping (Primary Path)
@@ -19,6 +20,11 @@ Use split wrappers for migrated commands.
 | `pr-review` | `platform_pr_review_write` |
 
 ## Compatibility Command Surface
+
+Retained compatibility allowlist: the commands below still forward through
+`platform_operations`, but the mapped split wrapper remains the primary path.
+Migrated routes outside this allowlist fail closed with deterministic migration
+guidance (for example, use `platform_pr_read` for `pr-diff`).
 
 | Command | Required params | Notes |
 |---|---|---|
@@ -62,6 +68,12 @@ platform_pr_review_write({"command": "pr-review", "issue_number": "42", "body": 
 ```
 
 ## Deterministic Failure and Recovery Examples
+
+Unsupported migrated route through the compatibility wrapper:
+
+```text
+ERROR: platform_operations compatibility mode does not support 'pr-diff'. Use 'platform_pr_read' instead.
+```
 
 Pre-spawn validation (missing required identifier):
 

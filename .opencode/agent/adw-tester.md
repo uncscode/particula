@@ -23,17 +23,18 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -78,32 +79,32 @@ The ADW workflow maintains metadata in `agents/{adw_id}/`:
 
 The testing guide is the single source of truth for all repository-specific testing details.
 
-# Python Projects: Using the run_pytest Tool
+# Python Projects: Using the Pytest Tools
 
-**IMPORTANT**: For Python projects using pytest, use the `run_pytest` tool instead of manually running tests.
+**IMPORTANT**: For Python projects using pytest, use `run_pytest_advanced` when you need passthrough pytest args, coverage, durations, or ini overrides. Use `run_pytest_basic` only for simple `testPath` runs and move filter/output toggles through `options`.
 
 ## Basic Usage
 
 **Run full test suite:**
 ```python
-run_pytest({
-  "outputMode": "full",
+run_pytest_advanced({
+  "options": "output=full",
   "minTests": 1
 })
 ```
 
 **Run scoped tests (specific module/directory):**
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["adw/core/tests/"],
   "minTests": 1,
-  "failFast": true
+  "options": "fail-fast"
 })
 ```
 
 **Run with coverage threshold:**
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["adw/utils/tests/"],
   "minTests": 1,
   "coverage": true,
@@ -114,7 +115,7 @@ run_pytest({
 
 **Run in worktree context:**
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["adw/"],
   "cwd": "/home/kyle/Code/Agent/trees/abc12345",
   "minTests": 1
@@ -123,7 +124,7 @@ run_pytest({
 
 **Skip slow/performance tests:**
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["-m", "not slow and not performance"],
   "minTests": 1
 })
@@ -135,15 +136,14 @@ run_pytest({
 |--------|------|-------------|
 | `pytestArgs` | array | Arguments passed to pytest (paths, markers, flags) |
 | `minTests` | number | Minimum expected tests (use 1 for scoped tests) |
-| `failFast` | boolean | Stop on first failure (`-x` flag) |
 | `coverage` | boolean | Enable coverage reporting |
 | `coverageSource` | string | Module(s) to measure coverage for (comma-separated supported) |
 | `coverageThreshold` | number | Fail if coverage below this % |
 | `cwd` | string | Working directory (for worktrees) |
-| `outputMode` | string | `"summary"`, `"full"`, or `"json"` |
+| `options` | string | Bounded toggles such as `output=full`, `fail-fast`, `test-filter=...`, `durations=...` |
 | `timeout` | number | Max execution time in ms |
 
-**What run_pytest provides:**
+**What the pytest wrappers provide:**
 - Executes pytest with coverage reporting
 - Validates test count to prevent false positives
 - Returns comprehensive output suitable for parsing
@@ -152,15 +152,15 @@ run_pytest({
 
 **Important Notes:**
 - Set `minTests: 1` for scoped/targeted tests to validate at least 1 test runs
-- Use `outputMode: "full"` to get complete output for analysis
-- Use `failFast: true` for quick feedback during iterative fixing
+- Use `options: "output=full"` to get complete output for analysis
+- Use `options: "fail-fast"` for quick feedback during iterative fixing
 
 # Arguments
 
 **Arguments provided:** $ARGUMENTS
 
 Parse the arguments to determine execution mode:
-- If empty or not provided: Run full test suite with `run_pytest` (default)
+- If empty or not provided: Run full test suite with `run_pytest_advanced` (default)
 - If contains `adw_id=<value>`: Load workflow state from `agents/<value>/adw_state.json` and use worktree context
 - If contains `test_path=<value>`: Run specific test file or directory instead of full suite
 - Multiple arguments can be combined
@@ -170,7 +170,7 @@ Parse the arguments to determine execution mode:
 **Run all tests (default):**
 ```
 $ARGUMENTS = "" or not provided
--> Runs run_pytest with full test suite
+-> Runs `run_pytest_advanced` with full test suite
 ```
 
 **Run tests for specific ADW workflow:**
@@ -197,9 +197,9 @@ $ARGUMENTS = "adw_id=abc12345 test_path=adw/workflows/tests/plan_test.py"
 
 ### Step 1.1: Parse Arguments and Load State
 Parse `$ARGUMENTS` to extract:
-- `adw_id`: If present, get worktree path using adw_spec tool:
+- `adw_id`: If present, get worktree path using adw_spec_read tool:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "worktree_path"
@@ -214,29 +214,28 @@ Choose execution mode based on parsed arguments:
 
 **If no test_path provided** (default - run all tests):
 ```python
-run_pytest({
-  "outputMode": "full",
+run_pytest_advanced({
+  "options": "output=full",
   "minTests": 1
 })
 ```
 
 **If test_path is provided** (specific test):
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{test_path}", "-v"],
-  "outputMode": "full",
+  "options": "output=full",
   "minTests": 1
 })
 ```
 
 **If running in worktree context** (adw_id provided):
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{test_path}"],
   "cwd": "{worktree_path}",
-  "outputMode": "full",
+  "options": "output=full fail-fast",
   "minTests": 1,
-  "failFast": true
 })
 ```
 
@@ -259,7 +258,7 @@ Review all test output and identify:
 
 If `adw_id` was provided, read the spec content to understand what was implemented:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "spec_content"
@@ -315,7 +314,7 @@ For EACH **[SPEC-RELATED]** item in your fix checklist:
    - Make minimal, targeted fix to resolve issue
    - Follow repository conventions from guides
 3. **Verify the fix**:
-   - Re-run the specific failed test using `run_pytest`
+    - Re-run the specific failed test using `run_pytest_advanced`
    - Confirm test now passes
 4. **Mark as completed** in your checklist
 5. **Move to next fix**
@@ -360,7 +359,7 @@ Is the failure in code I implemented/modified?
 ## Phase 4: Final Validation
 
 ### Step 4.1: Re-run Full Test Suite
-After all fixes are complete, re-run `run_pytest` to confirm:
+After all fixes are complete, re-run `run_pytest_advanced` to confirm:
 - All **SPEC-RELATED** tests now pass
 - No new failures were introduced by fixes
 - Coverage meets requirements for new code

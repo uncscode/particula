@@ -38,8 +38,11 @@ Examples:
 """
 
 import argparse
+import importlib.util
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -77,6 +80,37 @@ class LinterResult:
         self.issues_fixed = 0
         self.success = True
         self.error_message: Optional[str] = None
+
+
+def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
+    """Return likely executable directories that may be absent from tool PATH."""
+
+    dirs: List[Path] = []
+    if cwd:
+        current = Path(cwd).resolve(strict=False)
+        while True:
+            dirs.extend([current / ".venv" / "bin", current / "venv" / "bin"])
+            if current.parent == current:
+                break
+            current = current.parent
+    dirs.append(Path(sys.executable).resolve(strict=False).parent)
+    dirs.append(Path.home() / ".local" / "bin")
+    return dirs
+
+
+def _resolve_python_tool_command(tool_name: str, module_name: str, cwd: Optional[str]) -> List[str]:
+    """Resolve a Python CLI robustly for non-login tool subprocess environments."""
+
+    resolved = shutil.which(tool_name)
+    if resolved:
+        return [resolved]
+    for directory in _candidate_tool_dirs(cwd):
+        candidate = directory / tool_name
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return [str(candidate)]
+    if importlib.util.find_spec(module_name) is not None:
+        return [sys.executable, "-m", module_name]
+    return [tool_name]
 
 
 def _count_ruff_issues(output: str) -> int:
@@ -207,7 +241,8 @@ def run_ruff_check(
             # Step 1: Apply fixes. Match CI's `ruff check --fix || true` behavior:
             # keep diagnostics from a non-zero fix pass, but continue to format
             # and let the final validation check determine success/failure.
-            fix_cmd = ["ruff", "check", "--fix", target_arg]
+            ruff_cmd = _resolve_python_tool_command("ruff", "ruff", resolved_cwd)
+            fix_cmd = [*ruff_cmd, "check", "--fix", target_arg]
             fix_proc = subprocess.run(
                 fix_cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
             )
@@ -217,7 +252,7 @@ def run_ruff_check(
                 result.issues_found = _count_ruff_issues(fix_proc.stdout)
 
             # Step 2: Format code
-            format_cmd = ["ruff", "format", target_arg]
+            format_cmd = [*ruff_cmd, "format", target_arg]
             format_proc = subprocess.run(
                 format_cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
             )
@@ -226,7 +261,8 @@ def run_ruff_check(
                 return result
 
         # Step 3: Final check (this determines success/failure)
-        check_cmd = ["ruff", "check", target_arg]
+        ruff_cmd = _resolve_python_tool_command("ruff", "ruff", resolved_cwd)
+        check_cmd = [*ruff_cmd, "check", target_arg]
         proc = subprocess.run(
             check_cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
         )
@@ -281,7 +317,7 @@ def run_ruff_format(
     try:
         resolved_cwd = _resolve_cwd(cwd)
         target_arg = _resolve_target_arg(target_dir, resolved_cwd)
-        cmd = ["ruff", "format", target_arg]
+        cmd = [*_resolve_python_tool_command("ruff", "ruff", resolved_cwd), "format", target_arg]
         proc = subprocess.run(
             cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
         )
@@ -333,7 +369,11 @@ def run_mypy(
     try:
         resolved_cwd = _resolve_cwd(cwd)
         target_arg = _resolve_target_arg(target_dir, resolved_cwd)
-        cmd = ["mypy", target_arg, "--ignore-missing-imports"]
+        cmd = [
+            *_resolve_python_tool_command("mypy", "mypy", resolved_cwd),
+            target_arg,
+            "--ignore-missing-imports",
+        ]
         proc = subprocess.run(
             cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
         )

@@ -10,7 +10,7 @@ description: >-
   - Validates epic child-plan references, phase IDs, parent epic references, dependencies, and local markdown links
   - Uses lookup-based (set/dict) resolution and avoids repeated full rescans
   - Does NOT expand thin content, add new sections, or restructure documents
-  - Writes one bounded adw_spec messages-write summary at end-of-pass
+  - Writes one bounded adw_spec_messages messages-write summary at end-of-pass
 mode: primary
 permission:
   "*": deny
@@ -19,10 +19,13 @@ permission:
   edit: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -43,7 +46,7 @@ input: $ARGUMENTS
 2. Discover scoped plan artifacts from a `plan-reviser` or `plan-orchestrator` `review_plan_ids` handoff.
 3. Build a single-pass document index/cache and perform lookup-based consistency checks.
 4. Auto-fix safe cross-document reference mismatches in-place.
-5. Write one bounded status summary via `adw_spec messages-write`.
+5. Write one bounded status summary via `adw_spec_messages messages-write`.
 
 ## Behavioral Contract (Correction-Only)
 
@@ -64,8 +67,8 @@ parse issues unless required workflow state is missing.
 
 - @.opencode/guides/code_style.md - deterministic, low-risk markdown edits
 - @.opencode/guides/testing_guide.md - validation expectations and naming conventions
-- `adw_plans({"command": "show", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})` - canonical plan metadata resolution
-- `adw_plans({"command": "list-sections", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})` - canonical section path mapping
+- `adw_plans_read({"command": "show", "plan_id": "{plan_id}", "options": "json", "cwd": worktree_path})` - canonical plan metadata resolution
+- `adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "options": "json", "cwd": worktree_path})` - canonical section path mapping
 - `.opencode/plans/sections/` - canonical consistency-review scope
 
 # Process
@@ -86,16 +89,16 @@ signal (`PLAN_CONSISTENCY_REVIEWER_FAILED`).
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -108,7 +111,7 @@ already been answered; do not require it and do not write back to `spec_content`
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -131,16 +134,16 @@ Use `review_plan_ids` (not `drafted_plan_ids`) as the canonical scope for this p
 For each `plan_id` in `review_plan_ids`, resolve canonical metadata via:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "show",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -160,12 +163,12 @@ Exclude non-target docs:
 
 If `review_plan_ids` is missing/empty, or section resolution yields an empty map,
 execute deterministic no-op success behavior:
-1. Write a no-op summary through `adw_spec messages-write`.
+1. Write a no-op summary through `adw_spec_messages messages-write`.
 2. Emit success signal (do not fail).
 3. **Return immediately** (do not continue to Step 7).
 
 No-op handling must use a single-path control flow so each run emits exactly one
-`messages-write` summary.
+`adw_spec_messages messages-write` summary.
 
 ## Step 3: Build single-pass index/cache (performance contract)
 
@@ -205,7 +208,7 @@ For each discovered plan document, validate and safely auto-fix when possible:
 
 1. **Epic child plan validation**
    - Validate epic `child_plans` references against canonical plan metadata.
-   - Resolve each child via `adw_plans show`.
+   - Resolve each child via `adw_plans_read show`.
    - If a safe deterministic path correction exists, update link/reference in-place.
 
 2. **Epic↔feature phase ID consistency**
@@ -213,7 +216,7 @@ For each discovered plan document, validate and safely auto-fix when possible:
    - Correct mismatched IDs when unambiguous.
 
 3. **Feature parent epic reference validation**
-   - Validate feature `parent_id` metadata resolves to an existing epic via `adw_plans show`.
+   - Validate feature `parent_id` metadata resolves to an existing epic via `adw_plans_read show`.
    - If missing or stale reference can be safely resolved, correct in-place.
 
 4. **Dependency reference resolution**
@@ -261,7 +264,7 @@ Track deterministic counters:
 Write one bounded end-of-pass summary through `messages-write`:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-consistency-reviewer",

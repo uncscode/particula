@@ -42,13 +42,13 @@ describe("mock-subprocess helper", () => {
     installSubprocessMocks();
     setSpawnResponse({ stdout: "ok", exitCode: 0 });
 
-    Bun.spawnSync(["uv", "run", "adw"]);
+    Bun.spawnSync(["uv", "run", "--active", "adw"]);
     expect(getInvocations()).toHaveLength(1);
 
     resetSubprocessMocks();
 
     expect(getInvocations()).toHaveLength(0);
-    Bun.spawnSync(["uv", "run", "adw", "plans"]);
-    expect(getInvocations()).toEqual([{ kind: "spawnSync", args: ["uv", "run", "adw", "plans"] }]);
+    Bun.spawnSync(["uv", "run", "--active", "adw", "plans"]);
+    expect(getInvocations()).toEqual([{ kind: "spawnSync", args: ["uv", "run", "--active", "adw", "plans"] }]);
   });
 });

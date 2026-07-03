@@ -27,19 +27,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -211,7 +212,7 @@ Check for `COMPLETENESS_REVIEW_COMPLETE` in result. Mark todo #6 as completed.
 Mark todo #7 as in_progress, then verify:
 
 ```python
-verification = adw_spec({
+verification = adw_spec_read({
   "command": "read",
   "adw_id": adw_id
 })

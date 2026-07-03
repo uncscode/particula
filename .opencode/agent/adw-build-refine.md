@@ -8,7 +8,7 @@ description: 'Primary agent that refines implementation after the initial build 
   This is the first step in the pipeline that commits changes. Operates fully
   autonomously with no user input.
 
-  This agent: - Reads spec_content via adw_spec tool - Moves to isolated worktree
+  This agent: - Reads spec_content via adw_spec_read tool - Moves to isolated worktree
   - Expects uncommitted changes from adw-build (dirty worktree is normal)
   - Runs git diff to detect plan gaps - Applies corrections with spot-check
   testing - Calls adw-build-tests for comprehensive validation - Calls adw-commit
@@ -19,28 +19,31 @@ description: 'Primary agent that refines implementation after the initial build 
   tests, docstrings, and linting issues should all be addressed during
   refinement.
 
-  Invoked by: adw workflow run build-refine <issue-number> --adw-id <id>'
+  Invoked by: workflow runner build-refine <issue-number> --adw-id <id>'
 mode: primary
 permission:
   "*": deny
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
-  refactor_astgrep: allow
+  refactor_astgrep_preview: allow
+  refactor_astgrep_apply: allow
   todoread: allow
   todowrite: allow
   task: allow
-  adw: allow
-  adw_spec: allow
+  adw: deny
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   build_mkdocs: deny
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -64,7 +67,7 @@ input: $ARGUMENTS
 
 Execute refinement by:
 1. Reading `spec_content` to understand the implementation plan
-2. Inspecting `git_operations` diff to find gaps vs the plan
+2. Inspecting `git_diff` output to find gaps vs the plan
 3. Applying corrective changes — spec gaps, tests, docstrings, linting
 4. Running **fast module/function tests** at the end
 5. Committing with pre-commit hook handling
@@ -169,7 +172,7 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -189,8 +192,8 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations and validate location with tools (no shell navigation):
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
-git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -203,7 +206,8 @@ gap analysis in Step 5.
   Step 4. The uncommitted diff is what you will compare against the spec to find gaps.
 - **Clean worktree (no changes):** This means either `adw-build` produced no changes or
   changes were already committed by a prior run. Proceed to Step 5 — use
-  `git_operations diff` with `base` set to the merge-base of `HEAD` and the target branch
+  `git_diff` with `command: "diff"` and `base` set to the merge-base of `HEAD`
+  and the target branch
   to review committed changes instead. If there is truly nothing to review, skip to
   Step 7 (testing) and then Step 8 (commit).
 - **Untracked worktree / missing path:** Fail with
@@ -217,13 +221,15 @@ Read `spec_content` and extract:
 
 ## Step 5: Diff vs Plan and Identify Gaps
 
-Use `git_operations` diff to compare current changes against the plan.
+Use `git_diff` to compare current changes against the plan.
 
 **Diff strategy based on worktree state from Step 3:**
 
-- **Uncommitted changes exist (normal case):** Use `git_operations diff` (no base) to see
+- **Uncommitted changes exist (normal case):** Use `git_diff` with `command: "diff"`
+  (no base) to see
   the working-tree diff. This captures everything `adw-build` implemented.
-- **Changes already committed (resumed/retry case):** Use `git_operations diff` with
+- **Changes already committed (resumed/retry case):** Use `git_diff` with
+  `command: "diff"` and
   `base` set to the target branch (e.g., `main` or `develop`) to compare committed changes
   against the branch point. Read `branch_name` from state to determine the correct base.
 
@@ -282,9 +288,9 @@ todowrite({
 After implementing each correction, run a **fast spot-check test** on the affected module:
 
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{module}/tests/", "-x", "--maxfail=1", "-q"],
-  "outputMode": "summary",
+  "options": "output=summary",
   "timeout": 60
 })
 ```

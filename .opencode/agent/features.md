@@ -4,7 +4,7 @@ description: 'Subagent that manages high-level feature documentation in docs/Fea
   Invoked by the documentation primary agent to create and update user-facing feature
   documentation for major ADW capabilities.
 
-  This subagent: - Loads workflow context from adw_spec tool - Creates/updates docs/Features/*.md
+  This subagent: - Loads workflow context from adw_spec_read tool - Creates/updates docs/Features/*.md
   feature documentation - Documents major user-facing features - Maintains feature
   overview and index - Validates markdown links
 
@@ -16,18 +16,18 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -88,7 +88,7 @@ task({
 
 Parse input arguments and load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })

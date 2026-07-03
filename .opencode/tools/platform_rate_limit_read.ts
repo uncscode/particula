@@ -8,6 +8,7 @@ const REDACTION_PATTERNS: RegExp[] = [
   /\bgh[pousr]_[A-Za-z0-9]{10,}\b/g,
   /\b(?:token|api[_-]?key|secret|password)\s*[:=]\s*([^\s"']+)/gi,
   /\bAuthorization\s*:\s*Bearer\s+([^\s"']+)/gi,
+  /"(?:token|api[_-]?key|secret|password)"\s*:\s*"[^"]*"/gi,
 ];
 
 const REDACTION_MARKER = "[REDACTED]";
@@ -21,6 +22,11 @@ function redactSensitiveFragments(value: string): string {
     return `${match.slice(0, splitIndex + 1)} ${REDACTION_MARKER}`;
   });
   redacted = redacted.replace(REDACTION_PATTERNS[2], `Authorization: Bearer ${REDACTION_MARKER}`);
+  redacted = redacted.replace(REDACTION_PATTERNS[3], (match) => {
+    const splitIndex = match.indexOf(":");
+    if (splitIndex < 0) return `"${REDACTION_MARKER}"`;
+    return `${match.slice(0, splitIndex + 1)}"${REDACTION_MARKER}"`;
+  });
   return redacted;
 }
 
@@ -59,6 +65,31 @@ function sanitizeAndTruncate(value: unknown): string {
   return truncate(sanitized);
 }
 
+function redactJsonValue(value: unknown): unknown {
+  if (typeof value === "string") {
+    return redactSensitiveFragments(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map(redactJsonValue);
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nestedValue]) => [key, redactJsonValue(nestedValue)]),
+    );
+  }
+  return value;
+}
+
+function getStructuredJsonPayload(value: unknown): string | undefined {
+  const decoded = decodeUnknown(value).trim();
+  if (!decoded) return undefined;
+  try {
+    return JSON.stringify(redactJsonValue(JSON.parse(decoded)));
+  } catch {
+    return undefined;
+  }
+}
+
 function buildMissingArgMessage(message: string): string {
   return `ERROR: ${message}`;
 }
@@ -69,6 +100,14 @@ function normalizeOptionalString(value: unknown): string | undefined {
   }
   const token = String(value).trim();
   return token.length > 0 ? token : undefined;
+}
+
+function normalizeOutputFormat(value: unknown): OutputFormat | undefined {
+  const token = normalizeOptionalString(value);
+  if (token === undefined) {
+    return undefined;
+  }
+  return token === "text" || token === "json" ? token : undefined;
 }
 
 async function runCommand(cmdParts: (string | number)[]): Promise<string> {
@@ -85,9 +124,9 @@ export default tool({
   },
   async execute(args) {
     const command = args.command as PlatformRateLimitReadCommand;
-    const outputFormat: OutputFormat = (args.output_format as OutputFormat) || "text";
+    const outputFormat = normalizeOutputFormat(args.output_format);
     const preferScope = normalizeOptionalString(args.prefer_scope);
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "platform", command];
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "platform", command];
 
     if (args.help) {
       cmdParts.push("--help");
@@ -108,8 +147,11 @@ export default tool({
     if (preferScope && !["fork", "upstream"].includes(preferScope)) {
       return buildMissingArgMessage("'prefer_scope' must be either 'fork' or 'upstream'");
     }
+    if (args.output_format !== undefined && outputFormat === undefined) {
+      return buildMissingArgMessage("'output_format' must be either 'text' or 'json'");
+    }
 
-    if (args.output_format) {
+    if (outputFormat) {
       cmdParts.push("--format", outputFormat);
     }
     if (preferScope) {
@@ -121,8 +163,11 @@ export default tool({
     } catch (error: any) {
       const stdout = sanitizeAndTruncate(error.stdout);
       const stderr = sanitizeAndTruncate(error.stderr);
-      if (outputFormat === "json" && stdout.trim()) {
-        return stdout;
+      if (outputFormat === "json") {
+        const structuredJson = getStructuredJsonPayload(error.stdout);
+        if (structuredJson) {
+          return structuredJson;
+        }
       }
       const parts: string[] = [`ERROR: Failed to execute 'adw platform ${command}'`];
       if (stderr) {

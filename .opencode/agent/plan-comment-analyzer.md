@@ -14,9 +14,13 @@ permission:
   read: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_write: allow
+  adw_spec_messages: allow
   feedback_log: allow
   platform_pr_read: allow
   get_datetime: allow
@@ -105,7 +109,7 @@ the failing todo `in_progress` and emit `PLAN_COMMENT_ANALYZER_FAILED`.
 Mark todo "Load workflow state" as `in_progress`.
 
 ```python
-adw_spec({"command": "list", "adw_id": "{adw_id}", "json": true})
+adw_spec_read({"command": "list", "adw_id": "{adw_id}", "options": "json"})
 ```
 
 This agent is the first plan-fix agent that writes `spec_content`, so
@@ -213,7 +217,7 @@ Mark todo "Build and write spec_content" as `in_progress`.
 Build the full payload in memory, then write once:
 
 ```python
-adw_spec({
+adw_spec_write({
   "command": "write",
   "adw_id": "{adw_id}",
   "field": "spec_content",
@@ -230,7 +234,7 @@ Mark todo "Verify spec_content" as `in_progress`.
 Read back immediately:
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "spec_content"
@@ -254,7 +258,7 @@ Mark todo as `completed`.
 Mark todo "Write summary message and emit signal" as `in_progress`.
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-comment-analyzer",

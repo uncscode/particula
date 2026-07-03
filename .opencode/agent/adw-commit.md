@@ -24,13 +24,16 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec: deny
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
@@ -39,7 +42,6 @@ permission:
   git_stage: allow
   git_branch: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -134,7 +136,7 @@ Closes #123
 
 Load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -163,7 +165,7 @@ Use the current working directory:
 ### 2.1: Check Git Status
 
 ```python
-status = git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+status = git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ```
 
 Identify:
@@ -174,13 +176,13 @@ Identify:
 ### 2.2: Get Diff Summary
 
 ```python
-diff_stat = git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
+diff_stat = git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
 ```
 
 ### 2.3: Understand Changes
 
 ```python
-full_diff = git_operations({"command": "diff", "worktree_path": worktree_path})
+full_diff = git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
 Analyze what was changed:
@@ -264,12 +266,12 @@ Made some changes to the parser
 
 **With adw_id (explicit worktree):**
 ```python
-git_operations({"command": "add", "stage_all": true, "worktree_path": worktree_path})
+git_stage({"command": "add", "stage_all": true, "worktree_path": worktree_path})
 ```
 
 **Without adw_id (current directory):**
 ```python
-git_operations({"command": "add", "stage_all": true})
+git_stage({"command": "add", "stage_all": true})
 # worktree_path parameter omitted - uses current working directory
 ```
 
@@ -284,7 +286,7 @@ ripgrep({"pattern": "**/*", "path": ".trash"})  # Check if .trash/ exists
 
 **If .trash/ exists, explicitly stage it:**
 ```python
-git_operations({"command": "add", "files": [".trash/"], "worktree_path": worktree_path})
+git_stage({"command": "add", "files": [".trash/"], "worktree_path": worktree_path})
 ```
 
 **Why this matters:**
@@ -300,7 +302,7 @@ git_operations({"command": "add", "files": [".trash/"], "worktree_path": worktre
 ### 4.3: Verify Staged Files
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ```
 
 Confirm all intended files are staged, including:
@@ -328,8 +330,7 @@ if all 3 attempts failed due to linter errors:
 
 **With adw_id:**
 ```python
-git_operations({
-  "command": "commit",
+git_commit({
   "summary": "<commit message>",
   "description": optional_body,
   "worktree_path": worktree_path,
@@ -339,8 +340,7 @@ git_operations({
 
 **Without adw_id:**
 ```python
-git_operations({
-  "command": "commit",
+git_commit({
   "summary": "<commit message>",
   "description": optional_body
   # worktree_path and adw_id omitted - commits to current branch
@@ -353,7 +353,7 @@ git_operations({
 
 **After any commit attempt, ALWAYS verify the actual state:**
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ```
 
 **Decision logic:**
@@ -362,7 +362,7 @@ git_operations({"command": "status", "porcelain": true, "worktree_path": worktre
 - Only report failure if working tree still has uncommitted changes after all retries
 
 **Critical edge case - "false failure" detection:**
-- If `git_operations commit` returns an error message BUT subsequent `git status` shows clean working tree → the commit actually succeeded
+- If `git_commit` returns an error message BUT subsequent `git status` shows clean working tree → the commit actually succeeded
 - This happens when pre-commit hooks skip checks (e.g., `ruff...(no files to check)Skipped`)
 - In this case: **report success** - do not retry or report failure
 - Log: "Commit succeeded (verified via clean working tree)"
@@ -377,15 +377,14 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 
 **If hooks actually fail:**
 - Use `run_linters` (with autoFix) to address formatting/lint issues
-- Re-stage changes with `git_operations({"command": "add", "stage_all": true, "worktree_path": worktree_path})`
+- Re-stage changes with `git_stage({"command": "add", "stage_all": true, "worktree_path": worktree_path})`
 - Retry commit (up to 3 attempts)
 
 ### 5.3: Retry Commit
 
 After fixes are applied:
 ```python
-git_operations({
-  "command": "commit",
+git_commit({
   "summary": "<commit message>",
   "description": optional_body,
   "worktree_path": worktree_path,
@@ -398,9 +397,8 @@ git_operations({
 If all 3 retry attempts fail due to persistent linter errors, **commit the changes anyway** using `max_retries: 0` to skip pre-commit hooks:
 
 ```python
-git_operations({"command": "add", "stage_all": true, "worktree_path": worktree_path})
-git_operations({
-  "command": "commit",
+git_stage({"command": "add", "stage_all": true, "worktree_path": worktree_path})
+git_commit({
   "summary": "<commit message>",
   "description": optional_body + "\n\nNote: committed with outstanding linter issues (to be addressed by downstream agents)",
   "worktree_path": worktree_path,
@@ -426,7 +424,7 @@ git_operations({
 ### 5.5: Verify Commit
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ```
 
 Confirm commit was created and working tree is clean.
@@ -442,9 +440,9 @@ Extract `branch_name` from workflow state (already loaded in Step 1).
 
 **Without adw_id:**
 ```python
-status = git_operations({"command": "status", "worktree_path": worktree_path})
+status = git_diff({"command": "status", "worktree_path": worktree_path})
 # Parse branch name from status output, or use:
-# git_operations returns current branch in status output
+# git_diff returns current branch in status output
 ```
 
 ### 6.2: Check for Protected Branches
@@ -469,7 +467,7 @@ if branch_name in protected_branches:
 
 **With adw_id:**
 ```python
-git_operations({
+git_branch({
   "command": "push",
   "branch": branch_name,
   "worktree_path": worktree_path
@@ -478,7 +476,7 @@ git_operations({
 
 **Without adw_id:**
 ```python
-git_operations({
+git_branch({
   "command": "push",
   "branch": branch_name
   # worktree_path omitted - uses current working directory
@@ -711,7 +709,7 @@ Closes #456
 **Cause:** Pre-commit hooks output messages like `(no files to check)Skipped` which the git tool interprets as an error, but the commit actually succeeded.
 
 **Symptoms:**
-- `git_operations commit` returns error with message containing `Skipped` or `(no files to check)`
+- `git_commit` returns error with message containing `Skipped` or `(no files to check)`
 - Subsequent `git status` shows clean working tree (no changes)
 - Agent gets confused and reports failure or retries unnecessarily
 
@@ -719,7 +717,7 @@ Closes #456
 1. **Always verify actual state**: After any commit attempt, check `git status --porcelain`
 2. **If working tree is clean**: The commit succeeded - report success
 3. **Do not retry**: Retrying will fail with "nothing to commit"
-4. **Report ADW_COMMIT_SUCCESS**: Even though git_operations returned an error
+4. **Report ADW_COMMIT_SUCCESS**: Even though `git_commit` returned an error
 
 **Example of false failure output:**
 ```
@@ -734,7 +732,7 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 **Cause:** Hooks like `ruff-format` or `trailing-whitespace` auto-fixed issues.
 
 **Solution:**
-1. Re-stage all changes: `git_operations({"command": "add", "stage_all": true, ...})`
+1. Re-stage all changes: `git_stage({"command": "add", "stage_all": true, ...})`
 2. Retry commit with same message
 3. Maximum 3 retries before reporting failure
 
@@ -761,7 +759,7 @@ This is NOT a real failure - it means pre-commit ran successfully with nothing t
 
 **Solution:**
 1. Check if `.trash/` exists: `ripgrep({"pattern": "**/*", "path": ".trash"})`
-2. Explicitly stage the folder: `git_operations({"command": "add", "files": [".trash/"]})`
+2. Explicitly stage the folder: `git_stage({"command": "add", "files": [".trash/"]})`
 3. Verify status shows renames (R) not deletions (D)
 4. Include note in commit message about soft-deleted files
 

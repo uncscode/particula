@@ -2,8 +2,8 @@
 
 description: >
   Primary agent for the forge issue-generation workflow. Reads shared
-  spec_content, initializes or resumes adw_issues_spec batch state, and refuses
-  to overwrite populated batch content.
+  spec_content, initializes or resumes issue batch state through the split
+  batch wrappers, and refuses to overwrite populated batch content.
 mode: primary
 permission:
   "*": deny
@@ -11,15 +11,16 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
-  adw_plans: allow
-  adw_issues_spec: deny
+  adw_spec_read: allow
+  adw_plans_read: allow
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -28,9 +29,7 @@ permission:
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -92,22 +91,21 @@ Mark each todo `in_progress` when starting and `completed` when done.
 Parse `adw_id` from the prompt. Read `spec_content`:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>"})
 ```
 
 Resolve the worktree path and plan ID from `spec_content`, then load plan
 section paths for direct file reads when needed:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
 ```
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -117,7 +115,7 @@ Count issues from the `## Phases` section. Require at least one phase.
 ## Step 2: Check Existing Batch State
 
 ```python
-adw_issues_spec({"command": "batch-read", "adw_id": "<adw_id>"})
+adw_issues_batch_read({"adw_id": "<adw_id>"})
 ```
 
 Decide state:
@@ -129,8 +127,7 @@ Decide state:
 ## Step 3: Initialize if Needed
 
 ```python
-adw_issues_spec({
-  "command": "batch-init",
+adw_issues_batch_init({
   "total": "<phase_count>",
   "source": "spec_content",
   "adw_id": "<adw_id>"
@@ -140,7 +137,7 @@ adw_issues_spec({
 ## Step 4: Verify
 
 ```python
-adw_issues_spec({"command": "batch-summary", "adw_id": "<adw_id>"})
+adw_issues_batch_summary({"adw_id": "<adw_id>"})
 ```
 
 Confirm the expected number of rows exists.

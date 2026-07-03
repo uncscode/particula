@@ -21,8 +21,8 @@ EXAMPLES:
       .describe("Output directory for converted notebooks"),
   },
   async execute(args) {
-    const notebookPath = args.notebookPath as string;
-    if (!notebookPath || !notebookPath.trim()) {
+    const notebookPath = typeof args.notebookPath === "string" ? args.notebookPath.trim() : "";
+    if (!notebookPath) {
       return "ERROR: notebookPath is required and must be non-empty.";
     }
     const recursive = Boolean(args.recursive);

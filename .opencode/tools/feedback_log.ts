@@ -5,10 +5,71 @@
  */
 
 import { tool } from "@opencode-ai/plugin";
+import { realpathSync } from "node:fs";
+import path from "node:path";
 
-const PROJECT_ROOT = `${import.meta.dir}/../..`;
+const PROJECT_ROOT = realpathSync(path.resolve(import.meta.dir, "../.."));
+const SCRIPT_PATH = `${import.meta.dir}/feedback_log.py`;
+
+const VALID_CATEGORIES = new Set(["bug", "feature", "friction", "performance"]);
+const VALID_SEVERITIES = new Set(["low", "medium", "high", "critical"]);
 
 const shouldInclude = (value?: string) => Boolean(value && value.trim().length > 0);
+
+const normalizeRequiredString = (value: unknown, fieldName: string, cliFlag: string) => {
+  if (typeof value !== "string") {
+    return {
+      error: `ERROR: ${fieldName} must be a non-empty string (${cliFlag}).`,
+      value: undefined,
+    };
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return {
+      error: `ERROR: ${fieldName} must be a non-empty string (${cliFlag}).`,
+      value: undefined,
+    };
+  }
+
+  return { error: undefined, value: trimmed };
+};
+
+const normalizeOptionalString = (value: unknown): string | undefined => {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed || undefined;
+};
+
+const validateEnum = (
+  value: unknown,
+  {
+    fieldName,
+    cliFlag,
+    allowed,
+  }: {
+  fieldName: string;
+  cliFlag: string;
+  allowed: Set<string>;
+  },
+) => {
+  const normalized = normalizeRequiredString(value, fieldName, cliFlag);
+  if (normalized.error || normalized.value === undefined) {
+    return normalized;
+  }
+
+  if (!allowed.has(normalized.value)) {
+    return {
+      error: `ERROR: Invalid ${fieldName} '${normalized.value}'.`,
+      value: undefined,
+    };
+  }
+
+  return normalized;
+};
 
 export default tool({
   description: `Log structured feedback when you encounter friction, bugs, or workflow gaps across tools, ADW workflows, agents, or any part of the system.
@@ -45,15 +106,12 @@ Feedback is fire-and-forget: it never blocks your workflow. Rate limited to 1 en
       .describe("Name of the tool that triggered this feedback (optional)."),
     workflowStep: tool.schema
       .string()
-      .optional()
       .describe("Current workflow step (e.g., 'build', 'test', 'review')."),
     agentType: tool.schema
       .string()
-      .optional()
       .describe("Agent type submitting feedback (e.g., 'adw-build', 'adw-review')."),
     adwId: tool.schema
       .string()
-      .optional()
       .describe("ADW workflow ID for traceability."),
     context: tool.schema
       .string()
@@ -61,34 +119,77 @@ Feedback is fire-and-forget: it never blocks your workflow. Rate limited to 1 en
       .describe("Additional context (issue number, retry count, error message, etc.)."),
   },
   async execute(args) {
+    const category = validateEnum(args.category, {
+      fieldName: "category",
+      cliFlag: "--category",
+      allowed: VALID_CATEGORIES,
+    });
+    if (category.error || category.value === undefined) {
+      return category.error;
+    }
+
+    const severity = validateEnum(args.severity, {
+      fieldName: "severity",
+      cliFlag: "--severity",
+      allowed: VALID_SEVERITIES,
+    });
+    if (severity.error || severity.value === undefined) {
+      return severity.error;
+    }
+
+    const description = normalizeRequiredString(args.description, "description", "--description");
+    if (description.error || description.value === undefined) {
+      return description.error;
+    }
+
+    const workflowStep = normalizeRequiredString(
+      args.workflowStep,
+      "workflowStep",
+      "--workflow-step",
+    );
+    if (workflowStep.error || workflowStep.value === undefined) {
+      return workflowStep.error;
+    }
+
+    const agentType = normalizeRequiredString(args.agentType, "agentType", "--agent-type");
+    if (agentType.error || agentType.value === undefined) {
+      return agentType.error;
+    }
+
+    const adwId = normalizeRequiredString(args.adwId, "adwId", "--adw-id");
+    if (adwId.error || adwId.value === undefined) {
+      return adwId.error;
+    }
+
+    const suggestedFix = normalizeOptionalString(args.suggestedFix);
+    const toolName = normalizeOptionalString(args.toolName);
+    const context = normalizeOptionalString(args.context);
+
     const cmdParts: (string | number)[] = [
       "python3",
-      `${import.meta.dir}/feedback_log.py`,
+      SCRIPT_PATH,
       "--category",
-      args.category,
+      category.value,
       "--severity",
-      args.severity,
+      severity.value,
       "--description",
-      args.description,
+      description.value,
+      "--workflow-step",
+      workflowStep.value,
+      "--agent-type",
+      agentType.value,
+      "--adw-id",
+      adwId.value,
     ];
 
-    if (shouldInclude(args.suggestedFix)) {
-      cmdParts.push("--suggested-fix", args.suggestedFix);
+    if (shouldInclude(suggestedFix)) {
+      cmdParts.push("--suggested-fix", suggestedFix);
     }
-    if (shouldInclude(args.toolName)) {
-      cmdParts.push("--tool-name", args.toolName);
+    if (shouldInclude(toolName)) {
+      cmdParts.push("--tool-name", toolName);
     }
-    if (shouldInclude(args.workflowStep)) {
-      cmdParts.push("--workflow-step", args.workflowStep);
-    }
-    if (shouldInclude(args.agentType)) {
-      cmdParts.push("--agent-type", args.agentType);
-    }
-    if (shouldInclude(args.adwId)) {
-      cmdParts.push("--adw-id", args.adwId);
-    }
-    if (shouldInclude(args.context)) {
-      cmdParts.push("--context", args.context);
+    if (shouldInclude(context)) {
+      cmdParts.push("--context", context);
     }
 
     try {

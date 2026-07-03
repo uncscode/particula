@@ -22,18 +22,19 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_bun_test: allow
   run_linters: deny
   get_datetime: allow
@@ -97,14 +98,13 @@ This subagent focuses on **fast tests** to provide quick feedback. See `.opencod
 
 **Test Execution Command:**
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{test_path}", "-m", "not slow and not performance"],
-  "outputMode": "full",
+  "options": "output=full fail-fast",
   "minTests": 1,
   "coverage": true,
   "coverageSource": "{source_module_a},{source_module_b}",
   "coverageThreshold": 80,
-  "failFast": true,
   "cwd": "{worktree_path}"
 })
 
@@ -115,7 +115,7 @@ run_pytest({
 - `coverage: true` - Enable coverage reporting (default)
 - `coverageSource: "{source_module_a},{source_module_b}"` - Modules to measure (e.g., "adw/core,adw/utils"); whitespace is trimmed
 - `coverageThreshold: 80` - Fail if coverage below 80%
-- `failFast: true` - Stop on first failure for quick feedback
+- `options: "fail-fast"` - Stop on first failure for quick feedback
 - `cwd: "{worktree_path}"` - Use when running in worktree
 
 **TypeScript wrapper validation:**
@@ -160,7 +160,7 @@ Parse arguments:
 
 Load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -344,14 +344,13 @@ while attempt <= 3:
 ### 5.1: Run Tests for Scope (FAST TESTS ONLY)
 
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{scope_path}", "-m", "not slow and not performance"],
-  "outputMode": "full",
+  "options": "output=full fail-fast",
   "minTests": 1,
   "coverage": true,
   "coverageSource": "{source_module}",
   "coverageThreshold": 80,
-  "failFast": true,
   "timeout": 120
 })
 ```
@@ -361,7 +360,7 @@ run_pytest({
 - `coverage: true` - Enable coverage measurement
 - `coverageSource: "{source_module_a},{source_module_b}"` - Measure coverage for the changed modules (e.g., "adw/core,adw/utils")
 - `coverageThreshold: 80` - Validation fails if coverage < 80%
-- `failFast: true` - Stop on first failure (`-x` flag) for faster feedback
+- `options: "fail-fast"` - Stop on first failure (`-x` flag) for faster feedback
 - `cwd: "{worktree_path}"` - Optional, use when running in isolated worktree
 - `pytestArgs` - Only needs scope path and markers (coverage handled by explicit options)
 

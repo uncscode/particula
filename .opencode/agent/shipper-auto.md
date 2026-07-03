@@ -11,7 +11,9 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todowrite: allow
   task: allow
@@ -30,7 +32,6 @@ permission:
   git_merge: allow
   platform_comment_write: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -62,7 +63,7 @@ tracking source branch.
 ## Forbidden Operations
 
 - Do not call create_pull_request().
-- Do not call finalize_git_operations().
+- Do not call the legacy finalize helper.
 
 This agent is accumulation-only and must not create per-slice PRs.
 

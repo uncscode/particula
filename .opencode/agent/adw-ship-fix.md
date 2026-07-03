@@ -11,7 +11,9 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
@@ -26,7 +28,6 @@ permission:
   git_branch: allow
   platform_operations: deny
   platform_comment_write: allow
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -44,7 +45,9 @@ Ships changes for PR-fix workflows by committing, pushing, and posting a summary
 
 1. **Load Context**: Read workflow state from `adw_spec_read`.
 2. **Commit + Push**: Delegate to `adw-commit` subagent.
-3. **Summarize Fixes**: Combine `spec_content` with `git diff --base` stats.
+3. **Summarize Fixes**: Combine available plan context with `git diff --base` stats.
+   Either `fix_spec_content` or `spec_content` may provide useful summary context, but
+   neither field is blocking by itself.
 4. **Comment on PR**: Post a summary comment to the existing PR.
 
 # Process
@@ -71,9 +74,16 @@ def load_state(adw_id: str) -> dict:
 Required fields:
 - `worktree_path`
 - `branch_name`
-- `spec_content`
 - `pr_number` (required for PR comment)
 - `target_branch` (optional; defaults to `origin/main` for diff)
+
+Optional plan-context fields:
+- `fix_spec_content` (review-fix plan context when present)
+- `spec_content` (original implementation plan context when present)
+
+Do not fail solely because either plan-context field is missing. Use whichever plan context
+is available; if neither is available, summarize from git diff stats and commit/delegated
+subagent output.
 
 If `pr_number` is missing, fail:
 ```
@@ -140,7 +150,9 @@ def get_diff_stat(worktree_path: str, base: str) -> dict:
     })
 ```
 
-If diff fails, fall back to `spec_content` and note the failure in the PR comment.
+If diff fails, fall back to whichever plan-context field is available and note the failure in
+the PR comment. If neither `fix_spec_content` nor `spec_content` is available, summarize from
+the commit/delegated subagent output and state that plan context was unavailable.
 
 ## Step 4: Post PR Comment
 
@@ -148,10 +160,10 @@ Comment format:
 ```markdown
 ## Fix Summary
 
-{summary_from_spec}
+{summary_from_available_context}
 
 ### Changes Made
-{changes_from_diff_or_spec}
+{changes_from_diff_or_available_context}
 
 ### Review Comments Addressed
 {review_comment_notes}
@@ -164,7 +176,8 @@ Comment format:
 ```
 
 Review comments section:
-- Use `spec_content` as the source of comment references.
+- Use `fix_spec_content` and/or `spec_content` as non-blocking context sources for comment
+  references.
 - If explicit comment IDs are unavailable, summarize and note that IDs were not recorded.
 
 Post comment:

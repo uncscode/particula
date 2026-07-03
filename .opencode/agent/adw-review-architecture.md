@@ -17,20 +17,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec: deny
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -212,7 +212,7 @@ def update_status(dispatcher=None):
 **Function:** `create_agent(name, config=None)` → `create_agent(name, config)`
 **Change:** `config` parameter changed from optional to required.
 **Impact:** All existing callers passing only `name` will break.
-**Affected Callers:** (search with ripgrep)
+**Affected Callers:** (search with split search wrappers)
 - `adw/workflows/dispatcher.py:45`
 - `adw/triggers/cron.py:78`
 **Suggested Fix:**

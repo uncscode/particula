@@ -1,6 +1,6 @@
 ---
 
-description: "Primary agent that converts consolidated self-review findings into a dedicated fix-pass plan written to fix_spec_content for auto workflows. Reads spec_content plus review state, preserves the original implementation plan, and exits SUCCESS/NO_ACTIONABLE/FAILURE."
+description: "Primary agent that converts consolidated self-review findings into a dedicated fix-pass plan written to fix_spec_content for auto workflows. Reads review state plus optional spec_content context, preserves the original implementation plan when present, and exits SUCCESS/NO_ACTIONABLE/FAILURE."
 mode: primary
 permission:
   "*": deny
@@ -8,19 +8,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -37,13 +38,13 @@ Build a dedicated fix-pass implementation plan for `complete-auto` / `patch-auto
 ## Purpose
 
 Translate persisted review findings into an `adw-build`-compatible fix plan written to
-`fix_spec_content` while leaving the original `spec_content` unchanged.
+`fix_spec_content` while leaving the original `spec_content` unchanged when it exists.
 
 ## Inputs
 
 - `issue_number` and `adw_id` from `$ARGUMENTS`
 - State fields:
-  - `spec_content` (original implementation plan)
+  - `spec_content` (optional original implementation plan context)
   - `review_findings` (preferred full consolidated review payload)
   - `review_feedback` (fallback summary)
   - `request_fix`
@@ -52,7 +53,7 @@ Translate persisted review findings into an `adw-build`-compatible fix plan writ
 ## Outputs
 
 - Writes fix-pass markdown plan to `fix_spec_content`
-- Leaves `spec_content` untouched
+- Leaves `spec_content` untouched when present
 - Emits one of:
   - `REVIEW_FIX_PLAN_COMPLETE`
   - `REVIEW_FIX_PLAN_NO_ACTIONABLE`
@@ -61,7 +62,8 @@ Translate persisted review findings into an `adw-build`-compatible fix plan writ
 ## Core Mission
 
 1. Confirm this is an actionable auto-workflow fix cycle.
-2. Read the original implementation context from `spec_content`.
+2. Try to read the original implementation context from `spec_content`, but do not fail
+   if it is missing or empty.
 3. Read full consolidated review findings from `review_findings`; fall back to
    `review_feedback` only if needed.
 4. Convert retained review issues into a focused plan with explicit steps, tests, and
@@ -71,16 +73,22 @@ Translate persisted review findings into an `adw-build`-compatible fix plan writ
 ## Required Order
 
 1. Read `request_fix`; if not strict boolean `true`, exit `REVIEW_FIX_PLAN_NO_ACTIONABLE`.
-2. Read `spec_content`; fail if missing.
+2. Read `spec_content` as optional context. If missing, empty, null, or the read returns a
+   missing-field error, record that original plan context is unavailable and continue.
 3. Read `review_findings`; if missing/empty, read `review_feedback` as fallback.
 4. If no review payload contains actionable items, write a short no-op note to
    `fix_spec_content` and exit `REVIEW_FIX_PLAN_NO_ACTIONABLE`.
 5. Generate the fix plan in memory.
-6. Write `fix_spec_content` with one `adw_spec write` call, then verify with read-back.
+6. Write `fix_spec_content` with one `adw_spec_write` call, then verify with `adw_spec_read`.
 
 ## Planning Rules
 
-- Preserve the original implementation plan in `spec_content`; never overwrite it.
+- Preserve the original implementation plan in `spec_content` when present; never overwrite
+  it.
+- Do not fail solely because `spec_content` is missing. In review-fix workflows opened from
+  PR review payloads, the review payload is sufficient source material for a fix plan.
+- When `spec_content` is unavailable, omit original-plan-specific assumptions and base the
+  fix steps, validation, and acceptance criteria on the review payload only.
 - Prefer concrete actionable findings (critical/warning) over suggestions.
 - Merge duplicates and group steps by file/module when that reduces churn.
 - Include regression tests for each code fix unless the review finding is docs-only.
@@ -93,14 +101,15 @@ Translate persisted review findings into an `adw-build`-compatible fix plan writ
 
 **Issue:** #{issue_number}
 **Generated From:** `review_findings` (fallback: `review_feedback`)
-**Original Plan Preserved In:** `spec_content`
+**Original Plan Context:** `{available in spec_content | unavailable; generated from review payload only}`
 
 ## Overview
 - Brief summary of why the fix pass is needed
 - Count of actionable findings translated into steps
 
 ## Original Plan Context
-- Short bullets from `spec_content` that matter for the fix work
+- If `spec_content` is available: short bullets that matter for the fix work
+- If unavailable: `spec_content` was unavailable; this plan is derived from review payload only
 
 ## Review Findings
 - List each actionable finding with file/line and expected correction
@@ -119,7 +128,8 @@ Translate persisted review findings into an `adw-build`-compatible fix plan writ
 ## Acceptance Criteria
 - [ ] Each retained actionable review finding is addressed
 - [ ] Regression coverage exists for changed behavior
-- [ ] Original implementation intent remains intact
+- [ ] Original implementation intent remains intact when original context is available
+- [ ] If original context is unavailable, fixes remain scoped to actionable review findings
 ```
 
 ## Verification

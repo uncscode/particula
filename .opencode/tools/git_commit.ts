@@ -1,7 +1,7 @@
 /**
  * Atomic git commit wrapper for OpenCode integration.
  *
- * This tool is intentionally scoped to `uv run adw git commit` only.
+ * This tool is intentionally scoped to `uv run --active adw git commit` only.
  * It preserves deterministic commit validation/error-envelope behavior.
  */
 
@@ -277,7 +277,7 @@ RULES:
   },
 
   async execute(args) {
-    const cmdParts = ["uv", "run", "adw", "git", "commit"];
+    const cmdParts = ["uv", "run", "--active", "adw", "git", "commit"];
 
     const rawArgs = args as Record<string, unknown>;
     const { normalized } = normalizeSparseOptions(rawArgs, {

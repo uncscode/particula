@@ -4,7 +4,7 @@ description: 'Subagent that updates general documentation in .opencode/guides/ a
   docs. Invoked by the documentation primary agent to ensure guides
   and references stay current with code changes.
 
-  This subagent: - Loads workflow context from adw_spec tool - Updates .opencode/guides/*.md
+  This subagent: - Loads workflow context from adw_spec_read tool - Updates .opencode/guides/*.md
   guides (code_style, testing_guide, etc.) - Updates .opencode/guides/agents/*.md agent
   documentation - Updates docs/index.md and docs/*.md root-level docs - Creates new docs for new features
   when appropriate - Ensures markdown links are valid
@@ -18,18 +18,18 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -103,7 +103,7 @@ task({
 
 Parse input arguments and load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })

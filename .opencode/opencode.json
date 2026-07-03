@@ -1,10 +1,18 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
-   "tools": {
+  "agent": {
+    "explore": {
+      "disable": true
+    },
+    "general": {
+      "disable": true
+    }
+  },
+  "tools": {
     "grep": false,
     "glob": false
-  }, 
+  },
   "permission": {
     "read": {
       "{env:ADW_PROJECT_ROOT}/src/**": "allow",

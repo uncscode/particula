@@ -1,6 +1,13 @@
-# ADW Plans Tool Reference
+# ADW Plans Tool Reference (Retired Compatibility Wrapper)
 
-Full parameter reference for the adw_plans tool. For quick usage, see the tool description.
+This document is retained as historical reference for the retired `adw_plans`
+ compatibility wrapper. Active integrations should use:
+
+- `adw_plans_read`
+- `adw_plans_mutate`
+
+The compatibility wrapper implementation has been retired from the live tool
+ tree and archived under `.trash/`.
 
 ## Commands
 
@@ -29,20 +36,37 @@ Full parameter reference for the adw_plans tool. For quick usage, see the tool d
 // Show a plan
 { "command": "show", "plan_id": "E17-F1", "options": "json" }
 
-// adw_spec read: get worktree_path from ADW state, then reuse that exact value as cwd
-adw_spec({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
+// adw_spec_read: get worktree_path from ADW state, then reuse that exact value as cwd
+adw_spec_read({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
 
 // Create a feature plan
 { "command": "create", "plan_type": "feature", "title": "Add Auth Module", "parent": "E17", "cwd": "/path/to/trees/abc12345" }
 
-// Update plan status
+// Historical compatibility example: direct status on retired unified wrapper
 { "command": "update", "plan_id": "E17-F8", "status": "Ready", "cwd": "/path/to/trees/abc12345" }
 
 // Add a phase
 { "command": "add-phase", "plan_id": "E17-F1", "title": "Core implementation", "options": "size=M", "cwd": "/path/to/trees/abc12345" }
 
-// Mark phase as shipped
+// Historical compatibility example: direct phase_status on retired unified wrapper
 { "command": "update-phase", "plan_id": "E17-F8", "phase_id": "E17-F8-P1", "phase_status": "Shipped", "cwd": "/path/to/trees/abc12345" }
+```
+
+Retirement note: the direct `status` and `phase_status` fields above were part
+of the retired unified wrapper. Active guidance uses the split-wrapper shape
+shown below, where optional aliases move through bounded `options` tokens.
+
+## Preferred Split-Wrapper Shape
+
+```jsonc
+// Read-only path: use adw_plans_read with bounded options tokens
+adw_plans_read({ "command": "list", "plan_type": "feature", "options": "status=In Progress json" })
+
+// Mutating path: use adw_plans_mutate and keep cwd/patch as direct exceptions
+adw_plans_mutate({ "command": "update", "plan_id": "E17-F8", "options": "status=Ready priority=P1", "cwd": "/path/to/trees/abc12345" })
+
+// Phase update: phase-status also moves through options on split wrappers
+adw_plans_mutate({ "command": "update-phase", "plan_id": "E17-F8", "phase_id": "E17-F8-P1", "options": "phase-status=Shipped issue=42", "patch": "{\"actuals\":\"wrapper docs aligned\"}", "cwd": "/path/to/trees/abc12345" })
 ```
 
 ## Advanced Examples
@@ -76,14 +100,16 @@ adw_spec({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
 { "command": "schema", "options": "check" }
 
 // Filter by status
-{ "command": "list", "plan_type": "feature", "status": "In Progress", "options": "json" }
+{ "command": "list", "plan_type": "feature", "options": "status=In Progress json" }
 ```
 
-Preferred guidance for new calls: use bounded `options` tokens for optional wrapper aliases such as
-`json`, `check`, `populate`, `status=<value>`, `phase-status=<value>`, `priority=<value>`,
-`size=<value>`, `after=<phase_id>`, `issue=<n>`, and `clear-issue-number`. Keep direct fields for
-required identifiers, raw JSON `patch`, and any `status` / `phase_status` values where the explicit
-field is clearer.
+Preferred guidance for new calls: use bounded `options` tokens for optional
+wrapper aliases such as `json`, `check`, `populate`, `status=<value>`,
+`phase-status=<value>`, `priority=<value>`, `size=<value>`,
+`after=<phase_id>`, `issue=<n>`, and `clear-issue-number`. Keep direct fields
+for required identifiers plus the payload-bearing direct exceptions `cwd` and
+raw JSON `patch`. Split wrappers route `status` / `phase-status` aliases
+through `options`.
 
 ## Parameter Reference
 
@@ -98,8 +124,8 @@ field is clearer.
 | `options`  | string | —       | Bounded command-scoped wrapper tokens such as `json`, `check`, `populate`, `status=<value>`, `phase-status=<value>`, `priority=<value>`, `size=<value>`, `after=<phase_id>`, `issue=<n>`, or `clear-issue-number` |
 
 `options` is a wrapper convenience field, not a raw CLI passthrough. Use it for
-supported optional tokens only. Keep direct fields for required identifiers, raw JSON
-`patch`, and any `status` / `phase_status` values where the explicit field is clearer.
+supported optional tokens only. Keep direct fields for required identifiers and raw JSON
+`patch`.
 
 ### List Filters
 
@@ -114,7 +140,7 @@ supported optional tokens only. Keep direct fields for required identifiers, raw
 | Parameter  | Type   | Description                              |
 |------------|--------|------------------------------------------|
 | `title`    | string | Plan title (required for create)         |
-| `status`   | enum   | Draft, Proposed, Ready, In Progress, etc.; direct field remains preferred for readability |
+| `status`   | enum   | Draft, Proposed, Ready, In Progress, etc.; historical unified-wrapper alias |
 | `patch`    | string | Raw JSON patch payload; keep this as a direct field |
 
 ### Phase Operations
@@ -122,7 +148,7 @@ supported optional tokens only. Keep direct fields for required identifiers, raw
 | Parameter            | Type    | Description                         |
 |----------------------|---------|-------------------------------------|
 | `phase_id`           | string  | Phase identifier (e.g., E17-F1-P1) |
-| `phase_status`       | enum    | Not Started, In Progress, Blocked, Shipped, Cancelled; direct field remains valid |
+| `phase_status`       | enum    | Not Started, In Progress, Blocked, Shipped, Cancelled; historical unified-wrapper alias |
 
 ### Schema/Sections
 
@@ -136,11 +162,11 @@ Use `options: "check"` for schema checks and `options: "populate"` for
 Resolve `worktree_path` from ADW state first, then pass that exact value as `cwd`:
 
 ```jsonc
-// 1) adw_spec read: get the isolated worktree path
-adw_spec({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
+// 1) adw_spec_read: get the isolated worktree path
+adw_spec_read({ "command": "read", "adw_id": "abc12345", "field": "worktree_path" })
 
 // 2) Pass that value into adw_plans mutating commands
-{ "command": "update", "plan_id": "E17-F8", "status": "Ready", "options": "priority=P1", "cwd": "/path/to/trees/abc12345" }
+{ "command": "update", "plan_id": "E17-F8", "options": "status=Ready priority=P1", "cwd": "/path/to/trees/abc12345" }
 ```
 
 Read-only commands (`list`, `show`, `validate`, `schema`, `list-sections`) accept optional `cwd`.
@@ -151,6 +177,7 @@ Read-only commands (`list`, `show`, `validate`, `schema`, `list-sections`) accep
 ERROR: update command requires 'cwd'.
 ERROR: cwd path does not exist: <path>
 ERROR: cwd path is not a directory: <path>
+ERROR: cwd path is not a repository/worktree root: <path> (missing .git metadata at <path>)
 ERROR: cwd path resolves outside repository root: <path> (canonical: <path>)
 ```
 
@@ -184,4 +211,4 @@ Not Started, In Progress, Blocked, Shipped, Cancelled
 - Routing hint:
   - Prefer `adw_plans_read` for read-only operations.
   - Prefer `adw_plans_mutate` for mutating operations requiring `cwd`.
-  - Keep `adw_plans` for compatibility/unified flows.
+  - Use `adw_plans_read` and `adw_plans_mutate` for all active flows.

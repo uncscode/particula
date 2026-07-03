@@ -212,6 +212,11 @@ type RefactorAstgrepNormalizedArgs = {
 
 type RefactorAstgrepExecutionMode = "preview" | "apply";
 
+type RefactorAstgrepErrorClassification =
+  | "missing_binary"
+  | "parse_input"
+  | "execution";
+
 const normalizeAndValidateArgs = (
   args: Record<string, unknown>,
 ): RefactorAstgrepNormalizedArgs | string => {
@@ -249,6 +254,27 @@ const buildBaseCommand = (args: RefactorAstgrepNormalizedArgs): string[] => {
   return ["ast-grep", "run", "-p", args.pattern, "-r", args.rewrite, "-l", args.lang, "--", args.path];
 };
 
+const classifyExecutionFailure = (combinedLower: string): RefactorAstgrepErrorClassification => {
+  if (combinedLower.includes("enoent") || combinedLower.includes("not found")) {
+    return "missing_binary";
+  }
+
+  const parseSignals = [
+    "parse error",
+    "failed to parse",
+    "cannot parse",
+    "invalid pattern",
+    "invalid rewrite",
+    "pattern parse",
+    "rewrite parse",
+  ];
+  if (parseSignals.some((signal) => combinedLower.includes(signal))) {
+    return "parse_input";
+  }
+
+  return "execution";
+};
+
 const formatExecutionError = (
   error: unknown,
   prefix: string,
@@ -259,24 +285,20 @@ const formatExecutionError = (
   const message = (error as any)?.message ?? "";
   const diagnostic = selectDiagnostic(stderr, stdout, message).message;
   const combinedLower = `${stderr} ${stdout} ${message}`.toLowerCase();
+  const classification = classifyExecutionFailure(combinedLower);
 
-  const isMissingBinary = combinedLower.includes("enoent") || combinedLower.includes("not found");
-  const isInvalidPattern =
-    combinedLower.includes("parse") || combinedLower.includes("pattern") || combinedLower.includes("rewrite");
-
-  const hint = isMissingBinary
-    ? MISSING_BINARY_HINT
-    : isInvalidPattern
-      ? "Check ast-grep pattern/rewrite syntax and retry with a valid AST pattern."
-      : mode === "apply"
-        ? "Apply mode may have partially modified files. Inspect `git diff`, restore affected paths, then retry."
-        : undefined;
+  const hint =
+    classification === "missing_binary"
+      ? MISSING_BINARY_HINT
+      : classification === "parse_input"
+        ? "Fix the ast-grep pattern/rewrite input and retry; this is an input parse failure, not a tooling install issue."
+        : mode === "apply"
+          ? "Apply mode may have partially modified files. Inspect `git diff`, restore affected paths, then retry."
+          : undefined;
 
   return buildErrorEnvelope({
     prefix,
-    contextLines: [
-      `classification: ${isMissingBinary ? "missing_binary" : isInvalidPattern ? "invalid_pattern" : "execution"}`,
-    ],
+    contextLines: [`classification: ${classification}`],
     diagnostic,
     hint,
   });

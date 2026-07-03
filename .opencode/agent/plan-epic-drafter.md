@@ -6,11 +6,11 @@ description: >-
 
   This agent:
   - Receives adw_id and target_id from plan-orchestrator handoff
-  - Adds phases to the epic plan via adw_plans add-phase
+  - Adds phases to the epic plan via adw_plans_mutate add-phase
   - Scaffolds and populates canonical section files
   - Calls codebase-researcher for architecture/file-context enrichment
   - Drafts first-pass content for all 15 epic sections
-  - Reports drafted sections, thin sections, and challenges via messages-write
+  - Reports drafted sections, thin sections, and challenges via adw_spec_messages messages-write
 
   Examples:
   - "Populate epic plan E18 with phases and section content"
@@ -24,11 +24,15 @@ permission:
   move: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
   task: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
+  adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -36,7 +40,7 @@ permission:
 # Plan Epic Drafter
 
 Populate an existing epic plan record with phases and first-pass section content.
-The plan record was already created by `plan-orchestrator` via `adw_plans create`.
+The plan record was already created by `plan-orchestrator` via `adw_plans_mutate create`.
 This agent adds phases, scaffolds sections, and drafts content.
 
 # Input Contract
@@ -58,8 +62,8 @@ If `adw_id` or `target_id` is missing, output `PLAN_EPIC_DRAFTER_FAILED` immedia
 
 # Worktree Context
 
-All `adw_plans` calls **must** include the `cwd` parameter. Resolve `cwd`
-from ADW state first (`adw_spec read` → `worktree_path`). When already
+All `adw_plans_read` and `adw_plans_mutate` calls **must** include the `cwd` parameter. Resolve `cwd`
+from ADW state first (`adw_spec_read read` → `worktree_path`). When already
 executing inside the target worktree (e.g. `/path/to/trees/{adw_id}`), use
 `cwd: "."` — do **not** use a nested relative worktree path, which would resolve to a
 nonexistent nested path.
@@ -79,11 +83,11 @@ cwd: "."
 # Core Mission
 
 1. Parse `adw_id` and `target_id` from orchestrator prompt
-2. Verify the plan exists via `adw_plans show`
-3. Scaffold section files via `adw_plans scaffold-sections`
+2. Verify the plan exists via `adw_plans_read show`
+3. Scaffold section files via `adw_plans_mutate scaffold-sections`
 4. Read workflow context from prior messages
 5. Enrich technical context via `codebase-researcher`
-6. Add phases to the plan via `adw_plans add-phase`
+6. Add phases to the plan via `adw_plans_mutate add-phase`
 7. Draft first-pass content for all 15 section files
 8. Write completion summary
 
@@ -95,12 +99,12 @@ Create a todo list at the start and update after each step:
 {
   "todos": [
     {"content": "Parse arguments: adw_id and target_id from prompt", "status": "pending", "priority": "high"},
-    {"content": "Verify epic plan exists: adw_plans show E18", "status": "pending", "priority": "high"},
-    {"content": "Scaffold section files: adw_plans scaffold-sections E18", "status": "pending", "priority": "high"},
-    {"content": "List section paths: adw_plans list-sections E18", "status": "pending", "priority": "high"},
+    {"content": "Verify epic plan exists: adw_plans_read show E18", "status": "pending", "priority": "high"},
+    {"content": "Scaffold section files: adw_plans_mutate scaffold-sections E18", "status": "pending", "priority": "high"},
+    {"content": "List section paths: adw_plans_read list-sections E18", "status": "pending", "priority": "high"},
     {"content": "Read workflow messages for context", "status": "pending", "priority": "high"},
     {"content": "Invoke codebase-researcher for technical context", "status": "pending", "priority": "medium"},
-    {"content": "Add phases to epic plan via adw_plans add-phase", "status": "pending", "priority": "high"},
+    {"content": "Add phases to epic plan via adw_plans_mutate add-phase", "status": "pending", "priority": "high"},
     {"content": "Draft section: vision_problem", "status": "pending", "priority": "high"},
     {"content": "Draft section: outcomes_guardrails", "status": "pending", "priority": "high"},
     {"content": "Draft section: scope_constraints", "status": "pending", "priority": "high"},
@@ -135,10 +139,10 @@ Validate `target_id` format: must match `^E\d+$`. If invalid, output
 The orchestrator already created the plan. Verify it exists:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "show",
   "plan_id": "E18",
-  "json": true,
+  "options": "json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -150,7 +154,7 @@ If the plan does not exist, output `PLAN_EPIC_DRAFTER_FAILED: Plan E18 not found
 Scaffold canonical section files from templates:
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "scaffold-sections",
   "plan_id": "E18",
   "plan_type": "epic",
@@ -161,11 +165,10 @@ adw_plans({
 Then list the section paths to know where to write content:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "E18",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -178,7 +181,7 @@ Use these paths for all subsequent writes.
 Read all workflow messages for classifier and orchestrator context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 Extract relevant context: plan type, feature tracks, maintenance tracks,
@@ -210,31 +213,31 @@ functions they test. Do NOT create a standalone "testing" phase. The final
 phase should be integration tests or documentation updates.
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "add-phase",
   "plan_id": "E18",
   "title": "Foundation models and core utilities",
-  "size": "M",
+  "options": "size=M",
   "cwd": "<worktree_path>"
 })
 ```
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "add-phase",
   "plan_id": "E18",
   "title": "Primary workflow implementation",
-  "size": "L",
+  "options": "size=L",
   "cwd": "<worktree_path>"
 })
 ```
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "add-phase",
   "plan_id": "E18",
   "title": "Integration tests and documentation updates",
-  "size": "M",
+  "options": "size=M",
   "cwd": "<worktree_path>"
 })
 ```
@@ -286,7 +289,7 @@ Each resolved section path must match: `^\.opencode/plans/sections/epics/E\d+/[a
 ## Step 8: Write Completion Message
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-epic-drafter",

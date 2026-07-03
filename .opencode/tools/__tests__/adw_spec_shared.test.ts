@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import fs from "node:fs";
+import path from "node:path";
 
 import {
   adwIdValidationMessage,
@@ -11,6 +12,7 @@ import {
   validateAndNormalizeAdwId,
   validateCanonicalInRepoPath,
 } from "../adw_spec_shared";
+import { ERROR_PRECEDENCE_FIXTURES } from "./fixtures/wrapper_contract_fixtures";
 import {
   getInvocations,
   installSubprocessMocks,
@@ -96,7 +98,7 @@ describe("adw_spec_shared", () => {
   });
 
   it("validates repository-confined canonical file paths", () => {
-    const fixturePath = `${process.cwd()}/../../README.md`;
+    const fixturePath = path.resolve(import.meta.dir, "../../../README.md");
     const inside = validateCanonicalInRepoPath(fixturePath);
     expect(inside).toEqual({ ok: true, canonicalPath: fs.realpathSync(fixturePath) });
 
@@ -117,14 +119,14 @@ describe("adw_spec_shared", () => {
   });
 
   it("returns success stdout and deterministic failure envelopes from spawned commands", () => {
-    expect(runAdwSpecCommand("read", ["uv", "run", "adw", "spec", "read"], {})).toEqual({
+    expect(runAdwSpecCommand("read", ["uv", "run", "--active", "adw", "spec", "read"], {})).toEqual({
       ok: true,
       stdout: "ok",
     });
     expect(getInvocations()).toHaveLength(1);
 
     setSpawnResponse({ stderr: "fatal /tmp/private.txt", stdout: "shadow stdout", exitCode: 2 });
-    const failure = runAdwSpecCommand("list", ["uv", "run", "adw", "spec", "list"], {});
+    const failure = runAdwSpecCommand("list", ["uv", "run", "--active", "adw", "spec", "list"], {});
     expect(failure.ok).toBe(false);
     expect(failure).toEqual(
       expect.objectContaining({ error: expect.stringContaining("ERROR: adw spec list failed (exit 2)") }),
@@ -134,16 +136,27 @@ describe("adw_spec_shared", () => {
   });
 
   it("uses catch-path stderr-first diagnostics and falls back to thrown message", () => {
-    setSpawnError({ stderr: "stderr /tmp/private.txt", stdout: "shadow stdout", message: "ignored" });
-    const stderrFailure = runAdwSpecCommand("list", ["uv", "run", "adw", "spec", "list"], {});
+    setSpawnError({
+      stderr: `${ERROR_PRECEDENCE_FIXTURES.stderrFirst.preferred} /tmp/private.txt`,
+      stdout: ERROR_PRECEDENCE_FIXTURES.stderrFirst.shadowed,
+      message: "ignored",
+    });
+    const stderrFailure = runAdwSpecCommand("list", ["uv", "run", "--active", "adw", "spec", "list"], {});
     expect(stderrFailure.ok).toBe(false);
     expect((stderrFailure as { error: string }).error).toContain("<path>");
-    expect((stderrFailure as { error: string }).error).not.toContain("shadow stdout");
+    expect((stderrFailure as { error: string }).error).toContain(
+      ERROR_PRECEDENCE_FIXTURES.stderrFirst.preferred,
+    );
+    expect((stderrFailure as { error: string }).error).not.toContain(
+      ERROR_PRECEDENCE_FIXTURES.stderrFirst.shadowed,
+    );
 
-    setSpawnError({ message: "message fallback diagnostic" });
-    const messageFailure = runAdwSpecCommand("list", ["uv", "run", "adw", "spec", "list"], {});
+    setSpawnError({ message: ERROR_PRECEDENCE_FIXTURES.messageOnly.message });
+    const messageFailure = runAdwSpecCommand("list", ["uv", "run", "--active", "adw", "spec", "list"], {});
     expect(messageFailure).toEqual(
-      expect.objectContaining({ error: expect.stringContaining("message fallback diagnostic") }),
+      expect.objectContaining({
+        error: expect.stringContaining(ERROR_PRECEDENCE_FIXTURES.messageOnly.message),
+      }),
     );
   });
 });

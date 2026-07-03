@@ -18,20 +18,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec: deny
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   get_datetime: allow
   get_version: allow

@@ -18,12 +18,17 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
-  adw: allow
+  adw: deny
+  adw_status_health: allow
+  adw_setup: allow
+  adw_service: allow
   adw_spec: deny
   adw_spec_read: allow
   adw_spec_write: allow
@@ -40,7 +45,7 @@ permission:
   platform_operations: deny
   platform_issue_read: allow
   platform_issue_write: allow
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -85,11 +90,11 @@ This agent uses repository base permissions from `.opencode` configuration. It h
 ### Tool Access
 - **adw_spec_read / adw_spec_write / adw_spec_messages**: Primary tools for reading/writing workflow state and messages
 - **adw**: ADW CLI operations (status, health, etc.)
-- **run_pytest**: Execute tests in Python projects
+- **run_pytest_advanced**: Execute pytest with coverage and passthrough arguments in Python projects
 - **run_linters**: Run linting/formatting via repository configuration
 - **get_version**: Get project version information
 - **get_datetime**: Get current date/time for timestamps (UTC by default, America/Denver when `localtime` is true)
-- **Core tool-only set**: read/edit/write/list/ripgrep/todoread/todowrite/create_workspace/workflow_builder plus split git/platform wrappers
+- **Core tool-only set**: read/edit/write/list/find_files/search_content/ripgrep_advanced/todoread/todowrite/create_workspace/workflow_builder plus split git/platform wrappers
 - **Denied**: webfetch, websearch, codesearch, bash
 
 ## Repository Context

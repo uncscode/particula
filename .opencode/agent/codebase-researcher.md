@@ -17,19 +17,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: allow
+  git_diff: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -91,7 +92,12 @@ Research Focus:
 
 # Git Notes Read-Only Policy (for prior-design context)
 
-Allowed commands (contract-enforced): `notes-blame`, `log`, `show`
+Allowed commands (contract-enforced): `log`, `show`
+
+When available, the read-only git history tool surface is `` `notes-blame`, `log`, `show` ``.
+
+Conditionally allowed command: `notes-blame` only when a notes-blame-capable
+path is available in the active tool surface
 
 Forbidden commands:
 - `add`
@@ -108,15 +114,19 @@ Forbidden commands:
 - `fetch`
 - `worktree-remove`
 
-Use `notes-blame` only on key issue-relevant files, not every scanned file.
-Prefer targeted file lookups with line-range selectors to keep history checks bounded.
+Prefer targeted `git_diff` lookups with `command: "log"` or `command: "show"` on
+key issue-relevant files only; keep history checks bounded.
+Prefer targeted file or line-range history lookups instead of broad scans.
 
-Path contract for `notes-blame`:
+Path contract for git history lookups:
 - prefer repo-relative paths
 - normalize under `worktree_path`
 - reject out-of-worktree targets
 
 Notes behavior requirements:
+- Before finalizing research, use targeted `notes-blame` checks on key
+  issue-relevant files only when a notes-blame-capable path is available in the
+  active tool surface.
 - If no notes exist for a file, continue normal research flow.
 - If a notes lookup fails for any reason, continue normally and rely on code/issue evidence.
 - notes are supplementary context only and never a required precondition.
@@ -128,7 +138,7 @@ Notes behavior requirements:
 
 Parse input arguments and load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "issue"
@@ -142,7 +152,7 @@ Extract:
 
 Also get worktree path:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "worktree_path"
@@ -162,7 +172,7 @@ todowrite({
     },
     {
       "id": "2",
-      "content": "Search for relevant files using ripgrep",
+      "content": "Search for relevant files using split search wrappers",
       "status": "pending",
       "priority": "high"
     },

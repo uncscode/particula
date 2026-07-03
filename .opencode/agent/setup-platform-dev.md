@@ -35,14 +35,16 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
   adw_setup: allow
   adw_status_health: allow
-  adw_spec: allow
+  adw_spec: deny
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
@@ -55,7 +57,6 @@ permission:
   platform_pr_read: allow
   platform_pr_write: allow
   platform_rate_limit_read: allow
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow

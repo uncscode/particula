@@ -1,63 +1,11 @@
 import { tool } from "@opencode-ai/plugin";
 
-// --- Inlined from lib/diagnostics.ts ---
-const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
-const WHITESPACE_COLLAPSE_PATTERN = /\s+/g;
-
-const REDACTION_PATTERNS: RegExp[] = [
-  /\bgh[pousr]_[A-Za-z0-9]{10,}\b/g,
-  /\b(?:token|api[_-]?key|secret|password)\s*[:=]\s*([^\s"']+)/gi,
-  /\bAuthorization\s*:\s*Bearer\s+([^\s"']+)/gi,
-];
-
-const REDACTION_MARKER = "[REDACTED]";
-
-function redactSensitiveFragments(value: string): string {
-  let redacted = value;
-  redacted = redacted.replace(REDACTION_PATTERNS[0], REDACTION_MARKER);
-  redacted = redacted.replace(REDACTION_PATTERNS[1], (match) => {
-    const splitIndex = match.indexOf(":") >= 0 ? match.indexOf(":") : match.indexOf("=");
-    if (splitIndex < 0) return REDACTION_MARKER;
-    return `${match.slice(0, splitIndex + 1)} ${REDACTION_MARKER}`;
-  });
-  redacted = redacted.replace(REDACTION_PATTERNS[2], `Authorization: Bearer ${REDACTION_MARKER}`);
-  return redacted;
-}
-
-function decodeUnknown(value: unknown): string {
-  if (value instanceof Uint8Array) return new TextDecoder().decode(value);
-  if (typeof value === "string") return value;
-  if (value === null || value === undefined) return "";
-  return String(value);
-}
-
-function sanitizeDiagnosticText(value: string, maxChars = 4000): string {
-  if (!value) return "";
-  const noControlChars = value.replace(CONTROL_CHARS_PATTERN, " ");
-  const redacted = redactSensitiveFragments(noControlChars);
-  const normalized = redacted.replace(WHITESPACE_COLLAPSE_PATTERN, " ").trim();
-  if (!normalized) return "";
-  if (normalized.length <= maxChars) return normalized;
-  return `${normalized.slice(0, maxChars)} ...(truncated)`;
-}
-// --- End inlined diagnostics ---
+import { getStructuredJsonPayload, sanitizeAndTruncate } from "./lib/platform_wrapper_utils";
 
 const ERROR_SNIPPET_LIMIT = 2000;
 
 type PlatformIssueReadCommand = "fetch-issue";
 type OutputFormat = "text" | "json";
-
-function truncate(value: string | undefined): string {
-  if (!value) return "";
-  return value.length > ERROR_SNIPPET_LIMIT
-    ? `${value.slice(0, ERROR_SNIPPET_LIMIT)}...<truncated>`
-    : value;
-}
-
-function sanitizeAndTruncate(value: unknown): string {
-  const sanitized = sanitizeDiagnosticText(decodeUnknown(value), ERROR_SNIPPET_LIMIT);
-  return truncate(sanitized);
-}
 
 function buildMissingArgMessage(message: string): string {
   return `ERROR: ${message}`;
@@ -77,6 +25,14 @@ function normalizeOptionalString(value: unknown): string | undefined {
   }
   const token = String(value).trim();
   return token.length > 0 ? token : undefined;
+}
+
+function normalizeOutputFormat(value: unknown): OutputFormat | undefined {
+  const token = normalizeOptionalString(value);
+  if (token === undefined) {
+    return undefined;
+  }
+  return token === "text" || token === "json" ? token : undefined;
 }
 
 function isSafeIssueNumberToken(token: string): boolean {
@@ -103,22 +59,22 @@ export default tool({
   async execute(args) {
     const command = args.command as PlatformIssueReadCommand;
     const issueNumberToken = normalizeIssueNumberToken(args.issue_number);
-    const outputFormat: OutputFormat = (args.output_format as OutputFormat) || "text";
+    const outputFormat = normalizeOutputFormat(args.output_format);
     const preferScope = normalizeOptionalString(args.prefer_scope);
 
     if (command !== "fetch-issue") {
       return buildMissingArgMessage(`Unsupported command: ${String(command)}`);
     }
 
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "platform", command];
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "platform", command];
 
     if (args.help) {
       cmdParts.push("--help");
       try {
         return await runCommand(cmdParts);
       } catch (error: any) {
-        const stdout = sanitizeAndTruncate(error.stdout);
-        const stderr = sanitizeAndTruncate(error.stderr);
+        const stdout = sanitizeAndTruncate(error.stdout, ERROR_SNIPPET_LIMIT);
+        const stderr = sanitizeAndTruncate(error.stderr, ERROR_SNIPPET_LIMIT);
         return `ERROR: Failed to fetch help for '${command}'.${
           stdout ? `\nSTDOUT:\n${stdout}` : ""
         }${stderr ? `\nSTDERR:\n${stderr}` : ""}`;
@@ -133,6 +89,9 @@ export default tool({
         "'issue_number' must be a positive integer token (digits only; leading zeros allowed)",
       );
     }
+    if (args.output_format !== undefined && outputFormat === undefined) {
+      return buildMissingArgMessage("'output_format' must be either 'text' or 'json'");
+    }
     if (args.prefer_scope !== undefined && preferScope === undefined) {
       return buildMissingArgMessage("'prefer_scope' must be either 'fork' or 'upstream'");
     }
@@ -141,7 +100,7 @@ export default tool({
     }
 
     cmdParts.push(issueNumberToken);
-    if (args.output_format) {
+    if (outputFormat) {
       cmdParts.push("--format", outputFormat);
     }
     if (preferScope) {
@@ -151,11 +110,14 @@ export default tool({
     try {
       return await runCommand(cmdParts);
     } catch (error: any) {
-      const stdout = sanitizeAndTruncate(error.stdout);
-      const stderr = sanitizeAndTruncate(error.stderr);
-      if (outputFormat === "json" && stdout) {
-        return sanitizeAndTruncate(stdout);
-      }
+      const stdout = sanitizeAndTruncate(error.stdout, ERROR_SNIPPET_LIMIT);
+      const stderr = sanitizeAndTruncate(error.stderr, ERROR_SNIPPET_LIMIT);
+       if (outputFormat === "json") {
+         const structuredJson = getStructuredJsonPayload(error.stdout);
+         if (structuredJson) {
+           return structuredJson;
+         }
+       }
       const parts: string[] = [`ERROR: Failed to execute 'adw platform ${command}'`];
       if (stderr) {
         parts.push(`STDERR:\n${stderr}`);

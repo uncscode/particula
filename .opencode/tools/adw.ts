@@ -1,8 +1,9 @@
 /**
- * Dynamic ADW Tool for OpenCode Integration
+ * Compatibility ADW tool delegator for OpenCode integration.
  *
- * Provides unified interface to all ADW CLI commands directly from OpenCode.
- * This tool enables seamless execution of ADW workflows without switching to terminal.
+ * This retained broad wrapper remains available during the migration window,
+ * but new and updated integrations should prefer the focused `adw_*` split
+ * wrappers for least-privilege command access.
  *
  * See https://opencode.ai/docs/custom-tools/ for OpenCode tool development patterns.
  */
@@ -14,7 +15,7 @@ import { tool } from "@opencode-ai/plugin";
 function sanitizedEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV" || value === undefined) continue;
+    if (value === undefined) continue;
     env[key] = value;
   }
   return env;
@@ -44,7 +45,7 @@ const DEFAULT_TIMEOUT_MS = 120_000; // 2 minutes
 const WORKFLOW_TIMEOUT_MS = 600_000; // 10 minutes
 
 const WORKFLOW_COMMAND_SET = new Set([
-  "complete", "patch", "plan", "build", "test", "review", "document", "ship",
+  "complete", "patch", "plan", "build", "test", "review", "document",
 ]);
 
 function getCommandTimeout(command: string): number {
@@ -77,6 +78,20 @@ const PROTECTED_FLAGS = new Set([
   "--text",
   "--source-issue",
 ]);
+
+const PROTECTED_FLAG_ALIASES = new Map<string, string>([
+  ["--adw_id", "--adw-id"],
+  ["--source_issue", "--source-issue"],
+]);
+
+function normalizeFlagToken(arg: string): { original: string; canonicalKey: string } {
+  const trimmed = arg.trim();
+  const equalsIndex = trimmed.indexOf("=");
+  const rawKey = equalsIndex >= 0 ? trimmed.slice(0, equalsIndex) : trimmed;
+  const loweredKey = rawKey.toLowerCase();
+  const canonicalKey = PROTECTED_FLAG_ALIASES.get(loweredKey) ?? loweredKey;
+  return { original: trimmed, canonicalKey };
+}
 
 function validateAdditionalArgs(rawAdditionalArgs: unknown):
   | { ok: true; args: string[] }
@@ -111,18 +126,13 @@ function validateAdditionalArgs(rawAdditionalArgs: unknown):
   }
 
   // Check for protected flags — both exact matches and --flag=value format.
-  const protectedFlag = parsedArgs.find((arg) =>
-    [...PROTECTED_FLAGS].some(
-      (flag) => arg === flag || arg.startsWith(flag + "="),
-    ),
-  );
+  const protectedFlag = parsedArgs
+    .map((arg) => normalizeFlagToken(arg))
+    .find((token) => PROTECTED_FLAGS.has(token.canonicalKey));
   if (protectedFlag) {
-    const matchedFlag = [...PROTECTED_FLAGS].find(
-      (flag) => protectedFlag === flag || protectedFlag.startsWith(flag + "="),
-    );
     return {
       ok: false,
-      error: `ERROR: Protected flag '${matchedFlag}' is not allowed in 'args'. Use top-level tool arguments instead.`,
+      error: `ERROR: Protected flag '${protectedFlag.canonicalKey}' is not allowed in 'args'. Use top-level tool arguments instead.`,
     };
   }
 
@@ -143,7 +153,7 @@ SIMPLE EXAMPLES (copy these patterns):
   Setup env:      { command: "setup", args: ["env"] }
 
 RULES:
-- Workflow commands (complete/patch/plan/build/test/review/document/ship) require issue_number.
+- Workflow commands (complete/patch/plan/build/test/review/document) require issue_number.
 - setup requires args for subcommands (e.g., ["template", "validate"]).
 - Omit optional fields entirely -- blank strings are treated as omitted.
 - Set help: true to see CLI usage for any command.
@@ -153,7 +163,7 @@ See .opencode/tools/adw.md for full parameter reference, setup commands, and mod
     command: tool.schema
       .enum([
         "complete", "patch", "plan", "build", "test", "review", "document",
-        "ship", "status", "health", "init", "create-issue", "interpret-issue",
+        "status", "health", "create-issue", "interpret-issue",
         "maintenance", "launch", "stop", "docstring", "finalize-docs", "setup"
       ])
       .describe(`ADW command to execute. Set help: true to see detailed usage for any command.`),
@@ -163,7 +173,7 @@ See .opencode/tools/adw.md for full parameter reference, setup commands, and mod
       .optional()
       .describe(`GitHub issue number for workflow commands.
 
-REQUIRED FOR: complete, patch, plan, build, test, review, document, ship
+REQUIRED FOR: complete, patch, plan, build, test, review, document
 OPTIONAL FOR: interpret-issue (use with --source-issue flag)
 EXAMPLE: issue_number: 123`),
     
@@ -179,10 +189,11 @@ EXAMPLE: adw_id: "a1b2c3d4"
 GET CURRENT: Use 'status' command to see active ADW IDs`),
     
     model: tool.schema
-      .enum(["base", "heavy"])
+      .enum(["light", "base", "heavy"])
       .optional()
       .describe(`Model set for AI operations. Defaults to 'base'.
 
+• light - Uses Haiku-class models (fastest, lowest-cost, lighter tasks)
 • base - Uses Sonnet models (faster, cost-effective, recommended for most tasks)
 • heavy - Uses Opus models (more capable, use for complex features or debugging)
 
@@ -288,22 +299,29 @@ body: "## Description\\nImplement user auth\\n\\n## Acceptance Criteria\\n- [ ] 
     const text = normalizeOptionalString(args.text);
     const title = normalizeOptionalString(args.title);
     const body = normalizeOptionalString(args.body);
-    const additionalArgsValidation = validateAdditionalArgs(rawAdditionalArgs);
-    if (!additionalArgsValidation.ok) {
-      return additionalArgsValidation.error;
+    const additionalArgs = help
+      ? []
+      : (() => {
+          const additionalArgsValidation = validateAdditionalArgs(rawAdditionalArgs);
+          if (!additionalArgsValidation.ok) {
+            return additionalArgsValidation.error;
+          }
+          return additionalArgsValidation.args;
+        })();
+    if (typeof additionalArgs === "string") {
+      return additionalArgs;
     }
-    const additionalArgs = additionalArgsValidation.args;
 
     // Command validation and argument requirements
     const workflowCommands = [
-      "complete", "patch", "plan", "build", "test", "review", "document", "ship"
+      "complete", "patch", "plan", "build", "test", "review", "document"
     ];
 
     // Validate required arguments based on command type (skip if help flag is set)
     if (!help) {
       if (workflowCommands.includes(command)) {
         if (issue_number === undefined || issue_number === null) {
-          return `ERROR: Command '${command}' requires 'issue_number' argument.\n\nUsage: adw ${command} <issue_number> [--adw-id <id>] [--model <base|heavy>]`;
+          return `ERROR: Command '${command}' requires 'issue_number' argument.\n\nUsage: adw ${command} <issue_number> [--adw-id <id>] [--model <light|base|heavy>]`;
         }
         if (!Number.isInteger(issue_number) || issue_number <= 0) {
           return `ERROR: Command '${command}' requires a positive integer 'issue_number'.`;
@@ -349,7 +367,7 @@ Use { command: "setup", help: true } to see CLI help.`;
     }
 
     // Build command arguments
-    const cmdParts = ["uv", "run", "adw", command];
+    const cmdParts = ["uv", "run", "--active", "adw", command];
 
     // For setup command, args are subcommands and must come immediately after "setup"
     if (command === "setup") {
@@ -367,7 +385,7 @@ Use { command: "setup", help: true } to see CLI help.`;
         cmdParts.push(issue_number.toString());
       }
 
-      if (adw_id !== undefined) {
+      if (!help && adw_id !== undefined) {
         const normalizedAdwId = normalizeAdwId(adw_id);
         if (!normalizedAdwId) {
           return `ERROR: ${adwIdValidationMessage()}`;
@@ -375,11 +393,11 @@ Use { command: "setup", help: true } to see CLI help.`;
         cmdParts.push("--adw-id", normalizedAdwId);
       }
 
-      if (model) {
+      if (!help && model) {
         cmdParts.push("--model", model);
       }
 
-      if (command === "create-issue") {
+      if (!help && command === "create-issue") {
         if (title) {
           cmdParts.push("--title", title);
         }
@@ -388,7 +406,7 @@ Use { command: "setup", help: true } to see CLI help.`;
         }
       }
 
-      if (command === "interpret-issue") {
+      if (!help && command === "interpret-issue") {
         if (text) {
           cmdParts.push("--text", text);
         } else if (issue_number !== undefined && issue_number !== null) {

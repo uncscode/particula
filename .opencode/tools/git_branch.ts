@@ -201,6 +201,20 @@ const selectDiagnostic = (
 
 const OPTIONAL_KEYS = ["branch", "create", "source", "worktree_path", "help"];
 
+const normalizeOptionalField = (fieldName: string, value?: string): { value?: string; error?: string } => {
+  if (value === undefined || value === null) {
+    return { value: undefined };
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return { value: undefined };
+  }
+  if (trimmed.startsWith("-")) {
+    return { error: `ERROR: Invalid ${fieldName}: ${value}.` };
+  }
+  return { value: trimmed };
+};
+
 export default tool({
   description: `Move branch pointers with a narrow ADW git wrapper (checkout, push, push-force-with-lease).
 
@@ -243,24 +257,29 @@ RULES:
       help?: boolean;
     };
 
-    const cmdParts: string[] = ["uv", "run", "adw", "git"];
+    const cmdParts: string[] = ["uv", "run", "--active", "adw", "git"];
 
-    const appendCommandParts = (skipValidation = false): string | undefined => {
+    const appendCommandParts = (skipRequiredChecks = false): string | undefined => {
+      const normalizedWorktree = normalizeOptionalField("worktree_path", worktree_path);
+      if (normalizedWorktree.error) {
+        return normalizedWorktree.error;
+      }
+
       switch (command) {
         case "push": {
           cmdParts.push("push");
           const normalizedBranch = normalizeRef(branch);
-          if (!skipValidation && !normalizedBranch) {
+          if (!skipRequiredChecks && !normalizedBranch) {
             return "ERROR: 'push' command requires 'branch'.";
           }
-          if (!skipValidation && normalizedBranch && !isValidRefToken(normalizedBranch)) {
+          if (normalizedBranch && !isValidRefToken(normalizedBranch)) {
             return `ERROR: Invalid branch: ${branch}.`;
           }
           if (normalizedBranch) {
             cmdParts.push("--branch", normalizedBranch);
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
@@ -270,22 +289,22 @@ RULES:
           const normalizedBranch = normalizeRef(branch);
           const normalizedSource = normalizeRef(source);
 
-          if (!skipValidation && !normalizedBranch) {
+          if (!skipRequiredChecks && !normalizedBranch) {
             return "ERROR: 'checkout' command requires 'branch'.";
           }
-          if (!skipValidation && normalizedBranch && !isValidRefToken(normalizedBranch)) {
+          if (normalizedBranch && !isValidRefToken(normalizedBranch)) {
             return `ERROR: Invalid branch: ${branch}.`;
           }
-          if (!skipValidation && rawSourceProvided && !normalizedSource) {
+          if (!skipRequiredChecks && rawSourceProvided && !normalizedSource) {
             return "ERROR: 'checkout' command requires non-empty 'source' when provided.";
           }
-          if (!skipValidation && normalizedSource && create !== true) {
+          if (!skipRequiredChecks && normalizedSource && create !== true) {
             return "ERROR: 'checkout' command requires 'create' when 'source' is provided.";
           }
-          if (!skipValidation && create === true && isProtectedBranchRef(normalizedBranch)) {
+          if (create === true && isProtectedBranchRef(normalizedBranch)) {
             return "ERROR: checkout --create to protected branch is blocked.";
           }
-          if (!skipValidation && normalizedSource && !isValidRefToken(normalizedSource)) {
+          if (normalizedSource && !isValidRefToken(normalizedSource)) {
             return `ERROR: Invalid source: ${source}.`;
           }
 
@@ -298,8 +317,8 @@ RULES:
           if (create) {
             cmdParts.push("--create");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
@@ -307,20 +326,20 @@ RULES:
         case "push-force-with-lease": {
           cmdParts.push("push-force-with-lease");
           const normalizedBranch = normalizeRef(branch);
-          if (!skipValidation && !normalizedBranch) {
+          if (!skipRequiredChecks && !normalizedBranch) {
             return "ERROR: 'push-force-with-lease' command requires 'branch'.";
           }
-          if (!skipValidation && normalizedBranch && !isValidRefToken(normalizedBranch)) {
+          if (normalizedBranch && !isValidRefToken(normalizedBranch)) {
             return `ERROR: Invalid branch: ${branch}.`;
           }
-          if (!skipValidation && isProtectedBranchRef(normalizedBranch)) {
+          if (isProtectedBranchRef(normalizedBranch)) {
             return "ERROR: push-force-with-lease to protected branch is blocked.";
           }
           if (normalizedBranch) {
             cmdParts.push("--branch", normalizedBranch);
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }

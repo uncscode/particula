@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Python CLI backend for logging agent feedback.
+"""Python CLI backend for logging and reading agent feedback.
 
-Validates CLI arguments, constructs a feedback entry, and delegates logging to
-``adw.utils.feedback.log_feedback``. Intended for subprocess invocation by
-``.opencode/tools/feedback_log.ts``.
+This backend powers ``.opencode/tools/feedback_log.ts``. Write mode validates
+the required feedback contract fields (category, severity, description,
+workflow step, agent type, and ADW ID), constructs a backend entry, and
+delegates to ``adw.utils.feedback.log_feedback`` when available. Read mode
+returns paginated JSON envelopes from the canonical feedback log with optional
+severity filtering. When the shared backend cannot be imported, the CLI falls
+back to verified local JSONL logging with deterministic rate limiting,
+rotation, and exit codes.
 
 Exit codes:
-    0: Feedback logged successfully or rate limited.
-    1: Validation error (invalid category or severity).
+    0: Feedback logged successfully, was rate limited, or read-mode succeeded.
+    1: Validation error.
     2: Write error or unexpected failure.
 """
 
@@ -45,11 +50,17 @@ READ_DEFAULT_PAGE_SIZE = 50
 READ_MAX_PAGE_SIZE = 500
 FALLBACK_MAX_LOG_BYTES = 1_000_000
 FALLBACK_MAX_ROTATED_BACKUPS = 4
+FALLBACK_MAX_ENTRY_BYTES = FALLBACK_MAX_LOG_BYTES
 
 
 @dataclass(frozen=True)
 class FeedbackLogResult:
-    """Structured result from feedback logging."""
+    """Structured result returned by a feedback logging backend.
+
+    Attributes:
+        success: Whether the backend accepted the feedback entry.
+        message: Human-readable backend status or error message.
+    """
 
     success: bool
     message: str
@@ -57,7 +68,16 @@ class FeedbackLogResult:
 
 @dataclass(frozen=True)
 class FeedbackBackend:
-    """Container describing the loaded feedback backend."""
+    """Container describing the active feedback backend.
+
+    Attributes:
+        categories: Accepted feedback categories for validation.
+        severities: Accepted feedback severities for validation.
+        entry_type: Backend-specific feedback entry type to instantiate.
+        log_feedback: Callable that persists an entry and returns a structured
+            result.
+        source: Identifier describing whether the backend is native or fallback.
+    """
 
     categories: Sequence[str]
     severities: Sequence[str]
@@ -68,7 +88,20 @@ class FeedbackBackend:
 
 @dataclass(frozen=True)
 class _FallbackFeedbackEntry:
-    """Fallback feedback entry when adw.utils.feedback is unavailable."""
+    """Fallback feedback entry when ``adw.utils.feedback`` is unavailable.
+
+    Attributes:
+        timestamp: UTC timestamp for the feedback submission.
+        adw_id: Workflow identifier used for scoping and rate limiting.
+        workflow_step: Workflow step associated with the feedback item.
+        agent_type: Agent name or role that submitted the feedback.
+        category: Feedback category validated against fallback allowlists.
+        severity: Feedback severity validated against fallback allowlists.
+        tool_name: Optional tool name associated with the issue.
+        description: Human-readable description of the issue.
+        suggested_fix: Optional proposed resolution.
+        context: Optional extra execution context.
+    """
 
     timestamp: datetime
     adw_id: str = ""
@@ -154,12 +187,20 @@ def _log_error(message: str) -> str:
 
 
 def _get_repo_root() -> Path:
-    """Return the repository root for this tool."""
+    """Return the repository root for this tool.
+
+    Returns:
+        Repository root resolved from this file location.
+    """
     return Path(__file__).resolve().parents[2]
 
 
 def _ensure_repo_root_on_path() -> Path:
-    """Ensure the repository root is on sys.path for imports."""
+    """Ensure the repository root is on ``sys.path`` for imports.
+
+    Returns:
+        Repository root that was ensured on ``sys.path``.
+    """
     repo_root = _get_repo_root()
     if str(repo_root) not in sys.path:
         sys.path.insert(0, str(repo_root))
@@ -167,7 +208,14 @@ def _ensure_repo_root_on_path() -> Path:
 
 
 def _normalize_timestamp(timestamp: datetime) -> datetime:
-    """Normalize timestamps to UTC for comparisons."""
+    """Normalize timestamps to UTC for comparisons.
+
+    Args:
+        timestamp: Timestamp to normalize.
+
+    Returns:
+        UTC-aware timestamp suitable for comparison operations.
+    """
     if timestamp.tzinfo is None:
         return timestamp.replace(tzinfo=timezone.utc)
     return timestamp.astimezone(timezone.utc)
@@ -175,7 +223,19 @@ def _normalize_timestamp(timestamp: datetime) -> datetime:
 
 @contextlib.contextmanager
 def _exclusive_lock(lock_path: Path):
-    """Acquire an exclusive advisory lock for fallback feedback writes."""
+    """Acquire an exclusive advisory lock for fallback feedback writes.
+
+    Args:
+        lock_path: Path to the lock file.
+
+    Yields:
+        None while the exclusive lock is held.
+
+    Raises:
+        OSError: If the lock path is unsafe or cannot be opened.
+        TimeoutError: If the lock cannot be acquired before the timeout.
+    """
+    lock_path = _normalize_and_validate_log_path(lock_path)
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     flags = os.O_APPEND | os.O_CREAT | os.O_WRONLY
     if hasattr(os, "O_NOFOLLOW"):
@@ -209,7 +269,15 @@ def _exclusive_lock(lock_path: Path):
 
 
 def _read_tail_lines_bytes(log_path: Path, max_bytes: int = 64 * 1024) -> list[bytes]:
-    """Read trailing log lines using byte offsets for robust tail parsing."""
+    """Read trailing log lines using byte offsets for robust tail parsing.
+
+    Args:
+        log_path: Path to the log file.
+        max_bytes: Maximum number of trailing bytes to inspect.
+
+    Returns:
+        Log lines from the file tail as raw bytes.
+    """
     with log_path.open("rb") as handle:
         handle.seek(0, os.SEEK_END)
         file_size = handle.tell()
@@ -232,6 +300,13 @@ def _atomic_append_json_line(log_path: Path, payload_line: str) -> None:
     The caller holds the exclusive file lock. The final open uses ``O_NOFOLLOW``
     when available and validates the opened descriptor before writing to close
     symlink replacement races between path validation and append.
+
+    Args:
+        log_path: Canonical feedback log path to append to.
+        payload_line: Serialized JSON object without a trailing newline.
+
+    Raises:
+        OSError: If the target cannot be opened safely or written successfully.
     """
     encoded_line = payload_line.encode("utf-8") + b"\n"
     flags = os.O_APPEND | os.O_CREAT | os.O_WRONLY
@@ -296,7 +371,16 @@ def _load_last_log_entry_for_key(
     adw_id: str,
     agent_type: str,
 ) -> _FallbackFeedbackEntry | None:
-    """Load the latest fallback log entry matching ``(adw_id, agent_type)``."""
+    """Load the latest fallback log entry matching ``(adw_id, agent_type)``.
+
+    Args:
+        log_path: Path to the fallback feedback log file.
+        adw_id: Workflow identifier to match.
+        agent_type: Agent type to match.
+
+    Returns:
+        Most recent matching fallback feedback entry, or None if unavailable.
+    """
     if not log_path.exists():
         return None
 
@@ -340,7 +424,15 @@ def _latest_entry_for_key(
     in_memory_entry: _FallbackFeedbackEntry | None,
     persisted_entry: _FallbackFeedbackEntry | None,
 ) -> _FallbackFeedbackEntry | None:
-    """Choose the latest entry for a key between memory cache and persisted log."""
+    """Choose the latest entry for a key between memory cache and persisted log.
+
+    Args:
+        in_memory_entry: Cached in-memory entry for the key.
+        persisted_entry: Most recent persisted entry for the key.
+
+    Returns:
+        Newest available entry, or None when neither source has one.
+    """
     if in_memory_entry is None:
         return persisted_entry
     if persisted_entry is None:
@@ -383,14 +475,28 @@ def _is_rate_limited(
 def _coerce_fallback_entry(
     entry: _FallbackFeedbackEntry | dict[str, Any],
 ) -> _FallbackFeedbackEntry:
-    """Convert raw fallback payloads into a typed fallback entry."""
+    """Convert raw fallback payloads into a typed fallback entry.
+
+    Args:
+        entry: Existing fallback entry or raw mapping payload.
+
+    Returns:
+        Normalized fallback entry instance.
+    """
     if isinstance(entry, _FallbackFeedbackEntry):
         return entry
     return _FallbackFeedbackEntry(**entry)
 
 
 def _format_fallback_write_error(exc: BaseException) -> str:
-    """Return a normalized fallback write error with a single prefix."""
+    """Return a normalized fallback write error with a single prefix.
+
+    Args:
+        exc: Exception raised during fallback logging.
+
+    Returns:
+        User-facing error message with canonical prefix handling.
+    """
     reason = str(exc).strip() or exc.__class__.__name__
     lowered_prefix = FALLBACK_WRITE_PREFIX.lower()
     if reason.lower().startswith(lowered_prefix):
@@ -442,6 +548,7 @@ def _fallback_log_feedback(
             if _is_rate_limited(last_entry, entry_obj, FALLBACK_RATE_LIMIT_WINDOW):
                 return FeedbackLogResult(False, FALLBACK_RATE_LIMIT_MESSAGE)
             _append_json_line(log_path, json.dumps(payload))
+            _verify_appended_payload(log_path, json.dumps(payload))
     except (OSError, TimeoutError) as exc:
         return FeedbackLogResult(False, _format_fallback_write_error(exc))
     except Exception as exc:  # pragma: no cover - defensive
@@ -454,9 +561,24 @@ def _fallback_log_feedback(
 def _wrap_feedback_logger(
     func: Callable[[Any], tuple[bool, str]],
 ) -> Callable[[Any], FeedbackLogResult]:
-    """Wrap a tuple-returning feedback logger with a structured result."""
+    """Wrap a tuple-returning feedback logger with a structured result.
+
+    Args:
+        func: Logger callable that returns ``(success, message)``.
+
+    Returns:
+        Wrapper that converts tuple results into ``FeedbackLogResult``.
+    """
 
     def _wrapped(entry: Any) -> FeedbackLogResult:
+        """Convert tuple logger results into ``FeedbackLogResult``.
+
+        Args:
+            entry: Feedback entry object passed through to the backend logger.
+
+        Returns:
+            Structured feedback logging result.
+        """
         success, message = func(entry)
         return FeedbackLogResult(success, message)
 
@@ -501,6 +623,11 @@ def _load_feedback_backend() -> FeedbackBackend:
 def _build_parser() -> argparse.ArgumentParser:
     """Create the argument parser for feedback logging.
 
+    The parser supports read and write modes. Write-mode validation is completed
+    in ``main()`` so the CLI can return deterministic error messages for the
+    required contract fields ``--workflow-step``, ``--agent-type``, and
+    ``--adw-id`` alongside the existing required write inputs.
+
     Returns:
         Configured ArgumentParser instance.
     """
@@ -512,7 +639,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--suggested-fix", default="", help="Suggested fix")
     parser.add_argument("--tool-name", default="", help="Tool that triggered feedback")
     parser.add_argument("--workflow-step", default="", help="Workflow step name")
-    parser.add_argument("--agent-type", default="unknown", help="Agent type")
+    parser.add_argument("--agent-type", default="", help="Agent type")
     parser.add_argument("--adw-id", default="", help="ADW workflow ID")
     parser.add_argument("--context", default="", help="Additional context")
     parser.add_argument("--page", type=int, default=READ_DEFAULT_PAGE, help="Read mode page number")
@@ -531,7 +658,11 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _resolve_project_root() -> Path:
-    """Resolve project root, preferring shared path helpers when available."""
+    """Resolve the project root, preferring shared path helpers when available.
+
+    Returns:
+        Canonical project root for the current worktree.
+    """
     _ensure_repo_root_on_path()
     try:
         from adw.utils.paths import get_project_root
@@ -561,7 +692,17 @@ def _resolve_feedback_log_path() -> Path:
 
 
 def _normalize_and_validate_log_path(log_path: Path) -> Path:
-    """Normalize and validate log path is safe and within repository root."""
+    """Normalize and validate that a log path is safe and repo-confined.
+
+    Args:
+        log_path: Candidate feedback log path.
+
+    Returns:
+        Normalized absolute path confined to the repository root.
+
+    Raises:
+        OSError: If the path is symlinked or resolves outside the repository.
+    """
     root = _resolve_project_root().resolve()
     candidate_raw = log_path.expanduser()
     if not candidate_raw.is_absolute():
@@ -589,7 +730,17 @@ def _normalize_and_validate_log_path(log_path: Path) -> Path:
 
 
 def _validate_existing_log_file(log_path: Path) -> Path:
-    """Validate an existing feedback log path before reads or rotation."""
+    """Validate an existing feedback log path before reads or rotation.
+
+    Args:
+        log_path: Feedback log path to validate.
+
+    Returns:
+        Normalized validated log path.
+
+    Raises:
+        OSError: If the existing path is not a regular file.
+    """
     normalized = _normalize_and_validate_log_path(log_path)
     if normalized.exists():
         path_stat = normalized.stat()
@@ -599,7 +750,11 @@ def _validate_existing_log_file(log_path: Path) -> Path:
 
 
 def _rotate_feedback_logs(log_path: Path) -> None:
-    """Shift numbered backups down and rotate active log to ``.1``."""
+    """Shift numbered backups down and rotate active log to ``.1``.
+
+    Args:
+        log_path: Active feedback log path.
+    """
     candidates: list[tuple[int, Path]] = []
     for rotated in log_path.parent.glob(f"{log_path.name}.*"):
         suffix = rotated.name.removeprefix(f"{log_path.name}.")
@@ -615,7 +770,12 @@ def _rotate_feedback_logs(log_path: Path) -> None:
 
 
 def _prune_rotated_backups(log_path: Path, *, max_backups: int | None = None) -> None:
-    """Prune rotated backups beyond the configured retention count."""
+    """Prune rotated backups beyond the configured retention count.
+
+    Args:
+        log_path: Active feedback log path whose numbered backups are pruned.
+        max_backups: Maximum number of rotated backups to retain.
+    """
     if max_backups is None:
         max_backups = FALLBACK_MAX_ROTATED_BACKUPS
     if max_backups < 1:
@@ -634,11 +794,23 @@ def _prune_rotated_backups(log_path: Path, *, max_backups: int | None = None) ->
 
 
 def _append_json_line(log_path: Path, payload_line: str) -> None:
-    """Append a JSONL line and rotate when size budget would be exceeded."""
+    """Append a JSONL line and rotate when size budget would be exceeded.
+
+    Args:
+        log_path: Target feedback log path.
+        payload_line: Serialized JSON line to append.
+
+    """
     normalized = _normalize_and_validate_log_path(log_path)
     normalized.parent.mkdir(parents=True, exist_ok=True)
 
     new_line_size = len(payload_line.encode("utf-8")) + 1
+    if new_line_size > FALLBACK_MAX_ENTRY_BYTES:
+        raise OSError(
+            "feedback log entry exceeds maximum size: "
+            f"{new_line_size} bytes > {FALLBACK_MAX_ENTRY_BYTES} bytes"
+        )
+
     existing_size = normalized.stat().st_size if normalized.exists() else 0
     if existing_size + new_line_size > FALLBACK_MAX_LOG_BYTES and normalized.exists():
         _rotate_feedback_logs(normalized)
@@ -646,8 +818,33 @@ def _append_json_line(log_path: Path, payload_line: str) -> None:
     _atomic_append_json_line(normalized, payload_line)
 
 
+def _verify_appended_payload(log_path: Path, payload_line: str) -> None:
+    """Verify that a just-written payload is present in the log tail.
+
+    Args:
+        log_path: Target feedback log path.
+        payload_line: Serialized JSON line that should have been appended.
+
+    Raises:
+        OSError: If the payload cannot be observed after append.
+    """
+    normalized = _validate_existing_log_file(log_path)
+    expected = payload_line.encode("utf-8")
+    for line in reversed(_read_tail_lines_bytes(normalized)):
+        if line.strip() == expected:
+            return
+    raise OSError(f"feedback log write verification failed for: {normalized}")
+
+
 def _iter_feedback_log_files(log_path: Path) -> list[Path]:
-    """Return rotated log files oldest-to-newest, ending with the current log file."""
+    """Return rotated log files oldest-to-newest, ending with the current log file.
+
+    Args:
+        log_path: Active feedback log path.
+
+    Returns:
+        Ordered list of rotated backups followed by the active log path.
+    """
     base = _normalize_and_validate_log_path(log_path)
     candidates: list[tuple[int, Path]] = []
     for rotated in base.parent.glob(f"{base.name}.*"):
@@ -665,7 +862,14 @@ def _iter_feedback_log_files(log_path: Path) -> list[Path]:
 
 
 def _iter_feedback_entries(log_path: Path) -> Iterable[dict[str, Any]]:
-    """Yield JSONL feedback entries from disk, skipping malformed records."""
+    """Yield JSONL feedback entries from disk, skipping malformed records.
+
+    Args:
+        log_path: Active feedback log path.
+
+    Yields:
+        Parsed feedback entry dictionaries from the log files.
+    """
     for path in _iter_feedback_log_files(log_path):
         if not path.exists():
             continue
@@ -683,7 +887,14 @@ def _iter_feedback_entries(log_path: Path) -> Iterable[dict[str, Any]]:
 
 
 def _read_feedback_entries(log_path: Path) -> list[dict[str, Any]]:
-    """Read JSONL feedback entries from disk, skipping malformed records."""
+    """Read JSONL feedback entries from disk, skipping malformed records.
+
+    Args:
+        log_path: Active feedback log path.
+
+    Returns:
+        Parsed feedback entry dictionaries in on-disk iteration order.
+    """
     return list(_iter_feedback_entries(log_path))
 
 
@@ -694,7 +905,17 @@ def _read_feedback_page(
     page_size: int,
     severity_filter: str | None,
 ) -> dict[str, Any]:
-    """Read one page of feedback entries without materializing full datasets."""
+    """Read one page of feedback entries without materializing full datasets.
+
+    Args:
+        log_path: Active feedback log path.
+        page: One-based page number to read.
+        page_size: Maximum number of entries to return.
+        severity_filter: Optional severity filter applied case-insensitively.
+
+    Returns:
+        Deterministic paginated response envelope.
+    """
     start_offset = (page - 1) * page_size
     end_offset = start_offset + page_size
     total_entries = 0
@@ -735,7 +956,16 @@ def _build_read_response(
     page: int,
     page_size: int,
 ) -> dict[str, Any]:
-    """Build deterministic read-mode response envelope."""
+    """Build a deterministic read-mode response envelope.
+
+    Args:
+        entries: All entries to paginate.
+        page: One-based page number to render.
+        page_size: Maximum number of entries to include.
+
+    Returns:
+        Paginated response envelope for read-mode callers.
+    """
     total_entries = len(entries)
     total_pages = (total_entries + page_size - 1) // page_size if total_entries > 0 else 0
     start_offset = (page - 1) * page_size
@@ -761,8 +991,110 @@ def _build_read_response(
     }
 
 
+def _normalize_cli_text(value: Any) -> str:
+    """Normalize CLI string-like values by trimming surrounding whitespace.
+
+    Args:
+        value: Raw CLI value to normalize.
+
+    Returns:
+        Trimmed string representation, or an empty string for None.
+    """
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _print_read_error(exc: BaseException) -> int:
+    """Print a deterministic read-mode failure message.
+
+    Args:
+        exc: Exception raised while serving a read-mode request.
+
+    Returns:
+        Canonical read-mode failure exit code.
+    """
+    print(_log_error(str(exc) or exc.__class__.__name__))
+    return 2
+
+
+def _build_feedback_entry(backend: FeedbackBackend, args: argparse.Namespace) -> Any:
+    """Build a backend feedback entry from normalized CLI arguments.
+
+    Args:
+        backend: Active backend contract used for validation and entry creation.
+        args: Parsed CLI arguments.
+
+    Returns:
+        Backend-specific feedback entry instance.
+
+    Raises:
+        ValueError: If required arguments are missing or validation fails.
+    """
+    category = _normalize_cli_text(args.category)
+    severity = _normalize_cli_text(args.severity)
+    description = _normalize_cli_text(args.description)
+    workflow_step = _normalize_cli_text(args.workflow_step)
+    agent_type = _normalize_cli_text(args.agent_type)
+    adw_id = _normalize_cli_text(args.adw_id)
+    suggested_fix = _normalize_cli_text(args.suggested_fix)
+    tool_name = _normalize_cli_text(args.tool_name)
+    context = _normalize_cli_text(args.context)
+
+    missing_args: list[str] = []
+    if not category:
+        missing_args.append("category")
+    if not severity:
+        missing_args.append("severity")
+    if not description:
+        missing_args.append("description")
+    if not workflow_step:
+        missing_args.append("workflow_step")
+    if not agent_type:
+        missing_args.append("agent_type")
+    if not adw_id:
+        missing_args.append("adw_id")
+    if missing_args:
+        missing_flags = ", ".join(f"--{item.replace('_', '-')}" for item in missing_args)
+        raise ValueError(f"Missing required arguments for write command: {missing_flags}")
+
+    if category not in backend.categories:
+        raise ValueError(
+            _validation_error(
+                f"Invalid category '{category}'",
+                backend.categories,
+                backend.severities,
+            )
+        )
+    if severity not in backend.severities:
+        raise ValueError(
+            _validation_error(
+                f"Invalid severity '{severity}'",
+                backend.categories,
+                backend.severities,
+            )
+        )
+
+    return backend.entry_type(
+        timestamp=datetime.now(timezone.utc),
+        adw_id=adw_id,
+        workflow_step=workflow_step,
+        agent_type=agent_type,
+        category=category,
+        severity=severity,
+        tool_name=tool_name,
+        description=description,
+        suggested_fix=suggested_fix,
+        context=context,
+    )
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entry point for feedback logging.
+
+    Write mode requires category, severity, description, workflow step, agent
+    type, and ADW ID so wrapper/backend validation stays aligned. Read mode
+    returns paginated JSON envelopes from the fallback feedback log.
 
     Args:
         argv: Optional CLI argument sequence for testing.
@@ -794,65 +1126,37 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             )
             return 1
 
-        log_path = _resolve_feedback_log_path()
-        print(
-            json.dumps(
-                _read_feedback_page(
-                    log_path,
-                    page=args.page,
-                    page_size=args.page_size,
-                    severity_filter=args.severity_filter,
-                ),
-                ensure_ascii=False,
+        try:
+            log_path = _resolve_feedback_log_path()
+            payload = _read_feedback_page(
+                log_path,
+                page=args.page,
+                page_size=args.page_size,
+                severity_filter=args.severity_filter,
             )
-        )
+        except Exception as exc:  # noqa: BLE001
+            return _print_read_error(exc)
+
+        print(json.dumps(payload, ensure_ascii=False))
         return 0
 
-    backend = _load_feedback_backend()
-
-    missing_args: list[str] = []
-    if not args.category:
-        missing_args.append("category")
-    if not args.severity:
-        missing_args.append("severity")
-    if not args.description:
-        missing_args.append("description")
-    if missing_args:
-        missing_flags = ", ".join(f"--{item.replace('_', '-')}" for item in missing_args)
-        print(
-            _validation_error(
-                f"Missing required arguments for write command: {missing_flags}", [], []
-            )
-        )
+    try:
+        backend = _load_feedback_backend()
+        entry = _build_feedback_entry(backend, args)
+    except ValueError as exc:
+        message = str(exc)
+        if message.startswith("Feedback error:"):
+            print(message)
+        else:
+            print(_validation_error(message, [], []))
         return 1
+    except Exception as exc:  # noqa: BLE001
+        print(_log_error(str(exc) or exc.__class__.__name__))
+        return 2
 
-    if args.category not in backend.categories:
-        print(
-            _validation_error(
-                f"Invalid category '{args.category}'", backend.categories, backend.severities
-            )
-        )
-        return 1
-    if args.severity not in backend.severities:
-        print(
-            _validation_error(
-                f"Invalid severity '{args.severity}'", backend.categories, backend.severities
-            )
-        )
-        return 1
-
-    entry = backend.entry_type(
-        timestamp=datetime.now(timezone.utc),
-        adw_id=args.adw_id,
-        workflow_step=args.workflow_step,
-        agent_type=args.agent_type,
-        category=args.category,
-        severity=args.severity,
-        tool_name=args.tool_name,
-        description=args.description,
-        suggested_fix=args.suggested_fix,
-        context=args.context,
-    )
+    category = _normalize_cli_text(args.category)
+    severity = _normalize_cli_text(args.severity)
+    description = _normalize_cli_text(args.description)
 
     try:
         result = backend.log_feedback(entry)
@@ -861,8 +1165,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
 
     if result.success:
-        truncated = _truncate_description(args.description)
-        print(f"Feedback logged, thank you. [{args.category}/{args.severity}] {truncated}")
+        truncated = _truncate_description(description)
+        print(f"Feedback logged, thank you. [{category}/{severity}] {truncated}")
         return 0
 
     if result.message.startswith(RATE_LIMIT_PREFIX):

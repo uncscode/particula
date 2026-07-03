@@ -102,7 +102,7 @@ export default tool({
     const issueNumberToken = normalizeIssueNumberToken(args.issue_number);
     const body = normalizeOptionalString(args.body);
     const preferScope = normalizeOptionalString(args.prefer_scope);
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "platform", command];
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "platform", command];
 
     if (args.help) {
       cmdParts.push("--help");

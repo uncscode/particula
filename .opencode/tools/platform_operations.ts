@@ -11,49 +11,30 @@
 
 import { tool } from "@opencode-ai/plugin";
 
-// --- Inlined from lib/diagnostics.ts ---
-const CONTROL_CHARS_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
-const WHITESPACE_COLLAPSE_PATTERN = /\s+/g;
-
-const REDACTION_PATTERNS: RegExp[] = [
-  /\bgh[pousr]_[A-Za-z0-9]{10,}\b/g,
-  /\b(?:token|api[_-]?key|secret|password)\s*[:=]\s*([^\s"']+)/gi,
-  /\bAuthorization\s*:\s*Bearer\s+([^\s"']+)/gi,
-];
-
-const REDACTION_MARKER = "[REDACTED]";
-
-function redactSensitiveFragments(value: string): string {
-  let redacted = value;
-  redacted = redacted.replace(REDACTION_PATTERNS[0], REDACTION_MARKER);
-  redacted = redacted.replace(REDACTION_PATTERNS[1], (match) => {
-    const splitIndex = match.indexOf(":") >= 0 ? match.indexOf(":") : match.indexOf("=");
-    if (splitIndex < 0) return REDACTION_MARKER;
-    return `${match.slice(0, splitIndex + 1)} ${REDACTION_MARKER}`;
-  });
-  redacted = redacted.replace(REDACTION_PATTERNS[2], `Authorization: Bearer ${REDACTION_MARKER}`);
-  return redacted;
-}
-
-function decodeUnknown(value: unknown): string {
-  if (value instanceof Uint8Array) return new TextDecoder().decode(value);
-  if (typeof value === "string") return value;
-  if (value === null || value === undefined) return "";
-  return String(value);
-}
-
-function sanitizeDiagnosticText(value: string, maxChars = 4000): string {
-  if (!value) return "";
-  const noControlChars = value.replace(CONTROL_CHARS_PATTERN, " ");
-  const redacted = redactSensitiveFragments(noControlChars);
-  const normalized = redacted.replace(WHITESPACE_COLLAPSE_PATTERN, " ").trim();
-  if (!normalized) return "";
-  if (normalized.length <= maxChars) return normalized;
-  return `${normalized.slice(0, maxChars)} ...(truncated)`;
-}
-// --- End inlined diagnostics ---
+import {
+  getStructuredJsonPayload,
+  normalizeLabels,
+  sanitizeAndTruncate,
+} from "./lib/platform_wrapper_utils";
 
 const ERROR_SNIPPET_LIMIT = 2000;
+
+const COMPATIBILITY_ROUTE_TO_WRAPPER = {
+  "create-pr": "platform_pr_write",
+  "fetch-issue": "platform_issue_read",
+  "create-issue": "platform_issue_write",
+  "update-issue": "platform_issue_write",
+  "add-labels": "platform_label_write",
+  "remove-labels": "platform_label_write",
+  comment: "platform_comment_write",
+  "pr-comments": "platform_pr_read",
+  "pr-review": "platform_pr_review_write",
+  "rate-limit": "platform_rate_limit_read",
+} as const;
+
+const SPLIT_ONLY_ROUTE_TO_WRAPPER = {
+  "pr-diff": "platform_pr_read",
+} as const;
 
 const REQUIRED_ISSUE_COMMANDS = new Set([
   "fetch-issue",
@@ -91,35 +72,53 @@ const PREFER_SCOPE_COMMANDS = [
 const PREFER_SCOPE_COMMAND_SET = new Set(PREFER_SCOPE_COMMANDS);
 const PREFER_SCOPE_COMMAND_LIST = PREFER_SCOPE_COMMANDS.join(", ");
 
- type PlatformCommand =
-   | "create-pr"
-   | "fetch-issue"
-   | "create-issue"
-   | "update-issue"
-   | "add-labels"
-   | "remove-labels"
-    | "comment"
-    | "pr-comments"
-    | "pr-review"
-    | "rate-limit";
+ type PlatformCommand = keyof typeof COMPATIBILITY_ROUTE_TO_WRAPPER;
 
 
 type OutputFormat = "text" | "json";
 
-function truncate(value: string | undefined): string {
-  if (!value) return "";
-  return value.length > ERROR_SNIPPET_LIMIT
-    ? `${value.slice(0, ERROR_SNIPPET_LIMIT)}...<truncated>`
-    : value;
+function isSupportedCompatibilityCommand(value: string): value is PlatformCommand {
+  return value in COMPATIBILITY_ROUTE_TO_WRAPPER;
 }
 
-function sanitizeAndTruncate(value: unknown): string {
-  const sanitized = sanitizeDiagnosticText(decodeUnknown(value), ERROR_SNIPPET_LIMIT);
-  return truncate(sanitized);
+function normalizeOutputFormat(value: unknown): OutputFormat | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  const token = String(value).trim();
+  return token === "text" || token === "json" ? token : undefined;
+}
+
+function isStrictPositiveInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && Number.isInteger(value) && value > 0;
+}
+
+function isSafeInlinePath(pathToken: string): boolean {
+  if (!pathToken || pathToken.startsWith("/") || pathToken.startsWith("\\")) {
+    return false;
+  }
+  if (pathToken.includes("\\")) {
+    return false;
+  }
+  const segments = pathToken.split("/");
+  if (segments.some((segment) => segment.length === 0 || segment === "." || segment === "..")) {
+    return false;
+  }
+  return true;
+}
+
+function isShaLikeToken(value: string): boolean {
+  return /^[0-9a-fA-F]{7,64}$/.test(value);
 }
 
 function buildMissingArgMessage(message: string): string {
   return `ERROR: ${message}`;
+}
+
+function buildCompatibilityGuidance(command: string, wrapper: string): string {
+  return buildMissingArgMessage(
+    `platform_operations compatibility mode does not support '${command}'. Use '${wrapper}' instead.`
+  );
 }
 
 function normalizeIssueNumberToken(value: unknown): string | undefined {
@@ -152,7 +151,7 @@ async function runCommand(cmdParts: (string | number)[]): Promise<string> {
 }
 
 export default tool({
-  description: `Execute platform operations (GitHub/GitLab) via the ADW PlatformRouter. Only include parameters you need.
+  description: `Execute platform operations (GitHub/GitLab) via the ADW PlatformRouter. Compatibility-only wrapper retained for legacy callers; prefer the mapped split wrappers for migrated commands. Only include parameters you need.
 
 SIMPLE EXAMPLES (copy these patterns):
 
@@ -351,31 +350,47 @@ EXAMPLE: { command: "create-issue", help: true }`),
   },
 
   async execute(args) {
-    const command = args.command as PlatformCommand;
-    const outputFormat: OutputFormat = (args.output_format as OutputFormat) || "text";
+    const rawCommand = String(args.command ?? "").trim();
+    if (rawCommand in SPLIT_ONLY_ROUTE_TO_WRAPPER) {
+      return buildCompatibilityGuidance(
+        rawCommand,
+        SPLIT_ONLY_ROUTE_TO_WRAPPER[rawCommand as keyof typeof SPLIT_ONLY_ROUTE_TO_WRAPPER]
+      );
+    }
+    if (!isSupportedCompatibilityCommand(rawCommand)) {
+      return buildMissingArgMessage(`Unsupported command: ${rawCommand}`);
+    }
+
+    const command = rawCommand;
+    const normalizedOutputFormat = normalizeOutputFormat(args.output_format);
+    const outputFormat: OutputFormat = normalizedOutputFormat || "text";
     const issueNumberToken = normalizeIssueNumberToken(args.issue_number);
     const title = normalizeOptionalString(args.title);
     const body = normalizeOptionalString(args.body);
     const head = normalizeOptionalString(args.head);
     const base = normalizeOptionalString(args.base);
     const adwId = normalizeOptionalString(args.adw_id);
-    const labels = normalizeOptionalString(args.labels);
+     const labels = normalizeLabels(args.labels);
     const preferScope = normalizeOptionalString(args.prefer_scope);
     const path = normalizeOptionalString(args.path);
     const commitSha = normalizeOptionalString(args.commit_sha);
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "platform", command];
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "platform", command];
 
     if (args.help) {
       cmdParts.push("--help");
       try {
         return await runCommand(cmdParts);
       } catch (error: any) {
-        const stdout = sanitizeAndTruncate(error.stdout);
-        const stderr = sanitizeAndTruncate(error.stderr);
+        const stderr = sanitizeAndTruncate(error.stderr, ERROR_SNIPPET_LIMIT);
+        const stdout = sanitizeAndTruncate(error.stdout, ERROR_SNIPPET_LIMIT);
         return `ERROR: Failed to fetch help for '${command}'.${
-          stdout ? `\nSTDOUT:\n${stdout}` : ""
-        }${stderr ? `\nSTDERR:\n${stderr}` : ""}`;
+          stderr ? `\nSTDERR:\n${stderr}` : ""
+        }${stdout ? `\nSTDOUT:\n${stdout}` : ""}`;
       }
+    }
+
+    if (args.output_format !== undefined && normalizedOutputFormat === undefined) {
+      return buildMissingArgMessage("'output_format' must be either 'text' or 'json'");
     }
 
     if (args.prefer_scope !== undefined && preferScope === undefined) {
@@ -396,6 +411,9 @@ EXAMPLE: { command: "create-issue", help: true }`),
         "'actionable_only' is only supported for the 'pr-comments' command"
       );
     }
+    if (args.actionable_only !== undefined && typeof args.actionable_only !== "boolean") {
+      return buildMissingArgMessage("'actionable_only' must be a boolean when provided");
+    }
 
     if (REQUIRED_ISSUE_COMMANDS.has(command) && !issueNumberToken) {
       return buildMissingArgMessage(
@@ -409,7 +427,7 @@ EXAMPLE: { command: "create-issue", help: true }`),
       );
     }
 
-    const labelsProvided = labels !== undefined;
+     const labelsProvided = labels !== undefined;
 
     switch (command) {
       case "create-pr": {
@@ -522,8 +540,8 @@ EXAMPLE: { command: "create-issue", help: true }`),
           return buildMissingArgMessage("'labels' is required and must contain at least one label (comma-separated)");
         }
         cmdParts.push(issueNumberToken as string, "--labels", labels as string);
-        if (args.prefer_scope) {
-          cmdParts.push("--prefer-scope", args.prefer_scope);
+        if (preferScope) {
+          cmdParts.push("--prefer-scope", preferScope);
         }
         if (args.output_format) {
           cmdParts.push("--format", outputFormat);
@@ -572,6 +590,22 @@ EXAMPLE: { command: "create-issue", help: true }`),
           return buildMissingArgMessage(
             "'--path' requires '--line' or '--position' for command 'pr-review'"
           );
+        }
+        if (line !== undefined && !isStrictPositiveInteger(line)) {
+          return buildMissingArgMessage("'line' must be a positive integer for command 'pr-review'");
+        }
+        if (position !== undefined && !isStrictPositiveInteger(position)) {
+          return buildMissingArgMessage(
+            "'position' must be a positive integer for command 'pr-review'"
+          );
+        }
+        if (path && !isSafeInlinePath(path)) {
+          return buildMissingArgMessage(
+            "'path' must be a safe repository-relative path without traversal for command 'pr-review'"
+          );
+        }
+        if (commitSha && !isShaLikeToken(commitSha)) {
+          return buildMissingArgMessage("'commit_sha' must be a SHA-like hex token (7-64 chars)");
         }
 
         cmdParts.push(issueNumberToken as string, "--body", body);
@@ -625,8 +659,8 @@ STATUS: SUCCESS`;
 
       return result;
     } catch (error: any) {
-      const stdout = sanitizeAndTruncate(error.stdout);
-      const stderr = sanitizeAndTruncate(error.stderr);
+      const stdout = sanitizeAndTruncate(error.stdout, ERROR_SNIPPET_LIMIT);
+      const stderr = sanitizeAndTruncate(error.stderr, ERROR_SNIPPET_LIMIT);
 
       // Add clear failure signal for create-pr command
       if (command === "create-pr") {
@@ -645,9 +679,12 @@ STATUS: SUCCESS`;
         return parts.join("\n");
       }
 
-      if (outputFormat === "json" && stdout) {
-        return stdout;
-      }
+       if (outputFormat === "json" && JSON_CAPABLE_COMMANDS.has(command)) {
+         const structuredJson = getStructuredJsonPayload(error.stdout);
+         if (structuredJson) {
+           return structuredJson;
+         }
+       }
 
       const parts: string[] = [
         `ERROR: Failed to execute 'adw platform ${command}'`,

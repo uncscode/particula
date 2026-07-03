@@ -7,6 +7,28 @@
 import { tool } from "@opencode-ai/plugin";
 
 type DateTimeFormat = "date" | "datetime" | "human";
+const DATE_TIME_FORMATS = ["date", "datetime", "human"] as const satisfies readonly DateTimeFormat[];
+const VALID_FORMATS = new Set<DateTimeFormat>(DATE_TIME_FORMATS);
+
+function validateFormat(value: unknown): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value !== "string" || !VALID_FORMATS.has(value as DateTimeFormat)) {
+    return "ERROR: Invalid format. Expected one of: date, datetime, human.";
+  }
+  return undefined;
+}
+
+function validateLocaltime(value: unknown): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value !== "boolean") {
+    return "ERROR: 'localtime' must be a boolean when provided.";
+  }
+  return undefined;
+}
 
 const buildOffset = (date: Date, timeZone: string): string => {
   const parts = formatParts(date, timeZone, true);
@@ -56,7 +78,7 @@ export default tool({
   description: "Get the current date or datetime in various formats (UTC or Denver local time)",
   args: {
     format: tool.schema
-      .enum(["date", "datetime", "human"])
+      .enum(DATE_TIME_FORMATS)
       .optional()
       .describe("Format: 'date' (YYYY-MM-DD), 'datetime' (ISO 8601), 'human' (human-readable). Default: 'date'"),
     localtime: tool.schema
@@ -65,8 +87,17 @@ export default tool({
       .describe("Use Denver timezone (America/Denver) instead of UTC. Default: false"),
   },
   async execute(args) {
-    const format: DateTimeFormat = args.format || "date";
-    const useLocalTime = args.localtime ?? false;
+    const formatError = validateFormat(args.format);
+    if (formatError) {
+      return formatError;
+    }
+    const localtimeError = validateLocaltime(args.localtime);
+    if (localtimeError) {
+      return localtimeError;
+    }
+
+    const format: DateTimeFormat = (args.format as DateTimeFormat | undefined) || "date";
+    const useLocalTime = args.localtime === true;
     const timeZone = useLocalTime ? "America/Denver" : "UTC";
     const now = new Date();
 
@@ -104,3 +135,5 @@ export default tool({
     }
   },
 });
+
+export { DATE_TIME_FORMATS };

@@ -9,7 +9,7 @@ description: 'Primary agent that validates implementation against spec intent an
   code, tests, lint, type issues - Runs scoped tests on affected modules only - Commits
   fixes after verification
 
-  Invoked by: adw workflow run validate <issue-number> --adw-id <id>
+  Invoked by: workflow runner validate <issue-number> --adw-id <id>
 
   Examples:
   - After build completes: validate spec intent was achieved, fix any gaps
@@ -24,19 +24,22 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec: deny
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: allow
+  git_diff: allow
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_bun_test: allow
   run_validate_agent_references: allow
   run_linters: allow
@@ -203,7 +206,7 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -233,10 +236,10 @@ Use tools to verify you're operating in the correct worktree:
 ripgrep({"pattern": "**/*", "path": worktree_path})
 
 # Check git status in worktree
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 
 # Get diff to understand what changed
-git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
 ```
 
 **CRITICAL:** All subsequent file operations MUST use paths relative to or within `worktree_path`.
@@ -288,7 +291,7 @@ Create a mental checklist of intents to verify:
 ### 5.1: Get Changed Files
 
 ```python
-git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
 ```
 
 ### 5.2: Read Changed Code
@@ -370,12 +373,12 @@ Changed: adw/core/models.py → Test: adw/core/tests/
 For each affected module:
 
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{module}/tests/", "-m", "not slow and not performance"],
   "minTests": 1,
-  "failFast": true,
   "timeout": 120,
-  "cwd": worktree_path
+  "cwd": worktree_path,
+  "options": "fail-fast"
 })
 ```
 
@@ -470,11 +473,11 @@ After fixing, verify everything passes:
 ### 10.1: Re-run Scoped Tests
 
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{affected_modules}/tests/", "-m", "not slow and not performance"],
   "minTests": 1,
-  "failFast": true,
-  "cwd": worktree_path
+  "cwd": worktree_path,
+  "options": "fail-fast"
 })
 ```
 
@@ -510,7 +513,7 @@ If any fixes were made, commit them:
 ### 11.1: Check for Changes
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ```
 
 ### 11.2: Commit via Subagent
@@ -763,4 +766,4 @@ Small issues that don't affect functionality.
 - Fixes are committed via adw-commit subagent
 - No changes = no commit (just report success)
 
-**References:** `adw_spec` for workflow state, `.opencode/guides/testing_guide.md`, `.opencode/guides/linting_guide.md`
+**References:** `adw_spec_read` for workflow state, `.opencode/guides/testing_guide.md`, `.opencode/guides/linting_guide.md`

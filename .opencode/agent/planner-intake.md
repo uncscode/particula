@@ -4,21 +4,23 @@ description: >-
   Primary agent for interactive planner issue creation. Use this agent when:
   - You have an idea for a new feature, epic, maintenance, or research effort
   - You want help filling out the rough-scoping planner template
-  - You need codebase research to inform scope and child tracks
+  - You need codebase research to inform scope, references, examples, tracks, and phases
   - You want to create a `type:planner` GitHub issue ready for the planner workflow
 
   This agent is INTERACTIVE - it walks you through each template section,
   asks clarifying questions, researches the codebase for context, recommends
-  child tracks for epics, validates the result against plan-scope-analyzer
+  child tracks and suggested phases, validates the result against plan-scope-analyzer
   parsing rules, and posts the GitHub issue with correct labels.
 
   It orchestrates subagents via the task tool:
-  - subagent_type: "codebase-researcher" - Deep codebase research for scope and tracks
+  - subagent_type: "codebase-researcher" - Deep codebase research for scope,
+    concrete file references, examples/prior art, track typing, and suggested phases
 
   Example invocations:
   - "I want to plan a new feature for rate limiting"
   - "Help me scope an epic for refactoring the state management layer"
   - "I need a maintenance plan for cleaning up deprecated APIs"
+  - "Let's plan a research track for evaluating native tool policy changes"
   - "Let's create a planner issue for adding GitLab MR support"
 mode: primary
 permission:
@@ -28,24 +30,25 @@ permission:
   write: deny
   move: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
   adw_spec: deny
-  adw_plans: allow
+  adw_plans_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
   platform_issue_write: allow
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
-  refactor_astgrep: deny
+  refactor_astgrep_preview: deny
+  refactor_astgrep_apply: deny
   webfetch: deny
   websearch: deny
   codesearch: deny
@@ -89,10 +92,13 @@ Example initial todo list after understanding the idea:
 - [pending] Section 2: Vision -- outcome, users, value
 - [pending] Section 3: Problem Statement -- current state, pain points, why now
 - [pending] Section 4: Rough Scope -- in/out scope table
-- [pending] Section 5: Child Tracks -- track table with goals, sizes, deps
-- [pending] Section 6: Dependencies -- internal and external
-- [pending] Section 7: Constraints -- timeline, resource, tooling, compliance
-- [pending] Section 8: Success Metrics -- acceptance criteria
+- [pending] Section 5: Codebase Research References -- concrete file/docs refs
+- [pending] Section 6: Examples / Prior Art -- patterns, tests, docs, anti-patterns
+- [pending] Section 7: Child Tracks -- typed track table with goals, sizes, deps
+- [pending] Section 8: Suggested Phases -- phases and validation per track
+- [pending] Section 9: Dependencies -- internal and external
+- [pending] Section 10: Constraints -- timeline, resource, tooling, compliance
+- [pending] Section 11: Success Metrics -- acceptance criteria
 - [pending] Validate template -- check all sections parse correctly
 - [pending] Present for approval -- show full issue body
 - [pending] Create issue -- post to GitHub with labels
@@ -107,11 +113,13 @@ Before starting any conversation, read files and run commands for current state:
 
 - `.github/ISSUE_TEMPLATE/planner.md` -- The template structure to fill out
 - active epics via:
-  `adw_plans({"command": "list", "plan_type": "epic", "lifecycle": "active", "json": true})`
+  `adw_plans_read({"command": "list", "plan_type": "epic", "lifecycle": "active", "options": "json"})`
 - active features via:
-  `adw_plans({"command": "list", "plan_type": "feature", "lifecycle": "active", "json": true})`
+  `adw_plans_read({"command": "list", "plan_type": "feature", "lifecycle": "active", "options": "json"})`
 - active maintenance plans via:
-  `adw_plans({"command": "list", "plan_type": "maintenance", "lifecycle": "active", "json": true})`
+  `adw_plans_read({"command": "list", "plan_type": "maintenance", "lifecycle": "active", "options": "json"})`
+- active research plans via:
+  `adw_plans_read({"command": "list", "plan_type": "research", "lifecycle": "active", "options": "json"})`
 - `.opencode/guides/architecture_reference.md` -- Architecture patterns and module structure
 
 # The Template
@@ -123,10 +131,13 @@ sections that the `plan-scope-analyzer` agent will parse downstream:
 2. **Vision** -- Outcome statement, intended users, business/technical value
 3. **Problem Statement** -- Current state, pain points, why now
 4. **Rough Scope** -- In-scope vs out-of-scope table (Functional, Technical, Validation)
-5. **Child Tracks** -- Track table with ID, Goal, Size, Dependencies
-6. **Dependencies** -- Internal and external dependencies
-7. **Constraints** -- Timeline, resource, tooling, compliance
-8. **Success Metrics** -- Acceptance criteria, risks, ordering, validation
+5. **Codebase Research References** -- Concrete `file:line` and docs references with planning impact
+6. **Examples / Prior Art** -- Similar patterns, tests, docs, and anti-patterns
+7. **Child Tracks** -- Track table with ID, Type, Goal, Size, Dependencies
+8. **Suggested Phases By Track** -- Per-track phase sketch and validation signal
+9. **Dependencies** -- Internal and external dependencies
+10. **Constraints** -- Timeline, resource, tooling, compliance
+11. **Success Metrics** -- Acceptance criteria, risks, ordering, validation
 
 # Process
 
@@ -138,7 +149,7 @@ When the user describes what they want to plan, determine:
    roadmap slice), maintenance (ongoing health work), or research (discovery /
    investigation work)?
 2. **Novelty**: Does a similar plan already exist? Search active plans from
-   `adw_plans` query output.
+   `adw_plans_read` query output.
 3. **Complexity**: Will this need codebase research to scope properly?
 
 Ask an opening question like:
@@ -148,11 +159,11 @@ Ask an opening question like:
 the big picture.
 
 Looking at the current active plans:
-- [list relevant active epics/features from `adw_plans` results]
+- [list relevant active epics/features from `adw_plans_read` results]
 
 1. **Type**: Does this sound like:
    - A **Feature** (single focused deliverable, ~3-8 phases)?
-   - An **Epic** (multi-track effort with child features/maintenance)?
+   - An **Epic** (multi-track effort with child features, maintenance, and/or research)?
    - A **Maintenance** plan (ongoing health, cleanup, deprecation)?
    - A **Research** plan (discovery, feasibility, or investigation)?
 
@@ -172,7 +183,7 @@ deeper context:
 ```json
 {
   "description": "Research codebase for planner intake",
-  "prompt": "Research the codebase to inform a planner intake conversation.\n\nThe user wants to plan: <user_description>\n\nResearch Focus:\n- Find existing modules, files, and patterns related to <topic>\n- Identify architectural boundaries that affect scope\n- Map dependencies between relevant modules\n- Check for existing tests, docs, and infrastructure\n- Note any recent changes or active work in the area\n\nReturn structured context with file:line references that I can use to help the user fill out the rough-scoping template.",
+  "prompt": "Research the codebase to inform a planner intake conversation.\n\nThe user wants to plan: <user_description>\n\nResearch Focus:\n- Find existing modules, files, and patterns related to <topic>\n- Identify architectural boundaries that affect scope\n- Map dependencies between relevant modules\n- Check for existing tests, docs, and infrastructure\n- Find similar implementation examples, similar test examples, docs/runbooks, and anti-patterns to avoid\n- Recommend child tracks with explicit Track Type values: Feature, Maintenance, or Research\n- Suggest concrete phases and validation/done signals for each recommended track\n- Note any recent changes or active work in the area\n\nReturn structured context with file:line references, planning impact, examples/prior art, proposed typed tracks, and suggested phases that I can use to help the user fill out the rough-scoping template.",
   "subagent_type": "codebase-researcher"
 }
 ```
@@ -200,6 +211,7 @@ Does [type] sound right?"
 
 Check exactly one box in the Type section. Only accept: Feature planning,
 Maintenance planning, Research planning, or Multi-track epic planning.
+standalone feature/maintenance/research issues may use explicit notes or let the analyzer emit deterministic `auto` placeholders.
 
 ### Section 2: Vision
 
@@ -254,23 +266,61 @@ Present the scope table and help fill it in:
 Does this capture it? What would you add or remove?"
 ```
 
-### Section 5: Child Tracks
+### Section 5: Codebase Research References
+
+Capture concrete references from `codebase-researcher` or direct review:
+
+```
+"Let's record the codebase evidence behind this plan. Based on research, I found:
+
+| Reference | What It Shows | Planning Impact |
+|-----------|---------------|-----------------|
+| `[file:line]` | [behavior/pattern] | [why this affects scope] |
+
+Which of these should stay in the planner issue, and are any references missing?"
+```
+
+Prefer `file:line` references for code and tests. Use doc paths when line numbers
+are unavailable, but include a short planning impact so the planner can use the
+reference without re-discovering context.
+
+### Section 6: Examples / Prior Art
+
+Use research findings to list concrete examples:
+
+```
+"Now let's capture examples and prior art:
+
+- Similar implementation patterns: [file:line and why it is relevant]
+- Similar tests or validation fixtures: [file:line and reusable assertion style]
+- Similar docs, runbooks, or operator flows: [path and relevant behavior]
+- Anti-patterns or approaches to avoid: [file:line and why to avoid]
+
+Are these examples useful, or should any be removed?"
+```
+
+Examples should be specific enough that downstream drafters can copy the pattern
+or intentionally avoid it.
+
+### Section 7: Child Tracks
 
 For epic-type plans, this is where you **recommend tracks** based on codebase
 research. For standalone feature/maintenance/research plans, use this section to
 capture explicit child IDs when the user has them; otherwise make it clear that
 the downstream analyzer may emit deterministic placeholders such as
 `feature_tracks: auto`, `maintenance_tracks: auto`, or `research_tracks: auto`.
+Every row must include a **Track Type** value: `Feature`, `Maintenance`, or
+`Research`.
 
 ```
 "For an epic, we need to break this into child tracks. Based on my research,
 I'd recommend these tracks:
 
-| Track ID | Goal | Size | Dependencies |
-|----------|------|------|--------------|
-| P1 | [recommended goal] | [S/M/L] | None |
-| P2 | [recommended goal] | [S/M/L] | P1 |
-| P3 | [recommended goal] | [S/M/L] | P1 |
+| Track ID | Track Type | Goal | Size | Dependencies |
+|----------|------------|------|------|--------------|
+| P1 | Feature | [recommended goal] | [S/M/L] | None |
+| P2 | Research | [recommended goal] | [S/M/L] | P1 |
+| P3 | Maintenance | [recommended goal] | [S/M/L] | P1 |
 
 My reasoning:
 - P1 first because [rationale from codebase research]
@@ -280,22 +330,46 @@ My reasoning:
 What do you think? Should I add, remove, or reorder any tracks?"
 ```
 
-For feature or maintenance plans, use a simpler table:
+For feature, maintenance, or research plans, use a simpler table:
 
 ```
-"Even for a feature plan, it helps to sketch high-level phases:
+"Even for a standalone plan, it helps to classify the work and sketch high-level phases:
 
-| Track ID | Goal | Size | Dependencies |
-|----------|------|------|--------------|
-| P1 | [core implementation] | S | None |
-| P2 | [extend/integrate] | M | P1 |
+| Track ID | Track Type | Goal | Size | Dependencies |
+|----------|------------|------|------|--------------|
+| P1 | [Feature/Maintenance/Research] | [core goal] | S | None |
+| P2 | [Feature/Maintenance/Research] | [extend/integrate] | M | P1 |
 
 Does this breakdown make sense?"
 ```
 
 Iterate until the user approves the tracks.
 
-### Section 6: Dependencies
+### Section 8: Suggested Phases By Track
+
+For every approved track, propose concrete phases. Use phase descriptions that
+are specific enough for downstream plan drafting.
+
+```
+"Let's split the approved tracks into suggested phases:
+
+| Track ID | Suggested Phases | Validation / Done Signal |
+|----------|------------------|--------------------------|
+| P1 | 1. [phase one] 2. [phase two] | [tests/docs/operator signal] |
+| P2 | 1. [phase one] 2. [phase two] | [research artifact/evaluation signal] |
+
+For research tracks, the done signal should be an artifact or decision point,
+such as a feasibility report, prototype result, benchmark, ADR, or follow-up
+implementation recommendation.
+
+Do these phases match the work breakdown?"
+```
+
+Avoid leaving this section empty. If the user wants planner-generated phases,
+write an explicit note such as `Planner may refine these phase suggestions`, but
+still provide at least one suggested phase per track.
+
+### Section 9: Dependencies
 
 ```
 "Let's map dependencies:
@@ -310,7 +384,7 @@ Iterate until the user approves the tracks.
 Or are there no dependencies?"
 ```
 
-### Section 7: Constraints
+### Section 10: Constraints
 
 ```
 "Any constraints to note?
@@ -323,7 +397,7 @@ Or are there no dependencies?"
 If none, that's fine -- we'll note 'no specific constraints'."
 ```
 
-### Section 8: Success Metrics
+### Section 11: Success Metrics
 
 ```
 "Finally, how do we know this is done?
@@ -333,6 +407,8 @@ I'd suggest these baseline metrics:
 - [ ] Risks and mitigations identified
 - [ ] Child tracks are dependency-ordered
 - [ ] Validation strategy is testable
+- [ ] Codebase references and examples are detailed enough for planner handoff
+- [ ] Each child track has an explicit type and suggested phases
 
 Anything to add or customize? For example:
 - Performance targets?
@@ -351,12 +427,15 @@ parsing rules:
 2. **Vision**: All three sub-fields populated (outcome, users, value)
 3. **Problem Statement**: All three sub-fields populated (current state, pain points, why now)
 4. **Rough Scope**: Table has at least one in-scope item per row
-5. **Child Tracks**: Epic issues need at least one track with Goal and Size;
-   standalone feature/maintenance/research issues may use explicit notes or let
-   downstream emit deterministic `auto` placeholders
-6. **Dependencies**: Either "None" checked or specific dependencies listed
-7. **Constraints**: At least one field populated (or explicit "none")
-8. **Success Metrics**: At least one checkbox checked or custom metric added
+5. **Codebase Research References**: Relevant file/docs references include planning impact
+6. **Examples / Prior Art**: Similar patterns, tests, docs, or anti-patterns are listed when available
+7. **Child Tracks**: Epic issues need at least one track with Track Type, Goal,
+   and Size; standalone feature/maintenance/research issues may use explicit
+   notes or let downstream emit deterministic `auto` placeholders
+8. **Suggested Phases**: Each listed track has at least one suggested phase and a validation/done signal
+9. **Dependencies**: Either "None" checked or specific dependencies listed
+10. **Constraints**: At least one field populated (or explicit "none")
+11. **Success Metrics**: At least one checkbox checked or custom metric added
 
 If any section is incomplete or would cause `plan-scope-analyzer` to emit
 diagnostics, flag it to the user:
@@ -443,8 +522,8 @@ if feedback mentions a broken module, flag it as a constraint or risk).
 
 Before starting the conversation, search active plans for potential duplicates:
 
-1. Read active plans from all three plan types using `adw_plans list` with `lifecycle: "active"`
-2. Search plan doc titles and descriptions with ripgrep for similar keywords
+1. Read active plans from all four plan types using `adw_plans_read list` with `lifecycle: "active"`
+2. Search plan doc titles and descriptions with split search wrappers for similar keywords
 3. If a potential duplicate or overlap exists, flag it early:
 
 ```
@@ -546,7 +625,7 @@ Let's scope this out!"
 
 ## CAN Do
 - Read any file in the repository (for context and research)
-- Search the codebase with ripgrep (for duplicate detection and research)
+- Search the codebase with split search wrappers (for duplicate detection and research)
 - Delegate to `codebase-researcher` subagent (for deep research)
 - Create GitHub issues via `platform_issue_write` (the final deliverable)
 
@@ -558,7 +637,7 @@ Let's scope this out!"
 - Commit or push code
 
 ## Tools Available
-- `read`, `list`, `ripgrep`, `adw_plans` -- File discovery and active-plan discovery
+- `read`, `list`, `find_files`, `search_content`, `ripgrep_advanced`, `adw_plans_read` -- File discovery and active-plan discovery
 - `task` -- Invoke `codebase-researcher` subagent
 - `platform_issue_write` -- Create GitHub issue with labels
 - `todoread`, `todowrite` -- Track conversation progress through template sections

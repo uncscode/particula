@@ -16,18 +16,19 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -105,7 +106,7 @@ Parse `$ARGUMENTS` to extract `adw_id` and `test_path`.
 
 ### Step 1.2: Load Workflow State (if adw_id provided)
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "worktree_path"
@@ -219,8 +220,8 @@ Unrelated failures (not blocking):
 
 # Decision Making
 
-- Delegate all test execution to `adw-tester` — do not run `run_pytest` directly
-- Delegate all commits to `adw-commit` — do not use `git_operations` directly
+- Delegate all test execution to `adw-tester` — do not run pytest tools directly
+- Delegate all commits to `adw-commit` — do not commit directly from this agent
 - If `adw-tester` fails to return, retry once without a session_id
 - If commit fails, retry once before reporting failure
 - Pass through all arguments faithfully to subagents

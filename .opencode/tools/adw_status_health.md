@@ -12,8 +12,7 @@ Read-only ADW wrapper for:
 
 ## Optional arguments
 
-- `adw_id` (accepted for schema compatibility; not forwarded to CLI)
-- `args` (validated additional CLI args; protected flags rejected)
+- No additional wrapper arguments beyond `help`.
 
 ## Timeout and errors
 

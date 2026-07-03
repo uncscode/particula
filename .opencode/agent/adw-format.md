@@ -5,11 +5,11 @@ description: 'Primary agent that handles code formatting, docstrings, and lintin
   Runs after adw-build to ensure code quality by adding docstrings, running linters
   with auto-fix, and committing formatting changes.
 
-  This agent: - Reads workflow state via adw_spec tool - Identifies changed files
+  This agent: - Reads workflow state via adw_spec_read tool - Identifies changed files
   from git - Calls adw-build-docstrings for docstrings and linting - Commits formatting
   changes via adw-commit - Operates fully autonomously with no user input
 
-  Invoked by: adw workflow run format <issue-number> --adw-id <id>
+  Invoked by: workflow runner format <issue-number> --adw-id <id>
   Typically runs after: adw-build
 
   Examples:
@@ -22,19 +22,20 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -57,7 +58,7 @@ input: $ARGUMENTS
 # Core Mission
 
 Ensure code quality by:
-1. Reading workflow context from `adw_spec`
+1. Reading workflow context from `adw_spec_read`
 2. Identifying all changed Python files
 3. Adding/updating docstrings for all functions, classes, and modules
 4. Running linters (ruff, mypy) with auto-fix
@@ -135,7 +136,7 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -153,7 +154,7 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations:
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -164,8 +165,8 @@ Confirm you are operating in the isolated worktree.
 Get all modified Python files:
 
 ```python
-git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ```
 
 **File Identification Rules:**

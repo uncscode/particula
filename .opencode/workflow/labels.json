@@ -37,13 +37,14 @@
       {"name": "adw:shutdown-system", "color": "1f2937", "description": "System-level shutdown - terminates all workflows and exits cron"}
     ],
     "auto_mode": [
-      {"name": "auto:enabled", "color": "f59e0b", "description": "Auto-mode eligible - scheduler will dispatch this issue"},
-      {"name": "auto:pause", "color": "d97706", "description": "Auto-mode paused - operator signal for paused issues"}
+      {"name": "auto:enabled", "color": "22c55e", "description": "Auto-mode eligible - scheduler will dispatch this issue"},
+      {"name": "auto:pause", "color": "16a34a", "description": "Auto-mode paused - operator signal for paused issues"}
     ],
     "pr_request": [
-      {"name": "request:review", "color": "0ea5e9", "description": "Request AI code review (no code changes)"},
+      {"name": "request:review", "color": "fb923c", "description": "Request AI code review (no code changes)"},
       {"name": "request:fix", "color": "f97316", "description": "Request AI to implement review suggestions"},
-      {"name": "request:plan-fix", "color": "fb923c", "description": "Request AI to apply follow-up fixes for planner output"}
+      {"name": "request:review-fix", "color": "ea580c", "description": "Request AI review followed by fixes"},
+      {"name": "request:plan-fix", "color": "c2410c", "description": "Request AI to apply follow-up fixes for planner output"}
     ],
     "branch": [
       {"name": "branch:develop", "color": "0e8a16", "description": "Target develop branch for integration workflows"},

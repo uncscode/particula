@@ -4,7 +4,7 @@ description: 'Subagent that manages practical examples and tutorials in docs/Exa
   Invoked by the documentation primary agent to create and maintain working examples,
   tutorials, and Jupyter notebooks for ADW features.
 
-  This subagent: - Loads workflow context from adw_spec tool - Creates and updates
+  This subagent: - Loads workflow context from adw_spec_read tool - Creates and updates
   docs/Examples/*.md files - Creates .py and .ipynb files in docs/Examples/ - Runs
   examples to validate they work - Adds examples for new features - Maintains folder
   structure and organization - Updates docs/Examples/index.md - Validates markdown
@@ -19,18 +19,18 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -102,7 +102,7 @@ task({
 
 Parse input arguments and load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })

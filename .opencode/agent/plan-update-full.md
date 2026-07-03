@@ -2,12 +2,12 @@
 description: >
   Subagent that updates structured plan section content after implementation
   changes. Consolidates feature and maintenance plan documentation into a single
-  agent that works through adw_plans.
+  agent that works through adw_plans_read.
 
   This subagent:
-  - Loads workflow context from adw_spec (issue number, spec_content)
-  - Uses adw_plans list/show to find the relevant plan by issue number
-  - Uses adw_plans list-sections to discover section file paths
+  - Loads workflow context from adw_spec_read (issue number, spec_content)
+  - Uses adw_plans_read list/show to find the relevant plan by issue number
+  - Uses adw_plans_read list-sections to discover section file paths
   - Reads section files and updates content to reflect implementation
   - Edits section markdown files directly for content changes
   - Handles feature, epic, and maintenance plan sections
@@ -22,10 +22,12 @@ permission:
   read: allow
   edit: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
   get_version: allow
@@ -39,7 +41,7 @@ Update structured plan section content to reflect implementation changes.
 
 Keep plan section content current by reading what changed in the implementation
 and updating the relevant section files under `.opencode/plans/sections/`. This agent
-works exclusively through `adw_plans` for plan discovery and direct file edits
+works exclusively through `adw_plans_read` for plan discovery and direct file edits
 for section content.
 
 # Input Format
@@ -68,7 +70,7 @@ task({
 
 **DENIED:**
 - Everything outside `.opencode/plans/sections/`
-- Plan JSON metadata files (use `adw_plans` tool for metadata mutations)
+- Plan JSON metadata files (use `adw_plans_mutate` tool for metadata mutations)
 - Source code, tests, other documentation
 
 # Process
@@ -78,7 +80,7 @@ task({
 Parse input arguments and load workflow state:
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -96,7 +98,7 @@ Search for plans related to this issue:
 
 ```python
 # List all active plans to find matches
-adw_plans({"command": "list", "lifecycle": "active", "json": true})
+adw_plans_read({"command": "list", "lifecycle": "active", "options": "json"})
 ```
 
 Match by:
@@ -106,7 +108,7 @@ Match by:
 
 If no active plans match, check completed plans:
 ```python
-adw_plans({"command": "list", "lifecycle": "completed", "json": true})
+adw_plans_read({"command": "list", "lifecycle": "completed", "options": "json"})
 ```
 
 ## Step 3: Discover Sections
@@ -114,7 +116,7 @@ adw_plans({"command": "list", "lifecycle": "completed", "json": true})
 For each matched plan:
 
 ```python
-adw_plans({"command": "list-sections", "plan_id": "{plan_id}", "json": true})
+adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "options": "json"})
 ```
 
 This returns a map of section names to file paths, e.g.:
@@ -254,7 +256,7 @@ Recommendation: {what_to_fix}
 
 **Scope:** `.opencode/plans/sections/**/*.md` only
 
-**Discovery:** `adw_plans list` + `adw_plans list-sections`
+**Discovery:** `adw_plans_read list` + `adw_plans_read list-sections`
 
 **Mutations:** Direct file edits to section markdown files
 

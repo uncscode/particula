@@ -22,7 +22,9 @@ permission:
   write: allow
   edit: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
   task: allow
   adw_spec_read: allow
@@ -38,7 +40,7 @@ subagent_type_allowlist:
 # Plan Research Drafter
 
 Populate an existing research plan record with phases and first-pass section content.
-The plan record was already created by `plan-orchestrator` via `adw_plans create`
+The plan record was already created by `plan-orchestrator` via `adw_plans_mutate create`
 with the required `cwd` worktree scope.
 This agent adds phases, scaffolds sections, and drafts content for `plan_type=research` only.
 
@@ -214,7 +216,7 @@ The orchestrator already created the plan. Verify it exists:
 adw_plans_read({
   "command": "show",
   "plan_id": "R12",
-  "json": true,
+  "options": "json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -240,8 +242,7 @@ Then list the section paths to know where to write content:
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "R12",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```

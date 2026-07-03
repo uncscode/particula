@@ -24,10 +24,13 @@ permission:
   move: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec: deny
+  adw_plans_read: allow
+  adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
 ---

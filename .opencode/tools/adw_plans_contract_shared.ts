@@ -103,7 +103,7 @@ export const ADW_PLANS_OPTION_STRING_AUDIT: readonly OptionsStringAuditEntry[] =
   { wrapper: "adw_plans_read", command: "list", field: "plan_type", cliFlag: "--type", disposition: "retained_direct", reason: "Registry-driven plan type filtering stays a retained direct field in P1." },
   { wrapper: "adw_plans_read", command: "list", field: "lifecycle", cliFlag: "--lifecycle", disposition: "retained_direct", reason: "Lifecycle filtering stays a retained direct field to avoid expanding the token grammar in P1." },
   { wrapper: "adw_plans_read", command: "list", field: "parent", cliFlag: "--parent", disposition: "retained_direct", reason: "Parent identifiers remain retained direct routing/filter values." },
-  { wrapper: "adw_plans_read", command: "list", field: "status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded plan status values support options-string status=<value> tokens while remaining accepted as direct wrapper fields." },
+  { wrapper: "adw_plans_read", command: "list", field: "status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded plan status values support options-string status=<value> tokens while split wrappers route them through options only." },
   { wrapper: "adw_plans_read", command: "list", field: "json", cliFlag: "--json", disposition: "token_candidate", reason: "Simple boolean flag forwarding maps to a bare token." },
   { wrapper: "adw_plans_read", command: "show", field: "plan_id", cliFlag: "<plan_id>", disposition: "retained_direct", reason: "Plan identifiers remain retained direct routing values for targeted commands." },
   { wrapper: "adw_plans_read", command: "show", field: "json", cliFlag: "--json", disposition: "token_candidate", reason: "Simple boolean flag forwarding maps to a bare token." },
@@ -122,10 +122,10 @@ export const ADW_PLANS_OPTION_STRING_AUDIT: readonly OptionsStringAuditEntry[] =
   { wrapper: "adw_plans_mutate", command: "create", field: "parent", cliFlag: "--parent", disposition: "retained_direct", reason: "Parent identifiers remain retained direct routing/filter values." },
   { wrapper: "adw_plans_mutate", command: "create", field: "priority", cliFlag: "--priority", disposition: "token_candidate", reason: "Bounded priority values fit command-scoped key=value tokens." },
   { wrapper: "adw_plans_mutate", command: "create", field: "size", cliFlag: "--size", disposition: "token_candidate", reason: "Bounded size values fit command-scoped key=value tokens." },
-  { wrapper: "adw_plans_mutate", command: "create", field: "status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded plan status values support options-string status=<value> tokens while remaining accepted as direct wrapper fields." },
+  { wrapper: "adw_plans_mutate", command: "create", field: "status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded plan status values support options-string status=<value> tokens while split wrappers route them through options only." },
   { wrapper: "adw_plans_mutate", command: "create", field: "cwd", cliFlag: "--cwd", disposition: "retained_direct", reason: "Mutating worktree/repository scoping stays a retained direct field and command-required outside token parsing." },
   { wrapper: "adw_plans_mutate", command: "update", field: "plan_id", cliFlag: "<plan_id>", disposition: "retained_direct", reason: "Plan identifiers remain retained direct routing values for targeted commands." },
-  { wrapper: "adw_plans_mutate", command: "update", field: "status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded plan status values support options-string status=<value> tokens while remaining accepted as direct wrapper fields." },
+  { wrapper: "adw_plans_mutate", command: "update", field: "status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded plan status values support options-string status=<value> tokens while split wrappers route them through options only." },
   { wrapper: "adw_plans_mutate", command: "update", field: "priority", cliFlag: "--priority", disposition: "token_candidate", reason: "Bounded priority values fit command-scoped key=value tokens." },
   { wrapper: "adw_plans_mutate", command: "update", field: "size", cliFlag: "--size", disposition: "token_candidate", reason: "Bounded size values fit command-scoped key=value tokens." },
   { wrapper: "adw_plans_mutate", command: "update", field: "title", cliFlag: "--title", disposition: "retained_direct", reason: "Free-form titles remain retained direct fields rather than entering token parsing." },
@@ -134,12 +134,12 @@ export const ADW_PLANS_OPTION_STRING_AUDIT: readonly OptionsStringAuditEntry[] =
   { wrapper: "adw_plans_mutate", command: "add-phase", field: "plan_id", cliFlag: "<plan_id>", disposition: "retained_direct", reason: "Plan identifiers remain retained direct routing values for targeted commands." },
   { wrapper: "adw_plans_mutate", command: "add-phase", field: "title", cliFlag: "--title", disposition: "retained_direct", reason: "Free-form titles remain retained direct fields rather than entering token parsing." },
   { wrapper: "adw_plans_mutate", command: "add-phase", field: "size", cliFlag: "--size", disposition: "token_candidate", reason: "Bounded size values fit command-scoped key=value tokens." },
-  { wrapper: "adw_plans_mutate", command: "add-phase", field: "phase_status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded phase status values support options-string phase-status=<value> tokens while remaining accepted as direct wrapper fields." },
+  { wrapper: "adw_plans_mutate", command: "add-phase", field: "phase_status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded phase status values support options-string phase-status=<value> tokens while split wrappers route them through options only." },
   { wrapper: "adw_plans_mutate", command: "add-phase", field: "after", cliFlag: "--after", disposition: "token_candidate", reason: "Single identifier references fit command-scoped key=value tokens." },
   { wrapper: "adw_plans_mutate", command: "add-phase", field: "cwd", cliFlag: "--cwd", disposition: "retained_direct", reason: "Mutating worktree/repository scoping stays a retained direct field and command-required outside token parsing." },
   { wrapper: "adw_plans_mutate", command: "update-phase", field: "plan_id", cliFlag: "<plan_id>", disposition: "retained_direct", reason: "Plan identifiers remain retained direct routing values for targeted commands." },
   { wrapper: "adw_plans_mutate", command: "update-phase", field: "phase_id", cliFlag: "<phase_id>", disposition: "retained_direct", reason: "Phase identifiers remain retained direct routing values for targeted commands." },
-  { wrapper: "adw_plans_mutate", command: "update-phase", field: "phase_status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded phase status values support options-string phase-status=<value> tokens while remaining accepted as direct wrapper fields." },
+  { wrapper: "adw_plans_mutate", command: "update-phase", field: "phase_status", cliFlag: "--status", disposition: "token_candidate", reason: "Bounded phase status values support options-string phase-status=<value> tokens while split wrappers route them through options only." },
   { wrapper: "adw_plans_mutate", command: "update-phase", field: "title", cliFlag: "--title", disposition: "retained_direct", reason: "Free-form titles remain retained direct fields rather than entering token parsing." },
   { wrapper: "adw_plans_mutate", command: "update-phase", field: "size", cliFlag: "--size", disposition: "token_candidate", reason: "Bounded size values fit command-scoped key=value tokens." },
   { wrapper: "adw_plans_mutate", command: "update-phase", field: "issue_number", cliFlag: "--issue", disposition: "token_candidate", reason: "Positive safe integer issue links fit command-scoped key=value tokens." },
@@ -158,7 +158,7 @@ export const ADW_PLANS_OPTION_STRING_RULES = {
   tokenNameStyle: "lowercase-kebab-case",
   tokenValueRule: "exactly one '=' with a non-empty value; status and phase-status may consume subsequent space-separated value words until the next valid bounded token candidate for the selected command",
   commandAllowlist: {
-    list: ["json"],
+    list: ["json", "status"],
     show: ["json"],
     create: ["status", "priority", "size"],
     update: ["status", "priority", "size"],
@@ -170,6 +170,8 @@ export const ADW_PLANS_OPTION_STRING_RULES = {
     "scaffold-sections": [],
   },
   retainedDirectFields: ["command", "plan_id", "plan_type", "phase_id", "title", "parent", "cwd", "lifecycle", "patch"],
+  compatibilityRetainedDirectFields: ["status", "phase_status"],
+  splitWrapperOptionOnlyFields: ["status", "phase_status"],
   mutualExclusionRules: [
     "update-phase tokens 'issue=<n>' and 'clear-issue-number' are mutually exclusive and must fail closed when combined.",
   ],
@@ -189,7 +191,7 @@ export const ADW_PLANS_OPTION_STRING_RULES = {
   patchExceptionReason:
     "Raw JSON patch payloads remain direct because whitespace, braces, and quotes exceed the bounded token grammar.",
   behaviorNeutralScope:
-    "P2 enables bounded options-string parsing across compatibility and split wrappers while preserving direct-field compatibility and direct patch exceptions.",
+    "P2 enables bounded options-string parsing across compatibility and split wrappers while preserving compatibility-only direct status aliases in unified adw_plans, split-wrapper option-only status routing, and direct patch exceptions.",
 } as const;
 
 const TOKEN_NAME_PATTERN = /^[a-z][a-z0-9-]*$/;
@@ -335,6 +337,34 @@ export function validatePlansCwdPath(cwdPath: string): string | undefined {
     return `ERROR: cwd path resolves outside repository root: ${redactedPath} (canonical: ${redactPathLikeText(canonical)})`;
   }
   return undefined;
+}
+
+export function validateAndNormalizePlansCwdPath(
+  raw: unknown,
+): { value?: string; error?: string } {
+  if (raw === undefined || raw === null) {
+    return {};
+  }
+  if (typeof raw !== "string") {
+    return {};
+  }
+
+  const normalized = raw.trim();
+  if (!normalized) {
+    return {};
+  }
+  if (normalized.startsWith("-")) {
+    return {
+      error: `ERROR: 'cwd' must not start with '-' to avoid CLI option confusion.`,
+    };
+  }
+
+  const validationError = validatePlansCwdPath(normalized);
+  if (validationError) {
+    return { error: validationError };
+  }
+
+  return { value: realpathSync(normalized) };
 }
 
 export function mergeParsedOptionField<T>(
@@ -840,6 +870,16 @@ export function stripDefaultArgs(raw: Record<string, any>): Record<string, any> 
     cleaned[key] = value;
   }
   return cleaned;
+}
+
+export function hasMeaningfulSplitWrapperAliasValue(raw: unknown): boolean {
+  if (raw === undefined || raw === null || raw === false || raw === 0) {
+    return false;
+  }
+  if (typeof raw === "string") {
+    return raw.trim() !== "";
+  }
+  return true;
 }
 
 export function validateRequiredArgs(

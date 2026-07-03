@@ -3,7 +3,7 @@
 
 Executes Jupyter notebooks and validates outputs. Supports single notebook or
 directories (optional recursion), per-notebook timeouts, output validation, and
-multiple output modes (summary/full/json). Mirrors run_pytest/run_ctest patterns.
+multiple output modes (summary/full/json). Mirrors run_ctest patterns.
 """
 
 from __future__ import annotations

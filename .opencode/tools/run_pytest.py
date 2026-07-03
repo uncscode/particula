@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Pytest Runner Tool with Coverage and Validation for ADW.
+"""Pytest runner with authoritative validation and coverage controls for ADW.
 
-Runs pytest with coverage reporting and result validation to prevent false
-positives. Supports scoped tests, coverage thresholds, and multiple output
-formats for both interactive and programmatic use.
+Runs pytest with coverage reporting and validation that prevents success-style
+output when pytest fails or when requested coverage data is unusable. Supports
+scoped tests, deterministic coverage source validation, a shared timeout cap of
+3600 seconds, process-group-aware timeout cleanup, and multiple output formats
+for both interactive and programmatic use.
 
 Key features:
     - Coverage reporting with configurable source and thresholds
+    - Hard-failure handling for unusable pytest-cov diagnostics
     - Validation of minimum test counts to catch collection errors
     - Fail-fast mode for quick development feedback
+    - Same-worktree coverage locking to avoid shared .coverage collisions
     - Duration profiling for performance optimization
     - Worktree-aware PYTHONPATH handling for isolated execution
 
@@ -41,16 +45,24 @@ Examples:
 """
 
 import argparse
+import errno
+import importlib.util
 import json
+import math
 import os
 import re
 import shlex
+import shutil
+import signal
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Pattern, Tuple, Union
+from zlib import crc32
 
 SECTION_HEADER_PATTERN = re.compile(r"^=+\s*.+\s*=+\s*$")
 DURATIONS_HEADER_PATTERN = re.compile(
@@ -60,8 +72,232 @@ DURATIONS_HEADER_PATTERN = re.compile(
 FAILURES_HEADER_PATTERN = re.compile(r"^=+\s*FAILURES\s*=+\s*$", re.IGNORECASE)
 
 COVERAGE_ADDOPT_PATTERN = re.compile(r"^(--cov(?:=|\b)|--cov-report=|--cov-fail-under=)")
+COVERAGE_PYTEST_ARG_PATTERN = re.compile(
+    r"^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|"
+    r"--cov-config(?:=|\b)|--cov-context(?:=|\b))"
+)
 COVERAGE_HEADER_PATTERN = re.compile(r"^-+\s+coverage:.*-+$", re.IGNORECASE)
 MAX_COVERAGE_FILES = 500
+COVERAGE_LOCK_FILENAME = ".run_pytest_coverage.lock"
+MAX_TIMEOUT_SECONDS = 3600
+PYTEST_TIMEOUT_KILL_GRACE_SECONDS = 1.0
+UNUSABLE_COVERAGE_FRAGMENTS = (
+    "no data collected",
+    "no data was collected",
+    "no data to report",
+    "module was never imported",
+)
+
+
+def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
+    """Return likely executable directories that may be absent from tool PATH."""
+
+    dirs: List[Path] = []
+    if cwd:
+        current = Path(cwd).resolve(strict=False)
+        while True:
+            dirs.extend([current / ".venv" / "bin", current / "venv" / "bin"])
+            if current.parent == current:
+                break
+            current = current.parent
+    dirs.append(Path(sys.executable).resolve(strict=False).parent)
+    dirs.append(Path.home() / ".local" / "bin")
+    return dirs
+
+
+def _resolve_python_tool_command(tool_name: str, module_name: str, cwd: Optional[str]) -> List[str]:
+    """Resolve a Python CLI robustly for non-login tool subprocess environments."""
+
+    resolved = shutil.which(tool_name)
+    if resolved:
+        return [resolved]
+    for directory in _candidate_tool_dirs(cwd):
+        candidate = directory / tool_name
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return [str(candidate)]
+    if importlib.util.find_spec(module_name) is not None:
+        return [sys.executable, "-m", module_name]
+    return [tool_name]
+
+
+class CoverageSourceValidationError(ValueError):
+    """Raised when coverage source input violates the wrapper contract."""
+
+
+class CoverageLockError(RuntimeError):
+    """Raised when a same-worktree coverage run is already in progress."""
+
+
+class PytestTimeoutValidationError(ValueError):
+    """Raised when a timeout argument violates the wrapper contract."""
+
+
+@dataclass(frozen=True)
+class PytestTimeoutDetails:
+    """Structured timeout details for deterministic wrapper diagnostics."""
+
+    timeout_seconds: float
+    elapsed_seconds: float
+    pid: int
+    process_group_id: int
+    cwd: str
+    command: List[str]
+    sigkill_escalated: bool
+
+
+class PytestTimedOutError(RuntimeError):
+    """Raised when pytest exceeds the configured timeout."""
+
+    def __init__(self, details: PytestTimeoutDetails) -> None:
+        super().__init__("pytest timed out")
+        self.details = details
+
+
+@dataclass(frozen=True)
+class PytestSubprocessResult:
+    """Captured subprocess result for pytest execution."""
+
+    returncode: int
+    stdout: str
+    stderr: str
+
+
+def _format_timeout_number(value: float) -> str:
+    """Format timeout-related numeric values deterministically."""
+
+    if float(value).is_integer():
+        return str(int(value))
+    return f"{value:.3f}".rstrip("0").rstrip(".")
+
+
+def _validate_timeout_seconds(timeout: object) -> float:
+    """Validate timeout input before any subprocess launch.
+
+    Args:
+        timeout: Caller-provided timeout value from the API or CLI.
+
+    Returns:
+        Normalized timeout value as a float in seconds.
+
+    Raises:
+        PytestTimeoutValidationError: The timeout is not numeric, is not finite,
+            is non-positive, or exceeds the shared 3600-second cap.
+    """
+
+    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
+        raise PytestTimeoutValidationError(
+            "timeout must be a positive finite number in seconds and must not exceed "
+            "3600 seconds (1 hour)."
+        )
+    timeout_value = float(timeout)
+    if (
+        not math.isfinite(timeout_value)
+        or timeout_value <= 0
+        or timeout_value > MAX_TIMEOUT_SECONDS
+    ):
+        raise PytestTimeoutValidationError(
+            "timeout must be a positive finite number in seconds and must not exceed "
+            "3600 seconds (1 hour)."
+        )
+    return timeout_value
+
+
+def _format_timeout_error(details: PytestTimeoutDetails) -> str:
+    """Render deterministic timeout diagnostics in a fixed field order.
+
+    Args:
+        details: Structured timeout metadata captured during subprocess cleanup.
+
+    Returns:
+        Wrapper-safe ``ERROR:`` string with stable timeout, process, and command
+        fields for downstream tooling and regression tests.
+    """
+
+    return (
+        "ERROR: pytest timed out; "
+        f"timeout_seconds={_format_timeout_number(details.timeout_seconds)}; "
+        f"elapsed_seconds={_format_timeout_number(details.elapsed_seconds)}; "
+        f"pid={details.pid}; "
+        f"process_group_id={details.process_group_id}; "
+        f"cwd={_redact_timeout_cwd(details.cwd)}; "
+        f"command={_redact_timeout_command(details.command)}; "
+        f"sigkill_escalated={'true' if details.sigkill_escalated else 'false'}"
+    )
+
+
+def _redact_timeout_cwd(cwd: str) -> str:
+    """Return a stable, non-absolute cwd token for timeout diagnostics."""
+
+    cwd_name = Path(cwd).name
+    return cwd_name or "."
+
+
+def _redact_timeout_command(command: List[str]) -> str:
+    """Return a stable, argument-redacted command summary."""
+
+    if not command:
+        return "<unknown>"
+    executable = Path(command[0]).name or command[0]
+    redacted_arg_count = max(len(command) - 1, 0)
+    if redacted_arg_count == 0:
+        return executable
+    return f"{executable} [args_redacted:{redacted_arg_count}]"
+
+
+def _process_group_exists(process_group_id: int) -> bool:
+    """Return whether the process group still exists."""
+
+    try:
+        os.killpg(process_group_id, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def _terminate_process_group(process: subprocess.Popen[str], process_group_id: int) -> bool:
+    """Terminate a timed-out pytest process group.
+
+    Sends ``SIGTERM`` to the full process group first, waits briefly for a
+    graceful exit, and escalates to ``SIGKILL`` only when the group remains
+    alive. Missing process groups are treated as already exited.
+
+    Args:
+        process: Running pytest subprocess handle.
+        process_group_id: Process-group identifier associated with ``process``.
+
+    Returns:
+        ``True`` when cleanup required ``SIGKILL`` escalation, otherwise
+        ``False``.
+    """
+
+    sigkill_escalated = False
+    try:
+        os.killpg(process_group_id, signal.SIGTERM)
+    except ProcessLookupError:
+        return sigkill_escalated
+
+    try:
+        process.wait(timeout=PYTEST_TIMEOUT_KILL_GRACE_SECONDS)
+    except subprocess.TimeoutExpired:
+        pass
+
+    if not _process_group_exists(process_group_id):
+        return sigkill_escalated
+
+    sigkill_escalated = True
+
+    try:
+        os.killpg(process_group_id, signal.SIGKILL)
+    except ProcessLookupError:
+        return sigkill_escalated
+
+    try:
+        process.wait(timeout=PYTEST_TIMEOUT_KILL_GRACE_SECONDS)
+    except subprocess.TimeoutExpired:
+        pass
+    return sigkill_escalated
 
 
 def _filter_non_coverage_addopts(addopts: str) -> List[str]:
@@ -79,6 +315,14 @@ def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
     Returns:
         List of normalized coverage sources. Returns an empty list when
         coverage should fall back to the default configuration.
+
+    Raises:
+        CoverageSourceValidationError: The input contains empty comma-separated
+            segments or absolute paths.
+
+    Notes:
+        The special value ``all`` clears explicit sources so pytest-cov falls
+        back to the repository coverage configuration.
     """
     if coverage_source is None:
         return []
@@ -86,7 +330,7 @@ def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
     sources: List[str] = []
     if isinstance(coverage_source, str):
         sources = coverage_source.split(",")
-    elif isinstance(coverage_source, list):
+    elif isinstance(coverage_source, (list, tuple)):
         for entry in coverage_source:
             if entry is None:
                 continue
@@ -95,26 +339,76 @@ def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
     else:
         return []
 
-    cleaned = [source.strip() for source in sources if source and source.strip()]
+    cleaned: List[str] = []
+    for source in sources:
+        stripped = source.strip()
+        if not stripped:
+            raise CoverageSourceValidationError(
+                "coverageSource must not contain empty comma-separated entries"
+            )
+        cleaned.append(stripped)
+
     if any(source.lower() == "all" for source in cleaned):
         return []
 
     normalized: List[str] = []
     for source in cleaned:
-        path = Path(source)
-        if path.suffix == ".py" and path.exists():
-            normalized.append(str(path.resolve()))
-        else:
-            normalized.append(source)
+        if Path(source).is_absolute():
+            raise CoverageSourceValidationError(
+                f"coverageSource must not contain absolute paths: {source}"
+            )
+        normalized.append(source)
     return normalized
 
 
-def _coverage_source_to_rcfile(sources: List[str]) -> Optional[str]:
+def _resolve_repo_root_for_coverage(cwd: Optional[str]) -> Path:
+    """Resolve the trusted repository/worktree root used for coverage paths."""
+
+    if cwd:
+        return Path(cwd).resolve()
+
+    current = Path.cwd().resolve()
+    while current != current.parent:
+        if (current / "pyproject.toml").exists() or (current / ".git").exists():
+            return current
+        current = current.parent
+    return Path.cwd().resolve()
+
+
+def _validate_coverage_source_scope(source: str, repo_root: Path) -> None:
+    """Reject path-like coverage sources that resolve outside the repo/worktree."""
+
+    if (
+        "/" not in source
+        and "\\" not in source
+        and not source.startswith(".")
+        and not source.endswith(".py")
+    ):
+        return
+
+    resolved_source = (repo_root / Path(source)).resolve(strict=False)
+    try:
+        resolved_source.relative_to(repo_root)
+    except ValueError as exc:
+        raise CoverageSourceValidationError(
+            f"coverageSource must stay within the repository/worktree root: {source}"
+        ) from exc
+
+
+def _contains_coverage_pytest_args(args: List[str]) -> bool:
+    """Return True when passthrough pytest args request coverage behavior."""
+
+    return any(COVERAGE_PYTEST_ARG_PATTERN.match(arg) for arg in args)
+
+
+def _coverage_source_to_rcfile(sources: List[str], cwd: Optional[str] = None) -> Optional[str]:
     """Create a temporary coveragerc file for explicit coverage sources.
 
     Args:
         sources: Normalized coverage sources (module names or paths) that should
             be injected into the coverage configuration.
+        cwd: Base directory used to resolve repo-relative path sources before
+            writing the temporary coverage config.
 
     Returns:
         Absolute path to the generated temporary coveragerc file when sources
@@ -124,10 +418,11 @@ def _coverage_source_to_rcfile(sources: List[str]) -> Optional[str]:
     if not sources:
         return None
     resolved_sources: List[str] = []
+    base_dir = Path(cwd) if cwd else Path.cwd()
     for source in sources:
         path = Path(source)
-        if path.is_absolute() or "/" in source or path.exists():
-            resolved_sources.append(str(path.resolve()))
+        if "/" in source or "\\" in source or source.endswith(".py"):
+            resolved_sources.append(str((base_dir / path).resolve()))
         else:
             resolved_sources.append(source)
     temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".coveragerc")
@@ -189,6 +484,33 @@ def _should_apply_coverage_threshold(
         if match and match.group(1):
             return True
     return False
+
+
+def _coverage_request_has_file_target(sources: List[str]) -> bool:
+    """Return True when coverage sources include a repo-relative file target."""
+
+    return any(Path(source).suffix == ".py" for source in sources)
+
+
+def _detect_unusable_coverage_diagnostics(output: str) -> Optional[str]:
+    """Return a stable error for pytest-cov diagnostics that invalidate coverage.
+
+    Args:
+        output: Combined pytest stdout and stderr.
+
+    Returns:
+        A reviewer-actionable validation message when pytest-cov reports known
+        unusable coverage diagnostics, otherwise ``None``.
+    """
+
+    lowered_output = output.lower()
+    for fragment in UNUSABLE_COVERAGE_FRAGMENTS:
+        if fragment in lowered_output:
+            return (
+                "Coverage data is unusable: pytest-cov reported "
+                f"'{fragment}'. Review coverageSource/import targeting."
+            )
+    return None
 
 
 def _extract_section(
@@ -571,44 +893,141 @@ def _resolve_normalized_sources(
     """Resolve normalized coverage sources for the current invocation.
 
     Args:
-        cwd: Requested pytest working directory. When set, sources remain
-            cwd-relative for worktree execution.
+        cwd: Requested pytest working directory. Included for call-site parity;
+            normalization validates inputs but does not rewrite them.
         coverage_source: Optional coverage source configuration from caller.
 
     Returns:
-        Normalized list of coverage sources.
+        Normalized list of coverage sources that preserves module names,
+        repo-relative directories, and repo-relative file targets.
     """
 
-    if not cwd:
-        return _normalize_coverage_source(coverage_source)
-
-    if coverage_source is None:
-        return []
-
-    normalized_sources: List[str] = []
-    if isinstance(coverage_source, (list, tuple)):
-        for source in coverage_source:
-            if source is None:
-                continue
-            if isinstance(source, str):
-                normalized_sources.extend(
-                    entry.strip() for entry in source.split(",") if entry.strip()
-                )
-    else:
-        normalized_sources = [
-            entry.strip() for entry in str(coverage_source).split(",") if entry.strip()
-        ]
-
-    if any(source.lower() == "all" for source in normalized_sources):
-        return []
-
+    normalized_sources = _normalize_coverage_source(coverage_source)
+    repo_root = _resolve_repo_root_for_coverage(cwd)
+    for source in normalized_sources:
+        _validate_coverage_source_scope(source, repo_root)
     return normalized_sources
 
 
+def _recover_stale_coverage_lock(lock_path: Path) -> bool:
+    """Recover a stale same-worktree coverage lock when safe to do so."""
+
+    try:
+        contents = lock_path.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise CoverageLockError(
+            "coverage lock exists but could not be inspected for stale recovery: "
+            f"{lock_path} ({exc})"
+        ) from exc
+
+    pid_text = contents.removeprefix("pid=").strip()
+    if not pid_text.isdigit():
+        try:
+            lock_path.unlink()
+        except OSError as exc:
+            raise CoverageLockError(
+                f"coverage lock exists with invalid metadata and could not be removed: {lock_path}"
+            ) from exc
+        return True
+
+    pid = int(pid_text)
+    try:
+        os.kill(pid, 0)
+    except OSError as exc:
+        if exc.errno != errno.ESRCH:
+            raise CoverageLockError(
+                "coverage-enabled pytest runs in the same worktree must be serialized; "
+                f"coverage lock holder pid={pid} could not be verified"
+            ) from exc
+        try:
+            lock_path.unlink()
+        except OSError as unlink_exc:
+            raise CoverageLockError(
+                f"stale coverage lock could not be removed: {lock_path}"
+            ) from unlink_exc
+        return True
+
+    return False
+
+
+def _get_coverage_lock_path(cwd: str) -> Path:
+    """Return the repo-local runtime lock path for the given worktree.
+
+    Args:
+        cwd: Worktree root used for the pytest run.
+
+    Returns:
+        Absolute path to the deterministic lock file under ``adforge_local/state``.
+    """
+
+    worktree_root = Path(cwd).resolve()
+    runtime_state_dir = worktree_root / "adforge_local" / "state"
+    runtime_state_dir.mkdir(parents=True, exist_ok=True)
+    suffix = f"{crc32(str(worktree_root).encode('utf-8')):08x}"
+    return runtime_state_dir / f"{suffix}-{COVERAGE_LOCK_FILENAME}"
+
+
+def _acquire_coverage_lock(cwd: str) -> str:
+    """Acquire an exclusive same-worktree coverage lock.
+
+    Args:
+        cwd: Worktree root where the lock file should be created.
+
+    Returns:
+        Absolute path to the created lock file.
+
+    Raises:
+        CoverageLockError: Another coverage-enabled pytest run is already active
+            in the same worktree.
+    """
+
+    lock_path = _get_coverage_lock_path(cwd)
+    for _ in range(2):
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError as exc:
+            if _recover_stale_coverage_lock(lock_path):
+                continue
+            raise CoverageLockError(
+                "coverage-enabled pytest runs in the same worktree must be serialized; "
+                "another coverage run is already active"
+            ) from exc
+    else:
+        raise CoverageLockError(
+            f"failed to acquire coverage lock after stale-lock recovery: {lock_path}"
+        )
+
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write(f"pid={os.getpid()}\n")
+    return str(lock_path)
+
+
 def _run_pytest_subprocess(
-    cmd: List[str], *, cwd: str, requested_cwd: Optional[str], timeout: int
-) -> subprocess.CompletedProcess[str]:
-    """Execute pytest with worktree-aware PYTHONPATH handling."""
+    cmd: List[str], *, cwd: str, requested_cwd: Optional[str], timeout: float | int
+) -> PytestSubprocessResult:
+    """Execute pytest with worktree-aware PYTHONPATH and timeout cleanup.
+
+    Starts pytest in a new process group so timeout handling can terminate the
+    entire pytest tree rather than only the direct child process. When a
+    timeout occurs, the function records deterministic diagnostics and raises a
+    structured timeout error after cleanup.
+
+    Args:
+        cmd: Fully resolved pytest command to execute.
+        cwd: Working directory used for the subprocess.
+        requested_cwd: Original caller-provided worktree path to prepend to
+            ``PYTHONPATH`` for isolated imports.
+        timeout: Maximum runtime in seconds. Values must satisfy the shared
+            timeout validation contract.
+
+    Returns:
+        Captured subprocess result containing return code, stdout, and stderr.
+
+    Raises:
+        PytestTimedOutError: Pytest exceeded ``timeout`` and the process group
+            was terminated.
+    """
 
     env = os.environ.copy()
     if requested_cwd:
@@ -619,14 +1038,101 @@ def _run_pytest_subprocess(
             else requested_cwd
         )
 
-    return subprocess.run(
+    timeout_seconds = _validate_timeout_seconds(timeout)
+    started_at = time.monotonic()
+    process = subprocess.Popen(
         cmd,
         cwd=cwd,
         env=env,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
-        timeout=timeout,
+        start_new_session=True,
     )
+
+    try:
+        stdout, stderr = process.communicate(timeout=timeout_seconds)
+        return PytestSubprocessResult(
+            returncode=process.returncode or 0, stdout=stdout, stderr=stderr
+        )
+    except subprocess.TimeoutExpired:
+        elapsed_seconds = time.monotonic() - started_at
+        try:
+            process_group_id = os.getpgid(process.pid)
+        except ProcessLookupError:
+            process_group_id = process.pid
+        sigkill_escalated = _terminate_process_group(process, process_group_id)
+        raise PytestTimedOutError(
+            PytestTimeoutDetails(
+                timeout_seconds=timeout_seconds,
+                elapsed_seconds=elapsed_seconds,
+                pid=process.pid,
+                process_group_id=process_group_id,
+                cwd=cwd,
+                command=cmd,
+                sigkill_escalated=sigkill_escalated,
+            )
+        ) from None
+
+
+def _build_pytest_command(
+    *,
+    args: List[str],
+    fail_fast: bool,
+    durations: Optional[int],
+    durations_min: Optional[float],
+    coverage: bool,
+    normalized_sources: List[str],
+    coverage_rcfile: Optional[str],
+    cov_report: str,
+    override_ini: Optional[List[str]],
+) -> tuple[List[str], List[str], List[str], str]:
+    """Build the pytest command and related derived coverage/ini state."""
+
+    cmd = ["pytest", "-v", "--tb=short"]
+
+    if fail_fast:
+        cmd.append("-x")
+
+    if durations is not None:
+        cmd.append(f"--durations={durations}")
+        if durations_min is not None:
+            cmd.append(f"--durations-min={durations_min}")
+
+    effective_override_ini = list(override_ini or [])
+    if not any(entry.startswith("addopts=") for entry in effective_override_ini):
+        if not coverage or normalized_sources:
+            effective_override_ini.append("addopts=")
+
+    if effective_override_ini:
+        cmd.extend([f"--override-ini={entry}" for entry in effective_override_ini])
+
+    cov_args: List[str] = []
+    effective_cov_report = cov_report
+    if coverage and not any("--cov" in arg for arg in args):
+        if normalized_sources:
+            for source in normalized_sources:
+                cov_args.append(f"--cov={source}")
+            if coverage_rcfile:
+                cov_args.append(f"--cov-config={coverage_rcfile}")
+            else:
+                cov_args.append("--cov-config=/dev/null")
+            cov_args.append("--cov-context=test")
+            cov_args.extend(_filter_non_coverage_addopts(os.environ.get("PYTEST_ADDOPTS", "")))
+            if effective_cov_report.strip() == "term-missing":
+                cov_args.append("--cov-report=term-missing")
+                effective_cov_report = ""
+        else:
+            cov_args.append("--cov")
+        for report_format in effective_cov_report.split(","):
+            if report_format.strip():
+                cov_args.append(f"--cov-report={report_format.strip()}")
+
+    if cov_args:
+        cmd.extend(cov_args)
+
+    cmd.extend(args)
+    return cmd, cov_args, effective_override_ini, effective_cov_report
 
 
 def run_pytest(
@@ -634,7 +1140,7 @@ def run_pytest(
     output_mode: str = "summary",
     min_test_count: int = 1,
     cwd: Optional[str] = None,
-    timeout: int = 600,
+    timeout: Union[int, float] = 600,
     coverage: bool = True,
     coverage_source: Optional[Union[str, List[str]]] = None,
     coverage_threshold: Optional[int] = None,
@@ -648,7 +1154,9 @@ def run_pytest(
 
     Executes pytest with the specified options, parses results, and validates
     against expected criteria. Automatically handles worktree PYTHONPATH for
-    isolated execution environments.
+    isolated execution environments. Non-zero pytest exits always fail
+    validation, and coverage-enabled runs also fail when pytest-cov reports
+    unusable data such as missing imports or no collected coverage.
 
     Note:
         -v and --tb=short are always included. Do NOT pass these in args.
@@ -664,11 +1172,13 @@ def run_pytest(
             Set to ~1700 for full suite validation, 1 for scoped tests.
         cwd: Working directory for pytest execution. If provided, prepends
             to PYTHONPATH for worktree isolation. Defaults to project root.
-        timeout: Maximum execution time in seconds (default: 600 = 10 min).
+        timeout: Maximum execution time in seconds (default: 600 = 10 min,
+            maximum: 3600 = 1 hour).
         coverage: Enable coverage reporting (default: True). Uses pytest-cov.
-        coverage_source: Source module/path for coverage (e.g., 'adw' or 'adw.core').
-            Comma-separated sources are supported. If None, uses pyproject.toml
-            [tool.coverage.run].source config.
+        coverage_source: Source module/path for coverage (for example, ``adw``,
+            ``adw.core``, ``adw/``, or a repo-relative ``.py`` file target).
+            Comma-separated sources are supported. ``None`` or ``all`` uses the
+            repository coverage configuration.
         coverage_threshold: Minimum coverage percentage (0-100) to enforce.
             None skips threshold validation.
         cov_report: Coverage report format(s), comma-separated (default: "term-missing").
@@ -682,64 +1192,13 @@ def run_pytest(
 
     Returns:
         Tuple of (exit_code, output_string) where exit_code is 0 if pytest
-        and validation pass, 1 otherwise.
+        and validation pass, 1 otherwise. File-target coverage requests preserve
+        explicit ``coverage_files = null`` semantics when per-file numeric detail
+        is not authoritative.
 
     Raises:
         Does not raise; errors are captured and returned in output_string.
     """
-    # Build pytest command
-    # NOTE: -v and --tb=short are always included. Do not pass these in pytestArgs.
-    cmd = ["pytest", "-v", "--tb=short"]
-
-    # Add fail-fast if requested
-    if fail_fast:
-        cmd.append("-x")
-
-    # Add durations if requested
-    if durations is not None:
-        cmd.append(f"--durations={durations}")
-        if durations_min is not None:
-            cmd.append(f"--durations-min={durations_min}")
-
-    normalized_sources = _resolve_normalized_sources(cwd, coverage_source)
-    coverage_rcfile = _coverage_source_to_rcfile(normalized_sources) if coverage else None
-    effective_override_ini = list(override_ini or [])
-    if (
-        coverage
-        and normalized_sources
-        and not any(entry.startswith("addopts=") for entry in effective_override_ini)
-    ):
-        effective_override_ini.append("addopts=")
-
-    if effective_override_ini:
-        cmd.extend([f"--override-ini={entry}" for entry in effective_override_ini])
-
-    # Add coverage if enabled and not already specified in args
-    cov_args: List[str] = []
-    if coverage and not any("--cov" in arg for arg in args):
-        if normalized_sources:
-            for source in normalized_sources:
-                cov_args.append(f"--cov={source}")
-            if coverage_rcfile:
-                cov_args.append(f"--cov-config={coverage_rcfile}")
-            else:
-                cov_args.append("--cov-config=/dev/null")
-            cov_args.append("--cov-context=test")
-            cov_args.extend(_filter_non_coverage_addopts(os.environ.get("PYTEST_ADDOPTS", "")))
-            if cov_report.strip() == "term-missing":
-                cov_args.append("--cov-report=term-missing")
-                cov_report = ""
-        else:
-            cov_args.append("--cov")  # Enable coverage without specifying source
-        # Add each report format separately
-        for report_format in cov_report.split(","):
-            cov_args.append(f"--cov-report={report_format.strip()}")
-    if cov_args:
-        cmd.extend(cov_args)
-
-    # Add user arguments
-    cmd.extend(args)
-
     # Determine working directory
     requested_cwd = cwd
     if cwd is None:
@@ -753,7 +1212,36 @@ def run_pytest(
         if cwd is None:
             cwd = str(Path.cwd())
 
+    coverage_rcfile: Optional[str] = None
+    coverage_lock_path: Optional[str] = None
+
     try:
+        _validate_timeout_seconds(timeout)
+        normalized_sources = _resolve_normalized_sources(cwd, coverage_source)
+        file_scoped_coverage = _coverage_request_has_file_target(normalized_sources)
+        coverage_rcfile = _coverage_source_to_rcfile(normalized_sources, cwd) if coverage else None
+
+        if not coverage and _contains_coverage_pytest_args(args):
+            raise CoverageSourceValidationError(
+                "coverage-related pytest arguments are not allowed when coverage is disabled"
+            )
+
+        cmd, cov_args, _, _ = _build_pytest_command(
+            args=args,
+            fail_fast=fail_fast,
+            durations=durations,
+            durations_min=durations_min,
+            coverage=coverage,
+            normalized_sources=normalized_sources,
+            coverage_rcfile=coverage_rcfile,
+            cov_report=cov_report,
+            override_ini=override_ini,
+        )
+        cmd = [*_resolve_python_tool_command("pytest", "pytest", cwd), *cmd[1:]]
+
+        if coverage:
+            coverage_lock_path = _acquire_coverage_lock(cwd)
+
         result = _run_pytest_subprocess(
             cmd,
             cwd=cwd,
@@ -769,6 +1257,8 @@ def run_pytest(
         # Parse output
         metrics = parse_pytest_output(full_output)
         metrics["exit_code"] = result.returncode
+        if file_scoped_coverage:
+            metrics["coverage_files"] = None
 
         # Validate results (including coverage threshold)
         threshold = coverage_threshold
@@ -779,6 +1269,21 @@ def run_pytest(
         ):
             threshold = None
         validation_errors = validate_results(metrics, min_test_count, threshold)
+        if result.returncode != 0:
+            validation_errors.append(
+                "pytest exited with code "
+                f"{result.returncode}; inspect failed tests and stderr output"
+            )
+        if coverage:
+            unusable_coverage_error = _detect_unusable_coverage_diagnostics(full_output)
+            if unusable_coverage_error:
+                validation_errors.append(unusable_coverage_error)
+            elif metrics["coverage_pct"] is None:
+                validation_errors.append(
+                    "Coverage data is unavailable: pytest-cov did not report a TOTAL "
+                    "coverage percentage. "
+                    "Review coverageSource/import targeting."
+                )
 
         # Determine final exit code (fail if validation fails)
         exit_code = result.returncode
@@ -837,13 +1342,24 @@ def run_pytest(
 
         return exit_code, output
 
-    except subprocess.TimeoutExpired:
-        return 1, f"ERROR: pytest timed out after {timeout} seconds"
+    except CoverageSourceValidationError as exc:
+        return 1, f"ERROR: {exc}"
+    except CoverageLockError as exc:
+        return 1, f"ERROR: {exc}"
+    except PytestTimeoutValidationError as exc:
+        return 1, f"ERROR: {exc}"
+    except PytestTimedOutError as exc:
+        return 1, _format_timeout_error(exc.details)
     except FileNotFoundError:
         return 1, "ERROR: pytest command not found. Is pytest installed?"
     except Exception as e:
         return 1, f"ERROR: Unexpected error running pytest: {e}"
     finally:
+        if coverage_lock_path:
+            try:
+                os.unlink(coverage_lock_path)
+            except OSError:
+                pass
         if coverage_rcfile:
             try:
                 os.unlink(coverage_rcfile)
@@ -855,6 +1371,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     """Main entry point for CLI usage.
 
     Parses command-line arguments and executes pytest with validation.
+
+    Args:
+        argv: Optional argument list. When omitted, arguments are read from
+            ``sys.argv``.
 
     Returns:
         Exit code (0 if pytest and validation pass, 1 otherwise).
@@ -896,9 +1416,9 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
     )
     parser.add_argument(
         "--timeout",
-        type=int,
-        default=600,
-        help="Timeout in seconds (default: 600 = 10 minutes)",
+        type=float,
+        default=600.0,
+        help="Timeout in seconds (default: 600 = 10 minutes, maximum: 3600 = 1 hour)",
     )
     # Coverage options
     parser.add_argument(
@@ -986,7 +1506,7 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
         cwd=args.cwd,
         timeout=args.timeout,
         coverage=coverage_enabled,
-        coverage_source=_normalize_coverage_source(args.coverage_source),
+        coverage_source=args.coverage_source,
         coverage_threshold=args.coverage_threshold,
         cov_report=args.cov_report,
         fail_fast=args.fail_fast,

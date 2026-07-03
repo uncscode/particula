@@ -1,64 +1,6 @@
 import { tool } from "@opencode-ai/plugin";
 
-// --- Inlined from lib/adw_notes_shared (+ transitive deps) ---
-
-const SHOW_PARSE_SNIPPET_LIMIT = 160;
-const ERROR_OUTPUT_SNIPPET_LIMIT = 400;
-const SPAWN_TIMEOUT_MS = 30_000;
-
-function sanitizeSnippet(value: string, maxLen = ERROR_OUTPUT_SNIPPET_LIMIT): string {
-  const collapsed = value
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (collapsed.length === 0) return "";
-  return collapsed.length > maxLen ? `${collapsed.slice(0, maxLen)}...(truncated)` : collapsed;
-}
-
-function normalizeRef(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function selectDiagnostic(...candidates: unknown[]): string {
-  for (const candidate of candidates) {
-    const snippet = sanitizeSnippet(candidate ? String(candidate) : "");
-    if (snippet) return snippet;
-  }
-  return "";
-}
-
-function runNotesCommand(command: "write" | "write-from-state" | "show", cmdParts: string[]): {
-  ok: true; stdout: string;
-} | {
-  ok: false; error: string;
-} {
-  try {
-    const result = Bun.spawnSync({
-      cmd: cmdParts,
-      stdout: "pipe",
-      stderr: "pipe",
-      timeout: SPAWN_TIMEOUT_MS,
-    });
-    const decoder = new TextDecoder();
-    const stdout = result.stdout ? decoder.decode(result.stdout) : "";
-    const stderr = result.stderr ? decoder.decode(result.stderr) : "";
-    if (result.exitCode !== 0) {
-      const diagnostic = selectDiagnostic(stderr, stdout, (result as any)?.message);
-      const fallback = diagnostic || `Exit code ${result.exitCode}`;
-      return { ok: false, error: `ERROR: adw notes ${command} failed.\n${fallback}` };
-    }
-    return { ok: true, stdout };
-  } catch (error: any) {
-    const diagnostic =
-      selectDiagnostic(error?.stderr?.toString?.() ?? error?.stderr, error?.stdout?.toString?.() ?? error?.stdout, error?.message) ||
-      "Unknown execution error";
-    return { ok: false, error: `ERROR: Failed to execute adw notes ${command}. ${diagnostic}` };
-  }
-}
-
-// --- End inlined helpers ---
+import { normalizeRef, parseShowOutput, runNotesCommand } from "./adw_notes_shared";
 
 const COMMANDS = ["show"] as const;
 type ReadCommand = (typeof COMMANDS)[number];
@@ -102,18 +44,11 @@ Examples:
       return buildError(`'ref' is required for '${command}'.`);
     }
 
-    const result = runNotesCommand(command, ["uv", "run", "adw", "notes", "show", "--ref", ref]);
+    const result = runNotesCommand(command, ["uv", "run", "--active", "adw", "notes", "show", "--ref", ref]);
     if (!result.ok) {
       return result.error;
     }
 
-    try {
-      const parsed = JSON.parse(result.stdout);
-      return JSON.stringify(parsed, null, 2);
-    } catch {
-      const snippet = sanitizeSnippet(result.stdout, SHOW_PARSE_SNIPPET_LIMIT);
-      const safeSnippet = snippet.length > 0 ? snippet : "<empty stdout>";
-      return `ERROR: Failed to parse JSON output from adw notes show. Snippet: ${safeSnippet}`;
-    }
+    return parseShowOutput(result.stdout);
   },
 });

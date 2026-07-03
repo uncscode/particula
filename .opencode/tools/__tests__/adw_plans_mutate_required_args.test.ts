@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
@@ -41,6 +41,8 @@ describe("adw_plans_mutate required-arg preflight", () => {
     await loadToolExecute("../../adw_plans_mutate.ts");
     const args = getCapturedToolDefinition()?.args ?? {};
     expect(args).toHaveProperty("options");
+    expect(args).not.toHaveProperty("status");
+    expect(args).not.toHaveProperty("phase_status");
     expect(args).not.toHaveProperty("priority");
     expect(args).not.toHaveProperty("size");
     expect(args).not.toHaveProperty("after");
@@ -84,9 +86,121 @@ describe("adw_plans_mutate required-arg preflight", () => {
 
   it("rejects missing required plan_id for update before spawn", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
-    const result = await execute({ command: "update", status: "Ready" });
+    const result = await execute({ command: "update", options: "status=Ready" });
     assertContains(String(result), "update command requires 'plan_id'.");
     expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects direct status on the split mutate wrapper before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    const result = await execute({ command: "create", plan_type: "feature", title: "x", status: "Ready", cwd: repoRoot } as any);
+    assertContains(String(result), "'status' is not accepted as a direct field in adw_plans_mutate");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("treats inert direct status aliases as omitted in the split mutate wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+
+    await execute({ command: "create", plan_type: "feature", title: "x", status: "   ", cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "x",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "create", plan_type: "feature", title: "x", status: false as any, cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "x",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "create", plan_type: "feature", title: "x", status: 0 as any, cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "create",
+      "--type",
+      "feature",
+      "--title",
+      "x",
+      "--cwd",
+      repoRoot,
+    ]);
+  });
+
+  it("rejects direct phase_status on the split mutate wrapper before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    const result = await execute({ command: "update-phase", plan_id: "E1", phase_id: "E1-P1", phase_status: "Blocked", cwd: repoRoot } as any);
+    assertContains(String(result), "'phase_status' is not accepted as a direct field in adw_plans_mutate");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("treats inert direct phase_status aliases as omitted in the split mutate wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+
+    await execute({ command: "update-phase", plan_id: "E1", phase_id: "E1-P1", phase_status: "   ", cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "update-phase",
+      "E1",
+      "E1-P1",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "update-phase", plan_id: "E1", phase_id: "E1-P1", phase_status: false as any, cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "update-phase",
+      "E1",
+      "E1-P1",
+      "--cwd",
+      repoRoot,
+    ]);
+
+    await execute({ command: "update-phase", plan_id: "E1", phase_id: "E1-P1", phase_status: 0 as any, cwd: repoRoot } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "update-phase",
+      "E1",
+      "E1-P1",
+      "--cwd",
+      repoRoot,
+    ]);
   });
 
   it("rejects missing cwd for mutating commands before spawn", async () => {
@@ -157,6 +271,23 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toContain(repoRoot);
   });
 
+  it("forwards canonical cwd when mutate wrapper receives a symlink alias", async () => {
+    const execute = await loadToolExecute("../../adw_plans_mutate.ts");
+    const tempRoot = resolve(repoRoot, "adforge_local/opencode/tmp");
+    mkdirSync(tempRoot, { recursive: true });
+    const aliasPath = resolve(tempRoot, "adw-plans-mutate-alias");
+    rmSync(aliasPath, { recursive: true, force: true });
+    symlinkSync(repoRoot, aliasPath, "dir");
+
+    try {
+      await execute({ command: "create", plan_type: "feature", title: "x", cwd: aliasPath });
+      expect(getInvocations().at(-1)?.args).toContain(repoRoot);
+      expect(getInvocations().at(-1)?.args).not.toContain(aliasPath);
+    } finally {
+      rmSync(aliasPath, { recursive: true, force: true });
+    }
+  });
+
   it("parses bounded options for create/update/add-phase/update-phase in mutate wrapper", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
 
@@ -170,6 +301,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "create",
@@ -191,6 +323,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update",
@@ -209,6 +342,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "add-phase",
@@ -233,6 +367,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "add-phase",
@@ -253,6 +388,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update-phase",
@@ -282,6 +418,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update-phase",
@@ -302,6 +439,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update-phase",
@@ -325,6 +463,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update-phase",
@@ -343,13 +482,14 @@ describe("adw_plans_mutate required-arg preflight", () => {
     ]);
   });
 
-  it("ignores whitespace-only options and merges identical direct values in mutate wrapper", async () => {
+  it("ignores whitespace-only options in mutate wrapper", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
 
     await execute({ command: "create", plan_type: "feature", title: "x", options: "   ", cwd: repoRoot });
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "create",
@@ -360,29 +500,10 @@ describe("adw_plans_mutate required-arg preflight", () => {
       "--cwd",
       repoRoot,
     ]);
-
-    await execute({
-      command: "update-phase",
-      plan_id: "M37",
-      phase_id: "M37-P2",
-      phase_status: "Blocked",
-      options: "phase-status=Blocked size=M issue=42",
-      cwd: repoRoot,
-    });
-    expect(getInvocations().at(-1)?.args.filter((arg) => arg === "--status")).toHaveLength(1);
   });
 
-  it("rejects option conflicts and still requires cwd in mutate wrapper", async () => {
+  it("rejects contradictory issue-link options and still requires cwd in mutate wrapper", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
-
-    const conflictResult = await execute({
-      command: "update",
-      plan_id: "M37",
-      status: "Ready",
-      options: "status=Blocked",
-      cwd: repoRoot,
-    });
-    assertContains(String(conflictResult), "'status' cannot conflict between direct input and options string.");
 
     const issueConflictResult = await execute({
       command: "update-phase",
@@ -405,25 +526,25 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(getInvocations()).toHaveLength(0);
   });
 
-  it("preserves multi-word plan status values as direct wrapper arguments", async () => {
+  it("preserves multi-word plan status values through options", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
     await execute({
       command: "create",
       plan_type: "feature",
       title: "x",
-      status: "In Progress",
+      options: "status=In Progress",
       cwd: repoRoot,
     });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status In Progress");
   });
 
-  it("preserves multi-word phase status values as direct wrapper arguments", async () => {
+  it("preserves multi-word phase status values through options", async () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
     await execute({
       command: "update-phase",
       plan_id: "E1-F1",
       phase_id: "E1-F1-P1",
-      phase_status: "Not Started",
+      options: "phase-status=Not Started",
       cwd: repoRoot,
     });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status Not Started");
@@ -566,7 +687,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     const execute = await loadToolExecute("../../adw_plans_mutate.ts");
     await execute({ command: "create", plan_type: "research", title: "x", cwd: repoRoot });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      `uv run adw plans create --type research --title x --cwd ${repoRoot}`,
+      `uv run --active adw plans create --type research --title x --cwd ${repoRoot}`,
     );
   });
 
@@ -598,7 +719,6 @@ describe("adw_plans_mutate required-arg preflight", () => {
       phase_id: "E1-F1-P1",
       parent: "E1",
       priority: "high",
-      status: "Ready",
       patch: '{"status":"Shipped"}',
       cwd: repoRoot,
     } as any);
@@ -607,6 +727,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update-phase",
@@ -628,10 +749,8 @@ describe("adw_plans_mutate required-arg preflight", () => {
       command: "update-phase",
       plan_id: "E1-F1",
       phase_id: "E1-F1-P1",
-      status: "Ready",
-      phase_status: "In Progress",
       title: "Phase Title",
-      options: "size=M issue=123",
+      options: "phase-status=In Progress size=M issue=123",
       patch: '{"owner":"team"}',
       cwd: repoRoot,
     } as any);
@@ -640,6 +759,7 @@ describe("adw_plans_mutate required-arg preflight", () => {
     expect(args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "update-phase",

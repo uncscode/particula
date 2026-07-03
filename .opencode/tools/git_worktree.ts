@@ -224,7 +224,7 @@ RULES:
       help?: boolean;
     };
 
-    const cmdParts: string[] = ["uv", "run", "adw", "git"];
+    const cmdParts: string[] = ["uv", "run", "--active", "adw", "git"];
 
     const appendCommandParts = (skipMissingRequiredValidation = false): string | undefined => {
       switch (command) {

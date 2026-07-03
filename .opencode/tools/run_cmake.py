@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""CMake Configuration Tool for ADW.
+"""Run CMake configure and optional build steps with ADW-style summaries.
 
-Runs CMake configuration with preset/generator support, summary parsing,
-and multiple output modes modeled after ``run_pytest.py``.
+This backend powers the ``run_cmake`` wrapper family. It validates
+repository-confined paths, supports configure presets and optional Ninja
+selection, parses configure and build output into structured metrics, and
+returns summary, full, or JSON-formatted results with bounded captured output.
 
 Usage:
     python3 run_cmake.py --preset default
@@ -35,6 +37,59 @@ OUTPUT_LINE_LIMIT = 500
 OUTPUT_BYTE_LIMIT = 50_000
 TARGET_SUMMARY_LIMIT = 10
 MESSAGE_CAPTURE_LIMIT = 50
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_within_repo_root(value: str, *, base_dir: Optional[Path] = None) -> Path:
+    """Resolve a path and fail closed if it escapes the repository root.
+
+    Args:
+        value: User-provided path to resolve.
+        base_dir: Optional base directory for resolving relative paths.
+
+    Returns:
+        Canonical resolved path under ``REPO_ROOT``.
+
+    Raises:
+        ValueError: If the resolved path escapes the repository root.
+    """
+
+    candidate = Path(value)
+    anchor = base_dir or REPO_ROOT
+    resolved = (candidate if candidate.is_absolute() else anchor / candidate).resolve(strict=False)
+    try:
+        resolved.relative_to(REPO_ROOT)
+    except ValueError as exc:
+        raise ValueError(
+            f"Path resolves outside repository root: {value} (canonical: {resolved})"
+        ) from exc
+    return resolved
+
+
+def _resolve_preset_build_dir(
+    preset_name: str,
+    preset_data: Dict[str, Any],
+    source_dir: str,
+) -> Optional[str]:
+    """Resolve and confine a preset-derived build directory.
+
+    Args:
+        preset_name: Configure preset name to inspect.
+        preset_data: Parsed preset metadata.
+        source_dir: Confined source directory containing the preset files.
+
+    Returns:
+        Confined canonical build directory path, or ``None`` when the preset does
+        not declare ``binaryDir``.
+
+    Raises:
+        ValueError: If the preset-derived build directory escapes the repository root.
+    """
+
+    resolved_dir = _resolve_build_dir_from_preset(preset_name, preset_data)
+    if not resolved_dir:
+        return None
+    return str(_resolve_within_repo_root(resolved_dir, base_dir=Path(source_dir)))
 
 
 def _truncate_output(output: str) -> Tuple[str, bool, str]:
@@ -339,6 +394,7 @@ def build_cmake(
     build_timeout: int = 1800,
     output_mode: str = "summary",
     build_preset: Optional[str] = None,
+    cwd: Optional[str] = None,
 ) -> Tuple[int, str, Dict[str, Any]]:
     """Run ``cmake --build`` with optional parallelism and output formatting.
 
@@ -352,9 +408,13 @@ def build_cmake(
         build_timeout: Timeout in seconds for the build command.
         output_mode: Output format, one of ``summary``, ``full``, or ``json``.
         build_preset: Optional build preset name for ``cmake --build --preset``.
+        cwd: Optional working directory for preset-driven builds.
 
     Returns:
         Tuple of (exit_code, output_text, metrics) describing build execution.
+
+    Raises:
+        ValueError: If ``output_mode`` is unsupported.
     """
     if build_preset:
         cmd: List[str] = ["cmake", "--build", "--preset", build_preset]
@@ -369,6 +429,7 @@ def build_cmake(
             capture_output=True,
             text=False,
             timeout=build_timeout,
+            cwd=cwd,
         )
         stdout_decoded = _decode_capture(result.stdout)
         stderr_decoded = _decode_capture(result.stderr)
@@ -624,7 +685,7 @@ def run_cmake(
     jobs: int = 0,
     build_timeout: int = 1800,
 ) -> Tuple[int, str]:
-    """Run CMake configuration with preset and Ninja support.
+    """Run CMake configuration with optional build execution and formatted output.
 
     Subprocess output is captured in binary mode (``text=False``) and normalized
     through ``_decode_capture`` so mixed ``bytes``/``str``/``None`` capture values
@@ -645,6 +706,9 @@ def run_cmake(
     Returns:
         A tuple of (exit_code, output_text) where ``output_text`` is formatted according
         to ``output_mode`` and ``exit_code`` is 0 on success and 1 on failure.
+
+    Raises:
+        ValueError: If ``output_mode`` is unsupported during formatting.
     """
     cmake_args = cmake_args or []
     cmd: List[str] = ["cmake"]
@@ -658,9 +722,16 @@ def run_cmake(
     build_truncation_notice = ""
 
     try:
+        resolved_source_dir = _resolve_within_repo_root(source_dir)
+        resolved_build_dir = _resolve_within_repo_root(build_dir)
+        source_dir = str(resolved_source_dir)
+        build_dir = str(resolved_build_dir)
         if preset:
             preset_data = _load_presets(source_dir)
             _validate_preset_name(preset, preset_data)
+            resolved_preset_build_dir = _resolve_preset_build_dir(preset, preset_data, source_dir)
+            if resolved_preset_build_dir is not None:
+                build_dir = resolved_preset_build_dir
             cmd.extend(["--preset", preset])
         else:
             Path(build_dir).mkdir(parents=True, exist_ok=True)
@@ -685,6 +756,7 @@ def run_cmake(
             capture_output=True,
             text=False,
             timeout=timeout,
+            cwd=source_dir if preset else None,
         )
         stdout_decoded = _decode_capture(result.stdout)
         stderr_decoded = _decode_capture(result.stderr)
@@ -717,7 +789,7 @@ def run_cmake(
             build_dir_resolved = build_dir
             build_preset = None
             if preset and preset_data:
-                resolved_dir = _resolve_build_dir_from_preset(preset, preset_data)
+                resolved_dir = _resolve_preset_build_dir(preset, preset_data, source_dir)
                 if resolved_dir:
                     build_dir_resolved = resolved_dir
                 build_preset = _find_build_preset(preset, preset_data)
@@ -729,6 +801,7 @@ def run_cmake(
                     build_timeout=build_timeout,
                     output_mode="json",
                     build_preset=build_preset,
+                    cwd=source_dir if build_preset else None,
                 )
                 try:
                     build_payload = json.loads(build_output_text)
@@ -748,6 +821,7 @@ def run_cmake(
                     build_timeout=build_timeout,
                     output_mode=output_mode,
                     build_preset=build_preset,
+                    cwd=source_dir if build_preset else None,
                 )
 
         if output_mode == "summary":
@@ -882,6 +956,9 @@ def main(argv: Optional[List[str]] = None) -> None:
 
     Args:
         argv: Optional list of command-line arguments; defaults to ``sys.argv``.
+
+    Raises:
+        SystemExit: Always raised with the exit code returned by ``run_cmake``.
     """
     parser = build_arg_parser()
     args = parser.parse_args(argv)

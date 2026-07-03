@@ -249,7 +249,7 @@ RULES:
       return normalizedFiles.error;
     }
 
-    const cmdParts = ["uv", "run", "adw", "git"];
+    const cmdParts = ["uv", "run", "--active", "adw", "git"];
     const appendCommandParts = (skipValidation = false): string | undefined => {
       const normalizedWorktree = normalizeOptionalField("worktree_path", worktree_path);
       if (normalizedWorktree.error) {

@@ -1,7 +1,7 @@
 # adw_plans_read
 
-Read-only wrapper for `adw plans`. Prefer this split wrapper for new or updated
-read-only integrations; keep `adw_plans` for compatibility or unified flows.
+Read-only wrapper for `adw plans`. Prefer this split wrapper for all active
+read-only integrations.
 
 ## Supported commands
 
@@ -20,6 +20,10 @@ Mutating commands are intentionally rejected. Use `adw_plans_mutate` for writes.
 ```
 
 ```json
+{ "command": "list", "options": "status=In Progress json" }
+```
+
+```json
 { "command": "show", "plan_id": "E17-F1", "options": "json" }
 ```
 
@@ -27,12 +31,24 @@ Mutating commands are intentionally rejected. Use `adw_plans_mutate` for writes.
 { "command": "list-sections", "plan_id": "E17-F1", "options": "json populate" }
 ```
 
+```json
+{ "command": "schema", "options": "check" }
+```
+
+```json
+{ "command": "list", "plan_type": "research", "cwd": "/path/to/trees/abc12345", "options": "json" }
+```
+
 ## Notes
 
 - Optional `cwd` is accepted for read commands and validated when provided.
-- Prefer bounded `options` tokens for optional wrapper aliases in new docs (`json`, `check`,
-  `populate`), while direct multi-word `status` filters remain valid when they are clearer.
-- Success/failure envelopes are preserved via delegation to `adw_plans`.
+- Use bounded `options` tokens for optional wrapper aliases (`json`, `check`, `populate`,
+  `status=<value>`). Direct `status` is not part of the split-wrapper contract.
+- Keep direct fields for required identifiers such as `plan_id` and optional
+  direct filters such as `plan_type`, `parent`, and `lifecycle`.
+- Example of stale shape to avoid on split wrappers: `{ "command": "list",
+  "status": "In Progress" }`.
+- Success/failure envelopes are preserved by the active split wrapper implementation.
 - Compatibility and split wrappers share the same spawned-command failure handling:
   - `stderr` -> `stdout` -> message/fallback precedence
   - bounded truncation for long diagnostics
@@ -42,6 +58,7 @@ Mutating commands are intentionally rejected. Use `adw_plans_mutate` for writes.
 - Deterministic invalid-cwd errors (when provided):
   - `ERROR: cwd path does not exist: <path>`
   - `ERROR: cwd path is not a directory: <path>`
+  - `ERROR: cwd path is not a repository/worktree root: <path> (missing .git metadata at <path>)`
   - `ERROR: cwd path resolves outside repository root: <path> (canonical: <path>)`
 
 Delegated failure envelope example:

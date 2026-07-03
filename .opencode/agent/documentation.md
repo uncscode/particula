@@ -7,31 +7,32 @@ description: >
   stay current with code changes.
 
   The agent will:
-  - Read implementation plan and issue from adw_spec tool
+  - Read implementation plan and issue from adw_spec_read tool
   - Analyze git diff to understand what changed
   - Create todo list determining which subagents are needed
   - Invoke specialized documentation subagents with specific targets
   - Validate all markdown links across documentation
   - Commit all documentation changes via adw-commit subagent
 
-  Invoked by: uv run adw workflow run document <issue-number> --adw-id <id>
+  Invoked by: workflow runner document <issue-number> --adw-id <id>
 mode: primary
 permission:
   "*": deny
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   build_mkdocs: deny
   feedback_log: allow
@@ -86,7 +87,7 @@ to use `build_mkdocs_validate` (validation-only path).
 |----------|---------|-------|
 | **docstring** | Update Python docstrings | `*.py` files |
 | **docs** | Update general documentation | `.opencode/guides/*.md`, `README.md`, `docs/*.md` |
-| **plan-update-full** | Update plan section content | `.opencode/plans/sections/**/*.md` via `adw_plans` |
+| **plan-update-full** | Update plan section content | `.opencode/plans/sections/**/*.md` via `adw_plans_read` |
 | **examples** | Create/update examples | `docs/Examples/*.md`, `.py`, `.ipynb` |
 | **architecture** | ADRs and architecture outline | `.opencode/guides/architecture/*.md` |
 | **theory** | Conceptual documentation | `docs/Theory/*.md` |
@@ -113,7 +114,7 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -138,7 +139,7 @@ git_diff({"command": "status", "worktree_path": worktree_path, "porcelain": true
 git_diff({"command": "diff", "worktree_path": worktree_path, "stat": true})
 ```
 
-Use `branch_name` from `adw_spec` to confirm you are on the expected branch.
+Use `branch_name` from `adw_spec_read` to confirm you are on the expected branch.
 
 ## Step 4: Analyze Changes
 

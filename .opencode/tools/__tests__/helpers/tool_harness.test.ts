@@ -4,6 +4,11 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 import {
+  assertCountedAndExemptFields,
+  assertPublicSchemaIncludesKeys,
+  assertPublicSchemaOmitsKeys,
+  getCapturedToolDefinition,
+  getPublicSchemaKeys,
   loadToolExecute,
   loadToolExecuteFromAbsolutePath,
   resetCapturedToolDefinition,
@@ -38,5 +43,60 @@ describe("tool_harness helper", () => {
     } finally {
       rmSync(fixtureRoot, { recursive: true, force: true });
     }
+  });
+
+  it("reads captured public schema keys and supports inclusion/omission assertions", async () => {
+    await loadToolExecute("../../find_files.ts");
+    const definition = getCapturedToolDefinition();
+
+    expect(getPublicSchemaKeys(definition)).toEqual(["options", "path", "pattern"]);
+    expect(() => assertPublicSchemaIncludesKeys(definition, ["pattern", "options"])).not.toThrow();
+    expect(() =>
+      assertPublicSchemaOmitsKeys(definition, ["contentPattern", "filesWithMatches"]),
+    ).not.toThrow();
+  });
+
+  it("asserts counted and exempt field expectations against the captured schema", async () => {
+    await loadToolExecute("../../run_validate_agent_references.ts");
+
+    expect(() =>
+      assertCountedAndExemptFields(getCapturedToolDefinition(), {
+        counted: ["cwd"],
+        exempt: ["baselinePath"],
+        actualCounted: ["cwd"],
+        actualExempt: ["baselinePath"],
+      }),
+    ).not.toThrow();
+  });
+
+  it("fails when counted and exempt category assignment shifts despite matching union", async () => {
+    await loadToolExecute("../../find_files.ts");
+
+    expect(() =>
+      assertCountedAndExemptFields(getCapturedToolDefinition(), {
+        counted: ["pattern", "path"],
+        exempt: ["options"],
+        actualCounted: ["options", "path", "pattern"],
+        actualExempt: [],
+      }),
+    ).toThrow("ASSERT: counted field classification did not match expectation");
+  });
+
+  it("emits deterministic assertion text for schema expectation mismatches", async () => {
+    await loadToolExecute("../../find_files.ts");
+    const definition = getCapturedToolDefinition();
+
+    expect(() => assertPublicSchemaIncludesKeys(definition, ["pattern", "contentPattern"])).toThrow(
+      "ASSERT: public schema missing expected keys: contentPattern",
+    );
+    expect(() => assertCountedAndExemptFields(definition, { counted: ["pattern"], exempt: [] })).toThrow(
+      "ASSERT: public schema keys did not match counted+exempt expectations",
+    );
+  });
+
+  it("throws deterministic assertion text for malformed tool args schemas", () => {
+    expect(() => getPublicSchemaKeys({ args: undefined })).toThrow(
+      "ASSERT: tool.args schema must be an object-like record",
+    );
   });
 });

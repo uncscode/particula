@@ -46,7 +46,9 @@ ERROR: Failed to execute 'adw platform pr-review'
 
 Routing hint:
 
-- Prefer `platform_pr_review_write` for review comments and inline review operations; keep `platform_operations` as compatibility/delegation path only.
+- Prefer `platform_pr_review_write` for review comments and inline review
+  operations; keep `platform_operations` as a compatibility-only delegation
+  path for legacy flows.
 
 ## Examples
 

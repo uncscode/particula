@@ -1,13 +1,81 @@
 /**
  * Notebook Execution Tool
  *
- * Executes Jupyter notebooks and validates outputs. Mirrors the run_pytest/run_linters/run_ctest
+ * Executes Jupyter notebooks and validates outputs. Mirrors the run_linters/run_ctest
  * patterns with summary/full/json modes and structured results.
  */
 
 import { tool } from "@opencode-ai/plugin";
 
 const MISSING_SCRIPT_HINT = "Missing backing script .opencode/tools/run_notebook.py (dependency #1466).";
+
+type OutputMode = "summary" | "full" | "json";
+
+type ParsedRunNotebookOptions = {
+  outputMode?: OutputMode;
+};
+
+type ParsedRunNotebookOptionsResult =
+  | { ok: true; options: ParsedRunNotebookOptions }
+  | { ok: false; error: string };
+
+const OUTPUT_MODES = new Set<OutputMode>(["summary", "full", "json"]);
+
+const parseRunNotebookOptions = (options: unknown): ParsedRunNotebookOptionsResult => {
+  if (options === undefined || options === null) {
+    return { ok: true, options: {} };
+  }
+  if (typeof options !== "string") {
+    return { ok: false, error: "ERROR: 'options' must be a string when provided." };
+  }
+
+  const normalized = options.trim();
+  if (!normalized) {
+    return { ok: true, options: {} };
+  }
+
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  const parsed: ParsedRunNotebookOptions = {};
+  for (const token of tokens) {
+    const separatorIndex = token.indexOf("=");
+    if (separatorIndex !== token.lastIndexOf("=")) {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': tokens must contain at most one '=' separator.`,
+      };
+    }
+    if (separatorIndex === -1) {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.`,
+      };
+    }
+
+    const name = token.slice(0, separatorIndex);
+    const value = token.slice(separatorIndex + 1).trim();
+    if (name !== "output") {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token is not supported.` };
+    }
+    if (!value) {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.`,
+      };
+    }
+    if (!OUTPUT_MODES.has(value as OutputMode)) {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': output must be one of summary, full, json.`,
+      };
+    }
+    if (parsed.outputMode !== undefined) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+    }
+    parsed.outputMode = value as OutputMode;
+  }
+
+  return { ok: true, options: parsed };
+};
 
 export default tool({
   description: `Execute Jupyter notebooks and Python scripts with validation and structured outputs.
@@ -20,7 +88,7 @@ EXAMPLES:
 - Single notebook: run_notebook({notebookPath: 'docs/Examples/setup-template-init-tutorial.ipynb'})
 - All notebooks in dir: run_notebook({notebookPath: 'docs/Examples/', recursive: true})
 - With timeout: run_notebook({notebookPath: 'notebook.ipynb', timeout: 300})
-- JSON output: run_notebook({notebookPath: 'notebook.ipynb', outputMode: 'json'})
+- JSON output: run_notebook({notebookPath: 'notebook.ipynb', options: 'output=json'})
 - Validate output: run_notebook({notebookPath: 'notebook.ipynb', expectOutput: ['DataFrame', 'plot']})
 - Single script (auto-detected): run_notebook({notebookPath: 'examples/demo.py'})
 - Scripts in directory: run_notebook({notebookPath: 'examples/', script: true, recursive: true})
@@ -29,7 +97,7 @@ EXAMPLES:
 py:percent SCRIPTS:
 Pass a py:percent (.py) file directly to execute it and get stdout/stderr/errors back.
 The # %% cell markers are plain comments to Python, so the script runs top-to-bottom.
-- Run py:percent script: run_notebook({notebookPath: 'docs/Examples/panel-methods/regime-selection.py', outputMode: 'full', timeout: 300})
+- Run py:percent script: run_notebook({notebookPath: 'docs/Examples/panel-methods/regime-selection.py', options: 'output=full', timeout: 300})
 - Run all py:percent scripts in dir: run_notebook({notebookPath: 'docs/Examples/panel-methods/', script: true, recursive: true})
 Use outputMode 'full' to see stdout/stderr per script, or 'json' for structured results.
 
@@ -37,12 +105,10 @@ IMPORTANT: Requires nbconvert and nbclient packages (dev dependencies) for noteb
 NOTE: Default timeout is 600 seconds per notebook/script. Scripts run via sys.executable (same Python/venv as the tool).
 SPARSE OPTIONALS: Only include optional fields when meaningful. Blank optional cwd/writeExecuted values are treated as omitted; timeout must be positive when provided.`,
   args: {
-    outputMode: tool.schema
-      .enum(["summary", "full", "json"])
+    options: tool.schema
+      .string()
       .optional()
-      .describe(
-        "Output mode: 'summary' (default, concise), 'full' (per-notebook details), 'json' (structured payload)",
-      ),
+      .describe("Bounded wrapper toggles: output=<summary|full|json>"),
     notebookPath: tool.schema
       .string()
       .describe("Path to notebook file (.ipynb), .py script, or directory containing notebooks. Required and must be non-empty."),
@@ -90,23 +156,34 @@ SPARSE OPTIONALS: Only include optional fields when meaningful. Blank optional c
       .describe("Skip pre-execution validation when running known-invalid notebooks"),
   },
   async execute(args) {
-    const outputMode = args.outputMode || "summary";
+    const parsedOptions = parseRunNotebookOptions(args.options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
+    }
+
+    const outputMode = parsedOptions.options.outputMode || "summary";
     const notebookPath = typeof args.notebookPath === "string" ? args.notebookPath.trim() : "";
-    const recursive = args.recursive || false;
+    const recursive = Boolean(args.recursive);
     const timeout = args.timeout ?? 600;
     const expectOutput = args.expectOutput || [];
     const cwd = typeof args.cwd === "string" ? args.cwd.trim() : undefined;
     const writeExecuted = typeof args.writeExecuted === "string" ? args.writeExecuted.trim() : undefined;
-    const noOverwrite = args.noOverwrite || false;
-    const noBackup = args.noBackup || false;
-    const skipValidation = args.skipValidation || false;
-    const script = args.script || false;
+    const noOverwrite = Boolean(args.noOverwrite);
+    const noBackup = Boolean(args.noBackup);
+    const skipValidation = Boolean(args.skipValidation);
+    const script = Boolean(args.script);
 
     if (!notebookPath) {
       return "ERROR: notebookPath is required and must be non-empty.";
     }
-    if (timeout <= 0) {
-      return "ERROR: timeout must be positive.";
+    if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0) {
+      return "ERROR: timeout must be a positive finite number.";
+    }
+    if (!Array.isArray(expectOutput) || expectOutput.some((value) => typeof value !== "string")) {
+      return "ERROR: expectOutput must be an array of strings when provided.";
+    }
+    if (expectOutput.some((value) => value.startsWith("-"))) {
+      return "ERROR: expectOutput entries must not start with '-' or '--'.";
     }
 
     const cmdParts: (string | number)[] = [

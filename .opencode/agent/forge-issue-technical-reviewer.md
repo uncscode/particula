@@ -11,15 +11,16 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
-  adw_plans: allow
-  adw_issues_spec: deny
+  adw_spec_read: allow
+  adw_plans_read: allow
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -28,9 +29,7 @@ permission:
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -94,22 +93,21 @@ Mark each todo `in_progress` when starting and `completed` when done.
 Parse `adw_id` from the prompt. Read shared context:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>"})
 ```
 
 Resolve the worktree path and plan ID from `spec_content`, then load plan
 section paths to validate technical notes against plan source:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
 ```
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -126,8 +124,7 @@ read({"filePath": "<resolved_implementation_tasks_path_from_list_sections>"})
 Read all three sections for every issue:
 
 ```python
-adw_issues_spec({
-  "command": "batch-read",
+adw_issues_batch_read({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "technical_notes"
@@ -135,8 +132,7 @@ adw_issues_spec({
 ```
 
 ```python
-adw_issues_spec({
-  "command": "batch-read",
+adw_issues_batch_read({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "edge_cases"
@@ -144,8 +140,7 @@ adw_issues_spec({
 ```
 
 ```python
-adw_issues_spec({
-  "command": "batch-read",
+adw_issues_batch_read({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "example_usage"
@@ -157,8 +152,7 @@ adw_issues_spec({
 Review all issues in order. Revise weak or incorrect sections:
 
 ```python
-adw_issues_spec({
-  "command": "batch-write",
+adw_issues_batch_write({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "technical_notes",
@@ -171,8 +165,7 @@ adw_issues_spec({
 Log each issue as `PASS` or `REVISED`:
 
 ```python
-adw_issues_spec({
-  "command": "batch-log",
+adw_issues_batch_log({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "reviewer": "technical",

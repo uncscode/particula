@@ -6,13 +6,19 @@
 - [x] write
 - [x] move
 - [x] list
-- [x] ripgrep
-- [x] git_operations
-- [x] platform_operations
+- [x] find_files / search_content / ripgrep_advanced
+- [x] git_diff
+- [x] git_stage
+- [x] git_branch
+- [x] git_merge
+- [x] git_worktree
+- [x] platform_comment_write
+- [x] platform_issue_write
+- [x] platform_pr_write
 - [x] todoread
 - [x] todowrite
 - [x] task
-- [x] adw_spec
+- [x] adw_spec_read
 
 ## Forbidden tools (false)
 - [x] bash
@@ -21,9 +27,8 @@
 - [x] codesearch
 - [x] create_workspace
 - [x] workflow_builder
-- [x] run_pytest
 - [x] run_linters
-- [x] adw
+- [x] adw_status_health
 
 ## Capabilities & commands
 - [x] Mentions conflict read/edit guidance

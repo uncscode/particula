@@ -2,11 +2,12 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   buildCommandFailureError,
-  validatePlansCwdPath,
+  hasMeaningfulSplitWrapperAliasValue,
   mergeParsedOptionField,
   parseCommandOptionsString,
   sanitizeSuccessOutput,
   stripDefaultArgs,
+  validateAndNormalizePlansCwdPath,
   validateRequiredArgs,
 } from "./adw_plans_contract_shared";
 
@@ -44,9 +45,6 @@ const COMMAND_TIMEOUTS: Record<PlanCommand, number> = {
 function sanitizedChildEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV") {
-      continue;
-    }
     if (value !== undefined) {
       env[key] = value;
     }
@@ -65,7 +63,7 @@ type IdentifierOptions = {
 };
 
 const COMMAND_GUIDE = `Commands:
-• list — Filters: type, lifecycle, parent, status; Optional options: json
+• list — Filters: type, lifecycle, parent; Optional options: json status=<value>
 • show — Required: plan_id; Optional options: json
 • validate — No additional parameters
 • schema — Optional options: check
@@ -102,18 +100,6 @@ function normalizeIdentifier(
   return { value: normalized };
 }
 
-function normalizeCwd(raw: unknown): { value?: string; error?: string } {
-  const normalized = normalizeIdentifier(raw, {
-    field: "cwd",
-    required: false,
-    emptyMessage: "'cwd' must not be empty when provided.",
-  });
-  if (normalized.error || !normalized.value) {
-    return normalized;
-  }
-  return normalized;
-}
-
 const REQUIRED_ARGS = {
   show: [{ field: "plan_id", message: "show command requires 'plan_id'." }],
   "list-sections": [{ field: "plan_id", message: "list-sections command requires 'plan_id'." }],
@@ -139,6 +125,9 @@ function isReadCommand(command: unknown): command is (typeof READ_COMMANDS)[numb
 // --- Inlined execute logic from adw_plans.ts (read-only commands only) ---
 
 async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<string> {
+  if (hasMeaningfulSplitWrapperAliasValue(args.status)) {
+    return buildError("'status' is not accepted as a direct field in adw_plans_read; use options: \"status=<value>\".");
+  }
   const preflightError = validateRequiredArgs(args, REQUIRED_ARGS, buildError);
   if (preflightError) {
     return preflightError;
@@ -150,7 +139,6 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
     plan_type,
     lifecycle,
     parent,
-    status,
     options,
     cwd,
   } = normalized;
@@ -160,6 +148,8 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
     return parsedOptions.error;
   }
   const optionValues = parsedOptions.values ?? {};
+  const resolvedStatus = mergeParsedOptionField(undefined, optionValues.status, "status", buildError);
+  if (resolvedStatus.error) return resolvedStatus.error;
   const resolvedJson = mergeParsedOptionField(undefined, optionValues.json, "json", buildError);
   if (resolvedJson.error) return resolvedJson.error;
   const resolvedCheck = mergeParsedOptionField(undefined, optionValues.check, "check", buildError);
@@ -172,7 +162,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
   );
   if (resolvedPopulate.error) return resolvedPopulate.error;
 
-  const cmdParts = ["uv", "run", "adw", "plans"];
+  const cmdParts = ["uv", "run", "--active", "adw", "plans"];
   const executedCommand = command as PlanCommand;
 
   switch (executedCommand) {
@@ -197,8 +187,8 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
           cmdParts.push("--parent", normalizedParent.value);
         }
       }
-      if (status) {
-        cmdParts.push("--status", status);
+      if (resolvedStatus.value) {
+        cmdParts.push("--status", resolvedStatus.value);
       }
       if (resolvedJson.value) {
         cmdParts.push("--json");
@@ -260,15 +250,11 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
       );
   }
 
-  const normalizedCwd = normalizeCwd(cwd);
+  const normalizedCwd = validateAndNormalizePlansCwdPath(cwd);
   if (normalizedCwd.error) {
     return normalizedCwd.error;
   }
   if (normalizedCwd.value) {
-    const cwdValidationError = validatePlansCwdPath(normalizedCwd.value);
-    if (cwdValidationError) {
-      return cwdValidationError;
-    }
     cmdParts.push("--cwd", normalizedCwd.value);
   }
 
@@ -345,7 +331,6 @@ Contract parity note: successful and failed command output envelopes are delegat
     plan_type: tool.schema.string().optional(),
     lifecycle: tool.schema.enum(["active", "completed", "closed"]).optional(),
     parent: tool.schema.string().optional(),
-    status: tool.schema.enum(["Draft", "Proposed", "Ready", "In Progress", "Blocked", "Monitoring", "Shipped", "Cancelled", "Superseded"]).optional(),
     options: tool.schema.string().optional(),
     cwd: tool.schema.string().optional(),
   },

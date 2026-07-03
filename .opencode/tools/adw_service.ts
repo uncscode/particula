@@ -5,7 +5,7 @@ import { tool } from "@opencode-ai/plugin";
 function sanitizedEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV" || value === undefined) continue;
+    if (value === undefined) continue;
     env[key] = value;
   }
   return env;
@@ -125,7 +125,7 @@ RULES:
   async execute(input) {
     const { command, mode, background, force, help } = input;
 
-    const cmdParts = ["uv", "run", "adw", command];
+    const cmdParts = ["uv", "run", "--active", "adw", command];
 
     if (help) {
       cmdParts.push("--help");
@@ -134,6 +134,9 @@ RULES:
 
     if (command === "launch" && force !== undefined) {
       return "ERROR: 'force' is only supported for command 'stop'.";
+    }
+    if (mode !== undefined && mode !== "local" && mode !== "remote") {
+      return "ERROR: 'mode' must be 'local' or 'remote' when provided.";
     }
     if (command === "stop" && mode !== undefined) {
       return "ERROR: 'mode' is only supported for command 'launch'.";

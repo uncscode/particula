@@ -27,7 +27,7 @@ describe("platform_pr_review_write wrapper", () => {
     const execute = await loadToolExecute("../../platform_pr_review_write.ts");
     await execute({ command: "pr-review", issue_number: "42", body: "review" });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run adw platform pr-review 42 --body review",
+      "uv run --active adw platform pr-review 42 --body review",
     );
   });
 

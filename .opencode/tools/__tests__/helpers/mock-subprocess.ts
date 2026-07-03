@@ -1,6 +1,8 @@
 type SpawnResponse = {
   stdout?: string;
+  stdoutChunks?: string[];
   stderr?: string;
+  stderrChunks?: string[];
   exitCode?: number;
   timedOut?: boolean;
 };
@@ -20,6 +22,8 @@ type BunDollarError = {
 type Invocation = {
   kind: "spawnSync" | "$";
   args: string[];
+  env?: Record<string, string>;
+  cwd?: string;
 };
 
 const originalBun = (globalThis as { Bun?: typeof Bun }).Bun;
@@ -48,7 +52,24 @@ const ensureBun = (): typeof Bun => {
 
 const bunRef = ensureBun();
 const originalSpawnSync = bunRef.spawnSync;
+const originalSpawn = bunRef.spawn;
 const originalDollar = bunRef.$;
+
+const createStreamFromChunks = (chunks: string[] | undefined): ReadableStream<Uint8Array> => {
+  const encoder = new TextEncoder();
+  const values = (chunks && chunks.length > 0 ? chunks : [""]).map((chunk) => encoder.encode(chunk));
+  let index = 0;
+  return new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (index >= values.length) {
+        controller.close();
+        return;
+      }
+      controller.enqueue(values[index] ?? new Uint8Array());
+      index += 1;
+    },
+  });
+};
 
 const toArgv = (input: unknown[]): string[] =>
   input.flatMap((part) => {
@@ -59,13 +80,13 @@ const toArgv = (input: unknown[]): string[] =>
   });
 
 export const installSubprocessMocks = (): void => {
-  bunRef.spawnSync = ((args: string[] | { cmd?: string[] }) => {
+  bunRef.spawnSync = ((args: string[] | { cmd?: string[]; env?: Record<string, string> }) => {
     const capturedArgs = Array.isArray(args)
       ? [...args]
       : Array.isArray(args?.cmd)
       ? [...args.cmd]
       : [String(args)];
-    invocations.push({ kind: "spawnSync", args: capturedArgs });
+    invocations.push({ kind: "spawnSync", args: capturedArgs, env: Array.isArray(args) ? undefined : args?.env });
     if (spawnError) {
       const err = new Error(spawnError.message ?? "") as Error & {
         stdout?: Buffer;
@@ -83,6 +104,29 @@ export const installSubprocessMocks = (): void => {
     };
   }) as typeof bunRef.spawnSync;
 
+  bunRef.spawn = ((args: string[] | { cmd?: string[]; env?: Record<string, string> }) => {
+    const capturedArgs = Array.isArray(args)
+      ? [...args]
+      : Array.isArray(args?.cmd)
+      ? [...args.cmd]
+      : [String(args)];
+    invocations.push({ kind: "spawnSync", args: capturedArgs, env: Array.isArray(args) ? undefined : args?.env });
+    if (spawnError) {
+      throw new Error(spawnError.message ?? "");
+    }
+    let killed = false;
+    return {
+      stdout: createStreamFromChunks(spawnResponse.stdoutChunks ?? [spawnResponse.stdout ?? ""]),
+      stderr: createStreamFromChunks(spawnResponse.stderrChunks ?? [spawnResponse.stderr ?? ""]),
+      kill() {
+        killed = true;
+      },
+      get exited() {
+        return Promise.resolve(killed ? 0 : (spawnResponse.exitCode ?? 0));
+      },
+    } as unknown as ReturnType<typeof bunRef.spawn>;
+  }) as typeof bunRef.spawn;
+
   bunRef.$ = ((strings: TemplateStringsArray, ...values: unknown[]) => {
     const segments: unknown[] = [];
     for (let i = 0; i < strings.length; i += 1) {
@@ -94,19 +138,32 @@ export const installSubprocessMocks = (): void => {
         segments.push(values[i]);
       }
     }
-    invocations.push({ kind: "$", args: toArgv(segments) });
+    const invocation: Invocation = { kind: "$", args: toArgv(segments) };
+    invocations.push(invocation);
 
-    if (dollarError) {
-      const err = new Error(dollarError.message ?? "mock subprocess failure") as Error & {
-        stdout?: Buffer;
-        stderr?: Buffer;
-      };
-      err.stdout = Buffer.from(dollarError.stdout ?? "");
-      err.stderr = Buffer.from(dollarError.stderr ?? "");
-      return { text: async () => Promise.reject(err) };
-    }
+    const text = async () => {
+      if (dollarError) {
+        const err = new Error(dollarError.message ?? "mock subprocess failure") as Error & {
+          stdout?: Buffer;
+          stderr?: Buffer;
+        };
+        err.stdout = Buffer.from(dollarError.stdout ?? "");
+        err.stderr = Buffer.from(dollarError.stderr ?? "");
+        return Promise.reject(err);
+      }
 
-    return { text: async () => dollarText };
+      return dollarText;
+    };
+
+    const command = {
+      cwd(value: string) {
+        invocation.cwd = value;
+        return command;
+      },
+      text,
+    };
+
+    return command;
   }) as typeof bunRef.$;
 };
 
@@ -142,6 +199,7 @@ export const resetSubprocessMocks = (): void => {
 /** Restore Bun globals to original state; call from afterEach for isolation. */
 export const restoreSubprocessMocks = (): void => {
   bunRef.spawnSync = originalSpawnSync;
+  bunRef.spawn = originalSpawn;
   bunRef.$ = originalDollar;
   resetSubprocessMocks();
 

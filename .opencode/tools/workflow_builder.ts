@@ -1,25 +1,15 @@
 /**
  * Workflow Builder Tool for OpenCode Integration
- * 
+ *
  * Provides access to WorkflowBuilderTool for creating and validating ADW workflow JSON files.
  * Enables interactive workflow creation with incremental validation.
- * 
+ *
  * See https://opencode.ai/docs/custom-tools/ for OpenCode tool development patterns.
  */
 
 import { tool } from "@opencode-ai/plugin";
 
-const MAX_DIAGNOSTIC_CHARS = 2000;
-
-function sanitizeDiagnostic(value: unknown): string {
-  const text = typeof value === "string" ? value : value == null ? "" : String(value);
-  const withoutAnsi = text.replace(/\x1b\[[0-9;]*m/g, "");
-  const withoutNul = withoutAnsi.replace(/\u0000/g, "");
-  if (withoutNul.length <= MAX_DIAGNOSTIC_CHARS) {
-    return withoutNul;
-  }
-  return `${withoutNul.slice(0, MAX_DIAGNOSTIC_CHARS)}... [truncated]`;
-}
+import { executeWorkflowBuilder } from "./workflow_builder_shared";
 
 export default tool({
   description: `Create and validate ADW workflow JSON files with the WorkflowBuilderTool.
@@ -59,13 +49,14 @@ OUTPUT MODES:
 
   args: {
     command: tool.schema
-      .enum(["create", "add_step", "remove_step", "get", "list", "update", "validate"])
+      .string()
+      .optional()
       .describe(`Command to execute.
 
 COMMANDS:
 • create - Create new workflow file (requires: workflow_name, description)
 • add_step - Add step to workflow (requires: workflow_name, step_json)
-• remove_step - Remove step (requires: workflow_name, step_index OR step_name)
+• remove_step - Remove step (requires: workflow_name, and at least one of step_index or step_name)
 • get - Get workflow details (requires: workflow_name)
 • list - List all workflows (no arguments required)
 • update - Update workflow (requires: workflow_name, workflow_json)
@@ -146,7 +137,8 @@ NOTE: Must provide either 'command' OR 'agent', not both.`),
       .optional()
       .describe(`Zero-based index of step to remove (for 'remove_step' command).
 
-Use this OR step_name, not both.
+Use this alone or together with step_name. At least one selector is required.
+If both are provided, backend precedence is preserved.
 EXAMPLE: step_index: 0 (removes first step)`),
 
     step_name: tool.schema
@@ -154,7 +146,8 @@ EXAMPLE: step_index: 0 (removes first step)`),
       .optional()
       .describe(`Name of step to remove (for 'remove_step' command).
 
-Use this OR step_index, not both.
+Use this alone or together with step_index. At least one selector is required.
+If both are provided, backend precedence is preserved.
 EXAMPLE: step_name: "Plan"`),
 
     position: tool.schema
@@ -193,88 +186,6 @@ MODES:
   },
 
   async execute(args) {
-    const {
-      command,
-      workflow_name,
-      description,
-      version = "1.0.0",
-      workflow_type = "custom",
-      step_json,
-      step_index,
-      step_name,
-      position,
-      workflow_json,
-      output = "summary",
-    } = args;
-
-    // Build Python command
-    const cmdParts = [
-      "python3",
-      ".opencode/tools/workflow_builder.py",
-      command,
-    ];
-
-    // Add arguments based on command
-    if (workflow_name) {
-      cmdParts.push("--workflow-name", workflow_name);
-    }
-
-    if (description) {
-      cmdParts.push("--description", description);
-    }
-
-    if (version && version !== "1.0.0") {
-      cmdParts.push("--version", version);
-    }
-
-    if (workflow_type && workflow_type !== "custom") {
-      cmdParts.push("--workflow-type", workflow_type);
-    }
-
-    if (step_json) {
-      cmdParts.push("--step-json", step_json);
-    }
-
-    if (step_index !== undefined) {
-      cmdParts.push("--step-index", step_index.toString());
-    }
-
-    if (step_name) {
-      cmdParts.push("--step-name", step_name);
-    }
-
-    if (position !== undefined) {
-      cmdParts.push("--position", position.toString());
-    }
-
-    if (workflow_json) {
-      cmdParts.push("--workflow-json", workflow_json);
-    }
-
-    if (output) {
-      cmdParts.push("--output", output);
-    }
-
-    try {
-      // Execute the Python workflow builder tool
-      const result = await Bun.$`${cmdParts}`.text();
-      
-      // Return result directly - errors are included in output
-      return result;
-      
-    } catch (error: any) {
-      // Handle execution errors
-      const errorOutput = sanitizeDiagnostic(error?.stdout?.toString?.() ?? error?.stdout);
-      const errorStderr = sanitizeDiagnostic(error?.stderr?.toString?.() ?? error?.stderr);
-      const errorMsg = sanitizeDiagnostic(error?.message);
-      
-      // Return error information for LLM to see
-      if (errorOutput) {
-        const detail = errorStderr || errorMsg || "No additional diagnostics provided.";
-        return `Workflow Builder Error:\n${errorOutput}\n\nStderr:\n${detail}`;
-      }
-      
-      return `Workflow Builder Execution Error:\n${errorStderr || errorMsg || "Unknown execution failure"}`;
-    }
+    return executeWorkflowBuilder(args);
   },
 });

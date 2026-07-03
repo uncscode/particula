@@ -16,37 +16,67 @@ function normalizeAdwId(value: unknown): string | null {
   return trimmed.toLowerCase();
 }
 
-const COMMANDS = ["init-from-batch", "init", "status", "validate", "reset"] as const;
+const COMMANDS = ["init-from-batch", "init", "status", "validate", "reset", "complete"] as const;
 const MAX_ISSUES = 500;
 const MAX_DEPENDS = 500;
 const MAX_BRANCH_LEN = 255;
 const BRANCH_REF_PATTERN = /^[A-Za-z0-9._/\-]+$/;
 const CONTROL_CHARS_PATTERN = /[\x00-\x1F\x7F]/;
+const BOUNDED_OPTION_NAME_PATTERN = /^[a-z][a-z0-9-]*$/;
+
+const COMMAND_OPTION_TOKENS = {
+  "init-from-batch": ["force"],
+  init: ["force"],
+  status: ["json"],
+  validate: [],
+  reset: ["resume", "force"],
+  complete: ["force", "dry-run", "branch-merged", "no-branch-merged"],
+} as const satisfies Record<AutoModeCommand, readonly string[]>;
 
 const USAGE_EXAMPLE = `Example usage:
-  auto_mode_manifest({ command: "init-from-batch", adw_id: "abc12345", source_branch: "epic/e14-auto", target_branch: "develop", branch_type: "epic", ship_strategy: "accumulate" })
-  auto_mode_manifest({ command: "init", issues: "42,43", depends: "43:42", ship_strategy: "pr" })
-  auto_mode_manifest({ command: "status", branch: "epic/e14-auto", json: true })
+  auto_mode_manifest({ command: "init-from-batch", adw_id: "abc12345", source_branch: "epic/e14-auto", target_branch: "develop", branch_type: "epic", ship_strategy: "accumulate", options: "force" })
+  auto_mode_manifest({ command: "init", issues: "42,43", depends: "43:42", ship_strategy: "pr", options: "force" })
+  auto_mode_manifest({ command: "status", branch: "epic/e14-auto", options: "json" })
   auto_mode_manifest({ command: "validate", branch: "epic/e14-auto" })
-  auto_mode_manifest({ command: "reset", issue: "42", branch: "epic/e14-auto", resume: true })`;
+  auto_mode_manifest({ command: "reset", issue: "42", branch: "epic/e14-auto", options: "resume force" })
+  auto_mode_manifest({ command: "complete", issue: "42", adw_id: "abc12345", branch: "epic/e14-auto", completed_at: "2026-06-27T23:59:59Z", detail: "Issue completed (branch accumulation).", options: "branch-merged dry-run" })`;
 
 const COMMAND_DESCRIPTIONS = `AVAILABLE COMMANDS:
 • init-from-batch: Initialize manifest from batch state
-  Usage: { command: "init-from-batch", adw_id: "abc12345", source_branch?: "epic/e14-auto", target_branch?: "develop", branch_type?: "epic", segment_size?: 3, ship_strategy?: "accumulate", force?: true }
+  Usage: { command: "init-from-batch", adw_id: "abc12345", source_branch?: "epic/e14-auto", target_branch?: "develop", branch_type?: "epic", segment_size?: 3, ship_strategy?: "accumulate", options?: "force" }
 
 • init: Initialize manifest from issues list
-  Usage: { command: "init", issues: "42,43", depends?: "43:42,44:43", source_branch?: "epic/e14-auto", target_branch?: "develop", branch_type?: "epic", segment_size?: 3, ship_strategy?: "pr", force?: true }
+  Usage: { command: "init", issues: "42,43", depends?: "43:42,44:43", source_branch?: "epic/e14-auto", target_branch?: "develop", branch_type?: "epic", segment_size?: 3, ship_strategy?: "pr", options?: "force" }
 
 • status: Show current manifest state
-  Usage: { command: "status", branch?: "epic/e14-auto", json?: true }
+  Usage: { command: "status", branch?: "epic/e14-auto", options?: "json" }
 
 • validate: Validate current manifest state
   Usage: { command: "validate", branch?: "epic/e14-auto" }
 
 • reset: Reset manifest issue state
-  Usage: { command: "reset", issue: "42", branch?: "epic/e14-auto", resume?: true, force?: true }`;
+  Usage: { command: "reset", issue: "42", branch?: "epic/e14-auto", options?: "resume force" }
+
+• complete: Mark an issue completed for accumulate-mode handoff
+  Usage: { command: "complete", issue: "42", adw_id: "abc12345", branch?: "epic/e14-auto", completed_at?: "2026-06-27T23:59:59Z", detail?: "Issue completed (branch accumulation).", options?: "force dry-run branch-merged" }
+  Note: completion requires workflow context for the target manifest issue because adw_id must match the persisted issue record.`;
 
 type AutoModeCommand = (typeof COMMANDS)[number];
+type AutoModeOptionToken =
+  | "force"
+  | "json"
+  | "resume"
+  | "dry-run"
+  | "branch-merged"
+  | "no-branch-merged";
+type ParsedCommandOptions = {
+  force?: true;
+  json?: true;
+  resume?: true;
+  "dry-run"?: true;
+  "branch-merged"?: true;
+  "no-branch-merged"?: true;
+};
 
 function buildError(message: string): string {
   return `ERROR: ${message}\n\n${USAGE_EXAMPLE}`;
@@ -71,6 +101,9 @@ function normalizeNonNegativeInt(value: string | number): string | null {
 function validateBranchRef(branchName: string): string | null {
   if (!branchName) {
     return "Branch name is required";
+  }
+  if (branchName.startsWith("-")) {
+    return `Invalid branch name: ${branchName}`;
   }
   if (branchName.length > MAX_BRANCH_LEN) {
     return `Branch name is too long (max ${MAX_BRANCH_LEN} chars).`;
@@ -158,6 +191,60 @@ function isCommand(command: string): command is AutoModeCommand {
 
 function buildCliError(output: string): string {
   return `ERROR: adw auto-mode command failed.\n${output}\n\n${USAGE_EXAMPLE}`;
+}
+
+function parseCommandOptions(
+  command: AutoModeCommand,
+  rawOptions: unknown,
+): { values?: ParsedCommandOptions; error?: string } {
+  if (rawOptions === undefined) {
+    return { values: {} };
+  }
+  if (rawOptions !== undefined && rawOptions !== null && typeof rawOptions !== "string") {
+    return {
+      error: "ERROR: 'options' must be a string when provided.",
+    };
+  }
+  if (rawOptions === null) {
+    return { values: {} };
+  }
+
+  const trimmed = rawOptions.trim();
+  if (!trimmed) {
+    return { values: {} };
+  }
+
+  const allowedTokens = COMMAND_OPTION_TOKENS[command];
+  const parsedValues: ParsedCommandOptions = {};
+
+  for (const token of trimmed.split(/\s+/)) {
+    const separatorCount = token.split("=").length - 1;
+    if (separatorCount > 0) {
+      return {
+        error: `ERROR: Invalid options token '${token}' for '${command}': bare tokens only; '=value' is not supported.`,
+      };
+    }
+    if (!BOUNDED_OPTION_NAME_PATTERN.test(token)) {
+      return {
+        error: `ERROR: Invalid options token '${token}' for '${command}': token names must use lowercase-kebab-case.`,
+      };
+    }
+    if (!allowedTokens.includes(token)) {
+      return {
+        error: `ERROR: Invalid options token '${token}' for '${command}': token is not allowed for command '${command}'.`,
+      };
+    }
+
+    const fieldName = token as AutoModeOptionToken;
+    if (parsedValues[fieldName]) {
+      return {
+        error: `ERROR: Invalid options token '${token}' for '${command}': duplicate '${token}' token is not allowed.`,
+      };
+    }
+    parsedValues[fieldName] = true;
+  }
+
+  return { values: parsedValues };
 }
 
 function normalizeIssues(issues: string): { csv: string; items: string[] } | null {
@@ -314,6 +401,7 @@ function appendShipStrategy(
 function buildInitFromBatchCommand(
   cmdParts: (string | number)[],
   args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
 ): string | null {
   if (!args.adw_id) {
     return "'adw_id' is required for init-from-batch.";
@@ -337,7 +425,7 @@ function buildInitFromBatchCommand(
   if (shipError) {
     return shipError;
   }
-  if (args.force) {
+  if (options.force) {
     cmdParts.push("--force");
   }
   return null;
@@ -346,6 +434,7 @@ function buildInitFromBatchCommand(
 function buildInitCommand(
   cmdParts: (string | number)[],
   args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
 ): string | null {
   if (!args.issues) {
     return "'issues' is required for init.";
@@ -388,19 +477,23 @@ function buildInitCommand(
   if (shipError) {
     return shipError;
   }
-  if (args.force) {
+  if (options.force) {
     cmdParts.push("--force");
   }
   return null;
 }
 
-function buildStatusCommand(cmdParts: (string | number)[], args: AutoModeManifestArgs): string | null {
+function buildStatusCommand(
+  cmdParts: (string | number)[],
+  args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
+): string | null {
   cmdParts.push("status");
   const branchError = appendBranchFilter(cmdParts, args.branch);
   if (branchError) {
     return branchError;
   }
-  if (args.json) {
+  if (options.json) {
     cmdParts.push("--json");
   }
   return null;
@@ -421,6 +514,7 @@ function buildValidateCommand(
 function buildResetCommand(
   cmdParts: (string | number)[],
   args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
 ): string | null {
   if (!args.issue) {
     return "'issue' is required for reset.";
@@ -434,11 +528,61 @@ function buildResetCommand(
   if (branchError) {
     return branchError;
   }
-  if (args.resume) {
+  if (options.resume) {
     cmdParts.push("--resume");
   }
-  if (args.force) {
+  if (options.force) {
     cmdParts.push("--force");
+  }
+  return null;
+}
+
+function buildCompleteCommand(
+  cmdParts: (string | number)[],
+  args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
+): string | null {
+  if (!args.issue) {
+    return "'issue' is required for complete.";
+  }
+  const normalizedIssue = normalizePositiveInt(args.issue);
+  if (!normalizedIssue) {
+    return `Invalid issue "${args.issue}". Issue must be a positive integer.`;
+  }
+  if (!args.adw_id) {
+    return "'adw_id' is required for complete.";
+  }
+  const normalizedAdwId = normalizeAdwId(args.adw_id);
+  if (!normalizedAdwId) {
+    return `Invalid adw_id "${args.adw_id}". Must be an 8-character hex string (e.g., "abc12345").`;
+  }
+  if (options["branch-merged"] && options["no-branch-merged"]) {
+    return "Invalid options for 'complete': 'branch-merged' and 'no-branch-merged' cannot be combined.";
+  }
+  cmdParts.push("complete", "--issue", normalizedIssue, "--adw-id", normalizedAdwId);
+  const branchError = appendBranchFilter(cmdParts, args.branch);
+  if (branchError) {
+    return branchError;
+  }
+  const completedAt = normalizeOptionalString(args.completed_at);
+  if (completedAt !== undefined) {
+    cmdParts.push("--completed-at", completedAt);
+  }
+  const detail = normalizeOptionalString(args.detail);
+  if (detail !== undefined) {
+    cmdParts.push("--detail", detail);
+  }
+  if (options.force) {
+    cmdParts.push("--force");
+  }
+  if (options["dry-run"]) {
+    cmdParts.push("--dry-run");
+  }
+  if (options["branch-merged"]) {
+    cmdParts.push("--branch-merged");
+  }
+  if (options["no-branch-merged"]) {
+    cmdParts.push("--no-branch-merged");
   }
   return null;
 }
@@ -447,7 +591,7 @@ export default tool({
   description: `Manage ADW auto-mode manifest operations via \`adw auto-mode\`.
 
 This tool wraps the auto-mode CLI commands with validation to provide agents
-safe access to manifest creation, inspection, and resets.
+safe access to manifest creation, inspection, resets, and manual completion.
 
 ${COMMAND_DESCRIPTIONS}
 
@@ -455,6 +599,7 @@ NOTES:
 • \`issues\` is a comma-separated list of positive integers.
 • \`depends\` is a comma-separated list of A:B pairs (e.g., "43:42,44:43").
 • Sparse-call rule: omit optional fields unless intentionally set; blank optional strings are treated as omitted.
+• Bounded options use command-scoped bare tokens only (e.g., options: "force" or options: "resume force").
 • Errors return with an ERROR: prefix and include a usage example.
 
 ${USAGE_EXAMPLE}`,
@@ -471,14 +616,17 @@ REQUIRED PARAMETERS BY COMMAND:
 • init: issues
 • status: none
 • validate: none
-• reset: issue`),
+• reset: issue
+• complete: issue, adw_id`),
 
     adw_id: tool.schema
       .string()
       .optional()
       .describe(`ADW workflow ID.
 
-REQUIRED FOR: init-from-batch
+REQUIRED FOR: init-from-batch, complete
+For complete, this must match the persisted workflow context recorded on the
+target manifest issue.
 EXAMPLE: adw_id: "abc12345"`),
 
     issues: tool.schema
@@ -507,19 +655,24 @@ EXAMPLE: depends: "43:42,44:43"`),
 OPTIONAL FOR: init-from-batch, init
 EXAMPLE: segment_size: 0`),
 
-    force: tool.schema
-      .boolean()
+    options: tool.schema
+      .string()
       .optional()
-      .describe(`Force manifest operations.
+      .describe(`Bounded command-scoped toggle carrier.
 
-OPTIONAL FOR: init-from-batch, init, reset`),
+SUPPORTED TOKENS:
+• init-from-batch: force
+• init: force
+• status: json
+• reset: resume, force
+• complete: force, dry-run, branch-merged, no-branch-merged
 
-    json: tool.schema
-      .boolean()
-      .optional()
-      .describe(`Return JSON output.
+Use space-separated bare tokens and keep payload-bearing fields explicit.
 
-APPLIES TO: status`),
+EXAMPLES:
+• options: "force"
+• options: "json"
+• options: "resume force"`),
 
     source_branch: tool.schema
       .string()
@@ -563,23 +716,32 @@ ALLOWED: pr, accumulate`),
       .optional()
       .describe(`Issue number as a positive integer string.
 
-REQUIRED FOR: reset
-EXAMPLE: issue: "42"`),
-
-    resume: tool.schema
-      .boolean()
-      .optional()
-      .describe(`Resume dispatching after reset.
-
-OPTIONAL FOR: reset`),
+        REQUIRED FOR: reset, complete
+        EXAMPLE: issue: "42"`),
 
     branch: tool.schema
       .string()
       .optional()
       .describe(`Branch name filter for manifest operations.
 
-APPLIES TO: status, validate, reset
+APPLIES TO: status, validate, reset, complete
 MAPS TO: --branch`),
+
+    completed_at: tool.schema
+      .string()
+      .optional()
+      .describe(`UTC ISO 8601 completion timestamp.
+
+OPTIONAL FOR: complete
+MAPS TO: --completed-at`),
+
+    detail: tool.schema
+      .string()
+      .optional()
+      .describe(`Checkpoint detail text.
+
+OPTIONAL FOR: complete
+MAPS TO: --detail`),
   },
 
   async execute(args: AutoModeManifestArgs) {
@@ -590,22 +752,28 @@ MAPS TO: --branch`),
       );
     }
 
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "auto-mode"];
+    const parsedOptions = parseCommandOptions(command, args.options);
+    if (parsedOptions.error) {
+      return `${parsedOptions.error}\n\n${USAGE_EXAMPLE}`;
+    }
+
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "auto-mode"];
     let buildErrorMessage: string | null = null;
+    const optionValues = parsedOptions.values ?? {};
 
     switch (command) {
       case "init-from-batch": {
-        buildErrorMessage = buildInitFromBatchCommand(cmdParts, args);
+        buildErrorMessage = buildInitFromBatchCommand(cmdParts, args, optionValues);
         break;
       }
 
       case "init": {
-        buildErrorMessage = buildInitCommand(cmdParts, args);
+        buildErrorMessage = buildInitCommand(cmdParts, args, optionValues);
         break;
       }
 
       case "status": {
-        buildErrorMessage = buildStatusCommand(cmdParts, args);
+        buildErrorMessage = buildStatusCommand(cmdParts, args, optionValues);
         break;
       }
 
@@ -615,7 +783,12 @@ MAPS TO: --branch`),
       }
 
       case "reset": {
-        buildErrorMessage = buildResetCommand(cmdParts, args);
+        buildErrorMessage = buildResetCommand(cmdParts, args, optionValues);
+        break;
+      }
+
+      case "complete": {
+        buildErrorMessage = buildCompleteCommand(cmdParts, args, optionValues);
         break;
       }
     }
@@ -659,13 +832,13 @@ interface AutoModeManifestArgs {
   issues?: string;
   depends?: string;
   segment_size?: string | number;
-  force?: boolean;
-  json?: boolean;
+  options?: string;
   source_branch?: string;
   target_branch?: string;
   branch_type?: string;
   ship_strategy?: string;
   issue?: string;
-  resume?: boolean;
   branch?: string;
+  completed_at?: string;
+  detail?: string;
 }

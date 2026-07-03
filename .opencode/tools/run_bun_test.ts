@@ -6,56 +6,175 @@
  */
 
 import { tool } from "@opencode-ai/plugin";
-import { existsSync, realpathSync, statSync } from "node:fs";
-import path from "node:path";
-
-// --- Inlined from lib/cpp_lint_wrapper_shared.ts (isStatDirectory only) ---
-
-const S_IFMT = 0o170000;
-const S_IFDIR = 0o040000;
-
-function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
-  if (typeof s.isDirectory === "function") return s.isDirectory();
-  if (typeof s.isDirectory === "boolean") return s.isDirectory;
-  return (((s as any).mode ?? 0) & S_IFMT) === S_IFDIR;
-}
+import { validateCwdWithinRepo, validatePathWithinRepo } from "./lib/path_validation";
 
 // --- Tool-local helpers ---
 
 const MISSING_SCRIPT_HINT = "Missing backing script .opencode/tools/run_bun_test.py.";
 
-const normalizeFailFast = (value: unknown): boolean => {
-  if (typeof value === "string") {
-    return value.toLowerCase() === "true";
-  }
-  return Boolean(value);
+type OutputMode = "summary" | "full" | "json";
+type ParsedBunOptions = {
+  outputMode?: OutputMode;
+  testFilter?: string;
+  failFast?: true;
 };
 
-const validateCwdWithinRepo = (cwd: string | undefined): string | undefined => {
-  if (!cwd) {
-    return undefined;
-  }
+type ParsedBunOptionsResult =
+  | { ok: true; options: ParsedBunOptions }
+  | { ok: false; error: string };
 
-  try {
-    if (!existsSync(cwd)) {
-      return `ERROR: cwd path does not exist: ${cwd}`;
-    }
-    if (!isStatDirectory(statSync(cwd))) {
-      return `ERROR: cwd path is not a directory: ${cwd}`;
-    }
+const BUN_OPTION_RULES = new Set(["output", "test-filter", "fail-fast"]);
+const OUTPUT_MODES = new Set<OutputMode>(["summary", "full", "json"]);
+const LEGACY_DIRECT_KEYS = new Set(["outputMode", "testFilter", "failFast"]);
 
-    const repoRoot = realpathSync(process.cwd());
-    const resolvedCwd = realpathSync(cwd);
-    const rel = path.relative(repoRoot, resolvedCwd);
-    if (rel.startsWith("..") || path.isAbsolute(rel)) {
-      return `ERROR: cwd path resolves outside repository root: ${cwd} (canonical: ${resolvedCwd})`;
+const hasLegacyDirectKey = (args: Record<string, unknown>): string | undefined => {
+  for (const key of LEGACY_DIRECT_KEYS) {
+    if (Object.hasOwn(args, key)) {
+      return key;
     }
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    return `ERROR: invalid cwd path: ${cwd} (${message})`;
   }
 
   return undefined;
+};
+
+const tokenizeOptions = (options: string): { ok: true; tokens: string[] } | { ok: false; error: string } => {
+  const tokens: string[] = [];
+  let current = "";
+  let quote: "'" | '"' | undefined;
+
+  for (let index = 0; index < options.length; index += 1) {
+    const char = options[index];
+    if (quote) {
+      current += char;
+      if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+      current += char;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      if (current) {
+        tokens.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += char;
+  }
+
+  if (quote) {
+    return { ok: false, error: "ERROR: Invalid options string: unterminated quoted value." };
+  }
+  if (current) {
+    tokens.push(current);
+  }
+  return { ok: true, tokens };
+};
+
+const stripOptionalQuotes = (value: string): string => {
+  if (value.length >= 2) {
+    const first = value[0];
+    const last = value[value.length - 1];
+    if ((first === '"' || first === "'") && last === first) {
+      return value.slice(1, -1);
+    }
+  }
+  return value;
+};
+
+const parseBunOptions = (options: unknown): ParsedBunOptionsResult => {
+  if (options === undefined || options === null) {
+    return { ok: true, options: {} };
+  }
+  if (typeof options !== "string") {
+    return { ok: false, error: "ERROR: 'options' must be a string when provided." };
+  }
+
+  const normalized = options.trim();
+  if (!normalized) {
+    return { ok: true, options: {} };
+  }
+
+  const tokenized = tokenizeOptions(normalized);
+  if (!tokenized.ok) {
+    return tokenized;
+  }
+
+  const parsed: ParsedBunOptions = {};
+  for (const token of tokenized.tokens) {
+    const separatorIndex = token.indexOf("=");
+    if (separatorIndex !== token.lastIndexOf("=")) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': tokens must contain at most one '=' separator.` };
+    }
+    if (separatorIndex === -1) {
+      if (!BUN_OPTION_RULES.has(token)) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': token is not supported.` };
+      }
+      if (token !== "fail-fast") {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.` };
+      }
+      if (parsed.failFast) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+      }
+      parsed.failFast = true;
+      continue;
+    }
+
+    const name = token.slice(0, separatorIndex);
+    const rawValue = token.slice(separatorIndex + 1);
+    if (!BUN_OPTION_RULES.has(name)) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token is not supported.` };
+    }
+    if (!rawValue) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.` };
+    }
+    if (name === "fail-fast") {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token does not accept a value.` };
+    }
+
+    const value = stripOptionalQuotes(rawValue).trim();
+    if (!value) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.` };
+    }
+
+    if (name === "output") {
+      if (!OUTPUT_MODES.has(value as OutputMode)) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': output must be one of summary, full, json.` };
+      }
+      if (parsed.outputMode !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+      }
+      parsed.outputMode = value as OutputMode;
+      continue;
+    }
+
+    if (name === "test-filter") {
+      if (parsed.testFilter !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+      }
+      parsed.testFilter = value;
+    }
+  }
+
+  return { ok: true, options: parsed };
+};
+
+const validatePositiveFiniteNumber = (name: string, value: unknown): string | undefined => {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+    return `ERROR: ${name} must be a positive finite number.`;
+  }
+  return undefined;
+};
+
+const validateTestPathWithinRepo = (
+  testPath: string | undefined,
+  cwd: string | undefined,
+): string | undefined => {
+  return validatePathWithinRepo(testPath, "testPath", cwd);
 };
 
 // --- Tool definition ---
@@ -66,9 +185,9 @@ export default tool({
 EXAMPLES:
 - Run all tests: run_bun_test({ testPath: '__tests__/' })
 - Single test file: run_bun_test({ testPath: '__tests__/get_datetime.test.ts' })
-- Filter by name: run_bun_test({ testFilter: 'datetime' })
-- Fail fast: run_bun_test({ testPath: '__tests__/', failFast: true })
-- JSON output: run_bun_test({ outputMode: 'json' })
+- Filter by name: run_bun_test({ options: 'test-filter=datetime' })
+- Fail fast: run_bun_test({ testPath: '__tests__/', options: 'fail-fast' })
+- JSON output: run_bun_test({ options: 'output=json' })
 
 IMPORTANT: Requires bun to be installed on the host system.
 NOTE: Default working directory is .opencode/tools/ (where package.json lives).`,
@@ -77,14 +196,6 @@ NOTE: Default working directory is .opencode/tools/ (where package.json lives).`
       .string()
       .optional()
       .describe("Path to test file or directory. Example: '__tests__/', '__tests__/get_datetime.test.ts'."),
-    testFilter: tool.schema
-      .string()
-      .optional()
-      .describe("Test name pattern filter (maps to --filter). Example: 'datetime'."),
-    outputMode: tool.schema
-      .enum(["summary", "full", "json"])
-      .optional()
-      .describe("Output mode: 'summary' (default), 'full', 'json'."),
     timeout: tool.schema
       .number()
       .optional()
@@ -97,32 +208,47 @@ NOTE: Default working directory is .opencode/tools/ (where package.json lives).`
       .string()
       .optional()
       .describe("Working directory override (default: .opencode/tools/)."),
-    failFast: tool.schema
-      .boolean()
+    options: tool.schema
+      .string()
       .optional()
-      .describe("Stop on first failure (maps to --bail)."),
+      .describe("Bounded options string. Supported tokens: output=<summary|full|json>, test-filter=<value>, fail-fast."),
   },
   async execute(args) {
-    const outputMode = args.outputMode || "summary";
+    const legacyDirectKey = hasLegacyDirectKey(args as Record<string, unknown>);
+    if (legacyDirectKey) {
+      return `ERROR: run_bun_test does not accept direct field '${legacyDirectKey}'. Use 'options' tokens instead.`;
+    }
+
+    const parsedOptions = parseBunOptions((args as Record<string, unknown>).options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
+    }
+
+    const outputMode = parsedOptions.options.outputMode || "summary";
     const testPath = typeof args.testPath === "string" ? args.testPath.trim() : undefined;
-    const testFilter = typeof args.testFilter === "string" ? args.testFilter.trim() : undefined;
+    const testFilter = parsedOptions.options.testFilter;
     const timeout = args.timeout ?? 300;
     const minTests = args.minTests ?? 1;
     const cwd = typeof args.cwd === "string" ? args.cwd.trim() : undefined;
-    const failFast = normalizeFailFast(args.failFast);
+    const failFast = parsedOptions.options.failFast === true;
 
-    if (timeout <= 0) {
-      return `ERROR: Timeout must be positive (received ${timeout}).`;
+    const timeoutError = validatePositiveFiniteNumber("timeout", timeout);
+    if (timeoutError) {
+      return timeoutError;
     }
 
-    if (minTests <= 0) {
-      return `ERROR: minTests must be positive (received ${minTests}).`;
+    const minTestsError = validatePositiveFiniteNumber("minTests", minTests);
+    if (minTestsError) {
+      return minTestsError;
     }
 
     if (typeof args.testPath === "string" && !testPath) {
       return "ERROR: testPath must not be blank when provided.";
     }
-    if (typeof args.testFilter === "string" && !testFilter) {
+    if (testPath?.startsWith("-")) {
+      return "ERROR: testPath must not start with '-' (potential option injection).";
+    }
+    if (parsedOptions.options.testFilter !== undefined && !testFilter) {
       return "ERROR: testFilter must not be blank when provided.";
     }
     if (typeof args.cwd === "string" && !cwd) {
@@ -132,6 +258,10 @@ NOTE: Default working directory is .opencode/tools/ (where package.json lives).`
     const cwdError = validateCwdWithinRepo(cwd);
     if (cwdError) {
       return cwdError;
+    }
+    const testPathError = validateTestPathWithinRepo(testPath, cwd);
+    if (testPathError) {
+      return testPathError;
     }
 
     const cmdParts: (string | number)[] = [

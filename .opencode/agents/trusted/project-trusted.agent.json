@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "name": "project.trusted-agent",
+    "description": "Project trusted executable agent spec fixture"
+  },
+  "model": {
+    "provider": "openai",
+    "model": "gpt-5.4"
+  },
+  "request": {},
+  "result": {},
+  "factory": {}
+}

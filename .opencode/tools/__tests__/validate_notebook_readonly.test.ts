@@ -27,7 +27,7 @@ describe("validate_notebook_readonly wrapper", () => {
   it("runs validation command in success path", async () => {
     setDollarText(buildSuccessOutput("NOTEBOOK_OK"));
     const execute = await loadToolExecute("../../validate_notebook_readonly.ts");
-    const result = await execute({ notebookPath: "docs/Examples", recursive: true, outputMode: "json" });
+    const result = await execute({ notebookPath: "docs/Examples", recursive: true, options: "output=json" });
 
     expect(result).toBe("NOTEBOOK_OK");
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
@@ -41,17 +41,62 @@ describe("validate_notebook_readonly wrapper", () => {
     const result = await execute({ notebookPath: "n.ipynb", sync: true });
     assertErrorPrefix(String(result), "ERROR:");
     expect(result).toContain("does not support mutating options");
+    expect(await execute({ notebookPath: "n.ipynb", outputDir: "" })).toContain(
+      "does not support mutating options",
+    );
   });
 
   it("rejects empty notebookPath and conflicting validation options", async () => {
     const execute = await loadToolExecute("../../validate_notebook_readonly.ts");
     expect(await execute({ notebookPath: "  " })).toContain("'notebookPath' is required");
-    expect(await execute({ notebookPath: "n.ipynb", fast: true, full: true })).toContain("cannot both be true");
-    expect(await execute({ notebookPath: "n.ipynb", validationMode: "fast", full: true })).toContain(
-      "either 'validationMode' or 'fast/full'",
+    expect(await execute({ notebookPath: "n.ipynb", options: "fast full" })).toContain("cannot both be true");
+    expect(await execute({ notebookPath: "n.ipynb", options: "validation-mode=fast full" })).toContain(
+      "either 'validation-mode' or 'fast/full'",
     );
-    expect(await execute({ notebookPath: "n.ipynb", checkSync: true, outputMode: "summary" })).toContain(
+    expect(await execute({ notebookPath: "n.ipynb", checkSync: true, options: "output=json" })).toContain(
       "'checkSync' cannot be combined",
+    );
+    expect(await execute({ notebookPath: "n.ipynb", checkSync: true, options: "output=summary" })).toContain(
+      "'checkSync' cannot be combined",
+    );
+  });
+
+  it("supports bounded validation aliases and bare checkSync success paths", async () => {
+    setDollarText(buildSuccessOutput("NOTEBOOK_OK"));
+    const execute = await loadToolExecute("../../validate_notebook_readonly.ts");
+
+    await execute({ notebookPath: "docs/Examples/demo.ipynb", options: "validation-mode=fast" });
+    let cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
+    expect(cmd).toContain("--validation-mode fast");
+    expect(cmd).not.toContain("--check-sync");
+
+    await execute({ notebookPath: "docs/Examples/demo.ipynb", options: "fast" });
+    cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
+    expect(cmd).toContain("--fast");
+
+    await execute({ notebookPath: "docs/Examples", recursive: true, checkSync: true });
+    cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
+    expect(cmd).toContain("--check-sync");
+    expect(cmd).toContain("--recursive");
+    expect(cmd).not.toContain("--output=");
+    expect(cmd).not.toContain("--validation-mode");
+    expect(cmd).not.toContain("--fast");
+  });
+
+  it("rejects malformed, duplicate, and unsupported bounded options", async () => {
+    const execute = await loadToolExecute("../../validate_notebook_readonly.ts");
+
+    expect(await execute({ notebookPath: "n.ipynb", options: "unknown-token" })).toContain(
+      "token is not supported",
+    );
+    expect(await execute({ notebookPath: "n.ipynb", options: "output=summary output=json" })).toContain(
+      "duplicate token",
+    );
+    expect(await execute({ notebookPath: "n.ipynb", options: "output=xml" })).toContain(
+      "output must be one of summary, full, json",
+    );
+    expect(await execute({ notebookPath: "n.ipynb", options: 'output="' })).toContain(
+      "unterminated quoted value",
     );
   });
 

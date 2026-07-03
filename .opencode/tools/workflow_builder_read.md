@@ -19,6 +19,8 @@ Rejected, omitted, or blank commands fail closed with deterministic errors:
 
 `ERROR: workflow_builder_read does not support command '<cmd>'. Use: list, get, validate.`
 
+Required read inputs (`workflow_name` for `get`, `workflow_json` for `validate`) also fail closed when missing or whitespace-only. Blank optional string inputs are omitted from delegated CLI argv.
+
 ## Example
 
 ```json

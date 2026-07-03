@@ -9,7 +9,7 @@ description: >-
   - Reviews testing_strategy, phase_details, and testing_requirements section keys
   - Enforces tests-with-feature coverage requirements for code-bearing phases
   - Expands missing test descriptions with concrete test types and file targets
-  - Writes bounded review status summaries via adw_spec messages-write
+  - Writes bounded review status summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -18,10 +18,13 @@ permission:
   edit: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -42,7 +45,7 @@ input: $ARGUMENTS
 2. Discover scoped section files from `plan-reviser` or `plan-orchestrator` `review_plan_ids`.
 3. Review section keys `testing_strategy`, `phase_details`, and `testing_requirements`.
 4. Enforce tests-with-feature expectations for implementation phases and document valid exceptions.
-5. Write a bounded status summary via `adw_spec messages-write`.
+5. Write a bounded status summary via `adw_spec_messages messages-write`.
 
 ## Trust Boundary
 
@@ -75,16 +78,16 @@ signal (`PLAN_REVIEW_TESTING_FAILED`).
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -97,7 +100,7 @@ do not require it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -120,10 +123,10 @@ Use `review_plan_ids` (not `drafted_plan_ids`) as the canonical scope for this p
 For each plan ID from `review_plan_ids`, resolve canonical section files via:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -144,7 +147,7 @@ or non-`.md` targets).
 
 If `review_plan_ids` is missing/empty, or section resolution yields no files,
 execute deterministic no-op success behavior:
-1. Write a no-op summary through `adw_spec messages-write`.
+1. Write a no-op summary through `adw_spec_messages messages-write`.
 2. Emit success signal (do not fail).
 3. **Return immediately** (do not continue to Step 7).
 
@@ -228,7 +231,7 @@ If a document is malformed, partially structured, or cannot be parsed reliably:
 Write one bounded summary through `messages-write`:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-review-testing",

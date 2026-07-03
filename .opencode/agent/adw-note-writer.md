@@ -3,7 +3,7 @@
 description: >-
   Subagent that writes structured workflow context notes to HEAD using either
   ADW workflow state (`write-from-state`) or a commit-context fallback
-  (`git_operations` + explicit `write`) when no adw_id is available. Invoked by
+  (`git_diff` + explicit `write`) when no adw_id is available. Invoked by
   shipper/shipper-auto after ADW_COMMIT_SUCCESS or ADW_COMMIT_SKIPPED. Note
   writing is best-effort and must never block ship completion.
 mode: subagent
@@ -13,7 +13,9 @@ permission:
   edit: deny
   write: deny
   list: deny
-  ripgrep: deny
+  find_files: deny
+  search_content: deny
+  ripgrep_advanced: deny
   move: deny
   todoread: deny
   todowrite: deny
@@ -22,7 +24,6 @@ permission:
   adw_spec: deny
   adw_spec_read: allow
   adw_spec_messages: allow
-  adw_issues_spec: deny
   adw_notes: deny
   adw_notes_read: allow
   adw_notes_write: allow
@@ -31,7 +32,6 @@ permission:
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: deny
   get_version: deny
@@ -66,14 +66,15 @@ If `adw_id` is provided but malformed, fail closed.
 
 ### Path A: ADW state-backed note (`adw_id` present and valid)
 
-3A. Read workflow state once via `adw_spec({"command": "read", "adw_id": adw_id})`.
+3A. Read workflow state once via `adw_spec_read({"command": "read", "adw_id": adw_id})`.
 4A. Extract needed fields in one pass and reuse in-memory:
    - `spec_content`
    - `architecture_review_content`
    - `review_feedback`
    - `review_findings`
 5A. Read recent messages using a **bounded window**:
-   - `adw_spec({"command": "messages-read", "adw_id": adw_id, "last": 20})`
+    - `adw_spec_messages({"command": "messages-read", "adw_id": adw_id, "options": "last=20"})`
+    - Keep the bounded message window fixed at `"last": 20` semantics.
 6A. Build note fields with deterministic condensation:
    - `plan_summary`: condense `spec_content` into **2-3 sentences**
    - `architecture_notes`: condense `architecture_review_content` (nullable)
@@ -84,9 +85,9 @@ If `adw_id` is provided but malformed, fail closed.
 ### Path B: Commit-context fallback (`adw_id` missing)
 
 3B. Inspect the most recent commit using git tools only:
-   - `git_operations({"command": "show", "ref": "HEAD", "stat": true})`
+   - `git_diff({"command": "show", "ref": "HEAD", "stat": true})`
    - If needed, read one commit of history for subject confirmation using
-     `git_operations({"command": "log", "ref": "HEAD", "max_count": 1, "oneline": true})`
+     `git_diff({"command": "log", "ref": "HEAD", "max_count": 1, "oneline": true})`
 4B. Derive note fields from commit context:
    - `plan_summary`: summarize the commit message and overall change intent in **2-3 sentences**
    - `architecture_notes`: include only if the commit clearly changes architecture or workflow
@@ -119,7 +120,7 @@ If `adw_id` is provided but malformed, fail closed.
   drop empty/whitespace-only entries.
 - Missing `review_feedback`: set `review_findings` to null.
 - Missing `adw_id`: do **not** fail. Use the commit-context fallback path instead.
-- Missing parent commit or unusual git history: use `git_operations show HEAD --stat` only and
+- Missing parent commit or unusual git history: use `git_diff show HEAD --stat` only and
   summarize the available commit metadata conservatively.
 - If neither ADW state nor commit context can be read, emit `ADW_NOTE_FAILED` with the blocking
   reason.

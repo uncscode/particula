@@ -2,11 +2,12 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   buildCommandFailureError,
-  validatePlansCwdPath,
+  hasMeaningfulSplitWrapperAliasValue,
   mergeParsedOptionField,
   parseCommandOptionsString,
   sanitizeSuccessOutput,
   stripDefaultArgs,
+  validateAndNormalizePlansCwdPath,
   validateUpdatePhaseIssueLinkArgs,
   validateRequiredArgs,
 } from "./adw_plans_contract_shared";
@@ -54,9 +55,6 @@ const COMMAND_TIMEOUTS: Record<PlanCommand, number> = {
 function sanitizedChildEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV") {
-      continue;
-    }
     if (value !== undefined) {
       env[key] = value;
     }
@@ -75,7 +73,7 @@ type IdentifierOptions = {
 };
 
 const COMMAND_GUIDE = `Commands:
-• create — Required: plan_type, title; Optional: plan_id, parent, status, patchless options: priority=<value> size=<value>
+• create — Required: plan_type, title; Optional: plan_id, parent; Optional options: status=<value> priority=<value> size=<value>
 • update — Required: plan_id; Optional: title, patch; Optional options: status=<value> priority=<value> size=<value>
 • add-phase — Required: plan_id, title; Optional options: phase-status=<value> size=<value> after=<phase_id>
 • update-phase — Required: plan_id, phase_id; Optional: title, patch; Optional options: phase-status=<value> size=<value> issue=<n> clear-issue-number
@@ -110,18 +108,6 @@ function normalizeIdentifier(
     };
   }
   return { value: normalized };
-}
-
-function normalizeCwd(raw: unknown): { value?: string; error?: string } {
-  const normalized = normalizeIdentifier(raw, {
-    field: "cwd",
-    required: false,
-    emptyMessage: "'cwd' must not be empty when provided.",
-  });
-  if (normalized.error || !normalized.value) {
-    return normalized;
-  }
-  return normalized;
 }
 
 function normalizePatch(raw: unknown): { value?: string; error?: string } {
@@ -185,6 +171,12 @@ function isMutateCommand(command: unknown): command is (typeof MUTATE_COMMANDS)[
 // --- Inlined execute logic from adw_plans.ts (mutating commands only) ---
 
 async function executeAdwPlansMutate(args: Record<string, any>): Promise<string> {
+  if (hasMeaningfulSplitWrapperAliasValue(args.status)) {
+    return buildError("'status' is not accepted as a direct field in adw_plans_mutate; use options: \"status=<value>\".");
+  }
+  if (hasMeaningfulSplitWrapperAliasValue(args.phase_status)) {
+    return buildError("'phase_status' is not accepted as a direct field in adw_plans_mutate; use options: \"phase-status=<value>\".");
+  }
   const preflightError = validateRequiredArgs(args, REQUIRED_ARGS, buildError);
   if (preflightError) {
     return preflightError;
@@ -195,10 +187,8 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
     plan_id,
     plan_type,
     parent,
-    status,
     title,
     phase_id,
-    phase_status,
     options,
     patch,
     cwd,
@@ -209,14 +199,14 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
     return parsedOptions.error;
   }
   const optionValues = parsedOptions.values ?? {};
-  const resolvedStatus = mergeParsedOptionField(status, optionValues.status, "status", buildError);
+  const resolvedStatus = mergeParsedOptionField(undefined, optionValues.status, "status", buildError);
   if (resolvedStatus.error) return resolvedStatus.error;
   const resolvedPriority = mergeParsedOptionField(undefined, optionValues.priority, "priority", buildError);
   if (resolvedPriority.error) return resolvedPriority.error;
   const resolvedSize = mergeParsedOptionField(undefined, optionValues.size, "size", buildError);
   if (resolvedSize.error) return resolvedSize.error;
   const resolvedPhaseStatus = mergeParsedOptionField(
-    phase_status,
+    undefined,
     optionValues.phase_status,
     "phase_status",
     buildError,
@@ -241,7 +231,7 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
 
   const lazyNormalizePatch = (): { value?: string; error?: string } => normalizePatch(patch);
 
-  const cmdParts = ["uv", "run", "adw", "plans"];
+  const cmdParts = ["uv", "run", "--active", "adw", "plans"];
   const executedCommand = command as PlanCommand;
 
   switch (executedCommand) {
@@ -451,7 +441,7 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
       );
   }
 
-  const normalizedCwd = normalizeCwd(cwd);
+  const normalizedCwd = validateAndNormalizePlansCwdPath(cwd);
   if (normalizedCwd.error) {
     return normalizedCwd.error;
   }
@@ -459,10 +449,6 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
     return buildError(`${executedCommand} command requires 'cwd'.`);
   }
   if (normalizedCwd.value) {
-    const cwdValidationError = validatePlansCwdPath(normalizedCwd.value);
-    if (cwdValidationError) {
-      return cwdValidationError;
-    }
     cmdParts.push("--cwd", normalizedCwd.value);
   }
 
@@ -539,10 +525,8 @@ Contract parity note: command execution and envelopes are delegated to adw_plans
     plan_type: tool.schema.string().optional(),
     title: tool.schema.string().optional(),
     parent: tool.schema.string().optional(),
-    status: tool.schema.enum(["Draft", "Proposed", "Ready", "In Progress", "Blocked", "Monitoring", "Shipped", "Cancelled", "Superseded"]).optional(),
     options: tool.schema.string().optional(),
     phase_id: tool.schema.string().optional(),
-    phase_status: tool.schema.enum(["Not Started", "In Progress", "Blocked", "Shipped", "Cancelled"]).optional(),
     patch: tool.schema.string().optional(),
     cwd: tool.schema.string().optional(),
   },

@@ -3,8 +3,8 @@
 description: >-
   Use this agent to maintain ADW templates by syncing changes from live files
   back into template files. This agent manages TWO maintenance workflows:
-  1. .opencode/guides/ → adw/templates/docs_stubs/*/.opencode/guides/ (documentation scaffolds)
-  2. .opencode/ refreshed via `adw setup pull-opencode` (OpenCode configuration)
+  1. .opencode/guides/ → documentation stub templates (documentation scaffolds)
+  2. .opencode/ refreshed via `adw_setup` `pull-opencode` (OpenCode configuration)
   
   This agent should be invoked when:
   - Live documentation in `.opencode/guides/` has been updated and templates need syncing
@@ -16,38 +16,40 @@ description: >-
   
   Examples:
   - User: "Extract the docs changes back into templates"
-    Assistant: "I'll run adw setup template extract to sync changes from live docs to templates."
+    Assistant: "I'll run `adw_setup` template extract to sync changes from live docs to templates."
   
   - User: "Sync the agent files to templates"
-    Assistant: "I'll refresh .opencode/ with adw setup pull-opencode and reconcile local agent changes."
+    Assistant: "I'll refresh .opencode/ with `adw_setup` pull-opencode and reconcile local agent changes."
   
   - User: "A file was moved to legacy, update templates"
     Assistant: "I'll move the file from templates root to templates legacy folder."
   
   - User: "Check if templates are in sync with live files"
-    Assistant: "I'll compare directory structures and run adw setup template extract --diff."
+    Assistant: "I'll compare directory structures and run `adw_setup` template extract --diff."
   
   - User: "Validate that all template placeholders are defined"
-    Assistant: "I'll run adw setup template validate to check placeholder coverage."
+    Assistant: "I'll run `adw_setup` template validate to check placeholder coverage."
 mode: primary
 permission:
   "*": deny
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
-  adw: allow
-  adw_spec: allow
+  adw: deny
+  adw_setup: allow
+  adw_spec: deny
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: allow
+  git_diff: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -115,7 +117,7 @@ Before starting, consult:
 
 # Key Commands
 
-All commands use the `adw` tool with `command: "setup"` and subcommands passed via `args`.
+All commands use the `adw_setup` tool with `command: "template"` and subcommands passed via `args`.
 The CLI structure is `adw setup template <subcommand>`.
 
 ## Check for Drift (Read-Only)
@@ -123,7 +125,7 @@ The CLI structure is `adw setup template <subcommand>`.
 Show differences between live docs and templates (ignores placeholder differences):
 
 ```python
-adw({"command": "setup", "args": ["template", "extract", "--diff"]})
+adw_setup({"command": "template", "args": ["extract", "--diff"]})
 ```
 
 ## Extract Changes to Templates
@@ -132,13 +134,13 @@ Extract literal values from live docs into placeholder tokens:
 
 ```python
 # Preview what would be extracted
-adw({"command": "setup", "args": ["template", "extract", "--dry-run"]})
+adw_setup({"command": "template", "args": ["extract", "--dry-run"]})
 
 # Extract with confirmation prompts
-adw({"command": "setup", "args": ["template", "extract"]})
+adw_setup({"command": "template", "args": ["extract"]})
 
 # Extract without prompts (DESTRUCTIVE - ask user first!)
-adw({"command": "setup", "args": ["template", "extract", "--yes"]})
+adw_setup({"command": "template", "args": ["extract", "--yes"]})
 ```
 
 ## Validate Placeholders
@@ -147,10 +149,10 @@ Check that all template placeholders are defined in keyword manifest:
 
 ```python
 # Text output
-adw({"command": "setup", "args": ["template", "validate"]})
+adw_setup({"command": "template", "args": ["validate"]})
 
 # JSON output for programmatic use
-adw({"command": "setup", "args": ["template", "validate", "--format", "json"]})
+adw_setup({"command": "template", "args": ["validate", "--format", "json"]})
 ```
 
 ## Manage Keyword Tokens
@@ -159,16 +161,16 @@ List, add, update, or remove keyword tokens (~15 essential keywords):
 
 ```python
 # List all keywords
-adw({"command": "setup", "args": ["template", "token", "list"]})
+adw_setup({"command": "template", "args": ["token", "list"]})
 
 # Add a new keyword
-adw({"command": "setup", "args": ["template", "token", "add", "DATABASE_URL", "--default", "postgresql://localhost/db", "--description", "Database connection string"]})
+adw_setup({"command": "template", "args": ["token", "add", "DATABASE_URL", "--default", "postgresql://localhost/db", "--description", "Database connection string"]})
 
 # Update existing keyword (requires --force)
-adw({"command": "setup", "args": ["template", "token", "add", "PACKAGE_NAME", "--default", "new_name", "--description", "Updated description", "--force"]})
+adw_setup({"command": "template", "args": ["token", "add", "PACKAGE_NAME", "--default", "new_name", "--description", "Updated description", "--force"]})
 
 # Remove a keyword (DESTRUCTIVE - ask user first!)
-adw({"command": "setup", "args": ["template", "token", "remove", "OLD_KEYWORD", "--yes"]})
+adw_setup({"command": "template", "args": ["token", "remove", "OLD_KEYWORD", "--yes"]})
 ```
 
 ## Initialize Manifest (if needed)
@@ -177,10 +179,10 @@ If no manifest exists, initialize one in `live` mode:
 
 ```python
 # Interactive (prompts for mode and ~15 keyword values)
-adw({"command": "setup", "args": ["template", "init"]})
+adw_setup({"command": "template", "args": ["init"]})
 
 # Non-interactive with defaults (for automation)
-adw({"command": "setup", "args": ["template", "init", "--yes"]})
+adw_setup({"command": "template", "args": ["init", "--yes"]})
 ```
 
 # Manual File Structure Sync
@@ -280,7 +282,7 @@ If manifest doesn't exist, offer to initialize it.
 Run diff to see what's changed:
 
 ```python
-adw({"command": "setup", "args": ["template", "extract", "--diff"]})
+adw_setup({"command": "template", "args": ["extract", "--diff"]})
 ```
 
 Report findings:
@@ -293,7 +295,7 @@ Report findings:
 Check placeholder coverage:
 
 ```python
-adw({"command": "setup", "args": ["template", "validate", "--format", "json"]})
+adw_setup({"command": "template", "args": ["validate", "--format", "json"]})
 ```
 
 Report:
@@ -341,7 +343,7 @@ Proceed with these changes? [Y/n]
 For each new keyword:
 
 ```python
-adw({"command": "setup", "args": ["template", "token", "add", "KEYWORD_NAME", "--default", "default_value", "--description", "Description of the keyword"]})
+adw_setup({"command": "template", "args": ["token", "add", "KEYWORD_NAME", "--default", "default_value", "--description", "Description of the keyword"]})
 ```
 
 ### Step 3.2: Extract Changes
@@ -349,13 +351,13 @@ adw({"command": "setup", "args": ["template", "token", "add", "KEYWORD_NAME", "-
 Run extraction with dry-run first:
 
 ```python
-adw({"command": "setup", "args": ["template", "extract", "--dry-run"]})
+adw_setup({"command": "template", "args": ["extract", "--dry-run"]})
 ```
 
 If user confirms, run actual extraction:
 
 ```python
-adw({"command": "setup", "args": ["template", "extract", "--yes"]})
+adw_setup({"command": "template", "args": ["extract", "--yes"]})
 ```
 
 ### Step 3.3: Remove Deprecated Keywords (if requested)
@@ -377,7 +379,7 @@ Are you sure you want to remove this keyword? [y/N]
 Only proceed if user explicitly confirms:
 
 ```python
-adw({"command": "setup", "args": ["template", "token", "remove", "OLD_KEYWORD", "--yes"]})
+adw_setup({"command": "template", "args": ["token", "remove", "OLD_KEYWORD", "--yes"]})
 ```
 
 ## Phase 4: Validation
@@ -385,13 +387,13 @@ adw({"command": "setup", "args": ["template", "token", "remove", "OLD_KEYWORD", 
 ### Step 4.1: Re-validate Placeholders
 
 ```python
-adw({"command": "setup", "args": ["template", "validate", "--format", "json"]})
+adw_setup({"command": "template", "args": ["validate", "--format", "json"]})
 ```
 
 ### Step 4.2: Check Git Status
 
 ```python
-git_operations({"command": "status", "porcelain": true})
+git_diff({"command": "status", "porcelain": true})
 ```
 
 ### Step 4.3: Present Summary
