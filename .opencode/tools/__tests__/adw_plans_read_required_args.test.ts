@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
@@ -41,6 +41,7 @@ describe("adw_plans_read required-arg preflight", () => {
     await loadToolExecute("../../adw_plans_read.ts");
     const args = getCapturedToolDefinition()?.args ?? {};
     expect(args).toHaveProperty("options");
+    expect(args).not.toHaveProperty("status");
     expect(args).not.toHaveProperty("json");
     expect(args).not.toHaveProperty("check");
     expect(args).not.toHaveProperty("populate");
@@ -127,22 +128,70 @@ describe("adw_plans_read required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toContain(repoRoot);
   });
 
-  it("preserves multi-word plan status values as direct wrapper arguments", async () => {
+  it("forwards canonical cwd when read wrapper receives a symlink alias", async () => {
     const execute = await loadToolExecute("../../adw_plans_read.ts");
-    await execute({ command: "list", status: "In Progress" });
+    const tempRoot = resolve(repoRoot, "adforge_local/opencode/tmp");
+    mkdirSync(tempRoot, { recursive: true });
+    const aliasPath = resolve(tempRoot, "adw-plans-read-alias");
+    rmSync(aliasPath, { recursive: true, force: true });
+    symlinkSync(repoRoot, aliasPath, "dir");
+
+    try {
+      await execute({ command: "list", cwd: aliasPath });
+      expect(getInvocations().at(-1)?.args).toContain(repoRoot);
+      expect(getInvocations().at(-1)?.args).not.toContain(aliasPath);
+    } finally {
+      rmSync(aliasPath, { recursive: true, force: true });
+    }
+  });
+
+  it("parses multi-word plan status values through options", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    await execute({ command: "list", options: "status=In Progress" });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain("--status In Progress");
+  });
+
+  it("rejects direct status on the split wrapper before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+    const result = await execute({ command: "list", status: "Ready" } as any);
+    assertContains(String(result), "'status' is not accepted as a direct field in adw_plans_read");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("treats inert direct status aliases as omitted in the split wrapper", async () => {
+    const execute = await loadToolExecute("../../adw_plans_read.ts");
+
+    await execute({ command: "list", status: "   " } as any);
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "--active", "adw", "plans", "list"]);
+
+    await execute({ command: "list", status: false as any });
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "--active", "adw", "plans", "list"]);
+
+    await execute({ command: "list", status: 0 as any });
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "--active", "adw", "plans", "list"]);
   });
 
   it("parses list/show/schema/list-sections option strings in read wrapper", async () => {
     const execute = await loadToolExecute("../../adw_plans_read.ts");
 
-    await execute({ command: "list", options: "json" });
-    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "adw", "plans", "list", "--json"]);
+    await execute({ command: "list", options: "status=Ready json" });
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "plans",
+      "list",
+      "--status",
+      "Ready",
+      "--json",
+    ]);
 
     await execute({ command: "show", plan_id: "M37", options: "json" });
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "show",
@@ -154,6 +203,7 @@ describe("adw_plans_read required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "schema",
@@ -164,6 +214,7 @@ describe("adw_plans_read required-arg preflight", () => {
     expect(getInvocations().at(-1)?.args).toEqual([
       "uv",
       "run",
+      "--active",
       "adw",
       "plans",
       "list-sections",
@@ -177,7 +228,7 @@ describe("adw_plans_read required-arg preflight", () => {
     const execute = await loadToolExecute("../../adw_plans_read.ts");
 
     await execute({ command: "list", options: "   \n\t  " });
-    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "adw", "plans", "list"]);
+    expect(getInvocations().at(-1)?.args).toEqual(["uv", "run", "--active", "adw", "plans", "list"]);
   });
 
   it("rejects invalid option tokens in read wrapper before spawn", async () => {
@@ -312,7 +363,7 @@ describe("adw_plans_read required-arg preflight", () => {
   it("accepts registry-driven plan_type strings without wrapper allowlist rejection", async () => {
     const execute = await loadToolExecute("../../adw_plans_read.ts");
     await execute({ command: "list", plan_type: "research" });
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain("uv run adw plans list --type research");
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("uv run --active adw plans list --type research");
   });
 
   it("preserves path-like success output without split-wrapper redaction drift", async () => {

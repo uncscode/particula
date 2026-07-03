@@ -9,7 +9,7 @@ description: >-
   - Runs cross-section completeness checks (metadata, placeholders, sections, changelog, final phase)
   - Expands section 10 (Risk Register), section 9 (Success Criteria), and section 11 (Open Questions)
   - Uses warn-and-continue handling for malformed docs or missing sections
-  - Writes bounded review status summaries via adw_spec messages-write
+  - Writes bounded review status summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -18,10 +18,13 @@ permission:
   edit: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -40,10 +43,10 @@ input: $ARGUMENTS
 
 1. Parse `adw_id` from `$ARGUMENTS` and load workflow context.
 2. Resolve scoped plan targets from a `plan-reviser` or `plan-orchestrator` handoff (`review_plan_ids`).
-3. Resolve canonical section files via `adw_plans list-sections` under `.opencode/plans/sections/`.
+3. Resolve canonical section files via `adw_plans_read list-sections` under `.opencode/plans/sections/`.
 4. Perform completeness checks for placeholders, metadata, change-log presence, and final-phase policy.
 5. Expand thin completeness sections in-place for canonical section keys.
-5. Write a bounded status summary via `adw_spec messages-write`.
+5. Write a bounded status summary via `adw_spec_messages messages-write`.
 
 ## Trust Boundary
 
@@ -56,9 +59,9 @@ issues unless required workflow state is missing.
 
 - @.opencode/guides/code_style.md - deterministic, low-risk markdown edits
 - @.opencode/guides/testing_guide.md - plan quality and validation expectations
-- `adw_plans({"command": "list", "lifecycle": "active", "json": true, "cwd": worktree_path})` - optional active-plan sanity source
-- `adw_plans({"command": "show", "plan_id": "<id>", "json": true, "cwd": worktree_path})` - plan metadata source
-- `adw_plans({"command": "list-sections", "plan_id": "<id>", "json": true, "cwd": worktree_path})` - section-file discovery source
+- `adw_plans_read({"command": "list", "lifecycle": "active", "options": "json", "cwd": worktree_path})` - optional active-plan sanity source
+- `adw_plans_read({"command": "show", "plan_id": "<id>", "options": "json", "cwd": worktree_path})` - plan metadata source
+- `adw_plans_read({"command": "list-sections", "plan_id": "<id>", "options": "json", "cwd": worktree_path})` - section-file discovery source
 - `.opencode/plans/sections/` - canonical editable plan section root
 
 # Process
@@ -85,16 +88,16 @@ Invocation/schema/tool boundary owner (prompt-independent contract):
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -107,7 +110,7 @@ questions; do not require it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -130,22 +133,22 @@ Fail-closed contract for reviewer stage:
 - missing, empty, malformed, or duplicated IDs must fail immediately with `PLAN_REVIEW_COMPLETENESS_FAILED`.
 
 If no in-scope plan IDs remain after validation, execute deterministic no-op success behavior:
-1. Write a no-op summary through `adw_spec messages-write`.
+1. Write a no-op summary through `adw_spec_messages messages-write`.
 2. Emit success signal (do not fail).
 3. **Return immediately** (do not continue to Step 7).
 
 No-op handling must use a single-path control flow so each run emits exactly one
-`messages-write` summary.
+`adw_spec_messages messages-write` summary.
 
 ## Step 2: Resolve Section Files and Enforce Path Boundary
 
 For each `plan_id` in `review_plan_ids`, resolve section file mapping:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -180,10 +183,10 @@ For each in-scope plan, validate the following:
     - Resolve plan metadata via:
 
       ```python
-      adw_plans({
+      adw_plans_read({
         "command": "show",
         "plan_id": "{plan_id}",
-        "json": true,
+        "options": "json",
         "cwd": worktree_path
       })
       ```
@@ -279,7 +282,7 @@ Track and include deterministic counters:
 Write one bounded summary through `messages-write`:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-review-completeness",

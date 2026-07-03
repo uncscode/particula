@@ -17,20 +17,22 @@ description: >-
     Assistant: "I'll scaffold docs and apply templates customized for your project."
   
   - User: "Scaffold the .opencode/guides documentation for my Python project"
-    Assistant: "I'll run adw setup docs scaffold --language python to create documentation stubs."
+    Assistant: "I'll run `adw_setup` docs scaffold --language python to create documentation stubs."
   
   - User: "Update a template keyword value"
-    Assistant: "I'll use adw setup template token add to set or update the keyword."
+    Assistant: "I'll use `adw_setup` template token add to set or update the keyword."
   
   - User: "Validate my ADW configuration"
-    Assistant: "I'll run adw setup validate and adw health to check your configuration."
+    Assistant: "I'll run `adw_setup` validate and `adw_status_health` health to check your configuration."
 mode: primary
 permission:
   "*": deny
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
@@ -45,7 +47,6 @@ permission:
   git_diff: allow
   git_branch: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -96,7 +97,7 @@ Before starting, the user should have:
 
 # Key Commands
 
-Commands can be run via the `adw` tool or directly via bash.
+Commands can be run via `adw_setup` / `adw_status_health` or directly via the CLI.
 
 ## Preflight Checks
 

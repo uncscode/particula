@@ -5,7 +5,8 @@ Constrained content-search wrapper for common `ripgrep` workflows.
 ## Scope Boundary
 
 - `search_content` supports **simple content search only**.
-- Advanced controls are intentionally rejected with deterministic `ERROR:` responses.
+- Advanced direct fields are outside the public wrapper schema; advanced-style
+  `options` tokens still fail closed with deterministic `ERROR:` responses.
 - Use **`ripgrep_advanced`** for advanced flags.
 
 ## When to use search_content vs ripgrep_advanced
@@ -20,10 +21,10 @@ Constrained content-search wrapper for common `ripgrep` workflows.
 { "contentPattern": "TODO" }
 
 // Filter to Python files in adw/
-{ "contentPattern": "import", "path": "adw", "fileType": "py" }
+{ "contentPattern": "import", "path": "adw", "options": "file-type=py" }
 
 // Bound output
-{ "contentPattern": "ERROR:", "maxResults": 200, "maxMatchesPerFile": 3 }
+{ "contentPattern": "ERROR:", "options": "max-results=200 max-matches-per-file=3" }
 ```
 
 ## Supported Parameters
@@ -31,18 +32,35 @@ Constrained content-search wrapper for common `ripgrep` workflows.
 | Parameter | Type | Required | Description |
 |---|---|---:|---|
 | `contentPattern` | string | ✅ | Regex pattern to search within files (non-empty after trim). |
-| `pattern` | string | ❌ | Optional glob filter (`--glob`) applied during content search. |
-| `path` | string | ❌ | Directory scope for search (default: current working directory). |
-| `fileType` | string | ❌ | Include only this ripgrep file type (`-t`). |
-| `excludeFileType` | string | ❌ | Exclude this ripgrep file type (`-T`). |
-| `globCaseInsensitive` | boolean | ❌ | Case-insensitive glob matching. |
-| `compactOutput` | boolean | ❌ | Included for schema parity; content output remains `file:line:content`. |
-| `maxResults` | number | ❌ | Max output lines returned (default: 5000). |
-| `maxMatchesPerFile` | number | ❌ | Bounds matches per file (`--max-count`). |
+| `path` | string | ❌ | Scoped search target (default: current working directory). File path = search only that file; directory path = search only that subtree. |
+| `options` | string | ❌ | Bounded token carrier for optional simple-search controls. |
+
+## Supported `options` Tokens
+
+- `pattern=<glob>`
+- `file-type=<type>`
+- `exclude-file-type=<type>`
+- `glob-case-insensitive`
+- `compact-output` (rewrite matched file paths relative to the scoped target)
+- `max-results=<n>`
+- `max-matches-per-file=<n>`
+
+## Path Contract
+
+- File `path` values search only the requested file.
+- Directory `path` values search only the requested subtree.
+- Missing, invalid, or out-of-repo `path` values fail closed with deterministic `ERROR:` output.
+
+Example single-file search:
+
+```jsonc
+{ "contentPattern": "TODO", "path": ".opencode/tools/search_content.ts" }
+```
 
 ## Unsupported Advanced Controls
 
-The following fields fail closed with `ERROR:` and guidance to use `ripgrep_advanced`:
+The following controls are not part of the `search_content` schema and should be
+routed to `ripgrep_advanced` instead:
 
 - `contextLines`
 - `beforeContext`
@@ -56,6 +74,8 @@ The following fields fail closed with `ERROR:` and guidance to use `ripgrep_adva
 ## Deterministic Behavior Notes
 
 - Search paths are validated against repository boundaries (lexical and canonical checks).
+- Scoped path misses never widen back to the repository root.
 - Empty result sets return deterministic **non-error** text.
 - Wrapper execution and invalid-regex failures return deterministic `ERROR:` diagnostics.
+- `compact-output` rewrites file prefixes relative to the scoped file/directory base.
 - Output larger than `maxResults` appends deterministic truncation warning text.

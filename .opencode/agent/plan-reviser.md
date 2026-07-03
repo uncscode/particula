@@ -10,7 +10,7 @@ description: >-
   - Optionally delegates major scope changes to helper agents (bounded)
   - Emits orchestrator-compatible handoff message with review_plan_ids for
     downstream agents (reviewers, phase-splitter, issue-generator)
-  - Writes deterministic revision summaries via adw_spec messages-write
+  - Writes deterministic revision summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -19,11 +19,14 @@ permission:
   edit: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
   task: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -45,7 +48,7 @@ input: $ARGUMENTS
 3. Extract analyzer `review_plan_ids`, per-item `target_plan_ids`, and `target_paths`.
 4. Revise impacted plan section files under `.opencode/plans/sections/`.
 5. Keep revisions scoped, idempotent, and complete against the analyzer item count.
-6. Write exactly one bounded summary via `adw_spec messages-write`.
+6. Write exactly one bounded summary via `adw_spec_messages messages-write`.
 
 # Required Reading
 
@@ -71,16 +74,16 @@ If invalid, emit `PLAN_REVISER_FAILED`.
 Read workflow state and analyzer output:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call or section-path edit:
+Resolve the ADW worktree before any `adw_plans_read` call or section-path edit:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and analyzer `target_paths` resolve inside the ADW worktree, not
 the caller's current checkout. All relative section reads/writes must be rooted
 at `worktree_path`.
@@ -110,7 +113,7 @@ Construct deterministic impacted-file set from analyzer payload.
 Rules:
 - primary scope: every explicit path in per-item `target_paths`
 - secondary scope: when `target_paths` is empty, infer candidate section files
-  from per-item `target_plan_ids` using `adw_plans list-sections` and the
+  from per-item `target_plan_ids` using `adw_plans_read list-sections` and the
   `requested_edit` topic
 - downstream review scope: always use top-level analyzer `review_plan_ids`, not
   only revised paths, so reviewers re-check every plan represented by the PR
@@ -145,13 +148,13 @@ candidate target_paths:
 If a pathless item cannot be safely mapped to a section file, record it as
 `unmapped_actionable` in the summary. Do not drop it silently.
 
-Use this `adw_plans` shape for pathless mapping:
+Use this `adw_plans_read` shape for pathless mapping:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -214,7 +217,7 @@ Determine `plan_type` from the plan ID family:
 Write exactly one handoff message under the `plan-reviser` agent name:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-reviser",
@@ -253,7 +256,7 @@ unmapped_actionable_count: 0
 Write exactly one bounded summary message:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-reviser",

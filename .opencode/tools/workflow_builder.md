@@ -9,6 +9,15 @@ Use split wrappers for new and updated workflows:
 
 `workflow_builder` remains active during the compatibility window and supports the full command set.
 
+Unsupported or blank commands fail closed before delegation with:
+
+`ERROR: workflow_builder does not support command '<cmd>'. Use: create, add_step, remove_step, get, list, update, validate.`
+
+Command-specific required fields are validated before subprocess execution, and blank optional string values are omitted instead of being forwarded as empty CLI flags.
+
+For `remove_step`, provide at least one selector: `step_index` and/or `step_name`.
+If both are provided, current backend precedence is preserved.
+
 ## Preferred Routing
 
 | Intent | Preferred wrapper |

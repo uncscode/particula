@@ -17,7 +17,6 @@ permission:
   task: deny
   adw: deny
   adw_spec: deny
-  adw_issues_spec: deny
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -26,8 +25,6 @@ permission:
   feedback_log: allow
   auto_mode_manifest: allow
   platform_operations: deny
-  git_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -98,8 +95,7 @@ MANIFEST_BUILD_FAILED: {reason}
 1. Read the batch summary:
 
    ```python
-   summary = adw_issues_spec({
-     "command": "batch-summary",
+   summary = adw_issues_batch_summary({
      "adw_id": adw_id
    })
    ```

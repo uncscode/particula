@@ -2,7 +2,7 @@
 """CTest Runner Tool for ADW.
 
 Runs CTest with parsing, validation, and structured outputs
-modeled after the run_pytest tool. Supports filtering, parallel
+modeled after the pytest runner backend. Supports filtering, parallel
 execution, timeouts, and multiple output modes (summary/full/json).
 
 Usage:
@@ -43,6 +43,23 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 OUTPUT_LINE_LIMIT = 500
 OUTPUT_BYTE_LIMIT = 50_000
 DEFAULT_TIMEOUT = 300
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_within_repo_root(value: Path | str) -> Path:
+    """Resolve a path and fail closed if it escapes the repository root."""
+
+    candidate = Path(value)
+    resolved = (candidate if candidate.is_absolute() else REPO_ROOT / candidate).resolve(
+        strict=False
+    )
+    try:
+        resolved.relative_to(REPO_ROOT)
+    except ValueError as exc:
+        raise ValueError(
+            f"Path resolves outside repository root: {value} (canonical: {resolved})"
+        ) from exc
+    return resolved
 
 
 def _truncate_output(output: str) -> Tuple[str, bool, str]:
@@ -256,7 +273,23 @@ def run_ctest(
     metrics["timeout_seconds"] = timeout
     validation_errors: List[str] = []
 
-    build_path = Path(build_dir)
+    try:
+        build_path = _resolve_within_repo_root(build_dir)
+    except ValueError as exc:
+        validation_errors = [str(exc)]
+        summary = format_summary(metrics, validation_errors)
+        if output_mode == "json":
+            payload = {
+                "metrics": metrics,
+                "validation_errors": validation_errors,
+                "success": False,
+                "output": summary,
+                "truncated": False,
+                "truncation_notice": "",
+            }
+            return 1, json.dumps(payload, indent=2)
+        return 1, summary
+
     ctest_file = build_path / "CTestTestfile.cmake"
     if not build_path.exists() or not ctest_file.exists():
         metrics["build_dir_error"] = True

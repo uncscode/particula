@@ -16,8 +16,10 @@ Each tool is a self-contained `.ts` (or `.js`) file that exports one or more `to
 ```
 
 - The `.ts` filename becomes the tool name (e.g., `my_tool.ts` registers as `my_tool`).
-- An optional `.md` file with the same base name provides an extended description injected into the tool's system prompt context.
-- Backend scripts (`.py`, `.sh`, etc.) can live alongside and be invoked via `Bun.$` or `Bun.spawnSync`.
+- An optional `.md` file with the same base name provides an extended
+  description injected into the tool's system prompt context.
+- Backend scripts (`.py`, `.sh`, etc.) can live alongside and be invoked via
+  `Bun.$` or `Bun.spawnSync`.
 
 ---
 
@@ -31,8 +33,10 @@ export default tool({
   args: {
     name: tool.schema.string().describe("A required string argument"),
     count: tool.schema.number().optional().describe("An optional number"),
-    verbose: tool.schema.boolean().optional(),
-    mode: tool.schema.enum(["fast", "slow"]).optional(),
+    verbose: tool.schema.boolean().optional()
+      .describe("Enable verbose output. Omit unless explicitly requested."),
+    mode: tool.schema.enum(["fast", "slow"]).optional()
+      .describe("Execution mode. Omit to use the tool default."),
   },
   async execute(args) {
     // args is typed from the schema above
@@ -183,6 +187,109 @@ count: tool.schema.number().optional()
   .describe("Number of results to return. Omit to use the default (10)."),
 ```
 
+### Schema Budget for Tool Arguments
+
+Counted direct fields are the top-level entries in `args`. Tool wrappers should
+stay at four or fewer counted direct fields.
+
+The counted-field budget is four direct fields; narrow exempt `options` and
+usage-only `help` may exist separately when they follow the rules below.
+
+`command` counts toward that budget even when it is only an enum router for
+multiple subcommands.
+
+Before relying on exceptions or broader schemas, prefer narrower focused or
+split wrappers that expose only the fields each workflow actually needs.
+Compatibility wrappers may still exist when repository policy allows them, but
+they should not drive new broad top-level schemas.
+
+Compliant example (four counted direct fields: `command`, `path`, `format`,
+and `limit`):
+
+```typescript
+args: {
+  command: tool.schema.enum(["status", "diff"]),
+  path: tool.schema.string().optional()
+    .describe("Path to inspect. Omit to use the current worktree root."),
+  format: tool.schema.enum(["summary", "json"]).optional()
+    .describe("Output format. Omit to use the wrapper default."),
+  limit: tool.schema.number().optional()
+    .describe("Maximum number of rows to return. Omit to use the default."),
+}
+```
+
+This stays within budget because it exposes exactly four counted top-level
+fields.
+
+Over-budget example (five counted direct fields: `command`, `path`, `format`,
+`limit`, and `timeout`):
+
+```typescript
+args: {
+  command: tool.schema.enum(["status", "diff"]),
+  path: tool.schema.string().optional()
+    .describe("Path to inspect. Omit to use the current worktree root."),
+  format: tool.schema.enum(["summary", "json"]).optional()
+    .describe("Output format. Omit to use the wrapper default."),
+  limit: tool.schema.number().optional()
+    .describe("Maximum number of rows to return. Omit to use the default."),
+  timeout: tool.schema.number().optional()
+    .describe("Timeout in seconds. Omit to use the wrapper default."),
+}
+```
+
+This is over budget. Redesign or split the tool instead of widening the direct
+schema further.
+
+Only these narrow cases are exempt from the counted-field budget:
+
+- Bounded, documented, deterministically parsed `options`.
+- Usage-only `help`, where `help: true` bypasses normal validation, returns
+  concise usage guidance, and points to the companion `.md` path for extended
+  documentation when relevant.
+
+These exemptions are not broad escape hatches. Optional fields still need clear
+descriptions, runtime parsing/validation should stay deterministic, and
+wrappers should continue to omit noisy defaults instead of encoding wider
+top-level schemas.
+
+Bounded exemption example (`command` and `path` count; `options` and `help` do
+not):
+
+```typescript
+args: {
+  command: tool.schema.enum(["show"]),
+  path: tool.schema.string().optional()
+    .describe("Path to inspect. Omit to use the current worktree root."),
+  options: tool.schema.string().optional().describe(
+    "Bounded option tokens only (for example: 'json' or 'limit=10'). Omit " +
+    "unless a documented token is required.",
+  ),
+  help: tool.schema.boolean().optional().describe(
+    "Show usage guidance for this wrapper. Omit unless the caller explicitly " +
+    "requests help.",
+  ),
+}
+```
+
+`options` is exempt only when it is bounded to known tokens and is
+deterministically parsed and validated before execution. `help` is exempt only
+for usage output.
+
+Example help output:
+
+```text
+Usage: my_tool_show({ command: "show" })
+Optional: path, options
+Use help: true to show this guidance without running normal validation.
+Docs: .opencode/tools/my_tool_show.md
+```
+
+Keep `help: true` narrow. It may bypass normal validation only to return usage
+and companion-doc guidance; it must not become a broader runtime branching path
+or a free-form passthrough surface, and the companion `.md` file remains
+informational rather than changing runtime behavior.
+
 ---
 
 ## Execute Function
@@ -231,6 +338,14 @@ async execute(args, context) {
 Use `context.directory` for the session working directory.
 Use `context.worktree` for the git worktree root when resolving project paths.
 
+When a wrapper accepts repository-relative paths, keep resolution root-confined:
+
+- Reject absolute paths unless the wrapper contract explicitly allows them.
+- Reject traversal attempts such as `..` segments before resolution.
+- Canonicalize resolved paths (`realpath`) before use so symlink escapes are
+  detected.
+- Fail closed if the canonical target resolves outside `context.worktree`.
+
 ---
 
 ## Hard Constraints
@@ -238,16 +353,19 @@ Use `context.worktree` for the git worktree root when resolving project paths.
 These are enforced by the OpenCode tool loader and will cause build failures or
 runtime crashes if violated.
 
-### 1. Single-file, self-contained
+### 1. Self-contained wrapper entrypoint
 
-Each `.ts` tool must be a **single file with no local imports**. You cannot:
+Each `.ts` tool wrapper must keep its exported `tool()` definition
+self-contained and must not rely on importing another wrapper entrypoint as its
+primary implementation path. In particular, you cannot:
 
-- Import from `./lib/shared_helpers`
 - Import from `./other_tool`
-- Import from any relative path
+- Import one wrapper from another wrapper directory path as the main
+  execution path
+- Turn a focused wrapper into a thin proxy around another wrapper file
 
-The tool loader bundles each `.ts` file independently. Unresolved local imports
-produce a build error:
+The tool loader bundles each `.ts` file independently. Unsupported or
+unresolved local imports produce a build error:
 
 ```
 Cannot find module './lib/my_shared' from '.opencode/tools/my_tool.ts'
@@ -257,8 +375,15 @@ Cannot find module './lib/my_shared' from '.opencode/tools/my_tool.ts'
 - `@opencode-ai/plugin` (the tool API)
 - `zod` (same as `tool.schema`)
 - Node/Bun built-ins: `fs`, `path`, `node:fs`, `node:path`, etc.
+- Narrow local shared helper modules when repository policy explicitly permits
+  them and the helper is not itself another wrapper
 
-**If you need shared code**, inline it directly into each tool file that uses it.
+**If you need shared code**, prefer a narrow local shared helper module when
+that pattern is already allowed by repository policy; otherwise inline the
+logic. Do not import one tool wrapper from another as a shortcut.
+Helper-module imports are fine only when the imported file is a non-wrapper
+helper and the wrapper still owns its own schema, validation, and execution
+boundary.
 
 ### 2. Every export must be a tool definition
 
@@ -401,29 +526,51 @@ async execute(args) {
 
 ### Input Safety
 
-Reject option-injection in path and ref arguments:
+Reject option-injection in path and ref arguments, and keep filesystem access
+confined to the intended repository root:
 
 ```typescript
 if (typeof args.path === "string" && args.path.startsWith("-")) {
   return "ERROR: path must not start with '-'.";
 }
+
+if (typeof args.path === "string" && path.isAbsolute(args.path)) {
+  return "ERROR: absolute paths are not allowed.";
+}
+
+const candidate = path.resolve(context.worktree, args.path);
+const canonical = await fs.promises.realpath(candidate);
+const canonicalRoot = await fs.promises.realpath(context.worktree);
+if (
+  !canonical.startsWith(`${canonicalRoot}${path.sep}`) &&
+  canonical !== canonicalRoot
+) {
+  return "ERROR: path resolves outside repository root.";
+}
 ```
+
+Also reject traversal-oriented inputs such as `..` segments when your wrapper
+contract expects only repo-relative paths.
 
 ### Delegator / Compatibility Wrappers
 
-When a tool delegates to the same underlying logic as another tool (e.g., a
-read-only wrapper around a broader tool), **inline the shared execution logic**
-into both files. Do not import one tool from another.
+When two tools need the same low-level implementation logic (for example, a
+focused wrapper and a compatibility wrapper around the same CLI), keep the
+wrapper entrypoints separate and **do not import one tool from another**.
+Repository policy may allow a narrow shared helper module for the common logic;
+otherwise inline the logic in both files.
 
 ```typescript
-// my_tool_read.ts - inlines the execute logic, adds a read-only gate
+// my_tool_shared.ts - helper only, not a tool wrapper export file
+export function executeSharedLogic(args: Record<string, unknown>): string {
+  // ... shared helper logic
+}
+
+// my_tool_read.ts - wrapper entrypoint with a read-only gate
 import { tool } from "@opencode-ai/plugin";
+import { executeSharedLogic } from "./my_tool_shared";
 
 const READ_COMMANDS = ["list", "show"] as const;
-
-function executeSharedLogic(args: Record<string, unknown>): string {
-  // ... shared logic inlined here
-}
 
 export default tool({
   description: "Read-only wrapper",
@@ -467,7 +614,9 @@ available. Use it for:
 - Contract documentation (success/failure markers)
 
 The `.md` file does not affect the tool's schema or behavior -- it is purely
-informational context for the LLM.
+informational context for the LLM. `help: true` output may point callers to
+that companion file for extended usage guidance, but the `.md` content still
+does not alter runtime behavior.
 
 ---
 
@@ -483,16 +632,26 @@ This loads all tools and prints the agent configuration. If your tool appears in
 the `"tools"` object, it loaded successfully. Any errors will show the failing
 module and reason.
 
+If your edit changes headings, anchors, wrapper names, or referenced guide/tool
+paths, run the relevant docs/reference validation as part of the same change.
+
 ---
 
 ## Summary of Rules
 
-| Rule | Consequence of Violation |
-|---|---|
-| No relative imports (`./lib/`, `./other_tool`) | Build error: `Cannot find module` |
-| Every export must be a `tool()` definition | Crash: `Object.entries requires that input parameter not be null or undefined` |
-| `execute` returns a string or `{ output: string }` | Type error at runtime |
-| File must use `@opencode-ai/plugin` or `zod` | Tool not recognized |
+- Keep counted direct args at four or fewer (excluding bounded `options` and
+  usage-only `help`). Violation consequence: over-broad schema; split into
+  focused wrappers instead.
+- Do not import one tool wrapper from another as the primary implementation
+  path. Violation consequence: build/policy failure or incorrect wrapper
+  boundaries.
+- Every export must be a `tool()` definition. Violation consequence:
+  `Object.entries requires that input parameter not be null or undefined`.
+- `execute` must return a string or `{ output: string }`. Violation
+  consequence: type error at runtime.
+- The file must use `@opencode-ai/plugin` or `zod`. Violation consequence:
+  tool not recognized.
 
-Keep each tool self-contained, validate with `opencode debug agent build`, and
-inline any shared logic directly.
+Keep each wrapper entrypoint self-contained, validate with
+`opencode debug agent build`, and use only policy-approved narrow shared
+helpers instead of wrapper-to-wrapper delegation.

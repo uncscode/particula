@@ -1,6 +1,6 @@
 import { tool } from "@opencode-ai/plugin";
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync, statSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 
@@ -34,6 +34,53 @@ const normalizeOptionalString = (value: unknown): string | undefined => {
   }
   const text = String(value).trim();
   return text || undefined;
+};
+
+const resolveTrustedWorktreeRoots = (): string[] => {
+  const repoRoot = findRepoRoot();
+  const roots = new Set<string>([repoRoot]);
+  const repoParent = dirname(repoRoot);
+
+  roots.add(resolve(repoRoot, "trees"));
+  if (repoParent.split(/[/\\]/).at(-1) === "trees") {
+    roots.add(repoParent);
+  }
+
+  return Array.from(roots);
+};
+
+const validateTrustedWorktreePath = (value: string | undefined): string | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    if (!existsSync(value)) {
+      return `ERROR: worktree_path does not exist: ${value}`;
+    }
+    if (!statSync(value).isDirectory()) {
+      return `ERROR: worktree_path is not a directory: ${value}`;
+    }
+
+    const resolvedCandidate = realpathSync(value);
+    const trustedRoots = resolveTrustedWorktreeRoots();
+    const isTrusted = trustedRoots.some((root) => {
+      if (resolvedCandidate === root) {
+        return true;
+      }
+      const rel = relative(root, resolvedCandidate);
+      return rel.length > 0 && !rel.startsWith("..");
+    });
+
+    if (!isTrusted) {
+      return `ERROR: worktree_path resolves outside repository root or ADW worktree roots: ${value}`;
+    }
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return `ERROR: invalid worktree_path: ${value} (${message})`;
+  }
+
+  return undefined;
 };
 
 const normalizeOptionalBoolean = (value: unknown): boolean | unknown | undefined => {
@@ -142,7 +189,7 @@ const normalizeRef = (value?: string): string => {
   return trimmed;
 };
 
-const isValidRefToken = (value: string): boolean => {
+const isValidRevSpec = (value: string): boolean => {
   if (!value) {
     return false;
   }
@@ -151,7 +198,6 @@ const isValidRefToken = (value: string): boolean => {
   }
   if (
     value.includes("..") ||
-    value.includes("@{") ||
     value.includes("//") ||
     value.startsWith("/") ||
     value.endsWith("/") ||
@@ -162,7 +208,7 @@ const isValidRefToken = (value: string): boolean => {
   ) {
     return false;
   }
-  return /^[A-Za-z0-9._/\-~^]+$/.test(value);
+  return /^[A-Za-z0-9._/\-~^@{}]+$/.test(value);
 };
 
 const normalizeSnippet = (value: unknown): string => {
@@ -297,13 +343,75 @@ const normalizeOptionalField = (fieldName: string, value?: string): { value?: st
   return { value: trimmed };
 };
 
+const normalizeOptionalRefField = (
+  fieldName: string,
+  value?: string,
+): { value?: string; error?: string } => {
+  if (value === undefined || value === null) {
+    return { value: undefined };
+  }
+  const normalized = normalizeRef(value);
+  if (!normalized) {
+    return { value: undefined };
+  }
+  if (!isValidRevSpec(normalized)) {
+    return { error: `ERROR: Invalid ${fieldName}: ${value}.` };
+  }
+  return { value: normalized };
+};
+
+const normalizeOptionalDiffPathField = (value?: string): { value?: string; error?: string } => {
+  if (value === undefined || value === null) {
+    return { value: undefined };
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return { value: undefined };
+  }
+  if (trimmed.startsWith("-")) {
+    return { error: `ERROR: Invalid path: ${value}.` };
+  }
+
+  const normalized = trimmed.replaceAll("\\", "/");
+  if (normalized === "." || normalized === "./" || normalized === ".//") {
+    return { error: `ERROR: Invalid path: ${value}.` };
+  }
+  const pathParts = normalized.split("/");
+  if (
+    normalized.startsWith("/") ||
+    /^[A-Za-z]:\//.test(normalized) ||
+    normalized.includes(":") ||
+    normalized.includes("\x00") ||
+    pathParts.includes("..")
+  ) {
+    return { error: `ERROR: Invalid path: ${value}.` };
+  }
+
+  return { value: normalized };
+};
+
+const appendIfValid = (
+  normalized: { value?: string; error?: string },
+  cmdParts: string[],
+  flag: string,
+): string | undefined => {
+  if (normalized.error) {
+    return normalized.error;
+  }
+  if (normalized.value) {
+    cmdParts.push(flag, normalized.value);
+  }
+  return undefined;
+};
+
 export default tool({
   description: `Execute ADW read-only git inspection commands (status, diff, log, show).
 
 SIMPLE EXAMPLES (copy these patterns):
 
 Status:    { command: "status", porcelain: true, worktree_path: "./trees/abc" }
-Diff:      { command: "diff", stat: true, worktree_path: "./trees/abc" }
+Diff:      { command: "diff", stat: true, path: "adw/git/operations.py", worktree_path: "./trees/abc" }
 Diff base: { command: "diff", base: "main", target: "feature", stat: true }
 Log:       { command: "log", max_count: 5, oneline: true, ref: "main" }
 Show:      { command: "show", ref: "HEAD~1", path: "adw/core/" }
@@ -311,6 +419,7 @@ Show:      { command: "show", ref: "HEAD~1", path: "adw/core/" }
 RULES:
 - Supports only read-only commands: status, diff, log, show.
 - Empty strings, false booleans, and noisy numeric defaults are treated as omitted.
+- diff supports optional path scoping via path and rejects malformed/out-of-scope-looking values before spawn.
 - show requires ref (unless help: true).
 - log max_count must be an integer between 1 and 1000.
 - Set help: true to view CLI help for any command.`,
@@ -357,16 +466,25 @@ RULES:
       help?: boolean;
     };
 
-    const cmdParts: string[] = ["uv", "run", "adw", "git"];
-    const appendCommandParts = (skipValidation = false): string | undefined => {
+    const cmdParts: string[] = ["uv", "run", "--active", "adw", "git"];
+    const appendCommandParts = (skipRequiredChecks = false): string | undefined => {
+      const normalizedWorktree = normalizeOptionalField("worktree_path", worktree_path);
+      if (normalizedWorktree.error) {
+        return normalizedWorktree.error;
+      }
+      const trustedWorktreeError = validateTrustedWorktreePath(normalizedWorktree.value);
+      if (trustedWorktreeError) {
+        return trustedWorktreeError;
+      }
+
       switch (command) {
         case "status":
           cmdParts.push("status");
           if (porcelain) {
             cmdParts.push("--porcelain");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         case "diff": {
@@ -374,42 +492,42 @@ RULES:
           if (stat) {
             cmdParts.push("--stat");
           }
-          const normalizedBase = normalizeOptionalField("base", base);
-          if (!skipValidation && normalizedBase.error) {
-            return normalizedBase.error;
+          const normalizedBase = normalizeOptionalRefField("base", base);
+          const baseValidation = appendIfValid(normalizedBase, cmdParts, "--base");
+          if (baseValidation) {
+            return baseValidation;
           }
-          if (normalizedBase.value) {
-            cmdParts.push("--base", normalizedBase.value);
+          const normalizedTarget = normalizeOptionalRefField("target", target);
+          const targetValidation = appendIfValid(normalizedTarget, cmdParts, "--target");
+          if (targetValidation) {
+            return targetValidation;
           }
-          const normalizedTarget = normalizeOptionalField("target", target);
-          if (!skipValidation && normalizedTarget.error) {
-            return normalizedTarget.error;
+          const normalizedPath = normalizeOptionalDiffPathField(path);
+          if (normalizedPath.error) {
+            return normalizedPath.error;
           }
-          if (normalizedTarget.value) {
-            cmdParts.push("--target", normalizedTarget.value);
+          if (normalizedPath.value) {
+            cmdParts.push("--path", normalizedPath.value);
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
         case "log": {
           cmdParts.push("log");
-          const normalizedLogRef = normalizeRef(ref);
-          if (!skipValidation && ref !== undefined && !normalizedLogRef) {
+          const normalizedLogRef = normalizeOptionalRefField("ref", ref);
+          if (normalizedLogRef.error) {
+            return normalizedLogRef.error;
+          }
+          if (!skipRequiredChecks && ref !== undefined && !normalizedLogRef.value) {
             return "ERROR: 'log' command requires non-empty 'ref' when provided.";
           }
-          if (!skipValidation && normalizedLogRef && !isValidRefToken(normalizedLogRef)) {
-            return `ERROR: Invalid ref: ${ref}.`;
-          }
-          if (normalizedLogRef) {
-            cmdParts.push("--ref", normalizedLogRef);
+          if (normalizedLogRef.value) {
+            cmdParts.push("--ref", normalizedLogRef.value);
           }
           const boundedMaxCount = max_count ?? 10;
-          if (
-            !skipValidation &&
-            (!Number.isInteger(boundedMaxCount) || boundedMaxCount < 1 || boundedMaxCount > 1000)
-          ) {
+          if (!Number.isInteger(boundedMaxCount) || boundedMaxCount < 1 || boundedMaxCount > 1000) {
             return "ERROR: 'max_count' must be an integer between 1 and 1000.";
           }
           cmdParts.push("--max-count", boundedMaxCount.toString());
@@ -419,25 +537,25 @@ RULES:
           if (stat) {
             cmdParts.push("--stat");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
         case "show": {
           cmdParts.push("show");
-          if (!skipValidation && (!ref || !ref.trim())) {
+          if (!skipRequiredChecks && (!ref || !ref.trim())) {
             return "ERROR: 'show' command requires 'ref'.";
           }
-          const normalizedShowRef = normalizeOptionalField("ref", ref);
-          if (!skipValidation && normalizedShowRef.error) {
+          const normalizedShowRef = normalizeOptionalRefField("ref", ref);
+          if (normalizedShowRef.error) {
             return normalizedShowRef.error;
           }
           if (normalizedShowRef.value) {
             cmdParts.push("--ref", normalizedShowRef.value);
           }
           const normalizedPath = normalizeOptionalField("path", path);
-          if (!skipValidation && normalizedPath.error) {
+          if (normalizedPath.error) {
             return normalizedPath.error;
           }
           if (normalizedPath.value) {
@@ -446,8 +564,8 @@ RULES:
           if (stat) {
             cmdParts.push("--stat");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }

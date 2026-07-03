@@ -11,13 +11,15 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
@@ -29,7 +31,6 @@ permission:
   platform_comment_write: allow
   platform_issue_write: allow
   platform_pr_write: allow
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -50,7 +51,7 @@ Guides interactive branch synchronization, rebase, and conflict resolution with 
 - Enforce safety: protected branches, force-with-lease only, confirmations before destructive actions
 
 ## Tools Available
-- **read/list/ripgrep**: Inspect files, including conflicted files
+- **read/list/find_files/search_content/ripgrep_advanced**: Inspect files, including conflicted files
 - **edit/write**: Resolve conflicts directly in files
 - **git_merge**: fetch, merge, rebase, sync, abort, continue, reset lifecycle flows
 - **git_diff**: status/diff/log/show inspection and conflict checks
@@ -58,7 +59,7 @@ Guides interactive branch synchronization, rebase, and conflict resolution with 
 - **git_stage**: add/restore staging operations
 - **git_worktree**: worktree-list/worktree-prune/worktree-remove lifecycle operations
 - **platform_comment_write/platform_issue_write/platform_pr_write**: Update issues/PRs when needed
-- **todoread/todowrite/task/adw_spec**: Track progress, delegate subagents, and load workflow state
+- **todoread/todowrite/task/adw_spec_read**: Track progress, delegate subagents, and load workflow state
 - **get_datetime/get_version**: Utilities for logging and version awareness
 
 ## Capabilities
@@ -92,7 +93,7 @@ Guides interactive branch synchronization, rebase, and conflict resolution with 
 
 ## Conflict Resolution Workflow
 1. Detect conflicts (git_merge merge/rebase output or git_diff status)
-2. Read conflicted files with `read`/`ripgrep` to understand both sides
+2. Read conflicted files with `read` plus split search wrappers to understand both sides
 3. Edit/write to resolve markers; stage via git_stage add (implicit in resolution flow)
 4. Continue rebase/merge or abort per user choice
 5. Summarize resolved files and next steps (commit or continue)

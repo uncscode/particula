@@ -5,21 +5,24 @@ description: >-
 
   This agent:
   - Discovers scoped canonical plan sections from orchestrator review_plan_ids
-  - Ingests review-agent messages from adw_spec message logs
+  - Ingests review-agent messages from adw_spec_messages logs
   - Extracts unresolved placeholders, TBD/TODO markers, OR choices, and risk confirmations
   - Posts a structured PR overview comment via platform_comment_write
   - Attempts inline comment posting when feasible, then falls back to overview grouping with file:line references
-  - Writes deterministic fallback summaries to adw_spec messages-write when PR comment posting fails
+  - Writes deterministic fallback summaries to adw_spec_messages messages-write when PR comment posting fails
 mode: primary
 permission:
   "*": deny
   read: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   platform_comment_write: allow
   platform_pr_review_write: allow
@@ -39,13 +42,13 @@ input: $ARGUMENTS
 # Core Mission
 
 1. Parse and validate `--adw-id` and `--pr-number` from `$ARGUMENTS` using fail-closed contracts.
-2. Read `plan-reviser` or `plan-orchestrator` handoff from `adw_spec messages-read` and extract `review_plan_ids`.
-3. Discover scoped plan sections via `adw_plans list-sections` for each plan ID.
+2. Read `plan-reviser` or `plan-orchestrator` handoff from `adw_spec_messages messages-read` and extract `review_plan_ids`.
+3. Discover scoped plan sections via `adw_plans_read list-sections` for each plan ID.
 4. Extract unresolved ambiguities and risk-confirmation questions from docs + messages.
 5. Sanitize outbound content before any PR posting attempt (fail-safe fallback when sanitization fails).
 6. Post a structured overview PR comment, then attempt inline comments when feasible.
 7. Fall back to overview-only `file:line` grouping when inline posting is unavailable.
-8. Emit deterministic completion/failure output and preserve fallback context via `adw_spec messages-write`.
+8. Emit deterministic completion/failure output and preserve fallback context via `adw_spec_messages messages-write`.
 
 # Required Reading
 
@@ -78,16 +81,16 @@ If either marker is missing, duplicated, or malformed, fail immediately with
 Load optional workflow context from `spec_content`:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -102,7 +105,7 @@ require it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -122,22 +125,22 @@ If no valid `plan-reviser` or `plan-orchestrator` handoff is found, or
 Use `review_plan_ids` (not `drafted_plan_ids`) as the canonical scope for this pass.
 
 Least-privilege command scope for state access:
-- `adw_spec read` (optional `spec_content` context),
-- `adw_spec read --field worktree_path` (required worktree context for `adw_plans`),
-- `adw_spec messages-read` (planner/reviewer signals),
-- `adw_spec messages-write` (bounded fallback summary only).
+- `adw_spec_read read` (optional `spec_content` context),
+- `adw_spec_read read --field worktree_path` (required worktree context for `adw_plans_read`),
+- `adw_spec_messages messages-read` (planner/reviewer signals),
+- `adw_spec_messages messages-write` (bounded fallback summary only).
 
-No additional `adw_spec` commands are permitted.
+No additional ADW state commands are permitted beyond those split wrappers.
 
 ## Step 3: Discover Active Plan Documents
 
 For each plan ID from `review_plan_ids`, resolve canonical section files via:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -180,7 +183,7 @@ If `review_plan_ids` is missing/empty, or section resolution yields no files,
 execute deterministic no-op success behavior:
 1. Post a positive "No clarification questions — plan is ready for implementation."
    comment on the PR via `platform_comment_write`.
-2. Write a no-op summary through `adw_spec messages-write`.
+2. Write a no-op summary through `adw_spec_messages messages-write`.
 3. Emit `PLAN_QUESTIONS_SURFACER_COMPLETE`.
 4. **Return immediately** (do not continue to Step 4).
 
@@ -240,7 +243,7 @@ snippets using this required sequence:
 
 If sanitization fails for any item:
 - do not post partial unsafe content,
-- write a deterministic fallback summary via `adw_spec messages-write`,
+- write a deterministic fallback summary via `adw_spec_messages messages-write`,
 - include unresolved item count and affected source documents.
 
 ## Step 6: Post Overview PR Comment
@@ -300,7 +303,7 @@ If inline posting is unavailable or partial:
 
 If PR comment posting fails for any reason:
 1. Capture error context.
-2. Write fallback summary via `adw_spec messages-write` so plan-fix can consume
+2. Write fallback summary via `adw_spec_messages messages-write` so plan-fix can consume
    unresolved questions.
 3. Include grouped `file:line` entries and unresolved counts.
 
@@ -311,7 +314,7 @@ Fallback writes must be deterministic and bounded (single summary record).
 **Every execution path MUST write exactly one summary message** via:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-questions-surfacer",
@@ -347,6 +350,6 @@ Failure is reserved for unrecoverable execution issues (for example invalid
 required input contracts), not for ordinary no-question/no-message paths.
 
 **Every exit path — success, no-op, or failure — MUST:**
-1. Write a summary message via `adw_spec messages-write` (Step 9).
+1. Write a summary message via `adw_spec_messages messages-write` (Step 9).
 2. Post a PR comment via `platform_comment_write` (Step 6), OR record failure in the summary.
 3. Emit one of the two output signals above.

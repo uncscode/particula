@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Bun Test Runner Tool for ADW.
+"""Run ``bun test`` with ADW-style parsing, validation, and bounded output.
 
-Runs bun test with parsing, validation, and structured outputs
-modeled after the run_ctest tool. Supports filtering, timeouts,
-and multiple output modes (summary/full/json).
+This backend powers the ``run_bun_test`` wrapper. It validates repository-confined
+paths, executes ``bun test`` with optional path and name filtering, parses common
+result metrics from Bun output, and returns summary, full, or JSON-formatted
+results with bounded captured output.
 
 Usage:
     python3 .opencode/tools/run_bun_test.py
@@ -24,6 +25,34 @@ from typing import Any, Dict, List, Optional, Tuple
 OUTPUT_LINE_LIMIT = 500
 OUTPUT_BYTE_LIMIT = 50_000
 DEFAULT_TIMEOUT = 300
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_within_repo_root(value: str, *, base_dir: Path) -> Path:
+    """Resolve a path against a base directory and enforce repo-root confinement.
+
+    Args:
+        value: User-provided path to resolve.
+        base_dir: Base directory used for relative path resolution.
+
+    Returns:
+        Canonical resolved path under ``REPO_ROOT``.
+
+    Raises:
+        ValueError: If the resolved path escapes the repository root.
+    """
+
+    candidate = Path(value)
+    resolved = (candidate if candidate.is_absolute() else base_dir / candidate).resolve(
+        strict=False
+    )
+    try:
+        resolved.relative_to(REPO_ROOT)
+    except ValueError as exc:
+        raise ValueError(
+            f"Path resolves outside repository root: {value} (canonical: {resolved})"
+        ) from exc
+    return resolved
 
 
 def _truncate_output(output: str) -> Tuple[str, bool, str]:
@@ -223,7 +252,7 @@ def run_bun_test(
     bail: bool = False,
     cwd: Optional[str] = None,
 ) -> Tuple[int, str]:
-    """Run bun test with parsing and validation.
+    """Run ``bun test`` with parsing, validation, and bounded output handling.
 
     Args:
         test_path: Optional test file or directory path to run.
@@ -236,7 +265,8 @@ def run_bun_test(
 
     Returns:
         Tuple of (exit_code, output_string) where exit_code is 0 on success and
-        1 on validation or execution failure.
+        1 on validation or execution failure. ``output_string`` is a summary,
+        bounded full output, or JSON payload depending on ``output_mode``.
     """
 
     metrics = parse_bun_output("")
@@ -244,31 +274,52 @@ def run_bun_test(
     validation_errors: List[str] = []
 
     default_cwd = Path(__file__).resolve().parent
-    cwd_path = Path(cwd) if cwd else default_cwd
+    test_path_obj: Optional[Path] = None
+    try:
+        cwd_path = _resolve_within_repo_root(cwd, base_dir=REPO_ROOT) if cwd else default_cwd
 
-    if test_path:
-        test_path_obj = Path(test_path)
-        if not test_path_obj.is_absolute():
-            test_path_obj = cwd_path / test_path_obj
-        if not test_path_obj.exists():
-            metrics["test_path_error"] = True
-            validation_errors = validate_results(metrics, min_test_count=min_test_count)
-            summary = format_summary(metrics, validation_errors)
-            if output_mode == "json":
-                payload = {
-                    "metrics": metrics,
-                    "validation_errors": validation_errors,
-                    "success": False,
-                    "output": summary,
-                    "truncated": False,
-                    "truncation_notice": "",
-                }
-                return 1, json.dumps(payload, indent=2)
-            return 1, summary
+        if test_path:
+            test_path_obj = _resolve_within_repo_root(test_path, base_dir=cwd_path)
+            if not test_path_obj.exists():
+                metrics["test_path_error"] = True
+                validation_errors = validate_results(metrics, min_test_count=min_test_count)
+                summary = format_summary(metrics, validation_errors)
+                if output_mode == "json":
+                    payload = {
+                        "metrics": metrics,
+                        "validation_errors": validation_errors,
+                        "success": False,
+                        "output": summary,
+                        "truncated": False,
+                        "truncation_notice": "",
+                    }
+                    return 1, json.dumps(payload, indent=2)
+                return 1, summary
+    except ValueError as exc:
+        metrics["exit_code"] = 1
+        validation_errors = [str(exc)]
+        if output_mode == "json":
+            payload = {
+                "metrics": metrics,
+                "validation_errors": validation_errors,
+                "success": False,
+                "output": str(exc),
+                "truncated": False,
+                "truncation_notice": "",
+            }
+            return 1, json.dumps(payload, indent=2)
+        return 1, str(exc)
 
     cmd: List[str] = ["bun", "test"]
     if test_path:
-        cmd.append(test_path)
+        test_arg = str(test_path_obj.relative_to(cwd_path)) if test_path_obj else test_path
+        if (
+            not Path(test_arg).is_absolute()
+            and not test_arg.startswith("./")
+            and not test_arg.startswith("../")
+        ):
+            test_arg = f"./{test_arg}"
+        cmd.append(test_arg)
     cmd.extend(["--timeout", str(timeout)])
     if bail:
         cmd.append("--bail")

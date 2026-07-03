@@ -4,7 +4,7 @@ description: 'Subagent that manages architecture documentation in .opencode/guid
   Invoked by the documentation primary agent to create ADRs, update the architecture
   outline, and maintain architecture documentation.
 
-  This subagent: - Loads workflow context from adw_spec tool - Creates Architecture
+  This subagent: - Loads workflow context from adw_spec_read tool - Creates Architecture
   Decision Records (ADRs) following template - Archives old ADRs when approaches are
   superseded - Updates architecture_outline.md when new modules added - Updates architecture_guide.md
   for major changes - Maintains .opencode/guides/architecture/decisions/README.md - Excludes
@@ -18,18 +18,18 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -100,7 +100,7 @@ task({
 
 Parse input arguments and load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })

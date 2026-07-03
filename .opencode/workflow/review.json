@@ -11,7 +11,7 @@
       "description": "Multi-agent code review: parallel specialized reviewers → consolidation → feedback posting",
       "agent": "adw-review-orchestrator",
       "prompt": "$ARGUMENTS --adw-id ${adw_id} --pr-number ${pr_number}",
-      "model": "base",
+      "model": "heavy",
       "timeout": 1800,
       "retry": {
         "max_retries": 2,

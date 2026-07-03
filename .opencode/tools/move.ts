@@ -390,7 +390,7 @@ export default tool({
 Compatibility wrapper: prefer move_safe, move_overwrite, and move_trash for new usage.`,
   args: {
     source: tool.schema.string(),
-    destination: tool.schema.string(),
+    destination: tool.schema.string().optional(),
     overwrite: tool.schema.boolean().optional(),
     trash: tool.schema.boolean().optional(),
   },

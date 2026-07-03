@@ -1,16 +1,16 @@
 ---
 description: >-
   Subagent that populates a maintenance plan record created by plan-orchestrator.
-  Adds phases, drafts all 11 canonical section files, and reports completion
+  Adds phases, drafts all 12 canonical section files, and reports completion
   via workflow messages.
 
   This agent:
   - Receives adw_id, target_id, and optional parent_id from plan-orchestrator handoff
-  - Adds phases to the maintenance plan via adw_plans add-phase
+  - Adds phases to the maintenance plan via adw_plans_mutate add-phase
   - Scaffolds and populates canonical section files
-  - Drafts first-pass content for all 11 maintenance sections
+  - Drafts first-pass content for all 12 maintenance sections
   - Does NOT invoke codebase-researcher (task: false)
-  - Reports drafted sections, scenario, and challenges via messages-write
+  - Reports drafted sections, scenario, and challenges via adw_spec_messages messages-write
 
   Examples:
   - "Populate maintenance plan E18-M1 with phases and section content"
@@ -24,10 +24,14 @@ permission:
   move: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
+  adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -35,11 +39,11 @@ permission:
 # Plan Maintenance Drafter
 
 Populate an existing maintenance plan record with phases and first-pass section content.
-The plan record was already created by `plan-orchestrator` via `adw_plans create`.
+The plan record was already created by `plan-orchestrator` via `adw_plans_mutate create`.
 This agent adds phases, scaffolds sections, and drafts content.
 
 Unlike epic/feature drafters, this agent does **not** invoke `codebase-researcher`
-(`task: false`). It relies on prompt context, workflow messages, and `ripgrep`/`read` only.
+(`task: false`). It relies on prompt context, workflow messages, split search wrappers, and `read` only.
 
 # Input Contract
 
@@ -69,8 +73,8 @@ If `adw_id` or `target_id` is missing, output `PLAN_MAINTENANCE_DRAFTER_FAILED` 
 
 # Worktree Context
 
-All `adw_plans` calls **must** include the `cwd` parameter. Resolve `cwd`
-from ADW state first (`adw_spec read` → `worktree_path`). When already
+All `adw_plans_read` and `adw_plans_mutate` calls **must** include the `cwd` parameter. Resolve `cwd`
+from ADW state first (`adw_spec_read read` → `worktree_path`). When already
 executing inside the target worktree (e.g. `/path/to/trees/{adw_id}`), use
 `cwd: "."` — do **not** use a nested relative worktree path, which would resolve to a
 nonexistent nested path.
@@ -86,16 +90,16 @@ cwd: "."
 
 - `.opencode/plans/templates/maintenance/` (authoritative section template source)
 - Prior workflow messages for classifier/orchestrator context
-- Relevant maintenance examples discovered with `ripgrep` / `read`
+- Relevant maintenance examples discovered with split search wrappers / `read`
 
 # Core Mission
 
 1. Parse `adw_id`, `target_id`, and optional `parent_id` from orchestrator prompt
-2. Verify the plan exists via `adw_plans show`
-3. Scaffold section files via `adw_plans scaffold-sections`
+2. Verify the plan exists via `adw_plans_read show`
+3. Scaffold section files via `adw_plans_mutate scaffold-sections`
 4. Read workflow context from prior messages
-5. Add phases to the plan via `adw_plans add-phase`
-6. Draft first-pass content for all 11 section files
+5. Add phases to the plan via `adw_plans_mutate add-phase`
+6. Draft first-pass content for all 12 section files
 7. Write completion summary
 
 # Todo Tracking (Required)
@@ -106,16 +110,17 @@ Create a todo list at the start and update after each step:
 {
   "todos": [
     {"content": "Parse arguments: adw_id, target_id, parent_id from prompt", "status": "pending", "priority": "high"},
-    {"content": "Verify maintenance plan exists: adw_plans show E18-M1", "status": "pending", "priority": "high"},
-    {"content": "Scaffold section files: adw_plans scaffold-sections E18-M1", "status": "pending", "priority": "high"},
-    {"content": "List section paths: adw_plans list-sections E18-M1", "status": "pending", "priority": "high"},
+    {"content": "Verify maintenance plan exists: adw_plans_read show E18-M1", "status": "pending", "priority": "high"},
+    {"content": "Scaffold section files: adw_plans_mutate scaffold-sections E18-M1", "status": "pending", "priority": "high"},
+    {"content": "List section paths: adw_plans_read list-sections E18-M1", "status": "pending", "priority": "high"},
     {"content": "Read workflow messages for context", "status": "pending", "priority": "high"},
-    {"content": "Add phases to maintenance plan via adw_plans add-phase", "status": "pending", "priority": "high"},
+    {"content": "Add phases to maintenance plan via adw_plans_mutate add-phase", "status": "pending", "priority": "high"},
     {"content": "Draft section: purpose_justification", "status": "pending", "priority": "high"},
     {"content": "Draft section: scope", "status": "pending", "priority": "high"},
     {"content": "Draft section: guidelines_requirements", "status": "pending", "priority": "high"},
     {"content": "Draft section: success_criteria", "status": "pending", "priority": "high"},
     {"content": "Draft section: phase_details", "status": "pending", "priority": "high"},
+    {"content": "Draft section: appendix", "status": "pending", "priority": "high"},
     {"content": "Draft section: testing_requirements", "status": "pending", "priority": "high"},
     {"content": "Draft section: example_tasks", "status": "pending", "priority": "high"},
     {"content": "Draft section: dependencies", "status": "pending", "priority": "high"},
@@ -151,10 +156,10 @@ output `PLAN_MAINTENANCE_DRAFTER_FAILED` and halt.
 The orchestrator already created the plan. Verify it exists:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "show",
   "plan_id": "E18-M1",
-  "json": true,
+  "options": "json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -166,7 +171,7 @@ If the plan does not exist, output `PLAN_MAINTENANCE_DRAFTER_FAILED: Plan E18-M1
 Scaffold canonical section files from templates:
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "scaffold-sections",
   "plan_id": "E18-M1",
   "plan_type": "maintenance",
@@ -177,11 +182,10 @@ adw_plans({
 Then list the section paths to know where to write content:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "E18-M1",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -194,7 +198,7 @@ Use these paths for all subsequent writes.
 Read all workflow messages for classifier, orchestrator, and other drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 For epic-linked maintenance, use the epic-drafter's and feature-drafter's completion
@@ -210,31 +214,31 @@ functions they test. Do NOT create a standalone "testing" phase. The final
 phase should be integration tests or documentation updates.
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "add-phase",
   "plan_id": "E18-M1",
   "title": "Audit deprecated patterns and add deprecation tests",
-  "size": "S",
+  "options": "size=S",
   "cwd": "<worktree_path>"
 })
 ```
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "add-phase",
   "plan_id": "E18-M1",
   "title": "Remove deprecated code and update references with tests",
-  "size": "S",
+  "options": "size=S",
   "cwd": "<worktree_path>"
 })
 ```
 
 ```python
-adw_plans({
+adw_plans_mutate({
   "command": "add-phase",
   "plan_id": "E18-M1",
   "title": "Integration tests and cleanup verification",
-  "size": "XS",
+  "options": "size=XS",
   "cwd": "<worktree_path>"
 })
 ```
@@ -244,7 +248,7 @@ Each phase that modifies functions must include co-located unit tests for those 
 
 ## Step 6: Draft All Section Content
 
-Draft first-pass content for all 11 required maintenance sections. Write each
+Draft first-pass content for all 12 required maintenance sections. Write each
 section file using the paths from Step 3.
 
 ### Required Maintenance Sections
@@ -258,6 +262,7 @@ Write to the canonical section files under `.opencode/plans/sections/maintenance
 | `guidelines_requirements` | `guidelines_requirements.md` | Standards and requirements |
 | `success_criteria` | `success_criteria.md` | How to verify completion |
 | `phase_details` | `phase_details.md` | Detailed phase descriptions matching add-phase |
+| `appendix` | `appendix.md` | Optional audit evidence, ledgers, and closeout support |
 | `testing_requirements` | `testing_requirements.md` | Test approach, co-located testing |
 | `example_tasks` | `example_tasks.md` | Concrete example tasks |
 | `dependencies` | `dependencies.md` | Internal and external dependencies |
@@ -285,7 +290,7 @@ Each resolved section path must match:
 
 Completion message payload contract:
 - `scenario`: string enum, one of `standalone-maintenance` or `epic-linked-maintenance`
-- `sections_drafted`: integer count of drafted maintenance sections (expected `11` on success)
+- `sections_drafted`: integer count of drafted maintenance sections (expected `12` on success)
 - `challenges`: list of strings; use `[]` when no challenges are present
 
 Preserve this exact key order in completion examples and emitted messages:
@@ -294,11 +299,11 @@ Preserve this exact key order in completion examples and emitted messages:
 3. `challenges`
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-maintenance-drafter",
-  "message": "status: drafted\ntarget_id: E18-M1\nscenario: epic-linked-maintenance\nsections_drafted: 11\nchallenges: []"
+  "message": "status: drafted\ntarget_id: E18-M1\nscenario: epic-linked-maintenance\nsections_drafted: 12\nchallenges: []"
 })
 ```
 

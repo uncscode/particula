@@ -1,0 +1,86 @@
+{
+  "name": "review-fix",
+  "version": "1.0.0",
+  "description": "PR review + fix workflow",
+  "workflow_type": "review-fix",
+  "steps": [
+    {
+      "type": "workflow",
+      "name": "Review",
+      "workflow_name": "review"
+    },
+    {
+      "type": "agent",
+      "name": "Plan Fix",
+      "agent": "review-fix-planner",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 900,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 5.0,
+        "backoff": 2.0
+      },
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "agent",
+      "name": "Fix",
+      "agent": "adw-build-fix",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "base",
+      "timeout": 3600,
+      "retry": {
+        "max_retries": 1,
+        "initial_delay": 10.0,
+        "backoff": 2.0
+      },
+      "condition": {
+        "if_condition": "state.request_fix == True",
+        "skip_if": "state.fix_completed == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Validate",
+      "workflow_name": "adw-validate",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Polish",
+      "workflow_name": "adw-polish",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Test",
+      "workflow_name": "test",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Fix-Format",
+      "workflow_name": "adw-format",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    },
+    {
+      "type": "workflow",
+      "name": "Ship",
+      "workflow_name": "adw-ship-fix",
+      "condition": {
+        "if_condition": "state.request_fix == True"
+      }
+    }
+  ]
+}

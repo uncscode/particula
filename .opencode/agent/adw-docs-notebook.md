@@ -4,7 +4,7 @@ description: 'Subagent that handles Jupyter notebook creation, editing, validati
   execution, and conversion. Provides expert knowledge about notebook JSON structure,
   validation workflows, Jupytext conversion, and safe notebook editing patterns.
 
-  This subagent: - Loads workflow context from adw_spec tool - Creates new notebooks
+  This subagent: - Loads workflow context from adw_spec_read tool - Creates new notebooks
   with proper JSON structure - Edits existing notebooks safely using Jupytext workflow
   - Validates notebooks before and after changes - Executes notebooks to verify they
   run correctly - Converts notebooks to/from Python scripts via Jupytext - Handles
@@ -30,18 +30,18 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -442,7 +442,7 @@ Extract from input:
 ### 1.2: Load Workflow State (if adw_id provided)
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -1569,7 +1569,7 @@ Before reporting completion, verify:
 
 **Standard Tools:**
 - `read`, `edit`, `write` - File operations
-- `ripgrep` - Search notebooks
+- `find_files` / `search_content` / `ripgrep_advanced` - Search notebooks
 - `list`, `move` - File management
 - `todoread`, `todowrite` - Task tracking
 

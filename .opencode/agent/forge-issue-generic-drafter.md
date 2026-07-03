@@ -11,15 +11,15 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
-  adw_plans: deny
-  adw_issues_spec: deny
+  adw_spec_read: allow
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -28,9 +28,7 @@ permission:
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -93,13 +91,13 @@ Mark each todo `in_progress` when starting and `completed` when done.
 Parse `adw_id` from prompt input and read workflow context:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>"})
 ```
 
 Load batch state:
 
 ```python
-adw_issues_spec({"command": "batch-summary", "adw_id": "<adw_id>"})
+adw_issues_batch_summary({"adw_id": "<adw_id>"})
 ```
 
 ## Step 2: Role Index Normalization
@@ -157,8 +155,7 @@ includes the limit type and affected issue/section context.
 Write section content:
 
 ```python
-adw_issues_spec({
-  "command": "batch-write",
+adw_issues_batch_write({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "<role_resolved_target_section>",

@@ -9,7 +9,7 @@ description: >-
   - Parses checklist phase IDs and Size metadata in one parse pass per file
   - Applies XS/S/M/L/XL split policy with explicit fallback behavior
   - Requires tests-with-feature annotation on all newly created sub-phases
-  - Writes aggregate split summary counts via adw_spec messages-write
+  - Writes aggregate split summary counts via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -19,10 +19,13 @@ permission:
   move: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -45,7 +48,7 @@ input: $ARGUMENTS
 3. Early-filter non-phase files before full parsing.
 4. Read each candidate file at most once (single-read, no duplicate I/O).
 5. Parse phase IDs and `Size:` metadata, apply split rules, and accumulate decisions in one pass.
-6. Write updates safely and emit an aggregate-first summary via `adw_spec messages-write`.
+6. Write updates safely and emit an aggregate-first summary via `adw_spec_messages messages-write`.
 
 ## Contract Schema (v1)
 
@@ -80,16 +83,16 @@ Extract `adw_id` from `$ARGUMENTS`. If missing, fail fast.
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -102,7 +105,7 @@ it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -127,10 +130,10 @@ Use handoff-scoped discovery from `review_plan_ids`.
 For each plan ID, resolve section files via:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -265,7 +268,7 @@ Canonical split-rule source for all agent/docs/test consumers:
 Write a bounded summary message to the workflow message log:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-phase-splitter",

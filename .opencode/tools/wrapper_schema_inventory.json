@@ -1,0 +1,3464 @@
+{
+  "audit_scope": ".opencode/tools/*.ts",
+  "counting_rule": "direct_args_fields_with_help_and_bounded_options_exempt",
+  "rows": [
+    {
+      "wrapper_path": ".opencode/tools/adw_issues_batch_init.ts",
+      "companion_doc_path": ".opencode/tools/adw_issues_batch_init.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "total",
+        "source",
+        "adw_id"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_issues_batch_init.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_issues_batch_log.ts",
+      "companion_doc_path": ".opencode/tools/adw_issues_batch_log.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "adw_id",
+        "issue",
+        "reviewer",
+        "status",
+        "note"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M7",
+      "nearest_test_path": ".opencode/tools/__tests__/adw_issues_batch_log_summary.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_issues_batch_read.ts",
+      "companion_doc_path": ".opencode/tools/adw_issues_batch_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "adw_id",
+        "issue",
+        "section"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_issues_batch_read.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_issues_batch_summary.ts",
+      "companion_doc_path": ".opencode/tools/adw_issues_batch_summary.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "adw_id"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 1,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 1,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_issues_batch_log_summary.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_issues_batch_write.ts",
+      "companion_doc_path": ".opencode/tools/adw_issues_batch_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "adw_id",
+        "issue",
+        "content",
+        "section"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_issues_batch_read_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_notes_read.ts",
+      "companion_doc_path": ".opencode/tools/adw_notes_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "ref"
+      ],
+      "exempt_fields": [],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_notes_read.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_notes_write.ts",
+      "companion_doc_path": ".opencode/tools/adw_notes_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "ref",
+        "adw_id",
+        "fields"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_notes_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_notes.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "ref",
+        "adw_id",
+        "fields"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_notes.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_plans_mutate.ts",
+      "companion_doc_path": ".opencode/tools/adw_plans_mutate.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "plan_id",
+        "plan_type",
+        "title",
+        "parent",
+        "phase_id",
+        "patch",
+        "cwd"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 8,
+      "diagnostic": null,
+      "classification": "bounded-options-needed",
+      "target_shape": "bounded-options",
+      "target_count": null,
+      "owner_plan": "E27-M6",
+      "nearest_test_path": null
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_plans_read.ts",
+      "companion_doc_path": ".opencode/tools/adw_plans_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "plan_id",
+        "plan_type",
+        "lifecycle",
+        "parent",
+        "cwd"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 6,
+      "diagnostic": null,
+      "classification": "bounded-options-needed",
+      "target_shape": "bounded-options",
+      "target_count": null,
+      "owner_plan": "E27-M6",
+      "nearest_test_path": null
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_service.ts",
+      "companion_doc_path": ".opencode/tools/adw_service.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "mode",
+        "background",
+        "force"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_service.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_setup.ts",
+      "companion_doc_path": ".opencode/tools/adw_setup.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "wizard",
+        "args"
+      ],
+      "exempt_fields": [
+        "help",
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_setup.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_spec_messages.ts",
+      "companion_doc_path": ".opencode/tools/adw_spec_messages.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "adw_id",
+        "agent",
+        "message"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_spec_messages.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_spec_read.ts",
+      "companion_doc_path": ".opencode/tools/adw_spec_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "adw_id",
+        "field"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_spec_read.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_spec_write.ts",
+      "companion_doc_path": ".opencode/tools/adw_spec_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "adw_id",
+        "field",
+        "content",
+        "file"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M6",
+      "nearest_test_path": ".opencode/tools/__tests__/adw_spec_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw_status_health.ts",
+      "companion_doc_path": ".opencode/tools/adw_status_health.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 1,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 1,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/adw_status_health.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/adw.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "adw_id",
+        "model",
+        "args",
+        "text",
+        "title",
+        "body"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 8,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M5",
+      "nearest_test_path": ".opencode/tools/__tests__/adw.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/auto_mode_manifest.ts",
+      "companion_doc_path": ".opencode/tools/auto_mode_manifest.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "adw_id",
+        "issues",
+        "depends",
+        "segment_size",
+        "source_branch",
+        "target_branch",
+        "branch_type",
+        "ship_strategy",
+        "issue",
+        "branch",
+        "completed_at",
+        "detail"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 13,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M7",
+      "nearest_test_path": ".opencode/tools/__tests__/auto_mode_manifest.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/build_mkdocs_build.ts",
+      "companion_doc_path": ".opencode/tools/build_mkdocs_build.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "timeout",
+        "cwd",
+        "configFile"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/build_mkdocs.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for mkdocs wrapper execution."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository-root-confined docs build root."
+        },
+        {
+          "field": "strict",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "clean",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "configFile",
+          "role": "safety-field",
+          "notes": "Repository-root-confined mkdocs config path."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/strict/clean toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/build_mkdocs_validate.ts",
+      "companion_doc_path": ".opencode/tools/build_mkdocs_validate.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "timeout",
+        "cwd",
+        "configFile"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/build_mkdocs.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for mkdocs wrapper execution."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository-root-confined docs validation root."
+        },
+        {
+          "field": "strict",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "clean",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "configFile",
+          "role": "safety-field",
+          "notes": "Repository-root-confined mkdocs config path."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/strict/clean toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/build_mkdocs.ts",
+      "companion_doc_path": ".opencode/tools/build_mkdocs.md",
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "timeout",
+        "cwd",
+        "configFile",
+        "validateOnly"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/build_mkdocs.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for mkdocs wrapper execution."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository-root-confined docs build root."
+        },
+        {
+          "field": "strict",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "clean",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "configFile",
+          "role": "safety-field",
+          "notes": "Repository-root-confined mkdocs config path."
+        },
+        {
+          "field": "validateOnly",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only mode selector bridging validate-only and artifact-producing split wrappers."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/strict/clean toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/clear_build_delete.ts",
+      "companion_doc_path": ".opencode/tools/clear_build_delete.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "buildDir",
+        "force"
+      ],
+      "exempt_fields": [],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/clear_build.test.ts",
+      "field_role_audit": [
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repo-confined destructive target path for explicit delete mode."
+        },
+        {
+          "field": "force",
+          "role": "safety-field",
+          "notes": "Destructive authorization gate must remain explicit."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/clear_build_preview.ts",
+      "companion_doc_path": ".opencode/tools/clear_build_preview.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "buildDir"
+      ],
+      "exempt_fields": [],
+      "current_count": 1,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 1,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/clear_build.test.ts",
+      "field_role_audit": [
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repo-confined cleanup target path for read-only preview scope."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/clear_build.ts",
+      "companion_doc_path": ".opencode/tools/clear_build.md",
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "buildDir",
+        "dryRun",
+        "force"
+      ],
+      "exempt_fields": [],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/clear_build.test.ts",
+      "field_role_audit": [
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repo-confined destructive target path; build cleanup scope must remain explicit even when preview/delete mode is selected elsewhere."
+        },
+        {
+          "field": "dryRun",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only preview/delete selector retained direct to preserve the split-wrapper boundary."
+        },
+        {
+          "field": "force",
+          "role": "safety-field",
+          "notes": "Destructive authorization gate must remain explicit."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/convert_notebook_to_py.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "notebookPath",
+        "recursive",
+        "outputDir"
+      ],
+      "exempt_fields": [],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/convert_notebook_to_py.test.ts",
+      "field_role_audit": [
+        {
+          "field": "notebookPath",
+          "role": "payload-bearing",
+          "notes": "Notebook or directory operand for py:percent conversion."
+        },
+        {
+          "field": "recursive",
+          "role": "safety-field",
+          "notes": "Directory traversal scope remains explicit for bulk conversion."
+        },
+        {
+          "field": "outputDir",
+          "role": "safety-field",
+          "notes": "Conversion output directory remains explicit because the backend resolves it under the repository root before writing scripts."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/convert_py_to_notebook.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "notebookPath",
+        "recursive",
+        "outputDir"
+      ],
+      "exempt_fields": [],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/convert_py_to_notebook.test.ts",
+      "field_role_audit": [
+        {
+          "field": "notebookPath",
+          "role": "payload-bearing",
+          "notes": "py:percent script or directory operand for notebook conversion."
+        },
+        {
+          "field": "recursive",
+          "role": "safety-field",
+          "notes": "Directory traversal scope remains explicit for bulk conversion."
+        },
+        {
+          "field": "outputDir",
+          "role": "safety-field",
+          "notes": "Conversion output directory remains explicit because the backend resolves it under the repository root before writing notebooks."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/create_workspace.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "issueNumber",
+        "workflowType",
+        "adwId",
+        "triggeredBy",
+        "outputMode"
+      ],
+      "exempt_fields": [],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M5",
+      "nearest_test_path": ".opencode/tools/__tests__/wrapper_schema_inventory.test.ts",
+      "field_role_audit": [
+        {
+          "field": "issueNumber",
+          "role": "required-identifier"
+        },
+        {
+          "field": "workflowType",
+          "role": "bounded-option-candidate",
+          "notes": "Workflow-family selector rather than a broad command surface."
+        },
+        {
+          "field": "adwId",
+          "role": "safety-field",
+          "notes": "Resume identifier normalized to canonical lowercase hex before dispatch."
+        },
+        {
+          "field": "triggeredBy",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        }
+      ],
+      "audit_notes": [
+        "Backend companion .opencode/tools/create_workspace.py mirrors the wrapper contract via positional issue_number plus workflow/output selectors.",
+        "Ownership remains with E27-M5 for downstream workspace-schema migration; E27-M8-P1 records the baseline only."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/feedback_log.ts",
+      "companion_doc_path": ".opencode/tools/feedback_log.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "category",
+        "severity",
+        "description",
+        "suggestedFix",
+        "toolName",
+        "workflowStep",
+        "agentType",
+        "adwId",
+        "context"
+      ],
+      "exempt_fields": [],
+      "current_count": 9,
+      "diagnostic": null,
+      "classification": "compatibility-defer-with-owner",
+      "target_shape": "compatibility-window",
+      "target_count": null,
+      "owner_plan": "E27-M11",
+      "nearest_test_path": ".opencode/tools/__tests__/feedback_log.test.ts",
+      "field_role_audit": [
+        {
+          "field": "category",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "severity",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "description",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "suggestedFix",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "toolName",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "workflowStep",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "agentType",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "adwId",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "context",
+          "role": "payload-bearing"
+        }
+      ],
+      "audit_notes": [
+        "E27-M11 audit confirms the utility/telemetry wrapper family is exactly feedback_log, get_datetime, and get_version with no extra wrapper assigned by committed inventory artifacts.",
+        "Python backend read-mode inputs command/page/page-size/severity-filter are backend-only surface area in .opencode/tools/feedback_log.py and are intentionally not modeled as direct TypeScript wrapper fields in this audit.",
+        "feedback_log schema/behavior migration landed in E27-M11 P2 with dedicated wrapper coverage; broader compatibility-window enforcement cleanup remains deferred to E27-M12.",
+        "E27-M11 P5 adds a compact companion wrapper doc for write-mode usage while leaving AGENTS.md as the canonical operator note for backend read-mode and fallback-policy details."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/find_files.ts",
+      "companion_doc_path": ".opencode/tools/find_files.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "pattern",
+        "path"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/find_files.test.ts",
+      "field_role_audit": [
+        {
+          "field": "pattern",
+          "role": "payload-bearing",
+          "notes": "Discovery-mode glob selector."
+        },
+        {
+          "field": "path",
+          "role": "safety-field",
+          "notes": "Repository-constrained search root."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for discovery-only optional controls."
+        },
+        {
+          "field": "fileType",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "excludeFileType",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "globCaseInsensitive",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "compactOutput",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "maxResults",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "contentPattern",
+          "role": "explicit-exception",
+          "notes": "Accepted only to fail closed with split-wrapper guidance."
+        },
+        {
+          "field": "filesWithMatches",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "filesWithoutMatches",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "contextLines",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "beforeContext",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "afterContext",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "maxMatchesPerFile",
+          "role": "explicit-exception"
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/get_datetime.ts",
+      "companion_doc_path": ".opencode/tools/get_datetime.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "format",
+        "localtime"
+      ],
+      "exempt_fields": [],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/get_datetime.test.ts",
+      "field_role_audit": [
+        {
+          "field": "format",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "localtime",
+          "role": "safety-field",
+          "notes": "Behavior toggle switches between UTC and America/Denver output modes."
+        }
+      ],
+      "audit_notes": [
+        "E27-M11 audit keeps get_datetime as an already-compliant row with owner_plan null while recording family membership and no additional wrapper assignment beyond feedback_log/get_datetime/get_version.",
+        "No exception-only migration is needed for this row in P1; wrapper-contract changes remain deferred to E27-M11 P3 if later schema work is required.",
+        "E27-M11 P5 adds a compact companion doc that records the shipped format/localtime schema and output guarantees without reopening wrapper behavior."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/get_version.ts",
+      "companion_doc_path": ".opencode/tools/get_version.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "file"
+      ],
+      "exempt_fields": [],
+      "current_count": 1,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 1,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/get_version.test.ts",
+      "field_role_audit": [
+        {
+          "field": "file",
+          "role": "payload-bearing"
+        }
+      ],
+      "audit_notes": [
+        "E27-M11 audit keeps get_version as an already-compliant row with owner_plan null while recording family membership and no additional wrapper assignment beyond feedback_log/get_datetime/get_version.",
+        "Sibling-family boundary note: broader search/refactor/move/build wrapper leftovers remain owned by E27-M8 through E27-M10; no extra small utility wrapper is reassigned into E27-M11 by committed artifacts in this audit.",
+        "No exception-only migration is needed for this row in P1; wrapper-contract changes remain deferred to E27-M11 P3 if later schema work is required.",
+        "E27-M11 P5 refreshes the companion doc so the shipped blank-input omission, default lookup order, and deterministic failure hints remain discoverable."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/git_branch.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "branch",
+        "create",
+        "source",
+        "worktree_path"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M4",
+      "nearest_test_path": ".opencode/tools/__tests__/git_branch.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/git_commit.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "summary",
+        "description",
+        "adw_id",
+        "worktree_path",
+        "stage_all",
+        "max_retries",
+        "no_verify"
+      ],
+      "exempt_fields": [],
+      "current_count": 7,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M4",
+      "nearest_test_path": ".opencode/tools/__tests__/git_commit.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/git_diff.ts",
+      "companion_doc_path": ".opencode/tools/git_diff.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "worktree_path",
+        "porcelain",
+        "stat",
+        "base",
+        "target",
+        "ref",
+        "path",
+        "max_count",
+        "oneline"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 10,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M4",
+      "nearest_test_path": ".opencode/tools/__tests__/git_diff.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/git_merge.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "source",
+        "target",
+        "no_ff",
+        "abort_on_conflict",
+        "branch",
+        "onto",
+        "remote",
+        "prune",
+        "slice_branch",
+        "tracking_branch",
+        "recover_missing_worktree",
+        "ref",
+        "hard",
+        "worktree_path"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 15,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M4",
+      "nearest_test_path": ".opencode/tools/__tests__/git_merge.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/git_stage.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "files",
+        "stage_all",
+        "staged",
+        "worktree_path"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M4",
+      "nearest_test_path": ".opencode/tools/__tests__/git_stage.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/git_worktree.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "adw_id",
+        "force"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/git_worktree.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/move_overwrite.ts",
+      "companion_doc_path": ".opencode/tools/move_overwrite.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "source",
+        "destination"
+      ],
+      "exempt_fields": [],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/wrapper_schema_inventory.test.ts",
+      "field_role_audit": [
+        {
+          "field": "source",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "destination",
+          "role": "payload-bearing"
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/move_safe.ts",
+      "companion_doc_path": ".opencode/tools/move_safe.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "source",
+        "destination"
+      ],
+      "exempt_fields": [],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/move_safe.test.ts",
+      "field_role_audit": [
+        {
+          "field": "source",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "destination",
+          "role": "payload-bearing"
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/move_trash.ts",
+      "companion_doc_path": ".opencode/tools/move_trash.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "source"
+      ],
+      "exempt_fields": [],
+      "current_count": 1,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 1,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/wrapper_schema_inventory.test.ts",
+      "field_role_audit": [
+        {
+          "field": "source",
+          "role": "payload-bearing",
+          "notes": "Repo-confined path moved into .trash/<relative-path>."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/move.ts",
+      "companion_doc_path": ".opencode/tools/move.md",
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "source",
+        "destination",
+        "overwrite",
+        "trash"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/move.test.ts",
+      "field_role_audit": [
+        {
+          "field": "source",
+          "role": "payload-bearing",
+          "notes": "Repo-confined path operand for all move modes."
+        },
+        {
+          "field": "destination",
+          "role": "payload-bearing",
+          "notes": "Repo-confined destination operand for safe/overwrite modes."
+        },
+        {
+          "field": "overwrite",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only delegator toggle; split wrappers keep this mutation intent explicit."
+        },
+        {
+          "field": "trash",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only delegator toggle; split wrappers keep trash intent explicit."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_comment_write.ts",
+      "companion_doc_path": ".opencode/tools/platform_comment_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "body",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/platform_comment_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_issue_read.ts",
+      "companion_doc_path": ".opencode/tools/platform_issue_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "output_format",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/platform_issue_read.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_issue_write.ts",
+      "companion_doc_path": ".opencode/tools/platform_issue_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "title",
+        "body",
+        "labels",
+        "state",
+        "output_format",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 8,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M3",
+      "nearest_test_path": ".opencode/tools/__tests__/platform_issue_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_label_write.ts",
+      "companion_doc_path": ".opencode/tools/platform_label_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "labels",
+        "output_format",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M3",
+      "nearest_test_path": ".opencode/tools/__tests__/platform_label_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_operations.ts",
+      "companion_doc_path": ".opencode/tools/platform_operations.md",
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "title",
+        "body",
+        "head",
+        "base",
+        "adw_id",
+        "draft",
+        "state",
+        "labels",
+        "output_format",
+        "prefer_scope",
+        "actionable_only",
+        "path",
+        "line",
+        "commit_sha",
+        "position"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 17,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M3",
+      "nearest_test_path": ".opencode/tools/__tests__/platform_operations_compat_comment_pr_review.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_pr_read.ts",
+      "companion_doc_path": ".opencode/tools/platform_pr_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "output_format",
+        "actionable_only",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M3",
+      "nearest_test_path": ".opencode/tools/__tests__/platform_pr_read.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_pr_review_write.ts",
+      "companion_doc_path": ".opencode/tools/platform_pr_review_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "issue_number",
+        "body",
+        "path",
+        "line",
+        "position",
+        "commit_sha",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 8,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M3",
+      "nearest_test_path": ".opencode/tools/__tests__/platform_pr_review_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_pr_write.ts",
+      "companion_doc_path": ".opencode/tools/platform_pr_write.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "title",
+        "body",
+        "head",
+        "base",
+        "adw_id",
+        "draft",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 8,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M3",
+      "nearest_test_path": ".opencode/tools/__tests__/platform_pr_write.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/platform_rate_limit_read.ts",
+      "companion_doc_path": ".opencode/tools/platform_rate_limit_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "output_format",
+        "prefer_scope"
+      ],
+      "exempt_fields": [
+        "help"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/platform_rate_limit_read.test.ts"
+    },
+    {
+      "wrapper_path": ".opencode/tools/refactor_astgrep_apply.ts",
+      "companion_doc_path": ".opencode/tools/refactor_astgrep_apply.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "pattern",
+        "rewrite",
+        "lang",
+        "path"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/refactor_astgrep_apply.test.ts",
+      "field_role_audit": [
+        {
+          "field": "pattern",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "rewrite",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "lang",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "path",
+          "role": "safety-field",
+          "notes": "Explicit repository-confined mutation scope."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/refactor_astgrep_preview.ts",
+      "companion_doc_path": ".opencode/tools/refactor_astgrep_preview.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "pattern",
+        "rewrite",
+        "lang",
+        "path"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/refactor_astgrep_preview.test.ts",
+      "field_role_audit": [
+        {
+          "field": "pattern",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "rewrite",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "lang",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "path",
+          "role": "safety-field",
+          "notes": "Explicit repository-confined preview scope."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/ripgrep_advanced.ts",
+      "companion_doc_path": ".opencode/tools/ripgrep_advanced.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "contentPattern",
+        "path"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/ripgrep_advanced.test.ts",
+      "field_role_audit": [
+        {
+          "field": "contentPattern",
+          "role": "payload-bearing",
+          "notes": "Required advanced content-search selector."
+        },
+        {
+          "field": "pattern",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "path",
+          "role": "safety-field",
+          "notes": "Repository-constrained search root."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for advanced content-search controls."
+        },
+        {
+          "field": "fileType",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "excludeFileType",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "globCaseInsensitive",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "compactOutput",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "maxResults",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "maxMatchesPerFile",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "contextLines",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "beforeContext",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "afterContext",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "filesWithMatches",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "filesWithoutMatches",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "unrestricted",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "ignoreGitignore",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "includeHidden",
+          "role": "bounded-option-candidate"
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_bun_test.ts",
+      "companion_doc_path": ".opencode/tools/run_bun_test.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "testPath",
+        "timeout",
+        "minTests",
+        "cwd"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_bun_test.test.ts",
+      "field_role_audit": [
+        {
+          "field": "testPath",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "testFilter",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for timeout enforcement."
+        },
+        {
+          "field": "minTests",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for test-count enforcement."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository-root-confined execution root for bun test runs."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for bun test wrapper toggles."
+        },
+        {
+          "field": "failFast",
+          "role": "bounded-option-candidate"
+        }
+      ],
+      "audit_notes": [
+        "Bun wrapper keeps legacy output/filter/fail-fast toggles off the published schema and requires them through bounded options."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cmake_build.ts",
+      "companion_doc_path": ".opencode/tools/run_cmake_build.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "preset",
+        "buildDir",
+        "buildTimeout",
+        "timeout"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_cmake.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "preset",
+          "role": "required-identifier",
+          "notes": "Alternative build-context selector paired with buildDir."
+        },
+        {
+          "field": "buildDir",
+          "role": "required-identifier",
+          "notes": "Alternative build-context selector paired with preset."
+        },
+        {
+          "field": "jobs",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "buildTimeout",
+          "role": "explicit-exception",
+          "notes": "Build timeout guard retained direct."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Wrapper execution timeout guard retained direct."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/jobs build toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cmake_configure.ts",
+      "companion_doc_path": ".opencode/tools/run_cmake_configure.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "preset",
+        "sourceDir",
+        "buildDir",
+        "timeout",
+        "cmakeArgs"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M9",
+      "nearest_test_path": ".opencode/tools/__tests__/run_cmake.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "preset",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "sourceDir",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "buildDir",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "ninja",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for timeout enforcement."
+        },
+        {
+          "field": "cmakeArgs",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/ninja configure toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cmake.ts",
+      "companion_doc_path": ".opencode/tools/run_cmake.md",
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "preset",
+        "sourceDir",
+        "buildDir",
+        "build",
+        "buildTimeout",
+        "timeout",
+        "cmakeArgs"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 7,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M9",
+      "nearest_test_path": ".opencode/tools/__tests__/run_cmake.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "preset",
+          "role": "payload-bearing",
+          "notes": "Compatibility configure/build context selector when preset-driven flows are used."
+        },
+        {
+          "field": "sourceDir",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "buildDir",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "ninja",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "build",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only mode selector bridging configure-only and build-only split wrappers."
+        },
+        {
+          "field": "jobs",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "buildTimeout",
+          "role": "explicit-exception",
+          "notes": "Build-phase timeout guard retained direct on the compatibility wrapper."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Configure-phase timeout guard retained direct on the compatibility wrapper."
+        },
+        {
+          "field": "cmakeArgs",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/ninja/jobs compatibility toggles."
+        }
+      ],
+      "audit_notes": [
+        "P3 follow-up covers run_ctest, run_cmake*, run_linters, run_validate_agent_references, build_mkdocs*, and clear_build* schema-budget migration work; E27-M9 records the baseline only."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cpp_coverage_advanced.ts",
+      "companion_doc_path": ".opencode/tools/run_cpp_coverage_advanced.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "buildDir",
+        "threshold",
+        "timeout",
+        "filter",
+        "html",
+        "options"
+      ],
+      "exempt_fields": [],
+      "current_count": 6,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_cpp_coverage_advanced.test.ts",
+      "field_role_audit": [
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for advanced coverage artifacts."
+        },
+        {
+          "field": "threshold",
+          "role": "explicit-exception",
+          "notes": "Coverage threshold guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "filter",
+          "role": "payload-bearing",
+          "notes": "Coverage include/filter selector remains direct freeform payload input."
+        },
+        {
+          "field": "html",
+          "role": "safety-field",
+          "notes": "Repository-confined HTML output directory remains explicit."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output-mode and coverage-tool selection."
+        }
+      ],
+      "audit_notes": [
+        "Advanced coverage wrapper routes output-mode and coverage-tool selection through bounded options while preserving direct filter/html safety boundaries.",
+        "Validated buildDir/html paths are canonicalized before subprocess assembly, and nested new repo-confined html output directories remain allowed.",
+        "extraArgs is intentionally excluded from the shipped C++ coverage wrapper family until backend support exists."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cpp_coverage_summary.ts",
+      "companion_doc_path": ".opencode/tools/run_cpp_coverage_summary.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "buildDir",
+        "threshold",
+        "timeout",
+        "tool",
+        "filter",
+        "html",
+        "options"
+      ],
+      "exempt_fields": [],
+      "current_count": 7,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_cpp_coverage_summary.test.ts",
+      "field_role_audit": [
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for routine coverage artifacts."
+        },
+        {
+          "field": "threshold",
+          "role": "explicit-exception",
+          "notes": "Coverage threshold guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "tool",
+          "role": "explicit-exception",
+          "notes": "Advanced-only schema key intentionally retained for deterministic rejection in the summary wrapper."
+        },
+        {
+          "field": "filter",
+          "role": "explicit-exception",
+          "notes": "Advanced-only schema key intentionally retained for deterministic rejection in the summary wrapper."
+        },
+        {
+          "field": "html",
+          "role": "explicit-exception",
+          "notes": "Advanced-only schema key intentionally retained for deterministic rejection in the summary wrapper."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output-mode selection."
+        }
+      ],
+      "audit_notes": [
+        "Routine coverage wrapper now uses bounded options for output-mode selection while intentionally keeping advanced-only keys in schema space only to fail closed and preserve the summary vs advanced split boundary.",
+        "extraArgs is intentionally excluded from the shipped C++ coverage wrapper family until backend support exists."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cpp_lint_check.ts",
+      "companion_doc_path": ".opencode/tools/run_cpp_lint_check.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "sourceDir",
+        "buildDir",
+        "timeout",
+        "options"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_cpp_lint_check.test.ts",
+      "field_role_audit": [
+        {
+          "field": "sourceDir",
+          "role": "safety-field",
+          "notes": "Repository-confined C++ source root for non-mutating lint checks."
+        },
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for clang-tidy compile_commands access."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output and linter selection."
+        }
+      ],
+      "audit_notes": [
+        "Split check wrapper is intentionally non-mutating and now routes output/linter selection through bounded options without exposing an auto-fix toggle."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cpp_lint_fix.ts",
+      "companion_doc_path": ".opencode/tools/run_cpp_lint_fix.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "sourceDir",
+        "buildDir",
+        "timeout",
+        "options"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_cpp_lint_fix.test.ts",
+      "field_role_audit": [
+        {
+          "field": "sourceDir",
+          "role": "safety-field",
+          "notes": "Repository-confined C++ source root for mutating lint-fix runs."
+        },
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for clang-tidy compile_commands access."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output and linter selection."
+        }
+      ],
+      "audit_notes": [
+        "Split fix wrapper preserves always-on auto-fix semantics without reintroducing a direct mode toggle in the schema surface."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_cpp_linters.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "sourceDir",
+        "buildDir",
+        "autoFix",
+        "timeout",
+        "options"
+      ],
+      "exempt_fields": [],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_cpp_linters.test.ts",
+      "field_role_audit": [
+        {
+          "field": "sourceDir",
+          "role": "safety-field",
+          "notes": "Repository-confined C++ source root for compatibility lint runs."
+        },
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for clang-tidy compile_commands access."
+        },
+        {
+          "field": "autoFix",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only direct bridge between the split check and fix wrappers."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output and linter selection."
+        }
+      ],
+      "audit_notes": [
+        "Compatibility C++ lint wrapper keeps autoFix explicit as a bridge surface while moving output/linter selection behind bounded options."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_ctest.ts",
+      "companion_doc_path": ".opencode/tools/run_ctest.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "buildDir",
+        "timeout",
+        "minTests"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_ctest.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "buildDir",
+          "role": "required-identifier",
+          "notes": "Required build-directory selector for the target CTest context."
+        },
+        {
+          "field": "testFilter",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "excludeFilter",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "parallel",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for timeout enforcement."
+        },
+        {
+          "field": "minTests",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for minimum-count enforcement."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/filter/parallel toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_linters.ts",
+      "companion_doc_path": ".opencode/tools/run_linters.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "autoFix",
+        "targetDir",
+        "ruffTimeout",
+        "mypyTimeout"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_linters.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "autoFix",
+          "role": "safety-field",
+          "notes": "Mutating vs validation-only mode boundary must remain explicit."
+        },
+        {
+          "field": "linters",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "targetDir",
+          "role": "safety-field",
+          "notes": "Direct path scope for linter execution."
+        },
+        {
+          "field": "ruffTimeout",
+          "role": "explicit-exception",
+          "notes": "Tool-specific timeout guard retained direct."
+        },
+        {
+          "field": "mypyTimeout",
+          "role": "explicit-exception",
+          "notes": "Tool-specific timeout guard retained direct."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output/linters toggles."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_notebook.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "options",
+        "notebookPath",
+        "recursive",
+        "script",
+        "timeout",
+        "expectOutput",
+        "cwd",
+        "writeExecuted",
+        "noOverwrite",
+        "noBackup",
+        "skipValidation"
+      ],
+      "exempt_fields": [],
+      "current_count": 11,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_notebook.test.ts",
+      "field_role_audit": [
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for output-mode selection."
+        },
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "notebookPath",
+          "role": "payload-bearing",
+          "notes": "Primary notebook/script/directory execution operand."
+        },
+        {
+          "field": "recursive",
+          "role": "safety-field",
+          "notes": "Directory traversal scope remains explicit for bulk execution."
+        },
+        {
+          "field": "script",
+          "role": "safety-field",
+          "notes": "Execution-mode selector remains explicit because it switches directory collection from notebooks to scripts."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Execution timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "expectOutput",
+          "role": "payload-bearing",
+          "notes": "Execution-output expectations remain direct structured payload input."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Execution root remains explicit, but the backend only checks that cwd exists as a directory; it does not repository-confine the path."
+        },
+        {
+          "field": "writeExecuted",
+          "role": "safety-field",
+          "notes": "Executed-notebook output directory remains explicit because the backend creates/uses the provided directory without repository confinement (and ignores it in script mode)."
+        },
+        {
+          "field": "noOverwrite",
+          "role": "safety-field",
+          "notes": "Overwrite behavior toggle remains explicit because it changes mutation semantics and backup policy."
+        },
+        {
+          "field": "noBackup",
+          "role": "safety-field",
+          "notes": "Backup suppression remains explicit because it weakens the default safety path."
+        },
+        {
+          "field": "skipValidation",
+          "role": "safety-field",
+          "notes": "Validation-bypass toggle remains explicit because it relaxes the normal pre-execution guardrail."
+        }
+      ],
+      "audit_notes": [
+        "E27-M10 records the notebook execution baseline only; overwrite, backup, and validation-bypass controls stay explicit so later slimming does not hide execution-safety decisions.",
+        "run_notebook path notes intentionally distinguish repository-confined notebook conversion outputs from cwd/writeExecuted inputs, which are validated for existence or directory shape but not repository confinement."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_pytest_advanced.ts",
+      "companion_doc_path": ".opencode/tools/run_pytest_advanced.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "minTests",
+        "timeout",
+        "cwd",
+        "testPath",
+        "pytestArgs",
+        "coverage",
+        "coverageSource",
+        "coverageThreshold",
+        "overrideIni"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 9,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M9",
+      "nearest_test_path": ".opencode/tools/__tests__/run_pytest_advanced.test.ts",
+      "field_role_audit": [
+        {
+          "field": "minTests",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for scoped test-count enforcement."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for timeout enforcement."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository-root-confined execution root for advanced test runs."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for advanced wrapper toggles."
+        },
+        {
+          "field": "testPath",
+          "role": "payload-bearing",
+          "notes": "Direct routine/advanced test target operand."
+        },
+        {
+          "field": "pytestArgs",
+          "role": "payload-bearing",
+          "notes": "Direct pytest passthrough payload."
+        },
+        {
+          "field": "coverage",
+          "role": "explicit-exception",
+          "notes": "Direct coverage mode toggle retained across the advanced execution path."
+        },
+        {
+          "field": "coverageSource",
+          "role": "payload-bearing"
+        },
+        {
+          "field": "coverageThreshold",
+          "role": "explicit-exception",
+          "notes": "Coverage validation guard retained direct."
+        },
+        {
+          "field": "overrideIni",
+          "role": "payload-bearing"
+        }
+      ],
+      "audit_notes": [
+        "Advanced split wrapper now keeps legacy routine/report toggles off the published schema and requires them through bounded options."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_pytest_basic.ts",
+      "companion_doc_path": ".opencode/tools/run_pytest_basic.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "minTests",
+        "timeout",
+        "cwd",
+        "testPath"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_pytest_basic.test.ts",
+      "field_role_audit": [
+        {
+          "field": "minTests",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for scoped test-count enforcement."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Validation guard retained direct for timeout enforcement."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository-root-confined execution root for routine test runs."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for routine wrapper toggles."
+        },
+        {
+          "field": "testPath",
+          "role": "payload-bearing",
+          "notes": "Direct routine test target operand."
+        }
+      ],
+      "audit_notes": [
+        "Split basic wrapper now exposes only compact routine fields in schema space.",
+        "Legacy direct routine toggles and advanced-only keys now fail closed in execute() with deterministic migration guidance."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_sanitizers_advanced.ts",
+      "companion_doc_path": ".opencode/tools/run_sanitizers_advanced.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "outputMode",
+        "buildDir",
+        "executable",
+        "sanitizer",
+        "timeout",
+        "suppressions",
+        "options",
+        "normalDuration",
+        "extraArgs"
+      ],
+      "exempt_fields": [],
+      "current_count": 9,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_sanitizers_advanced.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for sanitizer-enabled binaries."
+        },
+        {
+          "field": "executable",
+          "role": "safety-field",
+          "notes": "Executable path remains explicit because the wrapper validates repo/buildDir confinement and file type."
+        },
+        {
+          "field": "sanitizer",
+          "role": "payload-bearing",
+          "notes": "Required sanitizer mode selector for advanced runs."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "suppressions",
+          "role": "safety-field",
+          "notes": "Optional suppressions file path remains explicit because it points to filesystem input that the backend reads directly without repository confinement."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Sanitizer environment-options string remains explicit because it is both powerful and wrapper-specific."
+        },
+        {
+          "field": "normalDuration",
+          "role": "explicit-exception",
+          "notes": "Positive-duration validation guard remains direct for fail-closed overhead calculations."
+        },
+        {
+          "field": "extraArgs",
+          "role": "payload-bearing",
+          "notes": "Executable passthrough arguments remain direct advanced payload input."
+        }
+      ],
+      "audit_notes": [
+        "Advanced sanitizer wrapper records the live payload/safety split only; E27-M10 does not migrate the schema surface."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_sanitizers_basic.ts",
+      "companion_doc_path": ".opencode/tools/run_sanitizers_basic.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "outputMode",
+        "buildDir",
+        "executable",
+        "sanitizer",
+        "timeout"
+      ],
+      "exempt_fields": [],
+      "current_count": 5,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_sanitizers_basic.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for sanitizer-enabled binaries."
+        },
+        {
+          "field": "executable",
+          "role": "safety-field",
+          "notes": "Executable path remains explicit because the wrapper validates repo/buildDir confinement and file type."
+        },
+        {
+          "field": "sanitizer",
+          "role": "payload-bearing",
+          "notes": "Required sanitizer mode selector for routine runs."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        }
+      ],
+      "audit_notes": [
+        "Routine sanitizer wrapper keeps only shipped direct fields in counted inventory output.",
+        "Advanced-only rejected keys remain part of runtime rejection behavior, but inventory output no longer represents them as accepted direct fields."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_sanitizers.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "outputMode",
+        "buildDir",
+        "executable",
+        "sanitizer",
+        "timeout",
+        "suppressions",
+        "options",
+        "normalDuration",
+        "extraArgs"
+      ],
+      "exempt_fields": [],
+      "current_count": 9,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/run_sanitizers.test.ts",
+      "field_role_audit": [
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "buildDir",
+          "role": "safety-field",
+          "notes": "Repository-confined build directory for sanitizer-enabled binaries."
+        },
+        {
+          "field": "executable",
+          "role": "safety-field",
+          "notes": "Executable path remains explicit because the wrapper validates repo/buildDir confinement and file type."
+        },
+        {
+          "field": "sanitizer",
+          "role": "payload-bearing",
+          "notes": "Required sanitizer mode selector on the compatibility bridge."
+        },
+        {
+          "field": "timeout",
+          "role": "explicit-exception",
+          "notes": "Timeout guard remains direct for fail-closed validation."
+        },
+        {
+          "field": "suppressions",
+          "role": "safety-field",
+          "notes": "Compatibility bridge forwards the suppressions file path as an explicit path-like safety input."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Compatibility bridge keeps the sanitizer options string explicit instead of hiding it behind a bounded carrier."
+        },
+        {
+          "field": "normalDuration",
+          "role": "explicit-exception",
+          "notes": "Positive-duration validation guard remains direct for fail-closed overhead calculations."
+        },
+        {
+          "field": "extraArgs",
+          "role": "payload-bearing",
+          "notes": "Compatibility bridge forwards executable passthrough arguments."
+        }
+      ],
+      "audit_notes": [
+        "Compatibility sanitizer wrapper is a bridge surface, not the target end-state; E27-M10 records its direct-field rationale without changing runtime behavior."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/run_validate_agent_references.ts",
+      "companion_doc_path": ".opencode/tools/run_validate_agent_references.md",
+      "wrapper_kind": "unsplit",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "cwd",
+        "baselinePath"
+      ],
+      "exempt_fields": [],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/run_validate_agent_references.test.ts",
+      "field_role_audit": [
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Exact-root validation target; wrapper fails closed unless cwd resolves to the current repository/worktree root exactly."
+        },
+        {
+          "field": "baselinePath",
+          "role": "safety-field",
+          "notes": "Repo-relative committed baseline path confined to .opencode/guides/ for auditable suppressions."
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/search_content.ts",
+      "companion_doc_path": ".opencode/tools/search_content.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "contentPattern",
+        "path"
+      ],
+      "exempt_fields": [
+        "options"
+      ],
+      "current_count": 2,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 2,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/search_content.test.ts",
+      "field_role_audit": [
+        {
+          "field": "contentPattern",
+          "role": "payload-bearing",
+          "notes": "Required content-search selector."
+        },
+        {
+          "field": "pattern",
+          "role": "bounded-option-candidate",
+          "notes": "Optional glob filter paired with content search."
+        },
+        {
+          "field": "path",
+          "role": "safety-field",
+          "notes": "Repository-constrained search root."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for simple-search optional controls."
+        },
+        {
+          "field": "fileType",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "excludeFileType",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "globCaseInsensitive",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "compactOutput",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "maxResults",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "maxMatchesPerFile",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "contextLines",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "beforeContext",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "afterContext",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "filesWithMatches",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "filesWithoutMatches",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "unrestricted",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "ignoreGitignore",
+          "role": "explicit-exception"
+        },
+        {
+          "field": "includeHidden",
+          "role": "explicit-exception"
+        }
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/sync_notebook_pair.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "notebookPath",
+        "recursive",
+        "outputDir"
+      ],
+      "exempt_fields": [],
+      "current_count": 3,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 3,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/sync_notebook_pair.test.ts",
+      "field_role_audit": [
+        {
+          "field": "notebookPath",
+          "role": "payload-bearing",
+          "notes": "Notebook/script operand for pair synchronization."
+        },
+        {
+          "field": "recursive",
+          "role": "safety-field",
+          "notes": "Directory traversal scope remains explicit for bulk sync operations."
+        },
+        {
+          "field": "outputDir",
+          "role": "explicit-exception",
+          "notes": "Schema key is retained only for deterministic rejection because sync does not support conversion output targets."
+        }
+      ],
+      "audit_notes": [
+        "Split sync wrapper keeps the unsupported outputDir key only to fail closed with conversion-wrapper guidance."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/validate_notebook_readonly.ts",
+      "companion_doc_path": ".opencode/tools/validate_notebook_readonly.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "notebookPath",
+        "recursive",
+        "options",
+        "checkSync"
+      ],
+      "exempt_fields": [],
+      "current_count": 4,
+      "diagnostic": null,
+      "classification": "already-compliant",
+      "target_shape": "direct_args_object",
+      "target_count": 4,
+      "owner_plan": null,
+      "nearest_test_path": ".opencode/tools/__tests__/validate_notebook_readonly.test.ts",
+      "field_role_audit": [
+        {
+          "field": "notebookPath",
+          "role": "payload-bearing",
+          "notes": "Primary read-only notebook or directory operand."
+        },
+        {
+          "field": "recursive",
+          "role": "safety-field",
+          "notes": "Directory traversal scope remains explicit for read-only notebook validation."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for read-only validation-only controls."
+        },
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "skipSyntax",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "validationMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "fast",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "full",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "checkSync",
+          "role": "explicit-exception",
+          "notes": "Explicit read-only mode selector with conflict checking distinct from validation-output flags."
+        }
+      ],
+      "audit_notes": [
+        "Read-only split wrapper omits mutating keys from its schema and keeps check-sync semantics explicit instead of folding them into a generic bounded-options bucket."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/validate_notebook.ts",
+      "companion_doc_path": null,
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "notebookPath",
+        "recursive",
+        "options",
+        "convertToPy",
+        "convertToIpynb",
+        "sync",
+        "checkSync",
+        "outputDir"
+      ],
+      "exempt_fields": [],
+      "current_count": 8,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M10",
+      "nearest_test_path": ".opencode/tools/__tests__/validate_notebook.test.ts",
+      "field_role_audit": [
+        {
+          "field": "notebookPath",
+          "role": "payload-bearing",
+          "notes": "Primary notebook or directory operand across validation, conversion, and sync flows."
+        },
+        {
+          "field": "recursive",
+          "role": "safety-field",
+          "notes": "Directory traversal scope remains explicit for notebook tree operations."
+        },
+        {
+          "field": "options",
+          "role": "explicit-exception",
+          "notes": "Bounded token carrier for validation-only controls on the compatibility wrapper."
+        },
+        {
+          "field": "outputMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "skipSyntax",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "validationMode",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "fast",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "full",
+          "role": "bounded-option-candidate"
+        },
+        {
+          "field": "convertToPy",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only direct mode selector bridging the dedicated conversion wrapper."
+        },
+        {
+          "field": "convertToIpynb",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only direct mode selector bridging the dedicated conversion wrapper."
+        },
+        {
+          "field": "sync",
+          "role": "explicit-exception",
+          "notes": "Compatibility-only direct mode selector bridging the dedicated sync wrapper."
+        },
+        {
+          "field": "checkSync",
+          "role": "explicit-exception",
+          "notes": "Read-only sync-check selector remains explicit because it switches validation vs sync-state semantics."
+        },
+        {
+          "field": "outputDir",
+          "role": "explicit-exception",
+          "notes": "Compatibility conversion-output operand retained direct to preserve split-wrapper parity and rejection behavior elsewhere."
+        }
+      ],
+      "audit_notes": [
+        "Compatibility notebook wrapper intentionally preserves convert/sync direct toggles as an explicit bridge to the split notebook family; E27-M10 records the audit baseline only."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/workflow_builder_mutate.ts",
+      "companion_doc_path": ".opencode/tools/workflow_builder_mutate.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "workflow_name",
+        "description",
+        "version",
+        "workflow_type",
+        "step_json",
+        "step_index",
+        "step_name",
+        "position",
+        "workflow_json",
+        "output"
+      ],
+      "exempt_fields": [],
+      "current_count": 11,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M8",
+      "nearest_test_path": ".opencode/tools/__tests__/workflow_builder_mutate.test.ts",
+      "field_role_audit": [
+        {
+          "field": "command",
+          "role": "command-selector",
+          "notes": "Mutating gate accepts create/add_step/remove_step/update only."
+        },
+        {
+          "field": "workflow_name",
+          "role": "safety-field",
+          "commands": [
+            "create",
+            "add_step",
+            "remove_step",
+            "update"
+          ],
+          "notes": "Workflow selector determines which repository workflow JSON file is mutated."
+        },
+        {
+          "field": "description",
+          "role": "payload-bearing",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "version",
+          "role": "bounded-option-candidate",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "workflow_type",
+          "role": "bounded-option-candidate",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "step_json",
+          "role": "payload-bearing",
+          "commands": [
+            "add_step"
+          ]
+        },
+        {
+          "field": "step_index",
+          "role": "required-identifier",
+          "commands": [
+            "remove_step"
+          ]
+        },
+        {
+          "field": "step_name",
+          "role": "required-identifier",
+          "commands": [
+            "remove_step"
+          ]
+        },
+        {
+          "field": "position",
+          "role": "bounded-option-candidate",
+          "commands": [
+            "add_step"
+          ]
+        },
+        {
+          "field": "workflow_json",
+          "role": "payload-bearing",
+          "commands": [
+            "update"
+          ]
+        },
+        {
+          "field": "output",
+          "role": "bounded-option-candidate"
+        }
+      ],
+      "audit_notes": [
+        "Split mutate wrapper intentionally keeps the broad schema but treats read-only command payloads as command-gated explicit rejections."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/workflow_builder_read.ts",
+      "companion_doc_path": ".opencode/tools/workflow_builder_read.md",
+      "wrapper_kind": "split",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "workflow_name",
+        "description",
+        "version",
+        "workflow_type",
+        "step_json",
+        "step_index",
+        "step_name",
+        "position",
+        "workflow_json",
+        "output"
+      ],
+      "exempt_fields": [],
+      "current_count": 11,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M8",
+      "nearest_test_path": ".opencode/tools/__tests__/workflow_builder_read.test.ts",
+      "field_role_audit": [
+        {
+          "field": "command",
+          "role": "command-selector",
+          "notes": "Read-only gate accepts list/get/validate only."
+        },
+        {
+          "field": "workflow_name",
+          "role": "safety-field",
+          "commands": [
+            "get"
+          ],
+          "notes": "Workflow selector determines which repository workflow JSON file is read."
+        },
+        {
+          "field": "description",
+          "role": "explicit-exception",
+          "commands": [
+            "create"
+          ],
+          "notes": "Schema retained for compatibility pass-through but rejected by the read-wrapper command gate."
+        },
+        {
+          "field": "version",
+          "role": "explicit-exception",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "workflow_type",
+          "role": "explicit-exception",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "step_json",
+          "role": "explicit-exception",
+          "commands": [
+            "add_step"
+          ]
+        },
+        {
+          "field": "step_index",
+          "role": "explicit-exception",
+          "commands": [
+            "remove_step"
+          ]
+        },
+        {
+          "field": "step_name",
+          "role": "explicit-exception",
+          "commands": [
+            "remove_step"
+          ]
+        },
+        {
+          "field": "position",
+          "role": "explicit-exception",
+          "commands": [
+            "add_step"
+          ]
+        },
+        {
+          "field": "workflow_json",
+          "role": "payload-bearing",
+          "commands": [
+            "validate"
+          ]
+        },
+        {
+          "field": "output",
+          "role": "bounded-option-candidate"
+        }
+      ],
+      "audit_notes": [
+        "Split read wrapper intentionally keeps the broad schema but records mutate-only fields as explicit rejection semantics rather than supported read-surface inputs."
+      ]
+    },
+    {
+      "wrapper_path": ".opencode/tools/workflow_builder.ts",
+      "companion_doc_path": ".opencode/tools/workflow_builder.md",
+      "wrapper_kind": "compatibility",
+      "status": "ok",
+      "current_shape": "direct_args_object",
+      "counted_fields": [
+        "command",
+        "workflow_name",
+        "description",
+        "version",
+        "workflow_type",
+        "step_json",
+        "step_index",
+        "step_name",
+        "position",
+        "workflow_json",
+        "output"
+      ],
+      "exempt_fields": [],
+      "current_count": 11,
+      "diagnostic": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M8",
+      "nearest_test_path": ".opencode/tools/__tests__/workflow_builder.test.ts",
+      "field_role_audit": [
+        {
+          "field": "command",
+          "role": "command-selector"
+        },
+        {
+          "field": "workflow_name",
+          "role": "safety-field",
+          "commands": [
+            "create",
+            "add_step",
+            "remove_step",
+            "get",
+            "update"
+          ],
+          "notes": "Workflow selector determines which repository workflow JSON file is read or mutated."
+        },
+        {
+          "field": "description",
+          "role": "payload-bearing",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "version",
+          "role": "bounded-option-candidate",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "workflow_type",
+          "role": "bounded-option-candidate",
+          "commands": [
+            "create"
+          ]
+        },
+        {
+          "field": "step_json",
+          "role": "payload-bearing",
+          "commands": [
+            "add_step"
+          ]
+        },
+        {
+          "field": "step_index",
+          "role": "required-identifier",
+          "commands": [
+            "remove_step"
+          ],
+          "notes": "Alternative remove_step selector; paired with step_name."
+        },
+        {
+          "field": "step_name",
+          "role": "required-identifier",
+          "commands": [
+            "remove_step"
+          ],
+          "notes": "Alternative remove_step selector; paired with step_index."
+        },
+        {
+          "field": "position",
+          "role": "bounded-option-candidate",
+          "commands": [
+            "add_step"
+          ]
+        },
+        {
+          "field": "workflow_json",
+          "role": "payload-bearing",
+          "commands": [
+            "update",
+            "validate"
+          ]
+        },
+        {
+          "field": "output",
+          "role": "bounded-option-candidate"
+        }
+      ],
+      "audit_notes": [
+        "Command-scoped meanings are intentional: the same field name can switch between required identifier, payload, or inert sparse optional depending on the selected command."
+      ]
+    }
+  ]
+}

@@ -105,7 +105,7 @@ export default tool({
       return buildMissingArgMessage(`Unsupported command: ${String(command)}`);
     }
 
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "platform", command];
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "platform", command];
 
     if (args.help) {
       cmdParts.push("--help");
@@ -128,6 +128,9 @@ export default tool({
     }
     if (adwId && !isCanonicalAdwId(adwId)) {
       return buildMissingArgMessage("'adw_id' must be an 8-character lowercase hex string");
+    }
+    if (args.draft !== undefined && typeof args.draft !== "boolean") {
+      return buildMissingArgMessage("'draft' must be a boolean when provided");
     }
 
     if (args.prefer_scope !== undefined && preferScope === undefined) {

@@ -38,7 +38,22 @@ describe("git_commit wrapper", () => {
     const execute = await loadToolExecute("../../git_commit.ts");
     await execute({ summary: "test commit" });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run adw git commit --summary test commit",
+      "uv run --active adw git commit --summary test commit",
+    );
+  });
+
+  it("assembles description adw_id worktree_path and stage_all with default retries", async () => {
+    const execute = await loadToolExecute("../../git_commit.ts");
+    await execute({
+      summary: "test commit",
+      description: "body",
+      adw_id: "dac13a15",
+      worktree_path: "./trees/abc",
+      stage_all: true,
+    });
+
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
+      "uv run --active adw git commit --summary test commit --description body --adw-id dac13a15 --worktree-path ./trees/abc --stage-all --max-retries 3",
     );
   });
 
@@ -47,7 +62,7 @@ describe("git_commit wrapper", () => {
     await execute({ summary: "test commit", no_verify: true, max_retries: 0 });
 
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run adw git commit --summary test commit --no-verify --max-retries 0",
+      "uv run --active adw git commit --summary test commit --no-verify --max-retries 0",
     );
   });
 
@@ -64,6 +79,16 @@ describe("git_commit wrapper", () => {
 
     assertContains(String(result), "'worktree_path' cannot start with '-'");
     expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("does not emit flags for false optional booleans", async () => {
+    const execute = await loadToolExecute("../../git_commit.ts");
+    await execute({ summary: "test commit", no_verify: false, stage_all: false });
+
+    const command = getInvocations().at(-1)?.args.join(" ") ?? "";
+    expect(command).toContain("--max-retries 3");
+    expect(command).not.toContain("--no-verify");
+    expect(command).not.toContain("--stage-all");
   });
 
   it("passes through committed status and sha beneath wrapper prefix", async () => {

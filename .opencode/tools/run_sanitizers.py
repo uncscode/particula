@@ -3,7 +3,7 @@
 
 Executes sanitizer-enabled binaries (ASAN, TSAN, UBSAN), parses their outputs
 into structured ``SanitizerError`` objects, and renders summary/full/JSON
-reports similar to the run_ctest/run_pytest tools. Supports output truncation,
+reports similar to the run_ctest and pytest runner tools. Supports output truncation,
 suppressions, timeout handling, and environment option propagation.
 
 Usage:

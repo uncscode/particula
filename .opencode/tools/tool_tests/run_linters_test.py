@@ -1,6 +1,7 @@
 import importlib.util
 import subprocess
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -19,6 +20,16 @@ def _completed_process(args: list[str], returncode: int = 0, stdout: str = "", s
         stdout=stdout,
         stderr=stderr,
     )
+
+
+def _tool_command(args: list[str]) -> list[str]:
+    if len(args) >= 3 and args[1] == "-m" and args[2] in {"ruff", "mypy"}:
+        return [args[2], *args[3:]]
+    return [Path(args[0]).name, *args[1:]]
+
+
+def _call_args(call: dict[str, object]) -> list[str]:
+    return cast(list[str], call["args"])
 
 
 def test_count_ruff_issues_extracts_found_error_count():
@@ -69,7 +80,7 @@ def test_run_ruff_check_no_auto_fix_runs_only_validation_check(
     )
 
     assert result.success is True
-    assert [call["args"] for call in calls] == [["ruff", "check", "adw/core/"]]
+    assert [_tool_command(_call_args(call)) for call in calls] == [["ruff", "check", "adw/core/"]]
     assert calls[0]["timeout"] == 33
     assert calls[0]["cwd"] == str(tmp_path)
 
@@ -88,7 +99,7 @@ def test_run_ruff_check_auto_fix_runs_fix_format_then_final_check(
     result = run_linters_tool.run_ruff_check(target_dir="adw/core", auto_fix=True)
 
     assert result.success is True
-    assert calls == [
+    assert [_tool_command(call) for call in calls] == [
         ["ruff", "check", "--fix", "adw/core/"],
         ["ruff", "format", "adw/core/"],
         ["ruff", "check", "adw/core/"],
@@ -146,7 +157,7 @@ def test_run_linters_passes_isolated_cwd_to_subprocess_calls(
     )
 
     assert exit_code == 0
-    assert [call["args"] for call in calls] == [
+    assert [_tool_command(_call_args(call)) for call in calls] == [
         ["ruff", "check", "adw/core/"],
         ["mypy", "adw/core/", "--ignore-missing-imports"],
     ]
@@ -161,7 +172,7 @@ def test_run_ruff_check_timeout_sets_error_without_followup_mutation(
 
     def fake_run(args, **kwargs):
         calls.append(list(args))
-        if args[:3] == ["ruff", "check", "--fix"]:
+        if _tool_command(list(args))[:3] == ["ruff", "check", "--fix"]:
             raise subprocess.TimeoutExpired(cmd=args, timeout=kwargs["timeout"])
         return _completed_process(list(args), stdout="All checks passed\n")
 
@@ -171,7 +182,7 @@ def test_run_ruff_check_timeout_sets_error_without_followup_mutation(
 
     assert result.success is False
     assert result.error_message == "Timeout after 12 seconds"
-    assert calls == [["ruff", "check", "--fix", "adw/core/"]]
+    assert [_tool_command(call) for call in calls] == [["ruff", "check", "--fix", "adw/core/"]]
 
 
 def test_run_ruff_check_fix_failure_continues_to_format_and_final_check(
@@ -181,7 +192,7 @@ def test_run_ruff_check_fix_failure_continues_to_format_and_final_check(
 
     def fake_run(args, **kwargs):
         calls.append(list(args))
-        if args[:3] == ["ruff", "check", "--fix"]:
+        if _tool_command(list(args))[:3] == ["ruff", "check", "--fix"]:
             return _completed_process(
                 list(args),
                 returncode=1,
@@ -195,7 +206,7 @@ def test_run_ruff_check_fix_failure_continues_to_format_and_final_check(
 
     assert result.success is True
     assert result.exit_code == 0
-    assert calls == [
+    assert [_tool_command(call) for call in calls] == [
         ["ruff", "check", "--fix", "adw/core/"],
         ["ruff", "format", "adw/core/"],
         ["ruff", "check", "adw/core/"],
@@ -221,7 +232,7 @@ def test_run_ruff_check_format_failure_stops_before_final_check(
 
     def fake_run(args, **kwargs):
         calls.append(list(args))
-        if args[:2] == ["ruff", "format"]:
+        if _tool_command(list(args))[:2] == ["ruff", "format"]:
             return _completed_process(list(args), returncode=2, stderr="format failed")
         return _completed_process(list(args), stdout="All checks passed\n")
 
@@ -232,7 +243,7 @@ def test_run_ruff_check_format_failure_stops_before_final_check(
     assert result.success is False
     assert result.exit_code == 2
     assert result.stderr == "format failed"
-    assert calls == [
+    assert [_tool_command(call) for call in calls] == [
         ["ruff", "check", "--fix", "adw/core/"],
         ["ruff", "format", "adw/core/"],
     ]
@@ -305,7 +316,7 @@ def test_run_linters_selected_linters_preserve_existing_orchestrator_behavior(
         cwd=str(tmp_path),
     )
     assert exit_code_ruff == 0
-    assert calls == [["ruff", "check", "adw/core/"]]
+    assert [_tool_command(call) for call in calls] == [["ruff", "check", "adw/core/"]]
 
     calls.clear()
 
@@ -316,7 +327,9 @@ def test_run_linters_selected_linters_preserve_existing_orchestrator_behavior(
         cwd=str(tmp_path),
     )
     assert exit_code_mypy == 0
-    assert calls == [["mypy", "adw/core/", "--ignore-missing-imports"]]
+    assert [_tool_command(call) for call in calls] == [
+        ["mypy", "adw/core/", "--ignore-missing-imports"]
+    ]
 
 
 def test_run_ruff_format_counts_reformatted_files(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):

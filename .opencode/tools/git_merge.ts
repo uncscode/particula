@@ -317,27 +317,32 @@ RULES:
       help?: boolean;
     };
 
-    const cmdParts: string[] = ["uv", "run", "adw", "git"];
+    const cmdParts: string[] = ["uv", "run", "--active", "adw", "git"];
 
-    const appendCommandParts = (skipValidation = false): string | undefined => {
+    const appendCommandParts = (skipRequiredChecks = false): string | undefined => {
+      const normalizedWorktree = normalizeOptionalField("worktree_path", worktree_path);
+      if (normalizedWorktree.error) {
+        return normalizedWorktree.error;
+      }
+
       switch (command) {
         case "merge": {
           cmdParts.push("merge");
           const normalizedSource = normalizeRef(source);
-          if (!skipValidation && !normalizedSource) {
+          if (!skipRequiredChecks && !normalizedSource) {
             return "ERROR: 'merge' command requires 'source'.";
           }
-          if (!skipValidation && normalizedSource && !isValidRefToken(normalizedSource)) {
+          if (normalizedSource && !isValidRefToken(normalizedSource)) {
             return `ERROR: Invalid source: ${source}.`;
           }
           if (normalizedSource) {
             cmdParts.push(normalizedSource);
           }
           const normalizedTarget = normalizeRef(target);
-          if (!skipValidation && target !== undefined && !normalizedTarget) {
+          if (!skipRequiredChecks && target !== undefined && !normalizedTarget) {
             return "ERROR: 'target' must be non-empty when provided.";
           }
-          if (!skipValidation && normalizedTarget && !isValidRefToken(normalizedTarget)) {
+          if (normalizedTarget && !isValidRefToken(normalizedTarget)) {
             return `ERROR: Invalid target: ${target}.`;
           }
           if (normalizedTarget) {
@@ -349,8 +354,8 @@ RULES:
           if (abort_on_conflict === false) {
             cmdParts.push("--no-abort-on-conflict");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
@@ -358,20 +363,20 @@ RULES:
         case "rebase": {
           cmdParts.push("rebase");
           const normalizedBranch = normalizeRef(branch);
-          if (!skipValidation && !normalizedBranch) {
+          if (!skipRequiredChecks && !normalizedBranch) {
             return "ERROR: 'rebase' command requires 'branch'.";
           }
-          if (!skipValidation && normalizedBranch && !isValidRefToken(normalizedBranch)) {
+          if (normalizedBranch && !isValidRefToken(normalizedBranch)) {
             return `ERROR: Invalid branch: ${branch}.`;
           }
           if (normalizedBranch) {
             cmdParts.push(normalizedBranch);
           }
           const normalizedOnto = normalizeRef(onto);
-          if (!skipValidation && onto !== undefined && !normalizedOnto) {
+          if (!skipRequiredChecks && onto !== undefined && !normalizedOnto) {
             return "ERROR: 'onto' must be non-empty when provided.";
           }
-          if (!skipValidation && normalizedOnto && !isValidRefToken(normalizedOnto)) {
+          if (normalizedOnto && !isValidRefToken(normalizedOnto)) {
             return `ERROR: Invalid onto: ${onto}.`;
           }
           if (normalizedOnto) {
@@ -380,8 +385,8 @@ RULES:
           if (abort_on_conflict === false) {
             cmdParts.push("--no-abort-on-conflict");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
@@ -390,13 +395,13 @@ RULES:
           cmdParts.push("fetch");
           const normalizedRemote = normalizeOptionalField("remote", remote);
           const normalizedBranch = normalizeRef(branch);
-          if (!skipValidation && normalizedRemote.error) {
+          if (normalizedRemote.error) {
             return normalizedRemote.error;
           }
-          if (!skipValidation && branch !== undefined && !normalizedBranch) {
+          if (!skipRequiredChecks && branch !== undefined && !normalizedBranch) {
             return "ERROR: 'branch' must be non-empty when provided.";
           }
-          if (!skipValidation && normalizedBranch && !isValidRefToken(normalizedBranch)) {
+          if (normalizedBranch && !isValidRefToken(normalizedBranch)) {
             return `ERROR: Invalid branch: ${branch}.`;
           }
           if (normalizedRemote.value) {
@@ -410,8 +415,8 @@ RULES:
           if (prune) {
             cmdParts.push("--prune");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
@@ -419,27 +424,27 @@ RULES:
         case "sync": {
           cmdParts.push("sync");
           const normalizedSource = normalizeRef(source);
-          if (!skipValidation && source !== undefined && !normalizedSource) {
+          if (!skipRequiredChecks && source !== undefined && !normalizedSource) {
             return "ERROR: 'source' must be non-empty when provided.";
           }
-          if (!skipValidation && normalizedSource && !isValidRefToken(normalizedSource)) {
+          if (normalizedSource && !isValidRefToken(normalizedSource)) {
             return `ERROR: Invalid source: ${source}.`;
           }
           if (normalizedSource) {
             cmdParts.push("--source", normalizedSource);
           }
           const normalizedTarget = normalizeRef(target);
-          if (!skipValidation && target !== undefined && !normalizedTarget) {
+          if (!skipRequiredChecks && target !== undefined && !normalizedTarget) {
             return "ERROR: 'target' must be non-empty when provided.";
           }
-          if (!skipValidation && normalizedTarget && !isValidRefToken(normalizedTarget)) {
+          if (normalizedTarget && !isValidRefToken(normalizedTarget)) {
             return `ERROR: Invalid target: ${target}.`;
           }
           if (normalizedTarget) {
             cmdParts.push("--target", normalizedTarget);
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
@@ -448,16 +453,16 @@ RULES:
           cmdParts.push("accumulate");
           const normalizedSliceBranch = normalizeRef(slice_branch);
           const normalizedTrackingBranch = normalizeRef(tracking_branch);
-          if (!skipValidation && !normalizedSliceBranch) {
+          if (!skipRequiredChecks && !normalizedSliceBranch) {
             return "ERROR: 'accumulate' command requires 'slice_branch'.";
           }
-          if (!skipValidation && !normalizedTrackingBranch) {
+          if (!skipRequiredChecks && !normalizedTrackingBranch) {
             return "ERROR: 'accumulate' command requires 'tracking_branch'.";
           }
-          if (!skipValidation && normalizedSliceBranch && !isValidRefToken(normalizedSliceBranch)) {
+          if (normalizedSliceBranch && !isValidRefToken(normalizedSliceBranch)) {
             return `ERROR: Invalid slice_branch: ${slice_branch}.`;
           }
-          if (!skipValidation && normalizedTrackingBranch && !isValidRefToken(normalizedTrackingBranch)) {
+          if (normalizedTrackingBranch && !isValidRefToken(normalizedTrackingBranch)) {
             return `ERROR: Invalid tracking_branch: ${tracking_branch}.`;
           }
           if (normalizedSliceBranch) {
@@ -470,35 +475,35 @@ RULES:
           if (recover_missing_worktree) {
             cmdParts.push("--recover-missing-worktree");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
 
         case "abort": {
           cmdParts.push("abort");
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
 
         case "continue": {
           cmdParts.push("continue");
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }
 
         case "reset": {
           cmdParts.push("reset");
-          if (!skipValidation && (!ref || !ref.trim())) {
+          if (!skipRequiredChecks && (!ref || !ref.trim())) {
             return "ERROR: 'reset' command requires 'ref'.";
           }
           const normalizedResetRef = normalizeRef(ref);
-          if (!skipValidation && normalizedResetRef && !isValidRefToken(normalizedResetRef)) {
+          if (normalizedResetRef && !isValidRefToken(normalizedResetRef)) {
             return `ERROR: Invalid ref: ${ref}.`;
           }
           if (normalizedResetRef) {
@@ -507,8 +512,8 @@ RULES:
           if (hard) {
             cmdParts.push("--hard");
           }
-          if (worktree_path) {
-            cmdParts.push("--worktree-path", worktree_path);
+          if (normalizedWorktree.value) {
+            cmdParts.push("--worktree-path", normalizedWorktree.value);
           }
           return undefined;
         }

@@ -10,15 +10,16 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
-  adw_plans: allow
-  adw_issues_spec: deny
+  adw_spec_read: allow
+  adw_plans_read: allow
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -27,9 +28,7 @@ permission:
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -111,22 +110,21 @@ All 9 canonical sections must be non-empty:
 Parse `adw_id` from the prompt. Read shared context and full batch:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>"})
 ```
 
 Resolve the worktree path and plan ID from `spec_content`, then load plan
 section paths for completeness cross-checks:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
 ```
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -139,7 +137,7 @@ read({"filePath": "<resolved_phase_details_path_from_list_sections>"})
 ```
 
 ```python
-adw_issues_spec({"command": "batch-summary", "adw_id": "<adw_id>"})
+adw_issues_batch_summary({"adw_id": "<adw_id>"})
 ```
 
 ## Step 2: Validate Metadata
@@ -147,7 +145,7 @@ adw_issues_spec({"command": "batch-summary", "adw_id": "<adw_id>"})
 For every row, confirm `phase` and `title` are non-empty:
 
 ```python
-adw_issues_spec({"command": "batch-read", "adw_id": "<adw_id>", "issue": "<index>"})
+adw_issues_batch_read({"adw_id": "<adw_id>", "issue": "<index>"})
 ```
 
 ## Step 3: Validate Sections
@@ -155,8 +153,7 @@ adw_issues_spec({"command": "batch-read", "adw_id": "<adw_id>", "issue": "<index
 Read each canonical section for every row. Confirm non-empty:
 
 ```python
-adw_issues_spec({
-  "command": "batch-read",
+adw_issues_batch_read({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "description"
@@ -170,11 +167,10 @@ Repeat for all 9 sections.
 Confirm review logs exist for the 4 reviewer families:
 
 ```python
-adw_issues_spec({
-  "command": "batch-log",
+adw_issues_batch_log({
   "adw_id": "<adw_id>",
   "issue": "<index>",
-  "read": true
+  "options": "read"
 })
 ```
 
@@ -192,8 +188,7 @@ in the batch and the dependency graph is acyclic (no circular references).
 Revise minor completeness gaps when safe. Log each issue:
 
 ```python
-adw_issues_spec({
-  "command": "batch-log",
+adw_issues_batch_log({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "reviewer": "completeness",

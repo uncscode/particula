@@ -8,22 +8,25 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   platform_pr_read: allow
   platform: deny
-  run_pytest: deny
-  run_pytest_basic: allow
-  run_linters: allow
+  run_pytest_basic: deny
+  run_pytest_advanced: deny
+  run_linters: deny
   get_datetime: allow
   get_version: deny
   webfetch: deny
@@ -76,7 +79,7 @@ permission:
    - Tests to Write: from intent==test or derived gaps
    - Error Handling: fetch failure, empty actionable, missing head_branch (warn and continue), spec write/verify retry once
    - Acceptance Criteria: checklist entries per grouped finding, conversation item, and behaviors above
-7) **Write + verify**: write plan to `spec_content` via `adw_spec write`; then read-back and verify non-empty + contains Overview/Steps. If verification fails once, retry write+read once; if still bad → FAILURE.
+7) **Write + verify**: write plan to `spec_content` via `adw_spec_write`; then read-back with `adw_spec_read` and verify non-empty + contains Overview/Steps. If verification fails once, retry write+read once; if still bad → FAILURE.
 8) **Exit signaling**: emit SUCCESS with summary; NO_ACTIONABLE for empty; FAILURE with reason for fetch/spec errors.
 
 ## PR Comment Ingestion
@@ -166,7 +169,7 @@ permission:
 - **SUCCESS**: plan generated, spec_content verified.
 - **NO_ACTIONABLE**: no actionable comments; minimal note written; no steps/tests.
 - **FAILURE**: fetch error, missing `pr_number`, or spec write/verify failure (after one retry).
-- If `adw_spec` write succeeds but verify fails: retry once; otherwise fail.
+- If `adw_spec_write` succeeds but verify fails: retry once; otherwise fail.
 - Missing `head_branch`: include warning and continue; do not fail.
 
 ## Cross-References

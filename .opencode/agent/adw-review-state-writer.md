@@ -8,19 +8,20 @@ permission:
   edit: deny
   write: deny
   list: deny
-  ripgrep: deny
+  find_files: deny
+  search_content: deny
+  ripgrep_advanced: deny
   move: deny
   todoread: deny
   todowrite: deny
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: deny
   get_version: deny

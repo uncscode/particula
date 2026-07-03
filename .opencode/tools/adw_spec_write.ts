@@ -2,6 +2,7 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   normalizeOptionalString,
+  parseSpecOptions,
   runAdwSpecCommand,
   validateAndNormalizeAdwId,
   validateCanonicalInRepoPath,
@@ -10,7 +11,7 @@ import {
 function sanitizedEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV" || value === undefined) continue;
+    if (value === undefined) continue;
     env[key] = value;
   }
   return env;
@@ -31,18 +32,21 @@ No contract change versus legacy adw_spec write/delete behavior.`,
     field: tool.schema.string().optional(),
     content: tool.schema.string().optional(),
     file: tool.schema.string().optional(),
-    append: tool.schema.boolean().optional(),
-    confirm: tool.schema.boolean().optional(),
+    options: tool.schema.string().optional(),
   },
 
   async execute(args) {
-    const { command, adw_id, field, content, file, append, confirm } = args;
+    const { command, adw_id, field, content, file, options } = args;
     const normalized = validateAndNormalizeAdwId(command, adw_id);
     if (!normalized.ok) {
       return normalized.error;
     }
+    const parsedOptions = parseSpecOptions(command, options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
+    }
 
-    const cmdParts = ["uv", "run", "adw", "spec", command, "--adw-id", normalized.adwId];
+    const cmdParts = ["uv", "run", "--active", "adw", "spec", command, "--adw-id", normalized.adwId];
 
     if (command === "write") {
       const hasContent = typeof content === "string";
@@ -70,7 +74,7 @@ Usage:
         }
         cmdParts.push("--file", validatedPath.canonicalPath);
       }
-      if (append === true) {
+      if (parsedOptions.options.append) {
         cmdParts.push("--append");
       }
     } else {
@@ -84,7 +88,7 @@ Note: Protected fields (adw_id, issue_number) cannot be deleted.`;
       }
 
       cmdParts.push("--field", normalizedField);
-      if (confirm === true) {
+      if (parsedOptions.options.confirm) {
         cmdParts.push("--confirm");
       }
     }

@@ -29,12 +29,12 @@ describe("adw_issues_batch_read wrapper", () => {
       adw_id: "A1B2C3D4",
       issue: "1",
       section: "metadata",
-      raw: true,
+      options: "raw",
     });
 
     expect(result).toBe("ok");
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run adw spec batch read --adw-id a1b2c3d4 --issue 1 --section metadata --raw",
+      "uv run --active adw spec batch read --adw-id a1b2c3d4 --issue 1 --section metadata --raw",
     );
   });
 });

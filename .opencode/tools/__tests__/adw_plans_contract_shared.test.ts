@@ -1,10 +1,13 @@
 import { describe, expect, it } from "bun:test";
+import { existsSync, mkdirSync, realpathSync, rmSync, symlinkSync } from "node:fs";
+import path from "node:path";
 
 import {
   ADW_PLANS_OPTION_STRING_AUDIT,
   ADW_PLANS_OPTION_STRING_RULES,
   buildCommandFailureError,
   deriveCommandFailureHint,
+  hasMeaningfulSplitWrapperAliasValue,
   mergeParsedOptionField,
   parseCommandOptionsString,
   redactPathLikeText,
@@ -12,9 +15,24 @@ import {
   sanitizeSuccessOutput,
   selectCommandFailureDiagnostic,
   stripDefaultArgs,
+  validateAndNormalizePlansCwdPath,
   validateUpdatePhaseIssueLinkArgs,
   validateRequiredArgs,
 } from "../adw_plans_contract_shared";
+
+const findRepoRoot = (): string => {
+  let current = path.resolve(process.cwd());
+  while (true) {
+    if (existsSync(path.join(current, "AGENTS.md")) && existsSync(path.join(current, ".opencode"))) {
+      return current;
+    }
+    const parent = path.resolve(current, "..");
+    if (parent === current) {
+      return path.resolve(process.cwd());
+    }
+    current = parent;
+  }
+};
 
 describe("adw_plans_contract_shared", () => {
   it("sanitizes diagnostics by removing control characters and redacting absolute paths", () => {
@@ -228,6 +246,36 @@ describe("adw_plans_contract_shared", () => {
     ).toBeUndefined();
   });
 
+  it("classifies split-wrapper direct alias values as meaningful or inert", () => {
+    expect(hasMeaningfulSplitWrapperAliasValue(undefined)).toBe(false);
+    expect(hasMeaningfulSplitWrapperAliasValue(null)).toBe(false);
+    expect(hasMeaningfulSplitWrapperAliasValue(false)).toBe(false);
+    expect(hasMeaningfulSplitWrapperAliasValue(0)).toBe(false);
+    expect(hasMeaningfulSplitWrapperAliasValue("   ")).toBe(false);
+
+    expect(hasMeaningfulSplitWrapperAliasValue("Ready")).toBe(true);
+    expect(hasMeaningfulSplitWrapperAliasValue(true)).toBe(true);
+    expect(hasMeaningfulSplitWrapperAliasValue(1)).toBe(true);
+    expect(hasMeaningfulSplitWrapperAliasValue({ alias: true })).toBe(true);
+  });
+
+  it("canonicalizes validated cwd paths", () => {
+    const tempRoot = path.resolve(process.cwd(), "adforge_local/opencode/tmp");
+    mkdirSync(tempRoot, { recursive: true });
+    const aliasPath = path.join(tempRoot, "adw-plans-shared-alias");
+    rmSync(aliasPath, { recursive: true, force: true });
+    const repoRoot = findRepoRoot();
+    symlinkSync(repoRoot, aliasPath, "dir");
+
+    try {
+      expect(validateAndNormalizePlansCwdPath(aliasPath)).toEqual({
+        value: realpathSync(repoRoot),
+      });
+    } finally {
+      rmSync(aliasPath, { recursive: true, force: true });
+    }
+  });
+
   it("captures the wrapper-family optional field inventory with explicit dispositions", () => {
     expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
       wrapper: "adw_plans",
@@ -245,7 +293,7 @@ describe("adw_plans_contract_shared", () => {
       cliFlag: "--status",
       disposition: "token_candidate",
       reason:
-        "Bounded phase status values support options-string phase-status=<value> tokens while remaining accepted as direct wrapper fields.",
+        "Bounded phase status values support options-string phase-status=<value> tokens while split wrappers route them through options only.",
     });
     expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
       wrapper: "adw_plans",
@@ -298,11 +346,15 @@ describe("adw_plans_contract_shared", () => {
         "Mutating worktree/repository scoping stays a retained direct field and command-required outside token parsing.",
     });
     expect(ADW_PLANS_OPTION_STRING_AUDIT.filter((entry) => entry.field === "cwd")).toHaveLength(20);
-    expect(
-      ADW_PLANS_OPTION_STRING_AUDIT.filter(
-        (entry) => entry.field === "status" || entry.field === "phase_status",
-      ).every((entry) => entry.disposition === "token_candidate"),
-    ).toBe(true);
+    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
+      wrapper: "adw_plans_read",
+      command: "list",
+      field: "status",
+      cliFlag: "--status",
+      disposition: "token_candidate",
+      reason:
+        "Bounded plan status values support options-string status=<value> tokens while split wrappers route them through options only.",
+    });
     expect(
       ADW_PLANS_OPTION_STRING_AUDIT.filter((entry) => entry.disposition === "direct_exception"),
     ).toEqual([
@@ -347,7 +399,7 @@ describe("adw_plans_contract_shared", () => {
 
   it("defines the bounded command allowlists and malformed token rules for the later parser slice", () => {
     expect(ADW_PLANS_OPTION_STRING_RULES.commandAllowlist).toEqual({
-      list: ["json"],
+      list: ["json", "status"],
       show: ["json"],
       create: ["status", "priority", "size"],
       update: ["status", "priority", "size"],
@@ -369,6 +421,14 @@ describe("adw_plans_contract_shared", () => {
     ]);
     expect(ADW_PLANS_OPTION_STRING_RULES.retainedDirectFields).not.toContain("status");
     expect(ADW_PLANS_OPTION_STRING_RULES.retainedDirectFields).not.toContain("phase_status");
+    expect(ADW_PLANS_OPTION_STRING_RULES.compatibilityRetainedDirectFields).toEqual([
+      "status",
+      "phase_status",
+    ]);
+    expect(ADW_PLANS_OPTION_STRING_RULES.splitWrapperOptionOnlyFields).toEqual([
+      "status",
+      "phase_status",
+    ]);
     expect(ADW_PLANS_OPTION_STRING_RULES.malformedTokenRules).toContain(
       "issue values must parse as positive safe integers.",
     );
@@ -389,6 +449,9 @@ describe("adw_plans_contract_shared", () => {
 
     expect(parseCommandOptionsString("list", "json", buildError)).toEqual({
       values: { json: true },
+    });
+    expect(parseCommandOptionsString("list", "status=Ready json", buildError)).toEqual({
+      values: { status: "Ready", json: true },
     });
     expect(parseCommandOptionsString("list-sections", "json populate", buildError)).toEqual({
       values: { json: true, populate: true },
@@ -461,6 +524,9 @@ describe("adw_plans_contract_shared", () => {
     );
     expect(parseCommandOptionsString("list", "priority=P1", buildError).error).toContain(
       "token is not allowed for this command",
+    );
+    expect(parseCommandOptionsString("list", "status=Unknown", buildError).error).toContain(
+      "status values must be one of",
     );
     expect(parseCommandOptionsString("update-phase", "issue=0", buildError).error).toContain(
       "issue values must be positive safe integers",

@@ -130,7 +130,7 @@ export default tool({
     const path = normalizeOptionalString(args.path);
     const commitSha = normalizeOptionalString(args.commit_sha);
     const preferScope = normalizeOptionalString(args.prefer_scope);
-    const cmdParts: (string | number)[] = ["uv", "run", "adw", "platform", command];
+    const cmdParts: (string | number)[] = ["uv", "run", "--active", "adw", "platform", command];
 
     if (args.help) {
       cmdParts.push("--help");

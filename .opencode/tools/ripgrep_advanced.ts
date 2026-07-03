@@ -1,315 +1,35 @@
 import { tool } from "@opencode-ai/plugin";
-import * as fs from "fs";
 import * as path from "node:path";
+import {
+  buildTruncationWarning,
+  DEFAULT_MAX_RESULTS,
+  executeRipgrepSearch,
+  normalizeNumericParam,
+  resolveValidatedSearchPath,
+  validateNonNegativeInt,
+} from "./lib/ripgrep_shared";
 
-// --- Inlined from lib/ripgrep_shared.ts ---
+// --- Tool-local helpers ---
 
-const DEFAULT_MAX_RESULTS = 5000;
+const TOKEN_NAME_PATTERN = /^[a-z][a-z0-9-]*$/;
 
-const MAX_STDOUT_CAPTURE_BYTES = 4 * 1024 * 1024;
-
-interface SearchParams {
+interface ParsedRipgrepAdvancedOptions {
   pattern?: string;
-  contentPattern?: string;
-  searchPath: string;
-  ignoreGitignore?: boolean;
-  includeHidden?: boolean;
-  unrestricted?: number;
   fileType?: string;
   excludeFileType?: string;
   globCaseInsensitive?: boolean;
   compactOutput?: boolean;
-  filesWithMatches?: boolean;
-  filesWithoutMatches?: boolean;
   maxResults?: number;
   maxMatchesPerFile?: number;
   contextLines?: number;
   beforeContext?: number;
   afterContext?: number;
+  filesWithMatches?: boolean;
+  filesWithoutMatches?: boolean;
+  unrestricted?: number;
+  ignoreGitignore?: boolean;
+  includeHidden?: boolean;
 }
-
-interface SearchResult {
-  files: string[];
-  rawLines?: string[];
-  exitCode: number;
-  errorMessage?: string;
-  outputClipped?: boolean;
-}
-
-interface ValidatedSearchPathResult {
-  canonicalPath?: string;
-  error?: string;
-}
-
-function normalizeNumericParam(value: number | undefined): number | undefined {
-  if (value === undefined || value === null) return undefined;
-  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) return undefined;
-  return value;
-}
-
-function validateNonNegativeInt(value: unknown, paramName: string): string | undefined {
-  if (value === undefined) return undefined;
-  const num = typeof value === "number" ? value : Number(String(value).trim());
-  if (!Number.isInteger(num) || num < 0) {
-    return `ERROR: Invalid ${paramName} value. It must be a non-negative integer.`;
-  }
-  return undefined;
-}
-
-function isWithinRepository(targetPath: string, repoRoot: string): boolean {
-  const normalizedTarget = path.normalize(path.resolve(targetPath));
-  const normalizedRoot = path.normalize(path.resolve(repoRoot));
-  return (
-    normalizedTarget === normalizedRoot ||
-    normalizedTarget.startsWith(normalizedRoot + path.sep)
-  );
-}
-
-function isWithinRepositoryRealpath(targetPath: string, repoRoot: string): boolean {
-  const normalizedTarget = path.normalize(path.resolve(targetPath));
-  const normalizedRoot = path.normalize(path.resolve(repoRoot));
-  return (
-    normalizedTarget === normalizedRoot || normalizedTarget.startsWith(normalizedRoot + path.sep)
-  );
-}
-
-async function resolveValidatedSearchPath(
-  resolvedSearchPath: string,
-  cwd: string
-): Promise<ValidatedSearchPathResult> {
-  if (!isWithinRepository(resolvedSearchPath, cwd)) {
-    return {
-      error: `ERROR: Search path is outside the repository: ${resolvedSearchPath}\n\nHint: All searches must stay within the repository root (${cwd}).`,
-    };
-  }
-
-  try {
-    const stats = await fs.promises.stat(resolvedSearchPath);
-    if (!stats.isDirectory()) {
-      return {
-        error: `ERROR: Search path is not a directory: ${resolvedSearchPath}\n\nHint: Provide a directory path to search in.`,
-      };
-    }
-  } catch {
-    return {
-      error: `ERROR: Search path does not exist: ${resolvedSearchPath}\n\nHint: Verify the path is correct.`,
-    };
-  }
-
-  try {
-    const [canonicalSearchPath, canonicalRepoRoot] = await Promise.all([
-      fs.promises.realpath(resolvedSearchPath),
-      fs.promises.realpath(cwd),
-    ]);
-    if (!isWithinRepositoryRealpath(canonicalSearchPath, canonicalRepoRoot)) {
-      return {
-        error:
-          `ERROR: Search path is outside the repository: ${resolvedSearchPath}\n\n` +
-          `Hint: All searches must stay within the repository root (${cwd}).`,
-      };
-    }
-
-    return { canonicalPath: canonicalSearchPath };
-  } catch {
-    return {
-      error:
-        `ERROR: Unable to resolve canonical search path: ${resolvedSearchPath}\n\n` +
-        "Hint: Verify the path exists and is accessible.",
-    };
-  }
-}
-
-function collectBoundedNonEmptyLines(output: string, limit: number): string[] {
-  if (!output) return [];
-
-  const lines: string[] = [];
-  const boundedLimit = Math.max(1, Math.trunc(limit));
-  let start = 0;
-
-  for (let i = 0; i <= output.length; i++) {
-    const atEnd = i === output.length;
-    const isNewline = !atEnd && output.charCodeAt(i) === 10;
-    if (!atEnd && !isNewline) continue;
-
-    const rawLine = output.slice(start, i).replace(/\r$/, "");
-    if (rawLine.trim().length > 0) {
-      lines.push(rawLine);
-      if (lines.length >= boundedLimit) {
-        return lines;
-      }
-    }
-    start = i + 1;
-  }
-
-  return lines;
-}
-
-function buildTruncationWarning(
-  limit: number,
-  total: number,
-  unit: "files" | "lines",
-  options?: { approximateTotal?: boolean }
-): string {
-  const qualifier = options?.approximateTotal ? `at least ${total}` : `${total}`;
-  return `[WARNING: Results truncated to ${limit} ${unit} (${qualifier} total found). Use maxResults parameter to increase limit.]`;
-}
-
-async function executeRipgrepSearch(params: SearchParams): Promise<SearchResult> {
-  const {
-    pattern,
-    contentPattern,
-    searchPath,
-    ignoreGitignore,
-    includeHidden,
-    unrestricted,
-    fileType,
-    excludeFileType,
-    globCaseInsensitive,
-    maxResults,
-    maxMatchesPerFile,
-    contextLines,
-    beforeContext,
-    afterContext,
-    filesWithMatches,
-    filesWithoutMatches,
-  } = params;
-
-  const isContentSearch = contentPattern !== undefined;
-  const cmdArgs: string[] = isContentSearch
-    ? ["rg", "-n", "-e", contentPattern]
-    : ["rg", "--files"];
-
-  if (isContentSearch) {
-    if (filesWithMatches) {
-      cmdArgs.push("-l");
-    } else if (filesWithoutMatches) {
-      cmdArgs.push("-L");
-    }
-  }
-
-  if (pattern && pattern.trim()) cmdArgs.push("--glob", pattern);
-
-  if (unrestricted !== undefined) {
-    cmdArgs.push("-" + "u".repeat(unrestricted));
-  } else {
-    if (ignoreGitignore) cmdArgs.push("--no-ignore-vcs");
-    if (includeHidden) cmdArgs.push("--hidden");
-  }
-
-  if (fileType) cmdArgs.push("-t", fileType);
-  if (excludeFileType) cmdArgs.push("-T", excludeFileType);
-  if (globCaseInsensitive) cmdArgs.push("--glob-case-insensitive");
-
-  if (isContentSearch) {
-    for (const [val, name] of [
-      [contextLines, "contextLines"],
-      [beforeContext, "beforeContext"],
-      [afterContext, "afterContext"],
-    ] as const) {
-      const err = validateNonNegativeInt(val, name);
-      if (err) return { files: [], exitCode: 2, errorMessage: err };
-    }
-  }
-
-  if (isContentSearch) {
-    const maxMatchesError = validateNonNegativeInt(maxMatchesPerFile, "maxMatchesPerFile");
-    if (maxMatchesError) return { files: [], exitCode: 2, errorMessage: maxMatchesError };
-  }
-
-  const hasContext =
-    (contextLines !== undefined && contextLines > 0) ||
-    (beforeContext !== undefined && beforeContext > 0) ||
-    (afterContext !== undefined && afterContext > 0);
-  const effectiveMaxCount = maxMatchesPerFile ?? maxResults;
-  const filesOnlyMode = Boolean(filesWithMatches || filesWithoutMatches);
-
-  if (isContentSearch && !filesOnlyMode && effectiveMaxCount !== undefined && !hasContext) {
-    cmdArgs.push("--max-count", String(effectiveMaxCount));
-  }
-
-  if (isContentSearch) {
-    const hasDirectionalContext =
-      (beforeContext !== undefined && beforeContext > 0) ||
-      (afterContext !== undefined && afterContext > 0);
-    if (hasDirectionalContext) {
-      if (beforeContext !== undefined && beforeContext > 0) cmdArgs.push("-B", String(beforeContext));
-      if (afterContext !== undefined && afterContext > 0) cmdArgs.push("-A", String(afterContext));
-    } else if (contextLines !== undefined && contextLines > 0) {
-      cmdArgs.push("-C", String(contextLines));
-    }
-  }
-
-  cmdArgs.push("--", searchPath);
-
-  try {
-    const result = Bun.spawnSync(cmdArgs);
-    const stdoutBuffer = Buffer.from(result.stdout ?? "");
-    const outputClipped = stdoutBuffer.length > MAX_STDOUT_CAPTURE_BYTES;
-    const boundedStdout = outputClipped
-      ? stdoutBuffer.subarray(0, MAX_STDOUT_CAPTURE_BYTES)
-      : stdoutBuffer;
-    const output = boundedStdout.toString();
-    const exitCode = result.exitCode;
-
-    if (exitCode === 2) {
-      const stderr = result.stderr.toString();
-      if (stderr.includes("regex parse error") || stderr.includes("invalid")) {
-        if (isContentSearch) {
-          return {
-            files: [],
-            exitCode,
-            errorMessage: `ERROR: Invalid contentPattern regex: ${contentPattern}\n\nRipgrep error: ${stderr}`,
-          };
-        }
-        return {
-          files: [],
-          exitCode,
-          errorMessage: `ERROR: Invalid glob pattern: ${pattern}\n\nPattern syntax help:\n- * matches any characters except /\n- ** matches any characters including /\n- ? matches any single character\n- [abc] matches a, b, or c\n\nRipgrep error: ${stderr}`,
-        };
-      }
-      return {
-        files: [],
-        exitCode,
-        errorMessage: `ERROR: Ripgrep failed with exit code 2.\n\n${stderr}`,
-      };
-    }
-
-    if (isContentSearch) {
-      const lineLimit = Math.max(1, (maxResults ?? DEFAULT_MAX_RESULTS) + 1);
-      const rawLines = collectBoundedNonEmptyLines(output, lineLimit);
-      const files = filesWithMatches || filesWithoutMatches ? rawLines : [];
-      return { files, rawLines, exitCode, outputClipped };
-    }
-
-    const files = output
-      .trim()
-      .split("\n")
-      .filter((line) => line.trim().length > 0);
-
-    return { files, exitCode, outputClipped };
-  } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    if (
-      errorMessage.includes("ENOENT") ||
-      errorMessage.includes("not found") ||
-      errorMessage.includes("No such file")
-    ) {
-      return {
-        files: [],
-        exitCode: 2,
-        errorMessage:
-          "ERROR: ripgrep (rg) is not installed or not in PATH.\n\nInstallation:\n- macOS: brew install ripgrep\n- Ubuntu/Debian: apt install ripgrep\n- Windows: choco install ripgrep\n- Rust: cargo install ripgrep",
-      };
-    }
-    return {
-      files: [],
-      exitCode: 2,
-      errorMessage: `ERROR: Failed to execute ripgrep: ${errorMessage}`,
-    };
-  }
-}
-
-// --- Tool-local helpers ---
 
 function normalizeOptionalType(value: string | undefined): { value?: string; error?: string } {
   if (value === undefined || value === null) return {};
@@ -321,6 +41,184 @@ function normalizeOptionalType(value: string | undefined): { value?: string; err
   return { value: trimmed.toLowerCase() };
 }
 
+function parseNonNegativeIntegerToken(token: string, rawValue: string, label: string): number | string {
+  if (!/^\d+$/.test(rawValue)) {
+    return `ERROR: Invalid options token '${token}': ${label} must be a non-negative integer.`;
+  }
+  return Number(rawValue);
+}
+
+function parseRipgrepAdvancedOptions(rawOptions: unknown):
+  | { ok: true; options: ParsedRipgrepAdvancedOptions }
+  | { ok: false; error: string } {
+  if (rawOptions === undefined || rawOptions === null) {
+    return { ok: true, options: {} };
+  }
+  if (typeof rawOptions !== "string") {
+    return { ok: false, error: "ERROR: 'options' must be a string when provided." };
+  }
+
+  const normalizedOptions = rawOptions.trim();
+  if (!normalizedOptions) {
+    return { ok: true, options: {} };
+  }
+
+  const parsed: ParsedRipgrepAdvancedOptions = {};
+
+  for (const token of normalizedOptions.split(/\s+/)) {
+    const separatorCount = token.split("=").length - 1;
+    if (separatorCount > 1) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': tokens must contain at most one '=' separator.` };
+    }
+
+    if (separatorCount === 0) {
+      if (!TOKEN_NAME_PATTERN.test(token)) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': token names must use lowercase-kebab-case.` };
+      }
+
+      if (token === "glob-case-insensitive") {
+        if (parsed.globCaseInsensitive) {
+          return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'glob-case-insensitive' token is not allowed.` };
+        }
+        parsed.globCaseInsensitive = true;
+        continue;
+      }
+      if (token === "compact-output") {
+        if (parsed.compactOutput) {
+          return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'compact-output' token is not allowed.` };
+        }
+        parsed.compactOutput = true;
+        continue;
+      }
+      if (token === "files-with-matches") {
+        if (parsed.filesWithMatches) {
+          return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'files-with-matches' token is not allowed.` };
+        }
+        parsed.filesWithMatches = true;
+        continue;
+      }
+      if (token === "files-without-matches") {
+        if (parsed.filesWithoutMatches) {
+          return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'files-without-matches' token is not allowed.` };
+        }
+        parsed.filesWithoutMatches = true;
+        continue;
+      }
+      if (token === "ignore-gitignore") {
+        if (parsed.ignoreGitignore) {
+          return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'ignore-gitignore' token is not allowed.` };
+        }
+        parsed.ignoreGitignore = true;
+        continue;
+      }
+      if (token === "include-hidden") {
+        if (parsed.includeHidden) {
+          return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'include-hidden' token is not allowed.` };
+        }
+        parsed.includeHidden = true;
+        continue;
+      }
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.` };
+    }
+
+    const [tokenName, rawValue] = token.split("=");
+    if (!TOKEN_NAME_PATTERN.test(tokenName)) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token names must use lowercase-kebab-case.` };
+    }
+    if (!rawValue) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token value must not be empty.` };
+    }
+
+    if (["glob-case-insensitive", "compact-output", "files-with-matches", "files-without-matches", "ignore-gitignore", "include-hidden"].includes(tokenName)) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}': token must be provided without '=value'.` };
+    }
+
+    if (tokenName === "pattern") {
+      if (parsed.pattern !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'pattern' token is not allowed.` };
+      }
+      parsed.pattern = rawValue;
+      continue;
+    }
+    if (tokenName === "file-type") {
+      if (parsed.fileType !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'file-type' token is not allowed.` };
+      }
+      const normalized = normalizeOptionalType(rawValue);
+      if (normalized.error) return { ok: false, error: normalized.error };
+      parsed.fileType = normalized.value;
+      continue;
+    }
+    if (tokenName === "exclude-file-type") {
+      if (parsed.excludeFileType !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'exclude-file-type' token is not allowed.` };
+      }
+      const normalized = normalizeOptionalType(rawValue);
+      if (normalized.error) return { ok: false, error: normalized.error };
+      parsed.excludeFileType = normalized.value;
+      continue;
+    }
+
+    const parsedNumber = (() => {
+      switch (tokenName) {
+        case "max-results":
+          return parseNonNegativeIntegerToken(token, rawValue, "max-results");
+        case "max-matches-per-file":
+          return parseNonNegativeIntegerToken(token, rawValue, "max-matches-per-file");
+        case "context-lines":
+          return parseNonNegativeIntegerToken(token, rawValue, "context-lines");
+        case "before-context":
+          return parseNonNegativeIntegerToken(token, rawValue, "before-context");
+        case "after-context":
+          return parseNonNegativeIntegerToken(token, rawValue, "after-context");
+        case "unrestricted":
+          return parseNonNegativeIntegerToken(token, rawValue, "unrestricted");
+        default:
+          return undefined;
+      }
+    })();
+
+    if (typeof parsedNumber === "string") {
+      return { ok: false, error: parsedNumber };
+    }
+
+    if (tokenName === "max-results") {
+      if (parsed.maxResults !== undefined) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'max-results' token is not allowed.` };
+      parsed.maxResults = parsedNumber;
+      continue;
+    }
+    if (tokenName === "max-matches-per-file") {
+      if (parsed.maxMatchesPerFile !== undefined) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'max-matches-per-file' token is not allowed.` };
+      parsed.maxMatchesPerFile = parsedNumber;
+      continue;
+    }
+    if (tokenName === "context-lines") {
+      if (parsed.contextLines !== undefined) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'context-lines' token is not allowed.` };
+      parsed.contextLines = parsedNumber;
+      continue;
+    }
+    if (tokenName === "before-context") {
+      if (parsed.beforeContext !== undefined) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'before-context' token is not allowed.` };
+      parsed.beforeContext = parsedNumber;
+      continue;
+    }
+    if (tokenName === "after-context") {
+      if (parsed.afterContext !== undefined) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'after-context' token is not allowed.` };
+      parsed.afterContext = parsedNumber;
+      continue;
+    }
+    if (tokenName === "unrestricted") {
+      if (parsed.unrestricted !== undefined) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate 'unrestricted' token is not allowed.` };
+      parsed.unrestricted = parsedNumber;
+      continue;
+    }
+
+    return { ok: false, error: `ERROR: Invalid options token '${token}': token is not allowed for this wrapper.` };
+  }
+
+  return { ok: true, options: parsed };
+}
+
 // --- Tool definition ---
 
 export default tool({
@@ -328,11 +226,11 @@ export default tool({
 
 SIMPLE EXAMPLES (copy these patterns):
 
-Context lines:          { contentPattern: "TODO", contextLines: 2 }
-Before/after context:   { contentPattern: "ERROR", beforeContext: 2, afterContext: 1 }
-Files with matches:     { contentPattern: "import", filesWithMatches: true }
-Files without matches:  { contentPattern: "TODO", filesWithoutMatches: true, path: "adw" }
-Unrestricted search:    { contentPattern: "secret", unrestricted: 2 }
+Context lines:          { contentPattern: "TODO", options: "context-lines=2" }
+Before/after context:   { contentPattern: "ERROR", options: "before-context=2 after-context=1" }
+Files with matches:     { contentPattern: "import", options: "files-with-matches" }
+Files without matches:  { contentPattern: "TODO", path: "adw", options: "files-without-matches" }
+Unrestricted search:    { contentPattern: "secret", options: "unrestricted=2" }
 
 RULES:
 - Required 'contentPattern' must be a non-empty string after trim.
@@ -343,22 +241,8 @@ RULES:
 
   args: {
     contentPattern: tool.schema.string(),
-    pattern: tool.schema.string().optional(),
     path: tool.schema.string().optional(),
-    fileType: tool.schema.string().optional(),
-    excludeFileType: tool.schema.string().optional(),
-    globCaseInsensitive: tool.schema.boolean().optional(),
-    compactOutput: tool.schema.boolean().optional(),
-    maxResults: tool.schema.number().optional(),
-    maxMatchesPerFile: tool.schema.number().optional(),
-    contextLines: tool.schema.number().optional(),
-    beforeContext: tool.schema.number().optional(),
-    afterContext: tool.schema.number().optional(),
-    filesWithMatches: tool.schema.boolean().optional(),
-    filesWithoutMatches: tool.schema.boolean().optional(),
-    unrestricted: tool.schema.number().optional(),
-    ignoreGitignore: tool.schema.boolean().optional(),
-    includeHidden: tool.schema.boolean().optional(),
+    options: tool.schema.string().optional(),
   },
 
   async execute(args) {
@@ -371,41 +255,39 @@ RULES:
       return "ERROR: 'contentPattern' parameter is required and cannot be empty.\n\nHint: Provide a non-empty regex string such as 'TODO'.";
     }
 
-    if (args.filesWithMatches && args.filesWithoutMatches) {
+    const parsedOptions = parseRipgrepAdvancedOptions((args as Record<string, unknown>).options);
+    if (!parsedOptions.ok) return parsedOptions.error;
+
+    if (parsedOptions.options.filesWithMatches && parsedOptions.options.filesWithoutMatches) {
       return (
         "ERROR: 'filesWithMatches' and 'filesWithoutMatches' cannot both be true.\n\n" +
         "Hint: Choose exactly one file-mode toggle."
       );
     }
 
-    const normalizedFileType = normalizeOptionalType(args.fileType);
-    if (normalizedFileType.error) return normalizedFileType.error;
-    const normalizedExcludeFileType = normalizeOptionalType(args.excludeFileType);
-    if (normalizedExcludeFileType.error) return normalizedExcludeFileType.error;
-
     for (const [value, name] of [
-      [args.contextLines, "contextLines"],
-      [args.beforeContext, "beforeContext"],
-      [args.afterContext, "afterContext"],
-      [args.maxMatchesPerFile, "maxMatchesPerFile"],
-      [args.unrestricted, "unrestricted"],
+      [parsedOptions.options.contextLines, "contextLines"],
+      [parsedOptions.options.beforeContext, "beforeContext"],
+      [parsedOptions.options.afterContext, "afterContext"],
+      [parsedOptions.options.maxMatchesPerFile, "maxMatchesPerFile"],
+      [parsedOptions.options.unrestricted, "unrestricted"],
     ] as const) {
       const err = validateNonNegativeInt(value, name);
       if (err) return err;
     }
 
-    const normalizedUnrestricted = normalizeNumericParam(args.unrestricted);
+    const normalizedUnrestricted = normalizeNumericParam(parsedOptions.options.unrestricted);
     if (normalizedUnrestricted !== undefined && (normalizedUnrestricted < 1 || normalizedUnrestricted > 3)) {
       return "ERROR: Invalid unrestricted value. It must be an integer between 1 and 3.";
     }
 
-    if (args.maxResults !== undefined) {
-      const maxResultsError = validateNonNegativeInt(args.maxResults, "maxResults");
+    if (parsedOptions.options.maxResults !== undefined) {
+      const maxResultsError = validateNonNegativeInt(parsedOptions.options.maxResults, "maxResults");
       if (maxResultsError) return maxResultsError;
     }
 
-    const normalizedMaxResults = normalizeNumericParam(args.maxResults);
-    const normalizedMaxMatchesPerFile = normalizeNumericParam(args.maxMatchesPerFile);
+    const normalizedMaxResults = normalizeNumericParam(parsedOptions.options.maxResults);
+    const normalizedMaxMatchesPerFile = normalizeNumericParam(parsedOptions.options.maxMatchesPerFile);
     const maxResults = normalizedMaxResults ?? DEFAULT_MAX_RESULTS;
 
     const cwd = process.cwd();
@@ -421,22 +303,26 @@ RULES:
 
     const searchResult = await executeRipgrepSearch({
       contentPattern,
-      pattern: args.pattern,
+      pattern: parsedOptions.options.pattern,
       searchPath: executedSearchPath,
-      fileType: normalizedFileType.value,
-      excludeFileType: normalizedExcludeFileType.value,
-      globCaseInsensitive: args.globCaseInsensitive,
-      compactOutput: args.compactOutput,
+      fileType: parsedOptions.options.fileType,
+      excludeFileType: parsedOptions.options.excludeFileType,
+      globCaseInsensitive: parsedOptions.options.globCaseInsensitive,
+      compactOutput: parsedOptions.options.compactOutput,
+      compactOutputBase: parsedOptions.options.compactOutput
+        ? validatedPath.compactOutputBase ?? path.dirname(executedSearchPath)
+        : undefined,
+      targetKind: validatedPath.targetKind,
       maxResults,
       maxMatchesPerFile: normalizedMaxMatchesPerFile,
-      contextLines: args.contextLines,
-      beforeContext: args.beforeContext,
-      afterContext: args.afterContext,
-      filesWithMatches: args.filesWithMatches,
-      filesWithoutMatches: args.filesWithoutMatches,
+      contextLines: parsedOptions.options.contextLines,
+      beforeContext: parsedOptions.options.beforeContext,
+      afterContext: parsedOptions.options.afterContext,
+      filesWithMatches: parsedOptions.options.filesWithMatches,
+      filesWithoutMatches: parsedOptions.options.filesWithoutMatches,
       unrestricted: normalizedUnrestricted,
-      ignoreGitignore: args.ignoreGitignore,
-      includeHidden: args.includeHidden,
+      ignoreGitignore: parsedOptions.options.ignoreGitignore,
+      includeHidden: parsedOptions.options.includeHidden,
     });
 
     if (searchResult.errorMessage) return searchResult.errorMessage;

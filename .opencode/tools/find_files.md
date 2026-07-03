@@ -6,7 +6,8 @@ Discovery-only file search tool for simple glob-based file listing.
 
 - `find_files` supports **file discovery only**.
 - Content-search belongs to `search_content`; advanced controls belong to `ripgrep_advanced`.
-- Unsupported fields (for example `contentPattern`, context flags, and files-with-matches flags) fail closed with deterministic `ERROR:` messages.
+- Unsupported direct fields are outside the public wrapper schema; bounded `options`
+  tokens still fail closed when callers try unsupported wrapper-specific controls.
 
 ## Simple Examples
 
@@ -18,14 +19,14 @@ Discovery-only file search tool for simple glob-based file listing.
 { "pattern": "**/*.py", "path": "adw" }
 
 // Limit returned results
-{ "pattern": "**/*", "maxResults": 100 }
+{ "pattern": "**/*", "options": "max-results=100" }
 
 // Return paths relative to the search directory
-{ "pattern": "**/*.ts", "path": ".opencode/tool", "compactOutput": true }
+{ "pattern": "**/*.ts", "path": ".opencode/tools", "options": "compact-output" }
 
 // Include or exclude ripgrep file types
-{ "pattern": "**/*", "fileType": "py" }
-{ "pattern": "**/*", "excludeFileType": "json" }
+{ "pattern": "**/*", "options": "file-type=py" }
+{ "pattern": "**/*", "options": "exclude-file-type=json" }
 ```
 
 ## Supported Parameters
@@ -33,16 +34,34 @@ Discovery-only file search tool for simple glob-based file listing.
 | Parameter | Type | Required | Description |
 |---|---|---:|---|
 | `pattern` | string | ✅ | Glob pattern for discovery (non-empty after trim). |
-| `path` | string | ❌ | Directory to search (default: current working directory). |
-| `fileType` | string | ❌ | Include only this ripgrep type (`-t`). |
-| `excludeFileType` | string | ❌ | Exclude this ripgrep type (`-T`). |
-| `globCaseInsensitive` | boolean | ❌ | Case-insensitive glob matching. |
-| `compactOutput` | boolean | ❌ | Output paths relative to search directory. |
-| `maxResults` | number | ❌ | Max files returned (default: 5000). |
+| `path` | string | ❌ | Scoped discovery target (default: current working directory). File path = discover only that file; directory path = discover only that subtree. |
+| `options` | string | ❌ | Bounded token carrier for optional discovery controls. |
+
+## Supported `options` Tokens
+
+- `file-type=<type>`
+- `exclude-file-type=<type>`
+- `glob-case-insensitive`
+- `compact-output`
+- `max-results=<n>`
+
+## Path Contract
+
+- File `path` values discover only the requested file.
+- Directory `path` values discover only the requested subtree.
+- Missing, invalid, or out-of-repo `path` values fail closed with deterministic `ERROR:` output.
+- `compact-output` stays relative to the searched directory for directory targets and to the file's parent directory for file targets.
+
+Example single-file discovery:
+
+```jsonc
+{ "pattern": "**/*", "path": ".opencode/tools/find_files.ts", "options": "compact-output" }
+```
 
 ## Deterministic Behavior Notes
 
 - Results are sorted by modification time (most recent first).
 - Search paths are validated against repository boundaries with lexical and canonical checks.
+- Scoped path misses never widen back to the repository root.
 - No-match outcomes are non-error, deterministic text responses.
 - If results exceed `maxResults`, output appends a deterministic truncation warning.

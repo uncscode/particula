@@ -4,7 +4,7 @@ description: 'Subagent that runs linters and auto-fixes code quality issues foll
   repository conventions. Invoked by primary agents (execute-plan, implementor, etc.)
   to validate code quality before committing.
 
-  This subagent: - Loads workflow context from adw_spec tool - Runs configured linters
+  This subagent: - Loads workflow context from adw_spec_read tool - Runs configured linters
   (ruff, mypy, etc.) - Auto-fixes issues where possible - Creates todo list for manual
   fixes - Reports linting success or failure
 
@@ -17,18 +17,18 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -87,7 +87,7 @@ task({
 
 ## Step 1: Load Context
 - Parse arguments: `adw_id`, `worktree_path`, `target_dir`
-- Load workflow state via `adw_spec({"command": "read", "adw_id": adw_id})`
+- Load workflow state via `adw_spec_read({"command": "read", "adw_id": adw_id})`
 - Extract: `worktree_path`, `target_dir` (default: adw)
 - Change to worktree directory
 

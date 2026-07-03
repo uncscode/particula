@@ -12,7 +12,7 @@ description: >-
   comprehensive code review covering quality, correctness, performance,
   security, tests, documentation, and architecture
 
-  Invoked by: adw workflow review <PR-number> or manually triggered
+  Invoked by: workflow review <PR-number> or manually triggered
 
   Example scenarios: - User: "Review PR #42 for our HPC simulation codebase" -
   Automated: Triggered on new PR via dispatcher - Manual: "@adw-review please
@@ -24,21 +24,21 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
-  git_operations: deny
   platform_issue_read: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -226,7 +226,7 @@ platform_operations({
 
 **Resolve worktree path from ADW state:**
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "worktree_path"

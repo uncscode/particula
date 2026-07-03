@@ -1,6 +1,14 @@
-# ADW Spec Tool Reference
+# ADW Spec Tool Reference (Retired Compatibility Wrapper)
 
-Full parameter reference for the adw_spec tool. For quick usage, see the tool description.
+This document is retained as historical reference for the retired `adw_spec`
+ compatibility wrapper. Active integrations should use:
+
+- `adw_spec_read`
+- `adw_spec_write`
+- `adw_spec_messages`
+
+The compatibility wrapper implementation has been retired from the live tool
+ tree and archived under `.trash/`.
 
 ## Commands
 
@@ -26,35 +34,41 @@ Full parameter reference for the adw_spec tool. For quick usage, see the tool de
 { "command": "write", "adw_id": "abc12345", "content": "# Implementation Plan\n\n## Step 1\n..." }
 
 // Append to spec
-{ "command": "write", "adw_id": "abc12345", "content": "\n\nNotes", "append": true }
+{ "command": "write", "adw_id": "abc12345", "content": "\n\nNotes", "options": "append" }
 
 // Write from file
 { "command": "write", "adw_id": "abc12345", "file": "plan.md" }
 
 // List all fields
-{ "command": "list", "adw_id": "abc12345", "json": true }
+{ "command": "list", "adw_id": "abc12345", "options": "json" }
 
 // Write a workflow message
 { "command": "messages-write", "adw_id": "abc12345", "agent": "planner", "message": "Done." }
 
 // Read recent messages
-{ "command": "messages-read", "adw_id": "abc12345", "last": 3, "raw": true }
+{ "command": "messages-read", "adw_id": "abc12345", "options": "last=3 raw" }
+
+// Read all messages by omitting last
+{ "command": "messages-read", "adw_id": "abc12345", "options": "raw" }
+
+// Explicit last=0 also means all messages
+{ "command": "messages-read", "adw_id": "abc12345", "options": "last=0 raw" }
 ```
 
 ## Advanced Examples
 
 ```jsonc
 // Read raw content (no formatting)
-{ "command": "read", "adw_id": "abc12345", "raw": true }
+{ "command": "read", "adw_id": "abc12345", "options": "raw" }
 
 // Delete a custom field
-{ "command": "delete", "adw_id": "abc12345", "field": "custom_field", "confirm": true }
+{ "command": "delete", "adw_id": "abc12345", "field": "custom_field", "options": "confirm" }
 
 // Write to a specific field
 { "command": "write", "adw_id": "abc12345", "field": "plan_file", "content": "path/to/plan.md" }
 
 // Read all messages
-{ "command": "messages-read", "adw_id": "abc12345", "raw": true }
+{ "command": "messages-read", "adw_id": "abc12345", "options": "raw" }
 ```
 
 ## Parameter Reference
@@ -70,13 +84,10 @@ Full parameter reference for the adw_spec tool. For quick usage, see the tool de
 
 | Parameter | Type    | Default          | Description                            |
 |-----------|---------|------------------|----------------------------------------|
-| `field`   | string  | "spec_content"   | Field to read/write/delete             |
+| `field`   | string  | "spec_content" for `read`/`write`; required for `delete` | Field to read/write/delete |
 | `content` | string  | —                | Content to write                       |
 | `file`    | string  | —                | File path to read content from         |
-| `append`  | boolean | false            | Append instead of replace              |
-| `raw`     | boolean | false            | Raw output without formatting (read)   |
-| `json`    | boolean | false            | JSON output (list command)             |
-| `confirm` | boolean | false            | Skip confirmation (delete command)     |
+| `options` | string  | —                | Bounded toggle carrier (`json`, `raw`, `append`, `confirm`, `last=<n>`) |
 
 ### Messages
 
@@ -84,7 +95,7 @@ Full parameter reference for the adw_spec tool. For quick usage, see the tool de
 |-----------|--------|---------|------------------------------------------|
 | `agent`   | string | —       | Agent name (required for messages-write) |
 | `message` | string | —       | Message text (required for messages-write)|
-| `last`    | number | all     | Return last N messages (0 = all, max 50) |
+| `options` | string | —       | Command-scoped tokens such as `last=<n>` and `raw` for `messages-read` |
 
 ## Common Fields
 
@@ -108,14 +119,18 @@ Use `list` command to see all available fields for a workflow.
 - Empty/missing field: returns `""`
 - Failure: returns `ERROR: adw spec read failed (exit N)`
 
-### Legacy `adw_spec` vs Split Wrapper Contracts
+### Historical `adw_spec` vs Split Wrapper Contracts
 
-- Legacy `adw_spec` is command-sensitive:
+- Retired `adw_spec` was command-sensitive:
   - `read`: returns raw field content (including `""` for empty/missing/null-like successful reads).
   - non-`read`: returns `ADW Spec Command: <command>\n\n<stdout>`.
 - Split wrappers preserve the same behavior for their scoped commands:
   - `adw_spec_read` returns raw payload for `read` and envelope for `list`.
   - `adw_spec_write` and `adw_spec_messages` return command envelopes on success.
+- Bounded `options` are command-scoped, not global free-form flags:
+  - `adw_spec_read`: `json` for `list`, `raw` for `read`
+  - `adw_spec_write`: `append` for `write`, `confirm` for `delete`
+  - `adw_spec_messages`: `last=<n>` and `raw` for `messages-read`
 - `write --file` is canonicalized and constrained to existing repository-confined paths across both compatibility and split wrappers.
 - Trimmed validated strings are what get forwarded downstream for `field`, `agent`, `message`, and normalized `adw_id` values.
 - Required `adw_id` handling is aligned across compatibility and split surfaces:
@@ -167,3 +182,4 @@ Warning: Field 'issue_title' not found or is null
 
 Practical guardrail: classify responses by command context (`read` vs non-`read`).
 For `read`, treat `result === ""` as no-content and any non-empty string as payload.
+For `messages-read`, omit `last=<n>` or pass `last=0` to read the full history.

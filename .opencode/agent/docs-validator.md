@@ -4,7 +4,7 @@ description: 'Subagent that validates documentation quality and consistency acro
   all docs. Invoked by the documentation primary agent after all other subagents complete
   to ensure documentation integrity.
 
-  This subagent: - Loads workflow context from adw_spec tool - Checks all markdown
+  This subagent: - Loads workflow context from adw_spec_read tool - Checks all markdown
   links (internal and external) - Validates markdown formatting - Ensures cross-references
   are valid - Verifies documentation structure - Reports validation results with fixes
   needed
@@ -16,18 +16,18 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_bun_test: allow
   run_validate_agent_references: allow
   run_linters: deny
@@ -82,7 +82,7 @@ the documentation. Prefer strict validation to surface warnings as failures.
 
 ```python
 # Strict validation without writing build artifacts
-build_mkdocs_validate({"strict": True})
+build_mkdocs_validate({"options": "strict"})
 ```
 
 Review the output for broken cross-references, missing pages, or plugin errors and report
@@ -144,15 +144,15 @@ failures, then include any findings in the validation summary.
 
 Parse input arguments and load workflow state:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
 ```
 
-Extract `worktree_path` and scope every permitted tool call (`read`, `ripgrep`,
-`build_mkdocs_validate`, `run_bun_test`, `run_validate_agent_references`) to that
-worktree context.
+Extract `worktree_path` and scope every permitted tool call (`read`,
+`find_files`, `search_content`, `ripgrep_advanced`, `build_mkdocs_validate`,
+`run_bun_test`, `run_validate_agent_references`) to that worktree context.
 
 ## Step 2: Create Validation Checklist
 
@@ -166,15 +166,16 @@ Maintain a short checklist in your final response (no tool call), covering:
 
 ## Step 3: Collect Markdown Files
 
-Use repo-safe file discovery tools already available to this agent (`ripgrep` plus targeted
-`read` calls), and avoid assuming `find_files`, `list`, or shell access.
+Use repo-safe discovery and search tools already available to this agent
+(`find_files`, `search_content`, `ripgrep_advanced`, plus targeted `read`
+calls).
 
 ```python
-# Discover markdown files with ripgrep globs scoped to the worktree
-ripgrep({"pattern": "docs/**/*.md", "path": "{worktree_path}"})
-ripgrep({"pattern": "README.md", "path": "{worktree_path}"})
-ripgrep({"pattern": "AGENTS.md", "path": "{worktree_path}"})
-ripgrep({"pattern": ".opencode/**/*.md", "path": "{worktree_path}"})
+# Discover markdown files with find_files scoped to the worktree
+find_files({"pattern": "docs/**/*.md", "path": "{worktree_path}"})
+find_files({"pattern": "README.md", "path": "{worktree_path}"})
+find_files({"pattern": "AGENTS.md", "path": "{worktree_path}"})
+find_files({"pattern": ".opencode/**/*.md", "path": "{worktree_path}"})
 ```
 
 Categorize files:
@@ -191,10 +192,10 @@ Categorize files:
 For each markdown file:
 ```text
 # Extract markdown links
-ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "{file}"})
+search_content({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "path": "{file}"})
 
 # Extract just the paths
-ripgrep({"contentPattern": "\\]\\(([^)]+)\\)", "pattern": "{file}"})
+search_content({"contentPattern": "\\]\\(([^)]+)\\)", "path": "{file}"})
 ```
 
 ### 4.2: Validate Internal Links
@@ -227,7 +228,7 @@ For links starting with `http://` or `https://`:
 
 ```text
 # Basic URL format validation (pattern check only)
-# Use ripgrep against a literal string value if needed.
+# Use search_content against a literal string value if needed.
 ```
 
 **Note:** Do NOT make HTTP requests to validate URLs (too slow, may fail). Just check format and note for manual review.
@@ -240,7 +241,7 @@ For links with `#anchor`:
 
 ```text
 # Extract headers (which become anchors)
-ripgrep({"contentPattern": "^#{1,6} ", "pattern": "{file}"})
+search_content({"contentPattern": "^#{1,6} ", "path": "{file}"})
 ```
 
 ### 6.2: Convert Headers to Anchor Format
@@ -261,13 +262,13 @@ Check if anchor link target exists in file.
 
 ```text
 # Check for broken code blocks (odd number of ```)
-ripgrep({"contentPattern": "```", "pattern": "{file}"})  # Count matches in output
+search_content({"contentPattern": "```", "path": "{file}"})  # Count matches in output
 
 # Check for unclosed links
-ripgrep({"contentPattern": "\\[.*\\]\\([^)]*$", "pattern": "{file}"})
+search_content({"contentPattern": "\\[.*\\]\\([^)]*$", "path": "{file}"})
 
 # Check for empty links
-ripgrep({"contentPattern": "\\[\\]\\(\\)", "pattern": "{file}"})
+search_content({"contentPattern": "\\[\\]\\(\\)", "path": "{file}"})
 ```
 
 ### 7.2: Check Required Elements

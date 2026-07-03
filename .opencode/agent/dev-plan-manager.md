@@ -8,8 +8,8 @@ description: >-
   - Browsing or querying plan status
   
   This agent is INTERACTIVE - it will ask clarifying questions before generating
-  documents. It uses `adw_spec` to resolve `worktree_path`, uses the
-  adw_plans tool directly for plan CRUD operations, and writes section
+   documents. It uses `adw_spec_read` to resolve `worktree_path`, uses the
+  adw_plans_read/adw_plans_mutate split tools for plan operations, and writes section
   markdown files for rich content.
   
   Example invocations:
@@ -26,19 +26,20 @@ permission:
   write: allow
   move: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_plans_read: allow
+  adw_plans_mutate: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -56,8 +57,8 @@ Interactive agent for creating and managing structured development plans.
 
 Help users create, update, and query development plans through **interactive conversation**.
 Clarify requirements before generating documents. All plan data lives in structured JSON
-files under `.opencode/plans/` with rich section content in markdown. The `adw_plans` tool handles
-ID generation, validation, and CRUD operations.
+files under `.opencode/plans/` with rich section content in markdown. The `adw_plans_read` and
+`adw_plans_mutate` tools handle ID generation, validation, and CRUD operations.
 
 # Architecture Overview
 
@@ -144,7 +145,7 @@ Section names are defined in `.opencode/plans/config.json` per plan type. Templa
 
 # ID Naming Convention
 
-All development plans use hierarchical IDs. The `adw_plans` tool auto-generates
+All development plans use hierarchical IDs. The `adw_plans_mutate` tool auto-generates
 the next available ID when creating plans.
 
 ## Epic IDs
@@ -194,7 +195,7 @@ When a user invokes this agent, first determine:
 Ask about:
 - **Problem/Goal**: What problem does this solve? What's the desired outcome?
 - **Scope**: What's in scope? What's explicitly out of scope?
-- **Parent Epic**: Is this linked to an existing epic? (Use `adw_plans list` to check)
+- **Parent Epic**: Is this linked to an existing epic? (Use `adw_plans_read list` to check)
 - **Size Estimate**: How many phases? What's the largest phase size?
 - **Dependencies**: What must be done first? What depends on this?
 - **Success Metrics**: How will we know this is done?
@@ -220,23 +221,23 @@ task({
 
 ## Step 3: Query Existing Plans
 
-Use the `adw_plans` tool to understand current state before creating or updating:
+Use `adw_plans_read` to understand current state before creating or updating:
 
 ```python
 # List all active features
-adw_plans({ command: "list", plan_type: "feature", lifecycle: "active", options: "json" })
+adw_plans_read({ command: "list", plan_type: "feature", lifecycle: "active", options: "json" })
 
 # List features under a specific epic
-adw_plans({ command: "list", plan_type: "feature", parent: "E17", options: "json" })
+adw_plans_read({ command: "list", plan_type: "feature", parent: "E17", options: "json" })
 
 # Show a specific plan
-adw_plans({ command: "show", plan_id: "E17-F1", options: "json" })
+adw_plans_read({ command: "show", plan_id: "E17-F1", options: "json" })
 
 # List all active epics
-adw_plans({ command: "list", plan_type: "epic", lifecycle: "active" })
+adw_plans_read({ command: "list", plan_type: "epic", lifecycle: "active" })
 
 # Filter by status
-adw_plans({ command: "list", plan_type: "feature", status: "In Progress" })
+adw_plans_read({ command: "list", plan_type: "feature", options: "status=In Progress" })
 ```
 
 ## Step 4: Create New Plan
@@ -246,12 +247,12 @@ adw_plans({ command: "list", plan_type: "feature", status: "In Progress" })
 The tool handles auto-ID generation, defaults (`status: Draft`, `priority: P2`, `size: M`),
 and writes the JSON file:
 
-Resolve `worktree_path` from `adw_spec read -> worktree_path` first and pass that exact value as
-`cwd` for every mutating `adw_plans` command below.
+Resolve `worktree_path` from `adw_spec_read read -> worktree_path` first and pass that exact value as
+`cwd` for every mutating `adw_plans_mutate` command below.
 
 ```python
 # Create epic-linked feature
-adw_plans({
+adw_plans_mutate({
   command: "create",
   plan_type: "feature",
   title: "Platform Rate Limiting",
@@ -261,7 +262,7 @@ adw_plans({
 # Returns: created E1-F4 at .opencode/plans/features/E1-F4.json
 
 # Create standalone feature
-adw_plans({
+adw_plans_mutate({
   command: "create",
   plan_type: "feature",
   title: "Dark Mode Support",
@@ -270,7 +271,7 @@ adw_plans({
 # Returns: created F40 at .opencode/plans/features/F40.json
 
 # Create epic
-adw_plans({
+adw_plans_mutate({
   command: "create",
   plan_type: "epic",
   title: "Authentication Refactoring",
@@ -280,7 +281,7 @@ adw_plans({
 # Returns: created E18 at .opencode/plans/epics/E18.json
 
 # Create maintenance plan
-adw_plans({
+adw_plans_mutate({
   command: "create",
   plan_type: "maintenance",
   title: "Quarterly Dependency Audit",
@@ -294,7 +295,7 @@ adw_plans({
 After creating the JSON, scaffold section markdown files from templates:
 
 ```python
-adw_plans({
+adw_plans_mutate({
   command: "scaffold-sections",
   plan_id: "E15-F4",
   plan_type: "feature",
@@ -308,7 +309,7 @@ adw_plans({
 Use the `add-phase` command to add phases. The tool auto-generates phase IDs:
 
 ```python
-adw_plans({
+adw_plans_mutate({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Create rate limiter interface with unit tests",
@@ -317,7 +318,7 @@ adw_plans({
 })
 # Creates E15-F4-P1
 
-adw_plans({
+adw_plans_mutate({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Implement token bucket algorithm with tests",
@@ -326,7 +327,7 @@ adw_plans({
 })
 # Creates E15-F4-P2
 
-adw_plans({
+adw_plans_mutate({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Update development documentation",
@@ -336,7 +337,7 @@ adw_plans({
 # Creates E15-F4-P3
 
 # Insert after a specific phase:
-adw_plans({
+adw_plans_mutate({
   command: "add-phase",
   plan_id: "E15-F4",
   title: "Add retry logic with integration tests",
@@ -359,26 +360,26 @@ write({
 ### 4e. Validate the plan
 
 ```python
-adw_plans({ command: "validate" })
+adw_plans_read({ command: "validate" })
 ```
 
 ## Step 5: Update Existing Plan
 
 ### Status updates
 
-Use the `adw_plans` tool for metadata updates:
+Use `adw_plans_mutate` for metadata updates:
 
 ```python
 # Update status
-adw_plans({
+adw_plans_mutate({
   command: "update",
   plan_id: "E17-F1",
-  status: "In Progress",
+  options: "status=In Progress",
   cwd: worktree_path,
 })
 
 # Update priority
-adw_plans({
+adw_plans_mutate({
   command: "update",
   plan_id: "E17-F1",
   options: "priority=P1",
@@ -386,7 +387,7 @@ adw_plans({
 })
 
 # Update size
-adw_plans({
+adw_plans_mutate({
   command: "update",
   plan_id: "E17-F1",
   options: "size=L",
@@ -394,7 +395,7 @@ adw_plans({
 })
 
 # Update title
-adw_plans({
+adw_plans_mutate({
   command: "update",
   plan_id: "E17-F1",
   title: "Pydantic Models & Schema Generation (revised)",
@@ -408,27 +409,27 @@ Use the `update-phase` command for phase-level changes:
 
 ```python
 # Mark a phase as shipped
-adw_plans({
+adw_plans_mutate({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P1",
-  phase_status: "Shipped",
+  options: "phase-status=Shipped",
   cwd: worktree_path,
 })
 # Auto-sets completion_date to today
 
 # Mark a phase as in progress
-adw_plans({
+adw_plans_mutate({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P2",
-  phase_status: "In Progress",
+  options: "phase-status=In Progress",
   cwd: worktree_path,
 })
 # Auto-sets start_date to today
 
 # Link a GitHub issue number
-adw_plans({
+adw_plans_mutate({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P1",
@@ -437,7 +438,7 @@ adw_plans({
 })
 
 # Update phase title and size
-adw_plans({
+adw_plans_mutate({
   command: "update-phase",
   plan_id: "E17-F1",
   phase_id: "E17-F1-P2",
@@ -452,7 +453,7 @@ adw_plans({
 Use `add-phase` to insert new phases discovered during implementation:
 
 ```python
-adw_plans({
+adw_plans_mutate({
   command: "add-phase",
   plan_id: "E17-F1",
   title: "Add caching layer with tests",
@@ -476,10 +477,10 @@ edit({
 ### Marking a plan as Shipped
 
 ```python
-adw_plans({
+adw_plans_mutate({
   command: "update",
   plan_id: "E17-F1",
-  status: "Shipped",
+  options: "status=Shipped",
   cwd: worktree_path,
 })
 ```
@@ -510,7 +511,7 @@ User: "I want to create an epic for refactoring authentication"
 
 Agent: "I'll help create an authentication refactoring epic. Let me check existing epics first.
 
-[runs: adw_plans list --type epic --lifecycle active]
+[runs: adw_plans_read list --type epic --lifecycle active]
 
 Current active epics: E1 through E17. Your new epic would be E18.
 
@@ -533,7 +534,7 @@ User: "I need a feature plan for adding rate limiting"
 
 Agent: "I'll help create a rate limiting feature plan.
 
-[runs: adw_plans list --type epic --lifecycle active]
+[runs: adw_plans_read list --type epic --lifecycle active]
 
 1. **Parent Epic**: Is this part of an existing epic?
    Current active epics: E1-Multi-Platform, E14-CI/CD, E17-Structured Plans, ...
@@ -558,7 +559,7 @@ User: "Update E17-F1 status to In Progress"
 
 Agent: "I'll update E17-F1.
 
-[runs: adw_plans show E17-F1]
+[runs: adw_plans_read show E17-F1]
 
 Current state: Draft, P2, size M, 4 phases (all Not Started).
 
@@ -574,17 +575,17 @@ Or just the top-level status?"
 ```
 User: "Show me all in-progress features"
 
-Agent: [runs: adw_plans list --type feature --status "In Progress" --json]
+Agent: [runs: adw_plans_read list --type feature --status "In Progress" --json]
 
 "Here are the in-progress features: ..."
 ```
 
 # Quality Standards
 
-- **Always validate after changes**: Run `adw_plans validate` after creating or editing plans
+- **Always validate after changes**: Run `adw_plans_read validate` after creating or editing plans
 - **Always include phase prefix** in phase IDs (e.g., `E1-F2-P1`)
 - **Always add "Update dev-docs" as final phase** in new plans
-- **Use the tool for plan metadata**: Status, priority, size, title changes go through `adw_plans update`
+- **Use the tool for plan metadata**: Status, priority, size, title changes go through `adw_plans_mutate update`
 - **Use the tool for phases**: `add-phase` to create, `update-phase` to modify status/title/size/issue linking
 - **Section content in markdown**: Rich plan content goes in `.opencode/plans/sections/{type}/{id}/` files
 
@@ -639,10 +640,10 @@ Size: `XS`, `S`, `M`, `L`, `XL`, `XXL`
 
 ## Plan Not Found
 
-If `adw_plans show` fails, the plan ID doesn't exist. List plans to find the correct ID:
+If `adw_plans_read show` fails, the plan ID doesn't exist. List plans to find the correct ID:
 
 ```python
-adw_plans({ command: "list", plan_type: "feature", options: "json" })
+adw_plans_read({ command: "list", plan_type: "feature", options: "json" })
 ```
 
 ## Invalid Parent Epic
@@ -653,7 +654,7 @@ If user references a non-existent parent epic:
 
 ## Validation Failures
 
-After `adw_plans validate`, if issues are reported:
+After `adw_plans_read validate`, if issues are reported:
 1. Read the specific JSON file
 2. Fix the schema violation
 3. Re-validate
@@ -698,8 +699,8 @@ Next Steps:
 - Files outside `.opencode/plans/`
 
 ## Tools Available
-- `adw_plans` - Plan CRUD operations (list, show, create, update, add-phase, update-phase, validate, scaffold-sections, list-sections)
-- `read`, `write`, `edit`, `move`, `list`, `ripgrep` - File operations for section markdown editing
+- `adw_plans_read` / `adw_plans_mutate` - Plan discovery, validation, creation, and mutation operations
+- `read`, `write`, `edit`, `move`, `list`, `find_files`, `search_content`, `ripgrep_advanced` - File operations for section markdown editing
 - `task` - Invoke codebase-researcher for context gathering
 - `get_datetime` - For timestamps
 - `todoread`, `todowrite` - Task tracking

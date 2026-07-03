@@ -82,56 +82,8 @@ const WORKFLOW_COMMAND_SET = new Set([
   "complete", "patch", "plan", "build", "test", "review", "document", "ship",
 ]);
 
-const PROTECTED_FLAGS = new Set([
-  "--adw-id", "--model", "--help", "--title", "--body", "--text", "--source-issue",
-]);
-
-const PROTECTED_FLAG_ALIASES = new Map<string, string>([
-  ["--adw_id", "--adw-id"],
-  ["--source_issue", "--source-issue"],
-]);
-
-function normalizeFlagToken(arg: string): { original: string; key: string; canonicalKey: string } {
-  const trimmed = arg.trim();
-  const equalsIndex = trimmed.indexOf("=");
-  const rawKey = equalsIndex >= 0 ? trimmed.slice(0, equalsIndex) : trimmed;
-  const loweredKey = rawKey.toLowerCase();
-  const canonicalKey = PROTECTED_FLAG_ALIASES.get(loweredKey) ?? loweredKey;
-  return { original: trimmed, key: rawKey, canonicalKey };
-}
-
 function getCommandTimeout(command: string): number {
   return WORKFLOW_COMMAND_SET.has(command) ? WORKFLOW_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
-}
-
-function validateAdditionalArgs(rawAdditionalArgs: unknown):
-  | { ok: true; args: string[] }
-  | { ok: false; error: string } {
-  if (rawAdditionalArgs === undefined) return { ok: true, args: [] };
-  if (!Array.isArray(rawAdditionalArgs)) {
-    return { ok: false, error: "ERROR: Invalid 'args': expected an array of strings." };
-  }
-  const invalidElement = rawAdditionalArgs.find(
-    (value) => typeof value !== "string" || value.trim().length === 0,
-  );
-  if (invalidElement !== undefined) {
-    return { ok: false, error: "ERROR: Invalid 'args': all entries must be non-empty strings." };
-  }
-  const parsedArgs = rawAdditionalArgs.map((value) => (value as string).trim());
-  if (rawAdditionalArgs.length > 0 && parsedArgs.length === 0) {
-    return { ok: false, error: "ERROR: Invalid 'args': no usable arguments after validation." };
-  }
-  const protectedFlag = parsedArgs
-    .map((arg) => normalizeFlagToken(arg))
-    .find((token) => PROTECTED_FLAGS.has(token.canonicalKey));
-  if (protectedFlag) {
-    const matchedFlag = protectedFlag.canonicalKey;
-    return {
-      ok: false,
-      error: `ERROR: Protected flag '${matchedFlag}' is not allowed in 'args'. Use top-level tool arguments instead.`,
-    };
-  }
-  return { ok: true, args: parsedArgs };
 }
 
 export default tool({
@@ -144,32 +96,17 @@ Health check: { command: "health" }
 
 RULES:
 - issue_number is not required.
-- Omit optional fields entirely -- blank strings are treated as omitted.
 - Set help: true to see CLI usage for any command.`,
   args: {
     command: tool.schema.enum(["status", "health"]),
-    adw_id: tool.schema.string().optional(),
-    args: tool.schema.any().optional(),
     help: tool.schema.boolean().optional(),
   },
   async execute(args) {
-    const { command, args: rawAdditionalArgs, help } = args;
+    const { command, help } = args;
 
-    const additionalArgsValidation = help
-      ? { ok: true as const, args: [] }
-      : validateAdditionalArgs(rawAdditionalArgs);
-    if (!additionalArgsValidation.ok) {
-      return additionalArgsValidation.error;
-    }
-    const additionalArgs = additionalArgsValidation.args;
-
-    const cmdParts = ["uv", "run", "adw", command];
+    const cmdParts = ["uv", "run", "--active", "adw", command];
     if (help) {
       cmdParts.push("--help");
-    }
-
-    if (additionalArgs.length > 0) {
-      cmdParts.push(...additionalArgs);
     }
 
     const commandTimeout = getCommandTimeout(command);

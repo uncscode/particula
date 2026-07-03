@@ -2,9 +2,9 @@
 
 description: >
   Primary agent for the forge issue-generation workflow. Fetches the source
-  generate issue, resolves the plan via adw_plans, researches canonical plan
-  sections, and writes shared Markdown context to spec_content for downstream
-  forge agents.
+  generate issue, resolves the plan via adw_plans_read, researches canonical
+  plan sections, and writes shared Markdown context to spec_content for
+  downstream forge agents.
 mode: primary
 permission:
   "*": deny
@@ -12,21 +12,23 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
-  adw_plans: allow
-  adw_issues_spec: deny
+  adw_spec: deny
+  adw_spec_read: allow
+  adw_spec_write: allow
+  adw_plans_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
-  platform_operations: allow
-  run_pytest: deny
+  platform_operations: deny
+  platform_issue_read: allow
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -75,10 +77,10 @@ Create a todo list at the start of execution:
 ```python
 todowrite({"todos": [
   {"content": "Parse issue_number and adw_id from prompt", "status": "pending", "priority": "high"},
-  {"content": "Fetch source issue via platform_operations", "status": "pending", "priority": "high"},
+  {"content": "Fetch source issue via platform_issue_read", "status": "pending", "priority": "high"},
   {"content": "Determine workflow mode (generate vs generate-auto)", "status": "pending", "priority": "high"},
   {"content": "Extract plan ID and phase rows from issue body", "status": "pending", "priority": "high"},
-  {"content": "Resolve plan via adw_plans show", "status": "pending", "priority": "high"},
+  {"content": "Resolve plan via adw_plans_read show", "status": "pending", "priority": "high"},
   {"content": "Load and read canonical plan section files", "status": "pending", "priority": "high"},
   {"content": "Write spec_content Markdown dossier", "status": "pending", "priority": "high"},
   {"content": "Verify spec_content and emit completion signal", "status": "pending", "priority": "medium"}
@@ -96,7 +98,7 @@ Parse `issue_number` and `adw_id` from the prompt. Fail if either is missing.
 ## Step 2: Fetch Source Issue
 
 ```python
-platform_operations({
+platform_issue_read({
   "command": "fetch-issue",
   "issue_number": "<issue_number>",
   "output_format": "json"
@@ -119,13 +121,13 @@ Extract phase rows from the `## Phases to Generate` table.
 Resolve the worktree path first:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
 ```
 
 Then resolve the plan:
 
 ```python
-adw_plans({"command": "show", "plan_id": "<plan_id>", "json": true, "cwd": "<worktree_path>"})
+adw_plans_read({"command": "show", "plan_id": "<plan_id>", "options": "json", "cwd": "<worktree_path>"})
 ```
 
 Do not pass empty optional tool parameters.
@@ -133,11 +135,10 @@ Do not pass empty optional tool parameters.
 ## Step 6: Load Section Paths
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -158,7 +159,7 @@ Read the important section files when paths are available:
 Write concise Markdown to `spec_content`:
 
 ```python
-adw_spec({"command": "write", "adw_id": "<adw_id>", "content": "<markdown_dossier>"})
+adw_spec_write({"command": "write", "adw_id": "<adw_id>", "content": "<markdown_dossier>"})
 ```
 
 # `spec_content` Shape
@@ -178,8 +179,8 @@ Use normal Markdown, not strict JSON. Include these sections:
 
 The `Tooling Notes` section must state:
 
-- Use `adw_id` from this workflow for `adw_spec` and `adw_issues_spec`.
-- Use the worktree path as `cwd` for `adw_plans` calls.
+- Use `adw_id` from this workflow for `adw_spec_read`, `adw_spec_write`, and any `adw_issues_batch_*` calls.
+- Use the worktree path as `cwd` for `adw_plans_read` calls.
 - Do not pass empty optional parameters to tools.
 - Metadata must be populated and verified before any section drafting.
 - Co-located tests are required for implementation issues.

@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { assertContains } from "./helpers/assert-error-envelope";
 import { getInvocations, installSubprocessMocks, restoreSubprocessMocks, setSpawnError, setSpawnResponse } from "./helpers/mock-subprocess";
-import { loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
+import { getCapturedToolDefinition, loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
 
 describe("adw_spec_read wrapper", () => {
   beforeEach(() => {
@@ -51,8 +51,8 @@ describe("adw_spec_read wrapper", () => {
 
   it("assembles list with json", async () => {
     const execute = await loadToolExecute("../../adw_spec_read.ts");
-    await execute({ command: "list", adw_id: "a1b2c3d4", json: true });
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain("uv run adw spec list --adw-id a1b2c3d4 --json");
+    await execute({ command: "list", adw_id: "a1b2c3d4", options: "json" });
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("uv run --active adw spec list --adw-id a1b2c3d4 --json");
   });
 
   it("returns raw stdout for read command without envelope", async () => {
@@ -62,6 +62,13 @@ describe("adw_spec_read wrapper", () => {
     expect(result).toBe("raw-content");
   });
 
+  it("preserves successful read payloads that begin with ERROR:", async () => {
+    setSpawnResponse({ stdout: "ERROR: still payload", exitCode: 0 });
+    const execute = await loadToolExecute("../../adw_spec_read.ts");
+    const result = await execute({ command: "read", adw_id: "a1b2c3d4" });
+    expect(result).toBe("ERROR: still payload");
+  });
+
   it("returns empty string for successful empty read", async () => {
     setSpawnResponse({ stdout: "", exitCode: 0 });
     const execute = await loadToolExecute("../../adw_spec_read.ts");
@@ -69,20 +76,64 @@ describe("adw_spec_read wrapper", () => {
     expect(result).toBe("");
   });
 
+  it("returns delegated null payload for successful present-null raw reads", async () => {
+    setSpawnResponse({ stdout: "null\n", exitCode: 0 });
+    const execute = await loadToolExecute("../../adw_spec_read.ts");
+    const result = await execute({ command: "read", adw_id: "a1b2c3d4", field: "spec_content", options: "raw" });
+    expect(result).toBe("null\n");
+  });
+
+  it("preserves successful non-raw present-null reads instead of treating them as missing", async () => {
+    setSpawnResponse({ stdout: "Field: spec_content\nADW ID: a1b2c3d4\nNone\n", exitCode: 0 });
+    const execute = await loadToolExecute("../../adw_spec_read.ts");
+    const result = await execute({ command: "read", adw_id: "a1b2c3d4", field: "spec_content" });
+    expect(String(result)).toContain("Field: spec_content");
+    expect(String(result)).toContain("None");
+  });
+
+  it("still returns deterministic delegated failure envelopes for absent fields", async () => {
+    setSpawnResponse({ stderr: "Warning: Field 'missing' not found", exitCode: 1 });
+    const execute = await loadToolExecute("../../adw_spec_read.ts");
+    const result = await execute({ command: "read", adw_id: "a1b2c3d4", field: "missing" });
+    expect(String(result)).toContain("ERROR: adw spec read failed");
+    expect(String(result)).toContain("Field 'missing' not found");
+  });
+
   it("adds --field and --raw when provided for read", async () => {
     const execute = await loadToolExecute("../../adw_spec_read.ts");
-    await execute({ command: "read", adw_id: "a1b2c3d4", field: "spec_content", raw: true });
+    await execute({ command: "read", adw_id: "a1b2c3d4", field: "spec_content", options: "raw" });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run adw spec read --adw-id a1b2c3d4 --field spec_content --raw",
+      "uv run --active adw spec read --adw-id a1b2c3d4 --field spec_content --raw",
     );
   });
 
   it("forwards normalized field values instead of whitespace-padded input", async () => {
     const execute = await loadToolExecute("../../adw_spec_read.ts");
-    await execute({ command: "read", adw_id: "A1B2C3D4", field: " spec_content ", raw: true });
+    await execute({ command: "read", adw_id: "A1B2C3D4", field: " spec_content ", options: "raw" });
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run adw spec read --adw-id a1b2c3d4 --field spec_content --raw",
+      "uv run --active adw spec read --adw-id a1b2c3d4 --field spec_content --raw",
     );
+  });
+
+  it("rejects wrong-command options tokens before spawn", async () => {
+    const execute = await loadToolExecute("../../adw_spec_read.ts");
+    const result = await execute({ command: "read", adw_id: "a1b2c3d4", options: "json" });
+    assertContains(String(result), "token is not allowed for this command");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("omits blank options safely", async () => {
+    const execute = await loadToolExecute("../../adw_spec_read.ts");
+    await execute({ command: "list", adw_id: "a1b2c3d4", options: "   " });
+    expect(getInvocations().at(-1)?.args.join(" ")).toBe("uv run --active adw spec list --adw-id a1b2c3d4");
+  });
+
+  it("exposes slim schema with options carrier", async () => {
+    await loadToolExecute("../../adw_spec_read.ts");
+    const definition = getCapturedToolDefinition();
+    expect(Object.keys(definition?.args ?? {})).toContain("options");
+    expect(Object.keys(definition?.args ?? {})).not.toContain("json");
+    expect(Object.keys(definition?.args ?? {})).not.toContain("raw");
   });
 
   it("prefers stderr over stdout for non-zero exit diagnostics", async () => {

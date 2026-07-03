@@ -2,6 +2,7 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   normalizeOptionalString,
+  parseSpecOptions,
   runAdwSpecCommand,
   validateAndNormalizeAdwId,
 } from "./adw_spec_shared";
@@ -9,7 +10,7 @@ import {
 function sanitizedEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV" || value === undefined) continue;
+    if (value === undefined) continue;
     env[key] = value;
   }
   return env;
@@ -29,28 +30,22 @@ No contract change versus legacy adw_spec messages behavior.`,
     adw_id: tool.schema.string(),
     agent: tool.schema.string().optional(),
     message: tool.schema.string().optional(),
-    last: tool.schema.number().optional(),
-    raw: tool.schema.boolean().optional(),
+    options: tool.schema.string().optional(),
   },
 
   async execute(args) {
-    const { command, adw_id, agent, message, last, raw } = args;
+    const { command, adw_id, agent, message, options } = args;
     const normalized = validateAndNormalizeAdwId(command, adw_id);
     if (!normalized.ok) {
       return normalized.error;
     }
 
-    const maxLast = 50;
-    if (last !== undefined) {
-      if (!Number.isInteger(last)) {
-        return `ERROR: 'last' must be an integer (0-${maxLast}).`;
-      }
-      if (last < 0 || last > maxLast) {
-        return `ERROR: 'last' must be between 0 and ${maxLast}.`;
-      }
+    const parsedOptions = parseSpecOptions(command, options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
     }
 
-    const cmdParts = ["uv", "run", "adw", "spec", "messages"];
+    const cmdParts = ["uv", "run", "--active", "adw", "spec", "messages"];
 
     if (command === "messages-write") {
       const normalizedAgent = normalizeOptionalString(agent);
@@ -79,10 +74,10 @@ Usage:
       );
     } else {
       cmdParts.push("read", "--adw-id", normalized.adwId);
-      if (last !== undefined && last > 0) {
-        cmdParts.push("--last", String(last));
+      if (parsedOptions.options.last !== undefined && parsedOptions.options.last > 0) {
+        cmdParts.push("--last", String(parsedOptions.options.last));
       }
-      if (raw === true) {
+      if (parsedOptions.options.raw) {
         cmdParts.push("--raw");
       }
     }

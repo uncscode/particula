@@ -1,7 +1,8 @@
 ---
 
 description: >-
-  Subagent that resolves an epic plan and its child feature plans via adw_plans,
+  Subagent that resolves an epic plan and its child feature plans via
+  adw_plans_read,
   then creates
   type:generate GitHub issues for each feature directly via platform_operations.
   Use this agent when:
@@ -10,7 +11,7 @@ description: >-
   - You need a dependency-aware batch of feature-level issues from an epic
   - You want to preview what would be created with --dry-run
 
-  Unlike the issue-generator pipeline (which uses adw_issues_spec batch state and
+  Unlike the issue-generator pipeline (which uses split issue-batch state tools and
   5 sequential reviewers), this agent creates simpler templated issues directly
   because type:generate issues follow a fixed, well-defined format.
 
@@ -26,21 +27,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
   adw_spec: deny
-  adw_plans: allow
-  adw_issues_spec: deny
+  adw_plans_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: allow
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -58,7 +58,7 @@ spawns implementation issues for that feature's phases.
 
 # Core Mission
 
-Read an epic plan and its child feature plans through `adw_plans`, build dependency-aware
+Read an epic plan and its child feature plans through `adw_plans_read`, build dependency-aware
 `type:generate` issues from a fixed template, and create them via
 `platform_operations create-issue` in dependency order. Optionally preview
 with dry-run mode.
@@ -86,8 +86,8 @@ Create issues for E5 --skip F1,F2
 # Required Reading
 
 Before executing, consult these for context:
-- The epic plan via `adw_plans show` (primary input)
-- Each child feature plan via `adw_plans show` / `adw_plans list-sections`
+- The epic plan via `adw_plans_read show` (primary input)
+- Each child feature plan via `adw_plans_read show` / `adw_plans_read list-sections`
 
 # Todo Tracking (Required)
 
@@ -124,16 +124,16 @@ If `epic_id` is missing, report an error and stop.
 
 ## Step 2: Read Epic Plan
 
-Resolve the epic plan via `adw_plans`.
+Resolve the epic plan via `adw_plans_read`.
 
 ```python
-adw_plans({"command": "show", "plan_id": epic_id, "json": true})
+adw_plans_read({"command": "show", "plan_id": epic_id, "options": "json"})
 ```
 
 If richer section content is required, load populated sections:
 
 ```python
-adw_plans({"command": "list-sections", "plan_id": epic_id, "json": true, "populate": true})
+adw_plans_read({"command": "list-sections", "plan_id": epic_id, "options": "populate json"})
 ```
 
 Read the epic plan payload and extract:
@@ -152,8 +152,8 @@ requested. Apply `--feature` filter and `--skip` list.
 For each feature or maintenance track to process, resolve the plan ID directly:
 
 ```python
-adw_plans({"command": "show", "plan_id": feature_id, "json": true})
-adw_plans({"command": "list-sections", "plan_id": feature_id, "json": true, "populate": true})
+adw_plans_read({"command": "show", "plan_id": feature_id, "options": "json"})
+adw_plans_read({"command": "list-sections", "plan_id": feature_id, "options": "populate json"})
 ```
 
 From each feature plan, extract:
@@ -327,9 +327,9 @@ Generate implementation issues for feature **{feature_id}: {feature_title}**.
 ## ADW Instructions
 
 When processing this issue:
-1. Resolve the feature plan via `adw_plans show {feature_id}`
-2. Load feature sections via `adw_plans list-sections {feature_id} --populate` when needed
-3. Resolve the parent epic via `adw_plans show {epic_id}`
+1. Resolve the feature plan via `adw_plans_read show {feature_id}`
+2. Load feature sections via `adw_plans_read list-sections {feature_id} --populate` when needed
+3. Resolve the parent epic via `adw_plans_read show {epic_id}`
 4. For each phase in the Phase Checklist ({phase_range}), create an implementation issue with:
    - Full technical details from the feature plan
    - Specific file paths from the feature plan's scope section
@@ -457,7 +457,7 @@ explicitly specifies a different dependency structure.
 
 # See Also
 
-- `adw_plans` - Canonical epic/feature/maintenance plan lookup
-- `plans/` - Structured plan storage managed by `adw_plans`
+- `adw_plans_read` - Canonical epic/feature/maintenance plan lookup
+- `plans/` - Structured plan storage managed by `adw_plans_read`
 - `.opencode/agent/issue-generator.md` - Full multi-review issue pipeline (different use case)
 - `.opencode/agent/adw-issue-creator.md` - Batch issue creator (used by issue-generator)

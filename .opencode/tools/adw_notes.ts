@@ -6,31 +6,16 @@
 
 import { tool } from "@opencode-ai/plugin";
 
-// --- Inlined from lib/env_utils ---
-
-function sanitizedEnv(): Record<string, string> {
-  const env: Record<string, string> = {};
-  for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV" || value === undefined) continue;
-    env[key] = value;
-  }
-  return env;
-}
+import {
+  buildFieldArgs,
+  normalizeRef,
+  parseFieldEntries,
+  parseShowOutput,
+  runNotesCommand,
+  validateRequiredAdwId,
+} from "./adw_notes_shared";
 
 // --- Tool implementation ---
-
-const ADW_ID_PATTERN = /^[0-9a-f]{8}$/i;
-
-function normalizeAdwId(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  if (!ADW_ID_PATTERN.test(trimmed)) return null;
-  return trimmed.toLowerCase();
-}
-
-function adwIdValidationMessage(): string {
-  return "'adw_id' must be an 8-character hex string (e.g., \"abc12345\").";
-}
 
 const COMMANDS = ["write", "write-from-state", "show"] as const;
 
@@ -44,10 +29,6 @@ Notes:
     an array of { key, value } objects, a plain object, or a JSON string containing one of those forms.
   - write-from-state requires adw_id and forwards only --adw-id to CLI state resolution.`;
 
-const SHOW_PARSE_SNIPPET_LIMIT = 160;
-const ERROR_OUTPUT_SNIPPET_LIMIT = 400;
-const SPAWN_TIMEOUT_MS = 30_000;
-
 type NoteCommand = (typeof COMMANDS)[number];
 
 function buildError(message: string): string {
@@ -59,93 +40,6 @@ function normalizeCommand(value: unknown): NoteCommand | null {
     return null;
   }
   return (COMMANDS as readonly string[]).includes(value) ? (value as NoteCommand) : null;
-}
-
-function normalizeRef(value: unknown): string | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function parseFieldEntries(fields: unknown): [string, string][] | null {
-  if (fields === undefined || fields === null) {
-    return [];
-  }
-
-  let parsed: unknown = fields;
-  if (typeof parsed === "string") {
-    const trimmed = parsed.trim();
-    if (trimmed.length === 0) {
-      return [];
-    }
-    try {
-      parsed = JSON.parse(trimmed);
-    } catch {
-      return null;
-    }
-  }
-
-  const normalized: [string, string][] = [];
-
-  if (Array.isArray(parsed)) {
-    for (const entry of parsed) {
-      if (
-        Array.isArray(entry) &&
-        entry.length === 2 &&
-        typeof entry[0] === "string" &&
-        typeof entry[1] === "string"
-      ) {
-        normalized.push([entry[0], entry[1]]);
-        continue;
-      }
-
-      if (
-        entry &&
-        typeof entry === "object" &&
-        typeof (entry as Record<string, unknown>).key === "string" &&
-        typeof (entry as Record<string, unknown>).value === "string"
-      ) {
-        normalized.push([
-          (entry as Record<string, string>).key,
-          (entry as Record<string, string>).value,
-        ]);
-        continue;
-      }
-
-      return null;
-    }
-
-    return normalized;
-  }
-
-  if (parsed && typeof parsed === "object") {
-    for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
-      if (typeof value !== "string") {
-        return null;
-      }
-      normalized.push([key, value]);
-    }
-    return normalized;
-  }
-
-  return null;
-}
-
-function sanitizeSnippet(value: string, maxLen = ERROR_OUTPUT_SNIPPET_LIMIT): string {
-  const collapsed = value
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (collapsed.length === 0) {
-    return "";
-  }
-  return collapsed.length > maxLen ? `${collapsed.slice(0, maxLen)}...(truncated)` : collapsed;
-}
-
-function buildFieldArgs(fields: [string, string][]): string[] {
-  return fields.flatMap(([key, value]) => ["--field", key, value]);
 }
 
 export default tool({
@@ -191,68 +85,41 @@ Examples:
       return buildError(`'ref' is required for '${command}'.`);
     }
 
-    const adwId = normalizeAdwId(args.adw_id);
-    if (command === "write-from-state" && !adwId) {
-      return buildError(`'adw_id' is required for '${command}'.`);
+    const adwId = validateRequiredAdwId(command, args.adw_id);
+    if (adwId.error) {
+      return buildError(adwId.error);
     }
 
     let fields: [string, string][] = [];
     if (command !== "show") {
       const parsedFields = parseFieldEntries((args as Record<string, unknown>).fields);
-      if (!parsedFields) {
+      if (!parsedFields.ok) {
         return buildError(
-          "'fields' must be an ordered array of [key, value], array of { key, value }, plain object, or JSON string.",
+          `'fields' payload is malformed: ${parsedFields.diagnostic}. Accepted forms: ordered [key, value] entries, { key, value } objects, plain object, or JSON string of those forms.`,
         );
       }
-      fields = parsedFields;
+      fields = parsedFields.entries;
     }
 
     const fieldArgs = buildFieldArgs(fields);
-    const cmdParts = ["uv", "run", "adw", "notes"];
+    const cmdParts = ["uv", "run", "--active", "adw", "notes"];
     if (command === "write") {
       cmdParts.push("write", "--ref", ref, ...fieldArgs);
     } else if (command === "write-from-state") {
-      cmdParts.push("write-from-state", "--ref", ref, "--adw-id", adwId as string, ...fieldArgs);
+      cmdParts.push("write-from-state", "--ref", ref, "--adw-id", adwId.value as string, ...fieldArgs);
     } else {
       cmdParts.push("show", "--ref", ref);
     }
 
-    try {
-      const result = Bun.spawnSync({
-        cmd: cmdParts,
-        stdout: "pipe",
-        stderr: "pipe",
-        timeout: SPAWN_TIMEOUT_MS,
-        env: sanitizedEnv(),
-      });
-
-      const decoder = new TextDecoder();
-      const stdout = result.stdout ? decoder.decode(result.stdout) : "";
-      const stderr = result.stderr ? decoder.decode(result.stderr) : "";
-
-      if (result.exitCode !== 0) {
-        const prioritized = sanitizeSnippet(stderr) || sanitizeSnippet(stdout);
-        const fallback = prioritized || `Exit code ${result.exitCode}`;
-        return `ERROR: adw notes ${command} failed.\n${fallback}`;
-      }
-
-      if (command === "show") {
-        try {
-          const parsed = JSON.parse(stdout);
-          return JSON.stringify(parsed, null, 2);
-        } catch {
-          const snippet = sanitizeSnippet(stdout, SHOW_PARSE_SNIPPET_LIMIT);
-          const safeSnippet = snippet.length > 0 ? snippet : "<empty stdout>";
-          return `ERROR: Failed to parse JSON output from adw notes show. Snippet: ${safeSnippet}`;
-        }
-      }
-
-      return `ADW Notes Command: ${command}\n\n${stdout}`;
-    } catch (error: any) {
-      const message = sanitizeSnippet(
-        error?.message ? String(error.message) : "Unknown execution error",
-      );
-      return `ERROR: Failed to execute adw notes ${command}. ${message}`;
+    const result = runNotesCommand(command, cmdParts);
+    if (!result.ok) {
+      return result.error;
     }
+
+    if (command === "show") {
+      return parseShowOutput(result.stdout);
+    }
+
+    return `ADW Notes Command: ${command}\n\n${result.stdout}`;
   },
 });

@@ -7,20 +7,24 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
-  refactor_astgrep: allow
+  refactor_astgrep_preview: allow
+  refactor_astgrep_apply: allow
   todoread: allow
   todowrite: allow
   task: allow
-  adw: allow
-  adw_spec: allow
+  adw: deny
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -80,12 +84,12 @@ If either is missing, output `ADW_BUILD_FIX_FAILED: Missing required arguments (
 Read these state fields explicitly:
 
 ```python
-current_step = adw_spec({"command": "read", "adw_id": adw_id, "field": "current_step"})
-request_fix = adw_spec({"command": "read", "adw_id": adw_id, "field": "request_fix"})
-fix_spec_content = adw_spec({"command": "read", "adw_id": adw_id, "field": "fix_spec_content"})
-review_feedback = adw_spec({"command": "read", "adw_id": adw_id, "field": "review_feedback"})
-review_findings = adw_spec({"command": "read", "adw_id": adw_id, "field": "review_findings"})
-worktree_path = adw_spec({"command": "read", "adw_id": adw_id, "field": "worktree_path"})
+current_step = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "current_step"})
+request_fix = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "request_fix"})
+fix_spec_content = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "fix_spec_content"})
+review_feedback = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "review_feedback"})
+review_findings = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "review_findings"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "worktree_path"})
 ```
 
 Validation rules:
@@ -102,7 +106,7 @@ If any validation fails, stop with a clear `ADW_BUILD_FIX_FAILED` message.
 Before any implementation work, write `fix_completed=true` using an explicit field write:
 
 ```python
-adw_spec({
+adw_spec_write({
   "command": "write",
   "adw_id": adw_id,
   "field": "fix_completed",
@@ -112,7 +116,7 @@ adw_spec({
 
 Then verify it with read-back. Retry once if necessary; otherwise fail closed.
 
-**Guardrail:** Never call `adw_spec write` without `field` when updating control-plane flags.
+**Guardrail:** Never call `adw_spec_write` without `field` when updating control-plane flags.
 
 ### Step 4: Verify Worktree
 

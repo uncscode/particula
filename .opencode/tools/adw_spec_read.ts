@@ -2,6 +2,7 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   normalizeOptionalString,
+  parseSpecOptions,
   runAdwSpecCommand,
   validateAndNormalizeAdwId,
 } from "./adw_spec_shared";
@@ -11,7 +12,7 @@ import {
 function sanitizedEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
-    if (key === "VIRTUAL_ENV" || value === undefined) continue;
+    if (value === undefined) continue;
     env[key] = value;
   }
   return env;
@@ -30,20 +31,23 @@ No contract change versus legacy adw_spec behavior for read semantics.`,
     command: tool.schema.enum(["list", "read"]),
     adw_id: tool.schema.string(),
     field: tool.schema.string().optional(),
-    json: tool.schema.boolean().optional(),
-    raw: tool.schema.boolean().optional(),
+    options: tool.schema.string().optional(),
   },
 
   async execute(args) {
-    const { command, adw_id, field, json, raw } = args;
+    const { command, adw_id, field, options } = args;
     const normalized = validateAndNormalizeAdwId(command, adw_id);
     if (!normalized.ok) {
       return normalized.error;
     }
+    const parsedOptions = parseSpecOptions(command, options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
+    }
 
-    const cmdParts = ["uv", "run", "adw", "spec", command, "--adw-id", normalized.adwId];
+    const cmdParts = ["uv", "run", "--active", "adw", "spec", command, "--adw-id", normalized.adwId];
     if (command === "list") {
-      if (json === true) {
+      if (parsedOptions.options.json) {
         cmdParts.push("--json");
       }
     } else {
@@ -51,7 +55,7 @@ No contract change versus legacy adw_spec behavior for read semantics.`,
       if (normalizedField) {
         cmdParts.push("--field", normalizedField);
       }
-      if (raw === true) {
+      if (parsedOptions.options.raw) {
         cmdParts.push("--raw");
       }
     }

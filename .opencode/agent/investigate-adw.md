@@ -13,9 +13,9 @@ description: >-
   Can fix issues with user approval.
   
   Examples:
-  - "Investigate adw abc12345"
+  - "Investigate workflow abc12345"
   - "Why did workflow xyz98765 fail?"
-  - "Check what's wrong with adw id def11111"
+  - "Check what's wrong with workflow id def11111"
 mode: primary
 permission:
   "*": deny
@@ -23,22 +23,22 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
   adw_status_health: allow
-  adw_workflow: allow
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   platform_issue_read: allow
   platform_pr_read: allow
-  run_pytest: deny
   run_pytest_basic: allow
   run_linters: allow
   get_datetime: allow
@@ -90,7 +90,7 @@ adw_status_health({"command": "status"})
 ## Step 1: Load State
 
 ```python
-adw_spec({"command": "list", "adw_id": "{adw_id}", "json": true})
+adw_spec_read({"command": "list", "adw_id": "{adw_id}", "options": "json"})
 ```
 
 **Key fields:**
@@ -173,14 +173,14 @@ platform_pr_read({"command": "pr-comments", "issue_number": "{pr_number}", "outp
 
 ```python
 # System status
-adw({"command": "status"})
-adw({"command": "health"})
+adw_status_health({"command": "status"})
+adw_status_health({"command": "health"})
 
 # Read specific field
-adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "workflow_checkpoint"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "workflow_checkpoint"})
 
 # Run tests in worktree
-run_pytest({"pytestArgs": ["{path}"], "cwd": "{worktree_path}", "minTests": 1, "failFast": true})
+run_pytest_basic({"testPath": "{path}", "cwd": "{worktree_path}", "minTests": 1, "options": "fail-fast"})
 
 # Check linting
 run_linters({"targetDir": "{worktree_path}", "autoFix": false})

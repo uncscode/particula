@@ -8,21 +8,24 @@ description: >-
   - Resolves planning context via prioritized fallback chain:
     1. plan-reviser handoff message with review_plan_ids (primary)
     2. PR/issue body metadata with plan ID extraction (fallback)
-  - Resolves canonical plan metadata and sections through adw_plans
+  - Resolves canonical plan metadata and sections through adw_plans_read
   - Resolves targets deterministically for epic/feature/maintenance variants
   - Creates type:generate issues via platform_issue_write create-issue
   - Enforces title and label contracts for generated issues
-  - Writes bounded completion/failure summaries via adw_spec messages-write
+  - Writes bounded completion/failure summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
   read: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   platform_issue_write: allow
   get_datetime: allow
@@ -48,7 +51,7 @@ input: $ARGUMENTS
    - Standalone maintenance: exactly one issue.
 3. Build issue payloads with canonical title/body/labels contracts.
 4. Create issues via `platform_issue_write` using bounded retries.
-5. Write a deterministic summary via `adw_spec messages-write` with created issue
+5. Write a deterministic summary via `adw_spec_messages messages-write` with created issue
    numbers, titles, and plan IDs plus partial-failure details when applicable.
 
 # Required Reading
@@ -72,16 +75,16 @@ Extract `adw_id` from `$ARGUMENTS` and fail closed if missing/malformed.
 Read workflow state:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "options": "raw"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path", "options": "raw"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and section `target_paths` resolve inside the ADW worktree, not
 the caller's current checkout.
 
@@ -97,7 +100,7 @@ list.
 Read workflow messages and look for the handoff emitted by `plan-reviser`:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 Scan messages (newest first) for a message where `agent == "plan-reviser"` and
@@ -115,7 +118,7 @@ metadata stored in `adw_state.json`.
 Read the full workflow state:
 
 ```python
-adw_spec({"command": "list", "adw_id": "{adw_id}", "json": true})
+adw_spec_read({"command": "list", "adw_id": "{adw_id}", "options": "json"})
 ```
 
 From the issue body and PR body, scan for:
@@ -126,10 +129,10 @@ From the issue body and PR body, scan for:
 2. **Plan type indicators** — look for keywords like `feature plan`,
    `epic plan`, `maintenance plan`, or the plan directory structure.
 
-Validate each candidate plan ID via `adw_plans show`:
+Validate each candidate plan ID via `adw_plans_read show`:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "show",
   "plan_id": "{candidate_id}",
   "options": "json",
@@ -137,7 +140,7 @@ adw_plans({
 })
 ```
 
-Accept only plan IDs where `adw_plans show` succeeds. Derive `plan_type` from
+Accept only plan IDs where `adw_plans_read show` succeeds. Derive `plan_type` from
 the validated plan's metadata.
 
 If at least one valid plan ID is confirmed, proceed to Step 3.
@@ -145,7 +148,7 @@ If at least one valid plan ID is confirmed, proceed to Step 3.
 ### No Context Available
 
 If no usable messages exist and both sources fail:
-1. Write a bounded status note via `adw_spec messages-write` explaining which
+1. Write a bounded status note via `adw_spec_messages messages-write` explaining which
    sources were attempted and why each failed.
 2. Exit cleanly (no issue creation attempt).
 
@@ -172,11 +175,11 @@ If no usable messages exist and both sources fail:
 ## Step 4: Resolve Canonical Plan Data and Extract Issue Content
 
 Canonical source-of-truth policy:
-- Use `adw_plans` as the **only** source for plan metadata, phases, and section
+- Use `adw_plans_read` as the **only** source for plan metadata, phases, and section
   content. Do **not** require rendered markdown docs; use canonical structured
   plan files only.
-- `adw_plans show` provides plan metadata, phases, and status.
-- `adw_plans list-sections` (with `options: "populate json"`) provides section content
+- `adw_plans_read show` provides plan metadata, phases, and status.
+- `adw_plans_read list-sections` (with `options: "populate json"`) provides section content
   for richer issue bodies.
 
 For each target plan:
@@ -184,7 +187,7 @@ For each target plan:
 1. Resolve canonical plan metadata:
 
    ```python
-   adw_plans({
+    adw_plans_read({
      "command": "show",
      "plan_id": "{plan_id}",
      "options": "json",
@@ -198,7 +201,7 @@ For each target plan:
 2. Load section content when richer body context is needed:
 
    ```python
-   adw_plans({
+    adw_plans_read({
      "command": "list-sections",
      "plan_id": "{plan_id}",
      "options": "populate json",
@@ -210,7 +213,7 @@ For each target plan:
    dependencies, implementation tasks) for the issue body.
 
 3. Build the phase checklist from the structured `phases` array in the
-   `adw_plans show` response. Each phase entry provides `id`, `title`, `size`,
+    `adw_plans_read show` response. Each phase entry provides `id`, `title`, `size`,
    and `status`.
 
 Canonical resolution contract (fail closed):
@@ -222,9 +225,9 @@ Canonical resolution contract (fail closed):
   - `E{n}-F{m}`
   - `E{n}-M{m}`
 - enforce canonical ID validation before payload build and reject non-canonical IDs,
-- require `adw_plans show` to succeed for that ID,
+- require `adw_plans_read show` to succeed for that ID,
 - reject ambiguous or malformed IDs,
-- if section loading is needed, require `adw_plans list-sections` to resolve
+- if section loading is needed, require `adw_plans_read list-sections` to resolve
   cleanly,
 - if plan lookup is ambiguous or fails, skip that target.
 
@@ -289,12 +292,12 @@ Priority fallback:
 
 ### Body Contract
 
-Build the issue body entirely from `adw_plans` structured data. Include:
+Build the issue body entirely from `adw_plans_read` structured data. Include:
 - the target plan identifier and title,
 - the canonical `plan_id`,
-- the phase checklist table extracted from the `phases` array in `adw_plans show`,
+- the phase checklist table extracted from the `phases` array in `adw_plans_read show`,
 - section-derived context (overview, scope, testing strategy) from
-  `adw_plans list-sections --populate` when available.
+  `adw_plans_read list-sections --populate` when available.
 
 **Body template:**
 
@@ -322,8 +325,8 @@ Generate implementation issues for **{plan_type}** plan **{plan_id}: {plan_title
 ## ADW Instructions
 
 When processing this issue:
-1. Resolve the plan via `adw_plans show {plan_id}`
-2. Load plan sections via `adw_plans list-sections {plan_id} --populate` when needed
+1. Resolve the plan via `adw_plans_read show {plan_id}`
+2. Load plan sections via `adw_plans_read list-sections {plan_id} --populate` when needed
 3. For each phase in the Phases to Generate table, create an implementation issue with:
    - Full technical details from the plan sections
    - Specific file paths from the scope section
@@ -367,7 +370,7 @@ At completion, write one bounded summary message containing:
 Use:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-issue-generator",

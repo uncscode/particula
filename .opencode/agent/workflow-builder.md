@@ -10,7 +10,9 @@ permission:
   edit: allow
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
@@ -20,9 +22,7 @@ permission:
   feedback_log: allow
   create_workspace: deny
   workflow_builder: allow
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow

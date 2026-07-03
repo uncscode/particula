@@ -11,7 +11,9 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
@@ -20,9 +22,7 @@ permission:
   adw_spec: deny
   adw_spec_read: allow
   adw_spec_messages: allow
-  adw_plans: deny
   adw_plans_read: allow
-  adw_issues_spec: deny
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -31,10 +31,8 @@ permission:
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_issue_write: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: deny
@@ -92,22 +90,21 @@ Mark each todo `in_progress` when starting and `completed` when done.
 Parse `adw_id` from the prompt. Read shared context and full batch:
 
 ```python
-adw_spec_read({"command": "read", "adw_id": "<adw_id>"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "options": "raw"})
 ```
 
 Resolve the worktree path and plan ID from `spec_content`, then load plan
 section paths for issue body assembly and source traceability:
 
 ```python
-adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path", "options": "raw"})
 ```
 
 ```python
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```
@@ -124,7 +121,7 @@ Confirm completeness review is present for every row:
 adw_issues_batch_log({
   "adw_id": "<adw_id>",
   "issue": "<index>",
-  "read": true
+  "options": "read"
 })
 ```
 
@@ -170,6 +167,9 @@ adw_issues_batch_write({
   "content": "{\"metadata\": {\"github_issue_number\": 123}}"
 })
 ```
+
+Do not set `section: "metadata"` on writes. `metadata` is a read-only selector;
+metadata updates must omit `section` and use a JSON payload.
 
 6. Stop on first create/writeback failure and report partial success.
 

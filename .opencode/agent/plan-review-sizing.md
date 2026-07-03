@@ -10,7 +10,7 @@ description: >-
   - Enforces 100 LOC-oriented granularity guidance and canonical sizing rules
   - Expands vague descriptions to concrete file/method/LOC-level actions
   - Adds missing Size annotations where absent and flags unresolved M/L phases as warnings
-  - Writes bounded review status summaries via adw_spec messages-write
+  - Writes bounded review status summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -19,10 +19,13 @@ permission:
   edit: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -44,13 +47,13 @@ input: $ARGUMENTS
 3. Review section keys `phase_details`, `implementation_tasks`, `example_tasks`, and `milestones_timeline`.
 4. Expand vague checklist/task items into specific file/method/LOC-oriented actions.
 5. Apply canonical sizing references (`.opencode/guides/code_culture.md` and
-   `.opencode/guides/phase-sizing-rules.md`) and emit bounded summary status via `adw_spec messages-write`.
+   `.opencode/guides/phase-sizing-rules.md`) and emit bounded summary status via `adw_spec_messages messages-write`.
 
 # Required Reading
 
 - @.opencode/guides/code_style.md - Coding conventions
 - @.opencode/guides/testing_guide.md - Testing and plan-quality expectations
-- `adw_plans({"command": "list-sections", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})` - scoped section discovery source
+- `adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "options": "json", "cwd": worktree_path})` - scoped section discovery source
 - @.opencode/guides/code_culture.md - 100 LOC rule and slicing expectations
 - @.opencode/guides/phase-sizing-rules.md - canonical XS/S/M/L/XL sizing behavior
 
@@ -65,16 +68,16 @@ If missing or invalid `adw_id`, fail with explicit signal (`PLAN_REVIEW_SIZING_F
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -87,7 +90,7 @@ do not require it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -110,10 +113,10 @@ Use `review_plan_ids` (not `drafted_plan_ids`) as the canonical scope for this p
 For each plan ID from `review_plan_ids`, resolve canonical section files via:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -140,7 +143,7 @@ Edits stay scoped to canonical structured plan files.
 
 If `review_plan_ids` is missing/empty, or section resolution yields no files,
 do a deterministic no-op success path:
-1. Write a no-op summary through `adw_spec messages-write`.
+1. Write a no-op summary through `adw_spec_messages messages-write`.
 2. Emit success signal (do not fail).
 
 ## Step 3: Review canonical section keys
@@ -221,7 +224,7 @@ Use `.opencode/guides/phase-sizing-rules.md` as canonical guidance:
 Write one bounded summary message using:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-review-sizing",

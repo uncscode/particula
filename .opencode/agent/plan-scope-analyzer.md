@@ -5,9 +5,9 @@ description: >-
   writes a plain-text classification summary to the workflow message log.
 
   This agent:
-  - Reads rough-scoping issue body via adw_spec
+  - Reads rough-scoping issue body via adw_spec_read
   - Parses required template sections (with diagnostics for missing sections)
-  - Extracts feature/maintenance/research child-track hints
+  - Extracts feature/maintenance/research child-track hints from explicit track types
   - Emits deterministic standalone `auto` placeholders for downstream create-time ID resolution
   - Treats plan references in rough scope/dependencies as context unless the issue explicitly requests a parent epic/epic-linked track
   - Emits a plain-text classification message for downstream planners
@@ -17,9 +17,12 @@ permission:
   read: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -65,7 +68,7 @@ If missing or malformed, emit `PLAN_SCOPE_ANALYZER_FAILED`.
 Read the rough-scoping issue from workflow state:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "issue"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "issue"})
 ```
 
 Extract the issue body string for parsing. If the issue is missing or empty,
@@ -79,7 +82,10 @@ Parse these sections (case-insensitive headings) from the rough-scoping template
 - Vision
 - Problem Statement
 - Rough Scope
+- Codebase Research References
+- Examples / Prior Art
 - Child Tracks
+- Suggested Phases By Track
 - Dependencies
 - Constraints
 - Success Metrics
@@ -104,11 +110,24 @@ Do not guess a type.
 ### Child Tracks Parsing
 
 Extract child-track hints from the Child Tracks section. Accept either a table
-or bullet list. Split results into three lists:
+or bullet list. Prefer explicit `Track Type` values when present and split
+results into three lists:
 
 - `feature_tracks`
 - `maintenance_tracks`
 - `research_tracks`
+
+Accepted track type labels are `Feature`, `Maintenance`, and `Research`
+(case-insensitive). Treat `Research` rows as `research_tracks`. If a row omits
+Track Type, fall back to existing name/description inference and record a
+diagnostic note such as `missing_track_type: <track-id>` when the type cannot be
+inferred deterministically.
+
+The Codebase Research References, Examples / Prior Art, and Suggested Phases By
+Track sections are context sections for downstream plan drafting. Preserve their
+content as issue context; they do not add output keys beyond the existing
+`feature_tracks`, `maintenance_tracks`, `research_tracks`, `next_ids`, and
+`diagnostics` lines.
 
 Allow multiple track lists to be populated when the issue is epic-scoped. If
 no tracks are detected from the Child Tracks section, apply standalone
@@ -150,7 +169,7 @@ Derive `epic_id` using these rules:
 - If the issue provides an explicit epic ID (e.g., `E18`), use it.
 - If the issue says "this is an epic" but does not provide an explicit epic ID,
   set `epic_id: auto`. The orchestrator will auto-derive the next `E{n}` via
-  `adw_plans create`.
+  `adw_plans_mutate create`.
 
 **For `plan_type: feature` or `plan_type: maintenance` (parent linking):**
 
@@ -206,7 +225,7 @@ schema lines are consumed by the orchestrator's create-time ID resolution and
 Write a plain-text message to the workflow message log:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-scope-analyzer",

@@ -19,7 +19,7 @@ describe("mock-subprocess", () => {
     installSubprocessMocks();
     setDollarText("ok");
 
-    await Bun.$`${["uv", "run", "adw", "status"]}`.text();
+    await Bun.$`${["uv", "run", "--active", "adw", "status"]}`.text();
     expect(getInvocations().length).toBe(1);
 
     resetSubprocessMocks();
@@ -30,12 +30,12 @@ describe("mock-subprocess", () => {
     installSubprocessMocks();
     setSpawnResponse({ stdout: "spawn-ok", stderr: "", exitCode: 0 });
 
-    const result = Bun.spawnSync(["uv", "run", "adw", "status"]);
+    const result = Bun.spawnSync(["uv", "run", "--active", "adw", "status"]);
     expect(result.exitCode).toBe(0);
     expect(Buffer.from(result.stdout).toString()).toBe("spawn-ok");
     expect(getInvocations().at(-1)).toEqual({
       kind: "spawnSync",
-      args: ["uv", "run", "adw", "status"],
+      args: ["uv", "run", "--active", "adw", "status"],
     });
   });
 
@@ -43,7 +43,7 @@ describe("mock-subprocess", () => {
     installSubprocessMocks();
     setDollarError({ stderr: "stderr message", stdout: "stdout shadow", message: "boom" });
 
-    await expect(Bun.$`uv run adw status`.text()).rejects.toThrow("boom");
+    await expect(Bun.$`uv run --active adw status`.text()).rejects.toThrow("boom");
     expect(getInvocations().at(-1)?.kind).toBe("$");
   });
 });

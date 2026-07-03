@@ -34,4 +34,4 @@ Read-only wrapper for pull-request / merge-request read commands.
 
 - Required PR/MR identifiers are validated before subprocess execution.
 - `pr-diff` rejects `actionable_only` during wrapper preflight.
-- Success output is delegated directly from `uv run adw platform <command>`.
+- Success output is delegated directly from `uv run --active adw platform <command>`.

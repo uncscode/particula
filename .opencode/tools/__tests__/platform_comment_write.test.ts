@@ -27,7 +27,7 @@ describe("platform_comment_write wrapper", () => {
     const execute = await loadToolExecute("../../platform_comment_write.ts");
     await execute({ command: "comment", issue_number: "123", body: "LGTM" });
     const call = getInvocations().at(-1);
-    expect(call?.args.join(" ")).toContain("uv run adw platform comment 123 --body LGTM");
+    expect(call?.args.join(" ")).toContain("uv run --active adw platform comment 123 --body LGTM");
   });
 
   it("rejects all-zero issue token", async () => {

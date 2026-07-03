@@ -3,11 +3,11 @@
 description: 'Primary agent that polishes code after the build-refine phase by running
   linting with auto-fix and committing formatting changes when needed.
 
-  This agent: - Reads workflow state via adw_spec tool - Detects clean working tree
+  This agent: - Reads workflow state via adw_spec_read tool - Detects clean working tree
   to skip polish - Runs linters (ruff, mypy) with auto-fix - Commits polish changes
   via adw-commit - Operates fully autonomously with no user input
 
-  Invoked by: adw workflow run adw-polish <issue-number> --adw-id <id>
+  Invoked by: workflow runner polish <issue-number> --adw-id <id>
   Runs once after build-refine in complete/patch/pr-fix pipelines
 
   Examples:
@@ -19,20 +19,21 @@ permission:
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   build_mkdocs: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -55,7 +56,7 @@ input: $ARGUMENTS
 # Core Mission
 
 Ensure code quality after build-refine by:
-1. Reading workflow context from `adw_spec`
+1. Reading workflow context from `adw_spec_read`
 2. Exiting early when the working tree is clean
 3. Running linters (ruff, mypy) with auto-fix
 4. Committing polish changes
@@ -127,7 +128,7 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -145,7 +146,7 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations:
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -156,7 +157,7 @@ Confirm you are operating in the isolated worktree.
 Run the clean tree check before any linting or subagent call:
 
 ```python
-status = git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+status = git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
 if not status.strip():
     print("ADW_POLISH_SKIPPED: No changes to polish (working tree clean)")
     return

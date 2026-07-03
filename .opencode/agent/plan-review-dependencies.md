@@ -9,7 +9,7 @@ description: >-
   - Reviews section 6 (Dependencies / Integration Points) and section 3 (Phase Checklist)
   - Detects forward-reference violations and intra-feature cycle/DAG issues
   - Validates cross-document dependency consistency between related plan docs
-  - Writes bounded review status summaries via adw_spec messages-write
+  - Writes bounded review status summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -18,10 +18,13 @@ permission:
   edit: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -40,10 +43,10 @@ input: $ARGUMENTS
 
 1. Parse `adw_id` from `$ARGUMENTS` and load workflow context.
 2. Resolve scoped plan IDs from a `plan-reviser` or `plan-orchestrator` handoff (`review_plan_ids`) and fail closed on missing/empty input.
-3. Resolve canonical section files via `adw_plans list-sections` under `.opencode/plans/sections/`.
+3. Resolve canonical section files via `adw_plans_read list-sections` under `.opencode/plans/sections/`.
 4. Review dependency-focused canonical sections (`dependencies`/`dependency_map`/`phase_details`).
 4. Validate sequencing, forward-reference, cycle/DAG, and cross-document consistency rules.
-5. Expand thin dependency guidance in-place and write a bounded summary via `adw_spec messages-write`.
+5. Expand thin dependency guidance in-place and write a bounded summary via `adw_spec_messages messages-write`.
 
 ## Trust Boundary
 
@@ -56,8 +59,8 @@ behavior for document-level issues unless required workflow state is missing.
 
 - @.opencode/guides/architecture_reference.md - architecture boundaries and integration points
 - @.opencode/guides/code_style.md - deterministic, bounded edits
-- `adw_plans({"command": "list", "lifecycle": "active", "json": true, "cwd": worktree_path})` - optional active-plan sanity source
-- `adw_plans({"command": "list-sections", "plan_id": "<id>", "json": true, "cwd": worktree_path})` - per-plan section resolution source
+- `adw_plans_read({"command": "list", "lifecycle": "active", "options": "json", "cwd": worktree_path})` - optional active-plan sanity source
+- `adw_plans_read({"command": "list-sections", "plan_id": "<id>", "options": "json", "cwd": worktree_path})` - per-plan section resolution source
 - `.opencode/plans/sections/` - canonical editable plan section root
 
 # Process
@@ -78,16 +81,16 @@ signal (`PLAN_REVIEW_DEPENDENCIES_FAILED`).
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -100,7 +103,7 @@ questions; do not require it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -128,10 +131,10 @@ Fail-closed rationale:
 For each `plan_id` in `review_plan_ids`, resolve canonical section files:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -230,7 +233,7 @@ If a document is malformed, partial, or cannot be parsed reliably:
 Write one bounded summary through `messages-write`:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-review-dependencies",

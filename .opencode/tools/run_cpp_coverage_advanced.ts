@@ -1,130 +1,18 @@
 import { tool } from "@opencode-ai/plugin";
-import { existsSync, realpathSync, statSync } from "node:fs";
-import path from "node:path";
 
-// --- Inlined from lib/cpp_lint_wrapper_shared.ts ---
-
-const MAX_DIAGNOSTIC_LENGTH = 4_000;
-
-const S_IFMT = 0o170000;
-const S_IFDIR = 0o040000;
-
-function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
-  if (typeof s.isDirectory === "function") return s.isDirectory();
-  if (typeof s.isDirectory === "boolean") return s.isDirectory;
-  return (((s as any).mode ?? 0) & S_IFMT) === S_IFDIR;
-}
-
-type RedactionRule = {
-  pattern: RegExp;
-  redact: (...groups: string[]) => string;
-};
-
-const REDACTION_RULES: RedactionRule[] = [
-  {
-    pattern: /\b(auth|token|key|password|secret)=([^\s,]+)/gi,
-    redact: (key) => `${key}=[REDACTED]`,
-  },
-  {
-    pattern: /(https?:\/\/[^:\s]+:)([^@\s/]+)(@[^\s]+)/gi,
-    redact: (prefix, _secret, suffix) => `${prefix}[REDACTED]${suffix}`,
-  },
-  {
-    pattern: /(bearer\s+)([^\s]+)/gi,
-    redact: (prefix) => `${prefix}[REDACTED]`,
-  },
-];
-
-function escapeControlChars(value: string): string {
-  return value.replace(/[\x00-\x1f\x7f]/g, (char) => {
-    const hex = char.charCodeAt(0).toString(16).padStart(2, "0");
-    return `\\x${hex}`;
-  });
-}
-
-function redactSecrets(value: string): string {
-  let redacted = value;
-  for (const rule of REDACTION_RULES) {
-    redacted = redacted.replace(rule.pattern, (...args: string[]) => {
-      const groups = args.slice(1, -2);
-      return rule.redact(...groups);
-    });
-  }
-  return redacted;
-}
-
-function sanitizeDiagnosticValue(value: string): string {
-  const sanitized = redactSecrets(escapeControlChars(value));
-  if (sanitized.length <= MAX_DIAGNOSTIC_LENGTH) {
-    return sanitized;
-  }
-  return `${sanitized.slice(0, MAX_DIAGNOSTIC_LENGTH)}... [truncated]`;
-}
-
-function validatePathWithinRepo(pathValue: string, label: "sourceDir" | "buildDir"): string | undefined {
-  try {
-    if (!existsSync(pathValue)) {
-      return `ERROR: ${label} path does not exist: ${pathValue}`;
-    }
-    if (!isStatDirectory(statSync(pathValue))) {
-      return `ERROR: ${label} path is not a directory: ${pathValue}`;
-    }
-
-    const repoRoot = realpathSync(process.cwd());
-    const resolvedPath = realpathSync(pathValue);
-    const rel = path.relative(repoRoot, resolvedPath);
-    if (rel.startsWith("..") || path.isAbsolute(rel)) {
-      return `ERROR: ${label} path resolves outside repository root: ${pathValue} (canonical: ${resolvedPath})`;
-    }
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    return `ERROR: invalid ${label} path: ${pathValue} (${message})`;
-  }
-
-  return undefined;
-}
-
-function validateDirectoryPathWithinRepo(pathValue: string, label: string): string | undefined {
-  try {
-    const repoRoot = realpathSync(process.cwd());
-    const resolvedPath = path.resolve(pathValue);
-
-    if (existsSync(resolvedPath)) {
-      const resolvedExistingPath = realpathSync(resolvedPath);
-      const rel = path.relative(repoRoot, resolvedExistingPath);
-      if (rel.startsWith("..") || path.isAbsolute(rel)) {
-        return `ERROR: ${label} path resolves outside repository root: ${pathValue} (canonical: ${resolvedExistingPath})`;
-      }
-
-      if (!isStatDirectory(statSync(resolvedPath))) {
-        return `ERROR: ${label} path is not a directory: ${pathValue}`;
-      }
-
-      return undefined;
-    }
-
-    const parentPath = path.dirname(resolvedPath);
-    const resolvedParentPath = realpathSync(parentPath);
-    const rel = path.relative(repoRoot, resolvedParentPath);
-    if (rel.startsWith("..") || path.isAbsolute(rel)) {
-      return `ERROR: ${label} path resolves outside repository root: ${pathValue} (canonical: ${resolvedParentPath})`;
-    }
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    return `ERROR: invalid ${label} path: ${pathValue} (${message})`;
-  }
-
-  return undefined;
-}
-
-// --- Tool-local helpers ---
+import {
+  parseCppCoverageAdvancedOptions,
+  rejectLegacyDirectFields,
+  resolveDirectoryPathWithinRepo,
+  resolveExistingDirectoryWithinRepo,
+  sanitizeDiagnosticValue,
+} from "./run_cpp_wrapper_shared";
 
 const MISSING_SCRIPT_HINT = "Missing backing script .opencode/tools/run_cpp_coverage.py.";
 const MIN_TIMEOUT_SECONDS = 1;
 const MAX_TIMEOUT_SECONDS = 3_600;
 const MIN_THRESHOLD = 0;
 const MAX_THRESHOLD = 100;
-const SUPPORTED_TOOLS = new Set(["gcov", "llvm-cov"]);
 
 function validateThreshold(threshold: unknown): string | undefined {
   if (threshold === undefined) {
@@ -152,29 +40,36 @@ function validateTimeout(timeout: unknown): string | undefined {
   return undefined;
 }
 
-// --- Tool definition ---
-
 export default tool({
   description: `Run advanced C++ coverage checks with extended controls.
 
 Use this wrapper when you need tool/filter/html options in addition to routine buildDir/threshold/timeout controls.`,
   args: {
-    outputMode: tool.schema.enum(["summary", "full", "json"]).optional(),
     buildDir: tool.schema.string(),
     threshold: tool.schema.number().optional(),
     timeout: tool.schema.number().optional(),
-    tool: tool.schema.enum(["gcov", "llvm-cov"]).optional(),
     filter: tool.schema.string().optional(),
     html: tool.schema.string().optional(),
+    options: tool.schema.string().optional(),
   },
   async execute(args) {
+    const legacyFieldError = rejectLegacyDirectFields(args, "run_cpp_coverage_advanced", ["outputMode", "tool", "extraArgs"]);
+    if (legacyFieldError) {
+      return legacyFieldError;
+    }
+
+    const parsedOptions = parseCppCoverageAdvancedOptions(args.options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
+    }
+
     const buildDir = typeof args.buildDir === "string" ? args.buildDir.trim() : "";
     if (!buildDir) {
       return "ERROR: buildDir is required. Provide a build directory containing coverage artifacts.";
     }
-    const pathError = validatePathWithinRepo(buildDir, "buildDir");
-    if (pathError) {
-      return pathError;
+    const buildDirResult = resolveExistingDirectoryWithinRepo(buildDir, "buildDir");
+    if (!buildDirResult.ok) {
+      return buildDirResult.error;
     }
 
     const thresholdError = validateThreshold(args.threshold);
@@ -186,25 +81,23 @@ Use this wrapper when you need tool/filter/html options in addition to routine b
       return timeoutError;
     }
 
-    const coverageTool = typeof args.tool === "string" ? args.tool.trim() : "";
-    if (coverageTool && !SUPPORTED_TOOLS.has(coverageTool)) {
-      return "ERROR: tool must be one of: gcov, llvm-cov.";
-    }
-
+    const coverageTool = parsedOptions.options.tool || "";
     const filter = typeof args.filter === "string" ? args.filter.trim() : "";
     const html = typeof args.html === "string" ? args.html.trim() : "";
+    let resolvedHtml: string | undefined;
     if (html) {
-      const htmlPathError = validateDirectoryPathWithinRepo(html, "html");
-      if (htmlPathError) {
-        return htmlPathError;
+      const htmlResult = resolveDirectoryPathWithinRepo(html, "html");
+      if (!htmlResult.ok) {
+        return htmlResult.error;
       }
+      resolvedHtml = htmlResult.path;
     }
 
-    const outputMode = args.outputMode || "summary";
+    const outputMode = parsedOptions.options.outputMode || "summary";
     const cmdParts: (string | number)[] = [
       "python3",
       `${import.meta.dir}/run_cpp_coverage.py`,
-      `--build-dir=${buildDir}`,
+      `--build-dir=${buildDirResult.path}`,
       `--output=${outputMode}`,
     ];
 
@@ -220,8 +113,8 @@ Use this wrapper when you need tool/filter/html options in addition to routine b
     if (filter) {
       cmdParts.push(`--filter=${filter}`);
     }
-    if (html) {
-      cmdParts.push(`--html=${html}`);
+    if (resolvedHtml) {
+      cmdParts.push(`--html=${resolvedHtml}`);
     }
 
     try {
@@ -233,17 +126,13 @@ Use this wrapper when you need tool/filter/html options in addition to routine b
       const message = sanitizeDiagnosticValue(error?.message || "Unknown error");
       const combinedLower = `${stderr} ${stdout} ${message}`.toLowerCase();
 
-      if (stderr.trim() || stdout.trim()) {
+      if (stdout.trim()) {
+        return stdout;
+      }
+
+      if (stderr.trim()) {
         const hint = combinedLower.includes("enoent") ? `\n${MISSING_SCRIPT_HINT}` : "";
-        return [
-          "ERROR: C++ coverage advanced run failed",
-          "",
-          "STDERR:",
-          stderr || "(empty)",
-          "",
-          "STDOUT:",
-          stdout || "(empty)",
-        ].join("\n") + hint;
+        return `ERROR: C++ coverage advanced run failed\n\n${stderr}${hint}`;
       }
 
       const hint = combinedLower.includes("enoent") ? `\n${MISSING_SCRIPT_HINT}` : "";

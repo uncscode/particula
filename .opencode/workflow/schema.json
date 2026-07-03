@@ -249,7 +249,8 @@
               "git_merge",
               "git_worktree",
               "run_linters",
-              "run_pytest"
+              "run_pytest_basic",
+              "run_pytest_advanced"
             ]
           }
         },

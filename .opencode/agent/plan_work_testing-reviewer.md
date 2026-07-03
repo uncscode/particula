@@ -21,19 +21,20 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: deny
   adw: deny
-  adw_spec: allow
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
-  git_operations: deny
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -83,7 +84,7 @@ task({
 ## Step 1: Load Plan from spec_content
 
 ```python
-current_plan = adw_spec({
+current_plan = adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })
@@ -91,7 +92,7 @@ current_plan = adw_spec({
 
 Also load context:
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
 ## Step 2: Extract Test Requirements
@@ -161,7 +162,7 @@ For each error condition in plan:
 
 2. Write revised plan to spec_content:
 ```python
-adw_spec({
+adw_spec_write({
   "command": "write",
   "adw_id": "{adw_id}",
   "content": revised_plan
@@ -170,7 +171,7 @@ adw_spec({
 
 3. Verify write:
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })

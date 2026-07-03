@@ -22,11 +22,16 @@ permission:
   edit: allow
   write: allow
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
   todoread: allow
   todowrite: allow
-  adw: allow
+  adw: deny
+  adw_status_health: allow
+  adw_setup: allow
+  adw_service: allow
   adw_spec: deny
   adw_spec_read: allow
   adw_spec_write: allow
@@ -35,10 +40,10 @@ permission:
   create_workspace: allow
   workflow_builder: allow
   git_diff: allow
-  git_operations: deny
   platform_operations: deny
   platform_issue_write: allow
-  run_pytest: allow
+  run_pytest_basic: allow
+  run_pytest_advanced: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -132,13 +137,17 @@ tools:
   edit: true           # Edit existing files (find/replace)
   write: true          # Write/create new files
   list: true           # List directory contents
-  ripgrep: true        # Search files/contents (glob + content modes)
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   # Task Management
   todoread: true       # Read todo list
   todowrite: true      # Write/update todo list
   task: false          # Launch subagents (primary agents only)
   # ADW Workflow Tools
-  adw: false           # ADW CLI commands
+  adw_status_health: false   # Read-only status/health commands
+  adw_setup: false           # Setup-family commands
+  adw_service: false         # Service lifecycle commands
   adw_spec_read: true  # Read workflow state
   adw_spec_write: true # Write workflow state
   adw_spec_messages: true # Read/write workflow messages
@@ -153,7 +162,8 @@ tools:
   platform_issue_write: false  # Create/update GitHub/GitLab issues
   platform_comment_write: false # Post comments
   # Validation Tools
-  run_pytest: false        # Run tests with coverage
+  run_pytest_basic: false      # Run routine pytest checks
+  run_pytest_advanced: false   # Run pytest with coverage/passthrough controls
   run_linters: false       # Run ruff, mypy with auto-fix
   # Utility Tools
   get_datetime: true           # Get current date/time
@@ -187,17 +197,17 @@ Agent instructions and guidelines go here in markdown format.
 | | `edit` | Edit existing files (find/replace) |
 | | `write` | Write/create new files |
 | | `list` | List directory contents |
-| | `ripgrep` | File discovery + content search |
+| | `find_files` / `search_content` / `ripgrep_advanced` | File discovery + content search |
 | **Task Management** | `todoread` | Read todo list |
 | | `todowrite` | Write/update todo list |
 | | `task` | Launch subagents (omit session_id on retries) |
-| **ADW Workflow** | `adw` | ADW CLI commands |
+| **ADW Workflow** | `adw_status_health` / `adw_setup` / `adw_service` | Focused ADW CLI wrapper commands |
 | | `adw_spec_read` / `adw_spec_write` / `adw_spec_messages` | Read/write workflow state and messages |
 | | `create_workspace` | Create ADW worktrees |
 | | `workflow_builder` | Build workflow definitions |
 | **Git & Platform** | `git_diff` / `git_stage` / `git_commit` / `git_branch` / `git_merge` / `git_worktree` | Split git operations by capability |
 | | `platform_issue_read` / `platform_issue_write` / `platform_comment_write` / `platform_pr_write` / `platform_pr_read` | Split GitHub/GitLab API operations by capability |
-| **Validation** | `run_pytest` | Run tests with coverage |
+| **Validation** | `run_pytest_basic` / `run_pytest_advanced` | Run routine or advanced pytest checks |
 | | `run_linters` | Run ruff, mypy with auto-fix |
 | **Utility** | `get_datetime` | Get current date/time |
 | | `get_version` | Get package version |
@@ -293,7 +303,7 @@ Use these question templates to begin the dialogue:
 - "Are there areas of the codebase it should NOT access?"
 
 **Tool Requirements**:
-- "Does this agent need to run tests? (run_pytest)"
+- "Does this agent need to run tests? (run_pytest_basic or run_pytest_advanced)"
 - "Does this agent need to fix linting issues? (run_linters)"
 - "Does this agent need to inspect, stage, commit, or push git changes? (split git wrappers such as git_diff, git_stage, git_commit, git_branch)"
 - "Does this agent need to interact with GitHub/GitLab? (split platform wrappers such as platform_issue_read, platform_issue_write, platform_comment_write)"
@@ -307,11 +317,11 @@ Use these question templates to begin the dialogue:
 
 **Available Tools** (show full list):
 ```
-File Operations: read, edit, write, list, ripgrep
+File Operations: read, edit, write, list, find_files, search_content, ripgrep_advanced
 Task Management: todoread, todowrite, task (subagent invocation)
-ADW Workflow: adw, adw_spec_read, adw_spec_write, adw_spec_messages, create_workspace, workflow_builder
+ADW Workflow: adw_status_health, adw_setup, adw_service, adw_spec_read, adw_spec_write, adw_spec_messages, create_workspace, workflow_builder
 Git & Platform: git_diff, git_stage, git_commit, git_branch, git_merge, git_worktree, platform_issue_read, platform_issue_write, platform_comment_write, platform_pr_read, platform_pr_write
-Validation: run_pytest, run_linters
+Validation: run_pytest_basic/run_pytest_advanced, run_linters
 Utility: get_datetime, get_version
 Disabled (security): webfetch, websearch, codesearch, bash
 ```
@@ -424,11 +434,15 @@ tools:
   edit: false      # Cannot modify files
   write: false     # Cannot create files
   list: true
-  ripgrep: true
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   todoread: true
   todowrite: true
   task: false
-  adw: false
+  adw_status_health: false
+  adw_setup: false
+  adw_service: false
   adw_spec_read: true
   create_workspace: false
   workflow_builder: false
@@ -437,7 +451,8 @@ tools:
   git_commit: false
   platform_issue_read: false
   platform_issue_write: false
-  run_pytest: false
+  run_pytest_basic: false
+  run_pytest_advanced: false
   run_linters: false
   get_datetime: true
   get_version: true
@@ -454,11 +469,15 @@ tools:
   edit: true       # Can modify existing files
   write: true      # Can create new files
   list: true
-  ripgrep: true
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   todoread: true
   todowrite: true
   task: false
-  adw: false
+  adw_status_health: false
+  adw_setup: false
+  adw_service: false
   adw_spec_read: true
   adw_spec_write: true
   create_workspace: false
@@ -467,7 +486,7 @@ tools:
   git_stage: true         # Can stage
   git_commit: true        # Can commit
   platform_issue_write: false
-  run_pytest: true        # Can run tests
+  run_pytest_advanced: true   # Can run pytest with coverage/passthrough controls
   run_linters: true       # Can run linters
   get_datetime: true
   get_version: true
@@ -484,18 +503,22 @@ tools:
   edit: true
   write: true
   list: true
-  ripgrep: true
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   todoread: true
   todowrite: true
   task: false
-  adw: false
+  adw_status_health: false
+  adw_setup: false
+  adw_service: false
   adw_spec_read: true
   create_workspace: false
   workflow_builder: false
   git_diff: true
   git_stage: true
   platform_issue_write: false
-  run_pytest: true        # Primary tool
+  run_pytest_advanced: true   # Primary pytest tool
   run_linters: false
   get_datetime: true
   get_version: true
@@ -512,11 +535,15 @@ tools:
   edit: true
   write: true
   list: true
-  ripgrep: true
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   todoread: true
   todowrite: true
   task: false
-  adw: false
+  adw_status_health: false
+  adw_setup: false
+  adw_service: false
   adw_spec_read: true
   adw_spec_write: true
   adw_spec_messages: true
@@ -528,7 +555,7 @@ tools:
   git_branch: true        # Push branches
   platform_pr_write: true # For PRs (create-pr)
   platform_comment_write: true
-  run_pytest: true
+  run_pytest_advanced: true
   run_linters: true
   get_datetime: true
   get_version: true
@@ -545,11 +572,15 @@ tools:
   edit: true
   write: true
   list: true
-  ripgrep: true
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   todoread: true
   todowrite: true
   task: true              # Can invoke subagents (omit session_id on retries to see filesystem changes)
-  adw: true               # Can run ADW commands
+  adw_status_health: true    # Can check ADW status/health
+  adw_setup: true            # Can run setup-family commands when needed
+  adw_service: true          # Can launch/stop ADW service when needed
   adw_spec_read: true
   adw_spec_write: true
   adw_spec_messages: true
@@ -563,7 +594,7 @@ tools:
   platform_issue_write: true
   platform_pr_write: true
   platform_comment_write: true
-  run_pytest: true
+  run_pytest_advanced: true
   run_linters: true
   get_datetime: true
   get_version: true
@@ -635,19 +666,19 @@ When designing an agent, go through each tool and decide if it's needed:
 **Always Enabled (most agents need these):**
 - `read` - Read files (almost always needed)
 - `list` - List directories
-- `ripgrep` - File discovery + content search
+- `find_files` / `search_content` / `ripgrep_advanced` - File discovery + content search
 - `todoread` / `todowrite` - Task tracking
 - `adw_spec_read` / `adw_spec_write` / `adw_spec_messages` - Workflow state access
 - `get_datetime` / `get_version` - Utility info
 
 **Enable Based on Purpose:**
 - `edit` / `write` - Only if agent modifies files
-- `run_pytest` - Only if agent runs/validates tests
+- `run_pytest_basic` / `run_pytest_advanced` - Only if agent runs/validates pytest tests
 - `run_linters` - Only if agent needs to fix code style
 - Split git wrappers (`git_diff`, `git_stage`, `git_commit`, `git_branch`) - Only for the specific git capability needed
 - Split platform wrappers (`platform_issue_read`, `platform_issue_write`, `platform_comment_write`, `platform_pr_write`) - Only for the specific platform capability needed
 - `task` - Only for primary agents that invoke subagents
-- `adw` - Only for workflow orchestration
+- `adw_status_health` / `adw_setup` / `adw_service` - Only for the specific ADW command family needed
 - `create_workspace` - Only for workspace management
 - `workflow_builder` - Only for workflow creation
 
@@ -691,13 +722,17 @@ tools:
   edit: [true/false based on agent needs]
   write: [true/false based on agent needs]
   list: true
-  ripgrep: true
+  find_files: true
+  search_content: true
+  ripgrep_advanced: true
   # Task Management
   todoread: true
   todowrite: true
   task: [true only for primary agents]
   # ADW Workflow Tools
-  adw: [true/false]
+  adw_status_health: [true/false]
+  adw_setup: [true/false]
+  adw_service: [true/false]
   adw_spec_read: true
   adw_spec_write: [true/false]
   adw_spec_messages: [true/false]
@@ -712,7 +747,8 @@ tools:
   platform_issue_write: [true/false]
   platform_comment_write: [true/false]
   # Validation Tools
-  run_pytest: [true/false]
+  run_pytest_basic: [true/false]
+  run_pytest_advanced: [true/false]
   run_linters: [true/false]
   # Utility Tools
   get_datetime: true
@@ -819,7 +855,7 @@ Create a documentation file in `.opencode/guides/agents/` directory:
 | `edit` | [✅/❌] | [Why enabled/disabled] |
 | `write` | [✅/❌] | [Why enabled/disabled] |
 | `git_diff` / `git_stage` / `git_commit` / `git_branch` | [✅/❌] | [Why enabled/disabled] |
-| `run_pytest` | [✅/❌] | [Why enabled/disabled] |
+| `run_pytest_basic` / `run_pytest_advanced` | [✅/❌] | [Why enabled/disabled] |
 | `run_linters` | [✅/❌] | [Why enabled/disabled] |
 | `bash` | ❌ | Always disabled for security |
 
@@ -922,17 +958,17 @@ The agent will consult these files:
 | edit | [✅/❌] | [Why] |
 | write | [✅/❌] | [Why] |
 | list | ✅ | [Directory navigation] |
-| ripgrep | ✅ | [File discovery + content search] |
+| find_files / search_content / ripgrep_advanced | ✅ | [File discovery + content search] |
 | todoread | ✅ | [Task tracking] |
 | todowrite | ✅ | [Task tracking] |
 | task | [✅/❌] | [Only if primary agent] |
-| adw | [✅/❌] | [Why] |
+| adw_status_health / adw_setup / adw_service | [✅/❌] | [Why] |
 | adw_spec_read/write/messages | ✅ | [Workflow state] |
 | create_workspace | [✅/❌] | [Why] |
 | workflow_builder | [✅/❌] | [Why] |
 | git_diff/stage/commit/branch | [✅/❌] | [Why] |
 | platform_issue/pr/comment wrappers | [✅/❌] | [Why] |
-| run_pytest | [✅/❌] | [Why] |
+| run_pytest_basic / run_pytest_advanced | [✅/❌] | [Why] |
 | run_linters | [✅/❌] | [Why] |
 | get_datetime | ✅ | [Utility] |
 | get_version | ✅ | [Utility] |
@@ -1117,19 +1153,19 @@ After generating, offer to:
 - Execute plans and specifications
 - Write production code and tests
 - Follow strict coding standards
-- **Key tools**: `edit`, `write`, split git wrappers as needed, `run_pytest`, `run_linters`
+- **Key tools**: `edit`, `write`, split git wrappers as needed, `run_pytest_advanced`, `run_linters`
 
 ## 2. Planning Agents
 - Design architecture and technical plans
 - Create specifications and roadmaps
 - Read-only or limited write (for docs)
-- **Key tools**: `read`, `ripgrep` (disable `edit`, `write`, mutating git wrappers)
+- **Key tools**: `read`, `find_files`, `search_content`, `ripgrep_advanced` (disable `edit`, `write`, mutating git wrappers)
 
 ## 3. Review Agents
 - Analyze code quality and standards
 - Produce review reports
 - Identify issues and improvements
-- **Key tools**: `read`, `ripgrep` (disable `edit`, `write`, mutating git wrappers)
+- **Key tools**: `read`, `find_files`, `search_content`, `ripgrep_advanced` (disable `edit`, `write`, mutating git wrappers)
 
 ## 4. Documentation Agents
 - Update README, guides, and docs
@@ -1141,13 +1177,13 @@ After generating, offer to:
 - Write and execute tests
 - Generate test cases
 - Analyze test coverage
-- **Key tools**: `edit`, `write`, `run_pytest`, split git wrappers as needed
+- **Key tools**: `edit`, `write`, `run_pytest_advanced`, split git wrappers as needed
 
 ## 6. Refactoring Agents
 - Restructure code without changing behavior
 - Improve code quality
 - Apply design patterns
-- **Key tools**: `edit`, split git wrappers as needed, `run_pytest`, `run_linters`
+- **Key tools**: `edit`, split git wrappers as needed, `run_pytest_advanced`, `run_linters`
 
 ## 7. Maintenance Agents
 - Update dependencies
@@ -1198,17 +1234,22 @@ When creating an agent, produce:
         edit: false       # No modifications
         write: false      # No file creation
         list: true        # Directory navigation
-        ripgrep: true     # File discovery + content search
+        find_files: true
+        search_content: true
+        ripgrep_advanced: true
         todoread: true    # Task tracking
         todowrite: true   # Task tracking
         task: false       # Not a primary agent
-        adw: false        # No workflow commands
+        adw_status_health: false  # No ADW status commands
+        adw_setup: false          # No setup commands
+        adw_service: false        # No service commands
         adw_spec_read: true    # Workflow state access
         create_workspace: false
         workflow_builder: false
         git_diff: false  # No git inspection
         platform_issue_read: false  # No GitHub/GitLab API
-        run_pytest: false
+        run_pytest_basic: false
+        run_pytest_advanced: false
         run_linters: false
         get_datetime: true
         get_version: true
@@ -1496,16 +1537,16 @@ AGENT DESIGN SUMMARY
 | File Ops | read | ✅ | [reason] |
 | | edit | [✅/❌] | [reason] |
 | | write | [✅/❌] | [reason] |
-| | list, ripgrep | ✅ | Standard discovery |
+| | list, find_files, search_content, ripgrep_advanced | ✅ | Standard discovery |
 | Task Mgmt | todoread/write | ✅ | Task tracking |
 | | task | [✅/❌] | [Only if primary] |
-| ADW | adw | [✅/❌] | [reason] |
+| ADW | adw_status_health / adw_setup / adw_service | [✅/❌] | [reason] |
 | | adw_spec_read/write/messages | ✅ | Workflow state |
 | | create_workspace | [✅/❌] | [reason] |
 | | workflow_builder | [✅/❌] | [reason] |
 | Git/Platform | git_diff/stage/commit/branch | [✅/❌] | [reason] |
 | | platform_issue/pr/comment wrappers | [✅/❌] | [reason] |
-| Validation | run_pytest | [✅/❌] | [reason] |
+| Validation | run_pytest_basic / run_pytest_advanced | [✅/❌] | [reason] |
 | | run_linters | [✅/❌] | [reason] |
 | Utility | get_datetime/version | ✅ | Standard utils |
 | Security | webfetch/search | ❌ | Security |

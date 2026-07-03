@@ -39,7 +39,9 @@ ERROR: Failed to execute 'adw platform comment'
 
 Routing hint:
 
-- Prefer `platform_comment_write` for comment writes; use `platform_operations` only when legacy compatibility routing is required.
+- Prefer `platform_comment_write` for comment writes; treat
+  `platform_operations` as a compatibility-only delegation path for legacy
+  flows.
 
 ## Example
 

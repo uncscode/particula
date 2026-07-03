@@ -12,10 +12,28 @@ Focused ADW spec wrapper for workflow messages.
   - malformed non-blank strings still fail the 8-character-hex validation path
 - `messages-write` requires non-empty `agent` and `message`
 - trimmed `agent` and `message` values are what get forwarded downstream
-- `messages-read` validates `last` as integer in `0..50`
-  - `last = 0` omits `--last`
-  - `last > 0` includes `--last <n>`
-- `raw` is supported for `messages-read`
+- `messages-read` validates `options: "last=<n>"` as integer in `0..50`
+  - `last=0` omits `--last`
+  - `last>0` includes `--last <n>`
+- `options: "raw"` is supported for `messages-read`
+
+## Examples
+
+```json
+{ "command": "messages-write", "adw_id": "abc12345", "agent": "planner", "message": "Done." }
+```
+
+```json
+{ "command": "messages-read", "adw_id": "abc12345", "options": "last=3 raw" }
+```
+
+```json
+{ "command": "messages-read", "adw_id": "abc12345", "options": "raw" }
+```
+
+```json
+{ "command": "messages-read", "adw_id": "abc12345", "options": "last=0 raw" }
+```
 
 ## Contract Note
 - Success is always envelope-based for this wrapper:
@@ -58,3 +76,7 @@ ERROR: adw spec messages-read failed (exit N)
 Routing hint:
 
 - Use this wrapper only for `messages-write`/`messages-read`; route state reads/writes to `adw_spec_read`/`adw_spec_write`.
+
+Practical guardrail:
+
+- Omit `last=<n>` or pass `last=0` to read the full message history.

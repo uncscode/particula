@@ -86,7 +86,7 @@
       "name": "Surface Questions",
       "agent": "plan-questions-surfacer",
       "prompt": "$ARGUMENTS --adw-id ${adw_id} --pr-number ${pr_number}",
-      "model": "base",
+      "model": "heavy",
       "timeout": 1800
     }
   ]

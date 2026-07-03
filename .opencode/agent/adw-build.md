@@ -5,7 +5,7 @@ description: 'Primary agent that orchestrates implementation with spot-check tes
   Executes implementation plans by converting steps to todos, implementing code with
   spot-check testing during build, then running comprehensive tests before completion.
 
-  This agent: - Reads plan from spec_content via adw_spec tool - Moves to isolated
+  This agent: - Reads plan from spec_content via adw_spec_read tool - Moves to isolated
   worktree - Converts plan steps to todo list - Implements tasks with spot-check tests
   during build - Calls adw-build-tests for comprehensive test validation - Operates
   fully autonomously with no user input
@@ -13,27 +13,30 @@ description: 'Primary agent that orchestrates implementation with spot-check tes
   NOTE: Validation against spec is handled by adw-validate agent in a separate workflow
   step. Docstrings and linting are handled separately by adw-polish agent.
 
-  Invoked by: adw workflow run build <issue-number> --adw-id <id>'
+  Invoked by: workflow runner build <issue-number> --adw-id <id>'
 mode: primary
 permission:
   "*": deny
   read: allow
   edit: allow
   write: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: allow
-  refactor_astgrep: allow
+  refactor_astgrep_preview: allow
+  refactor_astgrep_apply: allow
   todoread: allow
   todowrite: allow
   task: allow
-  adw: allow
-  adw_spec: allow
+  adw: deny
+  adw_spec_read: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  run_pytest: allow
+  run_pytest_advanced: allow
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -153,7 +156,7 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": adw_id
 })
@@ -178,8 +181,8 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations and validate location with tools (no shell navigation):
 
 ```python
-git_operations({"command": "status", "porcelain": true, "worktree_path": worktree_path})
-git_operations({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -272,9 +275,9 @@ todowrite({
 After implementing each task, run a **fast spot-check test** on the affected module:
 
 ```python
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["{module}/tests/", "-x", "--maxfail=1", "-q"],
-  "outputMode": "summary",
+  "options": "output=summary",
   "timeout": 60
 })
 ```
@@ -289,9 +292,9 @@ run_pytest({
 **Example:**
 ```python
 # If you modified adw/utils/parser.py
-run_pytest({
+run_pytest_advanced({
   "pytestArgs": ["adw/utils/tests/parser_test.py", "-x", "-q"],
-  "outputMode": "summary"
+  "options": "output=summary"
 })
 ```
 
@@ -483,12 +486,12 @@ Notebooks are fully validated during the documentation workflow:
 
 **Task 1:**
 - Implement validate_input()
-- Spot-check: `run_pytest(["adw/utils/tests/parser_test.py", "-x"])` -> PASS
+- Spot-check: `run_pytest_advanced({"pytestArgs": ["adw/utils/tests/parser_test.py", "-x"]})` -> PASS
 - Mark complete
 
 **Task 2:**
 - Add edge case tests
-- Spot-check: `run_pytest(["adw/utils/tests/parser_test.py", "-x"])` -> PASS
+- Spot-check: `run_pytest_advanced({"pytestArgs": ["adw/utils/tests/parser_test.py", "-x"]})` -> PASS
 - Mark complete
 
 **Step 7:** Comprehensive testing:

@@ -19,11 +19,14 @@ permission:
   read: allow
   edit: allow
   list: allow
-  grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  refactor_astgrep: allow
-  adw_spec: allow
+  refactor_astgrep_preview: allow
+  adw_spec: deny
+  adw_spec_read: allow
+  adw_spec_write: allow
   feedback_log: allow
   git_diff: allow
   get_datetime: allow
@@ -38,7 +41,7 @@ Generate initial implementation plan and write to spec_content.
 
 Create the first draft of an implementation plan by:
 1. Reading issue details from workflow state
-2. Researching the codebase directly (using read, ripgrep, list)
+2. Researching the codebase directly (using read, find_files, search_content, ripgrep_advanced, list)
 3. Generating structured implementation plan
 4. Writing plan to `spec_content` in adw_state.json
 5. Verifying write succeeded
@@ -109,7 +112,7 @@ Notes usage requirements:
 Parse `adw_id` from arguments, then load issue details:
 
 ```python
-adw_spec({
+adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
   "field": "issue"
@@ -118,8 +121,8 @@ adw_spec({
 
 Also read workflow context:
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "branch_name"})
-adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "branch_name"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
 Extract from issue:
@@ -131,7 +134,7 @@ Extract from issue:
 
 Issues are typically already well scoped and researched, so treat the issue
 details as the primary starting point and only expand your search as needed.
-Use `refactor_astgrep`, `ripgrep`, `read`, and `list` to gather context quickly.
+Use `refactor_astgrep_preview`, `find_files`, `search_content`, `ripgrep_advanced`, `read`, and `list` to gather context quickly.
 Do NOT invoke subagents — perform all research yourself.
 
 ### 2.1: Identify Search Terms
@@ -144,24 +147,23 @@ From the issue, extract:
 
 ### 2.2: Search for Relevant Files
 
-Start with fast AST-level lookups for symbol references, then fall back to
-`ripgrep` for keyword and path discovery.
+Start with fast AST-level lookups for symbol references, then use the split
+search wrappers for keyword and path discovery.
 
 ```python
 # AST-aware symbol search (fast reference discovery)
-refactor_astgrep({
+refactor_astgrep_preview({
   "pattern": "{symbol}($$$ARGS)",
   "rewrite": "{symbol}($$$ARGS)",
   "lang": "python",
   "path": "{worktree_path}",
-  "dryRun": true
 })
 
 # Find files by name pattern
-ripgrep({"pattern": "**/*{keyword}*.py", "path": "{worktree_path}/adw"})
+find_files({"pattern": "**/*{keyword}*.py", "path": "{worktree_path}/adw"})
 
 # Search file contents for keywords
-ripgrep({"contentPattern": "{keyword}", "pattern": "**/*.py", "path": "{worktree_path}"})
+search_content({"contentPattern": "{keyword}", "path": "{worktree_path}"})
 ```
 
 Prioritize results:
@@ -182,10 +184,10 @@ read({"filePath": "{worktree_path}/{file_path}", "offset": start_line, "limit": 
 
 ### 2.4: Map Module Structure
 
-Use `list` and `ripgrep` to understand the module layout around affected areas:
+Use `list` and `find_files` to understand the module layout around affected areas:
 
 ```python
-ripgrep({"pattern": "**/*.py", "path": "{worktree_path}/adw/{module}"})
+find_files({"pattern": "**/*.py", "path": "{worktree_path}/adw/{module}"})
 ```
 
 ### 2.5: Identify Patterns and Conventions
@@ -200,30 +202,30 @@ Compile your research findings — they feed directly into Step 3.
 
 Integrate prior design intent directly into existing plan sections using clear rationale language.
 
-## Rule of Thumb: AST vs ripgrep
+## Rule of Thumb: AST vs split search wrappers
 
-- Use `refactor_astgrep` when you have a concrete symbol name (function, class,
+- Use `refactor_astgrep_preview` when you have a concrete symbol name (function, class,
   method) and want precise references fast.
-- Use `ripgrep` for broad keyword discovery, error strings, or when symbols are
-  unknown/ambiguous.
+- Use `find_files` for path discovery, `search_content` for straightforward text
+  matches, and `ripgrep_advanced` when you need context lines or advanced
+  matching controls.
 - Use `read` once you have 3-5 likely files; avoid scanning large files without
   a target.
 
 ## Targeted Snippets (Avoid Full-File Reads)
 
-Both `ripgrep` and `read` can return focused chunks so you do not have to load
-an entire file. Use context flags on `ripgrep`, then `read` only the relevant
-line ranges.
+Both `ripgrep_advanced` and `read` can return focused chunks so you do not have
+to load an entire file. Use context flags on `ripgrep_advanced`, then `read`
+only the relevant line ranges.
 
 Example:
 
 ```python
 # Search with context lines (keeps output tight)
-ripgrep({
+ripgrep_advanced({
   "contentPattern": "sync_todos",
-  "pattern": "**/*.py",
   "path": "{worktree_path}",
-  "contextLines": 2
+  "options": "context-lines=2"
 })
 
 # Read only the surrounding lines once you find a match
@@ -240,24 +242,22 @@ Scenario: issue mentions `TodoSyncer` and a failing `sync_todos` call.
 
 ```python
 # 1) AST search for method calls and definitions
-refactor_astgrep({
+refactor_astgrep_preview({
   "pattern": "sync_todos($$$ARGS)",
   "rewrite": "sync_todos($$$ARGS)",
   "lang": "python",
   "path": "{worktree_path}",
-  "dryRun": true
 })
-refactor_astgrep({
+refactor_astgrep_preview({
   "pattern": "class TodoSyncer($$$BASES): $$$BODY",
   "rewrite": "class TodoSyncer($$$BASES): $$$BODY",
   "lang": "python",
   "path": "{worktree_path}",
-  "dryRun": true
 })
 
 # 2) Content search for log/error strings
-ripgrep({"contentPattern": "TodoSyncer", "pattern": "**/*.py", "path": "{worktree_path}"})
-ripgrep({"contentPattern": "sync_todos", "pattern": "**/*.py", "path": "{worktree_path}"})
+search_content({"contentPattern": "TodoSyncer", "path": "{worktree_path}"})
+search_content({"contentPattern": "sync_todos", "path": "{worktree_path}"})
 
 # 3) Read the most relevant files
 read({"filePath": "{worktree_path}/adw/workflows/operations/todo_sync.py"})
@@ -317,7 +317,7 @@ Using the issue and research context, create the plan:
 **CRITICAL - DO NOT SKIP**
 
 ```python
-adw_spec({
+adw_spec_write({
   "command": "write",
   "adw_id": "{adw_id}",
   "content": plan_content
@@ -327,7 +327,7 @@ adw_spec({
 ## Step 5: Verify Write Succeeded
 
 ```python
-verification = adw_spec({
+verification = adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}"
 })

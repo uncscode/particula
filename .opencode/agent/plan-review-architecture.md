@@ -9,7 +9,7 @@ description: >-
   - Reviews architecture_design, dependencies, implementation_strategy, dependency_map, and guidelines_requirements
   - Expands thin sections in-place when content is under ~3 substantive sentences
   - Preserves existing structure (no new section creation in this phase)
-  - Writes bounded review status summaries via adw_spec messages-write
+  - Writes bounded review status summaries via adw_spec_messages messages-write
 mode: primary
 permission:
   "*": deny
@@ -19,10 +19,13 @@ permission:
   move: allow
   list: allow
   grep: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   todowrite: allow
-  adw_spec: allow
-  adw_plans: allow
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   feedback_log: allow
   get_datetime: allow
 ---
@@ -44,7 +47,7 @@ input: $ARGUMENTS
 3. Review section keys `architecture_design`, `dependencies`, `implementation_strategy`,
    `dependency_map`, and `guidelines_requirements`.
 4. Expand thin sections in-place (< ~3 substantive sentences), preserving section boundaries.
-5. Write a bounded status summary (revised/passed/concerns) via `adw_spec messages-write`.
+5. Write a bounded status summary (revised/passed/concerns) via `adw_spec_messages messages-write`.
 
 # Required Reading
 
@@ -64,16 +67,16 @@ If missing or invalid, fail with explicit signal.
 Read optional workflow context from `spec_content` before processing messages:
 
 ```python
-adw_spec({"command": "read", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}"})
 ```
 
-Resolve the ADW worktree before any `adw_plans` call:
+Resolve the ADW worktree before any `adw_plans_read` call:
 
 ```python
-worktree_path = adw_spec({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
+worktree_path = adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 ```
 
-All `adw_plans` calls in this agent must include `"cwd": worktree_path` so
+All `adw_plans_read` calls in this agent must include `"cwd": worktree_path` so
 plan metadata and `target_paths` resolve inside the ADW worktree, not the caller's
 current checkout.
 
@@ -86,7 +89,7 @@ questions; do not require it and do not write back to `spec_content`.
 Read all workflow messages to get the scoped handoff and drafter context:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "{adw_id}"})
+adw_spec_messages({"command": "messages-read", "adw_id": "{adw_id}"})
 ```
 
 From the messages, scan newest-first and extract the first valid handoff from
@@ -109,10 +112,10 @@ Use `review_plan_ids` (not `drafted_plan_ids`) as the canonical scope for this p
 For each plan ID from `review_plan_ids`, resolve canonical section files via:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "json": true,
+  "options": "json",
   "cwd": worktree_path
 })
 ```
@@ -144,7 +147,7 @@ Exclude non-active or non-target docs:
 
 If `review_plan_ids` is missing/empty, or section resolution yields no files,
 do a deterministic no-op success path:
-1. Write a no-op summary through `adw_spec messages-write`.
+1. Write a no-op summary through `adw_spec_messages messages-write`.
 2. Emit success signal (do not fail).
 
 ## Step 3: Review architecture/dependency section keys
@@ -215,7 +218,7 @@ If cross-document naming or pattern inconsistencies are detected:
 Write one bounded summary message using:
 
 ```python
-adw_spec({
+adw_spec_messages({
   "command": "messages-write",
   "adw_id": "{adw_id}",
   "agent": "plan-review-architecture",

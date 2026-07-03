@@ -33,7 +33,7 @@ function redactSensitiveFragments(value: string): string {
   return redacted;
 }
 
-function sanitizeDiagnosticText(value: string, maxChars = 4000): string {
+function sanitizeDiagnosticText(value: string): string {
   if (!value) {
     return "";
   }
@@ -43,10 +43,7 @@ function sanitizeDiagnosticText(value: string, maxChars = 4000): string {
   if (!normalized) {
     return "";
   }
-  if (normalized.length <= maxChars) {
-    return normalized;
-  }
-  return `${normalized.slice(0, maxChars)} ...(truncated)`;
+  return normalized;
 }
 
 // --- Inlined from lib/cpp_lint_wrapper_shared.ts (isStatDirectory only) ---
@@ -68,6 +65,13 @@ const MISSING_SCRIPT_HINT =
 
 const MAX_DIAGNOSTIC_CHARS = 4000;
 const DIAGNOSTIC_TRUNCATION_MARKER = "... [truncated]";
+type OutputMode = "summary" | "full" | "json";
+type ParsedMkdocsOptions = {
+  outputMode?: OutputMode;
+  strict?: true;
+  clean?: boolean;
+};
+const OUTPUT_MODES = new Set<OutputMode>(["summary", "full", "json"]);
 
 const sanitizeAndClipDiagnostic = (value: string): string => {
   const sanitized = sanitizeDiagnosticText(value);
@@ -84,11 +88,31 @@ function validateTimeout(timeout: number): string | null {
   return null;
 }
 
+function extractTimeoutDiagnostic(stderr: string, message: string): string | null {
+  const timeoutMatch =
+    stderr.match(/timed out after (\d+(?:\.\d+)?) seconds/i) ??
+    message.match(/timed out after (\d+(?:\.\d+)?) seconds/i);
+  if (!timeoutMatch) {
+    return null;
+  }
+  const seconds = timeoutMatch[1] ?? "unknown";
+  return (
+    "ERROR: MkDocs validation timed out\n\n" +
+    `diagnostic: mkdocs validation exceeded the wrapper timeout after ${seconds} seconds\n` +
+    `hint: build_mkdocs_validate defaults to 120 seconds; pass a larger direct timeout for slow validations.`
+  );
+}
+
 function formatExecutionError(error: any): string {
   const stdout = sanitizeAndClipDiagnostic(error?.stdout?.toString?.() || "");
   const stderr = sanitizeAndClipDiagnostic(error?.stderr?.toString?.() || "");
   const message = error?.message || "Unknown error";
   const combinedLower = `${stderr} ${message}`.toLowerCase();
+  const timeoutDiagnostic = extractTimeoutDiagnostic(stderr, message);
+
+  if (timeoutDiagnostic) {
+    return timeoutDiagnostic;
+  }
 
   if (stdout.trim()) {
     return stdout;
@@ -109,6 +133,7 @@ function formatExecutionError(error: any): string {
 function validatePathWithinRepoRoot(
   value: string | undefined,
   parameterName: "cwd" | "configFile",
+  cwdValue?: string,
 ): string | undefined {
   if (!value) {
     return undefined;
@@ -125,7 +150,9 @@ function validatePathWithinRepoRoot(
     }
 
     const repoRoot = realpathSync(process.cwd());
-    const resolvedPath = realpathSync(value);
+    const resolvedPath = parameterName === "configFile" && cwdValue && !path.isAbsolute(value)
+      ? realpathSync(path.resolve(realpathSync(cwdValue), value))
+      : realpathSync(value);
     const rel = path.relative(repoRoot, resolvedPath);
     if (rel.startsWith("..") || path.isAbsolute(rel)) {
       return `ERROR: ${parameterName} path resolves outside repository root: ${value} (canonical: ${resolvedPath})`;
@@ -147,6 +174,98 @@ async function executeMkdocsWrapper(cmdParts: (string | number)[]): Promise<stri
   }
 }
 
+function parseMkdocsOptions(rawOptions: unknown):
+  | { ok: true; options: ParsedMkdocsOptions }
+  | { ok: false; error: string } {
+  if (rawOptions === undefined || rawOptions === null) {
+    return { ok: true, options: {} };
+  }
+  if (typeof rawOptions !== "string") {
+    return { ok: false, error: "ERROR: 'options' must be a string when provided." };
+  }
+
+  const normalized = rawOptions.trim();
+  if (!normalized) {
+    return { ok: true, options: {} };
+  }
+
+  const parsed: ParsedMkdocsOptions = {};
+  for (const token of normalized.split(/\s+/)) {
+    const separatorIndex = token.indexOf("=");
+    if (separatorIndex !== token.lastIndexOf("=")) {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': tokens must contain at most one '=' separator.`,
+      };
+    }
+
+    if (separatorIndex === -1) {
+      if (token !== "strict") {
+        return {
+          ok: false,
+          error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.`,
+        };
+      }
+      if (parsed.strict) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+      }
+      parsed.strict = true;
+      continue;
+    }
+
+    const name = token.slice(0, separatorIndex);
+    const value = token.slice(separatorIndex + 1).trim();
+    if (!value) {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.`,
+      };
+    }
+
+    if (name === "output") {
+      if (!OUTPUT_MODES.has(value as OutputMode)) {
+        return {
+          ok: false,
+          error: `ERROR: Invalid options token '${token}': output must be one of summary, full, json.`,
+        };
+      }
+      if (parsed.outputMode !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+      }
+      parsed.outputMode = value as OutputMode;
+      continue;
+    }
+
+    if (name === "clean") {
+      if (parsed.clean !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
+      }
+      if (value !== "true" && value !== "false") {
+        return {
+          ok: false,
+          error: `ERROR: Invalid options token '${token}': clean must be true or false.`,
+        };
+      }
+      parsed.clean = value === "true";
+      continue;
+    }
+
+    if (name === "strict") {
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': token does not accept a value.`,
+      };
+    }
+
+    return {
+      ok: false,
+      error: `ERROR: Invalid options token '${token}': token is not supported.`,
+    };
+  }
+
+  return { ok: true, options: parsed };
+}
+
 // --- Tool definition ---
 
 export default tool({
@@ -154,23 +273,28 @@ export default tool({
 
 EXAMPLES:
 - Default validate: build_mkdocs_validate({})
-- Strict validate: build_mkdocs_validate({ strict: true })
+- Strict validate: build_mkdocs_validate({ options: 'strict' })
 - Custom config: build_mkdocs_validate({ configFile: 'docs/mkdocs.yml' })
 
-IMPORTANT:
-- Always runs validate-only mode (temporary output dir).
-- Uses python3 to run the backing script.
-- Default timeout is 120 seconds.`,
+  IMPORTANT:
+  - Always runs validate-only mode (temporary output dir).
+  - Uses python3 to run the backing script.
+  - Default timeout is 120 seconds.
+  - The backing Python script supports longer runtimes, but this wrapper intentionally keeps a shorter validation default.
+  - Passing 'strict' escalates MkDocs warnings into failure behavior.`,
   args: {
-    outputMode: tool.schema.enum(["summary", "full", "json"]).optional(),
     timeout: tool.schema.number().optional(),
     cwd: tool.schema.string().optional(),
-    strict: tool.schema.boolean().optional(),
-    clean: tool.schema.boolean().optional(),
     configFile: tool.schema.string().optional(),
+    options: tool.schema.string().optional(),
   },
   async execute(args) {
-    const outputMode = (args.outputMode as string | undefined) || "summary";
+    const parsedOptions = parseMkdocsOptions(args.options);
+    if (!parsedOptions.ok) {
+      return parsedOptions.error;
+    }
+
+    const outputMode = parsedOptions.options.outputMode || "summary";
     const timeout = args.timeout ?? 120;
     const timeoutError = validateTimeout(timeout);
     if (timeoutError) {
@@ -192,7 +316,7 @@ IMPORTANT:
     if (cwdError) {
       return cwdError;
     }
-    const configError = validatePathWithinRepoRoot(configRaw || undefined, "configFile");
+    const configError = validatePathWithinRepoRoot(configRaw || undefined, "configFile", cwdRaw || undefined);
     if (configError) {
       return configError;
     }
@@ -200,10 +324,10 @@ IMPORTANT:
     if (cwdRaw) {
       cmdParts.push(`--cwd=${cwdRaw}`);
     }
-    if (args.strict === true) {
+    if (parsedOptions.options.strict === true) {
       cmdParts.push("--strict");
     }
-    if (args.clean === false) {
+    if (parsedOptions.options.clean === false) {
       cmdParts.push("--no-clean");
     }
     if (configRaw) {

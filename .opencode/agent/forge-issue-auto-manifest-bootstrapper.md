@@ -23,15 +23,17 @@ permission:
   edit: deny
   write: deny
   list: allow
-  ripgrep: allow
+  find_files: allow
+  search_content: allow
+  ripgrep_advanced: allow
   move: deny
   todoread: allow
   todowrite: allow
   task: allow
   adw: deny
-  adw_spec: allow
-  adw_plans: allow
-  adw_issues_spec: deny
+  adw_spec_read: allow
+  adw_spec_messages: allow
+  adw_plans_read: allow
   adw_issues_batch_init: allow
   adw_issues_batch_read: allow
   adw_issues_batch_write: allow
@@ -44,7 +46,6 @@ permission:
   git_branch: allow
   platform_label_write: allow
   platform_operations: deny
-  run_pytest: deny
   run_linters: deny
   get_datetime: allow
   get_version: allow
@@ -63,7 +64,7 @@ subagent, and final `auto:enabled` labeling.
 # Core Mission
 
 1. Verify the generated issue batch is complete.
-2. Load bootstrap metadata from `adw_spec messages-read` first.
+2. Load bootstrap metadata from `adw_spec_messages messages-read` first.
 3. Fall back to parsing batch and source data only when needed.
 4. Meta-check message data against parsed fallback and fail closed on mismatch.
 5. Ensure the deterministic source branch exists from `main` and push it directly.
@@ -121,9 +122,9 @@ Expected machine-readable payload fields:
 ## Secondary source: parse fallback
 
 If the message is missing or incomplete, reconstruct from:
-1. `adw_issues_spec batch-summary` and `batch-read`
-2. `adw_spec read` for `spec_content` and `worktree_path`
-3. `adw_plans list-sections` for plan metadata
+1. `adw_issues_batch_summary` and `adw_issues_batch_read`
+2. `adw_spec_read read` for `spec_content` and `worktree_path`
+3. `adw_plans_read list-sections` for plan metadata
 4. Batch metadata dependencies and issue numbers
 
 ## Meta-check rule
@@ -218,13 +219,13 @@ Mark each todo `in_progress` when starting and `completed` when done.
 Read batch state and confirm every row has `github_issue_number`:
 
 ```python
-adw_issues_spec({"command": "batch-summary", "adw_id": "<adw_id>"})
+adw_issues_batch_summary({"adw_id": "<adw_id>"})
 ```
 
 Read individual rows if needed:
 
 ```python
-adw_issues_spec({"command": "batch-read", "adw_id": "<adw_id>", "issue": "<index>"})
+adw_issues_batch_read({"adw_id": "<adw_id>", "issue": "<index>"})
 ```
 
 - Confirm every batch issue has `github_issue_number`
@@ -233,10 +234,10 @@ adw_issues_spec({"command": "batch-read", "adw_id": "<adw_id>", "issue": "<index
 
 ## Step 3: Load Bootstrap Metadata from Messages
 
-Use `adw_spec messages-read` to find the bootstrap payload:
+Use `adw_spec_messages messages-read` to find the bootstrap payload:
 
 ```python
-adw_spec({"command": "messages-read", "adw_id": "<adw_id>"})
+adw_spec_messages({"command": "messages-read", "adw_id": "<adw_id>"})
 ```
 
 Select the latest message with `message_type=issue_generation_bootstrap` for
@@ -249,18 +250,17 @@ If the message is missing or incomplete, reconstruct from:
 1. Read shared context:
 
 ```python
-adw_spec({"command": "read", "adw_id": "<adw_id>"})
-adw_spec({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>"})
+adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})
 ```
 
 2. Load plan metadata:
 
 ```python
-adw_plans({
+adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "json": true,
-  "populate": true,
+  "options": "populate json",
   "cwd": "<worktree_path>"
 })
 ```

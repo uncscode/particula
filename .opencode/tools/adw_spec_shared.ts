@@ -40,8 +40,32 @@ type SanitizedDiagnostic = {
   hasVisibleContent: boolean;
 };
 
+type ParsedSpecOptions = {
+  raw?: true;
+  json?: true;
+  append?: true;
+  confirm?: true;
+  last?: number;
+};
+
+const SPEC_OPTION_RULES = {
+  list: ["json"],
+  read: ["raw"],
+  write: ["append"],
+  delete: ["confirm"],
+  "messages-write": [],
+  "messages-read": ["last", "raw"],
+} as const;
+
+const SPEC_BOOLEAN_OPTION_TOKENS = new Set(["raw", "json", "append", "confirm"]);
+const SPEC_MAX_LAST = 50;
+
 export type AdwSpecCommandResult =
   | { ok: true; stdout: string }
+  | { ok: false; error: string };
+
+type ParsedSpecOptionsResult =
+  | { ok: true; options: ParsedSpecOptions }
   | { ok: false; error: string };
 
 function redactAbsolutePaths(raw: string): string {
@@ -143,6 +167,80 @@ export function validateCanonicalInRepoPath(
     return { ok: true, canonicalPath };
   }
   return { ok: false, error: "ERROR: '--file' path resolves outside repository root." };
+}
+
+export function parseSpecOptions(command: string, options: unknown): ParsedSpecOptionsResult {
+  if (options === undefined || options === null) {
+    return { ok: true, options: {} };
+  }
+  if (typeof options !== "string") {
+    return { ok: false, error: "ERROR: 'options' must be a string when provided." };
+  }
+
+  const normalizedOptions = options.trim();
+  if (!normalizedOptions) {
+    return { ok: true, options: {} };
+  }
+
+  const allowedTokens = SPEC_OPTION_RULES[command as keyof typeof SPEC_OPTION_RULES];
+  if (!allowedTokens) {
+    return { ok: false, error: `ERROR: Unsupported spec command '${command}' for options parsing.` };
+  }
+
+  const parsed: ParsedSpecOptions = {};
+  for (const token of normalizedOptions.split(/\s+/)) {
+    if (!token) continue;
+    const separatorCount = token.split("=").length - 1;
+    if (separatorCount > 1) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': tokens must contain at most one '=' separator.` };
+    }
+
+    if (separatorCount === 0) {
+      if (!allowedTokens.includes(token as never)) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': token is not allowed for this command.` };
+      }
+      if (!SPEC_BOOLEAN_OPTION_TOKENS.has(token)) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': token requires a non-empty '=value' suffix.` };
+      }
+      if (token in parsed) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': duplicate token.` };
+      }
+      if (token === "raw") parsed.raw = true;
+      if (token === "json") parsed.json = true;
+      if (token === "append") parsed.append = true;
+      if (token === "confirm") parsed.confirm = true;
+      continue;
+    }
+
+    const [name, rawValue] = token.split("=", 2);
+    if (!allowedTokens.includes(name as never)) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': token is not allowed for this command.` };
+    }
+    if (SPEC_BOOLEAN_OPTION_TOKENS.has(name)) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': token does not accept a value.` };
+    }
+    if (!rawValue) {
+      return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': token requires a non-empty '=value' suffix.` };
+    }
+    if (name === "last") {
+      if (!/^\d+$/.test(rawValue)) {
+        return { ok: false, error: `ERROR: 'last' must be an integer (0-${SPEC_MAX_LAST}).` };
+      }
+      const last = Number(rawValue);
+      if (last < 0 || last > SPEC_MAX_LAST) {
+        return { ok: false, error: `ERROR: 'last' must be between 0 and ${SPEC_MAX_LAST}.` };
+      }
+      if (parsed.last !== undefined) {
+        return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': duplicate token.` };
+      }
+      parsed.last = last;
+      continue;
+    }
+
+    return { ok: false, error: `ERROR: Invalid options token '${token}' for '${command}': unsupported token.` };
+  }
+
+  return { ok: true, options: parsed };
 }
 
 export function selectDiagnostic(sources: DiagnosticSources, fallback: string): string {

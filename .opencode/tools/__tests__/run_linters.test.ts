@@ -41,7 +41,7 @@ describe("run_linters wrapper", () => {
   it("emits no-auto-fix and forwards target-dir when explicitly disabled", async () => {
     const execute = await loadToolExecute("../../run_linters.ts");
 
-    await execute({ autoFix: false, targetDir: "adw/core", outputMode: "full", linters: ["ruff"] });
+    await execute({ autoFix: false, targetDir: "adw/core", options: "output=full linters=ruff" });
 
     const command = getInvocations().at(-1)?.args.join(" ") ?? "";
 
@@ -56,18 +56,35 @@ describe("run_linters wrapper", () => {
     expect(command).not.toContain("--auto-fix");
   });
 
-  it("forwards custom timeout values and omits the linters flag when none are requested", async () => {
+  it("forwards custom timeout values and selected linters from bounded options", async () => {
     const execute = await loadToolExecute("../../run_linters.ts");
 
-    await execute({ autoFix: false, linters: [], ruffTimeout: 33, mypyTimeout: 44 });
+    await execute({ autoFix: false, ruffTimeout: 33, mypyTimeout: 44, options: "linters=mypy" });
 
     const command = getInvocations().at(-1)?.args.join(" ") ?? "";
 
     expect(command).toContain("--ruff-timeout=33");
     expect(command).toContain("--mypy-timeout=44");
-    expect(command).not.toContain("--linters=");
+    expect(command).toContain("--linters=mypy");
     expect(command).toContain("--no-auto-fix");
     expect(command).not.toContain("--auto-fix");
+  });
+
+  it("rejects unsupported, duplicate, and malformed bounded option tokens before subprocess execution", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    expect(await execute({ options: "unsupported=1" })).toContain("not supported");
+    expect(await execute({ options: "output=full output=json" })).toContain("duplicate token");
+    expect(await execute({ options: "linters=eslint" })).toContain("unsupported linter");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects invalid timeout guards before subprocess execution", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    expect(await execute({ ruffTimeout: 0 })).toContain("ruffTimeout must be positive");
+    expect(await execute({ mypyTimeout: Number.NaN })).toContain("mypyTimeout must be positive");
+    expect(getInvocations()).toHaveLength(0);
   });
 
   it("returns stdout from subprocess failures for deterministic diagnostics", async () => {

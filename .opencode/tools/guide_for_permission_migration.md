@@ -85,9 +85,8 @@ monolithic tool names with the specific split wrappers the agent needs:
 | `adw_plans` | `adw_plans_read`, `adw_plans_mutate` |
 | `adw_issues_spec` | `adw_issues_batch_init`, `adw_issues_batch_read`, `adw_issues_batch_write`, `adw_issues_batch_log`, `adw_issues_batch_summary` |
 | `adw_notes` | `adw_notes_read`, `adw_notes_write` |
-| `git_operations` | `git_diff`, `git_stage`, `git_commit`, `git_branch`, `git_merge`, `git_worktree` |
-| `platform_operations` | `platform_pr_write`, `platform_pr_read`, `platform_issue_read`, `platform_issue_write`, `platform_label_write`, `platform_rate_limit_read` (**compatibility-only exception:** keep `platform_operations` only for unsplit commands `comment` and `pr-review` until dedicated wrappers land) |
-| `run_pytest` | `run_pytest_basic`, `run_pytest_advanced` |
+| `platform_operations` | `platform_pr_write`, `platform_pr_read`, `platform_issue_read`, `platform_issue_write`, `platform_label_write`, `platform_comment_write`, `platform_pr_review_write`, `platform_rate_limit_read` |
+| Retired pytest compatibility wrapper | `run_pytest_basic`, `run_pytest_advanced` |
 | `run_cmake` | `run_cmake_configure`, `run_cmake_build` |
 | `run_sanitizers` | `run_sanitizers_basic`, `run_sanitizers_advanced` |
 | `run_cpp_linters` | `run_cpp_lint_check`, `run_cpp_lint_fix` |
@@ -212,9 +211,9 @@ tools:
   feedback_log: true
   create_workspace: false
   workflow_builder: false
-  git_operations: false
   platform_operations: false
-  run_pytest: false
+  run_pytest_basic: false
+  run_pytest_advanced: false
   run_linters: false
   get_datetime: true
   get_version: false
