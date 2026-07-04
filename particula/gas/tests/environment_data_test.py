@@ -1,5 +1,7 @@
 """Tests for the EnvironmentData dataclass."""
 
+from typing import Any
+
 import numpy as np
 import particula.gas as gas_package
 import pytest
@@ -7,15 +9,15 @@ from particula.gas.environment_data import EnvironmentData
 
 
 def _make_environment_data(
-    temperature: object,
-    pressure: object,
-    saturation_ratio: object,
+    temperature: Any,
+    pressure: Any,
+    saturation_ratio: Any,
 ) -> EnvironmentData:
     """Construct EnvironmentData with broad array-like test inputs."""
     return EnvironmentData(
-        temperature=temperature,  # type: ignore[arg-type]
-        pressure=pressure,  # type: ignore[arg-type]
-        saturation_ratio=saturation_ratio,  # type: ignore[arg-type]
+        temperature=temperature,
+        pressure=pressure,
+        saturation_ratio=saturation_ratio,
     )
 
 
@@ -340,6 +342,56 @@ def test_environment_data_valid_inputs_preserve_float64_values() -> None:
         environment.temperature,
         np.array([298.15, 300.15], dtype=np.float64),
     )
+
+
+def test_environment_data_constructor_copies_caller_owned_arrays() -> None:
+    """Constructor normalization owns storage instead of aliasing inputs."""
+    temperature = np.array([298.15, 300.15], dtype=np.float64)
+    pressure = np.array([101325.0, 95000.0], dtype=np.float64)
+    saturation_ratio = np.array([[0.9, 1.0], [1.2, 0.5]], dtype=np.float64)
+
+    environment = _make_environment_data(
+        temperature=temperature,
+        pressure=pressure,
+        saturation_ratio=saturation_ratio,
+    )
+
+    assert not np.shares_memory(environment.temperature, temperature)
+    assert not np.shares_memory(environment.pressure, pressure)
+    assert not np.shares_memory(
+        environment.saturation_ratio,
+        saturation_ratio,
+    )
+
+    temperature[0] = 310.0
+    pressure[1] = 97000.0
+    saturation_ratio[0, 1] = 0.75
+
+    np.testing.assert_allclose(
+        environment.temperature,
+        np.array([298.15, 300.15], dtype=np.float64),
+    )
+    np.testing.assert_allclose(
+        environment.pressure,
+        np.array([101325.0, 95000.0], dtype=np.float64),
+    )
+    np.testing.assert_allclose(
+        environment.saturation_ratio,
+        np.array([[0.9, 1.0], [1.2, 0.5]], dtype=np.float64),
+    )
+
+
+def test_environment_data_zero_species_saturation_ratio_is_allowed() -> None:
+    """Zero-species environments remain valid when box counts still match."""
+    environment = _make_environment_data(
+        temperature=[298.15, 300.15],
+        pressure=[101325.0, 95000.0],
+        saturation_ratio=np.empty((2, 0)),
+    )
+
+    assert environment.n_boxes == 2
+    assert environment.saturation_ratio.shape == (2, 0)
+    assert environment.saturation_ratio.dtype == np.float64
 
 
 def test_environment_data_copy_creates_independent_arrays() -> None:

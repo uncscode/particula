@@ -34,12 +34,14 @@
 
 ## E2-F2-P3: Documentation
 
-- Update data-container migration docs to include `EnvironmentData` as the
-  owner of per-box thermodynamic state, explicitly excluding simulation volume.
-- Update the GPU roadmap docs to note the CPU baseline exists and that GPU
-  mirror/conversion work remains downstream.
-- Document current read/mutate boundaries: existing processes still consume
-  scalar temperature and pressure until explicit migration features wire in the
-  new container.
-- Validate documentation references if the repository's docs validation tooling
-  is available.
+- Done in issue #1191: updated migration/docs wording to present
+  `EnvironmentData` as the shipped CPU owner of per-box thermodynamic state,
+  explicitly excluding simulation volume.
+- Done in issue #1191: updated roadmap language so remaining work is scoped to
+  `WarpEnvironmentData`, CPU↔GPU conversion, and downstream migration
+  boundaries.
+- Done in issue #1191: documented current read/mutate boundaries: existing
+  processes still consume scalar temperature and pressure until explicit
+  migration features wire in the new container.
+- Done in issue #1191: performed a lightweight documentation accuracy review
+  for the touched roadmap and implementation-task files.
