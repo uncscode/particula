@@ -2,6 +2,13 @@
 
 ## 2026-07-03
 
+- Updated E2-F1 plan sections after Issue #1183 shipped.
+- Marked phase E2-F1-P1 complete for the docs-only container schema inventory.
+- Recorded that the authoritative current-state inventory was published in
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+
+## 2026-07-03
+
 - Created first-pass feature plan content for E2-F1.
 - Added four issue-sized phases:
   - E2-F1-P1: Inventory current CPU and GPU container schemas

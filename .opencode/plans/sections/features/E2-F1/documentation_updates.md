@@ -2,24 +2,26 @@
 
 ## Primary Documentation Deliverables
 
-- Create or update a schema decision record for particle, gas, and environment
-  state ownership.
-- Add a shape convention table covering CPU and GPU containers.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` with links to the decision
-  record and explicit E2-F1 outcomes.
-- Update `docs/Features/particle-data-migration.md` or related feature docs with
-  links to the canonical shape rules where appropriate.
+- Shipped Issue #1183 as a docs-only inventory update in
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Published the authoritative current-state schema table for `ParticleData`,
+  `GasData`, `WarpParticleData`, and `WarpGasData` in that roadmap document.
+- Captured current CPU↔GPU round-trip caveats there, including placeholder gas
+  species names on restore and `WarpGasData.vapor_pressure` being dropped on
+  return to CPU `GasData`.
+- Deferred broader ownership, environment-container, and downstream handoff docs
+  to later E2-F1 phases.
 
 ## Required Content
 
-- Current schema inventory for `ParticleData`, `GasData`, `WarpParticleData`, and
-  `WarpGasData`.
-- Ownership table for shared and per-box fields.
-- Round-trip semantics for CPU/GPU conversions, including lossy or metadata-only
-  fields.
-- Shape rules for single-box, multi-box, particle-resolved, and binned
-  workflows.
-- Handoff notes for E2-F2 through E2-F9.
+- Current schema inventory for `ParticleData`, `GasData`, `WarpParticleData`,
+  and `WarpGasData`.
+- Exact field shapes, dtypes, storage notes, validation/coercion hooks, and
+  CPU↔GPU transfer behavior for the current public stored fields.
+- Evidence references back to source files and existing tests for each row.
+- Derived-property note separating `ParticleData` stored fields from computed
+  accessors.
+- Explicit notes for the current lossy gas round-trip behavior.
 
 ## Style and Maintenance
 

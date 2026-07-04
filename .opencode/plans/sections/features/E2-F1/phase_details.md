@@ -1,12 +1,15 @@
 # Phase Details
 
-- [ ] **E2-F1-P1:** Inventory current CPU and GPU container schemas
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E2-F1-P1:** Inventory current CPU and GPU container schemas
+  - Issue: #1183 | Size: XS | Status: Completed
   - Goal: Produce a concise inventory of existing container fields, shapes,
     dtypes, mutability, and round-trip behavior.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, optional new schema
-    decision record under `docs/Features/` or architecture docs.
-  - Tests: Documentation/link validation if a new docs artifact is added.
+  - Shipped: a docs-only authoritative inventory in
+    `docs/Features/Roadmap/data-oriented-gpu.md` covering `ParticleData`,
+    `GasData`, `WarpParticleData`, and `WarpGasData`, plus the current lossy
+    gas round-trip caveats.
+  - Tests: No new tests added; the inventory cites existing container and
+    conversion tests as executable evidence.
 
 - [ ] **E2-F1-P2:** Record authoritative field ownership decisions
   - Issue: TBD | Size: S | Status: Not Started
