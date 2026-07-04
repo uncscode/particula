@@ -1,7 +1,8 @@
 """Tests for Warp GPU data types.
 
-Tests cover struct instantiation, field shapes, array dtypes,
-single-box and multi-box scenarios for WarpParticleData and WarpGasData.
+Tests cover struct instantiation, field shapes, array dtypes, and
+single-box and multi-box scenarios for WarpParticleData,
+WarpGasData, and WarpEnvironmentData.
 """
 
 import numpy as np
@@ -9,7 +10,11 @@ import pytest
 
 wp = pytest.importorskip("warp")
 
-from particula.gpu.warp_types import WarpGasData, WarpParticleData  # noqa: E402
+from particula.gpu.warp_types import (  # noqa: E402
+    WarpEnvironmentData,
+    WarpGasData,
+    WarpParticleData,
+)
 
 
 class TestWarpParticleDataCreation:
@@ -183,6 +188,7 @@ class TestWarpGasDataCreation:
         assert gas.vapor_pressure.shape == (n_boxes, n_species)
         assert gas.partitioning.shape == (n_species,)
 
+
     def test_single_box_gas_data(self) -> None:
         """Test WarpGasData with n_boxes = 1 (single box)."""
         n_boxes, n_species = 1, 2
@@ -253,6 +259,122 @@ class TestWarpGasDataCreation:
         assert gas.concentration.shape == (n_boxes, n_species)
         assert gas.vapor_pressure.shape == (n_boxes, n_species)
         assert gas.partitioning.shape == (n_species,)
+
+
+class TestWarpEnvironmentDataCreation:
+    """Tests for WarpEnvironmentData struct instantiation."""
+
+    def test_warp_environment_data_creation(self) -> None:
+        """Verify WarpEnvironmentData struct can be instantiated."""
+        environment = WarpEnvironmentData()
+        environment.temperature = wp.array([298.15, 300.15], dtype=wp.float64)
+        environment.pressure = wp.array([101325.0, 100500.0], dtype=wp.float64)
+        environment.saturation_ratio = wp.array(
+            [[0.95, 1.05], [0.85, 1.15]],
+            dtype=wp.float64,
+        )
+
+        assert environment.temperature is not None
+        assert environment.pressure is not None
+        assert environment.saturation_ratio is not None
+        assert hasattr(environment, "temperature")
+        assert hasattr(environment, "pressure")
+        assert hasattr(environment, "saturation_ratio")
+
+    def test_warp_environment_data_field_shapes(self) -> None:
+        """Verify environment field shapes match the CPU schema."""
+        n_boxes = 2
+        n_species = 3
+
+        environment = WarpEnvironmentData()
+        environment.temperature = wp.array([298.15, 299.15], dtype=wp.float64)
+        environment.pressure = wp.array([101325.0, 99000.0], dtype=wp.float64)
+        environment.saturation_ratio = wp.array(
+            [[0.90, 1.00, 1.10], [0.85, 0.95, 1.05]],
+            dtype=wp.float64,
+        )
+
+        assert environment.temperature.shape == (n_boxes,)
+        assert environment.pressure.shape == (n_boxes,)
+        assert environment.saturation_ratio.shape == (n_boxes, n_species)
+
+    def test_single_box_environment_data(self) -> None:
+        """Verify single-box inputs preserve the leading box axis."""
+        environment = WarpEnvironmentData()
+        environment.temperature = wp.array([298.15], dtype=wp.float64)
+        environment.pressure = wp.array([101325.0], dtype=wp.float64)
+        environment.saturation_ratio = wp.array(
+            [[0.92, 1.08]],
+            dtype=wp.float64,
+        )
+
+        assert environment.temperature.shape == (1,)
+        assert environment.pressure.shape == (1,)
+        assert environment.saturation_ratio.shape == (1, 2)
+
+    def test_multi_box_environment_data(self) -> None:
+        """Verify multi-box inputs preserve the box axis."""
+        n_boxes = 3
+        n_species = 2
+
+        environment = WarpEnvironmentData()
+        environment.temperature = wp.array(
+            [295.15, 296.15, 297.15],
+            dtype=wp.float64,
+        )
+        environment.pressure = wp.array(
+            [101325.0, 100800.0, 100200.0],
+            dtype=wp.float64,
+        )
+        environment.saturation_ratio = wp.array(
+            [[0.80, 0.90], [0.95, 1.05], [1.10, 1.20]],
+            dtype=wp.float64,
+        )
+
+        assert environment.temperature.shape == (n_boxes,)
+        assert environment.pressure.shape == (n_boxes,)
+        assert environment.saturation_ratio.shape == (n_boxes, n_species)
+
+    def test_environment_data_field_dtypes(self) -> None:
+        """Verify all environment arrays use float64."""
+        environment = WarpEnvironmentData()
+        environment.temperature = wp.array([298.15, 301.15], dtype=wp.float64)
+        environment.pressure = wp.array([101325.0, 101000.0], dtype=wp.float64)
+        environment.saturation_ratio = wp.array(
+            [[0.88, 0.98], [1.02, 1.12]],
+            dtype=wp.float64,
+        )
+
+        assert environment.temperature.dtype == wp.float64
+        assert environment.pressure.dtype == wp.float64
+        assert environment.saturation_ratio.dtype == wp.float64
+
+    def test_environment_data_with_numpy_values_round_trip(self) -> None:
+        """Verify deterministic NumPy inputs survive Warp round-trip access."""
+        temperature = np.array([298.15, 301.25], dtype=np.float64)
+        pressure = np.array([101325.0, 99500.0], dtype=np.float64)
+        saturation_ratio = np.array(
+            [[0.91, 1.00, 1.07], [0.85, 0.97, 1.11]],
+            dtype=np.float64,
+        )
+
+        environment = WarpEnvironmentData()
+        environment.temperature = wp.array(temperature, dtype=wp.float64)
+        environment.pressure = wp.array(pressure, dtype=wp.float64)
+        environment.saturation_ratio = wp.array(
+            saturation_ratio,
+            dtype=wp.float64,
+        )
+
+        assert environment.temperature.shape == (2,)
+        assert environment.pressure.shape == (2,)
+        assert environment.saturation_ratio.shape == (2, 3)
+        np.testing.assert_array_equal(environment.temperature.numpy(), temperature)
+        np.testing.assert_array_equal(environment.pressure.numpy(), pressure)
+        np.testing.assert_array_equal(
+            environment.saturation_ratio.numpy(),
+            saturation_ratio,
+        )
 
 
 class TestWarpDataFieldAccess:
