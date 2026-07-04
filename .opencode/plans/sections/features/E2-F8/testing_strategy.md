@@ -18,8 +18,8 @@
 - `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`
   - Add multi-box `ParticleData` tests for strategy helpers and `step()` paths.
   - Prefer assertions that unsupported multi-box calls raise `ValueError`.
-  - If box-0 behavior is retained, assert box 1 remains unchanged and document
-    that this is transitional compatibility, not all-box execution.
+  - Assert the error message names unsupported multi-box execution rather than
+    implying box-0 fallback behavior.
 
 ## Non-Regression Tests
 

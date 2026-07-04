@@ -6,8 +6,10 @@
   them.
 - Current absolute per-species `fp64` mass storage is evaluated as the reference
   baseline.
-- At least `fp32` and mixed-precision candidates are compared; representation
-  alternatives are evaluated or explicitly ruled out with rationale.
+- Lower-precision candidates such as `fp32` or mixed precision are treated as
+  exploratory comparisons until measured evidence supports a recommendation;
+  representation alternatives are evaluated or explicitly ruled out with
+  rationale.
 - Conservation, small-particle fidelity, nonnegative/clamping behavior, memory
   budget, and runtime/throughput tradeoffs are reported.
 - Production schema and dtype defaults remain unchanged unless a later feature

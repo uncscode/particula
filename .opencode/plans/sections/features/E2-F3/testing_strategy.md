@@ -9,7 +9,9 @@ There is no standalone testing-only implementation phase.
 
 - `WarpEnvironmentData` struct can be instantiated and populated on the Warp
   CPU backend.
-- Every field has the expected `float64` dtype and `(n_boxes,)` shape.
+- `temperature` and `pressure` keep `float64` dtype with `(n_boxes,)` shape,
+  while `saturation_ratio` keeps `float64` dtype with `(n_boxes, n_species)`
+  shape.
 - One-box and multi-box environment containers transfer correctly.
 - `to_warp_environment_data(..., device="cpu")` preserves values.
 - `from_warp_environment_data(..., sync=True)` reconstructs the CPU container.
@@ -19,6 +21,10 @@ There is no standalone testing-only implementation phase.
   conversion helpers.
 - Optional CUDA-parametrized tests run when `warp_devices(wp)` includes
   `"cuda"` and skip otherwise.
+
+Use parametrized assertions in `particula/gpu/tests/warp_types_test.py` and
+`particula/gpu/tests/conversion_test.py` so reviewers can see one-box and
+multi-box cases for all three fields without duplicating transfer logic.
 
 ## Suggested test locations
 

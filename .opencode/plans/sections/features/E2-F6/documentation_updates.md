@@ -7,7 +7,7 @@
 - Include the final recommendation, validation evidence, tested cases,
   candidate alternatives, and reproduction instructions.
 - Cross-link the report from `docs/Features/Roadmap/data-oriented-gpu.md` where
-  the T6 requirement is described.
+  the E2-F6 requirement is described.
 
 ## Recommended Content
 

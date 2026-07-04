@@ -31,6 +31,6 @@
 
 ## Done Signal
 
-Issue `#1172` track `T4` is complete when gas round-trip semantics are explicit,
+Issue `#1172` feature `E2-F4` is complete when gas round-trip semantics are explicit,
 test-backed, and documented closely enough that E2-F5 and E2-F9 can cite one
 authoritative contract.

@@ -4,6 +4,9 @@
 
 - Container schema and ownership decisions for particle, gas, and environment
   state.
+- Confirmation that `ParticleData.volume` remains the authoritative per-box
+  simulation volume carrier; `EnvironmentData` must not own or mutate simulation
+  volume.
 - CPU `EnvironmentData` and Warp `WarpEnvironmentData` implementations.
 - Conversion helpers between CPU and GPU environment containers.
 - Gas schema drift resolution for names, partitioning, vapor pressure, and
@@ -19,6 +22,8 @@
 - Full multi-box support for every CPU dynamics strategy.
 - Complete replacement of legacy `ParticleRepresentation`, `GasSpecies`, or
   `Atmosphere` APIs.
+- Moving vapor pressure into CPU `GasData` or `EnvironmentData` ownership; vapor
+  pressure remains explicit process state or GPU-helper/kernel state.
 - Production implementation of new stiff condensation integrators beyond the
   recommendation and foundation work described by E2-F7.
 - Automatic hidden CPU/GPU synchronization in simulation loops.
@@ -33,4 +38,6 @@
   optional where existing test conventions allow it.
 - Shape validation should follow current `ParticleData` and `GasData` patterns:
   explicit `ValueError` messages with expected and actual shapes.
+- `ParticleData.density` remains shared across boxes with shape `(n_species,)`,
+  not a per-box environment field.
 - Documentation must distinguish container capability from dynamics support.

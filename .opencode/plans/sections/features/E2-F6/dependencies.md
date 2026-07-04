@@ -2,7 +2,7 @@
 
 ## Internal Dependencies
 
-- **E2-F1/T1:** Required. Provides schema foundation and terminology for the
+- **E2-F1:** Required. Provides schema foundation and terminology for the
   particle data model used as the study baseline.
 - **E2 parent epic:** Supplies the broader data-model and numerical foundation
   scope for issue #1172.

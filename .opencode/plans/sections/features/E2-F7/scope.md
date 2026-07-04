@@ -17,6 +17,9 @@
   for future Warp autodiff experiments.
 - Publish a stiffness map and integration recommendation in the E2 roadmap
   documentation.
+- Require a gas-coupled production condensation integration path with
+  conservation checks, or an explicit follow-up feature split if that scope is
+  too large for E2-F7.
 
 ## Out of Scope
 
@@ -28,8 +31,10 @@
 - A new JAX backend; current repository evidence points to Warp graph capture
   and Warp autodiff rather than an implemented JAX path.
 - Broad dtype migration; precision choices must remain aligned with E2-F6.
-- Final per-box environment migration if E2-F2/T2 containers are not yet
+- Final per-box environment migration if E2-F2 containers are not yet
   available. This feature may define contracts and use compatibility shims.
+- Leaving gas-coupled production integration unspecified; if not implemented in
+  this feature, it must be captured as a follow-up feature with clear gates.
 
 ## Assumptions
 

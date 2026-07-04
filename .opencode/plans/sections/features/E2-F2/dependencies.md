@@ -2,8 +2,10 @@
 
 ## Internal Dependencies
 
-- **E2-F1/T1:** Required schema foundation. Implementation should align field
-  names, positive/nonnegative semantics, and package location with T1 decisions.
+- **E2-F1:** Required schema foundation. Implementation should align field
+  names, strict positive-pressure validation, supersaturation-friendly
+  `saturation_ratio` semantics, and package location with the accepted E2-F1
+  decisions.
 - `particula/gas/gas_data.py`: primary container pattern for dataclass shape
   validation, dtype coercion, properties, and `copy()`.
 - `particula/particles/particle_data.py`: multi-box container precedent.
@@ -31,8 +33,9 @@
 
 ## Dependency Risks
 
-- If E2-F1 chooses different humidity/saturation naming or bounds, P1 must
-  adopt those decisions before tests are finalized.
+- If shared docs or examples still refer to legacy humidity naming or weaker
+  pressure bounds, P1 must normalize them to the accepted `saturation_ratio`
+  and strictly-positive-pressure contract before tests are finalized.
 - Existing scalar dynamics APIs may tempt scope creep; keep those migrations in
   downstream sibling features.
 

@@ -44,3 +44,15 @@
   - Tests: Existing scalar coagulation tests still pass; uniform per-box
     environment matches scalar behavior within stochastic tolerances; wrong
     `n_boxes` and device mismatch errors are covered.
+
+## Phase Ordering Notes
+
+- P1 should define the scalar-versus-explicit-environment contract before any
+  helper code lands so later phases do not encode conflicting precedence rules.
+- P2 should follow P1 and `E2-F3-P2` because environment normalization should
+  reuse the published transfer-helper naming and device-validation surface.
+- P3 should follow P2 and the `E2-F4-P3` vapor-pressure decision so the
+  condensation API does not freeze an environment contract that sibling gas work
+  still treats as provisional.
+- P4 should follow P3 so coagulation inherits the tested normalization path and
+  documentation publishes one shared per-box environment handoff.

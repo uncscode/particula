@@ -32,6 +32,6 @@
 
 ## Done Signal
 
-Issue `#1172` track `T5` is complete when scalar callers remain supported,
+Issue `#1172` feature `E2-F5` is complete when scalar callers remain supported,
 multi-box environment inputs are validated before launch, and downstream GPU
 work can reuse one documented environment feed path.

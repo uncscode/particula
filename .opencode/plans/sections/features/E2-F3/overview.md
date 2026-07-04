@@ -2,7 +2,7 @@
 
 Feature `E2-F3` implements the Warp-side representation of the environment
 container introduced by `E2-F2` and adds explicit CPU/GPU conversion helpers.
-The track is tied to issue `#1172` / track `T3` in parent epic `E2`.
+This feature is tied to issue `#1172` as feature `E2-F3` in parent epic `E2`.
 
 ## Goals
 
@@ -28,7 +28,7 @@ migration tracks (`E2-F5+`).
 ## Parent and sibling context
 
 - Parent epic: `E2` (Data-model and numerical foundations v2).
-- Upstream dependency: `E2-F2` / `T2`, which defines the CPU
+- Upstream dependency: `E2-F2`, which defines the CPU
   `EnvironmentData` schema and validation boundary.
 - Related completed tracks: `E2-F1` established CPU data-container patterns;
   `E2-F2` provides the environment container this feature mirrors.

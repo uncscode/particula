@@ -17,9 +17,8 @@
 - Add coagulation tests for multi-box `ParticleData` strategy calls.
 - Prefer adding a small helper in `coagulation_strategy_abc.py` to require
   `n_boxes=1` before helpers mutate or compute from box 0.
-- If compatibility requires retaining box-0 behavior, add tests proving only
-  box 0 is read/mutated and document this as transitional rather than full
-  multi-box support.
+- Remove transitional box-0 behavior for unsupported multi-box inputs; tests
+  should assert clear errors instead of documenting partial box-0 execution.
 - Keep tests co-located with changed strategy code.
 
 ## E2-F8-P3: Improve Unsupported Multi-Box Errors and User Documentation

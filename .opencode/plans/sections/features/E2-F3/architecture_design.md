@@ -14,8 +14,14 @@ between CPU NumPy arrays and Warp arrays.
 class WarpEnvironmentData:
     temperature: wp.array(dtype=wp.float64)
     pressure: wp.array(dtype=wp.float64)
-    # Additional E2-F2 numeric environment fields, each shaped (n_boxes,).
+    saturation_ratio: wp.array(dtype=wp.float64)
 ```
+
+`WarpEnvironmentData` mirrors the CPU `EnvironmentData` schema exactly:
+`temperature` and `pressure` are shaped `(n_boxes,)`, and `saturation_ratio` is
+shaped `(n_boxes, n_species)` with finite nonnegative supersaturation values
+allowed. It does not add simulation volume; `ParticleData.volume` remains the
+authoritative volume carrier.
 
 ```python
 def to_warp_environment_data(

@@ -2,16 +2,16 @@
 
 ## Required Dependencies
 
-- **E2-F1/T1:** Container schema foundation. E2-F8 relies on the established
+- **E2-F1:** Container schema foundation. E2-F8 relies on the established
   `ParticleData` and `GasData` shape contracts and should not redefine them.
 
 ## Related Sibling Features
 
-- **E2-F2/T2:** Environment containers may influence documentation wording for
+- **E2-F2:** Environment containers may influence documentation wording for
   box/environment boundaries.
-- **E2-F3/T3 and E2-F4/T4:** Gas/environment boundaries and vapor-pressure
+- **E2-F3 and E2-F4:** Gas/environment boundaries and vapor-pressure
   ownership should remain consistent with support-boundary docs.
-- **E2-F6/T6 and E2-F7/T7:** Numerical evidence and GPU condensation work are
+- **E2-F6 and E2-F7:** Numerical evidence and GPU condensation work are
   adjacent but not prerequisites for this CPU support-boundary feature.
 
 ## Internal Code Dependencies

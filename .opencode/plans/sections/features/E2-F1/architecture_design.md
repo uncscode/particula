@@ -31,13 +31,19 @@ Current code inventory
 ## Ownership Model to Decide
 
 - `ParticleData`: owns particle masses, concentration/count representation,
-  charge, particle material density, and currently per-box volume.
+  charge, per-box simulation volume, and particle material density. Volume stays
+  on `ParticleData`; `EnvironmentData` must not own or mutate simulation volume.
+  Density remains shared across boxes with shape `(n_species,)`.
 - `GasData`: owns species metadata and gas concentration, including names,
-  molar mass, and partitioning eligibility.
-- `EnvironmentData` (future): should own per-box thermodynamic state such as
-  temperature, pressure, and selected humidity/saturation fields.
+  molar mass, and partitioning eligibility. Vapor pressure is not CPU `GasData`
+  ownership; keep it as explicit process or GPU-helper/kernel state.
+- `EnvironmentData` (future): owns `temperature` and `pressure` shaped
+  `(n_boxes,)`, plus canonical `saturation_ratio` shaped
+  `(n_boxes, n_species)` with supersaturation allowed.
 - GPU mirrors: should represent device-compatible views of the same state, with
-  explicit exceptions for strings and device-only caches.
+  explicit exceptions for strings and device-only caches. `WarpGasData` remains
+  numeric only, so CPU restoration requires caller-supplied names or side
+  metadata rather than embedded name preservation.
 
 ## Security & Compliance
 

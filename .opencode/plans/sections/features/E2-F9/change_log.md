@@ -2,7 +2,7 @@
 
 ## 2026-07-03: Initial draft
 
-- Created first-pass feature plan for issue #1172 track T9.
+- Created first-pass feature plan for issue #1172 feature E2-F9.
 - Added three documentation/example phases:
   - E2-F9-P1 foundation guide.
   - E2-F9-P2 minimal examples.

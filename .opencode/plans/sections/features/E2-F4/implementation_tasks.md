@@ -11,27 +11,28 @@
 
 ## E2-F4-P2: Name and Partitioning Semantics
 
-- Decide the missing-name contract for `from_warp_gas_data()`:
-  - require explicit names,
-  - preserve current placeholders with a clear warning/docstring, or
-  - support metadata sidecar restoration.
-- Implement the selected behavior in `particula/gpu/conversion.py`.
-- Add tests for supplied names, missing names, mismatched name counts, and
-  placeholder/error behavior.
+- Implement `from_warp_gas_data()` so CPU restoration prefers caller-supplied
+  `name` input or documented external metadata, without treating `WarpGasData`
+  as authoritative name storage.
+- If placeholder names remain as a compatibility fallback, keep that path
+  explicit in `particula/gpu/conversion.py` docstrings and tests rather than as
+  silent metadata preservation.
+- Add tests in `particula/gpu/tests/conversion_test.py` for supplied names,
+  missing names, mismatched name counts, and any placeholder fallback behavior.
 - Add tests that GPU `int32` partitioning returns CPU boolean partitioning and
-  invalid or non-binary values behave according to the chosen contract.
+  that invalid or non-binary values raise before casting.
 
 ## E2-F4-P3: Vapor-Pressure Semantics
 
-- Decide whether vapor pressure is intentionally discarded on CPU return,
-  returned through a sidecar/helper, or added to a separate environment-derived
-  transfer structure.
-- Keep `to_warp_gas_data()` shape validation explicit for
-  `(n_boxes, n_species)` buffers.
-- Replace surprising zero defaults with an explicit behavior if the audit finds
-  that silent defaults are unsafe.
-- Add tests for supplied, missing, invalid-shape, and round-trip vapor-pressure
-  behavior.
+- Treat `vapor_pressure` as explicit process or GPU-helper state rather than a
+  field owned by CPU `GasData` or `EnvironmentData`.
+- Keep `to_warp_gas_data(..., vapor_pressure=...)` shape validation explicit for
+  `(n_boxes, n_species)` buffers in `particula/gpu/conversion.py`.
+- Document and test the accepted CPU-return behavior: callers who need vapor
+  pressure after GPU execution must read it from `WarpGasData` before
+  `from_warp_gas_data()` or manage an explicit sidecar.
+- Add tests for supplied, missing, invalid-shape, and intentional non-round-trip
+  vapor-pressure behavior.
 
 ## E2-F4-P4: Documentation
 

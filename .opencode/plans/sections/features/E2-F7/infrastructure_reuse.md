@@ -52,7 +52,7 @@
 
 ## Documentation Assets
 
-- `docs/Features/Roadmap/data-oriented-gpu.md` contains the T7 stiffness and
+- `docs/Features/Roadmap/data-oriented-gpu.md` contains the E2-F7 stiffness and
   graph-capture requirements.
 - `docs/Features/Roadmap/warp-autodiff-limitations.md` records current Warp
   autodiff constraints and identifies deterministic condensation as an early

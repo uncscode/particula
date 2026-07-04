@@ -3,12 +3,14 @@
 - [ ] **E2-F2-P1:** Define EnvironmentData fields and validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Add the core per-box field schema and strict validation rules for
-    temperature, pressure, and humidity/saturation state.
+    `temperature`, `pressure`, and canonical species-resolved
+    `saturation_ratio` state.
   - Files: `particula/gas/environment_data.py`,
     `particula/gas/tests/environment_data_test.py`
   - Tests: valid single-box construction, invalid dimensionality, mismatched
-    field lengths, non-finite values, negative pressure/humidity, and positive
-    Kelvin temperature requirements.
+    field lengths, non-finite values, negative pressure or saturation ratio,
+    permitted supersaturation above `1.0`, and positive Kelvin temperature
+    requirements.
 
 - [ ] **E2-F2-P2:** Implement CPU dataclass exports and copy semantics with tests
   - Issue: TBD | Size: S | Status: Not Started
@@ -22,8 +24,8 @@
 - [ ] **E2-F2-P3:** Document process environment-state read and mutation boundaries
   - Issue: TBD | Size: XS | Status: Not Started
   - Goal: Update development docs so they explain that `EnvironmentData` owns
-    per-box thermodynamic state while current process APIs remain scalar until
-    downstream migration tracks.
+    per-box thermodynamic state, excluding simulation volume, while current
+    process APIs remain scalar until downstream migration tracks.
   - Files: `docs/Features/particle-data-migration.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`
   - Tests: documentation link/reference validation where available; no

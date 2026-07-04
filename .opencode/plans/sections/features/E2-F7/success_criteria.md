@@ -18,6 +18,9 @@
   evaluated or explicitly scoped with rationale if blocked.
 - Recommendation identifies required follow-up work for gas concentration
   updates, per-box environment inputs, clamp gradients, or precision changes.
+- Gas-coupled production condensation integration is either included with
+  conservation checks or split into a named follow-up feature because it is too
+  large for this issue-sized plan.
 - All new code has co-located tests and passes fast Warp CPU validation.
 - Documentation updates identify E2-F2 and E2-F6 as dependencies.
 

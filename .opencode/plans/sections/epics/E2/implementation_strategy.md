@@ -12,14 +12,20 @@ kernels. The current reference patterns are `ParticleData`, `GasData`,
 
 - The first dimension of batched state is `n_boxes`.
 - Particle state owns per-particle/per-species masses, concentrations, charge,
-  material density, and current per-box volume until E2-F1 decides otherwise.
+  current per-box volume, and shared material density. `ParticleData.volume`
+  remains the authoritative simulation volume carrier; `EnvironmentData` must
+  not own or mutate simulation volume. `ParticleData.density` remains shared
+  across boxes with shape `(n_species,)`.
 - Gas state owns gas species names, molar masses, concentrations, and
-  partitioning metadata.
-- Environment state should own per-box thermodynamic state such as temperature,
-  pressure, humidity, and saturation-related fields approved by E2-F1.
-- Vapor pressure semantics must be explicit: either passed as computed kernel
-  input, represented as gas/environment state, or intentionally excluded from
-  round trips with documented restoration requirements.
+  partitioning metadata. `WarpGasData` remains numeric only; CPU restoration
+  must prefer caller-supplied names or external index-map metadata instead of
+  preserving names inside the Warp struct.
+- Environment state owns per-box thermodynamic state: `temperature` and
+  `pressure` with shape `(n_boxes,)`, plus species-resolved
+  `saturation_ratio` with shape `(n_boxes, n_species)` that permits
+  supersaturation above `1.0`.
+- Vapor pressure semantics must be explicit process or GPU-helper/kernel state;
+  do not add vapor pressure ownership to CPU `GasData` or `EnvironmentData`.
 
 ### Reusable Patterns
 
@@ -51,3 +57,5 @@ kernels. The current reference patterns are `ParticleData`, `GasData`,
   environment state while preserving existing kernel signatures.
 - Treat E2-F6 and E2-F7 as evidence-producing tracks that can recommend future
   implementation work without overextending E2 scope.
+- Unsupported CPU multi-box dynamics paths should raise explicit errors rather
+  than applying transitional box-0 behavior.

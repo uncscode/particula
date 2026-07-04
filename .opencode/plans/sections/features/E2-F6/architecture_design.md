@@ -8,6 +8,10 @@ reference cases and analysis artifacts. Any experimental representation must be
 isolated in study helpers or notebooks/scripts and must not become a default
 constructor, conversion path, or Warp struct dtype.
 
+`fp64` is the baseline precision envelope for production schema decisions. Lower
+precision or mixed-precision work is exploratory until this feature records
+measured evidence that justifies a later implementation recommendation.
+
 ## Baseline Model
 
 - CPU baseline: `ParticleData.masses` stores absolute per-species mass in kg as

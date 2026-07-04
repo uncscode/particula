@@ -9,9 +9,11 @@ not lowered.
   - File: `particula/gas/tests/environment_data_test.py`
   - Test valid single-box construction.
   - Test invalid dimensionality for each field.
-  - Test mismatched `(n_boxes,)` lengths.
-  - Test non-finite temperature/pressure/humidity values.
+  - Test mismatched `(n_boxes,)` and `(n_boxes, n_species)` lengths.
+  - Test non-finite temperature/pressure/`saturation_ratio` values.
   - Test invalid negative values and positive-Kelvin requirements.
+  - Use parametrized cases that prove `saturation_ratio > 1.0` remains valid while
+    negative values still fail.
 
 - **P2: Container API and exports**
   - File: `particula/gas/tests/environment_data_test.py`

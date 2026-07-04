@@ -4,20 +4,27 @@
 
 - `EnvironmentData` exists as a CPU dataclass in the gas/data-container area of
   the package.
-- The container stores per-box temperature, pressure, and humidity/saturation
-  state as `np.float64` arrays shaped `(n_boxes,)`.
-- Single-box construction uses shape `(1,)` and multi-box construction supports
-  more than one box.
-- Invalid shapes, mismatched box counts, non-finite values, and invalid
-  negative or out-of-range values raise clear `ValueError`s.
+- The container stores `temperature` and `pressure` as `np.float64` arrays
+  shaped `(n_boxes,)`, plus `saturation_ratio` as an `np.float64` array shaped
+  `(n_boxes, n_species)`.
+- Single-box construction keeps the leading box dimension (`(1,)` and
+  `(1, n_species)`), and multi-box construction supports more than one box.
+- Invalid dimensionality, mismatched box counts, non-finite values, nonpositive
+  pressure, negative saturation ratio, and invalid temperature values raise
+  clear `ValueError`s.
+- Supersaturation values above `1.0` remain valid and are covered as an
+  explicit accepted case.
 - `n_boxes` and `copy()` behavior match existing data-container conventions.
 - The class is importable from the expected package export path.
 
 ## Test Criteria
 
 - New unit tests cover valid single-box and multi-box inputs.
-- New unit tests cover invalid shapes and invalid values.
+- New unit tests cover invalid shapes, species-dimension mismatches, and
+  invalid values.
 - New unit tests cover dtype coercion, copy independence, and package exports.
+- New unit tests include at least one supersaturation case (`saturation_ratio >
+  1.0`) and one positive-pressure validation failure.
 - Scoped gas tests pass.
 
 ## Documentation Criteria
@@ -29,5 +36,6 @@
 
 ## Done Signal
 
-EnvironmentData exists with per-box thermodynamic fields and tests for valid and
-invalid shapes, satisfying issue #1172 track T2.
+EnvironmentData exists with the canonical `temperature`, `pressure`, and
+species-resolved `saturation_ratio` fields, plus tests for valid and invalid
+construction, satisfying issue #1172 feature E2-F2.

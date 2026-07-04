@@ -35,6 +35,6 @@
 
 ## Documentation Sources
 
-- `docs/Features/Roadmap/data-oriented-gpu.md` is the roadmap source for T6.
+- `docs/Features/Roadmap/data-oriented-gpu.md` is the roadmap source for E2-F6.
 - `docs/Features/particle-data-migration.md` describes data-container migration
   context and should cross-link the final recommendation if updated.

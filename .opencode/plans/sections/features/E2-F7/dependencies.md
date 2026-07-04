@@ -2,11 +2,11 @@
 
 ## Required Upstream Dependencies
 
-- **E2-F2 / T2:** Environment and schema foundations.
+- **E2-F2:** Environment and schema foundations.
   - Needed for per-box temperature, pressure, and derived environment state.
   - Until available, E2-F7 should use current scalar `temperature` and
     `pressure` compatibility paths and document migration assumptions.
-- **E2-F6 / T6:** Dtype and precision envelope.
+- **E2-F6:** Dtype and precision envelope.
   - Needed before recommending any fp32 or mixed-precision condensation path.
   - Current plan treats fp64 as reference for all stiffness measurements.
 

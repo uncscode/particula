@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Issue #1172 track T7 addresses the numerical stiffness of the current GPU
+Issue #1172 feature E2-F7 addresses the numerical stiffness of the current GPU
 condensation timestep. The existing Warp path uses an explicit fixed-step
 particle-mass update with non-negative clamping, while aerosol condensation can
 span microsecond equilibration for nanometer particles and second-scale cloud
@@ -35,7 +35,7 @@ gradient-friendly control flow.
 ## Parent Epic Context
 
 - Parent epic: E2, Data-Model and Numerical Foundations v2.
-- Direct dependencies: E2-F2/T2 environment/schema foundations and E2-F6/T6
+- Direct dependencies: E2-F2 environment/schema foundations and E2-F6
   dtype/precision envelope.
 - Related sibling tracks: E2-F1 through E2-F6 establish GPU data layout,
   environment boundaries, vapor-property plumbing, kernel migration, and

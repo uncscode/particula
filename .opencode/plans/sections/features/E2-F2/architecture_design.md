@@ -12,7 +12,7 @@ Simulation state
   └─ EnvironmentData   -> per-box thermodynamic state
         ├─ temperature: (n_boxes,) float64
         ├─ pressure: (n_boxes,) float64
-        └─ humidity/saturation state: (n_boxes,) float64
+        └─ saturation_ratio: (n_boxes, n_species) float64
 
 Current processes
   -> continue accepting scalar temperature/pressure until migration tracks
@@ -23,8 +23,9 @@ Future processes
 ## Data / API / Workflow Changes
 
 - **Data Model:** Add a mutable CPU dataclass with one-dimensional per-box
-  arrays. The likely fields are `temperature`, `pressure`, and one clearly
-  named humidity/saturation field chosen to match E2-F1 schema terminology.
+  arrays for `temperature` and `pressure`, plus a species-resolved
+  `saturation_ratio` array shaped `(n_boxes, n_species)`. The container must not
+  own or mutate simulation volume; `ParticleData.volume` remains authoritative.
 - **API Surface:** Export `EnvironmentData` through `particula.gas`. Do not
   change existing dynamics method signatures in this feature.
 - **Workflow Hooks:** Downstream GPU mirror and process-migration tracks can use
@@ -32,15 +33,17 @@ Future processes
 
 ## Validation Rules
 
-- All fields must be one-dimensional arrays with identical length.
+- `temperature` and `pressure` must be one-dimensional arrays with identical
+  `(n_boxes,)` length.
+- `saturation_ratio` must be a two-dimensional array shaped
+  `(n_boxes, n_species)`.
 - `n_boxes` is derived from `temperature.shape[0]`.
 - Temperature must be finite and positive in Kelvin.
-- Pressure must be finite and nonnegative or positive according to E2-F1's
-  schema decision; prefer physically positive pressure unless zero-pressure
-  tests are intentionally supported.
-- Humidity/saturation state must be finite and nonnegative. If named relative
-  humidity, enforce an upper bound of `1.0`; if named saturation ratio, allow
-  supersaturation values above `1.0`.
+- Pressure must be finite and strictly positive so the container represents a
+  physically valid per-box environment and downstream transport/property
+  calculations do not need a parallel zero-pressure contract.
+- `saturation_ratio` must be finite and nonnegative; values above `1.0` are
+  valid supersaturation and must not be rejected.
 
 ## Security & Compliance
 

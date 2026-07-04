@@ -2,7 +2,7 @@
 
 ## 2026-07-03
 
-- Created first-pass feature plan for `E2-F4` / issue `#1172` track `T4`.
+- Created first-pass feature plan for `E2-F4` / issue `#1172` feature `E2-F4`.
 - Added four issue-sized phases covering schema audit, name and partitioning
   semantics, vapor-pressure ownership, and migration documentation.
 - Drafted all 13 canonical feature sections using classifier context,

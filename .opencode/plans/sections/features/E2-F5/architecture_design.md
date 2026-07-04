@@ -46,5 +46,7 @@ Array/environment inputs are validated for exact shape and device match.
 - Environment device must match particle arrays before launch.
 - `n_boxes` comes from `particles.masses.shape[0]` and must align with gas and
   environment state.
-- If scalar and environment values are both provided, the implementation must
-  either reject ambiguous inputs or document that explicit environment wins.
+- If scalar and environment values are both provided, the implementation should
+  raise a clear error instead of applying precedence rules. That keeps the first
+  migration path deterministic for callers and avoids silently mixing legacy
+  scalar inputs with per-box environment state.

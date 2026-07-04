@@ -2,7 +2,7 @@
 
 ## Required Dependencies
 
-- `E2-F1/T1`: schema foundation for data-oriented gas and particle containers.
+- `E2-F1`: schema foundation for data-oriented gas and particle containers.
   Implementation should confirm the final `GasData`, `WarpGasData`, and
   conversion-helper baseline before changing semantics.
 
