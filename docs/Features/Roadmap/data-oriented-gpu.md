@@ -14,7 +14,10 @@ The remaining work is organized into epics ordered by dependency: Epic A
 - [Epic E: Differentiability and Global Optimization](#epic-e-differentiability-and-global-optimization)
 - [Epic F: API Stability, Validation Infrastructure, and Documentation](#epic-f-api-stability-validation-infrastructure-and-documentation)
 
-Quick link: [Current container schema inventory](#current-container-schema-inventory).
+Quick links:
+
+- [Current container schema inventory](#current-container-schema-inventory)
+- [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
 
 ## Motivation and Target Workloads
 
@@ -216,6 +219,67 @@ Keep testing round-trips for the current CPU/GPU schema drift explicitly:
 `WarpGasData` drops `name`, stores `partitioning` as `int32` instead of
 `bool`, and adds `vapor_pressure` that is not restored to the CPU gas
 container.
+
+### Authoritative field ownership decisions
+
+This section is the canonical ownership and CPU↔GPU round-trip contract for
+follow-on E2 work. The inventory table above remains the shipped current-state
+evidence record; use the decision table below for policy when adding fields,
+conversion behavior, or future environment state.
+
+| Field / group | Authoritative owner | CPU shape | GPU shape | Dtype | Mutability | Round-trip behavior | Downstream consumers | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `ParticleData.masses` | Owned by `ParticleData` as the authoritative particle/species mass state | `(n_boxes, n_particles, n_species)` | `(n_boxes, n_particles, n_species)` via `WarpParticleData.masses` | `float64` on CPU / `wp.float64` on GPU | Mutable stored state on both containers | Must round-trip without schema drift through `to_warp_particle_data()` and `from_warp_particle_data()` | Particle property accessors, condensation, coagulation, and future GPU-resident timestep loops | `particula/particles/particle_data.py:76-98`; `particula/gpu/conversion.py:72-139,244-287`; `particula/particles/tests/particle_data_test.py:124-136`; `particula/gpu/tests/conversion_test.py:512-548` |
+| `ParticleData.concentration` | Owned by `ParticleData` as authoritative per-box particle concentration/count state | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` via `WarpParticleData.concentration` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without schema change | Particle dynamics kernels and any box-batched particle workflow | `particula/particles/particle_data.py:76-109`; `particula/gpu/conversion.py:113-115,283`; `particula/particles/tests/particle_data_test.py:138-164`; `particula/gpu/tests/conversion_test.py:521-545` |
+| `ParticleData.charge` | Owned by `ParticleData` as authoritative particle charge state | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` via `WarpParticleData.charge` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without dtype drift | Charged coagulation follow-on work and GPU parity paths that consume particle charge | `particula/particles/particle_data.py:76-109`; `particula/gpu/conversion.py:116,284`; `particula/particles/tests/particle_data_test.py:166-192`; `particula/gpu/tests/conversion_test.py:524-526,546-548` |
+| `ParticleData.density` | Owned by `ParticleData` and must remain shared-across-boxes material state, not per-box environment state | `(n_species,)` | `(n_species,)` via `WarpParticleData.density` | `float64` / `wp.float64` | Mutable stored state, but shared across boxes | Must round-trip as shared 1D species density state | Radius, effective-density, and mass-fraction calculations plus future GPU particle property parity | `particula/particles/particle_data.py:67-68,119-137`; `particula/gpu/conversion.py:117-119,285`; `particula/particles/tests/particle_data_test.py:208-234`; `particula/gpu/tests/warp_types_test.py:38-58` |
+| `ParticleData.volume` | Owned by `ParticleData` as the authoritative per-box simulation-volume carrier | `(n_boxes,)` | `(n_boxes,)` via `WarpParticleData.volume` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without schema change | Per-box particle workflows, dilution-style process work, and future environment/process coordination | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `particula/gpu/tests/conversion_test.py:530-548` |
+| `GasData.name` | Owned by CPU `GasData` as authoritative species-name metadata | `len == n_species` | Not owned on GPU | `list[str]` | Mutable CPU metadata only | Does not survive transfer on its own; CPU restore requires caller-supplied names or generated placeholders from external metadata | CPU-facing reporting, facade compatibility, and any restore path back to `GasData` | `particula/gas/gas_data.py:52-73`; `particula/gpu/warp_types.py:82-99`; `particula/gpu/conversion.py:155-157,301-345`; `particula/gas/tests/gas_data_test.py:119-127`; `particula/gpu/tests/conversion_test.py:600-640` |
+| `GasData.molar_mass` | Owned by `GasData` as authoritative gas species molar-mass state | `(n_species,)` | `(n_species,)` via `WarpGasData.molar_mass` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without schema drift | Gas property calculations, condensation, and GPU gas kernels | `particula/gas/gas_data.py:53-67,75-108`; `particula/gpu/warp_types.py:100-111,131`; `particula/gpu/conversion.py:214-216,354`; `particula/gpu/tests/warp_types_test.py:168-184,218-232`; `particula/gpu/tests/conversion_test.py:583-595` |
+| `GasData.concentration` | Owned by `GasData` as authoritative per-box gas concentration state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via `WarpGasData.concentration` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without shape drift | Condensation, gas-phase workflows, and future GPU-resident gas updates | `particula/gas/gas_data.py:55-57,76-101`; `particula/gpu/warp_types.py:104-105,132`; `particula/gpu/conversion.py:217-219,355`; `particula/gas/tests/gas_data_test.py:99-117`; `particula/gpu/tests/conversion_test.py:593-595` |
+| `GasData.partitioning` | Owned by `GasData` as authoritative shared-across-boxes partitioning eligibility state | `(n_species,)` | `(n_species,)` via `WarpGasData.partitioning` | `bool` on CPU / `wp.int32` on GPU | Mutable stored state on both containers | Must round-trip with explicit `bool → int32 → bool` conversion | Condensation partitioning decisions and GPU kernels that require a numeric mask | `particula/gas/gas_data.py:57-58,79-115`; `particula/gpu/warp_types.py:96-111,134`; `particula/gpu/conversion.py:159-160,208-209,223-239,347-356`; `particula/gas/tests/gas_data_test.py:77-97`; `particula/gpu/tests/conversion_test.py:189-199,609-619` |
+| `WarpParticleData` numeric mirrors | Owned on GPU only as mirrors of authoritative `ParticleData` fields, not as a separate source of truth | Mirrors CPU particle shapes | Stored on GPU as declared in `WarpParticleData` | `wp.float64` | Mutable GPU working state | Must restore to the corresponding `ParticleData` fields without adding or dropping particle schema | GPU-resident particle workflows and parity tests | `particula/gpu/warp_types.py:73-77`; `particula/gpu/conversion.py:111-137,281-287`; `particula/gpu/tests/warp_types_test.py:38-58,100-118,302-320`; `particula/gpu/tests/conversion_test.py:512-548` |
+| `WarpGasData.molar_mass` / `concentration` / `partitioning` | Owned on GPU only as numeric mirrors/helpers of authoritative CPU `GasData` state | `(n_species,)`, `(n_boxes, n_species)`, `(n_species,)` | Same declared GPU shapes | `wp.float64` / `wp.float64` / `wp.int32` | Mutable GPU working state | Must restore to `GasData` numeric state, with explicit `int32 → bool` recovery for `partitioning` | GPU condensation and other gas-kernel workflows | `particula/gpu/warp_types.py:82-99,100-111,131-134`; `particula/gpu/conversion.py:142-241,290-357`; `particula/gpu/tests/warp_types_test.py:168-184,218-232,322-338`; `particula/gpu/tests/conversion_test.py:189-229,583-619` |
+| `WarpGasData.vapor_pressure` | Owned by no CPU container; treated as GPU-helper/process state rather than authoritative `GasData` or future `EnvironmentData` state | Not owned on CPU containers | `(n_boxes, n_species)` via `WarpGasData.vapor_pressure` | `wp.float64` | Mutable GPU helper state | Must be recomputed, explicitly provided, or carried as sidecar state; CPU restore from `WarpGasData` is intentionally lossy because `from_warp_gas_data()` drops it | GPU condensation kernels and future on-device thermodynamic updates | `particula/gpu/warp_types.py:98-108,133`; `particula/gpu/conversion.py:162-206,220-241,301-304`; `particula/gpu/tests/warp_types_test.py:177-183,225-231`; `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595` |
+| Future `EnvironmentData.temperature` | Must be owned by future `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via future `WarpEnvironmentData` | `float64` on CPU / planned GPU numeric mirror | Mutable per-box thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Parcel/expansion workflows, latent-heat condensation, and other per-box thermodynamic updates | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+| Future `EnvironmentData.pressure` | Must be owned by future `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via future `WarpEnvironmentData` | `float64` on CPU / planned GPU numeric mirror | Mutable per-box thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Parcel/expansion workflows, kernel inputs, and per-box forcing profiles | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+| Future `EnvironmentData.saturation_ratio` | Must be owned by future `EnvironmentData` as per-box, per-species thermodynamic state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via future `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / planned GPU numeric mirror | Mutable derived-or-updated thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+| Simulation volume ownership | Not owned by future `EnvironmentData`; must remain owned by `ParticleData.volume` | `(n_boxes,)` on `ParticleData` | `(n_boxes,)` on `WarpParticleData` | `float64` / `wp.float64` | Mutable per-box simulation state under particle container ownership | Must continue to round-trip only with particle container conversion helpers | Per-box particle state, dilution-style workflows, and timestep orchestration that needs simulation volume | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+
+#### Rationale for issue-critical ownership decisions
+
+- `ParticleData.density` remains shared-across-boxes state with CPU/GPU shape
+  `(n_species,)`; the constructor enforces 1D species density semantics rather
+  than per-box thermodynamic ownership
+  (`particula/particles/particle_data.py:67-68,119-137`; tests:
+  `particula/particles/tests/particle_data_test.py:208-234`,
+  `particula/gpu/tests/warp_types_test.py:38-58`).
+- `ParticleData.volume` is the authoritative per-box simulation-volume carrier
+  with shape `(n_boxes,)`, and future `EnvironmentData` must not own or mutate
+  simulation volume
+  (`particula/particles/particle_data.py:69-70,111-117`; tests:
+  `particula/particles/tests/particle_data_test.py:194-206`;
+  `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
+- `vapor_pressure` is process/GPU-helper state rather than owned CPU
+  `GasData` or future `EnvironmentData` state; CPU-facing workflows must
+  recompute it or pass it as sidecar state, and CPU restore from
+  `WarpGasData` is intentionally lossy because `to_warp_gas_data()` injects
+  zeros when absent and `from_warp_gas_data()` drops the field
+  (`particula/gpu/conversion.py:162-206,301-304`; tests:
+  `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595`).
+- `WarpGasData` is numeric-only; restoring CPU gas names requires
+  caller-supplied names or equivalent external metadata because the GPU
+  container excludes string fields and `from_warp_gas_data()` otherwise
+  generates placeholder names such as `species_0`
+  (`particula/gpu/warp_types.py:82-99`;
+  `particula/gpu/conversion.py:305-345`; tests:
+  `particula/gpu/tests/conversion_test.py:600-640`).
+- Future environment ownership is `temperature: (n_boxes,)`, `pressure:
+  (n_boxes,)`, and `saturation_ratio: (n_boxes, n_species)`; this phase records
+  those ownership decisions for downstream work without moving simulation volume
+  out of `ParticleData.volume`
+  ([EnvironmentData Container](#environmentdata-container);
+  `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
 
 - Decide the particle mass storage representation given the wide dynamic range
   (see [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)).
