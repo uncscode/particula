@@ -23,9 +23,9 @@
 
 ## Conversion helpers
 
-- [ ] Add `to_warp_environment_data` using `_ensure_warp_available` and
+- [x] Add `to_warp_environment_data` using `_ensure_warp_available` and
       `_validate_device`.
-- [ ] Transfer `temperature`, `pressure`, and `saturation_ratio` explicitly in
+- [x] Transfer `temperature`, `pressure`, and `saturation_ratio` explicitly in
       `particula/gpu/conversion.py`; avoid loops that would hide field drift from
       reviewers unless they are generated from a documented shared schema tuple.
 - [ ] Add `from_warp_environment_data` with optional `sync` and exact CPU
@@ -34,10 +34,12 @@
 
 ## Tests
 
-- [ ] Add fixtures for one-box and multi-box `EnvironmentData` instances.
-- [ ] Add CPU-device transfer tests in
+- [x] Add fixtures for one-box and multi-box `EnvironmentData` instances.
+- [x] Add CPU-device transfer tests in
       `particula/gpu/tests/conversion_test.py` for values, shapes, and dtypes of
       all three fields.
+- [x] Add invalid-device, Warp-unavailable, and CPU copy-semantics coverage for
+      `to_warp_environment_data` in `particula/gpu/tests/conversion_test.py`.
 - [ ] Add round-trip tests comparing `temperature`, `pressure`, and
       `saturation_ratio` with NumPy assertions and explicit `sync=True`/
       `sync=False` coverage.

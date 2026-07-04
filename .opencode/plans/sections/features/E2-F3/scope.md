@@ -12,13 +12,18 @@
 - Add focused Warp CPU tests in `particula/gpu/tests/warp_types_test.py` for
   struct creation, field presence, one-box and multi-box shapes, `float64`
   dtypes, and deterministic NumPy-backed round-trip values.
+- Add `to_warp_environment_data(data, device="cuda", copy=True)` in
+  `particula/gpu/conversion.py` using the shared Warp-availability and
+  device-validation helpers.
+- Add focused conversion coverage in `particula/gpu/tests/conversion_test.py`
+  for values, shapes, dtypes, invalid-device behavior, Warp-unavailable
+  behavior, and CPU copy semantics.
 
 ## Out of scope
 
 - Do not redesign the CPU `EnvironmentData` schema except for small alignment
   fixes needed to make GPU transfer unambiguous.
-- Do not add CPU-to-Warp or Warp-to-CPU environment conversion helpers in this
-  shipped slice.
+- Do not add Warp-to-CPU environment conversion helpers in this shipped slice.
 - Do not update `particula/gpu/__init__.py` exports in this shipped slice.
 - Do not migrate existing condensation or coagulation kernels from scalar
   temperature/pressure arguments in this track.
@@ -32,7 +37,9 @@
 
 ## Done signal
 
-`WarpEnvironmentData` exists in `particula/gpu/warp_types.py`, its field shapes
-and dtypes match the CPU schema, deterministic Warp CPU tests pass in
-`particula/gpu/tests/warp_types_test.py`, and no conversion helpers or export
+`WarpEnvironmentData` exists in `particula/gpu/warp_types.py`,
+`to_warp_environment_data` exists in `particula/gpu/conversion.py`, field
+shapes and dtypes match the CPU schema, targeted Warp CPU tests pass in
+`particula/gpu/tests/warp_types_test.py` and
+`particula/gpu/tests/conversion_test.py`, and no reverse helper or export
 changes are introduced prematurely.

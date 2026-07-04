@@ -14,7 +14,12 @@
   `WarpEnvironmentData` in `particula/gpu/warp_types.py` and focused schema
   coverage in `particula/gpu/tests/warp_types_test.py`.
 - Recorded that no conversion helpers, package export changes, or external docs
-  landed in this implementation slice.
+  landed in the `#1192` implementation slice.
+- Updated plan sections after implementation issue `#1193` shipped `E2-F3-P2`
+  with `to_warp_environment_data` in `particula/gpu/conversion.py` and focused
+  conversion coverage in `particula/gpu/tests/conversion_test.py`.
+- Recorded that reverse conversion, package export changes, CUDA coverage, and
+  external docs remain deferred after the `#1193` slice.
 
 ## 2026-07-03
 

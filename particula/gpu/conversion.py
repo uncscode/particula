@@ -1,17 +1,24 @@
 """Conversion functions between CPU and GPU data containers.
 
-This module provides functions to transfer CPU-side ParticleData and GasData
-containers to GPU using NVIDIA Warp arrays. The conversion functions enable
-manual control over device selection and copy behavior for long GPU-resident
-simulations.
+This module provides helpers to transfer CPU-side particle, gas, and
+environment containers to GPU using NVIDIA Warp arrays. The conversion
+functions enable manual control over device selection and copy behavior for
+long GPU-resident simulations.
 
 Example:
-    >>> from particula.gpu import to_warp_particle_data, to_warp_gas_data
+    >>> from particula.gpu import (
+    ...     to_warp_environment_data,
+    ...     to_warp_gas_data,
+    ...     to_warp_particle_data,
+    ... )
     >>> gpu_particles = to_warp_particle_data(particles, device="cuda")
     >>> gpu_gas = to_warp_gas_data(gas, device="cuda")
+    >>> gpu_environment = to_warp_environment_data(environment, device="cuda")
     >>> # Run GPU simulation loop
     >>> for _ in range(10000):
-    ...     gpu_particles = condensation_step(gpu_particles, gpu_gas, dt)
+    ...     gpu_particles = condensation_step(
+    ...         gpu_particles, gpu_gas, gpu_environment, dt
+    ...     )
 """
 
 from __future__ import annotations
@@ -151,6 +158,10 @@ def to_warp_environment_data(
 ) -> "WarpEnvironmentData":
     """Transfer EnvironmentData to GPU with explicit control.
 
+    Use this helper when environment state should remain on the selected
+    Warp device alongside particle or gas data during GPU-resident
+    simulations.
+
     Args:
         data: CPU-side EnvironmentData container.
         device: Target device ("cuda", "cuda:0", "cuda:1", "cpu").
@@ -163,6 +174,14 @@ def to_warp_environment_data(
 
     Raises:
         RuntimeError: If Warp is not available or device not found.
+
+    Example:
+        >>> from particula.gpu import to_warp_environment_data
+        >>> gpu_environment = to_warp_environment_data(
+        ...     environment_data, device="cpu"
+        ... )
+        >>> gpu_environment.temperature.shape
+        (1,)
     """
     wp = _ensure_warp_available()
     _validate_device(wp, device)
