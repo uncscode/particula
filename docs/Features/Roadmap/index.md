@@ -66,6 +66,7 @@ pages.
 
 - [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md)
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
+- [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 
 ## Contribution Opportunities
 
