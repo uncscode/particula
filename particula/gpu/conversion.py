@@ -82,6 +82,22 @@ def _validate_device(wp, device: str):
         ) from e
 
 
+def _from_numpy_zero_copy(wp, values, dtype, device: str):
+    """Call ``wp.from_numpy`` with an explicit zero-copy preference.
+
+    Some Warp versions accept ``copy=False`` explicitly, while older versions
+    reject the keyword and use their built-in default behavior. Prefer the
+    explicit call when supported so regression tests can guard the intended
+    branch, but fall back for compatibility with older Warp releases.
+    """
+    try:
+        return wp.from_numpy(values, dtype=dtype, device=device, copy=False)
+    except TypeError as exc:
+        if "unexpected keyword argument 'copy'" not in str(exc):
+            raise
+        return wp.from_numpy(values, dtype=dtype, device=device)
+
+
 def to_warp_particle_data(
     data: "ParticleData",
     device: str = "cuda",
@@ -133,20 +149,20 @@ def to_warp_particle_data(
         gpu_data.volume = wp.array(data.volume, dtype=wp.float64, device=device)
     else:
         # Zero-copy via wp.from_numpy() (if array is on compatible device)
-        gpu_data.masses = wp.from_numpy(
-            data.masses, dtype=wp.float64, device=device
+        gpu_data.masses = _from_numpy_zero_copy(
+            wp, data.masses, dtype=wp.float64, device=device
         )
-        gpu_data.concentration = wp.from_numpy(
-            data.concentration, dtype=wp.float64, device=device
+        gpu_data.concentration = _from_numpy_zero_copy(
+            wp, data.concentration, dtype=wp.float64, device=device
         )
-        gpu_data.charge = wp.from_numpy(
-            data.charge, dtype=wp.float64, device=device
+        gpu_data.charge = _from_numpy_zero_copy(
+            wp, data.charge, dtype=wp.float64, device=device
         )
-        gpu_data.density = wp.from_numpy(
-            data.density, dtype=wp.float64, device=device
+        gpu_data.density = _from_numpy_zero_copy(
+            wp, data.density, dtype=wp.float64, device=device
         )
-        gpu_data.volume = wp.from_numpy(
-            data.volume, dtype=wp.float64, device=device
+        gpu_data.volume = _from_numpy_zero_copy(
+            wp, data.volume, dtype=wp.float64, device=device
         )
 
     return gpu_data
@@ -202,14 +218,14 @@ def to_warp_environment_data(
             data.saturation_ratio, dtype=wp.float64, device=device
         )
     else:
-        gpu_data.temperature = wp.from_numpy(
-            data.temperature, dtype=wp.float64, device=device
+        gpu_data.temperature = _from_numpy_zero_copy(
+            wp, data.temperature, dtype=wp.float64, device=device
         )
-        gpu_data.pressure = wp.from_numpy(
-            data.pressure, dtype=wp.float64, device=device
+        gpu_data.pressure = _from_numpy_zero_copy(
+            wp, data.pressure, dtype=wp.float64, device=device
         )
-        gpu_data.saturation_ratio = wp.from_numpy(
-            data.saturation_ratio, dtype=wp.float64, device=device
+        gpu_data.saturation_ratio = _from_numpy_zero_copy(
+            wp, data.saturation_ratio, dtype=wp.float64, device=device
         )
 
     return gpu_data
@@ -301,17 +317,17 @@ def to_warp_gas_data(
         )
     else:
         # Zero-copy via wp.from_numpy() (if array is on compatible device)
-        gpu_data.molar_mass = wp.from_numpy(
-            data.molar_mass, dtype=wp.float64, device=device
+        gpu_data.molar_mass = _from_numpy_zero_copy(
+            wp, data.molar_mass, dtype=wp.float64, device=device
         )
-        gpu_data.concentration = wp.from_numpy(
-            data.concentration, dtype=wp.float64, device=device
+        gpu_data.concentration = _from_numpy_zero_copy(
+            wp, data.concentration, dtype=wp.float64, device=device
         )
-        gpu_data.vapor_pressure = wp.from_numpy(
-            vp_array, dtype=wp.float64, device=device
+        gpu_data.vapor_pressure = _from_numpy_zero_copy(
+            wp, vp_array, dtype=wp.float64, device=device
         )
-        gpu_data.partitioning = wp.from_numpy(
-            partitioning_int, dtype=wp.int32, device=device
+        gpu_data.partitioning = _from_numpy_zero_copy(
+            wp, partitioning_int, dtype=wp.int32, device=device
         )
 
     return gpu_data
