@@ -44,21 +44,22 @@ in strategies and runnables:
     `EnvironmentData` is the shipped CPU container for per-box thermodynamic
     state, not a separate gas facade. It is available from
     `particula.gas.environment_data` and is exported from `particula.gas` for
-    package-level imports. It requires at least one box at construction time,
-    and it now participates in public CPU↔GPU conversion helpers only through
+    package-level imports. It requires at least one box at construction time.
+    The only shipped CPU↔GPU transfer boundary is the explicit helper trio
     `particula.gpu.WarpEnvironmentData`,
     `particula.gpu.to_warp_environment_data()`, and
-    `particula.gpu.from_warp_environment_data()`. Current tests cover one-box
-    and multi-box CPU→Warp→CPU round trips, preserving
+    `particula.gpu.from_warp_environment_data()`. The shape contract stays
+    fixed across that boundary:
     `temperature`/`pressure -> (n_boxes,)` and
-    `saturation_ratio -> (n_boxes, n_species)`, including device-aware parity
-    on Warp `cpu` everywhere and Warp `cuda` when available. Those transfers
-    stay explicit helper calls: kernels and runnables do not perform hidden
-    CPU↔GPU environment synchronization or movement. Current tests also cover
-    default synchronized restore, manual `sync=False` restore after explicit
-    synchronization, and schema validation failures. This documents the helper
-    surface only; broad high-level workflow integration still remains
-    incremental.
+    `saturation_ratio -> (n_boxes, n_species)`. Current regression coverage
+    checks one-box and multi-box CPU→Warp→CPU round trips, always on Warp `cpu`
+    and additionally on Warp `cuda` when available. Those transfers remain
+    explicit helper calls only: kernels and runnables do not perform hidden
+    CPU↔GPU environment synchronization or movement, and CUDA is optional
+    rather than required. Current tests also cover default synchronized
+    restore, manual `sync=False` restore after explicit synchronization, and
+    schema validation failures. This documents the helper surface only, not a
+    broader automatic runtime integration.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered
@@ -274,10 +275,13 @@ CPU side. `EnvironmentData` owns `temperature`, `pressure`, and
 `pressure` arguments where the process API has not yet been migrated; migrated
 process code may read `EnvironmentData` directly, but only the physical model
 that owns the update should mutate it. When a GPU round trip is needed, use
+the explicit helper boundary only:
 `particula.gpu.WarpEnvironmentData`,
 `particula.gpu.to_warp_environment_data()`, and
-`particula.gpu.from_warp_environment_data()` explicitly rather than expecting
-kernels or runnables to move environment state for you.
+`particula.gpu.from_warp_environment_data()`. Keep the documented shapes
+unchanged across that boundary—`temperature` and `pressure` stay
+`(n_boxes,)`, while `saturation_ratio` stays `(n_boxes, n_species)`—and do
+not expect kernels or runnables to move environment state for you.
 
 ## Conversion helpers
 
