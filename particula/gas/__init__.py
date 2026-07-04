@@ -51,6 +51,7 @@ from particula.gas.latent_heat_builders import (
 )
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.latent_heat_factories import LatentHeatFactory
+from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData, from_species, to_species
 from particula.gas.gas_data_builder import GasDataBuilder
 from particula.gas.species import GasSpecies
@@ -66,6 +67,7 @@ from particula.gas.atmosphere_builders import AtmosphereBuilder
 
 __all__ = [
     "GasData",
+    "EnvironmentData",
     "GasDataBuilder",
     "from_species",
     "to_species",

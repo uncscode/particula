@@ -5,9 +5,9 @@ temperature, pressure, and saturation-ratio fields associated with one or more
 simulation boxes. Separating this state from gas-species data lets multi-box
 workflows manage shared thermodynamic conditions independently.
 
-`EnvironmentData` is currently a constructor-validated CPU-side container in
-``particula.gas.environment_data``. It is not yet exported from
-``particula.gas`` and does not yet have CPU↔GPU conversion helpers.
+`EnvironmentData` is a constructor-validated CPU-side container in
+``particula.gas.environment_data`` and is exported from ``particula.gas``.
+It does not yet have CPU↔GPU conversion helpers.
 """
 
 from dataclasses import dataclass
@@ -60,6 +60,19 @@ class EnvironmentData:
         self._validate_shapes()
         self._validate_finite_values()
         self._validate_physical_bounds()
+
+    @property
+    def n_boxes(self) -> int:
+        """Number of simulation boxes."""
+        return int(self.temperature.shape[0])
+
+    def copy(self) -> "EnvironmentData":
+        """Create a deep copy of this EnvironmentData."""
+        return EnvironmentData(
+            temperature=np.copy(self.temperature),
+            pressure=np.copy(self.pressure),
+            saturation_ratio=np.copy(self.saturation_ratio),
+        )
 
     @staticmethod
     def _coerce_float64_array(

@@ -1,6 +1,7 @@
 """Tests for the EnvironmentData dataclass."""
 
 import numpy as np
+import particula.gas as gas_package
 import pytest
 from particula.gas.environment_data import EnvironmentData
 
@@ -32,6 +33,23 @@ def test_environment_data_valid_single_box_coerces_float64() -> None:
     assert environment.temperature.dtype == np.float64
     assert environment.pressure.dtype == np.float64
     assert environment.saturation_ratio.dtype == np.float64
+
+
+def test_environment_data_n_boxes_property() -> None:
+    """Box count is derived from the validated temperature axis."""
+    single_box_environment = _make_environment_data(
+        temperature=[298.15],
+        pressure=[101325.0],
+        saturation_ratio=[[0.8, 1.2]],
+    )
+    multi_box_environment = _make_environment_data(
+        temperature=[298.15, 300.0],
+        pressure=[101325.0, 90000.0],
+        saturation_ratio=[[0.8, 1.0], [1.2, 3.0]],
+    )
+
+    assert single_box_environment.n_boxes == 1
+    assert multi_box_environment.n_boxes == 2
 
 
 def test_environment_data_valid_multi_box_preserves_expected_shapes() -> None:
@@ -322,3 +340,72 @@ def test_environment_data_valid_inputs_preserve_float64_values() -> None:
         environment.temperature,
         np.array([298.15, 300.15], dtype=np.float64),
     )
+
+
+def test_environment_data_copy_creates_independent_arrays() -> None:
+    """copy() preserves values while duplicating array storage."""
+    environment = _make_environment_data(
+        temperature=[298.15, 300.15],
+        pressure=[101325.0, 95000.0],
+        saturation_ratio=[[0.9, 1.0], [1.2, 0.5]],
+    )
+
+    environment_copy = environment.copy()
+
+    assert environment_copy is not environment
+    np.testing.assert_allclose(
+        environment_copy.temperature,
+        environment.temperature,
+    )
+    np.testing.assert_allclose(
+        environment_copy.pressure,
+        environment.pressure,
+    )
+    np.testing.assert_allclose(
+        environment_copy.saturation_ratio,
+        environment.saturation_ratio,
+    )
+    assert not np.shares_memory(
+        environment_copy.temperature,
+        environment.temperature,
+    )
+    assert not np.shares_memory(
+        environment_copy.pressure,
+        environment.pressure,
+    )
+    assert not np.shares_memory(
+        environment_copy.saturation_ratio,
+        environment.saturation_ratio,
+    )
+
+
+def test_environment_data_copy_mutation_does_not_change_source() -> None:
+    """Mutating copied arrays leaves the original instance unchanged."""
+    environment = _make_environment_data(
+        temperature=[298.15, 300.15],
+        pressure=[101325.0, 95000.0],
+        saturation_ratio=[[0.9, 1.0], [1.2, 0.5]],
+    )
+
+    environment_copy = environment.copy()
+    environment_copy.temperature[0] = 310.0
+    environment_copy.pressure[1] = 97000.0
+    environment_copy.saturation_ratio[0, 1] = 0.75
+
+    np.testing.assert_allclose(
+        environment.temperature,
+        np.array([298.15, 300.15], dtype=np.float64),
+    )
+    np.testing.assert_allclose(
+        environment.pressure,
+        np.array([101325.0, 95000.0], dtype=np.float64),
+    )
+    np.testing.assert_allclose(
+        environment.saturation_ratio,
+        np.array([[0.9, 1.0], [1.2, 0.5]], dtype=np.float64),
+    )
+
+
+def test_environment_data_is_exported_from_particula_gas() -> None:
+    """Package and direct-module imports resolve to the same class."""
+    assert gas_package.EnvironmentData is EnvironmentData
