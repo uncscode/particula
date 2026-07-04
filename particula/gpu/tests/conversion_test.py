@@ -11,6 +11,7 @@ import pytest
 wp = pytest.importorskip("warp")
 
 from particula.gpu.conversion import (  # noqa: E402
+    from_warp_environment_data,
     from_warp_gas_data,
     from_warp_particle_data,
     gpu_context,
@@ -868,6 +869,149 @@ class TestFromWarpGasData:
         np.testing.assert_array_almost_equal(
             result.molar_mass, sample_gas_data.molar_mass
         )
+
+
+class TestFromWarpEnvironmentData:
+    """Tests for from_warp_environment_data() function."""
+
+    def test_from_warp_environment_data_basic_single_box(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test basic GPU-to-CPU transfer returns EnvironmentData."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box,
+            device="cpu",
+        )
+        result = from_warp_environment_data(gpu_data)
+
+        from particula.gas.environment_data import EnvironmentData
+
+        assert isinstance(result, EnvironmentData)
+
+    def test_environment_data_round_trip_single_box(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test single-box environment data survives CPU→Warp→CPU."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box,
+            device="cpu",
+        )
+        result = from_warp_environment_data(gpu_data)
+
+        assert result.temperature.shape == (
+            sample_environment_data_single_box.temperature.shape
+        )
+        assert result.pressure.shape == (
+            sample_environment_data_single_box.pressure.shape
+        )
+        assert result.saturation_ratio.shape == (
+            sample_environment_data_single_box.saturation_ratio.shape
+        )
+        np.testing.assert_array_equal(
+            result.temperature,
+            sample_environment_data_single_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            result.pressure,
+            sample_environment_data_single_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            result.saturation_ratio,
+            sample_environment_data_single_box.saturation_ratio,
+        )
+
+    def test_environment_data_round_trip_multi_box(
+        self, sample_environment_data_multi_box
+    ) -> None:
+        """Test multi-box environment data survives CPU→Warp→CPU."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_multi_box,
+            device="cpu",
+        )
+        result = from_warp_environment_data(gpu_data)
+
+        assert result.temperature.shape == (
+            sample_environment_data_multi_box.temperature.shape
+        )
+        assert result.pressure.shape == (
+            sample_environment_data_multi_box.pressure.shape
+        )
+        assert result.saturation_ratio.shape == (
+            sample_environment_data_multi_box.saturation_ratio.shape
+        )
+        np.testing.assert_array_equal(
+            result.temperature,
+            sample_environment_data_multi_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            result.pressure,
+            sample_environment_data_multi_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            result.saturation_ratio,
+            sample_environment_data_multi_box.saturation_ratio,
+        )
+
+    def test_from_warp_environment_data_sync_true(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test default synchronized transfer path."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box,
+            device="cpu",
+        )
+        result = from_warp_environment_data(gpu_data, sync=True)
+
+        np.testing.assert_array_equal(
+            result.temperature,
+            sample_environment_data_single_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            result.pressure,
+            sample_environment_data_single_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            result.saturation_ratio,
+            sample_environment_data_single_box.saturation_ratio,
+        )
+
+    def test_from_warp_environment_data_sync_false_manual(
+        self, sample_environment_data_multi_box
+    ) -> None:
+        """Test manual synchronization before sync=False transfer."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_multi_box,
+            device="cpu",
+        )
+        wp.synchronize()
+        result = from_warp_environment_data(gpu_data, sync=False)
+
+        np.testing.assert_array_equal(
+            result.temperature,
+            sample_environment_data_multi_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            result.pressure,
+            sample_environment_data_multi_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            result.saturation_ratio,
+            sample_environment_data_multi_box.saturation_ratio,
+        )
+
+    def test_from_warp_environment_data_invalid_saturation_ratio_shape_raises_value_error(
+        self,
+    ) -> None:
+        """Test malformed Warp environment data fails CPU schema validation."""
+        from particula.gpu.warp_types import WarpEnvironmentData
+
+        gpu_data = WarpEnvironmentData()
+        gpu_data.temperature = wp.array([298.15], dtype=wp.float64)
+        gpu_data.pressure = wp.array([101325.0], dtype=wp.float64)
+        gpu_data.saturation_ratio = wp.array([0.95, 1.05], dtype=wp.float64)
+
+        with pytest.raises(ValueError, match="saturation_ratio must be 2D"):
+            from_warp_environment_data(gpu_data)
 
 
 class TestGpuContext:
