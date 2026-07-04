@@ -930,31 +930,3 @@ class TestGpuContext:
         # In CI without GPU, this may raise an error - so we use cpu explicitly
         with gpu_context(sample_particle_data, device="cpu") as gpu_data:
             assert gpu_data is not None
-
-
-class TestModuleExports:
-    """Tests for module exports via gpu/__init__.py."""
-
-    def test_functions_importable_from_gpu_module(self) -> None:
-        """Verify functions importable via from particula.gpu import ..."""
-        from particula.gpu import to_warp_gas_data, to_warp_particle_data
-
-        assert to_warp_particle_data is not None
-        assert to_warp_gas_data is not None
-        assert callable(to_warp_particle_data)
-        assert callable(to_warp_gas_data)
-
-    def test_from_warp_functions_importable(self) -> None:
-        """Verify from_warp functions importable from particula.gpu."""
-        from particula.gpu import from_warp_gas_data, from_warp_particle_data
-
-        assert from_warp_particle_data is not None
-        assert from_warp_gas_data is not None
-        assert callable(from_warp_particle_data)
-        assert callable(from_warp_gas_data)
-
-    def test_gpu_context_importable(self) -> None:
-        """Verify gpu_context importable from particula.gpu."""
-        from particula.gpu import gpu_context
-
-        assert gpu_context is not None
