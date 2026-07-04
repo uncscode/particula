@@ -16,6 +16,8 @@
   CPU `EnvironmentData` in declared field order.
 - `particula.gpu` exports `WarpEnvironmentData`, `to_warp_environment_data`,
   and `from_warp_environment_data` when Warp is available.
+- One representative environment round-trip test runs through `warp_devices(wp)` so
+  CPU is always covered and CUDA is covered when available.
 - Existing particle and gas conversion behavior is unchanged.
 
 ## Design criteria
@@ -37,9 +39,10 @@
   `float64` dtypes, and deterministic values for one-box and multi-box inputs.
 - `particula/gpu/tests/conversion_test.py` asserts helper values, shapes,
   `float64` dtypes, invalid-device failures, Warp-unavailable behavior, CPU
-  copy semantics, round-trip equality, sync behavior, and malformed-schema
-  failures.
+  copy semantics, round-trip equality, sync behavior, malformed-schema
+  failures, and one device-aware parity case.
 - Linting passes for changed GPU modules.
 - Documentation covers updated module/class/helper docstrings plus repository
-  docs that name the shipped environment round-trip helper surface.
+  docs that name the shipped environment round-trip helper surface, explicit
+  transfer boundary, shape rules, and theory-doc example.
 - The implementation does not block downstream kernel migration tracks.

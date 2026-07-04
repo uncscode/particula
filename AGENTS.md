@@ -33,8 +33,8 @@ mypy particula/ --ignore-missing-imports
 pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
 
 # ADW tools
-.opencode/tool/run_pytest.py      # Run tests with validation
-.opencode/tool/run_linters.py     # Run linters following CI workflow
+.opencode/tools/run_pytest.py      # Run tests with validation
+.opencode/tools/run_linters.py     # Run linters following CI workflow
 ```
 Performance benchmarks verify O(n) scaling at 1k/10k/100k particles, theta-mode
 comparisons (half/random/batch), and deterministic seeds. Note: staggered uses
@@ -254,8 +254,12 @@ restored = from_warp_environment_data(gpu_environment)
 
 - `particula.gpu` now exports `WarpEnvironmentData`,
   `to_warp_environment_data`, and `from_warp_environment_data`.
-- `EnvironmentData` round trips preserve `temperature`, `pressure`, and
-  `saturation_ratio` for both single-box and multi-box CPU-backed tests.
+- Environment transfers are explicit helper calls; kernels and runnables do
+  not perform hidden CPU↔GPU synchronization for environment state.
+- `EnvironmentData.temperature` and `pressure` use `(n_boxes,)`;
+  `saturation_ratio` uses `(n_boxes, n_species)` on both CPU and Warp mirrors.
+- Round trips preserve `temperature`, `pressure`, and `saturation_ratio` for
+  CPU-backed tests and parity coverage now also runs on `cuda` when available.
 - `from_warp_environment_data(..., sync=False)` assumes manual Warp
   synchronization before `.numpy()` access.
 
@@ -288,8 +292,8 @@ adw workflow document      # Update documentation
 - `.pre-commit-config.yaml` - Pre-commit hooks
 
 **ADW Tools:**
-- `.opencode/tool/run_pytest.py` - Test runner with validation
-- `.opencode/tool/run_linters.py` - Linter runner following CI workflow
+- `.opencode/tools/run_pytest.py` - Test runner with validation
+- `.opencode/tools/run_linters.py` - Linter runner following CI workflow
 
 ## Dependencies
 
@@ -324,7 +328,7 @@ ruff check particula/ --fix && ruff format particula/ && ruff check particula/
 pytest --cov=particula
 
 # Or use ADW tools
-.opencode/tool/run_linters.py && .opencode/tool/run_pytest.py
+.opencode/tools/run_linters.py && .opencode/tools/run_pytest.py
 ```
 
 ## Notebook Editing (Jupytext Paired Sync)
@@ -338,10 +342,10 @@ ruff check docs/Examples/path/to/file.py --fix
 ruff format docs/Examples/path/to/file.py
 
 # 3. Sync to update .ipynb
-python3 .opencode/tool/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
+python3 .opencode/tools/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
 
 # 4. Execute to validate and generate outputs
-python3 .opencode/tool/run_notebook.py docs/Examples/path/to/file.ipynb
+python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
 
 # 5. Commit both files (.py and .ipynb)
 ```

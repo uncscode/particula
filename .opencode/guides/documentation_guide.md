@@ -43,8 +43,8 @@ file first, then sync and execute the `.ipynb`.
 ```bash
 ruff check docs/Examples/path/to/file.py --fix
 ruff format docs/Examples/path/to/file.py
-python3 .opencode/tool/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
-python3 .opencode/tool/run_notebook.py docs/Examples/path/to/file.ipynb
+ python3 .opencode/tools/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
+ python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
 ```
 
 Commit both paired files.

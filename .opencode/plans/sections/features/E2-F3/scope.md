@@ -37,8 +37,8 @@
 - Do not store string metadata or Python-only objects in `WarpEnvironmentData`.
 - Do not change precision defaults; use `float64` unless a later precision
   decision changes repository policy.
-- Do not add optional CUDA-parametrized transfer coverage or broader runtime
-  integration beyond the shipped helper/documentation boundary.
+- Do not add broader runtime integration beyond the shipped
+  helper/documentation boundary.
 
 ## Done signal
 
@@ -48,5 +48,6 @@
 `particula.gpu`, field shapes and dtypes match the CPU schema, targeted Warp
 CPU tests pass in
 `particula/gpu/tests/warp_types_test.py` and
-`particula/gpu/tests/conversion_test.py`, and only optional CUDA parity plus
-follow-on runtime integration remain open.
+`particula/gpu/tests/conversion_test.py`, including one device-aware parity
+test for Warp CPU plus optional CUDA, and only follow-on runtime integration
+remains open.

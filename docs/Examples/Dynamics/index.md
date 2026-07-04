@@ -31,7 +31,7 @@ These coagulation tutorials are maintained as Jupytext percent pairs (`.py` ⇄
 
 ### Functional
 
-These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods. All coagulation tutorials are Jupytext-paired: edit the `.py`, run `python3 .opencode/tool/validate_notebook.py <ipynb> --sync`, then `python3 .opencode/tool/run_notebook.py <ipynb>`.
+These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods. All coagulation tutorials are Jupytext-paired: edit the `.py`, run `python3 .opencode/tools/validate_notebook.py <ipynb> --sync`, then `python3 .opencode/tools/run_notebook.py <ipynb>`.
 
 - [Coagulation 1: Probability Mass Function](Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb)
 - [Coagulation Tutorial: Basic 2-PDF](Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb)
