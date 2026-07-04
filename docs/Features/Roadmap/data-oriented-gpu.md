@@ -87,11 +87,13 @@ and `GasSpecies` remain available for compatibility.
 Known data-model gaps:
 
 - `EnvironmentData` now provides a CPU-side home for per-box thermodynamic
-  state in `particula.gas.environment_data`, with `temperature -> (n_boxes,)`,
-  `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`.
-  It is a validated baseline container only: there is no `particula.gas`
-  package-level export, no CPU↔GPU conversion helper, and no broad runtime
-  integration yet (see [EnvironmentData Container](#environmentdata-container)).
+  state, with `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
+  `saturation_ratio -> (n_boxes, n_species)`. The shipped CPU baseline is
+  available from `particula.gas.environment_data` and exported from
+  `particula.gas`, with `copy()` support for CPU-side state handling. GPU
+  mirrors, CPU↔GPU conversion helpers, and broad runtime integration remain
+  downstream work (see
+  [EnvironmentData Container](#environmentdata-container)).
 - `ParticleData.density` is shaped `(n_species,)` and shared across boxes, so
   boxes at different temperatures cannot carry per-box densities.
 - Dilution exists only as free functions (`get_volume_dilution_coefficient`,
@@ -330,15 +332,15 @@ Shared-across-box and metadata fields:
 | `molar_mass` | `(n_species,)` | Shared across boxes. |
 | `partitioning` | `(n_species,)` | Shared across boxes; stored as `bool` on CPU. |
 
-Future `EnvironmentData` policy fields:
+Shipped CPU `EnvironmentData` fields:
 
 Per-box fields:
 
 | Field | Shape | Notes |
 | --- | --- | --- |
-| `temperature` | `(n_boxes,)` | Planned per-box thermodynamic state. |
-| `pressure` | `(n_boxes,)` | Planned per-box thermodynamic state. |
-| `saturation_ratio` | `(n_boxes, n_species)` | Planned per-box, per-species environment state. |
+| `temperature` | `(n_boxes,)` | Shipped per-box thermodynamic state owned by `EnvironmentData` on CPU. |
+| `pressure` | `(n_boxes,)` | Shipped per-box thermodynamic state owned by `EnvironmentData` on CPU. |
+| `saturation_ratio` | `(n_boxes, n_species)` | Shipped per-box, per-species thermodynamic helper state; refresh it after invalidating updates. |
 
 `WarpParticleData`
 
@@ -423,15 +425,15 @@ Shared-across-box fields:
   (`particula/gpu/warp_types.py:82-99`;
   `particula/gpu/conversion.py:305-345`; tests:
   `particula/gpu/tests/conversion_test.py:600-640`).
-- Future environment ownership is `temperature: (n_boxes,)`, `pressure:
-  (n_boxes,)`, and `saturation_ratio: (n_boxes, n_species)`; this phase records
-  those ownership decisions for downstream work without moving simulation volume
-  out of `ParticleData.volume`. `saturation_ratio` should be treated as a
-  derived thermodynamic helper tied to the current environment and gas state,
-  not as an independent source of truth. Any step that changes the upstream
-  environment or gas state must invalidate and recompute it before downstream
-  kernels consume it, so GPU/CPU paths never mix stale helpers with freshly
-  updated particle or gas fields
+- Shipped CPU environment ownership is `temperature: (n_boxes,)`, `pressure:
+  (n_boxes,)`, and `saturation_ratio: (n_boxes, n_species)` under
+  `EnvironmentData`, without moving simulation volume out of
+  `ParticleData.volume`. `saturation_ratio` should be treated as a derived
+  thermodynamic helper tied to the current environment and gas state, not as an
+  independent source of truth. Any step that changes the upstream environment or
+  gas state must invalidate and recompute it before downstream kernels consume
+  it, so GPU/CPU paths never mix stale helpers with freshly updated particle or
+  gas fields
   ([EnvironmentData Container](#environmentdata-container);
   `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
 
@@ -452,7 +454,7 @@ Shared-across-box fields:
     - Recommended command re-run before merge when command execution is
       available: `mkdocs build --strict`.
 
-- `E2-F2`: inherit future `EnvironmentData.temperature -> (n_boxes,)`,
+- `E2-F2`: inherit shipped CPU `EnvironmentData.temperature -> (n_boxes,)`,
   `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
   keep `ParticleData.volume -> (n_boxes,)` as the authoritative simulation
   volume owner rather than moving volume into `EnvironmentData`.
@@ -501,15 +503,18 @@ thermodynamic state. That CPU-side baseline now exists as
 `particula.gas.environment_data.EnvironmentData`, which validates per-box
 `temperature`, `pressure`, and per-box/per-species `saturation_ratio`.
 Current shipped scope is intentionally narrow: it is a constructor-validated
-CPU container, requires at least one box, is not exported from
-`particula.gas`, and does not yet have CPU↔GPU conversion helpers or direct
-process integration.
+CPU container, requires at least one box, is exported from `particula.gas`,
+supports `copy()` for CPU-side state management, and does not yet have CPU↔GPU
+conversion helpers or direct process integration.
 
 - Preserve the current `EnvironmentData` shape contract: `temperature` and
   `pressure` are `(n_boxes,)`, and `saturation_ratio` is
   `(n_boxes, n_species)`.
 - Add a future `WarpEnvironmentData` mirror and CPU↔GPU conversion helpers when
   GPU-side thermodynamic state work begins.
+- Existing process APIs may still accept scalar `temperature` and `pressure`
+  until later migration work lands; only migrated process code should read
+  `EnvironmentData` directly.
 - Latent-heat condensation must read and update per-box temperature; rising
   parcels, expansion, and combustion boxes prescribe temperature and pressure
   per box, while any simulation-volume evolution continues through
@@ -518,8 +523,9 @@ process integration.
   state, which mutate it, where prescribed (user-supplied) profiles are
   applied within a timestep, and when derived thermodynamic helpers such as
   `saturation_ratio` and GPU-side `vapor_pressure` must be invalidated and
-  recomputed. `saturation_ratio` should remain a derived/cache field tied to
-  current thermodynamic inputs rather than a separately authoritative state.
+  recomputed. Treat environment state as read-only unless the physical model
+  owns the update. `saturation_ratio` should remain a derived/cache field tied
+  to current thermodynamic inputs rather than a separately authoritative state.
 - Add round-trip conversion helpers and tests matching the existing
   `ParticleData`/`GasData` conversion patterns.
 - Decide how existing kernel APIs that accept scalar temperature and pressure

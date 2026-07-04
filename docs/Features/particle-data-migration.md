@@ -30,19 +30,21 @@ in strategies and runnables:
 
 - `ParticleData` stores per-particle arrays with an explicit batch dimension.
 - `GasData` stores gas species arrays with an explicit box dimension.
-- `EnvironmentData` now provides a constructor-validated CPU-side container for
-  per-box thermodynamic state in `particula.gas.environment_data` with
-  `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
-  `saturation_ratio -> (n_boxes, n_species)`.
+- `EnvironmentData` now provides the shipped CPU-side owner of per-box
+  thermodynamic state with `temperature -> (n_boxes,)`,
+  `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`.
+- `ParticleData.volume` remains the authoritative per-box simulation-volume
+  owner; this migration does not move simulation volume into
+  `EnvironmentData`.
 - `ParticleRepresentation` and `GasSpecies` remain as facades so existing
   workflows keep working while you migrate.
 
 !!! note
-    `EnvironmentData` is a shipped baseline container, not a full migration end
-    state. It currently lives in `particula.gas.environment_data`, requires at
-    least one box at construction time, is not exported from `particula.gas`,
-    and does not yet participate in CPU↔GPU conversion helpers or broad
-    high-level workflow integration.
+    `EnvironmentData` is a shipped CPU baseline container, not a full migration
+    end state. It is available from `particula.gas.environment_data` and is
+    exported from `particula.gas` for package-level imports. It requires at
+    least one box at construction time, but it does not yet participate in
+    CPU↔GPU conversion helpers or broad high-level workflow integration.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered
@@ -214,6 +216,12 @@ species = par.gas.GasSpecies.from_data(
 Condensation and coagulation strategies accept both legacy facades and the new
 data containers. The return type matches the input type.
 
+Today, the compatibility boundary is still scalar at many process entry points:
+existing dynamics APIs may continue to accept scalar `temperature` and
+`pressure`. Only migrated process code should read `EnvironmentData` directly,
+and environment fields should be treated as read-only unless the physical model
+owns the update and refreshes derived helpers such as `saturation_ratio`.
+
 ```python
 import particula as par
 
@@ -245,6 +253,10 @@ particle_out = coagulation.step(
     time_step=1.0,
 )
 ```
+
+Use `EnvironmentData` to document and carry per-box thermodynamic state on the
+CPU side, but keep current scalar `temperature` and `pressure` arguments where
+the process API has not yet been migrated.
 
 ## Conversion helpers
 
