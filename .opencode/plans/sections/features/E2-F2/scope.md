@@ -8,6 +8,8 @@
 - Store and validate canonical `saturation_ratio` as an `np.float64` array
   shaped `(n_boxes, n_species)`, allowing finite nonnegative supersaturation
   values above `1.0`.
+- Expose `n_boxes`, implement independent `copy()` semantics, and publish the
+  package-level `particula.gas.EnvironmentData` import path.
 - Coerce array-like inputs to `np.float64` in `__post_init__` following
   `GasData` and `ParticleData` conventions.
 - Add single-box, multi-box, invalid-shape, invalid-value, and dtype tests in
@@ -20,8 +22,6 @@
 - Adding `temperature`, `pressure`, or humidity fields to `GasData`.
 - Implementing `WarpEnvironmentData` or CPU/GPU transfer helpers; those belong
   to downstream sibling features.
-- Adding `n_boxes`, `copy()`, or package exports in phase P1; those remain
-  downstream follow-up work for later phases.
 - Migrating condensation, coagulation, parcel, or wall-loss process signatures
   from scalar `temperature`/`pressure` to `EnvironmentData`.
 - Changing numerical kernels or validating multi-box physics behavior.

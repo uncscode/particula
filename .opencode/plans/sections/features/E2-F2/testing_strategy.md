@@ -22,11 +22,13 @@ not lowered.
 
 - **P2: Container API and exports**
   - File: `particula/gas/tests/environment_data_test.py`
-  - Test `n_boxes` property.
-  - Test `copy()` returns independent arrays.
-  - Test import from `particula.gas`.
-  - Retain a smoke test confirming direct-module import still works after export
-    wiring is added.
+  - Shipped tests cover `n_boxes` for the validated per-box container API.
+  - Shipped tests prove `copy()` returns independent arrays with
+    `np.shares_memory(...)` checks.
+  - Shipped tests verify copy-mutation isolation for `temperature`, `pressure`,
+    and `saturation_ratio`.
+  - Shipped tests verify import from `particula.gas` and retain smoke coverage
+    for the direct-module path.
 
 - **P3: Documentation**
   - Validate docs by running available markdown/link tooling or at minimum
@@ -43,7 +45,7 @@ not lowered.
 
 ## Coverage Impact
 
-The new container already has direct unit coverage for `__post_init__` and the
-current validation helpers. Remaining phases should add targeted coverage for
-`n_boxes`, exports, and `copy()` without weakening the existing constructor
-contract. This feature should increase or preserve package coverage.
+The new container already has direct unit coverage for `__post_init__`, the
+validation helpers, `n_boxes`, exports, and `copy()` without weakening the
+existing constructor contract. The remaining documentation phase should not
+reduce package coverage.

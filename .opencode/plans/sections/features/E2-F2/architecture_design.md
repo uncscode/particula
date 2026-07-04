@@ -26,10 +26,11 @@ Future processes
   arrays for `temperature` and `pressure`, plus a species-resolved
   `saturation_ratio` array shaped `(n_boxes, n_species)`. The container must not
   own or mutate simulation volume; `ParticleData.volume` remains authoritative.
-- **API Surface:** P1 ships the dataclass at the direct module path
-  `particula.gas.environment_data.EnvironmentData` only. Package exports,
-  `n_boxes`, and `copy()` are intentionally deferred. Existing dynamics method
-  signatures are unchanged in this phase.
+- **API Surface:** P1 shipped the direct module path
+  `particula.gas.environment_data.EnvironmentData`, and P2 added the package
+  export path `particula.gas.EnvironmentData` together with `n_boxes` and
+  independent `copy()` semantics. Existing dynamics method signatures are still
+  unchanged.
 - **Workflow Hooks:** Downstream GPU mirror and process-migration tracks can use
   this CPU schema as their source of truth. Future phases should preserve the
   validation order already implemented: coercion -> ndim -> shared-box shape ->

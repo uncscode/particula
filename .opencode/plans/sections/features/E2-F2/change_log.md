@@ -21,3 +21,12 @@
   schema: `temperature` and `pressure` stay `(n_boxes,)`,
   `saturation_ratio` stays `(n_boxes, n_species)`, and supersaturation remains
   explicitly allowed.
+
+## 2026-07-04
+
+- Updated E2-F2 plan sections after issue #1189 shipped E2-F2-P2.
+- Recorded shipped `EnvironmentData.n_boxes`, independent `copy()`, and
+  `particula.gas.EnvironmentData` package export behavior.
+- Updated testing and success criteria sections to reflect new
+  `environment_data_test.py` coverage for copy independence, mutation
+  isolation, and package-export smoke tests.

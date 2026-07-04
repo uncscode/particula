@@ -16,8 +16,8 @@
   explicit accepted case.
 - P1 shipped the direct-module import path
   `particula.gas.environment_data.EnvironmentData`.
-- Later phases still need to add `n_boxes`, `copy()`, and the package export
-  path.
+- P2 shipped `EnvironmentData.n_boxes`, `EnvironmentData.copy()`, and the
+  package export path `particula.gas.EnvironmentData`.
 
 ## Test Criteria
 
@@ -25,7 +25,7 @@
 - New unit tests cover invalid shapes, species-dimension mismatches, and
   invalid values.
 - New unit tests cover dtype coercion.
-- Later phases still need test coverage for copy independence and package
+- New unit tests cover copy independence, copy-mutation isolation, and package
   exports.
 - New unit tests include at least one supersaturation case (`saturation_ratio >
   1.0`) and one nonpositive-pressure validation failure.
@@ -40,7 +40,8 @@
 
 ## Done Signal
 
-Issue #1188 satisfied the P1 done signal: `EnvironmentData` exists with the
-canonical `temperature`, `pressure`, and species-resolved `saturation_ratio`
-fields, plus tests for valid and invalid construction. Full feature completion
-still requires the later `n_boxes`, `copy()`, export, and documentation phases.
+Issues #1188 and #1189 satisfied the P1 and P2 done signals: `EnvironmentData`
+exists with the canonical `temperature`, `pressure`, and species-resolved
+`saturation_ratio` fields, plus the shipped `n_boxes`, `copy()`, and package
+export API with focused test coverage. Full feature completion still requires
+the documentation phase.

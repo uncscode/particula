@@ -21,13 +21,16 @@
 
 ## E2-F2-P2: Container API and Exports
 
-- Add `n_boxes` property based on the per-box arrays.
-- Add `copy()` returning independent arrays.
-- Export `EnvironmentData` in `particula/gas/__init__.py`.
-- Reuse the already-shipped multi-box and dtype coercion coverage; add only the
-  new copy/export-specific tests needed for this phase.
-- Run `ruff` formatting/checks on touched Python files and scoped pytest for
-  gas tests.
+- Done in issue #1189: added `EnvironmentData.n_boxes` based on the validated
+  `temperature` axis.
+- Done in issue #1189: added `EnvironmentData.copy()` returning independent
+  arrays.
+- Done in issue #1189: exported `EnvironmentData` in
+  `particula/gas/__init__.py`.
+- Done in issue #1189: extended
+  `particula/gas/tests/environment_data_test.py` with `n_boxes`, copy
+  independence, mutation-isolation, retained multi-box/dtype coverage, and
+  package-export smoke tests.
 
 ## E2-F2-P3: Documentation
 
