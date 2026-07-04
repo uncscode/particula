@@ -77,7 +77,7 @@ surface is now complete on the Warp CPU backend.
 
 ## E2-F3-P4: CUDA-parametrized transfer coverage and documentation updates
 
-- Issue: TBD | Size: S | Status: Not Started
+- Issue: #1195 | Size: S | Status: Shipped
 - Goal: Close the feature with optional CUDA parity coverage and docs that point
   users to the exact transfer entry points.
 - Files: `particula/gpu/tests/conversion_test.py`,
@@ -85,16 +85,25 @@ surface is now complete on the Warp CPU backend.
   `docs/Features/particle-data-migration.md`,
   `docs/Theory/nvidia-warp/datastructures.md`
 - Implementation:
-  - Use `warp_devices(wp)` to run the core round-trip test on `cpu` and `cuda`
-    when CUDA is available.
-  - Keep CUDA coverage optional and skip cleanly on CPU-only machines.
-  - Extend future docs only when new runtime/kernel integration changes the
-    user-facing environment transfer story beyond the now-shipped helper names
-    and shape semantics.
-- Tests: Keep the CUDA-parametrized test focused to one representative round trip
-  so the `S`-sized phase remains reviewable.
-  The structured phase metadata is authoritative: this phase is `S` because it
-  combines optional CUDA transfer coverage with user-facing documentation updates.
+  - Added `from particula.gpu.tests.cuda_availability import warp_devices` to
+    `particula/gpu/tests/conversion_test.py` and used
+    `@pytest.mark.parametrize("device", warp_devices(wp))` for one focused
+    environment round-trip parity test.
+  - Reused the existing multi-box fixture so the new test proves exact value
+    and shape preservation for `(n_boxes,)` `temperature`/`pressure` and
+    `(n_boxes, n_species)` `saturation_ratio` on Warp CPU and CUDA when
+    available.
+  - Updated `docs/Features/particle-data-migration.md` and
+    `docs/Features/Roadmap/data-oriented-gpu.md` to state that environment
+    transfers only happen through `particula.gpu.WarpEnvironmentData`,
+    `to_warp_environment_data()`, and `from_warp_environment_data()`.
+  - Added a concrete environment round-trip example to
+    `docs/Theory/nvidia-warp/datastructures.md` and documented the field-shape
+    rules there.
+- Tests: The new representative parity case stays intentionally narrow while
+  extending existing CPU-only round-trip, `sync=False`, and malformed-shape
+  coverage already present in `particula/gpu/tests/conversion_test.py`.
 
-Status note: Partially reduced by shipped `#1194` documentation updates. Optional
-CUDA transfer coverage and any follow-on integration docs remain open.
+Status note: Shipped in issue `#1195`. `E2-F3` now has explicit helper docs,
+shape-contract docs, and one device-aware parity test for CPU plus optional
+CUDA coverage.

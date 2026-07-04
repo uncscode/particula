@@ -33,11 +33,13 @@ There is no standalone testing-only implementation phase.
 - Public package-export coverage asserts `WarpEnvironmentData`,
   `to_warp_environment_data`, and `from_warp_environment_data` are available
   from `particula.gpu`.
+- Device-aware round-trip coverage runs the representative environment test on
+  Warp CPU everywhere and on CUDA when available via `warp_devices(wp)`.
 
 The shipped coverage now lives across
 `particula/gpu/tests/warp_types_test.py` and
-`particula/gpu/tests/conversion_test.py`; optional CUDA coverage remains
-future-phase work.
+`particula/gpu/tests/conversion_test.py`, including one representative
+device-aware environment round-trip test for CPU and optional CUDA parity.
 
 ## Suggested test locations
 
@@ -57,6 +59,7 @@ ruff check particula/gpu
 ## Acceptance threshold
 
 All `WarpEnvironmentData` schema, public-export, CPU-to-Warp, and
-Warp-to-CPU round-trip tests pass on the Warp CPU backend with exact shape,
-dtype, field-access, deterministic value, sync-path, and failure-path
+Warp-to-CPU round-trip tests pass on the Warp CPU backend, with one
+representative parity test also running on CUDA when available, and with exact
+shape, dtype, field-access, deterministic value, sync-path, and failure-path
 assertions.

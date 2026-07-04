@@ -17,6 +17,8 @@
 5. No additional environment fields were required for `E2-F3-P1`, `E2-F3-P2`,
    or `E2-F3-P3`. Downstream kernel tracks must justify any new fields in their
    own scope.
-6. Public helper exports now ship from `particula.gpu`; remaining work is not
-   about API surface discovery, but about optional CUDA parity and higher-level
-   runtime integration.
+6. Public helper exports now ship from `particula.gpu`; `#1195` also closed the
+   remaining helper-surface follow-up by adding device-aware parity coverage
+   and docs that make the explicit transfer boundary, shape rules, and
+   round-trip example unambiguous. Only higher-level runtime integration
+   remains future work outside this feature.

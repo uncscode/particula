@@ -90,8 +90,8 @@ Known data-model gaps:
   state, with `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
   `saturation_ratio -> (n_boxes, n_species)`. The shipped baseline is
   available from `particula.gas.environment_data`, exported from
-  `particula.gas`, supports `copy()` for CPU-side state handling, and now
-  round-trips through public `particula.gpu` helpers via
+  `particula.gas`, supports `copy()` for CPU-side state handling, and only
+  crosses the CPU↔GPU boundary through public `particula.gpu` helpers:
   `WarpEnvironmentData`, `to_warp_environment_data()`, and
   `from_warp_environment_data()`. Those helpers are the explicit transfer
   boundary: kernels and runnables do not perform hidden CPU↔GPU environment
@@ -114,8 +114,9 @@ The lower-level Warp backend is implemented and covered by targeted tests.
 - GPU Brownian coagulation kernels provide a tested `coagulation_step_gpu` API.
 - GPU benchmark scaffolding exists for CUDA-enabled environments.
 - Parity tests parametrize over available Warp devices, running on Warp CPU
-  everywhere and additionally on CUDA when a device is present, without making
-  CUDA a hard runtime or test requirement.
+  everywhere and additionally on Warp CUDA when a device is present, without
+  making CUDA a hard runtime or test requirement and without implying broader
+  automatic GPU runtime integration has shipped.
 
 The GPU backend is currently a directly callable lower-level API. It is not yet
 integrated as an automatic backend in the main `Aerosol`, `Runnable`, or
@@ -510,12 +511,12 @@ thermodynamic state. That baseline now exists as
 Current shipped scope is still intentionally narrow: it is a constructor-
 validated CPU container, requires at least one box, is exported from
 `particula.gas`, supports `copy()` for CPU-side state management, and now has
-public CPU↔GPU round-trip helpers through `particula.gpu.WarpEnvironmentData`,
-`to_warp_environment_data()`, and `from_warp_environment_data()`. What remains
-future work is direct process integration and a broader GPU-resident runtime.
-Those named helpers are also the only shipped environment transfer boundary;
-kernels and runnables do not perform hidden CPU↔GPU environment movement or
-implicit synchronization.
+public CPU↔GPU round-trip helpers only through
+`particula.gpu.WarpEnvironmentData`, `to_warp_environment_data()`, and
+`from_warp_environment_data()`. What remains future work is direct process
+integration and a broader GPU-resident runtime. Those named helpers are also
+the only shipped environment transfer boundary; kernels and runnables do not
+perform hidden CPU↔GPU environment movement or implicit synchronization.
 
 - Preserve the current `EnvironmentData` shape contract: `temperature` and
   `pressure` are `(n_boxes,)`, and `saturation_ratio` is
@@ -538,8 +539,10 @@ implicit synchronization.
   to current thermodynamic inputs rather than a separately authoritative state.
 - Keep round-trip conversion coverage aligned with the existing
   `ParticleData`/`GasData` conversion patterns, including one-box and multi-box
-  cases plus explicit synchronization behavior, with parity checks on Warp
-  `cpu` everywhere and Warp `cuda` when available.
+  cases plus explicit synchronization behavior, with device-parametrized parity
+  checks on Warp `cpu` everywhere and Warp `cuda` when available. That test
+  coverage confirms the helper surface only; it does not mean automatic
+  environment transfers inside broader runtimes have shipped.
 - Decide how existing kernel APIs that accept scalar temperature and pressure
   migrate to per-box arrays without breaking the current low-level API.
 

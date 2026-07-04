@@ -45,17 +45,20 @@ in strategies and runnables:
     state, not a separate gas facade. It is available from
     `particula.gas.environment_data` and is exported from `particula.gas` for
     package-level imports. It requires at least one box at construction time,
-    and it now participates in public CPU↔GPU conversion helpers through
+    and it now participates in public CPU↔GPU conversion helpers only through
     `particula.gpu.WarpEnvironmentData`,
     `particula.gpu.to_warp_environment_data()`, and
     `particula.gpu.from_warp_environment_data()`. Current tests cover one-box
-    and multi-box CPU→Warp→CPU round trips, including device-aware parity on
-    Warp `cpu` everywhere and Warp `cuda` when available. Those transfers stay
-    explicit helper calls: kernels and runnables do not perform hidden
+    and multi-box CPU→Warp→CPU round trips, preserving
+    `temperature`/`pressure -> (n_boxes,)` and
+    `saturation_ratio -> (n_boxes, n_species)`, including device-aware parity
+    on Warp `cpu` everywhere and Warp `cuda` when available. Those transfers
+    stay explicit helper calls: kernels and runnables do not perform hidden
     CPU↔GPU environment synchronization or movement. Current tests also cover
     default synchronized restore, manual `sync=False` restore after explicit
-    synchronization, and schema validation failures. Broad high-level workflow
-    integration still remains incremental.
+    synchronization, and schema validation failures. This documents the helper
+    surface only; broad high-level workflow integration still remains
+    incremental.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered
@@ -270,7 +273,11 @@ CPU side. `EnvironmentData` owns `temperature`, `pressure`, and
 `saturation_ratio`; `GasData` does not. Keep current scalar `temperature` and
 `pressure` arguments where the process API has not yet been migrated; migrated
 process code may read `EnvironmentData` directly, but only the physical model
-that owns the update should mutate it.
+that owns the update should mutate it. When a GPU round trip is needed, use
+`particula.gpu.WarpEnvironmentData`,
+`particula.gpu.to_warp_environment_data()`, and
+`particula.gpu.from_warp_environment_data()` explicitly rather than expecting
+kernels or runnables to move environment state for you.
 
 ## Conversion helpers
 
