@@ -162,16 +162,53 @@ thermodynamic state, precision, mass representation, and time integration.
 - Expand examples that start directly from `ParticleData` and `GasData` instead
   of converting from legacy objects.
 - Document shape conventions for single-box, multi-box, binned, and
-  particle-resolved simulations in one place, including which fields are
-  shared across boxes (for example `ParticleData.density` at `(n_species,)`)
-  and whether any need per-box variants for multi-temperature simulations.
-- Track and document schema drift between CPU `GasData` and `WarpGasData`. The
-  Warp container drops `name`, stores `partitioning` as `int32` instead of
-  `bool`, and adds a `vapor_pressure` field that is not round-tripped back to
-  the CPU container. `from_warp_gas_data` regenerates placeholder species
-  names, which silently breaks any name-keyed downstream logic after a round
-  trip. Define which container is authoritative for each field and test round
-  trips.
+  particle-resolved simulations in one place. The table below inventories the
+  current public stored schema for `ParticleData`, `GasData`,
+  `WarpParticleData`, and `WarpGasData`, including shared-across-box fields,
+  box-batched fields, validation hooks, and current CPU↔GPU round-trip
+  behavior.
+
+| Container | Field | Canonical owner | Shape | Dtype | Storage / mutability note | Validation / coercion hook | CPU↔GPU transfer behavior | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `ParticleData` | `masses` | `ParticleData` | `(n_boxes, n_particles, n_species)` | `float64` | Stored, mutable, box-batched particle/species mass array | `ParticleData.__post_init__()` requires 3D masses and uses it as the shape anchor for all other particle fields | `to_warp_particle_data()` copies or zero-copies to `WarpParticleData.masses`; `from_warp_particle_data()` restores the same shape and values | Source: `particula/particles/particle_data.py:76-98`, `particula/gpu/conversion.py:72-139,244-287`; tests: `particula/particles/tests/particle_data_test.py:124-136`, `particula/gpu/tests/conversion_test.py:512-548` |
+| `ParticleData` | `concentration` | `ParticleData` | `(n_boxes, n_particles)` | `float64` | Stored, mutable, box-batched number concentration/count | `ParticleData.__post_init__()` enforces `(n_boxes, n_particles)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without schema change | Source: `particula/particles/particle_data.py:77,96-103`, `particula/gpu/conversion.py:113-115,283`; tests: `particula/particles/tests/particle_data_test.py:138-164`, `particula/gpu/tests/conversion_test.py:521-545` |
+| `ParticleData` | `charge` | `ParticleData` | `(n_boxes, n_particles)` | `float64` | Stored, mutable, box-batched particle charge array | `ParticleData.__post_init__()` enforces `(n_boxes, n_particles)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without dtype conversion | Source: `particula/particles/particle_data.py:78,104-109`, `particula/gpu/conversion.py:116,284`; tests: `particula/particles/tests/particle_data_test.py:166-192`, `particula/gpu/tests/conversion_test.py:524-526,546-548` |
+| `ParticleData` | `density` | `ParticleData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `ParticleData.__post_init__()` requires 1D density, broadcasts scalar density to `n_species`, and fills empty density with zeros when `n_species > 0` | `to_warp_particle_data()` mirrors the shared 1D array to `WarpParticleData.density`; `from_warp_particle_data()` restores it to CPU storage | Source: `particula/particles/particle_data.py:79,119-137`, `particula/gpu/conversion.py:117-119,285`; tests: `particula/particles/tests/particle_data_test.py:208-234`, `particula/gpu/tests/warp_types_test.py:38-58` |
+| `ParticleData` | `volume` | `ParticleData` | `(n_boxes,)` | `float64` | Stored, mutable, per-box simulation volume | `ParticleData.__post_init__()` enforces `(n_boxes,)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without schema change | Source: `particula/particles/particle_data.py:80,111-117`, `particula/gpu/conversion.py:120,286`; tests: `particula/particles/tests/particle_data_test.py:194-206`, `particula/gpu/tests/conversion_test.py:530-548` |
+| `GasData` | `name` | `GasData` | `len == n_species` | `list[str]` | Stored, mutable CPU-only species metadata | `GasData.__post_init__()` rejects an empty species list | Not transferred by `to_warp_gas_data()` because `WarpGasData` has no string field; `from_warp_gas_data()` requires caller-supplied names or generates placeholders | Source: `particula/gas/gas_data.py:64,71-74`, `particula/gpu/conversion.py:155-164,290-345`; tests: `particula/gas/tests/gas_data_test.py:119-127`, `particula/gpu/tests/conversion_test.py:600-640` |
+| `GasData` | `molar_mass` | `GasData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `GasData.__post_init__()` coerces to `np.float64` and enforces `(n_species,)` | `to_warp_gas_data()` mirrors it to `WarpGasData.molar_mass`; `from_warp_gas_data()` restores the same numeric field | Source: `particula/gas/gas_data.py:65,75-77,103-108`, `particula/gpu/conversion.py:214-216,354`; tests: `particula/gpu/tests/warp_types_test.py:168-184,218-232`, `particula/gpu/tests/conversion_test.py:583-595` |
+| `GasData` | `concentration` | `GasData` | `(n_boxes, n_species)` | `float64` | Stored, mutable, box-batched gas mass concentration | `GasData.__post_init__()` coerces to `np.float64`, requires 2D, and checks width against `n_species` | `to_warp_gas_data()` mirrors it to `WarpGasData.concentration`; `from_warp_gas_data()` restores the same shape | Source: `particula/gas/gas_data.py:66,76-78,89-101`, `particula/gpu/conversion.py:217-219,355`; tests: `particula/gas/tests/gas_data_test.py:99-117`, `particula/gpu/tests/conversion_test.py:593-595` |
+| `GasData` | `partitioning` | `GasData` | `(n_species,)` | `bool` | Stored, mutable, shared-across-boxes partitioning mask | `GasData.__post_init__()` coerces values to `np.bool_` and enforces `(n_species,)` | `to_warp_gas_data()` converts `bool → int32`; `from_warp_gas_data()` converts `int32 → bool` on restore | Source: `particula/gas/gas_data.py:67,79-85,110-115`, `particula/gpu/conversion.py:208-209,223-239,347-356`; tests: `particula/gas/tests/gas_data_test.py:77-97`, `particula/gpu/tests/conversion_test.py:189-199,609-619` |
+| `WarpParticleData` | `masses` | `WarpParticleData` | `(n_boxes, n_particles, n_species)` | `wp.float64` | Stored, mutable GPU mirror of `ParticleData.masses` | Declared as `wp.array3d(dtype=wp.float64)`; populated by `to_warp_particle_data()` | Receives CPU particle masses on transfer to GPU; `from_warp_particle_data()` returns the same values to `ParticleData` | Source: `particula/gpu/warp_types.py:73`, `particula/gpu/conversion.py:111-125,282`; tests: `particula/gpu/tests/warp_types_test.py:38-58,100-118`, `particula/gpu/tests/conversion_test.py:512-548` |
+| `WarpParticleData` | `concentration` | `WarpParticleData` | `(n_boxes, n_particles)` | `wp.float64` | Stored, mutable GPU mirror of `ParticleData.concentration` | Declared as `wp.array2d(dtype=wp.float64)`; populated by `to_warp_particle_data()` | Receives CPU particle concentration/count state and round-trips back unchanged | Source: `particula/gpu/warp_types.py:74`, `particula/gpu/conversion.py:113-128,283`; tests: `particula/gpu/tests/warp_types_test.py:54-58,113-118`, `particula/gpu/tests/conversion_test.py:521-545` |
+| `WarpParticleData` | `charge` | `WarpParticleData` | `(n_boxes, n_particles)` | `wp.float64` | Stored, mutable GPU mirror of `ParticleData.charge` | Declared as `wp.array2d(dtype=wp.float64)`; populated by `to_warp_particle_data()` | Receives CPU charge data and round-trips back unchanged | Source: `particula/gpu/warp_types.py:75`, `particula/gpu/conversion.py:116,129-131,284`; tests: `particula/gpu/tests/warp_types_test.py:55-58,114-118`, `particula/gpu/tests/conversion_test.py:524-526,546-548` |
+| `WarpParticleData` | `density` | `WarpParticleData` | `(n_species,)` | `wp.float64` | Stored, mutable GPU mirror of the shared-across-boxes `ParticleData.density` array | Declared as `wp.array(dtype=wp.float64)`; populated by `to_warp_particle_data()` | Receives shared CPU density array and restores it on `from_warp_particle_data()` | Source: `particula/gpu/warp_types.py:76`, `particula/gpu/conversion.py:117-119,132-134,285`; tests: `particula/gpu/tests/warp_types_test.py:57-58,113-118,302-320`, `particula/gpu/tests/conversion_test.py:527-529` |
+| `WarpParticleData` | `volume` | `WarpParticleData` | `(n_boxes,)` | `wp.float64` | Stored, mutable GPU mirror of per-box `ParticleData.volume` | Declared as `wp.array(dtype=wp.float64)`; populated by `to_warp_particle_data()` | Receives per-box CPU volume array and restores it on `from_warp_particle_data()` | Source: `particula/gpu/warp_types.py:77`, `particula/gpu/conversion.py:120,135-137,286`; tests: `particula/gpu/tests/warp_types_test.py:57-58,113-118,302-320`, `particula/gpu/tests/conversion_test.py:530-548` |
+| `WarpGasData` | `molar_mass` | `WarpGasData` | `(n_species,)` | `wp.float64` | Stored, mutable GPU mirror of `GasData.molar_mass` shared across boxes | Declared as `wp.array(dtype=wp.float64)`; populated by `to_warp_gas_data()` from CPU gas state | Round-trips back through `from_warp_gas_data()` without schema drift | Source: `particula/gpu/warp_types.py:131`, `particula/gpu/conversion.py:214-216,228-230,354`; tests: `particula/gpu/tests/warp_types_test.py:168-184,218-232`, `particula/gpu/tests/conversion_test.py:583-595` |
+| `WarpGasData` | `concentration` | `WarpGasData` | `(n_boxes, n_species)` | `wp.float64` | Stored, mutable GPU mirror of `GasData.concentration` | Declared as `wp.array2d(dtype=wp.float64)`; populated by `to_warp_gas_data()` from CPU gas state | Round-trips back through `from_warp_gas_data()` without schema drift | Source: `particula/gpu/warp_types.py:132`, `particula/gpu/conversion.py:217-219,231-233,355`; tests: `particula/gpu/tests/warp_types_test.py:180-184,229-231`, `particula/gpu/tests/conversion_test.py:593-595` |
+| `WarpGasData` | `vapor_pressure` | `WarpGasData` | `(n_boxes, n_species)` | `wp.float64` | Stored, mutable GPU-only helper state for condensation kernels | `to_warp_gas_data()` validates the provided shape or creates a zero-filled default when `vapor_pressure` is `None` | Present only on the GPU container; `from_warp_gas_data()` drops it because `GasData` has no matching field | Source: `particula/gpu/warp_types.py:133`, `particula/gpu/conversion.py:146-147,162-206,220-235,301-304`; tests: `particula/gpu/tests/warp_types_test.py:177-183,225-231`, `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595` |
+| `WarpGasData` | `partitioning` | `WarpGasData` | `(n_species,)` | `wp.int32` | Stored, mutable GPU mirror/helper mask; shared across boxes | Declared as `wp.array(dtype=wp.int32)`; `to_warp_gas_data()` converts `GasData.partitioning` from `bool` to `int32` | `from_warp_gas_data()` restores `int32 → bool` into `GasData.partitioning` | Source: `particula/gpu/warp_types.py:134`, `particula/gpu/conversion.py:159-160,208-209,223-239,347-356`; tests: `particula/gpu/tests/warp_types_test.py:178-184,218-232,322-338`, `particula/gpu/tests/conversion_test.py:189-199,609-619` |
+
+Derived `ParticleData` accessors are intentionally separate from the stored
+schema above: `radii`, `total_mass`, `effective_density`, and
+`mass_fractions` are computed properties, not constructor-owned fields
+(`particula/particles/particle_data.py:166-218`; tests:
+`particula/particles/tests/particle_data_test.py:237-360`).
+
+Current gas round-trip behavior is intentionally lossy in two places:
+
+- `from_warp_gas_data()` restores `GasData.name` from caller input or
+  placeholder values such as `species_0`; the GPU container itself does not
+  preserve string species names.
+- `WarpGasData.vapor_pressure` is GPU-only helper state. It defaults to zeros
+  in `to_warp_gas_data()` when omitted and is dropped when restoring CPU
+  `GasData`.
+
+Keep testing round-trips for the current CPU/GPU schema drift explicitly:
+`WarpGasData` drops `name`, stores `partitioning` as `int32` instead of
+`bool`, and adds `vapor_pressure` that is not restored to the CPU gas
+container.
+
 - Decide the particle mass storage representation given the wide dynamic range
   (see [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)).
   Options include per-species absolute mass, log-mass, or bin/section reference
