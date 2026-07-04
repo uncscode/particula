@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Issue #1172 track T9 closes the documentation gap left by the data-model and
+Issue #1172 feature E2-F9 closes the documentation gap left by the data-model and
 GPU-foundation tracks. Users and planner agents can see `ParticleData`,
 `GasData`, Warp transfer helpers, and roadmap notes in scattered code and
 roadmap files, but there is no single foundation guide that explains schemas,
@@ -31,7 +31,7 @@ roadmap work without rediscovering current limits.
 ## Parent Epic Context
 
 - Parent epic: E2, issue #1172, Data-Model and Numerical Foundations v2.
-- Sibling dependencies: E2-F2/T2, E2-F3/T3, E2-F4/T4, E2-F5/T5, and E2-F8/T8.
+- Sibling dependencies: E2-F2, E2-F3, E2-F4, E2-F5, and E2-F8.
 - This track is documentation/example focused and should not introduce new
   container semantics beyond accurately describing shipped behavior and planned
   handoff points.

@@ -26,24 +26,31 @@
 - [ ] **E2-F7-P3:** Evaluate fixed-shape sub-stepping and semi-implicit candidates
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Compare graph-capture-compatible options against the explicit map and
-    identify the smallest safe foundation for future implementation.
+    identify the smallest safe foundation for future implementation while also
+    proving whether the chosen production path can update gas state in the same
+    step.
   - Files: a narrowly scoped helper in `particula/gpu/kernels/condensation.py`
-    or a test-only prototype under `particula/gpu/kernels/tests/`, plus
+    or a test-only prototype under `particula/gpu/kernels/tests/`,
+    `particula/integration_tests/condensation_particle_resolved_test.py` for a
+    bounded gas-coupled regression if production hooks land here, and
     `docs/Features/Roadmap/condensation-stiffness-study.md` analysis notes.
   - Tests: Unit tests for deterministic fixed-count sub-step behavior,
-    semi-implicit/asymptotic candidate invariants, and no dynamic allocation in
-    captured-step candidates where practical.
+    semi-implicit/asymptotic candidate invariants, no dynamic allocation in
+    captured-step candidates where practical, and gas-coupled particle-plus-gas
+    conservation checks if this phase lands the production hook.
 
 - [ ] **E2-F7-P4:** Publish integration recommendation and development documentation
   - Issue: TBD | Size: XS | Status: Not Started
   - Goal: Record the recommended integration foundation, rejected alternatives,
-    graph-capture/autodiff constraints, and follow-up implementation gates.
+    graph-capture/autodiff constraints, and either the shipped gas-coupled
+    production path or the exact follow-up split boundary required to land it.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/Roadmap/warp-autodiff-limitations.md`,
     `docs/Features/Roadmap/condensation-stiffness-study.md`, and plan sections
     as needed.
-  - Tests: Documentation link checks and any updated fast tests from earlier
-    phases.
+  - Tests: Documentation link checks, reruns of the focused condensation tests,
+    and reruns of the bounded gas-coupled regression when P3 or an earlier phase
+    ships the production hook.
 
 ## Phase Ordering Notes
 

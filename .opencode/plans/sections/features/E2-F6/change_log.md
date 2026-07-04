@@ -2,7 +2,7 @@
 
 ## 2026-07-03
 
-- Created first-pass feature plan for issue #1172 track T6.
+- Created first-pass feature plan for issue #1172 feature E2-F6.
 - Added four issue-sized phases covering numerical case definition, precision
   candidate comparison, conservation/fidelity/memory evaluation, and final
   recommendation publication.

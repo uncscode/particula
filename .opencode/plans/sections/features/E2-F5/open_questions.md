@@ -10,7 +10,7 @@
 - Precompute per-box dynamic viscosity and mean free path on the host for the
   first migration path. Move those calculations into Warp kernels only when a
   later feature needs fully device-resident thermodynamic updates.
-- Include `saturation_ratio` in the first migration path even if a specific T5
+- Include `saturation_ratio` in the first migration path even if a specific E2-F5
   path only consumes temperature and pressure, so environment shape semantics are
   exercised consistently.
 - Keep scalar functions as the primary public entry points initially. Add

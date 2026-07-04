@@ -2,12 +2,12 @@
 
 ## Upstream Dependencies
 
-- **E2-F2 / T2:** Provides or defines environment containers, including expected
+- **E2-F2:** Provides or defines environment containers, including expected
   fields such as temperature and pressure, `n_boxes` shape conventions, and any
   CPU/GPU conversion helpers.
-- **E2-F3 / T3:** Establishes `WarpEnvironmentData` and the explicit CPU/GPU
-  transfer conventions that T5 should reuse for environment inputs.
-- **E2-F4 / T4:** Vapor-pressure boundary decisions may influence whether
+- **E2-F3:** Establishes `WarpEnvironmentData` and the explicit CPU/GPU
+  transfer conventions that E2-F5 should reuse for environment inputs.
+- **E2-F4:** Vapor-pressure boundary decisions may influence whether
   condensation receives precomputed per-box vapor-pressure state or recomputes
   temperature-dependent terms later.
 
@@ -31,3 +31,19 @@
   path rather than defining separate scalar/array migration logic.
 - Documentation and examples must explain that scalar compatibility is a bridge,
   not the long-term multi-box environment model.
+
+## Sequencing Notes
+
+- `E2-F5-P1` can start once E2-F2 publishes the accepted environment field list,
+  but it should treat E2-F3 helper names as provisional until `E2-F3-P2` lands.
+- `E2-F5-P2` should wait for `E2-F3-P2` so normalization logic reuses the same
+  transfer vocabulary and device-validation path instead of creating a parallel
+  contract.
+- `E2-F5-P3` should follow `P2` and should incorporate the vapor-pressure
+  boundary documented by `E2-F4-P3` before condensation inputs are treated as
+  final.
+- `E2-F5-P4` should follow `P3` so coagulation adopts the tested normalization
+  path after condensation proves the shared helper surface.
+- E2-F7 and E2-F9 should consume the `P3`/`P4` environment-input contract rather
+  than redefining scalar compatibility rules, which keeps the cross-feature DAG
+  one-directional.

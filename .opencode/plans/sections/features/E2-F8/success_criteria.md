@@ -5,8 +5,8 @@
 - CPU condensation public data-container paths reject multi-box inputs with
   clear, tested `ValueError` messages.
 - CPU coagulation multi-box `ParticleData` behavior is no longer ambiguous:
-  either unsupported calls raise clear errors, or transitional box-0 behavior is
-  explicitly tested and documented.
+  unsupported calls raise clear errors rather than using transitional box-0
+  behavior.
 - Single-box `ParticleData`/`GasData` dynamics behavior remains supported.
 
 ## Documentation Criteria

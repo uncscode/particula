@@ -8,7 +8,7 @@
   - E2-F1-P2: Record authoritative field ownership decisions
   - E2-F1-P3: Document shape conventions across container workflows
   - E2-F1-P4: Publish downstream handoff map and development documentation
-- Incorporated classifier prompt context for Issue #1172 track T1.
+- Incorporated classifier prompt context for Issue #1172 feature E2-F1.
 - Incorporated epic drafter context for parent E2 and sibling features E2-F2
   through E2-F9.
 - Incorporated codebase research for `ParticleData`, `GasData`, Warp container

@@ -3,7 +3,7 @@
 ## Problem Statement
 
 Epic E2 prepares data-model and numerical foundations for data-oriented GPU
-work. Track T6 must decide whether the current absolute per-species `fp64` mass
+work. Feature E2-F6 must decide whether the current absolute per-species `fp64` mass
 storage is sufficient before any schema or dtype changes are made. The target
 simulation range spans new-particle-formation clusters through cloud droplets,
 which stresses floating-point dynamic range, conservation accounting, and
@@ -29,8 +29,8 @@ study validates conservation and accuracy tradeoffs.
 ## Parent Epic Context
 
 - Parent: E2, issue #1172.
-- Track: T6.
-- Dependency: E2-F1/T1 schema foundation must define the baseline particle data
+- Feature: E2-F6.
+- Dependency: E2-F1 schema foundation must define the baseline particle data
   model and terminology used by this study.
 - Sibling context: E2-F2 through E2-F5 cover environment containers and kernel
   migration boundaries; this feature remains a study/report and does not mutate

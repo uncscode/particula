@@ -16,7 +16,7 @@
 ## Out of Scope
 
 - Implementing full CPU multi-box condensation or coagulation loops.
-- Changing `ParticleData` or `GasData` schema shapes established by E2-F1/T1.
+- Changing `ParticleData` or `GasData` schema shapes established by E2-F1.
 - Introducing GPU kernels or changing dtype/mass schema decisions from E2-F6 or
   E2-F7.
 - Redesigning public dynamics APIs beyond clearer validation and documentation.
@@ -25,7 +25,7 @@
 
 ## Assumptions
 
-- E2-F1/T1 container shape conventions are the dependency baseline.
+- E2-F1 container shape conventions are the dependency baseline.
 - Condensation's current `_require_single_box` behavior is intentional and
   should remain unless future tracks implement multi-box strategy execution.
 - Coagulation's current box-0 behavior should be either explicitly rejected for

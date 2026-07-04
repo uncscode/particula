@@ -8,9 +8,13 @@
   - `particula/gpu/warp_types.py::WarpParticleData`
   - `particula/gpu/warp_types.py::WarpGasData`
 - Decide authoritative ownership for shared and per-box fields, including:
-  - particle masses, concentration/counts, charge, density, and volume
-  - gas names, molar masses, concentration, partitioning, and vapor pressure
-  - environment temperature, pressure, humidity/saturation, and per-box scalars
+  - particle masses, concentration/counts, charge, shared density shaped
+    `(n_species,)`, and authoritative per-box simulation volume on
+    `ParticleData`
+  - gas names, molar masses, concentration, and partitioning, while keeping vapor
+    pressure out of CPU `GasData` and `EnvironmentData` ownership
+  - environment temperature, pressure, and canonical species-resolved
+    `saturation_ratio`
 - Document shape conventions for:
   - single-box workflows with leading `n_boxes == 1`
   - multi-box workflows with leading `n_boxes`
@@ -40,3 +44,5 @@
   containers can hold multi-box state.
 - Do not make GPU-only fields silently authoritative without documenting CPU
   round-trip behavior.
+- Do not preserve species names inside `WarpGasData`; require explicit CPU-side
+  names or external index-map metadata on restoration.

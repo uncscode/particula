@@ -26,14 +26,15 @@ semantics in each track.
 - As a GPU-kernel implementer, I want explicit CPU/GPU shape conventions so I
   can validate transfers and kernel launches for single-box and multi-box
   workflows.
-- As a downstream planner, I want field ownership handoffs from T1 so tracks
-  T2-T9 can implement against the same authoritative source.
+- As a downstream planner, I want field ownership handoffs from E2-F1 so
+  features E2-F2 through E2-F9 can implement against the same authoritative
+  source.
 
 ## Parent Epic Context
 
 - Parent epic: E2, Issue #1172, Data-Model and Numerical Foundations v2.
 - Scenario: epic-linked feature.
 - Sibling tracks documented by the epic drafter: E2-F2 through E2-F9. Their
-  work depends on T1 decisions for environment fields, GPU mirrors, gas schema
-  drift, scalar migration, numerical evidence, CPU support boundaries, and final
-  user-facing docs.
+  work depends on E2-F1 decisions for environment fields, GPU mirrors, gas
+  schema drift, scalar migration, numerical evidence, CPU support boundaries,
+  and final user-facing docs.

@@ -22,8 +22,8 @@ semantics rather than bugs.
 ## Parent Epic Context
 
 - Parent epic: `E2` for issue `#1172`.
-- Track: `T4`.
-- Dependency: `E2-F1/T1`, which establishes the schema foundation and should be
+- Feature: `E2-F4`.
+- Dependency: `E2-F1`, which establishes the schema foundation and should be
   treated as the baseline authority for data-container ownership decisions.
 - Sibling context: `E2-F2` defines environment container boundaries, and
   `E2-F3` separates gas/environment responsibility. This feature should avoid

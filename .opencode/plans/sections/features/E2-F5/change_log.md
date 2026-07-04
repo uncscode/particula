@@ -2,7 +2,7 @@
 
 ## 2026-07-03
 
-- Drafted feature plan E2-F5 for issue #1172 track T5.
+- Drafted feature plan E2-F5 for issue #1172 feature E2-F5.
 - Added four issue-sized phases covering compatibility design, environment
   normalization helpers, condensation migration, and coagulation/documentation
   handoff.

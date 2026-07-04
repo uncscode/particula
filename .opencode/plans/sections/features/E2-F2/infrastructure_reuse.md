@@ -15,10 +15,10 @@
 
 - Mirror current manual validation in `GasData` for dimensionality and shape.
 - Use the repository's value semantics from `validate_inputs` as guidance:
-  temperature should be finite and physically positive in Kelvin; pressure and
-  humidity/saturation fields should be finite and nonnegative, with upper
-  bounds only when the field represents relative humidity rather than a general
-  saturation ratio.
+  temperature should be finite and physically positive in Kelvin; pressure
+  should be finite and physically positive or nonnegative per the final schema;
+  `saturation_ratio` should be finite, nonnegative, shaped
+  `(n_boxes, n_species)`, and allowed to exceed `1.0` for supersaturation.
 
 ## Test Patterns
 

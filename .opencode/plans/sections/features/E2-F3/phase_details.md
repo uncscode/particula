@@ -3,14 +3,16 @@
 ## E2-F3-P1: WarpEnvironmentData struct and CPU schema alignment with unit tests
 
 - Issue: TBD | Size: S | Status: Not Started
-- Goal: Mirror the `E2-F2` CPU environment schema in Warp with a small, reviewable
-  struct change and tests that prove every field stays `(n_boxes,)`.
+- Goal: Mirror the `E2-F2` CPU environment schema in Warp with a small,
+  reviewable struct change and tests that prove `temperature` and `pressure`
+  stay `(n_boxes,)` while `saturation_ratio` stays `(n_boxes, n_species)`.
 - Files: `particula/gpu/warp_types.py`,
   `particula/gpu/tests/warp_types_test.py`
 - Implementation:
   - Confirm the `E2-F2` `EnvironmentData` import path and exact field names.
-  - Add `WarpEnvironmentData` to `particula/gpu/warp_types.py` with one
-    `wp.array(dtype=wp.float64)` attribute per numeric CPU field.
+  - Add `WarpEnvironmentData` to `particula/gpu/warp_types.py` with explicit
+    `temperature`, `pressure`, and `saturation_ratio` `wp.array(dtype=wp.float64)`
+    attributes matching the CPU field list and shapes.
   - Keep the struct edit focused to field declarations/docstrings rather than a
     broad refactor of existing Warp types.
 - Tests: Add one-box and multi-box struct creation coverage plus dtype/shape
@@ -51,7 +53,7 @@
 
 ## E2-F3-P4: CUDA-parametrized transfer coverage and documentation updates
 
-- Issue: TBD | Size: XS | Status: Not Started
+- Issue: TBD | Size: S | Status: Not Started
 - Goal: Close the feature with optional CUDA parity coverage and docs that point
   users to the exact transfer entry points.
 - Files: `particula/gpu/tests/conversion_test.py`,
@@ -65,4 +67,6 @@
   - Update roadmap, migration, and Warp datastructure docs with the explicit
     environment-transfer helper names and shape semantics.
 - Tests: Keep the CUDA-parametrized test focused to one representative round trip
-  so this phase stays XS-sized.
+  so the `S`-sized phase remains reviewable.
+  The structured phase metadata is authoritative: this phase is `S` because it
+  combines optional CUDA transfer coverage with user-facing documentation updates.

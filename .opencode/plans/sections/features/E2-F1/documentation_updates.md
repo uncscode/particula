@@ -6,7 +6,7 @@
   state ownership.
 - Add a shape convention table covering CPU and GPU containers.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` with links to the decision
-  record and explicit T1 outcomes.
+  record and explicit E2-F1 outcomes.
 - Update `docs/Features/particle-data-migration.md` or related feature docs with
   links to the canonical shape rules where appropriate.
 

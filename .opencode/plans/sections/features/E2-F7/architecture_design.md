@@ -9,6 +9,10 @@
   `EnvironmentData` and E2-F3 provides `WarpEnvironmentData`.
 - Treat fp64 as the reference precision unless E2-F6 explicitly authorizes a
   different precision envelope.
+- Require gas-coupled production condensation integration for physical
+  completeness, including conservation checks that account for gas depletion; if
+  that implementation grows beyond this feature's issue size, split it into an
+  explicit follow-up feature rather than leaving the requirement implicit.
 - Make future gradient paths explicit: no stochastic theta modes, no unbounded
   adaptive loops, and documented clamp/guard behavior.
 
@@ -26,9 +30,9 @@
    - Metrics for non-negative mass, bounded fractional mass change, monotonic
      convergence toward equilibrium where applicable, CPU/GPU parity, and
      conservation caveats.
-   - The current GPU path does not update gas concentration, so metrics must
-     clearly distinguish particle-only GPU behavior from full gas-particle
-     mass conservation.
+    - The current GPU path does not update gas concentration, so metrics must
+      clearly distinguish particle-only GPU behavior from full gas-particle
+      mass conservation and identify the gas-coupled production integration gap.
 
 3. **Explicit timestep scan**
    - A fixed list of timestep candidates per stress case.

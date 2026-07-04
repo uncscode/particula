@@ -10,7 +10,7 @@
     | CPU dynamics path | Containers accepted | Multi-box strategy execution |
     | --- | --- | --- |
     | Condensation | `ParticleData` + `GasData` | `n_boxes=1` only; multi-box raises `ValueError` |
-    | Coagulation | `ParticleData` | Single-box only or documented box-0 transitional behavior |
+    | Coagulation | `ParticleData` | `n_boxes=1` only; multi-box raises `ValueError` |
 
 - `docs/Features/Roadmap/data-oriented-gpu.md`
   - Clarify that data-container shape support is a prerequisite for future
@@ -38,6 +38,7 @@ Document the intended interpretation of errors:
 Docs must let a reader distinguish these statements:
 
 1. The containers can store multiple boxes.
-2. Legacy-compatible CPU strategy code is currently single-box or box-0 only.
+2. Legacy-compatible CPU strategy code is currently single-box only unless a
+   strategy explicitly documents broader support.
 3. Full strategy-level multi-box execution is future work unless a strategy
    explicitly documents otherwise.

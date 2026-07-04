@@ -13,11 +13,11 @@ ParticleData / GasData schemas
         |
         v
 CPU condensation strategies
-  unwrap data containers -> require n_boxes == 1 -> use box 0 arrays
+  unwrap data containers -> require n_boxes == 1 -> raise clear errors otherwise
         |
         v
 CPU coagulation strategies
-  unwrap ParticleData -> currently use box 0 adapters
+  unwrap ParticleData -> require n_boxes == 1 -> raise clear errors otherwise
         |
         v
 E2-F8 boundary clarification
@@ -40,9 +40,8 @@ E2-F8 boundary clarification
   messages.
 - Coagulation should avoid silent all-box expectations. The preferred design is
   explicit single-box validation for `ParticleData` strategy calls that would
-  otherwise operate only on `particle.*[0]`. If implementation chooses to keep
-  box-0 transitional semantics for compatibility, tests and docs must state
-  that only box 0 is executed and other boxes are untouched.
+  otherwise operate only on `particle.*[0]`. Do not keep transitional box-0
+  behavior for unsupported multi-box inputs; raise explicit errors instead.
 
 ## Security & Compliance
 

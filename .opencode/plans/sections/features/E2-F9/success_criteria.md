@@ -30,6 +30,6 @@
 
 ## Done Signal
 
-Issue `#1172` track `T9` is complete when users can find one accurate foundation
+Issue `#1172` feature `E2-F9` is complete when users can find one accurate foundation
 guide, one validated example path, and one roadmap handoff trail without having
 to infer current support boundaries from source code alone.

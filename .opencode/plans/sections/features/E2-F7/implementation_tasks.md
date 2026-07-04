@@ -37,6 +37,9 @@
   fixed shapes and preallocated scratch buffers only.
 - Compare candidates against CPU reference calculations and document rejected
   alternatives, including random staggered theta modes, in the study report.
+- Evaluate the work needed for gas-coupled production condensation integration,
+  including gas-depletion conservation checks; split that implementation into a
+  follow-up feature if it cannot remain issue-sized here.
 - Record graph-capture and autodiff compatibility for each candidate with clear
   pass/fail notes.
 

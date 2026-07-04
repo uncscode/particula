@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Issue #1172 track T2 needs a CPU-side `EnvironmentData` container for
+Issue #1172 feature E2-F2 needs a CPU-side `EnvironmentData` container for
 per-box thermodynamic state. Existing `GasData` owns gas-species state and
 existing dynamics APIs pass `temperature` and `pressure` as scalars, leaving
 multi-box temperature, pressure, humidity, and saturation state without a
@@ -28,7 +28,7 @@ clear before downstream tracks add GPU mirrors and migrate process kernels.
 ## Parent Epic Context
 
 - Parent epic: E2, issue #1172, Data-Model and Numerical Foundations v2.
-- Dependency: E2-F1/T1 schema foundation should define the common container
+- Dependency: E2-F1 schema foundation should define the common container
   conventions this feature follows.
 - Sibling tracks include GPU mirror/conversion work and kernel/process
   migrations; this feature only establishes the CPU environment container.

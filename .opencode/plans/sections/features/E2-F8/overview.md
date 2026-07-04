@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Issue #1172 track T8 clarifies a user-facing ambiguity introduced by the
+Issue #1172 feature E2-F8 clarifies a user-facing ambiguity introduced by the
 E2 data-container migration: `ParticleData` and `GasData` support multi-box
 shapes at the container/schema level, but current CPU dynamics strategies do
 not provide full multi-box execution semantics. CPU condensation already
@@ -19,7 +19,7 @@ multi-box container executes all boxes.
   box 0.
 - Gives users clear guidance for single-box runs, caller-managed per-box loops,
   and future multi-box strategy work.
-- Preserves momentum from dependency E2-F1/T1 by documenting the current
+- Preserves momentum from dependency E2-F1 by documenting the current
   container contract before later feature tracks expand behavior.
 
 ## User Stories
