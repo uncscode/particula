@@ -69,6 +69,8 @@ pages.
 - [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 - [Canonical shape conventions for container workflows](data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
 - [Final downstream handoff map for sibling features](data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
+- [CPU↔GPU restore boundary for ordered gas metadata](data-oriented-gpu.md#authoritative-field-ownership-decisions)
+- [Current CPU execution limits for multi-box-ready containers](data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
 
 ## Contribution Opportunities
 

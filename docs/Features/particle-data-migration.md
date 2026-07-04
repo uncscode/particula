@@ -34,12 +34,15 @@ in strategies and runnables:
   workflows keep working while you migrate.
 
 !!! warning
-    GPU→CPU gas restore is lossy unless you preserve ordered species metadata
-    outside the GPU container. `from_warp_gas_data()` can validate only the
-    supplied name-list length today; it does not verify that the restored names
-    still match the original species ordering. Use the roadmap's
-    [final downstream handoff map for sibling features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
-    and [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
+    GPU→CPU gas restore is intentionally lossy unless you preserve ordered
+    species metadata outside the GPU container. `WarpGasData` excludes string
+    fields and `from_warp_gas_data()` can validate only the supplied name-list
+    length today; it does not verify that restored names still match the
+    original species ordering, and GPU helper state such as
+    `WarpGasData.vapor_pressure` is dropped on CPU restore. Use the roadmap's
+    [authoritative field ownership decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
+    [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows),
+    and [final downstream handoff map for sibling features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
     as the authoritative contract for this restore boundary.
 
 ## Why migrate
