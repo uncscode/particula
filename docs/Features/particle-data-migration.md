@@ -29,6 +29,14 @@ in strategies and runnables:
 - `ParticleRepresentation` and `GasSpecies` remain as facades so existing
   workflows keep working while you migrate.
 
+!!! warning
+    GPU→CPU gas restore is lossy unless you preserve ordered species metadata
+    outside the GPU container. `from_warp_gas_data()` can validate only the
+    supplied name-list length today; it does not verify that the restored names
+    still match the original species ordering. Use the roadmap's
+    [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
+    as the authoritative contract for this restore boundary.
+
 ## Why migrate
 
 - **Clear data/behavior split**: data containers keep state, strategies keep

@@ -32,25 +32,26 @@
     `docs/Features/Roadmap/index.md` plus
     `docs/Features/particle-data-migration.md` still link to it.
 
-- [x] **E2-F1-P3:** Document shape conventions across container workflows
-  - Issue: #1185 | Size: S | Status: Completed
+- [ ] **E2-F1-P3:** Document shape conventions across container workflows
+  - Issue: #1185 | Size: S | Status: In Progress
   - Goal: Publish shape rules for single-box, multi-box, particle-resolved, and
     binned workflows across CPU and GPU containers.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
-    `docs/Features/particle-data-migration.md`, and `docs/index.md`.
-  - Shipped: a canonical `Canonical shape conventions for container workflows`
-    subsection in `docs/Features/Roadmap/data-oriented-gpu.md` with workflow
-    rules, concrete example shapes, explicit field tables for `ParticleData`,
-    `GasData`, future `EnvironmentData`, `WarpParticleData`, and `WarpGasData`,
-    plus a caution that current CPU condensation and coagulation paths remain
-    single-box even though the containers can store multi-box state.
-  - Discoverability: the migration guide now links directly to the canonical
-    shape-conventions anchor, and `docs/index.md` adds a minimal pointer to that
-    subsection while keeping the roadmap subsection as the single source of
-    truth.
-  - Tests: Docs-first update; validation should rely on existing container,
-    builder, Warp, conversion, condensation, and coagulation evidence plus
-    anchor/link smoke checks rather than new automated tests.
+    `docs/Features/particle-data-migration.md`, and
+    `docs/Features/Roadmap/index.md`.
+  - Current state: the canonical `Canonical shape conventions for container
+    workflows` subsection is drafted in
+    `docs/Features/Roadmap/data-oriented-gpu.md` with workflow rules, concrete
+    example shapes, explicit field tables for `ParticleData`, `GasData`, future
+    `EnvironmentData`, `WarpParticleData`, and `WarpGasData`, plus a caution
+    that current CPU condensation and coagulation paths remain single-box even
+    though the containers can store multi-box state.
+  - Discoverability: the migration guide links directly to the canonical
+    shape-conventions anchor, and the roadmap index points to that subsection
+    while keeping the roadmap subsection as the single source of truth.
+  - Validation: docs-first update; validation should rely on existing
+    container, builder, Warp, conversion, condensation, and coagulation
+    evidence plus anchor/link smoke checks rather than new automated tests.
 
 - [ ] **E2-F1-P4:** Publish downstream handoff map and development documentation
   - Issue: TBD | Size: XS | Status: Not Started

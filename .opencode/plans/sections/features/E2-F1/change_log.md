@@ -2,12 +2,12 @@
 
 ## 2026-07-04
 
-- Updated E2-F1 plan sections after Issue #1185 shipped.
-- Marked phase E2-F1-P3 complete for the docs-first canonical shape
-  conventions update.
+- Updated E2-F1 plan sections during the pre-ship fix pass for Issue #1185.
+- Kept phase E2-F1-P3 in progress while the docs-first canonical shape
+  conventions update remains in the ADW fix cycle.
 - Recorded that `docs/Features/Roadmap/data-oriented-gpu.md` is now the single
   source of truth for container workflow shape conventions, with direct links
-  from the migration guide and a minimal top-level docs pointer.
+  from the migration guide and roadmap index.
 
 ## 2026-07-03
 
