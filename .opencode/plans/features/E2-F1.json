@@ -2,7 +2,7 @@
   "id": "E2-F1",
   "type": "feature",
   "title": "Define container schema, shape conventions, and state ownership",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -71,11 +71,11 @@
     {
       "id": "E2-F1-P4",
       "title": "Publish downstream handoff map and development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -83,5 +83,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
