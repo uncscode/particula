@@ -14,17 +14,21 @@
   clear `ValueError`s.
 - Supersaturation values above `1.0` remain valid and are covered as an
   explicit accepted case.
-- `n_boxes` and `copy()` behavior match existing data-container conventions.
-- The class is importable from the expected package export path.
+- P1 shipped the direct-module import path
+  `particula.gas.environment_data.EnvironmentData`.
+- Later phases still need to add `n_boxes`, `copy()`, and the package export
+  path.
 
 ## Test Criteria
 
 - New unit tests cover valid single-box and multi-box inputs.
 - New unit tests cover invalid shapes, species-dimension mismatches, and
   invalid values.
-- New unit tests cover dtype coercion, copy independence, and package exports.
+- New unit tests cover dtype coercion.
+- Later phases still need test coverage for copy independence and package
+  exports.
 - New unit tests include at least one supersaturation case (`saturation_ratio >
-  1.0`) and one positive-pressure validation failure.
+  1.0`) and one nonpositive-pressure validation failure.
 - Scoped gas tests pass.
 
 ## Documentation Criteria
@@ -36,6 +40,7 @@
 
 ## Done Signal
 
-EnvironmentData exists with the canonical `temperature`, `pressure`, and
-species-resolved `saturation_ratio` fields, plus tests for valid and invalid
-construction, satisfying issue #1172 feature E2-F2.
+Issue #1188 satisfied the P1 done signal: `EnvironmentData` exists with the
+canonical `temperature`, `pressure`, and species-resolved `saturation_ratio`
+fields, plus tests for valid and invalid construction. Full feature completion
+still requires the later `n_boxes`, `copy()`, export, and documentation phases.

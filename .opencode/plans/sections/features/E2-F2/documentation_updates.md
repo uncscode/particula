@@ -2,6 +2,11 @@
 
 ## Required Updates
 
+- Current shipped state from issue #1188 / E2-F2-P1:
+  - `EnvironmentData` exists at `particula.gas.environment_data`.
+  - Direct-module import is the current supported path.
+  - Package exports, `n_boxes`, and `copy()` are still pending later phases.
+
 - `docs/Features/particle-data-migration.md`
   - Add `EnvironmentData` to the data-container overview.
   - Clarify that thermodynamic state belongs in `EnvironmentData`, not
