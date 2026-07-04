@@ -29,7 +29,8 @@ The migration moves **data** into dedicated containers and leaves **behavior**
 in strategies and runnables:
 
 - `ParticleData` stores per-particle arrays with an explicit batch dimension.
-- `GasData` stores gas species arrays with an explicit box dimension.
+- `GasData` stores gas species arrays with an explicit box dimension; it does
+  not own per-box thermodynamic state.
 - `EnvironmentData` now provides the shipped CPU-side owner of per-box
   thermodynamic state with `temperature -> (n_boxes,)`,
   `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`.
@@ -256,10 +257,11 @@ particle_out = coagulation.step(
 ```
 
 Use `EnvironmentData` to document and carry per-box thermodynamic state on the
-CPU side. Keep current scalar `temperature` and `pressure` arguments where the
-process API has not yet been migrated; migrated process code may read
-`EnvironmentData` directly, but only the physical model that owns the update
-should mutate it.
+CPU side. `EnvironmentData` owns `temperature`, `pressure`, and
+`saturation_ratio`; `GasData` does not. Keep current scalar `temperature` and
+`pressure` arguments where the process API has not yet been migrated; migrated
+process code may read `EnvironmentData` directly, but only the physical model
+that owns the update should mutate it.
 
 ## Conversion helpers
 
