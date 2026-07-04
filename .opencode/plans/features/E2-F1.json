@@ -58,11 +58,11 @@
     {
       "id": "E2-F1-P3",
       "title": "Document shape conventions across container workflows",
-      "status": "In Progress",
+      "status": "Shipped",
       "size": "S",
       "issue_number": 1185,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
