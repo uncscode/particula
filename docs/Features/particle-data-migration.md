@@ -17,7 +17,9 @@ that page now redirects to this canonical guide.
 
 Before adding container fields or changing CPU↔GPU conversion behavior, review
 the roadmap's
-[authoritative field ownership decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions).
+[canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
+and its surrounding [authoritative field ownership
+decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions).
 
 The migration moves **data** into dedicated containers and leaves **behavior**
 in strategies and runnables:

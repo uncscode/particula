@@ -246,6 +246,140 @@ conversion behavior, or future environment state.
 | Future `EnvironmentData.saturation_ratio` | Must be owned by future `EnvironmentData` as per-box, per-species thermodynamic state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via future `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / planned GPU numeric mirror | Mutable derived-or-updated thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
 | Simulation volume ownership | Not owned by future `EnvironmentData`; must remain owned by `ParticleData.volume` | `(n_boxes,)` on `ParticleData` | `(n_boxes,)` on `WarpParticleData` | `float64` / `wp.float64` | Mutable per-box simulation state under particle container ownership | Must continue to round-trip only with particle container conversion helpers | Per-box particle state, dilution-style workflows, and timestep orchestration that needs simulation volume | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
 
+#### Canonical shape conventions for container workflows
+
+Use this subsection as the single shape contract for container-first workflow
+documentation. Per-box arrays always keep a leading `n_boxes` dimension, even
+when `n_boxes == 1`. Shared arrays keep their species-only or metadata-only
+shape and do not gain a box dimension just because the workflow is batched.
+
+Workflow rules:
+
+- Single-box workflows still store every per-box array with a leading `1`.
+- Multi-box workflows store every per-box array with a leading `n_boxes`.
+- Particle-resolved workflows use `ParticleData.masses`
+  `(n_boxes, n_particles, n_species)` and `ParticleData.concentration`
+  `(n_boxes, n_particles)`, where concentration carries count semantics.
+- Binned workflows keep the same container ranks, but particle concentration is
+  interpreted as number per m^3 rather than count.
+- Shared arrays such as `ParticleData.density`, `GasData.molar_mass`, and
+  `GasData.partitioning` remain species-only arrays with no box axis.
+- Storage shape and interpretation semantics are separate concerns: a
+  particle-resolved workflow and a binned workflow may use the same stored
+  ranks while assigning different physical meaning to the values.
+
+Concrete example shapes backed by current constructors and tests:
+
+- `ParticleData.masses -> (1, n_particles, n_species)`
+- `ParticleData.concentration -> (1, n_particles)`
+- `GasData.concentration -> (1, n_species)`
+- `ParticleData.density -> (n_species,)`
+- `WarpGasData.vapor_pressure -> (n_boxes, n_species)`
+
+Verification evidence for the shape claims in this subsection:
+
+- `particula/particles/tests/particle_data_test.py` for single-box, multi-box,
+  shared-density, and derived-shape behavior.
+- `particula/gas/tests/gas_data_test.py` and
+  `particula/gas/tests/gas_data_builder_test.py` for gas constructor and
+  builder-added leading box dimensions.
+- `particula/gpu/tests/warp_types_test.py` and
+  `particula/gpu/tests/conversion_test.py` for Warp container parity and
+  CPU↔GPU shape preservation.
+- `particula/dynamics/condensation/tests/condensation_strategies_test.py` and
+  `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`
+  for the current single-box CPU execution boundary documented below.
+
+`ParticleData`
+
+Per-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `masses` | `(n_boxes, n_particles, n_species)` | Same stored rank for single-box, multi-box, particle-resolved, and binned workflows. |
+| `concentration` | `(n_boxes, n_particles)` | Count semantics for particle-resolved workflows; number per m^3 semantics for binned workflows. |
+| `charge` | `(n_boxes, n_particles)` | Per-box particle charge state. |
+| `volume` | `(n_boxes,)` | Per-box simulation volume remains owned by `ParticleData`. |
+
+Shared-across-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `density` | `(n_species,)` | Shared material density; never add a box dimension. |
+
+`GasData`
+
+Per-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `concentration` | `(n_boxes, n_species)` | Single-box gas workflows still use `(1, n_species)`. |
+
+Shared-across-box and metadata fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `name` | `len == n_species` | CPU-only ordered species metadata. |
+| `molar_mass` | `(n_species,)` | Shared across boxes. |
+| `partitioning` | `(n_species,)` | Shared across boxes; stored as `bool` on CPU. |
+
+Future `EnvironmentData` policy fields:
+
+Per-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `temperature` | `(n_boxes,)` | Planned per-box thermodynamic state. |
+| `pressure` | `(n_boxes,)` | Planned per-box thermodynamic state. |
+| `saturation_ratio` | `(n_boxes, n_species)` | Planned per-box, per-species environment state. |
+
+`WarpParticleData`
+
+Per-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `masses` | `(n_boxes, n_particles, n_species)` | GPU mirror of `ParticleData.masses`. |
+| `concentration` | `(n_boxes, n_particles)` | GPU mirror of particle concentration/count state. |
+| `charge` | `(n_boxes, n_particles)` | GPU mirror of particle charge state. |
+| `volume` | `(n_boxes,)` | GPU mirror of per-box simulation volume. |
+
+Shared-across-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `density` | `(n_species,)` | GPU mirror of shared particle density. |
+
+`WarpGasData`
+
+Per-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `concentration` | `(n_boxes, n_species)` | GPU mirror of gas concentration. |
+| `vapor_pressure` | `(n_boxes, n_species)` | GPU-only helper state; not restored to CPU `GasData`. |
+
+Shared-across-box fields:
+
+| Field | Shape | Notes |
+| --- | --- | --- |
+| `molar_mass` | `(n_species,)` | GPU mirror of shared gas molar mass. |
+| `partitioning` | `(n_species,)` | GPU mirror/helper mask; stored as `int32` on GPU. |
+
+> [!CAUTION]
+> Container storage is already multi-box-capable, but current CPU execution is
+> not generally multi-box end to end. Condensation explicitly enforces
+> `n_boxes == 1` via `_require_single_box()` in
+> `particula/dynamics/condensation/condensation_strategies.py`. Current CPU
+> coagulation helpers and entry points read `ParticleData` through box index `0`
+> access patterns such as `particle.radii[0]`, `particle.total_mass[0]`,
+> `particle.concentration[0]`, `particle.charge[0]`, and `particle.volume[0]`
+> in `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`,
+> while `particula/dynamics/particle_process.py` continues to execute those
+> strategies through the legacy aerosol path. Document storage as multi-box
+> capable, but document today's CPU condensation and coagulation paths as
+> single-box workflows.
+
 #### Rationale for issue-critical ownership decisions
 
 - `ParticleData.density` remains shared-across-boxes state with CPU/GPU shape
