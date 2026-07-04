@@ -14,6 +14,7 @@ from particula.gpu.conversion import (  # noqa: E402
     from_warp_gas_data,
     from_warp_particle_data,
     gpu_context,
+    to_warp_environment_data,
     to_warp_gas_data,
     to_warp_particle_data,
 )
@@ -45,6 +46,32 @@ def sample_gas_data():
         molar_mass=np.array([0.018, 0.017, 0.098]),
         concentration=np.random.rand(n_boxes, n_species) * 1e15,
         partitioning=np.array([True, True, False]),
+    )
+
+
+@pytest.fixture
+def sample_environment_data_single_box():
+    """Create single-box EnvironmentData for testing."""
+    from particula.gas.environment_data import EnvironmentData
+
+    return EnvironmentData(
+        temperature=np.array([298.15]),
+        pressure=np.array([101325.0]),
+        saturation_ratio=np.array([[0.95, 1.05]]),
+    )
+
+
+@pytest.fixture
+def sample_environment_data_multi_box():
+    """Create multi-box EnvironmentData for testing."""
+    from particula.gas.environment_data import EnvironmentData
+
+    return EnvironmentData(
+        temperature=np.array([298.15, 305.0]),
+        pressure=np.array([101325.0, 90000.0]),
+        saturation_ratio=np.array(
+            [[0.95, 1.05, 0.75], [0.8, 0.9, 1.1]],
+        ),
     )
 
 
@@ -185,7 +212,6 @@ class TestToWarpGasData:
         assert gpu_data.concentration.dtype == wp.float64
         assert gpu_data.vapor_pressure.dtype == wp.float64
         assert gpu_data.partitioning.dtype == wp.int32
-
     def test_gas_data_partitioning_conversion(self, sample_gas_data) -> None:
         """Test bool to int32 conversion (True->1, False->0)."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -241,6 +267,197 @@ class TestToWarpGasData:
         np.testing.assert_array_almost_equal(
             gpu_data.concentration.numpy(),
             sample_gas_data.concentration,
+        )
+
+
+class TestToWarpEnvironmentData:
+    """Tests for to_warp_environment_data() function."""
+
+    def test_environment_data_warp_unavailable_error(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test helper propagates Warp-unavailable RuntimeError."""
+        from unittest.mock import patch
+
+        with patch(
+            "particula.gpu.conversion._ensure_warp_available",
+            side_effect=RuntimeError("Warp is not installed"),
+        ):
+            with pytest.raises(RuntimeError, match="Warp is not installed"):
+                to_warp_environment_data(
+                    sample_environment_data_single_box,
+                    device="cpu",
+                )
+
+    def test_to_warp_environment_data_default(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test helper returns populated environment fields."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box, device="cpu"
+        )
+
+        assert gpu_data.temperature is not None
+        assert gpu_data.pressure is not None
+        assert gpu_data.saturation_ratio is not None
+
+    def test_environment_data_single_box_shapes_and_values(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test single-box conversion preserves shapes, values, and dtypes."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box, device="cpu"
+        )
+
+        assert gpu_data.temperature.shape == (1,)
+        assert gpu_data.pressure.shape == (1,)
+        assert gpu_data.saturation_ratio.shape == (1, 2)
+
+        np.testing.assert_array_equal(
+            gpu_data.temperature.numpy(),
+            sample_environment_data_single_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.pressure.numpy(),
+            sample_environment_data_single_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.saturation_ratio.numpy(),
+            sample_environment_data_single_box.saturation_ratio,
+        )
+
+        assert gpu_data.temperature.dtype == wp.float64
+        assert gpu_data.pressure.dtype == wp.float64
+        assert gpu_data.saturation_ratio.dtype == wp.float64
+
+    def test_environment_data_multi_box_shapes_and_values(
+        self, sample_environment_data_multi_box
+    ) -> None:
+        """Test multi-box conversion preserves shapes, values, and dtypes."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_multi_box, device="cpu"
+        )
+
+        assert gpu_data.temperature.shape == (2,)
+        assert gpu_data.pressure.shape == (2,)
+        assert gpu_data.saturation_ratio.shape == (2, 3)
+
+        np.testing.assert_array_equal(
+            gpu_data.temperature.numpy(),
+            sample_environment_data_multi_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.pressure.numpy(),
+            sample_environment_data_multi_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.saturation_ratio.numpy(),
+            sample_environment_data_multi_box.saturation_ratio,
+        )
+
+        assert gpu_data.temperature.dtype == wp.float64
+        assert gpu_data.pressure.dtype == wp.float64
+        assert gpu_data.saturation_ratio.dtype == wp.float64
+
+    def test_environment_data_invalid_device_error(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test invalid device raises shared RuntimeError style."""
+        with pytest.raises(RuntimeError) as exc_info:
+            to_warp_environment_data(
+                sample_environment_data_single_box,
+                device="invalid_device_xyz",
+            )
+
+        error_msg = str(exc_info.value)
+        assert "invalid_device_xyz" in error_msg
+        assert "not found" in error_msg
+
+    def test_environment_data_copy_true_independence(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test copy=True creates independent CPU-backed Warp arrays."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box,
+            device="cpu",
+            copy=True,
+        )
+
+        original_temperature = (
+            sample_environment_data_single_box.temperature.copy()
+        )
+        original_pressure = sample_environment_data_single_box.pressure.copy()
+        original_saturation_ratio = (
+            sample_environment_data_single_box.saturation_ratio.copy()
+        )
+
+        sample_environment_data_single_box.temperature[0] = 310.0
+        sample_environment_data_single_box.pressure[0] = 95000.0
+        sample_environment_data_single_box.saturation_ratio[0, 0] = 0.5
+
+        np.testing.assert_array_equal(
+            gpu_data.temperature.numpy(), original_temperature
+        )
+        np.testing.assert_array_equal(
+            gpu_data.pressure.numpy(), original_pressure
+        )
+        np.testing.assert_array_equal(
+            gpu_data.saturation_ratio.numpy(), original_saturation_ratio
+        )
+
+    def test_environment_data_copy_false_cpu_behavior(
+        self, sample_environment_data_single_box
+    ) -> None:
+        """Test copy=False preserves supported CPU-backed transfer behavior."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box,
+            device="cpu",
+            copy=False,
+        )
+
+        np.testing.assert_array_equal(
+            gpu_data.temperature.numpy(),
+            sample_environment_data_single_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.pressure.numpy(),
+            sample_environment_data_single_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.saturation_ratio.numpy(),
+            sample_environment_data_single_box.saturation_ratio,
+        )
+
+        original_temperature = (
+            sample_environment_data_single_box.temperature.copy()
+        )
+        original_pressure = sample_environment_data_single_box.pressure.copy()
+        original_saturation_ratio = (
+            sample_environment_data_single_box.saturation_ratio.copy()
+        )
+
+        sample_environment_data_single_box.temperature[0] = 302.0
+        sample_environment_data_single_box.pressure[0] = 98000.0
+        sample_environment_data_single_box.saturation_ratio[0, 1] = 0.85
+
+        gpu_temperature = gpu_data.temperature.numpy()
+        gpu_pressure = gpu_data.pressure.numpy()
+        gpu_saturation_ratio = gpu_data.saturation_ratio.numpy()
+
+        assert np.array_equal(
+            gpu_temperature,
+            sample_environment_data_single_box.temperature,
+        ) or np.array_equal(gpu_temperature, original_temperature)
+        assert np.array_equal(
+            gpu_pressure,
+            sample_environment_data_single_box.pressure,
+        ) or np.array_equal(gpu_pressure, original_pressure)
+        assert np.array_equal(
+            gpu_saturation_ratio,
+            sample_environment_data_single_box.saturation_ratio,
+        ) or np.array_equal(
+            gpu_saturation_ratio,
+            original_saturation_ratio,
         )
 
 
