@@ -188,7 +188,6 @@ class TestWarpGasDataCreation:
         assert gas.vapor_pressure.shape == (n_boxes, n_species)
         assert gas.partitioning.shape == (n_species,)
 
-
     def test_single_box_gas_data(self) -> None:
         """Test WarpGasData with n_boxes = 1 (single box)."""
         n_boxes, n_species = 1, 2
@@ -369,7 +368,9 @@ class TestWarpEnvironmentDataCreation:
         assert environment.temperature.shape == (2,)
         assert environment.pressure.shape == (2,)
         assert environment.saturation_ratio.shape == (2, 3)
-        np.testing.assert_array_equal(environment.temperature.numpy(), temperature)
+        np.testing.assert_array_equal(
+            environment.temperature.numpy(), temperature
+        )
         np.testing.assert_array_equal(environment.pressure.numpy(), pressure)
         np.testing.assert_array_equal(
             environment.saturation_ratio.numpy(),
