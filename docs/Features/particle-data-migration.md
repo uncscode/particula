@@ -49,10 +49,13 @@ in strategies and runnables:
     `particula.gpu.WarpEnvironmentData`,
     `particula.gpu.to_warp_environment_data()`, and
     `particula.gpu.from_warp_environment_data()`. Current tests cover one-box
-    and multi-box CPU→Warp→CPU round trips, default synchronized restore,
-    manual `sync=False` restore after explicit synchronization, and schema
-    validation failures. Broad high-level workflow integration still remains
-    incremental.
+    and multi-box CPU→Warp→CPU round trips, including device-aware parity on
+    Warp `cpu` everywhere and Warp `cuda` when available. Those transfers stay
+    explicit helper calls: kernels and runnables do not perform hidden
+    CPU↔GPU environment synchronization or movement. Current tests also cover
+    default synchronized restore, manual `sync=False` restore after explicit
+    synchronization, and schema validation failures. Broad high-level workflow
+    integration still remains incremental.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered

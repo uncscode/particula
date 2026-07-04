@@ -368,6 +368,44 @@ if step % output_interval == 0:
     result = gpu_array.numpy()
 ```
 
+For environment state, the same rule applies through explicit helper APIs only.
+`particula.gpu.WarpEnvironmentData` is the Warp-side mirror of
+`particula.gas.EnvironmentData`, and callers move data with
+`to_warp_environment_data()` and `from_warp_environment_data()`. Kernels and
+runnables do not perform hidden CPU↔GPU environment transfers for you.
+
+#### EnvironmentData Round-Trip Example
+
+- `temperature`: `(n_boxes,)`
+- `pressure`: `(n_boxes,)`
+- `saturation_ratio`: `(n_boxes, n_species)`
+
+```python
+import numpy as np
+
+from particula.gas import EnvironmentData
+from particula.gpu import (
+    from_warp_environment_data,
+    to_warp_environment_data,
+)
+
+environment = EnvironmentData(
+    temperature=np.array([298.15, 305.0]),
+    pressure=np.array([101325.0, 90000.0]),
+    saturation_ratio=np.array(
+        [[0.95, 1.05, 0.75], [0.8, 0.9, 1.1]],
+    ),
+)
+
+gpu_environment = to_warp_environment_data(environment, device="cpu")
+restored = from_warp_environment_data(gpu_environment)
+```
+
+Use `device="cpu"` for a portable round-trip and `device="cuda"` only when
+Warp reports CUDA availability. Repeated hidden transfers are still a bad
+performance pattern here: keep `WarpEnvironmentData` resident on the selected
+device until you explicitly need CPU-side access again.
+
 ### Pre-allocation
 
 ```python
