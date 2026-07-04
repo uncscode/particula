@@ -19,6 +19,7 @@ from particula.gpu.conversion import (  # noqa: E402
     to_warp_gas_data,
     to_warp_particle_data,
 )
+from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
 
 
 @pytest.fixture
@@ -932,6 +933,41 @@ class TestFromWarpEnvironmentData:
         gpu_data = to_warp_environment_data(
             sample_environment_data_multi_box,
             device="cpu",
+        )
+        result = from_warp_environment_data(gpu_data)
+
+        assert result.temperature.shape == (
+            sample_environment_data_multi_box.temperature.shape
+        )
+        assert result.pressure.shape == (
+            sample_environment_data_multi_box.pressure.shape
+        )
+        assert result.saturation_ratio.shape == (
+            sample_environment_data_multi_box.saturation_ratio.shape
+        )
+        np.testing.assert_array_equal(
+            result.temperature,
+            sample_environment_data_multi_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            result.pressure,
+            sample_environment_data_multi_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            result.saturation_ratio,
+            sample_environment_data_multi_box.saturation_ratio,
+        )
+
+    @pytest.mark.parametrize("device", warp_devices(wp))
+    def test_environment_data_round_trip_available_warp_devices(
+        self,
+        sample_environment_data_multi_box,
+        device: str,
+    ) -> None:
+        """Test environment round-trip parity on available Warp devices."""
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_multi_box,
+            device=device,
         )
         result = from_warp_environment_data(gpu_data)
 
