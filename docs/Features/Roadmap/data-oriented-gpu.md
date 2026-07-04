@@ -446,7 +446,9 @@ Shared-across-box fields:
 - `E2-F4`: inherit that `GasData.name` remains CPU-only ordered metadata,
   `GasData.partitioning` stays `bool` on CPU and `int32` on GPU, and
   `WarpGasData.vapor_pressure -> (n_boxes, n_species)` remains explicit
-  GPU-helper state dropped on CPU restore.
+  GPU-helper state dropped on CPU restore; callers must preserve ordered
+  species names outside `WarpGasData` and pass them back on restore because
+  GPU→CPU restore is intentionally lossy for gas metadata and helper state.
 - `E2-F5`: inherit the single-box leading-dimension contract for per-box arrays
   such as `ParticleData.masses -> (1, n_particles, n_species)`,
   `ParticleData.concentration -> (1, n_particles)`, and
@@ -460,13 +462,15 @@ Shared-across-box fields:
   lossy helper state, and the requirement that integration guidance stay
   deterministic and fixed-shape for graph-capture-friendly execution.
 - `E2-F8`: inherit that container schemas are already multi-box capable through
-  leading `n_boxes` dimensions, while current CPU condensation remains
-  single-box and current CPU coagulation paths are still documented as single-box
-  or explicitly transitional execution boundaries.
+  leading `n_boxes` dimensions, while current CPU condensation runtime support
+  remains single-box and current CPU coagulation paths are still documented as
+  single-box or explicitly transitional execution boundaries; do not infer
+  broader multi-box CPU execution support from storage shape alone.
 - `E2-F9`: inherit this roadmap page as the canonical source of truth for field
   ownership, shape tables, CPU↔GPU transfer caveats, validation evidence, and
-  downstream handoff references; link to these anchors instead of duplicating
-  the contract prose elsewhere.
+  downstream handoff references; downstream docs should link to the exact
+  ownership, shape, and handoff anchors here instead of restoring ambiguous
+  execution-boundary wording or duplicating contract prose elsewhere.
 
 - Decide the particle mass storage representation given the wide dynamic range
   (see [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)).
