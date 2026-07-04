@@ -3944,6 +3944,8 @@
       
         
       
+        
+      
     
     
     
@@ -4032,6 +4034,34 @@
     
   
     particula.gas.atmosphere_builders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gas/environment_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gas.environment_data
   
 
     
@@ -4427,10 +4457,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18_16" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_18_15" id="__nav_2_3_18_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_18_16" id="__nav_2_3_18_16_label" tabindex="0">
             
   
   
@@ -4448,8 +4478,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_18_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_18_15">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_18_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_18_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14484,10 +14514,26 @@ for the exact inherited field, shape, ownership, and CPU↔GPU transfer rules.</
 in strategies and runnables:</p>
 <ul>
 <li><code>ParticleData</code> stores per-particle arrays with an explicit batch dimension.</li>
-<li><code>GasData</code> stores gas species arrays with an explicit box dimension.</li>
+<li><code>GasData</code> stores gas species arrays with an explicit box dimension; it does
+  not own per-box thermodynamic state.</li>
+<li><code>EnvironmentData</code> now provides the shipped CPU-side owner of per-box
+  thermodynamic state with <code>temperature -&gt; (n_boxes,)</code>,
+  <code>pressure -&gt; (n_boxes,)</code>, and <code>saturation_ratio -&gt; (n_boxes, n_species)</code>.</li>
+<li><code>ParticleData.volume</code> remains the authoritative per-box simulation-volume
+  owner; this migration does not move simulation volume into
+  <code>EnvironmentData</code>.</li>
 <li><code>ParticleRepresentation</code> and <code>GasSpecies</code> remain as facades so existing
   workflows keep working while you migrate.</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>EnvironmentData</code> is the shipped CPU container for per-box thermodynamic
+state, not a separate gas facade. It is available from
+<code>particula.gas.environment_data</code> and is exported from <code>particula.gas</code> for
+package-level imports. It requires at least one box at construction time,
+but it does not yet participate in CPU↔GPU conversion helpers or broad
+high-level workflow integration.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>GPU→CPU gas restore is intentionally lossy unless you preserve ordered
@@ -14775,6 +14821,11 @@ methods provided by each facade:</p>
 <h2 id="using-particledatagasdata-in-dynamics">Using ParticleData/GasData in dynamics<a class="headerlink" href="#using-particledatagasdata-in-dynamics" title="Permanent link">&para;</a></h2>
 <p>Condensation and coagulation strategies accept both legacy facades and the new
 data containers. The return type matches the input type.</p>
+<p>Today, the compatibility boundary is still scalar at many process entry points:
+existing dynamics APIs may continue to accept scalar <code>temperature</code> and
+<code>pressure</code>. Only migrated process code should read <code>EnvironmentData</code> directly,
+and environment fields should be treated as read-only unless the physical model
+owns the update and refreshes derived helpers such as <code>saturation_ratio</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
@@ -14805,6 +14856,12 @@ data containers. The return type matches the input type.</p>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
+<p>Use <code>EnvironmentData</code> to document and carry per-box thermodynamic state on the
+CPU side. <code>EnvironmentData</code> owns <code>temperature</code>, <code>pressure</code>, and
+<code>saturation_ratio</code>; <code>GasData</code> does not. Keep current scalar <code>temperature</code> and
+<code>pressure</code> arguments where the process API has not yet been migrated; migrated
+process code may read <code>EnvironmentData</code> directly, but only the physical model
+that owns the update should mutate it.</p>
 <h2 id="conversion-helpers">Conversion helpers<a class="headerlink" href="#conversion-helpers" title="Permanent link">&para;</a></h2>
 <p>Use the conversion helpers when you need to bridge old and new APIs:</p>
 <ul>

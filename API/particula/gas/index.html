@@ -1418,6 +1418,56 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;EnvironmentData
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" EnvironmentData">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData.n_boxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;n_boxes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData.__post_init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__post_init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData.copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;copy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.gas.GasData" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5711,6 +5761,8 @@
       
         
       
+        
+      
     
     
     
@@ -5799,6 +5851,34 @@
     
   
     particula.gas.atmosphere_builders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="environment_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gas.environment_data
   
 
     
@@ -6194,10 +6274,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_18_16" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_18_15" id="__nav_2_3_18_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_18_16" id="__nav_2_3_18_16_label" tabindex="0">
             
   
   
@@ -6215,8 +6295,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_18_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_18_15">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_18_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_18_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16121,6 +16201,56 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;EnvironmentData
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" EnvironmentData">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData.n_boxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;n_boxes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData.__post_init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__post_init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#particula.gas.EnvironmentData.copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;copy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.gas.GasData" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17399,10 +17529,10 @@
 
     <div class="doc doc-contents first">
 
-        <p>Gas phase module for particula.</p>
-<p>This module provides classes and functions for gas phase modeling,
-including vapor pressure and latent heat strategies, gas species, and
-atmosphere builders.</p>
+        <p>Expose the public gas-phase API for particula.</p>
+<p>This module provides classes and functions for gas-phase modeling,
+including thermodynamic environment containers, gas species,
+atmosphere builders, and vapor-pressure and latent-heat strategies.</p>
 
 
 <details class="example" open>
@@ -17410,7 +17540,12 @@ atmosphere builders.</p>
   <blockquote>
 <blockquote>
 <blockquote>
-<p>from particula.gas import GasDataBuilder, GasData
+<p>from particula.gas import EnvironmentData, GasDataBuilder
+environment = EnvironmentData(
+...     temperature=[298.15],
+...     pressure=[101325.0],
+...     saturation_ratio=[[0.5]],
+... )
 gas = (
 ...     GasDataBuilder()
 ...     .set_names(["Water"])
@@ -17418,7 +17553,9 @@ gas = (
 ...     .set_concentration([1e-6], units="kg/m^3")
 ...     .set_partitioning([True])
 ...     .build()
-... )</p>
+... )
+environment.n_boxes
+1</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -20586,6 +20723,363 @@ model.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># repeat the constant value for each element temperature</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vapor_pressure</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="particula.gas.EnvironmentData" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnvironmentData</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#particula.gas.EnvironmentData" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">EnvironmentData</span><span class="p">(</span><span class="n">temperature</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">saturation_ratio</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Mutable thermodynamic environment data for one or more boxes.</p>
+<p>This class stores box-level temperature and pressure together with a
+per-box, per-species saturation-ratio array. The temperature array is
+the source of truth for the box axis, so derived properties such as
+<code>n_boxes</code> follow <code>temperature.shape[0]</code>.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.EnvironmentData.temperature">temperature</span></code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Box temperatures in kelvin. Shape: <code>(n_boxes,)</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.EnvironmentData.pressure">pressure</span></code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Box pressures in pascals. Shape: <code>(n_boxes,)</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gas.EnvironmentData.saturation_ratio">saturation_ratio</span></code></b>
+              (<code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>)
+          –
+          <div class="doc-md-description">
+            <p>Per-box, per-species saturation ratios.
+Shape: <code>(n_boxes, n_species)</code>.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If any field has invalid dimensionality, shape,
+finiteness, or physical bounds.</p>
+          </div>
+        </li>
+    </ul>
+
+        <p>Construct and normalize per-box environment data.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Box temperatures in kelvin with shape <code>(n_boxes,)</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>pressure</code></b>
+              (<code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Box pressures in pascals with shape <code>(n_boxes,)</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>saturation_ratio</code></b>
+              (<code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Per-box, per-species saturation ratios with
+shape <code>(n_boxes, n_species)</code>.</p>
+          </div>
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>particula/gas/environment_data.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+    <span class="n">saturation_ratio</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct and normalize per-box environment data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        temperature: Box temperatures in kelvin with shape ``(n_boxes,)``.</span>
+<span class="sd">        pressure: Box pressures in pascals with shape ``(n_boxes,)``.</span>
+<span class="sd">        saturation_ratio: Per-box, per-species saturation ratios with</span>
+<span class="sd">            shape ``(n_boxes, n_species)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coerce_float64_array</span><span class="p">(</span>
+        <span class="n">temperature</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pressure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coerce_float64_array</span><span class="p">(</span>
+        <span class="n">pressure</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;pressure&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">saturation_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coerce_float64_array</span><span class="p">(</span>
+        <span class="n">saturation_ratio</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;saturation_ratio&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="particula.gas.EnvironmentData.n_boxes" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">n_boxes</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#particula.gas.EnvironmentData.n_boxes" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the number of simulation boxes.</p>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="int">int</span></code>
+          –
+          <div class="doc-md-description">
+            <p>Number of boxes represented by <code>temperature.shape[0]</code>.</p>
+          </div>
+        </li>
+    </ul>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.gas.EnvironmentData.__post_init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__post_init__</span>
+
+
+<a href="#particula.gas.EnvironmentData.__post_init__" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__post_init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate the normalized field contract.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If any field fails dimensionality, shape, finiteness,
+or physical-bound validation.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/gas/environment_data.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the normalized field contract.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If any field fails dimensionality, shape, finiteness,</span>
+<span class="sd">            or physical-bound validation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_dimensionality</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_shapes</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_values</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_physical_bounds</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="particula.gas.EnvironmentData.copy" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">copy</span>
+
+
+<a href="#particula.gas.EnvironmentData.copy" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">copy</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">EnvironmentData</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Create an independent copy of the environment state.</p>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>New</code></b> (              <code><a class="autorefs autorefs-internal" title="            EnvironmentData
+
+
+  
+      dataclass
+   (particula.gas.environment_data.EnvironmentData)" href="environment_data/#particula.gas.environment_data.EnvironmentData">EnvironmentData</a></code>
+)          –
+          <div class="doc-md-description">
+            <p>class:<code>EnvironmentData</code> instance with copied temperature,</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><a class="autorefs autorefs-internal" title="            EnvironmentData
+
+
+  
+      dataclass
+   (particula.gas.environment_data.EnvironmentData)" href="environment_data/#particula.gas.environment_data.EnvironmentData">EnvironmentData</a></code>
+          –
+          <div class="doc-md-description">
+            <p>pressure, and saturation-ratio arrays.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/gas/environment_data.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EnvironmentData&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an independent copy of the environment state.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        New :class:`EnvironmentData` instance with copied temperature,</span>
+<span class="sd">        pressure, and saturation-ratio arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">EnvironmentData</span><span class="p">(</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">),</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pressure</span><span class="p">),</span>
+        <span class="n">saturation_ratio</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saturation_ratio</span><span class="p">),</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
