@@ -31,11 +31,33 @@ not lowered.
     for the direct-module path.
 
 - **P3: Documentation**
-  - Shipped validation is documentation-only: re-read the changed feature-guide
-    and roadmap sections, confirm they agree on ownership and mutation
-    boundaries, and inspect changed references manually.
-  - Preferred tooling remains `mkdocs build --strict` when available, but no
-    production-code tests are added in this phase.
+  - Required validation path: run `mkdocs build --strict` when command
+    execution is available to the builder.
+  - Manual re-read and reference inspection are fallback-only validation when
+    the docs build cannot be run in the available execution environment.
+  - Any fallback note must explicitly record why `mkdocs build --strict` was
+    unavailable for the fix pass.
+  - No new production-code tests are required for this phase unless claim
+    verification reveals shipped behavior without existing supporting coverage.
+
+## Behavior-Claim Verification Checklist
+
+- Package export claim:
+  confirm `particula/gas/__init__.py` imports and exports `EnvironmentData`
+  for `from particula.gas import EnvironmentData`.
+- Ownership claim:
+  confirm `particula/gas/environment_data.py` defines `EnvironmentData` as the
+  CPU owner of per-box `temperature`, `pressure`, and `saturation_ratio`.
+- Copy-semantics claim:
+  confirm `particula/gas/environment_data.py` implements `copy()` with
+  independent NumPy arrays for all three fields.
+- Regression-coverage claim:
+  confirm `particula/gas/tests/environment_data_test.py` covers the package
+  export path plus copy-value, copy-memory-independence, and copy-mutation
+  isolation behavior.
+- Compatibility-boundary claim:
+  confirm changed docs preserve the statement that existing process APIs may
+  still accept scalar `temperature` and `pressure` until later migrations.
 
 ## Commands
 
@@ -49,4 +71,5 @@ not lowered.
 The new container already has direct unit coverage for `__post_init__`, the
 validation helpers, `n_boxes`, exports, and `copy()` without weakening the
 existing constructor contract. The shipped documentation phase does not add new
-runtime coverage and should not reduce package coverage.
+runtime coverage by default, should not reduce package coverage, and must
+verify behavior claims against the shipped code/tests above.
