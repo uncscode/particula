@@ -65,6 +65,7 @@ as design notes, example outputs, prototype workflows, and milestone-specific
 pages.
 
 - [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md)
+- [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
 
 ## Contribution Opportunities
 
