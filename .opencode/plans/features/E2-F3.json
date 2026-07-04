@@ -2,7 +2,7 @@
   "id": "E2-F3",
   "type": "feature",
   "title": "Implement WarpEnvironmentData and CPU/GPU conversion helpers",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -71,11 +71,11 @@
     {
       "id": "E2-F3-P4",
       "title": "CUDA-parametrized transfer coverage and documentation updates",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -83,5 +83,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
