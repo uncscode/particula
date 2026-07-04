@@ -16,6 +16,18 @@
   `docs/Features/particle-data-migration.md`.
 - Added a broader discoverability link from `docs/index.md` to the roadmap and
   migration guidance.
+- Shipped Issue #1185 as a docs-first shape-conventions update in
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Added a canonical `Canonical shape conventions for container workflows`
+  subsection there with workflow rules, concrete shape examples, explicit field
+  tables for `ParticleData`, `GasData`, future `EnvironmentData`,
+  `WarpParticleData`, and `WarpGasData`, and a source-backed CPU execution
+  boundary caution for condensation and coagulation.
+- Updated `docs/Features/particle-data-migration.md` to link directly to the
+  canonical shape-conventions anchor.
+- Updated `docs/index.md` with one minimal discoverability reference to the
+  canonical shape conventions while keeping the roadmap subsection as the
+  single source of truth.
 
 ## Required Content
 
@@ -29,6 +41,8 @@
 - Explicit notes for the current lossy gas round-trip behavior.
 - An authoritative ownership-decision section covering field owners, shape
   expectations, mutability, and CPU↔GPU round-trip constraints.
+- A canonical shape-conventions subsection under that roadmap decision record,
+  rather than duplicated shape tables across multiple docs.
 - Cross-links from roadmap, migration, and top-level docs entry points so
   implementers can find the ownership record without searching plan prose.
 

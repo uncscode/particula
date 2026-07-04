@@ -16,8 +16,10 @@ artifact. Do not create a separate testing-only phase.
   plus future environment fields required by E2-F2/E2-F3. Add lightweight tests
   only if examples or snippets are included.
 - **P3 Shape Conventions:** Verify documented shapes against constructor tests,
-  builder tests, Warp type tests, and conversion tests. Ensure single-box shapes
-  keep a leading dimension.
+  builder tests, Warp type tests, conversion tests, and the current
+  condensation/coagulation boundary evidence. Ensure single-box shapes keep a
+  leading dimension, the roadmap subsection remains the single source of truth,
+  and migration/discoverability links point to the canonical shape anchor.
 - **P4 Handoff Documentation:** Run documentation/link validation and verify all
   sibling tracks are named with explicit handoff decisions.
 
@@ -26,18 +28,21 @@ artifact. Do not create a separate testing-only phase.
 ```bash
 pytest particula/particles/tests/particle_data_test.py \
   particula/gas/tests/gas_data_test.py \
+  particula/gas/tests/gas_data_builder_test.py \
   particula/gpu/tests/warp_types_test.py \
-  particula/gpu/tests/conversion_test.py
+  particula/gpu/tests/conversion_test.py \
+  particula/dynamics/condensation/tests/condensation_strategies_test.py \
+  particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py
 ```
 
 If docs tooling is available for changed files, also run the repository's
 markdown/link validation workflow or the closest available documentation check.
 
-For issue #1184 fix follow-up work, the fallback docs validation path is to
-verify that the roadmap ownership heading still exists at
-`data-oriented-gpu.md#authoritative-field-ownership-decisions`, and that both
-`docs/Features/Roadmap/index.md` and
-`docs/Features/particle-data-migration.md` still link to that anchor.
+For issue #1185 docs-first follow-up work, the fallback docs validation path is
+to verify that `data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows`
+exists, that `docs/Features/particle-data-migration.md` links directly to that
+anchor, and that `docs/index.md` still points readers to the roadmap subsection
+without creating a second source of truth.
 
 ## Acceptance Evidence
 
@@ -68,3 +73,9 @@ verify that the roadmap ownership heading still exists at
   the ownership anchor and that `docs/Features/Roadmap/index.md` plus
   `docs/Features/particle-data-migration.md` still link to
   `#authoritative-field-ownership-decisions`.
+- Issue #1185 shipped as a documentation-only canonical-shape update in
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- The shipped P3 evidence is the roadmap canonical shape subsection, its direct
+  migration-guide anchor link, the minimal `docs/index.md` discoverability
+  wording, and existing test/source evidence for shapes plus current single-box
+  condensation/coagulation execution boundaries.
