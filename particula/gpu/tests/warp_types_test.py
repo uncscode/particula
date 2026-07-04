@@ -464,6 +464,29 @@ class TestWarpDataFieldAccess:
 class TestWarpAvailability:
     """Tests for WARP_AVAILABLE sentinel in module."""
 
+    def test_check_warp_available_returns_true_when_warp_imports(self) -> None:
+        """Verify the package helper reports True when Warp imports."""
+        from particula import gpu as gpu_package
+
+        assert gpu_package._check_warp_available() is True
+
+    def test_check_warp_available_returns_false_on_import_error(self) -> None:
+        """Verify the package helper reports False on Warp import failure."""
+        import builtins
+        from unittest.mock import patch
+
+        from particula import gpu as gpu_package
+
+        original_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "warp":
+                raise ImportError("No module named 'warp'")
+            return original_import(name, *args, **kwargs)
+
+        with patch.object(builtins, "__import__", side_effect=mock_import):
+            assert gpu_package._check_warp_available() is False
+
     def test_warp_available_sentinel(self) -> None:
         """Verify WARP_AVAILABLE is True when warp is imported."""
         from particula.gpu import WARP_AVAILABLE
@@ -471,9 +494,18 @@ class TestWarpAvailability:
         assert WARP_AVAILABLE is True
 
     def test_module_exports(self) -> None:
-        """Verify WarpParticleData and WarpGasData are exported."""
-        from particula.gpu import WarpGasData, WarpParticleData
+        """Verify environment, gas, and particle exports are available."""
+        from particula.gpu import (
+            WarpEnvironmentData,
+            WarpGasData,
+            WarpParticleData,
+            from_warp_environment_data,
+            to_warp_environment_data,
+        )
 
         # Verify classes are importable
         assert WarpParticleData is not None
         assert WarpGasData is not None
+        assert WarpEnvironmentData is not None
+        assert to_warp_environment_data is not None
+        assert from_warp_environment_data is not None

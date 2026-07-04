@@ -7,8 +7,8 @@ multi-box workflows manage shared thermodynamic conditions independently.
 
 `EnvironmentData` is a constructor-validated CPU-side container in
 ``particula.gas.environment_data`` and is also exported from
-``particula.gas`` for package-level imports. It does not yet have CPU↔GPU
-conversion helpers.
+``particula.gas`` for package-level imports. Warp transfer helpers live in
+``particula.gpu.conversion`` and enable CPU↔GPU environment round trips.
 """
 
 from dataclasses import dataclass

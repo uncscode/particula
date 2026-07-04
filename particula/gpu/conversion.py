@@ -432,6 +432,47 @@ def from_warp_gas_data(
     )
 
 
+def from_warp_environment_data(
+    gpu_data: "WarpEnvironmentData",
+    sync: bool = True,
+) -> "EnvironmentData":
+    """Transfer WarpEnvironmentData back to CPU.
+
+    Use this to transfer GPU-resident environment data back to CPU after
+    GPU simulation steps. The returned EnvironmentData can be used for
+    checkpointing, analysis, or continuing with CPU-based operations.
+
+    Args:
+        gpu_data: GPU-resident WarpEnvironmentData container.
+        sync: If True (default), synchronize device before transfer
+            to ensure all GPU operations have completed. Set False
+            only if you've already synchronized manually (e.g., for
+            batched transfers).
+
+    Returns:
+        CPU-side EnvironmentData with NumPy arrays.
+
+    Example:
+        >>> result = from_warp_environment_data(gpu_environment)
+        >>>
+        >>> import warp as wp
+        >>> wp.synchronize()
+        >>> result = from_warp_environment_data(gpu_environment, sync=False)
+    """
+    wp = _ensure_warp_available()
+
+    if sync:
+        wp.synchronize()
+
+    from particula.gas.environment_data import EnvironmentData
+
+    return EnvironmentData(
+        temperature=gpu_data.temperature.numpy(),
+        pressure=gpu_data.pressure.numpy(),
+        saturation_ratio=gpu_data.saturation_ratio.numpy(),
+    )
+
+
 @contextmanager
 def gpu_context(
     data: "ParticleData",
