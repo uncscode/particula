@@ -159,3 +159,8 @@ print(result)
   runnable pipelines.
 - [Wall loss strategy system](Features/wall_loss_strategy_system.md) — chamber
   wall loss strategies with builders, factory, and runnable integration.
+- [ParticleData and GasData migration guide](Features/particle-data-migration.md)
+  — data-container migration workflow plus links to authoritative field
+  ownership decisions.
+- [Data-oriented design and GPU roadmap](Features/Roadmap/data-oriented-gpu.md)
+  — current schema inventory and authoritative CPU/GPU field ownership policy.

@@ -47,3 +47,8 @@ markdown/link validation workflow or the closest available documentation check.
   points each schema claim back to source or existing tests in
   `particula/particles/tests/`, `particula/gas/tests/`, and
   `particula/gpu/tests/`.
+- Issue #1184 shipped as a documentation-only ownership-decision update with
+  links from `docs/Features/Roadmap/index.md` and
+  `docs/Features/particle-data-migration.md`.
+- The current shipped evidence for P2 is the published roadmap section and its
+  discoverability links rather than new automated tests.
