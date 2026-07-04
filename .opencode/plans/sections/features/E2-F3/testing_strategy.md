@@ -12,37 +12,31 @@ There is no standalone testing-only implementation phase.
 - `temperature` and `pressure` keep `float64` dtype with `(n_boxes,)` shape,
   while `saturation_ratio` keeps `float64` dtype with `(n_boxes, n_species)`
   shape.
-- One-box and multi-box environment containers transfer correctly.
-- `to_warp_environment_data(..., device="cpu")` preserves values.
-- `from_warp_environment_data(..., sync=True)` reconstructs the CPU container.
-- Full CPU round trip preserves all environment fields.
-- `sync=False` path is covered where safe.
-- Invalid device names raise the same style of `RuntimeError` as existing
-  conversion helpers.
-- Optional CUDA-parametrized tests run when `warp_devices(wp)` includes
-  `"cuda"` and skip otherwise.
+- One-box and multi-box environment containers preserve their leading box axis.
+- Field access assertions prove the struct exposes `temperature`, `pressure`,
+  and `saturation_ratio` directly.
+- Deterministic NumPy-backed construction plus `.numpy()` checks preserve exact
+  values for all three fields.
 
-Use parametrized assertions in `particula/gpu/tests/warp_types_test.py` and
-`particula/gpu/tests/conversion_test.py` so reviewers can see one-box and
-multi-box cases for all three fields without duplicating transfer logic.
+The shipped coverage lives entirely in
+`particula/gpu/tests/warp_types_test.py`; conversion-helper and CUDA coverage
+remain future-phase work because no transfer API was added in issue `#1192`.
 
 ## Suggested test locations
 
 - `particula/gpu/tests/warp_types_test.py`
-- `particula/gpu/tests/conversion_test.py`
-- Reuse `particula/gpu/tests/cuda_availability.py`.
 
 ## Commands
 
 ```bash
-pytest particula/gpu/tests/warp_types_test.py \
-  particula/gpu/tests/conversion_test.py
-ruff check particula/gpu particula/gas --fix
-ruff format particula/gpu particula/gas
-ruff check particula/gpu particula/gas
+pytest particula/gpu/tests/warp_types_test.py -v -Werror
+ruff check particula/gpu --fix
+ruff format particula/gpu
+ruff check particula/gpu
 ```
 
 ## Acceptance threshold
 
-All Warp CPU tests pass. CUDA-specific assertions are active only on machines
-where Warp reports CUDA availability.
+All `WarpEnvironmentData` schema tests in `warp_types_test.py` pass on the Warp
+CPU backend with exact shape, dtype, field-access, and deterministic value
+assertions.

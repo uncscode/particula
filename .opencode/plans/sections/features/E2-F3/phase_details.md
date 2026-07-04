@@ -2,7 +2,7 @@
 
 ## E2-F3-P1: WarpEnvironmentData struct and CPU schema alignment with unit tests
 
-- Issue: TBD | Size: S | Status: Not Started
+- Issue: #1192 | Size: S | Status: Shipped
 - Goal: Mirror the `E2-F2` CPU environment schema in Warp with a small,
   reviewable struct change and tests that prove `temperature` and `pressure`
   stay `(n_boxes,)` while `saturation_ratio` stays `(n_boxes, n_species)`.
@@ -11,12 +11,16 @@
 - Implementation:
   - Confirm the `E2-F2` `EnvironmentData` import path and exact field names.
   - Add `WarpEnvironmentData` to `particula/gpu/warp_types.py` with explicit
-    `temperature`, `pressure`, and `saturation_ratio` `wp.array(dtype=wp.float64)`
-    attributes matching the CPU field list and shapes.
+    `temperature` and `pressure` `wp.array(dtype=wp.float64)` fields plus a
+    `saturation_ratio` `wp.array2d(dtype=wp.float64)` field matching the CPU
+    field list and shapes.
+  - Expand the module docstring and add a dedicated `WarpEnvironmentData`
+    class docstring describing the environment schema.
   - Keep the struct edit focused to field declarations/docstrings rather than a
     broad refactor of existing Warp types.
-- Tests: Add one-box and multi-box struct creation coverage plus dtype/shape
-  assertions in `particula/gpu/tests/warp_types_test.py`.
+- Tests: Added one-box and multi-box struct creation coverage plus dtype/shape
+  assertions, field-access checks, and deterministic NumPy-backed round-trip
+  value assertions in `particula/gpu/tests/warp_types_test.py`.
 
 ## E2-F3-P2: CPU-to-Warp environment conversion helper with unit tests
 
@@ -35,6 +39,9 @@
 - Tests: Add CPU-device tests for values, shapes, dtypes, invalid devices, and
   `copy=True` versus `copy=False` behavior where Warp supports host aliasing.
 
+Status note: Not started. Issue `#1192` intentionally stopped short of helper
+implementation so the struct schema could land first.
+
 ## E2-F3-P3: Warp-to-CPU environment conversion and round-trip coverage
 
 - Issue: TBD | Size: S | Status: Not Started
@@ -50,6 +57,9 @@
     `from_warp_environment_data` from `particula/gpu/__init__.py`.
 - Tests: Add `sync=True`, `sync=False`, CPU-backend round-trip, and multi-box
   equality coverage for every environment field.
+
+Status note: Not started. No package exports or CPU reconstruction helpers have
+been added yet.
 
 ## E2-F3-P4: CUDA-parametrized transfer coverage and documentation updates
 
@@ -70,3 +80,6 @@
   so the `S`-sized phase remains reviewable.
   The structured phase metadata is authoritative: this phase is `S` because it
   combines optional CUDA transfer coverage with user-facing documentation updates.
+
+Status note: Not started. No CUDA transfer coverage or external docs were
+required for the shipped P1 implementation.
