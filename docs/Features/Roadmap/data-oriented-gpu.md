@@ -86,11 +86,12 @@ and `GasSpecies` remain available for compatibility.
 
 Known data-model gaps:
 
-- There is no container for per-box thermodynamic state. Temperature,
-  pressure, and humidity are passed as scalars into kernels and have no home
-  in `ParticleData` or `GasData`, which blocks parcel/expansion workflows and
-  latent-heat temperature feedback (see
-  [EnvironmentData Container](#environmentdata-container)).
+- `EnvironmentData` now provides a CPU-side home for per-box thermodynamic
+  state in `particula.gas.environment_data`, with `temperature -> (n_boxes,)`,
+  `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`.
+  It is a validated baseline container only: there is no `particula.gas`
+  package-level export, no CPU↔GPU conversion helper, and no broad runtime
+  integration yet (see [EnvironmentData Container](#environmentdata-container)).
 - `ParticleData.density` is shaped `(n_species,)` and shared across boxes, so
   boxes at different temperatures cannot carry per-box densities.
 - Dilution exists only as free functions (`get_volume_dilution_coefficient`,
@@ -496,13 +497,19 @@ Shared-across-box fields:
 ### EnvironmentData Container
 
 Parcel/expansion workflows and latent-heat condensation require per-box
-thermodynamic state that has no home in the current containers. The direction
-is a third container rather than extending `GasData`.
+thermodynamic state. That CPU-side baseline now exists as
+`particula.gas.environment_data.EnvironmentData`, which validates per-box
+`temperature`, `pressure`, and per-box/per-species `saturation_ratio`.
+Current shipped scope is intentionally narrow: it is a constructor-validated
+CPU container, requires at least one box, is not exported from
+`particula.gas`, and does not yet have CPU↔GPU conversion helpers or direct
+process integration.
 
-- Add an `EnvironmentData` container with per-box temperature and pressure
-  shaped `(n_boxes,)`, plus per-box, per-species `saturation_ratio` shaped
-  `(n_boxes, n_species)`, mirrored by a `WarpEnvironmentData` struct on the
-  GPU.
+- Preserve the current `EnvironmentData` shape contract: `temperature` and
+  `pressure` are `(n_boxes,)`, and `saturation_ratio` is
+  `(n_boxes, n_species)`.
+- Add a future `WarpEnvironmentData` mirror and CPU↔GPU conversion helpers when
+  GPU-side thermodynamic state work begins.
 - Latent-heat condensation must read and update per-box temperature; rising
   parcels, expansion, and combustion boxes prescribe temperature and pressure
   per box, while any simulation-volume evolution continues through
