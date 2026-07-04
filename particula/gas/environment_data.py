@@ -14,10 +14,10 @@ conversion helpers.
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 
-@dataclass(eq=False)
+@dataclass(eq=False, init=False)
 class EnvironmentData:
     """Mutable thermodynamic environment data for one or more boxes.
 
@@ -41,27 +41,41 @@ class EnvironmentData:
     pressure: NDArray[np.float64]
     saturation_ratio: NDArray[np.float64]
 
-    def __post_init__(self) -> None:
-        """Coerce constructor inputs and validate the field contract.
+    def __init__(
+        self,
+        temperature: ArrayLike,
+        pressure: ArrayLike,
+        saturation_ratio: ArrayLike,
+    ) -> None:
+        """Construct and normalize per-box environment data.
 
-        Raises:
-            ValueError: If any field cannot be coerced to ``np.float64`` or
-                fails dimensionality, shape, finiteness, or physical-bound
-                validation.
+        Args:
+            temperature: Box temperatures in kelvin with shape ``(n_boxes,)``.
+            pressure: Box pressures in pascals with shape ``(n_boxes,)``.
+            saturation_ratio: Per-box, per-species saturation ratios with
+                shape ``(n_boxes, n_species)``.
         """
         self.temperature = self._coerce_float64_array(
-            self.temperature,
+            temperature,
             field_name="temperature",
         )
         self.pressure = self._coerce_float64_array(
-            self.pressure,
+            pressure,
             field_name="pressure",
         )
         self.saturation_ratio = self._coerce_float64_array(
-            self.saturation_ratio,
+            saturation_ratio,
             field_name="saturation_ratio",
         )
+        self.__post_init__()
 
+    def __post_init__(self) -> None:
+        """Validate the normalized field contract.
+
+        Raises:
+            ValueError: If any field fails dimensionality, shape, finiteness,
+                or physical-bound validation.
+        """
         self._validate_dimensionality()
         self._validate_shapes()
         self._validate_finite_values()
@@ -108,7 +122,7 @@ class EnvironmentData:
             ValueError: If ``values`` cannot be converted to a float64 array.
         """
         try:
-            return np.asarray(values, dtype=np.float64)
+            return np.array(values, dtype=np.float64, copy=True)
         except (TypeError, ValueError, OverflowError) as exc:
             raise ValueError(
                 f"{field_name} must be array-like and coercible to float64"

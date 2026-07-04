@@ -1018,8 +1018,8 @@ epics above.
 
 ### Milestone 2: Foundations and Backend Selection (Epics A, C)
 
-- Add the `EnvironmentData`/`WarpEnvironmentData` containers with round-trip
-  conversion and tests.
+- `EnvironmentData` is already shipped on CPU; add `WarpEnvironmentData`
+  plus CPU↔GPU round-trip conversion coverage and tests.
 - Add an API design for selecting CPU or GPU execution from user-facing
   simulation code.
 - Implement backend selection for at least one condensation workflow and one
@@ -1028,7 +1028,8 @@ epics above.
 - Adopt the device-aware pytest policy for GPU parity tests.
 - **Exit bar:** At least one condensation and one coagulation workflow run on GPU
   through the selection API, match CPU within recorded tolerance, and are used in
-  a documented example; `EnvironmentData` round-trips are tested.
+  a documented example; `WarpEnvironmentData` and CPU↔GPU `EnvironmentData`
+  round-trips are tested.
 
 ### Milestone 2.5: Missing GPU Physics (Epic B)
 
