@@ -11,14 +11,13 @@
 4. Defer a builder until scalar-to-box broadcasting is needed by process
    migration tracks. Issue #1188 confirmed the first CPU container can stay a
    minimal explicit data API.
-5. Issue #1188 intentionally did not export `EnvironmentData` from
-   `particula.gas`; direct-module import is the shipped contract for now.
-   Revisit package-level and root-level exports in P2 once `n_boxes`/`copy()`
-   semantics land.
+5. Issue #1189 shipped the package-level `particula.gas.EnvironmentData`
+   export together with `n_boxes` and `copy()` semantics. Root-level package
+   export remains deferred to downstream API-surface decisions.
 
 ## Resolution Path
 
 - Implement the smallest documented API that satisfies E2-F2 and leave builder
   and root-export decisions to downstream migration tracks.
-- Preserve the current validation order and error-message specificity when P2 or
-  later phases add convenience API surface.
+- Preserve the current validation order and error-message specificity as later
+  phases document or migrate the shipped convenience API surface.

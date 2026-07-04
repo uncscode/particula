@@ -1,11 +1,16 @@
-"""Gas phase module for particula.
+"""Expose the public gas-phase API for particula.
 
-This module provides classes and functions for gas phase modeling,
-including vapor pressure and latent heat strategies, gas species, and
-atmosphere builders.
+This module provides classes and functions for gas-phase modeling,
+including thermodynamic environment containers, gas species,
+atmosphere builders, and vapor-pressure and latent-heat strategies.
 
 Example:
-    >>> from particula.gas import GasDataBuilder, GasData
+    >>> from particula.gas import EnvironmentData, GasDataBuilder
+    >>> environment = EnvironmentData(
+    ...     temperature=[298.15],
+    ...     pressure=[101325.0],
+    ...     saturation_ratio=[[0.5]],
+    ... )
     >>> gas = (
     ...     GasDataBuilder()
     ...     .set_names(["Water"])
@@ -14,6 +19,8 @@ Example:
     ...     .set_partitioning([True])
     ...     .build()
     ... )
+    >>> environment.n_boxes
+    1
 """
 
 # pylint: disable=unused-import

@@ -1,13 +1,14 @@
 """Provide per-box thermodynamic state for gas-phase simulations.
 
 This module defines :class:`EnvironmentData`, a mutable container for the
-temperature, pressure, and saturation-ratio fields associated with one or more
-simulation boxes. Separating this state from gas-species data lets multi-box
-workflows manage shared thermodynamic conditions independently.
+temperature, pressure, and saturation-ratio fields associated with one or
+more simulation boxes. Separating this state from gas-species data lets
+multi-box workflows manage shared thermodynamic conditions independently.
 
 `EnvironmentData` is a constructor-validated CPU-side container in
-``particula.gas.environment_data`` and is exported from ``particula.gas``.
-It does not yet have CPU↔GPU conversion helpers.
+``particula.gas.environment_data`` and is also exported from
+``particula.gas`` for package-level imports. It does not yet have CPU↔GPU
+conversion helpers.
 """
 
 from dataclasses import dataclass
@@ -19,6 +20,11 @@ from numpy.typing import NDArray
 @dataclass
 class EnvironmentData:
     """Mutable thermodynamic environment data for one or more boxes.
+
+    This class stores box-level temperature and pressure together with a
+    per-box, per-species saturation-ratio array. The temperature array is
+    the source of truth for the box axis, so derived properties such as
+    ``n_boxes`` follow ``temperature.shape[0]``.
 
     Attributes:
         temperature: Box temperatures in kelvin. Shape: ``(n_boxes,)``.
@@ -63,11 +69,20 @@ class EnvironmentData:
 
     @property
     def n_boxes(self) -> int:
-        """Number of simulation boxes."""
+        """Return the number of simulation boxes.
+
+        Returns:
+            Number of boxes represented by ``temperature.shape[0]``.
+        """
         return int(self.temperature.shape[0])
 
     def copy(self) -> "EnvironmentData":
-        """Create a deep copy of this EnvironmentData."""
+        """Create an independent copy of the environment state.
+
+        Returns:
+            New :class:`EnvironmentData` instance with copied temperature,
+            pressure, and saturation-ratio arrays.
+        """
         return EnvironmentData(
             temperature=np.copy(self.temperature),
             pressure=np.copy(self.pressure),

@@ -2,10 +2,13 @@
 
 ## Required Updates
 
-- Current shipped state from issue #1188 / E2-F2-P1:
+- Current shipped state from issues #1188 and #1189 / E2-F2-P1+P2:
   - `EnvironmentData` exists at `particula.gas.environment_data`.
-  - Direct-module import is the current supported path.
-  - Package exports, `n_boxes`, and `copy()` are still pending later phases.
+  - `particula.gas.EnvironmentData` is now the supported package import path.
+  - `EnvironmentData` now exposes `n_boxes` and an independent `copy()`
+    implementation.
+  - Code-level docs in `particula/gas/environment_data.py` should reflect the
+    shipped export and copy semantics.
 
 - `docs/Features/particle-data-migration.md`
   - Add `EnvironmentData` to the data-container overview.
@@ -15,7 +18,7 @@
     scalar `temperature` and `pressure` until migration tracks update them.
 
 - `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Mark the CPU `EnvironmentData` baseline as implemented once complete.
+  - Mark the CPU `EnvironmentData` baseline and convenience API as implemented.
   - Keep future `WarpEnvironmentData`, conversion, and kernel integration work
     listed as downstream.
 
