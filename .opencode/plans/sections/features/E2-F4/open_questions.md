@@ -1,14 +1,18 @@
 # Open Questions
 
-- Should `from_warp_gas_data()` require explicit `name` input, warn when using
-  placeholders, or preserve the current placeholder behavior as a documented
-  contract?
-- Should non-binary `WarpGasData.partitioning` values raise an error before
-  casting to CPU boolean values?
-- Should missing `vapor_pressure` in `to_warp_gas_data()` remain a zero-filled
-  default, become an explicit required argument for condensation paths, or emit
-  a warning?
-- Should GPU vapor pressure ever be returned to CPU as a sidecar, or should it
-  remain intentionally discarded because CPU `GasData` does not own behavior?
-- What final decisions from `E2-F2` and `E2-F3` constrain vapor-pressure
-  ownership when temperature or environment state is involved?
+## Resolved Answers
+
+- `from_warp_gas_data()` should prefer explicit `name` input. Placeholder names
+  may remain as documented fallback behavior, but they must not be treated as
+  preserved metadata.
+- Non-binary `WarpGasData.partitioning` values should raise before casting to CPU
+  booleans.
+- Missing `vapor_pressure` in generic `to_warp_gas_data()` may remain a
+  zero-filled default, but condensation paths that need vapor pressure should
+  pass it explicitly and document that requirement.
+- GPU vapor pressure should not be returned to CPU as part of `GasData`. If a
+  caller needs it, they should read it from `WarpGasData` before conversion or
+  manage an explicit sidecar outside `GasData`.
+- E2-F2 and E2-F3 constrain vapor-pressure ownership by keeping environment state
+  to `temperature`, `pressure`, and `saturation_ratio`; vapor pressure remains a
+  process/kernel input derived from gas and thermodynamic state.

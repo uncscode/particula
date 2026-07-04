@@ -1,24 +1,20 @@
 # E2-F8 Open Questions
 
-1. Should CPU coagulation immediately reject `ParticleData.n_boxes != 1`, or
-   retain documented transitional box-0 behavior for one release?
-   - Preferred answer: reject unsupported multi-box calls to avoid silent misuse.
+## Resolved Answers
 
-2. Which public condensation methods provide the best representative coverage
-   for multi-box rejection tests?
-   - Candidate: `IsothermalCondensationStrategy.step()` plus one pressure-delta
-     path that already uses `_require_single_box`.
+1. CPU coagulation should immediately reject `ParticleData.n_boxes != 1` for
+   unsupported paths. Avoid silent box-0 behavior.
+2. Use `IsothermalCondensationStrategy.step()` plus one public pressure-delta or
+   mass-transfer path that already flows through `_require_single_box` for
+   representative multi-box rejection tests.
+3. Include caller-managed per-box loop pseudocode only if it is accurate without
+   introducing new helper APIs.
+4. Mention E2-F2 environment containers as a short cross-reference in the CPU
+   dynamics boundary doc. Do not imply CPU dynamics have full environment-aware
+   multi-box support.
 
-3. Should docs include caller-managed per-box loop pseudocode?
-   - Include only if it can be accurate without creating new helper APIs.
+## Deferred Out-of-Scope Topics
 
-4. Do E2-F2 environment containers need mention in this CPU dynamics boundary
-   doc?
-   - Likely only as a short cross-reference, unless implementation touches
-     environment-aware dynamics paths.
-
-## Questions That Are Out of Scope
-
-- How should full multi-box CPU condensation or coagulation be implemented?
-- Should GPU strategy kernels own first-class all-box execution semantics?
-- Should the container schema change to represent environment boxes differently?
+- Full multi-box CPU condensation or coagulation implementation details.
+- First-class all-box execution semantics for GPU strategy kernels.
+- Container schema changes for representing environment boxes differently.

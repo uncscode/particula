@@ -1,13 +1,18 @@
 # E2-F9 Open Questions
 
-- Have E2-F2 and E2-F3 introduced concrete `EnvironmentData` and
-  `WarpEnvironmentData` APIs by the time this feature is implemented, or should
-  the guide keep environment state entirely in the planned/future-work section?
-- Should the foundation guide be a new page
-  `docs/Features/data-containers-and-gpu-foundations.md`, or should it extend
-  `docs/Features/particle-data-migration.md` with a clearer GPU section?
-- Should examples be plain Python only, paired notebooks, or both?
-- What docs validation command should be considered authoritative for this
-  repository in the implementation PR?
-- Should optional Warp CPU execution be demonstrated, or should examples only
-  show guarded transfer code that skips when Warp is unavailable?
+## Resolved Answers
+
+- If E2-F2 and E2-F3 have landed, document concrete `EnvironmentData` and
+  `WarpEnvironmentData` APIs. If either is still pending, keep environment state
+  in a clearly labeled planned/future-work section.
+- Create a new guide at `docs/Features/data-containers-and-gpu-foundations.md`
+  and link it from `docs/Features/particle-data-migration.md` rather than
+  overloading the migration page.
+- Use plain Python examples first. Add paired notebooks only if the example needs
+  narrative execution output or interactive exploration.
+- Authoritative docs validation should be `mkdocs build` or the repository's
+  MkDocs validation wrapper when available, plus focused example execution for
+  any new example files.
+- Demonstrate guarded transfer code that skips cleanly when Warp is unavailable.
+  Optional Warp CPU execution may be shown only behind the same availability
+  guard.

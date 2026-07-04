@@ -1,22 +1,24 @@
 # Open Questions
 
-1. Should `ParticleData.density` remain `(n_species,)` and shared across boxes
-   for the whole E2 epic, or should the decision record reserve a future per-box
-   material-property representation?
-2. Is `ParticleData.volume` authoritative particle-container state, shared
-   simulation state, or a field that future `EnvironmentData` may own/mutate?
-3. Should `vapor_pressure` be treated as gas state, environment-derived state,
-   process scratch/cache, or GPU-only helper state with explicit loss semantics?
-4. How should species names be preserved across GPU workflows: CPU-only metadata,
-   an index-map sidecar, or a required `names` argument on return conversion?
-5. Which humidity or saturation fields are required in the first
-   `EnvironmentData` implementation, and should any be `(n_boxes, n_species)`
-   instead of `(n_boxes,)`?
+## Resolved Answers
+
+1. `ParticleData.density` remains `(n_species,)` and shared across boxes for the
+   E2 epic. Future per-box material properties may be reserved in documentation,
+   but they are not part of the E2 container contract.
+2. `ParticleData.volume` remains authoritative container-carried simulation
+   metadata with shape `(n_boxes,)`. `EnvironmentData` should not own or mutate
+   volume in E2.
+3. `vapor_pressure` is explicit process/kernel state, not CPU `GasData` or
+   `EnvironmentData` ownership. GPU paths may carry it as helper state with
+   documented loss on CPU restoration.
+4. Species names remain CPU metadata. GPU workflows should rely on caller-supplied
+   names or an external index map when converting numeric `WarpGasData` back to
+   CPU state.
+5. The first `EnvironmentData` implementation should include `temperature`,
+   `pressure`, and `saturation_ratio`. `saturation_ratio` should use
+   `(n_boxes, n_species)`; temperature and pressure should use `(n_boxes,)`.
 
 ## Resolution Policy
 
-- Questions 1-4 should be resolved by E2-F1 because they affect multiple sibling
-  tracks.
-- Question 5 may be partially resolved by E2-F1 as a shape/ownership rule and
-  finalized by E2-F2 when implementing `EnvironmentData`.
-- Any unresolved item must name a downstream owner before E2-F1 ships.
+- These answers are authoritative for sibling tracks unless E2-F2 discovers a
+  direct implementation blocker.
