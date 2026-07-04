@@ -2,7 +2,7 @@
   "id": "E2-F2",
   "type": "feature",
   "title": "Implement EnvironmentData CPU container",
-  "status": "In Progress",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -58,11 +58,11 @@
     {
       "id": "E2-F2-P3",
       "title": "Document process environment-state read and mutation boundaries",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -70,5 +70,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
