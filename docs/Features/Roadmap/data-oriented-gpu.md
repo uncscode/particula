@@ -186,7 +186,7 @@ implying broader test coverage.
 | `ParticleData` | `masses` | `ParticleData` | `(n_boxes, n_particles, n_species)` | `float64` | Stored, mutable, box-batched particle/species mass array | `ParticleData.__post_init__()` requires 3D masses and uses it as the shape anchor for all other particle fields | `to_warp_particle_data()` copies or zero-copies to `WarpParticleData.masses`; `from_warp_particle_data()` restores the same shape and values | Source: `particula/particles/particle_data.py:76-98`, `particula/gpu/conversion.py:72-139,244-287`; tests: `particula/particles/tests/particle_data_test.py:124-136`, `particula/gpu/tests/conversion_test.py:512-548` |
 | `ParticleData` | `concentration` | `ParticleData` | `(n_boxes, n_particles)` | `float64` | Stored, mutable, box-batched number concentration/count | `ParticleData.__post_init__()` enforces `(n_boxes, n_particles)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without schema change | Source: `particula/particles/particle_data.py:77,96-103`, `particula/gpu/conversion.py:113-115,283`; tests: `particula/particles/tests/particle_data_test.py:138-164`, `particula/gpu/tests/conversion_test.py:521-545` |
 | `ParticleData` | `charge` | `ParticleData` | `(n_boxes, n_particles)` | `float64` | Stored, mutable, box-batched particle charge array | `ParticleData.__post_init__()` enforces `(n_boxes, n_particles)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without dtype conversion | Source: `particula/particles/particle_data.py:78,104-109`, `particula/gpu/conversion.py:116,284`; tests: `particula/particles/tests/particle_data_test.py:166-192`, `particula/gpu/tests/conversion_test.py:524-526,546-548` |
-| `ParticleData` | `density` | `ParticleData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `ParticleData.__post_init__()` requires 1D density, broadcasts scalar density to `n_species`, and fills empty density with zeros when `n_species > 0` | `to_warp_particle_data()` mirrors the shared 1D array to `WarpParticleData.density`; `from_warp_particle_data()` restores it to CPU storage | Source: `particula/particles/particle_data.py:79,119-137`, `particula/gpu/conversion.py:117-119,285`; tests: `particula/particles/tests/particle_data_test.py:208-234`, `particula/gpu/tests/warp_types_test.py:38-58` |
+| `ParticleData` | `density` | `ParticleData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `ParticleData.__post_init__()` requires a 1D density array, expands a length-1 density array to `n_species`, and fills empty density with zeros when `n_species > 0` | `to_warp_particle_data()` mirrors the shared 1D array to `WarpParticleData.density`; `from_warp_particle_data()` restores it to CPU storage | Source: `particula/particles/particle_data.py:79,119-137`, `particula/gpu/conversion.py:117-119,285`; tests: `particula/particles/tests/particle_data_test.py:208-234`, `particula/gpu/tests/warp_types_test.py:38-58` |
 | `ParticleData` | `volume` | `ParticleData` | `(n_boxes,)` | `float64` | Stored, mutable, per-box simulation volume | `ParticleData.__post_init__()` enforces `(n_boxes,)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without schema change | Source: `particula/particles/particle_data.py:80,111-117`, `particula/gpu/conversion.py:120,286`; tests: `particula/particles/tests/particle_data_test.py:194-206`, `particula/gpu/tests/conversion_test.py:530-548` |
 | `GasData` | `name` | `GasData` | `len == n_species` | `list[str]` | Stored, mutable CPU-only species metadata | `GasData.__post_init__()` rejects an empty species list; it does not enforce uniqueness or survive GPU transfer on its own | Not transferred by `to_warp_gas_data()` because `WarpGasData` has no string field; `from_warp_gas_data()` restores caller-supplied names or generates placeholders such as `species_0`, and current restore validation checks only the supplied name-list length | Source: `GasData.__post_init__()` and `from_warp_gas_data()` in `particula/gas/gas_data.py` and `particula/gpu/conversion.py`; tests: `particula/gas/tests/gas_data_test.py:119-127`, `particula/gpu/tests/conversion_test.py:600-640` |
 | `GasData` | `molar_mass` | `GasData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `GasData.__post_init__()` coerces to `np.float64` and enforces `(n_species,)` | `to_warp_gas_data()` mirrors it to `WarpGasData.molar_mass`; `from_warp_gas_data()` restores the same numeric field | Source: `particula/gas/gas_data.py:65,75-77,103-108`, `particula/gpu/conversion.py:214-216,354`; tests: `particula/gpu/tests/warp_types_test.py:168-184,218-232`, `particula/gpu/tests/conversion_test.py:583-595` |
@@ -218,6 +218,8 @@ Current gas round-trip behavior is intentionally lossy in two places:
   in `to_warp_gas_data()` when omitted and is dropped when restoring CPU
   `GasData`.
 
+#### CPU↔GPU restore boundary for ordered gas metadata
+
 Keep testing round-trips for the current CPU/GPU schema drift explicitly:
 `WarpGasData` drops `name`, stores `partitioning` as `int32` instead of
 `bool`, and adds `vapor_pressure` that is not restored to the CPU gas
@@ -246,7 +248,7 @@ conversion behavior, or future environment state.
 | `WarpGasData.vapor_pressure` | Owned by no CPU container; treated as GPU-helper/process state rather than authoritative `GasData` or future `EnvironmentData` state | Not owned on CPU containers | `(n_boxes, n_species)` via `WarpGasData.vapor_pressure` | `wp.float64` | Mutable GPU helper state | Must be recomputed from the current authoritative thermodynamic inputs, explicitly provided, or carried as sidecar state; update order must prevent mixed stale/new state, and CPU restore from `WarpGasData` remains intentionally lossy because `from_warp_gas_data()` drops it | GPU condensation kernels and future on-device thermodynamic updates | `particula/gpu/warp_types.py:98-108,133`; `particula/gpu/conversion.py:162-206,220-241,301-304`; `particula/gpu/tests/warp_types_test.py:177-183,225-231`; `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595` |
 | Future `EnvironmentData.temperature` | Must be owned by future `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via future `WarpEnvironmentData` | `float64` on CPU / planned GPU numeric mirror | Mutable per-box thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Parcel/expansion workflows, latent-heat condensation, and other per-box thermodynamic updates | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
 | Future `EnvironmentData.pressure` | Must be owned by future `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via future `WarpEnvironmentData` | `float64` on CPU / planned GPU numeric mirror | Mutable per-box thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Parcel/expansion workflows, kernel inputs, and per-box forcing profiles | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
-| Future `EnvironmentData.saturation_ratio` | Must be owned by future `EnvironmentData` as per-box, per-species thermodynamic state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via future `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / planned GPU numeric mirror | Mutable derived-or-updated thermodynamic state | Must round-trip through future environment conversion helpers once implemented; this phase records policy only | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+| Future `EnvironmentData.saturation_ratio` | Future `EnvironmentData` may carry this as per-box, per-species thermodynamic helper state, but not as an independent source of truth separate from current environment and gas state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via future `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / planned GPU numeric mirror | Mutable derived/cache state that must be refreshed after invalidating updates | If stored, it must round-trip through future environment conversion helpers once implemented while preserving its derived-helper semantics; this phase records policy only | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
 | Simulation volume ownership | Not owned by future `EnvironmentData`; must remain owned by `ParticleData.volume` | `(n_boxes,)` on `ParticleData` | `(n_boxes,)` on `WarpParticleData` | `float64` / `wp.float64` | Mutable per-box simulation state under particle container ownership | Must continue to round-trip only with particle container conversion helpers | Per-box particle state, dilution-style workflows, and timestep orchestration that needs simulation volume | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
 
 #### Canonical shape conventions for container workflows
@@ -370,21 +372,24 @@ Shared-across-box fields:
 | `molar_mass` | `(n_species,)` | GPU mirror of shared gas molar mass. |
 | `partitioning` | `(n_species,)` | GPU mirror/helper mask; stored as `int32` on GPU. |
 
-> [!CAUTION]
-> Container storage is already multi-box-capable, but current CPU execution is
-> not generally multi-box end to end. Condensation explicitly enforces
-> `n_boxes == 1` via `_require_single_box()` in
-> `particula/dynamics/condensation/condensation_strategies.py`. Current CPU
-> coagulation helpers and entry points read `ParticleData` through box index `0`
-> access patterns such as `particle.radii[0]`, `particle.total_mass[0]`,
-> `particle.concentration[0]`, `particle.charge[0]`, and `particle.volume[0]`
-> in `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`,
-> while `particula/dynamics/particle_process.py` continues to execute those
-> strategies through the legacy aerosol path. This is source-backed evidence for
-> today's single-box CPU boundary, not a broader claim that all coagulation
-> entry points have dedicated multi-box validation. Document storage as
-> multi-box capable, but document today's CPU condensation and coagulation paths
-> as single-box workflows.
+#### Current CPU execution limits for multi-box-ready containers
+
+!!! caution
+    Container storage is already multi-box-capable, but current CPU execution
+    is not generally multi-box end to end. Condensation explicitly enforces
+    `n_boxes == 1` via `_require_single_box()` in
+    `particula/dynamics/condensation/condensation_strategies.py`. Current CPU
+    coagulation helpers and entry points read `ParticleData` through box index
+    `0` access patterns such as `particle.radii[0]`, `particle.total_mass[0]`,
+    `particle.concentration[0]`, `particle.charge[0]`, and
+    `particle.volume[0]` in
+    `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`,
+    while `particula/dynamics/particle_process.py` continues to execute those
+    strategies through the legacy aerosol path. This is source-backed evidence
+    for today's single-box CPU boundary, not a broader claim that all
+    coagulation entry points have dedicated multi-box validation. Document
+    storage as multi-box capable, but document today's CPU condensation and
+    coagulation paths as single-box workflows.
 
 #### Rationale for issue-critical ownership decisions
 
@@ -420,20 +425,31 @@ Shared-across-box fields:
 - Future environment ownership is `temperature: (n_boxes,)`, `pressure:
   (n_boxes,)`, and `saturation_ratio: (n_boxes, n_species)`; this phase records
   those ownership decisions for downstream work without moving simulation volume
-  out of `ParticleData.volume`. `saturation_ratio` should be derived from the
-  current environment and gas state after any updates that invalidate it, so
-  downstream kernels never mix stale thermodynamic helpers with freshly updated
-  particle or gas fields
+  out of `ParticleData.volume`. `saturation_ratio` should be treated as a
+  derived thermodynamic helper tied to the current environment and gas state,
+  not as an independent source of truth. Any step that changes the upstream
+  environment or gas state must invalidate and recompute it before downstream
+  kernels consume it, so GPU/CPU paths never mix stale helpers with freshly
+  updated particle or gas fields
   ([EnvironmentData Container](#environmentdata-container);
   `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
 
 #### Final downstream handoff map for sibling features
 
-> [!NOTE]
-> Publication note for `E2-F1-P4`: this phase publishes the finalized P2/P3
-> ownership and shape contract for downstream implementers; it does not add new
-> schema semantics. Documentation validation command:
-> `python3 .opencode/tools/build_mkdocs.py --validate-only --strict`
+!!! note
+    Publication note for `E2-F1-P4`: this phase publishes the finalized P2/P3
+    ownership and shape contract for downstream implementers; it does not add
+    new schema semantics.
+
+    Observed fix-pass validation on 2026-07-04:
+
+    - Anchor and heading inspection → PASS for the roadmap quick links updated
+      in `docs/Features/Roadmap/index.md`.
+    - Plan metadata consistency inspection → PASS for
+      `.opencode/plans/features/E2-F1.json` against recorded phase issue
+      details.
+    - Recommended command re-run before merge when command execution is
+      available: `mkdocs build --strict`.
 
 - `E2-F2`: inherit future `EnvironmentData.temperature -> (n_boxes,)`,
   `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
@@ -495,7 +511,8 @@ is a third container rather than extending `GasData`.
   state, which mutate it, where prescribed (user-supplied) profiles are
   applied within a timestep, and when derived thermodynamic helpers such as
   `saturation_ratio` and GPU-side `vapor_pressure` must be invalidated and
-  recomputed.
+  recomputed. `saturation_ratio` should remain a derived/cache field tied to
+  current thermodynamic inputs rather than a separately authoritative state.
 - Add round-trip conversion helpers and tests matching the existing
   `ParticleData`/`GasData` conversion patterns.
 - Decide how existing kernel APIs that accept scalar temperature and pressure
