@@ -10,11 +10,21 @@
 - `particula/gpu/conversion.py`: add the `to_warp_environment_data` docstring
   describing the explicit CPU-to-Warp transfer boundary, `device`, `copy`, and
   the shared `RuntimeError` failure modes.
+- `particula/gpu/conversion.py`: document
+  `from_warp_environment_data(gpu_data, sync=True)` and its manual-sync caveat
+  for `sync=False`.
+- `particula/gas/environment_data.py`: remove the outdated note that the
+  environment container does not yet have CPU↔GPU helpers.
+- Repository docs should name the shipped helper surface in `particula.gpu` and
+  describe the now-supported environment CPU↔GPU round trip.
 
 ## Content to include
 
-- The shipped work now includes helper-level code documentation for
-  `to_warp_environment_data`, but no external user/API docs were added.
+- The shipped work now includes helper-level code documentation for both
+  `to_warp_environment_data` and `from_warp_environment_data`.
+- Repository docs were updated in `readme.md`, `docs/index.md`,
+  `docs/Features/particle-data-migration.md`, `docs/Features/Roadmap/data-oriented-gpu.md`,
+  and `AGENTS.md` to reflect the shipped environment round-trip helpers.
 - Environment string metadata, if any is added later, remains CPU-only unless a
   separate GPU representation is designed.
 - Future docs can build on the now-stable field list without revisiting names or
@@ -22,5 +32,5 @@
 
 ## Documentation examples
 
-No external documentation or package-export examples were updated in this
-implementation slice.
+Examples can now import `WarpEnvironmentData`, `to_warp_environment_data`, and
+`from_warp_environment_data` directly from `particula.gpu`.

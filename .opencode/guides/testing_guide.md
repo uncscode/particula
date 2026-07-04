@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-06-06
+**Last Updated:** 2026-07-04
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -166,6 +166,12 @@ def test_gpu_matches_numpy():
 
 Use constants from `particula.util.constants`; do not hardcode physical
 constants in kernels.
+
+For CPU↔GPU container helpers, add round-trip coverage that checks exact value
+and shape preservation on the Warp CPU backend. For `EnvironmentData`, cover
+single-box and multi-box cases, the default synchronized path, any supported
+manual `sync=False` path, and malformed-schema failures surfaced by CPU-side
+validation.
 
 ## Test Quality
 

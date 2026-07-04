@@ -1,12 +1,15 @@
 # Overview
 
-Feature `E2-F3` implements the Warp-side representation of the environment
-container introduced by `E2-F2`. The shipped work now includes issue `#1192`
-(`E2-F3-P1`), which added `WarpEnvironmentData` plus focused schema tests, and
-issue `#1193` (`E2-F3-P2`), which added the explicit CPU-to-Warp helper
-`to_warp_environment_data` with targeted conversion coverage. Reverse
-conversion, package exports, CUDA-parametrized transfer coverage, and broader
-transfer documentation remain deferred to later phases of the feature.
+Feature `E2-F3` implements the Warp-side representation and explicit transfer
+helpers for the environment container introduced by `E2-F2`. The shipped work
+now includes issue `#1192` (`E2-F3-P1`), which added `WarpEnvironmentData`
+plus focused schema tests, issue `#1193` (`E2-F3-P2`), which added the
+explicit CPU-to-Warp helper `to_warp_environment_data`, and issue `#1194`
+(`E2-F3-P3`), which completed the public round-trip surface with
+`from_warp_environment_data`, `particula.gpu` exports, round-trip/sync/error
+tests, and repository documentation updates. Optional CUDA-parametrized
+coverage and broader runtime integration remain deferred to later phases of the
+feature.
 
 ## Goals
 
@@ -22,17 +25,23 @@ transfer documentation remain deferred to later phases of the feature.
 - Cover CPU transfer values, shapes, dtypes, invalid-device handling,
   Warp-unavailable behavior, and `copy=True` / `copy=False` semantics in
   `particula/gpu/tests/conversion_test.py`.
-- Keep the shipped scope intentionally narrow: no Warp-to-CPU helper, package
-  export changes, or CUDA-parametrized transfer coverage were added.
+- Add `from_warp_environment_data(gpu_data, sync=True)` so CPU environment
+  containers can be reconstructed explicitly from `WarpEnvironmentData`.
+- Export `WarpEnvironmentData`, `to_warp_environment_data`, and
+  `from_warp_environment_data` through `particula.gpu`.
+- Cover round-trip behavior, `sync=True` / `sync=False` usage, and malformed
+  schema failures in `particula/gpu/tests/conversion_test.py`.
+- Keep the remaining scope intentionally narrow: optional CUDA-parametrized
+  transfer coverage and higher-level runtime integration were not added.
 
 ## Motivation
 
 The data-oriented GPU roadmap requires per-box environmental state to travel
 alongside gas and particle data before kernels can migrate from scalar
-temperature and pressure inputs to batched environment arrays. The landed P1
-and P2 work establishes both the Warp-side schema boundary and the first
-explicit environment transfer entry point that later `E2-F3` phases and
-downstream kernel migration tracks (`E2-F5+`) can build on.
+temperature and pressure inputs to batched environment arrays. The landed P1,
+P2, and P3 work establishes the Warp-side schema boundary, both explicit
+transfer directions, and the public helper surface that downstream kernel
+migration tracks (`E2-F5+`) can build on.
 
 ## Parent and sibling context
 
@@ -41,6 +50,8 @@ downstream kernel migration tracks (`E2-F5+`) can build on.
   `EnvironmentData` schema and validation boundary.
 - Related completed tracks: `E2-F1` established CPU data-container patterns;
   `E2-F2` provides the environment container this feature mirrors.
-- Downstream tracks can now consume `to_warp_environment_data` rather than
-  performing ad-hoc Warp transfers inside kernels, while reverse conversion and
-  public package-export work remain for later phases.
+- Downstream tracks can now consume the shipped
+  `to_warp_environment_data`/`from_warp_environment_data` pair rather than
+  performing ad-hoc Warp transfers inside kernels.
+- Remaining future work is limited to optional CUDA parity coverage and
+  higher-level runtime integration on top of the now-shipped helper surface.

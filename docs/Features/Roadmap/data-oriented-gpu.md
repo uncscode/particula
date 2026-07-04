@@ -88,12 +88,13 @@ Known data-model gaps:
 
 - `EnvironmentData` now provides a CPU-side home for per-box thermodynamic
   state, with `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
-  `saturation_ratio -> (n_boxes, n_species)`. The shipped CPU baseline is
-  available from `particula.gas.environment_data` and exported from
-  `particula.gas`, with `copy()` support for CPU-side state handling. GPU
-  mirrors, CPU↔GPU conversion helpers, and broad runtime integration remain
-  downstream work (see
-  [EnvironmentData Container](#environmentdata-container)).
+  `saturation_ratio -> (n_boxes, n_species)`. The shipped baseline is
+  available from `particula.gas.environment_data`, exported from
+  `particula.gas`, supports `copy()` for CPU-side state handling, and now
+  round-trips through public `particula.gpu` helpers via
+  `WarpEnvironmentData`, `to_warp_environment_data()`, and
+  `from_warp_environment_data()`. Broad runtime integration still remains
+  downstream work (see [EnvironmentData Container](#environmentdata-container)).
 - `ParticleData.density` is shaped `(n_species,)` and shared across boxes, so
   boxes at different temperatures cannot carry per-box densities.
 - Dilution exists only as free functions (`get_volume_dilution_coefficient`,
@@ -249,9 +250,9 @@ conversion behavior, or future GPU environment state.
 | `WarpParticleData` numeric mirrors | Owned on GPU only as mirrors of authoritative `ParticleData` fields, not as a separate source of truth | Mirrors CPU particle shapes | Stored on GPU as declared in `WarpParticleData` | `wp.float64` | Mutable GPU working state | Must restore to the corresponding `ParticleData` fields without adding or dropping particle schema | GPU-resident particle workflows and parity tests | `particula/gpu/warp_types.py:73-77`; `particula/gpu/conversion.py:111-137,281-287`; `particula/gpu/tests/warp_types_test.py:38-58,100-118,302-320`; `particula/gpu/tests/conversion_test.py:512-548` |
 | `WarpGasData.molar_mass` / `concentration` / `partitioning` | Owned on GPU only as numeric mirrors/helpers of authoritative CPU `GasData` state | `(n_species,)`, `(n_boxes, n_species)`, `(n_species,)` | Same declared GPU shapes | `wp.float64` / `wp.float64` / `wp.int32` | Mutable GPU working state | Must restore to `GasData` numeric state, with explicit `int32 → bool` recovery for `partitioning` | GPU condensation and other gas-kernel workflows | `particula/gpu/warp_types.py:82-99,100-111,131-134`; `particula/gpu/conversion.py:142-241,290-357`; `particula/gpu/tests/warp_types_test.py:168-184,218-232,322-338`; `particula/gpu/tests/conversion_test.py:189-229,583-619` |
 | `WarpGasData.vapor_pressure` | Owned by no CPU container; treated as GPU-helper/process state rather than authoritative `GasData` or shipped CPU `EnvironmentData` state | Not owned on CPU containers | `(n_boxes, n_species)` via `WarpGasData.vapor_pressure` | `wp.float64` | Mutable GPU helper state | Must be recomputed from the current authoritative thermodynamic inputs, explicitly provided, or carried as sidecar state; update order must prevent mixed stale/new state, and CPU restore from `WarpGasData` remains intentionally lossy because `from_warp_gas_data()` drops it | GPU condensation kernels and future on-device thermodynamic updates | `particula/gpu/warp_types.py:98-108,133`; `particula/gpu/conversion.py:162-206,220-241,301-304`; `particula/gpu/tests/warp_types_test.py:177-183,225-231`; `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595` |
-| EnvironmentData.temperature | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via future `WarpEnvironmentData` | `float64` on CPU / planned GPU numeric mirror | Mutable per-box thermodynamic state | CPU state is already shipped; future environment conversion helpers must preserve the existing shape and ownership boundary | Parcel/expansion workflows, latent-heat condensation, and other per-box thermodynamic updates | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
-| EnvironmentData.pressure | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via future `WarpEnvironmentData` | `float64` on CPU / planned GPU numeric mirror | Mutable per-box thermodynamic state | CPU state is already shipped; future environment conversion helpers must preserve the existing shape and ownership boundary | Parcel/expansion workflows, kernel inputs, and per-box forcing profiles | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
-| EnvironmentData.saturation_ratio | Shipped CPU `EnvironmentData` helper state; not an independent source of truth separate from current environment and gas state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via future `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / planned GPU numeric mirror | Mutable derived/cache state that must be refreshed after invalidating updates | If stored, it must round-trip through future environment conversion helpers once implemented while preserving its derived-helper semantics; this phase records policy only | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | Direction recorded in [EnvironmentData Container](#environmentdata-container); `docs/Features/Roadmap/data-oriented-gpu.md`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+| EnvironmentData.temperature | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via shipped `WarpEnvironmentData` | `float64` on CPU / `wp.float64` on GPU | Mutable per-box thermodynamic state | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()`; broader GPU-resident runtime ownership remains future work | Parcel/expansion workflows, latent-heat condensation, and other per-box thermodynamic updates | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
+| EnvironmentData.pressure | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via shipped `WarpEnvironmentData` | `float64` on CPU / `wp.float64` on GPU | Mutable per-box thermodynamic state | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()`; broader GPU-resident runtime ownership remains future work | Parcel/expansion workflows, kernel inputs, and per-box forcing profiles | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
+| EnvironmentData.saturation_ratio | Shipped CPU `EnvironmentData` helper state; not an independent source of truth separate from current environment and gas state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via shipped `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / `wp.float64` on GPU | Mutable derived/cache state that must be refreshed after invalidating updates | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()` and still must be invalidated/recomputed after upstream state changes; high-level process integration remains future work | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
 | Simulation volume ownership | Not owned by `EnvironmentData`; must remain owned by `ParticleData.volume` | `(n_boxes,)` on `ParticleData` | `(n_boxes,)` on `WarpParticleData` | `float64` / `wp.float64` | Mutable per-box simulation state under particle container ownership | Must continue to round-trip only with particle container conversion helpers | Per-box particle state, dilution-style workflows, and timestep orchestration that needs simulation volume | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
 
 #### Canonical shape conventions for container workflows
@@ -458,10 +459,11 @@ Shared-across-box fields:
   `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
   keep `ParticleData.volume -> (n_boxes,)` as the authoritative simulation
   volume owner rather than moving volume into `EnvironmentData`.
-- `E2-F3`: inherit exact CPU↔GPU schema mirroring between future
-  `EnvironmentData` and `WarpEnvironmentData`, with `temperature -> (n_boxes,)`,
-  `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
-  do not add an extra volume field or an implicit transfer path.
+- `E2-F3`: inherit the now-shipped exact CPU↔GPU schema mirroring between
+  `EnvironmentData` and `WarpEnvironmentData`, with
+  `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
+  `saturation_ratio -> (n_boxes, n_species)`; do not add an extra volume field
+  or an implicit transfer path.
 - `E2-F4`: inherit that `GasData.name` remains CPU-only ordered metadata,
   `GasData.partitioning` stays `bool` on CPU and `int32` on GPU, and
   `WarpGasData.vapor_pressure -> (n_boxes, n_species)` remains explicit
@@ -499,19 +501,21 @@ Shared-across-box fields:
 ### EnvironmentData Container
 
 Parcel/expansion workflows and latent-heat condensation require per-box
-thermodynamic state. That CPU-side baseline now exists as
+thermodynamic state. That baseline now exists as
 `particula.gas.environment_data.EnvironmentData`, which validates per-box
 `temperature`, `pressure`, and per-box/per-species `saturation_ratio`.
-Current shipped scope is intentionally narrow: it is a constructor-validated
-CPU container, requires at least one box, is exported from `particula.gas`,
-supports `copy()` for CPU-side state management, and does not yet have CPU↔GPU
-conversion helpers or direct process integration.
+Current shipped scope is still intentionally narrow: it is a constructor-
+validated CPU container, requires at least one box, is exported from
+`particula.gas`, supports `copy()` for CPU-side state management, and now has
+public CPU↔GPU round-trip helpers through `particula.gpu.WarpEnvironmentData`,
+`to_warp_environment_data()`, and `from_warp_environment_data()`. What remains
+future work is direct process integration and a broader GPU-resident runtime.
 
 - Preserve the current `EnvironmentData` shape contract: `temperature` and
   `pressure` are `(n_boxes,)`, and `saturation_ratio` is
   `(n_boxes, n_species)`.
-- Add a future `WarpEnvironmentData` mirror and CPU↔GPU conversion helpers when
-  GPU-side thermodynamic state work begins.
+- Build on the now-shipped `WarpEnvironmentData` mirror and CPU↔GPU conversion
+  helpers when broader GPU-side thermodynamic state work begins.
 - Existing process APIs may still accept scalar `temperature` and `pressure`
   until later migration work lands; only migrated process code should read
   `EnvironmentData` directly.
@@ -526,8 +530,9 @@ conversion helpers or direct process integration.
   recomputed. Treat environment state as read-only unless the physical model
   owns the update. `saturation_ratio` should remain a derived/cache field tied
   to current thermodynamic inputs rather than a separately authoritative state.
-- Add round-trip conversion helpers and tests matching the existing
-  `ParticleData`/`GasData` conversion patterns.
+- Keep round-trip conversion coverage aligned with the existing
+  `ParticleData`/`GasData` conversion patterns, including one-box and multi-box
+  cases plus explicit synchronization behavior.
 - Decide how existing kernel APIs that accept scalar temperature and pressure
   migrate to per-box arrays without breaking the current low-level API.
 
@@ -986,7 +991,7 @@ Cross-cutting work that runs alongside the other epics.
 | NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Study mass storage representation (per-species, log-mass, or binned) |
 | fp64 memory doubling vs large multi-box | Fewer boxes fit in memory | Build a memory-budget model; treat precision and box count together |
 | Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Characterize stiffness; evaluate sub-stepping and semi-implicit schemes that stay capture- and autodiff-friendly |
-| No GPU-ready per-box thermodynamic state path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, then add `WarpEnvironmentData` plus CPU↔GPU conversion and integration work |
+| No fully integrated GPU-ready per-box thermodynamic runtime path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, build on the shipped `WarpEnvironmentData` CPU↔GPU round-trip helpers, and add integration work |
 | Rejection-sampling acceptance collapse for wide size ranges | Coagulation trial counts explode in mixed NPF/droplet boxes | Evaluate binned majorant kernels or stratified pair sampling |
 | One-thread-per-box coagulation | Serializes large single-box workloads | Record as deliberate multi-box tradeoff or add parallel-within-box variant |
 | RNG state re-initialized every coagulation step | Correlated draws across steps; frozen seed under graph capture | Seed once, persist per-box RNG state between timesteps |
@@ -1018,8 +1023,9 @@ epics above.
 
 ### Milestone 2: Foundations and Backend Selection (Epics A, C)
 
-- `EnvironmentData` is already shipped on CPU; add `WarpEnvironmentData`
-  plus CPU↔GPU round-trip conversion coverage and tests.
+- `EnvironmentData` CPU↔GPU round-trip helpers and tests are now shipped;
+  build backend-selection APIs and workflow integration on top of
+  `WarpEnvironmentData`.
 - Add an API design for selecting CPU or GPU execution from user-facing
   simulation code.
 - Implement backend selection for at least one condensation workflow and one
@@ -1028,8 +1034,8 @@ epics above.
 - Adopt the device-aware pytest policy for GPU parity tests.
 - **Exit bar:** At least one condensation and one coagulation workflow run on GPU
   through the selection API, match CPU within recorded tolerance, and are used in
-  a documented example; `WarpEnvironmentData` and CPU↔GPU `EnvironmentData`
-  round-trips are tested.
+  a documented example, while the already-shipped `WarpEnvironmentData`
+  round-trip helpers remain covered by tests.
 
 ### Milestone 2.5: Missing GPU Physics (Epic B)
 

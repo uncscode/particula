@@ -20,6 +20,14 @@
   conversion coverage in `particula/gpu/tests/conversion_test.py`.
 - Recorded that reverse conversion, package export changes, CUDA coverage, and
   external docs remain deferred after the `#1193` slice.
+- Updated plan sections after implementation issue `#1194` shipped `E2-F3-P3`
+  with `from_warp_environment_data` in `particula/gpu/conversion.py`, public
+  `particula.gpu` exports, round-trip/sync/error coverage in
+  `particula/gpu/tests/conversion_test.py`, export assertions in
+  `particula/gpu/tests/warp_types_test.py`, and code-level plus repository docs
+  describing environment CPU↔GPU round trips.
+- Recorded that optional CUDA-parametrized coverage and broader runtime
+  integration remain future work after the `#1194` slice.
 
 ## 2026-07-03
 

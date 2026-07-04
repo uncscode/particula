@@ -46,26 +46,34 @@
   `particula/gpu/tests/conversion_test.py`.
 
 Status note: Shipped in issue `#1193`. Reverse conversion and public exports
-remain future-phase work.
+landed next in `#1194`.
 
 ## E2-F3-P3: Warp-to-CPU environment conversion and round-trip coverage
 
-- Issue: TBD | Size: S | Status: Not Started
+- Issue: #1194 | Size: S | Status: Shipped
 - Goal: Reconstruct the CPU container with no hidden field dropping so round-trip
   expectations are executable in tests.
 - Files: `particula/gpu/conversion.py`, `particula/gpu/__init__.py`,
-  `particula/gpu/tests/conversion_test.py`
+  `particula/gpu/tests/conversion_test.py`,
+  `particula/gpu/tests/warp_types_test.py`, `particula/gas/environment_data.py`
 - Implementation:
-  - Add `from_warp_environment_data(gpu_data, sync=True)` to
-    `particula/gpu/conversion.py`.
-  - Rebuild `EnvironmentData` from `.numpy()` arrays in declared field order.
-  - Export `WarpEnvironmentData`, `to_warp_environment_data`, and
+  - Added `from_warp_environment_data(gpu_data, sync=True)` to
+    `particula/gpu/conversion.py` using `_ensure_warp_available()` and the
+    same explicit field-by-field reconstruction style as the other reverse
+    helpers.
+  - Rebuilt `EnvironmentData` from `.numpy()` arrays in declared field order so
+    CPU-side constructor validation remains the schema check.
+  - Exported `WarpEnvironmentData`, `to_warp_environment_data`, and
     `from_warp_environment_data` from `particula/gpu/__init__.py`.
-- Tests: Add `sync=True`, `sync=False`, CPU-backend round-trip, and multi-box
-  equality coverage for every environment field.
+  - Updated the `EnvironmentData` module docstring so it no longer claims the
+    environment container lacks CPU↔GPU helpers.
+- Tests: Added `sync=True`, manual `wp.synchronize()` plus `sync=False`,
+  single-box and multi-box CPU round trips, malformed-schema failure coverage
+  in `particula/gpu/tests/conversion_test.py`, and public-export assertions in
+  `particula/gpu/tests/warp_types_test.py`.
 
-Status note: Not started. No package exports or CPU reconstruction helpers have
-been added yet.
+Status note: Shipped in issue `#1194`. The public environment round-trip helper
+surface is now complete on the Warp CPU backend.
 
 ## E2-F3-P4: CUDA-parametrized transfer coverage and documentation updates
 
@@ -80,12 +88,13 @@ been added yet.
   - Use `warp_devices(wp)` to run the core round-trip test on `cpu` and `cuda`
     when CUDA is available.
   - Keep CUDA coverage optional and skip cleanly on CPU-only machines.
-  - Update roadmap, migration, and Warp datastructure docs with the explicit
-    environment-transfer helper names and shape semantics.
+  - Extend future docs only when new runtime/kernel integration changes the
+    user-facing environment transfer story beyond the now-shipped helper names
+    and shape semantics.
 - Tests: Keep the CUDA-parametrized test focused to one representative round trip
   so the `S`-sized phase remains reviewable.
   The structured phase metadata is authoritative: this phase is `S` because it
   combines optional CUDA transfer coverage with user-facing documentation updates.
 
-Status note: Not started. No CUDA transfer coverage or external docs were
-required for the shipped P1/P2 implementation slices.
+Status note: Partially reduced by shipped `#1194` documentation updates. Optional
+CUDA transfer coverage and any follow-on integration docs remain open.

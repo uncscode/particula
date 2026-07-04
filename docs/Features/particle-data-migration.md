@@ -45,8 +45,14 @@ in strategies and runnables:
     state, not a separate gas facade. It is available from
     `particula.gas.environment_data` and is exported from `particula.gas` for
     package-level imports. It requires at least one box at construction time,
-    but it does not yet participate in CPU↔GPU conversion helpers or broad
-    high-level workflow integration.
+    and it now participates in public CPU↔GPU conversion helpers through
+    `particula.gpu.WarpEnvironmentData`,
+    `particula.gpu.to_warp_environment_data()`, and
+    `particula.gpu.from_warp_environment_data()`. Current tests cover one-box
+    and multi-box CPU→Warp→CPU round trips, default synchronized restore,
+    manual `sync=False` restore after explicit synchronization, and schema
+    validation failures. Broad high-level workflow integration still remains
+    incremental.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered

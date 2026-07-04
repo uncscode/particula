@@ -213,6 +213,7 @@ class TestToWarpGasData:
         assert gpu_data.concentration.dtype == wp.float64
         assert gpu_data.vapor_pressure.dtype == wp.float64
         assert gpu_data.partitioning.dtype == wp.int32
+
     def test_gas_data_partitioning_conversion(self, sample_gas_data) -> None:
         """Test bool to int32 conversion (True->1, False->0)."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
