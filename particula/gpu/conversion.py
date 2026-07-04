@@ -23,8 +23,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 if TYPE_CHECKING:
+    from particula.gas.environment_data import EnvironmentData
     from particula.gas.gas_data import GasData
-    from particula.gpu.warp_types import WarpGasData, WarpParticleData
+    from particula.gpu.warp_types import (
+        WarpEnvironmentData,
+        WarpGasData,
+        WarpParticleData,
+    )
     from particula.particles.particle_data import ParticleData
 
 
@@ -134,6 +139,57 @@ def to_warp_particle_data(
         )
         gpu_data.volume = wp.from_numpy(
             data.volume, dtype=wp.float64, device=device
+        )
+
+    return gpu_data
+
+
+def to_warp_environment_data(
+    data: "EnvironmentData",
+    device: str = "cuda",
+    copy: bool = True,
+) -> "WarpEnvironmentData":
+    """Transfer EnvironmentData to GPU with explicit control.
+
+    Args:
+        data: CPU-side EnvironmentData container.
+        device: Target device ("cuda", "cuda:0", "cuda:1", "cpu").
+        copy: If True (default), always copy data to device.
+            If False, attempt zero-copy via wp.from_numpy() when
+            arrays are already on a compatible device.
+
+    Returns:
+        WarpEnvironmentData with Warp arrays on specified device.
+
+    Raises:
+        RuntimeError: If Warp is not available or device not found.
+    """
+    wp = _ensure_warp_available()
+    _validate_device(wp, device)
+
+    from particula.gpu.warp_types import WarpEnvironmentData
+
+    gpu_data = WarpEnvironmentData()
+
+    if copy:
+        gpu_data.temperature = wp.array(
+            data.temperature, dtype=wp.float64, device=device
+        )
+        gpu_data.pressure = wp.array(
+            data.pressure, dtype=wp.float64, device=device
+        )
+        gpu_data.saturation_ratio = wp.array(
+            data.saturation_ratio, dtype=wp.float64, device=device
+        )
+    else:
+        gpu_data.temperature = wp.from_numpy(
+            data.temperature, dtype=wp.float64, device=device
+        )
+        gpu_data.pressure = wp.from_numpy(
+            data.pressure, dtype=wp.float64, device=device
+        )
+        gpu_data.saturation_ratio = wp.from_numpy(
+            data.saturation_ratio, dtype=wp.float64, device=device
         )
 
     return gpu_data
