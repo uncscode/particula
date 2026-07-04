@@ -43,3 +43,16 @@ Documentation now makes the following ownership rule explicit:
   that update, such as latent-heat temperature changes;
 - unrelated process steps should treat environment state as read-only and
   return mutations through documented state transitions.
+
+## Validation Expectations For This Docs Slice
+
+- Default validation for behavior-claim changes is `mkdocs build --strict`
+  when command execution is available to the builder.
+- If the docs build cannot be run, fallback validation must be documented
+  explicitly with the reason the command was unavailable.
+- Fallback validation remains scoped to manual changed-section reread plus the
+  claim-to-code/test checklist in
+  `.opencode/plans/sections/features/E2-F2/testing_strategy.md`.
+- No new product tests are required for this docs-only slice unless that
+  checklist reveals a documented shipped behavior without existing regression
+  support.

@@ -47,8 +47,12 @@
     volume under `ParticleData.volume`, preserving scalar `temperature` /
     `pressure` process APIs as the current compatibility boundary, and leaving
     GPU mirrors, conversion helpers, and runtime integration downstream.
-  - Tests: documentation-only validation via changed-section review and
-    reference/link inspection; no standalone test phase is created.
+  - Tests: documentation-only validation requires `mkdocs build --strict`
+    when command execution is available; otherwise record an explicit fallback
+    reason and use changed-section review, reference/link inspection, and the
+    claim-to-code/test checklist in `testing_strategy.md`. No standalone test
+    phase is created unless a documented shipped behavior lacks existing test
+    support.
 
 ## Phase Ordering Notes
 
