@@ -11,13 +11,16 @@
   - Tests: No new tests added; the inventory cites existing container and
     conversion tests as executable evidence.
 
-- [ ] **E2-F1-P2:** Record authoritative field ownership decisions
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F1-P2:** Record authoritative field ownership decisions
+  - Issue: #1184 | Size: S | Status: Completed
   - Goal: Decide which container owns each particle, gas, and environment field,
     including shared/per-box fields and lossy GPU transfer semantics.
   - Files: schema decision record, `docs/Features/Roadmap/data-oriented-gpu.md`,
     and links from relevant feature docs.
-  - Tests: Co-located docs checks or table/example validation where practical.
+  - Shipped: an `Authoritative field ownership decisions` section in
+    `docs/Features/Roadmap/data-oriented-gpu.md`, direct roadmap and migration
+    links to that section, and top-level docs links that improve discoverability.
+  - Tests: Docs-first update; no new automated tests added in this phase.
 
 - [ ] **E2-F1-P3:** Document shape conventions across container workflows
   - Issue: TBD | Size: S | Status: Not Started

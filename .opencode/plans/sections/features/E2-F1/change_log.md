@@ -2,6 +2,14 @@
 
 ## 2026-07-03
 
+- Updated E2-F1 plan sections after Issue #1184 shipped.
+- Marked phase E2-F1-P2 complete for the docs-first authoritative ownership
+  decision record.
+- Recorded shipped links from roadmap, migration, and top-level docs entry
+  points to the ownership-decision section.
+
+## 2026-07-03
+
 - Updated E2-F1 plan sections after Issue #1183 shipped.
 - Marked phase E2-F1-P1 complete for the docs-only container schema inventory.
 - Recorded that the authoritative current-state inventory was published in
