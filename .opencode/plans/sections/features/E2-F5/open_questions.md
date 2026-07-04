@@ -1,13 +1,18 @@
 # Open Questions
 
-- What exact name and fields does E2-F2 provide for the environment container
-  (`EnvironmentData`, `WarpEnvironmentData`, or another name)?
-- Should explicit environment plus scalar temperature/pressure be rejected as
-  ambiguous, or should explicit environment take precedence?
-- Should condensation precompute per-box dynamic viscosity and mean free path on
-  the host, or compute them inside Warp kernels from per-box temperature and
-  pressure?
-- Are humidity or saturation fields required in the first migration path, or is
-  temperature/pressure sufficient for T5?
-- Should wrapper APIs be public exports immediately, or should scalar functions
-  remain the only public entry points with environment support added internally?
+## Resolved Answers
+
+- E2-F2 provides `EnvironmentData`; E2-F3 mirrors it as `WarpEnvironmentData`.
+  Required fields are `temperature`, `pressure`, and `saturation_ratio`.
+- Reject calls that provide both explicit environment state and scalar
+  temperature/pressure. Explicit rejection is clearer than precedence rules for
+  early migration.
+- Precompute per-box dynamic viscosity and mean free path on the host for the
+  first migration path. Move those calculations into Warp kernels only when a
+  later feature needs fully device-resident thermodynamic updates.
+- Include `saturation_ratio` in the first migration path even if a specific T5
+  path only consumes temperature and pressure, so environment shape semantics are
+  exercised consistently.
+- Keep scalar functions as the primary public entry points initially. Add
+  environment support internally or through narrowly scoped wrappers before
+  expanding public exports.
