@@ -406,6 +406,23 @@ def test_environment_data_copy_mutation_does_not_change_source() -> None:
     )
 
 
+def test_environment_data_comparison_uses_identity_semantics() -> None:
+    """Distinct instances compare deterministically without NumPy ambiguity."""
+    environment = _make_environment_data(
+        temperature=[298.15, 300.15],
+        pressure=[101325.0, 95000.0],
+        saturation_ratio=[[0.9, 1.0], [1.2, 0.5]],
+    )
+    matching_environment = _make_environment_data(
+        temperature=[298.15, 300.15],
+        pressure=[101325.0, 95000.0],
+        saturation_ratio=[[0.9, 1.0], [1.2, 0.5]],
+    )
+
+    assert environment == environment
+    assert environment != matching_environment
+
+
 def test_environment_data_is_exported_from_particula_gas() -> None:
     """Package and direct-module imports resolve to the same class."""
     assert gas_package.EnvironmentData is EnvironmentData
