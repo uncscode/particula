@@ -58,11 +58,11 @@
     {
       "id": "E2-F3-P3",
       "title": "Warp-to-CPU environment conversion and round-trip coverage",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-04",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
