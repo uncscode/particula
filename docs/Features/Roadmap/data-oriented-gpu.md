@@ -166,8 +166,9 @@ thermodynamic state, precision, mass representation, and time integration.
   containers.
 - Expand examples that start directly from `ParticleData` and `GasData` instead
   of converting from legacy objects.
-- Document shape conventions for single-box, multi-box, binned, and
-  particle-resolved simulations in one place.
+- Expand implementation-facing examples and migration notes that point back to
+  the canonical shape-conventions section for single-box, multi-box, binned,
+  and particle-resolved simulations.
 
 #### Current container schema inventory
 
@@ -186,7 +187,7 @@ implying broader test coverage.
 | `ParticleData` | `charge` | `ParticleData` | `(n_boxes, n_particles)` | `float64` | Stored, mutable, box-batched particle charge array | `ParticleData.__post_init__()` enforces `(n_boxes, n_particles)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without dtype conversion | Source: `particula/particles/particle_data.py:78,104-109`, `particula/gpu/conversion.py:116,284`; tests: `particula/particles/tests/particle_data_test.py:166-192`, `particula/gpu/tests/conversion_test.py:524-526,546-548` |
 | `ParticleData` | `density` | `ParticleData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `ParticleData.__post_init__()` requires 1D density, broadcasts scalar density to `n_species`, and fills empty density with zeros when `n_species > 0` | `to_warp_particle_data()` mirrors the shared 1D array to `WarpParticleData.density`; `from_warp_particle_data()` restores it to CPU storage | Source: `particula/particles/particle_data.py:79,119-137`, `particula/gpu/conversion.py:117-119,285`; tests: `particula/particles/tests/particle_data_test.py:208-234`, `particula/gpu/tests/warp_types_test.py:38-58` |
 | `ParticleData` | `volume` | `ParticleData` | `(n_boxes,)` | `float64` | Stored, mutable, per-box simulation volume | `ParticleData.__post_init__()` enforces `(n_boxes,)` | Round-trips through `to_warp_particle_data()` / `from_warp_particle_data()` without schema change | Source: `particula/particles/particle_data.py:80,111-117`, `particula/gpu/conversion.py:120,286`; tests: `particula/particles/tests/particle_data_test.py:194-206`, `particula/gpu/tests/conversion_test.py:530-548` |
-| `GasData` | `name` | `GasData` | `len == n_species` | `list[str]` | Stored, mutable CPU-only species metadata | `GasData.__post_init__()` rejects an empty species list; it does not enforce uniqueness or survive GPU transfer on its own | Not transferred by `to_warp_gas_data()` because `WarpGasData` has no string field; `from_warp_gas_data()` restores caller-supplied names or generates placeholders such as `species_0` | Source: `GasData.__post_init__()` and `from_warp_gas_data()` in `particula/gas/gas_data.py` and `particula/gpu/conversion.py`; tests: `particula/gas/tests/gas_data_test.py:119-127`, `particula/gpu/tests/conversion_test.py:600-640` |
+| `GasData` | `name` | `GasData` | `len == n_species` | `list[str]` | Stored, mutable CPU-only species metadata | `GasData.__post_init__()` rejects an empty species list; it does not enforce uniqueness or survive GPU transfer on its own | Not transferred by `to_warp_gas_data()` because `WarpGasData` has no string field; `from_warp_gas_data()` restores caller-supplied names or generates placeholders such as `species_0`, and current restore validation checks only the supplied name-list length | Source: `GasData.__post_init__()` and `from_warp_gas_data()` in `particula/gas/gas_data.py` and `particula/gpu/conversion.py`; tests: `particula/gas/tests/gas_data_test.py:119-127`, `particula/gpu/tests/conversion_test.py:600-640` |
 | `GasData` | `molar_mass` | `GasData` | `(n_species,)` | `float64` | Stored, mutable, shared across boxes | `GasData.__post_init__()` coerces to `np.float64` and enforces `(n_species,)` | `to_warp_gas_data()` mirrors it to `WarpGasData.molar_mass`; `from_warp_gas_data()` restores the same numeric field | Source: `particula/gas/gas_data.py:65,75-77,103-108`, `particula/gpu/conversion.py:214-216,354`; tests: `particula/gpu/tests/warp_types_test.py:168-184,218-232`, `particula/gpu/tests/conversion_test.py:583-595` |
 | `GasData` | `concentration` | `GasData` | `(n_boxes, n_species)` | `float64` | Stored, mutable, box-batched gas mass concentration | `GasData.__post_init__()` coerces to `np.float64`, requires 2D, and checks width against `n_species` | `to_warp_gas_data()` mirrors it to `WarpGasData.concentration`; `from_warp_gas_data()` restores the same shape | Source: `particula/gas/gas_data.py:66,76-78,89-101`, `particula/gpu/conversion.py:217-219,355`; tests: `particula/gas/tests/gas_data_test.py:99-117`, `particula/gpu/tests/conversion_test.py:593-595` |
 | `GasData` | `partitioning` | `GasData` | `(n_species,)` | `bool` | Stored, mutable, shared-across-boxes partitioning mask | `GasData.__post_init__()` coerces with `np.asarray(..., dtype=np.bool_)` and enforces `(n_species,)`; this is dtype coercion, not a stricter semantic validation layer beyond NumPy truthiness | `to_warp_gas_data()` converts `bool → int32`; `from_warp_gas_data()` converts `int32 → bool` on restore | Source: `GasData.__post_init__()`, `to_warp_gas_data()`, and `from_warp_gas_data()` in `particula/gas/gas_data.py` and `particula/gpu/conversion.py`; tests: `particula/gas/tests/gas_data_test.py:77-97`, `particula/gpu/tests/conversion_test.py:189-199,609-619` |
@@ -210,7 +211,8 @@ Current gas round-trip behavior is intentionally lossy in two places:
 
 - `from_warp_gas_data()` restores `GasData.name` from caller input or
   placeholder values such as `species_0`; the GPU container itself never
-  preserves string species names.
+  preserves string species names, so callers must preserve ordered species
+  metadata externally if they need a lossless semantic restore.
 - `WarpGasData.vapor_pressure` is GPU-only helper state. It defaults to zeros
   in `to_warp_gas_data()` when omitted and is dropped when restoring CPU
   `GasData`.
@@ -234,7 +236,7 @@ conversion behavior, or future environment state.
 | `ParticleData.charge` | Owned by `ParticleData` as authoritative particle charge state | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` via `WarpParticleData.charge` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without dtype drift | Charged coagulation follow-on work and GPU parity paths that consume particle charge | `particula/particles/particle_data.py:76-109`; `particula/gpu/conversion.py:116,284`; `particula/particles/tests/particle_data_test.py:166-192`; `particula/gpu/tests/conversion_test.py:524-526,546-548` |
 | `ParticleData.density` | Owned by `ParticleData` and must remain shared-across-boxes material state, not per-box environment state | `(n_species,)` | `(n_species,)` via `WarpParticleData.density` | `float64` / `wp.float64` | Mutable stored state, but shared across boxes | Must round-trip as shared 1D species density state | Radius, effective-density, and mass-fraction calculations plus future GPU particle property parity | `particula/particles/particle_data.py:67-68,119-137`; `particula/gpu/conversion.py:117-119,285`; `particula/particles/tests/particle_data_test.py:208-234`; `particula/gpu/tests/warp_types_test.py:38-58` |
 | `ParticleData.volume` | Owned by `ParticleData` as the authoritative per-box simulation-volume carrier | `(n_boxes,)` | `(n_boxes,)` via `WarpParticleData.volume` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without schema change | Per-box particle workflows, dilution-style process work, and future environment/process coordination | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `particula/gpu/tests/conversion_test.py:530-548` |
-| `GasData.name` | Owned by CPU `GasData` as authoritative species-name metadata | `len == n_species` | Not owned on GPU | `list[str]` | Mutable CPU metadata only | Does not survive transfer on its own; CPU restore requires caller-supplied ordered species names from external metadata, and restore paths must validate both length and ordering against `n_species` before reconstructing `GasData` | CPU-facing reporting, facade compatibility, and any restore path back to `GasData` | `particula/gas/gas_data.py:52-73`; `particula/gpu/warp_types.py:82-99`; `particula/gpu/conversion.py:155-157,301-345`; `particula/gas/tests/gas_data_test.py:119-127`; `particula/gpu/tests/conversion_test.py:600-640` |
+| `GasData.name` | Owned by CPU `GasData` as authoritative species-name metadata | `len == n_species` | Not owned on GPU | `list[str]` | Mutable CPU metadata only | Does not survive transfer on its own; CPU restore requires caller-supplied ordered species names from external metadata, but the current `from_warp_gas_data()` implementation validates only name-list length before reconstructing `GasData`, so ordering must be preserved by the caller rather than inferred or checked during restore | CPU-facing reporting, facade compatibility, and any restore path back to `GasData` | `particula/gas/gas_data.py:52-73`; `particula/gpu/warp_types.py:82-99`; `particula/gpu/conversion.py:155-157,301-345`; `particula/gas/tests/gas_data_test.py:119-127`; `particula/gpu/tests/conversion_test.py:600-640` |
 | `GasData.molar_mass` | Owned by `GasData` as authoritative gas species molar-mass state | `(n_species,)` | `(n_species,)` via `WarpGasData.molar_mass` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without schema drift | Gas property calculations, condensation, and GPU gas kernels | `particula/gas/gas_data.py:53-67,75-108`; `particula/gpu/warp_types.py:100-111,131`; `particula/gpu/conversion.py:214-216,354`; `particula/gpu/tests/warp_types_test.py:168-184,218-232`; `particula/gpu/tests/conversion_test.py:583-595` |
 | `GasData.concentration` | Owned by `GasData` as authoritative per-box gas concentration state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via `WarpGasData.concentration` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without shape drift | Condensation, gas-phase workflows, and future GPU-resident gas updates | `particula/gas/gas_data.py:55-57,76-101`; `particula/gpu/warp_types.py:104-105,132`; `particula/gpu/conversion.py:217-219,355`; `particula/gas/tests/gas_data_test.py:99-117`; `particula/gpu/tests/conversion_test.py:593-595` |
 | `GasData.partitioning` | Owned by `GasData` as authoritative shared-across-boxes partitioning eligibility state | `(n_species,)` | `(n_species,)` via `WarpGasData.partitioning` | `bool` on CPU / `wp.int32` on GPU | Mutable stored state on both containers | Must round-trip with explicit `bool → int32 → bool` conversion | Condensation partitioning decisions and GPU kernels that require a numeric mask | `particula/gas/gas_data.py:57-58,79-115`; `particula/gpu/warp_types.py:96-111,134`; `particula/gpu/conversion.py:159-160,208-209,223-239,347-356`; `particula/gas/tests/gas_data_test.py:77-97`; `particula/gpu/tests/conversion_test.py:189-199,609-619` |
@@ -287,8 +289,9 @@ Verification evidence for the shape claims in this subsection:
   `particula/gpu/tests/conversion_test.py` for Warp container parity and
   CPU↔GPU shape preservation.
 - `particula/dynamics/condensation/tests/condensation_strategies_test.py` and
-  `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`
-  for the current single-box CPU execution boundary documented below.
+  `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`,
+  plus the current helper entry points they exercise, for the current
+  single-box CPU execution boundary documented below.
 
 `ParticleData`
 
@@ -376,9 +379,11 @@ Shared-across-box fields:
 > `particle.concentration[0]`, `particle.charge[0]`, and `particle.volume[0]`
 > in `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`,
 > while `particula/dynamics/particle_process.py` continues to execute those
-> strategies through the legacy aerosol path. Document storage as multi-box
-> capable, but document today's CPU condensation and coagulation paths as
-> single-box workflows.
+> strategies through the legacy aerosol path. This is source-backed evidence for
+> today's single-box CPU boundary, not a broader claim that all coagulation
+> entry points have dedicated multi-box validation. Document storage as
+> multi-box capable, but document today's CPU condensation and coagulation paths
+> as single-box workflows.
 
 #### Rationale for issue-critical ownership decisions
 
@@ -405,8 +410,9 @@ Shared-across-box fields:
 - `WarpGasData` is numeric-only; restoring CPU gas names requires
   caller-supplied ordered names or equivalent external metadata because the
   GPU container excludes string fields and `from_warp_gas_data()` otherwise
-  generates placeholder names such as `species_0`; restore paths should reject
-  metadata whose length or ordering does not match `n_species`
+  generates placeholder names such as `species_0`. Current restore logic checks
+  only metadata length against `n_species`, so preserving the intended species
+  ordering is a caller responsibility rather than a restore-time guarantee
   (`particula/gpu/warp_types.py:82-99`;
   `particula/gpu/conversion.py:305-345`; tests:
   `particula/gpu/tests/conversion_test.py:600-640`).

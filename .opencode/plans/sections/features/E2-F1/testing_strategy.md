@@ -41,8 +41,8 @@ markdown/link validation workflow or the closest available documentation check.
 For issue #1185 docs-first follow-up work, the fallback docs validation path is
 to verify that `data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows`
 exists, that `docs/Features/particle-data-migration.md` links directly to that
-anchor, and that `docs/index.md` still points readers to the roadmap subsection
-without creating a second source of truth.
+anchor, and that `docs/Features/Roadmap/index.md` points readers to that
+subsection without creating a second source of truth.
 
 ## Acceptance Evidence
 
@@ -73,9 +73,9 @@ without creating a second source of truth.
   the ownership anchor and that `docs/Features/Roadmap/index.md` plus
   `docs/Features/particle-data-migration.md` still link to
   `#authoritative-field-ownership-decisions`.
-- Issue #1185 shipped as a documentation-only canonical-shape update in
-  `docs/Features/Roadmap/data-oriented-gpu.md`.
-- The shipped P3 evidence is the roadmap canonical shape subsection, its direct
-  migration-guide anchor link, the minimal `docs/index.md` discoverability
-  wording, and existing test/source evidence for shapes plus current single-box
+- Issue #1185 is in the pre-ship fix cycle for a documentation-only canonical-
+  shape update in `docs/Features/Roadmap/data-oriented-gpu.md`.
+- The current P3 evidence is the roadmap canonical shape subsection, its direct
+  migration-guide anchor link, the roadmap-index discoverability wording, and
+  existing test/source evidence for shapes plus current single-box
   condensation/coagulation execution boundaries.
