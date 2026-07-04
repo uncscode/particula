@@ -14471,6 +14471,15 @@ toward the data-first workflow.</p>
 <p>If you arrived here from the legacy path <code>docs/migration/particle-data.md</code>,
 that page now redirects to this canonical guide.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Before adding container fields or changing CPU↔GPU conversion behavior, review
+the roadmap's
+<a href="../Roadmap/data-oriented-gpu/#canonical-shape-conventions-for-container-workflows">canonical shape conventions for container workflows</a>
+and its surrounding <a href="../Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative field ownership
+decisions</a>.
+Downstream implementers should then read the
+<a href="../Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map for sibling
+features</a>
+for the exact inherited field, shape, ownership, and CPU↔GPU transfer rules.</p>
 <p>The migration moves <strong>data</strong> into dedicated containers and leaves <strong>behavior</strong>
 in strategies and runnables:</p>
 <ul>
@@ -14479,6 +14488,19 @@ in strategies and runnables:</p>
 <li><code>ParticleRepresentation</code> and <code>GasSpecies</code> remain as facades so existing
   workflows keep working while you migrate.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>GPU→CPU gas restore is intentionally lossy unless you preserve ordered
+species metadata outside the GPU container. <code>WarpGasData</code> excludes string
+fields and <code>from_warp_gas_data()</code> can validate only the supplied name-list
+length today; it does not verify that restored names still match the
+original species ordering, and GPU helper state such as
+<code>WarpGasData.vapor_pressure</code> is dropped on CPU restore. Use the roadmap's
+<a href="../Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative field ownership decisions</a>,
+<a href="../Roadmap/data-oriented-gpu/#canonical-shape-conventions-for-container-workflows">canonical shape conventions for container workflows</a>,
+and <a href="../Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map for sibling features</a>
+as the authoritative contract for this restore boundary.</p>
+</div>
 <h2 id="why-migrate">Why migrate<a class="headerlink" href="#why-migrate" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Clear data/behavior split</strong>: data containers keep state, strategies keep
