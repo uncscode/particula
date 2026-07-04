@@ -31,10 +31,11 @@ not lowered.
     for the direct-module path.
 
 - **P3: Documentation**
-  - Validate docs by running available markdown/link tooling or at minimum
-    checking changed references manually.
-  - No production-code tests are added in this phase unless docs examples are
-    introduced.
+  - Shipped validation is documentation-only: re-read the changed feature-guide
+    and roadmap sections, confirm they agree on ownership and mutation
+    boundaries, and inspect changed references manually.
+  - Preferred tooling remains `mkdocs build --strict` when available, but no
+    production-code tests are added in this phase.
 
 ## Commands
 
@@ -47,5 +48,5 @@ not lowered.
 
 The new container already has direct unit coverage for `__post_init__`, the
 validation helpers, `n_boxes`, exports, and `copy()` without weakening the
-existing constructor contract. The remaining documentation phase should not
-reduce package coverage.
+existing constructor contract. The shipped documentation phase does not add new
+runtime coverage and should not reduce package coverage.

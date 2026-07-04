@@ -34,15 +34,21 @@
     `saturation_ratio` arrays, retained multi-box and dtype-coercion behavior,
     and package-export smoke coverage.
 
-- [ ] **E2-F2-P3:** Document process environment-state read and mutation boundaries
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E2-F2-P3:** Document process environment-state read and mutation boundaries
+  - Issue: #1190 | Size: XS | Status: Shipped
   - Goal: Update development docs so they explain that `EnvironmentData` owns
     per-box thermodynamic state, excluding simulation volume, while current
     process APIs remain scalar until downstream migration tracks.
   - Files: `docs/Features/particle-data-migration.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Tests: documentation link/reference validation where available; no
-    standalone test phase is created.
+  - Shipped details: both docs now describe the shipped CPU
+    `EnvironmentData` contract consistently, naming `temperature`, `pressure`,
+    and `saturation_ratio` as environment-owned state, keeping simulation
+    volume under `ParticleData.volume`, preserving scalar `temperature` /
+    `pressure` process APIs as the current compatibility boundary, and leaving
+    GPU mirrors, conversion helpers, and runtime integration downstream.
+  - Tests: documentation-only validation via changed-section review and
+    reference/link inspection; no standalone test phase is created.
 
 ## Phase Ordering Notes
 

@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## Required Updates
+## Shipped Updates
 
 - Current shipped state from issues #1188 and #1189 / E2-F2-P1+P2:
   - `EnvironmentData` exists at `particula.gas.environment_data`.
@@ -10,19 +10,23 @@
   - Code-level docs in `particula/gas/environment_data.py` should reflect the
     shipped export and copy semantics.
 
-- `docs/Features/particle-data-migration.md`
-  - Add `EnvironmentData` to the data-container overview.
-  - Clarify that thermodynamic state belongs in `EnvironmentData`, not
-    `GasData`.
-  - Explain current process boundary: existing dynamics APIs may still accept
-    scalar `temperature` and `pressure` until migration tracks update them.
+- Issue #1190 / E2-F2-P3 updated `docs/Features/particle-data-migration.md`
+  to:
+  - document `EnvironmentData` as the shipped CPU owner of per-box
+    `temperature`, `pressure`, and `saturation_ratio`;
+  - keep simulation volume explicitly under `ParticleData.volume` rather than
+    moving it into `EnvironmentData`;
+  - preserve the current compatibility boundary that existing process APIs may
+    still accept scalar `temperature` and `pressure` until later migrations.
 
-- `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Mark the CPU `EnvironmentData` baseline and convenience API as implemented.
-  - Keep future `WarpEnvironmentData`, conversion, and kernel integration work
-    listed as downstream.
+- Issue #1190 / E2-F2-P3 updated
+  `docs/Features/Roadmap/data-oriented-gpu.md` to:
+  - mark the CPU `EnvironmentData` baseline as shipped rather than future work;
+  - align ownership and mutation guidance with the feature migration guide; and
+  - keep `WarpEnvironmentData`, CPU↔GPU conversion helpers, and runtime/kernel
+    integration listed as downstream work.
 
-## Optional Updates
+## Remaining Optional Updates
 
 - Add a short example snippet showing single-box and multi-box construction if
   docs already include container usage examples.
@@ -31,7 +35,7 @@
 
 ## Process State Guidance
 
-Documentation should make the following ownership rule explicit:
+Documentation now makes the following ownership rule explicit:
 
 - processes read environment fields from `EnvironmentData` when they are
   migrated to the new API;

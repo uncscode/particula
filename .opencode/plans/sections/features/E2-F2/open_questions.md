@@ -14,6 +14,10 @@
 5. Issue #1189 shipped the package-level `particula.gas.EnvironmentData`
    export together with `n_boxes` and `copy()` semantics. Root-level package
    export remains deferred to downstream API-surface decisions.
+6. Issue #1190 resolved the process-boundary documentation: `EnvironmentData`
+   owns `temperature`, `pressure`, and `saturation_ratio`, but simulation
+   volume remains under `ParticleData.volume` and current process APIs may stay
+   scalar for `temperature`/`pressure` until later migrations.
 
 ## Resolution Path
 
@@ -21,3 +25,5 @@
   and root-export decisions to downstream migration tracks.
 - Preserve the current validation order and error-message specificity as later
   phases document or migrate the shipped convenience API surface.
+- Treat GPU mirrors, CPU↔GPU conversion helpers, and runtime integration as
+  downstream work rather than extending E2-F2 beyond the shipped CPU contract.
