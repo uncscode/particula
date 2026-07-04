@@ -39,3 +39,11 @@ markdown/link validation workflow or the closest available documentation check.
 - Shape tables cover CPU and GPU containers.
 - Tests or documented evidence show that current code matches the published
   schema inventory.
+
+## Current Shipped Evidence
+
+- Issue #1183 shipped as a documentation-only update.
+- The published inventory in `docs/Features/Roadmap/data-oriented-gpu.md`
+  points each schema claim back to source or existing tests in
+  `particula/particles/tests/`, `particula/gas/tests/`, and
+  `particula/gpu/tests/`.
