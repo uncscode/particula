@@ -1,7 +1,7 @@
 # Documentation Guide
 
 **Project:** particula  
-**Last Updated:** 2026-06-06
+**Last Updated:** 2026-07-04
 
 particula documentation is split between agent-facing guides in
 `.opencode/guides/` and user-facing MkDocs content in `docs/`.
@@ -17,7 +17,13 @@ particula documentation is split between agent-facing guides in
 
 ## MkDocs
 
-Build docs with:
+Validate documentation changes with the repository-local wrapper:
+
+```bash
+python3 .opencode/tools/build_mkdocs.py --validate-only --strict
+```
+
+Build docs directly with MkDocs when you need a full local site build:
 
 ```bash
 mkdocs build
@@ -59,4 +65,5 @@ help users understand model behavior or equations.
 ## Link Hygiene
 
 Prefer relative links within the repository. After documentation changes, run
-`mkdocs build` when feasible to catch broken documentation structure.
+`python3 .opencode/tools/build_mkdocs.py --validate-only --strict` when
+feasible to catch broken documentation structure and invalid links.

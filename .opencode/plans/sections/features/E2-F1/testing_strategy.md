@@ -73,9 +73,18 @@ subsection without creating a second source of truth.
   the ownership anchor and that `docs/Features/Roadmap/index.md` plus
   `docs/Features/particle-data-migration.md` still link to
   `#authoritative-field-ownership-decisions`.
-- Issue #1185 is in the pre-ship fix cycle for a documentation-only canonical-
-  shape update in `docs/Features/Roadmap/data-oriented-gpu.md`.
-- The current P3 evidence is the roadmap canonical shape subsection, its direct
+- Issue #1185 shipped as a documentation-only canonical-shape update in
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- The shipped P3 evidence is the roadmap canonical shape subsection, its direct
   migration-guide anchor link, the roadmap-index discoverability wording, and
   existing test/source evidence for shapes plus current single-box
   condensation/coagulation execution boundaries.
+- Issue #1186 shipped as a documentation-only downstream handoff publication
+  pass touching `docs/Features/Roadmap/data-oriented-gpu.md`,
+  `docs/Features/Roadmap/index.md`,
+  `docs/Features/particle-data-migration.md`, and `docs/index.md`.
+- The current P4 evidence is the published roadmap handoff map for `E2-F2`
+  through `E2-F9`, the direct handoff-anchor links from roadmap/migration/top-
+  level docs entry points, and the roadmap publication note recording
+  `python3 .opencode/tools/build_mkdocs.py --validate-only --strict` as the
+  docs validation command.
