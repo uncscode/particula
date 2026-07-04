@@ -17,7 +17,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-@dataclass
+@dataclass(eq=False)
 class EnvironmentData:
     """Mutable thermodynamic environment data for one or more boxes.
 
