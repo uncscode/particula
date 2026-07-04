@@ -18,6 +18,7 @@ Quick links:
 
 - [Current container schema inventory](#current-container-schema-inventory)
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
+- [Final downstream handoff map for sibling features](#final-downstream-handoff-map-for-sibling-features)
 
 ## Motivation and Target Workloads
 
@@ -425,6 +426,47 @@ Shared-across-box fields:
   particle or gas fields
   ([EnvironmentData Container](#environmentdata-container);
   `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
+
+#### Final downstream handoff map for sibling features
+
+> [!NOTE]
+> Publication note for `E2-F1-P4`: this phase publishes the finalized P2/P3
+> ownership and shape contract for downstream implementers; it does not add new
+> schema semantics. Documentation validation command:
+> `python3 .opencode/tools/build_mkdocs.py --validate-only --strict`
+
+- `E2-F2`: inherit future `EnvironmentData.temperature -> (n_boxes,)`,
+  `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
+  keep `ParticleData.volume -> (n_boxes,)` as the authoritative simulation
+  volume owner rather than moving volume into `EnvironmentData`.
+- `E2-F3`: inherit exact CPU↔GPU schema mirroring between future
+  `EnvironmentData` and `WarpEnvironmentData`, with `temperature -> (n_boxes,)`,
+  `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
+  do not add an extra volume field or an implicit transfer path.
+- `E2-F4`: inherit that `GasData.name` remains CPU-only ordered metadata,
+  `GasData.partitioning` stays `bool` on CPU and `int32` on GPU, and
+  `WarpGasData.vapor_pressure -> (n_boxes, n_species)` remains explicit
+  GPU-helper state dropped on CPU restore.
+- `E2-F5`: inherit the single-box leading-dimension contract for per-box arrays
+  such as `ParticleData.masses -> (1, n_particles, n_species)`,
+  `ParticleData.concentration -> (1, n_particles)`, and
+  `GasData.concentration -> (1, n_species)` without changing the canonical
+  storage ranks for multi-box-ready containers.
+- `E2-F6`: inherit the current `float64` / `wp.float64` schema baseline for
+  stored particle and gas arrays, plus the rule that no production
+  dtype-or-schema migration proceeds before study-backed approval.
+- `E2-F7`: inherit the existing environment and gas ownership boundaries,
+  including `ParticleData.volume` ownership, `WarpGasData.vapor_pressure` as
+  lossy helper state, and the requirement that integration guidance stay
+  deterministic and fixed-shape for graph-capture-friendly execution.
+- `E2-F8`: inherit that container schemas are already multi-box capable through
+  leading `n_boxes` dimensions, while current CPU condensation remains
+  single-box and current CPU coagulation paths are still documented as single-box
+  or explicitly transitional execution boundaries.
+- `E2-F9`: inherit this roadmap page as the canonical source of truth for field
+  ownership, shape tables, CPU↔GPU transfer caveats, validation evidence, and
+  downstream handoff references; link to these anchors instead of duplicating
+  the contract prose elsewhere.
 
 - Decide the particle mass storage representation given the wide dynamic range
   (see [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)).

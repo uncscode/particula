@@ -68,6 +68,7 @@ pages.
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
 - [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 - [Canonical shape conventions for container workflows](data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
+- [Final downstream handoff map for sibling features](data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
 
 ## Contribution Opportunities
 

@@ -20,6 +20,10 @@ the roadmap's
 [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
 and its surrounding [authoritative field ownership
 decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions).
+Downstream implementers should then read the
+[final downstream handoff map for sibling
+features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
+for the exact inherited field, shape, ownership, and CPU↔GPU transfer rules.
 
 The migration moves **data** into dedicated containers and leaves **behavior**
 in strategies and runnables:
@@ -34,7 +38,8 @@ in strategies and runnables:
     outside the GPU container. `from_warp_gas_data()` can validate only the
     supplied name-list length today; it does not verify that the restored names
     still match the original species ordering. Use the roadmap's
-    [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
+    [final downstream handoff map for sibling features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
+    and [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
     as the authoritative contract for this restore boundary.
 
 ## Why migrate

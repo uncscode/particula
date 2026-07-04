@@ -160,8 +160,11 @@ print(result)
 - [Wall loss strategy system](Features/wall_loss_strategy_system.md) — chamber
   wall loss strategies with builders, factory, and runnable integration.
 - [ParticleData and GasData migration guide](Features/particle-data-migration.md)
-  — data-container migration workflow with a direct path to the canonical shape
-  conventions.
+  — data-container migration workflow with direct links to the
+  [canonical shape contract](Features/Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
+  and [final downstream handoff map](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
 - [Data-oriented design and GPU roadmap](Features/Roadmap/data-oriented-gpu.md)
-  — current schema inventory, canonical shape conventions, and authoritative
-  CPU/GPU field ownership policy.
+  — current schema inventory,
+  [authoritative CPU/GPU field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
+  and the [final downstream handoff map for sibling E2
+  features](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
