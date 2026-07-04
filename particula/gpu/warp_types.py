@@ -1,8 +1,8 @@
 """GPU-side data containers using NVIDIA Warp.
 
-This module defines Warp struct containers for particle and gas data
-that mirror the CPU-side ParticleData and GasData containers. These
-structs enable efficient GPU-resident data for multi-box CFD simulations.
+This module defines Warp struct containers for particle, gas, and
+environment data that mirror CPU-side particula containers. These structs
+enable efficient GPU-resident data for multi-box CFD simulations.
 
 The structs use Warp array types for GPU memory management:
 - wp.array: 1D arrays
@@ -132,3 +132,25 @@ class WarpGasData:
     concentration: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
     vapor_pressure: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
     partitioning: wp.array(dtype=wp.int32)  # type: ignore[valid-type]
+
+
+@wp.struct
+class WarpEnvironmentData:
+    """GPU-side environment data container using Warp arrays.
+
+    Mirrors the shape convention of EnvironmentData from particula.gas.
+    Temperature and pressure store one value per simulation box, and
+    saturation ratio stores per-box, per-species values.
+
+    Attributes:
+        temperature: Box temperatures in kelvin.
+            Shape: (n_boxes,)
+        pressure: Box pressures in pascals.
+            Shape: (n_boxes,)
+        saturation_ratio: Per-box, per-species saturation ratios.
+            Shape: (n_boxes, n_species)
+    """
+
+    temperature: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
+    pressure: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
+    saturation_ratio: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
