@@ -410,7 +410,7 @@ class TestToWarpEnvironmentData:
     def test_environment_data_copy_false_cpu_behavior(
         self, sample_environment_data_single_box
     ) -> None:
-        """Test copy=False preserves supported CPU-backed transfer behavior."""
+        """Test copy=False does not expose a live CPU view after conversion."""
         gpu_data = to_warp_environment_data(
             sample_environment_data_single_box,
             device="cpu",
@@ -446,20 +446,24 @@ class TestToWarpEnvironmentData:
         gpu_pressure = gpu_data.pressure.numpy()
         gpu_saturation_ratio = gpu_data.saturation_ratio.numpy()
 
-        assert np.array_equal(
+        np.testing.assert_array_equal(gpu_temperature, original_temperature)
+        assert not np.array_equal(
             gpu_temperature,
             sample_environment_data_single_box.temperature,
-        ) or np.array_equal(gpu_temperature, original_temperature)
-        assert np.array_equal(
+        )
+
+        np.testing.assert_array_equal(gpu_pressure, original_pressure)
+        assert not np.array_equal(
             gpu_pressure,
             sample_environment_data_single_box.pressure,
-        ) or np.array_equal(gpu_pressure, original_pressure)
-        assert np.array_equal(
+        )
+
+        np.testing.assert_array_equal(
+            gpu_saturation_ratio, original_saturation_ratio
+        )
+        assert not np.array_equal(
             gpu_saturation_ratio,
             sample_environment_data_single_box.saturation_ratio,
-        ) or np.array_equal(
-            gpu_saturation_ratio,
-            original_saturation_ratio,
         )
 
 
