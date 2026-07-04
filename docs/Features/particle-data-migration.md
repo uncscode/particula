@@ -40,11 +40,12 @@ in strategies and runnables:
   workflows keep working while you migrate.
 
 !!! note
-    `EnvironmentData` is a shipped CPU baseline container, not a full migration
-    end state. It is available from `particula.gas.environment_data` and is
-    exported from `particula.gas` for package-level imports. It requires at
-    least one box at construction time, but it does not yet participate in
-    CPU↔GPU conversion helpers or broad high-level workflow integration.
+    `EnvironmentData` is the shipped CPU container for per-box thermodynamic
+    state, not a separate gas facade. It is available from
+    `particula.gas.environment_data` and is exported from `particula.gas` for
+    package-level imports. It requires at least one box at construction time,
+    but it does not yet participate in CPU↔GPU conversion helpers or broad
+    high-level workflow integration.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered
@@ -255,8 +256,10 @@ particle_out = coagulation.step(
 ```
 
 Use `EnvironmentData` to document and carry per-box thermodynamic state on the
-CPU side, but keep current scalar `temperature` and `pressure` arguments where
-the process API has not yet been migrated.
+CPU side. Keep current scalar `temperature` and `pressure` arguments where the
+process API has not yet been migrated; migrated process code may read
+`EnvironmentData` directly, but only the physical model that owns the update
+should mutate it.
 
 ## Conversion helpers
 
