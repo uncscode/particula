@@ -113,10 +113,11 @@ The lower-level Warp backend is implemented and covered by targeted tests.
 - GPU condensation kernels provide a tested `condensation_step_gpu` API.
 - GPU Brownian coagulation kernels provide a tested `coagulation_step_gpu` API.
 - GPU benchmark scaffolding exists for CUDA-enabled environments.
-- Parity tests parametrize over available Warp devices, running on Warp CPU
-  everywhere and additionally on Warp CUDA when a device is present, without
-  making CUDA a hard runtime or test requirement and without implying broader
-  automatic GPU runtime integration has shipped.
+- Parity tests parametrize over available Warp devices, always running on Warp
+  CPU and additionally on Warp CUDA when a device is present. CUDA is optional,
+  not a hard runtime or test requirement, and that parity coverage documents
+  the explicit helper surface rather than a shipped automatic GPU runtime
+  integration.
 
 The GPU backend is currently a directly callable lower-level API. It is not yet
 integrated as an automatic backend in the main `Aerosol`, `Runnable`, or
@@ -540,9 +541,9 @@ perform hidden CPU↔GPU environment movement or implicit synchronization.
 - Keep round-trip conversion coverage aligned with the existing
   `ParticleData`/`GasData` conversion patterns, including one-box and multi-box
   cases plus explicit synchronization behavior, with device-parametrized parity
-  checks on Warp `cpu` everywhere and Warp `cuda` when available. That test
-  coverage confirms the helper surface only; it does not mean automatic
-  environment transfers inside broader runtimes have shipped.
+  checks that always run on Warp `cpu` and add Warp `cuda` only when
+  available. That test coverage confirms the helper surface only; it does not
+  mean automatic environment transfers inside broader runtimes have shipped.
 - Decide how existing kernel APIs that accept scalar temperature and pressure
   migrate to per-box arrays without breaking the current low-level API.
 

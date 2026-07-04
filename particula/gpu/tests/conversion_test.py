@@ -22,6 +22,44 @@ from particula.gpu.conversion import (  # noqa: E402
 from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
 
 
+def _assert_environment_gpu_mirror_matches(source, gpu_data) -> None:
+    """Assert Warp mirror shapes, values, and dtypes match the CPU source."""
+    assert gpu_data.temperature.shape == source.temperature.shape
+    assert gpu_data.pressure.shape == source.pressure.shape
+    assert gpu_data.saturation_ratio.shape == source.saturation_ratio.shape
+
+    np.testing.assert_array_equal(
+        gpu_data.temperature.numpy(),
+        source.temperature,
+    )
+    np.testing.assert_array_equal(
+        gpu_data.pressure.numpy(),
+        source.pressure,
+    )
+    np.testing.assert_array_equal(
+        gpu_data.saturation_ratio.numpy(),
+        source.saturation_ratio,
+    )
+
+    assert gpu_data.temperature.dtype == wp.float64
+    assert gpu_data.pressure.dtype == wp.float64
+    assert gpu_data.saturation_ratio.dtype == wp.float64
+
+
+def _assert_environment_round_trip_matches(source, restored) -> None:
+    """Assert CPU→Warp→CPU preserves environment shapes and values exactly."""
+    assert restored.temperature.shape == source.temperature.shape
+    assert restored.pressure.shape == source.pressure.shape
+    assert restored.saturation_ratio.shape == source.saturation_ratio.shape
+
+    np.testing.assert_array_equal(restored.temperature, source.temperature)
+    np.testing.assert_array_equal(restored.pressure, source.pressure)
+    np.testing.assert_array_equal(
+        restored.saturation_ratio,
+        source.saturation_ratio,
+    )
+
+
 @pytest.fixture
 def sample_particle_data():
     """Create sample ParticleData for testing."""
@@ -311,27 +349,10 @@ class TestToWarpEnvironmentData:
         gpu_data = to_warp_environment_data(
             sample_environment_data_single_box, device="cpu"
         )
-
-        assert gpu_data.temperature.shape == (1,)
-        assert gpu_data.pressure.shape == (1,)
-        assert gpu_data.saturation_ratio.shape == (1, 2)
-
-        np.testing.assert_array_equal(
-            gpu_data.temperature.numpy(),
-            sample_environment_data_single_box.temperature,
+        _assert_environment_gpu_mirror_matches(
+            sample_environment_data_single_box,
+            gpu_data,
         )
-        np.testing.assert_array_equal(
-            gpu_data.pressure.numpy(),
-            sample_environment_data_single_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            gpu_data.saturation_ratio.numpy(),
-            sample_environment_data_single_box.saturation_ratio,
-        )
-
-        assert gpu_data.temperature.dtype == wp.float64
-        assert gpu_data.pressure.dtype == wp.float64
-        assert gpu_data.saturation_ratio.dtype == wp.float64
 
     def test_environment_data_multi_box_shapes_and_values(
         self, sample_environment_data_multi_box
@@ -340,27 +361,10 @@ class TestToWarpEnvironmentData:
         gpu_data = to_warp_environment_data(
             sample_environment_data_multi_box, device="cpu"
         )
-
-        assert gpu_data.temperature.shape == (2,)
-        assert gpu_data.pressure.shape == (2,)
-        assert gpu_data.saturation_ratio.shape == (2, 3)
-
-        np.testing.assert_array_equal(
-            gpu_data.temperature.numpy(),
-            sample_environment_data_multi_box.temperature,
+        _assert_environment_gpu_mirror_matches(
+            sample_environment_data_multi_box,
+            gpu_data,
         )
-        np.testing.assert_array_equal(
-            gpu_data.pressure.numpy(),
-            sample_environment_data_multi_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            gpu_data.saturation_ratio.numpy(),
-            sample_environment_data_multi_box.saturation_ratio,
-        )
-
-        assert gpu_data.temperature.dtype == wp.float64
-        assert gpu_data.pressure.dtype == wp.float64
-        assert gpu_data.saturation_ratio.dtype == wp.float64
 
     def test_environment_data_invalid_device_error(
         self, sample_environment_data_single_box
@@ -903,27 +907,9 @@ class TestFromWarpEnvironmentData:
             device="cpu",
         )
         result = from_warp_environment_data(gpu_data)
-
-        assert result.temperature.shape == (
-            sample_environment_data_single_box.temperature.shape
-        )
-        assert result.pressure.shape == (
-            sample_environment_data_single_box.pressure.shape
-        )
-        assert result.saturation_ratio.shape == (
-            sample_environment_data_single_box.saturation_ratio.shape
-        )
-        np.testing.assert_array_equal(
-            result.temperature,
-            sample_environment_data_single_box.temperature,
-        )
-        np.testing.assert_array_equal(
-            result.pressure,
-            sample_environment_data_single_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            result.saturation_ratio,
-            sample_environment_data_single_box.saturation_ratio,
+        _assert_environment_round_trip_matches(
+            sample_environment_data_single_box,
+            result,
         )
 
     def test_environment_data_round_trip_multi_box(
@@ -935,27 +921,9 @@ class TestFromWarpEnvironmentData:
             device="cpu",
         )
         result = from_warp_environment_data(gpu_data)
-
-        assert result.temperature.shape == (
-            sample_environment_data_multi_box.temperature.shape
-        )
-        assert result.pressure.shape == (
-            sample_environment_data_multi_box.pressure.shape
-        )
-        assert result.saturation_ratio.shape == (
-            sample_environment_data_multi_box.saturation_ratio.shape
-        )
-        np.testing.assert_array_equal(
-            result.temperature,
-            sample_environment_data_multi_box.temperature,
-        )
-        np.testing.assert_array_equal(
-            result.pressure,
-            sample_environment_data_multi_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            result.saturation_ratio,
-            sample_environment_data_multi_box.saturation_ratio,
+        _assert_environment_round_trip_matches(
+            sample_environment_data_multi_box,
+            result,
         )
 
     @pytest.mark.parametrize("device", warp_devices(wp))
@@ -964,33 +932,19 @@ class TestFromWarpEnvironmentData:
         sample_environment_data_multi_box,
         device: str,
     ) -> None:
-        """Test environment round-trip parity on available Warp devices."""
+        """Test explicit environment round-trip parity on available devices."""
         gpu_data = to_warp_environment_data(
             sample_environment_data_multi_box,
             device=device,
         )
+        _assert_environment_gpu_mirror_matches(
+            sample_environment_data_multi_box,
+            gpu_data,
+        )
         result = from_warp_environment_data(gpu_data)
-
-        assert result.temperature.shape == (
-            sample_environment_data_multi_box.temperature.shape
-        )
-        assert result.pressure.shape == (
-            sample_environment_data_multi_box.pressure.shape
-        )
-        assert result.saturation_ratio.shape == (
-            sample_environment_data_multi_box.saturation_ratio.shape
-        )
-        np.testing.assert_array_equal(
-            result.temperature,
-            sample_environment_data_multi_box.temperature,
-        )
-        np.testing.assert_array_equal(
-            result.pressure,
-            sample_environment_data_multi_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            result.saturation_ratio,
-            sample_environment_data_multi_box.saturation_ratio,
+        _assert_environment_round_trip_matches(
+            sample_environment_data_multi_box,
+            result,
         )
 
     def test_from_warp_environment_data_sync_true(
@@ -1002,18 +956,9 @@ class TestFromWarpEnvironmentData:
             device="cpu",
         )
         result = from_warp_environment_data(gpu_data, sync=True)
-
-        np.testing.assert_array_equal(
-            result.temperature,
-            sample_environment_data_single_box.temperature,
-        )
-        np.testing.assert_array_equal(
-            result.pressure,
-            sample_environment_data_single_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            result.saturation_ratio,
-            sample_environment_data_single_box.saturation_ratio,
+        _assert_environment_round_trip_matches(
+            sample_environment_data_single_box,
+            result,
         )
 
     def test_from_warp_environment_data_sync_false_manual(
@@ -1026,18 +971,9 @@ class TestFromWarpEnvironmentData:
         )
         wp.synchronize()
         result = from_warp_environment_data(gpu_data, sync=False)
-
-        np.testing.assert_array_equal(
-            result.temperature,
-            sample_environment_data_multi_box.temperature,
-        )
-        np.testing.assert_array_equal(
-            result.pressure,
-            sample_environment_data_multi_box.pressure,
-        )
-        np.testing.assert_array_equal(
-            result.saturation_ratio,
-            sample_environment_data_multi_box.saturation_ratio,
+        _assert_environment_round_trip_matches(
+            sample_environment_data_multi_box,
+            result,
         )
 
     def test_from_warp_environment_data_invalid_saturation_ratio_shape_raises_value_error(
@@ -1110,8 +1046,7 @@ class TestGpuContext:
         )
 
     def test_gpu_context_default_device(self, sample_particle_data) -> None:
-        """Test that default device is cuda (may fallback to cpu in tests)."""
-        # This test just verifies the function can be called with default device
-        # In CI without GPU, this may raise an error - so we use cpu explicitly
+        """Test gpu_context works when an explicit portable device is used."""
+        # Keep this fast test portable across environments by using Warp cpu.
         with gpu_context(sample_particle_data, device="cpu") as gpu_data:
             assert gpu_data is not None

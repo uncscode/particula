@@ -375,11 +375,13 @@ thermodynamic state, while the Warp object keeps the same logical fields in
 Warp arrays on the selected device. Callers choose when to cross the CPU↔GPU
 boundary with `to_warp_environment_data()` and
 `from_warp_environment_data()`. Kernels and runnables do not perform hidden
-CPU↔GPU environment transfers or synchronization for you.
+CPU↔GPU environment transfers or synchronization for you, and CUDA support is
+optional rather than required for this helper workflow.
 
 #### EnvironmentData Round-Trip Example
 
-The mirror keeps the same shape contract on both sides of the transfer:
+This explicit round trip keeps the same shape contract on both sides of the
+transfer:
 
 - `temperature`: `(n_boxes,)`
 - `pressure`: `(n_boxes,)`
@@ -390,6 +392,7 @@ import numpy as np
 
 from particula.gas import EnvironmentData
 from particula.gpu import (
+    WarpEnvironmentData,
     from_warp_environment_data,
     to_warp_environment_data,
 )
@@ -402,7 +405,10 @@ environment = EnvironmentData(
     ),
 )
 
-gpu_environment = to_warp_environment_data(environment, device="cpu")
+gpu_environment: WarpEnvironmentData = to_warp_environment_data(
+    environment,
+    device="cpu",
+)
 restored = from_warp_environment_data(gpu_environment)
 
 assert restored.temperature.shape == (2,)
@@ -416,12 +422,13 @@ assert np.array_equal(
 )
 ```
 
-Use `device="cpu"` for a portable round-trip on any Warp installation.
+Use `device="cpu"` for a portable round trip on any Warp installation.
 `device="cuda"` is optional and should be used only when Warp CUDA support is
 available. The important design rule is that transfer boundaries stay visible:
-build `WarpEnvironmentData` once, let kernels or runnables consume it in place,
-and convert back to `EnvironmentData` only when CPU-side analysis or control
-flow actually needs the data.
+build `EnvironmentData`, convert explicitly to `WarpEnvironmentData`, let
+kernels or runnables consume that mirror in place, and convert back to
+`EnvironmentData` only when CPU-side analysis or control flow actually needs
+the data.
 
 ### Pre-allocation
 
