@@ -4,6 +4,10 @@ This module defines :class:`EnvironmentData`, a mutable container for the
 temperature, pressure, and saturation-ratio fields associated with one or more
 simulation boxes. Separating this state from gas-species data lets multi-box
 workflows manage shared thermodynamic conditions independently.
+
+`EnvironmentData` is currently a constructor-validated CPU-side container in
+``particula.gas.environment_data``. It is not yet exported from
+``particula.gas`` and does not yet have CPU↔GPU conversion helpers.
 """
 
 from dataclasses import dataclass
@@ -77,7 +81,7 @@ class EnvironmentData:
         """
         try:
             return np.asarray(values, dtype=np.float64)
-        except (TypeError, ValueError) as exc:
+        except (TypeError, ValueError, OverflowError) as exc:
             raise ValueError(
                 f"{field_name} must be array-like and coercible to float64"
             ) from exc
@@ -110,10 +114,18 @@ class EnvironmentData:
         """Validate shared box-count consistency after ndim checks.
 
         Raises:
-            ValueError: If ``pressure`` or ``saturation_ratio`` does not share
-                the same leading box dimension as ``temperature``.
+            ValueError: If no boxes are provided, or if ``pressure`` or
+                ``saturation_ratio`` does not share the same leading box
+                dimension as ``temperature``.
         """
         n_boxes = self.temperature.shape[0]
+
+        if n_boxes == 0:
+            raise ValueError(
+                "EnvironmentData requires at least one box "
+                "(temperature, pressure, and saturation_ratio must not be "
+                "empty along the box dimension)"
+            )
 
         if self.pressure.shape != (n_boxes,):
             raise ValueError(

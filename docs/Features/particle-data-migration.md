@@ -30,8 +30,19 @@ in strategies and runnables:
 
 - `ParticleData` stores per-particle arrays with an explicit batch dimension.
 - `GasData` stores gas species arrays with an explicit box dimension.
+- `EnvironmentData` now provides a constructor-validated CPU-side container for
+  per-box thermodynamic state in `particula.gas.environment_data` with
+  `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
+  `saturation_ratio -> (n_boxes, n_species)`.
 - `ParticleRepresentation` and `GasSpecies` remain as facades so existing
   workflows keep working while you migrate.
+
+!!! note
+    `EnvironmentData` is a shipped baseline container, not a full migration end
+    state. It currently lives in `particula.gas.environment_data`, requires at
+    least one box at construction time, is not exported from `particula.gas`,
+    and does not yet participate in CPU↔GPU conversion helpers or broad
+    high-level workflow integration.
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered

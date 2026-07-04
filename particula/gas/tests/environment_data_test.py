@@ -1,9 +1,6 @@
 """Tests for the EnvironmentData dataclass."""
 
-import importlib
-
 import numpy as np
-import particula.gas as gas_package
 import pytest
 from particula.gas.environment_data import EnvironmentData
 
@@ -61,81 +58,6 @@ def test_environment_data_coerces_list_and_tuple_inputs_to_float64() -> None:
     assert environment.temperature.dtype == np.float64
     assert environment.pressure.dtype == np.float64
     assert environment.saturation_ratio.dtype == np.float64
-
-
-def test_environment_data_coerce_float64_array_returns_float64_array() -> None:
-    """Private coercion helper converts array-like input to float64."""
-    result = EnvironmentData._coerce_float64_array(
-        [298.15, 299.15],
-        field_name="temperature",
-    )
-
-    assert result.dtype == np.float64
-    np.testing.assert_allclose(result, np.array([298.15, 299.15]))
-
-
-def test_environment_data_coerce_float64_array_invalid_input_raises_value_error() -> (
-    None
-):
-    """Private coercion helper rejects non-coercible array-like input."""
-    with pytest.raises(
-        ValueError,
-        match="temperature must be array-like and coercible to float64",
-    ):
-        EnvironmentData._coerce_float64_array(
-            ["not-a-number"],
-            field_name="temperature",
-        )
-
-
-def test_environment_data_validate_dimensionality_accepts_valid_arrays() -> (
-    None
-):
-    """Private dimensionality validator accepts valid array shapes."""
-    environment = _make_environment_data(
-        temperature=[298.15],
-        pressure=[101325.0],
-        saturation_ratio=[[1.0]],
-    )
-
-    environment._validate_dimensionality()
-
-
-def test_environment_data_validate_shapes_accepts_matching_box_counts() -> None:
-    """Private shape validator accepts matching box counts."""
-    environment = _make_environment_data(
-        temperature=[298.15, 300.0],
-        pressure=[101325.0, 100000.0],
-        saturation_ratio=[[1.0], [0.9]],
-    )
-
-    environment._validate_shapes()
-
-
-def test_environment_data_validate_finite_values_accepts_finite_arrays() -> (
-    None
-):
-    """Private finite-value validator accepts finite numeric arrays."""
-    environment = _make_environment_data(
-        temperature=[298.15],
-        pressure=[101325.0],
-        saturation_ratio=[[0.8, 1.2]],
-    )
-
-    environment._validate_finite_values()
-
-
-def test_environment_data_validate_physical_bounds_accepts_valid_values() -> (
-    None
-):
-    """Private bounds validator accepts positive and nonnegative values."""
-    environment = _make_environment_data(
-        temperature=[298.15],
-        pressure=[101325.0],
-        saturation_ratio=[[0.0, 1.2]],
-    )
-
-    environment._validate_physical_bounds()
 
 
 @pytest.mark.parametrize(
@@ -213,6 +135,70 @@ def test_environment_data_saturation_ratio_box_count_mismatch_raises_value_error
             temperature=[298.15, 300.0],
             pressure=[101325.0, 90000.0],
             saturation_ratio=[[1.0, 0.9]],
+        )
+
+
+@pytest.mark.parametrize(
+    "saturation_ratio",
+    [np.empty((0, 0)), np.empty((0, 2))],
+)
+def test_environment_data_zero_box_inputs_raise_value_error(
+    saturation_ratio: np.ndarray,
+) -> None:
+    """EnvironmentData requires at least one box."""
+    with pytest.raises(ValueError, match="requires at least one box"):
+        _make_environment_data(
+            temperature=[],
+            pressure=[],
+            saturation_ratio=saturation_ratio,
+        )
+
+
+class _OverflowOnFloat:
+    """Helper object that raises OverflowError during float coercion."""
+
+    def __float__(self) -> float:
+        raise OverflowError("float overflow during coercion")
+
+
+@pytest.mark.parametrize(
+    ("field_name", "temperature", "pressure", "saturation_ratio"),
+    [
+        (
+            "temperature",
+            [[1.0], [2.0, 3.0]],
+            [101325.0],
+            [[1.0]],
+        ),
+        (
+            "pressure",
+            [298.15],
+            [_OverflowOnFloat()],
+            [[1.0]],
+        ),
+        (
+            "saturation_ratio",
+            [298.15],
+            [101325.0],
+            [[object()]],
+        ),
+    ],
+)
+def test_environment_data_invalid_coercion_raises_value_error(
+    field_name: str,
+    temperature: object,
+    pressure: object,
+    saturation_ratio: object,
+) -> None:
+    """Malformed constructor inputs fail with normalized ValueError."""
+    with pytest.raises(
+        ValueError,
+        match=f"{field_name} must be array-like and coercible to float64",
+    ):
+        _make_environment_data(
+            temperature=temperature,
+            pressure=pressure,
+            saturation_ratio=saturation_ratio,
         )
 
 
@@ -321,11 +307,18 @@ def test_environment_data_supersaturation_values_above_one_are_valid() -> None:
     )
 
 
-def test_environment_data_direct_module_import_requires_no_package_export_change() -> (
-    None
-):
-    """Direct module import works without adding a package-level export."""
-    module = importlib.import_module("particula.gas.environment_data")
+def test_environment_data_valid_inputs_preserve_float64_values() -> None:
+    """Valid constructor inputs remain accepted and coerced to float64."""
+    environment = _make_environment_data(
+        temperature=np.array([298.15, 300.15], dtype=np.float32),
+        pressure=(101325, 95000),
+        saturation_ratio=[[0, 1.0], [1.2, 0.5]],
+    )
 
-    assert module.EnvironmentData is EnvironmentData
-    assert not hasattr(gas_package, "EnvironmentData")
+    assert environment.temperature.dtype == np.float64
+    assert environment.pressure.dtype == np.float64
+    assert environment.saturation_ratio.dtype == np.float64
+    np.testing.assert_allclose(
+        environment.temperature,
+        np.array([298.15, 300.15], dtype=np.float64),
+    )
