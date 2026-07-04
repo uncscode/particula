@@ -74,8 +74,9 @@ def test_environment_data_coerce_float64_array_returns_float64_array() -> None:
     np.testing.assert_allclose(result, np.array([298.15, 299.15]))
 
 
-def test_environment_data_coerce_float64_array_invalid_input_raises_value_error(
-) -> None:
+def test_environment_data_coerce_float64_array_invalid_input_raises_value_error() -> (
+    None
+):
     """Private coercion helper rejects non-coercible array-like input."""
     with pytest.raises(
         ValueError,
@@ -87,7 +88,9 @@ def test_environment_data_coerce_float64_array_invalid_input_raises_value_error(
         )
 
 
-def test_environment_data_validate_dimensionality_accepts_valid_arrays() -> None:
+def test_environment_data_validate_dimensionality_accepts_valid_arrays() -> (
+    None
+):
     """Private dimensionality validator accepts valid array shapes."""
     environment = _make_environment_data(
         temperature=[298.15],
@@ -109,7 +112,9 @@ def test_environment_data_validate_shapes_accepts_matching_box_counts() -> None:
     environment._validate_shapes()
 
 
-def test_environment_data_validate_finite_values_accepts_finite_arrays() -> None:
+def test_environment_data_validate_finite_values_accepts_finite_arrays() -> (
+    None
+):
     """Private finite-value validator accepts finite numeric arrays."""
     environment = _make_environment_data(
         temperature=[298.15],
@@ -120,7 +125,9 @@ def test_environment_data_validate_finite_values_accepts_finite_arrays() -> None
     environment._validate_finite_values()
 
 
-def test_environment_data_validate_physical_bounds_accepts_valid_values() -> None:
+def test_environment_data_validate_physical_bounds_accepts_valid_values() -> (
+    None
+):
     """Private bounds validator accepts positive and nonnegative values."""
     environment = _make_environment_data(
         temperature=[298.15],
@@ -179,8 +186,9 @@ def test_environment_data_saturation_ratio_invalid_dimensionality_raises_value_e
         )
 
 
-def test_environment_data_temperature_pressure_length_mismatch_raises_value_error(
-) -> None:
+def test_environment_data_temperature_pressure_length_mismatch_raises_value_error() -> (
+    None
+):
     """Pressure box count must match temperature box count."""
     with pytest.raises(
         ValueError,
@@ -193,8 +201,9 @@ def test_environment_data_temperature_pressure_length_mismatch_raises_value_erro
         )
 
 
-def test_environment_data_saturation_ratio_box_count_mismatch_raises_value_error(
-) -> None:
+def test_environment_data_saturation_ratio_box_count_mismatch_raises_value_error() -> (
+    None
+):
     """Saturation ratio leading dimension must match temperature boxes."""
     with pytest.raises(
         ValueError,
@@ -260,7 +269,9 @@ def test_environment_data_nonpositive_temperature_raises_value_error(
     temperature: float,
 ) -> None:
     """Temperature must be strictly positive."""
-    with pytest.raises(ValueError, match="temperature must be strictly positive"):
+    with pytest.raises(
+        ValueError, match="temperature must be strictly positive"
+    ):
         _make_environment_data(
             temperature=[temperature],
             pressure=[101325.0],
@@ -286,7 +297,9 @@ def test_environment_data_negative_saturation_ratio_raises_value_error(
     saturation_ratio: float,
 ) -> None:
     """Saturation ratio must be nonnegative."""
-    with pytest.raises(ValueError, match="saturation_ratio must be nonnegative"):
+    with pytest.raises(
+        ValueError, match="saturation_ratio must be nonnegative"
+    ):
         _make_environment_data(
             temperature=[298.15],
             pressure=[101325.0],
@@ -308,8 +321,9 @@ def test_environment_data_supersaturation_values_above_one_are_valid() -> None:
     )
 
 
-def test_environment_data_direct_module_import_requires_no_package_export_change(
-) -> None:
+def test_environment_data_direct_module_import_requires_no_package_export_change() -> (
+    None
+):
     """Direct module import works without adding a package-level export."""
     module = importlib.import_module("particula.gas.environment_data")
 

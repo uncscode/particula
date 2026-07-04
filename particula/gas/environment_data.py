@@ -1,8 +1,9 @@
-"""Provide per-box thermodynamic environment data for gas simulations.
+"""Provide per-box thermodynamic state for gas-phase simulations.
 
-EnvironmentData isolates mutable temperature, pressure, and
-saturation-ratio arrays from gas-species state so multi-box simulations can
-manage thermodynamic conditions independently.
+This module defines :class:`EnvironmentData`, a mutable container for the
+temperature, pressure, and saturation-ratio fields associated with one or more
+simulation boxes. Separating this state from gas-species data lets multi-box
+workflows manage shared thermodynamic conditions independently.
 """
 
 from dataclasses import dataclass
@@ -31,7 +32,13 @@ class EnvironmentData:
     saturation_ratio: NDArray[np.float64]
 
     def __post_init__(self) -> None:
-        """Coerce array inputs and validate the environment contract."""
+        """Coerce constructor inputs and validate the field contract.
+
+        Raises:
+            ValueError: If any field cannot be coerced to ``np.float64`` or
+                fails dimensionality, shape, finiteness, or physical-bound
+                validation.
+        """
         self.temperature = self._coerce_float64_array(
             self.temperature,
             field_name="temperature",
@@ -56,7 +63,18 @@ class EnvironmentData:
         *,
         field_name: str,
     ) -> NDArray[np.float64]:
-        """Convert array-like input to a float64 NumPy array."""
+        """Convert array-like input to a ``np.float64`` NumPy array.
+
+        Args:
+            values: Array-like input supplied for a dataclass field.
+            field_name: Name of the field being coerced for error reporting.
+
+        Returns:
+            NumPy array with ``np.float64`` dtype.
+
+        Raises:
+            ValueError: If ``values`` cannot be converted to a float64 array.
+        """
         try:
             return np.asarray(values, dtype=np.float64)
         except (TypeError, ValueError) as exc:
@@ -65,7 +83,12 @@ class EnvironmentData:
             ) from exc
 
     def _validate_dimensionality(self) -> None:
-        """Validate per-field dimensionality requirements."""
+        """Validate per-field dimensionality requirements.
+
+        Raises:
+            ValueError: If ``temperature`` or ``pressure`` is not 1D, or if
+                ``saturation_ratio`` is not 2D.
+        """
         if self.temperature.ndim != 1:
             raise ValueError(
                 "temperature must be 1D (n_boxes,), "
@@ -74,8 +97,7 @@ class EnvironmentData:
 
         if self.pressure.ndim != 1:
             raise ValueError(
-                "pressure must be 1D (n_boxes,), "
-                f"got ndim={self.pressure.ndim}"
+                f"pressure must be 1D (n_boxes,), got ndim={self.pressure.ndim}"
             )
 
         if self.saturation_ratio.ndim != 2:
@@ -85,7 +107,12 @@ class EnvironmentData:
             )
 
     def _validate_shapes(self) -> None:
-        """Validate shared box-count consistency after ndim checks."""
+        """Validate shared box-count consistency after ndim checks.
+
+        Raises:
+            ValueError: If ``pressure`` or ``saturation_ratio`` does not share
+                the same leading box dimension as ``temperature``.
+        """
         n_boxes = self.temperature.shape[0]
 
         if self.pressure.shape != (n_boxes,):
@@ -102,7 +129,11 @@ class EnvironmentData:
             )
 
     def _validate_finite_values(self) -> None:
-        """Require all numeric fields to be finite."""
+        """Require all numeric fields to be finite.
+
+        Raises:
+            ValueError: If any field contains ``NaN`` or infinite values.
+        """
         if not np.all(np.isfinite(self.temperature)):
             raise ValueError("temperature must contain only finite values")
 
@@ -110,12 +141,15 @@ class EnvironmentData:
             raise ValueError("pressure must contain only finite values")
 
         if not np.all(np.isfinite(self.saturation_ratio)):
-            raise ValueError(
-                "saturation_ratio must contain only finite values"
-            )
+            raise ValueError("saturation_ratio must contain only finite values")
 
     def _validate_physical_bounds(self) -> None:
-        """Require positive thermodynamic state and nonnegative saturation."""
+        """Require positive thermodynamic state and nonnegative saturation.
+
+        Raises:
+            ValueError: If temperature or pressure is nonpositive, or if any
+                saturation ratio is negative.
+        """
         if np.any(self.temperature <= 0.0):
             raise ValueError("temperature must be strictly positive")
 

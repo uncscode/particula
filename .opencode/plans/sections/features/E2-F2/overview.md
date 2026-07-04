@@ -2,18 +2,20 @@
 
 ## Problem Statement
 
-Issue #1172 feature E2-F2 needs a CPU-side `EnvironmentData` container for
-per-box thermodynamic state. Existing `GasData` owns gas-species state and
-existing dynamics APIs pass `temperature` and `pressure` as scalars, leaving
-multi-box temperature, pressure, humidity, and saturation state without a
-consistent home.
+Issue #1188 shipped E2-F2 phase P1 by adding a CPU-side `EnvironmentData`
+container for per-box thermodynamic state in
+`particula/gas/environment_data.py`. Existing `GasData` still owns gas-species
+state and existing dynamics APIs still pass `temperature` and `pressure` as
+scalars, so the shipped work establishes the validated container baseline but
+does not yet migrate process call sites.
 
 ## Value Proposition
 
-`EnvironmentData` creates the third CPU data container identified by parent
-epic E2: `ParticleData` for particles, `GasData` for gas species, and
-`EnvironmentData` for per-box thermodynamic state. This keeps schema ownership
-clear before downstream tracks add GPU mirrors and migrate process kernels.
+`EnvironmentData` now exists as the third CPU data container identified by
+parent epic E2: `ParticleData` for particles, `GasData` for gas species, and
+`EnvironmentData` for per-box thermodynamic state. P1 gives downstream phases a
+validated direct-module container with deterministic coercion and validation
+rules before they add exports, copy helpers, or process/GPU integrations.
 
 ## User Stories
 

@@ -1,16 +1,22 @@
 # Phase Details
 
-- [ ] **E2-F2-P1:** Define EnvironmentData fields and validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F2-P1:** Define EnvironmentData fields and validation with unit tests
+  - Issue: #1188 | Size: S | Status: Shipped
   - Goal: Add the core per-box field schema and strict validation rules for
     `temperature`, `pressure`, and canonical species-resolved
     `saturation_ratio` state.
   - Files: `particula/gas/environment_data.py`,
     `particula/gas/tests/environment_data_test.py`
-  - Tests: valid single-box construction, invalid dimensionality, mismatched
-    field lengths, non-finite values, negative pressure or saturation ratio,
-    permitted supersaturation above `1.0`, and positive Kelvin temperature
-    requirements.
+  - Shipped details: constructor inputs are coerced with
+    `np.asarray(..., dtype=np.float64)`, validation runs in deterministic stages
+    (dimensionality, shared box-count shape, finiteness, then physical bounds),
+    and direct-module import is covered without adding package exports.
+  - Tests: valid single-box construction, valid multi-box construction,
+    list/tuple dtype coercion, invalid dimensionality, mismatched field
+    lengths, non-finite values, nonpositive pressure and negative
+    saturation_ratio,
+    permitted supersaturation above `1.0`, positive Kelvin temperature
+    requirements, and helper-level validation smoke coverage.
 
 - [ ] **E2-F2-P2:** Implement CPU dataclass exports and copy semantics with tests
   - Issue: TBD | Size: S | Status: Not Started
@@ -18,8 +24,11 @@
     exports, and multi-box behavior compatible with sibling containers.
   - Files: `particula/gas/environment_data.py`, `particula/gas/__init__.py`,
     `particula/gas/tests/environment_data_test.py`
-  - Tests: multi-box valid construction, dtype coercion to `np.float64`,
-    `n_boxes` property, copy independence, and import/export smoke tests.
+  - Notes for next phase: preserve the current direct-module import path and do
+    not regress existing dtype/dimensionality validation behavior while adding
+    `n_boxes`, `copy()`, and package exports.
+  - Tests: `n_boxes` property, copy independence, and import/export smoke
+    tests.
 
 - [ ] **E2-F2-P3:** Document process environment-state read and mutation boundaries
   - Issue: TBD | Size: XS | Status: Not Started

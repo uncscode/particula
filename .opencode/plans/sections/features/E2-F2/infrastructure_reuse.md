@@ -16,7 +16,7 @@
 - Mirror current manual validation in `GasData` for dimensionality and shape.
 - Use the repository's value semantics from `validate_inputs` as guidance:
   temperature should be finite and physically positive in Kelvin; pressure
-  should be finite and physically positive or nonnegative per the final schema;
+  should be finite and physically positive;
   `saturation_ratio` should be finite, nonnegative, shaped
   `(n_boxes, n_species)`, and allowed to exceed `1.0` for supersaturation.
 

@@ -10,11 +10,8 @@
   values above `1.0`.
 - Coerce array-like inputs to `np.float64` in `__post_init__` following
   `GasData` and `ParticleData` conventions.
-- Provide `n_boxes` and `copy()` behavior consistent with existing containers.
-- Export the container from the gas package if implementation location is
-  `particula/gas/environment_data.py`.
-- Add single-box, multi-box, invalid-shape, invalid-value, dtype, and copy
-  independence tests in module-local `tests/` files.
+- Add single-box, multi-box, invalid-shape, invalid-value, and dtype tests in
+  module-local `tests/` files.
 - Update feature documentation to explain how processes should read and mutate
   environment state.
 
@@ -23,6 +20,8 @@
 - Adding `temperature`, `pressure`, or humidity fields to `GasData`.
 - Implementing `WarpEnvironmentData` or CPU/GPU transfer helpers; those belong
   to downstream sibling features.
+- Adding `n_boxes`, `copy()`, or package exports in phase P1; those remain
+  downstream follow-up work for later phases.
 - Migrating condensation, coagulation, parcel, or wall-loss process signatures
   from scalar `temperature`/`pressure` to `EnvironmentData`.
 - Changing numerical kernels or validating multi-box physics behavior.
