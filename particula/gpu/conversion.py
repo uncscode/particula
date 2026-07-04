@@ -1,9 +1,10 @@
-"""Conversion functions between CPU and GPU data containers.
+"""Convert simulation data containers between CPU and Warp representations.
 
 This module provides helpers to transfer CPU-side particle, gas, and
-environment containers to GPU using NVIDIA Warp arrays. The conversion
-functions enable manual control over device selection and copy behavior for
-long GPU-resident simulations.
+environment containers to Warp arrays and reconstruct their CPU-side
+equivalents. The conversion functions enable manual control over device
+selection, copy behavior, and synchronization for long GPU-resident
+simulations.
 
 Example:
     >>> from particula.gpu import (
@@ -451,6 +452,10 @@ def from_warp_environment_data(
 
     Returns:
         CPU-side EnvironmentData with NumPy arrays.
+
+    Raises:
+        ValueError: If the recovered arrays do not satisfy the
+            ``EnvironmentData`` CPU schema.
 
     Example:
         >>> result = from_warp_environment_data(gpu_environment)

@@ -1,10 +1,11 @@
 """GPU acceleration module for particula.
 
-This module provides GPU-accelerated data containers and operations
-using NVIDIA Warp for high-performance particle simulations.
+This module provides GPU-accelerated data containers and CPU↔Warp
+conversion helpers using NVIDIA Warp for high-performance particle
+simulations.
 
 The GPU module enables:
-- GPU-resident particle and gas data via Warp structs
+- GPU-resident particle, gas, and environment data via Warp structs
 - Efficient multi-box CFD simulations with batch dimensions
 - Manual transfer control between CPU and GPU (to_warp/from_warp)
 - GPU kernels for condensation and coagulation (future phases)

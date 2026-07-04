@@ -23,11 +23,21 @@ There is no standalone testing-only implementation phase.
 - Conversion tests also cover Warp-unavailable behavior through the shared
   helper path plus `copy=True` independence and conservative CPU `copy=False`
   semantics.
+- `from_warp_environment_data` tests cover exact single-box and multi-box round
+  trips for `temperature`, `pressure`, and `saturation_ratio`.
+- Reverse-conversion tests exercise both the default `sync=True` path and the
+  documented manual-synchronization `sync=False` path.
+- Malformed `WarpEnvironmentData` fixtures raise `ValueError` through
+  `EnvironmentData` validation when array dimensionality or box axes drift from
+  the CPU contract.
+- Public package-export coverage asserts `WarpEnvironmentData`,
+  `to_warp_environment_data`, and `from_warp_environment_data` are available
+  from `particula.gpu`.
 
 The shipped coverage now lives across
 `particula/gpu/tests/warp_types_test.py` and
-`particula/gpu/tests/conversion_test.py`; CUDA coverage remains future-phase
-work.
+`particula/gpu/tests/conversion_test.py`; optional CUDA coverage remains
+future-phase work.
 
 ## Suggested test locations
 
@@ -46,6 +56,7 @@ ruff check particula/gpu
 
 ## Acceptance threshold
 
-All `WarpEnvironmentData` schema and CPU-to-Warp conversion tests pass on the
-Warp CPU backend with exact shape, dtype, field-access, deterministic value,
-and helper-behavior assertions.
+All `WarpEnvironmentData` schema, public-export, CPU-to-Warp, and
+Warp-to-CPU round-trip tests pass on the Warp CPU backend with exact shape,
+dtype, field-access, deterministic value, sync-path, and failure-path
+assertions.

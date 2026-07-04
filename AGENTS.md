@@ -136,16 +136,16 @@ particula/
 
 ## Documentation
 
-**Location:** `adw-docs/`
+**Location:** `.opencode/guides/`
 
 **Key guides:**
-- `adw-docs/testing_guide.md` - Test framework and conventions
-- `adw-docs/linting_guide.md` - Linting tools and configuration
-- `adw-docs/code_style.md` - Naming, formatting, type hints
-- `adw-docs/docstring_guide.md` - Google-style docstring format
-- `adw-docs/commit_conventions.md` - Commit message format
-- `adw-docs/pr_conventions.md` - Pull request conventions
-- `adw-docs/architecture/architecture_guide.md` - Module structure
+- `.opencode/guides/testing_guide.md` - Test framework and conventions
+- `.opencode/guides/linting_guide.md` - Linting tools and configuration
+- `.opencode/guides/code_style.md` - Naming, formatting, type hints
+- `.opencode/guides/docstring_guide.md` - Google-style docstring format
+- `.opencode/guides/commit_conventions.md` - Commit message format
+- `.opencode/guides/pr_conventions.md` - Pull request conventions
+- `docs/contribute/Feature_Workflow/index.md` - Contributor workflow overview
 
 ## Common Patterns
 
@@ -237,6 +237,27 @@ aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
   `strategy_type="charged"`.
 - Supported `distribution_type` values are `"discrete"`, `"continuous_pdf"`,
   and `"particle_resolved"`.
+
+### GPU environment round trips
+
+```python
+from particula.gpu import (
+    from_warp_environment_data,
+    to_warp_environment_data,
+)
+
+gpu_environment = to_warp_environment_data(environment, device="cpu")
+restored = from_warp_environment_data(gpu_environment)
+```
+
+**Key points:**
+
+- `particula.gpu` now exports `WarpEnvironmentData`,
+  `to_warp_environment_data`, and `from_warp_environment_data`.
+- `EnvironmentData` round trips preserve `temperature`, `pressure`, and
+  `saturation_ratio` for both single-box and multi-box CPU-backed tests.
+- `from_warp_environment_data(..., sync=False)` assumes manual Warp
+  synchronization before `.numpy()` access.
 
 ## ADW Workflows
 
@@ -331,12 +352,12 @@ python3 .opencode/tool/run_notebook.py docs/Examples/path/to/file.ipynb
 - Execute after sync to validate code and generate website outputs
 - Commit both files to keep them paired
 
-**Full documentation:** `adw-docs/documentation_guide.md` (Jupytext Paired Sync Workflow section)
+**Full documentation:** `.opencode/guides/documentation_guide.md` (Jupytext Paired Sync Workflow section)
 
 ## Getting Help
 
 **Documentation:**
-- Full guides: `adw-docs/`
+- Full guides: `.opencode/guides/`
 - Examples: `docs/Examples/`
 - Theory: `docs/Theory/`
 
@@ -349,6 +370,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-01-30  
-**For questions about ADW:** See `adw-docs/README.md`  
+**Last Updated:** 2026-07-04  
+**For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

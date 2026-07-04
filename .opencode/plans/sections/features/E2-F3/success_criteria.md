@@ -12,8 +12,10 @@
 - `to_warp_environment_data(data, device="cuda", copy=True)` exists and moves
   `temperature`, `pressure`, and `saturation_ratio` into
   `WarpEnvironmentData` with explicit `wp.float64` transfers.
-- No Warp-to-CPU helper or package export changes are introduced before later
-  phases define the remaining transfer boundary.
+- `from_warp_environment_data(gpu_data, sync=True)` exists and reconstructs
+  CPU `EnvironmentData` in declared field order.
+- `particula.gpu` exports `WarpEnvironmentData`, `to_warp_environment_data`,
+  and `from_warp_environment_data` when Warp is available.
 - Existing particle and gas conversion behavior is unchanged.
 
 ## Design criteria
@@ -34,9 +36,10 @@
 - `particula/gpu/tests/warp_types_test.py` asserts field presence, shapes,
   `float64` dtypes, and deterministic values for one-box and multi-box inputs.
 - `particula/gpu/tests/conversion_test.py` asserts helper values, shapes,
-  `float64` dtypes, invalid-device failures, Warp-unavailable behavior, and CPU
-  copy semantics.
+  `float64` dtypes, invalid-device failures, Warp-unavailable behavior, CPU
+  copy semantics, round-trip equality, sync behavior, and malformed-schema
+  failures.
 - Linting passes for changed GPU modules.
-- Documentation is limited to updated module/class docstrings plus the new
-  helper docstring.
+- Documentation covers updated module/class/helper docstrings plus repository
+  docs that name the shipped environment round-trip helper surface.
 - The implementation does not block downstream kernel migration tracks.
