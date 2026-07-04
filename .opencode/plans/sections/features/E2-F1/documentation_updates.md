@@ -28,6 +28,17 @@
 - Updated `docs/index.md` with one minimal discoverability reference to the
   canonical shape conventions while keeping the roadmap subsection as the
   single source of truth.
+- Shipped Issue #1186 as the docs-only downstream handoff publication pass for
+  E2-F1-P4.
+- Published the final downstream handoff map in
+  `docs/Features/Roadmap/data-oriented-gpu.md` with one concrete inheritance
+  note each for `E2-F2` through `E2-F9`, plus the roadmap publication note that
+  records `python3 .opencode/tools/build_mkdocs.py --validate-only --strict` as
+  the validation command for the docs-only release.
+- Updated `docs/Features/Roadmap/index.md`,
+  `docs/Features/particle-data-migration.md`, and `docs/index.md` so roadmap,
+  migration, and top-level feature entry points all link implementers directly
+  to the canonical downstream handoff map instead of duplicating contract prose.
 
 ## Required Content
 
@@ -45,6 +56,12 @@
   rather than duplicated shape tables across multiple docs.
 - Cross-links from roadmap, migration, and top-level docs entry points so
   implementers can find the ownership record without searching plan prose.
+- A final downstream handoff map for sibling features `E2-F2` through `E2-F9`,
+  published on the canonical roadmap page with direct entry-point links from
+  roadmap, migration, and top-level documentation.
+- A single roadmap publication note that states this phase shipped finalized
+  P2/P3 contracts rather than new schema semantics and records the exact docs
+  validation command used.
 
 ## Style and Maintenance
 

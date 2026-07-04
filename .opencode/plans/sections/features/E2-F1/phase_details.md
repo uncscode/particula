@@ -32,15 +32,15 @@
     `docs/Features/Roadmap/index.md` plus
     `docs/Features/particle-data-migration.md` still link to it.
 
-- [ ] **E2-F1-P3:** Document shape conventions across container workflows
-  - Issue: #1185 | Size: S | Status: In Progress
+- [x] **E2-F1-P3:** Document shape conventions across container workflows
+  - Issue: #1185 | Size: S | Status: Completed
   - Goal: Publish shape rules for single-box, multi-box, particle-resolved, and
     binned workflows across CPU and GPU containers.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/particle-data-migration.md`, and
     `docs/Features/Roadmap/index.md`.
-  - Current state: the canonical `Canonical shape conventions for container
-    workflows` subsection is drafted in
+  - Shipped: the canonical `Canonical shape conventions for container
+    workflows` subsection is published in
     `docs/Features/Roadmap/data-oriented-gpu.md` with workflow rules, concrete
     example shapes, explicit field tables for `ParticleData`, `GasData`, future
     `EnvironmentData`, `WarpParticleData`, and `WarpGasData`, plus a caution
@@ -49,17 +49,26 @@
   - Discoverability: the migration guide links directly to the canonical
     shape-conventions anchor, and the roadmap index points to that subsection
     while keeping the roadmap subsection as the single source of truth.
-  - Validation: docs-first update; validation should rely on existing
+  - Validation: docs-first update; validation relied on existing
     container, builder, Warp, conversion, condensation, and coagulation
     evidence plus anchor/link smoke checks rather than new automated tests.
 
-- [ ] **E2-F1-P4:** Publish downstream handoff map and development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E2-F1-P4:** Publish downstream handoff map and development documentation
+  - Issue: #1186 | Size: XS | Status: Completed
   - Goal: Document explicit ownership decisions needed by E2-F2 through E2-F9 and
     make the decision record discoverable for implementers.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, feature index or related
-    docs, and any architecture cross-reference.
-  - Tests: Documentation/link validation.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Features/Roadmap/index.md`,
+    `docs/Features/particle-data-migration.md`, and `docs/index.md`.
+  - Shipped: the roadmap now publishes a final downstream handoff map with one
+    concrete contract note each for `E2-F2` through `E2-F9`, plus a publication
+    note stating this phase shipped the finalized P2/P3 ownership/shape
+    contract rather than new schema semantics.
+  - Discoverability: roadmap, migration, and top-level docs entry points now
+    link directly to the canonical handoff anchor so downstream implementers can
+    find the authoritative contract without searching plan prose.
+  - Tests: documentation validation recorded in the roadmap publication note as
+    `python3 .opencode/tools/build_mkdocs.py --validate-only --strict`.
 
 ## Phase Ordering Notes
 

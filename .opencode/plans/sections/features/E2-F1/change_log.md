@@ -2,6 +2,17 @@
 
 ## 2026-07-04
 
+- Updated E2-F1 plan sections after Issue #1186 shipped.
+- Marked phase E2-F1-P4 complete for the docs-only downstream handoff map and
+  development-documentation publication pass.
+- Marked phase E2-F1-P3 complete now that the canonical shape-conventions work
+  is published as the finalized contract inherited by the handoff map.
+- Recorded the shipped roadmap publication note, the docs validation command,
+  and the direct handoff-map links from roadmap, migration, and top-level docs
+  entry points.
+
+## 2026-07-04
+
 - Updated E2-F1 plan sections during the pre-ship fix pass for Issue #1185.
 - Kept phase E2-F1-P3 in progress while the docs-first canonical shape
   conventions update remains in the ADW fix cycle.
