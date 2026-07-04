@@ -21,6 +21,16 @@
     `docs/Features/Roadmap/data-oriented-gpu.md`, direct roadmap and migration
     links to that section, and top-level docs links that improve discoverability.
   - Tests: Docs-first update; no new automated tests added in this phase.
+  - Fix-pass evidence: targeted regression evidence tests were re-run in
+    `particula/particles/tests/particle_data_test.py`,
+    `particula/gas/tests/gas_data_test.py`,
+    `particula/gpu/tests/warp_types_test.py`, and
+    `particula/gpu/tests/conversion_test.py`.
+  - Docs validation: fallback anchor/link verification confirmed that
+    `docs/Features/Roadmap/data-oriented-gpu.md` still exposes
+    `#authoritative-field-ownership-decisions` and that
+    `docs/Features/Roadmap/index.md` plus
+    `docs/Features/particle-data-migration.md` still link to it.
 
 - [ ] **E2-F1-P3:** Document shape conventions across container workflows
   - Issue: TBD | Size: S | Status: Not Started
