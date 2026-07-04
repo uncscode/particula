@@ -24,23 +24,29 @@
 
 ## E2-F3-P2: CPU-to-Warp environment conversion helper with unit tests
 
-- Issue: TBD | Size: S | Status: Not Started
+- Issue: #1193 | Size: S | Status: Shipped
 - Goal: Add a single explicit conversion helper that reviewers can trace field by
   field from `EnvironmentData` into `WarpEnvironmentData`.
 - Files: `particula/gpu/conversion.py`,
   `particula/gpu/tests/conversion_test.py`
 - Implementation:
-  - Add `to_warp_environment_data(data, device="cuda", copy=True)` to
-    `particula/gpu/conversion.py`.
-  - Reuse `_ensure_warp_available` and `_validate_device` rather than adding a
-    second device-validation path.
-  - Transfer each field explicitly with `wp.float64` buffers so missing fields
-    stay obvious in code review.
-- Tests: Add CPU-device tests for values, shapes, dtypes, invalid devices, and
-  `copy=True` versus `copy=False` behavior where Warp supports host aliasing.
+  - Added `to_warp_environment_data(data, device="cuda", copy=True)` to
+    `particula/gpu/conversion.py` immediately alongside the existing particle
+    and gas helpers.
+  - Reused `_ensure_warp_available` and `_validate_device` so missing-Warp and
+    invalid-device behavior follows the established helper path.
+  - Transferred `temperature`, `pressure`, and `saturation_ratio` explicitly
+    with `wp.float64` arrays for both `copy=True` (`wp.array`) and
+    `copy=False` (`wp.from_numpy`) paths.
+  - Added a Google-style helper docstring documenting arguments, return type,
+    and `RuntimeError` failure modes.
+- Tests: Added CPU-device tests for populated fields, single-box and multi-box
+  values/shapes, `wp.float64` dtypes, invalid devices, Warp-unavailable
+  behavior, and `copy=True` versus conservative CPU `copy=False` semantics in
+  `particula/gpu/tests/conversion_test.py`.
 
-Status note: Not started. Issue `#1192` intentionally stopped short of helper
-implementation so the struct schema could land first.
+Status note: Shipped in issue `#1193`. Reverse conversion and public exports
+remain future-phase work.
 
 ## E2-F3-P3: Warp-to-CPU environment conversion and round-trip coverage
 
@@ -82,4 +88,4 @@ been added yet.
   combines optional CUDA transfer coverage with user-facing documentation updates.
 
 Status note: Not started. No CUDA transfer coverage or external docs were
-required for the shipped P1 implementation.
+required for the shipped P1/P2 implementation slices.
