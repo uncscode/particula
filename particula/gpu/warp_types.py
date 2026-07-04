@@ -2,7 +2,8 @@
 
 This module defines Warp struct containers for particle, gas, and
 environment data that mirror CPU-side particula containers. These structs
-enable efficient GPU-resident data for multi-box CFD simulations.
+store multi-box simulation state in Warp-native array types for GPU-resident
+workflows.
 
 The structs use Warp array types for GPU memory management:
 - wp.array: 1D arrays
@@ -138,9 +139,10 @@ class WarpGasData:
 class WarpEnvironmentData:
     """GPU-side environment data container using Warp arrays.
 
-    Mirrors the shape convention of EnvironmentData from particula.gas.
-    Temperature and pressure store one value per simulation box, and
-    saturation ratio stores per-box, per-species values.
+    This struct mirrors the CPU-side ``EnvironmentData`` schema from
+    ``particula.gas.environment_data``. Temperature and pressure store one
+    float64 value per simulation box, and saturation ratio stores one float64
+    value per box and species.
 
     Attributes:
         temperature: Box temperatures in kelvin.

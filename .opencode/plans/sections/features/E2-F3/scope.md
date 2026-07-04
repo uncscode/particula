@@ -3,22 +3,23 @@
 ## In scope
 
 - Add `WarpEnvironmentData` to `particula/gpu/warp_types.py`.
-- Mirror all numeric fields from the `E2-F2` CPU `EnvironmentData` schema as
-  one-dimensional Warp arrays shaped `(n_boxes,)`.
-- Add CPU-to-Warp conversion helper with explicit `device` and `copy` controls.
-- Add Warp-to-CPU conversion helper with explicit `sync` control.
-- Update GPU package exports in `particula/gpu/__init__.py`.
-- Add Warp CPU tests for struct creation, conversion, copy behavior, sync
-  behavior, and round-trip equality.
-- Add optional CUDA-parametrized tests using the existing CUDA availability
-  helper; tests must skip cleanly when CUDA is unavailable.
-- Update feature and theory documentation with transfer semantics and the
-  no-hidden-transfer rule.
+- Mirror the `E2-F2` CPU `EnvironmentData` schema exactly with
+  `temperature` and `pressure` as `(n_boxes,)` `wp.array(dtype=wp.float64)`
+  fields and `saturation_ratio` as `(n_boxes, n_species)`
+  `wp.array2d(dtype=wp.float64)`.
+- Update the module/class docstrings in `particula/gpu/warp_types.py` so the
+  environment container and its shape semantics are explicit.
+- Add focused Warp CPU tests in `particula/gpu/tests/warp_types_test.py` for
+  struct creation, field presence, one-box and multi-box shapes, `float64`
+  dtypes, and deterministic NumPy-backed round-trip values.
 
 ## Out of scope
 
 - Do not redesign the CPU `EnvironmentData` schema except for small alignment
   fixes needed to make GPU transfer unambiguous.
+- Do not add CPU-to-Warp or Warp-to-CPU environment conversion helpers in this
+  shipped slice.
+- Do not update `particula/gpu/__init__.py` exports in this shipped slice.
 - Do not migrate existing condensation or coagulation kernels from scalar
   temperature/pressure arguments in this track.
 - Do not introduce implicit transfers inside runnable objects or kernel launch
@@ -26,9 +27,12 @@
 - Do not store string metadata or Python-only objects in `WarpEnvironmentData`.
 - Do not change precision defaults; use `float64` unless a later precision
   decision changes repository policy.
+- Do not add optional CUDA-parametrized transfer coverage or broader user docs
+  until later phases land the transfer boundary.
 
 ## Done signal
 
-Environment data round trips pass on the Warp CPU backend, CUDA coverage is
-automatically active when available, and code/documentation make transfer points
-explicit.
+`WarpEnvironmentData` exists in `particula/gpu/warp_types.py`, its field shapes
+and dtypes match the CPU schema, deterministic Warp CPU tests pass in
+`particula/gpu/tests/warp_types_test.py`, and no conversion helpers or export
+changes are introduced prematurely.

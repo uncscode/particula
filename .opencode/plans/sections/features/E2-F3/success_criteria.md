@@ -4,30 +4,31 @@
 
 - `WarpEnvironmentData` exists and mirrors the CPU `EnvironmentData` numeric
   schema from `E2-F2`.
-- CPU-to-Warp and Warp-to-CPU helpers are public through `particula.gpu` when
-  Warp is available.
-- Environment round trips preserve `temperature`, `pressure`, and
-  `saturation_ratio` on the Warp CPU backend without dropping fields or
-  reshaping them implicitly.
-- CUDA-parametrized round-trip coverage runs automatically when CUDA is
-  available and skips cleanly otherwise.
+- `WarpEnvironmentData` keeps `temperature` and `pressure` as `(n_boxes,)`
+  arrays and `saturation_ratio` as an `(n_boxes, n_species)` array.
+- Warp CPU schema tests preserve `temperature`, `pressure`, and
+  `saturation_ratio` values on deterministic NumPy-backed round trips without
+  dropping fields or reshaping them implicitly.
+- No CPU-to-Warp helpers, Warp-to-CPU helpers, or package export changes are
+  introduced before later phases define the transfer boundary.
 - Existing particle and gas conversion behavior is unchanged.
 
 ## Design criteria
 
-- Transfers are explicit and centralized in conversion helpers.
-- No kernel, runnable, or strategy object performs an implicit CPU/GPU transfer.
+- This phase leaves transfers undefined rather than implicit; no kernel,
+  runnable, or strategy object performs an environment CPU/GPU transfer yet.
 - `temperature` and `pressure` remain `(n_boxes,)`, while `saturation_ratio`
   remains `(n_boxes, n_species)`, including single-box simulations.
-- `to_warp_environment_data(..., device="cuda")` is the documented default,
-  with validation/tests covering both CPU and optional CUDA execution.
+- The struct declaration uses explicit field names and `wp.float64` array types
+  so later helper phases can build on a stable schema.
 - Optional dependency behavior for Warp remains unchanged.
 
 ## Verification criteria
 
 - Targeted GPU tests pass.
-- Round-trip tests assert field values, shapes, and `float64` dtypes for one-box
-  and multi-box inputs.
-- Linting passes for changed GPU/environment modules.
-- Documentation describes transfer semantics and no-hidden-transfer behavior.
+- `particula/gpu/tests/warp_types_test.py` asserts field presence, shapes,
+  `float64` dtypes, and deterministic values for one-box and multi-box inputs.
+- Linting passes for changed GPU modules.
+- Documentation is limited to updated module/class docstrings for the new
+  struct.
 - The implementation does not block downstream kernel migration tracks.
