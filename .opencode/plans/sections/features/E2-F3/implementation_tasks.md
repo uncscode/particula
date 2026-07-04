@@ -43,7 +43,7 @@
 - [x] Add round-trip tests comparing `temperature`, `pressure`, and
       `saturation_ratio` with NumPy assertions and explicit `sync=True`/
       `sync=False` coverage.
-- [ ] Add CUDA-parametrized coverage using `warp_devices(wp)`.
+- [x] Add CUDA-parametrized coverage using `warp_devices(wp)`.
 - [x] Add tests proving malformed environment reconstruction fails at the
       explicit helper boundary rather than via hidden conversion paths.
 
@@ -54,4 +54,4 @@
       `from_warp_environment_data`.
 - [x] Update `docs/Features/particle-data-migration.md` with environment
       transfer examples.
-- [ ] Update `docs/Theory/nvidia-warp/datastructures.md` with the new struct.
+- [x] Update `docs/Theory/nvidia-warp/datastructures.md` with the new struct.

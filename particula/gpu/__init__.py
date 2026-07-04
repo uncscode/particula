@@ -43,28 +43,18 @@ def _check_warp_available() -> bool:
 
 WARP_AVAILABLE = _check_warp_available()
 
-# Lazy import for optional dependency handling
-if WARP_AVAILABLE:
-    from particula.gpu.warp_types import (
-        WarpEnvironmentData,
-        WarpGasData,
-        WarpParticleData,
-    )
-    from particula.gpu.conversion import (
-        from_warp_environment_data,
-        from_warp_gas_data,
-        from_warp_particle_data,
-        gpu_context,
-        to_warp_environment_data,
-        to_warp_gas_data,
-        to_warp_particle_data,
-    )
+from particula.gpu.conversion import (
+    from_warp_environment_data,
+    from_warp_gas_data,
+    from_warp_particle_data,
+    gpu_context,
+    to_warp_environment_data,
+    to_warp_gas_data,
+    to_warp_particle_data,
+)
 
 __all__ = [
     "WARP_AVAILABLE",
-    "WarpParticleData",
-    "WarpGasData",
-    "WarpEnvironmentData",
     "to_warp_particle_data",
     "to_warp_gas_data",
     "to_warp_environment_data",
@@ -73,3 +63,19 @@ __all__ = [
     "from_warp_environment_data",
     "gpu_context",
 ]
+
+# Lazy import for optional dependency handling.
+if WARP_AVAILABLE:
+    from particula.gpu.warp_types import (
+        WarpEnvironmentData,
+        WarpGasData,
+        WarpParticleData,
+    )
+
+    __all__.extend(
+        [
+            "WarpParticleData",
+            "WarpGasData",
+            "WarpEnvironmentData",
+        ]
+    )

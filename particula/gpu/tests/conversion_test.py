@@ -5,6 +5,10 @@ including basic transfer, shape preservation, value integrity, copy behavior,
 device selection, multi-box scenarios, and error handling.
 """
 
+import builtins
+import importlib
+import sys
+
 import numpy as np
 import pytest
 
@@ -314,6 +318,44 @@ class TestToWarpGasData:
 class TestToWarpEnvironmentData:
     """Tests for to_warp_environment_data() function."""
 
+    def test_package_exports_environment_helpers_when_warp_unavailable(
+        self,
+        sample_environment_data_single_box,
+        monkeypatch,
+    ) -> None:
+        """Test package-level helper imports stay available without Warp."""
+        from particula import gpu as gpu_package
+
+        original_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "warp":
+                raise ImportError("No module named 'warp'")
+            return original_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", mock_import)
+
+        module_name = "_particula_gpu_without_warp"
+        spec = importlib.util.spec_from_file_location(
+            module_name,
+            gpu_package.__file__,
+        )
+        assert spec is not None
+        assert spec.loader is not None
+
+        unavailable_gpu = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(unavailable_gpu)
+
+        assert unavailable_gpu.WARP_AVAILABLE is False
+        assert unavailable_gpu.to_warp_environment_data is not None
+        assert unavailable_gpu.from_warp_environment_data is not None
+
+        with pytest.raises(RuntimeError, match="Warp is not installed"):
+            unavailable_gpu.to_warp_environment_data(
+                sample_environment_data_single_box,
+                device="cpu",
+            )
+
     def test_environment_data_warp_unavailable_error(
         self, sample_environment_data_single_box
     ) -> None:
@@ -468,6 +510,63 @@ class TestToWarpEnvironmentData:
         )
         assert not np.array_equal(
             gpu_saturation_ratio,
+            sample_environment_data_single_box.saturation_ratio,
+        )
+
+    def test_environment_data_copy_false_uses_wp_from_numpy_copy_false(
+        self, sample_environment_data_single_box, monkeypatch
+    ) -> None:
+        """Test copy=False forwards copy=False to wp.from_numpy."""
+        calls: list[dict[str, object]] = []
+        import types
+
+        class FakeWarpEnvironmentData:
+            pass
+
+        fake_wp = types.SimpleNamespace()
+        fake_wp.float64 = "float64"
+
+        def fake_from_numpy(values, **kwargs):
+            calls.append(kwargs.copy())
+            return types.SimpleNamespace(
+                numpy=lambda: np.asarray(values),
+                dtype=kwargs["dtype"],
+            )
+
+        fake_wp.from_numpy = fake_from_numpy
+
+        monkeypatch.setattr(
+            "particula.gpu.conversion._ensure_warp_available",
+            lambda: fake_wp,
+        )
+        monkeypatch.setattr(
+            "particula.gpu.conversion._validate_device",
+            lambda _wp, _device: None,
+        )
+        monkeypatch.setitem(
+            sys.modules,
+            "particula.gpu.warp_types",
+            types.SimpleNamespace(WarpEnvironmentData=FakeWarpEnvironmentData),
+        )
+
+        gpu_data = to_warp_environment_data(
+            sample_environment_data_single_box,
+            device="cpu",
+            copy=False,
+        )
+
+        assert len(calls) == 3
+        assert all(call.get("copy") is False for call in calls)
+        np.testing.assert_array_equal(
+            gpu_data.temperature.numpy(),
+            sample_environment_data_single_box.temperature,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.pressure.numpy(),
+            sample_environment_data_single_box.pressure,
+        )
+        np.testing.assert_array_equal(
+            gpu_data.saturation_ratio.numpy(),
             sample_environment_data_single_box.saturation_ratio,
         )
 
