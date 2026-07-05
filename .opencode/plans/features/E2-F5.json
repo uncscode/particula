@@ -45,11 +45,11 @@
     {
       "id": "E2-F5-P2",
       "title": "Implement environment normalization and validation helpers with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
