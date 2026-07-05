@@ -11,13 +11,14 @@ small-particle fidelity.
 
 ## Value Proposition
 
-This feature now has a shipped P1 baseline plus a shipped P2 comparison layer:
-deterministic NPF-to-droplet study cases, focused candidate-fidelity tests, and
-a roadmap page that records the current absolute per-species `fp64` /
-`wp.float64` storage policy alongside the executed study-only candidates.
-Downstream E2 tracks now have bounded evidence for candidate reconstruction
-behavior while preserving the existing production mass schema and dtype
-defaults.
+This feature now has shipped P1, P2, and P3 study coverage: deterministic
+NPF-to-droplet baseline cases, focused candidate-fidelity tests, executable
+conservation and mixed-scale error checks, clamp accounting, bounded optional
+throughput evidence, and a roadmap page that records the current absolute
+per-species `fp64` / `wp.float64` storage policy alongside the executed
+study-only candidates. Downstream E2 tracks now have bounded evidence for
+candidate reconstruction behavior and P3 tradeoff review without changing the
+existing production mass schema or dtype defaults.
 
 ## User Stories
 

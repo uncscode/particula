@@ -15,6 +15,11 @@ phase. There is no standalone testing phase.
   candidate projection/reconstruction helpers, mass/radius fidelity checks,
   invalid-candidate coverage, zero-total-mass handling, unsupported-candidate
   doc-only coverage, and CPU/Warp dtype regression checks.
+- `particula/gpu/tests/benchmark_helpers_test.py` for fast coverage of the
+  opt-in benchmark helpers, skip gates, projection helper behavior, and bounded
+  benchmark metadata capture added with P3.
+- `particula/gpu/tests/benchmark_test.py` for the optional P3 throughput entry
+  point guarded by `--benchmark` plus Warp/CUDA skip-safe behavior.
 - `particula/gpu/tests/mass_precision_case_helpers.py` only if shared helper
   logic becomes large enough to justify a small adjacent test helper module.
 - `docs/Features/Roadmap/mass-precision-study.md` for the reproducibility
@@ -30,6 +35,12 @@ phase. There is no standalone testing phase.
   `fp32_absolute_mass`, `mixed_precision_mass_plus_density`, and
   `fp32_total_mass_fp32_mass_fraction`, with explicit mass and radius
   tolerance assertions against the `fp64` baseline.
+- P3 extends `mass_precision_metrics_test.py` with cached reconstruction error,
+  CPU-reference mass-transfer deltas, mixed-scale smallest-particle thresholds,
+  zero-total-mass and zero-volume warning-clean paths, and explicit clamp
+  accounting assertions.
+- P3 also adds `benchmark_helpers_test.py` so the benchmark opt-in surface can
+  be validated quickly without requiring CUDA.
 - Production default tests should continue to assert `np.float64` and
   `wp.float64` in `particula/particles/tests/` and `particula/gpu/tests/`
   anywhere current behavior is intentionally unchanged; P1 added explicit
@@ -57,9 +68,10 @@ report so reviewers can rerun the same thresholds from the PR.
 - Use skip-safe CUDA/Warp device selection patterns from `particula/gpu/tests/`.
 - Keep fast unit tests separate from slow evidence-generation benchmarks.
 
-Fast default validation should stay in the two focused test files above. Any
-longer GPU sweeps should either be marked slow in the same files or invoked from
-documented reproduction commands in the study report.
+Fast default validation now lives in
+`mass_precision_cases_test.py`, `mass_precision_metrics_test.py`, and
+`benchmark_helpers_test.py`. Any longer GPU sweeps should remain in
+`benchmark_test.py` behind the documented opt-in reproduction commands.
 
 ## Documentation Validation
 
@@ -75,11 +87,14 @@ it should not defer unresolved helper or metric tests into a later PR.
 ```bash
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 pytest particula/gpu/tests/mass_precision_metrics_test.py -q
+pytest particula/gpu/tests/benchmark_helpers_test.py -q
 pytest particula/gpu/tests/mass_precision_cases_test.py \
-  particula/gpu/tests/mass_precision_metrics_test.py -q
+  particula/gpu/tests/mass_precision_metrics_test.py \
+  particula/gpu/tests/benchmark_helpers_test.py -q
 ```
 
-For the currently shipped scope, both focused modules are part of the bounded
-study surface: `mass_precision_cases_test.py` provides the reusable baseline
-fixtures and `mass_precision_metrics_test.py` exercises the shipped P2
-comparison layer.
+For the currently shipped scope, the bounded study surface now includes three
+fast modules: `mass_precision_cases_test.py` provides the reusable baseline
+fixtures, `mass_precision_metrics_test.py` exercises the shipped P2/P3
+comparison layer, and `benchmark_helpers_test.py` validates the optional
+benchmark surface without requiring a CUDA runtime.
