@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-04",
+  "last_updated": "2026-07-05",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E2-F4/architecture_design.md",
@@ -32,11 +32,11 @@
     {
       "id": "E2-F4-P1",
       "title": "Audit gas schema authority and round-trip expectations with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
