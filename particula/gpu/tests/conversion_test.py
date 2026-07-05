@@ -1000,9 +1000,9 @@ class TestValidateDevice:
 
         sentinel_device = object()
         fake_wp = types.SimpleNamespace(
-            get_device=lambda device: sentinel_device
-            if device == "cpu"
-            else None
+            get_device=lambda device: (
+                sentinel_device if device == "cpu" else None
+            )
         )
 
         result = _validate_device(fake_wp, "cpu")
