@@ -5186,6 +5186,8 @@
       
         
       
+        
+      
     
     
     
@@ -5274,6 +5276,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.environment
   
 
     
@@ -11353,6 +11383,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Using ParticleData/GasData in dynamics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#condensation_step_gpu-environment-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condensation_step_gpu environment inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -11416,6 +11463,17 @@
     <span class="md-ellipsis">
       
         Single-box vs multi-box data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condensation_step_gpu-rejects-my-environment-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condensation_step_gpu rejects my environment inputs
       
     </span>
   </a>
@@ -14406,6 +14464,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Using ParticleData/GasData in dynamics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#condensation_step_gpu-environment-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condensation_step_gpu environment inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -14469,6 +14544,17 @@
     <span class="md-ellipsis">
       
         Single-box vs multi-box data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condensation_step_gpu-rejects-my-environment-inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condensation_step_gpu rejects my environment inputs
       
     </span>
   </a>
@@ -14948,8 +15034,8 @@ owns the update and refreshes derived helpers such as <code>saturation_ratio</co
     <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategy</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
-    <span class="n">gas_species</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
+    <span class="n">particles</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
+    <span class="n">gas</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -14959,7 +15045,7 @@ owns the update and refreshes derived helpers such as <code>saturation_ratio</co
     <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span>
 <span class="p">)</span>
 <span class="n">particle_out</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">particle_out</span><span class="p">,</span>
+    <span class="n">particles</span><span class="o">=</span><span class="n">particle_out</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -14978,6 +15064,43 @@ the explicit helper boundary only:
 unchanged across that boundary—<code>temperature</code> and <code>pressure</code> stay
 <code>(n_boxes,)</code>, while <code>saturation_ratio</code> stays <code>(n_boxes, n_species)</code>—and do
 not expect kernels or runnables to move environment state for you.</p>
+<h3 id="condensation_step_gpu-environment-inputs"><code>condensation_step_gpu</code> environment inputs<a class="headerlink" href="#condensation_step_gpu-environment-inputs" title="Permanent link">&para;</a></h3>
+<p><code>particula.gpu.kernels.condensation_step_gpu(...)</code> supports the shared
+environment normalization contract used by the low-level GPU kernels.</p>
+<ul>
+<li>Keep using scalar <code>temperature</code> and <code>pressure</code> for legacy one-box calls.</li>
+<li>For multi-box or GPU-resident workflows, you may instead pass direct Warp
+  arrays with shape <code>(n_boxes,)</code>.</li>
+<li>Hybrid direct calls are also accepted: one of <code>temperature</code> or <code>pressure</code>
+  may be a scalar while the other is a Warp array.</li>
+<li>You may also pass <code>environment=WarpEnvironmentData(...)</code> instead of direct
+  temperature/pressure inputs.</li>
+<li><code>temperature</code> and <code>pressure</code> remain environment-owned state. Do not move them
+  into <code>GasData</code>.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_warp_environment_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">condensation_step_gpu</span>
+
+<span class="c1"># Legacy-compatible scalar call</span>
+<span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation_step_gpu</span><span class="p">(</span>
+    <span class="n">particles</span><span class="o">=</span><span class="n">warp_particle</span><span class="p">,</span>
+    <span class="n">gas</span><span class="o">=</span><span class="n">warp_gas</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Explicit environment-owned thermodynamic state</span>
+<span class="n">warp_environment</span> <span class="o">=</span> <span class="n">to_warp_environment_data</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation_step_gpu</span><span class="p">(</span>
+    <span class="n">particles</span><span class="o">=</span><span class="n">warp_particle</span><span class="p">,</span>
+    <span class="n">gas</span><span class="o">=</span><span class="n">warp_gas</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">environment</span><span class="o">=</span><span class="n">warp_environment</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
 <h2 id="conversion-helpers">Conversion helpers<a class="headerlink" href="#conversion-helpers" title="Permanent link">&para;</a></h2>
 <p>Use the conversion helpers when you need to bridge old and new APIs:</p>
 <ul>
@@ -15014,6 +15137,21 @@ when you need legacy-shaped arrays:</p>
 <div class="highlight"><pre><span></span><code><span class="n">radii_single_box</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">concentration_single_box</span> <span class="o">=</span> <span class="n">gas_data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div>
+<h3 id="condensation_step_gpu-rejects-my-environment-inputs"><code>condensation_step_gpu</code> rejects my environment inputs<a class="headerlink" href="#condensation_step_gpu-rejects-my-environment-inputs" title="Permanent link">&para;</a></h3>
+<p><code>condensation_step_gpu(...)</code> now validates environment inputs before Warp
+launch. Check the following first:</p>
+<ul>
+<li>Do not mix direct <code>temperature</code>/<code>pressure</code> arguments with <code>environment=</code> in
+  the same call.</li>
+<li>If <code>environment</code> is omitted, supply both required direct thermodynamic
+  inputs, either as scalars, <code>(n_boxes,)</code> Warp arrays, or a supported hybrid.</li>
+<li>Ensure direct or environment-owned <code>temperature</code> and <code>pressure</code> values are
+  positive and finite.</li>
+<li>Ensure <code>(n_boxes,)</code> direct arrays match the particle/gas box count and live
+  on the same Warp device.</li>
+</ul>
+<p>If you need a CPU-owned source of truth, keep using <code>EnvironmentData</code> and only
+convert it at the explicit <code>to_warp_environment_data()</code> boundary.</p>
 <h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>ParticleData</code> source:

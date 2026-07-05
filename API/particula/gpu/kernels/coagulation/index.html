@@ -5200,6 +5200,8 @@
       
         
       
+        
+      
     
     
     
@@ -5391,6 +5393,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.environment
   
 
     
@@ -14127,8 +14157,12 @@
 
         <p>GPU Brownian coagulation kernels and orchestration utilities.</p>
 <p>This module composes Warp <code>@wp.func</code> building blocks into an end-to-end
-coagulation pipeline. The kernels operate on GPU-resident particle data and
-produce collision pairs that are applied to merge particle masses in-place.</p>
+coagulation pipeline. Entry-point validation accepts scalar direct inputs,
+explicit <code>(n_boxes,)</code> Warp arrays, or a <code>WarpEnvironmentData</code> container.
+Those sources are normalized into per-box Warp arrays before volume setup,
+RNG initialization, or any Warp launch. The kernels operate on GPU-resident
+particle data and produce collision pairs that are applied to merge particle
+masses in-place.</p>
 
 
 
@@ -14206,23 +14240,7 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
 <span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
@@ -14241,7 +14259,23 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 <span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span>
-<span class="normal">344</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_coagulation_kernel</span><span class="p">(</span>
@@ -14338,7 +14372,7 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
               (<code><span title="typing.Any">Any</span></code>)
           –
           <div class="doc-md-description">
-            <p>Gas temperature [K].</p>
+            <p>Per-box gas temperatures <code>(n_boxes,)</code> [K].</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14346,7 +14380,7 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
               (<code><span title="typing.Any">Any</span></code>)
           –
           <div class="doc-md-description">
-            <p>Gas pressure [Pa].</p>
+            <p>Per-box gas pressures <code>(n_boxes,)</code> [Pa].</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14475,20 +14509,7 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
 <span class="normal"> 80</span>
@@ -14717,7 +14738,23 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 <span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
-<span class="normal">306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_coagulation_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
@@ -14750,8 +14787,8 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 <span class="sd">        concentration: Particle concentrations ``(n_boxes, n_particles)``.</span>
 <span class="sd">        density: Species densities ``(n_species,)``.</span>
 <span class="sd">        volume: Per-box volumes ``(n_boxes,)``.</span>
-<span class="sd">        temperature: Gas temperature [K].</span>
-<span class="sd">        pressure: Gas pressure [Pa].</span>
+<span class="sd">        temperature: Per-box gas temperatures ``(n_boxes,)`` [K].</span>
+<span class="sd">        pressure: Per-box gas pressures ``(n_boxes,)`` [Pa].</span>
 <span class="sd">        gas_constant: Universal gas constant [J/(mol·K)].</span>
 <span class="sd">        boltzmann_constant: Boltzmann constant [J/K].</span>
 <span class="sd">        molecular_weight_air: Molecular weight of air [kg/mol].</span>
@@ -14776,16 +14813,19 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
     <span class="n">n_particles</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">n_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
+    <span class="n">temperature_value</span> <span class="o">=</span> <span class="n">temperature</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
+    <span class="n">pressure_value</span> <span class="o">=</span> <span class="n">pressure</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
+
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">dynamic_viscosity_wp</span><span class="p">(</span>
-        <span class="n">temperature</span><span class="p">,</span>
+        <span class="n">temperature_value</span><span class="p">,</span>
         <span class="n">ref_viscosity</span><span class="p">,</span>
         <span class="n">ref_temperature</span><span class="p">,</span>
         <span class="n">sutherland_constant</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">mean_free_path</span> <span class="o">=</span> <span class="n">molecule_mean_free_path_wp</span><span class="p">(</span>
         <span class="n">molecular_weight_air</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="p">,</span>
+        <span class="n">temperature_value</span><span class="p">,</span>
+        <span class="n">pressure_value</span><span class="p">,</span>
         <span class="n">dynamic_viscosity</span><span class="p">,</span>
         <span class="n">gas_constant</span><span class="p">,</span>
     <span class="p">)</span>
@@ -14820,10 +14860,10 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
         <span class="n">slip</span> <span class="o">=</span> <span class="n">cunningham_slip_correction_wp</span><span class="p">(</span><span class="n">knudsen</span><span class="p">)</span>
         <span class="n">mobility</span> <span class="o">=</span> <span class="n">aerodynamic_mobility_wp</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">slip</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="p">)</span>
         <span class="n">diffusivity</span> <span class="o">=</span> <span class="n">brownian_diffusivity_wp</span><span class="p">(</span>
-            <span class="n">temperature</span><span class="p">,</span> <span class="n">mobility</span><span class="p">,</span> <span class="n">boltzmann_constant</span>
+            <span class="n">temperature_value</span><span class="p">,</span> <span class="n">mobility</span><span class="p">,</span> <span class="n">boltzmann_constant</span>
         <span class="p">)</span>
         <span class="n">speed</span> <span class="o">=</span> <span class="n">mean_thermal_speed_wp</span><span class="p">(</span>
-            <span class="n">total_mass</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">boltzmann_constant</span>
+            <span class="n">total_mass</span><span class="p">,</span> <span class="n">temperature_value</span><span class="p">,</span> <span class="n">boltzmann_constant</span>
         <span class="p">)</span>
         <span class="n">particle_mean_free_path</span> <span class="o">=</span> <span class="n">particle_mean_free_path_wp</span><span class="p">(</span><span class="n">diffusivity</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span>
         <span class="n">g_term</span> <span class="o">=</span> <span class="n">g_collection_term_wp</span><span class="p">(</span><span class="n">particle_mean_free_path</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
@@ -14974,7 +15014,7 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 
 
 <a href="#particula.gpu.kernels.coagulation.coagulation_step_gpu" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">coagulation_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_collisions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">coagulation_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_collisions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -14994,18 +15034,21 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>temperature</code></b>
-              (<code><span title="float">float</span></code>)
+              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>)
           –
           <div class="doc-md-description">
-            <p>Gas temperature in kelvin.</p>
+            <p>Direct gas temperature as either a scalar or a Warp array
+with shape <code>(n_boxes,)</code>. Use <code>None</code> only with
+<code>environment=...</code>.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
             <b><code>pressure</code></b>
-              (<code><span title="float">float</span></code>)
+              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>)
           –
           <div class="doc-md-description">
-            <p>Gas pressure in pascals.</p>
+            <p>Direct gas pressure as either a scalar or a Warp array with
+shape <code>(n_boxes,)</code>. Use <code>None</code> only with <code>environment=...</code>.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -15076,6 +15119,18 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
             <p>Optional preallocated RNG state buffer.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+            <b><code>environment</code></b>
+              (<code><span title="typing.Any">Any</span> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Optional <code>WarpEnvironmentData</code> with <code>(n_boxes,)</code>
+temperature and pressure arrays on the same device as <code>particles</code>.
+This mode is supported when both direct inputs are <code>None</code>.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -15100,43 +15155,49 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
             <p>If array shapes or devices mismatch expectations.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If direct <code>temperature</code> or <code>pressure</code> inputs are mixed
+with <code>environment</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If direct inputs are missing when <code>environment</code> is
+omitted.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If environment arrays do not match <code>(n_boxes,)</code> or the
+caller device.</p>
+          </div>
+        </li>
     </ul>
 
 
+<details class="notes" open>
+  <summary>Notes</summary>
+  <p>Accepted environment sources are scalar direct inputs, direct
+<code>(n_boxes,)</code> Warp arrays, hybrid scalar-plus-Warp-array direct
+inputs, or keyword-only <code>environment=...</code> execution.</p>
+<p><code>environment</code> remains keyword-only so existing positional scalar
+callers stay source-compatible.</p>
+<p>Validation runs before volume normalization, RNG setup, and kernel
+launches so invalid shape or device combinations fail without mutating
+particle state or allocating downstream launch work. The normalized
+environment arrays are forwarded directly into the launch path.</p>
+</details>
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span>
-<span class="normal">544</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">544</span>
 <span class="normal">545</span>
 <span class="normal">546</span>
 <span class="normal">547</span>
@@ -15234,10 +15295,76 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 <span class="normal">639</span>
 <span class="normal">640</span>
 <span class="normal">641</span>
-<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span>
+<span class="normal">701</span>
+<span class="normal">702</span>
+<span class="normal">703</span>
+<span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_collisions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
@@ -15245,13 +15372,18 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
     <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one Brownian coagulation timestep on the GPU.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: GPU-resident particle data.</span>
-<span class="sd">        temperature: Gas temperature in kelvin.</span>
-<span class="sd">        pressure: Gas pressure in pascals.</span>
+<span class="sd">        temperature: Direct gas temperature as either a scalar or a Warp array</span>
+<span class="sd">            with shape ``(n_boxes,)``. Use ``None`` only with</span>
+<span class="sd">            ``environment=...``.</span>
+<span class="sd">        pressure: Direct gas pressure as either a scalar or a Warp array with</span>
+<span class="sd">            shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.</span>
 <span class="sd">        time_step: Coagulation time step in seconds.</span>
 <span class="sd">        volume: Per-box volume [m^3]. If None, uses ``particles.volume``.</span>
 <span class="sd">        max_collisions: Maximum number of collisions per box.</span>
@@ -15259,18 +15391,48 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
 <span class="sd">        collision_pairs: Optional preallocated collision buffer.</span>
 <span class="sd">        n_collisions: Optional preallocated collision count buffer.</span>
 <span class="sd">        rng_states: Optional preallocated RNG state buffer.</span>
+<span class="sd">        environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``</span>
+<span class="sd">            temperature and pressure arrays on the same device as ``particles``.</span>
+<span class="sd">            This mode is supported when both direct inputs are ``None``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of updated particle data, collision pairs, and collision counts.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If array shapes or devices mismatch expectations.</span>
+<span class="sd">        ValueError: If direct ``temperature`` or ``pressure`` inputs are mixed</span>
+<span class="sd">            with ``environment``.</span>
+<span class="sd">        ValueError: If direct inputs are missing when ``environment`` is</span>
+<span class="sd">            omitted.</span>
+<span class="sd">        ValueError: If environment arrays do not match ``(n_boxes,)`` or the</span>
+<span class="sd">            caller device.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        Accepted environment sources are scalar direct inputs, direct</span>
+<span class="sd">        ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct</span>
+<span class="sd">        inputs, or keyword-only ``environment=...`` execution.</span>
+
+<span class="sd">        ``environment`` remains keyword-only so existing positional scalar</span>
+<span class="sd">        callers stay source-compatible.</span>
+
+<span class="sd">        Validation runs before volume normalization, RNG setup, and kernel</span>
+<span class="sd">        launches so invalid shape or device combinations fail without mutating</span>
+<span class="sd">        particle state or allocating downstream launch work. The normalized</span>
+<span class="sd">        environment arrays are forwarded directly into the launch path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">_validate_particle_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)</span>
 
     <span class="n">device</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span>
     <span class="n">_validate_device_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">temperature_array</span><span class="p">,</span> <span class="n">pressure_array</span> <span class="o">=</span> <span class="n">_ensure_environment_arrays</span><span class="p">(</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+        <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;coagulation_step_gpu&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
@@ -15330,8 +15492,8 @@ produce collision pairs that are applied to merge particle masses in-place.</p>
             <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
             <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
             <span class="n">volume_array</span><span class="p">,</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">temperature</span><span class="p">),</span>
-            <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">pressure</span><span class="p">),</span>
+            <span class="n">temperature_array</span><span class="p">,</span>
+            <span class="n">pressure_array</span><span class="p">,</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">GAS_CONSTANT</span><span class="p">),</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">BOLTZMANN_CONSTANT</span><span class="p">),</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MOLECULAR_WEIGHT_AIR</span><span class="p">),</span>

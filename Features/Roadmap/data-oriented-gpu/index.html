@@ -5186,6 +5186,8 @@
       
         
       
+        
+      
     
     
     
@@ -5274,6 +5276,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/kernels/environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.environment
   
 
     
@@ -16618,6 +16648,14 @@ epics above.</p>
 <li><code>EnvironmentData</code> CPU↔GPU round-trip helpers and tests are now shipped;
   build backend-selection APIs and workflow integration on top of
   <code>WarpEnvironmentData</code>.</li>
+<li><code>coagulation_step_gpu(...)</code> now follows the same environment normalization
+  contract as <code>condensation_step_gpu(...)</code>: callers may pass scalar direct
+  <code>temperature</code>/<code>pressure</code>, direct Warp arrays with shape <code>(n_boxes,)</code>, hybrid
+  scalar-plus-Warp-array direct inputs, or keyword-only
+  <code>environment=WarpEnvironmentData(...)</code>.</li>
+<li>Keep downstream GPU kernel handoffs aligned with that contract: accept
+  validated per-box temperature and pressure as environment-owned state, and
+  do not migrate those fields into <code>GasData</code>.</li>
 <li>Add an API design for selecting CPU or GPU execution from user-facing
   simulation code.</li>
 <li>Implement backend selection for at least one condensation workflow and one
