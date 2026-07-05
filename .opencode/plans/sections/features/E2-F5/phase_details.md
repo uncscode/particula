@@ -64,17 +64,31 @@
     fail-fast domain validation, caller-owned buffer immutability on rejected
     inputs, and degenerate-particle short-circuit safety.
 
-- [ ] **E2-F5-P4:** Migrate coagulation GPU API and document downstream environment handoff
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Remaining coagulation/documentation follow-up only if downstream
-    development docs or new wrappers are needed beyond the shipped shared
-    environment path.
-  - Files: `particula/gpu/kernels/coagulation.py`,
-    `particula/gpu/kernels/tests/coagulation_test.py`,
-    `docs/Features/Roadmap/data-oriented-gpu.md` or the relevant E2 docs.
-  - Tests: Existing scalar coagulation tests still pass; explicit environment,
-    direct-array, hybrid-input, wrong-`n_boxes`, and device mismatch behavior
-    are now covered at the kernel-test level.
+- [x] **E2-F5-P4:** Migrate coagulation GPU API and document downstream environment handoff
+  - Issue: #1206 | Size: S | Status: Completed
+  - Goal: Finish the coagulation-side adoption/documentation follow-up for the
+    shared GPU environment contract without reopening the already-shipped
+    normalization path.
+  - Delivered: Confirmed `coagulation_step_gpu(...)` already used the shared
+    normalization/runtime path, added focused coagulation regressions for
+    scalar-vs-uniform direct-array parity within stochastic tolerance,
+    non-uniform environment inputs changing collision trends directionally, and
+    the fewer-than-two-active-particles edge case still recording zero
+    collisions. Added the deferred roadmap note documenting accepted
+    scalar/direct-array/hybrid/explicit-environment call forms and reaffirming
+    that temperature and pressure remain environment-owned rather than
+    `GasData` fields. No runtime changes were needed in
+    `particula/gpu/kernels/coagulation.py`, and
+    `particula/gpu/kernels/tests/condensation_test.py` only had formatting
+    churn.
+  - Files: `particula/gpu/kernels/tests/coagulation_test.py` and
+    `docs/Features/Roadmap/data-oriented-gpu.md` plus formatting-only churn in
+    `particula/gpu/kernels/tests/condensation_test.py`.
+  - Tests: Added regressions for uniform direct arrays matching scalar behavior
+    within established stochastic tolerances, non-uniform environment inputs
+    shifting per-box collision totals in the CPU-Brownian-predicted direction,
+    and zero-collision preservation when a box has fewer than two active
+    particles.
 
 ## Phase Ordering Notes
 
@@ -86,5 +100,6 @@
   migration into P2 so the shared helper could be exercised by real entry-point
   execution instead of a helper-only shell.
 - P3 ultimately landed as regression hardening for the already-migrated
-  condensation path, so any later P4 work should stay narrow and additive
-  rather than re-litigating the shared normalization contract.
+  condensation path, and P4 stayed narrow by adding coagulation-side regression
+  hardening plus the deferred roadmap note without changing the shared
+  normalization contract.

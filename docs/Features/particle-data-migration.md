@@ -330,8 +330,8 @@ not expect kernels or runnables to move environment state for you.
 
 ### `condensation_step_gpu` environment inputs
 
-`particula.gpu.condensation_step_gpu(...)` now supports the shared environment
-normalization contract used by the low-level GPU kernels.
+`particula.gpu.kernels.condensation_step_gpu(...)` supports the shared
+environment normalization contract used by the low-level GPU kernels.
 
 - Keep using scalar `temperature` and `pressure` for legacy one-box calls.
 - For multi-box or GPU-resident workflows, you may instead pass direct Warp
@@ -344,7 +344,8 @@ normalization contract used by the low-level GPU kernels.
   into `GasData`.
 
 ```python
-from particula.gpu import condensation_step_gpu, to_warp_environment_data
+from particula.gpu import to_warp_environment_data
+from particula.gpu.kernels import condensation_step_gpu
 
 # Legacy-compatible scalar call
 particle_out, gas_out = condensation_step_gpu(
