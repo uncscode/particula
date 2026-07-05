@@ -7,17 +7,23 @@ testing phase.
 
 ## Unit and Conversion Tests
 
-- `E2-F4-P1` extended `particula/gpu/tests/conversion_test.py` only.
-- Added focused coverage for:
+- `E2-F4-P1` and `E2-F4-P2` use focused coverage in
+  `particula/gpu/tests/conversion_test.py`.
+- Added and maintained focused coverage for:
   - CPU-to-Warp gas conversion shapes and dtypes;
   - bool→`int32` and `int32`→bool `partitioning` conversion;
   - explicit and omitted `vapor_pressure` handling;
   - invalid vapor-pressure shape errors with actual/expected shape text;
-  - supplied names, placeholder-name fallback, and name-length mismatch
-    failures;
+  - supplied names, placeholder-name fallback, explicit `name=None`, and
+    name-length mismatch failures;
+  - empty provided name-list failures with actual/expected count messaging;
+  - non-binary `partitioning` restore failures with `partitioning` + binary
+    `0/1` message assertions;
+  - retry-safe recovery after correcting invalid names or invalid
+    `partitioning` values;
   - GPU-only `vapor_pressure` presence before restore and loss after restore.
-- No `warp_types`, `gas_data`, or production-code tests were needed because the
-  landed phase was contract-locking coverage rather than a runtime change.
+- `E2-F4-P2` pairs those tests with the restore-boundary validation and
+  docstring updates in `particula/gpu/conversion.py`.
 
 ## Integration and Documentation Checks
 
@@ -31,8 +37,10 @@ testing phase.
 | Behavior | Expected Coverage |
 | --- | --- |
 | Names supplied to `from_warp_gas_data()` | Preserved exactly |
-| Names omitted | Placeholder-name restore contract |
-| Partitioning round trip | CPU bool preserved through GPU int32 |
+| Names omitted or `None` | Placeholder-name restore contract |
+| Wrong-length or empty provided names | `ValueError` with actual/expected count text |
+| Partitioning round trip | CPU bool preserved through GPU int32 for binary `0/1` inputs |
+| Invalid restored partitioning | `ValueError` before bool coercion |
 | Vapor pressure supplied | Shape validated and values transferred to Warp |
 | Vapor pressure omitted | Zero-filled `(n_boxes, n_species)` GPU default |
 | Vapor pressure returned to CPU | Intentionally discarded on `GasData` restore |

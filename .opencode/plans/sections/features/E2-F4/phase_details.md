@@ -13,16 +13,26 @@
   - Notes: No production semantics or broader documentation changed in this
     phase.
 
-- [ ] **E2-F4-P2:** Make name and partitioning conversion semantics explicit with tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F4-P2:** Make name and partitioning conversion semantics explicit with tests
+  - Issue: `#1198` | Size: S | Status: Landed
   - Goal: Ensure `from_warp_gas_data()` behavior for missing names and
     `partitioning` int32-to-bool conversion is intentional and non-surprising.
   - Files: `particula/gpu/conversion.py`,
-    `particula/gpu/tests/conversion_test.py`, optional docstrings in
+    `particula/gpu/tests/conversion_test.py`, and nearby wording in
     `particula/gpu/warp_types.py`.
-  - Tests: Names supplied are preserved; missing-name behavior is explicitly
-    tested as error, warning, or placeholder contract; invalid name lengths
-    fail; partitioning round trips as boolean CPU state.
+  - Implemented:
+    - `from_warp_gas_data()` now documents that caller-supplied ordered names
+      are preferred because `WarpGasData` does not store strings.
+    - Omitted names, including explicit `name=None`, restore as placeholder
+      names `species_0..n-1`.
+    - Wrong-length and empty provided name lists fail with explicit
+      actual/expected count messaging.
+    - `_restore_partitioning_bool()` now acts as the explicit restore gate and
+      rejects non-binary `partitioning` values before CPU bool conversion.
+  - Tests: Coverage now pins supplied names, placeholder fallback,
+    `name=None`, invalid name counts, valid binary `partitioning` restore,
+    invalid non-binary failures, vapor-pressure drop behavior, multi-box shape
+    preservation, and retry-safe correction paths.
 
 - [ ] **E2-F4-P3:** Clarify vapor-pressure ownership and GPU transfer behavior with tests
   - Issue: TBD | Size: S | Status: Not Started
@@ -50,7 +60,8 @@
 ## Phase Ordering Notes
 
 - P1 should capture the current contract before P2 or P3 changes semantics.
-- P2 may proceed from the P1 audit, but P3 should wait for the `E2-F2` schema and
-  `E2-F3` transfer-helper details when vapor-pressure ownership is still open.
+- P2 proceeded from the P1 audit and is now landed; P3 should continue to use
+  the explicit P2 name and `partitioning` restore contract as its baseline
+  while vapor-pressure ownership remains open.
 - P4 is the publication gate and should follow the tested decisions from P2 and P3
   so downstream kernel and docs tracks cite the same gas round-trip behavior.

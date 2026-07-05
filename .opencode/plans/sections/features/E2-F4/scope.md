@@ -33,6 +33,21 @@
   - intentional loss of GPU-only `vapor_pressure` when restoring `GasData`.
 - Kept production code and broader documentation unchanged for this phase.
 
+## Implemented in E2-F4-P2 (`#1198`)
+
+- Updated `particula/gpu/conversion.py` to make the GPU→CPU restore contract
+  explicit for names and `partitioning`.
+- Preserved caller-supplied ordered names when provided and documented
+  placeholder-name generation for omitted or `None` names.
+- Rejected wrong-length and empty provided name lists with explicit
+  actual/expected count messaging.
+- Preserved GPU-only `vapor_pressure` drop behavior on restore while tightening
+  `_restore_partitioning_bool()` so only binary `0/1` values are accepted
+  before CPU bool conversion.
+- Extended `particula/gpu/tests/conversion_test.py` with focused coverage for
+  the shipped name contract, binary `partitioning` validation, multi-box shape
+  preservation, and retry-safe correction paths.
+
 ## Out of Scope
 
 - Rewriting GPU condensation kernels beyond any small compatibility updates

@@ -2,25 +2,29 @@
 
 ## Problem Statement
 
-`GasData` and `WarpGasData` intentionally diverge, but the current conversion
-helpers do not make that divergence explicit enough for users or implementers.
-CPU `GasData` owns species names, molar mass, concentration, and boolean
-partitioning. GPU `WarpGasData` drops names, stores partitioning as `int32`, and
-adds a `(n_boxes, n_species)` vapor-pressure buffer required by GPU
-condensation kernels. The current round trip can silently generate placeholder
-names, silently default missing vapor pressure to zeros, and drop GPU
-vapor-pressure data on return to CPU.
+`GasData` and `WarpGasData` intentionally diverge, so the feature must make the
+round-trip contract explicit for users and implementers. CPU `GasData` owns
+species names, molar mass, concentration, and boolean partitioning. GPU
+`WarpGasData` drops names, stores partitioning as `int32`, and adds a
+`(n_boxes, n_species)` vapor-pressure buffer required by GPU condensation
+kernels. After `E2-F4-P1` and `E2-F4-P2`, the name and partitioning restore
+paths are now explicit and test-backed, while vapor-pressure ownership and
+broader migration documentation remain for later phases.
 
 ## Value Proposition
 
 This feature makes gas CPU/GPU schema ownership and round-trip behavior
-predictable, tested, and documented. In the delivered `E2-F4-P1` slice for
-issue `#1197`, the implementation stayed intentionally narrow: it added focused
-regression coverage in `particula/gpu/tests/conversion_test.py` to lock the
-current contract without changing production semantics. Users migrating to the
-data-oriented GPU path can now rely on test-backed expectations for which
-metadata survives conversion, which fields must be provided explicitly, and
-which losses are intentional transfer-boundary semantics rather than bugs.
+predictable, tested, and documented. `E2-F4-P1` landed issue `#1197` as a
+focused regression-test audit. `E2-F4-P2` landed issue `#1198` by making the
+restore contract explicit in `particula/gpu/conversion.py` and expanding the
+focused tests in `particula/gpu/tests/conversion_test.py`. Users migrating to
+the data-oriented GPU path can now rely on test-backed expectations that:
+- caller-supplied ordered names are preferred on restore;
+- omitted or `None` names restore as placeholder `species_0..n-1` labels;
+- wrong-length or empty provided name lists fail with actual/expected count
+  messaging; and
+- restored `partitioning` accepts only binary `0/1` values before conversion
+  back to CPU bool dtype.
 
 ## Parent Epic Context
 

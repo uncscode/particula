@@ -92,12 +92,14 @@ class WarpGasData:
         - Single-box simulations use n_boxes=1
 
     Note:
-        - The 'name' field from CPU GasData is excluded because strings
-          are not GPU-compatible. Preserve species identity with
-          external ordered name ownership or index mapping.
-        - The 'partitioning' field uses int32 instead of bool for GPU
-          compatibility (1 = True, 0 = False).
-        - 'vapor_pressure' is added for GPU kernels (not in CPU GasData).
+        - The ``name`` field from CPU ``GasData`` is excluded because
+          strings are not GPU-compatible. Preserve species identity with
+          caller-owned ordered names or index mapping outside this struct.
+        - The ``partitioning`` field uses int32 instead of bool for GPU
+          compatibility (1 = True, 0 = False) and is expected to remain
+          binary for CPU restore.
+        - ``vapor_pressure`` is added for GPU kernels and is not part of
+          CPU ``GasData``.
 
     Attributes:
         molar_mass: Molar masses in kg/mol.
