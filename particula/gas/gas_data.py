@@ -1,8 +1,13 @@
-"""Provide a batched gas data container for multi-box CFD simulations.
+"""Provide a batched CPU gas data container for multi-box CFD simulations.
 
 GasData isolates gas species arrays from behavior (vapor pressure strategies)
 while embedding the batch dimension required for CFD experiments spanning
-multiple boxes.
+multiple boxes. It is the CPU owner of ordered gas names, molar masses,
+concentrations, and boolean partitioning flags only. GPU helper state such as
+vapor pressure lives on ``WarpGasData`` with shape ``(n_boxes, n_species)``
+and does not round-trip back into this container automatically. Restoring from
+GPU data therefore depends on caller-managed ordered names for semantic name
+reconstruction.
 
 Example:
     Single-box simulation (n_boxes=1)::
@@ -45,6 +50,14 @@ class GasData:
     Simple data container with batch dimension built-in. Concentration
     arrays have shape (n_boxes, n_species) to support multi-box CFD.
     Single-box simulations use n_boxes=1.
+
+    ``GasData`` is also the CPU-side owner of ordered species names. GPU
+    transfer helpers exclude ``name``, convert ``partitioning`` as
+    ``bool → int32 → bool`` with binary ``0``/``1`` restore requirements, and
+    intentionally exclude GPU-only helper state such as vapor pressure from
+    restored CPU data. ``from_warp_gas_data()`` can rebuild names only from
+    caller-managed ordered names or placeholder names; it cannot recover
+    semantic species identity from GPU data alone.
 
     This is NOT a frozen dataclass - concentrations can be updated in place
     for performance. Use copy() if immutability is needed.

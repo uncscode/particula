@@ -263,6 +263,40 @@ restored = from_warp_environment_data(gpu_environment)
 - `from_warp_environment_data(..., sync=False)` assumes manual Warp
   synchronization before `.numpy()` access.
 
+### GPU gas round trips
+
+```python
+import numpy as np
+
+from particula.gpu import from_warp_gas_data, to_warp_gas_data
+
+vapor_pressure = np.array([[2330.0, 120.0]])  # (1, n_species)
+gpu_gas = to_warp_gas_data(
+    gas_data,
+    device="cpu",
+    vapor_pressure=vapor_pressure,
+)
+restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
+```
+
+**Key points:**
+
+- `GasData.name` is CPU-owned ordered metadata. `WarpGasData` does not store
+  names, so callers must preserve ordered names externally for semantic
+  restores.
+- Omitting `name` or passing `name=None` to `from_warp_gas_data()` restores
+  placeholders such as `species_0`.
+- `GasData.concentration` and GPU `vapor_pressure` use
+  `(n_boxes, n_species)`, including `(1, n_species)` for single-box examples.
+- `GasData.partitioning` is `bool` on CPU and `int32` on GPU, with explicit
+  `bool → int32 → bool` conversion across the helper boundary.
+- `WarpGasData.vapor_pressure` is GPU-only helper state. Pass it explicitly
+  when needed, otherwise `to_warp_gas_data()` allocates zeros with the same
+  shape, and `from_warp_gas_data()` always drops it on CPU restore.
+- See `docs/Features/particle-data-migration.md` for the user-facing field
+  authority table and `particula/gpu/tests/conversion_test.py` for the
+  regression-backed contract.
+
 ## ADW Workflows
 
 **Available workflows:**

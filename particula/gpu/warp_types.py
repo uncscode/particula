@@ -92,11 +92,22 @@ class WarpGasData:
         - Single-box simulations use n_boxes=1
 
     Note:
-        - The 'name' field from CPU GasData is excluded (strings not
-          GPU-compatible). Use index mapping for species identification.
-        - The 'partitioning' field uses int32 instead of bool for GPU
-          compatibility (1 = True, 0 = False).
-        - 'vapor_pressure' is added for GPU kernels (not in CPU GasData).
+        - The ``name`` field from CPU ``GasData`` is excluded because
+          strings are not GPU-compatible. Preserve species identity with
+          caller-owned ordered names or index mapping outside this struct;
+          placeholder names are generated only by CPU restore helpers when
+          names are omitted.
+        - The ``partitioning`` field uses int32 instead of bool for GPU
+          compatibility (1 = True, 0 = False) and is expected to remain
+          binary for CPU restore.
+        - ``vapor_pressure`` is GPU-only helper state for condensation-style
+          kernels and is not part of CPU ``GasData`` ownership.
+          ``to_warp_gas_data()`` accepts caller-supplied values with shape
+          ``(n_boxes, n_species)`` or allocates zeros when omitted. Those
+          zeros keep the Warp schema valid but do not provide physical
+          vapor-pressure inputs by themselves. CPU restore helpers drop this
+          field intentionally from restored ``GasData``, while the retained GPU
+          container can still expose it until the caller discards that object.
 
     Attributes:
         molar_mass: Molar masses in kg/mol.
@@ -106,7 +117,7 @@ class WarpGasData:
             Shape: (n_boxes, n_species)
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)
-            Added for GPU condensation kernels.
+            GPU-only helper state for condensation kernels.
         partitioning: Whether each species can partition to particles.
             Shape: (n_species,)
             Uses int32 (1=True, 0=False) for GPU compatibility.

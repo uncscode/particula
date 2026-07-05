@@ -13,9 +13,14 @@ Example:
     ...     to_warp_particle_data,
     ... )
     >>> gpu_particles = to_warp_particle_data(particles, device="cuda")
-    >>> gpu_gas = to_warp_gas_data(gas, device="cuda")
+    >>> vapor_pressure = np.zeros(gas.concentration.shape, dtype=np.float64)
+    >>> gpu_gas = to_warp_gas_data(
+    ...     gas,
+    ...     device="cuda",
+    ...     vapor_pressure=vapor_pressure,
+    ... )
     >>> gpu_environment = to_warp_environment_data(environment, device="cuda")
-    >>> # Run GPU simulation loop
+    >>> # Run GPU simulation loop with caller-owned vapor-pressure state.
     >>> for _ in range(10000):
     ...     gpu_particles = condensation_step(
     ...         gpu_particles, gpu_gas, gpu_environment, dt
@@ -96,6 +101,28 @@ def _from_numpy_zero_copy(wp, values, dtype, device: str):
         if "unexpected keyword argument 'copy'" not in str(exc):
             raise
         return wp.from_numpy(values, dtype=dtype, device=device)
+
+
+def _restore_partitioning_bool(
+    partitioning_values: NDArray[np.int32] | NDArray[np.float64],
+) -> NDArray[np.bool_]:
+    """Validate GPU partitioning flags before restoring CPU bool values.
+
+    Args:
+        partitioning_values: GPU-restored partitioning values.
+
+    Returns:
+        Partitioning values restored as a NumPy bool array.
+
+    Raises:
+        ValueError: If any value is not one of ``0`` or ``1``.
+    """
+    if not np.all(np.isin(partitioning_values, (0, 1))):
+        raise ValueError(
+            "invalid partitioning restore values: partitioning must contain "
+            "only binary 0/1 values before restoring GasData"
+        )
+    return partitioning_values.astype(bool)
 
 
 def to_warp_particle_data(
@@ -237,7 +264,7 @@ def to_warp_gas_data(
     copy: bool = True,
     vapor_pressure: NDArray[np.float64] | None = None,
 ) -> "WarpGasData":
-    """Transfer GasData to GPU with explicit control.
+    """Transfer GasData to GPU with caller-owned vapor-pressure state.
 
     Use this for long GPU-resident simulations where you want to:
     1. Transfer data to GPU once at simulation start
@@ -251,9 +278,15 @@ def to_warp_gas_data(
         The 'partitioning' field is converted from bool to int32
         (1 = True, 0 = False) for GPU compatibility.
 
-        The 'vapor_pressure' field is required by WarpGasData but not
-        present in GasData. If not provided, it defaults to zeros.
-        Set it after conversion if needed for condensation kernels.
+        ``WarpGasData`` requires a ``vapor_pressure`` buffer even though CPU
+        ``GasData`` does not own that field. Callers may supply the
+        authoritative ``(n_boxes, n_species)`` vapor-pressure array when GPU
+        kernels need physical vapor-pressure values.
+
+        If ``vapor_pressure`` is omitted, this helper allocates a zero-filled
+        ``(n_boxes, n_species)`` GPU buffer on the selected device. That
+        default keeps the transfer schema valid, but condensation callers that
+        need physical vapor-pressure values must provide them explicitly.
 
     Args:
         data: CPU-side GasData container.
@@ -261,8 +294,9 @@ def to_warp_gas_data(
         copy: If True (default), always copy data to device.
               If False, attempt zero-copy via wp.from_numpy() when
               arrays are already on a compatible device.
-        vapor_pressure: Optional vapor pressure array in Pa.
-            Shape: (n_boxes, n_species). If None, zeros are used.
+        vapor_pressure: Optional caller-supplied vapor pressure array in Pa.
+            Shape: ``(n_boxes, n_species)``. If omitted, this helper creates
+            a zero-filled GPU buffer with that same shape for the Warp mirror.
 
     Returns:
         WarpGasData with Warp arrays on specified device.
@@ -271,11 +305,13 @@ def to_warp_gas_data(
         RuntimeError: If Warp is not available or device not found.
         ValueError: If vapor_pressure shape doesn't match expected
             (n_boxes, n_species).
+        ValueError: If vapor_pressure contains NaN, inf, or negative values.
 
     Example:
         >>> from particula.gpu import to_warp_gas_data
+        >>> # Omitted vapor pressure allocates zeros for schema parity only.
         >>> gpu_gas = to_warp_gas_data(gas_data, device="cuda")
-        >>> # With explicit vapor pressure:
+        >>> # Provide physical vapor pressure explicitly when kernels need it:
         >>> vp = np.array([[1000.0, 500.0, 200.0], [1000.0, 500.0, 200.0]])
         >>> gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)
     """
@@ -284,17 +320,23 @@ def to_warp_gas_data(
 
     from particula.gpu.warp_types import WarpGasData
 
-    # Validate vapor_pressure shape if provided
+    # Validate caller-owned vapor pressure state at the CPU→GPU boundary.
     expected_shape = (data.n_boxes, data.n_species)
     if vapor_pressure is not None:
-        if vapor_pressure.shape != expected_shape:
+        vp_array = np.asarray(vapor_pressure, dtype=np.float64)
+        if vp_array.shape != expected_shape:
             raise ValueError(
-                f"vapor_pressure shape {vapor_pressure.shape} does not match "
+                f"vapor_pressure shape {vp_array.shape} does not match "
                 f"expected {expected_shape}"
             )
-        vp_array = vapor_pressure
+        if not np.all(np.isfinite(vp_array)):
+            raise ValueError("vapor_pressure must contain only finite values")
+        if np.any(vp_array < 0.0):
+            raise ValueError(
+                "vapor_pressure must contain only nonnegative values"
+            )
     else:
-        # Default to zeros
+        # GPU kernels always receive a valid (n_boxes, n_species) buffer.
         vp_array = np.zeros(expected_shape, dtype=np.float64)
 
     # Convert partitioning from bool to int32 (1=True, 0=False)
@@ -381,27 +423,39 @@ def from_warp_particle_data(
 
 def from_warp_gas_data(
     gpu_data: "WarpGasData",
-    name: list | None = None,
+    name: list[str] | None = None,
     sync: bool = True,
 ) -> "GasData":
-    """Transfer WarpGasData back to CPU.
+    """Transfer WarpGasData back to CPU with an intentionally lossy restore.
 
     Use this to transfer GPU-resident gas data back to CPU after
     GPU simulation steps. The returned GasData can be used for
     checkpointing, analysis, or continuing with CPU-based operations.
 
     Note:
-        The 'vapor_pressure' field from WarpGasData is not transferred
-        as GasData does not have this field. If you need vapor pressure
-        values, access them directly from gpu_data before calling this.
+        The restored CPU ``GasData`` omits ``vapor_pressure`` because that
+        field is not part of the CPU schema. The ``WarpGasData`` container may
+        still retain ``gpu_data.vapor_pressure`` after this helper returns, so
+        callers can keep reading that GPU-side field while they retain the GPU
+        container, or preserve a sidecar copy if they need a detached CPU copy.
+        ``from_warp_gas_data()`` restores only the CPU-owned ``GasData``
+        fields.
 
-        Species names must be provided since WarpGasData does not store
-        string data. If not provided, placeholder names are generated.
+        ``WarpGasData`` does not store species names because string data is
+        not GPU-compatible. Prefer caller-supplied ordered names when
+        reconstructing ``GasData``. Placeholder names are generated only
+        when ``name`` is omitted or explicitly set to ``None``.
+
+        Restored ``partitioning`` values must remain binary ``0``/``1`` on
+        the GPU side. Any non-binary values raise ``ValueError`` before a
+        ``GasData`` instance is returned.
 
     Args:
         gpu_data: GPU-resident WarpGasData container.
-        name: Species names. If None, generates placeholder names
-            ["species_0", "species_1", ...].
+        name: Optional ordered species names supplied by the caller.
+            If omitted or ``None``, generates placeholder names such as
+            ``["species_0", "species_1", ...]``. If provided, the list
+            length must match ``gpu_data.molar_mass.shape[0]``.
         sync: If True (default), synchronize device before transfer
             to ensure all GPU operations have completed. Set False
             only if you've already synchronized manually.
@@ -410,39 +464,52 @@ def from_warp_gas_data(
         CPU-side GasData with NumPy arrays.
 
     Raises:
-        ValueError: If name length doesn't match n_species.
+        ValueError: If ``name`` is not ``None`` or a ``list[str]``.
+        ValueError: If the supplied name count does not match ``n_species``.
+        ValueError: If restored ``partitioning`` contains values other than
+            ``0`` or ``1``.
 
     Example:
-        >>> # With original names preserved
+        >>> # With caller-supplied ordered names
         >>> result = from_warp_gas_data(gpu_data, name=["Water", "H2SO4"])
         >>>
-        >>> # With placeholder names
+        >>> # With placeholder names because GPU data stores no names
         >>> result = from_warp_gas_data(gpu_data)
         >>> print(result.name)  # ["species_0", "species_1"]
     """
     wp = _ensure_warp_available()
-
-    if sync:
-        wp.synchronize()
 
     # Determine n_species from molar_mass shape
     n_species = gpu_data.molar_mass.shape[0]
 
     # Handle name parameter
     if name is None:
-        name = [f"species_{i}" for i in range(n_species)]
-    elif len(name) != n_species:
-        raise ValueError(
-            f"name length {len(name)} does not match n_species {n_species}"
-        )
+        restored_names = [f"species_{i}" for i in range(n_species)]
+    else:
+        if not isinstance(name, list):
+            raise ValueError("name must be a list of strings or None")
+        if any(not isinstance(species_name, str) for species_name in name):
+            raise ValueError("name must contain only string entries")
+        if len(name) != n_species:
+            raise ValueError(
+                "name length mismatch when restoring GasData: expected "
+                f"{n_species} names, got {len(name)}"
+            )
+        restored_names = name
 
-    # Convert partitioning from int32 to bool
-    partitioning_bool = gpu_data.partitioning.numpy().astype(bool)
+    if sync:
+        wp.synchronize()
+
+    # Convert partitioning from int32 to bool after validating GPU flags.
+    partitioning_bool = _restore_partitioning_bool(
+        gpu_data.partitioning.numpy()
+    )
 
     from particula.gas.gas_data import GasData
 
+    # Intentionally drop GPU-only vapor_pressure when reconstructing GasData.
     return GasData(
-        name=name,
+        name=restored_names,
         molar_mass=gpu_data.molar_mass.numpy(),
         concentration=gpu_data.concentration.numpy(),
         partitioning=partitioning_bool,
