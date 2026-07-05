@@ -13,9 +13,14 @@ Example:
     ...     to_warp_particle_data,
     ... )
     >>> gpu_particles = to_warp_particle_data(particles, device="cuda")
-    >>> gpu_gas = to_warp_gas_data(gas, device="cuda")
+    >>> vapor_pressure = np.zeros(gas.concentration.shape, dtype=np.float64)
+    >>> gpu_gas = to_warp_gas_data(
+    ...     gas,
+    ...     device="cuda",
+    ...     vapor_pressure=vapor_pressure,
+    ... )
     >>> gpu_environment = to_warp_environment_data(environment, device="cuda")
-    >>> # Run GPU simulation loop
+    >>> # Run GPU simulation loop with caller-owned vapor-pressure state.
     >>> for _ in range(10000):
     ...     gpu_particles = condensation_step(
     ...         gpu_particles, gpu_gas, gpu_environment, dt
@@ -303,8 +308,9 @@ def to_warp_gas_data(
 
     Example:
         >>> from particula.gpu import to_warp_gas_data
+        >>> # Omitted vapor pressure allocates zeros for schema parity only.
         >>> gpu_gas = to_warp_gas_data(gas_data, device="cuda")
-        >>> # With explicit vapor pressure:
+        >>> # Provide physical vapor pressure explicitly when kernels need it:
         >>> vp = np.array([[1000.0, 500.0, 200.0], [1000.0, 500.0, 200.0]])
         >>> gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)
     """
@@ -316,12 +322,12 @@ def to_warp_gas_data(
     # Validate caller-owned vapor pressure state at the CPU→GPU boundary.
     expected_shape = (data.n_boxes, data.n_species)
     if vapor_pressure is not None:
-        if vapor_pressure.shape != expected_shape:
+        vp_array = np.asarray(vapor_pressure, dtype=np.float64)
+        if vp_array.shape != expected_shape:
             raise ValueError(
-                f"vapor_pressure shape {vapor_pressure.shape} does not match "
+                f"vapor_pressure shape {vp_array.shape} does not match "
                 f"expected {expected_shape}"
             )
-        vp_array = vapor_pressure
     else:
         # GPU kernels always receive a valid (n_boxes, n_species) buffer.
         vp_array = np.zeros(expected_shape, dtype=np.float64)
@@ -420,11 +426,11 @@ def from_warp_gas_data(
     checkpointing, analysis, or continuing with CPU-based operations.
 
     Note:
-        The ``vapor_pressure`` field from ``WarpGasData`` is not restored
-        because CPU ``GasData`` does not include this field. If you need the
-        authoritative vapor-pressure values after GPU work, read
-        ``gpu_data.vapor_pressure`` before calling this helper or keep a
-        sidecar copy yourself.
+        The restored CPU ``GasData`` omits ``vapor_pressure`` because that
+        field is not part of the CPU schema. The ``WarpGasData`` container may
+        still retain ``gpu_data.vapor_pressure`` after this helper returns, so
+        callers can keep reading that GPU-side field while they retain the GPU
+        container, or preserve a sidecar copy if they need a detached CPU copy.
         ``from_warp_gas_data()`` restores only the CPU-owned ``GasData``
         fields.
 

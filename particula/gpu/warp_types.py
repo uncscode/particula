@@ -103,10 +103,11 @@ class WarpGasData:
         - ``vapor_pressure`` is GPU-only helper state for condensation-style
           kernels and is not part of CPU ``GasData`` ownership.
           ``to_warp_gas_data()`` accepts caller-supplied values with shape
-          ``(n_boxes, n_species)`` or allocates zeros when omitted. CPU
-          restore helpers drop this field intentionally, so callers must read
-          it from the GPU container or preserve a sidecar if they still need
-          those values.
+          ``(n_boxes, n_species)`` or allocates zeros when omitted. Those
+          zeros keep the Warp schema valid but do not provide physical
+          vapor-pressure inputs by themselves. CPU restore helpers drop this
+          field intentionally from restored ``GasData``, while the retained GPU
+          container can still expose it until the caller discards that object.
 
     Attributes:
         molar_mass: Molar masses in kg/mol.

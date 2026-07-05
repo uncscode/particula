@@ -15,7 +15,9 @@ import pytest
 wp = pytest.importorskip("warp")
 
 from particula.gpu.conversion import (  # noqa: E402
+    _from_numpy_zero_copy,
     _restore_partitioning_bool,
+    _validate_device,
     from_warp_environment_data,
     from_warp_gas_data,
     from_warp_particle_data,
@@ -330,7 +332,7 @@ class TestToWarpGasData:
     def test_to_warp_gas_data_defaults_vapor_pressure_to_zeros(
         self, sample_gas_data
     ) -> None:
-        """Test omitted vapor pressure creates zeros with gas-shape parity."""
+        """Test omitted vapor pressure creates a zero-filled schema buffer."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         expected = np.zeros(
@@ -341,6 +343,26 @@ class TestToWarpGasData:
             gpu_data.vapor_pressure.shape == sample_gas_data.concentration.shape
         )
         assert gpu_data.vapor_pressure.dtype == wp.float64
+
+    def test_to_warp_gas_data_accepts_array_like_vapor_pressure(
+        self, sample_gas_data
+    ) -> None:
+        """Test array-like vapor pressure is normalized before transfer."""
+        vapor_pressure = np.asarray(
+            [[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]],
+            dtype=np.float64,
+        )
+
+        gpu_data = to_warp_gas_data(
+            sample_gas_data,
+            device="cpu",
+            vapor_pressure=vapor_pressure,
+        )
+
+        np.testing.assert_array_equal(
+            gpu_data.vapor_pressure.numpy(),
+            np.asarray(vapor_pressure, dtype=np.float64),
+        )
 
     def test_gas_data_copy_false_behavior(self, sample_gas_data) -> None:
         """Test that copy=False uses wp.from_numpy()."""
@@ -879,6 +901,139 @@ class TestErrorHandling:
         assert actual_shape in error_msg
         assert "(2, 3)" in error_msg
 
+    def test_to_warp_gas_data_array_like_invalid_shape_raises_value_error(
+        self, sample_gas_data
+    ) -> None:
+        """Test list-like invalid vapor pressure fails via documented shape path."""
+        wrong_shape_vp = np.asarray(
+            [[1000.0, 500.0], [1100.0, 550.0]], dtype=np.float64
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            to_warp_gas_data(
+                sample_gas_data,
+                device="cpu",
+                vapor_pressure=wrong_shape_vp,
+            )
+
+        error_msg = str(exc_info.value)
+        assert "(2, 2)" in error_msg
+        assert "(2, 3)" in error_msg
+
+
+class TestValidateDevice:
+    """Tests for _validate_device() helper."""
+
+    def test_validate_device_returns_lookup_result(self) -> None:
+        """Test successful device lookup returns the Warp device object."""
+        import types
+
+        sentinel_device = object()
+        fake_wp = types.SimpleNamespace(
+            get_device=lambda device: sentinel_device if device == "cpu" else None
+        )
+
+        result = _validate_device(fake_wp, "cpu")
+
+        assert result is sentinel_device
+
+    @pytest.mark.parametrize("error_type", [RuntimeError, ValueError])
+    def test_validate_device_wraps_lookup_errors(self, error_type) -> None:
+        """Test lookup failures become the documented RuntimeError."""
+        import types
+
+        def raise_lookup_error(_device):
+            raise error_type("bad device")
+
+        fake_wp = types.SimpleNamespace(get_device=raise_lookup_error)
+
+        with pytest.raises(RuntimeError) as exc_info:
+            _validate_device(fake_wp, "invalid_device_xyz")
+
+        error_msg = str(exc_info.value)
+        assert "invalid_device_xyz" in error_msg
+        assert "Available devices" in error_msg
+
+
+class TestFromNumpyZeroCopy:
+    """Tests for _from_numpy_zero_copy() helper."""
+
+    def test_from_numpy_zero_copy_prefers_explicit_copy_false(self) -> None:
+        """Test supported Warp versions receive the explicit copy=False hint."""
+        import types
+
+        values = np.array([1.0, 2.0], dtype=np.float64)
+        calls: list[dict[str, object]] = []
+        sentinel_result = object()
+
+        def fake_from_numpy(array, **kwargs):
+            calls.append({"array": array, **kwargs})
+            return sentinel_result
+
+        fake_wp = types.SimpleNamespace(from_numpy=fake_from_numpy)
+
+        result = _from_numpy_zero_copy(
+            fake_wp,
+            values,
+            dtype="float64",
+            device="cpu",
+        )
+
+        assert result is sentinel_result
+        assert len(calls) == 1
+        assert calls[0]["array"] is values
+        assert calls[0]["dtype"] == "float64"
+        assert calls[0]["device"] == "cpu"
+        assert calls[0]["copy"] is False
+
+    def test_from_numpy_zero_copy_falls_back_when_copy_keyword_unsupported(
+        self,
+    ) -> None:
+        """Test older Warp signatures retry without the copy keyword."""
+        import types
+
+        values = np.array([1.0, 2.0], dtype=np.float64)
+        calls: list[dict[str, object]] = []
+
+        def fake_from_numpy(array, **kwargs):
+            calls.append({"array": array, **kwargs})
+            if "copy" in kwargs:
+                raise TypeError("unexpected keyword argument 'copy'")
+            return types.SimpleNamespace(array=array, kwargs=kwargs)
+
+        fake_wp = types.SimpleNamespace(from_numpy=fake_from_numpy)
+
+        result = _from_numpy_zero_copy(
+            fake_wp,
+            values,
+            dtype="float64",
+            device="cpu",
+        )
+
+        assert len(calls) == 2
+        assert calls[0]["copy"] is False
+        assert "copy" not in calls[1]
+        assert calls[1]["dtype"] == "float64"
+        assert calls[1]["device"] == "cpu"
+        assert result.array is values
+
+    def test_from_numpy_zero_copy_reraises_unrelated_type_errors(self) -> None:
+        """Test unrelated TypeError values are not silently swallowed."""
+        import types
+
+        def fake_from_numpy(_array, **_kwargs):
+            raise TypeError("different type error")
+
+        fake_wp = types.SimpleNamespace(from_numpy=fake_from_numpy)
+
+        with pytest.raises(TypeError, match="different type error"):
+            _from_numpy_zero_copy(
+                fake_wp,
+                np.array([1.0], dtype=np.float64),
+                dtype="float64",
+                device="cpu",
+            )
+
 
 class TestFromWarpParticleData:
     """Tests for from_warp_particle_data() function."""
@@ -1150,11 +1305,7 @@ class TestFromWarpGasData:
     def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
         self, sample_gas_data
     ) -> None:
-        """Test restore drops GPU-only vapor pressure unless caller saves it.
-
-        The saved sidecar copy is the only CPU-accessible record of those
-        values after ``from_warp_gas_data()`` returns.
-        """
+        """Test restore drops vapor pressure from CPU GasData only."""
         vapor_pressure = np.array(
             [[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]],
             dtype=np.float64,
@@ -1172,6 +1323,10 @@ class TestFromWarpGasData:
         _assert_gas_round_trip_matches(sample_gas_data, result)
         assert not hasattr(result, "vapor_pressure")
         np.testing.assert_array_equal(vapor_pressure_sidecar, vapor_pressure)
+        np.testing.assert_array_equal(
+            gpu_data.vapor_pressure.numpy(),
+            vapor_pressure,
+        )
 
     def test_from_warp_gas_data_preserves_multi_box_round_trip(
         self, sample_gas_data
