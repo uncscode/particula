@@ -47,11 +47,23 @@
 - The P2 implementation confirmed again that production defaults remain
   absolute per-species `np.float64` on CPU and `wp.float64` on Warp mirrors.
 
+## Newly Resolved by P3 (#1210)
+
+- The shipped P3 executable surface is now split cleanly between fast metrics
+  in `particula/gpu/tests/mass_precision_metrics_test.py`, optional throughput
+  timing in `particula/gpu/tests/benchmark_test.py`, and fast helper coverage
+  in `particula/gpu/tests/benchmark_helpers_test.py`.
+- Conservation-sensitive candidate review is now grounded in executable
+  CPU-reference `get_mass_transfer(...)` comparisons with both per-particle and
+  aggregate species-total delta assertions.
+- Mixed-scale smallest-particle thresholds, zero-total-mass handling,
+  zero-volume warning-clean paths, and clamp accounting terminology are now all
+  fixed in the shipped test and roadmap surfaces.
+- The roadmap page now records explicit analytic memory-footprint examples and
+  documents the benchmark path as an opt-in, skip-safe throughput surface.
+
 ## Remaining Questions
 
-- Whether any candidate remains acceptable once broader conservation,
-  small-particle coexistence, memory-footprint, and throughput tradeoffs are
-  evaluated remains for P3-P4.
 - Whether the final recommendation should keep absolute `fp64` storage or
   endorse a later migration path remains open pending those broader tradeoff
   results.

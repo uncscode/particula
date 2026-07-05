@@ -32,16 +32,26 @@
     fidelity, invalid candidate ids, zero-total-mass reconstruction behavior,
     unsupported-candidate boundaries, and CPU/Warp `float64` regression checks.
 
-- [ ] **E2-F6-P3:** Evaluate conservation small-particle fidelity memory and throughput tradeoffs
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F6-P3:** Evaluate conservation small-particle fidelity memory and throughput tradeoffs
+  - Issue: #1210 | Size: S | Status: Shipped
   - Goal: Quantify conservation error, small-particle mass/radius fidelity,
     clamping behavior, memory footprint, and GPU/CPU throughput where available.
   - Files: `docs/Features/Roadmap/mass-precision-study.md`,
-    `particula/gpu/tests/mass_precision_metrics_test.py`, and any benchmark
-    helper kept adjacent to existing GPU condensation tests to avoid a new tool
-    surface.
-  - Tests: Conservation tolerance checks, small-particle fidelity checks,
-    memory-budget calculations, and skip-safe GPU benchmark validation.
+    `.opencode/plans/sections/features/E2-F6/documentation_updates.md`,
+    `particula/gpu/tests/mass_precision_metrics_test.py`,
+    `particula/gpu/tests/benchmark_test.py`, and
+    `particula/gpu/tests/benchmark_helpers_test.py`.
+  - Delivered: Added cached P3 reconstruction and CPU-reference
+    mass-transfer metrics, mixed-scale smallest-particle thresholds,
+    zero-total-mass and zero-volume warning-clean coverage, explicit clamp
+    accounting, bounded opt-in projection benchmarks, fast helper tests for the
+    benchmark path, and roadmap updates that record thresholds, memory examples,
+    and throughput availability.
+  - Tests: `mass_precision_metrics_test.py` now covers conservation-sensitive
+    candidate deltas, mixed-scale mass/radius thresholds, edge-path stability,
+    and clamp metrics; `benchmark_helpers_test.py` covers skip gates, helper
+    behavior, and bounded benchmark result recording; `benchmark_test.py`
+    retains the optional `--benchmark` throughput entry point.
 
 - [ ] **E2-F6-P4:** Publish precision recommendation report with validation evidence
   - Issue: TBD | Size: XS | Status: Not Started

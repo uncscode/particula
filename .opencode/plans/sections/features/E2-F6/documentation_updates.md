@@ -9,8 +9,8 @@
 - P2 expanded the roadmap page into a P1+P2 study record with executed
   candidate descriptions, unsupported-candidate notes, and focused
   reproduction commands.
-- Later phases still need to add broader tradeoff evidence and any final
-  recommendation.
+- Later phases still need to publish the final recommendation that interprets
+  the shipped P1-P3 evidence.
 
 ## Shipped P1 Content
 
@@ -49,6 +49,9 @@
 - Optional benchmark reproduction is documented as an explicit opt-in path on
   `particula/gpu/tests/benchmark_test.py`, including the clean-skip behavior on
   unsupported machines.
+- The documentation now matches the landed fast benchmark helper coverage in
+  `particula/gpu/tests/benchmark_helpers_test.py` so the opt-in benchmark path
+  is backed by a default-runnable validation layer.
 - The documentation now includes a checklist to verify candidate names,
   thresholds, memory examples, and reproduction commands against the landed
   executable test surface.

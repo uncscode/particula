@@ -322,6 +322,8 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 
 ```bash
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
+pytest particula/gpu/tests/mass_precision_metrics_test.py -q
+pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 ```
 
 **Key points:**
@@ -332,10 +334,17 @@ pytest particula/gpu/tests/mass_precision_cases_test.py -q
   masses without changing the production CPU/GPU storage schema.
 - The focused comparison module lives in
   `particula/gpu/tests/mass_precision_metrics_test.py` and evaluates exactly
-  three study-only reconstruction candidates against the fp64 baseline.
+  three study-only reconstruction candidates against the fp64 baseline,
+  including cached reconstruction, conservation, mixed-scale small-particle,
+  and clamp-accounting checks.
+- Mixed-scale review thresholds are now exercised explicitly so nanometer
+  particles cannot be masked by droplet-scale aggregates in the same array.
+- Optional throughput evidence lives on
+  `particula/gpu/tests/benchmark_test.py` behind the existing `--benchmark`
+  opt-in and still skips cleanly when Warp/CUDA is unavailable.
 - Use `docs/Features/Roadmap/mass-precision-study.md` as the reference for
-  case names, supported-vs-unsupported candidate scope, and focused
-  reproduction.
+  case names, supported-vs-unsupported candidate scope, thresholds,
+  memory-footprint examples, and focused reproduction.
 
 ## ADW Workflows
 

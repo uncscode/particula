@@ -177,6 +177,8 @@ print(result)
   features](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
 - [Mass-precision baseline and candidate fidelity study](Features/Roadmap/mass-precision-study.md)
   — deterministic NPF-to-droplet GPU baseline cases, unchanged fp64 storage
-  assumptions, the three study-only candidate fidelity checks, and focused
-  reproduction commands for `mass_precision_cases_test.py` and
-  `mass_precision_metrics_test.py`.
+  assumptions, the three study-only candidate fidelity checks, executable P3
+  conservation and mixed-scale thresholds, clamp accounting,
+  memory-footprint examples, and focused reproduction commands for
+  `mass_precision_cases_test.py`, `mass_precision_metrics_test.py`, and the
+  optional `benchmark_test.py --benchmark -k mass_precision` path.
