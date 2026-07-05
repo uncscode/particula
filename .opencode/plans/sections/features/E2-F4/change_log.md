@@ -25,3 +25,14 @@
   bool↔`int32` `partitioning`, explicit/implicit `vapor_pressure` behavior,
   placeholder names, name-length mismatch failures, and GPU-only
   `vapor_pressure` loss on restore.
+
+## 2026-07-04
+
+- Updated `E2-F4` plan sections after issue `#1198` landed as `E2-F4-P2`.
+- Recorded that `particula/gpu/conversion.py` now makes the restore contract
+  explicit for caller-supplied names, placeholder fallback, invalid name
+  counts, and binary-only `partitioning` restore.
+- Recorded that focused conversion tests now cover placeholder fallback,
+  `name=None`, empty-name failures, invalid non-binary `partitioning`,
+  retry-safe correction paths, vapor-pressure loss on restore, and multi-box
+  shape preservation.

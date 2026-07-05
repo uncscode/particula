@@ -5,6 +5,11 @@
 - `E2-F4-P1` did not land broader docs changes. The phase used
   `particula/gpu/tests/conversion_test.py` as an internal phase-local contract
   record for the current behavior, not as shipped user-facing documentation.
+- `E2-F4-P2` updated code-local documentation in
+  `particula/gpu/conversion.py` and nearby `WarpGasData` wording to state that
+  caller-supplied ordered names are preferred, placeholder names are generated
+  only when names are omitted or `None`, and restored `partitioning` must be
+  binary `0/1`.
 - `docs/Features/particle-data-migration.md`
   - Add a field-authority table for `GasData` versus `WarpGasData`.
   - Document name preservation/loss behavior and required user action.
@@ -17,11 +22,12 @@
 
 ## Code Documentation
 
-- No code docstrings were updated in the shipped `#1197` change.
-- Update `GasData` and `WarpGasData` docstrings if field authority wording is
-  stale.
-- Update `to_warp_gas_data()` and `from_warp_gas_data()` docstrings with exact
-  name and vapor-pressure semantics.
+- `#1197` did not update code docstrings, but `#1198` did update
+  `from_warp_gas_data()` and nearby `WarpGasData` wording.
+- Update `GasData` and `WarpGasData` docstrings further only if later phases
+  change field-authority wording again.
+- Keep `to_warp_gas_data()` and `from_warp_gas_data()` docstrings aligned with
+  the shipped name, `partitioning`, and vapor-pressure semantics.
 - Keep examples short and consistent with tests.
 
 ## Migration Guidance to Include

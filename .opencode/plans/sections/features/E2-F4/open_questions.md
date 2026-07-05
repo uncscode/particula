@@ -3,8 +3,13 @@
 ## Resolved Answers
 
 - `from_warp_gas_data()` should prefer explicit `name` input. Placeholder names
-  remain the current documented fallback behavior in the shipped `#1197`
-  regression tests, but they must not be treated as preserved metadata.
+  are now the shipped fallback behavior for omitted or `None` names after
+  `#1198`, but they must not be treated as preserved metadata.
+- Wrong-length and empty provided name lists now fail with explicit
+  actual/expected count messaging rather than falling back silently.
+- Non-binary `WarpGasData.partitioning` values now raise `ValueError` before
+  CPU bool restoration; only binary `0/1` values are accepted at the GPU→CPU
+  boundary.
 - Missing `vapor_pressure` in generic `to_warp_gas_data()` may remain a
   zero-filled default, but condensation paths that need vapor pressure should
   pass it explicitly and document that requirement.
@@ -17,9 +22,6 @@
 
 ## Still Open for Later Phases
 
-- Whether non-binary `WarpGasData.partitioning` values should raise before
-  casting to CPU booleans was not changed in `E2-F4-P1`; the phase only locked
-  the current bool↔`int32` happy-path contract.
-- Whether placeholder-name fallback should remain indefinitely, gain warnings,
-  or become a stricter error contract is deferred beyond the shipped test-only
-  audit phase.
+- Whether placeholder-name fallback should remain the long-term API contract,
+  gain warnings, or become stricter in a future migration-focused change is
+  still deferred beyond the shipped `#1198` implementation.

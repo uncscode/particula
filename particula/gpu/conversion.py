@@ -413,21 +413,26 @@ def from_warp_gas_data(
     checkpointing, analysis, or continuing with CPU-based operations.
 
     Note:
-        The 'vapor_pressure' field from WarpGasData is not transferred
-        because GasData does not include this field. If you need vapor
-        pressure values, access them directly from gpu_data before
+        The ``vapor_pressure`` field from ``WarpGasData`` is not restored
+        because ``GasData`` does not include this field. If you need vapor
+        pressure values, access them directly from ``gpu_data`` before
         calling this helper.
 
-        WarpGasData does not store species names because string data is
+        ``WarpGasData`` does not store species names because string data is
         not GPU-compatible. Prefer caller-supplied ordered names when
-        reconstructing GasData. Placeholder names are generated only
+        reconstructing ``GasData``. Placeholder names are generated only
         when ``name`` is omitted or explicitly set to ``None``.
+
+        Restored ``partitioning`` values must remain binary ``0``/``1`` on
+        the GPU side. Any non-binary values raise ``ValueError`` before a
+        ``GasData`` instance is returned.
 
     Args:
         gpu_data: GPU-resident WarpGasData container.
         name: Optional ordered species names supplied by the caller.
-            If omitted or ``None``, generates placeholder names
-            ["species_0", "species_1", ...].
+            If omitted or ``None``, generates placeholder names such as
+            ``["species_0", "species_1", ...]``. If provided, the list
+            length must match ``gpu_data.molar_mass.shape[0]``.
         sync: If True (default), synchronize device before transfer
             to ensure all GPU operations have completed. Set False
             only if you've already synchronized manually.
