@@ -364,6 +364,46 @@ class TestToWarpGasData:
             np.asarray(vapor_pressure, dtype=np.float64),
         )
 
+    @pytest.mark.parametrize(
+        ("vapor_pressure", "message"),
+        [
+            (
+                np.array(
+                    [[np.nan, 500.0, 200.0], [1100.0, 550.0, 220.0]],
+                    dtype=np.float64,
+                ),
+                "finite values",
+            ),
+            (
+                np.array(
+                    [[np.inf, 500.0, 200.0], [1100.0, 550.0, 220.0]],
+                    dtype=np.float64,
+                ),
+                "finite values",
+            ),
+            (
+                np.array(
+                    [[-1.0, 500.0, 200.0], [1100.0, 550.0, 220.0]],
+                    dtype=np.float64,
+                ),
+                "nonnegative values",
+            ),
+        ],
+    )
+    def test_to_warp_gas_data_rejects_invalid_vapor_pressure_values(
+        self,
+        sample_gas_data,
+        vapor_pressure: np.ndarray,
+        message: str,
+    ) -> None:
+        """Test NaN, inf, and negative vapor pressure fail fast."""
+        with pytest.raises(ValueError, match=message):
+            to_warp_gas_data(
+                sample_gas_data,
+                device="cpu",
+                vapor_pressure=vapor_pressure,
+            )
+
     def test_gas_data_copy_false_behavior(self, sample_gas_data) -> None:
         """Test that copy=False uses wp.from_numpy()."""
         # Just verify it works - actual zero-copy depends on memory layout
@@ -1178,6 +1218,32 @@ class TestFromWarpGasData:
 
         assert result.name == ["species_0", "species_1", "species_2"]
 
+    @pytest.mark.parametrize(
+        ("name", "message"),
+        [
+            ("Water", "list of strings or None"),
+            (("Water", "Ammonia", "H2SO4"), "list of strings or None"),
+            (["Water", 1, "H2SO4"], "only string entries"),
+        ],
+    )
+    def test_from_warp_gas_data_rejects_invalid_name_types_before_sync(
+        self,
+        sample_gas_data,
+        monkeypatch,
+        name,
+        message: str,
+    ) -> None:
+        """Test invalid name metadata fails before device synchronization."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+
+        def fail_if_called() -> None:
+            raise AssertionError("wp.synchronize should not be called")
+
+        monkeypatch.setattr(wp, "synchronize", fail_if_called)
+
+        with pytest.raises(ValueError, match=message):
+            from_warp_gas_data(gpu_data, name=name)
+
     def test_from_warp_gas_data_converts_partitioning_int32_to_bool(
         self, sample_gas_data
     ) -> None:
@@ -1358,6 +1424,20 @@ class TestFromWarpGasData:
         error_msg = str(exc_info.value)
         assert "expected 3 names" in error_msg
         assert "got 2" in error_msg
+
+    def test_from_warp_gas_data_rejects_name_length_mismatch_before_sync(
+        self, sample_gas_data, monkeypatch
+    ) -> None:
+        """Test name length mismatch is validated before synchronization."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+
+        def fail_if_called() -> None:
+            raise AssertionError("wp.synchronize should not be called")
+
+        monkeypatch.setattr(wp, "synchronize", fail_if_called)
+
+        with pytest.raises(ValueError, match="expected 3 names"):
+            from_warp_gas_data(gpu_data, name=["Only", "Two"])
 
     def test_from_warp_gas_data_allows_retry_after_name_length_failure(
         self, sample_gas_data
