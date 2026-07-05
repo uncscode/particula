@@ -43,16 +43,26 @@
     added direct-array, hybrid-input, mismatch, and pre-launch short-circuit
     regressions for both entry points; added reuse/precompute regression checks.
 
-- [ ] **E2-F5-P3:** Migrate condensation GPU API to per-box environment inputs with compatibility tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Remaining condensation-specific follow-up only if later work needs
-    more than the shared helper path already shipped in issue #1204.
-  - Files: `particula/gpu/kernels/condensation.py`,
-    `particula/gpu/kernels/tests/condensation_test.py`, and exports only if a
-    new wrapper API is introduced.
-  - Tests: Existing scalar condensation tests still pass; uniform per-box
-    environment matches scalar output; non-uniform multi-box environment path
-    now executes; any future P3 work would be additive.
+- [x] **E2-F5-P3:** Migrate condensation GPU API to per-box environment inputs with compatibility tests
+  - Issue: #1205 | Size: S | Status: Completed
+  - Goal: Lock in the P2-shipped condensation migration with focused
+    regression coverage rather than reopening the shared helper or public API
+    design.
+  - Delivered: Confirmed `condensation_step_gpu(...)` already shipped the
+    intended scalar/direct-array/hybrid/explicit-environment call forms and
+    added condensation-specific regression coverage for scalar-vs-uniform
+    equivalence, non-uniform explicit-environment parity, invalid direct or
+    environment domain short-circuiting before launch, rejected-input
+    `mass_transfer` buffer immutability, and zero-volume particle safety with
+    per-box arrays. No runtime or public-docstring behavior changes were needed
+    beyond tiny formatting-only test-file adjustments elsewhere.
+  - Files: `particula/gpu/kernels/tests/condensation_test.py` plus formatting-only
+    adjustments in `particula/gpu/kernels/tests/coagulation_test.py` and
+    `particula/gpu/kernels/tests/environment_test.py`.
+  - Tests: Added or refined focused condensation regressions proving scalar
+    compatibility, uniform-array equivalence, non-uniform per-box parity,
+    fail-fast domain validation, caller-owned buffer immutability on rejected
+    inputs, and degenerate-particle short-circuit safety.
 
 - [ ] **E2-F5-P4:** Migrate coagulation GPU API and document downstream environment handoff
   - Issue: TBD | Size: S | Status: Not Started
@@ -75,5 +85,6 @@
 - Issue #1204 pulled the minimum viable condensation/coagulation runtime
   migration into P2 so the shared helper could be exercised by real entry-point
   execution instead of a helper-only shell.
-- Any later P3/P4 work should now stay narrow and additive rather than
-  re-litigating the shared normalization contract.
+- P3 ultimately landed as regression hardening for the already-migrated
+  condensation path, so any later P4 work should stay narrow and additive
+  rather than re-litigating the shared normalization contract.

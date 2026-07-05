@@ -19,8 +19,10 @@
   device, mixed-input ambiguity, and missing-input behavior.
 - Condensation tests cover keyword-only signature behavior, positional scalar
   compatibility, explicit-environment success, direct-array success,
-  hybrid-input success, mismatch failures, helper short-circuiting, and the
-  one-time box-property precompute regression.
+  hybrid-input success, mismatch failures, helper short-circuiting, scalar
+  versus uniform-array equivalence, non-uniform explicit-environment parity,
+  rejected-input `mass_transfer` immutability, zero-volume short-circuit
+  safety, and the one-time box-property precompute regression.
 - Coagulation tests cover keyword-only signature behavior, positional scalar
   compatibility, explicit-environment success, direct-array success,
   hybrid-input success, mismatch failures, launch short-circuiting, and direct
@@ -37,8 +39,10 @@
 
 ## Done Signal
 
-Issues `#1203` and `#1204` completed the compatibility-contract and shared
-normalization milestones when scalar callers remained supported, valid explicit
-environment/direct-array inputs executed successfully, validation failed before
-launch for bad inputs, and downstream GPU work could reuse one shared
-environment feed path.
+Issues `#1203`, `#1204`, and `#1205` completed the compatibility-contract,
+shared normalization, and condensation regression-hardening milestones when
+scalar callers remained supported, valid explicit environment/direct-array
+inputs executed successfully, uniform and non-uniform condensation parity was
+covered, invalid domains failed before launch, rejected inputs left caller
+buffers unchanged, and downstream GPU work could reuse one shared environment
+feed path.

@@ -19,6 +19,9 @@
 - Condensation now prepares per-box dynamic viscosity and mean free path once
   per call in device-local precompute work and reuses them during the main
   kernel launch.
+- The public `condensation_step_gpu(...)` docstring already matches the shipped
+  scalar/direct-array/hybrid/explicit-environment contract, so P3 only needed
+  regression coverage rather than another documentation edit pass.
 - `saturation_ratio` remains part of the environment schema, but these entry
   points still only consume temperature and pressure in this phase.
 - Keep scalar functions as the primary public entry points initially. Add

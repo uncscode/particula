@@ -22,6 +22,11 @@ and opt into CUDA only through the repository's availability helpers.
   points.
 - **Direct array execution:** Direct Warp-array temperature/pressure inputs and
   hybrid scalar-plus-array direct inputs succeed for both entry points.
+- **Condensation regression hardening:** Condensation coverage proves scalar
+  versus uniform `(n_boxes,)` equivalence, non-uniform explicit-environment
+  parity, invalid temperature/pressure domain failures before launch, rejected
+  input preservation of caller-owned `mass_transfer` buffers, and zero-volume
+  particle short-circuit safety with per-box arrays.
 - **Pre-launch short-circuiting:** Contract failures occur before
   `get_dynamic_viscosity(...)`, `get_molecule_mean_free_path(...)`,
   `_ensure_volume_array(...)`, or any Warp launch.
@@ -37,6 +42,9 @@ and opt into CUDA only through the repository's availability helpers.
   `particula/gpu/kernels/tests/condensation_test.py`.
 - Coagulation behavior and validation:
   `particula/gpu/kernels/tests/coagulation_test.py`.
+- Formatting-only companion updates for shared GPU test readability may appear
+  in `coagulation_test.py` or `environment_test.py`, but shipped P3 behavior is
+  validated in condensation coverage.
 - Container/conversion behavior stays covered by existing helpers; this phase
   reuses `EnvironmentData` plus `to_warp_environment_data(...)` inside the
   co-located kernel/helper tests instead of changing conversion test scope.
