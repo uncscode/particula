@@ -34,6 +34,25 @@
 - Unsupported candidates that would require runtime schema expansion remain
   documentation-only in this phase.
 
+## Shipped P3 Additions
+
+- The roadmap page now records executable P3 thresholds for pure
+  reconstruction error, mixed-scale smallest-particle mass error, and
+  mixed-scale smallest-particle radius error.
+- The page now describes CPU-reference mass-transfer comparisons against
+  `get_mass_transfer`, including both per-particle deltas and aggregate
+  species-total deltas.
+- Clamp accounting is documented explicitly with raw updated mass,
+  post-clamp mass, clamp delta, and clamp frequency terminology.
+- Per-candidate memory-footprint examples now use explicit
+  `n_boxes × n_particles × n_species × dtype-size` calculations.
+- Optional benchmark reproduction is documented as an explicit opt-in path on
+  `particula/gpu/tests/benchmark_test.py`, including the clean-skip behavior on
+  unsupported machines.
+- The documentation now includes a checklist to verify candidate names,
+  thresholds, memory examples, and reproduction commands against the landed
+  executable test surface.
+
 ## Notebook/Example Notes
 
 If the evidence is presented in a notebook under `docs/Examples/` or
