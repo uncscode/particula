@@ -14275,11 +14275,22 @@ string fields (names) which are not GPU-compatible.</p>
 <details class="note" open>
   <summary>Note</summary>
   <ul>
-<li>The 'name' field from CPU GasData is excluded (strings not
-  GPU-compatible). Use index mapping for species identification.</li>
-<li>The 'partitioning' field uses int32 instead of bool for GPU
-  compatibility (1 = True, 0 = False).</li>
-<li>'vapor_pressure' is added for GPU kernels (not in CPU GasData).</li>
+<li>The <code>name</code> field from CPU <code>GasData</code> is excluded because
+  strings are not GPU-compatible. Preserve species identity with
+  caller-owned ordered names or index mapping outside this struct;
+  placeholder names are generated only by CPU restore helpers when
+  names are omitted.</li>
+<li>The <code>partitioning</code> field uses int32 instead of bool for GPU
+  compatibility (1 = True, 0 = False) and is expected to remain
+  binary for CPU restore.</li>
+<li><code>vapor_pressure</code> is GPU-only helper state for condensation-style
+  kernels and is not part of CPU <code>GasData</code> ownership.
+  <code>to_warp_gas_data()</code> accepts caller-supplied values with shape
+  <code>(n_boxes, n_species)</code> or allocates zeros when omitted. Those
+  zeros keep the Warp schema valid but do not provide physical
+  vapor-pressure inputs by themselves. CPU restore helpers drop this
+  field intentionally from restored <code>GasData</code>, while the retained GPU
+  container can still expose it until the caller discards that object.</li>
 </ul>
 </details>
 
@@ -14311,7 +14322,7 @@ Shape: (n_boxes, n_species)</p>
           <div class="doc-md-description">
             <p>Vapor pressures in Pa.
 Shape: (n_boxes, n_species)
-Added for GPU condensation kernels.</p>
+GPU-only helper state for condensation kernels.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">

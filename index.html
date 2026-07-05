@@ -14504,7 +14504,12 @@
   wall loss strategies with builders, factory, and runnable integration.</li>
 <li><a href="Features/particle-data-migration/">ParticleData and GasData migration guide</a>
   — data-container migration workflow, including <code>EnvironmentData</code>
-  CPU↔GPU round-trip helper coverage, with direct links to the
+  CPU↔GPU round-trip helper coverage. For gas restore, caller-supplied names
+  remain authoritative ordered metadata, placeholder names <code>species_0..n-1</code>
+  are generated when names are omitted or <code>None</code>, single-box gas arrays still
+  use <code>(1, n_species)</code>, <code>partitioning</code> crosses the boundary as CPU <code>bool</code> and
+  GPU <code>int32</code> with restore accepting only binary <code>0/1</code>, and GPU-only
+  <code>vapor_pressure</code> is dropped on CPU restore. Includes direct links to the
   <a href="Features/Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative field ownership policy</a>,
   <a href="Features/Roadmap/data-oriented-gpu/#canonical-shape-conventions-for-container-workflows">canonical shape contract</a>
   and <a href="Features/Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map</a>.</li>

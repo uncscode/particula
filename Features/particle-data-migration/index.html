@@ -11317,6 +11317,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#gasdata-warpgasdata-field-authority" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GasData ↔ WarpGasData field authority
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14359,6 +14370,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#gasdata-warpgasdata-field-authority" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GasData ↔ WarpGasData field authority
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14811,6 +14833,80 @@ index <code>data.concentration[0]</code> or <code>data.radii[0]</code> to get th
 you need strategy-driven behavior, and pass <code>GasData</code> where only data is
 required.</p>
 </div>
+<h3 id="gasdata-warpgasdata-field-authority"><code>GasData</code> ↔ <code>WarpGasData</code> field authority<a class="headerlink" href="#gasdata-warpgasdata-field-authority" title="Permanent link">&para;</a></h3>
+<p>Use this table as the migration-facing summary for what each container owns and
+what survives the explicit CPU↔GPU helper boundary.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>CPU <code>GasData</code></th>
+<th>GPU <code>WarpGasData</code></th>
+<th>Round-trip contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>Authoritative ordered species metadata as <code>list[str]</code> with <code>len == n_species</code>.</td>
+<td>Not stored. <code>WarpGasData</code> has no string field.</td>
+<td><code>to_warp_gas_data()</code> drops names. <code>from_warp_gas_data()</code> restores caller-supplied ordered names or, when <code>name</code> is omitted or <code>None</code>, placeholder values such as <code>species_0</code>. Current validation checks only list length, so callers must preserve ordering externally.</td>
+</tr>
+<tr>
+<td><code>molar_mass</code></td>
+<td>Authoritative shared-across-boxes numeric state. Shape <code>(n_species,)</code>.</td>
+<td>Numeric mirror with shape <code>(n_species,)</code>.</td>
+<td>Round-trips without value or shape changes.</td>
+</tr>
+<tr>
+<td><code>concentration</code></td>
+<td>Authoritative per-box gas state. Shape <code>(n_boxes, n_species)</code>, including <code>(1, n_species)</code> for one-box workflows.</td>
+<td>Numeric mirror with shape <code>(n_boxes, n_species)</code>.</td>
+<td>Round-trips without value or shape changes.</td>
+</tr>
+<tr>
+<td><code>partitioning</code></td>
+<td>Authoritative per-species boolean mask. Shape <code>(n_species,)</code>, dtype <code>bool</code>.</td>
+<td>Numeric GPU mask with shape <code>(n_species,)</code>, dtype <code>int32</code>.</td>
+<td>Converts <code>bool → int32 → bool</code>. GPU restore requires binary <code>0</code>/<code>1</code> values.</td>
+</tr>
+<tr>
+<td><code>vapor_pressure</code></td>
+<td>Not owned by <code>GasData</code>. Preserve or recompute it separately on the CPU side.</td>
+<td>GPU-only helper state with shape <code>(n_boxes, n_species)</code>.</td>
+<td>Pass it explicitly to <code>to_warp_gas_data()</code> when GPU kernels need physical vapor-pressure values. If omitted, the helper allocates zeros with the same shape. <code>from_warp_gas_data()</code> always drops this field.</td>
+</tr>
+</tbody>
+</table>
+<p>Migration rules backed by the regression tests:</p>
+<ul>
+<li>Keep the leading box axis explicit. Single-box gas arrays still use
+  <code>(1, n_species)</code>.</li>
+<li>Treat <code>name</code> as caller-owned metadata at the restore boundary. Supplying the
+  original ordered names gives a semantic round-trip; omitting <code>name</code> or
+  passing <code>name=None</code> produces placeholders only.</li>
+<li>Treat <code>partitioning</code> as a CPU boolean API and a GPU numeric mask. Do not
+  depend on non-binary GPU values being coerced.</li>
+<li>Treat <code>vapor_pressure</code> as sidecar process state for GPU workflows. Compute it
+  on the CPU, pass it to <code>to_warp_gas_data()</code>, and preserve it separately if
+  you still need it after restoring <code>GasData</code>.</li>
+</ul>
+<p>Example CPU→GPU→CPU handoff:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_warp_gas_data</span><span class="p">,</span> <span class="n">to_warp_gas_data</span>
+
+<span class="n">vapor_pressure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2330.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">]])</span>  <span class="c1"># (1, n_species)</span>
+<span class="n">gpu_gas</span> <span class="o">=</span> <span class="n">to_warp_gas_data</span><span class="p">(</span>
+    <span class="n">gas_data</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">vapor_pressure</span><span class="o">=</span><span class="n">vapor_pressure</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">restored</span> <span class="o">=</span> <span class="n">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_gas</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">gas_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Preserve ordered names outside WarpGasData and keep any vapor-pressure</span>
+<span class="c1"># sidecar separately (or recompute it) on the CPU side.</span>
+</code></pre></div>
 <h2 id="gradual-migration-with-data">Gradual migration with <code>.data</code><a class="headerlink" href="#gradual-migration-with-data" title="Permanent link">&para;</a></h2>
 <p>Both legacy facades expose their underlying data containers:</p>
 <div class="highlight"><pre><span></span><code><span class="n">particle_data</span> <span class="o">=</span> <span class="n">rep</span><span class="o">.</span><span class="n">data</span>

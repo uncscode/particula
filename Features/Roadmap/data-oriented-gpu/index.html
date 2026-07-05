@@ -15392,7 +15392,7 @@ implying broader test coverage.</p>
 <td><code>wp.float64</code></td>
 <td>Stored, mutable GPU mirror of <code>GasData.molar_mass</code> shared across boxes</td>
 <td>Declared as <code>wp.array(dtype=wp.float64)</code>; populated by <code>to_warp_gas_data()</code> from CPU gas state</td>
-<td>Round-trips back through <code>from_warp_gas_data()</code> without schema drift</td>
+<td>Restores the same numeric field through <code>from_warp_gas_data()</code> within the intentionally lossy gas boundary (<code>name</code> remains CPU-only and <code>vapor_pressure</code> is still dropped on CPU restore)</td>
 <td>Source: <code>particula/gpu/warp_types.py:131</code>, <code>particula/gpu/conversion.py:214-216,228-230,354</code>; tests: <code>particula/gpu/tests/warp_types_test.py:168-184,218-232</code>, <code>particula/gpu/tests/conversion_test.py:583-595</code></td>
 </tr>
 <tr>
@@ -15403,7 +15403,7 @@ implying broader test coverage.</p>
 <td><code>wp.float64</code></td>
 <td>Stored, mutable GPU mirror of <code>GasData.concentration</code></td>
 <td>Declared as <code>wp.array2d(dtype=wp.float64)</code>; populated by <code>to_warp_gas_data()</code> from CPU gas state</td>
-<td>Round-trips back through <code>from_warp_gas_data()</code> without schema drift</td>
+<td>Restores the same box-batched numeric field through <code>from_warp_gas_data()</code> within the intentionally lossy gas boundary (<code>name</code> remains caller-managed CPU metadata and <code>vapor_pressure</code> stays GPU-only)</td>
 <td>Source: <code>particula/gpu/warp_types.py:132</code>, <code>particula/gpu/conversion.py:217-219,231-233,355</code>; tests: <code>particula/gpu/tests/warp_types_test.py:180-184,229-231</code>, <code>particula/gpu/tests/conversion_test.py:593-595</code></td>
 </tr>
 <tr>
@@ -15446,7 +15446,8 @@ schema above: <code>radii</code>, <code>total_mass</code>, <code>effective_densi
   <code>GasData</code>.</li>
 </ul>
 <h4 id="cpugpu-restore-boundary-for-ordered-gas-metadata">CPU↔GPU restore boundary for ordered gas metadata<a class="headerlink" href="#cpugpu-restore-boundary-for-ordered-gas-metadata" title="Permanent link">&para;</a></h4>
-<p>Keep testing round-trips for the current CPU/GPU schema drift explicitly:
+<p>Keep testing round-trips for the current intentional CPU/GPU contract
+explicitly:
 <code>WarpGasData</code> drops <code>name</code>, stores <code>partitioning</code> as <code>int32</code> instead of
 <code>bool</code>, and adds <code>vapor_pressure</code> that is not restored to the CPU gas
 container.</p>
@@ -15543,7 +15544,7 @@ conversion behavior, or future GPU environment state.</p>
 <td><code>(n_species,)</code> via <code>WarpGasData.molar_mass</code></td>
 <td><code>float64</code> / <code>wp.float64</code></td>
 <td>Mutable stored state on both containers</td>
-<td>Must round-trip without schema drift</td>
+<td>Must round-trip with the same numeric values inside the documented gas restore boundary (<code>name</code> still requires caller-managed ordered metadata and <code>vapor_pressure</code> still has no CPU field)</td>
 <td>Gas property calculations, condensation, and GPU gas kernels</td>
 <td><code>particula/gas/gas_data.py:53-67,75-108</code>; <code>particula/gpu/warp_types.py:100-111,131</code>; <code>particula/gpu/conversion.py:214-216,354</code>; <code>particula/gpu/tests/warp_types_test.py:168-184,218-232</code>; <code>particula/gpu/tests/conversion_test.py:583-595</code></td>
 </tr>
@@ -16580,9 +16581,9 @@ the operators themselves must still be differentiable in state.</p>
 <td>Per-box RNG streams; document tolerances and reproducibility limits</td>
 </tr>
 <tr>
-<td><code>WarpGasData</code> schema drift from <code>GasData</code></td>
-<td>Silent field mismatches; placeholder names break name-keyed logic</td>
-<td>Define authoritative container per field; test round-trips</td>
+<td>Caller drops ordered gas metadata or vapor-pressure sidecar across <code>WarpGasData</code> restore</td>
+<td>Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic</td>
+<td>Treat the current field split as the resolved contract, preserve ordered names externally, and recompute or carry <code>vapor_pressure</code> sidecar data when needed</td>
 </tr>
 <tr>
 <td>Graph capture fragility (shape/process changes)</td>
