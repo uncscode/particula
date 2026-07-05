@@ -430,11 +430,14 @@ def condensation_step_gpu(
             omitted.
         ValueError: If environment arrays do not match ``(n_boxes,)`` or the
             caller device.
+        ValueError: If direct non-scalar, non-Warp-array temperature or
+            pressure inputs are provided.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
         ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
-        inputs, or keyword-only ``environment=...`` execution.
+        inputs, or keyword-only ``environment=...`` execution. NumPy arrays,
+        Python lists, and other non-Warp direct array-likes are rejected.
 
         Particle masses are updated in-place on the GPU. Callers that require
         rollback should copy masses before invoking this function.

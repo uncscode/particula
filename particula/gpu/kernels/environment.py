@@ -9,7 +9,7 @@ without performing hidden device transfers.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -62,6 +62,65 @@ def _validate_positive_finite_array(
     values_np = np.asarray(values.numpy(), dtype=np.float64)
     if not np.all(np.isfinite(values_np)) or np.any(values_np <= 0.0):
         raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
+
+
+def _coerce_direct_scalar(
+    name: str,
+    value: Any,
+    caller_name: str,
+) -> float:
+    """Coerce a supported direct scalar input into ``float``.
+
+    Args:
+        name: Human-readable scalar label for stable error messages.
+        value: Candidate scalar value.
+        caller_name: Entry-point name for stable contract messages.
+
+    Returns:
+        The coerced scalar value.
+
+    Raises:
+        ValueError: If ``value`` is not a supported scalar direct input.
+    """
+    if not np.isscalar(value):
+        raise ValueError(
+            f"{name} must be a scalar or Warp array with shape (n_boxes,) "
+            f"in {caller_name}."
+        )
+    try:
+        return float(cast(float, value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"{name} must be a scalar or Warp array with shape (n_boxes,) "
+            f"in {caller_name}."
+        ) from exc
+
+
+def _get_environment_array(
+    environment: Any,
+    field_name: str,
+    caller_name: str,
+) -> Any:
+    """Fetch a required environment field with a stable contract error.
+
+    Args:
+        environment: Environment-like container passed by the caller.
+        field_name: Required array attribute name.
+        caller_name: Entry-point name for stable contract messages.
+
+    Returns:
+        The requested environment field.
+
+    Raises:
+        ValueError: If the required field is missing.
+    """
+    value = getattr(environment, field_name, None)
+    if value is None:
+        raise ValueError(
+            f"environment.{field_name} must be a Warp array with shape "
+            f"(n_boxes,) in {caller_name}."
+        )
+    return value
 
 
 def _validate_box_array(
@@ -148,16 +207,26 @@ def _ensure_environment_arrays(
                 "Cannot mix direct temperature/pressure inputs with "
                 f"environment in {caller_name}."
             )
+        environment_temperature = _get_environment_array(
+            environment,
+            "temperature",
+            caller_name,
+        )
+        environment_pressure = _get_environment_array(
+            environment,
+            "pressure",
+            caller_name,
+        )
         temperature_array = _validate_box_array(
             "environment.temperature",
-            environment.temperature,
+            environment_temperature,
             n_boxes,
             device,
             caller_name,
         )
         pressure_array = _validate_box_array(
             "environment.pressure",
-            environment.pressure,
+            environment_pressure,
             n_boxes,
             device,
             caller_name,
@@ -192,12 +261,15 @@ def _ensure_environment_arrays(
             "temperature", temperature_array, caller_name
         )
     else:
+        temperature_scalar = _coerce_direct_scalar(
+            "temperature", temperature, caller_name
+        )
         _validate_positive_finite_scalar(
-            "temperature", float(temperature), caller_name
+            "temperature", temperature_scalar, caller_name
         )
         temperature_array = wp.full(
             n_boxes,
-            wp.float64(temperature),
+            wp.float64(temperature_scalar),
             dtype=wp.float64,
             device=device,
         )
@@ -212,12 +284,15 @@ def _ensure_environment_arrays(
         )
         _validate_positive_finite_array("pressure", pressure_array, caller_name)
     else:
+        pressure_scalar = _coerce_direct_scalar(
+            "pressure", pressure, caller_name
+        )
         _validate_positive_finite_scalar(
-            "pressure", float(pressure), caller_name
+            "pressure", pressure_scalar, caller_name
         )
         pressure_array = wp.full(
             n_boxes,
-            wp.float64(pressure),
+            wp.float64(pressure_scalar),
             dtype=wp.float64,
             device=device,
         )
