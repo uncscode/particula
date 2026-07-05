@@ -259,7 +259,7 @@ def to_warp_gas_data(
     copy: bool = True,
     vapor_pressure: NDArray[np.float64] | None = None,
 ) -> "WarpGasData":
-    """Transfer GasData to GPU with explicit control.
+    """Transfer GasData to GPU with explicit vapor-pressure ownership.
 
     Use this for long GPU-resident simulations where you want to:
     1. Transfer data to GPU once at simulation start
@@ -273,9 +273,15 @@ def to_warp_gas_data(
         The 'partitioning' field is converted from bool to int32
         (1 = True, 0 = False) for GPU compatibility.
 
-        The 'vapor_pressure' field is required by WarpGasData but not
-        present in GasData. If not provided, it defaults to zeros.
-        Set it after conversion if needed for condensation kernels.
+        ``WarpGasData`` requires a ``vapor_pressure`` buffer even though CPU
+        ``GasData`` does not own that field. Callers may supply an explicit
+        ``(n_boxes, n_species)`` array when GPU kernels need physical vapor
+        pressure values.
+
+        If ``vapor_pressure`` is omitted, this helper allocates a zero-filled
+        ``(n_boxes, n_species)`` GPU buffer. That default keeps the transfer
+        schema valid, but condensation callers that need physical vapor
+        pressure values must provide them explicitly.
 
     Args:
         data: CPU-side GasData container.
@@ -284,7 +290,8 @@ def to_warp_gas_data(
               If False, attempt zero-copy via wp.from_numpy() when
               arrays are already on a compatible device.
         vapor_pressure: Optional vapor pressure array in Pa.
-            Shape: (n_boxes, n_species). If None, zeros are used.
+            Shape: ``(n_boxes, n_species)``. If omitted, this helper creates
+            a zero-filled buffer with that same shape for the GPU mirror.
 
     Returns:
         WarpGasData with Warp arrays on specified device.
@@ -306,7 +313,7 @@ def to_warp_gas_data(
 
     from particula.gpu.warp_types import WarpGasData
 
-    # Validate vapor_pressure shape if provided
+    # Validate caller-owned vapor pressure state at the CPU→GPU boundary.
     expected_shape = (data.n_boxes, data.n_species)
     if vapor_pressure is not None:
         if vapor_pressure.shape != expected_shape:
@@ -316,7 +323,7 @@ def to_warp_gas_data(
             )
         vp_array = vapor_pressure
     else:
-        # Default to zeros
+        # GPU kernels always receive a valid (n_boxes, n_species) buffer.
         vp_array = np.zeros(expected_shape, dtype=np.float64)
 
     # Convert partitioning from bool to int32 (1=True, 0=False)
@@ -406,7 +413,7 @@ def from_warp_gas_data(
     name: list | None = None,
     sync: bool = True,
 ) -> "GasData":
-    """Transfer WarpGasData back to CPU.
+    """Transfer WarpGasData back to CPU with an intentionally lossy restore.
 
     Use this to transfer GPU-resident gas data back to CPU after
     GPU simulation steps. The returned GasData can be used for
@@ -414,10 +421,11 @@ def from_warp_gas_data(
 
     Note:
         The ``vapor_pressure`` field from ``WarpGasData`` is not restored
-        because ``GasData`` does not include this field. If you need vapor
-        pressure values, access them directly from ``gpu_data`` before
-        calling this helper. ``from_warp_gas_data()`` restores only the
-        CPU-owned ``GasData`` fields.
+        because CPU ``GasData`` does not include this field. If you need
+        vapor-pressure values after GPU work, read ``gpu_data.vapor_pressure``
+        before calling this helper or keep a sidecar copy yourself.
+        ``from_warp_gas_data()`` restores only the CPU-owned ``GasData``
+        fields.
 
         ``WarpGasData`` does not store species names because string data is
         not GPU-compatible. Prefer caller-supplied ordered names when

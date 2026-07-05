@@ -314,7 +314,7 @@ class TestToWarpGasData:
     def test_to_warp_gas_data_preserves_explicit_vapor_pressure_values(
         self, sample_gas_data
     ) -> None:
-        """Test explicit vapor pressure stays on the GPU mirror unchanged."""
+        """Test a valid (n_boxes, n_species) buffer is preserved exactly."""
         vp = np.array([[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]])
 
         gpu_data = to_warp_gas_data(
@@ -330,7 +330,7 @@ class TestToWarpGasData:
     def test_to_warp_gas_data_defaults_vapor_pressure_to_zeros(
         self, sample_gas_data
     ) -> None:
-        """Test omitted vapor pressure defaults to zero-filled GPU storage."""
+        """Test omitted vapor pressure creates a zero-filled GPU buffer."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         expected = np.zeros(
@@ -851,20 +851,29 @@ class TestErrorHandling:
                 error_msg = str(exc_info.value)
                 assert "pip install warp-lang" in error_msg
 
-    def test_to_warp_gas_data_raises_value_error_for_vapor_pressure_shape_mismatch(
-        self, sample_gas_data
+    @pytest.mark.parametrize(
+        ("wrong_shape_vp", "actual_shape"),
+        [
+            (np.ones(3), "(3,)"),
+            (np.ones((3, 2)), "(3, 2)"),
+            (np.ones((2, 4)), "(2, 4)"),
+        ],
+    )
+    def test_to_warp_gas_data_raises_value_error_for_invalid_vapor_pressure_shapes(
+        self,
+        sample_gas_data,
+        wrong_shape_vp,
+        actual_shape,
     ) -> None:
-        """Test vapor pressure shape failures report actual and expected dims."""
-        wrong_shape_vp = np.ones((3, 2))
-
+        """Test invalid vapor-pressure shapes report actual and expected dims."""
         with pytest.raises(ValueError) as exc_info:
             to_warp_gas_data(
                 sample_gas_data, device="cpu", vapor_pressure=wrong_shape_vp
             )
 
         error_msg = str(exc_info.value)
-        assert "(3, 2)" in error_msg  # actual shape
-        assert "(2, 3)" in error_msg  # expected shape
+        assert actual_shape in error_msg
+        assert "(2, 3)" in error_msg
 
 
 class TestFromWarpParticleData:
@@ -1137,7 +1146,7 @@ class TestFromWarpGasData:
     def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
         self, sample_gas_data
     ) -> None:
-        """Test GPU-only vapor pressure is present on GPU and lost on restore."""
+        """Test restore drops GPU-only vapor pressure unless caller saves it."""
         vapor_pressure = np.array(
             [[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]],
             dtype=np.float64,
@@ -1148,15 +1157,13 @@ class TestFromWarpGasData:
             vapor_pressure=vapor_pressure,
         )
 
-        np.testing.assert_array_equal(
-            gpu_data.vapor_pressure.numpy(),
-            vapor_pressure,
-        )
+        vapor_pressure_sidecar = gpu_data.vapor_pressure.numpy().copy()
 
         result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
 
         _assert_gas_round_trip_matches(sample_gas_data, result)
         assert not hasattr(result, "vapor_pressure")
+        np.testing.assert_array_equal(vapor_pressure_sidecar, vapor_pressure)
 
     def test_from_warp_gas_data_preserves_multi_box_round_trip(
         self, sample_gas_data
