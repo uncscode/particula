@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-04",
+  "last_updated": "2026-07-05",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E2-F5/architecture_design.md",
@@ -32,11 +32,11 @@
     {
       "id": "E2-F5-P1",
       "title": "Design scalar-to-environment compatibility contract with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
