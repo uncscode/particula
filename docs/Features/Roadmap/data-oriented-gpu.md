@@ -229,7 +229,8 @@ Current gas round-trip behavior is intentionally lossy in two places:
 
 #### CPU↔GPU restore boundary for ordered gas metadata
 
-Keep testing round-trips for the current CPU/GPU schema drift explicitly:
+Keep testing round-trips for the current intentional CPU/GPU contract
+explicitly:
 `WarpGasData` drops `name`, stores `partitioning` as `int32` instead of
 `bool`, and adds `vapor_pressure` that is not restored to the CPU gas
 container.
@@ -1010,7 +1011,7 @@ Cross-cutting work that runs alongside the other epics.
 | In-place kernels break gradients | Autodiff path unusable | Author differentiable-friendly kernel variants for the optimization path |
 | Tape memory for multi-step differentiable loops | Gradient runs exhaust GPU memory | Budget tape storage; evaluate gradient checkpointing |
 | RNG reproducibility across CPU/Warp CPU/CUDA | Non-reproducible stochastic results | Per-box RNG streams; document tolerances and reproducibility limits |
-| `WarpGasData` schema drift from `GasData` | Silent field mismatches; placeholder names break name-keyed logic | Define authoritative container per field; test round-trips |
+| Caller drops ordered gas metadata or vapor-pressure sidecar across `WarpGasData` restore | Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic | Treat the current field split as the resolved contract, preserve ordered names externally, and recompute or carry `vapor_pressure` sidecar data when needed |
 | Graph capture fragility (shape/process changes) | Invalid captured graphs | Fixed shapes, inactive slots, documented re-capture triggers |
 | GPU condensation lacks activity/kappa physics | Hygroscopicity and mixing-state targets unfittable | Plan GPU activity/surface-tension support in Epic B before Epic E targets |
 

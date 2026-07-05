@@ -199,6 +199,50 @@ gas_data = GasData(
     you need strategy-driven behavior, and pass `GasData` where only data is
     required.
 
+### `GasData` ↔ `WarpGasData` field authority
+
+Use this table as the migration-facing summary for what each container owns and
+what survives the explicit CPU↔GPU helper boundary.
+
+| Field | CPU `GasData` | GPU `WarpGasData` | Round-trip contract |
+| --- | --- | --- | --- |
+| `name` | Authoritative ordered species metadata as `list[str]` with `len == n_species`. | Not stored. `WarpGasData` has no string field. | `to_warp_gas_data()` drops names. `from_warp_gas_data()` restores caller-supplied ordered names or, when `name` is omitted or `None`, placeholder values such as `species_0`. Current validation checks only list length, so callers must preserve ordering externally. |
+| `molar_mass` | Authoritative shared-across-boxes numeric state. Shape `(n_species,)`. | Numeric mirror with shape `(n_species,)`. | Round-trips without value or shape changes. |
+| `concentration` | Authoritative per-box gas state. Shape `(n_boxes, n_species)`, including `(1, n_species)` for one-box workflows. | Numeric mirror with shape `(n_boxes, n_species)`. | Round-trips without value or shape changes. |
+| `partitioning` | Authoritative per-species boolean mask. Shape `(n_species,)`, dtype `bool`. | Numeric GPU mask with shape `(n_species,)`, dtype `int32`. | Converts `bool → int32 → bool`. GPU restore requires binary `0`/`1` values. |
+| `vapor_pressure` | Not owned by `GasData`. Preserve or recompute it separately on the CPU side. | GPU-only helper state with shape `(n_boxes, n_species)`. | Pass it explicitly to `to_warp_gas_data()` when GPU kernels need physical vapor-pressure values. If omitted, the helper allocates zeros with the same shape. `from_warp_gas_data()` always drops this field. |
+
+Migration rules backed by the regression tests:
+
+- Keep the leading box axis explicit. Single-box gas arrays still use
+  `(1, n_species)`.
+- Treat `name` as caller-owned metadata at the restore boundary. Supplying the
+  original ordered names gives a semantic round-trip; omitting `name` or
+  passing `name=None` produces placeholders only.
+- Treat `partitioning` as a CPU boolean API and a GPU numeric mask. Do not
+  depend on non-binary GPU values being coerced.
+- Treat `vapor_pressure` as sidecar process state for GPU workflows. Compute it
+  on the CPU, pass it to `to_warp_gas_data()`, and preserve it separately if
+  you still need it after restoring `GasData`.
+
+Example CPU→GPU→CPU handoff:
+
+```python
+import numpy as np
+
+from particula.gpu import from_warp_gas_data, to_warp_gas_data
+
+vapor_pressure = np.array([[2330.0, 120.0]])  # (1, n_species)
+gpu_gas = to_warp_gas_data(
+    gas_data,
+    device="cpu",
+    vapor_pressure=vapor_pressure,
+)
+restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
+
+# Preserve ordered names and any vapor-pressure sidecar outside WarpGasData.
+```
+
 ## Gradual migration with `.data`
 
 Both legacy facades expose their underlying data containers:
