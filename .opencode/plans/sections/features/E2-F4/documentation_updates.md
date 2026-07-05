@@ -3,8 +3,8 @@
 ## Required Updates
 
 - `E2-F4-P1` did not land broader docs changes. The phase used
-  `particula/gpu/tests/conversion_test.py` as the primary contract record for
-  the current behavior.
+  `particula/gpu/tests/conversion_test.py` as an internal phase-local contract
+  record for the current behavior, not as shipped user-facing documentation.
 - `docs/Features/particle-data-migration.md`
   - Add a field-authority table for `GasData` versus `WarpGasData`.
   - Document name preservation/loss behavior and required user action.

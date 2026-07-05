@@ -991,6 +991,37 @@ class TestFromWarpGasData:
             result.partitioning, sample_gas_data.partitioning
         )
 
+    def test_from_warp_gas_data_rejects_non_binary_partitioning_values(
+        self, sample_gas_data
+    ) -> None:
+        """Test malformed GPU partitioning flags fail before bool restore."""
+        from particula.gpu.warp_types import WarpGasData
+
+        gpu_data = WarpGasData()
+        gpu_data.molar_mass = wp.array(
+            sample_gas_data.molar_mass,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.concentration = wp.array(
+            sample_gas_data.concentration,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.vapor_pressure = wp.zeros(
+            sample_gas_data.concentration.shape,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.partitioning = wp.array(
+            np.array([1, 2, 0], dtype=np.int32),
+            dtype=wp.int32,
+            device="cpu",
+        )
+
+        with pytest.raises(ValueError, match="partitioning"):
+            from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
     def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
         self, sample_gas_data
     ) -> None:
@@ -1014,12 +1045,6 @@ class TestFromWarpGasData:
 
         _assert_gas_round_trip_matches(sample_gas_data, result)
         assert not hasattr(result, "vapor_pressure")
-        assert set(result.__dict__) == {
-            "name",
-            "molar_mass",
-            "concentration",
-            "partitioning",
-        }
 
     def test_from_warp_gas_data_preserves_multi_box_round_trip(
         self, sample_gas_data

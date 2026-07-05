@@ -25,7 +25,8 @@
 
 ## Documentation Criteria
 
-- In `E2-F4-P1`, regression tests act as the shipped contract documentation.
+- In `E2-F4-P1`, regression tests act as internal phase-local contract records,
+  not as shipped user-facing documentation.
 - Migration docs state the authoritative name contract, the vapor-pressure
   ownership decision, and any intentional CPU/GPU round-trip loss boundaries.
 - Docs/examples do not imply hidden metadata preservation when a sidecar or
