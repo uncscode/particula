@@ -247,6 +247,15 @@ def _copy_case(
     )
 
 
+def _expected_case_radii(case: _MassPrecisionCase) -> np.ndarray:
+    """Reconstruct expected radii from the authored case construction rule."""
+    scaled_total_volume = np.sum(
+        case.masses / case.density_kg_m3[np.newaxis, np.newaxis, :],
+        axis=-1,
+    )
+    return np.cbrt(scaled_total_volume * 3.0 / (4.0 * np.pi))
+
+
 @pytest.fixture(name="mass_precision_cases")
 def fixture_mass_precision_cases() -> list[_MassPrecisionCase]:
     """Provide deterministic mass-precision study cases."""
@@ -385,10 +394,8 @@ def test_mass_precision_case_radii_match_expected_scale_order(
         assert np.all(np.isfinite(derived_radii))
         assert np.all(derived_radii >= 0.0)
 
-        if case.masses.shape[-1] == 1:
-            scaling = np.cbrt(case.masses[..., 0] / case.masses[0, 0, 0])
-            expected_radii = case.target_radius_m * scaling
-            npt.assert_allclose(derived_radii, expected_radii, rtol=1e-12)
+        expected_radii = _expected_case_radii(case)
+        npt.assert_allclose(derived_radii, expected_radii, rtol=1e-12)
 
         mean_radii.append(np.mean(derived_radii))
 
@@ -462,12 +469,20 @@ def test_mass_precision_case_validator_rejects_invalid_masses(
         _validate_case(invalid_case)
 
 
-def test_mass_precision_baseline_policy_preserves_fp64_on_cpu_and_warp() -> (
-    None
-):
+@pytest.mark.parametrize(
+    "case",
+    [
+        _build_mass_precision_cases()[0],
+        _build_mass_precision_cases()[2],
+        _build_mass_precision_cases()[3],
+    ],
+    ids=lambda case: case.case_name,
+)
+def test_mass_precision_baseline_policy_preserves_fp64_on_cpu_and_warp(
+    case: _MassPrecisionCase,
+) -> None:
     """Baseline policy remains absolute per-species fp64 on CPU and Warp."""
     wp = pytest.importorskip("warp")
-    case = _build_mass_precision_cases()[-1]
 
     particle_data = ParticleData(
         masses=case.masses,
@@ -491,10 +506,20 @@ def test_mass_precision_baseline_policy_preserves_fp64_on_cpu_and_warp() -> (
     assert gpu_data.volume.dtype == wp.float64
 
 
-def test_mass_precision_case_warp_round_trip_preserves_values_exactly() -> None:
+@pytest.mark.parametrize(
+    "case",
+    [
+        _build_mass_precision_cases()[0],
+        _build_mass_precision_cases()[2],
+        _build_mass_precision_cases()[3],
+    ],
+    ids=lambda case: case.case_name,
+)
+def test_mass_precision_case_warp_round_trip_preserves_values_exactly(
+    case: _MassPrecisionCase,
+) -> None:
     """Warp CPU-device round trip preserves deterministic baseline values."""
     pytest.importorskip("warp")
-    case = _build_mass_precision_cases()[-1]
     particle_data = ParticleData(
         masses=case.masses,
         concentration=case.concentration,
