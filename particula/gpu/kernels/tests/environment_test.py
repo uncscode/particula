@@ -343,6 +343,7 @@ def test_environment_helper_returns_environment_array_dtype_unchanged(
     device: str,
 ) -> None:
     """Environment-backed Warp arrays are returned without copying."""
+
     class _EnvironmentLike:
         def __init__(self) -> None:
             self.temperature = wp.array(
