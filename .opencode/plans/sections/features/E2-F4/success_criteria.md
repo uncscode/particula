@@ -15,15 +15,17 @@
 
 ## Verification Criteria
 
-- Fast CPU/Warp semantic tests cover names supplied, names omitted, invalid name
-  lengths, `partitioning` round trips, supplied vapor pressure, missing vapor
-  pressure, and invalid vapor-pressure shapes.
+- `E2-F4-P1` now has fast CPU/Warp semantic tests covering names supplied,
+  names omitted, invalid name lengths, `partitioning` round trips, supplied
+  vapor pressure, missing vapor pressure, invalid vapor-pressure shapes, and
+  GPU-only `vapor_pressure` loss on restore.
 - No CUDA-only requirement is introduced for the semantic test path.
 - Focused conversion tests and the changed fast suite pass without requiring
   downstream kernel migration work.
 
 ## Documentation Criteria
 
+- In `E2-F4-P1`, regression tests act as the shipped contract documentation.
 - Migration docs state the authoritative name contract, the vapor-pressure
   ownership decision, and any intentional CPU/GPU round-trip loss boundaries.
 - Docs/examples do not imply hidden metadata preservation when a sidecar or

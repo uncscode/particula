@@ -2,12 +2,14 @@
 
 ## E2-F4-P1: Audit Current Contract
 
-- Inspect `GasData`, `WarpGasData`, and gas conversion helpers after `E2-F1`
-  lands.
-- Add tests that lock down current field ownership and round-trip outcomes.
-- Ensure tests include names, molar mass, concentration, partitioning, vapor
-  pressure, and invalid vapor-pressure shapes.
-- Update docstrings only where they are clearly stale.
+- Landed in issue `#1197` as a focused test-only update in
+  `particula/gpu/tests/conversion_test.py`.
+- Locked current field ownership and round-trip outcomes for names, molar mass,
+  concentration, `partitioning`, vapor pressure, and invalid vapor-pressure
+  shapes.
+- Added coverage for placeholder-name fallback, empty/wrong-length name
+  failures, and GPU-only `vapor_pressure` loss on CPU restore.
+- Left docstrings and production semantics unchanged in this phase.
 
 ## E2-F4-P2: Name and Partitioning Semantics
 

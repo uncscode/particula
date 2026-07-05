@@ -23,16 +23,15 @@ GasData(name supplied or explicit fallback, partitioning: bool)
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** No new required field should be added to `GasData` unless the
-  final implementation proves CPU ownership of vapor pressure is required and
-  compatible with `E2-F1`, `E2-F2`, and `E2-F3`. Preferred design keeps vapor
-  pressure as explicit process state, a GPU transfer buffer, or sidecar derived
-  from strategies and environment state; do not make it CPU `GasData` or
-  `EnvironmentData` ownership.
-- **API Surface:** `to_warp_gas_data()` and `from_warp_gas_data()` are the
-  expected API points for clarified semantics. Candidate changes include a
-  stricter missing-name policy, clearer optional arguments, warnings, or helper
-  docstrings. Backward compatibility must be tested and documented.
+- **Data Model:** `E2-F4-P1` did not add or remove any fields. The landed work
+  treats the existing implementation as authoritative for now: CPU `GasData`
+  owns `name`, `molar_mass`, `concentration`, and boolean `partitioning`, while
+  `WarpGasData` omits `name`, stores `partitioning` as `int32`, and carries a
+  GPU-only `vapor_pressure` buffer.
+- **API Surface:** `E2-F4-P1` changed no runtime API behavior. It tightened the
+  contract by adding regression tests around `to_warp_gas_data()` and
+  `from_warp_gas_data()` rather than introducing stricter missing-name or
+  vapor-pressure semantics in production code.
 - **Workflow Hooks:** GPU tests continue to use `pytest.importorskip("warp")`
   and `device="cpu"` where possible so that behavior can be validated without
   CUDA-only assumptions.

@@ -1,14 +1,17 @@
 # Phase Details
 
-- [ ] **E2-F4-P1:** Audit gas schema authority and round-trip expectations with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F4-P1:** Audit gas schema authority and round-trip expectations with unit tests
+  - Issue: `#1197` | Size: S | Status: Landed
   - Goal: Capture the current CPU/GPU gas schema contract in tests before
     changing behavior.
-  - Files: `particula/gas/gas_data.py`, `particula/gpu/warp_types.py`,
-    `particula/gpu/conversion.py`, `particula/gpu/tests/conversion_test.py`.
-  - Tests: Add or refine tests asserting the current authority for names,
-    partitioning dtype conversion, vapor-pressure shape, default behavior, and
-    round-trip losses.
+  - Files: `particula/gpu/tests/conversion_test.py`.
+  - Implemented: Added focused regression tests that lock current
+    `GasData`/`WarpGasData` shapes, dtypes, bool↔`int32` `partitioning`,
+    explicit and implicit `vapor_pressure` handling, placeholder-name restore
+    behavior, name-length mismatch failures, and GPU-only `vapor_pressure`
+    loss on restore.
+  - Notes: No production semantics or broader documentation changed in this
+    phase.
 
 - [ ] **E2-F4-P2:** Make name and partitioning conversion semantics explicit with tests
   - Issue: TBD | Size: S | Status: Not Started
