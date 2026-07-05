@@ -142,7 +142,7 @@ def _make_environment_data(
 def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> (
     None
 ):
-    """The reserved environment input stays keyword-only in P1."""
+    """The explicit environment input stays keyword-only."""
     parameter = inspect.signature(coagulation_step_gpu).parameters[
         "environment"
     ]
@@ -194,7 +194,7 @@ def test_coagulation_step_gpu_rejects_mixed_environment_inputs(
 
     with pytest.raises(
         ValueError,
-        match="scalar temperature/pressure inputs with environment",
+        match="direct temperature/pressure inputs with environment",
     ):
         coagulation_step_gpu(
             gpu_particles,
@@ -205,10 +205,10 @@ def test_coagulation_step_gpu_rejects_mixed_environment_inputs(
         )
 
 
-def test_coagulation_step_gpu_rejects_explicit_environment_in_p1(
+def test_coagulation_step_gpu_accepts_explicit_environment(
     device: str,
 ) -> None:
-    """Pure environment execution is reserved for a later phase."""
+    """Pure ``environment=...`` execution succeeds when inputs are valid."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     environment = to_warp_environment_data(
         _make_environment_data(n_boxes=1, n_species=1),
@@ -216,17 +216,30 @@ def test_coagulation_step_gpu_rejects_explicit_environment_in_p1(
     )
     gpu_particles = to_warp_particle_data(particles, device=device)
 
-    with pytest.raises(
-        ValueError,
-        match="environment execution is not implemented in P1",
-    ):
-        coagulation_step_gpu(
-            gpu_particles,
-            temperature=None,
-            pressure=None,
-            time_step=0.1,
-            environment=environment,
-        )
+    _, scalar_pairs, scalar_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+    )
+    scalar_pairs_np = np.asarray(scalar_pairs.numpy()).copy()
+    scalar_counts_np = np.asarray(scalar_counts.numpy()).copy()
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    _, env_pairs, env_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=None,
+        pressure=None,
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+        environment=environment,
+    )
+
+    npt.assert_array_equal(env_pairs.numpy(), scalar_pairs_np)
+    npt.assert_array_equal(env_counts.numpy(), scalar_counts_np)
 
 
 @pytest.mark.parametrize(
@@ -264,12 +277,12 @@ def test_coagulation_step_gpu_rejects_missing_scalar_inputs_without_environment(
         (
             298.15,
             101325.0,
-            "scalar temperature/pressure inputs with environment",
+            "direct temperature/pressure inputs with environment",
         ),
         (
             None,
             None,
-            "environment execution is not implemented in P1",
+            r"\(n_boxes,\)",
         ),
     ],
 )
@@ -282,10 +295,10 @@ def test_coagulation_step_gpu_contract_errors_short_circuit_before_launch(
 ) -> None:
     """Contract errors fire before volume setup or any Warp launch."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
-    environment = to_warp_environment_data(
-        _make_environment_data(n_boxes=1, n_species=1),
-        device=device,
-    )
+    environment_data = _make_environment_data(n_boxes=1, n_species=1)
+    if temperature is None and pressure is None:
+        environment_data.temperature = np.array([298.15, 299.15])
+    environment = to_warp_environment_data(environment_data, device=device)
     gpu_particles = to_warp_particle_data(particles, device=device)
     calls: list[str] = []
 
@@ -316,6 +329,179 @@ def test_coagulation_step_gpu_contract_errors_short_circuit_before_launch(
     assert calls == []
 
 
+def test_coagulation_step_gpu_accepts_direct_environment_arrays(
+    device: str,
+) -> None:
+    """Direct ``(n_boxes,)`` Warp-array inputs execute successfully."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    temperature = wp.array([298.15, 301.15], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0, 100800.0], dtype=wp.float64, device=device)
+
+    _, collision_pairs, collision_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+    )
+
+    assert collision_pairs.shape == (2, 4, 2)
+    assert collision_counts.shape == (2,)
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, np.array([101325.0, 100800.0], dtype=np.float64)),
+        (np.array([298.15, 301.15], dtype=np.float64), 101325.0),
+    ],
+)
+def test_coagulation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
+    device: str,
+    temperature: float | np.ndarray,
+    pressure: float | np.ndarray,
+) -> None:
+    """Hybrid direct inputs execute successfully."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    if isinstance(temperature, np.ndarray):
+        temperature = wp.array(temperature, dtype=wp.float64, device=device)
+    if isinstance(pressure, np.ndarray):
+        pressure = wp.array(pressure, dtype=wp.float64, device=device)
+
+    _, collision_pairs, collision_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+    )
+
+    assert collision_pairs.shape == (2, 4, 2)
+    assert collision_counts.shape == (2,)
+
+
+def test_coagulation_step_gpu_environment_shape_mismatch_raises_value_error(
+    device: str,
+) -> None:
+    """Environment arrays must match ``(n_boxes,)`` before launch work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    environment = to_warp_environment_data(
+        _make_environment_data(1, 1), device=device
+    )
+    environment.temperature = wp.array(
+        [298.15, 299.15], dtype=wp.float64, device=device
+    )
+
+    with pytest.raises(ValueError, match=r"\(n_boxes,\)"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+def test_coagulation_step_gpu_environment_device_mismatch_raises_value_error(
+    device: str,
+) -> None:
+    """Environment arrays on the wrong device fail before launch work."""
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not cuda_available(wp):
+        pytest.skip("CUDA not available for mismatch test")
+
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    environment = to_warp_environment_data(
+        _make_environment_data(1, 1), device=wrong_device
+    )
+
+    with pytest.raises(ValueError, match="environment.temperature device"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+def test_coagulation_step_gpu_direct_temperature_shape_mismatch_raises(
+    device: str,
+) -> None:
+    """Direct temperature arrays must match ``(n_boxes,)`` before launch."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    temperature = wp.array([298.15], dtype=wp.float64, device=device)
+
+    with pytest.raises(ValueError, match=r"temperature shape .*\(n_boxes,\)"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=101325.0,
+            time_step=0.1,
+        )
+
+
+def test_coagulation_step_gpu_direct_pressure_device_mismatch_raises(
+    device: str,
+) -> None:
+    """Direct pressure arrays on the wrong device fail before launch."""
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not cuda_available(wp):
+        pytest.skip("CUDA not available for mismatch test")
+
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pressure = wp.array([101325.0], dtype=wp.float64, device=wrong_device)
+
+    with pytest.raises(ValueError, match="pressure device"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=pressure,
+            time_step=0.1,
+        )
+
+
+def test_coagulation_step_gpu_reuses_direct_environment_arrays(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Coagulation forwards validated direct arrays without rebuilding them."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    temperature = wp.array([298.15, 301.15], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0, 100800.0], dtype=wp.float64, device=device)
+    original_launch = coagulation_module.wp.launch
+    forwarded_inputs: list[tuple[Any, Any]] = []
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        inputs = kwargs.get("inputs", [])
+        if getattr(kernel, "key", "") == "brownian_coagulation_kernel":
+            forwarded_inputs.append((inputs[4], inputs[5]))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
+
+    coagulation_step_gpu(
+        gpu_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+    )
+
+    assert forwarded_inputs == [(temperature, pressure)]
+
+
 @pytest.mark.parametrize(
     ("temperature", "pressure"),
     [
@@ -333,7 +519,9 @@ def test_coagulation_step_gpu_missing_scalar_inputs_short_circuit_before_mutatio
     """Missing scalar inputs fail before setup, launch, or input mutation."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
-    rng_states = wp.array(np.array([17], dtype=np.uint32), dtype=wp.uint32, device=device)
+    rng_states = wp.array(
+        np.array([17], dtype=np.uint32), dtype=wp.uint32, device=device
+    )
     initial_rng_states = np.asarray(rng_states.numpy()).copy()
     initial_particles = from_warp_particle_data(gpu_particles, sync=True)
     calls: list[str] = []
@@ -675,6 +863,16 @@ def test_brownian_coagulation_kernel_inactive_particles(
         dtype=wp.float64,
         device=device,
     )
+    temperature = wp.array(
+        np.array([298.15], dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    pressure = wp.array(
+        np.array([101325.0], dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
 
     radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     diffusivities = wp.zeros(
@@ -697,8 +895,8 @@ def test_brownian_coagulation_kernel_inactive_particles(
             concentration,
             density,
             volume,
-            wp.float64(298.15),
-            wp.float64(101325.0),
+            temperature,
+            pressure,
             wp.float64(constants.GAS_CONSTANT),
             wp.float64(constants.BOLTZMANN_CONSTANT),
             wp.float64(constants.MOLECULAR_WEIGHT_AIR),

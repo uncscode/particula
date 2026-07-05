@@ -2,11 +2,11 @@
 
 This module composes the condensation ``@wp.func`` building blocks into
 end-to-end kernels and provides a high-level ``condensation_step_gpu``
-orchestration API. P1 keeps scalar ``temperature`` and ``pressure`` as the
-only supported execution path while reserving a keyword-only
-``environment`` input for later per-box environment migration. Kernel
-launches operate on GPU-resident Warp arrays and update particle masses
-in-place.
+orchestration API. Entry-point validation accepts scalar direct inputs,
+explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container,
+then normalizes those sources into per-box Warp arrays before launch-time
+work. Kernel launches operate on GPU-resident Warp arrays and update particle
+masses in-place.
 """
 
 # pyright: basic
@@ -15,7 +15,7 @@ in-place.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from typing import Any, cast
+from typing import Any
 
 import particula.util.constants as constants
 
@@ -27,17 +27,18 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
         "Install with: pip install warp-lang"
     ) from exc
 
-from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
-from particula.gas.properties.mean_free_path import (
-    get_molecule_mean_free_path,
-)
 from particula.gpu.dynamics.condensation_funcs import (
     diffusion_coefficient_wp,
     first_order_mass_transport_k_wp,
     mass_transfer_rate_wp,
     particle_radius_from_volume_wp,
 )
-from particula.gpu.properties.gas_properties import partial_pressure_wp
+from particula.gpu.kernels.environment import _ensure_environment_arrays
+from particula.gpu.properties.gas_properties import (
+    dynamic_viscosity_wp,
+    molecule_mean_free_path_wp,
+    partial_pressure_wp,
+)
 from particula.gpu.properties.particle_properties import (
     aerodynamic_mobility_wp,
     cunningham_slip_correction_wp,
@@ -52,17 +53,6 @@ from particula.gpu.properties.particle_properties import (
 _DEFAULT_SURFACE_TENSION = 0.072
 _DEFAULT_MASS_ACCOMMODATION = 1.0
 _DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
-_MIXED_ENVIRONMENT_ERROR = (
-    "Cannot mix scalar temperature/pressure inputs with environment in "
-    "condensation_step_gpu."
-)
-_MISSING_SCALAR_ENVIRONMENT_ERROR = (
-    "temperature and pressure must both be provided when environment is "
-    "omitted in condensation_step_gpu."
-)
-_UNSUPPORTED_ENVIRONMENT_ERROR = (
-    "environment execution is not implemented in P1 for condensation_step_gpu."
-)
 
 
 @wp.kernel
@@ -97,15 +87,18 @@ def condensation_mass_transfer_kernel(
         surface_tension: Per-species surface tension array.
         mass_accommodation: Per-species mass accommodation coefficients.
         diffusion_coefficient_vapor: Per-species vapor diffusion coefficients.
-        dynamic_viscosity: Gas dynamic viscosity [Pa·s].
-        mean_free_path: Gas mean free path [m].
+        dynamic_viscosity: Per-box gas dynamic viscosity [Pa·s].
+        mean_free_path: Per-box gas mean free path [m].
         gas_constant: Universal gas constant [J/(mol·K)].
         boltzmann_constant: Boltzmann constant [J/K].
-        temperature: Gas temperature [K].
+        temperature: Per-box gas temperature [K].
         time_step: Condensation time step [s].
         mass_transfer: Output mass transfer array.
     """  # type: ignore
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    dynamic_viscosity_value = dynamic_viscosity[box_idx]
+    mean_free_path_value = mean_free_path[box_idx]
+    temperature_value = temperature[box_idx]
 
     if concentration[box_idx, particle_idx] == wp.float64(0.0):
         for species_idx in range(masses.shape[2]):
@@ -130,13 +123,13 @@ def condensation_mass_transfer_kernel(
     if effective_density <= wp.float64(0.0):
         effective_density = density[0]
 
-    knudsen_number = knudsen_number_wp(mean_free_path, radius)
+    knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
     slip_correction = cunningham_slip_correction_wp(knudsen_number)
     mobility = aerodynamic_mobility_wp(
-        radius, slip_correction, dynamic_viscosity
+        radius, slip_correction, dynamic_viscosity_value
     )
     diffusion_coefficient_particle = diffusion_coefficient_wp(
-        temperature,
+        temperature_value,
         mobility,
         boltzmann_constant,
     )
@@ -158,14 +151,14 @@ def condensation_mass_transfer_kernel(
             surface_tension[species_idx],
             effective_density,
             molar_mass[species_idx],
-            temperature,
+            temperature_value,
             gas_constant,
         )
         kelvin_term = kelvin_term_wp(radius, kelvin_radius)
         partial_pressure_gas = partial_pressure_wp(
             gas_concentration[box_idx, species_idx],
             molar_mass[species_idx],
-            temperature,
+            temperature_value,
             gas_constant,
         )
         pressure_delta = partial_pressure_delta_wp(
@@ -176,13 +169,41 @@ def condensation_mass_transfer_kernel(
         mass_rate = mass_transfer_rate_wp(
             pressure_delta,
             mass_transport,
-            temperature,
+            temperature_value,
             molar_mass[species_idx],
             gas_constant,
         )
         mass_transfer[box_idx, particle_idx, species_idx] = (
             mass_rate * time_step
         )
+
+
+@wp.kernel
+# type: ignore[misc]
+def _prepare_environment_properties_kernel(
+    temperature: Any,
+    pressure: Any,
+    dynamic_viscosity: Any,
+    mean_free_path: Any,
+) -> None:
+    """Precompute box-level gas properties once per entry-point call."""
+    box_idx = wp.tid()  # type: ignore[misc]
+    temperature_value = temperature[box_idx]
+    pressure_value = pressure[box_idx]
+    viscosity_value = dynamic_viscosity_wp(
+        temperature_value,
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
+    )
+    dynamic_viscosity[box_idx] = viscosity_value
+    mean_free_path[box_idx] = molecule_mean_free_path_wp(
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        temperature_value,
+        pressure_value,
+        viscosity_value,
+        wp.float64(constants.GAS_CONSTANT),
+    )
 
 
 @wp.kernel
@@ -358,8 +379,8 @@ def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
 def condensation_step_gpu(
     particles: Any,
     gas: Any,
-    temperature: float | None,
-    pressure: float | None,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
     time_step: float,
     surface_tension: Any | None = None,
     mass_accommodation: Any | None = None,
@@ -370,20 +391,14 @@ def condensation_step_gpu(
 ) -> tuple[Any, Any]:
     """Execute one condensation timestep on the GPU.
 
-    P1 supports only scalar ``temperature`` and ``pressure`` inputs.
-    The reserved keyword-only ``environment`` parameter documents the
-    future ``WarpEnvironmentData`` handoff without yet enabling explicit
-    environment execution.
-
     Args:
         particles: GPU-resident particle data.
         gas: GPU-resident gas data.
-        temperature: Scalar gas temperature in kelvin for the supported P1
-            execution path. Use ``None`` only with ``environment=...`` to
-            exercise the reserved explicit-environment contract.
-        pressure: Scalar gas pressure in pascals for the supported P1
-            execution path. Use ``None`` only with ``environment=...`` to
-            exercise the reserved explicit-environment contract.
+        temperature: Direct gas temperature as either a scalar or a Warp array
+            with shape ``(n_boxes,)``. Use ``None`` only with
+            ``environment=...``.
+        pressure: Direct gas pressure as either a scalar or a Warp array with
+            shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.
         time_step: Condensation time step in seconds.
         surface_tension: Optional per-species surface tension [N/m].
         mass_accommodation: Optional per-species accommodation coefficient.
@@ -391,63 +406,48 @@ def condensation_step_gpu(
             coefficient [m^2/s].
         mass_transfer: Optional preallocated mass transfer buffer with shape
             ``(n_boxes, n_particles, n_species)``.
-        environment: Reserved keyword-only explicit environment input for a
-            future phase. When implemented, this will accept
-            ``WarpEnvironmentData`` with ``(n_boxes,)`` temperature and
-            pressure arrays. In P1, any explicit-environment call raises an
-            early ``ValueError``.
+        environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
+            temperature and pressure arrays on the same device as ``particles``
+            and ``gas``.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
 
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
-        ValueError: If ``environment`` is mixed with scalar ``temperature`` or
-            ``pressure`` inputs.
-        ValueError: If ``environment`` is supplied with both scalar inputs
-            omitted because explicit environment execution is temporarily
-            rejected in P1 until later follow-up work lands.
+        ValueError: If direct ``temperature`` or ``pressure`` inputs are mixed
+            with ``environment``.
+        ValueError: If direct inputs are missing when ``environment`` is
+            omitted.
+        ValueError: If environment arrays do not match ``(n_boxes,)`` or the
+            caller device.
 
     Notes:
         Particle masses are updated in-place on the GPU. Callers that require
         rollback should copy masses before invoking this function.
 
-        ``environment`` is keyword-only in P1 so existing positional scalar
-        callers remain source-compatible and do not gain a new positional API
-        dependency.
+        ``environment`` remains keyword-only so existing positional scalar
+        callers stay source-compatible.
 
-        P1 keeps scalar ``temperature`` and ``pressure`` as the only supported
-        execution path. Mixed calls such as
-        ``temperature=<scalar>, pressure=None, environment=...`` and
-        ``temperature=None, pressure=<scalar>, environment=...`` are treated
-        as ambiguous mixed-input calls and raise ``ValueError`` instead of
-        applying precedence. Pure explicit-environment calls using
-        ``temperature=None, pressure=None, environment=...`` also raise
-        ``ValueError`` in P1 until the later host-side feed points for
-        viscosity and mean-free-path calculations migrate to per-box
-        environment state.
-
-        Validation runs before host-side viscosity and mean-free-path
-        calculations so invalid calls fail without mutating particle state or
-        launching Warp work.
+        Validation runs before optional buffer setup or Warp launches so
+        invalid shape or device combinations fail without mutating particle
+        state. Box-level gas properties are prepared once per call and reused
+        during the per-particle kernel launch.
     """
-    if environment is not None:
-        if temperature is not None or pressure is not None:
-            raise ValueError(_MIXED_ENVIRONMENT_ERROR)
-        raise ValueError(_UNSUPPORTED_ENVIRONMENT_ERROR)
-
-    if temperature is None or pressure is None:
-        raise ValueError(_MISSING_SCALAR_ENVIRONMENT_ERROR)
-
-    scalar_temperature = cast(float, temperature)
-    scalar_pressure = cast(float, pressure)
-
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
     device = particles.masses.device
     _validate_device_arrays(particles, gas, device)
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature=temperature,
+        pressure=pressure,
+        environment=environment,
+        n_boxes=n_boxes,
+        device=device,
+        caller_name="condensation_step_gpu",
+    )
 
     if surface_tension is None:
         surface_tension = wp.full(
@@ -504,18 +504,19 @@ def condensation_step_gpu(
     else:
         _validate_mass_transfer_buffer(mass_transfer, expected_shape, device)
 
-    # Future phases will feed per-box environment state into these host-side
-    # gas-property calculations instead of the current scalar inputs.
-    dynamic_viscosity = get_dynamic_viscosity(
-        scalar_temperature,
-        reference_viscosity=constants.REF_VISCOSITY_AIR_STP,
-        reference_temperature=constants.REF_TEMPERATURE_STP,
-    )
-    mean_free_path = get_molecule_mean_free_path(
-        molar_mass=constants.MOLECULAR_WEIGHT_AIR,
-        temperature=scalar_temperature,
-        pressure=scalar_pressure,
-        dynamic_viscosity=dynamic_viscosity,
+    dynamic_viscosity = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    mean_free_path = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+
+    wp.launch(
+        _prepare_environment_properties_kernel,
+        dim=n_boxes,
+        inputs=[
+            temperature_array,
+            pressure_array,
+            dynamic_viscosity,
+            mean_free_path,
+        ],
+        device=device,
     )
 
     wp.launch(
@@ -531,11 +532,11 @@ def condensation_step_gpu(
             surface_tension,
             mass_accommodation,
             diffusion_coefficient_vapor,
-            wp.float64(dynamic_viscosity),
-            wp.float64(mean_free_path),
+            dynamic_viscosity,
+            mean_free_path,
             wp.float64(constants.GAS_CONSTANT),
             wp.float64(constants.BOLTZMANN_CONSTANT),
-            wp.float64(scalar_temperature),
+            temperature_array,
             wp.float64(time_step),
             mass_transfer,
         ],

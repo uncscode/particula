@@ -1,11 +1,11 @@
 """GPU Brownian coagulation kernels and orchestration utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
-coagulation pipeline. P1 keeps scalar ``temperature`` and ``pressure`` as
-the only supported execution path while reserving a keyword-only
-``environment`` input for later per-box environment migration. The kernels
-operate on GPU-resident particle data and produce collision pairs that are
-applied to merge particle masses in-place.
+coagulation pipeline. Entry-point validation accepts scalar direct inputs,
+explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container,
+then normalizes those sources into per-box Warp arrays before launch-time
+work. The kernels operate on GPU-resident particle data and produce collision
+pairs that are applied to merge particle masses in-place.
 """
 
 # pyright: basic
@@ -38,6 +38,7 @@ from particula.gpu.dynamics.coagulation_funcs import (
 from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
 )
+from particula.gpu.kernels.environment import _ensure_environment_arrays
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -47,18 +48,6 @@ from particula.gpu.properties.particle_properties import (
     cunningham_slip_correction_wp,
     knudsen_number_wp,
     mean_thermal_speed_wp,
-)
-
-_MIXED_ENVIRONMENT_ERROR = (
-    "Cannot mix scalar temperature/pressure inputs with environment in "
-    "coagulation_step_gpu."
-)
-_MISSING_SCALAR_ENVIRONMENT_ERROR = (
-    "temperature and pressure must both be provided when environment is "
-    "omitted in coagulation_step_gpu."
-)
-_UNSUPPORTED_ENVIRONMENT_ERROR = (
-    "environment execution is not implemented in P1 for coagulation_step_gpu."
 )
 
 
@@ -109,8 +98,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         concentration: Particle concentrations ``(n_boxes, n_particles)``.
         density: Species densities ``(n_species,)``.
         volume: Per-box volumes ``(n_boxes,)``.
-        temperature: Gas temperature [K].
-        pressure: Gas pressure [Pa].
+        temperature: Per-box gas temperatures ``(n_boxes,)`` [K].
+        pressure: Per-box gas pressures ``(n_boxes,)`` [Pa].
         gas_constant: Universal gas constant [J/(mol·K)].
         boltzmann_constant: Boltzmann constant [J/K].
         molecular_weight_air: Molecular weight of air [kg/mol].
@@ -135,16 +124,19 @@ def brownian_coagulation_kernel(  # noqa: C901
     n_particles = masses.shape[1]
     n_species = masses.shape[2]
 
+    temperature_value = temperature[box_idx]
+    pressure_value = pressure[box_idx]
+
     dynamic_viscosity = dynamic_viscosity_wp(
-        temperature,
+        temperature_value,
         ref_viscosity,
         ref_temperature,
         sutherland_constant,
     )
     mean_free_path = molecule_mean_free_path_wp(
         molecular_weight_air,
-        temperature,
-        pressure,
+        temperature_value,
+        pressure_value,
         dynamic_viscosity,
         gas_constant,
     )
@@ -179,10 +171,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         slip = cunningham_slip_correction_wp(knudsen)
         mobility = aerodynamic_mobility_wp(radius, slip, dynamic_viscosity)
         diffusivity = brownian_diffusivity_wp(
-            temperature, mobility, boltzmann_constant
+            temperature_value, mobility, boltzmann_constant
         )
         speed = mean_thermal_speed_wp(
-            total_mass, temperature, boltzmann_constant
+            total_mass, temperature_value, boltzmann_constant
         )
         particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
         g_term = g_collection_term_wp(particle_mean_free_path, radius)
@@ -527,8 +519,8 @@ def _ensure_volume_array(
 
 def coagulation_step_gpu(
     particles: Any,
-    temperature: float | None,
-    pressure: float | None,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
     time_step: float,
     volume: float | Any | None = None,
     max_collisions: int = 256,
@@ -541,19 +533,13 @@ def coagulation_step_gpu(
 ) -> tuple[Any, Any, Any]:
     """Execute one Brownian coagulation timestep on the GPU.
 
-    P1 supports only scalar ``temperature`` and ``pressure`` inputs.
-    The reserved keyword-only ``environment`` parameter documents the
-    future ``WarpEnvironmentData`` handoff without yet enabling explicit
-    environment execution.
-
     Args:
         particles: GPU-resident particle data.
-        temperature: Scalar gas temperature in kelvin for the supported P1
-            execution path. Use ``None`` only with ``environment=...`` to
-            exercise the reserved explicit-environment contract.
-        pressure: Scalar gas pressure in pascals for the supported P1
-            execution path. Use ``None`` only with ``environment=...`` to
-            exercise the reserved explicit-environment contract.
+        temperature: Direct gas temperature as either a scalar or a Warp array
+            with shape ``(n_boxes,)``. Use ``None`` only with
+            ``environment=...``.
+        pressure: Direct gas pressure as either a scalar or a Warp array with
+            shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.
         time_step: Coagulation time step in seconds.
         volume: Per-box volume [m^3]. If None, uses ``particles.volume``.
         max_collisions: Maximum number of collisions per box.
@@ -561,55 +547,42 @@ def coagulation_step_gpu(
         collision_pairs: Optional preallocated collision buffer.
         n_collisions: Optional preallocated collision count buffer.
         rng_states: Optional preallocated RNG state buffer.
-        environment: Reserved keyword-only explicit environment input for a
-            future phase. When implemented, this will accept
-            ``WarpEnvironmentData`` with ``(n_boxes,)`` temperature and
-            pressure arrays. In P1, any explicit-environment call raises an
-            early ``ValueError``.
+        environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
+            temperature and pressure arrays on the same device as ``particles``.
 
     Returns:
         Tuple of updated particle data, collision pairs, and collision counts.
 
     Raises:
         ValueError: If array shapes or devices mismatch expectations.
-        ValueError: If ``environment`` is mixed with scalar ``temperature`` or
-            ``pressure`` inputs.
-        ValueError: If ``environment`` is supplied with both scalar inputs
-            omitted because explicit environment execution is temporarily
-            rejected in P1 until later follow-up work lands.
+        ValueError: If direct ``temperature`` or ``pressure`` inputs are mixed
+            with ``environment``.
+        ValueError: If direct inputs are missing when ``environment`` is
+            omitted.
+        ValueError: If environment arrays do not match ``(n_boxes,)`` or the
+            caller device.
 
     Notes:
-        ``environment`` is keyword-only in P1 so existing positional scalar
-        callers remain source-compatible and do not gain a new positional API
-        dependency.
-
-        P1 keeps scalar ``temperature`` and ``pressure`` as the only supported
-        execution path. Mixed calls such as
-        ``temperature=<scalar>, pressure=None, environment=...`` and
-        ``temperature=None, pressure=<scalar>, environment=...`` are treated
-        as ambiguous mixed-input calls and raise ``ValueError`` instead of
-        applying precedence. Pure explicit-environment calls using
-        ``temperature=None, pressure=None, environment=...`` also raise
-        ``ValueError`` in P1 until the later Brownian-kernel launch inputs
-        migrate to per-box environment state.
+        ``environment`` remains keyword-only so existing positional scalar
+        callers stay source-compatible.
 
         Validation runs before volume normalization, RNG setup, and kernel
-        launches so invalid calls fail without mutating particle state or
-        allocating downstream launch work.
+        launches so invalid shape or device combinations fail without mutating
+        particle state or allocating downstream launch work.
     """
-    if environment is not None:
-        if temperature is not None or pressure is not None:
-            raise ValueError(_MIXED_ENVIRONMENT_ERROR)
-        raise ValueError(_UNSUPPORTED_ENVIRONMENT_ERROR)
-
-    if temperature is None or pressure is None:
-        raise ValueError(_MISSING_SCALAR_ENVIRONMENT_ERROR)
-
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature=temperature,
+        pressure=pressure,
+        environment=environment,
+        n_boxes=n_boxes,
+        device=device,
+        caller_name="coagulation_step_gpu",
+    )
 
     if volume is None:
         volume = particles.volume
@@ -644,8 +617,6 @@ def coagulation_step_gpu(
     else:
         _validate_rng_states(rng_states, expected_counts_shape, device)
 
-    # Future phases will feed per-box environment state into these launch
-    # inputs instead of the current scalar temperature and pressure values.
     radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     diffusivities = wp.zeros(
         (n_boxes, n_particles), dtype=wp.float64, device=device
@@ -671,8 +642,8 @@ def coagulation_step_gpu(
             particles.concentration,
             particles.density,
             volume_array,
-            wp.float64(temperature),
-            wp.float64(pressure),
+            temperature_array,
+            pressure_array,
             wp.float64(constants.GAS_CONSTANT),
             wp.float64(constants.BOLTZMANN_CONSTANT),
             wp.float64(constants.MOLECULAR_WEIGHT_AIR),
