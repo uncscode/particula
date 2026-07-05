@@ -2,7 +2,7 @@
   "id": "E2-F4",
   "type": "feature",
   "title": "Resolve GasData and WarpGasData schema drift",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -71,11 +71,11 @@
     {
       "id": "E2-F4-P4",
       "title": "Update migration documentation for gas round-trip semantics",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -83,5 +83,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
