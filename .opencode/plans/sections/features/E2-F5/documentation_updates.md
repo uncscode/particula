@@ -28,13 +28,30 @@
   docs already matched implementation while adding regression coverage for the
   documented contract.
 
+## Shipped P4 Documentation Outcome
+
+- Issue #1206 added the deferred developer-facing roadmap note in
+  `docs/Features/Roadmap/data-oriented-gpu.md` rather than changing public
+  kernel docstrings.
+- The roadmap now states that `coagulation_step_gpu(...)` accepts scalar direct
+  `temperature`/`pressure`, direct Warp arrays shaped `(n_boxes,)`, hybrid
+  scalar-plus-array direct inputs, or keyword-only
+  `environment=WarpEnvironmentData(...)`.
+- The same roadmap note now captures the downstream handoff rule for future
+  GPU kernels: keep temperature and pressure as validated environment-owned
+  state and do not migrate them into `GasData`.
+
 ## Deferred Documentation
 
-- Broader roadmap or user-facing GPU docs remain deferred until later phases
-  need to expose more than the code-local entry-point contract.
+- Broader user-facing GPU docs remain deferred until later phases need to
+  expose more than the code-local entry-point contract and shipped roadmap
+  guidance.
 
 ## Developer Notes
 
 - Explain scalar compatibility as a migration aid for existing callers.
 - Explain that normalization is private to `particula.gpu.kernels` and does not
   expand the public conversion API in this phase.
+- Note that P4 documentation scope was intentionally limited to the roadmap
+  handoff note because the implementation contract and kernel docstrings were
+  already current.

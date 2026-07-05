@@ -22,8 +22,15 @@
 - The public `condensation_step_gpu(...)` docstring already matches the shipped
   scalar/direct-array/hybrid/explicit-environment contract, so P3 only needed
   regression coverage rather than another documentation edit pass.
+- Coagulation-side follow-up confirmed the same shared contract and documented
+  it in the roadmap, including scalar direct inputs, direct `(n_boxes,)` Warp
+  arrays, hybrid scalar-plus-array inputs, and keyword-only
+  `environment=WarpEnvironmentData(...)`.
 - `saturation_ratio` remains part of the environment schema, but these entry
   points still only consume temperature and pressure in this phase.
 - Keep scalar functions as the primary public entry points initially. Add
   environment support internally or through narrowly scoped wrappers before
   expanding public exports.
+- Focused coagulation regressions now show that non-uniform environment inputs
+  measurably affect collision trends while degenerate boxes with fewer than two
+  active particles still safely record zero collisions.

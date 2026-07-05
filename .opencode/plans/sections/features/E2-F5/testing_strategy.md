@@ -27,6 +27,11 @@ and opt into CUDA only through the repository's availability helpers.
   parity, invalid temperature/pressure domain failures before launch, rejected
   input preservation of caller-owned `mass_transfer` buffers, and zero-volume
   particle short-circuit safety with per-box arrays.
+- **Coagulation regression hardening:** Coagulation coverage proves uniform
+  direct `(n_boxes,)` arrays match scalar behavior within established
+  stochastic tolerance, non-uniform environment inputs change per-box collision
+  trends in the CPU Brownian-rate direction, and boxes with fewer than two
+  active particles still record zero collisions.
 - **Pre-launch short-circuiting:** Contract failures occur before
   `get_dynamic_viscosity(...)`, `get_molecule_mean_free_path(...)`,
   `_ensure_volume_array(...)`, or any Warp launch.
@@ -43,8 +48,9 @@ and opt into CUDA only through the repository's availability helpers.
 - Coagulation behavior and validation:
   `particula/gpu/kernels/tests/coagulation_test.py`.
 - Formatting-only companion updates for shared GPU test readability may appear
-  in `coagulation_test.py` or `environment_test.py`, but shipped P3 behavior is
-  validated in condensation coverage.
+  in companion files; shipped P4 behavior is validated in
+  `coagulation_test.py`, while `condensation_test.py` only saw formatting-only
+  churn during the phase.
 - Container/conversion behavior stays covered by existing helpers; this phase
   reuses `EnvironmentData` plus `to_warp_environment_data(...)` inside the
   co-located kernel/helper tests instead of changing conversion test scope.
