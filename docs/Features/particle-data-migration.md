@@ -240,7 +240,8 @@ gpu_gas = to_warp_gas_data(
 )
 restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 
-# Preserve ordered names and any vapor-pressure sidecar outside WarpGasData.
+# Preserve ordered names outside WarpGasData and keep any vapor-pressure
+# sidecar separately (or recompute it) on the CPU side.
 ```
 
 ## Gradual migration with `.data`

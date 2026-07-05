@@ -6,7 +6,7 @@ multiple boxes. It is the CPU owner of ordered gas names, molar masses,
 concentrations, and boolean partitioning flags only. GPU helper state such as
 vapor pressure lives on ``WarpGasData`` with shape ``(n_boxes, n_species)``
 and does not round-trip back into this container automatically. Restoring from
-GPU data therefore depends on caller-supplied ordering for semantic name
+GPU data therefore depends on caller-managed ordered names for semantic name
 reconstruction.
 
 Example:
@@ -53,10 +53,11 @@ class GasData:
 
     ``GasData`` is also the CPU-side owner of ordered species names. GPU
     transfer helpers exclude ``name``, convert ``partitioning`` as
-    ``bool → int32 → bool``, and intentionally exclude GPU-only helper state
-    such as vapor pressure from restored CPU data. ``from_warp_gas_data()``
-    can rebuild names only from caller-supplied ordering or placeholder names;
-    it cannot recover semantic species identity from GPU data alone.
+    ``bool → int32 → bool`` with binary ``0``/``1`` restore requirements, and
+    intentionally exclude GPU-only helper state such as vapor pressure from
+    restored CPU data. ``from_warp_gas_data()`` can rebuild names only from
+    caller-managed ordered names or placeholder names; it cannot recover
+    semantic species identity from GPU data alone.
 
     This is NOT a frozen dataclass - concentrations can be updated in place
     for performance. Use copy() if immutability is needed.
