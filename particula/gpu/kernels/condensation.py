@@ -3,10 +3,10 @@
 This module composes the condensation ``@wp.func`` building blocks into
 end-to-end kernels and provides a high-level ``condensation_step_gpu``
 orchestration API. Entry-point validation accepts scalar direct inputs,
-explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container,
-then normalizes those sources into per-box Warp arrays before launch-time
-work. Kernel launches operate on GPU-resident Warp arrays and update particle
-masses in-place.
+explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
+Those sources are normalized into per-box Warp arrays before any buffer setup
+or Warp launch. Kernel launches operate on GPU-resident Warp arrays and update
+particle masses in-place.
 """
 
 # pyright: basic
@@ -186,7 +186,15 @@ def _prepare_environment_properties_kernel(
     dynamic_viscosity: Any,
     mean_free_path: Any,
 ) -> None:
-    """Precompute box-level gas properties once per entry-point call."""
+    """Precompute box-level gas properties once per entry-point call.
+
+    Args:
+        temperature: Per-box gas temperatures ``(n_boxes,)`` [K].
+        pressure: Per-box gas pressures ``(n_boxes,)`` [Pa].
+        dynamic_viscosity: Output dynamic viscosity array ``(n_boxes,)``
+            [Pa·s].
+        mean_free_path: Output mean free path array ``(n_boxes,)`` [m].
+    """
     box_idx = wp.tid()  # type: ignore[misc]
     temperature_value = temperature[box_idx]
     pressure_value = pressure[box_idx]
@@ -408,7 +416,8 @@ def condensation_step_gpu(
             ``(n_boxes, n_particles, n_species)``.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``
-            and ``gas``.
+            and ``gas``. This mode is supported when both direct inputs are
+            ``None``.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -423,6 +432,10 @@ def condensation_step_gpu(
             caller device.
 
     Notes:
+        Accepted environment sources are scalar direct inputs, direct
+        ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
+        inputs, or keyword-only ``environment=...`` execution.
+
         Particle masses are updated in-place on the GPU. Callers that require
         rollback should copy masses before invoking this function.
 
@@ -431,8 +444,9 @@ def condensation_step_gpu(
 
         Validation runs before optional buffer setup or Warp launches so
         invalid shape or device combinations fail without mutating particle
-        state. Box-level gas properties are prepared once per call and reused
-        during the per-particle kernel launch.
+        state. Box-level gas properties are prepared once per call from the
+        normalized temperature and pressure arrays, then reused during the
+        per-particle kernel launch.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)

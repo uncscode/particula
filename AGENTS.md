@@ -257,11 +257,13 @@ restored = from_warp_environment_data(gpu_environment)
 - Environment transfers are explicit helper calls; kernels and runnables do
   not perform hidden CPU↔GPU synchronization for environment state.
 - `condensation_step_gpu(..., environment=...)` and
-  `coagulation_step_gpu(..., environment=...)` reserve a keyword-only
-  environment path in P1, but still reject explicit environment execution.
-- Mixing scalar `temperature`/`pressure` with `environment=` raises an early
-  `ValueError`; `temperature=None`, `pressure=None`, and `environment=...`
-  also raise a phase-scoped P1 `ValueError` until later phases add support.
+  `coagulation_step_gpu(..., environment=...)` accept scalar
+  `temperature`/`pressure`, direct per-box Warp arrays shaped `(n_boxes,)`, or
+  explicit `WarpEnvironmentData` on the active device.
+- Mixing scalar or Warp-array `temperature`/`pressure` with `environment=`
+  still raises an early `ValueError`.
+- Explicit environment and direct Warp-array inputs must use `(n_boxes,)`
+  temperature and pressure arrays on the same device as the particle/gas data.
 - `EnvironmentData.temperature` and `pressure` use `(n_boxes,)`;
   `saturation_ratio` uses `(n_boxes, n_species)` on both CPU and Warp mirrors.
 - Round trips preserve `temperature`, `pressure`, and `saturation_ratio` for

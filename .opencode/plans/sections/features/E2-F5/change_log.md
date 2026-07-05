@@ -26,3 +26,14 @@
   regression tests.
 - Narrowed section language that previously implied environment normalization,
   shape/device validation, or real per-box execution had already shipped.
+
+## 2026-07-05
+
+- Updated plan sections after issue #1204 delivered the shared GPU environment
+  normalization helper and runtime consumption path.
+- Recorded new private module `particula/gpu/kernels/environment.py` plus
+  condensation/coagulation entry-point updates that now accept valid explicit
+  environment and direct `(n_boxes,)` Warp-array inputs.
+- Added shipped test coverage details for helper validation, explicit
+  environment success, hybrid direct inputs, mismatch failures, and
+  condensation/coagulation reuse regressions.

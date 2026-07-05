@@ -6,20 +6,21 @@
   Required fields are `temperature`, `pressure`, and `saturation_ratio`.
 - Reject calls that provide both explicit environment state and scalar
   temperature/pressure. Explicit rejection is clearer than precedence rules for
-  early migration.
+  early migration and remains the shipped contract.
 - Reserve `environment` as a keyword-only parameter on
-  `condensation_step_gpu(...)` and `coagulation_step_gpu(...)` so P1 publishes
-  the future handoff point without changing positional scalar callers.
-- In P1, explicit environment execution remains intentionally unsupported:
-  `temperature=None`, `pressure=None`, and `environment=...` raises a
-  phase-scoped `ValueError` until later phases wire per-box state into
-  host-side condensation helpers and Brownian coagulation launch inputs.
-- Precompute per-box dynamic viscosity and mean free path on the host for the
-  first migration path. Move those calculations into Warp kernels only when a
-  later feature needs fully device-resident thermodynamic updates.
-- Include `saturation_ratio` in the later migration path even if a specific
-  E2-F5 step only consumes temperature and pressure, so environment shape
-  semantics are exercised consistently.
+  `condensation_step_gpu(...)` and `coagulation_step_gpu(...)` so the
+  environment handoff point does not break positional scalar callers.
+- Shared `_ensure_environment_arrays(...)` validation is the canonical way to
+  normalize scalar, direct-array, and `WarpEnvironmentData` inputs without
+  hidden device transfers.
+- Explicit environment execution now works when `environment.temperature` and
+  `environment.pressure` are valid `(n_boxes,)` Warp arrays on the caller
+  device.
+- Condensation now prepares per-box dynamic viscosity and mean free path once
+  per call in device-local precompute work and reuses them during the main
+  kernel launch.
+- `saturation_ratio` remains part of the environment schema, but these entry
+  points still only consume temperature and pressure in this phase.
 - Keep scalar functions as the primary public entry points initially. Add
   environment support internally or through narrowly scoped wrappers before
   expanding public exports.
