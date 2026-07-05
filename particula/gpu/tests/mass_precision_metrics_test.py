@@ -37,6 +37,51 @@ _CASE_CANDIDATE_IDS = [
 ]
 
 
+def _assert_projected_schema(
+    projected: dict[str, np.ndarray],
+    case: _MassPrecisionCase,
+    candidate_id: str,
+) -> None:
+    """Assert each candidate publishes the documented projected schema."""
+    if candidate_id == "fp32_absolute_mass":
+        assert tuple(projected) == ("masses",)
+        assert projected["masses"].shape == case.masses.shape
+        assert projected["masses"].dtype == np.float32
+        return
+
+    if candidate_id == "mixed_precision_mass_plus_density":
+        assert tuple(projected) == (
+            "masses",
+            "concentration",
+            "charge",
+            "volume",
+            "density",
+        )
+        assert projected["masses"].shape == case.masses.shape
+        assert projected["masses"].dtype == np.float32
+        assert projected["concentration"].shape == case.concentration.shape
+        assert projected["concentration"].dtype == np.float32
+        assert projected["charge"].shape == case.charge.shape
+        assert projected["charge"].dtype == np.float32
+        assert projected["volume"].shape == case.volume.shape
+        assert projected["volume"].dtype == np.float32
+        assert projected["density"].shape == case.density_kg_m3.shape
+        assert projected["density"].dtype == np.float64
+        return
+
+    if candidate_id == "fp32_total_mass_fp32_mass_fraction":
+        assert tuple(projected) == ("total_mass", "mass_fractions")
+        assert projected["total_mass"].shape == case.masses.shape[:-1]
+        assert projected["total_mass"].dtype == np.float32
+        assert projected["mass_fractions"].shape == case.masses.shape
+        assert projected["mass_fractions"].dtype == np.float32
+        return
+
+    raise AssertionError(
+        f"candidate schema assertion missing for candidate={candidate_id}"
+    )
+
+
 def _candidate_ids() -> list[str]:
     """Return the supported executable candidate ids."""
     return list(_SUPPORTED_CANDIDATES)
@@ -67,8 +112,9 @@ def _project_candidate(
         }
 
     if candidate_id == "mixed_precision_mass_plus_density":
+        projected_masses = case.masses.astype(np.float32)
         projected = {
-            "masses": case.masses.astype(np.float32),
+            "masses": projected_masses,
             "concentration": case.concentration.astype(np.float32),
             "charge": case.charge.astype(np.float32),
             "volume": case.volume.astype(np.float32),
@@ -77,7 +123,7 @@ def _project_candidate(
         return {
             "candidate_id": candidate_id,
             "projected": projected,
-            "reconstructed_masses": projected["masses"].astype(np.float64),
+            "reconstructed_masses": projected_masses.astype(np.float64),
         }
 
     if candidate_id == "fp32_total_mass_fp32_mass_fraction":
@@ -158,6 +204,21 @@ def test_candidate_reconstructed_radii_match_fp64_baseline(
             f"case={case.case_name}, candidate={candidate_id}"
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("case", "candidate_id"),
+    _CASE_CANDIDATE_PARAMS,
+    ids=_CASE_CANDIDATE_IDS,
+)
+def test_candidate_projected_payload_matches_documented_schema(
+    case: _MassPrecisionCase,
+    candidate_id: str,
+) -> None:
+    """Each candidate exposes the documented projected payload schema."""
+    candidate = _project_candidate(case, candidate_id)
+
+    _assert_projected_schema(candidate["projected"], case, candidate_id)
 
 
 def test_projection_helper_invalid_candidate_raises_value_error() -> None:
