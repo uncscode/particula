@@ -239,11 +239,14 @@ class TestToWarpParticleData:
         assert gpu_data.volume.dtype == wp.float64
 
     def test_particle_data_copy_true_independence(
-        self, sample_particle_data
+        self,
+        sample_particle_data,
     ) -> None:
         """Test that copy=True creates independent copy."""
         gpu_data = to_warp_particle_data(
-            sample_particle_data, device="cpu", copy=True
+            sample_particle_data,
+            device="cpu",
+            copy=True,
         )
 
         # Store original value
@@ -256,12 +259,15 @@ class TestToWarpParticleData:
         assert gpu_data.masses.numpy()[0, 0, 0] == original_mass
 
     def test_particle_data_copy_false_behavior(
-        self, sample_particle_data
+        self,
+        sample_particle_data,
     ) -> None:
         """Test that copy=False uses wp.from_numpy()."""
         # Just verify it works - actual zero-copy depends on memory layout
         gpu_data = to_warp_particle_data(
-            sample_particle_data, device="cpu", copy=False
+            sample_particle_data,
+            device="cpu",
+            copy=False,
         )
 
         # Verify values match (basic functionality)
@@ -285,7 +291,8 @@ class TestToWarpGasData:
         assert gpu_data.partitioning is not None
 
     def test_to_warp_gas_data_preserves_shapes_and_dtypes(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test the Warp mirror locks the audited gas schema contract."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -302,7 +309,8 @@ class TestToWarpGasData:
         assert not hasattr(gpu_data, "name")
 
     def test_to_warp_gas_data_converts_partitioning_bool_to_int32(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test bool partitioning becomes the GPU int32 contract."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -314,13 +322,16 @@ class TestToWarpGasData:
         assert partitioning_np.dtype == np.int32
 
     def test_to_warp_gas_data_preserves_explicit_vapor_pressure_values(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test a valid (n_boxes, n_species) buffer is preserved exactly."""
         vp = np.array([[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]])
 
         gpu_data = to_warp_gas_data(
-            sample_gas_data, device="cpu", vapor_pressure=vp
+            sample_gas_data,
+            device="cpu",
+            vapor_pressure=vp,
         )
 
         _assert_gas_gpu_mirror_matches(
@@ -330,13 +341,15 @@ class TestToWarpGasData:
         )
 
     def test_to_warp_gas_data_defaults_vapor_pressure_to_zeros(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test omitted vapor pressure creates a zero-filled schema buffer."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         expected = np.zeros(
-            sample_gas_data.concentration.shape, dtype=np.float64
+            sample_gas_data.concentration.shape,
+            dtype=np.float64,
         )
         np.testing.assert_array_equal(gpu_data.vapor_pressure.numpy(), expected)
         assert (
@@ -345,7 +358,8 @@ class TestToWarpGasData:
         assert gpu_data.vapor_pressure.dtype == wp.float64
 
     def test_to_warp_gas_data_accepts_array_like_vapor_pressure(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test array-like vapor pressure is normalized before transfer."""
         vapor_pressure = np.asarray(
@@ -462,7 +476,8 @@ class TestToWarpEnvironmentData:
             )
 
     def test_environment_data_warp_unavailable_error(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test helper propagates Warp-unavailable RuntimeError."""
         from unittest.mock import patch
@@ -478,11 +493,13 @@ class TestToWarpEnvironmentData:
                 )
 
     def test_to_warp_environment_data_default(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test helper returns populated environment fields."""
         gpu_data = to_warp_environment_data(
-            sample_environment_data_single_box, device="cpu"
+            sample_environment_data_single_box,
+            device="cpu",
         )
 
         assert gpu_data.temperature is not None
@@ -490,11 +507,13 @@ class TestToWarpEnvironmentData:
         assert gpu_data.saturation_ratio is not None
 
     def test_environment_data_single_box_shapes_and_values(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test single-box conversion preserves shapes, values, and dtypes."""
         gpu_data = to_warp_environment_data(
-            sample_environment_data_single_box, device="cpu"
+            sample_environment_data_single_box,
+            device="cpu",
         )
         _assert_environment_gpu_mirror_matches(
             sample_environment_data_single_box,
@@ -502,11 +521,13 @@ class TestToWarpEnvironmentData:
         )
 
     def test_environment_data_multi_box_shapes_and_values(
-        self, sample_environment_data_multi_box
+        self,
+        sample_environment_data_multi_box,
     ) -> None:
         """Test multi-box conversion preserves shapes, values, and dtypes."""
         gpu_data = to_warp_environment_data(
-            sample_environment_data_multi_box, device="cpu"
+            sample_environment_data_multi_box,
+            device="cpu",
         )
         _assert_environment_gpu_mirror_matches(
             sample_environment_data_multi_box,
@@ -514,7 +535,8 @@ class TestToWarpEnvironmentData:
         )
 
     def test_environment_data_invalid_device_error(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test invalid device raises shared RuntimeError style."""
         with pytest.raises(RuntimeError) as exc_info:
@@ -528,7 +550,8 @@ class TestToWarpEnvironmentData:
         assert "not found" in error_msg
 
     def test_environment_data_copy_true_independence(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test copy=True creates independent CPU-backed Warp arrays."""
         gpu_data = to_warp_environment_data(
@@ -560,7 +583,8 @@ class TestToWarpEnvironmentData:
         )
 
     def test_environment_data_copy_false_cpu_behavior(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test copy=False does not expose a live CPU view after conversion."""
         gpu_data = to_warp_environment_data(
@@ -619,7 +643,9 @@ class TestToWarpEnvironmentData:
         )
 
     def test_environment_data_copy_false_uses_wp_from_numpy_copy_false(
-        self, sample_environment_data_single_box, monkeypatch
+        self,
+        sample_environment_data_single_box,
+        monkeypatch,
     ) -> None:
         """Test copy=False forwards copy=False to wp.from_numpy."""
         calls: list[dict[str, object]] = []
@@ -934,7 +960,9 @@ class TestErrorHandling:
         """
         with pytest.raises(ValueError) as exc_info:
             to_warp_gas_data(
-                sample_gas_data, device="cpu", vapor_pressure=wrong_shape_vp
+                sample_gas_data,
+                device="cpu",
+                vapor_pressure=wrong_shape_vp,
             )
 
         error_msg = str(exc_info.value)
@@ -942,11 +970,13 @@ class TestErrorHandling:
         assert "(2, 3)" in error_msg
 
     def test_to_warp_gas_data_array_like_invalid_shape_raises_value_error(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test list-like invalid vapor pressure fails via documented shape path."""
         wrong_shape_vp = np.asarray(
-            [[1000.0, 500.0], [1100.0, 550.0]], dtype=np.float64
+            [[1000.0, 500.0], [1100.0, 550.0]],
+            dtype=np.float64,
         )
 
         with pytest.raises(ValueError) as exc_info:
@@ -1097,23 +1127,29 @@ class TestFromWarpParticleData:
 
         # Verify all fields match original
         np.testing.assert_array_almost_equal(
-            result.masses, sample_particle_data.masses
+            result.masses,
+            sample_particle_data.masses,
         )
         np.testing.assert_array_almost_equal(
-            result.concentration, sample_particle_data.concentration
+            result.concentration,
+            sample_particle_data.concentration,
         )
         np.testing.assert_array_almost_equal(
-            result.charge, sample_particle_data.charge
+            result.charge,
+            sample_particle_data.charge,
         )
         np.testing.assert_array_almost_equal(
-            result.density, sample_particle_data.density
+            result.density,
+            sample_particle_data.density,
         )
         np.testing.assert_array_almost_equal(
-            result.volume, sample_particle_data.volume
+            result.volume,
+            sample_particle_data.volume,
         )
 
     def test_particle_data_shapes_preserved_roundtrip(
-        self, sample_particle_data
+        self,
+        sample_particle_data,
     ) -> None:
         """Test all shapes preserved after round-trip."""
         gpu_data = to_warp_particle_data(sample_particle_data, device="cpu")
@@ -1144,7 +1180,8 @@ class TestFromWarpParticleData:
 
         # Verify round-trip still works
         np.testing.assert_array_almost_equal(
-            result.masses, sample_particle_data.masses
+            result.masses,
+            sample_particle_data.masses,
         )
 
 
@@ -1190,7 +1227,8 @@ class TestFromWarpGasData:
         assert isinstance(result, GasData)
 
     def test_from_warp_gas_data_restores_supplied_names(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test supplied CPU names survive the round-trip exactly."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1199,7 +1237,8 @@ class TestFromWarpGasData:
         _assert_gas_round_trip_matches(sample_gas_data, result)
 
     def test_from_warp_gas_data_generates_placeholder_names_when_name_missing(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test omitted names produce the documented placeholder names."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1210,7 +1249,8 @@ class TestFromWarpGasData:
         assert result.concentration.shape == sample_gas_data.concentration.shape
 
     def test_from_warp_gas_data_treats_name_none_as_placeholder_path(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test explicit name=None follows the same placeholder path."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1245,7 +1285,8 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=name)
 
     def test_from_warp_gas_data_converts_partitioning_int32_to_bool(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test GPU int32 partitioning is restored as NumPy bool values."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1253,11 +1294,13 @@ class TestFromWarpGasData:
 
         assert result.partitioning.dtype == np.bool_
         np.testing.assert_array_equal(
-            result.partitioning, sample_gas_data.partitioning
+            result.partitioning,
+            sample_gas_data.partitioning,
         )
 
     def test_from_warp_gas_data_rejects_non_binary_partitioning_values(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test malformed GPU partitioning flags fail before bool restore."""
         from particula.gpu.warp_types import WarpGasData
@@ -1293,7 +1336,9 @@ class TestFromWarpGasData:
         assert "0/1" in error_msg
 
     def test_from_warp_gas_data_partitioning_failure_is_atomic(
-        self, sample_gas_data, monkeypatch
+        self,
+        sample_gas_data,
+        monkeypatch,
     ) -> None:
         """Test invalid partitioning raises before GasData construction."""
         from particula.gas import gas_data as gas_data_module
@@ -1330,7 +1375,8 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=sample_gas_data.name)
 
     def test_from_warp_gas_data_allows_retry_after_partitioning_failure(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test restore can be retried after correcting partitioning flags."""
         from particula.gpu.warp_types import WarpGasData
@@ -1371,7 +1417,8 @@ class TestFromWarpGasData:
         _assert_gas_round_trip_matches(sample_gas_data, result)
 
     def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test restore drops vapor pressure from CPU GasData only."""
         vapor_pressure = np.array(
@@ -1397,7 +1444,8 @@ class TestFromWarpGasData:
         )
 
     def test_from_warp_gas_data_preserves_multi_box_round_trip(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test the leading n_boxes dimension survives the full round-trip."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1413,7 +1461,8 @@ class TestFromWarpGasData:
         )
 
     def test_from_warp_gas_data_raises_value_error_for_name_length_mismatch(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test wrong name lengths fail with actual and expected counts."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1426,7 +1475,9 @@ class TestFromWarpGasData:
         assert "got 2" in error_msg
 
     def test_from_warp_gas_data_rejects_name_length_mismatch_before_sync(
-        self, sample_gas_data, monkeypatch
+        self,
+        sample_gas_data,
+        monkeypatch,
     ) -> None:
         """Test name length mismatch is validated before synchronization."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1440,7 +1491,8 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=["Only", "Two"])
 
     def test_from_warp_gas_data_allows_retry_after_name_length_failure(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test restore can be retried after correcting the name list."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1453,7 +1505,8 @@ class TestFromWarpGasData:
         _assert_gas_round_trip_matches(sample_gas_data, result)
 
     def test_from_warp_gas_data_raises_value_error_for_empty_name_list(
-        self, sample_gas_data
+        self,
+        sample_gas_data,
     ) -> None:
         """Test an empty provided name list is rejected as a mismatch."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
@@ -1470,11 +1523,14 @@ class TestFromWarpGasData:
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
         wp.synchronize()
         result = from_warp_gas_data(
-            gpu_data, name=sample_gas_data.name, sync=False
+            gpu_data,
+            name=sample_gas_data.name,
+            sync=False,
         )
 
         np.testing.assert_array_almost_equal(
-            result.molar_mass, sample_gas_data.molar_mass
+            result.molar_mass,
+            sample_gas_data.molar_mass,
         )
 
 
@@ -1482,7 +1538,8 @@ class TestFromWarpEnvironmentData:
     """Tests for from_warp_environment_data() function."""
 
     def test_from_warp_environment_data_basic_single_box(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test basic GPU-to-CPU transfer returns EnvironmentData."""
         gpu_data = to_warp_environment_data(
@@ -1496,7 +1553,8 @@ class TestFromWarpEnvironmentData:
         assert isinstance(result, EnvironmentData)
 
     def test_environment_data_round_trip_single_box(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test single-box environment data survives CPU→Warp→CPU."""
         gpu_data = to_warp_environment_data(
@@ -1510,7 +1568,8 @@ class TestFromWarpEnvironmentData:
         )
 
     def test_environment_data_round_trip_multi_box(
-        self, sample_environment_data_multi_box
+        self,
+        sample_environment_data_multi_box,
     ) -> None:
         """Test multi-box environment data survives CPU→Warp→CPU."""
         gpu_data = to_warp_environment_data(
@@ -1545,7 +1604,8 @@ class TestFromWarpEnvironmentData:
         )
 
     def test_from_warp_environment_data_sync_true(
-        self, sample_environment_data_single_box
+        self,
+        sample_environment_data_single_box,
     ) -> None:
         """Test default synchronized transfer path."""
         gpu_data = to_warp_environment_data(
@@ -1559,7 +1619,8 @@ class TestFromWarpEnvironmentData:
         )
 
     def test_from_warp_environment_data_sync_false_manual(
-        self, sample_environment_data_multi_box
+        self,
+        sample_environment_data_multi_box,
     ) -> None:
         """Test manual synchronization before sync=False transfer."""
         gpu_data = to_warp_environment_data(
@@ -1613,7 +1674,8 @@ class TestGpuContext:
 
         # Verify round-trip
         np.testing.assert_array_almost_equal(
-            result.masses, sample_particle_data.masses
+            result.masses,
+            sample_particle_data.masses,
         )
 
     def test_gpu_context_transfer_after(self, sample_particle_data) -> None:
