@@ -12,7 +12,7 @@ arrays and update particle masses in-place.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from typing import Any
+from typing import Any, cast
 
 import particula.util.constants as constants
 
@@ -420,6 +420,9 @@ def condensation_step_gpu(
             raise ValueError(_MIXED_ENVIRONMENT_ERROR)
         raise ValueError(_UNSUPPORTED_ENVIRONMENT_ERROR)
 
+    scalar_temperature = cast(float, temperature)
+    scalar_pressure = cast(float, pressure)
+
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
@@ -485,14 +488,14 @@ def condensation_step_gpu(
     # Future phases will feed per-box environment state into these host-side
     # gas-property calculations instead of the current scalar inputs.
     dynamic_viscosity = get_dynamic_viscosity(
-        temperature,
+        scalar_temperature,
         reference_viscosity=constants.REF_VISCOSITY_AIR_STP,
         reference_temperature=constants.REF_TEMPERATURE_STP,
     )
     mean_free_path = get_molecule_mean_free_path(
         molar_mass=constants.MOLECULAR_WEIGHT_AIR,
-        temperature=temperature,
-        pressure=pressure,
+        temperature=scalar_temperature,
+        pressure=scalar_pressure,
         dynamic_viscosity=dynamic_viscosity,
     )
 
@@ -513,7 +516,7 @@ def condensation_step_gpu(
             wp.float64(mean_free_path),
             wp.float64(constants.GAS_CONSTANT),
             wp.float64(constants.BOLTZMANN_CONSTANT),
-            wp.float64(temperature),
+            wp.float64(scalar_temperature),
             wp.float64(time_step),
             mass_transfer,
         ],
