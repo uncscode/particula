@@ -152,7 +152,8 @@ particula/
 - `.opencode/guides/commit_conventions.md` - Commit message format
 - `.opencode/guides/pr_conventions.md` - Pull request conventions
 - `docs/Features/Roadmap/mass-precision-study.md` - Deterministic GPU
-  mass-precision baseline assumptions and reproduction command
+  mass-precision baseline assumptions, candidate fidelity study scope, and
+  focused reproduction commands
 - `docs/contribute/Feature_Workflow/index.md` - Contributor workflow overview
 
 ## Common Patterns
@@ -329,8 +330,12 @@ pytest particula/gpu/tests/mass_precision_cases_test.py -q
   `particula/gpu/tests/mass_precision_cases_test.py`.
 - Baseline cases cover NPF, 5-10 nm, accumulation-mode, and droplet-scale
   masses without changing the production CPU/GPU storage schema.
+- The focused comparison module lives in
+  `particula/gpu/tests/mass_precision_metrics_test.py` and evaluates exactly
+  three study-only reconstruction candidates against the fp64 baseline.
 - Use `docs/Features/Roadmap/mass-precision-study.md` as the reference for
-  case names, assumptions, and focused reproduction.
+  case names, supported-vs-unsupported candidate scope, and focused
+  reproduction.
 
 ## ADW Workflows
 

@@ -175,7 +175,8 @@ print(result)
   [authoritative CPU/GPU field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
   and the [final downstream handoff map for sibling E2
   features](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
-- [Mass-precision baseline study](Features/Roadmap/mass-precision-study.md) —
-  deterministic NPF-to-droplet GPU baseline cases, fp64 storage assumptions,
-  and the focused reproduction command for
-  `particula/gpu/tests/mass_precision_cases_test.py`.
+- [Mass-precision baseline and candidate fidelity study](Features/Roadmap/mass-precision-study.md)
+  — deterministic NPF-to-droplet GPU baseline cases, unchanged fp64 storage
+  assumptions, the three study-only candidate fidelity checks, and focused
+  reproduction commands for `mass_precision_cases_test.py` and
+  `mass_precision_metrics_test.py`.
