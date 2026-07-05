@@ -14,3 +14,14 @@
   verification, documentation, and done-signal checks.
 - Completeness review clarified the final phase as an explicit development-doc
   update gate.
+
+## 2026-07-04
+
+- Updated `E2-F4` plan sections after issue `#1197` landed as
+  `E2-F4-P1`.
+- Recorded that the shipped implementation was a focused test-only change in
+  `particula/gpu/tests/conversion_test.py`.
+- Clarified that current contract coverage now locks shapes/dtypes,
+  bool↔`int32` `partitioning`, explicit/implicit `vapor_pressure` behavior,
+  placeholder names, name-length mismatch failures, and GPU-only
+  `vapor_pressure` loss on restore.

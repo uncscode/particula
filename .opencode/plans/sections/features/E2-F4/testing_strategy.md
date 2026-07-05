@@ -7,18 +7,17 @@ testing phase.
 
 ## Unit and Conversion Tests
 
-- Extend `particula/gpu/tests/conversion_test.py` for:
-  - CPU-to-Warp gas conversion with supplied vapor pressure.
-  - Invalid vapor-pressure shape errors.
-  - Missing vapor-pressure behavior, whether default, warning, or error.
-  - Warp-to-CPU conversion with supplied names.
-  - Missing-name behavior, whether placeholder, warning, or error.
-  - Invalid name count errors.
-  - `partitioning` bool-to-int32 and int32-to-bool round trips.
-- Extend `particula/gpu/tests/warp_types_test.py` only if struct docs or shape
-  assumptions change.
-- Extend `particula/gas/tests/gas_data_test.py` if `GasData` ownership or
-  docstring-visible semantics change.
+- `E2-F4-P1` extended `particula/gpu/tests/conversion_test.py` only.
+- Added focused coverage for:
+  - CPU-to-Warp gas conversion shapes and dtypes;
+  - bool→`int32` and `int32`→bool `partitioning` conversion;
+  - explicit and omitted `vapor_pressure` handling;
+  - invalid vapor-pressure shape errors with actual/expected shape text;
+  - supplied names, placeholder-name fallback, and name-length mismatch
+    failures;
+  - GPU-only `vapor_pressure` presence before restore and loss after restore.
+- No `warp_types`, `gas_data`, or production-code tests were needed because the
+  landed phase was contract-locking coverage rather than a runtime change.
 
 ## Integration and Documentation Checks
 
@@ -32,8 +31,8 @@ testing phase.
 | Behavior | Expected Coverage |
 | --- | --- |
 | Names supplied to `from_warp_gas_data()` | Preserved exactly |
-| Names omitted | Explicit placeholder, warning, or error contract |
+| Names omitted | Placeholder-name restore contract |
 | Partitioning round trip | CPU bool preserved through GPU int32 |
 | Vapor pressure supplied | Shape validated and values transferred to Warp |
-| Vapor pressure omitted | Explicit documented behavior |
-| Vapor pressure returned to CPU | Preserved sidecar or intentionally discarded by test |
+| Vapor pressure omitted | Zero-filled `(n_boxes, n_species)` GPU default |
+| Vapor pressure returned to CPU | Intentionally discarded on `GasData` restore |

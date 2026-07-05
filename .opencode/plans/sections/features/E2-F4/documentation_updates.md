@@ -2,6 +2,9 @@
 
 ## Required Updates
 
+- `E2-F4-P1` did not land broader docs changes. The phase used
+  `particula/gpu/tests/conversion_test.py` as the primary contract record for
+  the current behavior.
 - `docs/Features/particle-data-migration.md`
   - Add a field-authority table for `GasData` versus `WarpGasData`.
   - Document name preservation/loss behavior and required user action.
@@ -14,6 +17,7 @@
 
 ## Code Documentation
 
+- No code docstrings were updated in the shipped `#1197` change.
 - Update `GasData` and `WarpGasData` docstrings if field authority wording is
   stale.
 - Update `to_warp_gas_data()` and `from_warp_gas_data()` docstrings with exact

@@ -20,6 +20,19 @@
   introduced.
 - Update migration and roadmap documentation.
 
+## Implemented in E2-F4-P1 (`#1197`)
+
+- Added test-only coverage in `particula/gpu/tests/conversion_test.py`.
+- Locked the current public conversion contract for:
+  - exact CPU↔GPU shapes and dtypes for `molar_mass`, `concentration`,
+    `partitioning`, and `vapor_pressure`;
+  - CPU `bool` ↔ GPU `int32` partitioning conversion;
+  - explicit `vapor_pressure` preservation and zero-default behavior when
+    omitted;
+  - placeholder-name restore behavior and name-length mismatch failures;
+  - intentional loss of GPU-only `vapor_pressure` when restoring `GasData`.
+- Kept production code and broader documentation unchanged for this phase.
+
 ## Out of Scope
 
 - Rewriting GPU condensation kernels beyond any small compatibility updates
