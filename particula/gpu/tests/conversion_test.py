@@ -1056,6 +1056,43 @@ class TestFromWarpGasData:
         assert "binary" in error_msg
         assert "0/1" in error_msg
 
+    def test_from_warp_gas_data_partitioning_failure_is_atomic(
+        self, sample_gas_data, monkeypatch
+    ) -> None:
+        """Test invalid partitioning raises before GasData construction."""
+        from particula.gas import gas_data as gas_data_module
+        from particula.gpu.warp_types import WarpGasData
+
+        gpu_data = WarpGasData()
+        gpu_data.molar_mass = wp.array(
+            sample_gas_data.molar_mass,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.concentration = wp.array(
+            sample_gas_data.concentration,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.vapor_pressure = wp.zeros(
+            sample_gas_data.concentration.shape,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.partitioning = wp.array(
+            np.array([1, 2, 0], dtype=np.int32),
+            dtype=wp.int32,
+            device="cpu",
+        )
+
+        def fail_if_called(**_kwargs):
+            raise AssertionError("GasData constructor should not be called")
+
+        monkeypatch.setattr(gas_data_module, "GasData", fail_if_called)
+
+        with pytest.raises(ValueError, match="partitioning"):
+            from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
     def test_from_warp_gas_data_allows_retry_after_partitioning_failure(
         self, sample_gas_data
     ) -> None:
@@ -1147,8 +1184,8 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=["Only", "Two"])  # Need 3
 
         error_msg = str(exc_info.value)
-        assert "name length 2" in error_msg
-        assert "n_species 3" in error_msg
+        assert "expected 3 names" in error_msg
+        assert "got 2" in error_msg
 
     def test_from_warp_gas_data_allows_retry_after_name_length_failure(
         self, sample_gas_data
@@ -1156,7 +1193,7 @@ class TestFromWarpGasData:
         """Test restore can be retried after correcting the name list."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
-        with pytest.raises(ValueError, match="name length 2"):
+        with pytest.raises(ValueError, match="expected 3 names"):
             from_warp_gas_data(gpu_data, name=["Only", "Two"])
 
         result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
@@ -1173,8 +1210,8 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=[])  # Empty list
 
         error_msg = str(exc_info.value)
-        assert "name length 0" in error_msg
-        assert "n_species 3" in error_msg
+        assert "expected 3 names" in error_msg
+        assert "got 0" in error_msg
 
     def test_gas_data_sync_false(self, sample_gas_data) -> None:
         """Test manual sync with sync=False."""
