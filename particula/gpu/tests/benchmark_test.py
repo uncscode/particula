@@ -90,6 +90,9 @@ from particula.gpu.kernels.coagulation import (  # noqa: E402
 from particula.gpu.kernels.condensation import (  # noqa: E402
     condensation_step_gpu,
 )
+from particula.gpu.tests.mass_precision_cases_test import (  # noqa: E402
+    _build_mass_precision_cases,
+)
 from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
     get_aerodynamic_mobility,
@@ -189,6 +192,11 @@ _benchmark_results: dict[str, Any] = {
     "started_at": datetime.now(timezone.utc).isoformat(),
     "benchmarks": {},
 }
+_MASS_PRECISION_BENCHMARK_CONFIGS: list[tuple[str, int, str]] = [
+    ("npf_cluster", 0, "fp32_absolute_mass"),
+    ("accumulation_mode", 2, "fp32_total_mass_fp32_mass_fraction"),
+    ("cloud_droplet", 3, "mixed_precision_mass_plus_density"),
+]
 
 
 def _save_results() -> None:
@@ -211,6 +219,29 @@ def _skip_if_no_cuda() -> None:
     """
     if not cuda_available(wp):
         pytest.skip("CUDA not available")
+
+
+def _project_mass_precision_candidate(
+    masses: NDArray[np.float64],
+    candidate_id: str,
+) -> NDArray[np.float64]:
+    """Project and reconstruct study-only mass-precision candidates."""
+    if candidate_id == "fp32_absolute_mass":
+        return masses.astype(np.float32).astype(np.float64)
+    if candidate_id == "mixed_precision_mass_plus_density":
+        return masses.astype(np.float32).astype(np.float64)
+    if candidate_id == "fp32_total_mass_fp32_mass_fraction":
+        total_mass = np.sum(masses, axis=-1, dtype=np.float64).astype(np.float32)
+        mass_fractions = np.divide(
+            masses,
+            np.sum(masses, axis=-1, dtype=np.float64)[..., np.newaxis],
+            out=np.zeros_like(masses),
+            where=np.sum(masses, axis=-1, dtype=np.float64)[..., np.newaxis] > 0.0,
+        ).astype(np.float32)
+        return total_mass.astype(np.float64)[..., np.newaxis] * mass_fractions.astype(
+            np.float64
+        )
+    raise ValueError(f"Unsupported candidate id: {candidate_id}")
 
 
 @contextmanager
@@ -1239,5 +1270,42 @@ def test_wp_func_benchmarks() -> None:
             "cpu_us": cpu_brownian_kernel_time / kernel_calls * 1e6,
             "gpu_us": gpu_brownian_kernel_time / n_evals * 1e6,
         },
+    }
+    _save_results()
+
+
+@pytest.mark.parametrize(
+    ("label", "case_index", "candidate_id"),
+    _MASS_PRECISION_BENCHMARK_CONFIGS,
+)
+def test_mass_precision_projection_benchmark(
+    label: str,
+    case_index: int,
+    candidate_id: str,
+) -> None:
+    """Record optional bounded projection timings for P3 study candidates."""
+    _skip_if_no_cuda()
+    case = _build_mass_precision_cases()[case_index]
+    start = time.perf_counter()
+    reconstructed = case.masses
+    repeats = 5_000
+    for _ in range(repeats):
+        reconstructed = _project_mass_precision_candidate(
+            case.masses,
+            candidate_id,
+        )
+    elapsed = time.perf_counter() - start
+
+    assert reconstructed.shape == case.masses.shape
+    entry_key = f"mass_precision_projection_{label}_{candidate_id}"
+    _benchmark_results["benchmarks"][entry_key] = {
+        "case_name": case.case_name,
+        "candidate_id": candidate_id,
+        "repeats": repeats,
+        "elapsed_s": elapsed,
+        "mean_us": elapsed / repeats * 1e6,
+        "n_boxes": case.masses.shape[0],
+        "n_particles": case.masses.shape[1],
+        "n_species": case.masses.shape[2],
     }
     _save_results()
