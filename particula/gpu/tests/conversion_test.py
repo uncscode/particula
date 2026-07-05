@@ -64,6 +64,61 @@ def _assert_environment_round_trip_matches(source, restored) -> None:
     )
 
 
+def _assert_gas_gpu_mirror_matches(
+    source,
+    gpu_data,
+    vapor_pressure: np.ndarray,
+) -> None:
+    """Assert Warp gas mirror preserves audited shapes, values, and dtypes."""
+    assert gpu_data.molar_mass.shape == source.molar_mass.shape
+    assert gpu_data.concentration.shape == source.concentration.shape
+    assert gpu_data.vapor_pressure.shape == vapor_pressure.shape
+    assert gpu_data.partitioning.shape == source.partitioning.shape
+
+    np.testing.assert_array_equal(
+        gpu_data.molar_mass.numpy(), source.molar_mass
+    )
+    np.testing.assert_array_equal(
+        gpu_data.concentration.numpy(),
+        source.concentration,
+    )
+    np.testing.assert_array_equal(
+        gpu_data.vapor_pressure.numpy(),
+        vapor_pressure,
+    )
+    np.testing.assert_array_equal(
+        gpu_data.partitioning.numpy(),
+        source.partitioning.astype(np.int32),
+    )
+
+    assert gpu_data.molar_mass.dtype == wp.float64
+    assert gpu_data.concentration.dtype == wp.float64
+    assert gpu_data.vapor_pressure.dtype == wp.float64
+    assert gpu_data.partitioning.dtype == wp.int32
+
+
+def _assert_gas_round_trip_matches(source, restored) -> None:
+    """Assert CPU→Warp→CPU preserves the GasData-owned schema exactly."""
+    assert restored.name == source.name
+    assert restored.molar_mass.shape == source.molar_mass.shape
+    assert restored.concentration.shape == source.concentration.shape
+    assert restored.partitioning.shape == source.partitioning.shape
+
+    np.testing.assert_array_equal(restored.molar_mass, source.molar_mass)
+    np.testing.assert_array_equal(
+        restored.concentration,
+        source.concentration,
+    )
+    np.testing.assert_array_equal(
+        restored.partitioning,
+        source.partitioning,
+    )
+
+    assert restored.molar_mass.dtype == np.float64
+    assert restored.concentration.dtype == np.float64
+    assert restored.partitioning.dtype == np.bool_
+
+
 @pytest.fixture
 def sample_particle_data():
     """Create sample ParticleData for testing."""
@@ -226,78 +281,65 @@ class TestToWarpGasData:
         assert gpu_data.vapor_pressure is not None
         assert gpu_data.partitioning is not None
 
-    def test_gas_data_shapes_preserved(self, sample_gas_data) -> None:
-        """Test all shapes match expected dimensions."""
+    def test_to_warp_gas_data_preserves_shapes_and_dtypes(
+        self, sample_gas_data
+    ) -> None:
+        """Test the Warp mirror locks the audited gas schema contract."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
-
-        n_boxes, n_species = sample_gas_data.n_boxes, sample_gas_data.n_species
-
-        assert gpu_data.molar_mass.shape == (n_species,)
-        assert gpu_data.concentration.shape == (n_boxes, n_species)
-        assert gpu_data.vapor_pressure.shape == (n_boxes, n_species)
-        assert gpu_data.partitioning.shape == (n_species,)
-
-    def test_gas_data_values_preserved(self, sample_gas_data) -> None:
-        """Test round-trip comparison and dtype verification."""
-        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
-
-        # Verify values match
-        np.testing.assert_array_almost_equal(
-            gpu_data.molar_mass.numpy(),
-            sample_gas_data.molar_mass,
-        )
-        np.testing.assert_array_almost_equal(
-            gpu_data.concentration.numpy(),
-            sample_gas_data.concentration,
+        expected_vapor_pressure = np.zeros(
+            sample_gas_data.concentration.shape,
+            dtype=np.float64,
         )
 
-        # Verify dtypes (float64 for numerical, int32 for partitioning)
-        assert gpu_data.molar_mass.dtype == wp.float64
-        assert gpu_data.concentration.dtype == wp.float64
-        assert gpu_data.vapor_pressure.dtype == wp.float64
-        assert gpu_data.partitioning.dtype == wp.int32
+        _assert_gas_gpu_mirror_matches(
+            sample_gas_data,
+            gpu_data,
+            expected_vapor_pressure,
+        )
+        assert not hasattr(gpu_data, "name")
 
-    def test_gas_data_partitioning_conversion(self, sample_gas_data) -> None:
-        """Test bool to int32 conversion (True->1, False->0)."""
+    def test_to_warp_gas_data_converts_partitioning_bool_to_int32(
+        self, sample_gas_data
+    ) -> None:
+        """Test bool partitioning becomes the GPU int32 contract."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
-        # Original: [True, True, False]
         partitioning_np = gpu_data.partitioning.numpy()
-
-        # Should be [1, 1, 0]
         expected = np.array([1, 1, 0], dtype=np.int32)
-        np.testing.assert_array_equal(partitioning_np, expected)
 
-    def test_gas_data_vapor_pressure_provided(self, sample_gas_data) -> None:
-        """Test with explicit vapor_pressure, verify shape and values."""
-        n_boxes, n_species = sample_gas_data.n_boxes, sample_gas_data.n_species
+        np.testing.assert_array_equal(partitioning_np, expected)
+        assert partitioning_np.dtype == np.int32
+
+    def test_to_warp_gas_data_preserves_explicit_vapor_pressure_values(
+        self, sample_gas_data
+    ) -> None:
+        """Test explicit vapor pressure stays on the GPU mirror unchanged."""
         vp = np.array([[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]])
 
         gpu_data = to_warp_gas_data(
             sample_gas_data, device="cpu", vapor_pressure=vp
         )
 
-        # Verify shape
-        assert gpu_data.vapor_pressure.shape == (n_boxes, n_species)
-
-        # Verify values
-        np.testing.assert_array_almost_equal(
-            gpu_data.vapor_pressure.numpy(), vp
+        _assert_gas_gpu_mirror_matches(
+            sample_gas_data,
+            gpu_data,
+            vp,
         )
 
-    def test_gas_data_vapor_pressure_default_zeros(
+    def test_to_warp_gas_data_defaults_vapor_pressure_to_zeros(
         self, sample_gas_data
     ) -> None:
-        """Test that default vapor_pressure is zeros when not provided."""
+        """Test omitted vapor pressure defaults to zero-filled GPU storage."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
-        n_boxes, n_species = sample_gas_data.n_boxes, sample_gas_data.n_species
-
-        # Should be zeros
-        expected = np.zeros((n_boxes, n_species), dtype=np.float64)
-        np.testing.assert_array_almost_equal(
-            gpu_data.vapor_pressure.numpy(), expected
+        expected = np.zeros(
+            sample_gas_data.concentration.shape, dtype=np.float64
         )
+        np.testing.assert_array_equal(gpu_data.vapor_pressure.numpy(), expected)
+        assert (
+            gpu_data.vapor_pressure.shape == sample_gas_data.concentration.shape
+        )
+        assert gpu_data.vapor_pressure.dtype == wp.float64
 
     def test_gas_data_copy_false_behavior(self, sample_gas_data) -> None:
         """Test that copy=False uses wp.from_numpy()."""
@@ -808,9 +850,10 @@ class TestErrorHandling:
                 error_msg = str(exc_info.value)
                 assert "pip install warp-lang" in error_msg
 
-    def test_vapor_pressure_shape_mismatch(self, sample_gas_data) -> None:
-        """Test wrong shape vapor_pressure raises ValueError with details."""
-        # Wrong shape: should be (2, 3) but we provide (3, 2)
+    def test_to_warp_gas_data_raises_value_error_for_vapor_pressure_shape_mismatch(
+        self, sample_gas_data
+    ) -> None:
+        """Test vapor pressure shape failures report actual and expected dims."""
         wrong_shape_vp = np.ones((3, 2))
 
         with pytest.raises(ValueError) as exc_info:
@@ -907,46 +950,97 @@ class TestFromWarpGasData:
 
         assert isinstance(result, GasData)
 
-    def test_gas_data_round_trip(self, sample_gas_data) -> None:
-        """Test round-trip with original names preserved."""
+    def test_from_warp_gas_data_restores_supplied_names(
+        self, sample_gas_data
+    ) -> None:
+        """Test supplied CPU names survive the round-trip exactly."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
         result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
 
-        # Verify fields match (except vapor_pressure which is lost)
-        assert result.name == sample_gas_data.name
-        np.testing.assert_array_almost_equal(
-            result.molar_mass, sample_gas_data.molar_mass
-        )
-        np.testing.assert_array_almost_equal(
-            result.concentration, sample_gas_data.concentration
-        )
-        np.testing.assert_array_equal(
-            result.partitioning, sample_gas_data.partitioning
-        )
+        _assert_gas_round_trip_matches(sample_gas_data, result)
 
-    def test_gas_data_placeholder_names(self, sample_gas_data) -> None:
-        """Test default placeholder name generation."""
+    def test_from_warp_gas_data_generates_placeholder_names_when_name_missing(
+        self, sample_gas_data
+    ) -> None:
+        """Test omitted names produce the documented placeholder names."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
-        result = from_warp_gas_data(gpu_data)  # No name provided
+        result = from_warp_gas_data(gpu_data)
 
-        # Should have placeholder names
         expected_names = ["species_0", "species_1", "species_2"]
         assert result.name == expected_names
+        assert result.concentration.shape == sample_gas_data.concentration.shape
 
-    def test_gas_data_partitioning_conversion(self, sample_gas_data) -> None:
-        """Test int32->bool conversion for partitioning."""
+    def test_from_warp_gas_data_treats_name_none_as_placeholder_path(
+        self, sample_gas_data
+    ) -> None:
+        """Test explicit name=None follows the same placeholder path."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+        result = from_warp_gas_data(gpu_data, name=None)
+
+        assert result.name == ["species_0", "species_1", "species_2"]
+
+    def test_from_warp_gas_data_converts_partitioning_int32_to_bool(
+        self, sample_gas_data
+    ) -> None:
+        """Test GPU int32 partitioning is restored as NumPy bool values."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
         result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
 
-        # Should be bool dtype
         assert result.partitioning.dtype == np.bool_
-        # Should match original values
         np.testing.assert_array_equal(
             result.partitioning, sample_gas_data.partitioning
         )
 
-    def test_gas_data_name_length_mismatch(self, sample_gas_data) -> None:
-        """Test ValueError for wrong name length."""
+    def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
+        self, sample_gas_data
+    ) -> None:
+        """Test GPU-only vapor pressure is present on GPU and lost on restore."""
+        vapor_pressure = np.array(
+            [[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]],
+            dtype=np.float64,
+        )
+        gpu_data = to_warp_gas_data(
+            sample_gas_data,
+            device="cpu",
+            vapor_pressure=vapor_pressure,
+        )
+
+        np.testing.assert_array_equal(
+            gpu_data.vapor_pressure.numpy(),
+            vapor_pressure,
+        )
+
+        result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        _assert_gas_round_trip_matches(sample_gas_data, result)
+        assert not hasattr(result, "vapor_pressure")
+        assert set(result.__dict__) == {
+            "name",
+            "molar_mass",
+            "concentration",
+            "partitioning",
+        }
+
+    def test_from_warp_gas_data_preserves_multi_box_round_trip(
+        self, sample_gas_data
+    ) -> None:
+        """Test the leading n_boxes dimension survives the full round-trip."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+        result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        assert result.concentration.shape == (
+            sample_gas_data.n_boxes,
+            sample_gas_data.n_species,
+        )
+        np.testing.assert_array_equal(
+            result.concentration,
+            sample_gas_data.concentration,
+        )
+
+    def test_from_warp_gas_data_raises_value_error_for_name_length_mismatch(
+        self, sample_gas_data
+    ) -> None:
+        """Test wrong name lengths fail with actual and expected counts."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         with pytest.raises(ValueError) as exc_info:
@@ -956,8 +1050,10 @@ class TestFromWarpGasData:
         assert "2" in error_msg  # actual length
         assert "3" in error_msg  # expected length
 
-    def test_gas_data_empty_name_list(self, sample_gas_data) -> None:
-        """Test ValueError for empty name list."""
+    def test_from_warp_gas_data_raises_value_error_for_empty_name_list(
+        self, sample_gas_data
+    ) -> None:
+        """Test an empty provided name list is rejected as a mismatch."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         with pytest.raises(ValueError) as exc_info:
