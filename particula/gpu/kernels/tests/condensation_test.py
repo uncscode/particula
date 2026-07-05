@@ -147,26 +147,34 @@ def _cpu_mass_transfer(
     surface_tension: np.ndarray,
     mass_accommodation: np.ndarray,
     diffusion_coefficient_vapor: np.ndarray,
-    temperature: float,
-    pressure: float,
+    temperature: float | np.ndarray,
+    pressure: float | np.ndarray,
     time_step: float,
 ) -> np.ndarray:
     """Compute CPU mass transfer matching GPU kernel physics."""
     n_boxes, n_particles, n_species = particles.masses.shape
     mass_transfer = np.zeros_like(particles.masses)
-    dynamic_viscosity = get_dynamic_viscosity(
-        temperature,
-        reference_viscosity=constants.REF_VISCOSITY_AIR_STP,
-        reference_temperature=constants.REF_TEMPERATURE_STP,
-    )
-    mean_free_path = get_molecule_mean_free_path(
-        molar_mass=constants.MOLECULAR_WEIGHT_AIR,
-        temperature=temperature,
-        pressure=pressure,
-        dynamic_viscosity=dynamic_viscosity,
-    )
+    temperature_array = np.full((n_boxes,), temperature, dtype=np.float64)
+    if isinstance(temperature, np.ndarray):
+        temperature_array = np.asarray(temperature, dtype=np.float64)
+    pressure_array = np.full((n_boxes,), pressure, dtype=np.float64)
+    if isinstance(pressure, np.ndarray):
+        pressure_array = np.asarray(pressure, dtype=np.float64)
 
     for box_idx in range(n_boxes):
+        box_temperature = float(temperature_array[box_idx])
+        box_pressure = float(pressure_array[box_idx])
+        dynamic_viscosity = get_dynamic_viscosity(
+            box_temperature,
+            reference_viscosity=constants.REF_VISCOSITY_AIR_STP,
+            reference_temperature=constants.REF_TEMPERATURE_STP,
+        )
+        mean_free_path = get_molecule_mean_free_path(
+            molar_mass=constants.MOLECULAR_WEIGHT_AIR,
+            temperature=box_temperature,
+            pressure=box_pressure,
+            dynamic_viscosity=dynamic_viscosity,
+        )
         for particle_idx in range(n_particles):
             if particles.concentration[box_idx, particle_idx] == 0.0:
                 continue
@@ -191,7 +199,7 @@ def _cpu_mass_transfer(
                 dynamic_viscosity=dynamic_viscosity,
             )
             diffusion_particle = get_diffusion_coefficient(
-                temperature=temperature,
+                temperature=box_temperature,
                 aerodynamic_mobility=mobility,
                 boltzmann_constant=constants.BOLTZMANN_CONSTANT,
             )
@@ -213,13 +221,13 @@ def _cpu_mass_transfer(
                     effective_surface_tension=surface_tension[species_idx],
                     effective_density=effective_density,
                     molar_mass=gas.molar_mass[species_idx],
-                    temperature=temperature,
+                    temperature=box_temperature,
                 )
                 kelvin_term = get_kelvin_term(radius, kelvin_radius)
                 partial_pressure_gas = get_partial_pressure(
                     concentration=gas.concentration[box_idx, species_idx],
                     molar_mass=gas.molar_mass[species_idx],
-                    temperature=temperature,
+                    temperature=box_temperature,
                 )
                 pressure_delta = get_partial_pressure_delta(
                     partial_pressure_gas=partial_pressure_gas,
@@ -231,7 +239,7 @@ def _cpu_mass_transfer(
                 mass_rate = get_mass_transfer_rate(
                     pressure_delta=pressure_delta,
                     first_order_mass_transport=mass_transport,
-                    temperature=temperature,
+                    temperature=box_temperature,
                     molar_mass=gas.molar_mass[species_idx],
                 )
                 mass_transfer[box_idx, particle_idx, species_idx] = (
@@ -244,14 +252,15 @@ def _run_gpu_step(
     particles: ParticleData,
     gas: GasData,
     vapor_pressure: np.ndarray,
-    temperature: float,
-    pressure: float,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
     time_step: float,
     device: str,
     surface_tension: np.ndarray | None = None,
     mass_accommodation: np.ndarray | None = None,
     diffusion_coefficient_vapor: np.ndarray | None = None,
     mass_transfer: Any | None = None,
+    environment: Any | None = None,
 ) -> tuple[ParticleData, Any]:
     """Run GPU condensation step and return CPU particle data."""
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -270,6 +279,7 @@ def _run_gpu_step(
         mass_accommodation=mass_accommodation,
         diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         mass_transfer=mass_transfer,
+        environment=environment,
     )
     return (
         from_warp_particle_data(gpu_particles, sync=True),
@@ -280,7 +290,7 @@ def _run_gpu_step(
 def test_condensation_step_gpu_signature_keeps_environment_keyword_only() -> (
     None
 ):
-    """The reserved environment input stays keyword-only in P1."""
+    """The explicit environment input stays keyword-only."""
     parameter = inspect.signature(condensation_step_gpu).parameters[
         "environment"
     ]
@@ -344,7 +354,7 @@ def test_condensation_step_gpu_rejects_mixed_environment_inputs(
 
     with pytest.raises(
         ValueError,
-        match="scalar temperature/pressure inputs with environment",
+        match="direct temperature/pressure inputs with environment",
     ):
         condensation_step_gpu(
             gpu_particles,
@@ -356,10 +366,10 @@ def test_condensation_step_gpu_rejects_mixed_environment_inputs(
         )
 
 
-def test_condensation_step_gpu_rejects_explicit_environment_in_p1(
+def test_condensation_step_gpu_accepts_explicit_environment(
     device: str,
 ) -> None:
-    """Pure environment execution is reserved for a later phase."""
+    """Pure ``environment=...`` execution succeeds when inputs are valid."""
     particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
     gas = _make_gas_data(n_boxes=1, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
@@ -374,18 +384,26 @@ def test_condensation_step_gpu_rejects_explicit_environment_in_p1(
         vapor_pressure=vapor_pressure,
     )
 
-    with pytest.raises(
-        ValueError,
-        match="environment execution is not implemented in P1",
-    ):
-        condensation_step_gpu(
-            gpu_particles,
-            gpu_gas,
-            temperature=None,
-            pressure=None,
-            time_step=0.1,
-            environment=environment,
-        )
+    _, scalar_mass_transfer = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+    )
+    scalar_result = np.asarray(scalar_mass_transfer.numpy()).copy()
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    _, environment_mass_transfer = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=None,
+        pressure=None,
+        time_step=0.1,
+        environment=environment,
+    )
+
+    npt.assert_allclose(environment_mass_transfer.numpy(), scalar_result)
 
 
 @pytest.mark.parametrize(
@@ -431,12 +449,12 @@ def test_condensation_step_gpu_rejects_missing_scalar_inputs_without_environment
         (
             298.15,
             101325.0,
-            "scalar temperature/pressure inputs with environment",
+            "direct temperature/pressure inputs with environment",
         ),
         (
             None,
             None,
-            "environment execution is not implemented in P1",
+            r"\(n_boxes,\)",
         ),
     ],
 )
@@ -447,14 +465,14 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
     pressure: float | None,
     message: str,
 ) -> None:
-    """Contract errors fire before scalar gas-property helper calls."""
+    """Contract errors fire before buffer preparation or Warp launch work."""
     particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
     gas = _make_gas_data(n_boxes=1, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
-    environment = to_warp_environment_data(
-        _make_environment_data(n_boxes=1, n_species=1),
-        device=device,
-    )
+    environment_data = _make_environment_data(n_boxes=1, n_species=1)
+    if temperature is None and pressure is None:
+        environment_data.temperature = np.array([298.15, 299.15])
+    environment = to_warp_environment_data(environment_data, device=device)
     gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_gas = to_warp_gas_data(
         gas,
@@ -463,24 +481,11 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
     )
     calls: list[str] = []
 
-    def _unexpected_dynamic_viscosity(*args: Any, **kwargs: Any) -> float:
-        calls.append("dynamic_viscosity")
-        raise AssertionError("get_dynamic_viscosity should not be called")
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
 
-    def _unexpected_mean_free_path(*args: Any, **kwargs: Any) -> float:
-        calls.append("mean_free_path")
-        raise AssertionError("get_molecule_mean_free_path should not be called")
-
-    monkeypatch.setattr(
-        condensation_module,
-        "get_dynamic_viscosity",
-        _unexpected_dynamic_viscosity,
-    )
-    monkeypatch.setattr(
-        condensation_module,
-        "get_molecule_mean_free_path",
-        _unexpected_mean_free_path,
-    )
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(ValueError, match=message):
         condensation_step_gpu(
@@ -509,7 +514,7 @@ def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helper
     temperature: float | None,
     pressure: float | None,
 ) -> None:
-    """Missing scalar inputs fail before scalar gas-property helpers."""
+    """Missing direct inputs fail before buffer preparation or launch work."""
     particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
     gas = _make_gas_data(n_boxes=1, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
@@ -521,24 +526,11 @@ def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helper
     )
     calls: list[str] = []
 
-    def _unexpected_dynamic_viscosity(*args: Any, **kwargs: Any) -> float:
-        calls.append("dynamic_viscosity")
-        raise AssertionError("get_dynamic_viscosity should not be called")
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
 
-    def _unexpected_mean_free_path(*args: Any, **kwargs: Any) -> float:
-        calls.append("mean_free_path")
-        raise AssertionError("get_molecule_mean_free_path should not be called")
-
-    monkeypatch.setattr(
-        condensation_module,
-        "get_dynamic_viscosity",
-        _unexpected_dynamic_viscosity,
-    )
-    monkeypatch.setattr(
-        condensation_module,
-        "get_molecule_mean_free_path",
-        _unexpected_mean_free_path,
-    )
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(
         ValueError,
@@ -553,6 +545,253 @@ def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helper
         )
 
     assert calls == []
+
+
+def test_condensation_step_gpu_accepts_direct_environment_arrays(
+    device: str,
+) -> None:
+    """Direct ``(n_boxes,)`` Warp-array inputs match scalar results."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    temperature_values = np.array([298.15, 301.15], dtype=np.float64)
+    pressure_values = np.array([101325.0, 100800.0], dtype=np.float64)
+    expected = _cpu_mass_transfer(
+        particles,
+        gas,
+        vapor_pressure,
+        np.array([0.072], dtype=np.float64),
+        np.array([1.0], dtype=np.float64),
+        np.array([2.0e-5], dtype=np.float64),
+        temperature_values,
+        pressure_values,
+        0.1,
+    )
+
+    gpu_result, mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=wp.array(
+            temperature_values, dtype=wp.float64, device=device
+        ),
+        pressure=wp.array(pressure_values, dtype=wp.float64, device=device),
+        time_step=0.1,
+        device=device,
+    )
+
+    npt.assert_allclose(mass_transfer.numpy(), expected, rtol=1.0e-10)
+    npt.assert_allclose(
+        gpu_result.masses, np.maximum(particles.masses + expected, 0.0)
+    )
+
+
+@pytest.mark.parametrize(
+    ("temperature_input", "pressure_input"),
+    [
+        (
+            298.15,
+            np.array([101325.0, 100800.0], dtype=np.float64),
+        ),
+        (
+            np.array([298.15, 301.15], dtype=np.float64),
+            101325.0,
+        ),
+    ],
+)
+def test_condensation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
+    device: str,
+    temperature_input: float | np.ndarray,
+    pressure_input: float | np.ndarray,
+) -> None:
+    """Hybrid direct inputs match the CPU reference path."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    temperature_values = (
+        np.full((2,), temperature_input, dtype=np.float64)
+        if isinstance(temperature_input, float)
+        else temperature_input
+    )
+    pressure_values = (
+        np.full((2,), pressure_input, dtype=np.float64)
+        if isinstance(pressure_input, float)
+        else pressure_input
+    )
+    expected = _cpu_mass_transfer(
+        particles,
+        gas,
+        vapor_pressure,
+        np.array([0.072], dtype=np.float64),
+        np.array([1.0], dtype=np.float64),
+        np.array([2.0e-5], dtype=np.float64),
+        temperature_values,
+        pressure_values,
+        0.1,
+    )
+
+    temperature = temperature_input
+    if isinstance(temperature_input, np.ndarray):
+        temperature = wp.array(
+            temperature_input, dtype=wp.float64, device=device
+        )
+    pressure = pressure_input
+    if isinstance(pressure_input, np.ndarray):
+        pressure = wp.array(pressure_input, dtype=wp.float64, device=device)
+
+    _, mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=0.1,
+        device=device,
+    )
+
+    npt.assert_allclose(mass_transfer.numpy(), expected, rtol=1.0e-10)
+
+
+def test_condensation_step_gpu_environment_shape_mismatch_raises_value_error(
+    device: str,
+) -> None:
+    """Environment arrays must match ``(n_boxes,)`` before launch work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    environment = to_warp_environment_data(
+        _make_environment_data(1, 1), device=device
+    )
+    environment.temperature = wp.array(
+        [298.15, 299.15], dtype=wp.float64, device=device
+    )
+
+    with pytest.raises(ValueError, match=r"\(n_boxes,\)"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+def test_condensation_step_gpu_environment_device_mismatch_raises_value_error(
+    device: str,
+) -> None:
+    """Environment arrays on the wrong device fail before launch work."""
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not cuda_available(wp):
+        pytest.skip("CUDA not available for mismatch test")
+
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    environment = to_warp_environment_data(
+        _make_environment_data(1, 1),
+        device=wrong_device,
+    )
+
+    with pytest.raises(ValueError, match="environment.temperature device"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+def test_condensation_step_gpu_direct_temperature_shape_mismatch_raises(
+    device: str,
+) -> None:
+    """Direct temperature arrays must match ``(n_boxes,)`` before launch."""
+    particles = _make_particle_data(n_boxes=2, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    temperature = wp.array([298.15], dtype=wp.float64, device=device)
+
+    with pytest.raises(ValueError, match=r"temperature shape .*\(n_boxes,\)"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=101325.0,
+            time_step=0.1,
+        )
+
+
+def test_condensation_step_gpu_direct_pressure_device_mismatch_raises(
+    device: str,
+) -> None:
+    """Direct pressure arrays on the wrong device fail before launch."""
+    wrong_device = "cpu" if device == "cuda" else "cuda"
+    if wrong_device == "cuda" and not cuda_available(wp):
+        pytest.skip("CUDA not available for mismatch test")
+
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    pressure = wp.array([101325.0], dtype=wp.float64, device=wrong_device)
+
+    with pytest.raises(ValueError, match="pressure device"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=pressure,
+            time_step=0.1,
+        )
+
+
+def test_condensation_step_gpu_prepares_box_properties_once_per_call(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Condensation precomputes box properties once per entry-point call."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    launch_names: list[str] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launch_names.append(getattr(kernel, "key", str(kernel)))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+
+    condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+    )
+
+    assert launch_names.count("_prepare_environment_properties_kernel") == 1
 
 
 def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
