@@ -57,6 +57,11 @@ mass = (4.0 / 3.0) * π * radius^3 * density
 Mixed-species cases split the implied total particle volume across fixed species
 volume fractions before converting each species volume to mass.
 
+The regression suite reconstructs the expected radii for every deterministic
+case, including the mixed-species `accumulation_mode` and `cloud_droplet`
+baselines, from the authored total particle volume implied by those masses and
+densities.
+
 All reported radii use meters, densities use `kg/m^3`, and volume fractions are
 unitless fractions.
 
@@ -64,7 +69,8 @@ unitless fractions.
 
 - No random draws are used.
 - Arrays are rebuilt from fixed constants.
-- Tests assert exact rerun stability and exact Warp CPU-device round trips.
+- Tests assert exact rerun stability and exact Warp CPU-device round trips for
+  representative single-species and mixed-species cases.
 - Tests also assert finiteness, nonnegative masses, and malformed-input
   rejection.
 
