@@ -14530,9 +14530,22 @@ in strategies and runnables:</p>
 <p><code>EnvironmentData</code> is the shipped CPU container for per-box thermodynamic
 state, not a separate gas facade. It is available from
 <code>particula.gas.environment_data</code> and is exported from <code>particula.gas</code> for
-package-level imports. It requires at least one box at construction time,
-but it does not yet participate in CPU↔GPU conversion helpers or broad
-high-level workflow integration.</p>
+package-level imports. It requires at least one box at construction time.
+The only shipped CPU↔GPU transfer boundary is the explicit helper trio
+<code>particula.gpu.WarpEnvironmentData</code>,
+<code>particula.gpu.to_warp_environment_data()</code>, and
+<code>particula.gpu.from_warp_environment_data()</code>. The shape contract stays
+fixed across that boundary:
+<code>temperature</code>/<code>pressure -&gt; (n_boxes,)</code> and
+<code>saturation_ratio -&gt; (n_boxes, n_species)</code>. Current regression coverage
+checks one-box and multi-box CPU→Warp→CPU round trips, always on Warp <code>cpu</code>
+and additionally on Warp <code>cuda</code> when available. Those transfers remain
+explicit helper calls only: kernels and runnables do not perform hidden
+CPU↔GPU environment synchronization or movement, and CUDA is optional
+rather than required. Current tests also cover default synchronized
+restore, manual <code>sync=False</code> restore after explicit synchronization, and
+schema validation failures. This documents the helper surface only, not a
+broader automatic runtime integration.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -14861,7 +14874,14 @@ CPU side. <code>EnvironmentData</code> owns <code>temperature</code>, <code>pres
 <code>saturation_ratio</code>; <code>GasData</code> does not. Keep current scalar <code>temperature</code> and
 <code>pressure</code> arguments where the process API has not yet been migrated; migrated
 process code may read <code>EnvironmentData</code> directly, but only the physical model
-that owns the update should mutate it.</p>
+that owns the update should mutate it. When a GPU round trip is needed, use
+the explicit helper boundary only:
+<code>particula.gpu.WarpEnvironmentData</code>,
+<code>particula.gpu.to_warp_environment_data()</code>, and
+<code>particula.gpu.from_warp_environment_data()</code>. Keep the documented shapes
+unchanged across that boundary—<code>temperature</code> and <code>pressure</code> stay
+<code>(n_boxes,)</code>, while <code>saturation_ratio</code> stays <code>(n_boxes, n_species)</code>—and do
+not expect kernels or runnables to move environment state for you.</p>
 <h2 id="conversion-helpers">Conversion helpers<a class="headerlink" href="#conversion-helpers" title="Permanent link">&para;</a></h2>
 <p>Use the conversion helpers when you need to bridge old and new APIs:</p>
 <ul>

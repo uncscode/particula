@@ -14164,8 +14164,9 @@ more simulation boxes. Separating this state from gas-species data lets
 multi-box workflows manage shared thermodynamic conditions independently.</p>
 <p><code>EnvironmentData</code> is a constructor-validated CPU-side container in
 <code>particula.gas.environment_data</code> and is also exported from
-<code>particula.gas</code> for package-level imports. It does not yet have CPU↔GPU
-conversion helpers.</p>
+<code>particula.gas</code> for package-level imports. Warp transfer helpers such as
+<code>to_warp_environment_data</code> and <code>from_warp_environment_data</code> live in
+<code>particula.gpu.conversion</code> and enable CPU↔GPU environment round trips.</p>
 
 
 
@@ -14296,8 +14297,7 @@ shape <code>(n_boxes, n_species)</code>.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/gas/environment_data.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
-<span class="normal">45</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
@@ -14322,7 +14322,8 @@ shape <code>(n_boxes, n_species)</code>.</p>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
@@ -14432,8 +14433,7 @@ or physical-bound validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/environment_data.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
-<span class="normal">73</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">73</span>
 <span class="normal">74</span>
 <span class="normal">75</span>
 <span class="normal">76</span>
@@ -14442,7 +14442,8 @@ or physical-bound validation.</p>
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the normalized field contract.</span>
 
 <span class="sd">    Raises:</span>
@@ -14506,8 +14507,7 @@ or physical-bound validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gas/environment_data.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
-<span class="normal"> 94</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
@@ -14517,7 +14517,8 @@ or physical-bound validation.</p>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EnvironmentData&quot;</span><span class="p">:</span>
+<span class="normal">104</span>
+<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EnvironmentData&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an independent copy of the environment state.</span>
 
 <span class="sd">    Returns:</span>

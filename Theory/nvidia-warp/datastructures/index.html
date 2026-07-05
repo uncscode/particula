@@ -13232,6 +13232,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Data Transfer Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environmentdata-round-trip-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EnvironmentData Round-Trip Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -14581,6 +14598,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Data Transfer Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environmentdata-round-trip-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EnvironmentData Round-Trip Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -14945,6 +14979,63 @@
 <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="n">output_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">gpu_array</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 </code></pre></div>
+<p>For environment state, the same rule applies through explicit helper APIs only.
+<code>particula.gpu.WarpEnvironmentData</code> is the Warp-side mirror of
+<code>particula.gas.EnvironmentData</code>: the CPU object owns the host-side
+thermodynamic state, while the Warp object keeps the same logical fields in
+Warp arrays on the selected device. Callers choose when to cross the CPU↔GPU
+boundary with <code>to_warp_environment_data()</code> and
+<code>from_warp_environment_data()</code>. Kernels and runnables do not perform hidden
+CPU↔GPU environment transfers or synchronization for you, and CUDA support is
+optional rather than required for this helper workflow.</p>
+<h4 id="environmentdata-round-trip-example">EnvironmentData Round-Trip Example<a class="headerlink" href="#environmentdata-round-trip-example" title="Permanent link">&para;</a></h4>
+<p>This explicit round trip keeps the same shape contract on both sides of the
+transfer:</p>
+<ul>
+<li><code>temperature</code>: <code>(n_boxes,)</code></li>
+<li><code>pressure</code>: <code>(n_boxes,)</code></li>
+<li><code>saturation_ratio</code>: <code>(n_boxes, n_species)</code></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvironmentData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">WarpEnvironmentData</span><span class="p">,</span>
+    <span class="n">from_warp_environment_data</span><span class="p">,</span>
+    <span class="n">to_warp_environment_data</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">environment</span> <span class="o">=</span> <span class="n">EnvironmentData</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">298.15</span><span class="p">,</span> <span class="mf">305.0</span><span class="p">]),</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">101325.0</span><span class="p">,</span> <span class="mf">90000.0</span><span class="p">]),</span>
+    <span class="n">saturation_ratio</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">]],</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">gpu_environment</span><span class="p">:</span> <span class="n">WarpEnvironmentData</span> <span class="o">=</span> <span class="n">to_warp_environment_data</span><span class="p">(</span>
+    <span class="n">environment</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">restored</span> <span class="o">=</span> <span class="n">from_warp_environment_data</span><span class="p">(</span><span class="n">gpu_environment</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">restored</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span>
+<span class="k">assert</span> <span class="n">restored</span><span class="o">.</span><span class="n">pressure</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span>
+<span class="k">assert</span> <span class="n">restored</span><span class="o">.</span><span class="n">saturation_ratio</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">restored</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span> <span class="n">environment</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">restored</span><span class="o">.</span><span class="n">pressure</span><span class="p">,</span> <span class="n">environment</span><span class="o">.</span><span class="n">pressure</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span>
+    <span class="n">restored</span><span class="o">.</span><span class="n">saturation_ratio</span><span class="p">,</span>
+    <span class="n">environment</span><span class="o">.</span><span class="n">saturation_ratio</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Use <code>device="cpu"</code> for a portable round trip on any Warp installation.
+<code>device="cuda"</code> is optional and should be used only when Warp CUDA support is
+available. The important design rule is that transfer boundaries stay visible:
+build <code>EnvironmentData</code>, convert explicitly to <code>WarpEnvironmentData</code>, let
+kernels or runnables consume that mirror in place, and convert back to
+<code>EnvironmentData</code> only when CPU-side analysis or control flow actually needs
+the data.</p>
 <h3 id="pre-allocation">Pre-allocation<a class="headerlink" href="#pre-allocation" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Pre-allocate all arrays before simulation loop</span>
 <span class="n">positions</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_particles</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">vec3</span><span class="p">)</span>
