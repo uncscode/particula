@@ -701,7 +701,7 @@ def test_coagulation_step_gpu_reuses_direct_environment_arrays(
 def test_coagulation_step_gpu_uniform_direct_arrays_match_scalar_results(
     device: str,
 ) -> None:
-    """Uniform direct arrays stay within stochastic tolerance of scalars."""
+    """Uniform direct arrays stay within the established tolerance band."""
     particles = _make_particle_data(n_boxes=2, n_particles=6, n_species=1)
     seeds = range(11, 19)
     time_step = 0.5
@@ -1005,6 +1005,7 @@ def test_coagulation_step_gpu_nonuniform_environment_changes_collision_trend(
 ) -> None:
     """Nonuniform environment inputs shift box-local collisions directionally."""
     particles = _make_particle_data(n_boxes=2, n_particles=12, n_species=1)
+    particles.masses[1, :, :] = particles.masses[0, :, :]
     temperature = np.array([250.0, 350.0], dtype=np.float64)
     pressure = np.array([150000.0, 50000.0], dtype=np.float64)
     environment = to_warp_environment_data(
@@ -1016,22 +1017,26 @@ def test_coagulation_step_gpu_nonuniform_environment_changes_collision_trend(
         device=device,
     )
     density_value = float(np.asarray(particles.density).item())
-    mass_values = np.asarray(particles.masses[0, :, 0], dtype=np.float64)
-    radii = np.cbrt(3.0 * mass_values / (4.0 * np.pi * density_value))
+    mass_values = np.asarray(particles.masses[:, :, 0], dtype=np.float64)
     expected_rates = np.array(
         [
             np.sum(
                 np.asarray(
                     get_brownian_kernel_via_system_state(
-                        particle_radius=radii,
-                        particle_mass=mass_values,
+                        particle_radius=np.cbrt(
+                            3.0
+                            * box_mass_values
+                            / (4.0 * np.pi * density_value)
+                        ),
+                        particle_mass=box_mass_values,
                         temperature=temp_value,
                         pressure=pressure_value,
                     ),
                     dtype=np.float64,
-                )[np.triu_indices(len(radii), k=1)]
+                )[np.triu_indices(len(box_mass_values), k=1)]
             )
-            for temp_value, pressure_value in zip(
+            for box_mass_values, temp_value, pressure_value in zip(
+                mass_values,
                 temperature,
                 pressure,
                 strict=True,
