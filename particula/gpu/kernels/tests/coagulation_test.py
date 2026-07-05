@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+import inspect
+
 # pyright: reportArgumentType=false
 # pyright: reportAssignmentType=false
 # pyright: reportGeneralTypeIssues=false
@@ -20,12 +22,15 @@ import pytest
 
 wp = pytest.importorskip("warp")
 
+import particula.gpu.kernels.coagulation as coagulation_module  # noqa: E402
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel_via_system_state,
 )
+from particula.gas.environment_data import EnvironmentData  # noqa: E402
 from particula.gas.gas_data import GasData  # noqa: E402
 from particula.gpu.conversion import (  # noqa: E402
     from_warp_particle_data,
+    to_warp_environment_data,
     to_warp_particle_data,
 )
 from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
@@ -118,6 +123,166 @@ def _make_gas_data(n_boxes: int, n_species: int) -> GasData:
         concentration=concentration,
         partitioning=partitioning,
     )
+
+
+def _make_environment_data(
+    n_boxes: int,
+    n_species: int,
+    temperature: float = 298.15,
+    pressure: float = 101325.0,
+) -> EnvironmentData:
+    """Create deterministic environment data for contract tests."""
+    return EnvironmentData(
+        temperature=np.full((n_boxes,), temperature, dtype=np.float64),
+        pressure=np.full((n_boxes,), pressure, dtype=np.float64),
+        saturation_ratio=np.ones((n_boxes, n_species), dtype=np.float64),
+    )
+
+
+def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> None:
+    """The reserved environment input stays keyword-only in P1."""
+    parameter = inspect.signature(coagulation_step_gpu).parameters[
+        "environment"
+    ]
+
+    assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
+
+
+def test_coagulation_step_gpu_scalar_positional_call_remains_valid(
+    device: str,
+) -> None:
+    """Legacy positional scalar callers remain source-compatible."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    _, collision_pairs, collision_counts = coagulation_step_gpu(
+        gpu_particles,
+        298.15,
+        101325.0,
+        0.1,
+        max_collisions=4,
+        rng_seed=3,
+    )
+    wp.synchronize()
+
+    assert collision_pairs.shape == (1, 4, 2)
+    assert collision_counts.shape == (1,)
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, 101325.0),
+        (298.15, None),
+        (None, 101325.0),
+    ],
+)
+def test_coagulation_step_gpu_rejects_mixed_environment_inputs(
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+) -> None:
+    """Mixed scalar and environment inputs raise a stable contract error."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    with pytest.raises(
+        ValueError,
+        match="scalar temperature/pressure inputs with environment",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+def test_coagulation_step_gpu_rejects_explicit_environment_in_p1(
+    device: str,
+) -> None:
+    """Pure environment execution is reserved for a later phase."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    with pytest.raises(
+        ValueError,
+        match="environment execution is not implemented in P1",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "message"),
+    [
+        (
+            298.15,
+            101325.0,
+            "scalar temperature/pressure inputs with environment",
+        ),
+        (
+            None,
+            None,
+            "environment execution is not implemented in P1",
+        ),
+    ],
+)
+def test_coagulation_step_gpu_contract_errors_short_circuit_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+    message: str,
+) -> None:
+    """Contract errors fire before volume setup or any Warp launch."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    calls: list[str] = []
+
+    def _unexpected_ensure_volume_array(*args: Any, **kwargs: Any) -> Any:
+        calls.append("ensure_volume_array")
+        raise AssertionError("_ensure_volume_array should not be called")
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(
+        coagulation_module,
+        "_ensure_volume_array",
+        _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(ValueError, match=message):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            environment=environment,
+        )
+
+    assert calls == []
 
 
 @wp.kernel
@@ -244,7 +409,7 @@ def test_brownian_kernel_matrix_parity_gpu_cpu(device: str) -> None:
     npt.assert_allclose(kernel_wp.numpy(), expected, rtol=1.0e-7)
 
 
-def test_coagulation_statistical_collision_rate(device: str) -> None:  # noqa: E1136, E1135
+def test_coagulation_statistical_collision_rate(device: str) -> None:
     """Collision counts follow expected Brownian rate statistics."""
     temperature = 298.15
     pressure = 101325.0
@@ -337,6 +502,36 @@ def test_coagulation_mass_conservation(device: str) -> None:
 
     final_mass = np.sum(result.masses)
     npt.assert_allclose(final_mass, initial_mass, rtol=1.0e-12)
+
+
+def test_coagulation_step_gpu_reuses_preallocated_buffers(
+    device: str,
+) -> None:
+    """Preallocated coagulation buffers are reused without reallocation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    volume = wp.array(np.array([1.0e-6]), dtype=wp.float64, device=device)
+    collision_pairs = wp.zeros((1, 4, 2), dtype=wp.int32, device=device)
+    n_collisions = wp.zeros((1,), dtype=wp.int32, device=device)
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    _, returned_pairs, returned_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        volume=volume,
+        max_collisions=4,
+        rng_seed=11,
+        collision_pairs=collision_pairs,
+        n_collisions=n_collisions,
+        rng_states=rng_states,
+    )
+    wp.synchronize()
+
+    assert returned_pairs is collision_pairs
+    assert returned_counts is n_collisions
+    assert np.all(np.asarray(n_collisions.numpy()) >= 0)
 
 
 def test_coagulation_marks_inactive_particles(device: str) -> None:
@@ -707,6 +902,36 @@ def test_coagulation_ensure_volume_array(device: str) -> None:
 
     volume_array = _ensure_volume_array(1.5e-6, n_boxes=2, device=device)
     _validate_device_match("volume", volume_array, volume_array.device)
+
+
+def test_coagulation_validation_helpers_accept_valid_inputs(device: str) -> None:
+    """Validation helpers accept matching buffers and volume arrays."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    collision_pairs = wp.zeros((1, 2, 2), dtype=wp.int32, device=device)
+    n_collisions = wp.zeros((1,), dtype=wp.int32, device=device)
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    volume = wp.array(np.array([1.0e-6]), dtype=wp.float64, device=device)
+
+    _validate_particle_arrays(gpu_particles, 1, 2, 1)
+    _validate_collision_pairs(
+        collision_pairs,
+        (1, 2, 2),
+        gpu_particles.masses.device,
+    )
+    _validate_collision_counts(
+        n_collisions,
+        (1,),
+        gpu_particles.masses.device,
+    )
+    _validate_rng_states(rng_states, (1,), gpu_particles.masses.device)
+
+    returned_volume = _ensure_volume_array(
+        volume,
+        n_boxes=1,
+        device=volume.device,
+    )
+    assert returned_volume is volume
 
 
 def test_initialize_rng_states_changes_output(device: str) -> None:

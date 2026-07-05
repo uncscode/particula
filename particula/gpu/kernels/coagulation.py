@@ -46,6 +46,15 @@ from particula.gpu.properties.particle_properties import (
     mean_thermal_speed_wp,
 )
 
+_MIXED_ENVIRONMENT_ERROR = (
+    "Cannot mix scalar temperature/pressure inputs with environment in "
+    "coagulation_step_gpu."
+)
+_UNSUPPORTED_ENVIRONMENT_ERROR = (
+    "environment execution is not implemented in P1 for "
+    "coagulation_step_gpu."
+)
+
 
 @no_type_check
 @wp.kernel
@@ -512,8 +521,8 @@ def _ensure_volume_array(
 
 def coagulation_step_gpu(
     particles: Any,
-    temperature: float,
-    pressure: float,
+    temperature: float | None,
+    pressure: float | None,
     time_step: float,
     volume: float | Any | None = None,
     max_collisions: int = 256,
@@ -521,13 +530,19 @@ def coagulation_step_gpu(
     collision_pairs: Any | None = None,
     n_collisions: Any | None = None,
     rng_states: Any | None = None,
+    *,
+    environment: Any | None = None,
 ) -> tuple[Any, Any, Any]:
     """Execute one Brownian coagulation timestep on the GPU.
 
     Args:
         particles: GPU-resident particle data.
-        temperature: Gas temperature in kelvin.
-        pressure: Gas pressure in pascals.
+        temperature: Scalar gas temperature in kelvin for the supported P1
+            execution path. Use ``None`` only with ``environment=...`` to
+            exercise the reserved explicit-environment contract.
+        pressure: Scalar gas pressure in pascals for the supported P1
+            execution path. Use ``None`` only with ``environment=...`` to
+            exercise the reserved explicit-environment contract.
         time_step: Coagulation time step in seconds.
         volume: Per-box volume [m^3]. If None, uses ``particles.volume``.
         max_collisions: Maximum number of collisions per box.
@@ -535,13 +550,42 @@ def coagulation_step_gpu(
         collision_pairs: Optional preallocated collision buffer.
         n_collisions: Optional preallocated collision count buffer.
         rng_states: Optional preallocated RNG state buffer.
+        environment: Reserved keyword-only explicit environment input for a
+            future phase. When implemented, this will accept
+            ``WarpEnvironmentData`` with ``(n_boxes,)`` temperature and
+            pressure arrays.
 
     Returns:
         Tuple of updated particle data, collision pairs, and collision counts.
 
     Raises:
         ValueError: If array shapes or devices mismatch expectations.
+        ValueError: If ``environment`` is mixed with scalar ``temperature`` or
+            ``pressure`` inputs.
+        ValueError: If ``environment`` is supplied with both scalar inputs
+            omitted because explicit environment execution is reserved for P1+
+            follow-up work.
+
+    Notes:
+        ``environment`` is keyword-only in P1 so existing positional scalar
+        callers remain source-compatible and do not gain a new positional API
+        dependency.
+
+        P1 keeps scalar ``temperature`` and ``pressure`` as the only supported
+        execution path. Mixed calls such as
+        ``temperature=<scalar>, pressure=None, environment=...`` and
+        ``temperature=None, pressure=<scalar>, environment=...`` are treated
+        as ambiguous mixed-input calls and raise ``ValueError`` instead of
+        applying precedence. Pure explicit-environment calls using
+        ``temperature=None, pressure=None, environment=...`` also raise
+        ``ValueError`` in P1 until the later Brownian-kernel launch inputs
+        migrate to per-box environment state.
     """
+    if environment is not None:
+        if temperature is not None or pressure is not None:
+            raise ValueError(_MIXED_ENVIRONMENT_ERROR)
+        raise ValueError(_UNSUPPORTED_ENVIRONMENT_ERROR)
+
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
@@ -581,6 +625,8 @@ def coagulation_step_gpu(
     else:
         _validate_rng_states(rng_states, expected_counts_shape, device)
 
+    # Future phases will feed per-box environment state into these launch
+    # inputs instead of the current scalar temperature and pressure values.
     radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     diffusivities = wp.zeros(
         (n_boxes, n_particles), dtype=wp.float64, device=device
