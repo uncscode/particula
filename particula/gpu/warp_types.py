@@ -100,8 +100,11 @@ class WarpGasData:
         - The ``partitioning`` field uses int32 instead of bool for GPU
           compatibility (1 = True, 0 = False) and is expected to remain
           binary for CPU restore.
-        - ``vapor_pressure`` is added for GPU kernels and is not part of
-          CPU ``GasData``, so CPU restore helpers intentionally drop it.
+        - ``vapor_pressure`` is GPU-only helper state for condensation-style
+          kernels and is not part of CPU ``GasData`` ownership. CPU restore
+          helpers therefore drop it intentionally, so callers must read it
+          from the GPU container or preserve a sidecar if they still need
+          those values.
 
     Attributes:
         molar_mass: Molar masses in kg/mol.
@@ -111,7 +114,7 @@ class WarpGasData:
             Shape: (n_boxes, n_species)
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)
-            Added for GPU condensation kernels.
+            GPU-only helper state for condensation kernels.
         partitioning: Whether each species can partition to particles.
             Shape: (n_species,)
             Uses int32 (1=True, 0=False) for GPU compatibility.
