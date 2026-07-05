@@ -1,16 +1,21 @@
 # E2-F6 Phase Details
 
-- [ ] **E2-F6-P1:** Define NPF-to-droplet numerical cases and fp64 baseline with validation checks
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F6-P1:** Define NPF-to-droplet numerical cases and fp64 baseline with validation checks
+  - Issue: #1208 | Size: S | Status: Shipped
   - Goal: Build deterministic study cases covering NPF clusters, small
     particles, accumulation-mode particles, and cloud-droplet-scale masses.
   - Files: `docs/Features/Roadmap/mass-precision-study.md`,
-    `particula/gpu/tests/mass_precision_cases_test.py`, and an optional small
-    helper module such as `particula/gpu/tests/mass_precision_case_helpers.py`
-    if the case-building logic exceeds a single test file.
-  - Tests: Unit tests or reproducibility checks for case generation, expected
-    shapes, finite values, nonnegative masses, and baseline `fp64` reference
-    calculations.
+    `docs/Features/Roadmap/index.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, and
+    `particula/gpu/tests/mass_precision_cases_test.py`.
+  - Delivered: Added deterministic baseline cases for `npf_cluster`,
+    `five_to_ten_nm`, `accumulation_mode`, and `cloud_droplet`; recorded the
+    current `np.float64` / `wp.float64` baseline policy; and linked the new
+    roadmap page from existing roadmap artifacts.
+  - Tests: `mass_precision_cases_test.py` now covers deterministic rebuilds,
+    canonical shapes, finiteness, nonnegative masses, `ParticleData`
+    construction, derived-radius ordering, malformed-input rejection, Warp
+    dtype assertions, and exact Warp CPU-device round trips.
 
 - [ ] **E2-F6-P2:** Compare absolute fp64 mass storage with fp32 and mixed-precision candidates
   - Issue: TBD | Size: S | Status: Not Started

@@ -2,21 +2,24 @@
 
 ## Required Documentation
 
-- Create a precision/mass representation report, preferably under
-  `docs/Features/` or a clearly linked roadmap subpage.
-- Include the final recommendation, validation evidence, tested cases,
-  candidate alternatives, and reproduction instructions.
-- Cross-link the report from `docs/Features/Roadmap/data-oriented-gpu.md` where
-  the E2-F6 requirement is described.
+- P1 shipped the baseline roadmap page at
+  `docs/Features/Roadmap/mass-precision-study.md`.
+- P1 also added roadmap links in `docs/Features/Roadmap/index.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Later phases still need to extend the report with candidate comparisons,
+  measured tradeoffs, and the final recommendation.
 
-## Recommended Content
+## Shipped P1 Content
 
-- Current baseline: absolute per-species `fp64` mass storage on CPU and GPU.
-- Candidate alternatives: absolute `fp32`, mixed precision, log mass, and
-  reference/binned mass scaling.
-- Metrics: conservation, small-particle fidelity, clamping behavior, memory
-  footprint, and throughput.
-- Decision: recommended policy and follow-up constraints for schema/dtype work.
+- Current baseline: absolute per-species `np.float64` mass storage on CPU and
+  `wp.float64` on GPU.
+- Deterministic study cases: `npf_cluster`, `five_to_ten_nm`,
+  `accumulation_mode`, and `cloud_droplet`.
+- Assumptions recorded: radius bands, density choices, species volume
+  fractions, spherical mass formula, canonical shapes, and focused
+  reproduction command.
+- Explicit deferral: no precision recommendation yet; that remains future work
+  for later E2-F6 phases.
 
 ## Notebook/Example Notes
 
