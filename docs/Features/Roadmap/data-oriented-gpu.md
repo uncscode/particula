@@ -484,6 +484,7 @@ Shared-across-box fields:
 - `E2-F6`: inherit the current `float64` / `wp.float64` schema baseline for
   stored particle and gas arrays, plus the rule that no production
   dtype-or-schema migration proceeds before study-backed approval.
+  See also [Mass Precision Study Baseline](mass-precision-study.md).
 - `E2-F7`: inherit the existing environment and gas ownership boundaries,
   including `ParticleData.volume` ownership, `WarpGasData.vapor_pressure` as
   lossy helper state, and the requirement that integration guidance stay
