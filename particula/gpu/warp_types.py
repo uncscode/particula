@@ -101,9 +101,11 @@ class WarpGasData:
           compatibility (1 = True, 0 = False) and is expected to remain
           binary for CPU restore.
         - ``vapor_pressure`` is GPU-only helper state for condensation-style
-          kernels and is not part of CPU ``GasData`` ownership. CPU restore
-          helpers therefore drop it intentionally, so callers must read it
-          from the GPU container or preserve a sidecar if they still need
+          kernels and is not part of CPU ``GasData`` ownership.
+          ``to_warp_gas_data()`` accepts caller-supplied values with shape
+          ``(n_boxes, n_species)`` or allocates zeros when omitted. CPU
+          restore helpers drop this field intentionally, so callers must read
+          it from the GPU container or preserve a sidecar if they still need
           those values.
 
     Attributes:

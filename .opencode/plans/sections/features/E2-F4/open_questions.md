@@ -11,11 +11,13 @@
   CPU bool restoration; only binary `0/1` values are accepted at the GPU→CPU
   boundary.
 - Missing `vapor_pressure` in generic `to_warp_gas_data()` may remain a
-  zero-filled default, but condensation paths that need vapor pressure should
-  pass it explicitly and document that requirement.
+  zero-filled default. `#1199` confirmed that this is the shipped contract, and
+  condensation paths that need physical vapor pressure should pass it
+  explicitly.
 - GPU vapor pressure should not be returned to CPU as part of `GasData`. If a
   caller needs it, they should read it from `WarpGasData` before conversion or
-  manage an explicit sidecar outside `GasData`.
+  manage an explicit sidecar outside `GasData`. `#1199` now documents and tests
+  that lossy restore path directly.
 - E2-F2 and E2-F3 constrain vapor-pressure ownership by keeping environment state
   to `temperature`, `pressure`, and `saturation_ratio`; vapor pressure remains a
   process/kernel input derived from gas and thermodynamic state.
@@ -25,3 +27,5 @@
 - Whether placeholder-name fallback should remain the long-term API contract,
   gain warnings, or become stricter in a future migration-focused change is
   still deferred beyond the shipped `#1198` implementation.
+- Broader migration-document publication remains deferred to `E2-F4-P4` even
+  though the code-local vapor-pressure contract is now shipped.

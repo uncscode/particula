@@ -18,7 +18,7 @@
 
 ## Verification Criteria
 
-- `E2-F4-P1` and `E2-F4-P2` now have fast CPU/Warp semantic tests covering
+- `E2-F4-P1` through `E2-F4-P3` now have fast CPU/Warp semantic tests covering
   names supplied, names omitted, explicit `name=None`, invalid name lengths,
   empty name lists, valid binary `partitioning` restore, invalid non-binary
   `partitioning` failures, supplied vapor pressure, missing vapor pressure,
@@ -30,8 +30,9 @@
 
 ## Documentation Criteria
 
-- `E2-F4-P2` makes the restore contract explicit in code docstrings, while
-  broader migration documentation remains for later phases.
+- `E2-F4-P2` and `E2-F4-P3` make the restore and vapor-pressure transfer
+  contracts explicit in code docstrings, while broader migration documentation
+  remains for later phases.
 - Migration docs state the authoritative name contract, the vapor-pressure
   ownership decision, and any intentional CPU/GPU round-trip loss boundaries.
 - Docs/examples do not imply hidden metadata preservation when a sidecar or

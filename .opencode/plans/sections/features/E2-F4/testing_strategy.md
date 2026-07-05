@@ -7,7 +7,7 @@ testing phase.
 
 ## Unit and Conversion Tests
 
-- `E2-F4-P1` and `E2-F4-P2` use focused coverage in
+- `E2-F4-P1`, `E2-F4-P2`, and `E2-F4-P3` use focused coverage in
   `particula/gpu/tests/conversion_test.py`.
 - Added and maintained focused coverage for:
   - CPU-to-Warp gas conversion shapes and dtypes;
@@ -22,8 +22,8 @@ testing phase.
   - retry-safe recovery after correcting invalid names or invalid
     `partitioning` values;
   - GPU-only `vapor_pressure` presence before restore and loss after restore.
-- `E2-F4-P2` pairs those tests with the restore-boundary validation and
-  docstring updates in `particula/gpu/conversion.py`.
+- `E2-F4-P3` pairs those tests with the vapor-pressure contract wording in
+  `particula/gpu/conversion.py` and `particula/gpu/warp_types.py`.
 
 ## Integration and Documentation Checks
 
@@ -43,4 +43,5 @@ testing phase.
 | Invalid restored partitioning | `ValueError` before bool coercion |
 | Vapor pressure supplied | Shape validated and values transferred to Warp |
 | Vapor pressure omitted | Zero-filled `(n_boxes, n_species)` GPU default |
-| Vapor pressure returned to CPU | Intentionally discarded on `GasData` restore |
+| Invalid vapor-pressure shape | `ValueError` with actual/expected shape text |
+| Vapor pressure returned to CPU | Intentionally discarded on `GasData` restore, with sidecar preservation required |

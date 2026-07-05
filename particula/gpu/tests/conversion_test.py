@@ -330,7 +330,7 @@ class TestToWarpGasData:
     def test_to_warp_gas_data_defaults_vapor_pressure_to_zeros(
         self, sample_gas_data
     ) -> None:
-        """Test omitted vapor pressure creates a zero-filled GPU buffer."""
+        """Test omitted vapor pressure creates zeros with gas-shape parity."""
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         expected = np.zeros(
@@ -865,7 +865,11 @@ class TestErrorHandling:
         wrong_shape_vp,
         actual_shape,
     ) -> None:
-        """Test invalid vapor-pressure shapes report actual and expected dims."""
+        """Test invalid vapor-pressure shapes report actual and expected dims.
+
+        This covers a flat ``(n_species,)`` vector, swapped axes, and a
+        mismatched species-count case.
+        """
         with pytest.raises(ValueError) as exc_info:
             to_warp_gas_data(
                 sample_gas_data, device="cpu", vapor_pressure=wrong_shape_vp
@@ -1146,7 +1150,11 @@ class TestFromWarpGasData:
     def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
         self, sample_gas_data
     ) -> None:
-        """Test restore drops GPU-only vapor pressure unless caller saves it."""
+        """Test restore drops GPU-only vapor pressure unless caller saves it.
+
+        The saved sidecar copy is the only CPU-accessible record of those
+        values after ``from_warp_gas_data()`` returns.
+        """
         vapor_pressure = np.array(
             [[1000.0, 500.0, 200.0], [1100.0, 550.0, 220.0]],
             dtype=np.float64,

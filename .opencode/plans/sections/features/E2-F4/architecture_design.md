@@ -28,10 +28,12 @@ GasData(name supplied or explicit fallback, partitioning: bool)
   owns `name`, `molar_mass`, `concentration`, and boolean `partitioning`, while
   `WarpGasData` omits `name`, stores `partitioning` as `int32`, and carries a
   GPU-only `vapor_pressure` buffer.
-- **API Surface:** `E2-F4-P1` changed no runtime API behavior. It tightened the
-  contract by adding regression tests around `to_warp_gas_data()` and
-  `from_warp_gas_data()` rather than introducing stricter missing-name or
-  vapor-pressure semantics in production code.
+- **API Surface:** `E2-F4-P3` kept CPU `GasData` ownership unchanged while
+  tightening the conversion contract in production docstrings. `to_warp_gas_data()`
+  now explicitly documents optional caller-supplied `vapor_pressure`, required
+  `(n_boxes, n_species)` validation, and zero-filled GPU allocation when the
+  argument is omitted. `from_warp_gas_data()` now explicitly documents the
+  intentionally lossy CPU restore for `vapor_pressure`.
 - **Workflow Hooks:** GPU tests continue to use `pytest.importorskip("warp")`
   and `device="cpu"` where possible so that behavior can be validated without
   CUDA-only assumptions.
@@ -45,7 +47,9 @@ GasData(name supplied or explicit fallback, partitioning: bool)
 - `partitioning`: authoritative as CPU `bool`; represented as GPU `int32` for
   Warp compatibility.
 - `vapor_pressure`: operational GPU condensation input with explicit transfer
-  behavior; not silently confused with CPU `GasData` ownership.
+  behavior. Callers may supply it at the CPU→GPU boundary, omission allocates a
+  zero-filled `(n_boxes, n_species)` GPU buffer, and GPU→CPU restore drops it
+  intentionally because CPU `GasData` does not own that field.
 
 ## Security & Compliance
 
