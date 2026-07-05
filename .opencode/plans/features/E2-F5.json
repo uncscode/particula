@@ -2,7 +2,7 @@
   "id": "E2-F5",
   "type": "feature",
   "title": "Define scalar-to-per-box environment migration path",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -71,11 +71,11 @@
     {
       "id": "E2-F5-P4",
       "title": "Migrate coagulation GPU API and document downstream environment handoff",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -83,5 +83,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
