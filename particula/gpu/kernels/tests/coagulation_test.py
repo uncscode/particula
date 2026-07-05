@@ -512,6 +512,7 @@ def test_coagulation_step_gpu_preserves_environment_array_dtypes(
 ) -> None:
     """Explicit environment arrays are reused without dtype coercion."""
     particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+
     class _EnvironmentLike:
         def __init__(self) -> None:
             self.temperature = wp.array(
@@ -1386,8 +1387,7 @@ def test_coagulation_ensure_volume_array_rejects_invalid_arrays(
         _ensure_volume_array(volume, n_boxes=1, device=volume.device)
 
 
-def test_coagulation_ensure_volume_array_rejects_non_warp_tensor_like(
-) -> None:
+def test_coagulation_ensure_volume_array_rejects_non_warp_tensor_like() -> None:
     """Tensor-like non-Warp volume inputs fail with a stable type error."""
 
     class _FakeTensorLike:
