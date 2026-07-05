@@ -17,3 +17,12 @@
   condensation, coagulation, and documentation acceptance checks.
 - Completeness review clarified the final phase as a development-doc handoff
   step for downstream GPU kernel tracks.
+
+## 2026-07-05
+
+- Updated plan sections after issue #1203 delivered E2-F5-P1.
+- Marked P1 complete with the shipped keyword-only `environment` contract,
+  early mixed-input and pure explicit-environment guards, and focused kernel
+  regression tests.
+- Narrowed section language that previously implied environment normalization,
+  shape/device validation, or real per-box execution had already shipped.

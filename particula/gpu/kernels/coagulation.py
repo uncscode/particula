@@ -1,8 +1,11 @@
 """GPU Brownian coagulation kernels and orchestration utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
-coagulation pipeline. The kernels operate on GPU-resident particle data and
-produce collision pairs that are applied to merge particle masses in-place.
+coagulation pipeline. P1 keeps scalar ``temperature`` and ``pressure`` as
+the only supported execution path while reserving a keyword-only
+``environment`` input for later per-box environment migration. The kernels
+operate on GPU-resident particle data and produce collision pairs that are
+applied to merge particle masses in-place.
 """
 
 # pyright: basic
@@ -51,8 +54,7 @@ _MIXED_ENVIRONMENT_ERROR = (
     "coagulation_step_gpu."
 )
 _UNSUPPORTED_ENVIRONMENT_ERROR = (
-    "environment execution is not implemented in P1 for "
-    "coagulation_step_gpu."
+    "environment execution is not implemented in P1 for coagulation_step_gpu."
 )
 
 
@@ -535,6 +537,11 @@ def coagulation_step_gpu(
 ) -> tuple[Any, Any, Any]:
     """Execute one Brownian coagulation timestep on the GPU.
 
+    P1 supports only scalar ``temperature`` and ``pressure`` inputs.
+    The reserved keyword-only ``environment`` parameter documents the
+    future ``WarpEnvironmentData`` handoff without yet enabling explicit
+    environment execution.
+
     Args:
         particles: GPU-resident particle data.
         temperature: Scalar gas temperature in kelvin for the supported P1
@@ -553,7 +560,8 @@ def coagulation_step_gpu(
         environment: Reserved keyword-only explicit environment input for a
             future phase. When implemented, this will accept
             ``WarpEnvironmentData`` with ``(n_boxes,)`` temperature and
-            pressure arrays.
+            pressure arrays. In P1, any explicit-environment call raises an
+            early ``ValueError``.
 
     Returns:
         Tuple of updated particle data, collision pairs, and collision counts.
@@ -563,8 +571,8 @@ def coagulation_step_gpu(
         ValueError: If ``environment`` is mixed with scalar ``temperature`` or
             ``pressure`` inputs.
         ValueError: If ``environment`` is supplied with both scalar inputs
-            omitted because explicit environment execution is reserved for P1+
-            follow-up work.
+            omitted because explicit environment execution is temporarily
+            rejected in P1 until later follow-up work lands.
 
     Notes:
         ``environment`` is keyword-only in P1 so existing positional scalar
@@ -580,6 +588,10 @@ def coagulation_step_gpu(
         ``temperature=None, pressure=None, environment=...`` also raise
         ``ValueError`` in P1 until the later Brownian-kernel launch inputs
         migrate to per-box environment state.
+
+        Validation runs before volume normalization, RNG setup, and kernel
+        launches so invalid calls fail without mutating particle state or
+        allocating downstream launch work.
     """
     if environment is not None:
         if temperature is not None or pressure is not None:

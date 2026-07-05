@@ -277,7 +277,9 @@ def _run_gpu_step(
     )
 
 
-def test_condensation_step_gpu_signature_keeps_environment_keyword_only() -> None:
+def test_condensation_step_gpu_signature_keeps_environment_keyword_only() -> (
+    None
+):
     """The reserved environment input stays keyword-only in P1."""
     parameter = inspect.signature(condensation_step_gpu).parameters[
         "environment"
@@ -430,9 +432,7 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
 
     def _unexpected_mean_free_path(*args: Any, **kwargs: Any) -> float:
         calls.append("mean_free_path")
-        raise AssertionError(
-            "get_molecule_mean_free_path should not be called"
-        )
+        raise AssertionError("get_molecule_mean_free_path should not be called")
 
     monkeypatch.setattr(
         condensation_module,

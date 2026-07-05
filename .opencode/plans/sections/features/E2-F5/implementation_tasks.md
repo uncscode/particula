@@ -2,12 +2,19 @@
 
 ## E2-F5-P1: Compatibility Contract
 
-- Confirm E2-F2's environment container names and fields.
-- Decide whether explicit environment is passed through optional keyword
-  arguments or separate wrapper APIs.
-- Define conflict handling for scalar values plus explicit environment.
-- Add or update tests that assert legacy scalar calls still use the old public
-  call shape.
+- [x] Confirm E2-F2's environment container names and fields.
+- [x] Reserve explicit environment input through an optional keyword-only
+  `environment` argument on both GPU entry points instead of a new wrapper API.
+- [x] Define conflict handling for scalar values plus explicit environment:
+  any mixed call raises a stable early `ValueError`.
+- [x] Define the temporary pure explicit-environment behavior for P1:
+  `temperature=None`, `pressure=None`, and `environment=...` raises a
+  phase-scoped early `ValueError` until later migrations wire in per-box
+  execution.
+- [x] Add or update tests that assert legacy scalar calls still use the old
+  public call shape.
+- [x] Add short-circuit regression tests proving invalid contract calls fail
+  before host-side helper execution or Warp launch setup.
 
 ## E2-F5-P2: Helpers and Validation
 

@@ -2,8 +2,11 @@
 
 This module composes the condensation ``@wp.func`` building blocks into
 end-to-end kernels and provides a high-level ``condensation_step_gpu``
-orchestration API. Kernel launches operate on GPU-resident Warp
-arrays and update particle masses in-place.
+orchestration API. P1 keeps scalar ``temperature`` and ``pressure`` as the
+only supported execution path while reserving a keyword-only
+``environment`` input for later per-box environment migration. Kernel
+launches operate on GPU-resident Warp arrays and update particle masses
+in-place.
 """
 
 # pyright: basic
@@ -54,8 +57,7 @@ _MIXED_ENVIRONMENT_ERROR = (
     "condensation_step_gpu."
 )
 _UNSUPPORTED_ENVIRONMENT_ERROR = (
-    "environment execution is not implemented in P1 for "
-    "condensation_step_gpu."
+    "environment execution is not implemented in P1 for condensation_step_gpu."
 )
 
 
@@ -364,6 +366,11 @@ def condensation_step_gpu(
 ) -> tuple[Any, Any]:
     """Execute one condensation timestep on the GPU.
 
+    P1 supports only scalar ``temperature`` and ``pressure`` inputs.
+    The reserved keyword-only ``environment`` parameter documents the
+    future ``WarpEnvironmentData`` handoff without yet enabling explicit
+    environment execution.
+
     Args:
         particles: GPU-resident particle data.
         gas: GPU-resident gas data.
@@ -383,7 +390,8 @@ def condensation_step_gpu(
         environment: Reserved keyword-only explicit environment input for a
             future phase. When implemented, this will accept
             ``WarpEnvironmentData`` with ``(n_boxes,)`` temperature and
-            pressure arrays.
+            pressure arrays. In P1, any explicit-environment call raises an
+            early ``ValueError``.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -393,8 +401,8 @@ def condensation_step_gpu(
         ValueError: If ``environment`` is mixed with scalar ``temperature`` or
             ``pressure`` inputs.
         ValueError: If ``environment`` is supplied with both scalar inputs
-            omitted because explicit environment execution is reserved for P1+
-            follow-up work.
+            omitted because explicit environment execution is temporarily
+            rejected in P1 until later follow-up work lands.
 
     Notes:
         Particle masses are updated in-place on the GPU. Callers that require
@@ -414,6 +422,10 @@ def condensation_step_gpu(
         ``ValueError`` in P1 until the later host-side feed points for
         viscosity and mean-free-path calculations migrate to per-box
         environment state.
+
+        Validation runs before host-side viscosity and mean-free-path
+        calculations so invalid calls fail without mutating particle state or
+        launching Warp work.
     """
     if environment is not None:
         if temperature is not None or pressure is not None:

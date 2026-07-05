@@ -1,15 +1,23 @@
 # Phase Details
 
-- [ ] **E2-F5-P1:** Design scalar-to-environment compatibility contract with unit tests
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E2-F5-P1:** Design scalar-to-environment compatibility contract with unit tests
+  - Issue: #1203 | Size: XS | Status: Completed
   - Goal: Specify API behavior for scalar inputs, explicit environment inputs,
     conflict handling, and downstream kernel feed points.
+  - Delivered: Added keyword-only `environment` parameters and phase-scoped
+    docstrings to `condensation_step_gpu(...)` and `coagulation_step_gpu(...)`;
+    added early mixed-input and pure explicit-environment guards before helper
+    calls or Warp launch setup; left real per-box environment execution for
+    later phases.
   - Files: `particula/gpu/kernels/condensation.py`,
-    `particula/gpu/kernels/coagulation.py`, relevant GPU kernel tests, and this
-    plan's documentation sections as needed.
-  - Tests: Add lightweight unit tests or parameterized expectations that lock
-    scalar compatibility and explicit conflict/mismatch behavior where helpers
-    already exist.
+    `particula/gpu/kernels/coagulation.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`, and
+    `particula/gpu/kernels/tests/coagulation_test.py`.
+  - Tests: Added keyword-only signature checks, legacy positional scalar-call
+    regression checks, parametrized mixed-input `ValueError` coverage, pure
+    explicit-environment P1 rejection checks, and short-circuit tests proving
+    contract errors fire before gas-property helpers, volume normalization, or
+    Warp launch.
 
 - [ ] **E2-F5-P2:** Implement environment normalization and validation helpers with unit tests
   - Issue: TBD | Size: S | Status: Not Started
