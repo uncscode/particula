@@ -37,3 +37,15 @@
 - Added shipped test coverage details for helper validation, explicit
   environment success, hybrid direct inputs, mismatch failures, and
   condensation/coagulation reuse regressions.
+
+## 2026-07-05
+
+- Updated plan sections after issue #1205 delivered E2-F5-P3 as focused
+  condensation regression hardening.
+- Marked P3 complete with shipped coverage for scalar-vs-uniform equivalence,
+  non-uniform explicit-environment parity, invalid-domain short-circuiting,
+  rejected-input `mass_transfer` immutability, and zero-volume short-circuit
+  safety.
+- Noted that no additional public condensation docstring changes were needed
+  because the existing entry-point documentation already matched shipped call
+  forms and fail-fast validation behavior.

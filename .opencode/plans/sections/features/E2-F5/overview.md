@@ -31,10 +31,12 @@ direct inputs into canonical `(n_boxes,)` Warp arrays before launch work.
 
 ## Parent Epic Context
 
-Parent epic: E2. This feature is E2-F5. P1 shipped under issue #1203 and issue
+Parent epic: E2. This feature is E2-F5. P1 shipped under issue #1203, issue
 #1204 implemented the shared helper plus the minimal condensation/coagulation
-runtime migration needed to consume normalized per-box arrays. It depends on
-E2-F2 for the environment container schema and E2-F3 for GPU
-environment-transfer conventions. Sibling tracks E2-F1 through E2-F4 establish
-schema, environment-container, and vapor-pressure foundations; E2-F6 through
-E2-F9 can now build on a working shared environment feed path.
+runtime migration needed to consume normalized per-box arrays, and issue #1205
+closed the condensation follow-up with focused regression coverage for the
+already-shipped P3 behavior. It depends on E2-F2 for the environment container
+schema and E2-F3 for GPU environment-transfer conventions. Sibling tracks E2-F1
+through E2-F4 establish schema, environment-container, and vapor-pressure
+foundations; E2-F6 through E2-F9 can now build on a working shared environment
+feed path with stricter condensation regression protection.

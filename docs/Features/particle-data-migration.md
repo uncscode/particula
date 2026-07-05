@@ -328,6 +328,43 @@ unchanged across that boundary—`temperature` and `pressure` stay
 `(n_boxes,)`, while `saturation_ratio` stays `(n_boxes, n_species)`—and do
 not expect kernels or runnables to move environment state for you.
 
+### `condensation_step_gpu` environment inputs
+
+`particula.gpu.condensation_step_gpu(...)` now supports the shared environment
+normalization contract used by the low-level GPU kernels.
+
+- Keep using scalar `temperature` and `pressure` for legacy one-box calls.
+- For multi-box or GPU-resident workflows, you may instead pass direct Warp
+  arrays with shape `(n_boxes,)`.
+- Hybrid direct calls are also accepted: one of `temperature` or `pressure`
+  may be a scalar while the other is a Warp array.
+- You may also pass `environment=WarpEnvironmentData(...)` instead of direct
+  temperature/pressure inputs.
+- `temperature` and `pressure` remain environment-owned state. Do not move them
+  into `GasData`.
+
+```python
+from particula.gpu import condensation_step_gpu, to_warp_environment_data
+
+# Legacy-compatible scalar call
+particle_out, gas_out = condensation_step_gpu(
+    particle=warp_particle,
+    gas=warp_gas,
+    temperature=298.15,
+    pressure=101325.0,
+    time_step=1.0,
+)
+
+# Explicit environment-owned thermodynamic state
+warp_environment = to_warp_environment_data(environment, device="cpu")
+particle_out, gas_out = condensation_step_gpu(
+    particle=warp_particle,
+    gas=warp_gas,
+    environment=warp_environment,
+    time_step=1.0,
+)
+```
+
 ## Conversion helpers
 
 Use the conversion helpers when you need to bridge old and new APIs:
@@ -375,6 +412,23 @@ when you need legacy-shaped arrays:
 radii_single_box = particle_data.radii[0]
 concentration_single_box = gas_data.concentration[0]
 ```
+
+### `condensation_step_gpu` rejects my environment inputs
+
+`condensation_step_gpu(...)` now validates environment inputs before Warp
+launch. Check the following first:
+
+- Do not mix direct `temperature`/`pressure` arguments with `environment=` in
+  the same call.
+- If `environment` is omitted, supply both required direct thermodynamic
+  inputs, either as scalars, `(n_boxes,)` Warp arrays, or a supported hybrid.
+- Ensure direct or environment-owned `temperature` and `pressure` values are
+  positive and finite.
+- Ensure `(n_boxes,)` direct arrays match the particle/gas box count and live
+  on the same Warp device.
+
+If you need a CPU-owned source of truth, keep using `EnvironmentData` and only
+convert it at the explicit `to_warp_environment_data()` boundary.
 
 ## Related references
 

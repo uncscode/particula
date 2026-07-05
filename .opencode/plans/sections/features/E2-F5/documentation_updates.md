@@ -18,6 +18,16 @@
 - Docstrings in `particula/gpu/kernels/condensation.py` and
   `particula/gpu/kernels/coagulation.py`.
 
+## Shipped P3 Documentation Outcome
+
+- Issue #1205 did not require further docstring edits because the public
+  `condensation_step_gpu(...)` docstring already described the shipped
+  scalar/direct-array/hybrid/explicit-environment call forms and fail-fast
+  validation behavior.
+- P3 documentation work was therefore limited to confirming that code-local
+  docs already matched implementation while adding regression coverage for the
+  documented contract.
+
 ## Deferred Documentation
 
 - Broader roadmap or user-facing GPU docs remain deferred until later phases
