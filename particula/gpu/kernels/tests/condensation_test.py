@@ -673,6 +673,66 @@ def test_condensation_step_gpu_invalid_environment_domains_short_circuit_before_
     assert calls == []
 
 
+@pytest.mark.parametrize("field_name", ["temperature", "pressure"])
+def test_condensation_step_gpu_missing_environment_field_short_circuits_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    field_name: str,
+) -> None:
+    """Malformed environment payloads raise stable errors before launch."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    original_masses = np.asarray(gpu_particles.masses.numpy()).copy()
+    mass_transfer = wp.full(
+        (1, 1, 1),
+        wp.float64(5.0),
+        dtype=wp.float64,
+        device=device,
+    )
+    original_mass_transfer = np.asarray(mass_transfer.numpy()).copy()
+
+    class _MalformedEnvironment:
+        def __init__(self) -> None:
+            self.temperature = wp.array([298.15], dtype=wp.float64, device=device)
+            self.pressure = wp.array([101325.0], dtype=wp.float64, device=device)
+
+    environment = _MalformedEnvironment()
+    delattr(environment, field_name)
+    calls: list[str] = []
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(
+        ValueError,
+        match=rf"environment\.{field_name} must be a Warp array with shape "
+        r"\(n_boxes,\)",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            mass_transfer=mass_transfer,
+            environment=environment,
+        )
+
+    assert calls == []
+    npt.assert_allclose(gpu_particles.masses.numpy(), original_masses)
+    npt.assert_allclose(mass_transfer.numpy(), original_mass_transfer)
+
+
 @pytest.mark.parametrize(
     ("temperature_values", "pressure_values", "message"),
     [
@@ -731,6 +791,69 @@ def test_condensation_step_gpu_invalid_direct_array_domains_short_circuit_before
         )
 
     assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "message"),
+    [
+        (
+            np.array([298.15], dtype=np.float64),
+            101325.0,
+            "temperature must be a scalar or Warp array with shape",
+        ),
+        (
+            298.15,
+            np.array([101325.0], dtype=np.float64),
+            "pressure must be a scalar or Warp array with shape",
+        ),
+    ],
+)
+def test_condensation_step_gpu_rejects_direct_non_warp_arrays_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float | np.ndarray,
+    pressure: float | np.ndarray,
+    message: str,
+) -> None:
+    """Unsupported direct non-Warp arrays fail before launch or mutation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    original_masses = np.asarray(gpu_particles.masses.numpy()).copy()
+    mass_transfer = wp.full(
+        (1, 1, 1),
+        wp.float64(9.0),
+        dtype=wp.float64,
+        device=device,
+    )
+    original_mass_transfer = np.asarray(mass_transfer.numpy()).copy()
+    calls: list[str] = []
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(ValueError, match=message):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            mass_transfer=mass_transfer,
+        )
+
+    assert calls == []
+    npt.assert_allclose(gpu_particles.masses.numpy(), original_masses)
+    npt.assert_allclose(mass_transfer.numpy(), original_mass_transfer)
 
 
 @pytest.mark.parametrize(
