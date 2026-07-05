@@ -5,31 +5,33 @@
 - Preserve source compatibility for scalar GPU API callers.
 - Treat environment state as a first-class per-box input owned outside
   `GasData`.
-- Normalize and validate before launching Warp kernels so device code can assume
-  consistent `(n_boxes,)` inputs.
+- Validate the P1 contract before launching Warp kernels so later phases can add
+  normalization without changing the published ambiguity rule.
 - Keep conversion explicit; helpers may construct Warp arrays from scalars, but
   CPU-to-GPU environment container transfers should live in conversion utilities.
 
-## Proposed Compatibility Layer
+## Shipped P1 Compatibility Layer
 
-Implement a small normalization layer that accepts one of these forms:
+P1 shipped the API shell, not the normalization layer. Both GPU entry points now
+accept these contract forms:
 
 1. Legacy scalar `temperature: float` and `pressure: float`.
-2. Per-box temperature/pressure Warp arrays shaped `(n_boxes,)`.
-3. E2-F3 `WarpEnvironmentData` containing per-box temperature and pressure.
+2. Mixed scalar values plus `environment=...`, which raise an early
+   `ValueError`.
+3. `temperature=None`, `pressure=None`, and `environment=...`, which raise a
+   phase-scoped early `ValueError` in P1.
 
-The helper should return canonical per-box arrays for kernel launch. Scalar
-values are broadcast with `wp.full(n_boxes, value, dtype=wp.float64, device=...)`.
-Array/environment inputs are validated for exact shape and device match.
+The reserved `environment` parameter is keyword-only and documented as the
+future `WarpEnvironmentData` handoff point with `(n_boxes,)` temperature and
+pressure arrays.
 
 ## API Options
 
-- Preferred: keep existing scalar parameters and add an optional keyword-only
-  `environment=None` or internal wrapper that does not break positional callers.
-- Alternative: introduce `*_step_gpu_environment(...)` wrappers while retaining
-  the existing scalar functions as compatibility shims.
-- Avoid: changing positional ordering or making environment mandatory in the
-  first migration step.
+- Chosen in P1: keep existing scalar parameters and add an optional
+  keyword-only `environment=None` that does not break positional callers.
+- Deferred: helper-based normalization or dedicated environment wrappers.
+- Avoided in P1: changing positional ordering or making environment mandatory in
+  the first migration step.
 
 ## Kernel Feed Points
 
@@ -42,11 +44,12 @@ Array/environment inputs are validated for exact shape and device match.
 
 ## Error Handling
 
-- Environment shape must be `(n_boxes,)`; include expected shape in error text.
-- Environment device must match particle arrays before launch.
-- `n_boxes` comes from `particles.masses.shape[0]` and must align with gas and
-  environment state.
 - If scalar and environment values are both provided, the implementation should
   raise a clear error instead of applying precedence rules. That keeps the first
   migration path deterministic for callers and avoids silently mixing legacy
   scalar inputs with per-box environment state.
+- If `environment` is provided with both scalar inputs omitted, P1 should raise
+  a clear phase-scoped error instead of pretending explicit environment
+  execution already exists.
+- Shape, `n_boxes`, and device validation for real explicit-environment
+  execution are deferred to P2+.

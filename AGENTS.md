@@ -256,6 +256,12 @@ restored = from_warp_environment_data(gpu_environment)
   `to_warp_environment_data`, and `from_warp_environment_data`.
 - Environment transfers are explicit helper calls; kernels and runnables do
   not perform hidden CPU↔GPU synchronization for environment state.
+- `condensation_step_gpu(..., environment=...)` and
+  `coagulation_step_gpu(..., environment=...)` reserve a keyword-only
+  environment path in P1, but still reject explicit environment execution.
+- Mixing scalar `temperature`/`pressure` with `environment=` raises an early
+  `ValueError`; `temperature=None`, `pressure=None`, and `environment=...`
+  also raise a phase-scoped P1 `ValueError` until later phases add support.
 - `EnvironmentData.temperature` and `pressure` use `(n_boxes,)`;
   `saturation_ratio` uses `(n_boxes, n_species)` on both CPU and Warp mirrors.
 - Round trips preserve `temperature`, `pressure`, and `saturation_ratio` for
@@ -408,6 +414,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-04  
+**Last Updated:** 2026-07-05  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

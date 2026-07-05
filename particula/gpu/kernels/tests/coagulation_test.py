@@ -139,7 +139,9 @@ def _make_environment_data(
     )
 
 
-def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> None:
+def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> (
+    None
+):
     """The reserved environment input stays keyword-only in P1."""
     parameter = inspect.signature(coagulation_step_gpu).parameters[
         "environment"
@@ -904,7 +906,9 @@ def test_coagulation_ensure_volume_array(device: str) -> None:
     _validate_device_match("volume", volume_array, volume_array.device)
 
 
-def test_coagulation_validation_helpers_accept_valid_inputs(device: str) -> None:
+def test_coagulation_validation_helpers_accept_valid_inputs(
+    device: str,
+) -> None:
     """Validation helpers accept matching buffers and volume arrays."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)

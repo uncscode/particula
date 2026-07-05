@@ -44,6 +44,11 @@ Legacy facades remain available, with deprecation planned for v0.3.0.
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.
+GPU kernel entry points `condensation_step_gpu` and `coagulation_step_gpu`
+reserve a keyword-only `environment=` parameter for future per-box execution,
+but P1 still supports only scalar `temperature` and `pressure` execution.
+Mixed scalar-plus-environment calls, or pure explicit-environment calls with
+`temperature=None` and `pressure=None`, fail early by design in this phase.
 
 ## Code Structure
 
