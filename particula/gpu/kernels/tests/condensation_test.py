@@ -547,6 +547,94 @@ def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helper
     assert calls == []
 
 
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "message"),
+    [
+        (0.0, 101325.0, "temperature must be finite and > 0"),
+        (298.15, 0.0, "pressure must be finite and > 0"),
+        (float("nan"), 101325.0, "temperature must be finite and > 0"),
+    ],
+)
+def test_condensation_step_gpu_invalid_scalar_domains_short_circuit_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float,
+    pressure: float,
+    message: str,
+) -> None:
+    """Invalid scalar domains fail before any Warp launch work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    calls: list[str] = []
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(ValueError, match=message):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+        )
+
+    assert calls == []
+
+
+def test_condensation_step_gpu_invalid_environment_domains_short_circuit_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Invalid environment arrays fail before any Warp launch work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    environment.pressure = wp.array([0.0], dtype=wp.float64, device=device)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    calls: list[str] = []
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(
+        ValueError,
+        match="environment.pressure must be finite and > 0",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+    assert calls == []
+
+
 def test_condensation_step_gpu_accepts_direct_environment_arrays(
     device: str,
 ) -> None:
@@ -650,6 +738,87 @@ def test_condensation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
     )
 
     npt.assert_allclose(mass_transfer.numpy(), expected, rtol=1.0e-10)
+
+
+def test_condensation_step_gpu_preserves_direct_environment_array_dtypes(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Direct Warp arrays are reused without dtype coercion."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    launch_dtypes: list[tuple[Any, Any]] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        inputs = kwargs.get("inputs", [])
+        if getattr(kernel, "key", "") == "_prepare_environment_properties_kernel":
+            launch_dtypes.append((inputs[0].dtype, inputs[1].dtype))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+
+    condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=wp.array([298.15, 301.15], dtype=wp.float64, device=device),
+        pressure=wp.array(
+            [101325.0, 100800.0], dtype=wp.float64, device=device
+        ),
+        time_step=0.1,
+    )
+
+    assert launch_dtypes == [(wp.float64, wp.float64)]
+
+
+def test_condensation_step_gpu_preserves_environment_array_dtypes(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Explicit environment arrays are reused without dtype coercion."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    class _EnvironmentLike:
+        def __init__(self) -> None:
+            self.temperature = wp.array(
+                [298.15, 301.15], dtype=wp.float64, device=device
+            )
+            self.pressure = wp.array(
+                [101325.0, 100800.0], dtype=wp.float64, device=device
+            )
+
+    environment = _EnvironmentLike()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    launch_dtypes: list[tuple[Any, Any]] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        inputs = kwargs.get("inputs", [])
+        if getattr(kernel, "key", "") == "_prepare_environment_properties_kernel":
+            launch_dtypes.append((inputs[0].dtype, inputs[1].dtype))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+
+    condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=None,
+        pressure=None,
+        time_step=0.1,
+        environment=environment,
+    )
+
+    assert launch_dtypes == [(wp.float64, wp.float64)]
 
 
 def test_condensation_step_gpu_environment_shape_mismatch_raises_value_error(

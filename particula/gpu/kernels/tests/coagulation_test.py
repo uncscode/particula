@@ -329,6 +329,95 @@ def test_coagulation_step_gpu_contract_errors_short_circuit_before_launch(
     assert calls == []
 
 
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "message"),
+    [
+        (0.0, 101325.0, "temperature must be finite and > 0"),
+        (298.15, 0.0, "pressure must be finite and > 0"),
+        (float("nan"), 101325.0, "temperature must be finite and > 0"),
+    ],
+)
+def test_coagulation_step_gpu_invalid_scalar_domains_short_circuit_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float,
+    pressure: float,
+    message: str,
+) -> None:
+    """Invalid scalar domains fail before any setup or Warp launch work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    calls: list[str] = []
+
+    def _unexpected_ensure_volume_array(*args: Any, **kwargs: Any) -> Any:
+        calls.append("ensure_volume_array")
+        raise AssertionError("_ensure_volume_array should not be called")
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(
+        coagulation_module,
+        "_ensure_volume_array",
+        _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(ValueError, match=message):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+        )
+
+    assert calls == []
+
+
+def test_coagulation_step_gpu_invalid_environment_domains_short_circuit_before_launch(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Invalid environment arrays fail before any setup or Warp launch work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1), device=device
+    )
+    environment.pressure = wp.array([0.0], dtype=wp.float64, device=device)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    calls: list[str] = []
+
+    def _unexpected_ensure_volume_array(*args: Any, **kwargs: Any) -> Any:
+        calls.append("ensure_volume_array")
+        raise AssertionError("_ensure_volume_array should not be called")
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(
+        coagulation_module,
+        "_ensure_volume_array",
+        _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(
+        ValueError,
+        match="environment.pressure must be finite and > 0",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+    assert calls == []
+
+
 def test_coagulation_step_gpu_accepts_direct_environment_arrays(
     device: str,
 ) -> None:
@@ -383,6 +472,79 @@ def test_coagulation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
 
     assert collision_pairs.shape == (2, 4, 2)
     assert collision_counts.shape == (2,)
+
+
+def test_coagulation_step_gpu_preserves_direct_environment_array_dtypes(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Direct Warp arrays are reused without dtype coercion."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    original_launch = coagulation_module.wp.launch
+    launch_dtypes: list[tuple[Any, Any]] = []
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        inputs = kwargs.get("inputs", [])
+        if getattr(kernel, "key", "") == "brownian_coagulation_kernel":
+            launch_dtypes.append((inputs[4].dtype, inputs[5].dtype))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
+
+    coagulation_step_gpu(
+        gpu_particles,
+        temperature=wp.array([298.15, 301.15], dtype=wp.float64, device=device),
+        pressure=wp.array(
+            [101325.0, 100800.0], dtype=wp.float64, device=device
+        ),
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+    )
+
+    assert launch_dtypes == [(wp.float64, wp.float64)]
+
+
+def test_coagulation_step_gpu_preserves_environment_array_dtypes(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Explicit environment arrays are reused without dtype coercion."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    class _EnvironmentLike:
+        def __init__(self) -> None:
+            self.temperature = wp.array(
+                [298.15, 301.15], dtype=wp.float64, device=device
+            )
+            self.pressure = wp.array(
+                [101325.0, 100800.0], dtype=wp.float64, device=device
+            )
+
+    environment = _EnvironmentLike()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    original_launch = coagulation_module.wp.launch
+    launch_dtypes: list[tuple[Any, Any]] = []
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        inputs = kwargs.get("inputs", [])
+        if getattr(kernel, "key", "") == "brownian_coagulation_kernel":
+            launch_dtypes.append((inputs[4].dtype, inputs[5].dtype))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
+
+    coagulation_step_gpu(
+        gpu_particles,
+        temperature=None,
+        pressure=None,
+        time_step=0.1,
+        max_collisions=4,
+        rng_seed=3,
+        environment=environment,
+    )
+
+    assert launch_dtypes == [(wp.float64, wp.float64)]
 
 
 def test_coagulation_step_gpu_environment_shape_mismatch_raises_value_error(
@@ -1190,6 +1352,53 @@ def test_coagulation_ensure_volume_array(device: str) -> None:
 
     volume_array = _ensure_volume_array(1.5e-6, n_boxes=2, device=device)
     _validate_device_match("volume", volume_array, volume_array.device)
+
+
+@pytest.mark.parametrize(
+    "volume",
+    [0.0, -1.0, float("nan"), float("inf")],
+)
+def test_coagulation_ensure_volume_array_rejects_invalid_scalars(
+    device: str,
+    volume: float,
+) -> None:
+    """Scalar volume inputs must be positive finite values."""
+    with pytest.raises(ValueError, match="volume must be finite and > 0"):
+        _ensure_volume_array(volume, n_boxes=1, device=device)
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        np.array([0.0], dtype=np.float64),
+        np.array([-1.0], dtype=np.float64),
+        np.array([np.nan], dtype=np.float64),
+        np.array([np.inf], dtype=np.float64),
+    ],
+)
+def test_coagulation_ensure_volume_array_rejects_invalid_arrays(
+    device: str,
+    values: np.ndarray,
+) -> None:
+    """Warp-array volume inputs must be positive finite values."""
+    volume = wp.array(values, dtype=wp.float64, device=device)
+    with pytest.raises(ValueError, match="volume must be finite and > 0"):
+        _ensure_volume_array(volume, n_boxes=1, device=volume.device)
+
+
+def test_coagulation_ensure_volume_array_rejects_non_warp_tensor_like(
+) -> None:
+    """Tensor-like non-Warp volume inputs fail with a stable type error."""
+
+    class _FakeTensorLike:
+        def __init__(self) -> None:
+            self.shape = (1,)
+
+    with pytest.raises(
+        ValueError,
+        match=r"volume must be a Warp array with shape \(n_boxes,\)",
+    ):
+        _ensure_volume_array(_FakeTensorLike(), n_boxes=1, device="cpu")
 
 
 def test_coagulation_validation_helpers_accept_valid_inputs(

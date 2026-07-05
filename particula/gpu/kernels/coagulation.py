@@ -17,6 +17,8 @@ masses in-place.
 
 from typing import TYPE_CHECKING, Any, no_type_check
 
+import numpy as np
+
 import particula.util.constants as constants
 
 if TYPE_CHECKING:  # pragma: no cover - import for typing only
@@ -39,7 +41,10 @@ from particula.gpu.dynamics.coagulation_funcs import (
 from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
 )
-from particula.gpu.kernels.environment import _ensure_environment_arrays
+from particula.gpu.kernels.environment import (
+    _ensure_environment_arrays,
+    _is_warp_array_like,
+)
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -502,17 +507,27 @@ def _ensure_volume_array(
         Warp array of volumes ``(n_boxes,)``.
 
     Raises:
-        ValueError: If volume array has mismatched shape or device.
+        ValueError: If volume array has mismatched shape, device, or domain.
 
     Notes:
         Valid Warp arrays are returned unchanged so launch code can reuse
         caller-owned per-box volume buffers.
     """
-    if hasattr(volume, "shape"):
-        if volume.shape != (n_boxes,):
+    volume_array: Any = volume
+    if _is_warp_array_like(volume_array):
+        if volume_array.shape != (n_boxes,):
             raise ValueError("volume shape does not match (n_boxes,)")
-        _validate_device_match("volume", volume, device)
-        return volume
+        _validate_device_match("volume", volume_array, device)
+        volume_np = np.asarray(volume_array.numpy(), dtype=np.float64)
+        if not np.all(np.isfinite(volume_np)) or np.any(volume_np <= 0.0):
+            raise ValueError("volume must be finite and > 0")
+        return volume_array
+
+    if hasattr(volume, "shape"):
+        raise ValueError("volume must be a Warp array with shape (n_boxes,)")
+
+    if not np.isfinite(volume) or volume <= 0.0:
+        raise ValueError("volume must be finite and > 0")
 
     return wp.full(  # type: ignore[arg-type]
         n_boxes,

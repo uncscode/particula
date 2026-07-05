@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
+
 try:
     import warp as wp
 except ImportError as exc:  # pragma: no cover - handled via import guards
@@ -27,10 +29,39 @@ def _is_warp_array_like(value: Any) -> bool:
         value: Object to inspect.
 
     Returns:
-        ``True`` when the object exposes Warp-style ``shape`` and ``device``
-        attributes.
+        ``True`` when the object is a Warp array instance that exposes the
+        expected runtime attributes.
     """
-    return hasattr(value, "shape") and hasattr(value, "device")
+    value_type = type(value)
+    return (
+        value_type.__module__.startswith("warp")
+        and hasattr(value, "shape")
+        and hasattr(value, "device")
+        and hasattr(value, "dtype")
+        and hasattr(value, "numpy")
+        and callable(value.numpy)
+    )
+
+
+def _validate_positive_finite_scalar(
+    name: str,
+    value: float,
+    caller_name: str,
+) -> None:
+    """Validate a scalar physical input domain before array creation."""
+    if not np.isfinite(value) or value <= 0.0:
+        raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
+
+
+def _validate_positive_finite_array(
+    name: str,
+    values: Any,
+    caller_name: str,
+) -> None:
+    """Validate a per-box physical input domain before kernel launch."""
+    values_np = np.asarray(values.numpy(), dtype=np.float64)
+    if not np.all(np.isfinite(values_np)) or np.any(values_np <= 0.0):
+        raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
 
 
 def _validate_box_array(
@@ -50,15 +81,14 @@ def _validate_box_array(
         caller_name: Entry-point name for stable contract messages.
 
     Returns:
-        The original validated Warp array.
+        The validated Warp array.
 
     Raises:
         ValueError: If the input is not a Warp array on the expected device
             with shape ``(n_boxes,)``.
 
     Notes:
-        Valid arrays are returned unchanged so callers can reuse existing
-        device-local buffers without copies.
+        Valid arrays preserve caller-owned buffers and are forwarded unchanged.
     """
     if not _is_warp_array_like(values):
         raise ValueError(
@@ -109,8 +139,8 @@ def _ensure_environment_arrays(
 
     Notes:
         When one direct input is scalar and the other is already a valid Warp
-        array, only the scalar side is broadcast. Valid Warp arrays and
-        environment-backed arrays are returned unchanged.
+        array, only the scalar side is broadcast. Valid Warp arrays are
+        forwarded unchanged.
     """
     if environment is not None:
         if temperature is not None or pressure is not None:
@@ -118,22 +148,31 @@ def _ensure_environment_arrays(
                 "Cannot mix direct temperature/pressure inputs with "
                 f"environment in {caller_name}."
             )
-        return (
-            _validate_box_array(
-                "environment.temperature",
-                environment.temperature,
-                n_boxes,
-                device,
-                caller_name,
-            ),
-            _validate_box_array(
-                "environment.pressure",
-                environment.pressure,
-                n_boxes,
-                device,
-                caller_name,
-            ),
+        temperature_array = _validate_box_array(
+            "environment.temperature",
+            environment.temperature,
+            n_boxes,
+            device,
+            caller_name,
         )
+        pressure_array = _validate_box_array(
+            "environment.pressure",
+            environment.pressure,
+            n_boxes,
+            device,
+            caller_name,
+        )
+        _validate_positive_finite_array(
+            "environment.temperature",
+            temperature_array,
+            caller_name,
+        )
+        _validate_positive_finite_array(
+            "environment.pressure",
+            pressure_array,
+            caller_name,
+        )
+        return temperature_array, pressure_array
 
     if temperature is None or pressure is None:
         raise ValueError(
@@ -149,7 +188,13 @@ def _ensure_environment_arrays(
             device,
             caller_name,
         )
+        _validate_positive_finite_array(
+            "temperature", temperature_array, caller_name
+        )
     else:
+        _validate_positive_finite_scalar(
+            "temperature", float(temperature), caller_name
+        )
         temperature_array = wp.full(
             n_boxes,
             wp.float64(temperature),
@@ -165,7 +210,11 @@ def _ensure_environment_arrays(
             device,
             caller_name,
         )
+        _validate_positive_finite_array("pressure", pressure_array, caller_name)
     else:
+        _validate_positive_finite_scalar(
+            "pressure", float(pressure), caller_name
+        )
         pressure_array = wp.full(
             n_boxes,
             wp.float64(pressure),
