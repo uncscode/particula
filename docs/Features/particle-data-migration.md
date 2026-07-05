@@ -296,8 +296,8 @@ condensation = par.dynamics.CondensationIsothermal(
     vapor_pressure_strategy=vapor_pressure_strategy,
 )
 particle_out, gas_out = condensation.step(
-    particle=particle_data,
-    gas_species=gas_data,
+    particles=particle_data,
+    gas=gas_data,
     temperature=298.15,
     pressure=101325.0,
     time_step=1.0,
@@ -307,7 +307,7 @@ coagulation = par.dynamics.BrownianCoagulationStrategy(
     distribution_type="discrete"
 )
 particle_out = coagulation.step(
-    particle=particle_out,
+    particles=particle_out,
     temperature=298.15,
     pressure=101325.0,
     time_step=1.0,
@@ -349,7 +349,7 @@ from particula.gpu.kernels import condensation_step_gpu
 
 # Legacy-compatible scalar call
 particle_out, gas_out = condensation_step_gpu(
-    particle=warp_particle,
+    particles=warp_particle,
     gas=warp_gas,
     temperature=298.15,
     pressure=101325.0,
@@ -359,8 +359,10 @@ particle_out, gas_out = condensation_step_gpu(
 # Explicit environment-owned thermodynamic state
 warp_environment = to_warp_environment_data(environment, device="cpu")
 particle_out, gas_out = condensation_step_gpu(
-    particle=warp_particle,
+    particles=warp_particle,
     gas=warp_gas,
+    temperature=None,
+    pressure=None,
     environment=warp_environment,
     time_step=1.0,
 )

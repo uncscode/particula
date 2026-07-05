@@ -42,8 +42,11 @@ from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels.environment import (
+    _broadcast_scalar_array,
     _ensure_environment_arrays,
+    _is_supported_warp_float_dtype,
     _is_warp_array_like,
+    _validate_positive_finite_array,
 )
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
@@ -518,23 +521,24 @@ def _ensure_volume_array(
         if volume_array.shape != (n_boxes,):
             raise ValueError("volume shape does not match (n_boxes,)")
         _validate_device_match("volume", volume_array, device)
-        volume_np = np.asarray(volume_array.numpy(), dtype=np.float64)
-        if not np.all(np.isfinite(volume_np)) or np.any(volume_np <= 0.0):
-            raise ValueError("volume must be finite and > 0")
+        if not _is_supported_warp_float_dtype(volume_array.dtype):
+            raise ValueError("volume must use a supported Warp float dtype")
+        _validate_positive_finite_array(
+            "volume", volume_array, "coagulation_step_gpu"
+        )
         return volume_array
 
     if hasattr(volume, "shape"):
         raise ValueError("volume must be a Warp array with shape (n_boxes,)")
 
-    if not np.isfinite(volume) or volume <= 0.0:
+    if isinstance(volume, bool) or not isinstance(volume, (float, np.floating)):
+        raise ValueError("volume must be a floating scalar or Warp array")
+
+    volume_scalar = float(volume)
+    if not np.isfinite(volume_scalar) or volume_scalar <= 0.0:
         raise ValueError("volume must be finite and > 0")
 
-    return wp.full(  # type: ignore[arg-type]
-        n_boxes,
-        wp.float64(volume),
-        dtype=wp.float64,
-        device=device,
-    )
+    return _broadcast_scalar_array(volume_scalar, n_boxes, device)
 
 
 def coagulation_step_gpu(

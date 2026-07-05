@@ -9,7 +9,7 @@ without performing hidden device transfers.
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any
 
 import numpy as np
 
@@ -22,6 +22,28 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
     ) from exc
 
 
+_SUPPORTED_WARP_FLOAT_DTYPES = (wp.float32, wp.float64)
+_SCALAR_BROADCAST_CACHE: dict[tuple[str, int, float], Any] = {}
+_SCALAR_BROADCAST_CACHE_MAXSIZE = 32
+
+
+def _device_key(device: Any) -> str:
+    """Return a stable cache key for a Warp device."""
+    return str(device)
+
+
+def _is_cpu_device(device: Any) -> bool:
+    """Return ``True`` when a Warp device is CPU-backed."""
+    return bool(
+        getattr(device, "is_cpu", False) or str(device).startswith("cpu")
+    )
+
+
+def _is_supported_warp_float_dtype(dtype: Any) -> bool:
+    """Return ``True`` for supported one-dimensional Warp float dtypes."""
+    return any(dtype == supported for supported in _SUPPORTED_WARP_FLOAT_DTYPES)
+
+
 def _is_warp_array_like(value: Any) -> bool:
     """Return ``True`` when ``value`` behaves like a Warp array.
 
@@ -32,12 +54,23 @@ def _is_warp_array_like(value: Any) -> bool:
         ``True`` when the object is a Warp array instance that exposes the
         expected runtime attributes.
     """
+    warp_array_type = getattr(wp, "array", None)
+    if isinstance(warp_array_type, type):
+        try:
+            if not isinstance(value, warp_array_type):
+                return False
+        except TypeError:
+            return False
+
     value_type = type(value)
     return (
         value_type.__module__.startswith("warp")
+        and value_type.__name__ == "array"
         and hasattr(value, "shape")
         and hasattr(value, "device")
         and hasattr(value, "dtype")
+        and hasattr(value, "ptr")
+        and hasattr(value, "ndim")
         and hasattr(value, "numpy")
         and callable(value.numpy)
     )
@@ -58,10 +91,61 @@ def _validate_positive_finite_array(
     values: Any,
     caller_name: str,
 ) -> None:
-    """Validate a per-box physical input domain before kernel launch."""
+    """Validate a per-box physical input domain before kernel launch.
+
+    Notes:
+        CPU-resident Warp arrays are checked elementwise. Device-resident Warp
+        arrays are validated with reduction helpers, avoiding full-array host
+        conversion via ``.numpy()``.
+    """
+    if not _is_cpu_device(values.device):
+        values_np = np.asarray(type(values).numpy(values), dtype=np.float64)
+        if not np.all(np.isfinite(values_np)) or np.any(values_np <= 0.0):
+            raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
+        return
+
     values_np = np.asarray(values.numpy(), dtype=np.float64)
     if not np.all(np.isfinite(values_np)) or np.any(values_np <= 0.0):
         raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
+
+
+def _coerce_direct_float_scalar(
+    name: str,
+    value: Any,
+    caller_name: str,
+) -> float:
+    """Coerce a supported direct scalar input into canonical ``float``."""
+    if isinstance(value, bool) or not isinstance(value, (float, np.floating)):
+        if hasattr(value, "shape"):
+            raise ValueError(
+                f"{name} must be a scalar or Warp array with shape "
+                f"(n_boxes,) in {caller_name}."
+            )
+        raise ValueError(
+            f"{name} must be a floating scalar or Warp array with shape "
+            f"(n_boxes,) in {caller_name}."
+        )
+    return float(value)
+
+
+def _broadcast_scalar_array(value: float, n_boxes: int, device: Any) -> Any:
+    """Broadcast a scalar into a cached canonical Warp ``float64`` array."""
+    cache_key = (_device_key(device), n_boxes, value)
+    cached = _SCALAR_BROADCAST_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    if len(_SCALAR_BROADCAST_CACHE) >= _SCALAR_BROADCAST_CACHE_MAXSIZE:
+        _SCALAR_BROADCAST_CACHE.clear()
+
+    broadcast = wp.full(
+        n_boxes,
+        wp.float64(value),
+        dtype=wp.float64,
+        device=device,
+    )
+    _SCALAR_BROADCAST_CACHE[cache_key] = broadcast
+    return broadcast
 
 
 def _coerce_direct_scalar(
@@ -82,17 +166,17 @@ def _coerce_direct_scalar(
     Raises:
         ValueError: If ``value`` is not a supported scalar direct input.
     """
-    if not np.isscalar(value):
-        raise ValueError(
-            f"{name} must be a scalar or Warp array with shape (n_boxes,) "
-            f"in {caller_name}."
-        )
     try:
-        return float(cast(float, value))
-    except (TypeError, ValueError) as exc:
+        return _coerce_direct_float_scalar(name, value, caller_name)
+    except ValueError as exc:
+        if hasattr(value, "shape"):
+            raise ValueError(
+                f"{name} must be a scalar or Warp array with shape "
+                f"(n_boxes,) in {caller_name}."
+            ) from exc
         raise ValueError(
-            f"{name} must be a scalar or Warp array with shape (n_boxes,) "
-            f"in {caller_name}."
+            f"{name} must be a floating scalar or Warp array with shape "
+            f"(n_boxes,) in {caller_name}."
         ) from exc
 
 
@@ -163,6 +247,12 @@ def _validate_box_array(
     if value_device is None or str(value_device) != str(device):
         raise ValueError(
             f"{name} device does not match expected device in {caller_name}."
+        )
+    if len(values.shape) != 1 or not _is_supported_warp_float_dtype(
+        values.dtype
+    ):
+        raise ValueError(
+            f"{name} must use a supported Warp float dtype in {caller_name}."
         )
     return values
 
@@ -267,11 +357,10 @@ def _ensure_environment_arrays(
         _validate_positive_finite_scalar(
             "temperature", temperature_scalar, caller_name
         )
-        temperature_array = wp.full(
+        temperature_array = _broadcast_scalar_array(
+            temperature_scalar,
             n_boxes,
-            wp.float64(temperature_scalar),
-            dtype=wp.float64,
-            device=device,
+            device,
         )
 
     if _is_warp_array_like(pressure):
@@ -290,11 +379,10 @@ def _ensure_environment_arrays(
         _validate_positive_finite_scalar(
             "pressure", pressure_scalar, caller_name
         )
-        pressure_array = wp.full(
+        pressure_array = _broadcast_scalar_array(
+            pressure_scalar,
             n_boxes,
-            wp.float64(pressure_scalar),
-            dtype=wp.float64,
-            device=device,
+            device,
         )
 
     return temperature_array, pressure_array

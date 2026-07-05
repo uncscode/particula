@@ -412,7 +412,7 @@ def test_coagulation_step_gpu_invalid_environment_domains_short_circuit_before_l
     monkeypatch: pytest.MonkeyPatch,
     device: str,
 ) -> None:
-    """Invalid environment arrays fail before any setup or Warp launch work."""
+    """Invalid environment arrays fail before downstream setup or kernels."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     environment = to_warp_environment_data(
         _make_environment_data(n_boxes=1, n_species=1), device=device
@@ -425,16 +425,18 @@ def test_coagulation_step_gpu_invalid_environment_domains_short_circuit_before_l
         calls.append("ensure_volume_array")
         raise AssertionError("_ensure_volume_array should not be called")
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
-        calls.append("launch")
-        raise AssertionError("wp.launch should not be called")
+    original_launch = coagulation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        calls.append(getattr(kernel, "key", str(kernel)))
+        return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(
         coagulation_module,
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
     )
-    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
+    monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
 
     with pytest.raises(
         ValueError,
@@ -1576,6 +1578,47 @@ def test_coagulation_ensure_volume_array_rejects_non_warp_tensor_like() -> None:
         match=r"volume must be a Warp array with shape \(n_boxes,\)",
     ):
         _ensure_volume_array(_FakeTensorLike(), n_boxes=1, device="cpu")
+
+
+def test_coagulation_ensure_volume_array_rejects_integer_scalar(
+    device: str,
+) -> None:
+    """Integer scalar volumes are rejected at the GPU boundary."""
+    with pytest.raises(ValueError, match="floating scalar"):
+        _ensure_volume_array(1, n_boxes=1, device=device)
+
+
+def test_coagulation_ensure_volume_array_rejects_integer_dtype_array(
+    device: str,
+) -> None:
+    """Only supported Warp float dtypes are accepted for volume arrays."""
+    volume = wp.array([1], dtype=wp.int32, device=device)
+
+    with pytest.raises(ValueError, match="supported Warp float dtype"):
+        _ensure_volume_array(volume, n_boxes=1, device=volume.device)
+
+
+def test_coagulation_ensure_volume_array_skips_cuda_host_readback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """CUDA volume validation avoids implicit ``.numpy()`` synchronization."""
+    if not cuda_available(wp):
+        pytest.skip("CUDA not available for readback guard test")
+
+    volume = wp.array([1.0e-6], dtype=wp.float64, device="cuda")
+
+    def _forbidden_numpy(self: Any) -> np.ndarray:
+        raise AssertionError("unexpected host readback")
+
+    monkeypatch.setattr(volume, "numpy", _forbidden_numpy, raising=False)
+
+    returned_volume = _ensure_volume_array(
+        volume,
+        n_boxes=1,
+        device=volume.device,
+    )
+
+    assert returned_volume is volume
 
 
 def test_coagulation_validation_helpers_accept_valid_inputs(

@@ -12,6 +12,7 @@ wp = pytest.importorskip("warp")
 from particula.gas.environment_data import EnvironmentData  # noqa: E402
 from particula.gpu.conversion import to_warp_environment_data  # noqa: E402
 from particula.gpu.kernels.environment import (  # noqa: E402
+    _broadcast_scalar_array,
     _ensure_environment_arrays,
     _is_warp_array_like,
     _validate_box_array,
@@ -216,6 +217,99 @@ def test_environment_helper_rejects_non_warp_tensor_like_input() -> None:
             device=wp.get_device("cpu"),
             caller_name="test_caller",
         )
+
+
+def test_environment_helper_rejects_integer_scalars(device: str) -> None:
+    """Integer direct inputs are rejected before canonical float broadcast."""
+    with pytest.raises(ValueError, match="floating scalar"):
+        _ensure_environment_arrays(
+            temperature=298,
+            pressure=101325.0,
+            environment=None,
+            n_boxes=1,
+            device=wp.get_device(device),
+            caller_name="test_caller",
+        )
+
+
+def test_environment_helper_rejects_integer_dtype_arrays(device: str) -> None:
+    """Only supported Warp float dtypes are accepted for direct arrays."""
+    temperature = wp.array([298, 299], dtype=wp.int32, device=device)
+    pressure = wp.array([101325.0, 101000.0], dtype=wp.float64, device=device)
+
+    with pytest.raises(ValueError, match="supported Warp float dtype"):
+        _ensure_environment_arrays(
+            temperature=temperature,
+            pressure=pressure,
+            environment=None,
+            n_boxes=2,
+            device=wp.get_device(device),
+            caller_name="test_caller",
+        )
+
+
+def test_environment_helper_reuses_scalar_broadcast_arrays(device: str) -> None:
+    """Repeated scalar normalization reuses cached Warp broadcast arrays."""
+    temperature_a, pressure_a = _ensure_environment_arrays(
+        temperature=298.15,
+        pressure=101325.0,
+        environment=None,
+        n_boxes=2,
+        device=wp.get_device(device),
+        caller_name="test_caller",
+    )
+    temperature_b, pressure_b = _ensure_environment_arrays(
+        temperature=298.15,
+        pressure=101325.0,
+        environment=None,
+        n_boxes=2,
+        device=wp.get_device(device),
+        caller_name="test_caller",
+    )
+
+    assert temperature_a is temperature_b
+    assert pressure_a is pressure_b
+
+
+def test_environment_helper_cached_scalar_broadcasts_do_not_leak_stale_values(
+    device: str,
+) -> None:
+    """Changing a scalar input produces a distinct buffer with fresh values."""
+    first = _broadcast_scalar_array(298.15, 2, wp.get_device(device))
+    second = _broadcast_scalar_array(299.15, 2, wp.get_device(device))
+
+    assert first is not second
+    np.testing.assert_allclose(first.numpy(), [298.15, 298.15])
+    np.testing.assert_allclose(second.numpy(), [299.15, 299.15])
+
+
+def test_environment_helper_skips_host_readback_for_cuda_arrays(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """CUDA direct-array validation avoids implicit ``.numpy()`` readback."""
+    if not cuda_available(wp):
+        pytest.skip("CUDA not available for readback guard test")
+
+    temperature = wp.array([298.15, 299.15], dtype=wp.float64, device="cuda")
+    pressure = wp.array([101325.0, 101000.0], dtype=wp.float64, device="cuda")
+
+    def _forbidden_numpy(self: Any) -> np.ndarray:
+        raise AssertionError("unexpected host readback")
+
+    monkeypatch.setattr(temperature, "numpy", _forbidden_numpy, raising=False)
+    monkeypatch.setattr(pressure, "numpy", _forbidden_numpy, raising=False)
+
+    returned_temperature, returned_pressure = _ensure_environment_arrays(
+        temperature=temperature,
+        pressure=pressure,
+        environment=None,
+        n_boxes=2,
+        device=wp.get_device("cuda"),
+        caller_name="test_caller",
+    )
+
+    assert returned_temperature is temperature
+    assert returned_pressure is pressure
 
 
 @pytest.mark.parametrize(
