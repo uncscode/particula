@@ -48,6 +48,22 @@
   the shipped name contract, binary `partitioning` validation, multi-box shape
   preservation, and retry-safe correction paths.
 
+## Implemented in E2-F4-P3 (`#1199`)
+
+- Updated only:
+  - `particula/gpu/conversion.py`
+  - `particula/gpu/warp_types.py`
+  - `particula/gpu/tests/conversion_test.py`
+- Clarified `to_warp_gas_data()` so optional caller-supplied `vapor_pressure`
+  is explicitly documented, must match `(n_boxes, n_species)`, and otherwise
+  defaults to a zero-filled GPU buffer with that shape.
+- Clarified `from_warp_gas_data()` as an intentionally lossy CPU restore for
+  GPU-only `vapor_pressure`, with callers responsible for reading or saving a
+  sidecar before restore.
+- Added focused tests that directly assert valid explicit transfer, omitted
+  zero-fill behavior, invalid-shape errors, and sidecar preservation across
+  restore.
+
 ## Out of Scope
 
 - Rewriting GPU condensation kernels beyond any small compatibility updates

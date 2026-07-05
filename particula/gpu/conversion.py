@@ -259,7 +259,7 @@ def to_warp_gas_data(
     copy: bool = True,
     vapor_pressure: NDArray[np.float64] | None = None,
 ) -> "WarpGasData":
-    """Transfer GasData to GPU with explicit vapor-pressure ownership.
+    """Transfer GasData to GPU with caller-owned vapor-pressure state.
 
     Use this for long GPU-resident simulations where you want to:
     1. Transfer data to GPU once at simulation start
@@ -274,14 +274,14 @@ def to_warp_gas_data(
         (1 = True, 0 = False) for GPU compatibility.
 
         ``WarpGasData`` requires a ``vapor_pressure`` buffer even though CPU
-        ``GasData`` does not own that field. Callers may supply an explicit
-        ``(n_boxes, n_species)`` array when GPU kernels need physical vapor
-        pressure values.
+        ``GasData`` does not own that field. Callers may supply the
+        authoritative ``(n_boxes, n_species)`` vapor-pressure array when GPU
+        kernels need physical vapor-pressure values.
 
         If ``vapor_pressure`` is omitted, this helper allocates a zero-filled
-        ``(n_boxes, n_species)`` GPU buffer. That default keeps the transfer
-        schema valid, but condensation callers that need physical vapor
-        pressure values must provide them explicitly.
+        ``(n_boxes, n_species)`` GPU buffer on the selected device. That
+        default keeps the transfer schema valid, but condensation callers that
+        need physical vapor-pressure values must provide them explicitly.
 
     Args:
         data: CPU-side GasData container.
@@ -289,9 +289,9 @@ def to_warp_gas_data(
         copy: If True (default), always copy data to device.
               If False, attempt zero-copy via wp.from_numpy() when
               arrays are already on a compatible device.
-        vapor_pressure: Optional vapor pressure array in Pa.
+        vapor_pressure: Optional caller-supplied vapor pressure array in Pa.
             Shape: ``(n_boxes, n_species)``. If omitted, this helper creates
-            a zero-filled buffer with that same shape for the GPU mirror.
+            a zero-filled GPU buffer with that same shape for the Warp mirror.
 
     Returns:
         WarpGasData with Warp arrays on specified device.
@@ -421,9 +421,10 @@ def from_warp_gas_data(
 
     Note:
         The ``vapor_pressure`` field from ``WarpGasData`` is not restored
-        because CPU ``GasData`` does not include this field. If you need
-        vapor-pressure values after GPU work, read ``gpu_data.vapor_pressure``
-        before calling this helper or keep a sidecar copy yourself.
+        because CPU ``GasData`` does not include this field. If you need the
+        authoritative vapor-pressure values after GPU work, read
+        ``gpu_data.vapor_pressure`` before calling this helper or keep a
+        sidecar copy yourself.
         ``from_warp_gas_data()`` restores only the CPU-owned ``GasData``
         fields.
 

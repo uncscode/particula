@@ -36,3 +36,15 @@
   `name=None`, empty-name failures, invalid non-binary `partitioning`,
   retry-safe correction paths, vapor-pressure loss on restore, and multi-box
   shape preservation.
+
+## 2026-07-04
+
+- Updated `E2-F4` plan sections after issue `#1199` landed as `E2-F4-P3`.
+- Recorded that shipped production edits stayed narrow to
+  `particula/gpu/conversion.py` and `particula/gpu/warp_types.py`, with test
+  updates in `particula/gpu/tests/conversion_test.py`.
+- Recorded the explicit vapor-pressure contract: caller-supplied
+  `(n_boxes, n_species)` values transfer as-is, omitted input allocates a
+  zero-filled GPU buffer, invalid shapes raise `ValueError`, and CPU restore
+  intentionally drops GPU-only `vapor_pressure` unless callers preserve a
+  sidecar.

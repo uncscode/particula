@@ -34,18 +34,25 @@
     invalid non-binary failures, vapor-pressure drop behavior, multi-box shape
     preservation, and retry-safe correction paths.
 
-- [ ] **E2-F4-P3:** Clarify vapor-pressure ownership and GPU transfer behavior with tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Make `vapor_pressure` treatment explicit as GPU transient input,
-    returned sidecar, or documented loss according to the chosen ownership
-    decision.
-  - Files: `particula/gpu/conversion.py`,
-    `particula/gpu/tests/conversion_test.py`,
-    `particula/gpu/kernels/condensation.py` if validation messages need
-    alignment.
-  - Tests: Supplied vapor pressure transfers to Warp with exact shape; invalid
-    shapes raise `ValueError`; missing vapor pressure behavior is explicit;
-    round-trip preservation or intentional discard is tested.
+- [x] **E2-F4-P3:** Clarify vapor-pressure ownership and GPU transfer behavior with tests
+  - Issue: `#1199` | Size: S | Status: Landed
+  - Goal: Make `vapor_pressure` treatment explicit at the transfer boundary
+    without expanding CPU `GasData` ownership.
+  - Files: `particula/gpu/conversion.py`, `particula/gpu/warp_types.py`, and
+    `particula/gpu/tests/conversion_test.py`.
+  - Implemented:
+    - `to_warp_gas_data()` now explicitly documents optional caller-supplied
+      `vapor_pressure`, required `(n_boxes, n_species)` shape validation, and
+      zero-filled GPU allocation when omitted.
+    - `from_warp_gas_data()` now explicitly documents intentionally lossy CPU
+      restore for GPU-only `vapor_pressure` and the need to read/save it before
+      restore.
+    - `WarpGasData` keeps `vapor_pressure` documented as GPU-only helper state.
+    - No kernel compatibility edits were required.
+  - Tests: Coverage now directly asserts valid explicit vapor-pressure
+    transfer, omitted zero-fill behavior, invalid-shape `ValueError` cases for
+    `(n_species,)`, swapped axes, and mismatched species counts, plus sidecar
+    preservation across restore.
 
 - [ ] **E2-F4-P4:** Update migration documentation for gas round-trip semantics
   - Issue: TBD | Size: XS | Status: Not Started
@@ -60,8 +67,8 @@
 ## Phase Ordering Notes
 
 - P1 should capture the current contract before P2 or P3 changes semantics.
-- P2 proceeded from the P1 audit and is now landed; P3 should continue to use
-  the explicit P2 name and `partitioning` restore contract as its baseline
-  while vapor-pressure ownership remains open.
+- P2 proceeded from the P1 audit and is now landed; P3 is now landed as the
+  explicit vapor-pressure contract layer built on top of the P2 name and
+  `partitioning` restore baseline.
 - P4 is the publication gate and should follow the tested decisions from P2 and P3
   so downstream kernel and docs tracks cite the same gas round-trip behavior.

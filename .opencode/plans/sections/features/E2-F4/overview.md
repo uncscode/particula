@@ -7,24 +7,30 @@ round-trip contract explicit for users and implementers. CPU `GasData` owns
 species names, molar mass, concentration, and boolean partitioning. GPU
 `WarpGasData` drops names, stores partitioning as `int32`, and adds a
 `(n_boxes, n_species)` vapor-pressure buffer required by GPU condensation
-kernels. After `E2-F4-P1` and `E2-F4-P2`, the name and partitioning restore
-paths are now explicit and test-backed, while vapor-pressure ownership and
-broader migration documentation remain for later phases.
+kernels. After `E2-F4-P3` landed in issue `#1199`, the vapor-pressure transfer
+boundary is now explicit and test-backed without expanding CPU `GasData`
+ownership.
 
 ## Value Proposition
 
 This feature makes gas CPU/GPU schema ownership and round-trip behavior
 predictable, tested, and documented. `E2-F4-P1` landed issue `#1197` as a
 focused regression-test audit. `E2-F4-P2` landed issue `#1198` by making the
-restore contract explicit in `particula/gpu/conversion.py` and expanding the
-focused tests in `particula/gpu/tests/conversion_test.py`. Users migrating to
-the data-oriented GPU path can now rely on test-backed expectations that:
+restore contract explicit in `particula/gpu/conversion.py`. `E2-F4-P3` landed
+issue `#1199` by clarifying vapor-pressure transfer semantics in
+`particula/gpu/conversion.py`, `particula/gpu/warp_types.py`, and
+`particula/gpu/tests/conversion_test.py`. Users migrating to the data-oriented
+GPU path can now rely on test-backed expectations that:
 - caller-supplied ordered names are preferred on restore;
 - omitted or `None` names restore as placeholder `species_0..n-1` labels;
 - wrong-length or empty provided name lists fail with actual/expected count
   messaging; and
 - restored `partitioning` accepts only binary `0/1` values before conversion
-  back to CPU bool dtype.
+  back to CPU bool dtype;
+- caller-supplied `vapor_pressure` must have shape `(n_boxes, n_species)`;
+- omitted `vapor_pressure` becomes a zero-filled GPU buffer with that shape; and
+- CPU restore intentionally drops GPU-only `vapor_pressure`, so callers must
+  read or save it before `from_warp_gas_data()`.
 
 ## Parent Epic Context
 
