@@ -230,6 +230,35 @@ def test_coagulation_step_gpu_rejects_explicit_environment_in_p1(
 
 
 @pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, None),
+        (None, 101325.0),
+        (None, None),
+    ],
+)
+def test_coagulation_step_gpu_rejects_missing_scalar_inputs_without_environment(
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+) -> None:
+    """Scalar-mode calls require both temperature and pressure."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    with pytest.raises(
+        ValueError,
+        match="temperature and pressure must both be provided",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+        )
+
+
+@pytest.mark.parametrize(
     ("temperature", "pressure", "message"),
     [
         (
@@ -285,6 +314,65 @@ def test_coagulation_step_gpu_contract_errors_short_circuit_before_launch(
         )
 
     assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, None),
+        (None, 101325.0),
+        (None, None),
+    ],
+)
+def test_coagulation_step_gpu_missing_scalar_inputs_short_circuit_before_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+) -> None:
+    """Missing scalar inputs fail before setup, launch, or input mutation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    rng_states = wp.array(np.array([17], dtype=np.uint32), dtype=wp.uint32, device=device)
+    initial_rng_states = np.asarray(rng_states.numpy()).copy()
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    calls: list[str] = []
+
+    def _unexpected_ensure_volume_array(*args: Any, **kwargs: Any) -> Any:
+        calls.append("ensure_volume_array")
+        raise AssertionError("_ensure_volume_array should not be called")
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(
+        coagulation_module,
+        "_ensure_volume_array",
+        _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(
+        ValueError,
+        match="temperature and pressure must both be provided",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            rng_states=rng_states,
+        )
+
+    assert calls == []
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
+    result_particles = from_warp_particle_data(gpu_particles, sync=True)
+    npt.assert_allclose(result_particles.masses, initial_particles.masses)
+    npt.assert_allclose(
+        result_particles.concentration,
+        initial_particles.concentration,
+    )
 
 
 @wp.kernel

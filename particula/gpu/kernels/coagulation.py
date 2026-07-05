@@ -53,6 +53,10 @@ _MIXED_ENVIRONMENT_ERROR = (
     "Cannot mix scalar temperature/pressure inputs with environment in "
     "coagulation_step_gpu."
 )
+_MISSING_SCALAR_ENVIRONMENT_ERROR = (
+    "temperature and pressure must both be provided when environment is "
+    "omitted in coagulation_step_gpu."
+)
 _UNSUPPORTED_ENVIRONMENT_ERROR = (
     "environment execution is not implemented in P1 for coagulation_step_gpu."
 )
@@ -597,6 +601,9 @@ def coagulation_step_gpu(
         if temperature is not None or pressure is not None:
             raise ValueError(_MIXED_ENVIRONMENT_ERROR)
         raise ValueError(_UNSUPPORTED_ENVIRONMENT_ERROR)
+
+    if temperature is None or pressure is None:
+        raise ValueError(_MISSING_SCALAR_ENVIRONMENT_ERROR)
 
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)

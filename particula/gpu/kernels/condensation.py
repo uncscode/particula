@@ -56,6 +56,10 @@ _MIXED_ENVIRONMENT_ERROR = (
     "Cannot mix scalar temperature/pressure inputs with environment in "
     "condensation_step_gpu."
 )
+_MISSING_SCALAR_ENVIRONMENT_ERROR = (
+    "temperature and pressure must both be provided when environment is "
+    "omitted in condensation_step_gpu."
+)
 _UNSUPPORTED_ENVIRONMENT_ERROR = (
     "environment execution is not implemented in P1 for condensation_step_gpu."
 )
@@ -431,6 +435,9 @@ def condensation_step_gpu(
         if temperature is not None or pressure is not None:
             raise ValueError(_MIXED_ENVIRONMENT_ERROR)
         raise ValueError(_UNSUPPORTED_ENVIRONMENT_ERROR)
+
+    if temperature is None or pressure is None:
+        raise ValueError(_MISSING_SCALAR_ENVIRONMENT_ERROR)
 
     scalar_temperature = cast(float, temperature)
     scalar_pressure = cast(float, pressure)
