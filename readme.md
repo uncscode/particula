@@ -46,11 +46,14 @@ Legacy facades remain available, with deprecation planned for v0.3.0.
 single-box and multi-box round trips.
 GPU kernel entry points `condensation_step_gpu` and `coagulation_step_gpu`
 now accept scalar `temperature` / `pressure` inputs, per-box Warp arrays with
-shape `(n_boxes,)`, or a `WarpEnvironmentData` via the keyword-only
+shape `(n_boxes,)`, hybrid scalar-plus-Warp-array direct inputs when
+`environment` is omitted, or a `WarpEnvironmentData` via the keyword-only
 `environment=` parameter.
 Mixed scalar-plus-environment calls still fail early by design. Explicit
 environment inputs must match the particle/gas device and use `(n_boxes,)`
-temperature and pressure arrays.
+temperature and pressure arrays. All accepted temperature, pressure, and
+coagulation volume inputs are validated as positive finite physical values
+before launch.
 
 ## Code Structure
 

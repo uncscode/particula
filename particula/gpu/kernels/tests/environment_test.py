@@ -188,6 +188,187 @@ def test_environment_helper_detects_warp_array_like_and_plain_inputs(
         )
 
 
+class _FakeTensorLike:
+    """Tensor-like object that should not satisfy the Warp-array contract."""
+
+    def __init__(self, values: np.ndarray) -> None:
+        self.shape = values.shape
+        self.device = "cpu"
+        self.dtype = values.dtype
+        self._values = values
+
+    def numpy(self) -> np.ndarray:
+        """Return the stored array for compatibility-style probing."""
+        return self._values
+
+
+def test_environment_helper_rejects_non_warp_tensor_like_input() -> None:
+    """Unsupported tensor-like inputs fail before any later Warp execution."""
+    values = _FakeTensorLike(np.array([298.15, 299.15], dtype=np.float64))
+
+    assert not _is_warp_array_like(values)
+
+    with pytest.raises(ValueError, match="must be a Warp array"):
+        _validate_box_array(
+            "temperature",
+            values,
+            n_boxes=2,
+            device=wp.get_device("cpu"),
+            caller_name="test_caller",
+        )
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "message"),
+    [
+        (0.0, 101325.0, "temperature must be finite and > 0"),
+        (-1.0, 101325.0, "temperature must be finite and > 0"),
+        (float("nan"), 101325.0, "temperature must be finite and > 0"),
+        (298.15, 0.0, "pressure must be finite and > 0"),
+        (298.15, float("inf"), "pressure must be finite and > 0"),
+    ],
+)
+def test_environment_helper_rejects_invalid_scalar_domains(
+    device: str,
+    temperature: float,
+    pressure: float,
+    message: str,
+) -> None:
+    """Scalar inputs must be positive finite physical values."""
+    with pytest.raises(ValueError, match=message):
+        _ensure_environment_arrays(
+            temperature=temperature,
+            pressure=pressure,
+            environment=None,
+            n_boxes=1,
+            device=wp.get_device(device),
+            caller_name="test_caller",
+        )
+
+
+@pytest.mark.parametrize(
+    ("name", "values", "message"),
+    [
+        (
+            "temperature",
+            np.array([298.15, 0.0], dtype=np.float64),
+            "temperature must be finite and > 0",
+        ),
+        (
+            "temperature",
+            np.array([298.15, np.nan], dtype=np.float64),
+            "temperature must be finite and > 0",
+        ),
+        (
+            "pressure",
+            np.array([101325.0, np.inf], dtype=np.float64),
+            "pressure must be finite and > 0",
+        ),
+    ],
+)
+def test_environment_helper_rejects_invalid_direct_array_domains(
+    device: str,
+    name: str,
+    values: np.ndarray,
+    message: str,
+) -> None:
+    """Direct Warp-array inputs must be positive finite physical values."""
+    temperature = wp.array([298.15, 299.15], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0, 101000.0], dtype=wp.float64, device=device)
+    invalid = wp.array(values, dtype=wp.float64, device=device)
+    if name == "temperature":
+        temperature = invalid
+    else:
+        pressure = invalid
+
+    with pytest.raises(ValueError, match=message):
+        _ensure_environment_arrays(
+            temperature=temperature,
+            pressure=pressure,
+            environment=None,
+            n_boxes=2,
+            device=wp.get_device(device),
+            caller_name="test_caller",
+        )
+
+
+def test_environment_helper_rejects_invalid_environment_array_domains(
+    device: str,
+) -> None:
+    """Environment-backed arrays must be positive finite physical values."""
+    environment = to_warp_environment_data(
+        _make_environment(2, 1), device=device
+    )
+    environment.pressure = wp.array(
+        [101325.0, 0.0], dtype=wp.float64, device=device
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="environment.pressure must be finite and > 0",
+    ):
+        _ensure_environment_arrays(
+            temperature=None,
+            pressure=None,
+            environment=environment,
+            n_boxes=2,
+            device=environment.temperature.device,
+            caller_name="test_caller",
+        )
+
+
+def test_environment_helper_returns_direct_array_dtype_unchanged(
+    device: str,
+) -> None:
+    """Valid direct Warp arrays are returned without copying or coercion."""
+    temperature = wp.array([298.15, 299.15], dtype=wp.float32, device=device)
+    pressure = wp.array([101325.0, 101000.0], dtype=wp.float32, device=device)
+
+    returned_temperature, returned_pressure = _ensure_environment_arrays(
+        temperature=temperature,
+        pressure=pressure,
+        environment=None,
+        n_boxes=2,
+        device=temperature.device,
+        caller_name="test_caller",
+    )
+
+    assert returned_temperature is temperature
+    assert returned_pressure is pressure
+    assert returned_temperature.dtype == wp.float32
+    assert returned_pressure.dtype == wp.float32
+
+
+def test_environment_helper_returns_environment_array_dtype_unchanged(
+    device: str,
+) -> None:
+    """Environment-backed Warp arrays are returned without copying."""
+    class _EnvironmentLike:
+        def __init__(self) -> None:
+            self.temperature = wp.array(
+                [298.15, 299.15], dtype=wp.float32, device=device
+            )
+            self.pressure = wp.array(
+                [101325.0, 101000.0], dtype=wp.float32, device=device
+            )
+
+    environment = _EnvironmentLike()
+
+    returned_temperature, returned_pressure = _ensure_environment_arrays(
+        temperature=None,
+        pressure=None,
+        environment=environment,
+        n_boxes=2,
+        device=environment.temperature.device,
+        caller_name="test_caller",
+    )
+
+    assert returned_temperature is environment.temperature
+    assert returned_pressure is environment.pressure
+    assert returned_temperature.dtype == wp.float32
+    assert returned_pressure.dtype == wp.float32
+
+
 def test_environment_helper_rejects_environment_wrong_n_boxes(
     device: str,
 ) -> None:

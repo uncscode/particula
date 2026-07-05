@@ -258,12 +258,16 @@ restored = from_warp_environment_data(gpu_environment)
   not perform hidden CPU↔GPU synchronization for environment state.
 - `condensation_step_gpu(..., environment=...)` and
   `coagulation_step_gpu(..., environment=...)` accept scalar
-  `temperature`/`pressure`, direct per-box Warp arrays shaped `(n_boxes,)`, or
-  explicit `WarpEnvironmentData` on the active device.
+  `temperature`/`pressure`, direct per-box Warp arrays shaped `(n_boxes,)`,
+  hybrid scalar-plus-Warp-array direct inputs when `environment` is omitted,
+  or explicit `WarpEnvironmentData` on the active device.
 - Mixing scalar or Warp-array `temperature`/`pressure` with `environment=`
   still raises an early `ValueError`.
 - Explicit environment and direct Warp-array inputs must use `(n_boxes,)`
   temperature and pressure arrays on the same device as the particle/gas data.
+- Accepted direct/environment `temperature` and `pressure` inputs, plus direct
+  coagulation `volume` inputs, are validated as positive finite physical
+  values before launch.
 - `EnvironmentData.temperature` and `pressure` use `(n_boxes,)`;
   `saturation_ratio` uses `(n_boxes, n_species)` on both CPU and Warp mirrors.
 - Round trips preserve `temperature`, `pressure`, and `saturation_ratio` for
