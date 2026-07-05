@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from typing import Any
 
 import numpy as np
@@ -10,10 +11,12 @@ import pytest
 
 wp = pytest.importorskip("warp")
 
+import particula.gpu.kernels.condensation as condensation_module  # noqa: E402
 from particula.dynamics.condensation.mass_transfer import (  # noqa: E402
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
 )
+from particula.gas.environment_data import EnvironmentData  # noqa: E402
 from particula.gas.gas_data import GasData  # noqa: E402
 from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
     get_dynamic_viscosity,
@@ -26,6 +29,7 @@ from particula.gas.properties.pressure_function import (  # noqa: E402
 )
 from particula.gpu.conversion import (  # noqa: E402
     from_warp_particle_data,
+    to_warp_environment_data,
     to_warp_gas_data,
     to_warp_particle_data,
 )
@@ -120,6 +124,20 @@ def _make_vapor_pressure(n_boxes: int, n_species: int) -> np.ndarray:
     for box_idx in range(n_boxes):
         vapor_pressure[box_idx, :] = 800.0 + 50.0 * box_idx
     return vapor_pressure
+
+
+def _make_environment_data(
+    n_boxes: int,
+    n_species: int,
+    temperature: float = 298.15,
+    pressure: float = 101325.0,
+) -> EnvironmentData:
+    """Create deterministic environment data for contract tests."""
+    return EnvironmentData(
+        temperature=np.full((n_boxes,), temperature, dtype=np.float64),
+        pressure=np.full((n_boxes,), pressure, dtype=np.float64),
+        saturation_ratio=np.ones((n_boxes, n_species), dtype=np.float64),
+    )
 
 
 def _cpu_mass_transfer(
@@ -257,6 +275,187 @@ def _run_gpu_step(
         from_warp_particle_data(gpu_particles, sync=True),
         mass_transfer_buffer,
     )
+
+
+def test_condensation_step_gpu_signature_keeps_environment_keyword_only() -> None:
+    """The reserved environment input stays keyword-only in P1."""
+    parameter = inspect.signature(condensation_step_gpu).parameters[
+        "environment"
+    ]
+
+    assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
+
+
+def test_condensation_step_gpu_scalar_positional_call_remains_valid(
+    device: str,
+) -> None:
+    """Legacy positional scalar callers remain source-compatible."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    _, mass_transfer = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        298.15,
+        101325.0,
+        0.1,
+    )
+    wp.synchronize()
+
+    assert mass_transfer.shape == (1, 2, 1)
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, 101325.0),
+        (298.15, None),
+        (None, 101325.0),
+    ],
+)
+def test_condensation_step_gpu_rejects_mixed_environment_inputs(
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+) -> None:
+    """Mixed scalar and environment inputs raise a stable contract error."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="scalar temperature/pressure inputs with environment",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+def test_condensation_step_gpu_rejects_explicit_environment_in_p1(
+    device: str,
+) -> None:
+    """Pure environment execution is reserved for a later phase."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="environment execution is not implemented in P1",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=None,
+            pressure=None,
+            time_step=0.1,
+            environment=environment,
+        )
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "message"),
+    [
+        (
+            298.15,
+            101325.0,
+            "scalar temperature/pressure inputs with environment",
+        ),
+        (
+            None,
+            None,
+            "environment execution is not implemented in P1",
+        ),
+    ],
+)
+def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+    message: str,
+) -> None:
+    """Contract errors fire before scalar gas-property helper calls."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=1, n_species=1),
+        device=device,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    calls: list[str] = []
+
+    def _unexpected_dynamic_viscosity(*args: Any, **kwargs: Any) -> float:
+        calls.append("dynamic_viscosity")
+        raise AssertionError("get_dynamic_viscosity should not be called")
+
+    def _unexpected_mean_free_path(*args: Any, **kwargs: Any) -> float:
+        calls.append("mean_free_path")
+        raise AssertionError(
+            "get_molecule_mean_free_path should not be called"
+        )
+
+    monkeypatch.setattr(
+        condensation_module,
+        "get_dynamic_viscosity",
+        _unexpected_dynamic_viscosity,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "get_molecule_mean_free_path",
+        _unexpected_mean_free_path,
+    )
+
+    with pytest.raises(ValueError, match=message):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            environment=environment,
+        )
+
+    assert calls == []
 
 
 def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
@@ -570,6 +769,26 @@ def test_validate_mass_transfer_buffer_rejects_device(device: str) -> None:
             (1, 2, 2),
             wp.get_device(wrong_device),
         )
+
+
+def test_condensation_validation_helpers_accept_valid_inputs(
+    device: str,
+) -> None:
+    """Validation helpers accept correctly shaped on-device buffers."""
+    species_array = wp.zeros(2, dtype=wp.float64, device=device)
+    mass_transfer = wp.zeros((1, 2, 2), dtype=wp.float64, device=device)
+
+    _validate_species_array(
+        "surface_tension",
+        species_array,
+        2,
+        species_array.device,
+    )
+    _validate_mass_transfer_buffer(
+        mass_transfer,
+        (1, 2, 2),
+        mass_transfer.device,
+    )
 
 
 def test_condensation_step_gpu_rejects_particle_length_mismatch(
