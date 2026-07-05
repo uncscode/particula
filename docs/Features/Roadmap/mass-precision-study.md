@@ -1,16 +1,30 @@
-# Mass Precision Study Baseline and Candidate Fidelity Checks
+# Mass Precision Recommendation Report
 
-This page records the deterministic baseline cases and study-only candidate
-fidelity checks for the particle mass precision study used by `E2-F6`. In this
-phase, production particle storage remains absolute per-species `np.float64` on
-CPU and `wp.float64` on GPU.
+This page is the final `E2-F6` acceptance artifact for particle mass precision
+policy. It records the shipped P1-P3 evidence, publishes the current
+recommendation for downstream dtype/schema work, and keeps measured evidence
+separate from follow-up constraints.
 
-## Baseline policy
+Production particle storage remains absolute per-species `np.float64` on CPU
+and `wp.float64` on GPU. This report does not ship a runtime dtype or schema
+change.
 
-- CPU particle arrays remain absolute per-species `np.float64`.
-- Warp particle mirrors remain absolute per-species `wp.float64`.
-- This phase defines baseline cases plus bounded candidate fidelity checks.
-- This phase does not recommend a future precision or schema migration.
+## Final recommendation
+
+- Keep absolute per-species `np.float64` particle masses on CPU.
+- Keep absolute per-species `wp.float64` particle masses on GPU/Warp mirrors.
+- Treat this baseline as the accepted production policy until a later proposal
+  proves that an alternative representation preserves the documented fidelity,
+  conservation-sensitive behavior, and workflow constraints in this report.
+
+## Recommendation boundaries
+
+- This report summarizes only evidence already executed in the shipped P1-P3
+  test surface.
+- The recommendation is an approval gate for downstream dtype/schema proposals,
+  not approval to change production defaults now.
+- Optional benchmark evidence remains supplemental and opt-in; it does not by
+  itself authorize a production migration.
 
 ## Deterministic cases
 
@@ -66,7 +80,23 @@ densities.
 All reported radii use meters, densities use `kg/m^3`, and volume fractions are
 unitless fractions.
 
-## Executed P2 candidates
+## Shipped evidence summary
+
+The shipped evidence comes from the deterministic baseline fixture in
+`particula/gpu/tests/mass_precision_cases_test.py`, the comparison suite in
+`particula/gpu/tests/mass_precision_metrics_test.py`, and the fast benchmark
+helper coverage in `particula/gpu/tests/benchmark_helpers_test.py`.
+
+### P1 baseline coverage
+
+- Deterministic cases span NPF-scale through droplet-scale particles:
+  `npf_cluster`, `five_to_ten_nm`, `accumulation_mode`, and `cloud_droplet`.
+- All baseline inputs use explicit `np.float64` arrays and canonical container
+  shapes.
+- Mixed-species baselines reconstruct expected radii from authored total volume,
+  fixed species volume fractions, and documented densities.
+
+### P2 executed candidates
 
 The focused comparison module `particula/gpu/tests/mass_precision_metrics_test.py`
 evaluates exactly three study-only candidates against the `fp64` baseline:
@@ -92,7 +122,7 @@ For all three candidates, the study compares reconstructed per-species masses
 and derived radii against the baseline `np.float64` fixture values with bounded
 `numpy.testing.assert_allclose` tolerances.
 
-## P3 conservation and reconstruction thresholds
+### P3 thresholds and conservation-sensitive checks
 
 Phase P3 extends the same case-candidate matrix with cached executable metrics:
 
@@ -116,7 +146,7 @@ deterministic cases plus one mixed-scale stress case where nanometer particles
 and droplet-scale particles coexist in the same
 `(n_boxes, n_particles, n_species)` array.
 
-## P3 mixed-scale fidelity finding
+### P3 mixed-scale fidelity finding
 
 The mixed-scale stress case uses a single-species deterministic array that puts
 `1.5e-9 m` particles in the same boxes as `8.0e-6 m` to `1.5e-5 m` droplets.
@@ -129,7 +159,7 @@ slice checks. The aggregate assertion applies to species totals over the full
 array, while the mixed-scale smallest-particle assertions remain the guardrail
 for nanometer-scale fidelity.
 
-## P3 zero-mass and zero-volume edge handling
+### P3 zero-mass and zero-volume edge handling
 
 - Zero-total-mass reconstruction remains deterministic for
   `fp32_total_mass_fp32_mass_fraction`:
@@ -141,7 +171,7 @@ for nanometer-scale fidelity.
 - The fast metric suite is rerun under `pytest -Werror` to keep these paths
   divide-by-zero-warning free.
 
-## P3 clamp accounting
+### P3 clamp accounting
 
 When evaporation-oriented comparisons would drive raw updated mass below zero,
 the study records three separate quantities:
@@ -154,7 +184,7 @@ The executable metrics also report clamp frequency as the number of entries
 where `raw_updated_mass < 0.0`, and aggregate clamp delta per species. This
 keeps raw reconstruction error distinct from clamp-induced mass changes.
 
-## P3 memory-footprint examples
+### P3 memory-footprint examples
 
 These examples use analytic `shape × dtype-size` accounting only.
 
@@ -168,7 +198,7 @@ These examples use analytic `shape × dtype-size` accounting only.
 These examples document storage tradeoffs only. They do not change production
 runtime schemas or default dtypes.
 
-## P3 throughput evidence availability
+### P3 throughput evidence availability
 
 - Fast default validation remains in
   `particula/gpu/tests/mass_precision_metrics_test.py`.
@@ -183,12 +213,48 @@ runtime schemas or default dtypes.
   for GPU execution, while CPU-only helper coverage remains importable and the
   fast metric suite remains runnable.
 
+## Executed but not recommended candidates
+
+- `fp32_absolute_mass`
+- `mixed_precision_mass_plus_density`
+- `fp32_total_mass_fp32_mass_fraction`
+
+These candidates were executed to measure reconstruction fidelity,
+conservation-sensitive deltas, mixed-scale behavior, clamp accounting, and
+storage tradeoffs. They are not recommended for production defaults in this
+phase because the shipped evidence is used to approve the current `fp64`
+baseline, not to authorize a runtime migration.
+
 ## Unsupported candidates
 
 Candidates that need new runtime schema fields, extra production metadata, or
 public API expansion remain unsupported in this phase. They should be recorded
 as documentation-only ideas rather than added to executable runtime code or the
 focused test matrix.
+
+## Deferred investigation areas
+
+- Broader alternative mass representations such as log-mass or new reference-
+  mass schemas.
+- Production schema expansion that introduces new stored helper fields or new
+  public migration obligations.
+- Wider throughput campaigns beyond the focused opt-in benchmark surface.
+
+These follow-up areas are out of scope for this issue.
+
+## Downstream constraints for future dtype/schema proposals
+
+Any future proposal that changes production defaults must, at minimum:
+
+- preserve the deterministic P1 case coverage from NPF to droplet scale,
+- satisfy the shipped P3 reconstruction and mixed-scale thresholds with exact
+  candidate ids and warning-clean validation,
+- demonstrate acceptable conservation-sensitive mass-transfer deltas,
+- account for clamp behavior explicitly rather than hiding it inside aggregate
+  error metrics,
+- document storage/memory tradeoffs truthfully, and
+- update downstream roadmap and migration guidance in the same change so the
+  canonical policy reference stays consistent.
 
 ## Reproducibility
 
@@ -207,6 +273,23 @@ focused test matrix.
 - Threshold values match the fast metric assertions.
 - Memory examples use the documented formulas and concrete shapes.
 - Reproduction commands cover both fast checks and optional benchmark evidence.
+
+## Publication-readiness validation
+
+Rerun the focused commands below before treating this report as the backing
+reference for downstream dtype/schema work:
+
+- `pytest particula/gpu/tests/mass_precision_cases_test.py -q`
+- `pytest particula/gpu/tests/mass_precision_metrics_test.py -q`
+- `pytest particula/gpu/tests/benchmark_helpers_test.py -q`
+- `pytest -Werror particula/gpu/tests/mass_precision_metrics_test.py -q`
+
+Optional throughput evidence remains opt-in only:
+
+- `pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s`
+
+Check every Markdown link added by this report update directly and run
+`mkdocs build --strict` when the docs toolchain is available.
 
 ## Reproduction commands
 
