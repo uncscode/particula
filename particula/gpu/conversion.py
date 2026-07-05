@@ -114,8 +114,8 @@ def _restore_partitioning_bool(
     """
     if not np.all(np.isin(partitioning_values, (0, 1))):
         raise ValueError(
-            "invalid partitioning restore values; partitioning must contain "
-            "only binary 0/1 values when restoring GasData"
+            "invalid partitioning restore values: partitioning must contain "
+            "only binary 0/1 values before restoring GasData"
         )
     return partitioning_values.astype(bool)
 
@@ -416,7 +416,8 @@ def from_warp_gas_data(
         The ``vapor_pressure`` field from ``WarpGasData`` is not restored
         because ``GasData`` does not include this field. If you need vapor
         pressure values, access them directly from ``gpu_data`` before
-        calling this helper.
+        calling this helper. ``from_warp_gas_data()`` restores only the
+        CPU-owned ``GasData`` fields.
 
         ``WarpGasData`` does not store species names because string data is
         not GPU-compatible. Prefer caller-supplied ordered names when
@@ -441,7 +442,7 @@ def from_warp_gas_data(
         CPU-side GasData with NumPy arrays.
 
     Raises:
-        ValueError: If supplied name length doesn't match n_species.
+        ValueError: If the supplied name count does not match ``n_species``.
         ValueError: If restored ``partitioning`` contains values other than
             ``0`` or ``1``.
 
@@ -466,7 +467,8 @@ def from_warp_gas_data(
         name = [f"species_{i}" for i in range(n_species)]
     elif len(name) != n_species:
         raise ValueError(
-            f"name length {len(name)} does not match n_species {n_species}"
+            "name length mismatch when restoring GasData: expected "
+            f"{n_species} names, got {len(name)}"
         )
 
     # Convert partitioning from int32 to bool after validating GPU flags.
@@ -476,6 +478,7 @@ def from_warp_gas_data(
 
     from particula.gas.gas_data import GasData
 
+    # Intentionally drop GPU-only vapor_pressure when reconstructing GasData.
     return GasData(
         name=name,
         molar_mass=gpu_data.molar_mass.numpy(),

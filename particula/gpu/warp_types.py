@@ -94,12 +94,14 @@ class WarpGasData:
     Note:
         - The ``name`` field from CPU ``GasData`` is excluded because
           strings are not GPU-compatible. Preserve species identity with
-          caller-owned ordered names or index mapping outside this struct.
+          caller-owned ordered names or index mapping outside this struct;
+          placeholder names are generated only by CPU restore helpers when
+          names are omitted.
         - The ``partitioning`` field uses int32 instead of bool for GPU
           compatibility (1 = True, 0 = False) and is expected to remain
           binary for CPU restore.
         - ``vapor_pressure`` is added for GPU kernels and is not part of
-          CPU ``GasData``.
+          CPU ``GasData``, so CPU restore helpers intentionally drop it.
 
     Attributes:
         molar_mass: Molar masses in kg/mol.
