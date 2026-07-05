@@ -305,6 +305,7 @@ def to_warp_gas_data(
         RuntimeError: If Warp is not available or device not found.
         ValueError: If vapor_pressure shape doesn't match expected
             (n_boxes, n_species).
+        ValueError: If vapor_pressure contains NaN, inf, or negative values.
 
     Example:
         >>> from particula.gpu import to_warp_gas_data
@@ -327,6 +328,12 @@ def to_warp_gas_data(
             raise ValueError(
                 f"vapor_pressure shape {vp_array.shape} does not match "
                 f"expected {expected_shape}"
+            )
+        if not np.all(np.isfinite(vp_array)):
+            raise ValueError("vapor_pressure must contain only finite values")
+        if np.any(vp_array < 0.0):
+            raise ValueError(
+                "vapor_pressure must contain only nonnegative values"
             )
     else:
         # GPU kernels always receive a valid (n_boxes, n_species) buffer.
@@ -416,7 +423,7 @@ def from_warp_particle_data(
 
 def from_warp_gas_data(
     gpu_data: "WarpGasData",
-    name: list | None = None,
+    name: list[str] | None = None,
     sync: bool = True,
 ) -> "GasData":
     """Transfer WarpGasData back to CPU with an intentionally lossy restore.
@@ -457,6 +464,7 @@ def from_warp_gas_data(
         CPU-side GasData with NumPy arrays.
 
     Raises:
+        ValueError: If ``name`` is not ``None`` or a ``list[str]``.
         ValueError: If the supplied name count does not match ``n_species``.
         ValueError: If restored ``partitioning`` contains values other than
             ``0`` or ``1``.
@@ -471,20 +479,26 @@ def from_warp_gas_data(
     """
     wp = _ensure_warp_available()
 
-    if sync:
-        wp.synchronize()
-
     # Determine n_species from molar_mass shape
     n_species = gpu_data.molar_mass.shape[0]
 
     # Handle name parameter
     if name is None:
-        name = [f"species_{i}" for i in range(n_species)]
-    elif len(name) != n_species:
-        raise ValueError(
-            "name length mismatch when restoring GasData: expected "
-            f"{n_species} names, got {len(name)}"
-        )
+        restored_names = [f"species_{i}" for i in range(n_species)]
+    else:
+        if not isinstance(name, list):
+            raise ValueError("name must be a list of strings or None")
+        if any(not isinstance(species_name, str) for species_name in name):
+            raise ValueError("name must contain only string entries")
+        if len(name) != n_species:
+            raise ValueError(
+                "name length mismatch when restoring GasData: expected "
+                f"{n_species} names, got {len(name)}"
+            )
+        restored_names = name
+
+    if sync:
+        wp.synchronize()
 
     # Convert partitioning from int32 to bool after validating GPU flags.
     partitioning_bool = _restore_partitioning_bool(
@@ -495,7 +509,7 @@ def from_warp_gas_data(
 
     # Intentionally drop GPU-only vapor_pressure when reconstructing GasData.
     return GasData(
-        name=name,
+        name=restored_names,
         molar_mass=gpu_data.molar_mass.numpy(),
         concentration=gpu_data.concentration.numpy(),
         partitioning=partitioning_bool,
