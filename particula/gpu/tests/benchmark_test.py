@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -25,12 +26,21 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from particula.gpu.tests.cuda_availability import cuda_available
+from particula.gpu.tests.mass_precision_study_support import (
+    _build_mass_precision_cases,
+    _project_candidate,
+)
 
-def _benchmark_enabled() -> bool:
+try:
+    import warp as wp
+except ImportError:
+    wp = None
+
+
+def _benchmark_enabled(argv: list[str] | None = None) -> bool:
     """Check if --benchmark flag was passed to pytest."""
-    import sys
-
-    return "--benchmark" in sys.argv
+    return "--benchmark" in (sys.argv if argv is None else argv)
 
 
 if not _benchmark_enabled():
@@ -38,13 +48,6 @@ if not _benchmark_enabled():
         "GPU benchmarks skipped (pass --benchmark to enable)",
         allow_module_level=True,
     )
-
-wp = pytest.importorskip("warp", reason="warp required for GPU benchmarks")
-
-from particula.gpu.tests.cuda_availability import cuda_available  # noqa: E402
-
-if not cuda_available(wp):
-    pytest.skip("CUDA not available", allow_module_level=True)
 
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel_via_system_state,
@@ -71,28 +74,6 @@ from particula.gas.properties.mean_free_path import (  # noqa: E402
 from particula.gas.properties.pressure_function import (  # noqa: E402
     get_partial_pressure,
 )
-from particula.gpu.conversion import (  # noqa: E402
-    to_warp_gas_data,
-    to_warp_particle_data,
-)
-from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
-    brownian_diffusivity_wp,
-    brownian_kernel_pair_wp,
-)
-from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
-    diffusion_coefficient_wp,
-    mass_transfer_rate_wp,
-    particle_radius_from_volume_wp,
-)
-from particula.gpu.kernels.coagulation import (  # noqa: E402
-    coagulation_step_gpu,
-)
-from particula.gpu.kernels.condensation import (  # noqa: E402
-    condensation_step_gpu,
-)
-from particula.gpu.tests.mass_precision_cases_test import (  # noqa: E402
-    _build_mass_precision_cases,
-)
 from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
     get_aerodynamic_mobility,
@@ -117,6 +98,20 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
     get_vapor_transition_correction,
 )
 from particula.util import constants  # noqa: E402
+
+if wp is not None:
+    from particula.gpu.conversion import to_warp_gas_data, to_warp_particle_data
+    from particula.gpu.dynamics.coagulation_funcs import (
+        brownian_diffusivity_wp,
+        brownian_kernel_pair_wp,
+    )
+    from particula.gpu.dynamics.condensation_funcs import (
+        diffusion_coefficient_wp,
+        mass_transfer_rate_wp,
+        particle_radius_from_volume_wp,
+    )
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+    from particula.gpu.kernels.condensation import condensation_step_gpu
 
 pytestmark = [pytest.mark.slow, pytest.mark.performance, pytest.mark.benchmark]
 
@@ -207,7 +202,15 @@ def _save_results() -> None:
     etc.). The file is overwritten each time with the full dict.
     """
     _benchmark_results["updated_at"] = datetime.now(timezone.utc).isoformat()
-    BENCHMARK_OUTPUT.write_text(json.dumps(_benchmark_results, indent=2) + "\n")
+    try:
+        BENCHMARK_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        BENCHMARK_OUTPUT.write_text(
+            json.dumps(_benchmark_results, indent=2) + "\n"
+        )
+    except OSError as exc:
+        raise RuntimeError(
+            f"Failed to write benchmark results to {BENCHMARK_OUTPUT}: {exc}"
+        ) from exc
     print(f"  [save] Results written to {BENCHMARK_OUTPUT}")
 
 
@@ -217,31 +220,61 @@ def _skip_if_no_cuda() -> None:
     Raises:
         pytest.SkipTest: When a CUDA device is not present.
     """
-    if not cuda_available(wp):
-        pytest.skip("CUDA not available")
+    if wp is None or not cuda_available(wp):
+        pytest.skip("Warp/CUDA not available")
 
 
-def _project_mass_precision_candidate(
-    masses: NDArray[np.float64],
-    candidate_id: str,
-) -> NDArray[np.float64]:
-    """Project and reconstruct study-only mass-precision candidates."""
-    if candidate_id == "fp32_absolute_mass":
-        return masses.astype(np.float32).astype(np.float64)
-    if candidate_id == "mixed_precision_mass_plus_density":
-        return masses.astype(np.float32).astype(np.float64)
-    if candidate_id == "fp32_total_mass_fp32_mass_fraction":
-        total_mass = np.sum(masses, axis=-1, dtype=np.float64).astype(np.float32)
-        mass_fractions = np.divide(
-            masses,
-            np.sum(masses, axis=-1, dtype=np.float64)[..., np.newaxis],
-            out=np.zeros_like(masses),
-            where=np.sum(masses, axis=-1, dtype=np.float64)[..., np.newaxis] > 0.0,
-        ).astype(np.float32)
-        return total_mass.astype(np.float64)[..., np.newaxis] * mass_fractions.astype(
-            np.float64
+def _allocation_itemsize(itemsize: int | None, dtype: Any) -> int:
+    """Return an allocation itemsize for preflight checks."""
+    if itemsize is not None:
+        return itemsize
+    return int(np.dtype(dtype).itemsize)
+
+
+def _estimate_allocation_nbytes(shape: tuple[int, ...], itemsize: int) -> int:
+    """Estimate the bytes required for one array allocation."""
+    total_items = 1
+    for value in shape:
+        total_items *= value
+    return total_items * itemsize
+
+
+def _preflight_large_allocation(
+    shape: tuple[int, ...],
+    *,
+    label: str,
+    itemsize: int,
+) -> None:
+    """Skip oversized opt-in allocations before attempting device allocation."""
+    max_bytes = os.getenv("BENCHMARK_MAX_ALLOC_BYTES")
+    if max_bytes is None:
+        return
+    required_bytes = _estimate_allocation_nbytes(shape, itemsize)
+    if required_bytes > int(max_bytes):
+        pytest.skip(
+            f"Skipping {label}: requires {required_bytes} bytes, limit is "
+            f"{max_bytes}"
         )
-    raise ValueError(f"Unsupported candidate id: {candidate_id}")
+
+
+def _wp_zeros_with_guard(
+    shape: tuple[int, ...],
+    *,
+    dtype: Any,
+    device: str,
+    label: str,
+    itemsize: int | None = None,
+):
+    """Allocate a Warp array with preflight and graceful failure handling."""
+    _preflight_large_allocation(
+        shape,
+        label=label,
+        itemsize=_allocation_itemsize(itemsize, dtype),
+    )
+    try:
+        return wp.zeros(shape, dtype=dtype, device=device)
+    except (MemoryError, RuntimeError, ValueError) as exc:
+        pytest.skip(f"Skipping {label} allocation on {device}: {exc}")
 
 
 @contextmanager
@@ -830,11 +863,27 @@ def test_coagulation_scaling(
     particles = _make_particle_data(n_boxes, n_particles, n_species)
 
     gpu_particles = to_warp_particle_data(particles, device="cuda")
-    collision_pairs_buf = wp.zeros(
-        (n_boxes, MAX_COLLISIONS, 2), dtype=wp.int32, device="cuda"
+    collision_pairs_buf = _wp_zeros_with_guard(
+        (n_boxes, MAX_COLLISIONS, 2),
+        dtype=wp.int32,
+        device="cuda",
+        label=f"{tag} collision pairs",
+        itemsize=4,
     )
-    n_collisions_buf = wp.zeros((n_boxes,), dtype=wp.int32, device="cuda")
-    rng_states_buf = wp.zeros((n_boxes,), dtype=wp.uint32, device="cuda")
+    n_collisions_buf = _wp_zeros_with_guard(
+        (n_boxes,),
+        dtype=wp.int32,
+        device="cuda",
+        label=f"{tag} collision counts",
+        itemsize=4,
+    )
+    rng_states_buf = _wp_zeros_with_guard(
+        (n_boxes,),
+        dtype=wp.uint32,
+        device="cuda",
+        label=f"{tag} RNG state",
+        itemsize=4,
+    )
     step_counter = {"idx": 0}
 
     def gpu_step() -> None:
@@ -907,91 +956,93 @@ def test_coagulation_scaling(
     _save_results()
 
 
-@wp.kernel
-# type: ignore[misc]
-def _diffusion_coefficient_kernel(
-    temperatures: Any,
-    mobilities: Any,
-    boltzmann_constant: Any,
-    result: Any,
-) -> None:
-    """Evaluate diffusion_coefficient_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = diffusion_coefficient_wp(
-        temperatures[tid], mobilities[tid], boltzmann_constant
-    )
+if wp is not None:
+
+    @wp.kernel
+    # type: ignore[misc]
+    def _diffusion_coefficient_kernel(
+        temperatures: Any,
+        mobilities: Any,
+        boltzmann_constant: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate diffusion_coefficient_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = diffusion_coefficient_wp(
+            temperatures[tid], mobilities[tid], boltzmann_constant
+        )
 
 
-@wp.kernel
-# type: ignore[misc]
-def _mass_transfer_rate_kernel(
-    pressure_deltas: Any,
-    mass_transport: Any,
-    temperatures: Any,
-    molar_masses: Any,
-    gas_constant: Any,
-    result: Any,
-) -> None:
-    """Evaluate mass_transfer_rate_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = mass_transfer_rate_wp(
-        pressure_deltas[tid],
-        mass_transport[tid],
-        temperatures[tid],
-        molar_masses[tid],
-        gas_constant,
-    )
+    @wp.kernel
+    # type: ignore[misc]
+    def _mass_transfer_rate_kernel(
+        pressure_deltas: Any,
+        mass_transport: Any,
+        temperatures: Any,
+        molar_masses: Any,
+        gas_constant: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate mass_transfer_rate_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = mass_transfer_rate_wp(
+            pressure_deltas[tid],
+            mass_transport[tid],
+            temperatures[tid],
+            molar_masses[tid],
+            gas_constant,
+        )
 
 
-@wp.kernel
-# type: ignore[misc]
-def _brownian_diffusivity_kernel(
-    temperatures: Any,
-    mobilities: Any,
-    boltzmann_constant: Any,
-    result: Any,
-) -> None:
-    """Evaluate brownian_diffusivity_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = brownian_diffusivity_wp(
-        temperatures[tid], mobilities[tid], boltzmann_constant
-    )
+    @wp.kernel
+    # type: ignore[misc]
+    def _brownian_diffusivity_kernel(
+        temperatures: Any,
+        mobilities: Any,
+        boltzmann_constant: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate brownian_diffusivity_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = brownian_diffusivity_wp(
+            temperatures[tid], mobilities[tid], boltzmann_constant
+        )
 
 
-@wp.kernel
-# type: ignore[misc]
-def _brownian_kernel_pair_kernel(
-    radii_i: Any,
-    radii_j: Any,
-    diff_i: Any,
-    diff_j: Any,
-    g_i: Any,
-    g_j: Any,
-    speed_i: Any,
-    speed_j: Any,
-    result: Any,
-) -> None:
-    """Evaluate brownian_kernel_pair_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = brownian_kernel_pair_wp(
-        radii_i[tid],
-        radii_j[tid],
-        diff_i[tid],
-        diff_j[tid],
-        g_i[tid],
-        g_j[tid],
-        speed_i[tid],
-        speed_j[tid],
-        wp.float64(1.0),
-    )
+    @wp.kernel
+    # type: ignore[misc]
+    def _brownian_kernel_pair_kernel(
+        radii_i: Any,
+        radii_j: Any,
+        diff_i: Any,
+        diff_j: Any,
+        g_i: Any,
+        g_j: Any,
+        speed_i: Any,
+        speed_j: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate brownian_kernel_pair_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = brownian_kernel_pair_wp(
+            radii_i[tid],
+            radii_j[tid],
+            diff_i[tid],
+            diff_j[tid],
+            g_i[tid],
+            g_j[tid],
+            speed_i[tid],
+            speed_j[tid],
+            wp.float64(1.0),
+        )
 
 
-@wp.kernel
-# type: ignore[misc]
-def _particle_radius_kernel(volumes: Any, result: Any) -> None:
-    """Evaluate particle_radius_from_volume_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = particle_radius_from_volume_wp(volumes[tid])
+    @wp.kernel
+    # type: ignore[misc]
+    def _particle_radius_kernel(volumes: Any, result: Any) -> None:
+        """Evaluate particle_radius_from_volume_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = particle_radius_from_volume_wp(volumes[tid])
 
 
 def test_wp_func_benchmarks() -> None:
@@ -1290,14 +1341,14 @@ def test_mass_precision_projection_benchmark(
     reconstructed = case.masses
     repeats = 5_000
     for _ in range(repeats):
-        reconstructed = _project_mass_precision_candidate(
-            case.masses,
+        reconstructed = _project_candidate(
+            case,
             candidate_id,
-        )
+        )["reconstructed_masses"]
     elapsed = time.perf_counter() - start
 
     assert reconstructed.shape == case.masses.shape
-    entry_key = f"mass_precision_projection_{label}_{candidate_id}"
+    entry_key = f"mass_precision_candidate_payload_{label}_{candidate_id}"
     _benchmark_results["benchmarks"][entry_key] = {
         "case_name": case.case_name,
         "candidate_id": candidate_id,

@@ -11,22 +11,24 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+from particula.gpu.tests.mass_precision_study_support import (
+    _build_mass_precision_cases,
+    _project_candidate,
+)
 
-def _load_benchmark_module(monkeypatch: pytest.MonkeyPatch):
+
+def _load_benchmark_module(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    benchmark_enabled: bool = True,
+):
     """Load the benchmark module without running its opt-in skip gates."""
     module_path = Path(__file__).with_name("benchmark_test.py")
     module_name = "particula_gpu_benchmark_test_fast_import"
-    fake_cuda_module = types.ModuleType(
-        "particula.gpu.tests.cuda_availability"
-    )
-    fake_cuda_module.cuda_available = lambda _wp: True
-
-    monkeypatch.setitem(
-        sys.modules,
-        "particula.gpu.tests.cuda_availability",
-        fake_cuda_module,
-    )
-    monkeypatch.setattr(sys, "argv", [*sys.argv, "--benchmark"])
+    argv = ["pytest"]
+    if benchmark_enabled:
+        argv.append("--benchmark")
+    monkeypatch.setattr(sys, "argv", argv)
 
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     assert spec is not None
@@ -42,6 +44,17 @@ def _load_benchmark_module(monkeypatch: pytest.MonkeyPatch):
 def benchmark_module(monkeypatch: pytest.MonkeyPatch):
     """Load the opt-in benchmark module for fast helper tests."""
     return _load_benchmark_module(monkeypatch)
+
+
+def test_benchmark_module_requires_explicit_opt_in(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Benchmark module keeps the explicit --benchmark import gate."""
+    with pytest.raises(
+        pytest.skip.Exception,
+        match=r"GPU benchmarks skipped \(pass --benchmark to enable\)",
+    ):
+        _load_benchmark_module(monkeypatch, benchmark_enabled=False)
 
 
 def test_benchmark_enabled_detects_opt_in_flag(
@@ -75,6 +88,43 @@ def test_save_results_writes_json_snapshot(
     assert '"updated_at":' in written
 
 
+def test_save_results_creates_parent_directories(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Benchmark snapshots create missing parent directories first."""
+    output_path = tmp_path / "nested" / "gpu_benchmark_results.json"
+    monkeypatch.setattr(benchmark_module, "BENCHMARK_OUTPUT", output_path)
+    monkeypatch.setattr(
+        benchmark_module,
+        "_benchmark_results",
+        {"started_at": "2026-01-01T00:00:00+00:00", "benchmarks": {}},
+    )
+
+    benchmark_module._save_results()
+
+    assert output_path.exists()
+
+
+def test_save_results_surfaces_write_failures(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Benchmark snapshot failures raise a clear RuntimeError."""
+    output_path = tmp_path / "gpu_benchmark_results.json"
+    monkeypatch.setattr(benchmark_module, "BENCHMARK_OUTPUT", output_path)
+
+    def _raise_write_error(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(Path, "write_text", _raise_write_error)
+
+    with pytest.raises(RuntimeError, match="Failed to write benchmark results"):
+        benchmark_module._save_results()
+
+
 def test_skip_if_no_cuda_skips_when_cuda_unavailable(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,
@@ -82,7 +132,18 @@ def test_skip_if_no_cuda_skips_when_cuda_unavailable(
     """Benchmark helpers skip cleanly when CUDA is unavailable."""
     monkeypatch.setattr(benchmark_module, "cuda_available", lambda _wp: False)
 
-    with pytest.raises(pytest.skip.Exception, match="CUDA not available"):
+    with pytest.raises(pytest.skip.Exception, match="Warp/CUDA not available"):
+        benchmark_module._skip_if_no_cuda()
+
+
+def test_skip_if_no_cuda_skips_when_warp_is_missing(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """CPU-only helper coverage remains importable without Warp."""
+    monkeypatch.setattr(benchmark_module, "wp", None)
+
+    with pytest.raises(pytest.skip.Exception, match="Warp/CUDA not available"):
         benchmark_module._skip_if_no_cuda()
 
 
@@ -341,50 +402,54 @@ def test_print_timing_emits_speedup_summary(
     assert "Case A: GPU 2.0000s | CPU 10.0000s | speedup 5.00x" in captured.out
 
 
-def test_project_mass_precision_candidate_reconstructs_expected_shapes(
-    benchmark_module,
-) -> None:
+def test_project_mass_precision_candidate_reconstructs_expected_shapes() -> None:
     """Supported study candidates reconstruct arrays with stable shapes."""
-    case = benchmark_module._build_mass_precision_cases()[2]
+    case = _build_mass_precision_cases()[2]
 
     for candidate_id in (
         "fp32_absolute_mass",
         "mixed_precision_mass_plus_density",
         "fp32_total_mass_fp32_mass_fraction",
     ):
-        reconstructed = benchmark_module._project_mass_precision_candidate(
-            case.masses,
-            candidate_id,
-        )
+        reconstructed = _project_candidate(case, candidate_id)[
+            "reconstructed_masses"
+        ]
         assert reconstructed.shape == case.masses.shape
         assert reconstructed.dtype == np.float64
 
 
-def test_project_mass_precision_candidate_handles_zero_total_mass(
-    benchmark_module,
-) -> None:
+def test_project_mass_precision_candidate_handles_zero_total_mass() -> None:
     """Zero-total-mass inputs reconstruct zeros without instability."""
-    zero_masses = np.zeros((2, 3, 2), dtype=np.float64)
-
-    reconstructed = benchmark_module._project_mass_precision_candidate(
-        zero_masses,
-        "fp32_total_mass_fp32_mass_fraction",
+    case = _build_mass_precision_cases()[2]
+    zero_mass_case = type(case)(
+        case_name=case.case_name,
+        size_band=case.size_band,
+        radius_unit=case.radius_unit,
+        density_unit=case.density_unit,
+        volume_fraction_unit=case.volume_fraction_unit,
+        target_radius_m=case.target_radius_m,
+        density_kg_m3=case.density_kg_m3.copy(),
+        volume_fractions=case.volume_fractions.copy(),
+        masses=np.zeros((2, 3, 2), dtype=np.float64),
+        concentration=case.concentration.copy(),
+        charge=case.charge.copy(),
+        volume=case.volume.copy(),
     )
 
-    npt.assert_array_equal(reconstructed, zero_masses)
+    reconstructed = _project_candidate(
+        zero_mass_case,
+        "fp32_total_mass_fp32_mass_fraction",
+    )["reconstructed_masses"]
+
+    npt.assert_array_equal(reconstructed, zero_mass_case.masses)
 
 
-def test_project_mass_precision_candidate_rejects_unsupported_candidate(
-    benchmark_module,
-) -> None:
+def test_project_mass_precision_candidate_rejects_unsupported_candidate() -> None:
     """Unsupported candidate ids fail with a stable error message."""
-    case = benchmark_module._build_mass_precision_cases()[0]
+    case = _build_mass_precision_cases()[0]
 
     with pytest.raises(ValueError, match="Unsupported candidate id"):
-        benchmark_module._project_mass_precision_candidate(
-            case.masses,
-            "unsupported",
-        )
+        _project_candidate(case, "unsupported")
 
 
 def test_mass_precision_projection_benchmark_records_bounded_result(
@@ -404,11 +469,46 @@ def test_mass_precision_projection_benchmark_records_bounded_result(
         candidate_id,
     )
 
-    result = benchmark_module._benchmark_results[
-        "benchmarks"
-    ][f"mass_precision_projection_{label}_{candidate_id}"]
+    result = benchmark_module._benchmark_results["benchmarks"][
+        f"mass_precision_candidate_payload_{label}_{candidate_id}"
+    ]
     assert result["case_name"] == label
     assert result["candidate_id"] == candidate_id
     assert result["repeats"] == 5_000
     assert result["elapsed_s"] >= 0.0
     assert result["mean_us"] >= 0.0
+
+
+def test_preflight_large_allocation_skips_when_limit_is_exceeded(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Oversized opt-in allocations skip before touching device memory."""
+    monkeypatch.setenv("BENCHMARK_MAX_ALLOC_BYTES", "16")
+
+    with pytest.raises(pytest.skip.Exception, match="requires"):
+        benchmark_module._preflight_large_allocation(
+            (3, 3),
+            label="test array",
+            itemsize=8,
+        )
+
+
+def test_wp_zeros_with_guard_skips_allocation_failures(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Allocation helper turns device allocation failures into skips."""
+    fake_wp = types.SimpleNamespace(
+        zeros=lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("oom"))
+    )
+    monkeypatch.setattr(benchmark_module, "wp", fake_wp)
+
+    with pytest.raises(pytest.skip.Exception, match="allocation"):
+        benchmark_module._wp_zeros_with_guard(
+            (2, 2),
+            dtype=np.float64,
+            device="cuda",
+            label="test allocation",
+            itemsize=8,
+        )

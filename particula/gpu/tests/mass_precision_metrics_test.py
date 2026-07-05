@@ -10,9 +10,10 @@ import pytest
 
 from particula.dynamics.condensation.mass_transfer import get_mass_transfer
 from particula.gpu.conversion import to_warp_particle_data
-from particula.gpu.tests.mass_precision_cases_test import (
+from particula.gpu.tests.mass_precision_study_support import (
     _build_mass_precision_cases,
     _MassPrecisionCase,
+    _project_candidate,
 )
 from particula.particles.particle_data_builder import ParticleDataBuilder
 
@@ -244,9 +245,17 @@ def _build_candidate_study_result(
 def _build_mass_transfer_reference_result(
     case: _MassPrecisionCase,
     candidate_id: str,
+    candidate: dict[str, Any] | None = None,
 ) -> _MassTransferReferenceResult:
     """Build cached CPU-reference mass-transfer deltas for one candidate."""
-    candidate_result = _build_candidate_study_result(case, candidate_id)
+    if candidate is None:
+        candidate = _project_candidate(case, candidate_id)
+    candidate_projected = candidate["projected"]
+    candidate_reconstructed_masses = candidate["reconstructed_masses"]
+    candidate_concentration = candidate_projected.get("concentration")
+    if candidate_concentration is None:
+        candidate_concentration = case.concentration
+    candidate_concentration = candidate_concentration.astype(np.float64)
     time_step = 0.75
     mass_rate_scale = 2.5e-2
     baseline_mass_rate = (
@@ -256,10 +265,10 @@ def _build_mass_transfer_reference_result(
         / case.concentration[..., np.newaxis]
     )
     candidate_mass_rate = (
-        candidate_result.reconstructed_masses
+        candidate_reconstructed_masses
         * mass_rate_scale
         / time_step
-        / case.concentration[..., np.newaxis]
+        / candidate_concentration[..., np.newaxis]
     )
     flat_baseline_mass_rate = baseline_mass_rate.reshape(
         -1,
@@ -270,11 +279,12 @@ def _build_mass_transfer_reference_result(
         case.masses.shape[-1],
     )
     flat_baseline_mass = case.masses.reshape(-1, case.masses.shape[-1])
-    flat_candidate_mass = candidate_result.reconstructed_masses.reshape(
+    flat_candidate_mass = candidate_reconstructed_masses.reshape(
         -1,
         case.masses.shape[-1],
     )
     flat_concentration = case.concentration.reshape(-1)
+    flat_candidate_concentration = candidate_concentration.reshape(-1)
     gas_mass = np.sum(case.masses, axis=(0, 1), dtype=np.float64) * 2.0
     if case.masses.shape[-1] == 1:
         baseline_mass_transfer = get_mass_transfer(
@@ -289,7 +299,7 @@ def _build_mass_transfer_reference_result(
             time_step=time_step,
             gas_mass=gas_mass,
             particle_mass=flat_candidate_mass[:, 0],
-            particle_concentration=flat_concentration,
+            particle_concentration=flat_candidate_concentration,
         ).reshape(case.masses.shape[:-1] + (1,))
     else:
         baseline_mass_transfer = get_mass_transfer(
@@ -304,7 +314,7 @@ def _build_mass_transfer_reference_result(
             time_step=time_step,
             gas_mass=gas_mass,
             particle_mass=flat_candidate_mass,
-            particle_concentration=flat_concentration,
+            particle_concentration=flat_candidate_concentration,
         ).reshape(case.masses.shape)
     per_particle_delta = candidate_mass_transfer - baseline_mass_transfer
     return _MassTransferReferenceResult(
@@ -336,61 +346,6 @@ def _compute_clamp_metrics(
         clamp_frequency=int(np.count_nonzero(raw_updated_mass < 0.0)),
         aggregate_clamp_delta=np.sum(clamp_delta, axis=(0, 1), dtype=np.float64),
     )
-
-
-def _project_candidate(
-    case: _MassPrecisionCase,
-    candidate_id: str,
-) -> dict[str, Any]:
-    """Project one study case into a candidate representation."""
-    if candidate_id == "fp32_absolute_mass":
-        projected_masses = case.masses.astype(np.float32)
-        return {
-            "candidate_id": candidate_id,
-            "projected": {"masses": projected_masses},
-            "reconstructed_masses": projected_masses.astype(np.float64),
-        }
-
-    if candidate_id == "mixed_precision_mass_plus_density":
-        projected_masses = case.masses.astype(np.float32)
-        projected = {
-            "masses": projected_masses,
-            "concentration": case.concentration.astype(np.float32),
-            "charge": case.charge.astype(np.float32),
-            "volume": case.volume.astype(np.float32),
-            "density": case.density_kg_m3.astype(np.float64),
-        }
-        return {
-            "candidate_id": candidate_id,
-            "projected": projected,
-            "reconstructed_masses": projected_masses.astype(np.float64),
-        }
-
-    if candidate_id == "fp32_total_mass_fp32_mass_fraction":
-        total_mass = np.sum(case.masses, axis=-1, dtype=np.float64)
-        projected_total_mass = total_mass.astype(np.float32)
-        projected_mass_fractions = np.divide(
-            case.masses,
-            total_mass[..., np.newaxis],
-            where=total_mass[..., np.newaxis] > 0.0,
-            out=np.zeros_like(case.masses),
-        ).astype(np.float32)
-        reconstructed_masses = (
-            projected_total_mass.astype(np.float64)[..., np.newaxis]
-            * projected_mass_fractions.astype(np.float64)
-        )
-        return {
-            "candidate_id": candidate_id,
-            "projected": {
-                "total_mass": projected_total_mass,
-                "mass_fractions": projected_mass_fractions,
-            },
-            "reconstructed_masses": reconstructed_masses,
-        }
-
-    raise ValueError(f"Unsupported candidate id: {candidate_id}")
-
-
 _MIXED_SCALE_CASE = _build_mixed_scale_case()
 _CANDIDATE_STUDY_RESULTS = {
     (case.case_name, candidate_id): _build_candidate_study_result(
@@ -737,6 +692,41 @@ def test_zero_volume_and_zero_effective_radius_reference_paths_are_warning_clean
         np.zeros((2, 3), dtype=np.float64),
     )
     npt.assert_array_equal(mass_transfer, zero_mass_rate)
+
+
+def test_mixed_precision_candidate_reference_uses_candidate_concentration(
+) -> None:
+    """Candidate concentration perturbations remain visible in reference output."""
+    case = _MASS_PRECISION_CASES[0]
+    candidate = _project_candidate(case, "mixed_precision_mass_plus_density")
+    perturbed_candidate = {
+        **candidate,
+        "projected": {
+            **candidate["projected"],
+            "concentration": (
+                candidate["projected"]["concentration"]
+                * np.array([[1.25, 0.75, 1.5], [0.5, 1.1, 0.9]], dtype=np.float32)
+            ).astype(np.float32),
+        },
+    }
+
+    baseline_result = _build_mass_transfer_reference_result(
+        case,
+        "mixed_precision_mass_plus_density",
+        candidate=candidate,
+    )
+    perturbed_result = _build_mass_transfer_reference_result(
+        case,
+        "mixed_precision_mass_plus_density",
+        candidate=perturbed_candidate,
+    )
+
+    assert not np.allclose(
+        perturbed_result.candidate_mass_transfer,
+        baseline_result.candidate_mass_transfer,
+        rtol=0.0,
+        atol=0.0,
+    )
 
 
 @pytest.mark.parametrize("candidate_id", _SUPPORTED_CANDIDATES)
