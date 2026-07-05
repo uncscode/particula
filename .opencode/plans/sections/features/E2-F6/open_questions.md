@@ -18,3 +18,19 @@
 - Treat log-mass or reference-mass scaling as a quantitative candidate only if
   baseline `fp64` evidence shows absolute mass representation is insufficient;
   otherwise document it as future work.
+
+## Newly Resolved by P1 (#1208)
+
+- The baseline case set is now fixed in
+  `particula/gpu/tests/mass_precision_cases_test.py` as `npf_cluster`,
+  `five_to_ten_nm`, `accumulation_mode`, and `cloud_droplet`.
+- The baseline documentation location is now confirmed as
+  `docs/Features/Roadmap/mass-precision-study.md`, with cross-links from the
+  roadmap index and the data-oriented GPU roadmap.
+- The current baseline policy remains unchanged after implementation: absolute
+  per-species `np.float64` on CPU and `wp.float64` on Warp mirrors.
+
+## Remaining Questions
+
+- Whether `fp32`, mixed precision, or alternate mass representations meet
+  conservation and small-particle fidelity needs remains for P2-P4.

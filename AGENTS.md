@@ -32,6 +32,9 @@ mypy particula/ --ignore-missing-imports
 # Slow + performance benchmarks (excluded from CI)
 pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
 
+# Focused deterministic GPU mass-precision baseline tests
+pytest particula/gpu/tests/mass_precision_cases_test.py -q
+
 # ADW tools
 .opencode/tools/run_pytest.py      # Run tests with validation
 .opencode/tools/run_linters.py     # Run linters following CI workflow
@@ -99,6 +102,9 @@ particula/
 └── ...
 ```
 
+For deterministic GPU precision-baseline work, use explicit `np.float64`
+fixtures and keep reproduction commands focused on the affected module.
+
 ## Linting
 
 **Linters:** ruff (check + format), mypy
@@ -145,6 +151,8 @@ particula/
 - `.opencode/guides/docstring_guide.md` - Google-style docstring format
 - `.opencode/guides/commit_conventions.md` - Commit message format
 - `.opencode/guides/pr_conventions.md` - Pull request conventions
+- `docs/Features/Roadmap/mass-precision-study.md` - Deterministic GPU
+  mass-precision baseline assumptions and reproduction command
 - `docs/contribute/Feature_Workflow/index.md` - Contributor workflow overview
 
 ## Common Patterns
@@ -308,6 +316,21 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 - See `docs/Features/particle-data-migration.md` for the user-facing field
   authority table and `particula/gpu/tests/conversion_test.py` for the
   regression-backed contract.
+
+### GPU mass-precision baseline study
+
+```bash
+pytest particula/gpu/tests/mass_precision_cases_test.py -q
+```
+
+**Key points:**
+
+- The deterministic baseline lives in
+  `particula/gpu/tests/mass_precision_cases_test.py`.
+- Baseline cases cover NPF, 5-10 nm, accumulation-mode, and droplet-scale
+  masses without changing the production CPU/GPU storage schema.
+- Use `docs/Features/Roadmap/mass-precision-study.md` as the reference for
+  case names, assumptions, and focused reproduction.
 
 ## ADW Workflows
 

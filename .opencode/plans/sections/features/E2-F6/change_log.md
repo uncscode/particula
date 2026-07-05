@@ -15,3 +15,15 @@
 
 - Completeness review clarified the final report phase as a development-doc
   update gate for downstream dtype and schema tracks.
+
+## 2026-07-05
+
+- Updated the feature plan after shipping issue #1208 / E2-F6-P1.
+- Recorded that `particula/gpu/tests/mass_precision_cases_test.py` now defines
+  deterministic baseline cases for `npf_cluster`, `five_to_ten_nm`,
+  `accumulation_mode`, and `cloud_droplet`.
+- Recorded the new roadmap page `docs/Features/Roadmap/mass-precision-study.md`
+  plus added roadmap links in `index.md` and `data-oriented-gpu.md`.
+- Marked the current absolute per-species `np.float64` / `wp.float64` storage
+  policy as the implemented baseline, while leaving candidate-comparison and
+  recommendation work for later phases.

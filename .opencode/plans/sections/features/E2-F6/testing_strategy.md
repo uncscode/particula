@@ -7,9 +7,10 @@ phase. There is no standalone testing phase.
 
 ## Target Test Files
 
-- `particula/gpu/tests/mass_precision_cases_test.py` for deterministic case
-  generation, shape checks, finite-value assertions, and `fp64` baseline
-  fixtures introduced in P1.
+- `particula/gpu/tests/mass_precision_cases_test.py` for the shipped P1
+  deterministic case generation, shape checks, finite-value assertions,
+  malformed-input rejection, `ParticleData` compatibility, derived-radius
+  checks, and CPU/Warp `fp64` baseline assertions.
 - `particula/gpu/tests/mass_precision_metrics_test.py` for candidate
   reconstruction, conservation, fidelity, and memory-budget checks introduced
   in P2-P3.
@@ -20,15 +21,18 @@ phase. There is no standalone testing phase.
 
 ## Unit and Reproducibility Tests
 
-- `mass_precision_cases_test.py` should assert deterministic output, expected
-  shapes, finite values, nonnegative masses, and physically reasonable radii
-  for the NPF, accumulation-mode, and droplet coexistence cases added in P1.
+- `mass_precision_cases_test.py` now asserts deterministic output, expected
+  shapes, finite values, nonnegative masses, malformed-input rejection, and
+  physically reasonable radii for the shipped `npf_cluster`,
+  `five_to_ten_nm`, `accumulation_mode`, and `cloud_droplet` cases.
 - P2 candidate tests should cover conversion/reconstruction behavior for
   `fp32`, mixed precision, and any representation alternative named in the
   study, with explicit assertions for acceptable round-trip tolerances.
 - Production default tests should continue to assert `np.float64` and
   `wp.float64` in `particula/particles/tests/` and `particula/gpu/tests/`
-  anywhere current behavior is intentionally unchanged.
+  anywhere current behavior is intentionally unchanged; P1 added explicit
+  baseline-policy and Warp round-trip coverage in
+  `mass_precision_cases_test.py`.
 
 ## Numerical Validation
 
@@ -71,3 +75,6 @@ pytest particula/gpu/tests/mass_precision_metrics_test.py -q
 pytest particula/gpu/tests/mass_precision_cases_test.py \
   particula/gpu/tests/mass_precision_metrics_test.py -q
 ```
+
+For the currently shipped scope, the first command is the focused validation
+entry point because only the P1 baseline test module exists on this branch.

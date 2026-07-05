@@ -11,16 +11,18 @@ small-particle fidelity.
 
 ## Value Proposition
 
-This feature produces an evidence-backed report that keeps `fp64` as the
-reference, compares candidate storage/precision alternatives, and records a
-recommendation for future schema work. Downstream E2 tracks gain a documented
-decision boundary: no mass representation or dtype migration proceeds until the
-study validates conservation and accuracy tradeoffs.
+This feature now has a shipped P1 baseline: deterministic NPF-to-droplet study
+cases, focused validation tests, and a roadmap page that records the current
+absolute per-species `fp64` / `wp.float64` storage policy. Downstream E2 tracks
+now have a documented baseline and decision boundary: no mass representation or
+dtype migration proceeds until later phases compare alternatives and publish a
+recommendation.
 
 ## User Stories
 
-- As a numerical developer, I want NPF-to-droplet precision cases so that mass
-  representation choices are tested across the expected dynamic range.
+- As a numerical developer, I want deterministic NPF-to-droplet precision cases
+  so that mass representation choices are tested across the expected dynamic
+  range.
 - As a GPU implementer, I want fp64/fp32/mixed-precision memory and fidelity
   evidence so that future kernels do not optimize away required accuracy.
 - As a maintainer, I want a clear recommendation before schema changes so that
