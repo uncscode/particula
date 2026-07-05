@@ -2,7 +2,10 @@
 
 GasData isolates gas species arrays from behavior (vapor pressure strategies)
 while embedding the batch dimension required for CFD experiments spanning
-multiple boxes.
+multiple boxes. It is the CPU owner of gas names, molar masses,
+concentrations, and boolean partitioning flags only; GPU helper state such as
+vapor pressure lives on ``WarpGasData`` and does not round-trip back into this
+container automatically.
 
 Example:
     Single-box simulation (n_boxes=1)::
@@ -45,6 +48,11 @@ class GasData:
     Simple data container with batch dimension built-in. Concentration
     arrays have shape (n_boxes, n_species) to support multi-box CFD.
     Single-box simulations use n_boxes=1.
+
+    ``GasData`` is also the CPU-side owner of ordered species names. The GPU
+    transfer helpers mirror only numeric gas fields, convert
+    ``partitioning`` as ``bool → int32 → bool``, and intentionally exclude
+    GPU-only helper state such as vapor pressure from restored CPU data.
 
     This is NOT a frozen dataclass - concentrations can be updated in place
     for performance. Use copy() if immutability is needed.
