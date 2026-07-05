@@ -389,6 +389,43 @@ def test_condensation_step_gpu_rejects_explicit_environment_in_p1(
 
 
 @pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, None),
+        (None, 101325.0),
+        (None, None),
+    ],
+)
+def test_condensation_step_gpu_rejects_missing_scalar_inputs_without_environment(
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+) -> None:
+    """Scalar-mode calls require both temperature and pressure."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="temperature and pressure must both be provided",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+        )
+
+
+@pytest.mark.parametrize(
     ("temperature", "pressure", "message"),
     [
         (
@@ -453,6 +490,66 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
             pressure=pressure,
             time_step=0.1,
             environment=environment,
+        )
+
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure"),
+    [
+        (298.15, None),
+        (None, 101325.0),
+        (None, None),
+    ],
+)
+def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helpers(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    temperature: float | None,
+    pressure: float | None,
+) -> None:
+    """Missing scalar inputs fail before scalar gas-property helpers."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    calls: list[str] = []
+
+    def _unexpected_dynamic_viscosity(*args: Any, **kwargs: Any) -> float:
+        calls.append("dynamic_viscosity")
+        raise AssertionError("get_dynamic_viscosity should not be called")
+
+    def _unexpected_mean_free_path(*args: Any, **kwargs: Any) -> float:
+        calls.append("mean_free_path")
+        raise AssertionError("get_molecule_mean_free_path should not be called")
+
+    monkeypatch.setattr(
+        condensation_module,
+        "get_dynamic_viscosity",
+        _unexpected_dynamic_viscosity,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "get_molecule_mean_free_path",
+        _unexpected_mean_free_path,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="temperature and pressure must both be provided",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
         )
 
     assert calls == []
