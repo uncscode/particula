@@ -2,14 +2,13 @@
 
 ## Problem Statement
 
-`GasData` and `WarpGasData` intentionally diverge, so the feature must make the
-round-trip contract explicit for users and implementers. CPU `GasData` owns
-species names, molar mass, concentration, and boolean partitioning. GPU
-`WarpGasData` drops names, stores partitioning as `int32`, and adds a
-`(n_boxes, n_species)` vapor-pressure buffer required by GPU condensation
-kernels. After `E2-F4-P3` landed in issue `#1199`, the vapor-pressure transfer
-boundary is now explicit and test-backed without expanding CPU `GasData`
-ownership.
+`GasData` and `WarpGasData` intentionally diverge, so the feature needed to
+publish the tested round-trip contract clearly for users and implementers. CPU
+`GasData` owns species names, molar mass, concentration, and boolean
+partitioning. GPU `WarpGasData` drops names, stores partitioning as `int32`,
+and adds a `(n_boxes, n_species)` vapor-pressure buffer required by GPU
+condensation kernels. `E2-F4-P4` in issue `#1200` completed the migration-doc
+publication pass without changing runtime behavior.
 
 ## Value Proposition
 
@@ -19,8 +18,12 @@ focused regression-test audit. `E2-F4-P2` landed issue `#1198` by making the
 restore contract explicit in `particula/gpu/conversion.py`. `E2-F4-P3` landed
 issue `#1199` by clarifying vapor-pressure transfer semantics in
 `particula/gpu/conversion.py`, `particula/gpu/warp_types.py`, and
-`particula/gpu/tests/conversion_test.py`. Users migrating to the data-oriented
-GPU path can now rely on test-backed expectations that:
+`particula/gpu/tests/conversion_test.py`. `E2-F4-P4` landed issue `#1200` by
+updating the migration guide authority table, revising roadmap wording from
+unresolved schema drift to an intentional tested contract, and doing a narrow
+`GasData` docstring consistency pass only where wording still lagged the shipped
+semantics. Users migrating to the data-oriented GPU path can now rely on
+test-backed expectations that:
 - caller-supplied ordered names are preferred on restore;
 - omitted or `None` names restore as placeholder `species_0..n-1` labels;
 - wrong-length or empty provided name lists fail with actual/expected count
@@ -31,6 +34,8 @@ GPU path can now rely on test-backed expectations that:
 - omitted `vapor_pressure` becomes a zero-filled GPU buffer with that shape; and
 - CPU restore intentionally drops GPU-only `vapor_pressure`, so callers must
   read or save it before `from_warp_gas_data()`.
+- migration-facing docs now treat this as the authoritative published contract,
+  not an unresolved boundary.
 
 ## Parent Epic Context
 

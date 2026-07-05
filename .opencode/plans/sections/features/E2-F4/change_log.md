@@ -48,3 +48,13 @@
   zero-filled GPU buffer, invalid shapes raise `ValueError`, and CPU restore
   intentionally drops GPU-only `vapor_pressure` unless callers preserve a
   sidecar.
+
+## 2026-07-04
+
+- Updated `E2-F4` plan sections after issue `#1200` landed as `E2-F4-P4`.
+- Recorded that the shipped implementation stayed documentation-sized and did
+  not change gas runtime behavior.
+- Recorded the migration-guide authority table, explicit round-trip guidance,
+  roadmap wording update from unresolved schema drift to intentional tested
+  contract, and the narrow `particula/gas/gas_data.py` docstring consistency
+  pass.
