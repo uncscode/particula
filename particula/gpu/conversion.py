@@ -98,6 +98,28 @@ def _from_numpy_zero_copy(wp, values, dtype, device: str):
         return wp.from_numpy(values, dtype=dtype, device=device)
 
 
+def _restore_partitioning_bool(
+    partitioning_values: NDArray[np.int32] | NDArray[np.float64],
+) -> NDArray[np.bool_]:
+    """Validate GPU partitioning flags before restoring CPU bool values.
+
+    Args:
+        partitioning_values: GPU-restored partitioning values.
+
+    Returns:
+        Partitioning values restored as a NumPy bool array.
+
+    Raises:
+        ValueError: If any value is not one of ``0`` or ``1``.
+    """
+    if not np.all(np.isin(partitioning_values, (0, 1))):
+        raise ValueError(
+            "partitioning must contain only binary values 0 or 1 when "
+            "restoring GasData"
+        )
+    return partitioning_values.astype(bool)
+
+
 def to_warp_particle_data(
     data: "ParticleData",
     device: str = "cuda",
@@ -411,6 +433,8 @@ def from_warp_gas_data(
 
     Raises:
         ValueError: If name length doesn't match n_species.
+        ValueError: If restored ``partitioning`` contains values other than
+            ``0`` or ``1``.
 
     Example:
         >>> # With original names preserved
@@ -436,8 +460,10 @@ def from_warp_gas_data(
             f"name length {len(name)} does not match n_species {n_species}"
         )
 
-    # Convert partitioning from int32 to bool
-    partitioning_bool = gpu_data.partitioning.numpy().astype(bool)
+    # Convert partitioning from int32 to bool after validating GPU flags.
+    partitioning_bool = _restore_partitioning_bool(
+        gpu_data.partitioning.numpy()
+    )
 
     from particula.gas.gas_data import GasData
 
