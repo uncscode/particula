@@ -2,7 +2,9 @@
 
 This module validates direct temperature and pressure inputs for GPU kernel
 entry points and normalizes them into canonical Warp arrays with shape
-``(n_boxes,)`` on the caller's device.
+``(n_boxes,)`` on the caller's device. Supported entry-point contracts accept
+scalars, device-local Warp arrays, or a ``WarpEnvironmentData`` container
+without performing hidden device transfers.
 """
 
 from __future__ import annotations
@@ -19,7 +21,15 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
 
 
 def _is_warp_array_like(value: Any) -> bool:
-    """Return True when ``value`` behaves like a Warp array."""
+    """Return ``True`` when ``value`` behaves like a Warp array.
+
+    Args:
+        value: Object to inspect.
+
+    Returns:
+        ``True`` when the object exposes Warp-style ``shape`` and ``device``
+        attributes.
+    """
     return hasattr(value, "shape") and hasattr(value, "device")
 
 
@@ -45,6 +55,10 @@ def _validate_box_array(
     Raises:
         ValueError: If the input is not a Warp array on the expected device
             with shape ``(n_boxes,)``.
+
+    Notes:
+        Valid arrays are returned unchanged so callers can reuse existing
+        device-local buffers without copies.
     """
     if not _is_warp_array_like(values):
         raise ValueError(
@@ -75,9 +89,10 @@ def _ensure_environment_arrays(
     """Normalize environment inputs into validated ``(n_boxes,)`` Warp arrays.
 
     Args:
-        temperature: Scalar temperature, Warp array, or None.
-        pressure: Scalar pressure, Warp array, or None.
-        environment: Optional ``WarpEnvironmentData`` container.
+        temperature: Scalar temperature [K], Warp array, or None.
+        pressure: Scalar pressure [Pa], Warp array, or None.
+        environment: Optional ``WarpEnvironmentData`` container with
+            ``temperature`` and ``pressure`` arrays.
         n_boxes: Expected number of boxes.
         device: Expected Warp device.
         caller_name: Entry-point name for stable contract messages.
@@ -91,6 +106,11 @@ def _ensure_environment_arrays(
             missing.
         ValueError: If any array shape is not ``(n_boxes,)``.
         ValueError: If any array device mismatches ``device``.
+
+    Notes:
+        When one direct input is scalar and the other is already a valid Warp
+        array, only the scalar side is broadcast. Valid Warp arrays and
+        environment-backed arrays are returned unchanged.
     """
     if environment is not None:
         if temperature is not None or pressure is not None:

@@ -2,10 +2,11 @@
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Entry-point validation accepts scalar direct inputs,
-explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container,
-then normalizes those sources into per-box Warp arrays before launch-time
-work. The kernels operate on GPU-resident particle data and produce collision
-pairs that are applied to merge particle masses in-place.
+explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
+Those sources are normalized into per-box Warp arrays before volume setup,
+RNG initialization, or any Warp launch. The kernels operate on GPU-resident
+particle data and produce collision pairs that are applied to merge particle
+masses in-place.
 """
 
 # pyright: basic
@@ -502,6 +503,10 @@ def _ensure_volume_array(
 
     Raises:
         ValueError: If volume array has mismatched shape or device.
+
+    Notes:
+        Valid Warp arrays are returned unchanged so launch code can reuse
+        caller-owned per-box volume buffers.
     """
     if hasattr(volume, "shape"):
         if volume.shape != (n_boxes,):
@@ -549,6 +554,7 @@ def coagulation_step_gpu(
         rng_states: Optional preallocated RNG state buffer.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``.
+            This mode is supported when both direct inputs are ``None``.
 
     Returns:
         Tuple of updated particle data, collision pairs, and collision counts.
@@ -563,12 +569,17 @@ def coagulation_step_gpu(
             caller device.
 
     Notes:
+        Accepted environment sources are scalar direct inputs, direct
+        ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
+        inputs, or keyword-only ``environment=...`` execution.
+
         ``environment`` remains keyword-only so existing positional scalar
         callers stay source-compatible.
 
         Validation runs before volume normalization, RNG setup, and kernel
         launches so invalid shape or device combinations fail without mutating
-        particle state or allocating downstream launch work.
+        particle state or allocating downstream launch work. The normalized
+        environment arrays are forwarded directly into the launch path.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)

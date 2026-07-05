@@ -5,51 +5,52 @@
 - Preserve source compatibility for scalar GPU API callers.
 - Treat environment state as a first-class per-box input owned outside
   `GasData`.
-- Validate the P1 contract before launching Warp kernels so later phases can add
-  normalization without changing the published ambiguity rule.
+- Validate the environment contract before launching Warp kernels so ambiguity,
+  missing-input, shape, and device rules stay consistent across entry points.
 - Keep conversion explicit; helpers may construct Warp arrays from scalars, but
-  CPU-to-GPU environment container transfers should live in conversion utilities.
+  CPU-to-GPU environment container transfers should live in conversion
+  utilities.
 
-## Shipped P1 Compatibility Layer
+## Shipped Shared Normalization Layer
 
-P1 shipped the API shell, not the normalization layer. Both GPU entry points now
-accept these contract forms:
+Issue #1204 added `particula/gpu/kernels/environment.py` as the shared private
+normalization boundary for condensation and coagulation. Both GPU entry points
+now accept these contract forms:
 
 1. Legacy scalar `temperature: float` and `pressure: float`.
-2. Mixed scalar values plus `environment=...`, which raise an early
-   `ValueError`.
-3. `temperature=None`, `pressure=None`, and `environment=...`, which raise a
-   phase-scoped early `ValueError` in P1.
+2. Direct Warp arrays with shape `(n_boxes,)` on the caller device.
+3. Hybrid direct inputs where one side is scalar and the other is a valid Warp
+   array.
+4. `temperature=None`, `pressure=None`, and `environment=...` with valid
+   `WarpEnvironmentData` arrays.
 
-The reserved `environment` parameter is keyword-only and documented as the
-future `WarpEnvironmentData` handoff point with `(n_boxes,)` temperature and
-pressure arrays.
+Mixed direct inputs plus `environment=...` still raise an early `ValueError`.
+Valid arrays are returned unchanged so the launch path reuses existing
+device-local buffers without copies.
 
 ## API Options
 
-- Chosen in P1: keep existing scalar parameters and add an optional
-  keyword-only `environment=None` that does not break positional callers.
-- Deferred: helper-based normalization or dedicated environment wrappers.
-- Avoided in P1: changing positional ordering or making environment mandatory in
-  the first migration step.
+- Chosen: keep existing scalar parameters and add an optional keyword-only
+  `environment=None` that does not break positional callers.
+- Chosen: normalize once through a shared helper instead of duplicating
+  per-entry-point validation rules.
+- Avoided: changing positional ordering, making environment mandatory, or
+  introducing hidden device transfers.
 
 ## Kernel Feed Points
 
-- Condensation: replace globally scalar temperature-derived inputs with per-box
-  values indexed by `box_idx`. If dynamic viscosity and mean free path remain
-  precomputed on CPU, precompute them as `(n_boxes,)`; otherwise compute them in
-  device code from per-box temperature/pressure.
-- Coagulation: change Brownian kernel inputs from scalar temperature/pressure to
-  arrays and use `temperature[box_idx]` and `pressure[box_idx]`.
+- Condensation: normalize temperature and pressure once, prepare dynamic
+  viscosity and mean free path as per-box arrays through one dedicated
+  precompute launch, then reuse those arrays during the per-particle kernel.
+- Coagulation: pass normalized temperature and pressure arrays into
+  `brownian_coagulation_kernel(...)` and index them by `box_idx` inside the
+  kernel.
 
 ## Error Handling
 
 - If scalar and environment values are both provided, the implementation should
-  raise a clear error instead of applying precedence rules. That keeps the first
-  migration path deterministic for callers and avoids silently mixing legacy
-  scalar inputs with per-box environment state.
-- If `environment` is provided with both scalar inputs omitted, P1 should raise
-  a clear phase-scoped error instead of pretending explicit environment
-  execution already exists.
-- Shape, `n_boxes`, and device validation for real explicit-environment
-  execution are deferred to P2+.
+  raise a clear error instead of applying precedence rules.
+- If `environment` is omitted, both direct inputs must still be present.
+- Shape, `n_boxes`, and device mismatches now fail with stable pre-launch
+  `ValueError` messages that mention expected `(n_boxes,)` arrays or device
+  mismatch.

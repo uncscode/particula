@@ -45,10 +45,12 @@ Legacy facades remain available, with deprecation planned for v0.3.0.
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.
 GPU kernel entry points `condensation_step_gpu` and `coagulation_step_gpu`
-reserve a keyword-only `environment=` parameter for future per-box execution,
-but P1 still supports only scalar `temperature` and `pressure` execution.
-Mixed scalar-plus-environment calls, or pure explicit-environment calls with
-`temperature=None` and `pressure=None`, fail early by design in this phase.
+now accept scalar `temperature` / `pressure` inputs, per-box Warp arrays with
+shape `(n_boxes,)`, or a `WarpEnvironmentData` via the keyword-only
+`environment=` parameter.
+Mixed scalar-plus-environment calls still fail early by design. Explicit
+environment inputs must match the particle/gas device and use `(n_boxes,)`
+temperature and pressure arrays.
 
 ## Code Structure
 
