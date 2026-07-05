@@ -27,5 +27,10 @@
 - Whether placeholder-name fallback should remain the long-term API contract,
   gain warnings, or become stricter in a future migration-focused change is
   still deferred beyond the shipped `#1198` implementation.
-- Broader migration-document publication remains deferred to `E2-F4-P4` even
-  though the code-local vapor-pressure contract is now shipped.
+
+## Closed in `E2-F4-P4` (`#1200`)
+
+- Broader migration-document publication is no longer deferred. `#1200`
+  published the migration-guide authority table, explicit round-trip guidance,
+  roadmap contract wording, and the narrow `GasData` docstring consistency
+  updates needed to match the shipped tests.

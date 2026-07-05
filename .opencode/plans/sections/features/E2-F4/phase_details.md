@@ -54,15 +54,26 @@
     `(n_species,)`, swapped axes, and mismatched species counts, plus sidecar
     preservation across restore.
 
-- [ ] **E2-F4-P4:** Update migration documentation for gas round-trip semantics
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Update development docs with field authority, data loss boundaries,
-    placeholder-name behavior, and vapor-pressure ownership for migration
-    users.
+- [x] **E2-F4-P4:** Update migration documentation for gas round-trip semantics
+  - Issue: `#1200` | Size: XS | Status: Landed
+  - Goal: Publish the final tested migration-facing contract without changing
+    gas runtime behavior.
   - Files: `docs/Features/particle-data-migration.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, relevant code docstrings.
-  - Tests: Documentation examples or doctest-like snippets are kept consistent
-    with conversion tests; fast test suite still passes.
+    `docs/Features/Roadmap/data-oriented-gpu.md`, `particula/gas/gas_data.py`.
+  - Implemented:
+    - Added the migration guide authority table for `name`, `molar_mass`,
+      `concentration`, `partitioning`, and `vapor_pressure`.
+    - Added explicit round-trip guidance for caller-supplied names,
+      placeholder fallback, `bool → int32 → bool` `partitioning`, and
+      `(n_boxes, n_species)` vapor-pressure sidecars.
+    - Revised roadmap wording so the gas split is described as an intentional,
+      tested contract rather than unresolved schema drift.
+    - Updated `GasData` docstrings only where wording needed to match the final
+      published contract.
+    - Kept the phase documentation-sized with no runtime logic changes.
+  - Tests: Used `particula/gpu/tests/conversion_test.py` as the contract
+    authority and kept documentation wording aligned with its existing
+    regression coverage.
 
 ## Phase Ordering Notes
 
@@ -70,5 +81,5 @@
 - P2 proceeded from the P1 audit and is now landed; P3 is now landed as the
   explicit vapor-pressure contract layer built on top of the P2 name and
   `partitioning` restore baseline.
-- P4 is the publication gate and should follow the tested decisions from P2 and P3
-  so downstream kernel and docs tracks cite the same gas round-trip behavior.
+- P4 served as the publication gate after P2 and P3 so downstream kernel and
+  docs tracks can now cite the same gas round-trip behavior.

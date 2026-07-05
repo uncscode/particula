@@ -64,6 +64,21 @@
   zero-fill behavior, invalid-shape errors, and sidecar preservation across
   restore.
 
+## Implemented in E2-F4-P4 (`#1200`)
+
+- Updated only:
+  - `docs/Features/particle-data-migration.md`
+  - `docs/Features/Roadmap/data-oriented-gpu.md`
+  - `particula/gas/gas_data.py`
+- Published the migration-facing authority table and explicit round-trip
+  guidance for `name`, `molar_mass`, `concentration`, `partitioning`, and
+  `vapor_pressure`.
+- Revised roadmap wording from unresolved schema drift to an intentional,
+  tested CPU/GPU contract while keeping real limitations explicit.
+- Performed a narrow `GasData` docstring consistency pass only where wording
+  needed to match the shipped contract.
+- Kept the phase documentation-sized with no runtime behavior changes.
+
 ## Out of Scope
 
 - Rewriting GPU condensation kernels beyond any small compatibility updates

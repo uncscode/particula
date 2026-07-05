@@ -24,6 +24,9 @@ testing phase.
   - GPU-only `vapor_pressure` presence before restore and loss after restore.
 - `E2-F4-P3` pairs those tests with the vapor-pressure contract wording in
   `particula/gpu/conversion.py` and `particula/gpu/warp_types.py`.
+- `E2-F4-P4` adds no new runtime coverage; it relies on the existing
+  `particula/gpu/tests/conversion_test.py` contract while updating migration
+  docs and the `GasData` docstrings to match those assertions.
 
 ## Integration and Documentation Checks
 
@@ -31,6 +34,8 @@ testing phase.
   basic semantic validation.
 - Run focused tests for changed modules first, then the normal fast suite.
 - Verify docs match the exact behavior asserted by tests.
+- For the docs-only publication phase, verify there are no runtime behavior
+  claims beyond the existing tested contract.
 
 ## Acceptance Test Matrix
 
@@ -45,3 +50,12 @@ testing phase.
 | Vapor pressure omitted | Zero-filled `(n_boxes, n_species)` GPU default |
 | Invalid vapor-pressure shape | `ValueError` with actual/expected shape text |
 | Vapor pressure returned to CPU | Intentionally discarded on `GasData` restore, with sidecar preservation required |
+
+## Documentation-Phase Verification
+
+- Confirm `docs/Features/particle-data-migration.md` publishes the five-field
+  authority table and explicit round-trip guidance.
+- Confirm `docs/Features/Roadmap/data-oriented-gpu.md` describes the gas split
+  as an intentional tested contract, not unresolved schema drift.
+- Confirm any code-doc wording edits remain limited to consistency updates and
+  do not imply runtime changes.
