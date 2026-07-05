@@ -11,9 +11,10 @@ phase. There is no standalone testing phase.
   deterministic case generation, shape checks, finite-value assertions,
   malformed-input rejection, `ParticleData` compatibility, derived-radius
   checks, and CPU/Warp `fp64` baseline assertions.
-- `particula/gpu/tests/mass_precision_metrics_test.py` for candidate
-  reconstruction, conservation, fidelity, and memory-budget checks introduced
-  in P2-P3.
+- `particula/gpu/tests/mass_precision_metrics_test.py` for shipped P2
+  candidate projection/reconstruction helpers, mass/radius fidelity checks,
+  invalid-candidate coverage, zero-total-mass handling, unsupported-candidate
+  doc-only coverage, and CPU/Warp dtype regression checks.
 - `particula/gpu/tests/mass_precision_case_helpers.py` only if shared helper
   logic becomes large enough to justify a small adjacent test helper module.
 - `docs/Features/Roadmap/mass-precision-study.md` for the reproducibility
@@ -25,14 +26,16 @@ phase. There is no standalone testing phase.
   shapes, finite values, nonnegative masses, malformed-input rejection, and
   physically reasonable radii for the shipped `npf_cluster`,
   `five_to_ten_nm`, `accumulation_mode`, and `cloud_droplet` cases.
-- P2 candidate tests should cover conversion/reconstruction behavior for
-  `fp32`, mixed precision, and any representation alternative named in the
-  study, with explicit assertions for acceptable round-trip tolerances.
+- P2 candidate tests now cover conversion/reconstruction behavior for
+  `fp32_absolute_mass`, `mixed_precision_mass_plus_density`, and
+  `fp32_total_mass_fp32_mass_fraction`, with explicit mass and radius
+  tolerance assertions against the `fp64` baseline.
 - Production default tests should continue to assert `np.float64` and
   `wp.float64` in `particula/particles/tests/` and `particula/gpu/tests/`
   anywhere current behavior is intentionally unchanged; P1 added explicit
   baseline-policy and Warp round-trip coverage in
-  `mass_precision_cases_test.py`.
+  `mass_precision_cases_test.py`, and P2 added focused dtype-regression
+  coverage in `mass_precision_metrics_test.py`.
 
 ## Numerical Validation
 
@@ -76,5 +79,7 @@ pytest particula/gpu/tests/mass_precision_cases_test.py \
   particula/gpu/tests/mass_precision_metrics_test.py -q
 ```
 
-For the currently shipped scope, the first command is the focused validation
-entry point because only the P1 baseline test module exists on this branch.
+For the currently shipped scope, both focused modules are part of the bounded
+study surface: `mass_precision_cases_test.py` provides the reusable baseline
+fixtures and `mass_precision_metrics_test.py` exercises the shipped P2
+comparison layer.

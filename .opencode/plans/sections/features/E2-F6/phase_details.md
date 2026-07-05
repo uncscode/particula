@@ -17,18 +17,20 @@
     construction, derived-radius ordering, malformed-input rejection, Warp
     dtype assertions, and exact Warp CPU-device round trips.
 
-- [ ] **E2-F6-P2:** Compare absolute fp64 mass storage with fp32 and mixed-precision candidates
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Evaluate current absolute `fp64` storage against `fp32`, mixed
-    precision, and representation alternatives without changing production
-    defaults.
-  - Files: `docs/Features/Roadmap/mass-precision-study.md`,
-    `particula/particles/particle_data.py`,
-    `particula/particles/particle_data_builder.py`,
-    `particula/gpu/warp_types.py`, `particula/gpu/conversion.py`, and focused
-    study helpers/tests under `particula/gpu/tests/`.
-  - Tests: Candidate conversion checks, round-trip tolerances, and explicit
-    assertions that production defaults remain `fp64`.
+- [x] **E2-F6-P2:** Compare absolute fp64 mass storage with fp32 and mixed-precision candidates
+  - Issue: #1209 | Size: S | Status: Shipped
+  - Goal: Evaluate current absolute `fp64` storage against bounded study-only
+    candidates without changing production defaults.
+  - Files: `docs/Features/Roadmap/mass-precision-study.md` and
+    `particula/gpu/tests/mass_precision_metrics_test.py`.
+  - Delivered: Added study-only candidate projection/reconstruction helpers,
+    mass/radius tolerance checks for three executed candidates, invalid-input
+    coverage, zero-total-mass handling, unsupported-candidate doc-only
+    coverage, and explicit CPU/Warp dtype regression checks while leaving
+    production dtype defaults unchanged.
+  - Tests: `mass_precision_metrics_test.py` now covers candidate mass/radius
+    fidelity, invalid candidate ids, zero-total-mass reconstruction behavior,
+    unsupported-candidate boundaries, and CPU/Warp `float64` regression checks.
 
 - [ ] **E2-F6-P3:** Evaluate conservation small-particle fidelity memory and throughput tradeoffs
   - Issue: TBD | Size: S | Status: Not Started

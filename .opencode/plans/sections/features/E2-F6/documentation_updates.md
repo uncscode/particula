@@ -6,8 +6,11 @@
   `docs/Features/Roadmap/mass-precision-study.md`.
 - P1 also added roadmap links in `docs/Features/Roadmap/index.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md`.
-- Later phases still need to extend the report with candidate comparisons,
-  measured tradeoffs, and the final recommendation.
+- P2 expanded the roadmap page into a P1+P2 study record with executed
+  candidate descriptions, unsupported-candidate notes, and focused
+  reproduction commands.
+- Later phases still need to add broader tradeoff evidence and any final
+  recommendation.
 
 ## Shipped P1 Content
 
@@ -20,6 +23,16 @@
   reproduction command.
 - Explicit deferral: no precision recommendation yet; that remains future work
   for later E2-F6 phases.
+
+## Shipped P2 Additions
+
+- The roadmap page now documents the executed study-only candidates
+  `fp32_absolute_mass`, `mixed_precision_mass_plus_density`, and
+  `fp32_total_mass_fp32_mass_fraction`.
+- The page records how each candidate reconstructs comparable per-species
+  masses and derived radii for tolerance-based comparison against the baseline.
+- Unsupported candidates that would require runtime schema expansion remain
+  documentation-only in this phase.
 
 ## Notebook/Example Notes
 

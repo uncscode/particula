@@ -18,6 +18,9 @@
 - Treat log-mass or reference-mass scaling as a quantitative candidate only if
   baseline `fp64` evidence shows absolute mass representation is insufficient;
   otherwise document it as future work.
+- Keep the executed P2 comparison layer study-only: candidate helpers and
+  fidelity checks live in focused GPU tests and docs, while production dtype
+  defaults remain unchanged.
 
 ## Newly Resolved by P1 (#1208)
 
@@ -30,7 +33,25 @@
 - The current baseline policy remains unchanged after implementation: absolute
   per-species `np.float64` on CPU and `wp.float64` on Warp mirrors.
 
+## Newly Resolved by P2 (#1209)
+
+- The shipped executable candidate set is now fixed in
+  `particula/gpu/tests/mass_precision_metrics_test.py` as
+  `fp32_absolute_mass`, `mixed_precision_mass_plus_density`, and
+  `fp32_total_mass_fp32_mass_fraction`.
+- Invalid candidate ids now fail with a tested `ValueError`, and the
+  total-mass-plus-fraction path reconstructs zero-total-mass particles to
+  zeros without warning-driven behavior.
+- Candidates that require runtime schema expansion remain unsupported and are
+  documented without widening production APIs.
+- The P2 implementation confirmed again that production defaults remain
+  absolute per-species `np.float64` on CPU and `wp.float64` on Warp mirrors.
+
 ## Remaining Questions
 
-- Whether `fp32`, mixed precision, or alternate mass representations meet
-  conservation and small-particle fidelity needs remains for P2-P4.
+- Whether any candidate remains acceptable once broader conservation,
+  small-particle coexistence, memory-footprint, and throughput tradeoffs are
+  evaluated remains for P3-P4.
+- Whether the final recommendation should keep absolute `fp64` storage or
+  endorse a later migration path remains open pending those broader tradeoff
+  results.
