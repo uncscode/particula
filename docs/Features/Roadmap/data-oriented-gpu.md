@@ -1038,6 +1038,14 @@ epics above.
 - `EnvironmentData` CPU↔GPU round-trip helpers and tests are now shipped;
   build backend-selection APIs and workflow integration on top of
   `WarpEnvironmentData`.
+- `coagulation_step_gpu(...)` now follows the same environment normalization
+  contract as `condensation_step_gpu(...)`: callers may pass scalar direct
+  `temperature`/`pressure`, direct Warp arrays with shape `(n_boxes,)`, hybrid
+  scalar-plus-Warp-array direct inputs, or keyword-only
+  `environment=WarpEnvironmentData(...)`.
+- Keep downstream GPU kernel handoffs aligned with that contract: accept
+  validated per-box temperature and pressure as environment-owned state, and
+  do not migrate those fields into `GasData`.
 - Add an API design for selecting CPU or GPU execution from user-facing
   simulation code.
 - Implement backend selection for at least one condensation workflow and one

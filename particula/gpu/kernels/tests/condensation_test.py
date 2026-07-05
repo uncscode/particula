@@ -700,8 +700,12 @@ def test_condensation_step_gpu_missing_environment_field_short_circuits_before_l
 
     class _MalformedEnvironment:
         def __init__(self) -> None:
-            self.temperature = wp.array([298.15], dtype=wp.float64, device=device)
-            self.pressure = wp.array([101325.0], dtype=wp.float64, device=device)
+            self.temperature = wp.array(
+                [298.15], dtype=wp.float64, device=device
+            )
+            self.pressure = wp.array(
+                [101325.0], dtype=wp.float64, device=device
+            )
 
     environment = _MalformedEnvironment()
     delattr(environment, field_name)

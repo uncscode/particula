@@ -139,6 +139,39 @@ def _make_environment_data(
     )
 
 
+def _accumulate_collision_counts(
+    *,
+    particles: ParticleData,
+    device: str,
+    seeds: range,
+    time_step: float,
+    max_collisions: int,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    environment: Any | None = None,
+    volume: float | Any | None = None,
+) -> np.ndarray:
+    """Accumulate per-box collision counts across a small fixed seed set."""
+    total_counts = np.zeros(particles.masses.shape[0], dtype=np.int64)
+
+    for seed in seeds:
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        _, _, collision_counts = coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=time_step,
+            volume=volume,
+            max_collisions=max_collisions,
+            rng_seed=seed,
+            environment=environment,
+        )
+        wp.synchronize()
+        total_counts += np.asarray(collision_counts.numpy(), dtype=np.int64)
+
+    return total_counts
+
+
 def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> (
     None
 ):
@@ -665,6 +698,45 @@ def test_coagulation_step_gpu_reuses_direct_environment_arrays(
     assert forwarded_inputs == [(temperature, pressure)]
 
 
+def test_coagulation_step_gpu_uniform_direct_arrays_match_scalar_results(
+    device: str,
+) -> None:
+    """Uniform direct arrays stay within stochastic tolerance of scalars."""
+    particles = _make_particle_data(n_boxes=2, n_particles=6, n_species=1)
+    seeds = range(11, 19)
+    time_step = 0.5
+    max_collisions = 16
+
+    scalar_counts = _accumulate_collision_counts(
+        particles=particles,
+        device=device,
+        seeds=seeds,
+        time_step=time_step,
+        max_collisions=max_collisions,
+        temperature=298.15,
+        pressure=101325.0,
+    )
+    uniform_counts = _accumulate_collision_counts(
+        particles=particles,
+        device=device,
+        seeds=seeds,
+        time_step=time_step,
+        max_collisions=max_collisions,
+        temperature=wp.array([298.15, 298.15], dtype=wp.float64, device=device),
+        pressure=wp.array(
+            [101325.0, 101325.0], dtype=wp.float64, device=device
+        ),
+    )
+
+    diff = np.abs(uniform_counts - scalar_counts)
+    tolerance = np.maximum(3.0 * np.sqrt(np.maximum(scalar_counts, 1.0)), 1.0)
+
+    assert np.all(diff <= tolerance), (
+        "Uniform direct arrays should preserve scalar coagulation behavior "
+        "within the established stochastic tolerance band."
+    )
+
+
 @pytest.mark.parametrize(
     ("temperature", "pressure"),
     [
@@ -899,12 +971,18 @@ def test_coagulation_statistical_collision_rate(device: str) -> None:
 
 def test_coagulation_multi_box_independence(device: str) -> None:
     """Collision counts remain isolated per box."""
-    temperature = 300.0
-    pressure = 101325.0
     time_step = 1.0
     particles = _make_particle_data(n_boxes=3, n_particles=5, n_species=1)
     particles.concentration[1, :] = 0.0
     particles.concentration[2, 0] = 0.0
+    temperature = wp.array(
+        [300.0, 303.0, 297.0], dtype=wp.float64, device=device
+    )
+    pressure = wp.array(
+        [101325.0, 100500.0, 102000.0],
+        dtype=wp.float64,
+        device=device,
+    )
 
     gpu_particles = to_warp_particle_data(particles, device=device)
     _, _, collision_counts = coagulation_step_gpu(
@@ -920,6 +998,100 @@ def test_coagulation_multi_box_independence(device: str) -> None:
 
     assert result.reshape(-1)[1] == 0
     assert result.reshape(-1)[0] >= result.reshape(-1)[2]
+
+
+def test_coagulation_step_gpu_nonuniform_environment_changes_collision_trend(
+    device: str,
+) -> None:
+    """Nonuniform environment inputs shift box-local collisions directionally."""
+    particles = _make_particle_data(n_boxes=2, n_particles=12, n_species=1)
+    temperature = np.array([250.0, 350.0], dtype=np.float64)
+    pressure = np.array([150000.0, 50000.0], dtype=np.float64)
+    environment = to_warp_environment_data(
+        EnvironmentData(
+            temperature=temperature,
+            pressure=pressure,
+            saturation_ratio=np.ones((2, 1), dtype=np.float64),
+        ),
+        device=device,
+    )
+    density_value = float(np.asarray(particles.density).item())
+    mass_values = np.asarray(particles.masses[0, :, 0], dtype=np.float64)
+    radii = np.cbrt(3.0 * mass_values / (4.0 * np.pi * density_value))
+    expected_rates = np.array(
+        [
+            np.sum(
+                np.asarray(
+                    get_brownian_kernel_via_system_state(
+                        particle_radius=radii,
+                        particle_mass=mass_values,
+                        temperature=temp_value,
+                        pressure=pressure_value,
+                    ),
+                    dtype=np.float64,
+                )[np.triu_indices(len(radii), k=1)]
+            )
+            for temp_value, pressure_value in zip(
+                temperature,
+                pressure,
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    collision_totals = _accumulate_collision_counts(
+        particles=particles,
+        device=device,
+        seeds=range(31, 51),
+        time_step=0.5,
+        max_collisions=64,
+        temperature=None,
+        pressure=None,
+        environment=environment,
+        volume=1.0e-14,
+    )
+
+    higher_rate_idx = int(np.argmax(expected_rates))
+    lower_rate_idx = int(np.argmin(expected_rates))
+
+    assert expected_rates[higher_rate_idx] > expected_rates[lower_rate_idx]
+    assert collision_totals.shape == (2,)
+    assert (
+        collision_totals[higher_rate_idx] > collision_totals[lower_rate_idx]
+    ), (
+        "Nonuniform environment coverage is directional/statistical: "
+        "the box with the larger CPU Brownian-rate reference should accumulate "
+        "more collisions across the fixed seed set, without requiring exact "
+        "per-seed counts."
+    )
+
+
+def test_coagulation_step_gpu_nonuniform_arrays_keep_single_active_box_idle(
+    device: str,
+) -> None:
+    """A box with fewer than two active particles still records no collisions."""
+    particles = _make_particle_data(n_boxes=2, n_particles=4, n_species=1)
+    particles.concentration[1, 1:] = 0.0
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    _, _, collision_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=wp.array([298.15, 308.15], dtype=wp.float64, device=device),
+        pressure=wp.array(
+            [101325.0, 98000.0],
+            dtype=wp.float64,
+            device=device,
+        ),
+        time_step=0.5,
+        rng_seed=29,
+        max_collisions=8,
+    )
+    wp.synchronize()
+
+    result = np.asarray(collision_counts.numpy())
+
+    assert result.shape == (2,)
+    assert result[1] == 0
 
 
 def test_coagulation_mass_conservation(device: str) -> None:
