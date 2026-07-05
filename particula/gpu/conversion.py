@@ -114,8 +114,8 @@ def _restore_partitioning_bool(
     """
     if not np.all(np.isin(partitioning_values, (0, 1))):
         raise ValueError(
-            "partitioning must contain only binary values 0 or 1 when "
-            "restoring GasData"
+            "invalid partitioning restore values; partitioning must contain "
+            "only binary 0/1 values when restoring GasData"
         )
     return partitioning_values.astype(bool)
 
@@ -414,15 +414,19 @@ def from_warp_gas_data(
 
     Note:
         The 'vapor_pressure' field from WarpGasData is not transferred
-        as GasData does not have this field. If you need vapor pressure
-        values, access them directly from gpu_data before calling this.
+        because GasData does not include this field. If you need vapor
+        pressure values, access them directly from gpu_data before
+        calling this helper.
 
-        Species names must be provided since WarpGasData does not store
-        string data. If not provided, placeholder names are generated.
+        WarpGasData does not store species names because string data is
+        not GPU-compatible. Prefer caller-supplied ordered names when
+        reconstructing GasData. Placeholder names are generated only
+        when ``name`` is omitted or explicitly set to ``None``.
 
     Args:
         gpu_data: GPU-resident WarpGasData container.
-        name: Species names. If None, generates placeholder names
+        name: Optional ordered species names supplied by the caller.
+            If omitted or ``None``, generates placeholder names
             ["species_0", "species_1", ...].
         sync: If True (default), synchronize device before transfer
             to ensure all GPU operations have completed. Set False
@@ -432,15 +436,15 @@ def from_warp_gas_data(
         CPU-side GasData with NumPy arrays.
 
     Raises:
-        ValueError: If name length doesn't match n_species.
+        ValueError: If supplied name length doesn't match n_species.
         ValueError: If restored ``partitioning`` contains values other than
             ``0`` or ``1``.
 
     Example:
-        >>> # With original names preserved
+        >>> # With caller-supplied ordered names
         >>> result = from_warp_gas_data(gpu_data, name=["Water", "H2SO4"])
         >>>
-        >>> # With placeholder names
+        >>> # With placeholder names because GPU data stores no names
         >>> result = from_warp_gas_data(gpu_data)
         >>> print(result.name)  # ["species_0", "species_1"]
     """

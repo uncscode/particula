@@ -92,8 +92,9 @@ class WarpGasData:
         - Single-box simulations use n_boxes=1
 
     Note:
-        - The 'name' field from CPU GasData is excluded (strings not
-          GPU-compatible). Use index mapping for species identification.
+        - The 'name' field from CPU GasData is excluded because strings
+          are not GPU-compatible. Preserve species identity with
+          external ordered name ownership or index mapping.
         - The 'partitioning' field uses int32 instead of bool for GPU
           compatibility (1 = True, 0 = False).
         - 'vapor_pressure' is added for GPU kernels (not in CPU GasData).

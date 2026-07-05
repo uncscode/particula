@@ -15,6 +15,7 @@ import pytest
 wp = pytest.importorskip("warp")
 
 from particula.gpu.conversion import (  # noqa: E402
+    _restore_partitioning_bool,
     from_warp_environment_data,
     from_warp_gas_data,
     from_warp_particle_data,
@@ -937,6 +938,34 @@ class TestFromWarpParticleData:
         )
 
 
+class TestRestorePartitioningBool:
+    """Tests for _restore_partitioning_bool() helper."""
+
+    def test_restore_partitioning_bool_accepts_binary_values(self) -> None:
+        """Test binary GPU flags restore to a NumPy bool array."""
+        values = np.array([0, 1, 1, 0], dtype=np.int32)
+
+        result = _restore_partitioning_bool(values)
+
+        assert result.dtype == np.bool_
+        np.testing.assert_array_equal(
+            result,
+            np.array([False, True, True, False], dtype=np.bool_),
+        )
+
+    def test_restore_partitioning_bool_rejects_non_binary_values(self) -> None:
+        """Test non-binary GPU flags fail with the documented contract."""
+        values = np.array([-1, 2, 0], dtype=np.int32)
+
+        with pytest.raises(ValueError) as exc_info:
+            _restore_partitioning_bool(values)
+
+        error_msg = str(exc_info.value)
+        assert "partitioning" in error_msg
+        assert "binary" in error_msg
+        assert "0/1" in error_msg
+
+
 class TestFromWarpGasData:
     """Tests for from_warp_gas_data() function."""
 
@@ -1019,8 +1048,54 @@ class TestFromWarpGasData:
             device="cpu",
         )
 
+        with pytest.raises(ValueError) as exc_info:
+            from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        error_msg = str(exc_info.value)
+        assert "partitioning" in error_msg
+        assert "binary" in error_msg
+        assert "0/1" in error_msg
+
+    def test_from_warp_gas_data_allows_retry_after_partitioning_failure(
+        self, sample_gas_data
+    ) -> None:
+        """Test restore can be retried after correcting partitioning flags."""
+        from particula.gpu.warp_types import WarpGasData
+
+        gpu_data = WarpGasData()
+        gpu_data.molar_mass = wp.array(
+            sample_gas_data.molar_mass,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.concentration = wp.array(
+            sample_gas_data.concentration,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.vapor_pressure = wp.zeros(
+            sample_gas_data.concentration.shape,
+            dtype=wp.float64,
+            device="cpu",
+        )
+        gpu_data.partitioning = wp.array(
+            np.array([1, 2, 0], dtype=np.int32),
+            dtype=wp.int32,
+            device="cpu",
+        )
+
         with pytest.raises(ValueError, match="partitioning"):
             from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        gpu_data.partitioning = wp.array(
+            sample_gas_data.partitioning.astype(np.int32),
+            dtype=wp.int32,
+            device="cpu",
+        )
+
+        result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        _assert_gas_round_trip_matches(sample_gas_data, result)
 
     def test_from_warp_gas_data_drops_gpu_only_vapor_pressure(
         self, sample_gas_data
@@ -1072,8 +1147,21 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=["Only", "Two"])  # Need 3
 
         error_msg = str(exc_info.value)
-        assert "2" in error_msg  # actual length
-        assert "3" in error_msg  # expected length
+        assert "name length 2" in error_msg
+        assert "n_species 3" in error_msg
+
+    def test_from_warp_gas_data_allows_retry_after_name_length_failure(
+        self, sample_gas_data
+    ) -> None:
+        """Test restore can be retried after correcting the name list."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+
+        with pytest.raises(ValueError, match="name length 2"):
+            from_warp_gas_data(gpu_data, name=["Only", "Two"])
+
+        result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        _assert_gas_round_trip_matches(sample_gas_data, result)
 
     def test_from_warp_gas_data_raises_value_error_for_empty_name_list(
         self, sample_gas_data
@@ -1085,8 +1173,8 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=[])  # Empty list
 
         error_msg = str(exc_info.value)
-        assert "0" in error_msg  # actual length (0)
-        assert "3" in error_msg  # expected length
+        assert "name length 0" in error_msg
+        assert "n_species 3" in error_msg
 
     def test_gas_data_sync_false(self, sample_gas_data) -> None:
         """Test manual sync with sync=False."""
