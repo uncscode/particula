@@ -58,11 +58,11 @@
     {
       "id": "E2-F5-P3",
       "title": "Migrate condensation GPU API to per-box environment inputs with compatibility tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
