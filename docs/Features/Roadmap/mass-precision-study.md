@@ -108,6 +108,8 @@ Phase P3 extends the same case-candidate matrix with cached executable metrics:
     `particle_mass`, and `particle_concentration` directly from the cached
     baseline and reconstructed arrays
   - report both per-particle deltas and aggregate species-total deltas
+  - enforce aggregate species-total relative tolerance
+    `_AGGREGATE_DELTA_RTOL = 5e-7` separately from per-particle checks
 
 The fast P3 suite keeps representative coverage bounded to the shipped four
 deterministic cases plus one mixed-scale stress case where nanometer particles
@@ -121,6 +123,11 @@ The mixed-scale stress case uses a single-species deterministic array that puts
 The executable review threshold is intentionally focused on the smallest
 particle slice so whole-array aggregates cannot hide fragile small-particle
 loss.
+
+Aggregate mixed-scale checks are tracked separately from the smallest-particle
+slice checks. The aggregate assertion applies to species totals over the full
+array, while the mixed-scale smallest-particle assertions remain the guardrail
+for nanometer-scale fidelity.
 
 ## P3 zero-mass and zero-volume edge handling
 
@@ -167,11 +174,14 @@ runtime schemas or default dtypes.
   `particula/gpu/tests/mass_precision_metrics_test.py`.
 - Optional throughput evidence lives on the existing benchmark surface in
   `particula/gpu/tests/benchmark_test.py`.
-- The P3 benchmark path records bounded study-only projection timings for three
-  representative case/candidate pairs and still requires the explicit
-  `--benchmark` opt-in plus CUDA availability.
+- The P3 benchmark path records bounded study-only candidate-payload timings for
+  three representative case/candidate pairs, including the full documented
+  projection payload for each candidate rather than reconstruction-only mass
+  casts, and still requires the explicit `--benchmark` opt-in plus CUDA
+  availability.
 - On machines without Warp or CUDA support, the benchmark module skips cleanly
-  and the fast metric suite remains runnable.
+  for GPU execution, while CPU-only helper coverage remains importable and the
+  fast metric suite remains runnable.
 
 ## Unsupported candidates
 
@@ -203,6 +213,7 @@ focused test matrix.
 ```bash
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 pytest particula/gpu/tests/mass_precision_metrics_test.py -q
+pytest particula/gpu/tests/benchmark_helpers_test.py -q
 pytest -Werror particula/gpu/tests/mass_precision_metrics_test.py -q
 pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 ```
