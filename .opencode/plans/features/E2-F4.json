@@ -58,11 +58,11 @@
     {
       "id": "E2-F4-P3",
       "title": "Clarify vapor-pressure ownership and GPU transfer behavior with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-05",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
