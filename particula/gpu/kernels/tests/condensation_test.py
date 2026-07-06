@@ -606,8 +606,8 @@ def _run_gpu_step(
     mass_transfer: Any | None = None,
     environment: Any | None = None,
     return_gas_state: Literal[False] = False,
-) -> tuple[ParticleData, Any]:
-    ...
+) -> tuple[ParticleData, Any]: ...
+
 
 @overload
 def _run_gpu_step(
@@ -624,8 +624,8 @@ def _run_gpu_step(
     mass_transfer: Any | None = None,
     environment: Any | None = None,
     return_gas_state: Literal[True] = True,
-) -> tuple[ParticleData, Any, GasData]:
-    ...
+) -> tuple[ParticleData, Any, GasData]: ...
+
 
 def _run_gpu_step(
     particles: ParticleData,
@@ -2573,13 +2573,13 @@ def test_condensation_stiffness_recorded_grid_matches_configured_timesteps(
         configured_timesteps
     )
     if case.n_boxes == 1:
-        assert {
-            record.environment_input_mode for record in records
-        } == {"scalar_inputs"}
+        assert {record.environment_input_mode for record in records} == {
+            "scalar_inputs"
+        }
     else:
-        assert {
-            record.environment_input_mode for record in records
-        } == {"direct_warp_arrays"}
+        assert {record.environment_input_mode for record in records} == {
+            "direct_warp_arrays"
+        }
 
 
 @pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
