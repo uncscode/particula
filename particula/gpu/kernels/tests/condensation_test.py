@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -137,6 +138,268 @@ def _make_environment_data(
         temperature=np.full((n_boxes,), temperature, dtype=np.float64),
         pressure=np.full((n_boxes,), pressure, dtype=np.float64),
         saturation_ratio=np.ones((n_boxes, n_species), dtype=np.float64),
+    )
+
+
+@dataclass(frozen=True)
+class CondensationStiffnessCase:
+    """Deterministic fixed-shape condensation stress case definition."""
+
+    name: str
+    n_boxes: int
+    n_particles: int
+    n_species: int
+    time_step: float
+    temperature: float = 298.15
+    pressure: float = 101325.0
+    particle_mass_scale: float = 1.0
+    gas_concentration_scale: float = 1.0
+    vapor_pressure_scale: float = 1.0
+    box_temperature_step: float = 0.0
+    box_pressure_step: float = 0.0
+    zero_mass_particles: tuple[tuple[int, int], ...] = ()
+    zero_concentration_particles: tuple[tuple[int, int], ...] = ()
+
+    def build_particle_data(self) -> ParticleData:
+        """Build deterministic particle data for the configured case."""
+        particles = _make_particle_data(
+            n_boxes=self.n_boxes,
+            n_particles=self.n_particles,
+            n_species=self.n_species,
+        )
+        particles.masses *= self.particle_mass_scale
+        for box_idx, particle_idx in self.zero_mass_particles:
+            particles.masses[box_idx, particle_idx, :] = 0.0
+        for box_idx, particle_idx in self.zero_concentration_particles:
+            particles.concentration[box_idx, particle_idx] = 0.0
+        return particles
+
+    def build_gas_data(self) -> GasData:
+        """Build deterministic gas data for the configured case."""
+        gas = _make_gas_data(self.n_boxes, self.n_species)
+        gas.concentration *= self.gas_concentration_scale
+        return gas
+
+    def build_vapor_pressure(self) -> np.ndarray:
+        """Build deterministic vapor pressure data for the configured case."""
+        vapor_pressure = _make_vapor_pressure(self.n_boxes, self.n_species)
+        return vapor_pressure * self.vapor_pressure_scale
+
+    def build_environment_data(self) -> EnvironmentData:
+        """Build deterministic environment data for the configured case."""
+        environment = _make_environment_data(
+            self.n_boxes,
+            self.n_species,
+            temperature=self.temperature,
+            pressure=self.pressure,
+        )
+        if self.n_boxes > 1:
+            environment.temperature = (
+                self.temperature
+                + self.box_temperature_step
+                * np.arange(
+                    self.n_boxes,
+                    dtype=np.float64,
+                )
+            )
+            environment.pressure = (
+                self.pressure
+                + self.box_pressure_step
+                * np.arange(
+                    self.n_boxes,
+                    dtype=np.float64,
+                )
+            )
+        return environment
+
+    def temperature_array(self) -> np.ndarray:
+        """Return the per-box temperature inputs for the case."""
+        return self.build_environment_data().temperature
+
+    def pressure_array(self) -> np.ndarray:
+        """Return the per-box pressure inputs for the case."""
+        return self.build_environment_data().pressure
+
+
+@dataclass(frozen=True)
+class CondensationStiffnessClassification:
+    """Classification result for particle-only condensation stiffness checks."""
+
+    label: str
+    mass_nonnegative: bool
+    values_finite: bool
+    metadata_valid: bool
+    zero_mass_change_stable: bool
+    max_fractional_mass_change: float
+    threshold: float
+    particle_only_update: bool = True
+
+
+def _make_condensation_stiffness_cases() -> tuple[
+    CondensationStiffnessCase, ...
+]:
+    """Return the compact reusable stiffness catalog."""
+    return (
+        CondensationStiffnessCase(
+            name="nanometer",
+            n_boxes=1,
+            n_particles=4,
+            n_species=2,
+            time_step=0.05,
+            particle_mass_scale=0.15,
+            gas_concentration_scale=4.0,
+            vapor_pressure_scale=0.6,
+        ),
+        CondensationStiffnessCase(
+            name="accumulation_mode",
+            n_boxes=1,
+            n_particles=3,
+            n_species=2,
+            time_step=0.4,
+            particle_mass_scale=15.0,
+            gas_concentration_scale=1.5,
+            vapor_pressure_scale=0.85,
+        ),
+        CondensationStiffnessCase(
+            name="droplet_like",
+            n_boxes=2,
+            n_particles=2,
+            n_species=2,
+            time_step=4.0,
+            particle_mass_scale=8.0e4,
+            gas_concentration_scale=0.4,
+            vapor_pressure_scale=1.25,
+            box_temperature_step=4.0,
+            box_pressure_step=-750.0,
+        ),
+    )
+
+
+def _validate_stiffness_case_metadata(
+    case: CondensationStiffnessCase,
+    particles: ParticleData,
+    gas: GasData,
+    vapor_pressure: np.ndarray,
+) -> None:
+    """Validate fixed-shape and dtype expectations for a stiffness case."""
+    expected_particle_shape = (case.n_boxes, case.n_particles, case.n_species)
+    expected_concentration_shape = (case.n_boxes, case.n_particles)
+    expected_gas_shape = (case.n_boxes, case.n_species)
+    if particles.masses.shape != expected_particle_shape:
+        raise ValueError(
+            "particle masses shape does not match declared case metadata"
+        )
+    if particles.concentration.shape != expected_concentration_shape:
+        raise ValueError(
+            "particle concentration shape does not match declared case metadata"
+        )
+    if gas.concentration.shape != expected_gas_shape:
+        raise ValueError(
+            "gas concentration shape does not match declared case metadata"
+        )
+    if vapor_pressure.shape != expected_gas_shape:
+        raise ValueError(
+            "vapor pressure shape does not match declared case metadata"
+        )
+
+    dtype_expectations = (
+        ("particle masses", particles.masses),
+        ("particle concentration", particles.concentration),
+        ("particle density", particles.density),
+        ("particle volume", particles.volume),
+        ("gas concentration", gas.concentration),
+        ("gas molar mass", gas.molar_mass),
+        ("vapor pressure", vapor_pressure),
+    )
+    for name, values in dtype_expectations:
+        if values.dtype != np.float64:
+            raise TypeError(f"{name} must use np.float64")
+
+
+def _particle_mass_is_nonnegative(masses: np.ndarray) -> bool:
+    """Return whether all particle masses are non-negative."""
+    return bool(np.all(masses >= 0.0))
+
+
+def _particle_values_are_finite(*arrays: np.ndarray) -> bool:
+    """Return whether all provided arrays contain only finite values."""
+    return all(bool(np.all(np.isfinite(array))) for array in arrays)
+
+
+def _fractional_mass_change_per_bin(
+    initial_masses: np.ndarray,
+    final_masses: np.ndarray,
+) -> np.ndarray:
+    """Return per-bin fractional mass change for positive-mass entries only."""
+    if initial_masses.shape != final_masses.shape:
+        raise ValueError("initial and final masses must have matching shape")
+    initial = np.asarray(initial_masses, dtype=np.float64)
+    final = np.asarray(final_masses, dtype=np.float64)
+    change = np.abs(final - initial)
+    fractional_change = np.zeros_like(change)
+    positive_mask = initial > 0.0
+    fractional_change[positive_mask] = (
+        change[positive_mask] / initial[positive_mask]
+    )
+    return fractional_change
+
+
+def _zero_mass_entries_remain_stable(
+    initial_masses: np.ndarray,
+    final_masses: np.ndarray,
+) -> bool:
+    """Return whether zero-mass entries remain unchanged."""
+    zero_mask = np.asarray(initial_masses) == 0.0
+    return bool(np.all(np.asarray(final_masses)[zero_mask] == 0.0))
+
+
+def _classify_particle_only_condensation_stiffness(
+    case: CondensationStiffnessCase,
+    initial_masses: np.ndarray,
+    final_masses: np.ndarray,
+    gas: GasData,
+    vapor_pressure: np.ndarray,
+    *,
+    max_fractional_change: float,
+) -> CondensationStiffnessClassification:
+    """Classify particle-only condensation behavior as stable or unstable."""
+    particles = case.build_particle_data()
+    particles.masses = np.asarray(final_masses, dtype=np.float64)
+    _validate_stiffness_case_metadata(case, particles, gas, vapor_pressure)
+    fractional_change = _fractional_mass_change_per_bin(
+        initial_masses,
+        final_masses,
+    )
+    zero_mass_change_stable = _zero_mass_entries_remain_stable(
+        initial_masses,
+        final_masses,
+    )
+    mass_nonnegative = _particle_mass_is_nonnegative(final_masses)
+    values_finite = _particle_values_are_finite(
+        initial_masses,
+        final_masses,
+        gas.concentration,
+        vapor_pressure,
+    )
+    max_change = (
+        float(np.max(fractional_change)) if fractional_change.size else 0.0
+    )
+    label = "stable"
+    if (
+        max_change > max_fractional_change
+        or not mass_nonnegative
+        or not values_finite
+        or not zero_mass_change_stable
+    ):
+        label = "unstable"
+    return CondensationStiffnessClassification(
+        label=label,
+        mass_nonnegative=mass_nonnegative,
+        values_finite=values_finite,
+        metadata_valid=True,
+        zero_mass_change_stable=zero_mass_change_stable,
+        max_fractional_mass_change=max_change,
+        threshold=max_fractional_change,
     )
 
 
@@ -442,6 +705,273 @@ def test_condensation_step_gpu_uniform_direct_arrays_match_scalar_results(
         scalar_mass_transfer.numpy(),
         rtol=1.0e-10,
     )
+
+
+def test_condensation_stiffness_case_builds_named_regimes() -> None:
+    """Stiffness catalog exposes the expected deterministic baseline cases."""
+    cases = _make_condensation_stiffness_cases()
+
+    assert [case.name for case in cases] == [
+        "nanometer",
+        "accumulation_mode",
+        "droplet_like",
+    ]
+
+    for case in cases:
+        particles = case.build_particle_data()
+        gas = case.build_gas_data()
+        vapor_pressure = case.build_vapor_pressure()
+
+        _validate_stiffness_case_metadata(case, particles, gas, vapor_pressure)
+        assert particles.masses.shape == (
+            case.n_boxes,
+            case.n_particles,
+            case.n_species,
+        )
+        assert particles.masses.dtype == np.float64
+        assert gas.concentration.dtype == np.float64
+        assert vapor_pressure.dtype == np.float64
+
+
+def test_condensation_stiffness_case_zero_mass_preserves_fixed_shape() -> None:
+    """Zero-mass helper coverage preserves deterministic fixed-shape outputs."""
+    case = CondensationStiffnessCase(
+        name="zero_mass_edge",
+        n_boxes=1,
+        n_particles=2,
+        n_species=2,
+        time_step=0.1,
+        zero_mass_particles=((0, 1),),
+    )
+
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+
+    _validate_stiffness_case_metadata(case, particles, gas, vapor_pressure)
+    assert particles.masses.shape == (1, 2, 2)
+    npt.assert_allclose(particles.masses[0, 1, :], 0.0)
+
+
+def test_condensation_stiffness_case_direct_arrays_match_scalar_inputs(
+    device: str,
+) -> None:
+    """Representative case supports scalar and direct ``(n_boxes,)`` inputs."""
+    if device != "cpu":
+        pytest.skip("Stiffness baseline runs on Warp CPU")
+
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "droplet_like"
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+
+    _, scalar_mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=case.temperature,
+        pressure=case.pressure,
+        time_step=case.time_step,
+        device=device,
+    )
+    _, array_mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=wp.array(
+            case.temperature_array(),
+            dtype=wp.float64,
+            device=device,
+        ),
+        pressure=wp.array(
+            case.pressure_array(),
+            dtype=wp.float64,
+            device=device,
+        ),
+        time_step=case.time_step,
+        device=device,
+    )
+
+    assert scalar_mass_transfer.shape == array_mass_transfer.shape
+    assert array_mass_transfer.dtype == wp.float64
+    assert array_mass_transfer.shape == (
+        case.n_boxes,
+        case.n_particles,
+        case.n_species,
+    )
+    npt.assert_allclose(
+        array_mass_transfer.numpy()[0],
+        scalar_mass_transfer.numpy()[0],
+        rtol=1.0e-10,
+    )
+    assert (
+        np.max(
+            np.abs(
+                array_mass_transfer.numpy()[1] - scalar_mass_transfer.numpy()[1]
+            )
+        )
+        > 0.0
+    )
+
+
+def test_stiffness_metrics_reject_shape_metadata_mismatch() -> None:
+    """Metadata validation fails clearly on declared shape mismatches."""
+    case = CondensationStiffnessCase(
+        name="shape_mismatch",
+        n_boxes=1,
+        n_particles=2,
+        n_species=2,
+        time_step=0.1,
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    particles.masses = np.zeros((1, 3, 2), dtype=np.float64)
+
+    with pytest.raises(
+        ValueError,
+        match="particle masses shape does not match declared case metadata",
+    ):
+        _validate_stiffness_case_metadata(case, particles, gas, vapor_pressure)
+
+
+def test_stiffness_metrics_reject_dtype_metadata_mismatch() -> None:
+    """Metadata validation fails clearly on dtype mismatches."""
+    case = CondensationStiffnessCase(
+        name="dtype_mismatch",
+        n_boxes=1,
+        n_particles=2,
+        n_species=2,
+        time_step=0.1,
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure().astype(np.float32)
+
+    with pytest.raises(TypeError, match="vapor pressure must use np.float64"):
+        _validate_stiffness_case_metadata(case, particles, gas, vapor_pressure)
+
+
+def test_fractional_mass_change_zero_mass_returns_documented_result() -> None:
+    """Zero-initial-mass entries report zero fractional change when unchanged."""
+    initial = np.array([[[0.0, 2.0e-18]]], dtype=np.float64)
+    final = np.array([[[0.0, 3.0e-18]]], dtype=np.float64)
+
+    fractional_change = _fractional_mass_change_per_bin(initial, final)
+
+    npt.assert_allclose(fractional_change, [[[0.0, 0.5]]])
+    assert _zero_mass_entries_remain_stable(initial, final)
+
+
+def test_condensation_stiffness_metric_helpers_detect_invalid_values() -> None:
+    """Metric helpers expose non-negativity and finiteness checks."""
+    good = np.array([0.0, 1.0], dtype=np.float64)
+    bad = np.array([1.0, np.inf], dtype=np.float64)
+
+    assert _particle_mass_is_nonnegative(good)
+    assert not _particle_mass_is_nonnegative(np.array([-1.0], dtype=np.float64))
+    assert _particle_values_are_finite(good)
+    assert not _particle_values_are_finite(good, bad)
+
+
+def test_condensation_stiffness_classification_threshold_boundary() -> None:
+    """Exact threshold equality remains classified as stable."""
+    case = CondensationStiffnessCase(
+        name="threshold_boundary",
+        n_boxes=1,
+        n_particles=1,
+        n_species=1,
+        time_step=0.1,
+    )
+    initial = np.array([[[1.0e-18]]], dtype=np.float64)
+    final = np.array([[[1.5e-18]]], dtype=np.float64)
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial,
+        final,
+        gas,
+        vapor_pressure,
+        max_fractional_change=0.5,
+    )
+
+    assert classification.label == "stable"
+    assert classification.max_fractional_mass_change == pytest.approx(0.5)
+    assert classification.particle_only_update
+
+
+def test_condensation_stiffness_classification_marks_large_change_unstable() -> (
+    None
+):
+    """Large fractional mass changes are classified as unstable."""
+    case = CondensationStiffnessCase(
+        name="large_change",
+        n_boxes=1,
+        n_particles=1,
+        n_species=1,
+        time_step=1.0,
+    )
+    initial = np.array([[[1.0e-18]]], dtype=np.float64)
+    final = np.array([[[3.0e-18]]], dtype=np.float64)
+
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial,
+        final,
+        case.build_gas_data(),
+        case.build_vapor_pressure(),
+        max_fractional_change=0.5,
+    )
+
+    assert classification.label == "unstable"
+    assert classification.max_fractional_mass_change > classification.threshold
+    assert classification.particle_only_update
+
+
+def test_condensation_stiffness_classification_explicitly_marks_particle_only(
+    device: str,
+) -> None:
+    """Classification exposes the particle-only caveat without gas claims."""
+    if device != "cpu":
+        pytest.skip("Stiffness baseline runs on Warp CPU")
+
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "accumulation_mode"
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    initial_gas = gas.concentration.copy()
+    initial_masses = particles.masses.copy()
+
+    gpu_result, _ = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=case.temperature,
+        pressure=case.pressure,
+        time_step=case.time_step,
+        device=device,
+    )
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial_masses,
+        gpu_result.masses,
+        gas,
+        vapor_pressure,
+        max_fractional_change=10.0,
+    )
+
+    assert classification.particle_only_update is True
+    npt.assert_allclose(gas.concentration, initial_gas)
 
 
 @pytest.mark.parametrize(
@@ -1504,6 +2034,189 @@ def test_condensation_multi_species_parity(device: str) -> None:
     )
 
     npt.assert_allclose(gpu_result.masses, expected_masses, rtol=1.0e-10)
+
+
+def test_condensation_stiffness_case_classifies_stable_on_warp_cpu(
+    device: str,
+) -> None:
+    """A compact accumulation-mode case stays within the stable threshold."""
+    if device != "cpu":
+        pytest.skip("Stiffness baseline runs on Warp CPU")
+
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "accumulation_mode"
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    initial_masses = particles.masses.copy()
+
+    gpu_result, mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=case.temperature,
+        pressure=case.pressure,
+        time_step=case.time_step,
+        device=device,
+    )
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial_masses,
+        gpu_result.masses,
+        gas,
+        vapor_pressure,
+        max_fractional_change=10.0,
+    )
+
+    assert classification.label == "stable"
+    assert classification.mass_nonnegative
+    assert classification.values_finite
+    assert classification.particle_only_update
+    assert mass_transfer.shape == gpu_result.masses.shape
+
+
+def test_condensation_stiffness_case_classifies_unstable_on_warp_cpu(
+    device: str,
+) -> None:
+    """A deliberately stiff nanometer case exceeds the configured threshold."""
+    if device != "cpu":
+        pytest.skip("Stiffness baseline runs on Warp CPU")
+
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "nanometer"
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    initial_masses = particles.masses.copy()
+
+    gpu_result, _ = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=case.temperature,
+        pressure=case.pressure,
+        time_step=case.time_step,
+        device=device,
+    )
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial_masses,
+        gpu_result.masses,
+        gas,
+        vapor_pressure,
+        max_fractional_change=0.01,
+    )
+
+    assert classification.label == "unstable"
+    assert classification.mass_nonnegative
+    assert classification.values_finite
+    assert classification.particle_only_update
+
+
+def test_condensation_step_gpu_reuses_mass_transfer_buffer_for_stiffness_case(
+    device: str,
+) -> None:
+    """Buffer reuse remains valid for a deterministic stiffness study case."""
+    if device != "cpu":
+        pytest.skip("Stiffness baseline runs on Warp CPU")
+
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "droplet_like"
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    mass_transfer = wp.zeros(
+        (case.n_boxes, case.n_particles, case.n_species),
+        dtype=wp.float64,
+        device=device,
+    )
+
+    _, returned_buffer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=wp.array(
+            case.temperature_array(),
+            dtype=wp.float64,
+            device=device,
+        ),
+        pressure=wp.array(
+            case.pressure_array(),
+            dtype=wp.float64,
+            device=device,
+        ),
+        time_step=case.time_step,
+        mass_transfer=mass_transfer,
+        device=device,
+    )
+
+    assert returned_buffer is mass_transfer
+    assert np.any(returned_buffer.numpy() != 0.0)
+
+
+def test_condensation_stiffness_invalid_environment_inputs_do_not_mutate_case(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Pre-launch failures leave deterministic case inputs unchanged."""
+    if device != "cpu":
+        pytest.skip("Stiffness baseline runs on Warp CPU")
+
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "droplet_like"
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    original_masses = particles.masses.copy()
+    original_gas = gas.concentration.copy()
+    original_vapor_pressure = vapor_pressure.copy()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=vapor_pressure,
+    )
+    calls: list[str] = []
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(ValueError, match="temperature must be finite and > 0"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=wp.array(
+                [case.temperature, 0.0],
+                dtype=wp.float64,
+                device=device,
+            ),
+            pressure=wp.array(
+                case.pressure_array(),
+                dtype=wp.float64,
+                device=device,
+            ),
+            time_step=case.time_step,
+        )
+
+    assert calls == []
+    npt.assert_allclose(particles.masses, original_masses)
+    npt.assert_allclose(gas.concentration, original_gas)
+    npt.assert_allclose(vapor_pressure, original_vapor_pressure)
 
 
 def test_condensation_step_gpu_reuses_mass_transfer_buffer(
