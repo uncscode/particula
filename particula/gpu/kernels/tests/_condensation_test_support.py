@@ -2933,10 +2933,14 @@ def test_candidate_reuses_mass_transfer_and_fixed_shape_scratch_buffers(
         assert second.accumulator is None
     else:
         assert accumulator_id is not None
-        assert id(first.accumulator) == accumulator_id
-        assert id(second.accumulator) == accumulator_id
-        assert first.accumulator.shape == shape
-        assert second.accumulator.shape == shape
+        first_accumulator = first.accumulator
+        second_accumulator = second.accumulator
+        assert first_accumulator is not None
+        assert second_accumulator is not None
+        assert id(first_accumulator) == accumulator_id
+        assert id(second_accumulator) == accumulator_id
+        assert first_accumulator.shape == shape
+        assert second_accumulator.shape == shape
 
 
 @pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
