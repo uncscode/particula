@@ -22,17 +22,21 @@
   - Goal: Run the stress catalog against `condensation_step_gpu` with fixed
     shapes and preallocated buffers, producing a measured stability map for the
     current explicit GPU implementation.
-  - Files delivered: `particula/gpu/kernels/tests/condensation_test.py` and
+  - Files delivered: `particula/gpu/kernels/tests/condensation_stiffness_test.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`, and
     `docs/Features/Roadmap/condensation-stiffness-study.md`.
-  - Implementation notes: P2 added `_RECORDED_TIMESTEP_GRID_BY_CASE`,
-    `_RECORDED_STIFFNESS_THRESHOLD_BY_CASE`, and
+  - Implementation notes: P2 added `_RECORDED_TIMESTEP_GRID_BY_CASE`, the
+    shared `_RECORDED_STIFFNESS_THRESHOLD`, and
     `CondensationStiffnessTrialRecord`, then used a test-local sweep helper to
     rebuild fresh deterministic inputs per trial while reusing one
-    caller-owned `mass_transfer` buffer per case/device. The shipped tests
-    assert exact timestep order, at least one stable and one unstable result per
-    case, unchanged gas concentration for the particle-only path, scalar inputs
-    for single-box cases, direct Warp `(n_boxes,)` arrays for `droplet_like`,
-    and optional guarded CUDA contract parity.
+    caller-owned `mass_transfer` buffer per case/device. The recorded grid is
+    executable evidence for the current particle-only path: every shipped row is
+    `stable` under the shared inclusive threshold, gas concentration remains
+    unchanged, single-box cases keep scalar inputs, and `droplet_like` covers
+    direct Warp `(n_boxes,)` arrays. Separate regression tests still cover the
+    unstable branch for larger fractional changes, zero-mass growth, and
+    non-finite values, plus a guarded CUDA parity check for the nanometer
+    recorded-grid contract.
   - Tests: Fast Warp CPU recorded-grid tests plus a guarded CUDA parity check
     when available.
 
@@ -41,7 +45,9 @@
   - Goal: Compare graph-capture-compatible options against the explicit map and
     identify the smallest safe foundation for future implementation without
     broadening the current production particle-only contract.
-  - Files delivered: `particula/gpu/kernels/tests/condensation_test.py` and
+  - Files delivered: `particula/gpu/kernels/tests/condensation_stiffness_test.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`, and
     `docs/Features/Roadmap/condensation-stiffness-study.md`.
   - Implementation notes: P3 stayed test-local and evidence-driven. It added
     deterministic prototype candidates `fixed_count_substeps_4` and

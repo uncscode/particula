@@ -14,8 +14,9 @@ conservation claims.
 - Gas update: the current Warp path is particle-only and does not yet update gas
   concentrations during production condensation.
 - Baseline backend for this phase: `np.float64` inputs and Warp CPU execution.
-- Accepted environment inputs: scalar `temperature` and `pressure`, or direct
-  Warp arrays with shape `(n_boxes,)`.
+- Accepted study inputs: scalar `temperature` and `pressure`, direct Warp
+  arrays with shape `(n_boxes,)`, and the tested hybrid mode where one direct
+  input stays scalar while the other uses a Warp `(n_boxes,)` array.
 - Study cases are deterministic fixed-shape builders that should be recreated
   from clean inputs after failed validation or intentionally unstable runs.
 
@@ -77,8 +78,9 @@ The baseline tests use the following helper concepts:
 ## Measured Recorded Timestep Grid
 
 The current recorded sweep mirrors
-`particula/gpu/kernels/tests/condensation_test.py` exactly. For each named
-case, the tests:
+`particula/gpu/kernels/tests/condensation_stiffness_test.py` plus shared
+helpers in `particula/gpu/kernels/tests/_condensation_test_support.py`
+exactly. For each named case, the tests:
 
 - execute the fixed timestep grid from `_RECORDED_TIMESTEP_GRID_BY_CASE`
 - reuse one caller-owned preallocated `mass_transfer` buffer per case/device
@@ -112,10 +114,12 @@ and not a general stable-timestep limit for other cases.
 ## Candidate Evaluation Evidence
 
 This phase adds two deterministic prototype candidates in
-`particula/gpu/kernels/tests/condensation_test.py`. They remain test-local
-evidence only; the public `condensation_step_gpu(...)` runtime and package
-export surface are unchanged, no production gas-coupled hook shipped, and no
-new private production helper was added.
+`particula/gpu/kernels/tests/condensation_stiffness_test.py`, backed by shared
+test-only helpers in
+`particula/gpu/kernels/tests/_condensation_test_support.py`. They remain
+test-local evidence only; the public `condensation_step_gpu(...)` runtime and
+package export surface are unchanged, no production gas-coupled hook shipped,
+and no new private production helper was added.
 
 | Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
