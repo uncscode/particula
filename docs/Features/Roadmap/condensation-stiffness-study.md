@@ -72,6 +72,32 @@ The baseline tests use the following helper concepts:
   accepted direct `(n_boxes,)` Warp-array inputs and should not mutate
   caller-owned temperature or pressure arrays.
 
+## Measured Recorded Timestep Grid
+
+The current recorded sweep keeps one caller-owned preallocated
+`mass_transfer` buffer per case/device, rebuilds particle and gas inputs for
+every trial, and verifies that the particle-only Warp path leaves gas
+concentration unchanged.
+
+| Case | Environment input mode | Timestep | Threshold | Classification | Notes |
+| --- | --- | ---: | ---: | --- | --- |
+| `nanometer` | scalar `temperature` / `pressure` | `0.00005` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; gas unchanged. |
+| `nanometer` | scalar `temperature` / `pressure` | `0.05` | `0.5` | `unstable` | Same fixed-shape particle-only path; gas unchanged. |
+| `nanometer` | scalar `temperature` / `pressure` | `50.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `0.004` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; gas unchanged. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `0.4` | `0.5` | `unstable` | Same fixed-shape particle-only path; gas unchanged. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `40.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `0.04` | `1.0` | `stable` | Multi-box direct-array environment inputs stay supported; gas unchanged. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `4.0` | `0.5` | `unstable` | Same fixed-shape particle-only path; gas unchanged. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `400.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
+
+Across the current recorded grid, the executable tests observe the same
+particle-only maximum fractional-mass-change magnitude (`1.0`) for each row,
+so boundary classification is driven by the existing inclusive threshold rule:
+rows recorded at `1.0` remain `stable`, while rows recorded at `0.5` are
+classified `unstable`. This note therefore documents the measured current
+particle-only envelope without claiming gas-coupled conservation behavior.
+
 ## What This Phase Does Not Publish
 
 This baseline does **not** publish:

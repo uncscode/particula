@@ -275,6 +275,39 @@ def _make_condensation_stiffness_cases() -> tuple[
     )
 
 
+_RECORDED_TIMESTEP_GRID_BY_CASE: dict[str, tuple[float, ...]] = {
+    "nanometer": (0.00005, 0.05, 50.0),
+    "accumulation_mode": (0.004, 0.4, 40.0),
+    "droplet_like": (0.04, 4.0, 400.0),
+}
+
+
+_RECORDED_STIFFNESS_THRESHOLD_BY_CASE: dict[str, tuple[float, ...]] = {
+    "nanometer": (1.0, 0.5, 0.5),
+    "accumulation_mode": (1.0, 0.5, 0.5),
+    "droplet_like": (1.0, 0.5, 0.5),
+}
+
+
+@dataclass(frozen=True)
+class CondensationStiffnessTrialRecord:
+    """Recorded timestep trial result for a deterministic stiffness case."""
+
+    case_name: str
+    time_step: float
+    configured_time_step: float
+    timestep_index: int
+    environment_input_mode: str
+    classification: CondensationStiffnessClassification
+    gas_unchanged: bool
+    reuses_caller_mass_transfer_buffer: bool
+    mass_transfer_has_nonzero_values: bool
+    mass_transfer_changed_from_previous_trial: bool
+    final_masses: np.ndarray
+    initial_masses: np.ndarray
+    mass_transfer_values: np.ndarray
+
+
 def _validate_stiffness_case_metadata(
     case: CondensationStiffnessCase,
     particles: ParticleData,
@@ -554,6 +587,97 @@ def _run_gpu_step(
         from_warp_particle_data(gpu_particles, sync=True),
         mass_transfer_buffer,
     )
+
+
+def _record_condensation_stiffness_trials(
+    case: CondensationStiffnessCase,
+    device: str,
+) -> list[CondensationStiffnessTrialRecord]:
+    """Run the recorded timestep grid for one deterministic stiffness case."""
+    recorded_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
+    stability_thresholds = _RECORDED_STIFFNESS_THRESHOLD_BY_CASE[case.name]
+    mass_transfer = wp.zeros(
+        (case.n_boxes, case.n_particles, case.n_species),
+        dtype=wp.float64,
+        device=device,
+    )
+    previous_mass_transfer_values: np.ndarray | None = None
+    environment_input_mode = "direct_warp_arrays"
+    temperature: float | Any = case.temperature
+    pressure: float | Any = case.pressure
+    if case.n_boxes == 1:
+        environment_input_mode = "scalar_inputs"
+    else:
+        temperature = wp.array(
+            case.temperature_array(),
+            dtype=wp.float64,
+            device=device,
+        )
+        pressure = wp.array(
+            case.pressure_array(),
+            dtype=wp.float64,
+            device=device,
+        )
+
+    records: list[CondensationStiffnessTrialRecord] = []
+    for timestep_index, time_step in enumerate(recorded_timesteps):
+        particles = case.build_particle_data()
+        gas = case.build_gas_data()
+        vapor_pressure = case.build_vapor_pressure()
+        initial_masses = particles.masses.copy()
+        initial_gas_concentration = gas.concentration.copy()
+
+        gpu_result, returned_mass_transfer = _run_gpu_step(
+            particles,
+            gas,
+            vapor_pressure,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=time_step,
+            device=device,
+            mass_transfer=mass_transfer,
+        )
+        mass_transfer_values = returned_mass_transfer.numpy().copy()
+        classification = _classify_particle_only_condensation_stiffness(
+            case,
+            initial_masses,
+            gpu_result.masses,
+            gas,
+            vapor_pressure,
+            max_fractional_change=stability_thresholds[timestep_index],
+        )
+        records.append(
+            CondensationStiffnessTrialRecord(
+                case_name=case.name,
+                time_step=time_step,
+                configured_time_step=recorded_timesteps[timestep_index],
+                timestep_index=timestep_index,
+                environment_input_mode=environment_input_mode,
+                classification=classification,
+                gas_unchanged=bool(
+                    np.array_equal(gas.concentration, initial_gas_concentration)
+                ),
+                reuses_caller_mass_transfer_buffer=(
+                    returned_mass_transfer is mass_transfer
+                ),
+                mass_transfer_has_nonzero_values=bool(
+                    np.any(mass_transfer_values != 0.0)
+                ),
+                mass_transfer_changed_from_previous_trial=(
+                    previous_mass_transfer_values is not None
+                    and not np.array_equal(
+                        mass_transfer_values,
+                        previous_mass_transfer_values,
+                    )
+                ),
+                final_masses=gpu_result.masses.copy(),
+                initial_masses=initial_masses,
+                mass_transfer_values=mass_transfer_values,
+            )
+        )
+        previous_mass_transfer_values = mass_transfer_values
+
+    return records
 
 
 def test_condensation_step_gpu_signature_keeps_environment_keyword_only() -> (
@@ -2219,131 +2343,91 @@ def test_condensation_multi_species_parity(device: str) -> None:
     npt.assert_allclose(gpu_result.masses, expected_masses, rtol=1.0e-10)
 
 
-def test_condensation_stiffness_case_classifies_stable_on_warp_cpu(
+@pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
+def test_condensation_stiffness_recorded_grid_contains_stable_and_unstable_trials(
+    case: CondensationStiffnessCase,
     device: str,
 ) -> None:
-    """A compact accumulation-mode case stays within the stable threshold."""
+    """Recorded timestep sweeps include stable and unstable results per case."""
     if device != "cpu":
-        pytest.skip("Stiffness baseline runs on Warp CPU")
+        pytest.skip("Recorded stiffness sweeps run on Warp CPU")
 
-    case = next(
-        candidate
-        for candidate in _make_condensation_stiffness_cases()
-        if candidate.name == "accumulation_mode"
-    )
-    particles = case.build_particle_data()
-    gas = case.build_gas_data()
-    vapor_pressure = case.build_vapor_pressure()
-    initial_masses = particles.masses.copy()
+    records = _record_condensation_stiffness_trials(case, device=device)
+    labels = {record.classification.label for record in records}
 
-    gpu_result, mass_transfer = _run_gpu_step(
-        particles,
-        gas,
-        vapor_pressure,
-        temperature=case.temperature,
-        pressure=case.pressure,
-        time_step=case.time_step,
-        device=device,
-    )
-    classification = _classify_particle_only_condensation_stiffness(
-        case,
-        initial_masses,
-        gpu_result.masses,
-        gas,
-        vapor_pressure,
-        max_fractional_change=10.0,
+    assert labels == {"stable", "unstable"}, [
+        record.classification.max_fractional_mass_change for record in records
+    ]
+    for record in records:
+        assert record.time_step == record.configured_time_step
+        assert record.classification.mass_nonnegative
+        assert record.classification.values_finite
+        assert record.classification.particle_only_update
+        assert record.classification.zero_mass_change_stable
+        assert record.gas_unchanged
+        assert record.reuses_caller_mass_transfer_buffer
+        assert record.mass_transfer_has_nonzero_values
+        assert np.all(np.isfinite(record.final_masses))
+        assert np.all(record.final_masses >= 0.0)
+
+    assert any(
+        record.mass_transfer_changed_from_previous_trial
+        for record in records[1:]
     )
 
-    assert classification.label == "stable"
-    assert classification.mass_nonnegative
-    assert classification.values_finite
-    assert classification.particle_only_update
-    assert mass_transfer.shape == gpu_result.masses.shape
 
-
-def test_condensation_stiffness_case_classifies_unstable_on_warp_cpu(
+@pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
+def test_condensation_stiffness_recorded_grid_matches_configured_timesteps(
+    case: CondensationStiffnessCase,
     device: str,
 ) -> None:
-    """A deliberately stiff nanometer case exceeds the configured threshold."""
+    """Recorded sweeps preserve configured timestep count, order, and mode."""
     if device != "cpu":
-        pytest.skip("Stiffness baseline runs on Warp CPU")
+        pytest.skip("Recorded stiffness sweeps run on Warp CPU")
+
+    records = _record_condensation_stiffness_trials(case, device=device)
+    configured_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
+
+    assert len(records) == len(configured_timesteps)
+    assert [record.timestep_index for record in records] == list(
+        range(len(configured_timesteps))
+    )
+    assert [record.time_step for record in records] == list(
+        configured_timesteps
+    )
+    assert [record.configured_time_step for record in records] == list(
+        configured_timesteps
+    )
+    if case.n_boxes == 1:
+        assert {
+            record.environment_input_mode for record in records
+        } == {"scalar_inputs"}
+    else:
+        assert {
+            record.environment_input_mode for record in records
+        } == {"direct_warp_arrays"}
+
+
+def test_condensation_stiffness_recorded_grid_cuda_contract_parity(
+    device: str,
+) -> None:
+    """CUDA, when available, preserves the recorded-grid result contract."""
+    if device == "cpu":
+        pytest.skip("CUDA parity only runs on CUDA devices")
+    if not cuda_available(wp):
+        pytest.skip("CUDA is unavailable")
 
     case = next(
         candidate
         for candidate in _make_condensation_stiffness_cases()
         if candidate.name == "nanometer"
     )
-    particles = case.build_particle_data()
-    gas = case.build_gas_data()
-    vapor_pressure = case.build_vapor_pressure()
-    initial_masses = particles.masses.copy()
+    records = _record_condensation_stiffness_trials(case, device=device)
 
-    gpu_result, _ = _run_gpu_step(
-        particles,
-        gas,
-        vapor_pressure,
-        temperature=case.temperature,
-        pressure=case.pressure,
-        time_step=case.time_step,
-        device=device,
-    )
-    classification = _classify_particle_only_condensation_stiffness(
-        case,
-        initial_masses,
-        gpu_result.masses,
-        gas,
-        vapor_pressure,
-        max_fractional_change=0.01,
-    )
-
-    assert classification.label == "unstable"
-    assert classification.mass_nonnegative
-    assert classification.values_finite
-    assert classification.particle_only_update
-
-
-def test_condensation_step_gpu_reuses_mass_transfer_buffer_for_stiffness_case(
-    device: str,
-) -> None:
-    """Buffer reuse remains valid for a deterministic stiffness study case."""
-    if device != "cpu":
-        pytest.skip("Stiffness baseline runs on Warp CPU")
-
-    case = next(
-        candidate
-        for candidate in _make_condensation_stiffness_cases()
-        if candidate.name == "droplet_like"
-    )
-    particles = case.build_particle_data()
-    gas = case.build_gas_data()
-    vapor_pressure = case.build_vapor_pressure()
-    mass_transfer = wp.zeros(
-        (case.n_boxes, case.n_particles, case.n_species),
-        dtype=wp.float64,
-        device=device,
-    )
-
-    _, returned_buffer = _run_gpu_step(
-        particles,
-        gas,
-        vapor_pressure,
-        temperature=wp.array(
-            case.temperature_array(),
-            dtype=wp.float64,
-            device=device,
-        ),
-        pressure=wp.array(
-            case.pressure_array(),
-            dtype=wp.float64,
-            device=device,
-        ),
-        time_step=case.time_step,
-        mass_transfer=mass_transfer,
-        device=device,
-    )
-
-    assert returned_buffer is mass_transfer
-    assert np.any(returned_buffer.numpy() != 0.0)
+    assert len(records) == len(_RECORDED_TIMESTEP_GRID_BY_CASE[case.name])
+    assert all(record.reuses_caller_mass_transfer_buffer for record in records)
+    assert all(record.gas_unchanged for record in records)
+    assert all(record.case_name == case.name for record in records)
 
 
 def test_condensation_stiffness_invalid_environment_inputs_do_not_mutate_case(
