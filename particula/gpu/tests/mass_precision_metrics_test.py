@@ -2,6 +2,7 @@
 
 import warnings
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 import numpy as np
@@ -22,9 +23,7 @@ _SUPPORTED_CANDIDATES = (
     "mixed_precision_mass_plus_density",
     "fp32_total_mass_fp32_mass_fraction",
 )
-_UNSUPPORTED_CANDIDATES = (
-    "candidate_requiring_runtime_schema_expansion",
-)
+_UNSUPPORTED_CANDIDATES = ("candidate_requiring_runtime_schema_expansion",)
 _MASS_RTOL = 5e-7
 _MASS_ATOL = 1e-30
 _RADIUS_RTOL = 2e-7
@@ -32,7 +31,7 @@ _RADIUS_ATOL = 1e-16
 _MIXED_SCALE_MASS_RTOL = 6e-7
 _MIXED_SCALE_RADIUS_RTOL = 2.5e-7
 _AGGREGATE_DELTA_RTOL = 5e-7
-_MASS_PRECISION_CASES = _build_mass_precision_cases()
+_MASS_PRECISION_CASES = tuple(_build_mass_precision_cases())
 _CASE_CANDIDATE_PARAMS = [
     (case, candidate_id)
     for case in _MASS_PRECISION_CASES
@@ -82,6 +81,13 @@ class _ClampMetrics:
     clamp_delta: np.ndarray
     clamp_frequency: int
     aggregate_clamp_delta: np.ndarray
+
+
+_candidate_result_cache: dict[tuple[str, str], _CandidateStudyResult] = {}
+_mass_transfer_reference_cache: dict[
+    tuple[str, str],
+    _MassTransferReferenceResult,
+] = {}
 
 
 def _assert_projected_schema(
@@ -141,12 +147,14 @@ def _safe_relative_error(
     """Return warning-clean relative error with deterministic zero handling."""
     absolute_error = np.abs(observed - baseline)
     relative_error = np.zeros_like(absolute_error, dtype=np.float64)
+    nonzero_baseline = np.abs(baseline) > 0.0
     np.divide(
         absolute_error,
         np.abs(baseline),
         out=relative_error,
-        where=np.abs(baseline) > 0.0,
+        where=nonzero_baseline,
     )
+    relative_error[~nonzero_baseline & (absolute_error > 0.0)] = np.inf
     return relative_error
 
 
@@ -258,17 +266,17 @@ def _build_mass_transfer_reference_result(
     candidate_concentration = candidate_concentration.astype(np.float64)
     time_step = 0.75
     mass_rate_scale = 2.5e-2
-    baseline_mass_rate = (
-        case.masses
-        * mass_rate_scale
-        / time_step
-        / case.concentration[..., np.newaxis]
+    baseline_mass_rate = np.divide(
+        case.masses * mass_rate_scale,
+        time_step * case.concentration[..., np.newaxis],
+        out=np.zeros_like(case.masses, dtype=np.float64),
+        where=case.concentration[..., np.newaxis] > 0.0,
     )
-    candidate_mass_rate = (
-        candidate_reconstructed_masses
-        * mass_rate_scale
-        / time_step
-        / candidate_concentration[..., np.newaxis]
+    candidate_mass_rate = np.divide(
+        candidate_reconstructed_masses * mass_rate_scale,
+        time_step * candidate_concentration[..., np.newaxis],
+        out=np.zeros_like(candidate_reconstructed_masses, dtype=np.float64),
+        where=candidate_concentration[..., np.newaxis] > 0.0,
     )
     flat_baseline_mass_rate = baseline_mass_rate.reshape(
         -1,
@@ -344,27 +352,16 @@ def _compute_clamp_metrics(
         post_clamp_mass=post_clamp_mass,
         clamp_delta=clamp_delta,
         clamp_frequency=int(np.count_nonzero(raw_updated_mass < 0.0)),
-        aggregate_clamp_delta=np.sum(clamp_delta, axis=(0, 1), dtype=np.float64),
+        aggregate_clamp_delta=np.sum(
+            clamp_delta, axis=(0, 1), dtype=np.float64
+        ),
     )
-_MIXED_SCALE_CASE = _build_mixed_scale_case()
-_CANDIDATE_STUDY_RESULTS = {
-    (case.case_name, candidate_id): _build_candidate_study_result(
-        case,
-        candidate_id,
-    )
-    for case, candidate_id in _candidate_projection_items()
-}
-_MIXED_SCALE_RESULTS = {
-    candidate_id: _build_candidate_study_result(_MIXED_SCALE_CASE, candidate_id)
-    for candidate_id in _SUPPORTED_CANDIDATES
-}
-_MASS_TRANSFER_REFERENCE_RESULTS = {
-    (case.case_name, candidate_id): _build_mass_transfer_reference_result(
-        case,
-        candidate_id,
-    )
-    for case, candidate_id in _candidate_projection_items()
-}
+
+
+@lru_cache(maxsize=1)
+def _get_mixed_scale_case() -> _MassPrecisionCase:
+    """Build the mixed-scale study case lazily."""
+    return _build_mixed_scale_case()
 
 
 def _get_candidate_result(
@@ -372,7 +369,13 @@ def _get_candidate_result(
     candidate_id: str,
 ) -> _CandidateStudyResult:
     """Return cached candidate reconstruction metrics."""
-    return _CANDIDATE_STUDY_RESULTS[(case.case_name, candidate_id)]
+    cache_key = (case.case_name, candidate_id)
+    if cache_key not in _candidate_result_cache:
+        _candidate_result_cache[cache_key] = _build_candidate_study_result(
+            case,
+            candidate_id,
+        )
+    return _candidate_result_cache[cache_key]
 
 
 def _get_mass_transfer_reference_result(
@@ -380,7 +383,12 @@ def _get_mass_transfer_reference_result(
     candidate_id: str,
 ) -> _MassTransferReferenceResult:
     """Return cached CPU-reference mass-transfer comparison metrics."""
-    return _MASS_TRANSFER_REFERENCE_RESULTS[(case.case_name, candidate_id)]
+    cache_key = (case.case_name, candidate_id)
+    if cache_key not in _mass_transfer_reference_cache:
+        _mass_transfer_reference_cache[cache_key] = (
+            _build_mass_transfer_reference_result(case, candidate_id)
+        )
+    return _mass_transfer_reference_cache[cache_key]
 
 
 @pytest.mark.parametrize(
@@ -541,7 +549,7 @@ def test_mixed_scale_smallest_particle_mass_error_is_bounded(
     candidate_id: str,
 ) -> None:
     """Smallest-particle in mixed box keeps bounded mass error."""
-    result = _MIXED_SCALE_RESULTS[candidate_id]
+    result = _get_candidate_result(_get_mixed_scale_case(), candidate_id)
     smallest_particle_error = result.relative_mass_error[:, 0, :]
 
     assert np.max(smallest_particle_error) <= _MIXED_SCALE_MASS_RTOL, (
@@ -558,9 +566,10 @@ def test_mixed_scale_aggregate_mass_error_is_bounded_separately(
     candidate_id: str,
 ) -> None:
     """Whole-array mixed-scale totals stay bounded apart from smallest slices."""
-    result = _MIXED_SCALE_RESULTS[candidate_id]
+    mixed_scale_case = _get_mixed_scale_case()
+    result = _get_candidate_result(mixed_scale_case, candidate_id)
     baseline_species_total = np.sum(
-        _MIXED_SCALE_CASE.masses,
+        mixed_scale_case.masses,
         axis=(0, 1),
         dtype=np.float64,
     )
@@ -586,7 +595,7 @@ def test_mixed_scale_smallest_particle_radius_error_is_bounded(
     candidate_id: str,
 ) -> None:
     """Smallest-particle in mixed box keeps bounded radius error."""
-    result = _MIXED_SCALE_RESULTS[candidate_id]
+    result = _get_candidate_result(_get_mixed_scale_case(), candidate_id)
     smallest_particle_error = result.relative_radius_error[:, 0]
 
     assert np.max(smallest_particle_error) <= _MIXED_SCALE_RADIUS_RTOL, (
@@ -611,8 +620,9 @@ def test_candidate_ids_return_supported_executable_candidates() -> None:
     assert _candidate_ids() == list(_SUPPORTED_CANDIDATES)
 
 
-def test_total_mass_fraction_candidate_handles_zero_total_mass_without_warnings(
-) -> None:
+def test_total_mass_fraction_candidate_handles_zero_total_mass_without_warnings() -> (
+    None
+):
     """Zero-total-mass particles reconstruct zeros cleanly."""
     case = _MASS_PRECISION_CASES[2]
     zero_mass_case = _MassPrecisionCase(
@@ -664,8 +674,9 @@ def test_total_mass_fraction_candidate_handles_zero_total_mass_without_warnings(
     )
 
 
-def test_zero_volume_and_zero_effective_radius_reference_paths_are_warning_clean(
-) -> None:
+def test_zero_volume_and_zero_effective_radius_reference_paths_are_warning_clean() -> (
+    None
+):
     """Zero-volume and zero-effective-radius paths stay deterministic."""
     zero_particle_mass = np.zeros((2, 3, 1), dtype=np.float64)
     zero_mass_rate = np.zeros_like(zero_particle_mass)
@@ -694,8 +705,9 @@ def test_zero_volume_and_zero_effective_radius_reference_paths_are_warning_clean
     npt.assert_array_equal(mass_transfer, zero_mass_rate)
 
 
-def test_mixed_precision_candidate_reference_uses_candidate_concentration(
-) -> None:
+def test_mixed_precision_candidate_reference_uses_candidate_concentration() -> (
+    None
+):
     """Candidate concentration perturbations remain visible in reference output."""
     case = _MASS_PRECISION_CASES[0]
     candidate = _project_candidate(case, "mixed_precision_mass_plus_density")
@@ -705,7 +717,9 @@ def test_mixed_precision_candidate_reference_uses_candidate_concentration(
             **candidate["projected"],
             "concentration": (
                 candidate["projected"]["concentration"]
-                * np.array([[1.25, 0.75, 1.5], [0.5, 1.1, 0.9]], dtype=np.float32)
+                * np.array(
+                    [[1.25, 0.75, 1.5], [0.5, 1.1, 0.9]], dtype=np.float32
+                )
             ).astype(np.float32),
         },
     }
@@ -734,8 +748,8 @@ def test_clamp_accounting_distinguishes_raw_transfer_from_clamp_delta(
     candidate_id: str,
 ) -> None:
     """Clamp metrics separate raw transfer error from clamp-induced change."""
-    baseline_case = _MIXED_SCALE_CASE
-    candidate_result = _MIXED_SCALE_RESULTS[candidate_id]
+    baseline_case = _get_mixed_scale_case()
+    candidate_result = _get_candidate_result(baseline_case, candidate_id)
     scale = np.array(
         [[1.4, 0.25, 1.2], [0.9, 1.3, 0.2]],
         dtype=np.float64,
@@ -834,3 +848,49 @@ def test_study_helpers_leave_warp_defaults_at_float64() -> None:
     assert gpu_data.charge.dtype == wp.float64
     assert gpu_data.density.dtype == wp.float64
     assert gpu_data.volume.dtype == wp.float64
+
+
+def test_safe_relative_error_keeps_zero_baseline_deviations_visible() -> None:
+    """Zero baselines produce inf only when deviations are nonzero."""
+    result = _safe_relative_error(
+        np.array([0.0, 1.0, -2.0], dtype=np.float64),
+        np.array([0.0, 0.0, 0.0], dtype=np.float64),
+    )
+
+    npt.assert_array_equal(result, np.array([0.0, np.inf, np.inf]))
+
+
+def test_mass_transfer_reference_zero_concentration_is_warning_clean() -> None:
+    """Zero concentration yields zero transfer without runtime warnings."""
+    case = _MASS_PRECISION_CASES[0]
+    zero_concentration_case = _MassPrecisionCase(
+        case_name=f"{case.case_name}_zero_concentration",
+        size_band=case.size_band,
+        radius_unit=case.radius_unit,
+        density_unit=case.density_unit,
+        volume_fraction_unit=case.volume_fraction_unit,
+        target_radius_m=case.target_radius_m,
+        density_kg_m3=case.density_kg_m3.copy(),
+        volume_fractions=case.volume_fractions.copy(),
+        masses=case.masses.copy(),
+        concentration=np.zeros_like(case.concentration),
+        charge=case.charge.copy(),
+        volume=case.volume.copy(),
+    )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = _build_mass_transfer_reference_result(
+            zero_concentration_case,
+            "fp32_absolute_mass",
+        )
+
+    assert not caught
+    npt.assert_array_equal(
+        result.baseline_mass_transfer,
+        np.zeros_like(result.baseline_mass_transfer),
+    )
+    npt.assert_array_equal(
+        result.candidate_mass_transfer,
+        np.zeros_like(result.candidate_mass_transfer),
+    )
