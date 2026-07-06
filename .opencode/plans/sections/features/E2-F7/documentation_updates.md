@@ -19,11 +19,23 @@
   `asymptotic_relaxation`, explicit CPU-reference and baseline-comparison notes,
   graph-capture/autodiff implications, and the documented decision to defer any
   production gas-coupling hook and integration regression to later work.
+- P4 promotes `docs/Features/Roadmap/condensation-stiffness-study.md` into the
+  canonical recommendation record, naming `fixed_count_substeps_4` as the
+  preferred fixed-shape foundation while keeping the shipped production scope
+  particle-only, tying any future gas-coupled production claim to same-issue
+  conservation coverage in
+  `particula/integration_tests/condensation_particle_resolved_test.py`, and
+  keeping the E2-F2 environment-shape plus E2-F6 `float64` evidence boundaries
+  explicit.
 - P4 updates `docs/Features/Roadmap/data-oriented-gpu.md` and
-  `docs/Features/Roadmap/warp-autodiff-limitations.md` to publish the final
+  `docs/Features/Roadmap/warp-autodiff-limitations.md` to summarize that final
   recommendation, the fixed-loop/graph-capture constraints, and the still
   deferred gas-coupled production gate without duplicating the full evidence
   tables.
+- P4 also normalizes plan-section rerun references so executable focused
+  verification points at `_condensation_test_support.py` selectors and
+  `particula/dynamics/condensation/tests/staggered_stability_test.py -m slow
+  -v` instead of placeholder wrapper files.
 
 ## Optional Documentation
 

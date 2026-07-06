@@ -74,6 +74,15 @@
     `docs/Features/Roadmap/warp-autodiff-limitations.md`,
     `docs/Features/Roadmap/condensation-stiffness-study.md`, and plan sections
     as needed.
+  - Implementation notes: The published decision record now promotes the
+    stiffness study into the canonical recommendation source, recommends
+    `fixed_count_substeps_4` as the preferred fixed-shape implementation
+    foundation, keeps production scope explicitly particle-only, names
+    same-issue conservation coverage in
+    `particula/integration_tests/condensation_particle_resolved_test.py` as the
+    gate for any future gas-coupled production claim, and keeps the E2-F2
+    environment-shape plus E2-F6 `float64` evidence boundaries explicit across
+    the roadmap pages and plan metadata.
   - Tests: Documentation link checks, reruns of the executable focused
     condensation selectors in
     `particula/gpu/kernels/tests/_condensation_test_support.py`, reruns of

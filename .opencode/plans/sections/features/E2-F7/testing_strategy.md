@@ -30,8 +30,9 @@ tests in the same phase. There is no standalone testing phase.
 - `particula/gpu/kernels/tests/_condensation_test_support.py` for all fast
   P1-P4 executable coverage, including the shipped P3 test-local candidate
   evidence and the P4 rerun selectors.
-- `particula/integration_tests/condensation_particle_resolved_test.py` remains
-  future coverage if a gas-coupled production hook lands in a later phase.
+- `particula/integration_tests/condensation_particle_resolved_test.py` is the
+  named same-issue conservation gate for any future gas-coupled production
+  claim, but it remains follow-up coverage until that hook lands.
 - `particula/gpu/kernels/tests/condensation_test.py` and
   `particula/gpu/kernels/tests/condensation_stiffness_test.py` are currently
   non-executable wrappers only.
@@ -56,8 +57,9 @@ tests in the same phase. There is no standalone testing phase.
   timestep classified as stable.
 - Zero-initial-mass bins remain unchanged when classified stable.
 - Buffer shapes remain fixed and preallocated buffers are reused.
-- Documentation and helper outputs accurately mark GPU particle-only behavior
-  versus future gas-particle conservation work.
+- Documentation and helper outputs accurately mark GPU particle-only behavior,
+  the `fixed_count_substeps_4` recommendation boundary, and future gas-particle
+  conservation work.
 
 Map those assertions to phases: P1 now covers fixture/metric correctness,
 environment-input contract coverage, and negative validation paths. P2 now adds
@@ -69,7 +71,8 @@ fixed-shape scratch/buffer assertions, finite/non-negative candidate checks,
 CPU-reference tolerance checks, and explicit-baseline error-bound assertions,
 while leaving gas-coupled production/conservation coverage deferred. P4 remains
 the documentation-only exception that must rerun the same focused fast tests
-before publishing conclusions.
+before publishing conclusions, then cite only executable targets when recording
+recommendation evidence.
 
 ## Slow/Benchmark Coverage
 

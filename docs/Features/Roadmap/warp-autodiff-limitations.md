@@ -1,7 +1,7 @@
 # Warp Autodiff: Limitations and Stochastic Process Handling
 
 Reference notes for the differentiable-simulation goal in the
-[Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md#differentiability-for-global-optimization-warp-autodiff).
+[Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md#epic-e-differentiability-and-global-optimization).
 
 This page records how NVIDIA Warp automatic differentiation works, the
 constraints it imposes on kernel authoring, and the options for making
