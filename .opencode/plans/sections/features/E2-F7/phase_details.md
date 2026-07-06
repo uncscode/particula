@@ -5,6 +5,7 @@
   - Goal: Create a small, reproducible catalog of condensation regimes and
     stability metrics that can be reused by GPU and CPU comparisons.
   - Files delivered: `particula/gpu/kernels/tests/condensation_test.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`,
     `docs/Features/Roadmap/condensation-stiffness-study.md`, and
     `docs/Features/Roadmap/index.md`.
   - Implementation notes: P1 added `CondensationStiffnessCase`,
@@ -84,8 +85,9 @@
     environment-shape plus E2-F6 `float64` evidence boundaries explicit across
     the roadmap pages and plan metadata.
   - Tests: Documentation link checks, reruns of the executable focused
-    condensation selectors in
-    `particula/gpu/kernels/tests/_condensation_test_support.py`, reruns of
+    condensation selectors in discoverable wrappers
+    `particula/gpu/kernels/tests/condensation_test.py` and
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`, reruns of
     `particula/dynamics/condensation/tests/staggered_stability_test.py -m slow
     -v`, and reruns of the bounded gas-coupled regression only when the final
     wording still depends on that gate.

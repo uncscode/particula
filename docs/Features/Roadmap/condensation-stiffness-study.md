@@ -81,11 +81,11 @@ The baseline tests use the following helper concepts:
 
 ## Measured Recorded Timestep Grid
 
-The current recorded sweep is executed from
-`particula/gpu/kernels/tests/_condensation_test_support.py`. The wrapper file
-`particula/gpu/kernels/tests/condensation_stiffness_test.py` is a placeholder
-in the current tree and should not be treated as the runnable evidence target.
-For each named case, the tests:
+The current recorded sweep is implemented in
+`particula/gpu/kernels/tests/_condensation_test_support.py` and exposed through
+the discoverable wrapper
+`particula/gpu/kernels/tests/condensation_stiffness_test.py`. For each named
+case, the collected tests:
 
 - execute the fixed timestep grid from `_RECORDED_TIMESTEP_GRID_BY_CASE`
 - reuse one caller-owned preallocated `mass_transfer` buffer per case/device
@@ -118,10 +118,9 @@ and not a general stable-timestep limit for other cases.
 
 ## Candidate Evaluation Evidence
 
-This phase adds two deterministic prototype candidates exercised from
-`particula/gpu/kernels/tests/_condensation_test_support.py`. The
-`condensation_stiffness_test.py` wrapper remains a placeholder, so the support
-module is the executable evidence source for these candidate comparisons. They
+This phase adds two deterministic prototype candidates implemented in
+`particula/gpu/kernels/tests/_condensation_test_support.py` and collected
+through `particula/gpu/kernels/tests/condensation_stiffness_test.py`. They
 remain test-local evidence only; the public `condensation_step_gpu(...)`
 runtime and package export surface are unchanged, no production gas-coupled
 hook shipped, and no new private production helper was added.

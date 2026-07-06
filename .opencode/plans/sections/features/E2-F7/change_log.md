@@ -16,9 +16,10 @@
 
 - Updated plan sections to reflect issue #1213 implementation for phase
   `E2-F7-P1`.
-- Recorded that `particula/gpu/kernels/tests/condensation_test.py` now ships
+- Recorded that `_condensation_test_support.py` ships
   `CondensationStiffnessCase`, `CondensationStiffnessClassification`, and the
-  reusable baseline helper checks.
+  reusable baseline helper checks, with discoverable execution through
+  `particula/gpu/kernels/tests/condensation_test.py`.
 - Recorded the delivered named baseline regimes: `nanometer`,
   `accumulation_mode`, and `droplet_like`.
 - Recorded new roadmap documentation at
@@ -31,10 +32,11 @@
 
 - Updated plan sections to reflect issue #1214 implementation for phase
   `E2-F7-P2`.
-- Recorded that `particula/gpu/kernels/tests/condensation_test.py` now ships a
-  recorded timestep grid, a test-local trial record helper, stable/unstable
-  assertions per named case, caller-owned `mass_transfer` buffer reuse, and
-  unchanged-gas checks for the particle-only path.
+- Recorded that `_condensation_test_support.py` now ships a recorded timestep
+  grid, a test-local trial record helper, stable/unstable assertions per named
+  case, caller-owned `mass_transfer` buffer reuse, and unchanged-gas checks for
+  the particle-only path, with discoverable execution through
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
 - Recorded that single-box cases keep scalar environment inputs while
   `droplet_like` keeps direct Warp `(n_boxes,)` environment-array coverage, with
   optional guarded CUDA contract parity.
@@ -45,11 +47,23 @@
 
 - Updated plan sections to reflect issue #1215 implementation for phase
   `E2-F7-P3`.
-- Recorded that `particula/gpu/kernels/tests/condensation_test.py` now ships
-  test-local prototype candidates `fixed_count_substeps_4` and
-  `asymptotic_relaxation`, plus repeated-run determinism, finite/non-negative,
-  reusable fixed-shape scratch/buffer, CPU-reference tolerance, and
-  explicit-baseline error-bound coverage.
+- Recorded that `_condensation_test_support.py` now ships test-local prototype
+  candidates `fixed_count_substeps_4` and `asymptotic_relaxation`, plus
+  repeated-run determinism, finite/non-negative, reusable fixed-shape
+  scratch/buffer, CPU-reference tolerance, and explicit-baseline error-bound
+  coverage, with discoverable execution through
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
+
+## 2026-07-06 — Discoverable wrapper fix reflected
+
+- Restored runnable `*_test.py` entry points in
+  `particula/gpu/kernels/tests/condensation_test.py` and
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
+- Kept `_condensation_test_support.py` as the implementation home for shared
+  condensation test logic while making the wrappers the authoritative pytest
+  discovery targets.
+- Updated roadmap and plan documentation to reference discoverable wrappers and
+  real collection commands.
 - Recorded that
   `docs/Features/Roadmap/condensation-stiffness-study.md` now includes
   candidate evidence, graph-capture/autodiff notes, and the explicit deferred

@@ -7,12 +7,11 @@ tests in the same phase. There is no standalone testing phase.
 
 ## Fast Tests
 
-- The executable focused coverage currently lives in
-  `particula/gpu/kernels/tests/_condensation_test_support.py`; the wrapper
-  files `condensation_test.py` and `condensation_stiffness_test.py` are stub
-  placeholders in the current tree and must not be treated as the runnable
-  verification target unless they are first restored with real tests.
-- Reuse focused selectors in `_condensation_test_support.py` for:
+- The executable focused coverage is implemented in
+  `particula/gpu/kernels/tests/_condensation_test_support.py` and exposed
+  through the discoverable wrappers `condensation_test.py` and
+  `condensation_stiffness_test.py`.
+- Reuse focused selectors in the discoverable wrappers for:
   - stress-case fixture construction,
   - fixed-shape and dtype metadata validation,
   - scalar `temperature`/`pressure` coverage,
@@ -27,15 +26,14 @@ tests in the same phase. There is no standalone testing phase.
 
 ## Target Test and Evidence Files
 
-- `particula/gpu/kernels/tests/_condensation_test_support.py` for all fast
-  P1-P4 executable coverage, including the shipped P3 test-local candidate
-  evidence and the P4 rerun selectors.
+- `particula/gpu/kernels/tests/condensation_test.py` for discoverable core GPU
+  condensation contract coverage backed by `_condensation_test_support.py`.
+- `particula/gpu/kernels/tests/condensation_stiffness_test.py` for
+  discoverable stiffness and candidate-evidence coverage backed by
+  `_condensation_test_support.py`.
 - `particula/integration_tests/condensation_particle_resolved_test.py` is the
   named same-issue conservation gate for any future gas-coupled production
   claim, but it remains follow-up coverage until that hook lands.
-- `particula/gpu/kernels/tests/condensation_test.py` and
-  `particula/gpu/kernels/tests/condensation_stiffness_test.py` are currently
-  non-executable wrappers only.
 - `docs/Features/Roadmap/condensation-stiffness-study.md` now records the
   baseline case catalog, metric vocabulary, the shipped P2 measured-results
   table synchronized with the recorded timestep grid, and the shipped P3
@@ -81,16 +79,18 @@ recommendation evidence.
 - Slow tests should report enough context to reproduce the stiffness map but
   should not gate normal development unless runtime remains small.
 
-If wrapper files are restored later, keep at least one representative fast
-assertion in a real `*_test.py` entry point that proves the recommendation is
-tied to executable behavior rather than report-only analysis.
+Keep representative fast assertions in the discoverable `*_test.py` wrappers so
+the recommendation stays tied to executable behavior rather than report-only
+analysis.
 
 ## Verification Commands
 
 ```bash
-pytest particula/gpu/kernels/tests/_condensation_test_support.py -k "stiffness or candidate" -v
-pytest particula/gpu/kernels/tests/_condensation_test_support.py -k "condensation_step_gpu or apply_mass_transfer_kernel or condensation_skips_inactive_particles or condensation_multi_species_parity" -v
-pytest particula/gpu/kernels/tests/_condensation_test_support.py -k "rejects or short_circuit or mismatch or invalid_scalar_domains or raises_value_error" -v
+pytest particula/gpu/kernels/tests/condensation_stiffness_test.py --collect-only -q
+pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -k "stiffness or candidate" -v
+pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q
+pytest particula/gpu/kernels/tests/condensation_test.py -k "condensation_step_gpu or apply_mass_transfer_kernel or condensation_skips_inactive_particles or condensation_multi_species_parity" -v
+pytest particula/gpu/kernels/tests/condensation_test.py -k "rejects or short_circuit or mismatch or invalid_scalar_domains or raises_value_error" -v
 pytest particula/dynamics/condensation/tests/staggered_stability_test.py -m slow -v
 pytest particula/integration_tests/condensation_particle_resolved_test.py -v
 ruff check particula/ --fix && ruff format particula/ && ruff check particula/

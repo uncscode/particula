@@ -6,11 +6,11 @@
   `EnvironmentData.pressure` as `(n_boxes,)`, plus
   `EnvironmentData.saturation_ratio` as `(n_boxes, n_species)`. E2-F3 should
   mirror those fields and shapes in `WarpEnvironmentData`.
-- The first production GPU condensation integration should update both particle
-  and gas concentration for physical completeness. E2-F7 should add or expand a
-  phase for gas-coupled updates and conservation checks; if that exceeds the
-  feature size, split the production gas-coupled implementation into a follow-up
-  feature and keep E2-F7 as the measured foundation.
+- The first published P4 recommendation keeps production GPU condensation
+  particle-only and treats gas-coupled updates as a named follow-up gate. Any
+  future gas-concentration mutation path must land with the same-issue
+  conservation regression before roadmap language can claim production gas
+  coupling.
 - P1 resolved the baseline classification contract for the current particle-only
   GPU path: finite and non-negative state, bounded fractional particle-mass
   change, inclusive threshold semantics, zero-mass stability, and explicit
@@ -49,7 +49,5 @@
 
 ## Still Open for Later Phases
 
-- Whether the shipped `fixed_count_substeps_4` or `asymptotic_relaxation`
-  evidence becomes the preferred follow-on integration foundation in P4.
-- When gas-coupled production condensation and conservation checks should split
-  into a dedicated follow-up if they do not fit inside E2-F7.
+- When the deferred gas-coupled production condensation and conservation
+  checks should be scheduled as a dedicated follow-up feature.

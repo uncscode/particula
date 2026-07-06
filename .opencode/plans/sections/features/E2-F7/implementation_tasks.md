@@ -5,8 +5,9 @@
 - Implemented in issue #1213:
   - `CondensationStiffnessCase` and
     `CondensationStiffnessClassification` were added directly to
-    `particula/gpu/kernels/tests/condensation_test.py`; no helper-file split was
-    needed.
+    `particula/gpu/kernels/tests/_condensation_test_support.py`, with
+    discoverable coverage exposed from
+    `particula/gpu/kernels/tests/condensation_test.py`.
   - Fixed-shape named stress cases now cover `nanometer`,
     `accumulation_mode`, and `droplet_like` regimes with explicit metadata.
   - Reusable helpers now cover metadata validation, non-negativity,
@@ -19,9 +20,10 @@
 ## E2-F7-P2 Tasks
 
 - Implemented in issue #1214:
-  - `particula/gpu/kernels/tests/condensation_test.py` now records
-    `_RECORDED_TIMESTEP_GRID_BY_CASE` and
-    `_RECORDED_STIFFNESS_THRESHOLD_BY_CASE` directly in code.
+  - `particula/gpu/kernels/tests/_condensation_test_support.py` now records
+    `_RECORDED_TIMESTEP_GRID_BY_CASE` and `_RECORDED_STIFFNESS_THRESHOLD`
+    directly in code, with discoverable coverage exposed from
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
   - A test-local recorded-grid helper rebuilds fresh deterministic inputs for
     each trial while reusing one caller-owned `mass_transfer` buffer per
     case/device.
@@ -37,8 +39,9 @@
 ## E2-F7-P3 Tasks
 
 - Implemented in issue #1215:
-  - `particula/gpu/kernels/tests/condensation_test.py` now ships two
-    deterministic test-local prototype candidates:
+  - `particula/gpu/kernels/tests/_condensation_test_support.py` now ships two
+    deterministic test-local prototype candidates, exposed through
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`:
     `fixed_count_substeps_4` and `asymptotic_relaxation`.
   - Candidate coverage stays fixed-shape and reuses caller-owned buffers plus
     reusable scratch/storage inside the test harness; no production helper file

@@ -13,7 +13,9 @@ changing the particle-only production contract.
 ## Value Proposition
 
 This feature now has a reusable baseline, recorded P2 explicit evidence, and a
-shipped P3 candidate-evaluation layer in place: `condensation_test.py` defines
+shipped P3 candidate-evaluation layer in place. The real test implementation
+lives in `_condensation_test_support.py`, while discoverable wrappers
+`condensation_test.py` and `condensation_stiffness_test.py` now expose the
 named stress cases (`nanometer`, `accumulation_mode`, `droplet_like`),
 `CondensationStiffnessCase`/`CondensationStiffnessClassification`, the
 recorded timestep grid, test-local candidate helpers

@@ -149,6 +149,13 @@ GPU code must match Python/NumPy reference implementations. Use lightweight test
 kernels around `@wp.func` functions and compare against NumPy with tight
 tolerances.
 
+For the GPU condensation suite, keep shared helpers in support modules only when
+discoverable `*_test.py` wrappers expose the runnable cases. The current entry
+points are:
+
+- `particula/gpu/kernels/tests/condensation_test.py`
+- `particula/gpu/kernels/tests/condensation_stiffness_test.py`
+
 ```python
 import numpy as np
 import numpy.testing as npt
@@ -191,6 +198,10 @@ unchanged, say so directly in the related documentation.
 ## Troubleshooting
 
 - If tests are not discovered, check `*_test.py` naming and run `pytest --collect-only`.
+- For the GPU condensation suite, verify collection via
+  `pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q`
+  and
+  `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py --collect-only -q`.
 - If imports fail, install the package in development mode with `pip install -e .[dev]`.
 - If coverage looks wrong, run `pytest --cov=particula --cov-report=term`.
 - If CI fails but local tests pass, rerun locally with `pytest -Werror`.

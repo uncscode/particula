@@ -4,8 +4,8 @@
 
 - A shared condensation stiffness baseline exists for the current explicit GPU
   path.
-- A documented integration recommendation is deferred until later phases and is
-  cross-referenced from the E2 roadmap once measured evidence exists.
+- A documented integration recommendation is now published and cross-referenced
+  from the E2 roadmap with discoverable executable evidence.
 - The recommended direction is compatible with fixed shapes, preallocated
   buffers, deterministic execution, graph capture, and future autodiff.
 
@@ -15,8 +15,9 @@
   moderate accumulation-mode, and droplet-like regimes.
 - P1 baseline helpers and docs record the current GPU path's particle-only
   limitation explicitly.
-- P2 records a fixed timestep grid per named case and proves at least one
-  stable and one unstable recorded trial for each case.
+- P2 records a fixed timestep grid per named case through discoverable
+  `condensation_stiffness_test.py` coverage and records the measured stable
+  trial evidence used by the roadmap note.
 - Recorded-grid tests prove caller-owned `mass_transfer` buffer reuse,
   unchanged gas concentration, and scalar-vs-direct-Warp environment-input
   coverage for the current particle-only path.
@@ -27,6 +28,8 @@
 - Recommendation identifies required follow-up work for gas concentration
   updates, per-box environment inputs, clamp gradients, or precision changes.
 - All new code has co-located tests and passes fast Warp CPU validation.
+- Discoverable `particula/gpu/kernels/tests/*_test.py` entry points remain
+  non-empty wrappers over the shared support-backed condensation evidence.
 - Documentation updates identify E2-F2 and E2-F6 as dependencies and separate
   baseline definitions from future measured results.
 
