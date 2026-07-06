@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-06
+**Last Updated:** 2026-07-05
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -186,6 +186,18 @@ helpers, caller-owned scratch or buffer reuse, repeated-run equality checks,
 finite and non-negative mass assertions, and explicit CPU-reference error bounds
 recorded in the test or companion study note. If public runtime behavior is
 unchanged, say so directly in the related documentation.
+
+For deterministic GPU baseline studies, prefer explicit `np.float64` fixture
+construction over random inputs so later precision comparisons have a stable
+reference. The mass-precision baseline suite is the reference pattern:
+
+```bash
+pytest particula/gpu/tests/mass_precision_cases_test.py -q
+```
+
+Keep those tests warning-clean under `-Werror`, assert canonical
+`(n_boxes, n_particles, n_species)` shapes where relevant, and document any
+baseline assumptions in the matching roadmap page.
 
 ## Test Quality
 

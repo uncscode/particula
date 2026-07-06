@@ -175,3 +175,8 @@ print(result)
   [authoritative CPU/GPU field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
   and the [final downstream handoff map for sibling E2
   features](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
+- [Mass Precision Recommendation Report](Features/Roadmap/mass-precision-study.md)
+  — final E2-F6 policy report covering deterministic NPF-to-droplet GPU
+  evidence, the accepted unchanged `fp64`/`wp.float64` production baseline,
+  study-only candidate fidelity checks, executable P3 thresholds, clamp
+  accounting, memory-footprint examples, and focused reproduction commands.

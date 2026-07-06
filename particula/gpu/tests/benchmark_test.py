@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -25,12 +26,16 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from particula.gpu.tests.cuda_availability import cuda_available
+from particula.gpu.tests.mass_precision_study_support import (
+    _build_mass_precision_cases,
+    _project_candidate,
+)
 
-def _benchmark_enabled() -> bool:
+
+def _benchmark_enabled(argv: list[str] | None = None) -> bool:
     """Check if --benchmark flag was passed to pytest."""
-    import sys
-
-    return "--benchmark" in sys.argv
+    return "--benchmark" in (sys.argv if argv is None else argv)
 
 
 if not _benchmark_enabled():
@@ -39,12 +44,11 @@ if not _benchmark_enabled():
         allow_module_level=True,
     )
 
-wp = pytest.importorskip("warp", reason="warp required for GPU benchmarks")
-
-from particula.gpu.tests.cuda_availability import cuda_available  # noqa: E402
-
-if not cuda_available(wp):
-    pytest.skip("CUDA not available", allow_module_level=True)
+wp: Any
+try:
+    import warp as wp
+except ImportError:
+    wp = None
 
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel_via_system_state,
@@ -71,25 +75,6 @@ from particula.gas.properties.mean_free_path import (  # noqa: E402
 from particula.gas.properties.pressure_function import (  # noqa: E402
     get_partial_pressure,
 )
-from particula.gpu.conversion import (  # noqa: E402
-    to_warp_gas_data,
-    to_warp_particle_data,
-)
-from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
-    brownian_diffusivity_wp,
-    brownian_kernel_pair_wp,
-)
-from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
-    diffusion_coefficient_wp,
-    mass_transfer_rate_wp,
-    particle_radius_from_volume_wp,
-)
-from particula.gpu.kernels.coagulation import (  # noqa: E402
-    coagulation_step_gpu,
-)
-from particula.gpu.kernels.condensation import (  # noqa: E402
-    condensation_step_gpu,
-)
 from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
     get_aerodynamic_mobility,
@@ -114,6 +99,20 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
     get_vapor_transition_correction,
 )
 from particula.util import constants  # noqa: E402
+
+if wp is not None:
+    from particula.gpu.conversion import to_warp_gas_data, to_warp_particle_data
+    from particula.gpu.dynamics.coagulation_funcs import (
+        brownian_diffusivity_wp,
+        brownian_kernel_pair_wp,
+    )
+    from particula.gpu.dynamics.condensation_funcs import (
+        diffusion_coefficient_wp,
+        mass_transfer_rate_wp,
+        particle_radius_from_volume_wp,
+    )
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+    from particula.gpu.kernels.condensation import condensation_step_gpu
 
 pytestmark = [pytest.mark.slow, pytest.mark.performance, pytest.mark.benchmark]
 
@@ -189,6 +188,11 @@ _benchmark_results: dict[str, Any] = {
     "started_at": datetime.now(timezone.utc).isoformat(),
     "benchmarks": {},
 }
+_MASS_PRECISION_BENCHMARK_CONFIGS: list[tuple[str, int, str]] = [
+    ("npf_cluster", 0, "fp32_absolute_mass"),
+    ("accumulation_mode", 2, "fp32_total_mass_fp32_mass_fraction"),
+    ("cloud_droplet", 3, "mixed_precision_mass_plus_density"),
+]
 
 
 def _save_results() -> None:
@@ -199,7 +203,15 @@ def _save_results() -> None:
     etc.). The file is overwritten each time with the full dict.
     """
     _benchmark_results["updated_at"] = datetime.now(timezone.utc).isoformat()
-    BENCHMARK_OUTPUT.write_text(json.dumps(_benchmark_results, indent=2) + "\n")
+    try:
+        BENCHMARK_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        BENCHMARK_OUTPUT.write_text(
+            json.dumps(_benchmark_results, indent=2) + "\n"
+        )
+    except OSError as exc:
+        raise RuntimeError(
+            f"Failed to write benchmark results to {BENCHMARK_OUTPUT}: {exc}"
+        ) from exc
     print(f"  [save] Results written to {BENCHMARK_OUTPUT}")
 
 
@@ -209,8 +221,61 @@ def _skip_if_no_cuda() -> None:
     Raises:
         pytest.SkipTest: When a CUDA device is not present.
     """
-    if not cuda_available(wp):
-        pytest.skip("CUDA not available")
+    if wp is None or not cuda_available(wp):
+        pytest.skip("Warp/CUDA not available")
+
+
+def _allocation_itemsize(itemsize: int | None, dtype: Any) -> int:
+    """Return an allocation itemsize for preflight checks."""
+    if itemsize is not None:
+        return itemsize
+    return int(np.dtype(dtype).itemsize)
+
+
+def _estimate_allocation_nbytes(shape: tuple[int, ...], itemsize: int) -> int:
+    """Estimate the bytes required for one array allocation."""
+    total_items = 1
+    for value in shape:
+        total_items *= value
+    return total_items * itemsize
+
+
+def _preflight_large_allocation(
+    shape: tuple[int, ...],
+    *,
+    label: str,
+    itemsize: int,
+) -> None:
+    """Skip oversized opt-in allocations before attempting device allocation."""
+    max_bytes = os.getenv("BENCHMARK_MAX_ALLOC_BYTES")
+    if max_bytes is None:
+        return
+    required_bytes = _estimate_allocation_nbytes(shape, itemsize)
+    if required_bytes > int(max_bytes):
+        pytest.skip(
+            f"Skipping {label}: requires {required_bytes} bytes, limit is "
+            f"{max_bytes}"
+        )
+
+
+def _wp_zeros_with_guard(
+    shape: tuple[int, ...],
+    *,
+    dtype: Any,
+    device: str,
+    label: str,
+    itemsize: int | None = None,
+):
+    """Allocate a Warp array with preflight and graceful failure handling."""
+    _preflight_large_allocation(
+        shape,
+        label=label,
+        itemsize=_allocation_itemsize(itemsize, dtype),
+    )
+    try:
+        return wp.zeros(shape, dtype=dtype, device=device)
+    except (MemoryError, RuntimeError, ValueError) as exc:
+        pytest.skip(f"Skipping {label} allocation on {device}: {exc}")
 
 
 @contextmanager
@@ -306,6 +371,62 @@ def _compute_speedup(cpu_time: float, gpu_time: float) -> float:
     return cpu_time / gpu_time
 
 
+def _preflight_benchmark_array(
+    shape: tuple[int, ...],
+    *,
+    label: str,
+    dtype: Any = np.float64,
+    itemsize: int | None = None,
+) -> None:
+    """Preflight one large benchmark array before allocating it."""
+    _preflight_large_allocation(
+        shape,
+        label=label,
+        itemsize=_allocation_itemsize(itemsize, dtype),
+    )
+
+
+def _preflight_condensation_case_allocations(
+    label: str,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+) -> None:
+    """Preflight the largest arrays used by a condensation benchmark case."""
+    for shape, allocation_label in (
+        ((n_boxes, n_particles, n_species), f"cond-{label} particle masses"),
+        ((n_boxes, n_particles), f"cond-{label} particle concentration"),
+        ((n_boxes, n_species), f"cond-{label} gas concentration"),
+        ((n_boxes, n_species), f"cond-{label} vapor pressure"),
+        (
+            (n_boxes, n_particles, n_species),
+            f"cond-{label} gpu mass transfer buffer",
+        ),
+    ):
+        _preflight_benchmark_array(shape, label=allocation_label)
+
+
+def _preflight_coagulation_case_allocations(
+    label: str,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+) -> None:
+    """Preflight the largest arrays used by a coagulation benchmark case."""
+    for shape, allocation_label, itemsize in (
+        ((n_boxes, n_particles, n_species), f"coag-{label} particle masses", 8),
+        ((n_boxes, n_particles), f"coag-{label} particle concentration", 8),
+        ((n_boxes, MAX_COLLISIONS, 2), f"coag-{label} collision pairs", 4),
+        ((n_boxes,), f"coag-{label} collision counts", 4),
+        ((n_boxes,), f"coag-{label} RNG state", 4),
+    ):
+        _preflight_benchmark_array(
+            shape,
+            label=allocation_label,
+            itemsize=itemsize,
+        )
+
+
 def _make_particle_data(
     n_boxes: int,
     n_particles: int,
@@ -324,11 +445,10 @@ def _make_particle_data(
         ParticleData with masses, concentration, charge, density, and volume.
     """
     base_masses = np.linspace(1.0e-18, 3.0e-18, n_species, dtype=np.float64)
-    masses = np.empty((n_boxes, n_particles, n_species), dtype=np.float64)
-    for box_idx in range(n_boxes):
-        for particle_idx in range(n_particles):
-            scale = 1.0 + 0.1 * particle_idx + 0.05 * box_idx
-            masses[box_idx, particle_idx, :] = base_masses * scale
+    particle_scale = 0.1 * np.arange(n_particles, dtype=np.float64)
+    box_scale = 0.05 * np.arange(n_boxes, dtype=np.float64)
+    scales = 1.0 + box_scale[:, np.newaxis] + particle_scale[np.newaxis, :]
+    masses = scales[..., np.newaxis] * base_masses[np.newaxis, np.newaxis, :]
     concentration = np.full(
         (n_boxes, n_particles), concentration_scale, dtype=np.float64
     )
@@ -355,9 +475,11 @@ def _make_gas_data(n_boxes: int, n_species: int) -> GasData:
         GasData with molar mass, concentration, partitioning, and names.
     """
     molar_mass = np.linspace(0.018, 0.05, n_species, dtype=np.float64)
-    concentration = np.empty((n_boxes, n_species), dtype=np.float64)
-    for box_idx in range(n_boxes):
-        concentration[box_idx, :] = 1.0e-6 * (1.0 + 0.2 * box_idx)
+    concentration = (
+        1.0e-6
+        * (1.0 + 0.2 * np.arange(n_boxes, dtype=np.float64)[:, np.newaxis])
+        * np.ones((1, n_species), dtype=np.float64)
+    )
     partitioning = np.ones((n_species,), dtype=bool)
     names = [f"species_{idx}" for idx in range(n_species)]
     return GasData(
@@ -378,10 +500,12 @@ def _make_vapor_pressure(n_boxes: int, n_species: int) -> np.ndarray:
     Returns:
         Vapor pressure array shaped (n_boxes, n_species).
     """
-    vapor_pressure = np.empty((n_boxes, n_species), dtype=np.float64)
-    for box_idx in range(n_boxes):
-        vapor_pressure[box_idx, :] = 800.0 + 50.0 * box_idx
-    return vapor_pressure
+    return 800.0 + 50.0 * np.arange(n_boxes, dtype=np.float64)[
+        :, np.newaxis
+    ] * np.ones(
+        (1, n_species),
+        dtype=np.float64,
+    )
 
 
 def _cpu_mass_transfer(
@@ -654,6 +778,289 @@ def _print_timing(label: str, gpu_time: float, cpu_time: float) -> None:
     )
 
 
+def _build_wp_func_benchmark_inputs(
+    n_evals: int,
+    seed: int = 123,
+) -> dict[str, np.ndarray]:
+    """Build deterministic NumPy inputs for wp.func timing checks."""
+    rng = np.random.default_rng(seed)
+    return {
+        "temperatures": rng.uniform(280.0, 320.0, size=n_evals).astype(
+            np.float64
+        ),
+        "mobilities": rng.uniform(1.0e-8, 5.0e-8, size=n_evals).astype(
+            np.float64
+        ),
+        "pressure_deltas": rng.uniform(-5.0, 10.0, size=n_evals).astype(
+            np.float64
+        ),
+        "mass_transport": rng.uniform(1.0e-18, 1.0e-16, size=n_evals).astype(
+            np.float64
+        ),
+        "molar_masses": rng.uniform(0.018, 0.05, size=n_evals).astype(
+            np.float64
+        ),
+        "total_volumes": rng.uniform(1.0e-21, 1.0e-18, size=n_evals).astype(
+            np.float64
+        ),
+        "radii_i": rng.uniform(1.0e-9, 1.0e-7, size=n_evals).astype(np.float64),
+        "radii_j": rng.uniform(1.0e-9, 1.0e-7, size=n_evals).astype(np.float64),
+        "diff_i": rng.uniform(1.0e-10, 1.0e-9, size=n_evals).astype(np.float64),
+        "diff_j": rng.uniform(1.0e-10, 1.0e-9, size=n_evals).astype(np.float64),
+        "g_i": rng.uniform(1.0e-9, 1.0e-8, size=n_evals).astype(np.float64),
+        "g_j": rng.uniform(1.0e-9, 1.0e-8, size=n_evals).astype(np.float64),
+        "speed_i": rng.uniform(10.0, 40.0, size=n_evals).astype(np.float64),
+        "speed_j": rng.uniform(10.0, 40.0, size=n_evals).astype(np.float64),
+    }
+
+
+def _benchmark_cpu_wp_funcs(
+    inputs: dict[str, np.ndarray],
+    *,
+    kernel_sample: int = 256,
+) -> dict[str, float]:
+    """Time CPU-side reference calculations for wp.func comparisons."""
+    cpu_start = time.perf_counter()
+    _ = get_diffusion_coefficient(
+        temperature=inputs["temperatures"],
+        aerodynamic_mobility=inputs["mobilities"],
+        boltzmann_constant=constants.BOLTZMANN_CONSTANT,
+    )
+    cpu_diffusion_time = time.perf_counter() - cpu_start
+
+    cpu_start = time.perf_counter()
+    _ = get_mass_transfer_rate(
+        pressure_delta=inputs["pressure_deltas"],
+        first_order_mass_transport=inputs["mass_transport"],
+        temperature=inputs["temperatures"],
+        molar_mass=inputs["molar_masses"],
+    )
+    cpu_mass_transfer_time = time.perf_counter() - cpu_start
+
+    cpu_start = time.perf_counter()
+    _ = np.cbrt(3.0 * inputs["total_volumes"] / (4.0 * np.pi))
+    cpu_radius_time = time.perf_counter() - cpu_start
+
+    cpu_start = time.perf_counter()
+    _ = (
+        constants.BOLTZMANN_CONSTANT
+        * inputs["temperatures"]
+        * inputs["mobilities"]
+    )
+    cpu_brownian_diffusivity_time = time.perf_counter() - cpu_start
+
+    cpu_start = time.perf_counter()
+    _ = get_brownian_kernel_via_system_state(
+        particle_radius=inputs["temperatures"][:kernel_sample] * 0.0 + 1.0e-8,
+        particle_mass=np.full(kernel_sample, 1.0e-18, dtype=np.float64),
+        temperature=DEFAULT_TEMPERATURE,
+        pressure=DEFAULT_PRESSURE,
+    )
+    cpu_brownian_kernel_time = time.perf_counter() - cpu_start
+
+    return {
+        "diffusion_coefficient": cpu_diffusion_time,
+        "mass_transfer_rate": cpu_mass_transfer_time,
+        "particle_radius_from_volume": cpu_radius_time,
+        "brownian_diffusivity": cpu_brownian_diffusivity_time,
+        "brownian_kernel_pair": cpu_brownian_kernel_time,
+    }
+
+
+def _benchmark_gpu_wp_funcs(
+    inputs: dict[str, np.ndarray],
+) -> dict[str, float]:
+    """Time GPU-side wp.func kernel wrappers."""
+    n_evals = inputs["temperatures"].size
+    temperatures_wp: Any = wp.array(
+        inputs["temperatures"], dtype=wp.float64, device="cuda"
+    )
+    mobilities_wp: Any = wp.array(
+        inputs["mobilities"], dtype=wp.float64, device="cuda"
+    )
+    pressure_wp: Any = wp.array(
+        inputs["pressure_deltas"], dtype=wp.float64, device="cuda"
+    )
+    mass_transport_wp: Any = wp.array(
+        inputs["mass_transport"],
+        dtype=wp.float64,
+        device="cuda",
+    )
+    molar_mass_wp: Any = wp.array(
+        inputs["molar_masses"], dtype=wp.float64, device="cuda"
+    )
+    volumes_wp: Any = wp.array(
+        inputs["total_volumes"], dtype=wp.float64, device="cuda"
+    )
+    radii_i_wp: Any = wp.array(
+        inputs["radii_i"], dtype=wp.float64, device="cuda"
+    )
+    radii_j_wp: Any = wp.array(
+        inputs["radii_j"], dtype=wp.float64, device="cuda"
+    )
+    diff_i_wp: Any = wp.array(inputs["diff_i"], dtype=wp.float64, device="cuda")
+    diff_j_wp: Any = wp.array(inputs["diff_j"], dtype=wp.float64, device="cuda")
+    g_i_wp: Any = wp.array(inputs["g_i"], dtype=wp.float64, device="cuda")
+    g_j_wp: Any = wp.array(inputs["g_j"], dtype=wp.float64, device="cuda")
+    speed_i_wp: Any = wp.array(
+        inputs["speed_i"], dtype=wp.float64, device="cuda"
+    )
+    speed_j_wp: Any = wp.array(
+        inputs["speed_j"], dtype=wp.float64, device="cuda"
+    )
+
+    diffusion_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
+    transfer_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
+    radius_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
+    brownian_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
+
+    wp.launch(
+        _diffusion_coefficient_kernel,
+        dim=n_evals,
+        inputs=[
+            temperatures_wp,
+            mobilities_wp,
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+        ],
+        outputs=[diffusion_out],
+        device="cuda",
+    )
+    wp.launch(
+        _mass_transfer_rate_kernel,
+        dim=n_evals,
+        inputs=[
+            pressure_wp,
+            mass_transport_wp,
+            temperatures_wp,
+            molar_mass_wp,
+            wp.float64(constants.GAS_CONSTANT),
+        ],
+        outputs=[transfer_out],
+        device="cuda",
+    )
+    wp.launch(
+        _particle_radius_kernel,
+        dim=n_evals,
+        inputs=[volumes_wp],
+        outputs=[radius_out],
+        device="cuda",
+    )
+    wp.launch(
+        _brownian_diffusivity_kernel,
+        dim=n_evals,
+        inputs=[
+            temperatures_wp,
+            mobilities_wp,
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+        ],
+        outputs=[diffusion_out],
+        device="cuda",
+    )
+    wp.launch(
+        _brownian_kernel_pair_kernel,
+        dim=n_evals,
+        inputs=[
+            radii_i_wp,
+            radii_j_wp,
+            diff_i_wp,
+            diff_j_wp,
+            g_i_wp,
+            g_j_wp,
+            speed_i_wp,
+            speed_j_wp,
+        ],
+        outputs=[brownian_out],
+        device="cuda",
+    )
+    wp.synchronize()
+
+    start = time.perf_counter()
+    wp.launch(
+        _diffusion_coefficient_kernel,
+        dim=n_evals,
+        inputs=[
+            temperatures_wp,
+            mobilities_wp,
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+        ],
+        outputs=[diffusion_out],
+        device="cuda",
+    )
+    wp.synchronize()
+    gpu_diffusion_time = time.perf_counter() - start
+
+    start = time.perf_counter()
+    wp.launch(
+        _mass_transfer_rate_kernel,
+        dim=n_evals,
+        inputs=[
+            pressure_wp,
+            mass_transport_wp,
+            temperatures_wp,
+            molar_mass_wp,
+            wp.float64(constants.GAS_CONSTANT),
+        ],
+        outputs=[transfer_out],
+        device="cuda",
+    )
+    wp.synchronize()
+    gpu_mass_transfer_time = time.perf_counter() - start
+
+    start = time.perf_counter()
+    wp.launch(
+        _particle_radius_kernel,
+        dim=n_evals,
+        inputs=[volumes_wp],
+        outputs=[radius_out],
+        device="cuda",
+    )
+    wp.synchronize()
+    gpu_radius_time = time.perf_counter() - start
+
+    start = time.perf_counter()
+    wp.launch(
+        _brownian_diffusivity_kernel,
+        dim=n_evals,
+        inputs=[
+            temperatures_wp,
+            mobilities_wp,
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+        ],
+        outputs=[diffusion_out],
+        device="cuda",
+    )
+    wp.synchronize()
+    gpu_brownian_diffusivity_time = time.perf_counter() - start
+
+    start = time.perf_counter()
+    wp.launch(
+        _brownian_kernel_pair_kernel,
+        dim=n_evals,
+        inputs=[
+            radii_i_wp,
+            radii_j_wp,
+            diff_i_wp,
+            diff_j_wp,
+            g_i_wp,
+            g_j_wp,
+            speed_i_wp,
+            speed_j_wp,
+        ],
+        outputs=[brownian_out],
+        device="cuda",
+    )
+    wp.synchronize()
+    gpu_brownian_kernel_time = time.perf_counter() - start
+
+    return {
+        "diffusion_coefficient": gpu_diffusion_time,
+        "mass_transfer_rate": gpu_mass_transfer_time,
+        "particle_radius_from_volume": gpu_radius_time,
+        "brownian_diffusivity": gpu_brownian_diffusivity_time,
+        "brownian_kernel_pair": gpu_brownian_kernel_time,
+    }
+
+
 @pytest.mark.parametrize(
     "label,n_boxes,n_particles,n_species,run_cpu",
     CONDENSATION_CONFIGS,
@@ -673,6 +1080,12 @@ def test_condensation_scaling(
         f"\n  [{tag}] Setup: {n_boxes} box(es) x "
         f"{n_particles:,} particles x {n_species} species"
     )
+    _preflight_condensation_case_allocations(
+        label,
+        n_boxes,
+        n_particles,
+        n_species,
+    )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
     gas = _make_gas_data(n_boxes, n_species)
     vapor_pressure = _make_vapor_pressure(n_boxes, n_species)
@@ -690,18 +1103,19 @@ def test_condensation_scaling(
     gpu_gas = to_warp_gas_data(
         gas, device="cuda", vapor_pressure=vapor_pressure
     )
-    mass_transfer_buffer = wp.zeros(
+    mass_transfer_buffer = _wp_zeros_with_guard(
         (n_boxes, n_particles, n_species),
         dtype=wp.float64,
         device="cuda",
+        label=f"{tag} gpu mass transfer buffer",
     )
-    surface_tension_wp = wp.array(
+    surface_tension_wp: Any = wp.array(
         surface_tension, dtype=wp.float64, device="cuda"
     )
-    mass_accommodation_wp = wp.array(
+    mass_accommodation_wp: Any = wp.array(
         mass_accommodation, dtype=wp.float64, device="cuda"
     )
-    diffusion_vapor_wp = wp.array(
+    diffusion_vapor_wp: Any = wp.array(
         diffusion_vapor, dtype=wp.float64, device="cuda"
     )
 
@@ -796,14 +1210,36 @@ def test_coagulation_scaling(
         f"\n  [{tag}] Setup: {n_boxes} box(es) x "
         f"{n_particles:,} particles x {n_species} species"
     )
+    _preflight_coagulation_case_allocations(
+        label,
+        n_boxes,
+        n_particles,
+        n_species,
+    )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
 
     gpu_particles = to_warp_particle_data(particles, device="cuda")
-    collision_pairs_buf = wp.zeros(
-        (n_boxes, MAX_COLLISIONS, 2), dtype=wp.int32, device="cuda"
+    collision_pairs_buf = _wp_zeros_with_guard(
+        (n_boxes, MAX_COLLISIONS, 2),
+        dtype=wp.int32,
+        device="cuda",
+        label=f"{tag} collision pairs",
+        itemsize=4,
     )
-    n_collisions_buf = wp.zeros((n_boxes,), dtype=wp.int32, device="cuda")
-    rng_states_buf = wp.zeros((n_boxes,), dtype=wp.uint32, device="cuda")
+    n_collisions_buf = _wp_zeros_with_guard(
+        (n_boxes,),
+        dtype=wp.int32,
+        device="cuda",
+        label=f"{tag} collision counts",
+        itemsize=4,
+    )
+    rng_states_buf = _wp_zeros_with_guard(
+        (n_boxes,),
+        dtype=wp.uint32,
+        device="cuda",
+        label=f"{tag} RNG state",
+        itemsize=4,
+    )
     step_counter = {"idx": 0}
 
     def gpu_step() -> None:
@@ -876,343 +1312,127 @@ def test_coagulation_scaling(
     _save_results()
 
 
-@wp.kernel
-# type: ignore[misc]
-def _diffusion_coefficient_kernel(
-    temperatures: Any,
-    mobilities: Any,
-    boltzmann_constant: Any,
-    result: Any,
-) -> None:
-    """Evaluate diffusion_coefficient_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = diffusion_coefficient_wp(
-        temperatures[tid], mobilities[tid], boltzmann_constant
-    )
+if wp is not None:
 
+    @wp.kernel
+    # type: ignore[misc]
+    def _diffusion_coefficient_kernel(
+        temperatures: Any,
+        mobilities: Any,
+        boltzmann_constant: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate diffusion_coefficient_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = diffusion_coefficient_wp(
+            temperatures[tid], mobilities[tid], boltzmann_constant
+        )
 
-@wp.kernel
-# type: ignore[misc]
-def _mass_transfer_rate_kernel(
-    pressure_deltas: Any,
-    mass_transport: Any,
-    temperatures: Any,
-    molar_masses: Any,
-    gas_constant: Any,
-    result: Any,
-) -> None:
-    """Evaluate mass_transfer_rate_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = mass_transfer_rate_wp(
-        pressure_deltas[tid],
-        mass_transport[tid],
-        temperatures[tid],
-        molar_masses[tid],
-        gas_constant,
-    )
+    @wp.kernel
+    # type: ignore[misc]
+    def _mass_transfer_rate_kernel(
+        pressure_deltas: Any,
+        mass_transport: Any,
+        temperatures: Any,
+        molar_masses: Any,
+        gas_constant: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate mass_transfer_rate_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = mass_transfer_rate_wp(
+            pressure_deltas[tid],
+            mass_transport[tid],
+            temperatures[tid],
+            molar_masses[tid],
+            gas_constant,
+        )
 
+    @wp.kernel
+    # type: ignore[misc]
+    def _brownian_diffusivity_kernel(
+        temperatures: Any,
+        mobilities: Any,
+        boltzmann_constant: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate brownian_diffusivity_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = brownian_diffusivity_wp(
+            temperatures[tid], mobilities[tid], boltzmann_constant
+        )
 
-@wp.kernel
-# type: ignore[misc]
-def _brownian_diffusivity_kernel(
-    temperatures: Any,
-    mobilities: Any,
-    boltzmann_constant: Any,
-    result: Any,
-) -> None:
-    """Evaluate brownian_diffusivity_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = brownian_diffusivity_wp(
-        temperatures[tid], mobilities[tid], boltzmann_constant
-    )
+    @wp.kernel
+    # type: ignore[misc]
+    def _brownian_kernel_pair_kernel(
+        radii_i: Any,
+        radii_j: Any,
+        diff_i: Any,
+        diff_j: Any,
+        g_i: Any,
+        g_j: Any,
+        speed_i: Any,
+        speed_j: Any,
+        result: Any,
+    ) -> None:
+        """Evaluate brownian_kernel_pair_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = brownian_kernel_pair_wp(
+            radii_i[tid],
+            radii_j[tid],
+            diff_i[tid],
+            diff_j[tid],
+            g_i[tid],
+            g_j[tid],
+            speed_i[tid],
+            speed_j[tid],
+            wp.float64(1.0),
+        )
 
-
-@wp.kernel
-# type: ignore[misc]
-def _brownian_kernel_pair_kernel(
-    radii_i: Any,
-    radii_j: Any,
-    diff_i: Any,
-    diff_j: Any,
-    g_i: Any,
-    g_j: Any,
-    speed_i: Any,
-    speed_j: Any,
-    result: Any,
-) -> None:
-    """Evaluate brownian_kernel_pair_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = brownian_kernel_pair_wp(
-        radii_i[tid],
-        radii_j[tid],
-        diff_i[tid],
-        diff_j[tid],
-        g_i[tid],
-        g_j[tid],
-        speed_i[tid],
-        speed_j[tid],
-        wp.float64(1.0),
-    )
-
-
-@wp.kernel
-# type: ignore[misc]
-def _particle_radius_kernel(volumes: Any, result: Any) -> None:
-    """Evaluate particle_radius_from_volume_wp across an array."""
-    tid = wp.tid()  # type: ignore[misc]
-    result[tid] = particle_radius_from_volume_wp(volumes[tid])
+    @wp.kernel
+    # type: ignore[misc]
+    def _particle_radius_kernel(volumes: Any, result: Any) -> None:
+        """Evaluate particle_radius_from_volume_wp across an array."""
+        tid = wp.tid()  # type: ignore[misc]
+        result[tid] = particle_radius_from_volume_wp(volumes[tid])
 
 
 def test_wp_func_benchmarks() -> None:
     """Benchmark key Warp @wp.func utilities against NumPy equivalents."""
     _skip_if_no_cuda()
     n_evals = 100_000
-    rng = np.random.default_rng(123)
-    temperatures = rng.uniform(280.0, 320.0, size=n_evals).astype(np.float64)
-    mobilities = rng.uniform(1.0e-8, 5.0e-8, size=n_evals).astype(np.float64)
-    pressure_deltas = rng.uniform(-5.0, 10.0, size=n_evals).astype(np.float64)
-    mass_transport = rng.uniform(1.0e-18, 1.0e-16, size=n_evals).astype(
-        np.float64
-    )
-    molar_masses = rng.uniform(0.018, 0.05, size=n_evals).astype(np.float64)
-    total_volumes = rng.uniform(1.0e-21, 1.0e-18, size=n_evals).astype(
-        np.float64
-    )
-
-    cpu_start = time.perf_counter()
-    _ = get_diffusion_coefficient(
-        temperature=temperatures,
-        aerodynamic_mobility=mobilities,
-        boltzmann_constant=constants.BOLTZMANN_CONSTANT,
-    )
-    cpu_diffusion_time = time.perf_counter() - cpu_start
-
-    cpu_start = time.perf_counter()
-    _ = get_mass_transfer_rate(
-        pressure_delta=pressure_deltas,
-        first_order_mass_transport=mass_transport,
-        temperature=temperatures,
-        molar_mass=molar_masses,
-    )
-    cpu_mass_transfer_time = time.perf_counter() - cpu_start
-
-    cpu_start = time.perf_counter()
-    _ = np.cbrt(3.0 * total_volumes / (4.0 * np.pi))
-    cpu_radius_time = time.perf_counter() - cpu_start
-
-    cpu_start = time.perf_counter()
-    _ = constants.BOLTZMANN_CONSTANT * temperatures * mobilities
-    cpu_brownian_diffusivity_time = time.perf_counter() - cpu_start
-
     kernel_sample = 256
-    cpu_start = time.perf_counter()
-    _ = get_brownian_kernel_via_system_state(
-        particle_radius=temperatures[:kernel_sample] * 0.0 + 1.0e-8,
-        particle_mass=np.full(kernel_sample, 1.0e-18, dtype=np.float64),
-        temperature=DEFAULT_TEMPERATURE,
-        pressure=DEFAULT_PRESSURE,
-    )
-    cpu_brownian_kernel_time = time.perf_counter() - cpu_start
-
-    temperatures_wp = wp.array(temperatures, dtype=wp.float64, device="cuda")
-    mobilities_wp = wp.array(mobilities, dtype=wp.float64, device="cuda")
-    pressure_wp = wp.array(pressure_deltas, dtype=wp.float64, device="cuda")
-    mass_transport_wp = wp.array(
-        mass_transport, dtype=wp.float64, device="cuda"
-    )
-    molar_mass_wp = wp.array(molar_masses, dtype=wp.float64, device="cuda")
-    volumes_wp = wp.array(total_volumes, dtype=wp.float64, device="cuda")
-
-    diffusion_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
-    transfer_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
-    radius_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
-
-    wp.launch(
-        _diffusion_coefficient_kernel,
-        dim=n_evals,
-        inputs=[
-            temperatures_wp,
-            mobilities_wp,
-            wp.float64(constants.BOLTZMANN_CONSTANT),
-        ],
-        outputs=[diffusion_out],
-        device="cuda",
-    )
-    wp.launch(
-        _mass_transfer_rate_kernel,
-        dim=n_evals,
-        inputs=[
-            pressure_wp,
-            mass_transport_wp,
-            temperatures_wp,
-            molar_mass_wp,
-            wp.float64(constants.GAS_CONSTANT),
-        ],
-        outputs=[transfer_out],
-        device="cuda",
-    )
-    wp.launch(
-        _particle_radius_kernel,
-        dim=n_evals,
-        inputs=[volumes_wp],
-        outputs=[radius_out],
-        device="cuda",
-    )
-    wp.synchronize()
-
-    start = time.perf_counter()
-    wp.launch(
-        _diffusion_coefficient_kernel,
-        dim=n_evals,
-        inputs=[
-            temperatures_wp,
-            mobilities_wp,
-            wp.float64(constants.BOLTZMANN_CONSTANT),
-        ],
-        outputs=[diffusion_out],
-        device="cuda",
-    )
-    wp.synchronize()
-    gpu_diffusion_time = time.perf_counter() - start
-
-    start = time.perf_counter()
-    wp.launch(
-        _mass_transfer_rate_kernel,
-        dim=n_evals,
-        inputs=[
-            pressure_wp,
-            mass_transport_wp,
-            temperatures_wp,
-            molar_mass_wp,
-            wp.float64(constants.GAS_CONSTANT),
-        ],
-        outputs=[transfer_out],
-        device="cuda",
-    )
-    wp.synchronize()
-    gpu_mass_transfer_time = time.perf_counter() - start
-
-    start = time.perf_counter()
-    wp.launch(
-        _particle_radius_kernel,
-        dim=n_evals,
-        inputs=[volumes_wp],
-        outputs=[radius_out],
-        device="cuda",
-    )
-    wp.synchronize()
-    gpu_radius_time = time.perf_counter() - start
-
-    radii_i = rng.uniform(1.0e-9, 1.0e-7, size=n_evals).astype(np.float64)
-    radii_j = rng.uniform(1.0e-9, 1.0e-7, size=n_evals).astype(np.float64)
-    diff_i = rng.uniform(1.0e-10, 1.0e-9, size=n_evals).astype(np.float64)
-    diff_j = rng.uniform(1.0e-10, 1.0e-9, size=n_evals).astype(np.float64)
-    g_i = rng.uniform(1.0e-9, 1.0e-8, size=n_evals).astype(np.float64)
-    g_j = rng.uniform(1.0e-9, 1.0e-8, size=n_evals).astype(np.float64)
-    speed_i = rng.uniform(10.0, 40.0, size=n_evals).astype(np.float64)
-    speed_j = rng.uniform(10.0, 40.0, size=n_evals).astype(np.float64)
-
-    radii_i_wp = wp.array(radii_i, dtype=wp.float64, device="cuda")
-    radii_j_wp = wp.array(radii_j, dtype=wp.float64, device="cuda")
-    diff_i_wp = wp.array(diff_i, dtype=wp.float64, device="cuda")
-    diff_j_wp = wp.array(diff_j, dtype=wp.float64, device="cuda")
-    g_i_wp = wp.array(g_i, dtype=wp.float64, device="cuda")
-    g_j_wp = wp.array(g_j, dtype=wp.float64, device="cuda")
-    speed_i_wp = wp.array(speed_i, dtype=wp.float64, device="cuda")
-    speed_j_wp = wp.array(speed_j, dtype=wp.float64, device="cuda")
-    brownian_out = wp.zeros(n_evals, dtype=wp.float64, device="cuda")
-
-    wp.launch(
-        _brownian_diffusivity_kernel,
-        dim=n_evals,
-        inputs=[
-            temperatures_wp,
-            mobilities_wp,
-            wp.float64(constants.BOLTZMANN_CONSTANT),
-        ],
-        outputs=[diffusion_out],
-        device="cuda",
-    )
-    wp.launch(
-        _brownian_kernel_pair_kernel,
-        dim=n_evals,
-        inputs=[
-            radii_i_wp,
-            radii_j_wp,
-            diff_i_wp,
-            diff_j_wp,
-            g_i_wp,
-            g_j_wp,
-            speed_i_wp,
-            speed_j_wp,
-        ],
-        outputs=[brownian_out],
-        device="cuda",
-    )
-    wp.synchronize()
-
-    start = time.perf_counter()
-    wp.launch(
-        _brownian_diffusivity_kernel,
-        dim=n_evals,
-        inputs=[
-            temperatures_wp,
-            mobilities_wp,
-            wp.float64(constants.BOLTZMANN_CONSTANT),
-        ],
-        outputs=[diffusion_out],
-        device="cuda",
-    )
-    wp.synchronize()
-    gpu_brownian_diffusivity_time = time.perf_counter() - start
-
-    start = time.perf_counter()
-    wp.launch(
-        _brownian_kernel_pair_kernel,
-        dim=n_evals,
-        inputs=[
-            radii_i_wp,
-            radii_j_wp,
-            diff_i_wp,
-            diff_j_wp,
-            g_i_wp,
-            g_j_wp,
-            speed_i_wp,
-            speed_j_wp,
-        ],
-        outputs=[brownian_out],
-        device="cuda",
-    )
-    wp.synchronize()
-    gpu_brownian_kernel_time = time.perf_counter() - start
+    inputs = _build_wp_func_benchmark_inputs(n_evals)
+    cpu_timings = _benchmark_cpu_wp_funcs(inputs, kernel_sample=kernel_sample)
+    gpu_timings = _benchmark_gpu_wp_funcs(inputs)
 
     kernel_calls = kernel_sample * kernel_sample
     timing_lines = [
         "@wp.func timings (per call, microseconds):",
         (
             "  diffusion_coefficient_wp: "
-            f"CPU {cpu_diffusion_time / n_evals * 1e6:.4f} | "
-            f"GPU {gpu_diffusion_time / n_evals * 1e6:.4f}"
+            f"CPU {cpu_timings['diffusion_coefficient'] / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_timings['diffusion_coefficient'] / n_evals * 1e6:.4f}"
         ),
         (
             "  mass_transfer_rate_wp: "
-            f"CPU {cpu_mass_transfer_time / n_evals * 1e6:.4f} | "
-            f"GPU {gpu_mass_transfer_time / n_evals * 1e6:.4f}"
+            f"CPU {cpu_timings['mass_transfer_rate'] / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_timings['mass_transfer_rate'] / n_evals * 1e6:.4f}"
         ),
         (
             "  particle_radius_from_volume_wp: "
-            f"CPU {cpu_radius_time / n_evals * 1e6:.4f} | "
-            f"GPU {gpu_radius_time / n_evals * 1e6:.4f}"
+            f"CPU {cpu_timings['particle_radius_from_volume'] / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_timings['particle_radius_from_volume'] / n_evals * 1e6:.4f}"
         ),
         (
             "  brownian_diffusivity_wp: "
-            f"CPU {cpu_brownian_diffusivity_time / n_evals * 1e6:.4f} | "
-            f"GPU {gpu_brownian_diffusivity_time / n_evals * 1e6:.4f}"
+            f"CPU {cpu_timings['brownian_diffusivity'] / n_evals * 1e6:.4f} | "
+            f"GPU {gpu_timings['brownian_diffusivity'] / n_evals * 1e6:.4f}"
         ),
         (
             "  brownian_kernel_pair_wp: "
-            f"CPU {cpu_brownian_kernel_time / kernel_calls * 1e6:.4f} | "
-            f"GPU {gpu_brownian_kernel_time / n_evals * 1e6:.4f}"
+            f"CPU {cpu_timings['brownian_kernel_pair'] / kernel_calls * 1e6:.4f} | "
+            f"GPU {gpu_timings['brownian_kernel_pair'] / n_evals * 1e6:.4f}"
         ),
     ]
     print("\n".join(timing_lines))
@@ -1220,24 +1440,64 @@ def test_wp_func_benchmarks() -> None:
     _benchmark_results["benchmarks"]["wp_func"] = {
         "n_evals": n_evals,
         "diffusion_coefficient": {
-            "cpu_us": cpu_diffusion_time / n_evals * 1e6,
-            "gpu_us": gpu_diffusion_time / n_evals * 1e6,
+            "cpu_us": cpu_timings["diffusion_coefficient"] / n_evals * 1e6,
+            "gpu_us": gpu_timings["diffusion_coefficient"] / n_evals * 1e6,
         },
         "mass_transfer_rate": {
-            "cpu_us": cpu_mass_transfer_time / n_evals * 1e6,
-            "gpu_us": gpu_mass_transfer_time / n_evals * 1e6,
+            "cpu_us": cpu_timings["mass_transfer_rate"] / n_evals * 1e6,
+            "gpu_us": gpu_timings["mass_transfer_rate"] / n_evals * 1e6,
         },
         "particle_radius_from_volume": {
-            "cpu_us": cpu_radius_time / n_evals * 1e6,
-            "gpu_us": gpu_radius_time / n_evals * 1e6,
+            "cpu_us": cpu_timings["particle_radius_from_volume"]
+            / n_evals
+            * 1e6,
+            "gpu_us": gpu_timings["particle_radius_from_volume"]
+            / n_evals
+            * 1e6,
         },
         "brownian_diffusivity": {
-            "cpu_us": cpu_brownian_diffusivity_time / n_evals * 1e6,
-            "gpu_us": gpu_brownian_diffusivity_time / n_evals * 1e6,
+            "cpu_us": cpu_timings["brownian_diffusivity"] / n_evals * 1e6,
+            "gpu_us": gpu_timings["brownian_diffusivity"] / n_evals * 1e6,
         },
         "brownian_kernel_pair": {
-            "cpu_us": cpu_brownian_kernel_time / kernel_calls * 1e6,
-            "gpu_us": gpu_brownian_kernel_time / n_evals * 1e6,
+            "cpu_us": cpu_timings["brownian_kernel_pair"] / kernel_calls * 1e6,
+            "gpu_us": gpu_timings["brownian_kernel_pair"] / n_evals * 1e6,
         },
+    }
+    _save_results()
+
+
+@pytest.mark.parametrize(
+    ("label", "case_index", "candidate_id"),
+    _MASS_PRECISION_BENCHMARK_CONFIGS,
+)
+def test_mass_precision_projection_benchmark(
+    label: str,
+    case_index: int,
+    candidate_id: str,
+) -> None:
+    """Record optional bounded projection timings for P3 study candidates."""
+    case = _build_mass_precision_cases()[case_index]
+    start = time.perf_counter()
+    reconstructed = case.masses
+    repeats = 5_000
+    for _ in range(repeats):
+        reconstructed = _project_candidate(
+            case,
+            candidate_id,
+        )["reconstructed_masses"]
+    elapsed = time.perf_counter() - start
+
+    assert reconstructed.shape == case.masses.shape
+    entry_key = f"mass_precision_candidate_payload_{label}_{candidate_id}"
+    _benchmark_results["benchmarks"][entry_key] = {
+        "case_name": case.case_name,
+        "candidate_id": candidate_id,
+        "repeats": repeats,
+        "elapsed_s": elapsed,
+        "mean_us": elapsed / repeats * 1e6,
+        "n_boxes": case.masses.shape[0],
+        "n_particles": case.masses.shape[1],
+        "n_species": case.masses.shape[2],
     }
     _save_results()

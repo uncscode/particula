@@ -17,13 +17,13 @@ that page now redirects to this canonical guide.
 
 Before adding container fields or changing CPU↔GPU conversion behavior, review
 the roadmap's
-[canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
-and its surrounding [authoritative field ownership
-decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions).
-Downstream implementers should then read the
-[final downstream handoff map for sibling
-features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
-for the exact inherited field, shape, ownership, and CPU↔GPU transfer rules.
+[authoritative field ownership decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
+[canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows),
+and [final downstream handoff map for sibling
+features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
+Treat the [Mass Precision Recommendation
+Report](Roadmap/mass-precision-study.md) as the canonical reference before
+changing particle mass dtype/schema behavior.
 
 The migration moves **data** into dedicated containers and leaves **behavior**
 in strategies and runnables:
