@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Literal, overload
 
 import numpy as np
@@ -315,6 +316,68 @@ _RECORDED_STIFFNESS_THRESHOLD = 1.0
 
 
 @dataclass(frozen=True)
+class CondensationIntegrationCandidate:
+    """Describe one deterministic fixed-shape integration candidate."""
+
+    name: str
+    family: str
+    fixed_substeps: int
+    reference_rtol: float
+    baseline_relative_error_bound: float
+    graph_capture_compatible: bool
+    autodiff_implication: str
+
+
+@dataclass
+class CondensationCandidateScratch:
+    """Own fixed-shape reusable scratch arrays for one candidate run."""
+
+    mass_transfer: np.ndarray
+    work: np.ndarray
+    accumulator: np.ndarray | None = None
+
+
+@dataclass(frozen=True)
+class CondensationCandidateResult:
+    """Capture deterministic candidate output and buffer identity evidence."""
+
+    candidate_name: str
+    final_masses: np.ndarray
+    mass_transfer: np.ndarray
+    work: np.ndarray
+    accumulator: np.ndarray | None
+
+
+_CONDENSATION_INTEGRATION_CANDIDATES: tuple[
+    CondensationIntegrationCandidate, ...
+] = (
+    CondensationIntegrationCandidate(
+        name="fixed_count_substeps_4",
+        family="fixed_count_explicit",
+        fixed_substeps=4,
+        reference_rtol=5.0e-2,
+        baseline_relative_error_bound=5.0e-2,
+        graph_capture_compatible=True,
+        autodiff_implication=(
+            "Fixed loop count; no data-dependent branching beyond clamps."
+        ),
+    ),
+    CondensationIntegrationCandidate(
+        name="asymptotic_relaxation",
+        family="asymptotic_first_order",
+        fixed_substeps=1,
+        reference_rtol=3.5e-1,
+        baseline_relative_error_bound=3.5e-1,
+        graph_capture_compatible=True,
+        autodiff_implication=(
+            "Uses exp-based bounded relaxation, so autodiff stays plausible "
+            "but clamp boundaries remain non-smooth."
+        ),
+    ),
+)
+
+
+@dataclass(frozen=True)
 class CondensationStiffnessTrialRecord:
     """Capture one recorded-grid timestep trial for a stiffness case.
 
@@ -589,6 +652,188 @@ def _cpu_mass_transfer(
                     mass_rate * time_step
                 )
     return mass_transfer
+
+
+def _get_condensation_stiffness_case(name: str) -> CondensationStiffnessCase:
+    """Return one named deterministic stiffness case."""
+    return next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == name
+    )
+
+
+def _get_integration_candidate(name: str) -> CondensationIntegrationCandidate:
+    """Return one named deterministic integration candidate."""
+    return next(
+        candidate
+        for candidate in _CONDENSATION_INTEGRATION_CANDIDATES
+        if candidate.name == name
+    )
+
+
+def _make_candidate_scratch(
+    case: CondensationStiffnessCase,
+    candidate: CondensationIntegrationCandidate,
+) -> CondensationCandidateScratch:
+    """Allocate fixed-shape reusable scratch buffers for one candidate."""
+    shape = (case.n_boxes, case.n_particles, case.n_species)
+    accumulator = None
+    if candidate.family == "fixed_count_explicit":
+        accumulator = np.zeros(shape, dtype=np.float64)
+    return CondensationCandidateScratch(
+        mass_transfer=np.zeros(shape, dtype=np.float64),
+        work=np.zeros(shape, dtype=np.float64),
+        accumulator=accumulator,
+    )
+
+
+def _environment_inputs_for_case(
+    case: CondensationStiffnessCase,
+) -> tuple[float | np.ndarray, float | np.ndarray]:
+    """Return scalar or per-box CPU environment inputs for one case."""
+    if case.n_boxes == 1:
+        return case.temperature, case.pressure
+    return case.temperature_array(), case.pressure_array()
+
+
+def _apply_particle_only_mass_transfer(
+    particle_masses: np.ndarray,
+    mass_transfer: np.ndarray,
+) -> np.ndarray:
+    """Apply a particle-only mass-transfer update with a non-negative clamp."""
+    bounded_transfer = np.maximum(mass_transfer, -particle_masses)
+    return particle_masses + bounded_transfer
+
+
+@lru_cache(maxsize=None)
+def _cpu_reference_final_masses(case_name: str, time_step: float) -> np.ndarray:
+    """Cache CPU reference final masses for one case and timestep."""
+    case = _get_condensation_stiffness_case(case_name)
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    temperature, pressure = _environment_inputs_for_case(case)
+    mass_transfer = _cpu_mass_transfer(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension=np.full(case.n_species, 0.072, dtype=np.float64),
+        mass_accommodation=np.full(case.n_species, 1.0, dtype=np.float64),
+        diffusion_coefficient_vapor=np.full(
+            case.n_species,
+            2.0e-5,
+            dtype=np.float64,
+        ),
+        temperature=temperature,
+        pressure=pressure,
+        time_step=time_step,
+    )
+    return _apply_particle_only_mass_transfer(
+        particles.masses.copy(),
+        mass_transfer,
+    )
+
+
+@lru_cache(maxsize=None)
+def _recorded_explicit_final_masses_by_case(
+    case_name: str,
+) -> tuple[np.ndarray, ...]:
+    """Cache recorded explicit baseline final masses for one named case."""
+    case = _get_condensation_stiffness_case(case_name)
+    records = _record_condensation_stiffness_trials(case, device="cpu")
+    return tuple(record.final_masses.copy() for record in records)
+
+
+def _relative_mass_error(
+    candidate_masses: np.ndarray,
+    reference_masses: np.ndarray,
+) -> float:
+    """Return the max relative mass error with a finite nonzero denominator."""
+    scale = np.maximum(np.abs(reference_masses), 1.0e-30)
+    return float(
+        np.max(np.abs(candidate_masses - reference_masses) / scale)
+    )
+
+
+def _run_integration_candidate(
+    case: CondensationStiffnessCase,
+    candidate: CondensationIntegrationCandidate,
+    time_step: float,
+    scratch: CondensationCandidateScratch,
+) -> CondensationCandidateResult:
+    """Run one deterministic fixed-shape candidate with reusable scratch."""
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = case.build_vapor_pressure()
+    temperature, pressure = _environment_inputs_for_case(case)
+    scratch.mass_transfer.fill(0.0)
+    scratch.work.fill(0.0)
+    if scratch.accumulator is not None:
+        scratch.accumulator.fill(0.0)
+
+    if candidate.family == "fixed_count_explicit":
+        substep_time_step = time_step / candidate.fixed_substeps
+        assert scratch.accumulator is not None
+        for _ in range(candidate.fixed_substeps):
+            scratch.work[...] = _cpu_mass_transfer(
+                particles,
+                gas,
+                vapor_pressure,
+                surface_tension=np.full(case.n_species, 0.072, dtype=np.float64),
+                mass_accommodation=np.full(
+                    case.n_species,
+                    1.0,
+                    dtype=np.float64,
+                ),
+                diffusion_coefficient_vapor=np.full(
+                    case.n_species,
+                    2.0e-5,
+                    dtype=np.float64,
+                ),
+                temperature=temperature,
+                pressure=pressure,
+                time_step=substep_time_step,
+            )
+            scratch.work[...] = np.maximum(scratch.work, -particles.masses)
+            particles.masses += scratch.work
+            scratch.accumulator += scratch.work
+        scratch.mass_transfer[...] = scratch.accumulator
+    elif candidate.family == "asymptotic_first_order":
+        scratch.mass_transfer[...] = _cpu_mass_transfer(
+            particles,
+            gas,
+            vapor_pressure,
+            surface_tension=np.full(case.n_species, 0.072, dtype=np.float64),
+            mass_accommodation=np.full(case.n_species, 1.0, dtype=np.float64),
+            diffusion_coefficient_vapor=np.full(
+                case.n_species,
+                2.0e-5,
+                dtype=np.float64,
+            ),
+            temperature=temperature,
+            pressure=pressure,
+            time_step=time_step,
+        )
+        positive_transfer = np.maximum(scratch.mass_transfer, 0.0)
+        negative_transfer = np.minimum(scratch.mass_transfer, 0.0)
+        reference_scale = np.maximum(particles.masses, 1.0e-30)
+        relaxation_ratio = positive_transfer / reference_scale
+        scratch.work[...] = (
+            particles.masses * (1.0 - np.exp(-relaxation_ratio))
+        ) + np.maximum(negative_transfer, -particles.masses)
+        particles.masses += scratch.work
+        scratch.mass_transfer[...] = scratch.work
+    else:
+        raise ValueError(f"Unknown candidate family: {candidate.family}")
+
+    return CondensationCandidateResult(
+        candidate_name=candidate.name,
+        final_masses=particles.masses.copy(),
+        mass_transfer=scratch.mass_transfer,
+        work=scratch.work,
+        accumulator=scratch.accumulator,
+    )
 
 
 @overload
@@ -2515,6 +2760,183 @@ def test_condensation_multi_species_parity(device: str) -> None:
     )
 
     npt.assert_allclose(gpu_result.masses, expected_masses, rtol=1.0e-10)
+
+
+@pytest.mark.parametrize("case_name", ["nanometer", "droplet_like"])
+def test_fixed_count_candidate_is_deterministic_for_named_stiffness_case(
+    case_name: str,
+) -> None:
+    """Fixed-count candidate produces identical outputs on repeated runs."""
+    case = _get_condensation_stiffness_case(case_name)
+    candidate = _get_integration_candidate("fixed_count_substeps_4")
+    time_step = _RECORDED_TIMESTEP_GRID_BY_CASE[case_name][-1]
+
+    first = _run_integration_candidate(
+        case,
+        candidate,
+        time_step,
+        _make_candidate_scratch(case, candidate),
+    )
+    second = _run_integration_candidate(
+        case,
+        candidate,
+        time_step,
+        _make_candidate_scratch(case, candidate),
+    )
+
+    npt.assert_array_equal(first.final_masses, second.final_masses)
+    npt.assert_array_equal(first.mass_transfer, second.mass_transfer)
+
+
+@pytest.mark.parametrize("case_name", ["nanometer", "droplet_like"])
+def test_asymptotic_candidate_is_deterministic_for_named_stiffness_case(
+    case_name: str,
+) -> None:
+    """Asymptotic candidate produces identical outputs on repeated runs."""
+    case = _get_condensation_stiffness_case(case_name)
+    candidate = _get_integration_candidate("asymptotic_relaxation")
+    time_step = _RECORDED_TIMESTEP_GRID_BY_CASE[case_name][-1]
+
+    first = _run_integration_candidate(
+        case,
+        candidate,
+        time_step,
+        _make_candidate_scratch(case, candidate),
+    )
+    second = _run_integration_candidate(
+        case,
+        candidate,
+        time_step,
+        _make_candidate_scratch(case, candidate),
+    )
+
+    npt.assert_array_equal(first.final_masses, second.final_masses)
+    npt.assert_array_equal(first.mass_transfer, second.mass_transfer)
+
+
+@pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
+@pytest.mark.parametrize(
+    "candidate",
+    _CONDENSATION_INTEGRATION_CANDIDATES,
+    ids=lambda candidate: candidate.name,
+)
+def test_candidate_outputs_remain_finite_and_particle_masses_non_negative(
+    case: CondensationStiffnessCase,
+    candidate: CondensationIntegrationCandidate,
+) -> None:
+    """Candidate outputs stay finite and particle-only masses stay non-negative."""
+    result = _run_integration_candidate(
+        case,
+        candidate,
+        case.time_step,
+        _make_candidate_scratch(case, candidate),
+    )
+
+    assert np.all(np.isfinite(result.final_masses))
+    assert np.all(result.final_masses >= 0.0)
+    assert np.all(np.isfinite(result.mass_transfer))
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    _CONDENSATION_INTEGRATION_CANDIDATES,
+    ids=lambda candidate: candidate.name,
+)
+def test_candidate_reuses_mass_transfer_and_fixed_shape_scratch_buffers(
+    candidate: CondensationIntegrationCandidate,
+) -> None:
+    """Candidate execution reuses caller-owned fixed-shape scratch arrays."""
+    case = _get_condensation_stiffness_case("droplet_like")
+    scratch = _make_candidate_scratch(case, candidate)
+    mass_transfer_id = id(scratch.mass_transfer)
+    work_id = id(scratch.work)
+    accumulator_id = (
+        id(scratch.accumulator) if scratch.accumulator is not None else None
+    )
+    shape = (case.n_boxes, case.n_particles, case.n_species)
+
+    first = _run_integration_candidate(case, candidate, case.time_step, scratch)
+    second = _run_integration_candidate(case, candidate, case.time_step, scratch)
+
+    assert id(first.mass_transfer) == mass_transfer_id
+    assert id(second.mass_transfer) == mass_transfer_id
+    assert id(first.work) == work_id
+    assert id(second.work) == work_id
+    assert first.mass_transfer.shape == shape
+    assert second.mass_transfer.shape == shape
+    if scratch.accumulator is None:
+        assert first.accumulator is None
+        assert second.accumulator is None
+    else:
+        assert accumulator_id is not None
+        assert id(first.accumulator) == accumulator_id
+        assert id(second.accumulator) == accumulator_id
+        assert first.accumulator.shape == shape
+        assert second.accumulator.shape == shape
+
+
+@pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
+@pytest.mark.parametrize(
+    "candidate",
+    _CONDENSATION_INTEGRATION_CANDIDATES,
+    ids=lambda candidate: candidate.name,
+)
+def test_candidate_matches_cpu_reference_with_documented_tolerance(
+    case: CondensationStiffnessCase,
+    candidate: CondensationIntegrationCandidate,
+) -> None:
+    """Candidate stays within its documented CPU-reference agreement bound."""
+    reference = _cpu_reference_final_masses(case.name, case.time_step)
+    result = _run_integration_candidate(
+        case,
+        candidate,
+        case.time_step,
+        _make_candidate_scratch(case, candidate),
+    )
+
+    npt.assert_allclose(
+        result.final_masses,
+        reference,
+        rtol=candidate.reference_rtol,
+        atol=0.0,
+        err_msg=(
+            f"{candidate.name} should stay within rtol={candidate.reference_rtol} "
+            f"for {case.name}"
+        ),
+    )
+
+
+@pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
+@pytest.mark.parametrize(
+    "candidate",
+    _CONDENSATION_INTEGRATION_CANDIDATES,
+    ids=lambda candidate: candidate.name,
+)
+def test_candidate_preserves_recorded_explicit_baseline_ordering_or_error_bound(
+    case: CondensationStiffnessCase,
+    candidate: CondensationIntegrationCandidate,
+) -> None:
+    """Candidate stays within a documented error bound across the recorded grid."""
+    recorded_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
+    explicit_baseline = _recorded_explicit_final_masses_by_case(case.name)
+
+    relative_errors = []
+    for time_step, baseline_masses in zip(
+        recorded_timesteps,
+        explicit_baseline,
+        strict=True,
+    ):
+        result = _run_integration_candidate(
+            case,
+            candidate,
+            time_step,
+            _make_candidate_scratch(case, candidate),
+        )
+        relative_errors.append(
+            _relative_mass_error(result.final_masses, baseline_masses)
+        )
+
+    assert max(relative_errors) <= candidate.baseline_relative_error_bound
 
 
 @pytest.mark.parametrize("case", _make_condensation_stiffness_cases())

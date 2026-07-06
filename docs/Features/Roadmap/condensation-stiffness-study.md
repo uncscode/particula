@@ -108,13 +108,38 @@ zero-mass growth, and non-finite values. This is recorded-grid evidence for the
 current fixed-shape particle-only path, not a gas-coupled conservation result
 and not a general stable-timestep limit for other cases.
 
+## Candidate Evaluation Evidence
+
+This phase adds two deterministic prototype candidates in
+`particula/gpu/kernels/tests/condensation_test.py`. They remain test-local
+evidence only; the public `condensation_step_gpu(...)` runtime and package
+export surface are unchanged.
+
+| Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `fixed_count_substeps_4` | Fixed-count explicit sub-stepping | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grid. | Pass: fixed loop count (`4`) and fixed-shape scratch keep the prototype graph-capture-friendly. | Clamp boundaries are still non-smooth, but there are no data-dependent loop counts. |
+| `asymptotic_relaxation` | Asymptotic first-order bounded relaxation | Pass: one caller-owned `mass_transfer` array plus one fixed-shape `work` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 3.5e-1` at the baseline timestep and `max relative error <= 3.5e-1` across the recorded grid. This looser bound keeps the candidate in prototype/evidence scope only. | Pass: fixed-shape algebra with no adaptive search or variable-length loops. | `exp(...)` relaxation remains differentiable away from the same clamp boundary, so it is a plausible autodiff target but not yet production-qualified. |
+
+### Phase Boundary Decision
+
+- Gas coupling is still deferred. No production gas-state update hook shipped in
+  this issue.
+- The exact split boundary remains the same: any production gas-coupled path
+  must land with same-issue particle-plus-gas conservation regression coverage
+  in `particula/integration_tests/condensation_particle_resolved_test.py`.
+- The asymptotic candidate remains evidence-only because the tolerance required
+  to track the current CPU/explicit reference is materially looser than the
+  fixed-count candidate.
+- Because the candidate evidence was credible in test-local helpers, no private
+  production helper was added to `particula/gpu/kernels/condensation.py`.
+
 ## What This Phase Does Not Publish
 
 This baseline does **not** publish:
 
 - adaptive or exhaustive timestep search results
 - generalized stable timestep limits
-- candidate integrator comparisons
+- final candidate integrator recommendations
 - gas-coupled conservation claims that the current production path does not yet
   satisfy
 
