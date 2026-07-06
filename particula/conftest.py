@@ -35,3 +35,19 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers",
         "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
     )
+
+
+def pytest_collection_modifyitems(
+    config: pytest.Config,
+    items: list[pytest.Item],
+) -> None:
+    """Skip benchmark-marked tests unless the registered option enables them."""
+    if config.getoption("--benchmark"):
+        return
+
+    skip_benchmark = pytest.mark.skip(
+        reason="GPU benchmarks skipped (pass --benchmark to enable)"
+    )
+    for item in items:
+        if "benchmark" in item.keywords:
+            item.add_marker(skip_benchmark)

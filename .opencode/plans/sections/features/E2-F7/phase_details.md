@@ -66,15 +66,17 @@
     determinism, boundedness, reusable fixed-shape scratch coverage,
     CPU-reference tolerances, and explicit-baseline error bounds.
 
-- [ ] **E2-F7-P4:** Publish integration recommendation and development documentation
-  - Issue: #1216 | Size: XS | Status: In Progress
+- [x] **E2-F7-P4:** Publish integration recommendation and development documentation
+  - Issue: #1216 | Size: XS | Status: Implemented
   - Goal: Record the recommended integration foundation, rejected alternatives,
     graph-capture/autodiff constraints, and the exact follow-up split boundary
     required before any gas-coupled production path is claimed.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+  - Files delivered: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/Roadmap/warp-autodiff-limitations.md`,
     `docs/Features/Roadmap/condensation-stiffness-study.md`, and plan sections
-    as needed.
+    plus discoverable wrappers
+    `particula/gpu/kernels/tests/condensation_test.py` and
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
   - Implementation notes: The published decision record now promotes the
     stiffness study into the canonical recommendation source, recommends
     `fixed_count_substeps_4` as the preferred fixed-shape implementation
@@ -98,6 +100,6 @@
   any assumptions that must be revisited once `E2-F2` lands.
 - P2 should consume the P1 metric catalog and align its environment-shape
   expectations with `E2-F2` before the stability table is treated as reusable.
-- P3 and P4 should wait on `E2-F6` if they compare or recommend anything other
-  than the current `fp64` baseline; P3 now recorded evidence only and left the
-  production recommendation plus any gas-coupled hook to later work.
+- P3 and P4 stayed inside the current `E2-F6` `float64` evidence envelope; the
+  shipped recommendation remains scoped to that baseline and still leaves any
+  broader precision migration or gas-coupled production hook to later work.

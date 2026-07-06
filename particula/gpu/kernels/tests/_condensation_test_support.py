@@ -1,6 +1,6 @@
 """End-to-end tests for GPU condensation kernels."""
 
-# ruff: noqa: E501, S101
+# ruff: noqa: S101
 
 from __future__ import annotations
 
@@ -249,7 +249,8 @@ class CondensationStiffnessClassification:
     Attributes:
         label: Stability label derived from the recorded classification rule.
         mass_nonnegative: Whether all final particle masses stay non-negative.
-        values_finite: Whether particle, gas, and vapor-pressure values are finite.
+        values_finite: Whether particle, gas, and vapor-pressure values are
+            finite.
         metadata_valid: Whether shape and dtype checks passed for the case.
         zero_mass_change_stable: Whether zero-mass entries remain unchanged.
         max_fractional_mass_change: Largest positive-mass fractional change.
@@ -391,9 +392,11 @@ class CondensationStiffnessTrialRecord:
         environment_input_mode: Whether scalar or Warp-array inputs were used.
         classification: Particle-only stability classification for the result.
         gas_unchanged: Whether executed Warp gas concentration stayed unchanged.
-        reuses_caller_mass_transfer_buffer: Whether the caller buffer was reused.
+        reuses_caller_mass_transfer_buffer: Whether the caller buffer was
+            reused.
         mass_transfer_has_nonzero_values: Whether the buffer was populated.
-        mass_transfer_changed_from_previous_trial: Whether reuse overwrote values.
+        mass_transfer_changed_from_previous_trial: Whether reuse overwrote
+            values.
         final_masses: Final particle masses copied back from Warp.
         initial_masses: Initial particle masses used for classification.
         mass_transfer_values: CPU copy of the reused mass-transfer buffer.
@@ -1405,7 +1408,7 @@ def test_stiffness_metrics_reject_dtype_metadata_mismatch() -> None:
 
 
 def test_fractional_mass_change_zero_mass_returns_documented_result() -> None:
-    """Zero-initial-mass entries report zero fractional change when unchanged."""
+    """Zero-initial-mass entries report zero fractional change."""
     initial = np.array([[[0.0, 2.0e-18]]], dtype=np.float64)
     final = np.array([[[0.0, 3.0e-18]]], dtype=np.float64)
 
@@ -1478,9 +1481,7 @@ def test_condensation_stiffness_classification_threshold_boundary() -> None:
     assert classification.particle_only_update
 
 
-def test_condensation_stiffness_classification_marks_large_change_unstable() -> (
-    None
-):
+def test_large_fractional_change_is_unstable() -> None:
     """Large fractional mass changes are classified as unstable."""
     case = CondensationStiffnessCase(
         name="large_change",
@@ -1506,10 +1507,10 @@ def test_condensation_stiffness_classification_marks_large_change_unstable() -> 
     assert classification.particle_only_update
 
 
-def test_condensation_stiffness_classification_marks_zero_mass_growth_unstable() -> (
-    None
-):
-    """Zero-initial-mass growth is unstable even if fractional change is zero."""
+def test_zero_mass_growth_is_unstable() -> None:
+    """Zero-initial-mass growth is unstable even if fractional change is
+    zero.
+    """
     case = CondensationStiffnessCase(
         name="zero_mass_growth",
         n_boxes=1,
@@ -1534,9 +1535,7 @@ def test_condensation_stiffness_classification_marks_zero_mass_growth_unstable()
     assert classification.max_fractional_mass_change == 0.0
 
 
-def test_condensation_stiffness_classification_marks_nonfinite_values_unstable() -> (
-    None
-):
+def test_nonfinite_values_are_unstable() -> None:
     """Non-finite particle results are unstable regardless of threshold."""
     case = CondensationStiffnessCase(
         name="nonfinite_values",
@@ -1672,7 +1671,7 @@ def test_recorded_condensation_trials_detect_executed_gas_mutation(
         (None, None),
     ],
 )
-def test_condensation_step_gpu_rejects_missing_scalar_inputs_without_environment(
+def test_missing_scalar_inputs_without_environment_are_rejected(
     device: str,
     temperature: float | None,
     pressure: float | None,
@@ -1766,7 +1765,7 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
         (None, None),
     ],
 )
-def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helpers(
+def test_missing_scalar_inputs_short_circuit_before_helpers(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     temperature: float | None,
@@ -1813,7 +1812,7 @@ def test_condensation_step_gpu_missing_scalar_inputs_short_circuit_before_helper
         (float("nan"), 101325.0, "temperature must be finite and > 0"),
     ],
 )
-def test_condensation_step_gpu_invalid_scalar_domains_short_circuit_before_launch(
+def test_invalid_scalar_domains_short_circuit_before_launch(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     temperature: float,
@@ -1850,7 +1849,7 @@ def test_condensation_step_gpu_invalid_scalar_domains_short_circuit_before_launc
     assert calls == []
 
 
-def test_condensation_step_gpu_invalid_environment_domains_short_circuit_before_launch(
+def test_invalid_environment_domains_short_circuit_before_launch(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
 ) -> None:
@@ -1894,7 +1893,7 @@ def test_condensation_step_gpu_invalid_environment_domains_short_circuit_before_
 
 
 @pytest.mark.parametrize("field_name", ["temperature", "pressure"])
-def test_condensation_step_gpu_missing_environment_field_short_circuits_before_launch(
+def test_missing_environment_field_short_circuits_before_launch(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     field_name: str,
@@ -1972,7 +1971,7 @@ def test_condensation_step_gpu_missing_environment_field_short_circuits_before_l
         ),
     ],
 )
-def test_condensation_step_gpu_invalid_direct_array_domains_short_circuit_before_launch(
+def test_invalid_direct_array_domains_short_circuit_before_launch(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     temperature_values: np.ndarray,
@@ -2095,7 +2094,7 @@ def test_condensation_step_gpu_rejects_direct_non_warp_arrays_before_launch(
         ),
     ],
 )
-def test_condensation_step_gpu_invalid_environment_array_domains_short_circuit_before_launch(
+def test_invalid_environment_array_domains_short_circuit_before_launch(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     field_name: str,
@@ -2181,10 +2180,10 @@ def test_condensation_step_gpu_accepts_direct_environment_arrays(
     )
 
 
-def test_condensation_step_gpu_explicit_environment_matches_direct_arrays(
+def test_explicit_environment_matches_direct_arrays(
     device: str,
 ) -> None:
-    """Accepted ``environment=...`` arrays match accepted direct-array inputs."""
+    """Accepted ``environment=...`` arrays match direct-array inputs."""
     particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
     gas = _make_gas_data(n_boxes=2, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
@@ -2240,10 +2239,10 @@ def test_condensation_step_gpu_explicit_environment_matches_direct_arrays(
     )
 
 
-def test_condensation_step_gpu_success_does_not_mutate_environment_inputs(
+def test_success_does_not_mutate_environment_inputs(
     device: str,
 ) -> None:
-    """Successful ``environment=...`` execution preserves caller-owned arrays."""
+    """Successful ``environment=...`` execution preserves inputs."""
     particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
     gas = _make_gas_data(n_boxes=2, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
@@ -2882,11 +2881,13 @@ def test_asymptotic_candidate_is_deterministic_for_named_stiffness_case(
     _CONDENSATION_INTEGRATION_CANDIDATES,
     ids=lambda candidate: candidate.name,
 )
-def test_candidate_outputs_remain_finite_and_particle_masses_non_negative(
+def test_candidate_outputs_are_finite_and_non_negative(
     case: CondensationStiffnessCase,
     candidate: CondensationIntegrationCandidate,
 ) -> None:
-    """Candidate outputs stay finite and particle-only masses stay non-negative."""
+    """Candidate outputs stay finite and particle-only masses stay
+    non-negative.
+    """
     result = _run_integration_candidate(
         case,
         candidate,
@@ -2968,8 +2969,8 @@ def test_candidate_matches_cpu_reference_with_documented_tolerance(
         rtol=candidate.reference_rtol,
         atol=0.0,
         err_msg=(
-            f"{candidate.name} should stay within rtol={candidate.reference_rtol} "
-            f"for {case.name}"
+            f"{candidate.name} should stay within rtol="
+            f"{candidate.reference_rtol} for {case.name}"
         ),
     )
 
@@ -2984,7 +2985,9 @@ def test_candidate_preserves_recorded_explicit_baseline_ordering_or_error_bound(
     case: CondensationStiffnessCase,
     candidate: CondensationIntegrationCandidate,
 ) -> None:
-    """Candidate stays within a documented error bound across the recorded grid."""
+    """Candidate stays within a documented error bound across the recorded
+    grid.
+    """
     recorded_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
     explicit_baseline = _recorded_explicit_final_masses_by_case(case.name)
 
@@ -3283,7 +3286,7 @@ def test_condensation_step_gpu_reuses_mass_transfer_buffer(
     assert np.any(returned_buffer.numpy() != 0.0)
 
 
-def test_condensation_step_gpu_rejected_inputs_leave_mass_transfer_buffer_unchanged(
+def test_rejected_inputs_leave_mass_transfer_buffer_unchanged(
     device: str,
 ) -> None:
     """Rejected inputs do not mutate caller-owned mass-transfer buffers."""

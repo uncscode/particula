@@ -24,8 +24,10 @@
       states across high-stiffness and low-stiffness regimes.
     - Cases should include nanometer high-supersaturation conditions,
       accumulation-mode aerosol, and droplet-like larger particles.
-    - P1 implemented this directly in
-      `particula/gpu/kernels/tests/condensation_test.py` as
+    - P1 implemented the shared support in
+      `particula/gpu/kernels/tests/_condensation_test_support.py`, with
+      discoverable execution exposed from
+      `particula/gpu/kernels/tests/condensation_test.py`, as
       `CondensationStiffnessCase` definitions with explicit `n_boxes`,
       `n_particles`, `n_species`, scalar baseline `temperature`/`pressure`, and
       deterministic particle/gas/environment builders.
@@ -43,9 +45,11 @@
     - A fixed list of timestep candidates per stress case.
     - No adaptive while loop is required for captured execution; scans can live
       in test/benchmark code outside graph capture.
-    - P2 implemented this as a recorded-grid sweep in
-      `particula/gpu/kernels/tests/condensation_test.py`, with one reused
-      caller-owned `mass_transfer` buffer per case/device and fresh rebuilt
+    - P2 implemented this as shared support in
+      `particula/gpu/kernels/tests/_condensation_test_support.py`, with
+      discoverable execution exposed from
+      `particula/gpu/kernels/tests/condensation_stiffness_test.py`, one reused
+      caller-owned `mass_transfer` buffer per case/device, and fresh rebuilt
       particle/gas inputs for every trial.
     - The shipped evidence remains particle-only: particle masses change,
       gas concentration stays unchanged, and environment inputs stay split
@@ -58,7 +62,9 @@
       preserves fixed shapes and avoids dynamic control flow.
     - Prior art: CPU staggered update, used for comparison only unless a fixed
       deterministic batch schedule is designed.
-    - This remains future work; no integrator comparison shipped in P1.
+    - P3 shipped the fixed-shape candidate evidence in shared support, and P4
+      shipped the recommendation that `fixed_count_substeps_4` is the preferred
+      future foundation while production scope remains particle-only.
 
 ## Data Flow
 
