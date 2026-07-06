@@ -482,7 +482,7 @@ Shared-across-box fields:
   `GasData.concentration -> (1, n_species)` without changing the canonical
   storage ranks for multi-box-ready containers.
 - `E2-F6`: inherit the current `float64` / `wp.float64` schema baseline for
-  stored particle and gas arrays. Treat
+  stored particle and gas arrays. Treat the
   [Mass Precision Recommendation Report](mass-precision-study.md) as the
   canonical downstream reference before any production dtype-or-schema
   migration proceeds.
