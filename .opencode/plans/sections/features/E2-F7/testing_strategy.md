@@ -9,13 +9,14 @@ tests in the same phase. There is no standalone testing phase.
 
 - Add or extend `particula/gpu/kernels/tests/condensation_test.py` for:
   - stress-case fixture construction,
-  - fixed-shape and dtype validation,
-  - preallocated `mass_transfer` buffer reuse,
-  - explicit timestep stability classification,
-  - candidate integration invariants,
-  - gas concentration update behavior when the production path couples gas and
-    particle state, and
-  - particle-plus-gas conservation checks for representative stable timesteps.
+  - fixed-shape and dtype metadata validation,
+  - scalar `temperature`/`pressure` coverage,
+  - accepted direct `(n_boxes,)` Warp-array environment inputs,
+  - threshold-boundary classification semantics,
+  - particle-only caveat handling,
+  - zero-mass stability,
+  - finite/non-negative post-step checks, and
+  - pre-launch validation failures that short-circuit before kernel execution.
 - Keep tests compatible with Warp CPU execution by default.
 - Use CUDA-specific execution only behind existing availability guards.
 
@@ -23,13 +24,13 @@ tests in the same phase. There is no standalone testing phase.
 
 - `particula/gpu/kernels/tests/condensation_test.py` for all fast P1-P3
   executable coverage.
-- `particula/integration_tests/condensation_particle_resolved_test.py` for the
-  bounded production-style gas-coupled regression that proves the chosen path is
-  physically complete rather than particle-only.
-- `particula/gpu/kernels/tests/condensation_stiffness_helpers.py` only if the
-  shared stress-case builders or metric helpers outgrow the main test file.
-- `docs/Features/Roadmap/condensation-stiffness-study.md` for the published
-  timestep tables, reproduction notes, and final recommendation evidence.
+- `particula/integration_tests/condensation_particle_resolved_test.py` remains
+  future coverage if a gas-coupled production hook lands in a later phase.
+- `particula/gpu/kernels/tests/condensation_stiffness_helpers.py` was not
+  needed for P1; shared helpers remain in `condensation_test.py`.
+- `docs/Features/Roadmap/condensation-stiffness-study.md` now records the
+  baseline case catalog and metric vocabulary; timestep tables remain future
+  work.
 - `docs/Features/Roadmap/warp-autodiff-limitations.md` only for cross-links and
   documented constraints in P4; do not move executable assertions into docs.
 
@@ -45,20 +46,17 @@ tests in the same phase. There is no standalone testing phase.
 - Particle masses remain finite and non-negative.
 - Explicit fractional mass changes stay below documented thresholds for a
   timestep classified as stable.
+- Zero-initial-mass bins remain unchanged when classified stable.
 - Buffer shapes remain fixed and preallocated buffers are reused.
-- Candidate integrators are deterministic for repeated runs.
-- Gas concentration updates remain finite, non-negative where required by the
-  chosen production contract, and move opposite particle mass changes.
-- Combined particle-plus-gas totals stay within documented conservation
-  tolerances for the representative gas-coupled coverage case.
-- Documentation accurately marks GPU particle-only behavior versus full
-  gas-particle conservation.
+- Documentation and helper outputs accurately mark GPU particle-only behavior
+  versus future gas-particle conservation work.
 
-Map those assertions to phases: P1 covers fixture/metric correctness, P2 covers
-current explicit-step stability bounds, P3 covers candidate sub-step or
-semi-implicit invariants plus the required gas-coupled production/conservation
-coverage, and P4 is the documentation-only exception that must rerun the same
-focused fast tests before publishing conclusions.
+Map those assertions to phases: P1 now covers fixture/metric correctness,
+environment-input contract coverage, and negative validation paths. P2 covers
+measured explicit-step stability bounds. P3 covers candidate sub-step or
+semi-implicit invariants plus any gas-coupled production/conservation coverage.
+P4 remains the documentation-only exception that must rerun the same focused
+fast tests before publishing conclusions.
 
 ## Slow/Benchmark Coverage
 

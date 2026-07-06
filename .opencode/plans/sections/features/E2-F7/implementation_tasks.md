@@ -2,18 +2,19 @@
 
 ## E2-F7-P1 Tasks
 
-- Define `CondensationStiffnessCase` and metric helpers directly in
-  `particula/gpu/kernels/tests/condensation_test.py` unless they push the file
-  past a reviewable size; only then split them into
-  `particula/gpu/kernels/tests/condensation_stiffness_helpers.py`.
-- Add fixed-shape stress cases for nanometer/high-supersaturation,
-  accumulation-mode, and droplet-like regimes with explicit `n_boxes`,
-  `n_particles`, and `n_species` dimensions.
-- Implement metric helpers for non-negativity, fractional mass change,
-  boundedness, and particle-only parity caveats with names that can be reused by
-  later CPU/GPU comparisons.
-- Add fast tests validating case shapes, dtype assumptions, and metric threshold
-  behavior before any timestep sweep logic lands.
+- Implemented in issue #1213:
+  - `CondensationStiffnessCase` and
+    `CondensationStiffnessClassification` were added directly to
+    `particula/gpu/kernels/tests/condensation_test.py`; no helper-file split was
+    needed.
+  - Fixed-shape named stress cases now cover `nanometer`,
+    `accumulation_mode`, and `droplet_like` regimes with explicit metadata.
+  - Reusable helpers now cover metadata validation, non-negativity,
+    finite-value checks, fractional mass change, zero-mass stability, and
+    stable/unstable classification for the current particle-only path.
+  - Fast tests now cover scalar and direct `(n_boxes,)` environment inputs,
+    threshold-boundary behavior, dtype/shape metadata failures, particle-only
+    caveat handling, and pre-launch validation short-circuit behavior.
 
 ## E2-F7-P2 Tasks
 

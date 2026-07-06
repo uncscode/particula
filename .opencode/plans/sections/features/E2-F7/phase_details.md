@@ -1,21 +1,27 @@
 # E2-F7 Phase Details
 
-- [ ] **E2-F7-P1:** Define condensation stiffness stress cases and metrics with tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F7-P1:** Define condensation stiffness stress cases and metrics with tests
+  - Issue: #1213 | Size: S | Status: Implemented
   - Goal: Create a small, reproducible catalog of condensation regimes and
     stability metrics that can be reused by GPU and CPU comparisons.
-  - Files: `particula/gpu/kernels/tests/condensation_test.py`,
-    `particula/gpu/kernels/tests/condensation_stiffness_helpers.py` if the
-    fixtures/metrics no longer fit cleanly in the test file, and
-    `docs/Features/Roadmap/condensation-stiffness-study.md`.
-  - Tests: Unit tests for stress-case construction, metric calculation, and
-    explicit timestep pass/fail classification.
+  - Files delivered: `particula/gpu/kernels/tests/condensation_test.py`,
+    `docs/Features/Roadmap/condensation-stiffness-study.md`, and
+    `docs/Features/Roadmap/index.md`.
+  - Implementation notes: P1 added `CondensationStiffnessCase`,
+    `CondensationStiffnessClassification`, named `nanometer`,
+    `accumulation_mode`, and `droplet_like` baseline regimes, plus helper checks
+    for metadata validation, finite/non-negative results, fractional mass
+    change, zero-mass stability, threshold-boundary semantics, particle-only
+    caveat handling, and pre-launch validation short-circuit behavior.
+  - Tests: Unit and Warp CPU tests for stress-case construction, scalar/direct
+    environment-input coverage, metric calculation, metadata failures, and
+    stable/unstable classification.
 
 - [ ] **E2-F7-P2:** Measure stable explicit timestep for current GPU condensation path
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Run the stress catalog against `condensation_step_gpu` with fixed
-    shapes and preallocated buffers, producing a stability map for the current
-    explicit GPU implementation.
+    shapes and preallocated buffers, producing a measured stability map for the
+    current explicit GPU implementation.
   - Files: `particula/gpu/kernels/condensation.py` only for small helper hooks,
     `particula/gpu/kernels/tests/condensation_test.py`, and
     `docs/Features/Roadmap/condensation-stiffness-study.md` for the resulting

@@ -19,33 +19,39 @@
 ## Proposed Components
 
 1. **Stress-case catalog**
-   - Deterministic fixtures that construct particle, gas, and environment
-     states across high-stiffness and low-stiffness regimes.
-   - Cases should include nanometer high-supersaturation conditions,
-     accumulation-mode aerosol, and droplet-like larger particles.
-   - Each case records expected shape, particle/gas inventory assumptions, and
-     reference tolerances.
+    - Deterministic fixtures that construct particle, gas, and environment
+      states across high-stiffness and low-stiffness regimes.
+    - Cases should include nanometer high-supersaturation conditions,
+      accumulation-mode aerosol, and droplet-like larger particles.
+    - P1 implemented this directly in
+      `particula/gpu/kernels/tests/condensation_test.py` as
+      `CondensationStiffnessCase` definitions with explicit `n_boxes`,
+      `n_particles`, `n_species`, scalar baseline `temperature`/`pressure`, and
+      deterministic particle/gas/environment builders.
 
 2. **Stability metric helpers**
-   - Metrics for non-negative mass, bounded fractional mass change, monotonic
-     convergence toward equilibrium where applicable, CPU/GPU parity, and
-     conservation caveats.
-    - The current GPU path does not update gas concentration, so metrics must
-      clearly distinguish particle-only GPU behavior from full gas-particle
-      mass conservation and identify the gas-coupled production integration gap.
+    - P1 implemented reusable helper checks for metadata validity,
+      non-negative mass, finite values, bounded fractional mass change,
+      zero-mass stability, and explicit stable/unstable classification.
+    - Threshold semantics are executable and inclusive at the exact boundary.
+    - The current GPU path does not update gas concentration, so the
+      classification result marks the particle-only update caveat explicitly
+      rather than implying gas-particle conservation.
 
 3. **Explicit timestep scan**
-   - A fixed list of timestep candidates per stress case.
-   - No adaptive while loop is required for captured execution; scans can live
-     in test/benchmark code outside graph capture.
-   - Results become the stiffness map.
+    - A fixed list of timestep candidates per stress case.
+    - No adaptive while loop is required for captured execution; scans can live
+      in test/benchmark code outside graph capture.
+    - This remains future work; P1 intentionally stops at the shared baseline
+      rather than publishing measured bounds.
 
 4. **Integration candidate evaluation**
-   - Baseline: fixed-count sub-stepping with preallocated buffers.
-   - Candidate: deterministic semi-implicit/asymptotic first-order update that
-     preserves fixed shapes and avoids dynamic control flow.
-   - Prior art: CPU staggered update, used for comparison only unless a fixed
-     deterministic batch schedule is designed.
+    - Baseline: fixed-count sub-stepping with preallocated buffers.
+    - Candidate: deterministic semi-implicit/asymptotic first-order update that
+      preserves fixed shapes and avoids dynamic control flow.
+    - Prior art: CPU staggered update, used for comparison only unless a fixed
+      deterministic batch schedule is designed.
+    - This remains future work; no integrator comparison shipped in P1.
 
 ## Data Flow
 
