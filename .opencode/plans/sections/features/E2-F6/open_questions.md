@@ -64,6 +64,7 @@
 
 ## Remaining Questions
 
-- Whether the final recommendation should keep absolute `fp64` storage or
-  endorse a later migration path remains open pending those broader tradeoff
-  results.
+- None for the shipped P4 publication scope. The final recommendation now keeps
+  absolute per-species `np.float64` / `wp.float64` storage as the accepted
+  production baseline, and any later migration path is explicitly deferred to a
+  new downstream proposal that satisfies the published report constraints.

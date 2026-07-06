@@ -56,7 +56,8 @@ Welcome to the Particula Features documentation! This section provides comprehen
     ---
 
     Current direction for Particula feature development, including active
-    systems, planned improvements, and contribution opportunities.
+    systems, planned improvements, contribution opportunities, and canonical
+    report artifacts such as the Mass Precision Recommendation Report.
 
     [:octicons-arrow-right-24: View roadmap](Roadmap/index.md)
 
@@ -90,3 +91,6 @@ This pattern provides:
 - **Theory**: See [Theory Documentation](../Theory/index.md) for scientific background
 - **Tutorials**: See [Tutorials](../Examples/index.md#tutorials) for step-by-step learning
 - **Roadmap**: See [Feature Roadmap](Roadmap/index.md) for planned feature direction
+- **Mass precision policy**: See the
+  [Mass Precision Recommendation Report](Roadmap/mass-precision-study.md)
+  for the current downstream GPU dtype/schema recommendation baseline

@@ -53,15 +53,26 @@
     behavior, and bounded benchmark result recording; `benchmark_test.py`
     retains the optional `--benchmark` throughput entry point.
 
-- [ ] **E2-F6-P4:** Publish precision recommendation report with validation evidence
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Record the recommended mass representation and precision policy and
-    update development docs for downstream schema/dtype work.
+- [x] **E2-F6-P4:** Publish precision recommendation report with validation evidence
+  - Issue: #1211 | Size: XS | Status: Shipped
+  - Goal: Publish the final recommendation artifact for downstream dtype/schema
+    work without changing production runtime defaults.
   - Files: `docs/Features/Roadmap/mass-precision-study.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, and any short cross-link added
-    to migration docs.
-  - Tests: Documentation link checks plus any lightweight validation command
-    needed to regenerate or verify report evidence.
+    `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Features/Roadmap/index.md`, and
+    `docs/Features/particle-data-migration.md`.
+  - Delivered: Promoted the roadmap study page into the canonical Mass
+    Precision Recommendation Report, published the accepted policy to keep
+    absolute per-species `np.float64` / `wp.float64` particle mass storage,
+    separated measured evidence from rejected/unsupported/deferred paths,
+    recorded downstream constraints for future dtype/schema proposals, and
+    updated the GPU roadmap, roadmap index, and migration guide to cite the
+    report as the canonical reference.
+  - Tests: Publication guidance now names focused reruns of
+    `mass_precision_cases_test.py`, `mass_precision_metrics_test.py`,
+    `benchmark_helpers_test.py`, and `pytest -Werror`
+    `mass_precision_metrics_test.py`, plus direct Markdown-link checks and
+    optional `mkdocs build --strict` / benchmark validation when available.
 
 ## Phase Ordering Notes
 
