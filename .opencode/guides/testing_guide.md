@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-06
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -172,6 +172,13 @@ and shape preservation on the Warp CPU backend. For `EnvironmentData`, cover
 single-box and multi-box cases, the default synchronized path, any supported
 manual `sync=False` path, and malformed-schema failures surfaced by CPU-side
 validation.
+
+When evaluating experimental GPU integrator candidates, keep prototypes
+test-local until they are production-qualified. Prefer deterministic fixed-shape
+helpers, caller-owned scratch or buffer reuse, repeated-run equality checks,
+finite and non-negative mass assertions, and explicit CPU-reference error bounds
+recorded in the test or companion study note. If public runtime behavior is
+unchanged, say so directly in the related documentation.
 
 ## Test Quality
 

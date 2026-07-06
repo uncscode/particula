@@ -36,21 +36,28 @@
   - Tests: Fast Warp CPU recorded-grid tests plus a guarded CUDA parity check
     when available.
 
-- [ ] **E2-F7-P3:** Evaluate fixed-shape sub-stepping and semi-implicit candidates
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F7-P3:** Evaluate fixed-shape sub-stepping and semi-implicit candidates
+  - Issue: #1215 | Size: S | Status: Implemented
   - Goal: Compare graph-capture-compatible options against the explicit map and
-    identify the smallest safe foundation for future implementation while also
-    proving whether the chosen production path can update gas state in the same
-    step.
-  - Files: a narrowly scoped helper in `particula/gpu/kernels/condensation.py`
-    or a test-only prototype under `particula/gpu/kernels/tests/`,
-    `particula/integration_tests/condensation_particle_resolved_test.py` for a
-    bounded gas-coupled regression if production hooks land here, and
-    `docs/Features/Roadmap/condensation-stiffness-study.md` analysis notes.
-  - Tests: Unit tests for deterministic fixed-count sub-step behavior,
-    semi-implicit/asymptotic candidate invariants, no dynamic allocation in
-    captured-step candidates where practical, and gas-coupled particle-plus-gas
-    conservation checks if this phase lands the production hook.
+    identify the smallest safe foundation for future implementation without
+    broadening the current production particle-only contract.
+  - Files delivered: `particula/gpu/kernels/tests/condensation_test.py` and
+    `docs/Features/Roadmap/condensation-stiffness-study.md`.
+  - Implementation notes: P3 stayed test-local and evidence-driven. It added
+    deterministic prototype candidates `fixed_count_substeps_4` and
+    `asymptotic_relaxation`, reusable fixed-shape scratch/buffer coverage,
+    repeated-run determinism assertions, finite/non-negative particle-mass
+    checks, CPU-reference tolerance checks, and explicit-baseline error-bound
+    comparisons. The roadmap study now records graph-capture/autodiff notes and
+    the deferred gas-coupling boundary. No public API change landed in
+    `condensation_step_gpu(...)`, no private production helper was added under
+    `particula/gpu/kernels/condensation.py`, no production gas-state update hook
+    shipped, and
+    `particula/integration_tests/condensation_particle_resolved_test.py`
+    remained unchanged.
+  - Tests: Fast Warp CPU candidate tests for fixed-count and asymptotic
+    determinism, boundedness, reusable fixed-shape scratch coverage,
+    CPU-reference tolerances, and explicit-baseline error bounds.
 
 - [ ] **E2-F7-P4:** Publish integration recommendation and development documentation
   - Issue: TBD | Size: XS | Status: Not Started
@@ -72,4 +79,5 @@
 - P2 should consume the P1 metric catalog and align its environment-shape
   expectations with `E2-F2` before the stability table is treated as reusable.
 - P3 and P4 should wait on `E2-F6` if they compare or recommend anything other
-  than the current `fp64` baseline.
+  than the current `fp64` baseline; P3 now recorded evidence only and left the
+  production recommendation plus any gas-coupled hook to later work.

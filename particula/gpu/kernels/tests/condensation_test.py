@@ -751,9 +751,7 @@ def _relative_mass_error(
 ) -> float:
     """Return the max relative mass error with a finite nonzero denominator."""
     scale = np.maximum(np.abs(reference_masses), 1.0e-30)
-    return float(
-        np.max(np.abs(candidate_masses - reference_masses) / scale)
-    )
+    return float(np.max(np.abs(candidate_masses - reference_masses) / scale))
 
 
 def _run_integration_candidate(
@@ -780,7 +778,9 @@ def _run_integration_candidate(
                 particles,
                 gas,
                 vapor_pressure,
-                surface_tension=np.full(case.n_species, 0.072, dtype=np.float64),
+                surface_tension=np.full(
+                    case.n_species, 0.072, dtype=np.float64
+                ),
                 mass_accommodation=np.full(
                     case.n_species,
                     1.0,
@@ -2856,7 +2856,9 @@ def test_candidate_reuses_mass_transfer_and_fixed_shape_scratch_buffers(
     shape = (case.n_boxes, case.n_particles, case.n_species)
 
     first = _run_integration_candidate(case, candidate, case.time_step, scratch)
-    second = _run_integration_candidate(case, candidate, case.time_step, scratch)
+    second = _run_integration_candidate(
+        case, candidate, case.time_step, scratch
+    )
 
     assert id(first.mass_transfer) == mass_transfer_id
     assert id(second.mass_transfer) == mass_transfer_id

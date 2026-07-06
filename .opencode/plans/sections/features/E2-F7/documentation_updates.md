@@ -14,14 +14,19 @@
   `_RECORDED_TIMESTEP_GRID_BY_CASE`, including stable/unstable labels,
   environment-input mode, caller-owned buffer reuse context, and the explicit
   unchanged-gas particle-only caveat.
+- P3 updated `docs/Features/Roadmap/condensation-stiffness-study.md` with
+  candidate-specific evidence for `fixed_count_substeps_4` and
+  `asymptotic_relaxation`, explicit CPU-reference and baseline-comparison notes,
+  graph-capture/autodiff implications, and the documented decision to defer any
+  production gas-coupling hook and integration regression to later work.
 - Updates to `docs/Features/Roadmap/data-oriented-gpu.md` and
   `docs/Features/Roadmap/warp-autodiff-limitations.md` remain for later phases
   when measured bounds or recommendations exist.
 
 ## Optional Documentation
 
-- Add a follow-up appendix or summary once P3/P4 compare explicit recorded-grid
-  behavior against fixed-count sub-stepping or semi-implicit candidates.
+- Add a follow-up appendix or summary once P4 turns the shipped P3 evidence
+  into a recommendation.
 - Add follow-up implementation notes for future `WarpEnvironmentData` and gas
   concentration update work if those are blocked by upstream features.
 

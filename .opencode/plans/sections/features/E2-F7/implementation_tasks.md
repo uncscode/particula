@@ -36,19 +36,25 @@
 
 ## E2-F7-P3 Tasks
 
-- Prototype fixed-count sub-step evaluation behind a narrowly scoped helper so
-  production API churn stays under one file.
-- Compare fixed sub-step counts against the explicit stiffness map already
-  published in `docs/Features/Roadmap/condensation-stiffness-study.md`.
-- Evaluate a deterministic semi-implicit/asymptotic first-order update using
-  fixed shapes and preallocated scratch buffers only.
-- Compare candidates against CPU reference calculations and document rejected
-  alternatives, including random staggered theta modes, in the study report.
-- Evaluate the work needed for gas-coupled production condensation integration,
-  including gas-depletion conservation checks; split that implementation into a
-  follow-up feature if it cannot remain issue-sized here.
-- Record graph-capture and autodiff compatibility for each candidate with clear
-  pass/fail notes.
+- Implemented in issue #1215:
+  - `particula/gpu/kernels/tests/condensation_test.py` now ships two
+    deterministic test-local prototype candidates:
+    `fixed_count_substeps_4` and `asymptotic_relaxation`.
+  - Candidate coverage stays fixed-shape and reuses caller-owned buffers plus
+    reusable scratch/storage inside the test harness; no production helper file
+    split was needed.
+  - Fast Warp CPU tests now assert repeated-run determinism, finite and
+    non-negative particle masses, reusable fixed-shape scratch/buffer behavior,
+    CPU-reference agreement within documented tolerances, and explicit-baseline
+    error-bound comparisons.
+  - `docs/Features/Roadmap/condensation-stiffness-study.md` now records the P3
+    evidence, including graph-capture/autodiff notes and the explicit deferred
+    gas-coupling boundary.
+  - No public API change landed in `condensation_step_gpu(...)`, no private
+    production helper landed in `particula/gpu/kernels/condensation.py`, no
+    production gas-state update hook shipped, and no integration regression was
+    added to
+    `particula/integration_tests/condensation_particle_resolved_test.py`.
 
 ## E2-F7-P4 Tasks
 

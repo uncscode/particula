@@ -35,10 +35,21 @@
   with single-box cases using scalar environment inputs, `droplet_like` using
   direct Warp `(n_boxes,)` arrays, caller-owned `mass_transfer` buffer reuse,
   and unchanged gas concentration recorded explicitly in tests and docs.
+- P3 resolved the implementation-boundary question for issue #1215: candidate
+  evaluation remained test-local and evidence-only. Two deterministic prototype
+  candidates (`fixed_count_substeps_4`, `asymptotic_relaxation`) shipped with
+  reusable fixed-shape scratch coverage, determinism checks, finite/non-negative
+  particle-mass checks, CPU-reference tolerances, and explicit-baseline error
+  bounds, while the public `condensation_step_gpu(...)` API and production
+  kernel helper surface remained unchanged.
+- P3 also resolved the immediate gas-coupling scope question for this issue:
+  no production gas-state update hook landed, and the integration regression in
+  `particula/integration_tests/condensation_particle_resolved_test.py` was
+  intentionally deferred behind that later production boundary.
 
 ## Still Open for Later Phases
 
-- Whether fixed-count sub-stepping or a semi-implicit/asymptotic update becomes
-  the preferred follow-on integration foundation in P3/P4.
+- Whether the shipped `fixed_count_substeps_4` or `asymptotic_relaxation`
+  evidence becomes the preferred follow-on integration foundation in P4.
 - When gas-coupled production condensation and conservation checks should split
   into a dedicated follow-up if they do not fit inside E2-F7.

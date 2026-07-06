@@ -40,3 +40,20 @@
   optional guarded CUDA contract parity.
 - Recorded the measured-results table added to
   `docs/Features/Roadmap/condensation-stiffness-study.md`.
+
+## 2026-07-06 — P3 implementation reflected
+
+- Updated plan sections to reflect issue #1215 implementation for phase
+  `E2-F7-P3`.
+- Recorded that `particula/gpu/kernels/tests/condensation_test.py` now ships
+  test-local prototype candidates `fixed_count_substeps_4` and
+  `asymptotic_relaxation`, plus repeated-run determinism, finite/non-negative,
+  reusable fixed-shape scratch/buffer, CPU-reference tolerance, and
+  explicit-baseline error-bound coverage.
+- Recorded that
+  `docs/Features/Roadmap/condensation-stiffness-study.md` now includes
+  candidate evidence, graph-capture/autodiff notes, and the explicit deferred
+  gas-coupling boundary.
+- Clarified that no public `condensation_step_gpu(...)` API change, no private
+  production helper in `particula/gpu/kernels/condensation.py`, no production
+  gas-state update hook, and no integration regression landed in this phase.

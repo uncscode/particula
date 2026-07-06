@@ -20,8 +20,10 @@
 - Recorded-grid tests prove caller-owned `mass_transfer` buffer reuse,
   unchanged gas concentration, and scalar-vs-direct-Warp environment-input
   coverage for the current particle-only path.
-- Fixed sub-stepping and at least one semi-implicit/asymptotic candidate remain
-  deferred to P3 unless earlier scope changes are recorded.
+- P3 evaluates fixed sub-stepping and at least one semi-implicit/asymptotic
+  candidate with deterministic, fixed-shape, reusable-buffer evidence while
+  keeping those candidates out of the production API unless later phases choose
+  one.
 - Recommendation identifies required follow-up work for gas concentration
   updates, per-box environment inputs, clamp gradients, or precision changes.
 - All new code has co-located tests and passes fast Warp CPU validation.

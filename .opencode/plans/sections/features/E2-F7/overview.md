@@ -12,17 +12,20 @@ changing the particle-only production contract.
 
 ## Value Proposition
 
-This feature now has both a reusable baseline and recorded P2 evidence in
-place: `condensation_test.py` defines named stress cases (`nanometer`,
-`accumulation_mode`, `droplet_like`),
+This feature now has a reusable baseline, recorded P2 explicit evidence, and a
+shipped P3 candidate-evaluation layer in place: `condensation_test.py` defines
+named stress cases (`nanometer`, `accumulation_mode`, `droplet_like`),
 `CondensationStiffnessCase`/`CondensationStiffnessClassification`, the
-recorded timestep grid, a test-local sweep helper, and assertions for stable
-and unstable classifications per case. The roadmap artifact,
+recorded timestep grid, test-local candidate helpers
+(`fixed_count_substeps_4`, `asymptotic_relaxation`), reusable fixed-shape
+scratch coverage, repeated-run determinism checks, finite/non-negative
+particle-mass assertions, and CPU-reference plus explicit-baseline comparison
+bounds. The roadmap artifact,
 `docs/Features/Roadmap/condensation-stiffness-study.md`, now mirrors the
-shipped measured-results table, caller-owned `mass_transfer` buffer reuse,
-scalar vs direct Warp environment-input coverage, unchanged gas concentration,
-and optional guarded CUDA contract parity. Later phases can build integration
-recommendations from measured behavior instead of baseline assumptions alone.
+shipped measured-results table and P3 evidence, including graph-capture and
+autodiff notes plus the deferred gas-coupling boundary. The public
+`condensation_step_gpu(...)` API and production particle-only path remain
+unchanged while later phases build recommendations from measured evidence.
 
 ## User Stories
 

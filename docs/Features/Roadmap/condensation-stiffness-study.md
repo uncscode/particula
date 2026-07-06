@@ -3,8 +3,9 @@
 This note defines the reusable baseline for future GPU condensation stiffness
 work. It names deterministic study cases, shared metric language, explicit
 pass/fail rules, and the currently recorded timestep grid for the particle-only
-GPU path. It still does not publish adaptive search results, integrator
-recommendations, or gas-coupled conservation claims.
+GPU path. This issue adds candidate-evaluation evidence only. It still does not
+publish adaptive search results, integrator recommendations, or gas-coupled
+conservation claims.
 
 ## Current Runtime Scope
 
@@ -113,17 +114,21 @@ and not a general stable-timestep limit for other cases.
 This phase adds two deterministic prototype candidates in
 `particula/gpu/kernels/tests/condensation_test.py`. They remain test-local
 evidence only; the public `condensation_step_gpu(...)` runtime and package
-export surface are unchanged.
+export surface are unchanged, no production gas-coupled hook shipped, and no
+new private production helper was added.
 
 | Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `fixed_count_substeps_4` | Fixed-count explicit sub-stepping | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grid. | Pass: fixed loop count (`4`) and fixed-shape scratch keep the prototype graph-capture-friendly. | Clamp boundaries are still non-smooth, but there are no data-dependent loop counts. |
-| `asymptotic_relaxation` | Asymptotic first-order bounded relaxation | Pass: one caller-owned `mass_transfer` array plus one fixed-shape `work` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 3.5e-1` at the baseline timestep and `max relative error <= 3.5e-1` across the recorded grid. This looser bound keeps the candidate in prototype/evidence scope only. | Pass: fixed-shape algebra with no adaptive search or variable-length loops. | `exp(...)` relaxation remains differentiable away from the same clamp boundary, so it is a plausible autodiff target but not yet production-qualified. |
+| `fixed_count_substeps_4` | Fixed-count explicit sub-stepping | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grid. These recorded bounds are evidence, not a shipped production tolerance. | Pass: fixed loop count (`4`) and fixed-shape scratch keep the prototype graph-capture-friendly. | Clamp boundaries are still non-smooth, but there are no data-dependent loop counts. |
+| `asymptotic_relaxation` | Asymptotic first-order bounded relaxation | Pass: one caller-owned `mass_transfer` array plus one fixed-shape `work` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 3.5e-1` at the baseline timestep and `max relative error <= 3.5e-1` across the recorded grid. This looser bound is recorded as prototype evidence only and is not suitable for a production recommendation by itself. | Pass: fixed-shape algebra with no adaptive search or variable-length loops. | `exp(...)` relaxation remains differentiable away from the same clamp boundary, so it is a plausible autodiff target but not yet production-qualified. |
 
 ### Phase Boundary Decision
 
 - Gas coupling is still deferred. No production gas-state update hook shipped in
   this issue.
+- `condensation_step_gpu(...)` remains particle-only in production, so the new
+  candidate coverage should be read strictly as deterministic evaluation
+  evidence rather than a runtime capability change.
 - The exact split boundary remains the same: any production gas-coupled path
   must land with same-issue particle-plus-gas conservation regression coverage
   in `particula/integration_tests/condensation_particle_resolved_test.py`.

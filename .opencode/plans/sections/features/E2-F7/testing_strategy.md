@@ -23,14 +23,15 @@ tests in the same phase. There is no standalone testing phase.
 ## Target Test and Evidence Files
 
 - `particula/gpu/kernels/tests/condensation_test.py` for all fast P1-P3
-  executable coverage.
+  executable coverage, including the shipped P3 test-local candidate evidence.
 - `particula/integration_tests/condensation_particle_resolved_test.py` remains
   future coverage if a gas-coupled production hook lands in a later phase.
 - `particula/gpu/kernels/tests/condensation_stiffness_helpers.py` was not
   needed for P1; shared helpers remain in `condensation_test.py`.
 - `docs/Features/Roadmap/condensation-stiffness-study.md` now records the
-  baseline case catalog, metric vocabulary, and the shipped P2 measured-results
-  table synchronized with the recorded timestep grid.
+  baseline case catalog, metric vocabulary, the shipped P2 measured-results
+  table synchronized with the recorded timestep grid, and the shipped P3
+  candidate evidence plus graph-capture/autodiff notes.
 - `docs/Features/Roadmap/warp-autodiff-limitations.md` only for cross-links and
   documented constraints in P4; do not move executable assertions into docs.
 
@@ -55,8 +56,11 @@ Map those assertions to phases: P1 now covers fixture/metric correctness,
 environment-input contract coverage, and negative validation paths. P2 now adds
 recorded-grid stability evidence, exact timestep-order checks, caller-owned
 buffer reuse/overwrite assertions, unchanged-gas assertions, and scalar-vs-Warp
-environment-input mode coverage. P3 covers candidate sub-step or semi-implicit
-invariants plus any gas-coupled production/conservation coverage. P4 remains
+environment-input mode coverage. P3 now adds deterministic
+`fixed_count_substeps_4` and `asymptotic_relaxation` comparisons, reusable
+fixed-shape scratch/buffer assertions, finite/non-negative candidate checks,
+CPU-reference tolerance checks, and explicit-baseline error-bound assertions,
+while leaving gas-coupled production/conservation coverage deferred. P4 remains
 the documentation-only exception that must rerun the same focused fast tests
 before publishing conclusions.
 
