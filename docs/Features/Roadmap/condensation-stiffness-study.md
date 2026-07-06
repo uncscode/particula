@@ -48,9 +48,11 @@ The baseline tests use the following helper concepts:
 - `_particle_mass_is_nonnegative`: all post-step particle masses are `>= 0`.
 - `_particle_values_are_finite`: particle/gas/support arrays remain finite.
 - `_fractional_mass_change_per_bin`: fractional change is computed only for
-  positive initial masses.
+  positive initial masses, so zero-initial-mass bins need a separate stability
+  check.
 - `_zero_mass_entries_remain_stable`: zero-initial-mass bins remain at zero so
-  the zero-mass edge stays deterministic.
+  the zero-mass edge stays deterministic; helper inputs must have matching
+  shapes.
 - `_validate_stiffness_case_metadata`: declared case metadata must match array
   shape and `np.float64` dtype expectations.
 - `_classify_particle_only_condensation_stiffness`: returns a stable/unstable
@@ -61,9 +63,14 @@ The baseline tests use the following helper concepts:
 
 - Fractional-mass-change thresholds are inclusive: exact equality remains
   `stable`.
+- Zero-initial-mass growth remains `unstable` even though fractional change is
+  reported only for positive initial masses.
 - Declared shape mismatches fail validation.
 - Declared dtype mismatches fail validation.
 - Zero-mass entries are treated as stable only when they remain unchanged.
+- Accepted explicit `environment=...` inputs with `(n_boxes,)` Warp arrays match
+  accepted direct `(n_boxes,)` Warp-array inputs and should not mutate
+  caller-owned temperature or pressure arrays.
 
 ## What This Phase Does Not Publish
 

@@ -349,8 +349,12 @@ def _zero_mass_entries_remain_stable(
     final_masses: np.ndarray,
 ) -> bool:
     """Return whether zero-mass entries remain unchanged."""
-    zero_mask = np.asarray(initial_masses) == 0.0
-    return bool(np.all(np.asarray(final_masses)[zero_mask] == 0.0))
+    initial = np.asarray(initial_masses, dtype=np.float64)
+    final = np.asarray(final_masses, dtype=np.float64)
+    if initial.shape != final.shape:
+        raise ValueError("initial and final masses must have matching shape")
+    zero_mask = initial == 0.0
+    return bool(np.all(final[zero_mask] == 0.0))
 
 
 def _classify_particle_only_condensation_stiffness(
@@ -363,21 +367,23 @@ def _classify_particle_only_condensation_stiffness(
     max_fractional_change: float,
 ) -> CondensationStiffnessClassification:
     """Classify particle-only condensation behavior as stable or unstable."""
+    initial = np.asarray(initial_masses, dtype=np.float64)
+    final = np.asarray(final_masses, dtype=np.float64)
     particles = case.build_particle_data()
-    particles.masses = np.asarray(final_masses, dtype=np.float64)
+    particles.masses = final
     _validate_stiffness_case_metadata(case, particles, gas, vapor_pressure)
     fractional_change = _fractional_mass_change_per_bin(
-        initial_masses,
-        final_masses,
+        initial,
+        final,
     )
     zero_mass_change_stable = _zero_mass_entries_remain_stable(
-        initial_masses,
-        final_masses,
+        initial,
+        final,
     )
-    mass_nonnegative = _particle_mass_is_nonnegative(final_masses)
+    mass_nonnegative = _particle_mass_is_nonnegative(final)
     values_finite = _particle_values_are_finite(
-        initial_masses,
-        final_masses,
+        initial,
+        final,
         gas.concentration,
         vapor_pressure,
     )
@@ -867,6 +873,30 @@ def test_fractional_mass_change_zero_mass_returns_documented_result() -> None:
     assert _zero_mass_entries_remain_stable(initial, final)
 
 
+def test_fractional_mass_change_rejects_shape_mismatch() -> None:
+    """Fractional mass change helper rejects mismatched shapes."""
+    initial = np.zeros((1, 1, 1), dtype=np.float64)
+    final = np.zeros((1, 2, 1), dtype=np.float64)
+
+    with pytest.raises(
+        ValueError,
+        match="initial and final masses must have matching shape",
+    ):
+        _fractional_mass_change_per_bin(initial, final)
+
+
+def test_zero_mass_entries_remain_stable_rejects_shape_mismatch() -> None:
+    """Zero-mass stability helper rejects mismatched shapes."""
+    initial = np.zeros((1, 1, 1), dtype=np.float64)
+    final = np.zeros((1, 2, 1), dtype=np.float64)
+
+    with pytest.raises(
+        ValueError,
+        match="initial and final masses must have matching shape",
+    ):
+        _zero_mass_entries_remain_stable(initial, final)
+
+
 def test_condensation_stiffness_metric_helpers_detect_invalid_values() -> None:
     """Metric helpers expose non-negativity and finiteness checks."""
     good = np.array([0.0, 1.0], dtype=np.float64)
@@ -932,6 +962,61 @@ def test_condensation_stiffness_classification_marks_large_change_unstable() -> 
     assert classification.label == "unstable"
     assert classification.max_fractional_mass_change > classification.threshold
     assert classification.particle_only_update
+
+
+def test_condensation_stiffness_classification_marks_zero_mass_growth_unstable() -> (
+    None
+):
+    """Zero-initial-mass growth is unstable even if fractional change is zero."""
+    case = CondensationStiffnessCase(
+        name="zero_mass_growth",
+        n_boxes=1,
+        n_particles=1,
+        n_species=1,
+        time_step=0.1,
+    )
+    initial = np.array([[[0.0]]], dtype=np.float64)
+    final = np.array([[[1.0e-21]]], dtype=np.float64)
+
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial,
+        final,
+        case.build_gas_data(),
+        case.build_vapor_pressure(),
+        max_fractional_change=0.0,
+    )
+
+    assert classification.label == "unstable"
+    assert classification.zero_mass_change_stable is False
+    assert classification.max_fractional_mass_change == 0.0
+
+
+def test_condensation_stiffness_classification_marks_nonfinite_values_unstable() -> (
+    None
+):
+    """Non-finite particle results are unstable regardless of threshold."""
+    case = CondensationStiffnessCase(
+        name="nonfinite_values",
+        n_boxes=1,
+        n_particles=1,
+        n_species=1,
+        time_step=0.1,
+    )
+    initial = np.array([[[1.0e-18]]], dtype=np.float64)
+    final = np.array([[[np.nan]]], dtype=np.float64)
+
+    classification = _classify_particle_only_condensation_stiffness(
+        case,
+        initial,
+        final,
+        case.build_gas_data(),
+        case.build_vapor_pressure(),
+        max_fractional_change=10.0,
+    )
+
+    assert classification.label == "unstable"
+    assert classification.values_finite is False
 
 
 def test_condensation_stiffness_classification_explicitly_marks_particle_only(
@@ -1489,6 +1574,104 @@ def test_condensation_step_gpu_accepts_direct_environment_arrays(
     npt.assert_allclose(
         gpu_result.masses, np.maximum(particles.masses + expected, 0.0)
     )
+
+
+def test_condensation_step_gpu_explicit_environment_matches_direct_arrays(
+    device: str,
+) -> None:
+    """Accepted ``environment=...`` arrays match accepted direct-array inputs."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    temperature_values = np.array([298.15, 301.15], dtype=np.float64)
+    pressure_values = np.array([101325.0, 100800.0], dtype=np.float64)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=2, n_species=1),
+        device=device,
+    )
+    environment.temperature = wp.array(
+        temperature_values,
+        dtype=wp.float64,
+        device=device,
+    )
+    environment.pressure = wp.array(
+        pressure_values,
+        dtype=wp.float64,
+        device=device,
+    )
+
+    _, direct_mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=wp.array(
+            temperature_values,
+            dtype=wp.float64,
+            device=device,
+        ),
+        pressure=wp.array(
+            pressure_values,
+            dtype=wp.float64,
+            device=device,
+        ),
+        time_step=0.1,
+        device=device,
+    )
+    _, environment_mass_transfer = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=None,
+        pressure=None,
+        time_step=0.1,
+        device=device,
+        environment=environment,
+    )
+
+    npt.assert_allclose(
+        environment_mass_transfer.numpy(),
+        direct_mass_transfer.numpy(),
+        rtol=1.0e-10,
+    )
+
+
+def test_condensation_step_gpu_success_does_not_mutate_environment_inputs(
+    device: str,
+) -> None:
+    """Successful ``environment=...`` execution preserves caller-owned arrays."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=1)
+    gas = _make_gas_data(n_boxes=2, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
+    temperature_values = np.array([298.15, 301.15], dtype=np.float64)
+    pressure_values = np.array([101325.0, 100800.0], dtype=np.float64)
+    environment = to_warp_environment_data(
+        _make_environment_data(n_boxes=2, n_species=1),
+        device=device,
+    )
+    environment.temperature = wp.array(
+        temperature_values,
+        dtype=wp.float64,
+        device=device,
+    )
+    environment.pressure = wp.array(
+        pressure_values,
+        dtype=wp.float64,
+        device=device,
+    )
+
+    _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=None,
+        pressure=None,
+        time_step=0.1,
+        device=device,
+        environment=environment,
+    )
+
+    npt.assert_allclose(environment.temperature.numpy(), temperature_values)
+    npt.assert_allclose(environment.pressure.numpy(), pressure_values)
 
 
 @pytest.mark.parametrize(
