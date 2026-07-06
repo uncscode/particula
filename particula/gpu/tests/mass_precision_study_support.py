@@ -163,10 +163,9 @@ def _project_candidate(
             where=total_mass[..., np.newaxis] > 0.0,
             out=np.zeros_like(case.masses),
         ).astype(np.float32)
-        reconstructed_masses = (
-            projected_total_mass.astype(np.float64)[..., np.newaxis]
-            * projected_mass_fractions.astype(np.float64)
-        )
+        reconstructed_masses = projected_total_mass.astype(np.float64)[
+            ..., np.newaxis
+        ] * projected_mass_fractions.astype(np.float64)
         return {
             "candidate_id": candidate_id,
             "projected": {

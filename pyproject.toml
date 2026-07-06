@@ -39,7 +39,7 @@ dev = [
     "build", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
-    "griffe", "openai", "GitPython", "ruff", "mypy",
+    "griffe", "openai", "GitPython", "ruff==0.14.1", "mypy==1.19.0",
 ]
 extra = [
     "ipykernel", "nbclient", "nbconvert", "nbformat",
