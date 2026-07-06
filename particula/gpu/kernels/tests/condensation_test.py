@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import inspect
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal, overload
 
 import numpy as np
 import numpy.testing as npt
@@ -29,6 +29,7 @@ from particula.gas.properties.pressure_function import (  # noqa: E402
     get_partial_pressure,
 )
 from particula.gpu.conversion import (  # noqa: E402
+    from_warp_gas_data,
     from_warp_particle_data,
     to_warp_environment_data,
     to_warp_gas_data,
@@ -310,11 +311,7 @@ _RECORDED_TIMESTEP_GRID_BY_CASE: dict[str, tuple[float, ...]] = {
 }
 
 
-_RECORDED_STIFFNESS_THRESHOLD_BY_CASE: dict[str, tuple[float, ...]] = {
-    "nanometer": (1.0, 0.5, 0.5),
-    "accumulation_mode": (1.0, 0.5, 0.5),
-    "droplet_like": (1.0, 0.5, 0.5),
-}
+_RECORDED_STIFFNESS_THRESHOLD = 1.0
 
 
 @dataclass(frozen=True)
@@ -328,7 +325,7 @@ class CondensationStiffnessTrialRecord:
         timestep_index: Recorded-grid position for the trial.
         environment_input_mode: Whether scalar or Warp-array inputs were used.
         classification: Particle-only stability classification for the result.
-        gas_unchanged: Whether CPU-side gas concentration stayed unchanged.
+        gas_unchanged: Whether executed Warp gas concentration stayed unchanged.
         reuses_caller_mass_transfer_buffer: Whether the caller buffer was reused.
         mass_transfer_has_nonzero_values: Whether the buffer was populated.
         mass_transfer_changed_from_previous_trial: Whether reuse overwrote values.
@@ -594,6 +591,7 @@ def _cpu_mass_transfer(
     return mass_transfer
 
 
+@overload
 def _run_gpu_step(
     particles: ParticleData,
     gas: GasData,
@@ -607,8 +605,64 @@ def _run_gpu_step(
     diffusion_coefficient_vapor: np.ndarray | None = None,
     mass_transfer: Any | None = None,
     environment: Any | None = None,
+    return_gas_state: Literal[False] = False,
 ) -> tuple[ParticleData, Any]:
-    """Run GPU condensation step and return CPU particle data."""
+    ...
+
+@overload
+def _run_gpu_step(
+    particles: ParticleData,
+    gas: GasData,
+    vapor_pressure: np.ndarray,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float,
+    device: str,
+    surface_tension: np.ndarray | None = None,
+    mass_accommodation: np.ndarray | None = None,
+    diffusion_coefficient_vapor: np.ndarray | None = None,
+    mass_transfer: Any | None = None,
+    environment: Any | None = None,
+    return_gas_state: Literal[True] = True,
+) -> tuple[ParticleData, Any, GasData]:
+    ...
+
+def _run_gpu_step(
+    particles: ParticleData,
+    gas: GasData,
+    vapor_pressure: np.ndarray,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float,
+    device: str,
+    surface_tension: np.ndarray | None = None,
+    mass_accommodation: np.ndarray | None = None,
+    diffusion_coefficient_vapor: np.ndarray | None = None,
+    mass_transfer: Any | None = None,
+    environment: Any | None = None,
+    return_gas_state: bool = False,
+) -> tuple[ParticleData, Any] | tuple[ParticleData, Any, GasData]:
+    """Run GPU condensation step and return CPU particle data.
+
+    Args:
+        particles: CPU particle inputs.
+        gas: CPU gas inputs.
+        vapor_pressure: CPU vapor-pressure inputs.
+        temperature: Scalar or Warp temperature inputs.
+        pressure: Scalar or Warp pressure inputs.
+        time_step: Timestep passed to the Warp kernel.
+        device: Warp device name.
+        surface_tension: Optional per-species surface tension array.
+        mass_accommodation: Optional per-species accommodation array.
+        diffusion_coefficient_vapor: Optional per-species diffusion array.
+        mass_transfer: Optional caller-owned Warp mass-transfer buffer.
+        environment: Optional explicit Warp environment container.
+        return_gas_state: If True, also round-trip the executed Warp gas state.
+
+    Returns:
+        CPU particle data plus the Warp mass-transfer buffer. When
+        ``return_gas_state`` is True, also returns the executed CPU gas state.
+    """
     gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_gas = to_warp_gas_data(
         gas,
@@ -627,10 +681,11 @@ def _run_gpu_step(
         mass_transfer=mass_transfer,
         environment=environment,
     )
-    return (
-        from_warp_particle_data(gpu_particles, sync=True),
-        mass_transfer_buffer,
-    )
+    cpu_particles = from_warp_particle_data(gpu_particles, sync=True)
+    if not return_gas_state:
+        return cpu_particles, mass_transfer_buffer
+    cpu_gas = from_warp_gas_data(gpu_gas, name=gas.name, sync=False)
+    return cpu_particles, mass_transfer_buffer, cpu_gas
 
 
 def _record_condensation_stiffness_trials(
@@ -652,7 +707,6 @@ def _record_condensation_stiffness_trials(
         Ordered recorded-grid trial records for the requested case.
     """
     recorded_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
-    stability_thresholds = _RECORDED_STIFFNESS_THRESHOLD_BY_CASE[case.name]
     mass_transfer = wp.zeros(
         (case.n_boxes, case.n_particles, case.n_species),
         dtype=wp.float64,
@@ -684,7 +738,7 @@ def _record_condensation_stiffness_trials(
         initial_masses = particles.masses.copy()
         initial_gas_concentration = gas.concentration.copy()
 
-        gpu_result, returned_mass_transfer = _run_gpu_step(
+        gpu_result, returned_mass_transfer, executed_gas = _run_gpu_step(
             particles,
             gas,
             vapor_pressure,
@@ -693,6 +747,7 @@ def _record_condensation_stiffness_trials(
             time_step=time_step,
             device=device,
             mass_transfer=mass_transfer,
+            return_gas_state=True,
         )
         mass_transfer_values = returned_mass_transfer.numpy().copy()
         classification = _classify_particle_only_condensation_stiffness(
@@ -701,7 +756,7 @@ def _record_condensation_stiffness_trials(
             gpu_result.masses,
             gas,
             vapor_pressure,
-            max_fractional_change=stability_thresholds[timestep_index],
+            max_fractional_change=_RECORDED_STIFFNESS_THRESHOLD,
         )
         records.append(
             CondensationStiffnessTrialRecord(
@@ -712,7 +767,10 @@ def _record_condensation_stiffness_trials(
                 environment_input_mode=environment_input_mode,
                 classification=classification,
                 gas_unchanged=bool(
-                    np.array_equal(gas.concentration, initial_gas_concentration)
+                    np.array_equal(
+                        executed_gas.concentration,
+                        initial_gas_concentration,
+                    )
                 ),
                 reuses_caller_mass_transfer_buffer=(
                     returned_mass_transfer is mass_transfer
@@ -1238,6 +1296,65 @@ def test_condensation_stiffness_classification_explicitly_marks_particle_only(
 
     assert classification.particle_only_update is True
     npt.assert_allclose(gas.concentration, initial_gas)
+
+
+def test_run_gpu_step_can_round_trip_executed_gas_state(device: str) -> None:
+    """Helper can observe the executed Warp gas state directly."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
+
+    gpu_result, mass_transfer, executed_gas = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        device=device,
+        return_gas_state=True,
+    )
+
+    assert mass_transfer.shape == (1, 1, 1)
+    assert gpu_result.masses.shape == particles.masses.shape
+    npt.assert_allclose(executed_gas.concentration, gas.concentration)
+    assert executed_gas is not gas
+
+
+def test_recorded_condensation_trials_detect_executed_gas_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Recorded trials fail the gas-unchanged flag on executed-gas mutation."""
+    if device != "cpu":
+        pytest.skip("Recorded stiffness sweeps run on Warp CPU")
+
+    original_run_gpu_step = _run_gpu_step
+    case = next(
+        candidate
+        for candidate in _make_condensation_stiffness_cases()
+        if candidate.name == "nanometer"
+    )
+
+    def _mutating_run_gpu_step(*args: Any, **kwargs: Any) -> tuple[Any, ...]:
+        particle_result, mass_transfer, executed_gas = original_run_gpu_step(
+            *args,
+            **kwargs,
+        )
+        mutated_gas = GasData(
+            name=list(executed_gas.name),
+            molar_mass=executed_gas.molar_mass.copy(),
+            concentration=executed_gas.concentration.copy(),
+            partitioning=executed_gas.partitioning.copy(),
+        )
+        mutated_gas.concentration[0, 0] += 1.0
+        return particle_result, mass_transfer, mutated_gas
+
+    monkeypatch.setitem(globals(), "_run_gpu_step", _mutating_run_gpu_step)
+
+    records = _record_condensation_stiffness_trials(case, device=device)
+
+    assert not any(record.gas_unchanged for record in records)
 
 
 @pytest.mark.parametrize(
@@ -2401,21 +2518,21 @@ def test_condensation_multi_species_parity(device: str) -> None:
 
 
 @pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
-def test_condensation_stiffness_recorded_grid_contains_stable_and_unstable_trials(
+def test_condensation_stiffness_recorded_grid_uses_one_evidence_rule(
     case: CondensationStiffnessCase,
     device: str,
 ) -> None:
-    """Recorded timestep sweeps include stable and unstable results per case."""
+    """Recorded sweeps apply one shared evidence-backed stability rule."""
     if device != "cpu":
         pytest.skip("Recorded stiffness sweeps run on Warp CPU")
 
     records = _record_condensation_stiffness_trials(case, device=device)
-    labels = {record.classification.label for record in records}
 
-    assert labels == {"stable", "unstable"}, [
-        record.classification.max_fractional_mass_change for record in records
-    ]
+    assert {record.classification.threshold for record in records} == {
+        _RECORDED_STIFFNESS_THRESHOLD
+    }
     for record in records:
+        assert record.classification.label == "stable"
         assert record.time_step == record.configured_time_step
         assert record.classification.mass_nonnegative
         assert record.classification.values_finite
@@ -2463,6 +2580,24 @@ def test_condensation_stiffness_recorded_grid_matches_configured_timesteps(
         assert {
             record.environment_input_mode for record in records
         } == {"direct_warp_arrays"}
+
+
+@pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
+def test_condensation_stiffness_recorded_grid_reports_measured_change(
+    case: CondensationStiffnessCase,
+    device: str,
+) -> None:
+    """Recorded sweeps report the measured fractional change consistently."""
+    if device != "cpu":
+        pytest.skip("Recorded stiffness sweeps run on Warp CPU")
+
+    records = _record_condensation_stiffness_trials(case, device=device)
+
+    assert all(
+        record.classification.max_fractional_mass_change
+        == pytest.approx(_RECORDED_STIFFNESS_THRESHOLD)
+        for record in records
+    )
 
 
 def test_condensation_stiffness_recorded_grid_cuda_contract_parity(

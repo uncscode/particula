@@ -89,23 +89,24 @@ case, the tests:
 
 | Case | Environment input mode | Timestep | Threshold | Classification | Notes |
 | --- | --- | ---: | ---: | --- | --- |
-| `nanometer` | scalar `temperature` / `pressure` | `0.00005` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; gas unchanged. |
-| `nanometer` | scalar `temperature` / `pressure` | `0.05` | `0.5` | `unstable` | Same fixed-shape particle-only path; gas unchanged. |
-| `nanometer` | scalar `temperature` / `pressure` | `50.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
-| `accumulation_mode` | scalar `temperature` / `pressure` | `0.004` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; gas unchanged. |
-| `accumulation_mode` | scalar `temperature` / `pressure` | `0.4` | `0.5` | `unstable` | Same fixed-shape particle-only path; gas unchanged. |
-| `accumulation_mode` | scalar `temperature` / `pressure` | `40.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
-| `droplet_like` | direct Warp `(n_boxes,)` arrays | `0.04` | `1.0` | `stable` | Multi-box direct-array environment inputs stay supported; gas unchanged. |
-| `droplet_like` | direct Warp `(n_boxes,)` arrays | `4.0` | `0.5` | `unstable` | Same fixed-shape particle-only path; gas unchanged. |
-| `droplet_like` | direct Warp `(n_boxes,)` arrays | `400.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
+| `nanometer` | scalar `temperature` / `pressure` | `0.00005` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; executed Warp gas state unchanged. |
+| `nanometer` | scalar `temperature` / `pressure` | `0.05` | `1.0` | `stable` | Same fixed-shape particle-only path; executed Warp gas state unchanged. |
+| `nanometer` | scalar `temperature` / `pressure` | `50.0` | `1.0` | `stable` | Same caller-owned buffer contract; executed Warp gas state unchanged. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `0.004` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; executed Warp gas state unchanged. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `0.4` | `1.0` | `stable` | Same fixed-shape particle-only path; executed Warp gas state unchanged. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `40.0` | `1.0` | `stable` | Same caller-owned buffer contract; executed Warp gas state unchanged. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `0.04` | `1.0` | `stable` | Multi-box direct-array environment inputs stay supported; executed Warp gas state unchanged. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `4.0` | `1.0` | `stable` | Same fixed-shape particle-only path; executed Warp gas state unchanged. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `400.0` | `1.0` | `stable` | Same caller-owned buffer contract; executed Warp gas state unchanged. |
 
 Across the current recorded grid, the executable tests observe the same
 particle-only maximum fractional-mass-change magnitude (`1.0`) for every row.
-Classification is therefore driven by the existing inclusive threshold rule:
-rows recorded at threshold `1.0` remain `stable`, while rows recorded at
-threshold `0.5` are `unstable`. This is recorded-grid evidence for the current
-fixed-shape particle-only path, not a gas-coupled conservation result and not a
-general stable-timestep limit for other cases.
+The baseline therefore applies one inclusive threshold (`1.0`) across the full
+grid and records every row as `stable` under that shared rule. Separate unit
+tests still cover the `unstable` branch for larger fractional changes,
+zero-mass growth, and non-finite values. This is recorded-grid evidence for the
+current fixed-shape particle-only path, not a gas-coupled conservation result
+and not a general stable-timestep limit for other cases.
 
 ## What This Phase Does Not Publish
 
