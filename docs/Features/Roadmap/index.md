@@ -65,7 +65,8 @@ as design notes, example outputs, prototype workflows, and milestone-specific
 pages.
 
 - [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md)
-- [Mass Precision Recommendation Report](mass-precision-study.md)
+- [Mass Precision Recommendation Report](mass-precision-study.md) — canonical
+  reference for downstream dtype/schema decisions
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
 - [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 - [Canonical shape conventions for container workflows](data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
