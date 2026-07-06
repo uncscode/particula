@@ -45,11 +45,11 @@
     {
       "id": "E2-F7-P2",
       "title": "Measure stable explicit timestep for current GPU condensation path",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-06",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
