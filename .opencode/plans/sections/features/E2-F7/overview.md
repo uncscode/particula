@@ -2,24 +2,27 @@
 
 ## Problem Statement
 
-Issue #1213 implements the first foundational phase of feature E2-F7. The
+Issues #1213 and #1214 now cover the first two phases of feature E2-F7. The
 current Warp condensation path remains an explicit fixed-step particle-mass
 update with non-negative clamping, while aerosol condensation still spans
-nanometer-scale stiff behavior through droplet-like regimes. This phase does
-not measure stable timestep bounds yet; it establishes the deterministic case
-catalog, reusable metric helpers, and shared vocabulary needed so later phases
-can measure stiffness without redefining assumptions.
+nanometer-scale stiff behavior through droplet-like regimes. P1 established
+the deterministic case catalog, reusable metric helpers, and shared vocabulary;
+P2 measured the recorded explicit timestep grid for those same cases without
+changing the particle-only production contract.
 
 ## Value Proposition
 
-This feature now has its P1 baseline in place: `condensation_test.py` defines
-named stress cases (`nanometer`, `accumulation_mode`, `droplet_like`),
-`CondensationStiffnessCase`/`CondensationStiffnessClassification`, and helper
-checks for metadata validity, finite values, non-negativity, fractional mass
-change, zero-mass stability, and stable/unstable classification. A new roadmap
-artifact, `docs/Features/Roadmap/condensation-stiffness-study.md`, mirrors the
-same baseline assumptions. Later phases can now add measured bounds and
-integration recommendations against a fixed contract.
+This feature now has both a reusable baseline and recorded P2 evidence in
+place: `condensation_test.py` defines named stress cases (`nanometer`,
+`accumulation_mode`, `droplet_like`),
+`CondensationStiffnessCase`/`CondensationStiffnessClassification`, the
+recorded timestep grid, a test-local sweep helper, and assertions for stable
+and unstable classifications per case. The roadmap artifact,
+`docs/Features/Roadmap/condensation-stiffness-study.md`, now mirrors the
+shipped measured-results table, caller-owned `mass_transfer` buffer reuse,
+scalar vs direct Warp environment-input coverage, unchanged gas concentration,
+and optional guarded CUDA contract parity. Later phases can build integration
+recommendations from measured behavior instead of baseline assumptions alone.
 
 ## User Stories
 

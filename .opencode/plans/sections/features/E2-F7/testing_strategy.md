@@ -29,8 +29,8 @@ tests in the same phase. There is no standalone testing phase.
 - `particula/gpu/kernels/tests/condensation_stiffness_helpers.py` was not
   needed for P1; shared helpers remain in `condensation_test.py`.
 - `docs/Features/Roadmap/condensation-stiffness-study.md` now records the
-  baseline case catalog and metric vocabulary; timestep tables remain future
-  work.
+  baseline case catalog, metric vocabulary, and the shipped P2 measured-results
+  table synchronized with the recorded timestep grid.
 - `docs/Features/Roadmap/warp-autodiff-limitations.md` only for cross-links and
   documented constraints in P4; do not move executable assertions into docs.
 
@@ -52,11 +52,13 @@ tests in the same phase. There is no standalone testing phase.
   versus future gas-particle conservation work.
 
 Map those assertions to phases: P1 now covers fixture/metric correctness,
-environment-input contract coverage, and negative validation paths. P2 covers
-measured explicit-step stability bounds. P3 covers candidate sub-step or
-semi-implicit invariants plus any gas-coupled production/conservation coverage.
-P4 remains the documentation-only exception that must rerun the same focused
-fast tests before publishing conclusions.
+environment-input contract coverage, and negative validation paths. P2 now adds
+recorded-grid stability evidence, exact timestep-order checks, caller-owned
+buffer reuse/overwrite assertions, unchanged-gas assertions, and scalar-vs-Warp
+environment-input mode coverage. P3 covers candidate sub-step or semi-implicit
+invariants plus any gas-coupled production/conservation coverage. P4 remains
+the documentation-only exception that must rerun the same focused fast tests
+before publishing conclusions.
 
 ## Slow/Benchmark Coverage
 

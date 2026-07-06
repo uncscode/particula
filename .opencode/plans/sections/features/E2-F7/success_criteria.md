@@ -15,7 +15,11 @@
   moderate accumulation-mode, and droplet-like regimes.
 - P1 baseline helpers and docs record the current GPU path's particle-only
   limitation explicitly.
-- Measured explicit timestep stability results are deferred to P2.
+- P2 records a fixed timestep grid per named case and proves at least one
+  stable and one unstable recorded trial for each case.
+- Recorded-grid tests prove caller-owned `mass_transfer` buffer reuse,
+  unchanged gas concentration, and scalar-vs-direct-Warp environment-input
+  coverage for the current particle-only path.
 - Fixed sub-stepping and at least one semi-implicit/asymptotic candidate remain
   deferred to P3 unless earlier scope changes are recorded.
 - Recommendation identifies required follow-up work for gas concentration

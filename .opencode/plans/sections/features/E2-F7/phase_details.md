@@ -17,17 +17,24 @@
     environment-input coverage, metric calculation, metadata failures, and
     stable/unstable classification.
 
-- [ ] **E2-F7-P2:** Measure stable explicit timestep for current GPU condensation path
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E2-F7-P2:** Measure stable explicit timestep for current GPU condensation path
+  - Issue: #1214 | Size: S | Status: Implemented
   - Goal: Run the stress catalog against `condensation_step_gpu` with fixed
     shapes and preallocated buffers, producing a measured stability map for the
     current explicit GPU implementation.
-  - Files: `particula/gpu/kernels/condensation.py` only for small helper hooks,
-    `particula/gpu/kernels/tests/condensation_test.py`, and
-    `docs/Features/Roadmap/condensation-stiffness-study.md` for the resulting
-    timestep table.
-  - Tests: Fast Warp CPU tests for explicit timestep bounds and optional CUDA
-    benchmark coverage when available.
+  - Files delivered: `particula/gpu/kernels/tests/condensation_test.py` and
+    `docs/Features/Roadmap/condensation-stiffness-study.md`.
+  - Implementation notes: P2 added `_RECORDED_TIMESTEP_GRID_BY_CASE`,
+    `_RECORDED_STIFFNESS_THRESHOLD_BY_CASE`, and
+    `CondensationStiffnessTrialRecord`, then used a test-local sweep helper to
+    rebuild fresh deterministic inputs per trial while reusing one
+    caller-owned `mass_transfer` buffer per case/device. The shipped tests
+    assert exact timestep order, at least one stable and one unstable result per
+    case, unchanged gas concentration for the particle-only path, scalar inputs
+    for single-box cases, direct Warp `(n_boxes,)` arrays for `droplet_like`,
+    and optional guarded CUDA contract parity.
+  - Tests: Fast Warp CPU recorded-grid tests plus a guarded CUDA parity check
+    when available.
 
 - [ ] **E2-F7-P3:** Evaluate fixed-shape sub-stepping and semi-implicit candidates
   - Issue: TBD | Size: S | Status: Not Started

@@ -9,15 +9,19 @@
   - accepted scalar and direct `(n_boxes,)` environment-input assumptions, and
   - explicit particle-only runtime caveat language.
 - P1 updated `docs/Features/Roadmap/index.md` to link to the new baseline note.
+- P2 updated `docs/Features/Roadmap/condensation-stiffness-study.md` with a
+  measured-results section and markdown table that mirrors
+  `_RECORDED_TIMESTEP_GRID_BY_CASE`, including stable/unstable labels,
+  environment-input mode, caller-owned buffer reuse context, and the explicit
+  unchanged-gas particle-only caveat.
 - Updates to `docs/Features/Roadmap/data-oriented-gpu.md` and
   `docs/Features/Roadmap/warp-autodiff-limitations.md` remain for later phases
   when measured bounds or recommendations exist.
 
 ## Optional Documentation
 
-- Add a short table or appendix linking stress cases to particle size,
-  environment, gas concentration, and observed stable timestep once P2 has
-  measured bounds.
+- Add a follow-up appendix or summary once P3/P4 compare explicit recorded-grid
+  behavior against fixed-count sub-stepping or semi-implicit candidates.
 - Add follow-up implementation notes for future `WarpEnvironmentData` and gas
   concentration update work if those are blocked by upstream features.
 
@@ -27,5 +31,5 @@
   recommendations.
 - Any rejected option must include a concise reason, especially for random
   staggered modes and dynamically adaptive loops.
-- Cross-references to E2-F2, E2-F6, and issue #1213 should be present where
-  relevant.
+- Cross-references to E2-F2, E2-F6, and issues #1213/#1214 should be present
+  where relevant.

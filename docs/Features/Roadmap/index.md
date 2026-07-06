@@ -66,8 +66,8 @@ pages.
 
 - [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md)
 - [Condensation stiffness study baseline](condensation-stiffness-study.md)
-  - documents the current particle-only GPU contract, inclusive threshold
-    semantics, and accepted `(n_boxes,)` environment inputs
+  - documents the recorded timestep grid, particle-only GPU contract,
+    inclusive threshold semantics, and accepted `(n_boxes,)` environment inputs
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
 - [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 - [Canonical shape conventions for container workflows](data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)

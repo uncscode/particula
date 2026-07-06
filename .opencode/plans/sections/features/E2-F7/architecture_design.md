@@ -42,8 +42,14 @@
     - A fixed list of timestep candidates per stress case.
     - No adaptive while loop is required for captured execution; scans can live
       in test/benchmark code outside graph capture.
-    - This remains future work; P1 intentionally stops at the shared baseline
-      rather than publishing measured bounds.
+    - P2 implemented this as a recorded-grid sweep in
+      `particula/gpu/kernels/tests/condensation_test.py`, with one reused
+      caller-owned `mass_transfer` buffer per case/device and fresh rebuilt
+      particle/gas inputs for every trial.
+    - The shipped evidence remains particle-only: particle masses change,
+      gas concentration stays unchanged, and environment inputs stay split
+      between scalar single-box coverage and direct Warp `(n_boxes,)` arrays for
+      the multi-box case.
 
 4. **Integration candidate evaluation**
     - Baseline: fixed-count sub-stepping with preallocated buffers.

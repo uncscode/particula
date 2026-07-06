@@ -30,11 +30,14 @@
 - Broad stiffness sweeps should live outside default CI as slow pytest coverage
   or a documentation-generation script. Keep at least one fast Warp CPU test that
   ties the recommendation to executable behavior.
+- P2 resolved the first measured explicit-step question for the current recorded
+  grid: each named case now has executable stable and unstable recorded trials,
+  with single-box cases using scalar environment inputs, `droplet_like` using
+  direct Warp `(n_boxes,)` arrays, caller-owned `mass_transfer` buffer reuse,
+  and unchanged gas concentration recorded explicitly in tests and docs.
 
 ## Still Open for Later Phases
 
-- What measured timestep bounds emerge for each named regime once P2 runs the
-  explicit-step sweeps.
 - Whether fixed-count sub-stepping or a semi-implicit/asymptotic update becomes
   the preferred follow-on integration foundation in P3/P4.
 - When gas-coupled production condensation and conservation checks should split

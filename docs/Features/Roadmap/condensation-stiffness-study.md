@@ -1,9 +1,10 @@
 # Condensation Stiffness Study Baseline
 
 This note defines the reusable baseline for future GPU condensation stiffness
-work. It is intentionally foundational: it names deterministic study cases,
-shared metric language, and explicit pass/fail rules without publishing measured
-timestep bounds or integrator recommendations.
+work. It names deterministic study cases, shared metric language, explicit
+pass/fail rules, and the currently recorded timestep grid for the particle-only
+GPU path. It still does not publish adaptive search results, integrator
+recommendations, or gas-coupled conservation claims.
 
 ## Current Runtime Scope
 
@@ -74,10 +75,17 @@ The baseline tests use the following helper concepts:
 
 ## Measured Recorded Timestep Grid
 
-The current recorded sweep keeps one caller-owned preallocated
-`mass_transfer` buffer per case/device, rebuilds particle and gas inputs for
-every trial, and verifies that the particle-only Warp path leaves gas
-concentration unchanged.
+The current recorded sweep mirrors
+`particula/gpu/kernels/tests/condensation_test.py` exactly. For each named
+case, the tests:
+
+- execute the fixed timestep grid from `_RECORDED_TIMESTEP_GRID_BY_CASE`
+- reuse one caller-owned preallocated `mass_transfer` buffer per case/device
+- rebuild particle, gas, and vapor-pressure inputs before every trial
+- verify that the current Warp path updates particle masses only and leaves gas
+  concentration unchanged
+- keep scalar `temperature` / `pressure` inputs for single-box cases and direct
+  Warp `(n_boxes,)` arrays for the multi-box `droplet_like` case
 
 | Case | Environment input mode | Timestep | Threshold | Classification | Notes |
 | --- | --- | ---: | ---: | --- | --- |
@@ -92,18 +100,19 @@ concentration unchanged.
 | `droplet_like` | direct Warp `(n_boxes,)` arrays | `400.0` | `0.5` | `unstable` | Same caller-owned buffer contract; gas unchanged. |
 
 Across the current recorded grid, the executable tests observe the same
-particle-only maximum fractional-mass-change magnitude (`1.0`) for each row,
-so boundary classification is driven by the existing inclusive threshold rule:
-rows recorded at `1.0` remain `stable`, while rows recorded at `0.5` are
-classified `unstable`. This note therefore documents the measured current
-particle-only envelope without claiming gas-coupled conservation behavior.
+particle-only maximum fractional-mass-change magnitude (`1.0`) for every row.
+Classification is therefore driven by the existing inclusive threshold rule:
+rows recorded at threshold `1.0` remain `stable`, while rows recorded at
+threshold `0.5` are `unstable`. This is recorded-grid evidence for the current
+fixed-shape particle-only path, not a gas-coupled conservation result and not a
+general stable-timestep limit for other cases.
 
 ## What This Phase Does Not Publish
 
 This baseline does **not** publish:
 
-- measured stable timestep limits
-- broad timestep sweep tables
+- adaptive or exhaustive timestep search results
+- generalized stable timestep limits
 - candidate integrator comparisons
 - gas-coupled conservation claims that the current production path does not yet
   satisfy

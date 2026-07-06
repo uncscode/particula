@@ -18,15 +18,21 @@
 
 ## E2-F7-P2 Tasks
 
-- Extend `particula/gpu/kernels/tests/condensation_test.py` to run each stress
-  case through `condensation_step_gpu` with an explicitly preallocated
-  `mass_transfer` buffer.
-- Scan a fixed timestep grid that is recorded in code and mirrored into
-  `docs/Features/Roadmap/condensation-stiffness-study.md`.
-- Capture the resulting stable/unstable bounds in a compact markdown table
-  rather than free-form prose.
-- Document in both tests and the report that the current GPU condensation path
-  updates particles only and does not mutate gas concentration.
+- Implemented in issue #1214:
+  - `particula/gpu/kernels/tests/condensation_test.py` now records
+    `_RECORDED_TIMESTEP_GRID_BY_CASE` and
+    `_RECORDED_STIFFNESS_THRESHOLD_BY_CASE` directly in code.
+  - A test-local recorded-grid helper rebuilds fresh deterministic inputs for
+    each trial while reusing one caller-owned `mass_transfer` buffer per
+    case/device.
+  - Fast Warp CPU tests now assert exact timestep count/order, at least one
+    stable and one unstable result per named case, buffer overwrite behavior,
+    unchanged gas concentration, and scalar-vs-direct-Warp environment-input
+    mode coverage.
+  - An optional guarded CUDA parity test checks the same recorded-grid result
+    contract without making CUDA required.
+  - `docs/Features/Roadmap/condensation-stiffness-study.md` now ships a compact
+    measured-results table synchronized with the recorded grid.
 
 ## E2-F7-P3 Tasks
 

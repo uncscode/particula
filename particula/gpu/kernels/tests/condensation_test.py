@@ -143,7 +143,24 @@ def _make_environment_data(
 
 @dataclass(frozen=True)
 class CondensationStiffnessCase:
-    """Deterministic fixed-shape condensation stress case definition."""
+    """Define a deterministic fixed-shape condensation stress case.
+
+    Attributes:
+        name: Recorded case name used by the stiffness sweep helpers.
+        n_boxes: Number of spatial boxes in the deterministic case.
+        n_particles: Number of particles per box.
+        n_species: Number of condensable species.
+        time_step: Baseline timestep used by legacy single-step checks.
+        temperature: Baseline scalar temperature in K.
+        pressure: Baseline scalar pressure in Pa.
+        particle_mass_scale: Multiplier applied to the seed particle masses.
+        gas_concentration_scale: Multiplier applied to the seed gas field.
+        vapor_pressure_scale: Multiplier applied to the seed vapor pressure.
+        box_temperature_step: Per-box temperature increment for multi-box cases.
+        box_pressure_step: Per-box pressure increment for multi-box cases.
+        zero_mass_particles: Particle indices forced to zero initial mass.
+        zero_concentration_particles: Particle indices forced inactive.
+    """
 
     name: str
     n_boxes: int
@@ -223,7 +240,18 @@ class CondensationStiffnessCase:
 
 @dataclass(frozen=True)
 class CondensationStiffnessClassification:
-    """Classification result for particle-only condensation stiffness checks."""
+    """Store the particle-only stability classification for one trial.
+
+    Attributes:
+        label: Stability label derived from the recorded classification rule.
+        mass_nonnegative: Whether all final particle masses stay non-negative.
+        values_finite: Whether particle, gas, and vapor-pressure values are finite.
+        metadata_valid: Whether shape and dtype checks passed for the case.
+        zero_mass_change_stable: Whether zero-mass entries remain unchanged.
+        max_fractional_mass_change: Largest positive-mass fractional change.
+        threshold: Stability threshold applied to the trial.
+        particle_only_update: Whether the contract only updates particle masses.
+    """
 
     label: str
     mass_nonnegative: bool
@@ -291,7 +319,23 @@ _RECORDED_STIFFNESS_THRESHOLD_BY_CASE: dict[str, tuple[float, ...]] = {
 
 @dataclass(frozen=True)
 class CondensationStiffnessTrialRecord:
-    """Recorded timestep trial result for a deterministic stiffness case."""
+    """Capture one recorded-grid timestep trial for a stiffness case.
+
+    Attributes:
+        case_name: Name of the deterministic stiffness case.
+        time_step: Executed timestep for the trial.
+        configured_time_step: Matching timestep from the recorded grid.
+        timestep_index: Recorded-grid position for the trial.
+        environment_input_mode: Whether scalar or Warp-array inputs were used.
+        classification: Particle-only stability classification for the result.
+        gas_unchanged: Whether CPU-side gas concentration stayed unchanged.
+        reuses_caller_mass_transfer_buffer: Whether the caller buffer was reused.
+        mass_transfer_has_nonzero_values: Whether the buffer was populated.
+        mass_transfer_changed_from_previous_trial: Whether reuse overwrote values.
+        final_masses: Final particle masses copied back from Warp.
+        initial_masses: Initial particle masses used for classification.
+        mass_transfer_values: CPU copy of the reused mass-transfer buffer.
+    """
 
     case_name: str
     time_step: float
@@ -593,7 +637,20 @@ def _record_condensation_stiffness_trials(
     case: CondensationStiffnessCase,
     device: str,
 ) -> list[CondensationStiffnessTrialRecord]:
-    """Run the recorded timestep grid for one deterministic stiffness case."""
+    """Run the recorded timestep grid for one deterministic stiffness case.
+
+    The helper rebuilds fresh particle, gas, and vapor-pressure inputs for each
+    recorded timestep, reuses a caller-owned Warp ``mass_transfer`` buffer
+    across the full sweep, and records whether the particle-only path leaves the
+    CPU gas concentration unchanged.
+
+    Args:
+        case: Deterministic stiffness case to execute.
+        device: Warp device name used for the sweep.
+
+    Returns:
+        Ordered recorded-grid trial records for the requested case.
+    """
     recorded_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
     stability_thresholds = _RECORDED_STIFFNESS_THRESHOLD_BY_CASE[case.name]
     mass_transfer = wp.zeros(
