@@ -19,14 +19,16 @@
   `asymptotic_relaxation`, explicit CPU-reference and baseline-comparison notes,
   graph-capture/autodiff implications, and the documented decision to defer any
   production gas-coupling hook and integration regression to later work.
-- Updates to `docs/Features/Roadmap/data-oriented-gpu.md` and
-  `docs/Features/Roadmap/warp-autodiff-limitations.md` remain for later phases
-  when measured bounds or recommendations exist.
+- P4 updates `docs/Features/Roadmap/data-oriented-gpu.md` and
+  `docs/Features/Roadmap/warp-autodiff-limitations.md` to publish the final
+  recommendation, the fixed-loop/graph-capture constraints, and the still
+  deferred gas-coupled production gate without duplicating the full evidence
+  tables.
 
 ## Optional Documentation
 
-- Add a follow-up appendix or summary once P4 turns the shipped P3 evidence
-  into a recommendation.
+- Add a follow-up appendix only if later phases materially expand the current
+  fixed-count recommendation or ship a gas-coupled production hook.
 - Add follow-up implementation notes for future `WarpEnvironmentData` and gas
   concentration update work if those are blocked by upstream features.
 

@@ -66,17 +66,20 @@
     CPU-reference tolerances, and explicit-baseline error bounds.
 
 - [ ] **E2-F7-P4:** Publish integration recommendation and development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+  - Issue: #1216 | Size: XS | Status: In Progress
   - Goal: Record the recommended integration foundation, rejected alternatives,
-    graph-capture/autodiff constraints, and either the shipped gas-coupled
-    production path or the exact follow-up split boundary required to land it.
+    graph-capture/autodiff constraints, and the exact follow-up split boundary
+    required before any gas-coupled production path is claimed.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/Roadmap/warp-autodiff-limitations.md`,
     `docs/Features/Roadmap/condensation-stiffness-study.md`, and plan sections
     as needed.
-  - Tests: Documentation link checks, reruns of the focused condensation tests,
-    and reruns of the bounded gas-coupled regression when P3 or an earlier phase
-    ships the production hook.
+  - Tests: Documentation link checks, reruns of the executable focused
+    condensation selectors in
+    `particula/gpu/kernels/tests/_condensation_test_support.py`, reruns of
+    `particula/dynamics/condensation/tests/staggered_stability_test.py -m slow
+    -v`, and reruns of the bounded gas-coupled regression only when the final
+    wording still depends on that gate.
 
 ## Phase Ordering Notes
 

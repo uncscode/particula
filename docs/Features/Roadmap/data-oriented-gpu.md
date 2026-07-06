@@ -485,9 +485,13 @@ Shared-across-box fields:
   stored particle and gas arrays, plus the rule that no production
   dtype-or-schema migration proceeds before study-backed approval.
 - `E2-F7`: inherit the existing environment and gas ownership boundaries,
-  including `ParticleData.volume` ownership, `WarpGasData.vapor_pressure` as
-  lossy helper state, and the requirement that integration guidance stay
-  deterministic and fixed-shape for graph-capture-friendly execution.
+  including `ParticleData.volume` ownership and `WarpGasData.vapor_pressure` as
+  lossy helper state, then build later condensation integration work on the P4
+  recommendation in
+  [`condensation-stiffness-study.md`](condensation-stiffness-study.md):
+  `fixed_count_substeps_4` as the preferred fixed-shape foundation, bounded by
+  the E2-F2 environment-shape contract, the E2-F6 `float64` evidence envelope,
+  and the still-deferred gas-coupled production gate.
 - `E2-F8`: inherit that container schemas are already multi-box capable through
   leading `n_boxes` dimensions, while current CPU condensation runtime support
   remains single-box and current CPU coagulation paths are still documented as
@@ -578,21 +582,31 @@ not raw speed, is the main precision driver.
 
 The same NPF-to-droplet range that stresses mass precision also stresses time
 integration: nanometer particles equilibrate with vapor in microseconds while
-cloud droplets evolve over seconds. The current GPU condensation path is an
-explicit fixed-step update with non-negative clamping, which will be either
-unstable or wastefully slow when both size extremes share a timestep.
+cloud droplets evolve over seconds. P2/P3 recorded the current particle-only
+explicit timestep grid and compared two deterministic fixed-shape candidates;
+P4 turns that evidence into a development recommendation without expanding the
+shipped runtime boundary.
 
-- Characterize condensation stiffness across the target size range and record
-  the stable explicit step size as a function of particle size.
-- Evaluate integration options: sub-stepping, semi-implicit or asymptotic
-  updates (for example exponential integrators for first-order mass
-  transfer), and per-box or per-size-class adaptive stepping.
-- Any chosen scheme must remain graph-capture friendly (fixed iteration
-  counts, fixed shapes) and differentiable for the optimization path (see
-  [Epic E](#epic-e-differentiability-and-global-optimization)).
-- Water condensation near cloud activation is the hardest case: high vapor
-  concentration, tight supersaturation coupling, and latent-heat temperature
-  feedback. Use it as the stiffness stress test.
+- Detailed evidence lives in
+  [`condensation-stiffness-study.md`](condensation-stiffness-study.md),
+  including the recorded explicit grid, the candidate comparison, and the
+  particle-only gas-update caveat.
+- Later GPU condensation work should build on fixed-count explicit
+  sub-stepping, specifically `fixed_count_substeps_4`, because it has the best
+  documented agreement with the current CPU/explicit reference while preserving
+  deterministic fixed-shape buffer reuse.
+- Keep the implementation graph-capture-friendly and autodiff-compatible:
+  fixed iteration counts, stable allocation layouts, and no adaptive or
+  data-dependent loop bounds on the recommended path.
+- Do not claim gas-coupled GPU production support until the production hook and
+  same-issue conservation regression in
+  `particula/integration_tests/condensation_particle_resolved_test.py` land.
+- Downstream implementers must stay inside the E2-F2 environment-shape
+  contract and the E2-F6 `float64` evidence envelope when applying this
+  recommendation.
+- Water condensation near cloud activation remains the hardest stress case for
+  future follow-up work because of high vapor concentration, tight
+  supersaturation coupling, and latent-heat temperature feedback.
 
 ## Epic B: GPU Physics Coverage and Parity
 

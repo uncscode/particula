@@ -352,7 +352,10 @@ are already gradient-friendly; the stochastic control flow is not.
   `condensation_mass_transfer_kernel` computes a smooth rate and
   `apply_mass_transfer_kernel` applies it with `+=`-style updates plus a clamp
   (`particula/gpu/kernels/condensation.py`). This is the model to follow for a
-  differentiable coagulation rate kernel.
+  differentiable coagulation rate kernel. The P4 condensation stiffness
+  recommendation builds on a fixed-count substepping variant of this pattern,
+  because fixed iteration counts fit Warp autodiff and graph-capture
+  expectations better than adaptive loop structures.
 
 ### Non-differentiable points in coagulation
 
@@ -376,6 +379,10 @@ differentiate correctly as written.
 - Prove the autodiff loop on deterministic condensation first: allocate
   `requires_grad=True` inputs, record a multi-step condensation loop on a tape,
   and validate with `wp.autograd.gradcheck`.
+- For condensation implementation work, prefer the documented
+  `fixed_count_substeps_4` foundation over adaptive or per-case dynamic-loop
+  schemes. The fixed loop count is easier to replay, keeps buffer layouts
+  stable for graph capture, and avoids data-dependent backward-pass structure.
 - For coagulation, build a differentiable deterministic binned coagulation
   kernel (Smoluchowski) as the gradient path, distinct from the stochastic
   particle-resolved forward kernel. Validate that the two agree in the mean
@@ -383,6 +390,9 @@ differentiate correctly as written.
 - Keep optimization-path kernels to static loops, `+=`/`-=` updates, and
   guarded gradients. Avoid `*=`, `/=`, hard index scatter, and data-dependent
   loop bounds on that path.
+- Keep the existing condensation clamp boundary in mind: mass non-negativity is
+  still enforced with a non-smooth clamp, so gradients near that boundary will
+  remain less smooth even on the recommended fixed-count path.
 - Turn on `wp.config.verify_autograd_array_access=True` in tests to catch
   write-after-read overwrites early.
 - Define the state loss functions (size-distribution distance, hygroscopicity

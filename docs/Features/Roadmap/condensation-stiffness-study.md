@@ -1,11 +1,11 @@
-# Condensation Stiffness Study Baseline
+# Condensation Stiffness Study and Recommendation Record
 
-This note defines the reusable baseline for future GPU condensation stiffness
-work. It names deterministic study cases, shared metric language, explicit
-pass/fail rules, and the currently recorded timestep grid for the particle-only
-GPU path. This issue adds candidate-evaluation evidence only. It still does not
-publish adaptive search results, integrator recommendations, or gas-coupled
-conservation claims.
+This note is the canonical decision record for future GPU condensation
+integration work. It separates the current shipped runtime boundary, the
+measured P2/P3 evidence, and the final P4 recommendation derived from that
+evidence. The current production GPU path remains particle-only and `float64`
+bounded; this page does not claim that gas-coupled production condensation has
+shipped.
 
 ## Current Runtime Scope
 
@@ -19,6 +19,10 @@ conservation claims.
   input stays scalar while the other uses a Warp `(n_boxes,)` array.
 - Study cases are deterministic fixed-shape builders that should be recreated
   from clean inputs after failed validation or intentionally unstable runs.
+- Recommendation dependency boundary: the conclusions below assume the shipped
+  E2-F2 environment-shape contract for scalar or direct Warp `(n_boxes,)`
+  temperature and pressure inputs, and they stay inside the E2-F6 `float64`
+  evidence envelope.
 
 ## Shared Case Catalog
 
@@ -77,10 +81,11 @@ The baseline tests use the following helper concepts:
 
 ## Measured Recorded Timestep Grid
 
-The current recorded sweep mirrors
-`particula/gpu/kernels/tests/condensation_stiffness_test.py` plus shared
-helpers in `particula/gpu/kernels/tests/_condensation_test_support.py`
-exactly. For each named case, the tests:
+The current recorded sweep is executed from
+`particula/gpu/kernels/tests/_condensation_test_support.py`. The wrapper file
+`particula/gpu/kernels/tests/condensation_stiffness_test.py` is a placeholder
+in the current tree and should not be treated as the runnable evidence target.
+For each named case, the tests:
 
 - execute the fixed timestep grid from `_RECORDED_TIMESTEP_GRID_BY_CASE`
 - reuse one caller-owned preallocated `mass_transfer` buffer per case/device
@@ -113,13 +118,13 @@ and not a general stable-timestep limit for other cases.
 
 ## Candidate Evaluation Evidence
 
-This phase adds two deterministic prototype candidates in
-`particula/gpu/kernels/tests/condensation_stiffness_test.py`, backed by shared
-test-only helpers in
-`particula/gpu/kernels/tests/_condensation_test_support.py`. They remain
-test-local evidence only; the public `condensation_step_gpu(...)` runtime and
-package export surface are unchanged, no production gas-coupled hook shipped,
-and no new private production helper was added.
+This phase adds two deterministic prototype candidates exercised from
+`particula/gpu/kernels/tests/_condensation_test_support.py`. The
+`condensation_stiffness_test.py` wrapper remains a placeholder, so the support
+module is the executable evidence source for these candidate comparisons. They
+remain test-local evidence only; the public `condensation_step_gpu(...)`
+runtime and package export surface are unchanged, no production gas-coupled
+hook shipped, and no new private production helper was added.
 
 | Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -142,15 +147,72 @@ and no new private production helper was added.
 - Because the candidate evidence was credible in test-local helpers, no private
   production helper was added to `particula/gpu/kernels/condensation.py`.
 
-## What This Phase Does Not Publish
+## Final Recommendation
 
-This baseline does **not** publish:
+### Recommended implementation foundation
+
+Later GPU condensation implementation phases should build on
+`fixed_count_substeps_4` as the preferred integration foundation.
+
+Why this is the recommended path:
+
+- It has the strongest recorded agreement with the current CPU/explicit
+  reference, with documented `rtol <= 5e-2` at the baseline timestep and
+  `max relative error <= 5e-2` across the recorded grid.
+- It preserves deterministic fixed-shape execution with caller-owned buffer
+  reuse and fixed scratch layouts across repeated runs.
+- Its fixed loop count (`4`) is graph-capture-friendly in a way adaptive or
+  data-dependent loop counts are not.
+- It fits Warp autodiff expectations better than dynamic-loop schemes because
+  the repeated work is statically bounded even though clamp boundaries remain
+  non-smooth.
+- Its evidence quality is materially stronger than the asymptotic alternative,
+  so it provides the clearest foundation for later production work.
+
+### Alternatives considered but not selected
+
+- **Current single-step explicit update:** keep as the shipped baseline only.
+  It is still useful as the production reference path, but it is not a strong
+  forward-looking foundation for broader stiffness handling across the recorded
+  particle-size range.
+- **`asymptotic_relaxation`:** retain as evidence-only. It remains interesting
+  for differentiability because the algebra is smooth away from clamp
+  boundaries, but the measured CPU-reference agreement is materially looser
+  (`rtol <= 3.5e-1` / `max relative error <= 3.5e-1`) than the fixed-count
+  candidate.
+- **Adaptive or dynamic-loop schemes:** defer. They conflict with the fixed
+  iteration count and stable allocation layout preferred for Warp graph capture,
+  and they complicate autodiff replay because backward passes do not reliably
+  mirror data-dependent loop structure.
+
+### Gas-coupled follow-up gate
+
+The recommendation remains bounded to particle-only production condensation.
+Any future production gas-coupled GPU path must land with the production hook
+plus same-issue particle-plus-gas conservation regression coverage in
+`particula/integration_tests/condensation_particle_resolved_test.py`.
+Until that gate lands, roadmap and implementation guidance must not claim that
+GPU condensation updates gas concentrations in production.
+
+### Dependency boundaries that still limit the recommendation
+
+- **E2-F2 environment-shape dependency:** the recommendation assumes the shipped
+  contract for scalar inputs and explicit direct Warp `(n_boxes,)` environment
+  arrays. Broader conclusions should not be inferred for different environment
+  ownership or shape models.
+- **E2-F6 precision dependency:** the recommendation is supported only inside
+  the current `float64` / `wp.float64` evidence envelope. It does not approve a
+  lower-precision or mixed-precision production migration.
+
+## What This Record Does Not Publish
+
+This record does **not** publish:
 
 - adaptive or exhaustive timestep search results
 - generalized stable timestep limits
-- final candidate integrator recommendations
 - gas-coupled conservation claims that the current production path does not yet
   satisfy
 
-Later phases can measure explicit Warp behavior against this shared baseline
-without redefining case shapes, metric names, or threshold meaning.
+Later phases can build on this measured baseline and recommendation without
+redefining case shapes, metric names, threshold meaning, or the current
+particle-only production boundary.
