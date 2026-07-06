@@ -9,8 +9,8 @@
 - P2 expanded the roadmap page into a P1+P2 study record with executed
   candidate descriptions, unsupported-candidate notes, and focused
   reproduction commands.
-- Later phases still need to publish the final recommendation that interprets
-  the shipped P1-P3 evidence.
+- P4 has now published the final recommendation report that interprets the
+  shipped P1-P3 evidence and serves as the canonical downstream citation.
 
 ## Shipped P1 Content
 
@@ -55,6 +55,31 @@
 - The documentation now includes a checklist to verify candidate names,
   thresholds, memory examples, and reproduction commands against the landed
   executable test surface.
+
+## Shipped P4 Publication Outcome
+
+- `docs/Features/Roadmap/mass-precision-study.md` now publishes the final
+  recommendation report title and positions the page as the E2-F6 acceptance
+  artifact rather than only a study inventory.
+- The report explicitly recommends keeping absolute per-species `np.float64`
+  particle masses on CPU and `wp.float64` particle masses on GPU/Warp mirrors
+  as the current production policy.
+- The report now separates shipped evidence from policy boundaries, executed
+  but not recommended candidates, unsupported candidates, deferred follow-up
+  investigation, and downstream constraints for any future dtype/schema
+  proposal.
+- Publication-readiness validation guidance is now documented directly in the
+  report, including the focused `mass_precision_cases_test.py`,
+  `mass_precision_metrics_test.py`, `benchmark_helpers_test.py`, and
+  `pytest -Werror ... mass_precision_metrics_test.py` commands plus the opt-in
+  benchmark command.
+- `docs/Features/Roadmap/data-oriented-gpu.md` now names the report as the
+  canonical downstream reference before any production dtype-or-schema
+  migration proceeds.
+- `docs/Features/Roadmap/index.md` now keeps the roadmap artifact link text in
+  sync with the published report title.
+- `docs/Features/particle-data-migration.md` now directs contributors to the
+  mass-precision report before changing particle mass dtype/schema behavior.
 
 ## Notebook/Example Notes
 

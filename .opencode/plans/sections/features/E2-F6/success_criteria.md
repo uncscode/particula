@@ -18,3 +18,6 @@
   mixed-precision path, or investigate a different mass representation.
 - Fast validation tests pass, and slow/GPU evidence is either reproducible or
   skip-safe with documented environment requirements.
+- The canonical report title, roadmap index link, GPU roadmap handoff text, and
+  migration-guide policy cross-link all point to the same published acceptance
+  artifact.

@@ -82,19 +82,27 @@ P4 is a docs/report phase, so its valid exception is documentation validation
 plus rerunning the focused mass-precision tests that back the published tables;
 it should not defer unresolved helper or metric tests into a later PR.
 
+P4 publication guidance is now fixed in
+`docs/Features/Roadmap/mass-precision-study.md`: rerun the fast validation
+surface, keep the benchmark command opt-in only, and check new Markdown links
+directly with `mkdocs build --strict` when the docs toolchain is available.
+
 ## Verification Commands
 
 ```bash
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 pytest particula/gpu/tests/mass_precision_metrics_test.py -q
 pytest particula/gpu/tests/benchmark_helpers_test.py -q
-pytest particula/gpu/tests/mass_precision_cases_test.py \
-  particula/gpu/tests/mass_precision_metrics_test.py \
-  particula/gpu/tests/benchmark_helpers_test.py -q
+pytest -Werror particula/gpu/tests/mass_precision_metrics_test.py -q
+pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
+# if available for documentation smoke-checking
+mkdocs build --strict
 ```
 
 For the currently shipped scope, the bounded study surface now includes three
 fast modules: `mass_precision_cases_test.py` provides the reusable baseline
 fixtures, `mass_precision_metrics_test.py` exercises the shipped P2/P3
 comparison layer, and `benchmark_helpers_test.py` validates the optional
-benchmark surface without requiring a CUDA runtime.
+benchmark surface without requiring a CUDA runtime. P4 added the warning-clean
+`-Werror` rerun as the publication gate for zero-mass/zero-volume paths and
+kept the benchmark plus MkDocs checks explicitly optional/tooling-dependent.

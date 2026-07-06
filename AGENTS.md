@@ -151,9 +151,9 @@ particula/
 - `.opencode/guides/docstring_guide.md` - Google-style docstring format
 - `.opencode/guides/commit_conventions.md` - Commit message format
 - `.opencode/guides/pr_conventions.md` - Pull request conventions
-- `docs/Features/Roadmap/mass-precision-study.md` - Deterministic GPU
-  mass-precision baseline assumptions, candidate fidelity study scope, and
-  focused reproduction commands
+- `docs/Features/Roadmap/mass-precision-study.md` - Final GPU
+  mass-precision recommendation report, unchanged production baseline,
+  candidate study scope, and focused reproduction commands
 - `docs/contribute/Feature_Workflow/index.md` - Contributor workflow overview
 
 ## Common Patterns
