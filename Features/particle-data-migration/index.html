@@ -11553,6 +11553,8 @@
       
         
       
+        
+      
     
     
     
@@ -11625,6 +11627,34 @@
     
   
     Data-Oriented Design and GPU Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Roadmap/mass-precision-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mass Precision Recommendation Report
   
 
     
@@ -14611,13 +14641,13 @@ that page now redirects to this canonical guide.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>Before adding container fields or changing CPU↔GPU conversion behavior, review
 the roadmap's
-<a href="../Roadmap/data-oriented-gpu/#canonical-shape-conventions-for-container-workflows">canonical shape conventions for container workflows</a>
-and its surrounding <a href="../Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative field ownership
-decisions</a>.
-Downstream implementers should then read the
-<a href="../Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map for sibling
-features</a>
-for the exact inherited field, shape, ownership, and CPU↔GPU transfer rules.</p>
+<a href="../Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative field ownership decisions</a>,
+<a href="../Roadmap/data-oriented-gpu/#canonical-shape-conventions-for-container-workflows">canonical shape conventions for container workflows</a>,
+and <a href="../Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map for sibling
+features</a>.
+Treat the <a href="../Roadmap/mass-precision-study/">Mass Precision Recommendation
+Report</a> as the canonical reference before
+changing particle mass dtype/schema behavior.</p>
 <p>The migration moves <strong>data</strong> into dedicated containers and leaves <strong>behavior</strong>
 in strategies and runnables:</p>
 <ul>

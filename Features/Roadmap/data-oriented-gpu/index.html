@@ -14,7 +14,7 @@
         <link rel="prev" href="../">
       
       
-        <link rel="next" href="../warp-autodiff-limitations/">
+        <link rel="next" href="../mass-precision-study/">
       
       
         
@@ -11219,6 +11219,8 @@
       
         
       
+        
+      
     
     
     
@@ -11868,6 +11870,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mass-precision-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mass Precision Recommendation Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -16041,8 +16071,10 @@ new schema semantics.</p>
   <code>GasData.concentration -&gt; (1, n_species)</code> without changing the canonical
   storage ranks for multi-box-ready containers.</li>
 <li><code>E2-F6</code>: inherit the current <code>float64</code> / <code>wp.float64</code> schema baseline for
-  stored particle and gas arrays, plus the rule that no production
-  dtype-or-schema migration proceeds before study-backed approval.</li>
+  stored particle and gas arrays. Treat the
+  <a href="../mass-precision-study/">Mass Precision Recommendation Report</a> as the
+  canonical downstream reference before any production dtype-or-schema
+  migration proceeds.</li>
 <li><code>E2-F7</code>: inherit the existing environment and gas ownership boundaries,
   including <code>ParticleData.volume</code> ownership, <code>WarpGasData.vapor_pressure</code> as
   lossy helper state, and the requirement that integration guidance stay
