@@ -25,17 +25,19 @@
     coverage, replaced coagulation box-0-only regressions with multi-box
     rejection assertions, and retained supported single-box non-regressions.
 
-- [ ] **E2-F8-P3:** Improve unsupported multi-box errors and user documentation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Finish user-facing and development-doc guidance and align error
-    messages with the final tested behavior selected after the P1 baseline and
-    P2 validation changes.
+- [x] **E2-F8-P3:** Improve unsupported multi-box errors and user documentation
+  - Issue: #1220 | Size: S | Status: Completed
+  - Goal: Publish the tested CPU support boundary in user-facing docs without
+    expanding runtime behavior.
   - Files: `docs/Features/particle-data-migration.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, and strategy modules if error
-    wording needs final adjustment.
-  - Tests: Documentation examples or assertions that unsupported multi-box CPU
-    strategy calls produce clear errors; run focused dynamics tests and docs
-    link checks if available.
+    `docs/Features/Roadmap/data-oriented-gpu.md`
+  - Result: The migration guide now acts as the canonical support contract,
+    including a compact CPU support table, a supported `n_boxes == 1` example,
+    caller-managed per-box loop guidance, and a troubleshooting cross-reference.
+    The roadmap wording was narrowed so container compatibility is not read as
+    shipped CPU multi-box execution.
+  - Tests: Docs-only/manual validation; no strategy-module or behavior changes
+    were needed in this phase.
 
 ## Phase Ordering Notes
 
@@ -44,7 +46,7 @@
 - P2 followed P1 and the accepted E2-F2 environment wording so explicit
   unsupported multi-box errors now describe the same CPU-versus-environment
   boundary used elsewhere in the epic.
-- P3 should follow the tested rejection behavior from P2 so docs publish the
+- P3 followed the tested rejection behavior from P2 so docs now publish the
   exact unsupported-path contract rather than an aspirational boundary.
 - E2-F9 should document the support boundary only after P3 lands, which keeps
   user-facing guidance downstream of the executable CPU error contract.

@@ -8,11 +8,15 @@
 2. Representative condensation public multi-box rejection coverage now includes
    both the existing `mass_transfer_rate(...)` path and a public `step()` path
    that flows through `_require_single_box`.
-3. No general documentation update was needed in P2; broader caller guidance and
-   user-facing support-boundary wording remain deferred to the later doc phase.
+3. The deferred doc phase is now complete: the migration guide is the canonical
+   support contract, with explicit single-box guidance and caller-managed
+   per-box loop documentation.
 4. The tested CPU dynamics boundary now matches the intended E2-F2-aligned
    wording: multi-box containers may exist, but these CPU strategy paths are
    still single-box-only unless documented otherwise.
+5. P3 remained docs-only. Roadmap wording was qualified to distinguish
+   container compatibility from current CPU multi-box execution support, and no
+   runtime error-text adjustment was required.
 
 ## Deferred Out-of-Scope Topics
 
