@@ -16,8 +16,9 @@
 - Updated `docs/Features/particle-data-migration.md` to add early cross-links
   back to the canonical foundation guide and to keep migration-specific prose
   separate from the authoritative contract page.
-- Supporting docs discovery updates may also be present in `docs/index.md` from
-  the docs subagent; those are secondary to the feature-doc changes above.
+- `docs/index.md` was reviewed during the final handoff phase and intentionally
+  left unchanged; the feature-doc changes above remained the primary discovery
+  path for this track.
 
 ## Examples
 
@@ -33,8 +34,17 @@
 
 ## Roadmap and Handoff Docs
 
-- The new foundation guide links readers to
-  `docs/Features/Roadmap/data-oriented-gpu.md` for future work and planned
-  expansions.
-- No standalone roadmap-page edits were required for the issue #1223 example and
-  discoverability work.
+- Updated `docs/Features/Roadmap/data-oriented-gpu.md` so the quick links,
+  downstream handoff map, and relevant Epic B/C/D/E sections point readers to
+  the shipped foundation guide and runnable example before deeper roadmap
+  anchors.
+- Updated `docs/Features/Roadmap/warp-autodiff-limitations.md` to link back to
+  the shipped guide/example baseline as the starting point for differentiability
+  follow-on work.
+- Updated `docs/Features/Roadmap/index.md` to surface the shipped guide/example
+  alongside the roadmap anchors they now support.
+- Reviewed `docs/index.md` and general guides for follow-up discoverability
+  changes, but intentionally left them unchanged because the roadmap-facing
+  handoff was sufficient.
+- Validation evidence for this docs-only phase belongs in PR notes rather than a
+  committed repository artifact.

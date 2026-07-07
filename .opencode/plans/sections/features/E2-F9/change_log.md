@@ -40,3 +40,15 @@
 - Updated validation guidance to include
   `particula/gpu/tests/data_containers_example_test.py` and the published
   `python docs/Examples/data_containers_and_gpu_foundations.py` smoke command.
+
+## 2026-07-07: P3 implementation sync
+
+- Updated plan sections to reflect issue #1224 (`E2-F9-P3`) implementation on
+  the branch.
+- Recorded the shipped roadmap-facing handoff wiring in
+  `docs/Features/Roadmap/data-oriented-gpu.md`,
+  `docs/Features/Roadmap/warp-autodiff-limitations.md`, and
+  `docs/Features/Roadmap/index.md`.
+- Noted that `docs/index.md` and general guides were intentionally left
+  unchanged after review and that validation evidence should remain in PR notes
+  rather than a committed artifact.

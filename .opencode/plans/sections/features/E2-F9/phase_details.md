@@ -30,15 +30,21 @@
     `pytest particula/gpu/tests/data_containers_example_test.py -q`.
 
 - [ ] **E2-F9-P3:** Roadmap handoff links, docs index wiring, and validation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Link roadmap dependencies, update development docs/index wiring, and
-    validate that docs/examples are discoverable by users and planner agents.
+  - Issue: #1224 | Size: XS | Status: implementation landed on branch; metadata still pending update
+  - Goal: Link roadmap dependencies, update only the roadmap-facing index wiring
+    that proved necessary, and validate that docs/examples are discoverable by
+    users and planner agents.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
-    `docs/Features/Roadmap/warp-autodiff-limitations.md`, feature/example
-    indexes, and any generated docs validation notes kept with the final docs
-    update PR description rather than a new repo artifact.
-  - Tests: Documentation link check, mkdocs build if available, and examples
-    smoke validation.
+    `docs/Features/Roadmap/warp-autodiff-limitations.md`,
+    `docs/Features/Roadmap/index.md`, and PR-note validation evidence rather
+    than a new repo artifact.
+  - Branch outcome: roadmap quick links and downstream handoff notes now point
+    readers to the shipped foundation guide and runnable example, the autodiff
+    limitations page links back to that baseline, the roadmap index surfaces the
+    same entry points, and `docs/index.md` plus general guides were reviewed but
+    intentionally left unchanged.
+  - Tests: Documentation link inspection and/or mkdocs validation as available,
+    with validation results recorded in PR notes instead of a committed file.
 
 ## Phase Ordering Notes
 

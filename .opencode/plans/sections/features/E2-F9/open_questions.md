@@ -16,3 +16,8 @@
 - Demonstrate guarded transfer code that skips cleanly when Warp is unavailable.
   Optional Warp CPU execution may be shown only behind the same availability
   guard.
+- P3 follow-up review confirmed no additional `docs/index.md` or general-guide
+  edits were needed once the roadmap pages and roadmap index linked to the
+  shipped guide/example baseline.
+- Validation notes for the roadmap handoff phase should stay in PR notes; do not
+  add a separate committed validation artifact.
