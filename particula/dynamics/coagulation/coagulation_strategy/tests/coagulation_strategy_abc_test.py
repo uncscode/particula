@@ -34,6 +34,17 @@ class DummyCoagulationStrategy(coagulation_strategy_abc.CoagulationStrategyABC):
         return np.ones((size, size), dtype=np.float64)
 
 
+def _build_multi_box_particle_data() -> ParticleData:
+    """Create unsupported multi-box particle data for rejection tests."""
+    return ParticleData(
+        masses=np.array([[[1e-18], [2e-18]], [[9e-18], [8e-18]]]),
+        concentration=np.array([[1.0, 2.0], [10.0, 20.0]]),
+        charge=np.array([[0.0, 1.0], [4.0, 5.0]]),
+        density=np.array([1000.0]),
+        volume=np.array([1.0, 9.0]),
+    )
+
+
 def test_resolve_radius_indices_unique_match() -> None:
     """Unique radius lookup should resolve indices deterministically."""
     particle_radius = np.array([1.0, 2.0, 3.0], dtype=np.float64)
@@ -550,6 +561,48 @@ def test_loss_gain_and_net_rate_particle_data_paths(
         net_strategy.net_rate(data, temperature=298.15, pressure=101325.0),
         expected_net,
     )
+
+
+@pytest.mark.parametrize(
+    ("method_name", "args", "kwargs"),
+    [
+        (
+            "loss_rate",
+            (np.ones((2, 2), dtype=np.float64),),
+            {},
+        ),
+        (
+            "gain_rate",
+            (np.ones((2, 2), dtype=np.float64),),
+            {},
+        ),
+        ("net_rate", (), {"temperature": 298.15, "pressure": 101325.0}),
+        (
+            "friction_factor",
+            (),
+            {"temperature": 298.15, "pressure": 101325.0},
+        ),
+        (
+            "diffusive_knudsen",
+            (),
+            {"temperature": 298.15, "pressure": 101325.0},
+        ),
+        ("coulomb_potential_ratio", (), {"temperature": 298.15}),
+    ],
+)
+def test_public_particle_data_api_rejects_multi_box_inputs(
+    method_name: str,
+    args: tuple[object, ...],
+    kwargs: dict[str, float],
+) -> None:
+    """Public ParticleData APIs should reject unsupported multi-box input."""
+    strategy = DummyCoagulationStrategy(distribution_type="discrete")
+    data = _build_multi_box_particle_data()
+
+    method = getattr(strategy, method_name)
+
+    with pytest.raises(ValueError, match=r"n_boxes=1.*n_boxes=2"):
+        method(data, *args, **kwargs)
 
 
 def test_loss_gain_rate_reject_invalid_distribution_type() -> None:

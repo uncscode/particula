@@ -396,7 +396,7 @@ Shared-across-box fields:
     workflows. CPU condensation explicitly enforces `n_boxes == 1`, and CPU
     coagulation support for `ParticleData` is also documented and validated as
     `n_boxes == 1` only. For the canonical user-facing support contract, see
-    `docs/Features/particle-data-migration.md`.
+    [ParticleData and GasData Migration](../particle-data-migration.md).
 
 #### Rationale for issue-critical ownership decisions
 
