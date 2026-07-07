@@ -38,7 +38,25 @@ pytest particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_str
 pytest particula/dynamics/condensation/tests/condensation_strategies_test.py particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py -v -Werror
 ```
 
+## P3 Validation Outcome
+
+- P3 shipped as a docs-only update.
+- Validation centered on manual review of
+  `docs/Features/particle-data-migration.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md` to confirm:
+  - the migration guide is the canonical support contract,
+  - the CPU support table distinguishes container compatibility from execution
+    support,
+  - supported single-box usage is shown explicitly,
+  - caller-managed per-box looping is labeled as user code, and
+  - roadmap wording no longer implies current CPU multi-box execution support.
+- Because no Python behavior or error text changed in P3, the focused
+  condensation/coagulation test commands remained available but were not needed
+  as release-blocking validation for this phase.
+
 ## Acceptance for Tests
 
-Every phase that changes strategy behavior or docs must include its co-located
-unit tests. There is no standalone testing phase.
+Behavior-changing phases must include their co-located unit tests. Docs-only
+phases should validate against the existing focused test contract and manually
+confirm the published wording stays aligned. There is no standalone testing
+phase.

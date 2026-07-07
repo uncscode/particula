@@ -4,21 +4,21 @@
 
 - P1 result: no user-facing doc files changed.
 - P2 result: no user-facing doc files changed.
-- Reviewed future clarification targets only:
+- P3 completed the user-facing contract update in:
   - `docs/Features/particle-data-migration.md`
-    - Revisit "Using ParticleData/GasData in dynamics".
-    - Revisit "Single-box vs multi-box data".
-    - Preserve the current tested distinction:
-
-      | CPU dynamics path | Containers accepted | Current multi-box strategy behavior |
-      | --- | --- | --- |
-      | Condensation | `ParticleData` + `GasData` | `n_boxes=1` only; multi-box raises the existing `ValueError` |
-      | Coagulation | `ParticleData` | `n_boxes=1` only for the covered CPU paths; multi-box now raises `ValueError` instead of falling back to box 0 |
-
+    - Reworked `Using ParticleData/GasData in dynamics` into the canonical CPU
+      support contract.
+    - Added the compact CPU support table separating container acceptance from
+      current execution support.
+    - Added a supported single-box `n_boxes == 1` example.
+    - Added clearly labeled caller-managed per-box loop pseudocode for
+      unsupported multi-box CPU workflows.
+    - Added a troubleshooting cross-reference back to the canonical support
+      section.
   - `docs/Features/Roadmap/data-oriented-gpu.md`
-    - Clarify that data-container shape support is a prerequisite for future
-      multi-box execution, not proof that all current CPU strategies execute all
-      boxes.
+    - Qualified roadmap wording so container compatibility is not read as
+      current CPU multi-box execution support.
+    - Pointed readers back to the migration guide for the canonical contract.
 
 ## Error Message Documentation
 
@@ -29,17 +29,18 @@ Document the intended interpretation of current behavior:
 - Users may run per-box loops manually until first-class multi-box strategy
   execution is implemented.
 
-## Examples to Add or Update Later
+No runtime error-text update was needed in P3 because the existing tested
+`n_boxes == 1` boundary already matched the final documentation wording.
+
+## Examples Added
 
 - Single-box data-container dynamics example using `n_boxes=1`.
-- A short warning block for `n_boxes > 1` CPU strategy calls.
-- Optional caller-managed loop pseudocode that extracts one box at a time, if
-  consistent with final implementation behavior.
+- A compact support table for current CPU container workflows.
+- Caller-managed loop pseudocode that extracts one box at a time.
 
 ## Documentation Done Criteria
 
-When later doc updates land, they must let a reader distinguish these
-statements:
+The shipped doc updates now let a reader distinguish these statements:
 
 1. The containers can store multiple boxes.
 2. Current CPU strategy code is single-box only unless a strategy explicitly
