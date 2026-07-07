@@ -10,16 +10,21 @@ the documented container and transfer flows.
 
 ## Value Proposition
 
-This feature now publishes both the canonical guide and a validated runnable
-example layer for Epic E2. The branch work added
+This feature now publishes the canonical guide, a validated runnable example
+layer, and the roadmap-facing handoff trail for Epic E2. The branch work added
 `docs/Features/data-containers-and-gpu-foundations.md`, linked it from
 `docs/Features/index.md`, updated
 `docs/Features/particle-data-migration.md`, and then added the runnable example
 pair at `docs/Examples/data_containers_and_gpu_foundations.py` and
 `docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py` plus
-`docs/Examples/Data_Containers/index.md` and examples-gallery links. The result
-should help new users adopt the containers safely and help planner agents route
-later roadmap work without rediscovering current limits.
+`docs/Examples/Data_Containers/index.md` and examples-gallery links. Issue
+#1224 (`E2-F9-P3`) completed the roadmap handoff by updating
+`docs/Features/Roadmap/data-oriented-gpu.md`,
+`docs/Features/Roadmap/warp-autodiff-limitations.md`, and
+`docs/Features/Roadmap/index.md` so downstream work starts from the shipped
+guide/example baseline. The result should help new users adopt the containers
+safely and help planner agents route later roadmap work without rediscovering
+current limits or broadening top-level docs/index content unnecessarily.
 
 ## User Stories
 

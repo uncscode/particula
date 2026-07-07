@@ -10,9 +10,11 @@
 
 Target docs paths for this feature are
 `docs/Features/data-containers-and-gpu-foundations.md`,
-`docs/Features/index.md`, `docs/Features/particle-data-migration.md`, and any
-supporting discoverability updates such as `docs/Examples/index.md` and
-`docs/Examples/Data_Containers/index.md`.
+`docs/Features/index.md`, `docs/Features/particle-data-migration.md`,
+`docs/Examples/index.md`, `docs/Examples/Data_Containers/index.md`,
+`docs/Features/Roadmap/data-oriented-gpu.md`,
+`docs/Features/Roadmap/warp-autodiff-limitations.md`, and
+`docs/Features/Roadmap/index.md`.
 
 ## Example Validation
 
@@ -31,12 +33,14 @@ notebook unless one is intentionally published later.
 - P1 should validate docs links and any code snippets added with the guide.
 - P2 should validate each example in the same phase that adds it, including the
   exact top-level command path documented for users.
-- P3 should run final documentation/index validation after all links are wired.
+- P3 should run final roadmap-link validation after all links are wired and keep
+  any validation evidence in PR notes rather than a committed artifact.
 
 P1 and P3 are valid docs-only exceptions to production test expansion, but they
 must still run the relevant docs checks in the same PR. P2 is not complete until
 the example script is smoke-tested through both targeted pytest coverage and the
-published runnable path.
+published runnable path. P3 did not add code or notebooks, so unchanged example
+paths do not require new committed validation artifacts.
 
 ## Suggested Commands
 
@@ -44,11 +48,6 @@ published runnable path.
 python -m mkdocs build --strict
 python docs/Examples/data_containers_and_gpu_foundations.py
 pytest particula/gpu/tests/data_containers_example_test.py -q
-pytest particula/gpu/tests/conversion_test.py -q
-python3 .opencode/tools/validate_notebook.py \
-  docs/Examples/data_containers_and_gpu_foundations.ipynb --sync
-python3 .opencode/tools/run_notebook.py \
-  docs/Examples/data_containers_and_gpu_foundations.ipynb
 ```
 
 ## Non-Goals for Testing
