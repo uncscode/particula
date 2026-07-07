@@ -445,20 +445,8 @@ Shared-across-box fields:
 
 #### Final downstream handoff map for sibling features
 
-!!! note
-    Publication note for `E2-F1-P4`: this phase publishes the finalized P2/P3
-    ownership and shape contract for downstream implementers; it does not add
-    new schema semantics.
-
-    Observed fix-pass validation on 2026-07-04:
-
-    - Anchor and heading inspection → PASS for the roadmap quick links updated
-      in `docs/Features/Roadmap/index.md`.
-    - Plan metadata consistency inspection → PASS for
-      `.opencode/plans/features/E2-F1.json` against recorded phase issue
-      details.
-    - Recommended command re-run before merge when command execution is
-      available: `mkdocs build --strict`.
+This phase publishes the finalized P2/P3 ownership and shape contract for
+downstream implementers; it does not add new schema semantics.
 
 - `E2-F2`: inherit shipped CPU `EnvironmentData.temperature -> (n_boxes,)`,
   `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
