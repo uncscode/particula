@@ -70,6 +70,11 @@ pages.
     inclusive threshold semantics, and accepted `(n_boxes,)` environment inputs
 - [Mass Precision Recommendation Report](mass-precision-study.md) — canonical
   reference for downstream dtype/schema decisions
+- [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  — shipped guide for the current container, transfer-helper, and support
+  boundary baseline referenced by the roadmap
+- [Data Containers example](../../Examples/Data_Containers/index.md) —
+  canonical runnable entrypoint linked from the roadmap handoff notes
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
 - [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 - [Canonical shape conventions for container workflows](data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
