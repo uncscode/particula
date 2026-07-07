@@ -18,6 +18,7 @@ import os
 import sys
 import time
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, cast
@@ -125,6 +126,9 @@ DEFAULT_SURFACE_TENSION = 0.072
 DEFAULT_MASS_ACCOMMODATION = 1.0
 DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
 MAX_COLLISIONS = 256
+DEFAULT_BENCHMARK_MAX_BYTES = 2 * 1024 * 1024 * 1024
+BENCHMARK_ARTIFACT_DIR = Path(".artifacts") / "benchmarks"
+DEFAULT_BENCHMARK_OUTPUT_NAME = "gpu_benchmark_results.json"
 
 # ---------------------------------------------------------------------------
 # Scaling configurations
@@ -177,12 +181,197 @@ COAGULATION_CONFIGS: list[tuple[str, int, int, int, bool]] = [
     ("100x1k", 100, 1_000, 2, False),
 ]
 
-BENCHMARK_OUTPUT = Path(
-    os.getenv(
-        "BENCHMARK_OUTPUT",
-        "gpu_benchmark_results.json",
+
+@dataclass(frozen=True)
+class BenchmarkMemoryBudget:
+    """Estimated benchmark allocation footprint."""
+
+    label: str
+    cpu_bytes: int
+    gpu_bytes: int
+
+    @property
+    def total_bytes(self) -> int:
+        """Return the combined CPU and GPU allocation estimate."""
+        return self.cpu_bytes + self.gpu_bytes
+
+
+def _parse_positive_int_env(name: str, default: int) -> int:
+    """Parse a positive integer environment override."""
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise ValueError(
+            f"{name} must be a positive integer, got {raw_value!r}"
+        ) from exc
+    if value <= 0:
+        raise ValueError(f"{name} must be positive, got {value}")
+    return value
+
+
+def _sanitize_benchmark_output_name(raw_value: str) -> str:
+    """Normalize an output override to a safe artifact filename."""
+    candidate = Path(raw_value.strip()).name
+    if candidate in {"", ".", ".."}:
+        raise ValueError(
+            "BENCHMARK_OUTPUT must resolve to a non-empty filename"
+        )
+    return candidate
+
+
+def _get_benchmark_output_path() -> Path:
+    """Resolve the benchmark JSON output inside the controlled artifact root."""
+    file_name = _sanitize_benchmark_output_name(
+        os.getenv("BENCHMARK_OUTPUT", DEFAULT_BENCHMARK_OUTPUT_NAME)
     )
-)
+    return BENCHMARK_ARTIFACT_DIR / file_name
+
+
+BENCHMARK_OUTPUT = _get_benchmark_output_path()
+WARP_FLOAT64: Any
+WARP_FLOAT32: Any
+WARP_INT32: Any
+WARP_UINT32: Any
+if wp is None:
+    WARP_FLOAT64 = np.float64
+    WARP_FLOAT32 = np.float32
+    WARP_INT32 = np.int32
+    WARP_UINT32 = np.uint32
+else:
+    WARP_FLOAT64 = wp.float64
+    WARP_FLOAT32 = wp.float32
+    WARP_INT32 = wp.int32
+    WARP_UINT32 = wp.uint32
+
+
+def _warp_dtype_nbytes(dtype: Any) -> int:
+    """Return bytes per element for the supported Warp benchmark dtypes."""
+    warp_item_sizes = {
+        WARP_FLOAT64: 8,
+        WARP_FLOAT32: 4,
+        WARP_INT32: 4,
+        WARP_UINT32: 4,
+    }
+    try:
+        return warp_item_sizes[dtype]
+    except KeyError as exc:
+        raise ValueError(
+            f"Unsupported Warp dtype for sizing: {dtype!r}"
+        ) from exc
+
+
+def _array_nbytes(shape: tuple[int, ...], itemsize: int) -> int:
+    """Return the byte footprint for a dense array shape."""
+    element_count = int(np.prod(np.asarray(shape, dtype=np.int64)))
+    return element_count * itemsize
+
+
+def _numpy_nbytes(shape: tuple[int, ...], dtype: Any) -> int:
+    """Return the byte footprint for a NumPy array shape and dtype."""
+    return _array_nbytes(shape, np.dtype(dtype).itemsize)
+
+
+def _warp_nbytes(shape: tuple[int, ...], dtype: Any) -> int:
+    """Return the byte footprint for a Warp array shape and dtype."""
+    return _array_nbytes(shape, _warp_dtype_nbytes(dtype))
+
+
+def _estimate_condensation_budget(
+    label: str,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+    run_cpu: bool,
+) -> BenchmarkMemoryBudget:
+    """Estimate cumulative large-array allocations for condensation setup."""
+    particle_shape = (n_boxes, n_particles, n_species)
+    box_particle_shape = (n_boxes, n_particles)
+    box_species_shape = (n_boxes, n_species)
+
+    cpu_bytes = 0
+    cpu_bytes += _numpy_nbytes(particle_shape, np.float64)  # masses
+    cpu_bytes += _numpy_nbytes(box_particle_shape, np.float64)  # concentration
+    cpu_bytes += _numpy_nbytes(box_particle_shape, np.float64)  # charge
+    cpu_bytes += _numpy_nbytes((n_species,), np.float64)  # density
+    cpu_bytes += _numpy_nbytes((n_boxes,), np.float64)  # volume
+    cpu_bytes += _numpy_nbytes((n_species,), np.float64)  # molar mass
+    cpu_bytes += _numpy_nbytes(box_species_shape, np.float64)  # gas conc
+    cpu_bytes += _numpy_nbytes((n_species,), np.bool_)  # partitioning
+    cpu_bytes += _numpy_nbytes(box_species_shape, np.float64)  # vapor pressure
+    cpu_bytes += _numpy_nbytes((n_species,), np.float64) * 3  # species vectors
+    if run_cpu:
+        cpu_bytes += _numpy_nbytes(particle_shape, np.float64)  # copy masses
+        cpu_bytes += _numpy_nbytes(box_particle_shape, np.float64) * 2
+        cpu_bytes += _numpy_nbytes((n_species,), np.float64)
+        cpu_bytes += _numpy_nbytes((n_boxes,), np.float64)
+        cpu_bytes += _numpy_nbytes(particle_shape, np.float64)  # mass transfer
+
+    gpu_bytes = 0
+    gpu_bytes += _warp_nbytes(particle_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes(box_particle_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes((n_species,), WARP_FLOAT64) * 4
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes(box_species_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes((n_species,), WARP_INT32)
+
+    return BenchmarkMemoryBudget(
+        label=label, cpu_bytes=cpu_bytes, gpu_bytes=gpu_bytes
+    )
+
+
+def _estimate_coagulation_budget(
+    label: str,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+    run_cpu: bool,
+) -> BenchmarkMemoryBudget:
+    """Estimate cumulative large-array allocations for coagulation setup."""
+    particle_shape = (n_boxes, n_particles, n_species)
+    box_particle_shape = (n_boxes, n_particles)
+
+    cpu_bytes = 0
+    cpu_bytes += _numpy_nbytes(particle_shape, np.float64)
+    cpu_bytes += _numpy_nbytes(box_particle_shape, np.float64) * 2
+    cpu_bytes += _numpy_nbytes((n_species,), np.float64)
+    cpu_bytes += _numpy_nbytes((n_boxes,), np.float64)
+    if run_cpu:
+        cpu_bytes += _numpy_nbytes(particle_shape, np.float64)
+        cpu_bytes += _numpy_nbytes(box_particle_shape, np.float64) * 2
+        cpu_bytes += _numpy_nbytes((n_species,), np.float64)
+        cpu_bytes += _numpy_nbytes((n_boxes,), np.float64)
+        cpu_bytes += _numpy_nbytes((n_particles,), np.float64) * 7
+        cpu_bytes += _numpy_nbytes((64,), np.float64)
+        cpu_bytes += _numpy_nbytes((64, 64), np.float64)
+
+    gpu_bytes = 0
+    gpu_bytes += _warp_nbytes(particle_shape, WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes(box_particle_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes((n_species,), WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes((n_boxes, MAX_COLLISIONS, 2), WARP_INT32)
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_INT32)
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_UINT32)
+
+    return BenchmarkMemoryBudget(
+        label=label, cpu_bytes=cpu_bytes, gpu_bytes=gpu_bytes
+    )
+
+
+def _validate_benchmark_budget(budget: BenchmarkMemoryBudget) -> None:
+    """Skip oversized benchmark cases before allocating large buffers."""
+    max_bytes = _parse_positive_int_env(
+        "BENCHMARK_MAX_BYTES", DEFAULT_BENCHMARK_MAX_BYTES
+    )
+    if budget.total_bytes > max_bytes:
+        pytest.skip(
+            f"{budget.label} requires ~{budget.total_bytes:,} bytes, "
+            f"exceeding BENCHMARK_MAX_BYTES={max_bytes:,}"
+        )
+
 
 _benchmark_results: dict[str, Any] = {
     "started_at": datetime.now(timezone.utc).isoformat(),
@@ -203,16 +392,15 @@ def _save_results() -> None:
     etc.). The file is overwritten each time with the full dict.
     """
     _benchmark_results["updated_at"] = datetime.now(timezone.utc).isoformat()
+    output_path = BENCHMARK_OUTPUT
     try:
-        BENCHMARK_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        BENCHMARK_OUTPUT.write_text(
-            json.dumps(_benchmark_results, indent=2) + "\n"
-        )
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(_benchmark_results, indent=2) + "\n")
     except OSError as exc:
         raise RuntimeError(
-            f"Failed to write benchmark results to {BENCHMARK_OUTPUT}: {exc}"
+            f"Failed to write benchmark results to {output_path}: {exc}"
         ) from exc
-    print(f"  [save] Results written to {BENCHMARK_OUTPUT}")
+    print(f"  [save] Results written to {output_path}")
 
 
 def _skip_if_no_cuda() -> None:
@@ -1086,6 +1274,11 @@ def test_condensation_scaling(
         n_particles,
         n_species,
     )
+    _validate_benchmark_budget(
+        _estimate_condensation_budget(
+            label, n_boxes, n_particles, n_species, run_cpu
+        )
+    )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
     gas = _make_gas_data(n_boxes, n_species)
     vapor_pressure = _make_vapor_pressure(n_boxes, n_species)
@@ -1215,6 +1408,11 @@ def test_coagulation_scaling(
         n_boxes,
         n_particles,
         n_species,
+    )
+    _validate_benchmark_budget(
+        _estimate_coagulation_budget(
+            label, n_boxes, n_particles, n_species, run_cpu
+        )
     )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
 

@@ -65,6 +65,9 @@ as design notes, example outputs, prototype workflows, and milestone-specific
 pages.
 
 - [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md)
+- [Condensation stiffness study baseline](condensation-stiffness-study.md)
+  - documents the recorded timestep grid, particle-only GPU contract,
+    inclusive threshold semantics, and accepted `(n_boxes,)` environment inputs
 - [Mass Precision Recommendation Report](mass-precision-study.md) — canonical
   reference for downstream dtype/schema decisions
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)

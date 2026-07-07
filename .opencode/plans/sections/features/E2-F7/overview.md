@@ -2,30 +2,38 @@
 
 ## Problem Statement
 
-Issue #1172 feature E2-F7 addresses the numerical stiffness of the current GPU
-condensation timestep. The existing Warp path uses an explicit fixed-step
-particle-mass update with non-negative clamping, while aerosol condensation can
-span microsecond equilibration for nanometer particles and second-scale cloud
-droplet evolution. Without a stiffness map and integration recommendation, the
-E2 GPU roadmap risks choosing a timestep strategy that is either unstable,
-overly expensive, incompatible with graph capture, or hostile to autodiff.
+Issues #1213 and #1214 now cover the first two phases of feature E2-F7. The
+current Warp condensation path remains an explicit fixed-step particle-mass
+update with non-negative clamping, while aerosol condensation still spans
+nanometer-scale stiff behavior through droplet-like regimes. P1 established
+the deterministic case catalog, reusable metric helpers, and shared vocabulary;
+P2 measured the recorded explicit timestep grid for those same cases without
+changing the particle-only production contract.
 
 ## Value Proposition
 
-This feature produces a measured stiffness envelope and an actionable
-integration foundation for follow-up GPU condensation work. The result should
-tell implementers when the current explicit path is safe, when fixed
-sub-stepping is enough, and whether a deterministic semi-implicit/asymptotic
-update should become the preferred foundation. The recommendation must align
-with E2-F2 environment/container work and E2-F6 precision decisions, and it
-must preserve fixed shapes, preallocated buffers, deterministic execution, and
-gradient-friendly control flow.
+This feature now has a reusable baseline, recorded P2 explicit evidence, and a
+shipped P3 candidate-evaluation layer in place. The real test implementation
+lives in `_condensation_test_support.py`, while discoverable wrappers
+`condensation_test.py` and `condensation_stiffness_test.py` now expose the
+named stress cases (`nanometer`, `accumulation_mode`, `droplet_like`),
+`CondensationStiffnessCase`/`CondensationStiffnessClassification`, the
+recorded timestep grid, test-local candidate helpers
+(`fixed_count_substeps_4`, `asymptotic_relaxation`), reusable fixed-shape
+scratch coverage, repeated-run determinism checks, finite/non-negative
+particle-mass assertions, and CPU-reference plus explicit-baseline comparison
+bounds. The roadmap artifact,
+`docs/Features/Roadmap/condensation-stiffness-study.md`, now mirrors the
+shipped measured-results table and P3 evidence, including graph-capture and
+autodiff notes plus the deferred gas-coupling boundary. The public
+`condensation_step_gpu(...)` API and production particle-only path remain
+unchanged while later phases build recommendations from measured evidence.
 
 ## User Stories
 
-- As a GPU condensation implementer, I want stress cases and stable timestep
-  bounds so that I can avoid unstable explicit updates when extending the
-  Warp path.
+- As a GPU condensation implementer, I want deterministic stress cases and
+  explicit classification helpers so that later timestep studies use the same
+  baseline contract.
 - As a roadmap owner, I want a documented integration recommendation so that
   later E2 tracks do not rediscover stiffness trade-offs independently.
 - As an autodiff/graph-capture user, I want the selected foundation to avoid

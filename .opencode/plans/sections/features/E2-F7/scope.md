@@ -4,18 +4,20 @@
 
 - Define condensation stiffness stress cases spanning nanometer particles,
   accumulation-mode particles, and cloud-droplet-like regimes.
-- Define stability and quality metrics for the current GPU condensation path:
-  non-negative masses, bounded explicit mass increments, CPU/GPU parity where
-  applicable, conservation notes, and sensitivity to timestep size.
-- Build or extend benchmark/test harnesses that measure stable explicit
-  timestep limits for `particula.gpu.kernels.condensation.condensation_step_gpu`.
+- Define stability and quality metrics for the current GPU condensation path,
+  including metadata validation, non-negative masses, finite-value checks,
+  bounded fractional mass change, zero-mass stability, explicit
+  stable/unstable classification, and particle-only caveat handling.
+- Build or extend benchmark/test harnesses that can later measure stable
+  explicit timestep limits for
+  `particula.gpu.kernels.condensation.condensation_step_gpu`.
 - Compare fixed-shape-compatible integration options:
   - fixed-count sub-stepping,
   - deterministic two-pass/batch-inspired updates,
   - semi-implicit or asymptotic/exponential first-order candidates.
 - Document which options are graph-capture friendly and differentiable enough
   for future Warp autodiff experiments.
-- Publish a stiffness map and integration recommendation in the E2 roadmap
+- Publish the shared baseline assumptions and metric vocabulary in roadmap
   documentation.
 - Require a gas-coupled production condensation integration path with
   conservation checks, or an explicit follow-up feature split if that scope is
@@ -35,6 +37,8 @@
   available. This feature may define contracts and use compatibility shims.
 - Leaving gas-coupled production integration unspecified; if not implemented in
   this feature, it must be captured as a follow-up feature with clear gates.
+- Timestep sweep tables, measured stability bounds, and integrator comparisons
+  in P1.
 
 ## Assumptions
 

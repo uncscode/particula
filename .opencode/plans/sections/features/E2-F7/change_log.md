@@ -2,7 +2,7 @@
 
 ## 2026-07-03 — Initial Draft
 
-- Created first-pass feature plan content for issue #1172 feature E2-F7.
+- Created first-pass feature plan content for issue #1213 feature E2-F7.
 - Added four issue-sized phases covering stress-case definition, explicit GPU
   timestep measurement, fixed-shape integration candidate evaluation, and final
   documentation/recommendation.
@@ -11,3 +11,63 @@
   staggered prior art, graph-capture constraints, and Warp autodiff limitations.
 - Noted challenges: current GPU condensation is particle-only and explicit, while
   environment containers and the precision envelope remain upstream dependencies.
+
+## 2026-07-06 — P1 implementation reflected
+
+- Updated plan sections to reflect issue #1213 implementation for phase
+  `E2-F7-P1`.
+- Recorded that `_condensation_test_support.py` ships
+  `CondensationStiffnessCase`, `CondensationStiffnessClassification`, and the
+  reusable baseline helper checks, with discoverable execution through
+  `particula/gpu/kernels/tests/condensation_test.py`.
+- Recorded the delivered named baseline regimes: `nanometer`,
+  `accumulation_mode`, and `droplet_like`.
+- Recorded new roadmap documentation at
+  `docs/Features/Roadmap/condensation-stiffness-study.md` plus the link added to
+  `docs/Features/Roadmap/index.md`.
+- Clarified that P1 is foundational only: no timestep sweep tables, measured
+  bounds, or integrator comparisons were shipped.
+
+## 2026-07-06 — P2 implementation reflected
+
+- Updated plan sections to reflect issue #1214 implementation for phase
+  `E2-F7-P2`.
+- Recorded that `_condensation_test_support.py` now ships a recorded timestep
+  grid, a test-local trial record helper, stable/unstable assertions per named
+  case, caller-owned `mass_transfer` buffer reuse, and unchanged-gas checks for
+  the particle-only path, with discoverable execution through
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
+- Recorded that single-box cases keep scalar environment inputs while
+  `droplet_like` keeps direct Warp `(n_boxes,)` environment-array coverage, with
+  optional guarded CUDA contract parity.
+- Recorded the measured-results table added to
+  `docs/Features/Roadmap/condensation-stiffness-study.md`.
+
+## 2026-07-06 — P3 implementation reflected
+
+- Updated plan sections to reflect issue #1215 implementation for phase
+  `E2-F7-P3`.
+- Recorded that `_condensation_test_support.py` now ships test-local prototype
+  candidates `fixed_count_substeps_4` and `asymptotic_relaxation`, plus
+  repeated-run determinism, finite/non-negative, reusable fixed-shape
+  scratch/buffer, CPU-reference tolerance, and explicit-baseline error-bound
+  coverage, with discoverable execution through
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
+
+## 2026-07-06 — Discoverable wrapper fix reflected
+
+- Restored runnable `*_test.py` entry points in
+  `particula/gpu/kernels/tests/condensation_test.py` and
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
+- Kept `_condensation_test_support.py` as the implementation home for shared
+  condensation test logic while making the wrappers the authoritative pytest
+  discovery targets.
+- Updated roadmap and plan documentation to reference discoverable wrappers and
+  real collection commands.
+- Recorded that
+  `docs/Features/Roadmap/condensation-stiffness-study.md` now includes
+  candidate evidence, graph-capture/autodiff notes, and the explicit deferred
+  gas-coupling boundary.
+- Clarified that no public `condensation_step_gpu(...)` API change, no private
+  production helper in `particula/gpu/kernels/condensation.py`, no production
+  gas-state update hook, and no integration regression landed in this phase.

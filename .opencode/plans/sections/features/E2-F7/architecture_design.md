@@ -9,43 +9,62 @@
   `EnvironmentData` and E2-F3 provides `WarpEnvironmentData`.
 - Treat fp64 as the reference precision unless E2-F6 explicitly authorizes a
   different precision envelope.
-- Require gas-coupled production condensation integration for physical
-  completeness, including conservation checks that account for gas depletion; if
-  that implementation grows beyond this feature's issue size, split it into an
-  explicit follow-up feature rather than leaving the requirement implicit.
+- Treat gas-coupled production condensation integration as an explicit
+  follow-up requirement for physical completeness, including conservation
+  checks that account for gas depletion; if that implementation grows beyond
+  this feature's issue size, split it into an explicit follow-up feature rather
+  than leaving the requirement implicit.
 - Make future gradient paths explicit: no stochastic theta modes, no unbounded
   adaptive loops, and documented clamp/guard behavior.
 
 ## Proposed Components
 
 1. **Stress-case catalog**
-   - Deterministic fixtures that construct particle, gas, and environment
-     states across high-stiffness and low-stiffness regimes.
-   - Cases should include nanometer high-supersaturation conditions,
-     accumulation-mode aerosol, and droplet-like larger particles.
-   - Each case records expected shape, particle/gas inventory assumptions, and
-     reference tolerances.
+    - Deterministic fixtures that construct particle, gas, and environment
+      states across high-stiffness and low-stiffness regimes.
+    - Cases should include nanometer high-supersaturation conditions,
+      accumulation-mode aerosol, and droplet-like larger particles.
+    - P1 implemented the shared support in
+      `particula/gpu/kernels/tests/_condensation_test_support.py`, with
+      discoverable execution exposed from
+      `particula/gpu/kernels/tests/condensation_test.py`, as
+      `CondensationStiffnessCase` definitions with explicit `n_boxes`,
+      `n_particles`, `n_species`, scalar baseline `temperature`/`pressure`, and
+      deterministic particle/gas/environment builders.
 
 2. **Stability metric helpers**
-   - Metrics for non-negative mass, bounded fractional mass change, monotonic
-     convergence toward equilibrium where applicable, CPU/GPU parity, and
-     conservation caveats.
-    - The current GPU path does not update gas concentration, so metrics must
-      clearly distinguish particle-only GPU behavior from full gas-particle
-      mass conservation and identify the gas-coupled production integration gap.
+    - P1 implemented reusable helper checks for metadata validity,
+      non-negative mass, finite values, bounded fractional mass change,
+      zero-mass stability, and explicit stable/unstable classification.
+    - Threshold semantics are executable and inclusive at the exact boundary.
+    - The current GPU path does not update gas concentration, so the
+      classification result marks the particle-only update caveat explicitly
+      rather than implying gas-particle conservation.
 
 3. **Explicit timestep scan**
-   - A fixed list of timestep candidates per stress case.
-   - No adaptive while loop is required for captured execution; scans can live
-     in test/benchmark code outside graph capture.
-   - Results become the stiffness map.
+    - A fixed list of timestep candidates per stress case.
+    - No adaptive while loop is required for captured execution; scans can live
+      in test/benchmark code outside graph capture.
+    - P2 implemented this as shared support in
+      `particula/gpu/kernels/tests/_condensation_test_support.py`, with
+      discoverable execution exposed from
+      `particula/gpu/kernels/tests/condensation_stiffness_test.py`, one reused
+      caller-owned `mass_transfer` buffer per case/device, and fresh rebuilt
+      particle/gas inputs for every trial.
+    - The shipped evidence remains particle-only: particle masses change,
+      gas concentration stays unchanged, and environment inputs stay split
+      between scalar single-box coverage and direct Warp `(n_boxes,)` arrays for
+      the multi-box case.
 
 4. **Integration candidate evaluation**
-   - Baseline: fixed-count sub-stepping with preallocated buffers.
-   - Candidate: deterministic semi-implicit/asymptotic first-order update that
-     preserves fixed shapes and avoids dynamic control flow.
-   - Prior art: CPU staggered update, used for comparison only unless a fixed
-     deterministic batch schedule is designed.
+    - Baseline: fixed-count sub-stepping with preallocated buffers.
+    - Candidate: deterministic semi-implicit/asymptotic first-order update that
+      preserves fixed shapes and avoids dynamic control flow.
+    - Prior art: CPU staggered update, used for comparison only unless a fixed
+      deterministic batch schedule is designed.
+    - P3 shipped the fixed-shape candidate evidence in shared support, and P4
+      shipped the recommendation that `fixed_count_substeps_4` is the preferred
+      future foundation while production scope remains particle-only.
 
 ## Data Flow
 

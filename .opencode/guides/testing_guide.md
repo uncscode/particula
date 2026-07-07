@@ -149,6 +149,13 @@ GPU code must match Python/NumPy reference implementations. Use lightweight test
 kernels around `@wp.func` functions and compare against NumPy with tight
 tolerances.
 
+For the GPU condensation suite, keep shared helpers in support modules only when
+discoverable `*_test.py` wrappers expose the runnable cases. The current entry
+points are:
+
+- `particula/gpu/kernels/tests/condensation_test.py`
+- `particula/gpu/kernels/tests/condensation_stiffness_test.py`
+
 ```python
 import numpy as np
 import numpy.testing as npt
@@ -173,6 +180,13 @@ single-box and multi-box cases, the default synchronized path, any supported
 manual `sync=False` path, and malformed-schema failures surfaced by CPU-side
 validation.
 
+When evaluating experimental GPU integrator candidates, keep prototypes
+test-local until they are production-qualified. Prefer deterministic fixed-shape
+helpers, caller-owned scratch or buffer reuse, repeated-run equality checks,
+finite and non-negative mass assertions, and explicit CPU-reference error bounds
+recorded in the test or companion study note. If public runtime behavior is
+unchanged, say so directly in the related documentation.
+
 For deterministic GPU baseline studies, prefer explicit `np.float64` fixture
 construction over random inputs so later precision comparisons have a stable
 reference. The mass-precision baseline suite is the reference pattern:
@@ -196,6 +210,10 @@ baseline assumptions in the matching roadmap page.
 ## Troubleshooting
 
 - If tests are not discovered, check `*_test.py` naming and run `pytest --collect-only`.
+- For the GPU condensation suite, verify collection via
+  `pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q`
+  and
+  `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py --collect-only -q`.
 - If imports fail, install the package in development mode with `pip install -e .[dev]`.
 - If coverage looks wrong, run `pytest --cov=particula --cov-report=term`.
 - If CI fails but local tests pass, rerun locally with `pytest -Werror`.

@@ -2,46 +2,62 @@
 
 ## E2-F7-P1 Tasks
 
-- Define `CondensationStiffnessCase` and metric helpers directly in
-  `particula/gpu/kernels/tests/condensation_test.py` unless they push the file
-  past a reviewable size; only then split them into
-  `particula/gpu/kernels/tests/condensation_stiffness_helpers.py`.
-- Add fixed-shape stress cases for nanometer/high-supersaturation,
-  accumulation-mode, and droplet-like regimes with explicit `n_boxes`,
-  `n_particles`, and `n_species` dimensions.
-- Implement metric helpers for non-negativity, fractional mass change,
-  boundedness, and particle-only parity caveats with names that can be reused by
-  later CPU/GPU comparisons.
-- Add fast tests validating case shapes, dtype assumptions, and metric threshold
-  behavior before any timestep sweep logic lands.
+- Implemented in issue #1213:
+  - `CondensationStiffnessCase` and
+    `CondensationStiffnessClassification` were added directly to
+    `particula/gpu/kernels/tests/_condensation_test_support.py`, with
+    discoverable coverage exposed from
+    `particula/gpu/kernels/tests/condensation_test.py`.
+  - Fixed-shape named stress cases now cover `nanometer`,
+    `accumulation_mode`, and `droplet_like` regimes with explicit metadata.
+  - Reusable helpers now cover metadata validation, non-negativity,
+    finite-value checks, fractional mass change, zero-mass stability, and
+    stable/unstable classification for the current particle-only path.
+  - Fast tests now cover scalar and direct `(n_boxes,)` environment inputs,
+    threshold-boundary behavior, dtype/shape metadata failures, particle-only
+    caveat handling, and pre-launch validation short-circuit behavior.
 
 ## E2-F7-P2 Tasks
 
-- Extend `particula/gpu/kernels/tests/condensation_test.py` to run each stress
-  case through `condensation_step_gpu` with an explicitly preallocated
-  `mass_transfer` buffer.
-- Scan a fixed timestep grid that is recorded in code and mirrored into
-  `docs/Features/Roadmap/condensation-stiffness-study.md`.
-- Capture the resulting stable/unstable bounds in a compact markdown table
-  rather than free-form prose.
-- Document in both tests and the report that the current GPU condensation path
-  updates particles only and does not mutate gas concentration.
+- Implemented in issue #1214:
+  - `particula/gpu/kernels/tests/_condensation_test_support.py` now records
+    `_RECORDED_TIMESTEP_GRID_BY_CASE` and `_RECORDED_STIFFNESS_THRESHOLD`
+    directly in code, with discoverable coverage exposed from
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`.
+  - A test-local recorded-grid helper rebuilds fresh deterministic inputs for
+    each trial while reusing one caller-owned `mass_transfer` buffer per
+    case/device.
+  - Fast Warp CPU tests now assert exact timestep count/order, at least one
+    stable and one unstable result per named case, buffer overwrite behavior,
+    unchanged gas concentration, and scalar-vs-direct-Warp environment-input
+    mode coverage.
+  - An optional guarded CUDA parity test checks the same recorded-grid result
+    contract without making CUDA required.
+  - `docs/Features/Roadmap/condensation-stiffness-study.md` now ships a compact
+    measured-results table synchronized with the recorded grid.
 
 ## E2-F7-P3 Tasks
 
-- Prototype fixed-count sub-step evaluation behind a narrowly scoped helper so
-  production API churn stays under one file.
-- Compare fixed sub-step counts against the explicit stiffness map already
-  published in `docs/Features/Roadmap/condensation-stiffness-study.md`.
-- Evaluate a deterministic semi-implicit/asymptotic first-order update using
-  fixed shapes and preallocated scratch buffers only.
-- Compare candidates against CPU reference calculations and document rejected
-  alternatives, including random staggered theta modes, in the study report.
-- Evaluate the work needed for gas-coupled production condensation integration,
-  including gas-depletion conservation checks; split that implementation into a
-  follow-up feature if it cannot remain issue-sized here.
-- Record graph-capture and autodiff compatibility for each candidate with clear
-  pass/fail notes.
+- Implemented in issue #1215:
+  - `particula/gpu/kernels/tests/_condensation_test_support.py` now ships two
+    deterministic test-local prototype candidates, exposed through
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`:
+    `fixed_count_substeps_4` and `asymptotic_relaxation`.
+  - Candidate coverage stays fixed-shape and reuses caller-owned buffers plus
+    reusable scratch/storage inside the test harness; no production helper file
+    split was needed.
+  - Fast Warp CPU tests now assert repeated-run determinism, finite and
+    non-negative particle masses, reusable fixed-shape scratch/buffer behavior,
+    CPU-reference agreement within documented tolerances, and explicit-baseline
+    error-bound comparisons.
+  - `docs/Features/Roadmap/condensation-stiffness-study.md` now records the P3
+    evidence, including graph-capture/autodiff notes and the explicit deferred
+    gas-coupling boundary.
+  - No public API change landed in `condensation_step_gpu(...)`, no private
+    production helper landed in `particula/gpu/kernels/condensation.py`, no
+    production gas-state update hook shipped, and no integration regression was
+    added to
+    `particula/integration_tests/condensation_particle_resolved_test.py`.
 
 ## E2-F7-P4 Tasks
 
