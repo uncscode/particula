@@ -258,6 +258,25 @@ class TestCondensationIsothermal(unittest.TestCase):
                 pressure=self.pressure,
             )
 
+    def test_mass_transfer_rate_rejects_multi_box_data_inputs(self):
+        """mass_transfer_rate() preserves the public single-box guard."""
+        strategy = self._make_data_strategy()
+
+        particle_data = from_representation(self.particle, n_boxes=2)
+        gas_data = from_species(self.gas_species, n_boxes=2)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "ParticleData must have n_boxes=1 for condensation strategies, "
+            "got n_boxes=2.",
+        ):
+            strategy.mass_transfer_rate(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+            )
+
     def test_knudsen_number(self):
         """Test the Knudsen number call."""
         radius = 1e-9  # m
