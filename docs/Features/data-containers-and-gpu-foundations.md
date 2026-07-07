@@ -28,7 +28,6 @@ Prefer the currently exported package-level imports:
 ```python
 from particula.gas import EnvironmentData, GasData
 from particula.gpu import (
-    WARP_AVAILABLE,
     from_warp_environment_data,
     from_warp_gas_data,
     to_warp_environment_data,
@@ -37,14 +36,15 @@ from particula.gpu import (
 from particula.particles import ParticleData
 ```
 
-`WarpEnvironmentData` is exported from `particula.gpu` only when Warp is
-available, so import it only behind an optional Warp guard:
+`WarpEnvironmentData` and `WarpGasData` are exported from `particula.gpu`
+only when Warp is available, so import them only behind an optional Warp
+guard:
 
 ```python
 from particula.gpu import WARP_AVAILABLE
 
 if WARP_AVAILABLE:
-    from particula.gpu import WarpEnvironmentData
+    from particula.gpu import WarpEnvironmentData, WarpGasData
 ```
 
 ## Canonical container schemas

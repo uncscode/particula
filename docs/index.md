@@ -159,21 +159,13 @@ print(result)
   runnable pipelines.
 - [Wall loss strategy system](Features/wall_loss_strategy_system.md) — chamber
   wall loss strategies with builders, factory, and runnable integration.
+- [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
+  — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
+  explicit CPU↔GPU transfer helpers, leading-axis shape conventions, and the
+  current shipped CPU/GPU support boundary.
 - [ParticleData and GasData migration guide](Features/particle-data-migration.md)
-  — data-container migration workflow, including `EnvironmentData`
-  CPU↔GPU round-trip helper coverage and the canonical CPU support boundary:
-  multi-box container storage is supported, but current audited CPU
-  condensation and CPU coagulation execution remain `n_boxes == 1`, with
-  caller-managed per-box loops required for multi-box CPU workflows. For gas
-  restore, caller-supplied names remain authoritative ordered metadata,
-  placeholder names `species_0..n-1` are generated when names are omitted or
-  `None`, single-box gas arrays still use `(1, n_species)`, `partitioning`
-  crosses the boundary as CPU `bool` and GPU `int32` with restore accepting
-  only binary `0/1`, and GPU-only `vapor_pressure` is dropped on CPU restore.
-  Includes direct links to the
-  [authoritative field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
-  [canonical shape contract](Features/Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
-  and [final downstream handoff map](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
+  — migration workflow and before/after examples for moving from legacy facades
+  to the canonical data-container contract documented in the foundation guide.
 - [Data-oriented design and GPU roadmap](Features/Roadmap/data-oriented-gpu.md)
   — current schema inventory,
   [authoritative CPU/GPU field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),

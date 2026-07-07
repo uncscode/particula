@@ -38,7 +38,9 @@ aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
 
 ## Migration / What's New
 
-For migration details and updated API mappings, see the canonical guide:
+For the canonical container, shape, and CPU↔GPU transfer contract, see the
+[Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md).
+For migration details and updated API mappings, see the
 [ParticleData and GasData Migration Guide](./docs/Features/particle-data-migration.md).
 Legacy facades remain available, with deprecation planned for v0.3.0.
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via

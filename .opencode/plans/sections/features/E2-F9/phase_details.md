@@ -1,13 +1,18 @@
 # E2-F9 Phase Details
 
 - [ ] **E2-F9-P1:** Foundation guide for data containers, shapes, transfers, and limitations
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1222 | Size: S | Status: implementation landed on branch; metadata still pending update
   - Goal: Publish the canonical guide tying container schemas, shape
     conventions, GPU transfer caveats, and current limitations together.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
-    `docs/Features/index.md`, and the minimum supporting updates to
-    `docs/Features/particle-data-migration.md`.
-  - Tests: Markdown/link validation; doc snippets checked for accurate imports.
+    `docs/Features/index.md`, the minimum supporting updates to
+    `docs/Features/particle-data-migration.md`, and possible supporting
+    discoverability updates such as `docs/index.md`.
+  - Branch outcome: the canonical guide was added, the Features index now links
+    to it, and the migration guide now points readers back to the canonical
+    contract page.
+  - Tests: Documentation validation should focus on `mkdocs build --strict` and
+    doc-snippet import accuracy for the shipped public APIs.
 
 - [ ] **E2-F9-P2:** Minimal data-container and GPU transfer examples with guards
   - Issue: TBD | Size: S | Status: Not Started

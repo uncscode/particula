@@ -314,9 +314,10 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 - `WarpGasData.vapor_pressure` is GPU-only helper state. Pass it explicitly
   when needed, otherwise `to_warp_gas_data()` allocates zeros with the same
   shape, and `from_warp_gas_data()` always drops it on CPU restore.
-- See `docs/Features/particle-data-migration.md` for the user-facing field
-  authority table and `particula/gpu/tests/conversion_test.py` for the
-  regression-backed contract.
+- See `docs/Features/data-containers-and-gpu-foundations.md` for the canonical
+  user-facing field authority and transfer-boundary contract,
+  `docs/Features/particle-data-migration.md` for migration walkthroughs, and
+  `particula/gpu/tests/conversion_test.py` for the regression-backed contract.
 
 ### GPU mass-precision baseline study
 

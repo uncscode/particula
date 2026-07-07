@@ -2,28 +2,32 @@
 
 ## New or Updated User Docs
 
-- Add `docs/Features/data-containers-and-gpu-foundations.md` with:
-  - purpose and prerequisites.
-  - container schema tables.
-  - shape-convention tables.
-  - GPU transfer helper API summary.
-  - limitations/support-boundary table.
-  - downstream roadmap handoff notes.
-- Update `docs/Features/index.md` to link the guide.
-- Cross-link from `docs/Features/particle-data-migration.md` where users need
-  migration context.
+- Added `docs/Features/data-containers-and-gpu-foundations.md` as the canonical
+  reference for:
+  - `ParticleData`, `GasData`, `EnvironmentData`, `WarpGasData`, and
+    `WarpEnvironmentData` schemas.
+  - leading-axis shape conventions for single-box and multi-box workflows.
+  - explicit CPU↔GPU transfer helpers in `particula.gpu`.
+  - current shipped CPU/GPU support boundaries and intentionally lossy gas
+    restore behavior.
+- Updated `docs/Features/index.md` with a new
+  `Data Containers and GPU Foundations` card placed ahead of the migration
+  guide, and revised the migration card copy so it reads as migration-focused.
+- Updated `docs/Features/particle-data-migration.md` to add early cross-links
+  back to the canonical foundation guide and to keep migration-specific prose
+  separate from the authoritative contract page.
+- Supporting docs discovery updates may also be present in `docs/index.md` from
+  the docs subagent; those are secondary to the feature-doc changes above.
 
 ## Examples
 
-- Add minimal data-container and GPU-transfer examples under `docs/Examples/`.
-- Update `docs/Examples/index.md` with the new examples.
-- If examples use notebooks, maintain paired `.py` and `.ipynb` files.
+- No `docs/Examples/` artifacts were added in issue #1222; runnable examples
+  remain deferred to E2-F9-P2.
 
 ## Roadmap and Handoff Docs
 
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` to point to the foundation
-  guide and examples.
-- Link `docs/Features/Roadmap/warp-autodiff-limitations.md` from the limitations
-  section.
-- Include future-work notes for environment state, GPU-resident kernels,
-  graph capture, autodiff, and precision/mass representation decisions.
+- The new foundation guide links readers to
+  `docs/Features/Roadmap/data-oriented-gpu.md` for future work and planned
+  expansions.
+- No standalone roadmap-page edits are required to reflect the documentation
+  delivered in issue #1222.
