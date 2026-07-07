@@ -187,6 +187,50 @@ def test_getters_particle_data_match_arrays() -> None:
     )
 
 
+def test_getters_particle_data_use_box_zero_for_multi_box_inputs() -> None:
+    """Adapter helpers should ignore later boxes for ParticleData inputs."""
+    data = ParticleData(
+        masses=np.array(
+            [
+                [[1e-18, 2e-18], [2e-18, 3e-18]],
+                [[9e-18, 8e-18], [7e-18, 6e-18]],
+            ]
+        ),
+        concentration=np.array([[1.0, 2.0], [10.0, 20.0]]),
+        charge=np.array([[0.0, 1.0], [4.0, 5.0]]),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.array([1.0, 9.0]),
+    )
+
+    np.testing.assert_allclose(
+        coagulation_strategy_abc._get_radius(data),
+        data.radii[0],
+    )
+    np.testing.assert_allclose(
+        coagulation_strategy_abc._get_mass(data),
+        data.total_mass[0],
+    )
+    np.testing.assert_allclose(
+        coagulation_strategy_abc._get_concentration(data),
+        data.concentration[0],
+    )
+    charge_array = coagulation_strategy_abc._get_charge(data)
+    assert charge_array is not None
+    np.testing.assert_allclose(charge_array, data.charge[0])
+    np.testing.assert_allclose(
+        coagulation_strategy_abc._get_effective_density(data),
+        data.effective_density[0],
+    )
+    assert coagulation_strategy_abc._get_volume(data) == pytest.approx(1.0)
+
+    assert not np.array_equal(data.radii[0], data.radii[1])
+    assert not np.array_equal(data.total_mass[0], data.total_mass[1])
+    assert not np.array_equal(data.concentration[0], data.concentration[1])
+    assert not np.array_equal(data.charge[0], data.charge[1])
+    assert not np.array_equal(data.effective_density[0], data.effective_density[1])
+    assert data.volume[0] != data.volume[1]
+
+
 def test_getters_particle_representation_match_methods() -> None:
     """Adapter helpers should mirror ParticleRepresentation accessors."""
     representation = PresetParticleRadiusBuilder().build()
@@ -367,6 +411,67 @@ def test_step_particle_data_particle_resolved_updates_arrays(
     np.testing.assert_allclose(data.masses[0], expected_masses)
     np.testing.assert_allclose(data.concentration[0], expected_concentration)
     np.testing.assert_allclose(data.charge[0], expected_charge)
+
+
+def test_step_particle_data_multi_box_only_updates_box_zero(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Particle-resolved step should leave later boxes unchanged."""
+    data = ParticleData(
+        masses=np.array(
+            [
+                [[1e-18, 1e-18], [2e-18, 2e-18], [3e-18, 3e-18]],
+                [[9e-18, 8e-18], [7e-18, 6e-18], [5e-18, 4e-18]],
+            ]
+        ),
+        concentration=np.array([[1.0, 1.0, 1.0], [2.0, 3.0, 4.0]]),
+        charge=np.array([[0.0, 1.0, -1.0], [4.0, 5.0, 6.0]]),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.array([1.0, 5.0]),
+    )
+    strategy = DummyCoagulationStrategy(distribution_type="particle_resolved")
+    strategy.particle_resolved_radius = np.array(
+        [data.radii[0].min() * 0.8, data.radii[0].max() * 1.2],
+        dtype=np.float64,
+    )
+
+    def _fake_step_func(**_: object) -> NDArray[np.int64]:
+        return np.array([[0, 1]], dtype=np.int64)
+
+    monkeypatch.setattr(
+        coagulation_strategy_abc.particle_resolved_method,
+        "get_particle_resolved_coagulation_step",
+        _fake_step_func,
+    )
+    box_one_masses_before = data.masses[1].copy()
+    box_one_concentration_before = data.concentration[1].copy()
+    box_one_charge_before = data.charge[1].copy()
+
+    strategy.step(
+        particle=data,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+    )
+
+    expected_box_zero_masses = np.array(
+        [[0.0, 0.0], [3e-18, 3e-18], [3e-18, 3e-18]],
+        dtype=np.float64,
+    )
+    expected_box_zero_concentration = np.array(
+        [0.0, 1.0, 1.0], dtype=np.float64
+    )
+    expected_box_zero_charge = np.array([0.0, 1.0, -1.0], dtype=np.float64)
+    np.testing.assert_allclose(data.masses[0], expected_box_zero_masses)
+    np.testing.assert_allclose(
+        data.concentration[0], expected_box_zero_concentration
+    )
+    np.testing.assert_allclose(data.charge[0], expected_box_zero_charge)
+    np.testing.assert_allclose(data.masses[1], box_one_masses_before)
+    np.testing.assert_allclose(
+        data.concentration[1], box_one_concentration_before
+    )
+    np.testing.assert_allclose(data.charge[1], box_one_charge_before)
 
 
 def test_step_particle_data_zero_concentration_noop(
