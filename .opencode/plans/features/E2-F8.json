@@ -2,7 +2,7 @@
   "id": "E2-F8",
   "type": "feature",
   "title": "Clarify CPU dynamics data-container support boundaries",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -58,11 +58,11 @@
     {
       "id": "E2-F8-P3",
       "title": "Improve unsupported multi-box errors and user documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-07",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -70,5 +70,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
