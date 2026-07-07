@@ -11,7 +11,7 @@ and current CPU/GPU support boundaries.
 Use this guide when you need the current contract for:
 
 - `ParticleData`, `GasData`, and `EnvironmentData`
-- `WarpGasData` and `WarpEnvironmentData`
+- `WarpParticleData`, `WarpGasData`, and `WarpEnvironmentData`
 - explicit transfer helpers in `particula.gpu`
 - single-box and multi-box shape conventions
 - current shipped limitations for CPU and GPU workflows
@@ -28,23 +28,29 @@ Prefer the currently exported package-level imports:
 ```python
 from particula.gas import EnvironmentData, GasData
 from particula.gpu import (
+    from_warp_particle_data,
     from_warp_environment_data,
     from_warp_gas_data,
+    to_warp_particle_data,
     to_warp_environment_data,
     to_warp_gas_data,
 )
 from particula.particles import ParticleData
 ```
 
-`WarpEnvironmentData` and `WarpGasData` are exported from `particula.gpu`
-only when Warp is available, so import them only behind an optional Warp
-guard:
+`WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from
+`particula.gpu` only when Warp is available, so import them only behind an
+optional Warp guard:
 
 ```python
 from particula.gpu import WARP_AVAILABLE
 
 if WARP_AVAILABLE:
-    from particula.gpu import WarpEnvironmentData, WarpGasData
+    from particula.gpu import (
+        WarpEnvironmentData,
+        WarpGasData,
+        WarpParticleData,
+    )
 ```
 
 ## Canonical container schemas
@@ -148,12 +154,41 @@ transfers.
 
 Available public helpers:
 
+- `to_warp_particle_data()`
+- `from_warp_particle_data()`
 - `to_warp_gas_data()`
 - `from_warp_gas_data()`
 - `to_warp_environment_data()`
 - `from_warp_environment_data()`
 
 Optional Warp availability can be checked with `WARP_AVAILABLE`.
+
+### Particle transfer boundary
+
+`WarpParticleData` is the explicit Warp mirror for `ParticleData`. Use the
+helper boundary when particle-resident arrays must move between CPU-owned
+containers and Warp-owned storage:
+
+```python
+from particula.gpu import from_warp_particle_data, to_warp_particle_data
+
+gpu_particle = to_warp_particle_data(particle_data, device="cpu")
+restored_particle = from_warp_particle_data(gpu_particle)
+```
+
+Across this boundary, the shipped particle schema stays aligned:
+
+| Field | CPU `ParticleData` | GPU `WarpParticleData` | Contract |
+| --- | --- | --- | --- |
+| `masses` | `(n_boxes, n_particles, n_species)` | `(n_boxes, n_particles, n_species)` | Authoritative per-particle, per-species masses round-trip without shape drift. |
+| `concentration` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves the leading `n_boxes` axis for single-box and multi-box storage. |
+| `charge` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves particle charge state without hidden conversion. |
+| `density` | `(n_species,)` | `(n_species,)` | Shared species density remains shared; it does not gain a box axis. |
+| `volume` | `(n_boxes,)` | `(n_boxes,)` | Per-box simulation volume stays particle-owned across the helper boundary. |
+
+As with the gas and environment helpers, kernels and runnables do not perform
+hidden CPU↔GPU synchronization or implicit container transfers for particle
+state.
 
 ### Environment transfer boundary
 

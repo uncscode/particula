@@ -46,33 +46,20 @@ in strategies and runnables:
 
 !!! note
     `EnvironmentData` is the shipped CPU container for per-box thermodynamic
-    state, not a separate gas facade. It is exported from `particula.gas` for
-    package-level imports, while
-    `particula.gpu.WarpEnvironmentData` remains available only when Warp is
-    installed. It requires at least one box at construction time. The only
-    shipped CPU↔GPU transfer boundary is the explicit helper trio
-    `particula.gpu.WarpEnvironmentData`,
+    state, not a separate gas facade. In this migration context, the relevant
+    shipped environment-state CPU↔GPU transfer boundary is the explicit helper
+    trio `particula.gpu.WarpEnvironmentData`,
     `particula.gpu.to_warp_environment_data()`, and
-    `particula.gpu.from_warp_environment_data()`. The shape contract stays
-    fixed across that boundary:
-    `temperature`/`pressure -> (n_boxes,)` and
-    `saturation_ratio -> (n_boxes, n_species)`. Current regression coverage
-    checks one-box and multi-box CPU→Warp→CPU round trips, always on Warp `cpu`
-    and additionally on Warp `cuda` when available. Those transfers remain
-    explicit helper calls only: kernels and runnables do not perform hidden
-    CPU↔GPU environment synchronization or movement, and CUDA is optional
-    rather than required. Current tests also cover default synchronized
-    restore, manual `sync=False` restore after explicit synchronization, and
-    schema validation failures. This documents the helper surface only, not a
-    broader automatic runtime integration.
+    `particula.gpu.from_warp_environment_data()`. For the authoritative
+    container schema, shape contract, and helper/support-boundary details,
+    defer to
+    [Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md).
 
 !!! warning
     GPU→CPU gas restore is intentionally lossy unless you preserve ordered
     species metadata outside the GPU container. `WarpGasData` excludes string
-    fields and `from_warp_gas_data()` can validate only the supplied name-list
-    length today; it does not verify that restored names still match the
-    original species ordering, and GPU helper state such as
-    `WarpGasData.vapor_pressure` is dropped on CPU restore. Use
+    fields, and GPU-only helper state such as `vapor_pressure` is dropped on
+    CPU restore. Use
     [Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)
     as the authoritative shipped contract for this restore boundary, and use
     the roadmap's
@@ -207,35 +194,22 @@ gas_data = GasData(
     you need strategy-driven behavior, and pass `GasData` where only data is
     required.
 
-### `GasData` ↔ `WarpGasData` field authority
+### `GasData` ↔ `WarpGasData` migration summary
 
 For the canonical reference page covering this transfer boundary alongside
 `ParticleData`, `EnvironmentData`, and current support limits, see
 [Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md).
 
-Use this table as the migration-facing summary for what each container owns and
-what survives the explicit CPU↔GPU helper boundary.
-
-| Field | CPU `GasData` | GPU `WarpGasData` | Round-trip contract |
-| --- | --- | --- | --- |
-| `name` | Authoritative ordered species metadata as `list[str]` with `len == n_species`. | Not stored. `WarpGasData` has no string field. | `to_warp_gas_data()` drops names. `from_warp_gas_data()` restores caller-supplied ordered names or, when `name` is omitted or `None`, placeholder values such as `species_0`. Current validation checks only list length, so callers must preserve ordering externally. |
-| `molar_mass` | Authoritative shared-across-boxes numeric state. Shape `(n_species,)`. | Numeric mirror with shape `(n_species,)`. | Round-trips without value or shape changes. |
-| `concentration` | Authoritative per-box gas state. Shape `(n_boxes, n_species)`, including `(1, n_species)` for one-box workflows. | Numeric mirror with shape `(n_boxes, n_species)`. | Round-trips without value or shape changes. |
-| `partitioning` | Authoritative per-species boolean mask. Shape `(n_species,)`, dtype `bool`. | Numeric GPU mask with shape `(n_species,)`, dtype `int32`. | Converts `bool → int32 → bool`. GPU restore requires binary `0`/`1` values. |
-| `vapor_pressure` | Not owned by `GasData`. Preserve or recompute it separately on the CPU side. | GPU-only helper state with shape `(n_boxes, n_species)`. | Pass it explicitly to `to_warp_gas_data()` when GPU kernels need physical vapor-pressure values. If omitted, the helper allocates zeros with the same shape. `from_warp_gas_data()` always drops this field. |
-
-Migration rules backed by the regression tests:
+Migration-focused rules of thumb:
 
 - Keep the leading box axis explicit. Single-box gas arrays still use
   `(1, n_species)`.
 - Treat `name` as caller-owned metadata at the restore boundary. Supplying the
   original ordered names gives a semantic round-trip; omitting `name` or
   passing `name=None` produces placeholders only.
-- Treat `partitioning` as a CPU boolean API and a GPU numeric mask. Do not
-  depend on non-binary GPU values being coerced.
-- Treat `vapor_pressure` as sidecar process state for GPU workflows. Compute it
-  on the CPU, pass it to `to_warp_gas_data()`, and preserve it separately if
-  you still need it after restoring `GasData`.
+- Treat `partitioning` as a CPU boolean API and a GPU numeric mask.
+- Treat `vapor_pressure` as GPU sidecar process state that must be preserved
+  or recomputed outside `GasData` after restore.
 
 Example CPU→GPU→CPU handoff:
 
@@ -286,7 +260,7 @@ species = par.gas.GasSpecies.from_data(
 ## Using ParticleData/GasData in dynamics
 
 For the canonical support-boundary summary, including the preserved leading
-`n_boxes` axis and the explicit environment-helper boundary, see
+`n_boxes` axis and the explicit particle/gas/environment helper boundaries, see
 [Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md).
 
 Condensation and coagulation strategies accept both legacy facades and the new
@@ -397,13 +371,9 @@ CPU side. `EnvironmentData` owns `temperature`, `pressure`, and
 process code may read `EnvironmentData` directly, but that does not expand the
 current CPU dynamics boundary beyond the audited behavior above. Only the
 physical model that owns the update should mutate environment state. When a GPU
-round trip is needed, use the explicit helper boundary only:
-`particula.gpu.WarpEnvironmentData`,
-`particula.gpu.to_warp_environment_data()`, and
-`particula.gpu.from_warp_environment_data()`. Keep the documented shapes
-unchanged across that boundary—`temperature` and `pressure` stay
-`(n_boxes,)`, while `saturation_ratio` stays `(n_boxes, n_species)`—and do
-not expect kernels or runnables to move environment state for you.
+round trip is needed, use the explicit helper boundary documented in
+[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md);
+do not expect kernels or runnables to move environment state for you.
 
 ### `condensation_step_gpu` environment inputs
 
