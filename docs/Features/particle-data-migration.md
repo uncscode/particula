@@ -274,13 +274,23 @@ species = par.gas.GasSpecies.from_data(
 ## Using ParticleData/GasData in dynamics
 
 Condensation and coagulation strategies accept both legacy facades and the new
-data containers. The return type matches the input type.
+data containers. The return type matches the input type, but that container
+compatibility does **not** mean every CPU dynamics path already supports full
+multi-box execution.
 
 Today, the compatibility boundary is still scalar at many process entry points:
 existing dynamics APIs may continue to accept scalar `temperature` and
 `pressure`. Only migrated process code should read `EnvironmentData` directly,
 and environment fields should be treated as read-only unless the physical model
 owns the update and refreshes derived helpers such as `saturation_ratio`.
+
+For the currently audited CPU baseline:
+
+- `CondensationIsothermal` and related public condensation entry points accept
+  `ParticleData` and `GasData`, but they still require `n_boxes == 1`.
+- Current CPU coagulation `ParticleData` support is still box-0-only for the
+  audited paths. The strategy reads from box `0` and mutates box `0`; it is not
+  a general CPU multi-box coagulation implementation yet.
 
 ```python
 import particula as par
@@ -296,8 +306,8 @@ condensation = par.dynamics.CondensationIsothermal(
     vapor_pressure_strategy=vapor_pressure_strategy,
 )
 particle_out, gas_out = condensation.step(
-    particles=particle_data,
-    gas=gas_data,
+    particle=particle_data,
+    gas_species=gas_data,
     temperature=298.15,
     pressure=101325.0,
     time_step=1.0,
@@ -307,7 +317,7 @@ coagulation = par.dynamics.BrownianCoagulationStrategy(
     distribution_type="discrete"
 )
 particle_out = coagulation.step(
-    particles=particle_out,
+    particle=particle_out,
     temperature=298.15,
     pressure=101325.0,
     time_step=1.0,
@@ -318,9 +328,10 @@ Use `EnvironmentData` to document and carry per-box thermodynamic state on the
 CPU side. `EnvironmentData` owns `temperature`, `pressure`, and
 `saturation_ratio`; `GasData` does not. Keep current scalar `temperature` and
 `pressure` arguments where the process API has not yet been migrated; migrated
-process code may read `EnvironmentData` directly, but only the physical model
-that owns the update should mutate it. When a GPU round trip is needed, use
-the explicit helper boundary only:
+process code may read `EnvironmentData` directly, but that does not expand the
+current CPU dynamics boundary beyond the audited behavior above. Only the
+physical model that owns the update should mutate environment state. When a GPU
+round trip is needed, use the explicit helper boundary only:
 `particula.gpu.WarpEnvironmentData`,
 `particula.gpu.to_warp_environment_data()`, and
 `particula.gpu.from_warp_environment_data()`. Keep the documented shapes
@@ -408,8 +419,13 @@ prefer `ParticleData`/`GasData` directly or wrap with `from_data` methods.
 
 ### Single-box vs multi-box data
 
-Legacy facades assume a single box. For data containers, index the first box
-when you need legacy-shaped arrays:
+Legacy facades assume a single box. For data containers, the current audited
+CPU baseline is:
+
+- Condensation public `ParticleData`/`GasData` paths reject `n_boxes != 1`.
+- CPU coagulation `ParticleData` paths still read and mutate box `0` only.
+
+When you need legacy-shaped arrays, index the first box explicitly:
 
 ```python
 radii_single_box = particle_data.radii[0]
