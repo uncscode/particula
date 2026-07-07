@@ -1,22 +1,24 @@
 # E2-F8 Phase Details
 
-- [ ] **E2-F8-P1:** Audit CPU dynamics container boundaries and baseline docs
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Produce the implementation baseline by confirming condensation,
-    coagulation, and docs currently distinguish container shapes from strategy
-    execution incompletely.
-  - Files: `particula/dynamics/condensation/condensation_strategies.py`,
-    `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`,
-    `docs/Features/particle-data-migration.md`
-  - Tests: Add or update the smallest baseline tests needed to capture current
-    single-box behavior and any unsupported multi-box paths discovered during
-    the audit.
+- [x] **E2-F8-P1:** Audit CPU dynamics container boundaries and baseline docs
+  - Issue: #1218 | Size: XS | Status: Completed
+  - Goal: Produce the implementation baseline by confirming condensation and
+    coagulation distinguish container shapes from strategy execution
+    incompletely, then lock the current behavior in with focused regressions.
+  - Files: `particula/dynamics/condensation/tests/condensation_strategies_test.py`,
+    `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`
+  - Tests: Added a public condensation regression that preserves the existing
+    single-box `ValueError`, plus coagulation regressions proving helper-backed
+    reads and particle-resolved `step()` mutations are still box-0-only.
+  - Docs: General-doc review concluded no user-facing doc edit was needed in
+    this audit-only phase; follow-up doc targets remain queued for later phases.
 
 - [ ] **E2-F8-P2:** Clarify single-box requirements with focused tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add public-method tests for CPU condensation multi-box rejection and
-    CPU coagulation multi-box rejection, requiring explicit unsupported errors
-    instead of silent box-0 mutation.
+  - Goal: Use the P1 baseline to decide whether CPU coagulation should move
+    from documented box-0 behavior to explicit unsupported multi-box errors,
+    while keeping condensation public-method coverage aligned with its current
+    single-box guard.
   - Files: `particula/dynamics/condensation/tests/condensation_strategies_test.py`,
     `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`,
     optional validation helper changes in the corresponding strategy modules.
@@ -26,7 +28,8 @@
 - [ ] **E2-F8-P3:** Improve unsupported multi-box errors and user documentation
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Finish user-facing and development-doc guidance and align error
-    messages with the final tested behavior.
+    messages with the final tested behavior selected after the P1 baseline and
+    any P2 validation changes.
   - Files: `docs/Features/particle-data-migration.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, and strategy modules if error
     wording needs final adjustment.

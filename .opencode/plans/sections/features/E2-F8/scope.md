@@ -7,8 +7,8 @@
 - Add or strengthen tests that distinguish:
   - data-container shape support (`n_boxes >= 1`), and
   - CPU strategy execution support (`n_boxes=1` or transitional box-0 only).
-- Clarify public error messages for unsupported multi-box strategy calls,
-  especially where silent box-0 execution could confuse users.
+- Audit current public error-message and box-0-only behavior for unsupported
+  multi-box strategy calls without changing runtime semantics in P1.
 - Update user-facing docs in `docs/Features/particle-data-migration.md` and,
   if helpful, `docs/Features/Roadmap/data-oriented-gpu.md`.
 - Keep unit tests co-located with the dynamics modules they exercise.
@@ -29,8 +29,8 @@
 - Condensation's current `_require_single_box` behavior is intentional and
   should remain unless future tracks implement multi-box strategy execution.
 - Coagulation's current box-0 behavior should be either explicitly rejected for
-  `n_boxes != 1` or documented as transitional with tests proving boxes beyond
-  zero are not executed.
+  `n_boxes != 1` in a later phase or documented as transitional with tests
+  proving boxes beyond zero are not executed.
 
 ## Done Boundary
 
