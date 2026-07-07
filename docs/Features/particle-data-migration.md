@@ -15,8 +15,12 @@ that page now redirects to this canonical guide.
 
 ## Overview
 
-Before adding container fields or changing CPU↔GPU conversion behavior, review
-the roadmap's
+Before adding container fields or changing CPU↔GPU conversion behavior, start
+with the canonical
+[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)
+guide for the shipped schema, shape, helper, and support-boundary contract.
+
+For roadmap policy and planned follow-on work, review the roadmap's
 [authoritative field ownership decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
 [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows),
 and [final downstream handoff map for sibling
@@ -42,10 +46,11 @@ in strategies and runnables:
 
 !!! note
     `EnvironmentData` is the shipped CPU container for per-box thermodynamic
-    state, not a separate gas facade. It is available from
-    `particula.gas.environment_data` and is exported from `particula.gas` for
-    package-level imports. It requires at least one box at construction time.
-    The only shipped CPU↔GPU transfer boundary is the explicit helper trio
+    state, not a separate gas facade. It is exported from `particula.gas` for
+    package-level imports, while
+    `particula.gpu.WarpEnvironmentData` remains available only when Warp is
+    installed. It requires at least one box at construction time. The only
+    shipped CPU↔GPU transfer boundary is the explicit helper trio
     `particula.gpu.WarpEnvironmentData`,
     `particula.gpu.to_warp_environment_data()`, and
     `particula.gpu.from_warp_environment_data()`. The shape contract stays
@@ -67,11 +72,14 @@ in strategies and runnables:
     fields and `from_warp_gas_data()` can validate only the supplied name-list
     length today; it does not verify that restored names still match the
     original species ordering, and GPU helper state such as
-    `WarpGasData.vapor_pressure` is dropped on CPU restore. Use the roadmap's
+    `WarpGasData.vapor_pressure` is dropped on CPU restore. Use
+    [Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)
+    as the authoritative shipped contract for this restore boundary, and use
+    the roadmap's
     [authoritative field ownership decisions](Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
     [canonical shape conventions for container workflows](Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows),
     and [final downstream handoff map for sibling features](Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features)
-    as the authoritative contract for this restore boundary.
+    for deeper policy and future-work context.
 
 ## Why migrate
 
@@ -103,7 +111,7 @@ rep = par.particles.ParticleRepresentation(
 )
 
 # New data container
-from particula.particles.particle_data import ParticleData
+from particula.particles import ParticleData
 
 data = ParticleData(
     # (n_boxes, n_particles, n_species)
@@ -130,7 +138,7 @@ species = par.gas.GasSpecies(
 )
 
 # New data container
-from particula.gas.gas_data import GasData
+from particula.gas import GasData
 
 gas_data = GasData(
     name=["Water"],
@@ -200,6 +208,10 @@ gas_data = GasData(
     required.
 
 ### `GasData` ↔ `WarpGasData` field authority
+
+For the canonical reference page covering this transfer boundary alongside
+`ParticleData`, `EnvironmentData`, and current support limits, see
+[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md).
 
 Use this table as the migration-facing summary for what each container owns and
 what survives the explicit CPU↔GPU helper boundary.
@@ -272,6 +284,10 @@ species = par.gas.GasSpecies.from_data(
 ```
 
 ## Using ParticleData/GasData in dynamics
+
+For the canonical support-boundary summary, including the preserved leading
+`n_boxes` axis and the explicit environment-helper boundary, see
+[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md).
 
 Condensation and coagulation strategies accept both legacy facades and the new
 data containers. The return type matches the input type, but that container
@@ -430,16 +446,15 @@ particle_out, gas_out = condensation_step_gpu(
 
 Use the conversion helpers when you need to bridge old and new APIs:
 
-- [`from_representation`](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py)
-  and [`to_representation`](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py)
-  for particle data.
-- [`from_species`](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data.py)
-  and [`to_species`](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data.py)
-  for gas data.
+- `from_representation` and `to_representation` for particle data. Their
+  implementation lives in `particula/particles/particle_data.py` and they are
+  exported from `particula.particles`.
+- `from_species` and `to_species` for gas data. Their implementation lives in
+  `particula/gas/gas_data.py` and they are exported from `particula.gas`.
 
 ```python
-from particula.particles.particle_data import from_representation
-from particula.gas.gas_data import from_species
+from particula.gas import from_species
+from particula.particles import from_representation
 
 particle_data = from_representation(rep, n_boxes=1)
 gas_data = from_species(species, n_boxes=1)
@@ -504,10 +519,7 @@ convert it at the explicit `to_warp_environment_data()` boundary.
 
 ## Related references
 
-- `ParticleData` source:
-  [particula/particles/particle_data.py](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py)
-- `GasData` source:
-  [particula/gas/gas_data.py](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data.py)
-- Legacy facades:
-  [particula/particles/representation.py](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py),
-  [particula/gas/species.py](https://github.com/uncscode/particula/blob/main/particula/gas/species.py)
+- `ParticleData` implementation: `particula/particles/particle_data.py`
+- `GasData` implementation: `particula/gas/gas_data.py`
+- Legacy facades: `particula/particles/representation.py`,
+  `particula/gas/species.py`

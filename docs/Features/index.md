@@ -42,12 +42,21 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](wall_loss_strategy_system.md)
 
+-   __[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)__
+
+    ---
+
+    Canonical reference for container schemas, shape conventions, explicit
+    CPU↔GPU transfer helpers, and current support boundaries.
+
+    [:octicons-arrow-right-24: Learn more](data-containers-and-gpu-foundations.md)
+
 -   __[Particle & Gas Data Migration](particle-data-migration.md)__
 
     ---
 
-    Migration guide from legacy APIs (ParticleRepresentation, GasSpecies)
-    to the new data containers (ParticleData, GasData).
+    Migration guide from legacy APIs to the new data containers; use the
+    foundation guide for the canonical container and transfer contract.
 
     [:octicons-arrow-right-24: Learn more](particle-data-migration.md)
 
