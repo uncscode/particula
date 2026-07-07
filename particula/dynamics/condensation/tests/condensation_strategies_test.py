@@ -277,6 +277,26 @@ class TestCondensationIsothermal(unittest.TestCase):
                 pressure=self.pressure,
             )
 
+    def test_step_rejects_multi_box_data_inputs(self):
+        """step() preserves the public single-box guard for data inputs."""
+        strategy = self._make_data_strategy()
+
+        particle_data = from_representation(self.particle, n_boxes=2)
+        gas_data = from_species(self.gas_species, n_boxes=2)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "ParticleData must have n_boxes=1 for condensation strategies, "
+            "got n_boxes=2.",
+        ):
+            strategy.step(
+                particle=particle_data,
+                gas_species=gas_data,
+                temperature=self.temperature,
+                pressure=self.pressure,
+                time_step=self.time_step,
+            )
+
     def test_knudsen_number(self):
         """Test the Knudsen number call."""
         radius = 1e-9  # m
@@ -1132,6 +1152,25 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         self.assertIsInstance(particle_new, ParticleData)
         self.assertIsInstance(gas_new, GasData)
         self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)
+
+    def test_staggered_step_rejects_multi_box_data_inputs(self):
+        """Staggered step rejects unsupported multi-box data inputs."""
+        strategy = self._make_data_strategy()
+        particle_data = from_representation(self.particle, n_boxes=2)
+        gas_data = from_species(self.gas_species, n_boxes=2)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "ParticleData must have n_boxes=1 for condensation strategies, "
+            "got n_boxes=2.",
+        ):
+            strategy.step(
+                particle_data,
+                gas_data,
+                self.temperature,
+                self.pressure,
+                time_step=self.time_step,
+            )
 
     def test_staggered_step_returns_matching_types(self):
         """Staggered step returns matching types for legacy and data inputs."""

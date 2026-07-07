@@ -46,10 +46,22 @@ def _unwrap_particle(particle: ParticleLike) -> ParticleLike:
     return particle
 
 
+def _require_single_box_particle_data(particle: ParticleData) -> ParticleData:
+    """Validate that ParticleData uses the supported single-box layout."""
+    if particle.n_boxes != 1:
+        raise ValueError(
+            "ParticleData must have n_boxes=1 for CPU coagulation "
+            "strategies; multi-box execution is unsupported, got "
+            f"n_boxes={particle.n_boxes}."
+        )
+    return particle
+
+
 def _get_radius(particle: ParticleLike) -> NDArray[np.float64]:
     """Return particle radii for either legacy or new data containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         return particle.radii[0]
     return cast(ParticleRepresentation, particle).get_radius()
 
@@ -58,6 +70,7 @@ def _get_mass(particle: ParticleLike) -> NDArray[np.float64]:
     """Return particle total mass for either legacy or new data containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         return particle.total_mass[0]
     return cast(ParticleRepresentation, particle).get_mass()
 
@@ -66,6 +79,7 @@ def _get_concentration(particle: ParticleLike) -> NDArray[np.float64]:
     """Return particle concentration for either legacy or new containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         return particle.concentration[0]
     return cast(ParticleRepresentation, particle).concentration
 
@@ -74,6 +88,7 @@ def _get_charge(particle: ParticleLike) -> Optional[NDArray[np.float64]]:
     """Return particle charge for either legacy or new containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         return particle.charge[0]
     return cast(ParticleRepresentation, particle).get_charge()
 
@@ -82,6 +97,7 @@ def _get_volume(particle: ParticleLike) -> float:
     """Return particle simulation volume for either legacy or new containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         return float(particle.volume[0])
     return cast(ParticleRepresentation, particle).get_volume()
 
@@ -90,6 +106,7 @@ def _get_effective_density(particle: ParticleLike) -> NDArray[np.float64]:
     """Return particle effective density for either legacy or new containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         return particle.effective_density[0]
     return cast(ParticleRepresentation, particle).get_effective_density()
 
@@ -98,6 +115,7 @@ def _get_mean_effective_density(particle: ParticleLike) -> float:
     """Return the mean effective density for either legacy or new containers."""
     particle = _unwrap_particle(particle)
     if isinstance(particle, ParticleData):
+        particle = _require_single_box_particle_data(particle)
         effective_density = particle.effective_density[0]
         effective_density = effective_density[effective_density != 0]
         if effective_density.size == 0:
@@ -605,6 +623,8 @@ class CoagulationStrategyABC(ABC):
             ```
         """
         particle = _unwrap_particle(particle)
+        if isinstance(particle, ParticleData):
+            particle = _require_single_box_particle_data(particle)
         if self.distribution_type in ["discrete", "continuous_pdf"]:
             net_rate_value = self.net_rate(
                 particle=particle,
