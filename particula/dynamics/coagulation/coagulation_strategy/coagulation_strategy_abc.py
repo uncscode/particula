@@ -154,6 +154,7 @@ def _get_particle_resolved_kernel_radius_data(
     Raises:
         ValueError: If finite radii cannot be determined for binning.
     """
+    data = _require_single_box_particle_data(data)
     if bin_radius is not None:
         return bin_radius
     particle_radius = data.radii[0]
@@ -210,6 +211,7 @@ def _get_binned_kernel_data_from_particle_data(
     Returns:
         ParticleData with binned masses, concentration, and charge.
     """
+    data = _require_single_box_particle_data(data)
     radii = data.radii[0]
     masses = data.masses[0]
     concentration = data.concentration[0]
