@@ -2,22 +2,23 @@
 
 ## Documentation Validation
 
-- Run markdown link validation or mkdocs build if configured in the repository.
-- Confirm new feature and example pages are linked from their indexes.
+- Run `mkdocs build --strict` (or `python -m mkdocs build --strict`) as the
+  authoritative docs validation command for the issue #1222 documentation work.
+- Confirm the new feature guide is linked from `docs/Features/index.md` and any
+  supporting docs index updates.
 - Verify docs import snippets use public API paths and current object names.
 
 Target docs paths for this feature are
 `docs/Features/data-containers-and-gpu-foundations.md`,
-`docs/Features/index.md`, `docs/Examples/index.md`, and the roadmap cross-links
-updated in P3.
+`docs/Features/index.md`, `docs/Features/particle-data-migration.md`, and any
+supporting discoverability updates such as `docs/index.md`.
 
 ## Example Validation
 
-- Smoke-run plain Python examples in a default development environment.
-- Guard Warp-specific paths with `WARP_AVAILABLE`; absence of Warp should skip
-  or print a clear explanatory message, not fail unexpectedly.
-- If examples include notebooks, edit paired `.py` files, sync notebooks, and run
-  the repository notebook execution tool.
+- No example validation is required for issue #1222 because no `docs/Examples/`
+  files were added in P1.
+- Example smoke-running, Warp guards, and notebook sync/execution remain P2
+  validation requirements.
 
 For P2, keep executable example coverage tied to the concrete example targets:
 `docs/Examples/data_containers_and_gpu_foundations.py` and, if added,
@@ -36,10 +37,11 @@ the example script or notebook is actually smoke-tested.
 ## Suggested Commands
 
 ```bash
+python -m mkdocs build --strict
 python docs/Examples/data_containers_and_gpu_foundations.py
-python3 .opencode/tool/validate_notebook.py \
+python3 .opencode/tools/validate_notebook.py \
   docs/Examples/data_containers_and_gpu_foundations.ipynb --sync
-python3 .opencode/tool/run_notebook.py \
+python3 .opencode/tools/run_notebook.py \
   docs/Examples/data_containers_and_gpu_foundations.ipynb
 ```
 

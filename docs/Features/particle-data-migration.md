@@ -11,7 +11,7 @@ compatibility, but they are deprecated and emit log warnings to guide you
 toward the data-first workflow.
 
 If you arrived here from the legacy path `docs/migration/particle-data.md`,
-that page now redirects to this canonical guide.
+that page now redirects to this migration guide.
 
 ## Overview
 
@@ -299,9 +299,12 @@ multi-box execution.
 | Condensation | Legacy `ParticleRepresentation` + `GasSpecies`, or `ParticleData` + `GasData` | Supported with `n_boxes == 1` only | Run a caller-managed per-box loop in user code and pass one box at a time |
 | Coagulation | Legacy `ParticleRepresentation`, or `ParticleData` | Supported with `n_boxes == 1` only | Run a caller-managed per-box loop in user code and pass one box at a time |
 
-This is the canonical user-facing CPU support contract: `ParticleData` and
-`GasData` storage can be multi-box, but the current audited CPU condensation
-and CPU coagulation execution paths remain single-box workflows.
+The shipped CPU support boundary remains narrower than the storage schema:
+`ParticleData` and `GasData` storage can be multi-box, but the current audited
+CPU condensation and CPU coagulation execution paths remain single-box
+workflows. Use
+[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)
+as the canonical reference for the support contract.
 
 Today, the compatibility boundary is still scalar at many process entry points:
 existing dynamics APIs may continue to accept scalar `temperature` and
