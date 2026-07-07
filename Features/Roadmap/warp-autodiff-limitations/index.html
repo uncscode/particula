@@ -11221,6 +11221,8 @@
       
         
       
+        
+      
     
     
     
@@ -11276,6 +11278,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../condensation-stiffness-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Condensation Stiffness Study and Recommendation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -14666,7 +14696,7 @@
 
 <h1 id="warp-autodiff-limitations-and-stochastic-process-handling">Warp Autodiff: Limitations and Stochastic Process Handling<a class="headerlink" href="#warp-autodiff-limitations-and-stochastic-process-handling" title="Permanent link">&para;</a></h1>
 <p>Reference notes for the differentiable-simulation goal in the
-<a href="../data-oriented-gpu/#differentiability-for-global-optimization-warp-autodiff">Data-Oriented Design and GPU Roadmap</a>.</p>
+<a href="../data-oriented-gpu/#epic-e-differentiability-and-global-optimization">Data-Oriented Design and GPU Roadmap</a>.</p>
 <p>This page records how NVIDIA Warp automatic differentiation works, the
 constraints it imposes on kernel authoring, and the options for making
 stochastic aerosol processes (especially particle-resolved coagulation)
@@ -15037,7 +15067,10 @@ are already gradient-friendly; the stochastic control flow is not.</p>
   <code>condensation_mass_transfer_kernel</code> computes a smooth rate and
   <code>apply_mass_transfer_kernel</code> applies it with <code>+=</code>-style updates plus a clamp
   (<code>particula/gpu/kernels/condensation.py</code>). This is the model to follow for a
-  differentiable coagulation rate kernel.</li>
+  differentiable coagulation rate kernel. The P4 condensation stiffness
+  recommendation builds on a fixed-count substepping variant of this pattern,
+  because fixed iteration counts fit Warp autodiff and graph-capture
+  expectations better than adaptive loop structures.</li>
 </ul>
 <h3 id="non-differentiable-points-in-coagulation">Non-differentiable points in coagulation<a class="headerlink" href="#non-differentiable-points-in-coagulation" title="Permanent link">&para;</a></h3>
 <p>All three are in <code>particula/gpu/kernels/coagulation.py</code>:</p>
@@ -15059,6 +15092,10 @@ differentiate correctly as written.</p>
 <li>Prove the autodiff loop on deterministic condensation first: allocate
   <code>requires_grad=True</code> inputs, record a multi-step condensation loop on a tape,
   and validate with <code>wp.autograd.gradcheck</code>.</li>
+<li>For condensation implementation work, prefer the documented
+  <code>fixed_count_substeps_4</code> foundation over adaptive or per-case dynamic-loop
+  schemes. The fixed loop count is easier to replay, keeps buffer layouts
+  stable for graph capture, and avoids data-dependent backward-pass structure.</li>
 <li>For coagulation, build a differentiable deterministic binned coagulation
   kernel (Smoluchowski) as the gradient path, distinct from the stochastic
   particle-resolved forward kernel. Validate that the two agree in the mean
@@ -15066,6 +15103,9 @@ differentiate correctly as written.</p>
 <li>Keep optimization-path kernels to static loops, <code>+=</code>/<code>-=</code> updates, and
   guarded gradients. Avoid <code>*=</code>, <code>/=</code>, hard index scatter, and data-dependent
   loop bounds on that path.</li>
+<li>Keep the existing condensation clamp boundary in mind: mass non-negativity is
+  still enforced with a non-smooth clamp, so gradients near that boundary will
+  remain less smooth even on the recommended fixed-count path.</li>
 <li>Turn on <code>wp.config.verify_autograd_array_access=True</code> in tests to catch
   write-after-read overwrites early.</li>
 <li>Define the state loss functions (size-distribution distance, hygroscopicity
