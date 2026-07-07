@@ -45,11 +45,11 @@
     {
       "id": "E2-F8-P2",
       "title": "Clarify single-box and box-0 behavior with focused tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-07",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
