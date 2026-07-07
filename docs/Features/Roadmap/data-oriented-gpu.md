@@ -77,9 +77,15 @@ The core data-oriented model is implemented.
   partitioning flags with explicit box dimensions.
 - Conversion helpers bridge legacy facades and new containers.
 - Condensation and coagulation strategies accept the new data containers in
-  addition to legacy facades.
+  addition to legacy facades, but that compatibility is a container-boundary
+  statement and not proof of shipped CPU multi-box execution across every box.
 - Migration documentation exists in
   [ParticleData and GasData Migration](../particle-data-migration.md).
+
+For the canonical user-facing CPU support boundary, including the current
+`n_boxes == 1` limitation for audited CPU condensation and CPU coagulation
+container workflows, refer to
+[ParticleData and GasData Migration](../particle-data-migration.md).
 
 The work is still a migration, not a full replacement. `ParticleRepresentation`
 and `GasSpecies` remain available for compatibility.
