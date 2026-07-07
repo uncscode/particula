@@ -47,7 +47,8 @@ Welcome to the Particula Features documentation! This section provides comprehen
     ---
 
     Canonical reference for container schemas, shape conventions, explicit
-    CPU↔GPU transfer helpers, and current support boundaries.
+    CPU↔GPU transfer helpers, current support boundaries, and the runnable
+    [Data Containers example](../Examples/Data_Containers/index.md).
 
     [:octicons-arrow-right-24: Learn more](data-containers-and-gpu-foundations.md)
 

@@ -106,19 +106,21 @@ mkdocs build
 mkdocs serve
 ```
 
-## Notebook Workflow
+## Example Source Workflow
 
-Notebooks in `docs/Examples/` use Jupytext paired sync. Edit the `.py` percent
-file, not the `.ipynb` directly.
+`docs/Examples/` can contain runnable `.py` examples, paired notebooks, or
+both. When an example is notebook-backed, edit the `.py` percent file, not the
+`.ipynb` directly.
 
 ```bash
 ruff check docs/Examples/path/to/file.py --fix
 ruff format docs/Examples/path/to/file.py
-python3 .opencode/tool/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
-python3 .opencode/tool/run_notebook.py docs/Examples/path/to/file.ipynb
+python3 .opencode/tools/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
+python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
 ```
 
-Commit both the `.py` and `.ipynb` files after sync and execution.
+Commit both the `.py` and `.ipynb` files after sync and execution when the
+example ships as a notebook.
 
 ## Architecture Documentation
 

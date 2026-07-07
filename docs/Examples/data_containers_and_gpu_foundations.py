@@ -1,4 +1,8 @@
-"""Top-level runnable entrypoint for the data-container example."""
+"""Run the published data-container and Warp-transfer example.
+
+This wrapper preserves the top-level command path documented for the example
+while forwarding execution to the topic-directory implementation.
+"""
 
 from __future__ import annotations
 
@@ -7,7 +11,12 @@ from pathlib import Path
 
 
 def main() -> None:
-    """Load and run the topic-directory example implementation."""
+    """Load and run the topic-directory example implementation.
+
+    Raises:
+        RuntimeError: If the implementation module cannot be loaded from the
+            topic-directory example path.
+    """
     example_path = (
         Path(__file__).resolve().parent
         / "Data_Containers"

@@ -8,6 +8,14 @@ This page is the canonical reference for Particula's shipped data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
 and current CPU/GPU support boundaries.
 
+For a runnable walkthrough of the shipped single-box container construction and
+optional Warp CPU-backend round trips, see the
+[Data Containers example](../Examples/Data_Containers/index.md) and run:
+
+```bash
+python docs/Examples/data_containers_and_gpu_foundations.py
+```
+
 Use this guide when you need the current contract for:
 
 - `ParticleData`, `GasData`, and `EnvironmentData`
@@ -281,6 +289,7 @@ Additional shipped boundaries:
 
 ## Related references
 
+- [Data Containers example](../Examples/Data_Containers/index.md)
 - [Particle & Gas Data Migration](particle-data-migration.md)
 - [Data-Oriented Design and GPU Roadmap](Roadmap/data-oriented-gpu.md)
 - [Mass Precision Recommendation Report](Roadmap/mass-precision-study.md)

@@ -18,21 +18,21 @@
 
 ## E2-F9-P2: Examples
 
-- Add `docs/Examples/data_containers_and_gpu_foundations.py` as the primary
-  example file and keep the example small enough to execute in the default dev
-  environment.
-- In that example, construct or convert documented `ParticleData` and `GasData`
-  objects using public APIs.
-- Add a minimal GPU transfer section with:
+- Added `docs/Examples/data_containers_and_gpu_foundations.py` as the published
+  wrapper entrypoint while keeping the example logic in
+  `docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py`.
+- The shipped example constructs documented single-box `ParticleData` and
+  `GasData` objects using public APIs and prints concise shape-oriented output.
+- The shipped GPU transfer section uses:
   - `from particula.gpu import WARP_AVAILABLE` guard.
   - `to_warp_particle_data` and `from_warp_particle_data`.
   - `to_warp_gas_data(..., vapor_pressure=...)` and
     `from_warp_gas_data(..., name=...)`.
-  - A note that CUDA is optional and Warp CPU/fallback behavior depends on the
-    installed environment.
-- Link the example from `docs/Examples/index.md` and the new foundation guide.
-- If notebooks are used, pair them with the same base filename and follow the
-  repository's `.py`/`.ipynb` sync and execution workflow.
+  - A clear note that Warp-backed transfers are optional and use the Warp CPU
+    backend (`device="cpu"`) when available.
+- Linked the example from `docs/Examples/index.md` and published the rendered
+  landing page at `docs/Examples/Data_Containers/index.md`.
+- No notebook was used for the shipped implementation.
 
 ## E2-F9-P3: Handoff and Validation
 
@@ -43,3 +43,5 @@
 - Smoke-run `docs/Examples/data_containers_and_gpu_foundations.py` in the
   repository's default development environment.
 - Record any optional-Warp validation limitations in the final PR notes.
+- Keep `particula/gpu/tests/data_containers_example_test.py` aligned with the
+  published entrypoint and example output contract.

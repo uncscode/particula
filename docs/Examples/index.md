@@ -135,7 +135,7 @@ Jump in by selecting any card below and follow along in your browser or local en
     processes.
 
     Key examples:
-    - [Wall Loss Builders and Factory](Dynamics/wall_loss_builders_factory.md)
+    - [Wall Loss Builders and Factory](Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb)
 
     [:octicons-arrow-right-24: Tutorial](Dynamics/index.md)
 

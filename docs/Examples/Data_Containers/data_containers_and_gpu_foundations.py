@@ -1,4 +1,9 @@
-"""Runnable data-container and optional Warp-transfer example."""
+"""Demonstrate data-container construction and optional Warp CPU round trips.
+
+The example builds public ``ParticleData`` and ``GasData`` containers with the
+documented single-box shapes, then optionally exercises Warp-backed transfer
+helpers on the Warp CPU backend when Warp is available.
+"""
 
 from __future__ import annotations
 
@@ -19,7 +24,12 @@ _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
 
 
 def _build_particle_data() -> ParticleData:
-    """Create a single-box ParticleData example with documented shapes."""
+    """Create a single-box particle container for the example.
+
+    Returns:
+        ParticleData: Example particle data with documented public shapes for
+        masses, concentration, charge, density, and volume.
+    """
     return ParticleData(
         masses=np.array([[[1.0e-18, 2.5e-18], [3.5e-18, 0.5e-18]]]),
         concentration=np.array([[1.0e6, 2.5e5]]),
@@ -30,7 +40,12 @@ def _build_particle_data() -> ParticleData:
 
 
 def _build_gas_data() -> GasData:
-    """Create a single-box GasData example with documented shapes."""
+    """Create a single-box gas container for the example.
+
+    Returns:
+        GasData: Example gas data with documented public shapes for species
+        names, molar mass, concentration, and partitioning.
+    """
     return GasData(
         name=["Water", "H2SO4"],
         molar_mass=np.array([0.018, 0.098]),
@@ -40,12 +55,22 @@ def _build_gas_data() -> GasData:
 
 
 def _warp_enabled() -> bool:
-    """Return whether this run should execute optional Warp transfers."""
+    """Return whether optional Warp-backed transfers should run.
+
+    Returns:
+        bool: ``True`` when Warp is available and the opt-out environment
+        variable is not set.
+    """
     return WARP_AVAILABLE and os.getenv(_FORCE_NO_WARP_ENV) != "1"
 
 
 def run_example() -> list[str]:
-    """Run the documented CPU example and optional Warp round trips."""
+    """Run the documented CPU example and optional Warp round trips.
+
+    Returns:
+        list[str]: Human-readable output lines describing the constructed data
+        containers and any optional Warp round-trip results.
+    """
     particle_data = _build_particle_data()
     gas_data = _build_gas_data()
     vapor_pressure = np.array([[2330.0, 120.0]], dtype=np.float64)
@@ -101,7 +126,7 @@ def run_example() -> list[str]:
 
 
 def main() -> None:
-    """Print the example output for manual validation."""
+    """Print the example output lines for manual validation."""
     for line in run_example():
         print(line)
 
