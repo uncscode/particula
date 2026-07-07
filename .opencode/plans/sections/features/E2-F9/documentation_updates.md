@@ -21,13 +21,20 @@
 
 ## Examples
 
-- No `docs/Examples/` artifacts were added in issue #1222; runnable examples
-  remain deferred to E2-F9-P2.
+- Added `docs/Examples/data_containers_and_gpu_foundations.py` as the published
+  top-level runnable entrypoint required by issue #1223.
+- Added `docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py`
+  as the topic-directory implementation source of truth for the example logic.
+- Added `docs/Examples/Data_Containers/index.md` as the rendered landing page
+  with the canonical run command and GitHub source links.
+- Updated `docs/Examples/index.md` with a `Data Containers` card so the example
+  is discoverable from the examples gallery.
+- No notebook artifact was added; the shipped example remains Python-only.
 
 ## Roadmap and Handoff Docs
 
 - The new foundation guide links readers to
   `docs/Features/Roadmap/data-oriented-gpu.md` for future work and planned
   expansions.
-- No standalone roadmap-page edits are required to reflect the documentation
-  delivered in issue #1222.
+- No standalone roadmap-page edits were required for the issue #1223 example and
+  discoverability work.

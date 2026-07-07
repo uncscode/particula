@@ -15,15 +15,19 @@
     doc-snippet import accuracy for the shipped public APIs.
 
 - [ ] **E2-F9-P2:** Minimal data-container and GPU transfer examples with guards
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add small examples that show documented container usage and optional
-    Warp transfers without requiring CUDA for the default path.
+  - Issue: #1223 | Size: S | Status: implementation landed on branch; metadata still pending update
+  - Goal: Add a small runnable example that shows documented container usage and
+    optional Warp transfers without requiring CUDA for the default path.
   - Files: `docs/Examples/data_containers_and_gpu_foundations.py`,
-    `docs/Examples/index.md`, and `docs/Examples/data_containers_and_gpu_foundations.ipynb`
-    only if the implementation chooses a paired notebook instead of a Python-only
-    example.
-  - Tests: Run examples on CPU/default environment; if notebooks are added,
-    sync and execute paired notebooks through repository notebook tools.
+    `docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py`,
+    `docs/Examples/Data_Containers/index.md`, `docs/Examples/index.md`, and
+    `particula/gpu/tests/data_containers_example_test.py`.
+  - Branch outcome: the top-level wrapper forwards to the topic-directory
+    implementation, the rendered examples page documents the canonical run
+    command, Warp transfers stay behind `WARP_AVAILABLE` on `device="cpu"`, and
+    smoke tests cover both the CPU-only success path and the optional Warp path.
+  - Tests: `python docs/Examples/data_containers_and_gpu_foundations.py` and
+    `pytest particula/gpu/tests/data_containers_example_test.py -q`.
 
 - [ ] **E2-F9-P3:** Roadmap handoff links, docs index wiring, and validation
   - Issue: TBD | Size: XS | Status: Not Started

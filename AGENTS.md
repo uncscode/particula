@@ -415,9 +415,11 @@ pytest --cov=particula
 .opencode/tools/run_linters.py && .opencode/tools/run_pytest.py
 ```
 
-## Notebook Editing (Jupytext Paired Sync)
+## Example Editing
 
-Notebooks in `docs/Examples/` use Jupytext paired sync. Edit `.py` files, not `.ipynb`:
+`docs/Examples/` may contain runnable `.py` entrypoints, paired notebooks, or
+both. For notebook-backed examples, use Jupytext paired sync and edit `.py`
+files, not `.ipynb`:
 
 ```bash
 # 1. Edit the .py file (percent format with # %% cell markers)
@@ -435,10 +437,11 @@ python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
 ```
 
 **Key points:**
-- Always edit `.py` files, not `.ipynb` directly
+- Runnable script examples may be standalone `.py` files without notebooks
+- Always edit `.py` files, not `.ipynb` directly, when a notebook pair exists
 - Lint before sync to catch syntax errors
 - Execute after sync to validate code and generate website outputs
-- Commit both files to keep them paired
+- Commit both files to keep them paired when the example includes a notebook
 
 **Full documentation:** `.opencode/guides/documentation_guide.md` (Jupytext Paired Sync Workflow section)
 
