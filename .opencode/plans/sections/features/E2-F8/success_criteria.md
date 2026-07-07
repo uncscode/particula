@@ -5,9 +5,8 @@
 - CPU condensation public data-container paths reject multi-box inputs with
   tested current `ValueError` messages.
 - CPU coagulation multi-box `ParticleData` behavior is no longer implicit in the
-  plan: helper-backed reads and particle-resolved `step()` mutation are
-  explicitly captured as box-0-only baseline behavior until a later phase
-  changes it.
+  plan: helper-backed reads and particle-resolved `step()` paths now reject
+  unsupported multi-box execution with tested `ValueError` messages.
 - Single-box `ParticleData`/`GasData` dynamics behavior remains supported.
 
 ## Documentation Criteria
@@ -25,8 +24,8 @@
 
 - Focused condensation tests pass.
 - Focused coagulation strategy tests pass.
-- Assertions cover the current condensation public error boundary plus current
-  coagulation box-0-only read and mutation behavior.
+- Assertions cover the current condensation public error boundary plus explicit
+  coagulation multi-box rejection behavior.
 - No standalone testing phase is required because tests are co-located with the
   phases that change behavior.
 

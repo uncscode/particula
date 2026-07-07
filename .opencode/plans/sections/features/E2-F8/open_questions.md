@@ -2,18 +2,17 @@
 
 ## Resolved Answers
 
-1. P1 does not change runtime coagulation semantics. Current CPU coagulation
-   still accepts multi-box `ParticleData`, and the new regressions lock in the
-   present box-0-only read and mutation behavior for later phases to revisit.
-2. Use `IsothermalCondensationStrategy.step()` plus one public pressure-delta or
-   mass-transfer path that already flows through `_require_single_box` for
-   representative multi-box rejection tests. Implemented choice: public
-   `mass_transfer_rate(...)` coverage.
-3. No general documentation update was needed in this audit-only phase; keep any
-   future caller-managed per-box loop guidance deferred until a later doc phase.
-4. Any later CPU dynamics boundary doc can still mention E2-F2 environment
-   containers as a short cross-reference, but P1 should not imply CPU dynamics
-   have full environment-aware multi-box support.
+1. P2 chose explicit runtime rejection for CPU coagulation `ParticleData`
+   inputs with `n_boxes != 1` by adding a reusable shared guard in
+   `coagulation_strategy_abc.py` before helper reads and `step()` mutation.
+2. Representative condensation public multi-box rejection coverage now includes
+   both the existing `mass_transfer_rate(...)` path and a public `step()` path
+   that flows through `_require_single_box`.
+3. No general documentation update was needed in P2; broader caller guidance and
+   user-facing support-boundary wording remain deferred to the later doc phase.
+4. The tested CPU dynamics boundary now matches the intended E2-F2-aligned
+   wording: multi-box containers may exist, but these CPU strategy paths are
+   still single-box-only unless documented otherwise.
 
 ## Deferred Out-of-Scope Topics
 

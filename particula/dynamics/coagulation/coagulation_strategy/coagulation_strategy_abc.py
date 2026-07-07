@@ -47,7 +47,17 @@ def _unwrap_particle(particle: ParticleLike) -> ParticleLike:
 
 
 def _require_single_box_particle_data(particle: ParticleData) -> ParticleData:
-    """Validate that ParticleData uses the supported single-box layout."""
+    """Validate that ParticleData uses the supported single-box CPU layout.
+
+    Args:
+        particle: ParticleData input to validate.
+
+    Returns:
+        The original ParticleData instance when ``n_boxes == 1``.
+
+    Raises:
+        ValueError: If ``particle.n_boxes`` is not 1.
+    """
     if particle.n_boxes != 1:
         raise ValueError(
             "ParticleData must have n_boxes=1 for CPU coagulation "
@@ -602,7 +612,8 @@ class CoagulationStrategyABC(ABC):
         """Perform a single coagulation step over a specified time interval.
 
         Updates the particle distribution or representation based on the
-        net_rate calculated for the given time_step.
+        net_rate calculated for the given time_step. CPU ``ParticleData``
+        inputs are supported only for ``n_boxes == 1``.
 
         Arguments:
             - particle : The particle data to update.
@@ -615,7 +626,8 @@ class CoagulationStrategyABC(ABC):
             this step.
 
         Raises:
-            - ValueError : If the distribution type is invalid or unsupported.
+            - ValueError : If the distribution type is invalid or unsupported,
+              or if a CPU ParticleData input has ``n_boxes != 1``.
 
         Examples:
             ```py
