@@ -12,8 +12,8 @@
     `_require_single_box` for explicit single-box validation.
 - `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`
   - Existing `ParticleData` adapters (`_get_radius`, `_get_mass`,
-    `_get_concentration`, `_get_volume`) currently read box 0; use this as the
-    audit target and likely insertion point for validation.
+     `_get_concentration`, `_get_volume`) currently read box 0; use this as the
+    audit target and likely insertion point for any later validation change.
 - Existing tests:
   - `particula/dynamics/condensation/tests/condensation_strategies_test.py`
   - `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`
@@ -22,7 +22,8 @@
 
 - `docs/Features/particle-data-migration.md`
   - Already documents dynamics accepting data containers and has a
-    "Single-box vs multi-box data" section; expand it with a support table.
+    "Single-box vs multi-box data" section; keep it as a later follow-up target
+    for a support table once P2/P3 finalize user-facing wording.
 - `docs/Features/Roadmap/data-oriented-gpu.md`
   - Use for roadmap-level language that container support does not imply all
     strategies execute all boxes.
@@ -37,8 +38,9 @@
 ## Gaps to Close
 
 - Condensation has helper-level single-box tests, but public strategy methods
-  need clearer multi-box rejection coverage.
-- Coagulation lacks an explicit multi-box boundary test and may silently mutate
-  only box 0 for multi-box `ParticleData`.
+  needed clearer multi-box rejection coverage; P1 added that baseline at the
+  public `mass_transfer_rate(...)` level.
+- Coagulation lacked explicit multi-box boundary tests; P1 added regressions for
+  helper-backed box-0 reads and particle-resolved box-0-only mutation.
 - Docs currently state dynamics accept containers without enough strategy-level
-  limitations.
+  limitations, but P1 intentionally deferred general-doc edits.

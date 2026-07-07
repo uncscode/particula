@@ -2,23 +2,29 @@
 
 ## E2-F8-P1: Audit CPU Dynamics Container Boundaries and Baseline Docs
 
-- Confirm `ParticleData` and `GasData` shape contracts from their dataclasses.
-- Trace condensation data paths in `condensation_strategies.py` through unwrap,
-  matching-type validation, single-box validation, and box-0 array use.
-- Trace coagulation data paths in `coagulation_strategy_abc.py` through adapter
-  helpers and mutation sites that access `particle.*[0]`.
-- Identify the minimum doc sections requiring updates.
-- Add small baseline tests only if they reduce ambiguity for later phases.
+- [x] Confirm `ParticleData` and `GasData` shape contracts from their
+  dataclasses.
+- [x] Trace condensation data paths in `condensation_strategies.py` through
+  unwrap, matching-type validation, and single-box validation.
+- [x] Trace coagulation data paths in `coagulation_strategy_abc.py` through
+  adapter helpers and mutation sites that access `particle.*[0]`.
+- [x] Identify the minimum doc sections requiring updates.
+- [x] Add small baseline tests only where they reduce ambiguity for later
+  phases.
+- [x] Land the three focused regressions for issue #1218 in the existing
+  condensation and coagulation test modules.
 
 ## E2-F8-P2: Clarify Single-Box and Box-0 Behavior with Focused Tests
 
 - Add public condensation tests that pass multi-box `ParticleData`/`GasData` to
   representative strategy methods and assert clear `ValueError` messages.
-- Add coagulation tests for multi-box `ParticleData` strategy calls.
+- Decide whether to retain the P1 box-0-only coagulation baseline as documented
+  behavior or replace it with explicit unsupported-input validation.
 - Prefer adding a small helper in `coagulation_strategy_abc.py` to require
-  `n_boxes=1` before helpers mutate or compute from box 0.
-- Remove transitional box-0 behavior for unsupported multi-box inputs; tests
-  should assert clear errors instead of documenting partial box-0 execution.
+  `n_boxes=1` before helpers mutate or compute from box 0 if the chosen P2
+  direction is explicit rejection.
+- If P2 changes runtime semantics, replace the transitional box-0 baseline with
+  clear unsupported-input errors and update tests accordingly.
 - Keep tests co-located with changed strategy code.
 
 ## E2-F8-P3: Improve Unsupported Multi-Box Errors and User Documentation
@@ -35,8 +41,8 @@
 ## Verification Commands
 
 ```bash
-pytest particula/dynamics/condensation/tests/condensation_strategies_test.py
-pytest particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py
+pytest particula/dynamics/condensation/tests/condensation_strategies_test.py -v
+pytest particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py -v
 ruff check particula/ docs/Features --fix
 ruff format particula/
 ```

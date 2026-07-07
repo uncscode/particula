@@ -16,3 +16,13 @@
 
 - Completeness review clarified the final phase as a user-facing and
   development-doc support-boundary update gate.
+
+## 2026-07-07
+
+- Updated the feature plan after issue #1218 (E2-F8-P1) landed.
+- Marked P1 complete as an audit-only baseline phase.
+- Recorded that the implementation added three focused regressions only:
+  condensation public multi-box rejection, coagulation helper-backed box-0
+  reads, and particle-resolved coagulation box-0-only mutation.
+- Corrected plan sections that previously implied CPU coagulation already
+  rejects multi-box `ParticleData` or that user-facing docs changed in P1.

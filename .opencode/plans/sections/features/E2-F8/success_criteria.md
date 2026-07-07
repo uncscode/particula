@@ -3,30 +3,34 @@
 ## Functional Criteria
 
 - CPU condensation public data-container paths reject multi-box inputs with
-  clear, tested `ValueError` messages.
-- CPU coagulation multi-box `ParticleData` behavior is no longer ambiguous:
-  unsupported calls raise clear errors rather than using transitional box-0
-  behavior.
+  tested current `ValueError` messages.
+- CPU coagulation multi-box `ParticleData` behavior is no longer implicit in the
+  plan: helper-backed reads and particle-resolved `step()` mutation are
+  explicitly captured as box-0-only baseline behavior until a later phase
+  changes it.
 - Single-box `ParticleData`/`GasData` dynamics behavior remains supported.
 
 ## Documentation Criteria
 
-- `docs/Features/particle-data-migration.md` distinguishes container shape
-  support from CPU strategy execution support.
+- Future doc targets are named precisely enough that later phases can
+  distinguish container shape support from CPU strategy execution support
+  without reopening the baseline audit.
 - Any roadmap text that could imply all current strategies execute every box is
-  clarified.
-- User guidance names the workaround for multi-box workloads: caller-managed
-  per-box execution or waiting for future first-class multi-box strategies.
+  identified for follow-up clarification.
+- If user guidance is added later, it should name the workaround for multi-box
+  workloads: caller-managed per-box execution or waiting for future first-class
+  multi-box strategies.
 
 ## Test Criteria
 
 - Focused condensation tests pass.
 - Focused coagulation strategy tests pass.
-- Error-message assertions cover unsupported multi-box strategy calls.
+- Assertions cover the current condensation public error boundary plus current
+  coagulation box-0-only read and mutation behavior.
 - No standalone testing phase is required because tests are co-located with the
   phases that change behavior.
 
 ## Done Signal
 
-Docs and tests clearly distinguish data-container multi-box shape support from
-strategy-level multi-box execution support for CPU dynamics.
+Plan sections and co-located tests clearly distinguish data-container multi-box
+shape support from current CPU strategy execution support for dynamics.

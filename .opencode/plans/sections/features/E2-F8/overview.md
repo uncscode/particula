@@ -7,9 +7,9 @@ E2 data-container migration: `ParticleData` and `GasData` support multi-box
 shapes at the container/schema level, but current CPU dynamics strategies do
 not provide full multi-box execution semantics. CPU condensation already
 requires `n_boxes=1`; CPU coagulation accepts `ParticleData` but currently
-operates on box 0 through legacy-compatible adapters. Without explicit tests,
-errors, and documentation, users may incorrectly assume that passing a
-multi-box container executes all boxes.
+operates on box 0 through legacy-compatible adapters. Phase P1 for issue
+#1218 stays audit-only and locks that baseline in with focused regressions so
+later phases can change validation or docs from an explicit tested contract.
 
 ## Value Proposition
 
@@ -30,8 +30,8 @@ multi-box container executes all boxes.
 - As a developer maintaining condensation and coagulation strategies, I want
   focused tests around multi-box inputs so that support boundaries do not
   regress silently.
-- As a future multi-box implementer, I want existing unsupported paths to fail
-  clearly or document transitional box-0 behavior so that full multi-box work
+- As a future multi-box implementer, I want existing unsupported paths and
+  transitional box-0 behavior captured precisely so that full multi-box work
   has a clean baseline.
 
 ## Parent Epic Context
