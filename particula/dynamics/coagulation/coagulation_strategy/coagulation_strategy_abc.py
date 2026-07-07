@@ -473,7 +473,8 @@ class CoagulationStrategyABC(ABC):
         """Calculate the coagulation kernel [m^3/s].
 
         Uses particle attributes (e.g., radius, mass) along with temperature
-        and pressure to return a dimensional kernel for coagulation.
+        and pressure to return a dimensional kernel for coagulation. CPU
+        ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
         Arguments:
             particle : ParticleRepresentation or ParticleData providing radius
@@ -483,6 +484,9 @@ class CoagulationStrategyABC(ABC):
 
         Returns:
             - float or NDArray[np.float64] : The coagulation kernel [m^3/s].
+
+        Raises:
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -498,6 +502,8 @@ class CoagulationStrategyABC(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the coagulation loss rate [kg/s].
 
+        CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
+
         Arguments:
             particle : The particle data for which the loss rate
             is calculated.
@@ -508,6 +514,7 @@ class CoagulationStrategyABC(ABC):
 
         Raises:
             - ValueError : If the distribution type is invalid.
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -538,6 +545,8 @@ class CoagulationStrategyABC(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the coagulation gain rate [kg/s].
 
+        CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
+
         Arguments:
             particle : The particle data used in the
             calculation.
@@ -548,6 +557,7 @@ class CoagulationStrategyABC(ABC):
 
         Raises:
             - ValueError : If the distribution type is invalid.
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -580,6 +590,8 @@ class CoagulationStrategyABC(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Compute the net coagulation rate = gain - loss [kg/s].
 
+        CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
+
         Arguments:
             - particle : The particle data.
             - temperature : The gas-phase temperature [K].
@@ -588,6 +600,9 @@ class CoagulationStrategyABC(ABC):
         Returns:
             float or NDArray[np.float64] : The net coagulation rate
             [kg/s]. (positive => net gain, negative => net loss).
+
+        Raises:
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -904,7 +919,8 @@ class CoagulationStrategyABC(ABC):
         """Calculate the diffusive Knudsen number for each particle.
 
         The Knudsen number is used to characterize the relative importance of
-        diffusion-controlled processes.
+        diffusion-controlled processes. CPU ``ParticleData`` inputs are
+        supported only for ``n_boxes == 1``.
 
         Arguments:
             - particle : The particle data.
@@ -913,6 +929,9 @@ class CoagulationStrategyABC(ABC):
 
         Returns:
             - NDArray[np.float64] : Diffusive Knudsen number(s) [dimensionless].
+
+        Raises:
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -942,7 +961,8 @@ class CoagulationStrategyABC(ABC):
         """Calculate the Coulomb potential ratio for each particle.
 
         This ratio characterizes the influence of electrostatic forces on
-        coagulation processes.
+        coagulation processes. CPU ``ParticleData`` inputs are supported only
+        for ``n_boxes == 1``.
 
         Arguments:
             - particle : The particle data.
@@ -950,6 +970,9 @@ class CoagulationStrategyABC(ABC):
 
         Returns:
             - NDArray[np.float64] : Coulomb potential ratio(s) [dimensionless].
+
+        Raises:
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -975,7 +998,8 @@ class CoagulationStrategyABC(ABC):
         """Compute the friction factor for each particle in the aerosol.
 
         Considers dynamic viscosity, mean free path, and slip correction to
-        determine the friction factor [dimensionless].
+        determine the friction factor [dimensionless]. CPU ``ParticleData``
+        inputs are supported only for ``n_boxes == 1``.
 
         Arguments:
             particle : The particle data for which to compute
@@ -985,6 +1009,9 @@ class CoagulationStrategyABC(ABC):
 
         Returns:
             - NDArray[np.float64] : Friction factor(s) [dimensionless].
+
+        Raises:
+            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
