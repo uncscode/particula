@@ -377,6 +377,24 @@ def test_get_particle_resolved_kernel_radius_data_generates_requested_bins() -> 
     assert np.all(np.diff(inferred_bins) >= 0)
 
 
+def test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs() -> (
+    None
+):
+    """Radius helper should reject unsupported multi-box ParticleData."""
+    data = ParticleData(
+        masses=np.array([[[1e-18]], [[2e-18]]]),
+        concentration=np.array([[1.0], [2.0]]),
+        charge=np.array([[0.0], [1.0]]),
+        density=np.array([1000.0]),
+        volume=np.array([1.0, 2.0]),
+    )
+
+    with pytest.raises(ValueError, match=r"n_boxes=1.*n_boxes=2"):
+        coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(
+            data=data,
+        )
+
+
 def test_get_binned_kernel_data_from_particle_data_aggregates_bins() -> None:
     """Binning helper should aggregate mass and concentration by bins."""
     data = ParticleData(
@@ -432,6 +450,25 @@ def test_get_binned_kernel_data_from_particle_data_aggregates_bins() -> None:
     np.testing.assert_allclose(
         binned.charge[0], new_charge[mask_nan_zeros], rtol=1e-12
     )
+
+
+def test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs() -> (
+    None
+):
+    """Binning helper should reject unsupported multi-box ParticleData."""
+    data = ParticleData(
+        masses=np.array([[[1e-18]], [[2e-18]]]),
+        concentration=np.array([[1.0], [2.0]]),
+        charge=np.array([[0.0], [1.0]]),
+        density=np.array([1000.0]),
+        volume=np.array([1.0, 2.0]),
+    )
+
+    with pytest.raises(ValueError, match=r"n_boxes=1.*n_boxes=2"):
+        coagulation_strategy_abc._get_binned_kernel_data_from_particle_data(
+            data=data,
+            kernel_radius=np.array([1e-9, 2e-9], dtype=np.float64),
+        )
 
 
 def test_get_binned_kernel_data_from_particle_data_returns_empty_when_all_outside() -> (
