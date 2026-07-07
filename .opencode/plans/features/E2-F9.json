@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-04",
+  "last_updated": "2026-07-07",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E2-F9/architecture_design.md",
@@ -32,11 +32,11 @@
     {
       "id": "E2-F9-P1",
       "title": "Foundation guide for data containers, shapes, transfers, and limitations",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-07",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
