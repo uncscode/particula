@@ -15075,12 +15075,52 @@ methods provided by each facade:</p>
 </code></pre></div>
 <h2 id="using-particledatagasdata-in-dynamics">Using ParticleData/GasData in dynamics<a class="headerlink" href="#using-particledatagasdata-in-dynamics" title="Permanent link">&para;</a></h2>
 <p>Condensation and coagulation strategies accept both legacy facades and the new
-data containers. The return type matches the input type.</p>
+data containers. The return type matches the input type, but that container
+compatibility does <strong>not</strong> mean every CPU dynamics path already supports full
+multi-box execution.</p>
+<table>
+<thead>
+<tr>
+<th>CPU dynamics path</th>
+<th>Containers accepted</th>
+<th>Current CPU execution support</th>
+<th>If you need multi-box CPU execution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Condensation</td>
+<td>Legacy <code>ParticleRepresentation</code> + <code>GasSpecies</code>, or <code>ParticleData</code> + <code>GasData</code></td>
+<td>Supported with <code>n_boxes == 1</code> only</td>
+<td>Run a caller-managed per-box loop in user code and pass one box at a time</td>
+</tr>
+<tr>
+<td>Coagulation</td>
+<td>Legacy <code>ParticleRepresentation</code>, or <code>ParticleData</code></td>
+<td>Supported with <code>n_boxes == 1</code> only</td>
+<td>Run a caller-managed per-box loop in user code and pass one box at a time</td>
+</tr>
+</tbody>
+</table>
+<p>This is the canonical user-facing CPU support contract: <code>ParticleData</code> and
+<code>GasData</code> storage can be multi-box, but the current audited CPU condensation
+and CPU coagulation execution paths remain single-box workflows.</p>
 <p>Today, the compatibility boundary is still scalar at many process entry points:
 existing dynamics APIs may continue to accept scalar <code>temperature</code> and
 <code>pressure</code>. Only migrated process code should read <code>EnvironmentData</code> directly,
 and environment fields should be treated as read-only unless the physical model
 owns the update and refreshes derived helpers such as <code>saturation_ratio</code>.</p>
+<p>For the currently audited CPU baseline:</p>
+<ul>
+<li><code>CondensationIsothermal</code> and related public condensation entry points accept
+  <code>ParticleData</code> and <code>GasData</code> only when <code>n_boxes == 1</code>.</li>
+<li>CPU coagulation strategy support for <code>ParticleData</code> also remains single-box
+  only. Supported <code>n_boxes == 1</code> calls still work, but multi-box
+  <code>ParticleData</code> inputs now fail fast with a clear <code>ValueError</code> instead of
+  silently reading from or mutating box <code>0</code>.</li>
+</ul>
+<p>Supported single-box CPU usage looks like this when <code>particle_data</code> and
+<code>gas_data</code> each have <code>n_boxes == 1</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
@@ -15094,8 +15134,8 @@ owns the update and refreshes derived helpers such as <code>saturation_ratio</co
     <span class="n">vapor_pressure_strategy</span><span class="o">=</span><span class="n">vapor_pressure_strategy</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particles</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
-    <span class="n">gas</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">particle_data</span><span class="p">,</span>
+    <span class="n">gas_species</span><span class="o">=</span><span class="n">gas_data</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -15105,19 +15145,50 @@ owns the update and refreshes derived helpers such as <code>saturation_ratio</co
     <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span>
 <span class="p">)</span>
 <span class="n">particle_out</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particles</span><span class="o">=</span><span class="n">particle_out</span><span class="p">,</span>
+    <span class="n">particle</span><span class="o">=</span><span class="n">particle_out</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
     <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
+<p>If you need multi-box CPU execution today, manage the box loop in your own
+code rather than expecting a built-in CPU strategy loop. The following is
+caller-managed pseudocode, not a built-in particula helper:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Caller-managed user code for multi-box CPU workflows.</span>
+<span class="k">for</span> <span class="n">box_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">particle_data</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">):</span>
+    <span class="n">single_box_particle</span> <span class="o">=</span> <span class="n">build_single_box_particle_data</span><span class="p">(</span>
+        <span class="n">particle_data</span><span class="p">,</span>
+        <span class="n">box_index</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">single_box_gas</span> <span class="o">=</span> <span class="n">build_single_box_gas_data</span><span class="p">(</span><span class="n">gas_data</span><span class="p">,</span> <span class="n">box_index</span><span class="p">)</span>
+
+    <span class="n">particle_box_out</span><span class="p">,</span> <span class="n">gas_box_out</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+        <span class="n">particle</span><span class="o">=</span><span class="n">single_box_particle</span><span class="p">,</span>
+        <span class="n">gas_species</span><span class="o">=</span><span class="n">single_box_gas</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
+        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">particle_box_out</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+        <span class="n">particle</span><span class="o">=</span><span class="n">particle_box_out</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
+        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Reassemble results in caller-owned storage.</span>
+</code></pre></div>
+<p>Treat that pattern as an application-level workaround, not current built-in CPU
+multi-box strategy support.</p>
 <p>Use <code>EnvironmentData</code> to document and carry per-box thermodynamic state on the
 CPU side. <code>EnvironmentData</code> owns <code>temperature</code>, <code>pressure</code>, and
 <code>saturation_ratio</code>; <code>GasData</code> does not. Keep current scalar <code>temperature</code> and
 <code>pressure</code> arguments where the process API has not yet been migrated; migrated
-process code may read <code>EnvironmentData</code> directly, but only the physical model
-that owns the update should mutate it. When a GPU round trip is needed, use
-the explicit helper boundary only:
+process code may read <code>EnvironmentData</code> directly, but that does not expand the
+current CPU dynamics boundary beyond the audited behavior above. Only the
+physical model that owns the update should mutate environment state. When a GPU
+round trip is needed, use the explicit helper boundary only:
 <code>particula.gpu.WarpEnvironmentData</code>,
 <code>particula.gpu.to_warp_environment_data()</code>, and
 <code>particula.gpu.from_warp_environment_data()</code>. Keep the documented shapes
@@ -15192,8 +15263,18 @@ environment normalization contract used by the low-level GPU kernels.</p>
 <p>The facades log at INFO level to avoid <code>-Werror</code> failures. To reduce noise,
 prefer <code>ParticleData</code>/<code>GasData</code> directly or wrap with <code>from_data</code> methods.</p>
 <h3 id="single-box-vs-multi-box-data">Single-box vs multi-box data<a class="headerlink" href="#single-box-vs-multi-box-data" title="Permanent link">&para;</a></h3>
-<p>Legacy facades assume a single box. For data containers, index the first box
-when you need legacy-shaped arrays:</p>
+<p>Legacy facades assume a single box. For data containers, the current audited
+CPU baseline is:</p>
+<ul>
+<li>Condensation public <code>ParticleData</code>/<code>GasData</code> paths accept only
+  <code>n_boxes == 1</code> and reject <code>n_boxes != 1</code>.</li>
+<li>CPU coagulation <code>ParticleData</code> paths accept only <code>n_boxes == 1</code>; multi-box
+  inputs now raise a clear <code>ValueError</code> instead of falling back to box <code>0</code>.</li>
+</ul>
+<p>For the canonical support contract, including the supported single-box example
+and caller-managed per-box loop guidance, see
+<a href="#using-particledatagasdata-in-dynamics">Using ParticleData/GasData in dynamics</a>.</p>
+<p>When you need legacy-shaped arrays, index the first box explicitly:</p>
 <div class="highlight"><pre><span></span><code><span class="n">radii_single_box</span> <span class="o">=</span> <span class="n">particle_data</span><span class="o">.</span><span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">concentration_single_box</span> <span class="o">=</span> <span class="n">gas_data</span><span class="o">.</span><span class="n">concentration</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div>

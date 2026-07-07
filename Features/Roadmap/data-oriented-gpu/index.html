@@ -15199,10 +15199,15 @@ activation.</p>
   partitioning flags with explicit box dimensions.</li>
 <li>Conversion helpers bridge legacy facades and new containers.</li>
 <li>Condensation and coagulation strategies accept the new data containers in
-  addition to legacy facades.</li>
+  addition to legacy facades, but that compatibility is a container-boundary
+  statement and not proof of shipped CPU multi-box execution across every box.</li>
 <li>Migration documentation exists in
   <a href="../../particle-data-migration/">ParticleData and GasData Migration</a>.</li>
 </ul>
+<p>For the canonical user-facing CPU support boundary, including the current
+<code>n_boxes == 1</code> limitation for audited CPU condensation and CPU coagulation
+container workflows, refer to
+<a href="../../particle-data-migration/">ParticleData and GasData Migration</a>.</p>
 <p>The work is still a migration, not a full replacement. <code>ParticleRepresentation</code>
 and <code>GasSpecies</code> remain available for compatibility.</p>
 <p>Known data-model gaps:</p>
@@ -16003,21 +16008,12 @@ shape and do not gain a box dimension just because the workflow is batched.</p>
 <h4 id="current-cpu-execution-limits-for-multi-box-ready-containers">Current CPU execution limits for multi-box-ready containers<a class="headerlink" href="#current-cpu-execution-limits-for-multi-box-ready-containers" title="Permanent link">&para;</a></h4>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>Container storage is already multi-box-capable, but current CPU execution
-is not generally multi-box end to end. Condensation explicitly enforces
-<code>n_boxes == 1</code> via <code>_require_single_box()</code> in
-<code>particula/dynamics/condensation/condensation_strategies.py</code>. Current CPU
-coagulation helpers and entry points read <code>ParticleData</code> through box index
-<code>0</code> access patterns such as <code>particle.radii[0]</code>, <code>particle.total_mass[0]</code>,
-<code>particle.concentration[0]</code>, <code>particle.charge[0]</code>, and
-<code>particle.volume[0]</code> in
-<code>particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py</code>,
-while <code>particula/dynamics/particle_process.py</code> continues to execute those
-strategies through the legacy aerosol path. This is source-backed evidence
-for today's single-box CPU boundary, not a broader claim that all
-coagulation entry points have dedicated multi-box validation. Document
-storage as multi-box capable, but document today's CPU condensation and
-coagulation paths as single-box workflows.</p>
+<p>Container storage is already multi-box-capable, but shipped CPU execution
+remains single-box for the currently audited condensation and coagulation
+workflows. CPU condensation explicitly enforces <code>n_boxes == 1</code>, and CPU
+coagulation support for <code>ParticleData</code> is also documented and validated as
+<code>n_boxes == 1</code> only. For the canonical user-facing support contract, see
+<a href="../../particle-data-migration/">ParticleData and GasData Migration</a>.</p>
 </div>
 <h4 id="rationale-for-issue-critical-ownership-decisions">Rationale for issue-critical ownership decisions<a class="headerlink" href="#rationale-for-issue-critical-ownership-decisions" title="Permanent link">&para;</a></h4>
 <ul>
