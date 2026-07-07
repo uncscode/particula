@@ -81,12 +81,12 @@ def test_benchmark_related_markers_are_registered() -> None:
     assert config.marker_lines == [
         (
             "markers",
-            'slow: marks tests as slow (deselect with \'-m "not slow"\')',
+            "slow: marks tests as slow (deselect with '-m \"not slow\"')",
         ),
         (
             "markers",
             "performance: marks tests as performance-intensive "
-            '(deselect with \'-m "not performance"\')',
+            "(deselect with '-m \"not performance\"')",
         ),
         (
             "markers",

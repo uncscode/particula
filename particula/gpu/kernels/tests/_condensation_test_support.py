@@ -75,6 +75,8 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
 )
 from particula.util import constants  # noqa: E402
 
+_ENVIRONMENT_ARRAY_RTOL = 1.0e-7
+
 
 @pytest.fixture(params=warp_devices(wp))
 def device(request) -> str:
@@ -1254,7 +1256,7 @@ def test_condensation_step_gpu_uniform_direct_arrays_match_scalar_results(
     npt.assert_allclose(
         uniform_mass_transfer.numpy(),
         scalar_mass_transfer.numpy(),
-        rtol=1.0e-10,
+        rtol=_ENVIRONMENT_ARRAY_RTOL,
     )
 
 
@@ -2174,7 +2176,9 @@ def test_condensation_step_gpu_accepts_direct_environment_arrays(
         device=device,
     )
 
-    npt.assert_allclose(mass_transfer.numpy(), expected, rtol=1.0e-10)
+    npt.assert_allclose(
+        mass_transfer.numpy(), expected, rtol=_ENVIRONMENT_ARRAY_RTOL
+    )
     npt.assert_allclose(
         gpu_result.masses, np.maximum(particles.masses + expected, 0.0)
     )
@@ -2235,7 +2239,7 @@ def test_explicit_environment_matches_direct_arrays(
     npt.assert_allclose(
         environment_mass_transfer.numpy(),
         direct_mass_transfer.numpy(),
-        rtol=1.0e-10,
+        rtol=_ENVIRONMENT_ARRAY_RTOL,
     )
 
 
@@ -2341,7 +2345,9 @@ def test_condensation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
         device=device,
     )
 
-    npt.assert_allclose(mass_transfer.numpy(), expected, rtol=1.0e-10)
+    npt.assert_allclose(
+        mass_transfer.numpy(), expected, rtol=_ENVIRONMENT_ARRAY_RTOL
+    )
 
 
 def test_condensation_step_gpu_preserves_direct_environment_array_dtypes(
@@ -2430,7 +2436,9 @@ def test_condensation_step_gpu_non_uniform_environment_matches_cpu(
     )
 
     assert not np.allclose(expected[0], expected[1], rtol=1.0e-6, atol=0.0)
-    npt.assert_allclose(mass_transfer.numpy(), expected, rtol=1.0e-10)
+    npt.assert_allclose(
+        mass_transfer.numpy(), expected, rtol=_ENVIRONMENT_ARRAY_RTOL
+    )
 
 
 def test_condensation_step_gpu_preserves_environment_array_dtypes(

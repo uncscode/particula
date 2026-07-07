@@ -50,9 +50,6 @@ try:
     import warp as wp
 except ImportError:
     wp = None
-wp = pytest.importorskip(
-    "warp", reason="warp required for GPU benchmarks", exc_type=ImportError
-)
 
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel_via_system_state,
@@ -234,10 +231,20 @@ def _get_benchmark_output_path() -> Path:
 
 
 BENCHMARK_OUTPUT = _get_benchmark_output_path()
-WARP_FLOAT64 = wp.float64
-WARP_FLOAT32 = wp.float32
-WARP_INT32 = wp.int32
-WARP_UINT32 = wp.uint32
+WARP_FLOAT64: Any
+WARP_FLOAT32: Any
+WARP_INT32: Any
+WARP_UINT32: Any
+if wp is None:
+    WARP_FLOAT64 = np.float64
+    WARP_FLOAT32 = np.float32
+    WARP_INT32 = np.int32
+    WARP_UINT32 = np.uint32
+else:
+    WARP_FLOAT64 = wp.float64
+    WARP_FLOAT32 = wp.float32
+    WARP_INT32 = wp.int32
+    WARP_UINT32 = wp.uint32
 
 
 def _warp_dtype_nbytes(dtype: Any) -> int:

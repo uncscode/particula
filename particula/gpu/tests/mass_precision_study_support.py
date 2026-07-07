@@ -155,7 +155,10 @@ def _project_candidate(
         }
 
     if candidate_id == "fp32_total_mass_fp32_mass_fraction":
-        total_mass = np.sum(case.masses, axis=-1, dtype=np.float64)
+        total_mass = np.asarray(
+            np.sum(case.masses, axis=-1, dtype=np.float64),
+            dtype=np.float64,
+        )
         projected_total_mass = total_mass.astype(np.float32)
         projected_mass_fractions = np.divide(
             case.masses,

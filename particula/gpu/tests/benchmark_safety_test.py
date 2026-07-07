@@ -49,8 +49,12 @@ def test_warp_nbytes_uses_warp_dtype_sizes() -> None:
 
 def test_condensation_budget_grows_with_cpu_copy_buffers() -> None:
     """CPU-enabled condensation cases budget extra host allocations."""
-    gpu_only = benchmark_test._estimate_condensation_budget("case", 1, 32, 3, False)
-    with_cpu = benchmark_test._estimate_condensation_budget("case", 1, 32, 3, True)
+    gpu_only = benchmark_test._estimate_condensation_budget(
+        "case", 1, 32, 3, False
+    )
+    with_cpu = benchmark_test._estimate_condensation_budget(
+        "case", 1, 32, 3, True
+    )
     assert with_cpu.cpu_bytes > gpu_only.cpu_bytes
     assert with_cpu.gpu_bytes == gpu_only.gpu_bytes
 

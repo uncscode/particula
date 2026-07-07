@@ -242,9 +242,12 @@ def _build_candidate_study_result(
             reconstructed_radii,
             baseline_radii,
         ),
-        aggregate_mass_delta=np.sum(
-            reconstructed_masses - case.masses,
-            axis=(0, 1),
+        aggregate_mass_delta=np.asarray(
+            np.sum(
+                reconstructed_masses - case.masses,
+                axis=(0, 1),
+                dtype=np.float64,
+            ),
             dtype=np.float64,
         ),
     )
@@ -331,9 +334,12 @@ def _build_mass_transfer_reference_result(
         baseline_mass_transfer=baseline_mass_transfer,
         candidate_mass_transfer=candidate_mass_transfer,
         per_particle_delta=per_particle_delta,
-        aggregate_species_delta=np.sum(
-            per_particle_delta,
-            axis=(0, 1),
+        aggregate_species_delta=np.asarray(
+            np.sum(
+                per_particle_delta,
+                axis=(0, 1),
+                dtype=np.float64,
+            ),
             dtype=np.float64,
         ),
     )
@@ -352,8 +358,9 @@ def _compute_clamp_metrics(
         post_clamp_mass=post_clamp_mass,
         clamp_delta=clamp_delta,
         clamp_frequency=int(np.count_nonzero(raw_updated_mass < 0.0)),
-        aggregate_clamp_delta=np.sum(
-            clamp_delta, axis=(0, 1), dtype=np.float64
+        aggregate_clamp_delta=np.asarray(
+            np.sum(clamp_delta, axis=(0, 1), dtype=np.float64),
+            dtype=np.float64,
         ),
     )
 
@@ -568,9 +575,12 @@ def test_mixed_scale_aggregate_mass_error_is_bounded_separately(
     """Whole-array mixed-scale totals stay bounded apart from smallest slices."""
     mixed_scale_case = _get_mixed_scale_case()
     result = _get_candidate_result(mixed_scale_case, candidate_id)
-    baseline_species_total = np.sum(
-        mixed_scale_case.masses,
-        axis=(0, 1),
+    baseline_species_total = np.asarray(
+        np.sum(
+            mixed_scale_case.masses,
+            axis=(0, 1),
+            dtype=np.float64,
+        ),
         dtype=np.float64,
     )
     reconstructed_species_total = (
