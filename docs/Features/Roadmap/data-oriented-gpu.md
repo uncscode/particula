@@ -18,6 +18,8 @@ Quick links:
 
 - [Current container schema inventory](#current-container-schema-inventory)
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
+- [Shipped foundation guide](../data-containers-and-gpu-foundations.md)
+- [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
 - [Final downstream handoff map for sibling features](#final-downstream-handoff-map-for-sibling-features)
 
 ## Motivation and Target Workloads
@@ -496,11 +498,13 @@ Shared-across-box fields:
   remains single-box and current CPU coagulation paths are still documented as
   single-box or explicitly transitional execution boundaries; do not infer
   broader multi-box CPU execution support from storage shape alone.
-- `E2-F9`: inherit this roadmap page as the canonical source of truth for field
-  ownership, shape tables, CPU↔GPU transfer caveats, validation evidence, and
-  downstream handoff references; downstream docs should link to the exact
-  ownership, shape, and handoff anchors here instead of restoring ambiguous
-  execution-boundary wording or duplicating contract prose elsewhere.
+- `E2-F9`: start user-facing docs and examples from the shipped
+  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  guide and the
+  [Data Containers example](../../Examples/Data_Containers/index.md), then
+  link back to this roadmap page only for implementation-planning detail such
+  as field ownership, shape tables, CPU↔GPU transfer caveats, validation
+  evidence, and downstream handoff anchors.
 
 - Decide the particle mass storage representation given the wide dynamic range
   (see [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)).
@@ -613,6 +617,14 @@ Extend GPU support beyond condensation and Brownian coagulation where it is
 scientifically useful, fix known kernel defects, and validate CPU/GPU parity.
 
 ### Physics Coverage
+
+- For the current shipped baseline on explicit CPU↔GPU transfer helpers,
+  `EnvironmentData` ownership, current CPU/GPU support boundaries, and the
+  canonical runnable entrypoint, start from the
+  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  guide and the
+  [Data Containers example](../../Examples/Data_Containers/index.md); this
+  epic extends those contracts rather than redefining them here.
 
 - Add a Warp-backed latent-heat condensation path that matches the CPU
   `CondensationLatentHeat` behavior, including latent-heat-corrected mass
@@ -741,6 +753,14 @@ resident on the device between checkpoints.
 
 ### High-Level Integration
 
+- Use the shipped
+  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  guide and
+  [Data Containers example](../../Examples/Data_Containers/index.md) as the
+  current baseline for explicit transfer helpers, `EnvironmentData` ownership,
+  support boundaries, and runnable entrypoint wording before layering new
+  high-level GPU execution APIs on top.
+
 - Add user-facing APIs that can choose CPU or GPU execution without requiring
   users to call kernel modules directly.
 - Decide whether backend selection belongs on strategies, runnables, builders,
@@ -845,6 +865,14 @@ targets aligned with the multi-box scaling goal.
 
 ### Warp Graph Capture
 
+- Preserve the shipped explicit CPU↔GPU helper boundary and documented
+  container ownership model from the
+  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  guide while designing graph-captured GPU loops; performance work should not
+  reintroduce implicit synchronization or move the canonical example entrypoint
+  away from the
+  [Data Containers example](../../Examples/Data_Containers/index.md).
+
 - Investigate Warp graph capture for repeated timestep execution with a fixed
   process order and stable array shapes.
 - Separate graph-capturable kernels from setup work such as allocation,
@@ -899,11 +927,17 @@ resampling or volume-scaling policy before slot exhaustion.
 A longer-term goal is gradient-based global optimization: using Warp automatic
 differentiation to fit model parameters to experiments or observations.
 Differentiability constrains how kernels are written, so it must be considered
-while Epic B kernels are authored, not added afterward.
+while Epic B kernels are authored, not added afterward. For the shipped
+container, transfer, and runnable-example baseline that this differentiability
+work builds on, start from the
+[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+guide and the
+[Data Containers example](../../Examples/Data_Containers/index.md).
 
 See [Warp Autodiff: Limitations and Stochastic Process Handling](warp-autodiff-limitations.md)
-for the detailed autodiff mechanics, kernel-authoring constraints, offline code
-patterns, and the options for differentiating stochastic coagulation.
+for the detailed implementation-planning companion on autodiff mechanics,
+kernel-authoring constraints, offline code patterns, and the options for
+differentiating stochastic coagulation.
 
 **The optimization targets are initial state, not process parameters.** Physical
 coagulation and condensation parameters (accommodation coefficient, diffusivity,

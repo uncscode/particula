@@ -3,6 +3,12 @@
 Reference notes for the differentiable-simulation goal in the
 [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md#epic-e-differentiability-and-global-optimization).
 
+For the shipped container, transfer, and runnable-example baseline that this
+follow-on differentiability work builds on, start with the
+[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+guide and the
+[Data Containers example](../../Examples/Data_Containers/index.md).
+
 This page records how NVIDIA Warp automatic differentiation works, the
 constraints it imposes on kernel authoring, and the options for making
 stochastic aerosol processes (especially particle-resolved coagulation)
