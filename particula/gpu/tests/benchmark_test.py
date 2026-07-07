@@ -50,7 +50,9 @@ try:
     import warp as wp
 except ImportError:
     wp = None
-wp = pytest.importorskip("warp", reason="warp required for GPU benchmarks")
+wp = pytest.importorskip(
+    "warp", reason="warp required for GPU benchmarks", exc_type=ImportError
+)
 
 from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
     get_brownian_kernel_via_system_state,
@@ -58,7 +60,6 @@ from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
 from particula.dynamics.coagulation.particle_resolved_step import (  # noqa: E402
     particle_resolved_method as pr_method,
 )
-from particula.gpu.tests.cuda_availability import cuda_available  # noqa: E402
 
 get_particle_resolved_coagulation_step = (
     pr_method.get_particle_resolved_coagulation_step
@@ -232,18 +233,27 @@ def _get_benchmark_output_path() -> Path:
     return BENCHMARK_ARTIFACT_DIR / file_name
 
 
+BENCHMARK_OUTPUT = _get_benchmark_output_path()
+WARP_FLOAT64 = wp.float64
+WARP_FLOAT32 = wp.float32
+WARP_INT32 = wp.int32
+WARP_UINT32 = wp.uint32
+
+
 def _warp_dtype_nbytes(dtype: Any) -> int:
     """Return bytes per element for the supported Warp benchmark dtypes."""
     warp_item_sizes = {
-        wp.float64: 8,
-        wp.float32: 4,
-        wp.int32: 4,
-        wp.uint32: 4,
+        WARP_FLOAT64: 8,
+        WARP_FLOAT32: 4,
+        WARP_INT32: 4,
+        WARP_UINT32: 4,
     }
     try:
         return warp_item_sizes[dtype]
     except KeyError as exc:
-        raise ValueError(f"Unsupported Warp dtype for sizing: {dtype!r}") from exc
+        raise ValueError(
+            f"Unsupported Warp dtype for sizing: {dtype!r}"
+        ) from exc
 
 
 def _array_nbytes(shape: tuple[int, ...], itemsize: int) -> int:
@@ -293,14 +303,16 @@ def _estimate_condensation_budget(
         cpu_bytes += _numpy_nbytes(particle_shape, np.float64)  # mass transfer
 
     gpu_bytes = 0
-    gpu_bytes += _warp_nbytes(particle_shape, wp.float64) * 2  # masses/buffer
-    gpu_bytes += _warp_nbytes(box_particle_shape, wp.float64) * 2
-    gpu_bytes += _warp_nbytes((n_species,), wp.float64) * 4
-    gpu_bytes += _warp_nbytes((n_boxes,), wp.float64)
-    gpu_bytes += _warp_nbytes(box_species_shape, wp.float64) * 2
-    gpu_bytes += _warp_nbytes((n_species,), wp.int32)
+    gpu_bytes += _warp_nbytes(particle_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes(box_particle_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes((n_species,), WARP_FLOAT64) * 4
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes(box_species_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes((n_species,), WARP_INT32)
 
-    return BenchmarkMemoryBudget(label=label, cpu_bytes=cpu_bytes, gpu_bytes=gpu_bytes)
+    return BenchmarkMemoryBudget(
+        label=label, cpu_bytes=cpu_bytes, gpu_bytes=gpu_bytes
+    )
 
 
 def _estimate_coagulation_budget(
@@ -329,15 +341,17 @@ def _estimate_coagulation_budget(
         cpu_bytes += _numpy_nbytes((64, 64), np.float64)
 
     gpu_bytes = 0
-    gpu_bytes += _warp_nbytes(particle_shape, wp.float64)
-    gpu_bytes += _warp_nbytes(box_particle_shape, wp.float64) * 2
-    gpu_bytes += _warp_nbytes((n_species,), wp.float64)
-    gpu_bytes += _warp_nbytes((n_boxes,), wp.float64)
-    gpu_bytes += _warp_nbytes((n_boxes, MAX_COLLISIONS, 2), wp.int32)
-    gpu_bytes += _warp_nbytes((n_boxes,), wp.int32)
-    gpu_bytes += _warp_nbytes((n_boxes,), wp.uint32)
+    gpu_bytes += _warp_nbytes(particle_shape, WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes(box_particle_shape, WARP_FLOAT64) * 2
+    gpu_bytes += _warp_nbytes((n_species,), WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_FLOAT64)
+    gpu_bytes += _warp_nbytes((n_boxes, MAX_COLLISIONS, 2), WARP_INT32)
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_INT32)
+    gpu_bytes += _warp_nbytes((n_boxes,), WARP_UINT32)
 
-    return BenchmarkMemoryBudget(label=label, cpu_bytes=cpu_bytes, gpu_bytes=gpu_bytes)
+    return BenchmarkMemoryBudget(
+        label=label, cpu_bytes=cpu_bytes, gpu_bytes=gpu_bytes
+    )
 
 
 def _validate_benchmark_budget(budget: BenchmarkMemoryBudget) -> None:
@@ -350,6 +364,7 @@ def _validate_benchmark_budget(budget: BenchmarkMemoryBudget) -> None:
             f"{budget.label} requires ~{budget.total_bytes:,} bytes, "
             f"exceeding BENCHMARK_MAX_BYTES={max_bytes:,}"
         )
+
 
 _benchmark_results: dict[str, Any] = {
     "started_at": datetime.now(timezone.utc).isoformat(),
@@ -370,19 +385,14 @@ def _save_results() -> None:
     etc.). The file is overwritten each time with the full dict.
     """
     _benchmark_results["updated_at"] = datetime.now(timezone.utc).isoformat()
+    output_path = BENCHMARK_OUTPUT
     try:
-        BENCHMARK_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        BENCHMARK_OUTPUT.write_text(
-            json.dumps(_benchmark_results, indent=2) + "\n"
-        )
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(_benchmark_results, indent=2) + "\n")
     except OSError as exc:
         raise RuntimeError(
-            f"Failed to write benchmark results to {BENCHMARK_OUTPUT}: {exc}"
+            f"Failed to write benchmark results to {output_path}: {exc}"
         ) from exc
-    print(f"  [save] Results written to {BENCHMARK_OUTPUT}")
-    output_path = _get_benchmark_output_path()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(_benchmark_results, indent=2) + "\n")
     print(f"  [save] Results written to {output_path}")
 
 
@@ -1256,8 +1266,11 @@ def test_condensation_scaling(
         n_boxes,
         n_particles,
         n_species,
+    )
     _validate_benchmark_budget(
-        _estimate_condensation_budget(label, n_boxes, n_particles, n_species, run_cpu)
+        _estimate_condensation_budget(
+            label, n_boxes, n_particles, n_species, run_cpu
+        )
     )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
     gas = _make_gas_data(n_boxes, n_species)
@@ -1388,8 +1401,11 @@ def test_coagulation_scaling(
         n_boxes,
         n_particles,
         n_species,
+    )
     _validate_benchmark_budget(
-        _estimate_coagulation_budget(label, n_boxes, n_particles, n_species, run_cpu)
+        _estimate_coagulation_budget(
+            label, n_boxes, n_particles, n_species, run_cpu
+        )
     )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
 
