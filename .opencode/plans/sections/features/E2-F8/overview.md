@@ -5,22 +5,21 @@
 Issue #1172 feature E2-F8 clarifies a user-facing ambiguity introduced by the
 E2 data-container migration: `ParticleData` and `GasData` support multi-box
 shapes at the container/schema level, but current CPU dynamics strategies do
-not provide full multi-box execution semantics. CPU condensation already
-requires `n_boxes=1`; CPU coagulation accepts `ParticleData` but currently
-operates on box 0 through legacy-compatible adapters. Phase P1 for issue
-#1218 stays audit-only and locks that baseline in with focused regressions so
-later phases can change validation or docs from an explicit tested contract.
+not provide full multi-box execution semantics. P1 for issue #1218 documented
+the existing baseline, and P2 for issue #1219 shipped explicit single-box
+runtime enforcement for CPU coagulation `ParticleData` paths while broadening
+representative public condensation rejection coverage.
 
 ## Value Proposition
 
 - Makes the support boundary explicit: container multi-box shape support is not
   the same as strategy-level multi-box execution support.
-- Prevents silent misuse of CPU coagulation paths that only inspect or mutate
-  box 0.
+- Prevents silent misuse of CPU coagulation multi-box paths by failing fast with
+  explicit unsupported-input errors.
 - Gives users clear guidance for single-box runs, caller-managed per-box loops,
   and future multi-box strategy work.
-- Preserves momentum from dependency E2-F1 by documenting the current
-  container contract before later feature tracks expand behavior.
+- Preserves momentum from dependency E2-F1 by documenting and testing the
+  supported container contract before later feature tracks expand behavior.
 
 ## User Stories
 
@@ -30,9 +29,9 @@ later phases can change validation or docs from an explicit tested contract.
 - As a developer maintaining condensation and coagulation strategies, I want
   focused tests around multi-box inputs so that support boundaries do not
   regress silently.
-- As a future multi-box implementer, I want existing unsupported paths and
-  transitional box-0 behavior captured precisely so that full multi-box work
-  has a clean baseline.
+- As a future multi-box implementer, I want the current unsupported-path
+  enforcement captured precisely so that full multi-box work has a clean
+  baseline.
 
 ## Parent Epic Context
 

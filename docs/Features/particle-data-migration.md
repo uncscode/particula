@@ -287,10 +287,11 @@ owns the update and refreshes derived helpers such as `saturation_ratio`.
 For the currently audited CPU baseline:
 
 - `CondensationIsothermal` and related public condensation entry points accept
-  `ParticleData` and `GasData`, but they still require `n_boxes == 1`.
-- Current CPU coagulation `ParticleData` support is still box-0-only for the
-  audited paths. The strategy reads from box `0` and mutates box `0`; it is not
-  a general CPU multi-box coagulation implementation yet.
+  `ParticleData` and `GasData` only when `n_boxes == 1`.
+- CPU coagulation strategy support for `ParticleData` also remains single-box
+  only. Supported `n_boxes == 1` calls still work, but multi-box
+  `ParticleData` inputs now fail fast with a clear `ValueError` instead of
+  silently reading from or mutating box `0`.
 
 ```python
 import particula as par
@@ -422,8 +423,10 @@ prefer `ParticleData`/`GasData` directly or wrap with `from_data` methods.
 Legacy facades assume a single box. For data containers, the current audited
 CPU baseline is:
 
-- Condensation public `ParticleData`/`GasData` paths reject `n_boxes != 1`.
-- CPU coagulation `ParticleData` paths still read and mutate box `0` only.
+- Condensation public `ParticleData`/`GasData` paths accept only
+  `n_boxes == 1` and reject `n_boxes != 1`.
+- CPU coagulation `ParticleData` paths accept only `n_boxes == 1`; multi-box
+  inputs now raise a clear `ValueError` instead of falling back to box `0`.
 
 When you need legacy-shaped arrays, index the first box explicitly:
 

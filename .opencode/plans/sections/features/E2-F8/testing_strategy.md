@@ -3,31 +3,31 @@
 ## Test Goals
 
 - Preserve the current CPU condensation public data-container multi-box
-  rejection boundary.
-- Prove current CPU coagulation data-container paths do not imply full multi-box
-  execution and still operate on box 0 only.
+  rejection boundary through representative public entry points.
+- Prove CPU coagulation data-container paths reject unsupported multi-box
+  `ParticleData` execution instead of silently operating on box 0.
 - Keep existing single-box data-container behavior working.
-- Keep this phase audit-only: regressions should document baseline semantics
-  without changing runtime behavior.
+- Keep assertions focused on stable contract terms such as `n_boxes`,
+  `single-box`, and unsupported multi-box CPU execution.
 
 ## Co-Located Test Plan
 
 - `particula/dynamics/condensation/tests/condensation_strategies_test.py`
-  - Add a representative public `mass_transfer_rate(...)` multi-box rejection
-    regression.
+  - Keep `mass_transfer_rate(...)` multi-box rejection coverage and add a
+    representative public `step()`-path rejection case.
   - Keep existing `_require_single_box` helper tests.
   - Assert `ParticleData` and `GasData` mismatches still raise `TypeError`.
 - `particula/dynamics/coagulation/coagulation_strategy/tests/coagulation_strategy_abc_test.py`
-  - Add multi-box `ParticleData` regressions for helper-backed reads when box 1+
-    intentionally differs from box 0.
-  - Add a particle-resolved `step()` regression showing box 0 mutates while
-    later boxes remain unchanged.
+  - Replace multi-box helper-backed box-0 regressions with rejection tests.
+  - Replace particle-resolved multi-box mutation regressions with
+    raise-before-mutation tests.
+  - Retain single-box non-regression coverage, including supported no-op cases.
 
 ## Non-Regression Tests
 
 - Existing single-box condensation data tests continue to pass.
 - Existing coagulation adapter tests continue to pass for `n_boxes=1`, with the
-  new regressions documenting current multi-box box-0 fallback behavior.
+  new regressions documenting explicit multi-box rejection behavior.
 - Legacy `ParticleRepresentation` and `GasSpecies` paths remain unchanged.
 
 ## Commands

@@ -6,9 +6,9 @@
   `ParticleData` and/or `GasData`.
 - Add or strengthen tests that distinguish:
   - data-container shape support (`n_boxes >= 1`), and
-  - CPU strategy execution support (`n_boxes=1` or transitional box-0 only).
-- Audit current public error-message and box-0-only behavior for unsupported
-  multi-box strategy calls without changing runtime semantics in P1.
+  - CPU strategy execution support (`n_boxes=1` for the covered CPU paths).
+- Audit current public error-message behavior in P1, then tighten unsupported
+  multi-box CPU coagulation execution to explicit rejection in P2.
 - Update user-facing docs in `docs/Features/particle-data-migration.md` and,
   if helpful, `docs/Features/Roadmap/data-oriented-gpu.md`.
 - Keep unit tests co-located with the dynamics modules they exercise.
@@ -28,11 +28,11 @@
 - E2-F1 container shape conventions are the dependency baseline.
 - Condensation's current `_require_single_box` behavior is intentional and
   should remain unless future tracks implement multi-box strategy execution.
-- Coagulation's current box-0 behavior should be either explicitly rejected for
-  `n_boxes != 1` in a later phase or documented as transitional with tests
-  proving boxes beyond zero are not executed.
+- Coagulation `ParticleData` strategy calls should reject `n_boxes != 1` on CPU
+  unless a future track implements broader execution semantics.
 
 ## Done Boundary
 
 The feature is done when docs and tests clearly distinguish container multi-box
-shape support from strategy-level multi-box execution support for CPU dynamics.
+shape support from strategy-level single-box CPU execution support for the
+covered dynamics paths.

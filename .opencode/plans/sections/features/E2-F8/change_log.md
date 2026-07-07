@@ -26,3 +26,13 @@
   reads, and particle-resolved coagulation box-0-only mutation.
 - Corrected plan sections that previously implied CPU coagulation already
   rejects multi-box `ParticleData` or that user-facing docs changed in P1.
+
+## 2026-07-07
+
+- Updated the feature plan after issue #1219 (E2-F8-P2) landed.
+- Marked P2 complete and recorded the shipped production change in
+  `particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py`.
+- Replaced stale box-0 fallback wording across feature sections with the shipped
+  explicit single-box CPU coagulation rejection contract.
+- Recorded that condensation coverage expanded through representative public
+  multi-box rejection tests while user-facing docs still remain deferred to P3.
