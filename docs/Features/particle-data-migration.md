@@ -278,6 +278,15 @@ data containers. The return type matches the input type, but that container
 compatibility does **not** mean every CPU dynamics path already supports full
 multi-box execution.
 
+| CPU dynamics path | Containers accepted | Current CPU execution support | If you need multi-box CPU execution |
+| --- | --- | --- | --- |
+| Condensation | Legacy `ParticleRepresentation` + `GasSpecies`, or `ParticleData` + `GasData` | Supported with `n_boxes == 1` only | Run a caller-managed per-box loop in user code and pass one box at a time |
+| Coagulation | Legacy `ParticleRepresentation`, or `ParticleData` | Supported with `n_boxes == 1` only | Run a caller-managed per-box loop in user code and pass one box at a time |
+
+This is the canonical user-facing CPU support contract: `ParticleData` and
+`GasData` storage can be multi-box, but the current audited CPU condensation
+and CPU coagulation execution paths remain single-box workflows.
+
 Today, the compatibility boundary is still scalar at many process entry points:
 existing dynamics APIs may continue to accept scalar `temperature` and
 `pressure`. Only migrated process code should read `EnvironmentData` directly,
@@ -292,6 +301,9 @@ For the currently audited CPU baseline:
   only. Supported `n_boxes == 1` calls still work, but multi-box
   `ParticleData` inputs now fail fast with a clear `ValueError` instead of
   silently reading from or mutating box `0`.
+
+Supported single-box CPU usage looks like this when `particle_data` and
+`gas_data` each have `n_boxes == 1`:
 
 ```python
 import particula as par
@@ -324,6 +336,40 @@ particle_out = coagulation.step(
     time_step=1.0,
 )
 ```
+
+If you need multi-box CPU execution today, manage the box loop in your own
+code rather than expecting a built-in CPU strategy loop. The following is
+caller-managed pseudocode, not a built-in particula helper:
+
+```python
+# Caller-managed user code for multi-box CPU workflows.
+for box_index in range(particle_data.n_boxes):
+    single_box_particle = build_single_box_particle_data(
+        particle_data,
+        box_index,
+    )
+    single_box_gas = build_single_box_gas_data(gas_data, box_index)
+
+    particle_box_out, gas_box_out = condensation.step(
+        particle=single_box_particle,
+        gas_species=single_box_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+    )
+
+    particle_box_out = coagulation.step(
+        particle=particle_box_out,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+    )
+
+    # Reassemble results in caller-owned storage.
+```
+
+Treat that pattern as an application-level workaround, not current built-in CPU
+multi-box strategy support.
 
 Use `EnvironmentData` to document and carry per-box thermodynamic state on the
 CPU side. `EnvironmentData` owns `temperature`, `pressure`, and
@@ -427,6 +473,10 @@ CPU baseline is:
   `n_boxes == 1` and reject `n_boxes != 1`.
 - CPU coagulation `ParticleData` paths accept only `n_boxes == 1`; multi-box
   inputs now raise a clear `ValueError` instead of falling back to box `0`.
+
+For the canonical support contract, including the supported single-box example
+and caller-managed per-box loop guidance, see
+[Using ParticleData/GasData in dynamics](#using-particledatagasdata-in-dynamics).
 
 When you need legacy-shaped arrays, index the first box explicitly:
 
