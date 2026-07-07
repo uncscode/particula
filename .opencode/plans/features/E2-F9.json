@@ -2,7 +2,7 @@
   "id": "E2-F9",
   "type": "feature",
   "title": "Publish foundation docs and examples for data containers and GPU transfers",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -58,11 +58,11 @@
     {
       "id": "E2-F9-P3",
       "title": "Roadmap handoff links, docs index wiring, and validation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-07",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -70,5 +70,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
