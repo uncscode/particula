@@ -151,10 +151,12 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    Learn the shipped `ParticleData` and `GasData` shapes plus the optional
-    Warp CPU-backend transfer helpers.
+    Learn the shipped `ParticleData` and `GasData` shapes, then run the
+    canonical local example command `python
+    docs/Examples/data_containers_and_gpu_foundations.py` for the documented
+    CPU-only and optional Warp CPU-backend flow.
 
-    [:octicons-arrow-right-24: Tutorial](Data_Containers/index.md)
+    [:octicons-arrow-right-24: Guide](Data_Containers/index.md)
 
 -   __[Particle Phase](Particle_Phase/index.md)__
 
