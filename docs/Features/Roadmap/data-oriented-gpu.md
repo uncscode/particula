@@ -3,20 +3,42 @@
 This page tracks the status of the data-oriented container migration and the
 Warp-backed GPU work for particle-resolved aerosol simulations.
 
-The remaining work is organized into epics ordered by dependency: Epic A
-(foundations) unblocks Epic B (physics), which unblocks Epics C-E. Epic F
-(docs, API stability, validation infrastructure) runs alongside all of them.
+The roadmap is a single ordered sequence of epics with explicit boundaries.
+Epics are worked in the order below: when an epic meets its exit bar, the
+next pending epic in the sequence becomes the active one. Cross-cutting
+documentation, validation-infrastructure, and API-stability work is folded
+into each epic's feature list rather than running as a separate parallel
+epic.
 
-- [Epic A: Data-Model and Numerical Foundations](#epic-a-data-model-and-numerical-foundations)
-- [Epic B: GPU Physics Coverage and Parity](#epic-b-gpu-physics-coverage-and-parity)
-- [Epic C: High-Level Integration and GPU-Resident Simulation](#epic-c-high-level-integration-and-gpu-resident-simulation)
-- [Epic D: Graph Capture and Performance](#epic-d-graph-capture-and-performance)
-- [Epic E: Differentiability and Global Optimization](#epic-e-differentiability-and-global-optimization)
-- [Epic F: API Stability, Validation Infrastructure, and Documentation](#epic-f-api-stability-validation-infrastructure-and-documentation)
+Sizing convention: each epic targets roughly 5-10 features, each feature
+roughly 5-15 phases, and each phase roughly 100 lines of new source code plus
+its tests and documentation (canonical rules:
+`.opencode/guides/phase-sizing-rules.md`).
+
+## Epic Sequence and Status
+
+| Order | Epic | Status | ADW plan |
+| --- | --- | --- | --- |
+| 1 | [Epic A: Data-Model and Numerical Foundations](#epic-a-data-model-and-numerical-foundations) | Shipped | E2 |
+| 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped | E1 |
+| 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Next up | not scheduled |
+| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Pending | not scheduled |
+| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Pending | not scheduled |
+| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Pending | not scheduled |
+| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
+| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Pending | not scheduled |
+| 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
+
+The former suggested milestones are absorbed into the per-epic exit bars:
+Milestone 1 (documented low-level GPU API) is Epic C, Milestone 2 (backend
+selection) is Epic G, Milestone 2.5 (missing GPU physics) is Epics D-F,
+Milestone 2.75 (differentiable condensation) is Epic I, and Milestone 3
+(production GPU workflows) is the combined Epic G and Epic H exit bars.
 
 Quick links:
 
 - [Current container schema inventory](#current-container-schema-inventory)
+- [Shipped E2 foundation baseline](#shipped-e2-foundation-baseline)
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
 - [Shipped foundation guide](../data-containers-and-gpu-foundations.md)
 - [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
@@ -45,9 +67,9 @@ decisions in
 and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
 a size-range driver and a planned process: a nucleation/particle-source
-process does not exist in particula today and is added as an Epic B work item
-so freshly formed particles can enter GPU-resident simulations through slot
-activation.
+process does not exist in particula today and is added as an
+[Epic F](#epic-f-gpu-process-completeness) work item so freshly formed
+particles can enter GPU-resident simulations through slot activation.
 
 ## Non-Goals
 
@@ -174,10 +196,43 @@ Known GPU kernel defects and design limits (see
 
 ## Epic A: Data-Model and Numerical Foundations
 
-Foundation work that other epics depend on: container schemas, per-box
-thermodynamic state, precision, mass representation, and time integration.
+Status: shipped as plan E2. This foundation work now defines the container
+schemas, per-box thermodynamic state, precision baseline, mass representation
+policy, and time-integration recommendation that downstream GPU roadmap work
+must build on.
 
-### Remaining Data-Oriented Work
+### Shipped E2 Foundation Baseline
+
+E2 closed the foundation scope needed by later GPU roadmap epics:
+
+- `ParticleData`, `GasData`, `WarpParticleData`, and `WarpGasData` have a
+  documented field-ownership and shape contract, including leading `n_boxes`
+  dimensions for per-box state and species-only shapes for shared material or
+  gas metadata.
+- `EnvironmentData` is the CPU owner for per-box `temperature`, `pressure`, and
+  per-box/per-species `saturation_ratio`; simulation volume remains owned by
+  `ParticleData.volume`.
+- `WarpEnvironmentData`, `to_warp_environment_data()`, and
+  `from_warp_environment_data()` provide the explicit CPU↔GPU environment
+  transfer boundary. Kernels and runnables still do not perform hidden
+  CPU/GPU synchronization or movement.
+- Gas CPU/GPU restore semantics are locked down: `GasData.name` is CPU-only
+  ordered metadata, `partitioning` converts `bool` on CPU to `int32` on GPU,
+  and `WarpGasData.vapor_pressure` is GPU helper state dropped on CPU restore.
+- The low-level GPU condensation and coagulation environment inputs now share
+  a scalar-or-per-box normalization contract, including explicit
+  `WarpEnvironmentData` inputs.
+- The mass-precision report keeps absolute per-species `np.float64` /
+  `wp.float64` particle mass storage as the production baseline and defers any
+  dtype or schema migration until stronger evidence exists.
+- The condensation-stiffness study recommends `fixed_count_substeps_4` as the
+  fixed-shape foundation for later GPU condensation integration, while keeping
+  gas-coupled production support deferred.
+- The foundation guide, migration guide, data-container example, and support
+  boundary docs now distinguish multi-box-capable storage from still-limited
+  CPU process execution.
+
+### Post-E2 Data-Oriented Work
 
 - Finish reducing dependence on legacy facade objects in new examples and
   documentation.
@@ -248,10 +303,10 @@ container.
 
 ### Authoritative field ownership decisions
 
-This section is the canonical ownership and CPU↔GPU round-trip contract for
-follow-on E2 work. The inventory table above remains the shipped current-state
-evidence record; use the decision table below for policy when adding fields,
-conversion behavior, or future GPU environment state.
+This section is the canonical ownership and CPU↔GPU round-trip contract shipped
+by E2. The inventory table above remains the current-state evidence record; use
+the decision table below for policy when adding fields, conversion behavior, or
+future GPU environment state.
 
 | Field / group | Authoritative owner | CPU shape | GPU shape | Dtype | Mutability | Round-trip behavior | Downstream consumers | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -497,10 +552,9 @@ downstream implementers; it does not add new schema semantics.
   as field ownership, shape tables, CPU↔GPU transfer caveats, validation
   evidence, and downstream handoff anchors.
 
-- Decide the particle mass storage representation given the wide dynamic range
-  (see [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)).
-  Options include per-species absolute mass, log-mass, or bin/section reference
-  masses. This choice affects both accuracy and differentiability.
+- Keep the shipped particle mass storage representation unless a future
+  production migration proposal satisfies the evidence requirements in the
+  [Mass Precision Recommendation Report](mass-precision-study.md).
 
 ### EnvironmentData Container
 
@@ -553,24 +607,27 @@ That is roughly fifteen orders of magnitude in particle mass, which sits near
 the limit of double precision (~15-16 significant digits). This dynamic range,
 not raw speed, is the main precision driver.
 
-- **Keep fp64 as the reference precision** until a resolution study shows that a
-  lower precision or mixed-precision path preserves acceptable accuracy. fp64 is
-  justified by the physical dynamic range, not by preference.
+- **Keep fp64 as the reference and production baseline.** The E2 precision study
+  found the current absolute per-species `np.float64` / `wp.float64` schema is
+  the accepted baseline for shipped particle mass storage. Lower-precision or
+  mixed-precision paths remain future proposals until they meet the report's
+  conservation and small-particle fidelity evidence requirements.
 - **Target mass resolution is on the order of 0.1 ng per tracked quantity** so
   that both small freshly formed particles and large droplets remain
   representable in the same simulation.
-- **The open question is representation, not just dtype.** Storing per-particle
-  absolute mass in a single fp64 array can lose small-mass resolution when large
-  droplets coexist with tiny particles in the same box. Evaluate per-species
-  mass, log-mass storage, or binned reference masses as alternatives.
+- **Representation changes are deferred, not part of the shipped baseline.**
+  Per-species absolute mass remains the production representation. Log-mass,
+  binned reference masses, and other alternatives require a future scoped
+  migration proposal with reproducible evidence across the NPF-to-droplet cases.
 - **fp64 doubles memory** relative to fp32, which directly taxes the large
   multi-box goal. Precision and memory budget must be evaluated together (see
   [Performance and Memory](#performance-and-memory)).
 - **fp64 throughput is heavily reduced on consumer CUDA hardware.** Record which
   target devices matter, and whether a validated fp32 or mixed-precision path is
   needed for those devices.
-- Add a resolution/accuracy study that checks conservation and small-particle
-  fidelity across the full NPF-to-droplet range before changing precision.
+- Use the shipped
+  [Mass Precision Recommendation Report](mass-precision-study.md) as the
+  acceptance gate before changing precision, dtype, or mass schema.
 
 ### Time-Scale Stiffness
 
@@ -602,86 +659,94 @@ shipped runtime boundary.
   future follow-up work because of high vapor concentration, tight
   supersaturation coupling, and latent-heat temperature feedback.
 
-## Epic B: GPU Physics Coverage and Parity
+## Epic B: Non-Isothermal Condensation Public API (CPU)
 
-Extend GPU support beyond condensation and Brownian coagulation where it is
-scientifically useful, fix known kernel defects, and validate CPU/GPU parity.
+Status: shipped as ADW plan E1. This epic completed the CPU-side public API,
+validation, documentation, and acceleration readiness for non-isothermal
+(latent-heat) condensation, giving the GPU parity work in
+[Epic D](#epic-d-gpu-condensation-physics-parity) a stable,
+builder-accessible CPU reference to match.
 
-### Physics Coverage
+Shipped scope (tracked in plan E1):
 
-- For the current shipped baseline on explicit CPU↔GPU transfer helpers,
-  `EnvironmentData` ownership, current CPU/GPU support boundaries, and the
-  canonical runnable entrypoint, start from the
-  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
-  guide and the
-  [Data Containers example](../../Examples/Data_Containers/index.md); this
-  epic extends those contracts rather than redefining them here.
+- Public builder and factory support for latent-heat condensation (E1-F1),
+  exported through `particula.dynamics` and covered by export regression
+  tests.
+- Regression coverage for the latent-heat CPU path at the unit level,
+  including mass-transfer conservation and per-step
+  `last_latent_heat_energy` bookkeeping checks.
+- User-facing feature documentation with worked code snippets in the
+  [condensation strategy system guide](../condensation_strategy_system.md)
+  and the latent-heat section of the
+  [condensation equations theory page](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
+- CPU API decisions recorded as the reference contract for GPU latent-heat
+  parity (fixed-shape state, explicit environment inputs, no hidden CPU↔GPU
+  movement).
 
-- Add a Warp-backed latent-heat condensation path that matches the CPU
-  `CondensationLatentHeat` behavior, including latent-heat-corrected mass
-  transfer and per-step latent heat energy bookkeeping. See the
-  [condensation equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat)
-  for the governing equation. This depends on the
-  [EnvironmentData Container](#environmentdata-container) for per-box
-  temperature feedback.
-- Add on-device vapor pressure recomputation. Temperature-dependent saturation
-  vapor pressures must be recomputed on the GPU each timestep for parcels,
-  expansion, and latent-heat workflows; today `vapor_pressure` is set once at
-  transfer time and defaults to zeros.
-- Add GPU activity and surface-tension support needed by the condensation
-  targets: replace the hardcoded surface-tension default with per-species or
-  per-particle values, and decide which activity models (water activity,
-  kappa-hygroscopicity) get GPU kernels. This is a prerequisite for the
-  hygroscopicity and mixing-state optimization targets in
-  [Epic E](#epic-e-differentiability-and-global-optimization).
-- Add GPU support for charged particle-resolved coagulation, using particle
-  charge from `WarpParticleData.charge` rather than treating charge as stored
-  but inactive metadata.
-- Add GPU sedimentation coagulation matching the CPU Seinfeld-Pandis 2016
-  sedimentation kernel.
-- Add GPU simple turbulent shear coagulation matching the CPU Saffman-Turner
-  1956 turbulent shear kernel.
-- Defer GPU DNS turbulence until the simpler coagulation kernels are stable;
-  DNS turbulence is not part of the near-term GPU target.
-- Add a CPU `Dilution` strategy/runnable as the reference implementation, then
-  add the GPU dilution kernel and parity tests against it.
-- Add a nucleation/particle-source process. No nucleation code exists in
-  particula today. Implement a CPU reference process first, then a GPU version
-  that activates inactive particle slots (see
-  [Particle Slot Management](#particle-slot-management)). See the
-  [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
-  for the governing theory, rate expressions, and the mass-conserving source
-  term.
-- Define which wall loss, charged coagulation, turbulent coagulation, and
-  coupled-process workflows should receive GPU kernels.
-- Validate expansion to the other dynamical processes needed for complete
-  aerosol simulations, including wall loss, dilution, gas updates, and future
-  process modules.
-- Clarify which particle distributions are supported by GPU kernels and which
-  remain CPU-only. The current GPU path implicitly assumes particle-resolved
-  semantics (per-slot merges, concentration zeroing); binned/moving-bin
-  strategies have no GPU counterpart.
-- Staggered (Gauss-Seidel) condensation stays CPU-only (see
-  [Non-Goals](#non-goals)).
+Two follow-ups were deferred out of E1 (a runnable latent-heat example and
+an integration-level conservation case); they are scheduled as features 8
+and 9 in
+[Epic C](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening).
 
-Priority GPU physics candidates:
+**Exit bar (met):** Latent-heat condensation is a documented, builder/factory
+accessible CPU workflow with validation coverage, and its API decisions are
+recorded as the reference contract for GPU latent-heat parity in Epic D.
 
-- Latent-heat condensation parity with `CondensationLatentHeat` (requires
-  `EnvironmentData` and on-device vapor pressure).
-- Charged Brownian coagulation for particle-resolved simulations.
-- Combined Brownian plus charged coagulation when both mechanisms are active.
-- Sedimentation coagulation for gravitational settling collisions.
-- Simple turbulent shear coagulation.
-- Combined Brownian, charged, sedimentation, and turbulent shear kernels when
-  multiple mechanisms are active.
-- DNS turbulence only after the simpler GPU coagulation kernels are validated,
-  and only if the expected simulation workloads justify the added complexity.
-- Neutral wall loss and dilution kernels so complete simulations can stay on
-  the GPU between output checkpoints.
-- Charged wall loss after the neutral wall loss and core condensation and
-  coagulation GPU paths are stable.
-- Nucleation/particle-source via slot activation, after the CPU reference
-  process exists.
+## Epic C: GPU Kernel Correctness and Low-Level API Hardening
+
+Make the existing low-level GPU kernels correct, reproducible, and usable
+from documentation alone before adding new physics. This epic absorbs the
+former "documented low-level GPU API" milestone, the cross-cutting
+validation-infrastructure work, and the two documentation/validation
+follow-ups deferred from Epic B (plan E1).
+
+For the current shipped baseline on explicit CPU↔GPU transfer helpers,
+`EnvironmentData` ownership, current CPU/GPU support boundaries, and the
+canonical runnable entrypoint, start from the
+[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+guide and the
+[Data Containers example](../../Examples/Data_Containers/index.md); this
+epic and every later epic extend those contracts rather than redefining
+them.
+
+Planned features:
+
+1. Persist coagulation RNG state: seed once at loop setup and keep per-box
+   RNG state between `coagulation_step_gpu` calls instead of re-launching the
+   initialization kernel on every call.
+2. Improve rejection sampling for wide size ranges: evaluate size-binned
+   majorant kernels or stratified pair sampling so mixed NPF/droplet boxes do
+   not collapse acceptance rates.
+3. Record the one-thread-per-box coagulation design decision with a measured
+   single-box scaling limit, or scope a parallel-within-box variant.
+4. Resolve kernel entry-point exports: decide whether `condensation_step_gpu`
+   and `coagulation_step_gpu` are exported from top-level `particula.gpu` or
+   documented under `particula.gpu.kernels` (today they are only importable
+   from `particula.gpu.kernels`).
+5. Formalize device-aware pytest execution as project policy (a pytest
+   flag/config plus marker): parity tests always run on Warp CPU and add
+   CUDA automatically when a device is present; document that CUDA-device
+   validation is currently local/manual before releases.
+6. Record acceptable parity tolerances for stochastic coagulation and
+   floating-point differences across CPU, Warp CPU, and CUDA devices.
+7. Publish a GPU quick-start example for direct kernel use with
+   `ParticleData`, `GasData`, the Warp transfer helpers, `gpu_context`, and
+   `WARP_AVAILABLE`, plus troubleshooting notes for missing Warp, missing
+   CUDA, and device-mismatch errors, and installation/environment
+   expectations for `warp-lang`.
+8. Add a runnable `docs/Examples/` entry for a `CondensationLatentHeat`
+   workflow (deferred from E1; current tutorials only set `latent_heat` as a
+   vapor property), following the paired `.py`/`.ipynb` example conventions.
+9. Add a `particula/integration_tests/` latent-heat conservation case
+   (deferred from E1; today the conservation and energy regressions are
+   unit-level only), establishing the CPU integration baseline that the
+   Epic D latent-heat parity tests will reuse.
+
+**Exit bar:** A new user can run both kernels from the docs on a CUDA device
+and on Warp CPU without reading source, repeated coagulation steps draw
+uncorrelated samples without manual re-seeding, the device-aware test policy
+plus parity tolerances are recorded, and the deferred E1 latent-heat example
+and integration-conservation case have landed.
 
 ### Known Kernel Issues
 
@@ -708,39 +773,164 @@ fixed or explicitly accepted during this epic.
   this as a deliberate design decision with its measured single-box limit, or
   plan a parallel-within-box variant.
 
-### Validation and Parity
+## Epic D: GPU Condensation Physics Parity
 
-- Maintain CPU/GPU numerical parity tests for representative aerosol states.
-- Standardize device-aware test execution: tests detect available Warp devices
-  and run parity on Warp CPU everywhere, adding CUDA automatically when a
-  device is present. This keeps local `pytest` runs meaningful on GPU
-  workstations and will light up CUDA coverage automatically if CI gains a GPU
-  runner. Formalize the existing device parametrization helper as the
-  project-wide policy (a pytest flag/config plus marker), and document that
-  CUDA-device validation is currently local/manual.
-- Add CPU/GPU parity tests for latent-heat condensation, including the stored
-  latent heat energy diagnostic described in the
-  [condensation equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
-- Add CPU/GPU parity or statistically bounded tests for charged
-  particle-resolved coagulation.
-- Add CPU/GPU parity tests for sedimentation and simple turbulent shear
-  coagulation kernels.
-- Add CPU/GPU parity tests for wall loss and dilution once GPU kernels exist.
-- Add larger multi-box and particle-resolved regression cases that exercise
-  realistic simulation loops.
-- Add full-loop validation tests that compare CPU, uncaptured GPU, and
-  graph-captured GPU execution for the same process sequence.
-- Record acceptable tolerances for stochastic coagulation and floating-point
-  differences across CPU, Warp CPU, and CUDA devices.
-- Add multi-box validation tests for independent boxes, prescribed advection,
-  dilution, and expansion.
-- Add particle-slot validation tests for inactive slots, activation, slot
-  exhaustion handling, and conservation across resampling or volume scaling.
+Bring GPU condensation to parity with the CPU reference paths from Epics A
+and B: latent-heat physics, on-device thermodynamics, and the activity and
+surface-tension support required by the later optimization targets in
+[Epic I](#epic-i-differentiability-and-global-optimization). Staggered
+(Gauss-Seidel) condensation stays CPU-only (see [Non-Goals](#non-goals)).
+Every kernel in this epic ships with CPU/GPU parity tests under the Epic C
+device-aware test policy.
 
-## Epic C: High-Level Integration and GPU-Resident Simulation
+Planned features:
+
+1. On-device vapor pressure recomputation: temperature-dependent saturation
+   vapor pressures recomputed on the GPU each timestep for parcel,
+   expansion, and latent-heat workflows; today `vapor_pressure` is set once
+   at transfer time and defaults to zeros.
+2. Warp-backed latent-heat condensation kernel matching CPU
+   `CondensationLatentHeat`, including latent-heat-corrected mass transfer
+   and per-step latent heat energy bookkeeping (see the
+   [condensation equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat)),
+   with per-box temperature feedback through the
+   [EnvironmentData Container](#environmentdata-container).
+3. Fixed-count sub-stepping integration: build GPU condensation on the
+   `fixed_count_substeps_4` recommendation from the
+   [condensation stiffness study](condensation-stiffness-study.md), keeping
+   the implementation graph-capture-friendly and autodiff-compatible (fixed
+   iteration counts, stable allocation layouts, no data-dependent loop
+   bounds).
+4. Per-species or per-particle surface tension, replacing the hardcoded
+   0.072 N/m kernel default.
+5. GPU activity support: decide which activity models (water activity,
+   kappa-hygroscopicity) get GPU kernels and implement the selected scope; a
+   prerequisite for the hygroscopicity and mixing-state targets in
+   [Epic I](#epic-i-differentiability-and-global-optimization).
+6. CPU/GPU parity tests for latent-heat condensation, including the stored
+   latent heat energy diagnostic.
+7. Gas-coupled support gating: do not claim gas-coupled GPU production
+   support until the production hook and same-issue conservation regression
+   in `particula/integration_tests/condensation_particle_resolved_test.py`
+   land.
+
+**Exit bar:** GPU isothermal and latent-heat condensation match the CPU
+reference within recorded tolerances on Warp CPU (and CUDA when available),
+with on-device vapor pressure recomputation and configurable surface
+tension, while staying inside the E2 environment-shape contract and
+`float64` evidence envelope.
+
+## Epic E: GPU Coagulation Physics Coverage
+
+Extend GPU coagulation beyond the Brownian kernel to the collision
+mechanisms already available on CPU. DNS turbulence remains deferred (see
+[Non-Goals](#non-goals)). Every kernel in this epic ships with CPU/GPU
+parity or statistically bounded tests under the Epic C device-aware test
+policy.
+
+Planned features:
+
+1. Charged particle-resolved coagulation using `WarpParticleData.charge`
+   rather than treating charge as stored but inactive metadata.
+2. Combined Brownian plus charged coagulation when both mechanisms are
+   active.
+3. Sedimentation coagulation matching the CPU Seinfeld-Pandis 2016
+   sedimentation kernel.
+4. Simple turbulent shear coagulation matching the CPU Saffman-Turner 1956
+   kernel.
+5. Combined Brownian, charged, sedimentation, and turbulent shear kernels
+   when multiple mechanisms are active.
+6. Parity and statistical validation: CPU/GPU parity or statistically
+   bounded tests for each new kernel, with recorded tolerances.
+7. Distribution-support decision record: the current GPU path implicitly
+   assumes particle-resolved semantics (per-slot merges, concentration
+   zeroing); document which binned/moving-bin strategies remain CPU-only.
+
+**Exit bar:** Each in-scope CPU coagulation mechanism has a GPU kernel with
+parity or statistically bounded tests, combined-mechanism kernels are
+validated, and unsupported distribution types are documented as CPU-only.
+
+## Epic F: GPU Process Completeness
+
+Add the remaining processes a complete aerosol simulation needs to stay
+GPU-resident between checkpoints — dilution, wall loss, and nucleation —
+plus the fixed-slot particle management that nucleation and graph capture
+depend on.
+
+Planned features:
+
+1. CPU `Dilution` strategy/runnable reference implementation (today dilution
+   exists only as free functions, so GPU dilution has no process-level CPU
+   reference).
+2. GPU dilution kernel with parity tests against the CPU reference.
+3. GPU neutral wall loss (spherical/rectangular) with parity tests.
+4. GPU charged wall loss, after neutral wall loss and the core condensation
+   and coagulation GPU paths are stable.
+5. Nucleation/particle-source CPU reference process following the
+   [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
+   (no nucleation code exists in particula today).
+6. GPU nucleation via slot activation (see
+   [Particle Slot Management](#particle-slot-management)).
+7. Particle slot management: inactive zero-mass slots, activation,
+   per-box active-count diagnostics, and an exhaustion policy (resampling or
+   volume scaling).
+8. Slot and conservation validation: tests for inactive slots, activation,
+   slot exhaustion handling, and conservation across resampling or volume
+   scaling.
+
+### Particle Slot Management
+
+- Use fixed particle slot counts per box for GPU-resident simulations.
+- Represent inactive particle slots as particles with zero mass, zero radius,
+  and zero concentration or count.
+- Avoid dynamic allocation inside timestep kernels. Processes that create new
+  particles, including the planned nucleation process, should activate
+  inactive slots when available.
+- Add a resampling or volume-scaling policy for cases that would exceed the
+  available particle slots in a box.
+- Track per-box active particle counts as diagnostics, but keep the underlying
+  arrays fixed-shape for GPU kernels and graph capture.
+- Define compaction rules only if needed; inactive zero-mass slots are simpler
+  and graph-friendly.
+
+**Exit bar:** A complete GPU-resident timestep can run condensation,
+coagulation, wall loss, and dilution together with persistent RNG state, and
+new-particle creation works through validated, conservation-checked slot
+activation.
+
+## Epic G: Backend Selection and GPU-Resident Simulation
 
 Make GPU execution reachable from user-facing APIs and keep full simulations
-resident on the device between checkpoints.
+resident on the device between checkpoints. This epic also owns the
+cross-cutting CPU-fallback and API-stability decisions formerly tracked as a
+separate epic.
+
+Planned features:
+
+1. Backend-selection API design: decide whether selection belongs on
+   strategies, runnables, builders, or a separate execution context.
+2. Backend selection for at least one condensation workflow, with explicit
+   return types and mutation semantics.
+3. Backend selection for at least one Brownian coagulation workflow.
+4. GPU simulation loop abstraction that keeps `WarpParticleData`,
+   `WarpGasData`, and `WarpEnvironmentData` resident on the selected device
+   across all enabled dynamics.
+5. Deterministic process ordering/scheduler for full aerosol simulations
+   (condensation, coagulation, wall loss, dilution, environment updates, and
+   gas updates between steps).
+6. CPU fallback and API-stability policy: mark low-level `particula.gpu.*`
+   APIs experimental until selection and full-loop validation land; missing
+   GPU processes raise clear errors or use explicit fallback boundaries; no
+   silent CPU/GPU data movement in long simulations.
+7. Multi-box communication: prescribed advection, dilution, expansion, and
+   simple mixing maps, including per-box volume changes for parcel and
+   combustion cases.
+8. Per-box RNG streams so independent boxes remain reproducible, with
+   GPU-resident RNG state exercised in loop tests.
+9. Documentation and regression coverage: a GPU-resident multi-timestep
+   example that transfers back only at checkpoints, plus larger multi-box and
+   particle-resolved regression cases for independent boxes, prescribed
+   advection, dilution, and expansion.
 
 ### High-Level Integration
 
@@ -821,38 +1011,57 @@ Candidate GPU process coverage:
 - Validate simple 1D advection and expansion cases against CPU references before
   adding more complex coupling.
 
-### Particle Slot Management
-
-- Use fixed particle slot counts per box for GPU-resident simulations.
-- Represent inactive particle slots as particles with zero mass, zero radius,
-  and zero concentration or count.
-- Avoid dynamic allocation inside timestep kernels. Processes that create new
-  particles, including the planned nucleation process, should activate
-  inactive slots when available.
-- Add a resampling or volume-scaling policy for cases that would exceed the
-  available particle slots in a box.
-- Track per-box active particle counts as diagnostics, but keep the underlying
-  arrays fixed-shape for GPU kernels and graph capture.
-- Define compaction rules only if needed; inactive zero-mass slots are simpler
-  and graph-friendly.
+Fixed-slot particle management for these loops is defined in
+[Particle Slot Management](#particle-slot-management) under Epic F.
 
 ### Random Number Strategy
 
-- Define deterministic RNG seeding for stochastic coagulation on GPU.
-- Fix the current per-call re-initialization: seed once at loop setup and
-  persist per-box RNG state between timesteps instead of re-launching the
-  initialization kernel on every `coagulation_step_gpu` call (see
-  [Known Kernel Issues](#known-kernel-issues)).
+- Define deterministic RNG seeding for stochastic coagulation on GPU. The
+  per-call re-initialization defect itself is fixed in
+  [Epic C](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) (see
+  [Known Kernel Issues](#known-kernel-issues)); this epic builds the
+  loop-level RNG strategy on that fix.
 - Support per-box RNG streams so independent boxes remain reproducible when the
   number of boxes changes or when selected boxes are disabled.
 - Track RNG state on the GPU between timesteps and include it in graph-captured
   execution tests.
 - Document expected reproducibility limits across CPU, Warp CPU, and CUDA.
 
-## Epic D: Graph Capture and Performance
+**Exit bar:** At least one condensation and one coagulation workflow run on
+GPU through the selection API, match CPU within recorded tolerance, and are
+used in a documented example, and a multi-box GPU-resident loop runs all
+supported processes between checkpoints with per-box RNG streams and no
+hidden CPU transfers.
+
+## Epic H: Graph Capture and Performance
 
 Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.
+
+Planned features:
+
+1. Warp graph capture for repeated timestep execution with fixed process
+   order and stable array shapes.
+2. Separation of graph-capturable kernels from setup work (allocation,
+   validation, host-side scheduling).
+3. Preallocated buffer reuse for mass transfer, collision pairs, wall-loss
+   rates, dilution factors, diagnostics, and RNG state.
+4. Full-loop validation tests comparing CPU, uncaptured GPU, and
+   graph-captured GPU execution for the same process sequence.
+5. Multi-box scaling benchmarks with box count as the primary axis, plus
+   secondary particles-per-box scaling; benchmarks stay opt-in
+   (`--benchmark`-style gating) and CUDA-gated, separate from the default
+   parity suite.
+6. Memory-budget model covering state arrays, inactive slots, temporary
+   buffers, diagnostics, communication maps, and autodiff tape storage.
+7. Graph-capture example plus documented limitations and re-capture
+   triggers.
+8. CUDA kernel profiling (occupancy, memory access patterns) and
+   captured-vs-uncaptured launch-overhead benchmarks.
+
+**Exit bar:** A multi-box GPU-resident simulation runs graph-captured
+timesteps, matches CPU and uncaptured GPU references, and has published
+scaling numbers across box counts plus a recorded memory-budget model.
 
 ### Warp Graph Capture
 
@@ -909,16 +1118,17 @@ resampling or volume-scaling policy before slot exhaustion.
 - Add memory-budget estimates for `n_boxes × n_particles × n_species` state,
   inactive slots, temporary buffers, collision-pair buffers, diagnostics,
   communication maps, and autodiff tape storage for multi-step gradient runs
-  (see [Epic E](#epic-e-differentiability-and-global-optimization)).
+  (see [Epic I](#epic-i-differentiability-and-global-optimization)).
 - Include benchmark cases that vary boxes, particles per box, species count,
   active-slot fraction, and process combinations.
 
-## Epic E: Differentiability and Global Optimization
+## Epic I: Differentiability and Global Optimization
 
 A longer-term goal is gradient-based global optimization: using Warp automatic
 differentiation to fit model parameters to experiments or observations.
 Differentiability constrains how kernels are written, so it must be considered
-while Epic B kernels are authored, not added afterward. For the shipped
+while the Epic D and Epic E kernels are authored, not added afterward. For
+the shipped
 container, transfer, and runnable-example baseline that this differentiability
 work builds on, start from the
 [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
@@ -945,6 +1155,32 @@ or per-particle masses, concentrations, and composition), not with respect to
 its parameters. Prescribed parameters mean no parameter adjoints are needed, but
 the operators themselves must still be differentiable in state.
 
+Planned features:
+
+1. Differentiable-friendly variants of `apply_mass_transfer_kernel` and
+   `apply_coagulation_kernel` compatible with `wp.Tape` (no gradient-breaking
+   in-place mutation or control flow on the optimization path).
+2. End-to-end gradient from a final-state loss back to the initial state
+   through a multi-step deterministic condensation loop, with recorded tape
+   memory usage.
+3. Tape memory budgeting and gradient-checkpointing evaluation for long
+   differentiable loops, feeding the Epic H memory-budget model.
+4. Global-optimization example that recovers an initial size distribution
+   from a synthetic final distribution across multiple boxes, with process
+   parameters held fixed.
+5. Decision record for differentiable coagulation (deterministic
+   binned/sectional operator versus relaxed particle-resolved formulation).
+6. Decision record for the mixing-state and hygroscopicity state
+   representation (composition-resolved sectional versus particle-resolved
+   with a differentiable surrogate).
+7. Combined validation of autodiff, graph capture, and per-box RNG streams
+   operating together.
+8. Loss-function definitions on state (size distribution, hygroscopicity,
+   mixing-state metrics), each with a confirmed differentiable path back to
+   the initial state.
+
+Design constraints and open decisions:
+
 - **Author optimization-path kernels against Warp's `wp.Tape` requirements.**
   In-place mutation and some control-flow patterns can break or zero gradients.
   The current `apply_mass_transfer_kernel` and `apply_coagulation_kernel` use
@@ -959,7 +1195,7 @@ the operators themselves must still be differentiable in state.
   timesteps times `n_boxes × n_particles × n_species` fp64 state and can
   dominate the memory budget. Evaluate gradient checkpointing (recompute
   segments of the forward pass during the backward pass) before committing to
-  long differentiable loops, and include tape storage in the Epic D
+  long differentiable loops, and include tape storage in the Epic H
   memory-budget model.
 - **Stochastic coagulation blocks state gradients as currently implemented.** The
   GPU Brownian coagulation kernel uses stochastic acceptance-rejection and
@@ -980,7 +1216,7 @@ the operators themselves must still be differentiable in state.
   sectional bins (size by composition) versus particle-resolved with a
   differentiable surrogate. Note that hygroscopicity targets also require the
   GPU activity/kappa support planned in
-  [Epic B](#epic-b-gpu-physics-coverage-and-parity); a condensation operator
+  [Epic D](#epic-d-gpu-condensation-physics-parity); a condensation operator
   without water-activity modeling cannot fit hygroscopicity.
 - **Autodiff, graph capture, and RNG state interact.** Differentiable execution,
   graph-captured timestep loops, and per-box RNG streams must coexist for
@@ -992,55 +1228,19 @@ the operators themselves must still be differentiable in state.
   final size distributions, hygroscopicity distributions, or mixing-state
   metrics, and confirm each has a differentiable path back to the initial state.
 
-## Epic F: API Stability, Validation Infrastructure, and Documentation
-
-Cross-cutting work that runs alongside the other epics.
-
-### CPU Fallback and API Stability
-
-- Mark low-level `particula.gpu.*` APIs as experimental until high-level backend
-  selection and full-loop validation are in place.
-- Decide whether missing GPU processes should raise a clear error, fall back to
-  CPU, or require an explicit CPU/GPU synchronization boundary.
-- Prefer explicit fallback boundaries for scientific reproducibility; avoid
-  silently moving data between CPU and GPU in long simulations.
-
-### Validation Infrastructure
-
-- Adopt device-aware pytest execution as project policy: detect CUDA at test
-  time and run GPU parity tests on `cpu` plus `cuda` devices when available,
-  falling back to Warp CPU otherwise. This supports local validation on GPU
-  workstations today and enables CI coverage automatically if a GPU runner is
-  added later.
-- Keep benchmarks opt-in (`--benchmark` style gating) and CUDA-gated, separate
-  from the default parity suite.
-- Document the current CUDA validation cadence (local/manual before releases)
-  until GPU CI exists.
-
-### Documentation and Examples
-
-- Add a GPU quick-start example using `ParticleData`, `GasData`, and Warp
-  transfer helpers, including `gpu_context` and the `WARP_AVAILABLE` flag for
-  environments without Warp or CUDA.
-- Add an end-to-end GPU-resident simulation example that runs multiple
-  timesteps before transferring data back to CPU.
-- Add a full GPU simulation example once condensation, coagulation, wall loss,
-  and dilution have GPU implementations.
-- Add a Warp graph-capture example for a fixed process sequence and explain when
-  graph capture is useful.
-- Document installation and environment expectations for `warp-lang`, Warp CPU,
-  and CUDA devices.
-- Explain current limitations clearly so users know when to choose CPU versus
-  GPU execution.
+**Exit bar:** A gradient-based optimizer recovers a known initial state from
+synthetic multi-box final-state data within recorded tolerance, using GPU
+autodiff, without fitting any process parameters, and the differentiable
+coagulation and state-representation decisions are recorded.
 
 ## Risks and Key Decisions
 
 | Risk / Decision | Impact | Direction |
 | --- | --- | --- |
-| fp64 throughput on consumer CUDA | Slower GPU, weaker speedups | Keep fp64 as reference; evaluate mixed precision only after a resolution study |
-| NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Study mass storage representation (per-species, log-mass, or binned) |
+| fp64 throughput on consumer CUDA | Slower GPU, weaker speedups | Keep fp64 as the shipped reference and production baseline; evaluate mixed precision only through a future evidence-backed migration proposal |
+| NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Use the shipped mass-precision report as the baseline; keep per-species absolute mass until a future proposal proves an alternative across the E2 cases |
 | fp64 memory doubling vs large multi-box | Fewer boxes fit in memory | Build a memory-budget model; treat precision and box count together |
-| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Characterize stiffness; evaluate sub-stepping and semi-implicit schemes that stay capture- and autodiff-friendly |
+| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Build later GPU condensation integration from the shipped `fixed_count_substeps_4` recommendation while keeping gas-coupled production support gated |
 | No fully integrated GPU-ready per-box thermodynamic runtime path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, build on the shipped `WarpEnvironmentData` CPU↔GPU round-trip helpers, and add integration work |
 | Rejection-sampling acceptance collapse for wide size ranges | Coagulation trial counts explode in mixed NPF/droplet boxes | Evaluate binned majorant kernels or stratified pair sampling |
 | One-thread-per-box coagulation | Serializes large single-box workloads | Record as deliberate multi-box tradeoff or add parallel-within-box variant |
@@ -1051,100 +1251,4 @@ Cross-cutting work that runs alongside the other epics.
 | RNG reproducibility across CPU/Warp CPU/CUDA | Non-reproducible stochastic results | Per-box RNG streams; document tolerances and reproducibility limits |
 | Caller drops ordered gas metadata or vapor-pressure sidecar across `WarpGasData` restore | Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic | Treat the current field split as the resolved contract, preserve ordered names externally, and recompute or carry `vapor_pressure` sidecar data when needed |
 | Graph capture fragility (shape/process changes) | Invalid captured graphs | Fixed shapes, inactive slots, documented re-capture triggers |
-| GPU condensation lacks activity/kappa physics | Hygroscopicity and mixing-state targets unfittable | Plan GPU activity/surface-tension support in Epic B before Epic E targets |
-
-## Suggested Milestones
-
-Each milestone lists an exit bar so "done" is measurable, and maps to the
-epics above.
-
-### Milestone 1: Documented Low-Level GPU API (Epic F)
-
-- Publish examples for direct use of `to_warp_particle_data`,
-  `to_warp_gas_data`, `condensation_step_gpu`, and `coagulation_step_gpu`,
-  including `gpu_context` and `WARP_AVAILABLE` for environments without CUDA.
-- Add troubleshooting notes for missing Warp, missing CUDA, and device mismatch
-  errors.
-- Resolve whether `condensation_step_gpu` and `coagulation_step_gpu` are exported
-  from top-level `particula.gpu` or documented under `particula.gpu.kernels`
-  (today they are only importable from `particula.gpu.kernels`).
-- **Exit bar:** A new user can run both kernels from the docs on a CUDA device
-  and on Warp CPU without reading source.
-
-### Milestone 2: Foundations and Backend Selection (Epics A, C)
-
-- `EnvironmentData` CPU↔GPU round-trip helpers and tests are now shipped;
-  build backend-selection APIs and workflow integration on top of
-  `WarpEnvironmentData`.
-- `coagulation_step_gpu(...)` now follows the same environment normalization
-  contract as `condensation_step_gpu(...)`: callers may pass scalar direct
-  `temperature`/`pressure`, direct Warp arrays with shape `(n_boxes,)`, hybrid
-  scalar-plus-Warp-array direct inputs, or keyword-only
-  `environment=WarpEnvironmentData(...)`.
-- Keep downstream GPU kernel handoffs aligned with that contract: accept
-  validated per-box temperature and pressure as environment-owned state, and
-  do not migrate those fields into `GasData`.
-- Add an API design for selecting CPU or GPU execution from user-facing
-  simulation code.
-- Implement backend selection for at least one condensation workflow and one
-  Brownian coagulation workflow.
-- Keep return types and mutation semantics explicit.
-- Adopt the device-aware pytest policy for GPU parity tests.
-- **Exit bar:** At least one condensation and one coagulation workflow run on GPU
-  through the selection API, match CPU within recorded tolerance, and are used in
-  a documented example, while the already-shipped `WarpEnvironmentData`
-  round-trip helpers remain covered by tests.
-
-### Milestone 2.5: Missing GPU Physics (Epic B)
-
-- Fix RNG state persistence in `coagulation_step_gpu` (seed once, persist
-  per-box state between steps).
-- Implement and validate Warp-backed latent-heat condensation, including
-  per-box temperature feedback through `EnvironmentData` and on-device vapor
-  pressure recomputation.
-- Implement and validate charged particle-resolved coagulation on the GPU.
-- Implement and validate GPU sedimentation coagulation.
-- Implement and validate GPU simple turbulent shear coagulation.
-- Add the CPU `Dilution` strategy/runnable reference, then implement and
-  validate GPU wall loss and dilution kernels needed for complete GPU-resident
-  aerosol simulations.
-- Decide the nucleation/particle-source design and land the CPU reference
-  implementation following the
-  [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
-  (GPU slot-activation version may land in Milestone 3).
-- Decide the GPU activity/surface-tension scope needed for water uptake and
-  kappa-hygroscopicity.
-- Document which CPU strategy options are still unsupported on GPU (including
-  staggered condensation, which stays CPU-only).
-- **Exit bar:** Each new kernel has CPU/GPU parity (or statistically bounded)
-  tests, and a complete GPU-resident timestep can run condensation, coagulation,
-  wall loss, and dilution together with persistent RNG state.
-
-### Milestone 2.75: Differentiable Condensation and Global Optimization (Epic E)
-
-- Author differentiable-friendly condensation kernels compatible with `wp.Tape`.
-- Demonstrate an end-to-end gradient from a final-state loss back to the initial
-  state through a multi-step condensation loop, recording tape memory usage and
-  the checkpointing approach if needed.
-- Implement one global-optimization example that recovers an initial size
-  distribution from a synthetic final distribution across multiple boxes, with
-  process parameters held fixed.
-- Record the open decision for differentiable coagulation and the state
-  representation for mixing-state and hygroscopicity targets.
-- **Exit bar:** A gradient-based optimizer recovers a known initial state from
-  synthetic multi-box final-state data within recorded tolerance, using GPU
-  autodiff, without fitting any process parameters.
-
-### Milestone 3: Production GPU Workflows (Epics C, D)
-
-- Add multi-step GPU-resident examples and benchmark reports.
-- Expand parity coverage to realistic aerosol scenarios.
-- Add full-loop CPU, GPU, and graph-captured GPU validation tests.
-- Add Warp graph-capture support for stable, repeated timestep loops.
-- Publish multi-box scaling benchmarks that vary box count as the primary axis.
-- Land the GPU nucleation/particle-source process with slot-activation and
-  conservation tests, if the Milestone 2.5 decision calls for it.
-- Decide which GPU APIs are stable enough to document as supported public APIs.
-- **Exit bar:** A multi-box GPU-resident simulation runs graph-captured
-  timesteps, matches CPU and uncaptured GPU references, and has published
-  scaling numbers across box counts.
+| GPU condensation lacks activity/kappa physics | Hygroscopicity and mixing-state targets unfittable | Plan GPU activity/surface-tension support in Epic D before Epic I targets |

@@ -2,15 +2,14 @@
   "id": "E2-F6",
   "type": "feature",
   "title": "Produce mass representation and numerical precision study",
-  "status": "Active",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-05",
-  "last_updated": "2026-07-06",
+  "completion_date": "2026-07-08",
+  "last_updated": "2026-07-08",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E2-F6/architecture_design.md",
@@ -72,11 +71,11 @@
     {
       "id": "E2-F6-P4",
       "title": "Publish precision recommendation report with validation evidence",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
-      "issue_number": null,
+      "issue_number": 1211,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-08",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -84,5 +83,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

@@ -2,14 +2,14 @@
   "id": "E1-F1",
   "type": "feature",
   "title": "Public builder and factory support for latent-heat condensation",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": null,
+  "completion_date": "2026-07-08",
+  "last_updated": "2026-07-08",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E1-F1/architecture_design.md",
@@ -29,5 +29,6 @@
   "schema_version": "1.0",
   "parent_id": "E1",
   "phases": [],
-  "totals": null
+  "totals": null,
+  "lifecycle": "completed"
 }

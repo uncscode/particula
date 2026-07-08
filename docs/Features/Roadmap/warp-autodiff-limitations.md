@@ -1,7 +1,7 @@
 # Warp Autodiff: Limitations and Stochastic Process Handling
 
 Reference notes for the differentiable-simulation goal in the
-[Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md#epic-e-differentiability-and-global-optimization).
+[Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md#epic-i-differentiability-and-global-optimization).
 
 For the shipped container, transfer, and runnable-example baseline that this
 follow-on differentiability work builds on, start with the

@@ -2,14 +2,14 @@
   "id": "E1",
   "type": "epic",
   "title": "Complete Non-Isothermal Condensation Public API, Validation, Documentation, and Acceleration Readiness",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "XL",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": null,
+  "completion_date": "2026-07-08",
+  "last_updated": "2026-07-08",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E1/appendix.md",
@@ -30,5 +30,6 @@
   "child_plans": [],
   "milestones": [],
   "governance_log": [],
-  "risk_register": []
+  "risk_register": [],
+  "lifecycle": "completed"
 }

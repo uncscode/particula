@@ -9,3 +9,13 @@
   reconciliation, kernel migration, numerical studies, and final docs/handoff.
 - Recorded tooling challenge: epic records currently reject `add-phase`, so
   milestones are documented in section content rather than stored as phases.
+
+### 2026-07-08 -- Epic Shipped
+
+- Marked E2 as shipped after all child feature tracks E2-F1 through E2-F9
+  reached shipped status.
+- Closed the epic lifecycle as completed and updated the child-plan summary to
+  reflect the shipped foundation state.
+- Recorded that downstream roadmap work now proceeds from the shipped E2
+  container, transfer-helper, precision, stiffness, support-boundary, and docs
+  baseline.
