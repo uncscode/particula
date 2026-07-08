@@ -1,17 +1,23 @@
 # Open Questions
 
-1. Should the final public quick-start import from `particula.gpu.kernels` only,
-   or should `particula.gpu` add narrow top-level re-exports for the two step
-   functions?
-2. If top-level re-exports are added, should raw lower-level symbols such as
-   `apply_coagulation_kernel` remain excluded from `particula.gpu.__all__`?
-3. Should the quick-start live beside existing data-container examples, or in a
-   new GPU direct-kernels example path?
-4. After `E3-F1`, what is the minimum coagulation snippet that clearly shows
-   persisted `rng_states` without overcomplicating the quick-start?
-5. Should troubleshooting live in the example, the feature docs, or both?
+Status: reviewed and answered on 2026-07-08.
 
-Default recommendations: keep the documented low-level import path under
-`particula.gpu.kernels`, exclude raw kernel internals from broad public docs,
-and place troubleshooting in both the runnable example comments and the
-feature documentation.
+## Resolved Decisions
+
+1. The final public quick-start should import direct step functions from
+   `particula.gpu.kernels`. That package already exports `condensation_step_gpu`
+   and `coagulation_step_gpu`.
+2. Raw lower-level symbols such as `apply_coagulation_kernel` should remain
+   excluded from top-level `particula.gpu.__all__`. If top-level re-exports are
+   added later, limit them to the two step functions and cover them with export
+   tests.
+3. Put the quick-start beside the existing data-container/GPU foundation
+   examples unless implementation reveals a stronger need for a separate direct
+   kernels path.
+4. After E3-F1, the minimum coagulation snippet should show a caller-owned
+   `rng_states` buffer initialized once, passed into repeated
+   `coagulation_step_gpu` calls, and retained by the caller between steps.
+5. Troubleshooting should live in both the runnable example comments and the
+   feature documentation. The example should cover immediate failure modes;
+   the docs should explain broader CUDA/Warp availability and transfer-boundary
+   issues.

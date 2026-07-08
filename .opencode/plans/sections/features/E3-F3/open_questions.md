@@ -1,13 +1,19 @@
 # Open Questions
 
-- Which hardware and CUDA/Warp environment should be treated as the reference
-  context for refreshed benchmark numbers?
-- Should raw benchmark results live directly in roadmap prose, in a small
-  artifact, or both?
-- After E3-F2, is mixed-scale sampling stable enough for final coagulation
-  scaling interpretation?
-- What single-box particle-count threshold should documentation use as the
-  practical caution boundary, if the measurements show a clear break point?
-- If a parallel-within-box follow-up is needed, should it target pair-selection
-  parallelism, collision application parallelism, graph capture, or a staged
-  design investigation first?
+Status: reviewed and answered on 2026-07-08.
+
+## Resolved Decisions
+
+- Treat the maintainer's CUDA/Warp development machine as the reference context
+  for refreshed benchmark numbers, and record Warp, CUDA, device, driver, and
+  Python versions beside the results.
+- Store raw benchmark output as an artifact under `.artifacts/benchmarks/` and
+  summarize only the decision-relevant numbers in roadmap prose.
+- Final single-box scaling interpretation should wait until E3-F2 either
+  hardens mixed-scale sampling or documents its bounded limitation.
+- Pick the particle-count caution boundary from measured results, not before
+  data collection. The current benchmark matrix already spans `1x10k`, `1x20k`,
+  and `1x50k` coagulation GPU-only cases for this decision.
+- If a follow-up is needed, start with a staged design investigation. Compare
+  pair-selection parallelism, collision-application parallelism, and graph
+  capture before committing to a kernel rewrite.

@@ -1,13 +1,18 @@
 # Open Questions
 
-- What exact particle count and time-step count produce stable energy and mass
-  deltas while keeping the test fast? Start from the existing particle-resolved
-  condensation integration test and reduce only if stability remains strong.
-- Should the test construct `CondensationLatentHeat` directly through
-  `par.dynamics` or through `CondensationFactory(strategy_type="latent_heat")`?
-  Direct public construction is likely clearer for the baseline.
-- What tolerance is appropriate for total water inventory and energy comparison
-  after fixture tuning? Existing integration tolerance (`delta=1e-9`) is the
-  starting point, with tighter `np.testing.assert_allclose` possible for energy.
-- Has E3-F6 documentation landed at implementation time, and if so what exact
-  example path should be cross-linked?
+Status: reviewed and answered on 2026-07-08.
+
+## Resolved Decisions
+
+- Start from `particula/integration_tests/condensation_particle_resolved_test.py`
+  and reduce fixture size only if mass and energy deltas remain stable. Keep the
+  final test fast enough for normal integration-test execution.
+- Construct `CondensationLatentHeat` directly through `par.dynamics` for the
+  baseline. Direct public construction is clearer for a conservation reference;
+  factory coverage can remain separate.
+- Use the existing integration tolerance of `1e-9` as the initial water
+  inventory tolerance, then tighten with `np.testing.assert_allclose` only after
+  fixture tuning proves stable energy behavior.
+- Cross-link to the E3-F6 example when it exists. Until then, record the link as
+  a follow-up in E3-F7 documentation updates rather than blocking the baseline
+  test.

@@ -1,18 +1,25 @@
 ## Open Questions
 
-- Should the new example always be notebook-paired, or is a runnable `.py` file
-  sufficient if docs maintainers prefer a lighter artifact?
-- Should `docs/Features/condensation_strategy_system.md` link directly to the
-  new example, or is the Dynamics examples index enough discoverability?
-- What exact physical setup gives the clearest non-zero latent-heat diagnostic
-  while remaining fast and stable for docs execution?
-- Should the example include a small plot, or are printed tabular diagnostics
-  preferred for reliable CI/notebook execution?
+Status: reviewed and answered on 2026-07-08.
 
-### Assumptions for First Implementation
+## Resolved Decisions
 
-- Use the existing condensation example convention and create a paired notebook
-  unless implementation discovers a repository preference against new notebooks.
-- Keep all execution CPU-only and deterministic.
+- Create a runnable `.py` example and pair it with a notebook if the surrounding
+  examples directory uses the paired workflow. Repository guidance prefers
+  editing paired `.py` files and syncing notebooks when a notebook artifact is
+  present.
+- Link the new example from both the Dynamics examples index and
+  `docs/Features/condensation_strategy_system.md` if that feature page exists at
+  implementation time. The index provides discovery; the feature page provides
+  conceptual context.
+- Use a fast CPU-only water latent-heat setup that produces a non-zero
+  temperature/energy diagnostic. Keep the setup deterministic and avoid GPU
+  dependencies because GPU latent-heat condensation is explicitly downstream.
+- Prefer printed tabular diagnostics for reliable CI/notebook execution. Add a
+  plot only if it is lightweight and does not become the validation oracle.
+
+## Implementation Assumptions
+
 - Treat production code as stable; add tests only if a bug is found while making
   the example runnable.
+- E3-F7 should consume the final example path for cross-linking when available.

@@ -5,8 +5,10 @@
   "status": "Draft",
   "priority": "P2",
   "size": "M",
-  "owners": [],
-  "start_date": null,
+  "owners": [
+    "Gorkowski"
+  ],
+  "start_date": "2026-07-08",
   "target_date": null,
   "completion_date": null,
   "last_updated": "2026-07-08",
