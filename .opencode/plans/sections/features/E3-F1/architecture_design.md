@@ -33,8 +33,11 @@ coagulation_step_gpu(..., rng_states=rng_states)
     single-call behavior;
   - provided `rng_states`: validate and preserve the caller-owned state across
     repeated calls unless explicit initialization is requested;
-  - explicit seed-once setup: callers can request initialization outside a
-    repeated timestep loop without hidden host inspection of buffer contents.
+  - explicit seed-once setup: expose an initializer/reset helper or equivalent
+    keyword-only initialization path so callers can initialize outside a repeated
+    timestep loop without hidden host inspection of buffer contents;
+  - caller-supplied `rng_states`: continue to bypass automatic initialization
+    unless the caller explicitly invokes the initializer/reset path.
 - **Workflow Hooks:** Tests and documentation become the enforcement mechanism.
   Benchmarks that currently increment `rng_seed` every step should either adopt
   seed-once setup or explicitly document why they still vary seeds.

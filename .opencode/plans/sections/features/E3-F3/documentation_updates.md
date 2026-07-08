@@ -8,6 +8,9 @@
   - Include measured single-box and multi-box scaling limits with command and
     hardware context.
 - Reference E3-F2 if mixed-scale sampling results affect interpretation.
+- Preserve the one-thread-per-box decision as evidence-driven: summarize the
+  benchmark artifacts and measured limits that justify keeping, caveating, or
+  replacing the current approach.
 
 - `docs/Theory/nvidia-warp/examples/gpu_benchmarks.py`
   - Refresh benchmark interpretation text if existing single-box and multi-box

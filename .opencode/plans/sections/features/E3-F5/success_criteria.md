@@ -1,19 +1,38 @@
 # Success Criteria
 
-- Pytest markers and any selected options for Warp/GPU parity are registered in
-  both `particula/conftest.py` and `pyproject.toml` without unknown-marker
-  warnings.
-- Warp CPU tests run consistently when Warp is installed.
-- CUDA tests run automatically when CUDA is available to Warp and skip cleanly
-  when unavailable.
-- GPU device helper behavior is covered by co-located tests that do not require
-  real CUDA.
-- Coagulation and condensation GPU kernel tests use the standardized marker and
-  helper policy where practical.
-- Stochastic parity tolerance policy is documented, including aggregate
-  seed/step behavior and `3 sigma` or equivalent tolerance bands.
-- CUDA local/manual validation expectations are documented and do not make CUDA
-  a required CI dependency.
-- Existing benchmark gating via `--benchmark` remains intact.
-- Focused validation commands pass or skip as expected in a CPU-only
-  environment.
+## Pass / Fail Criteria
+
+- [ ] The marker vocabulary is explicit and consistent across code, config, and
+  docs: `warp`, `cuda`, `gpu_parity`, and `stochastic` are registered without
+  unknown-marker warnings.
+- [ ] Warp CPU remains the required baseline for GPU-test development, while
+  CUDA runs only when available and otherwise skips cleanly with reusable
+  helper behavior.
+- [ ] Device-selection helpers and skip utilities are covered by focused tests
+  that use fakes or monkeypatching rather than requiring real CUDA hardware.
+- [ ] Representative GPU kernel tests adopt the standardized markers/helpers
+  without weakening existing coverage for condensation, coagulation,
+  environment, or conversion paths.
+- [ ] The stochastic tolerance policy documents deterministic equality,
+  conservation, and aggregate-probabilistic checks with concrete guidance such
+  as `3 sigma`-style bands where appropriate.
+- [ ] Manual/release validation commands document CUDA-optional workflows and do
+  not turn CUDA into a required CI gate.
+- [ ] Existing benchmark gating through `--benchmark` remains intact and is not
+  conflated with default validation.
+
+## Evidence Metrics
+
+| Metric | Completion Signal | Evidence Source |
+| --- | --- | --- |
+| Marker registration | No unknown-marker warnings for `warp`, `cuda`, `gpu_parity`, `stochastic` | `particula/conftest.py`, `pyproject.toml`, hook tests |
+| CPU-only safety | Focused GPU tests run or skip correctly on Warp CPU-only machines | `cuda_availability_test.py` plus focused pytest runs |
+| CUDA optionality | CUDA branches execute when available and emit clean skip reasons when absent | Helper tests and local validation notes |
+| Policy adoption | Key GPU kernel modules use the shared marker/helper contract | Edited GPU test modules from P4 |
+| Documentation quality | Testing guide and roadmap record exact local/manual commands | `.opencode/guides/testing_guide.md`, roadmap updates |
+
+## Definition of Done
+
+Contributors can tell which GPU tests require only Warp CPU, which are
+CUDA-optional, and which use stochastic tolerances by reading one consistent
+marker/helper policy backed by tests.

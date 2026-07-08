@@ -2,29 +2,36 @@
 
 ## E3-F3-P1: Benchmark Reproduction
 
-- Confirm E3-F2 mixed-scale sampling decision is reflected in the benchmark
-  target before interpreting results.
-- Run the existing coagulation benchmark matrix from
+- Confirm the E3-F2 mixed-scale choice is reflected in the coagulation benchmark
+  case that `particula/gpu/tests/benchmark_test.py` actually exercises before
+  treating new timings as decision evidence.
+- If benchmark setup plumbing changes, keep the code edit inside named helpers
+  such as `_sanitize_benchmark_output_name()` or `_get_benchmark_output_path()`
+  rather than refactoring unrelated benchmark families in the same phase.
+- Run the existing coagulation benchmark entrypoint from
   `particula/gpu/tests/benchmark_test.py` on CUDA hardware when available;
-  otherwise record the exact skip outcome instead of inventing substitute CPU
-  timing evidence.
-- Record the exact command, hardware/GPU name, Warp version context if printed,
-  skip status, and a compact single-box versus multi-box timing summary in the
-  roadmap note that will ship with the decision.
-- Add or update fast tests only if benchmark metadata helpers or result parsing
-  in `benchmark_test.py` change; keep raw benchmark execution out of normal CI.
+  otherwise copy the exact skip outcome into
+  `docs/Features/Roadmap/data-oriented-gpu.md` instead of inventing substitute
+  CPU timing evidence.
+- Record one compact evidence block with the exact pytest command, GPU/hardware
+  name, Warp version context if printed, and single-box versus multi-box timing
+  summary; keep the shipped docs edit to roughly one roadmap subsection plus any
+  truly required benchmark helper delta so the phase stays near the 100-LOC
+  review target.
 
 ## E3-F3-P2: Scaling Limit Record
 
-- Summarize measured single-box behavior in
+- Summarize measured single-box behavior in a dedicated roadmap subsection of
   `docs/Features/Roadmap/data-oriented-gpu.md` and name the particle-count band
   where one-thread-per-box stops being a recommended path.
-- Summarize measured multi-box behavior in the same section and state where
+- Summarize measured multi-box behavior in the same subsection and state where
   independent-box parallelism remains effective.
+- If `docs/Theory/nvidia-warp/examples/gpu_benchmarks.py` is updated, limit the
+  code change to reproducing the shipped command/output context rather than
+  redesigning the theory example.
 - Include traceable numbers, benchmark date, and the exact command that produced
-  them; keep this as a docs-only update unless benchmark helper code changed.
-- Avoid overstating one-machine results: label hardware context clearly and keep
-  the decision language to accepted bounds, not universal GPU guarantees.
+  them, and label the evidence as one-machine bounded guidance rather than a
+  universal GPU guarantee.
 
 ## E3-F3-P3: Usage Boundary Documentation
 
@@ -41,9 +48,12 @@
 
 ## E3-F3-P4: Follow-up Scope
 
-- If measurements require future work, draft a small follow-up scope in the
-  roadmap/open-questions material for a parallel-within-box coagulation variant.
-- Capture open design questions such as collision-pair write ownership, RNG
+- If measurements require future work, draft the follow-up in exactly two plan
+  locations: `docs/Features/Roadmap/data-oriented-gpu.md` for the accepted
+  boundary and `.opencode/plans/sections/features/E3-F3/open_questions.md` for
+  unresolved design choices.
+- Capture concrete design questions such as collision-pair write ownership, RNG
   state partitioning, conservation validation, and stochastic parity targets.
 - Keep the follow-up to planning/documentation only; do not modify kernel launch
-  code, Warp buffers, or collision application logic in this phase.
+  code, Warp buffers, collision application logic, or benchmark kernels in this
+  phase.

@@ -33,7 +33,7 @@
   "phases": [
     {
       "id": "E3-F7-P1",
-      "title": "Adapt particle-resolved latent-heat integration fixture with unit tests",
+      "title": "Adapt particle-resolved latent-heat fixture as an integration test",
       "status": "Not Started",
       "size": "S",
       "issue_number": null,

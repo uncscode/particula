@@ -6,8 +6,8 @@
   `rng_seed` and `rng_states` behavior in the `coagulation_step_gpu` docstring
   before changing it.
 - [ ] Choose the compatibility mechanism for explicit initialization, such as a
-  keyword-only initialization mode or helper, without adding positional
-  arguments.
+  keyword-only initialization mode or an explicit initializer/reset helper,
+  without adding positional arguments.
 - [ ] Refactor RNG setup so `_initialize_rng_states` is launched only when the
   contract says this call initializes the state.
 - [ ] Keep `_validate_rng_states` and `_validate_device_match` checks before any
@@ -16,6 +16,8 @@
   buffer and initializing it from `rng_seed`.
 - [ ] Ensure caller-provided `rng_states` are advanced only by the coagulation
   kernel during valid repeated calls.
+- [ ] Treat caller-provided `rng_states` as the bypass for automatic
+  initialization unless the caller explicitly invokes the initializer/reset path.
 - [ ] Review `particula/gpu/tests/benchmark_test.py` for manual `rng_seed`
   increments and update to seed-once semantics if the benchmark passes a
   persistent `rng_states_buf`.
