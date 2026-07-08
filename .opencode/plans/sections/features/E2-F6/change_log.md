@@ -27,3 +27,10 @@
 - Marked the current absolute per-species `np.float64` / `wp.float64` storage
   policy as the implemented baseline, while leaving candidate-comparison and
   recommendation work for later phases.
+
+## 2026-07-08
+
+- Marked E2-F6 and E2-F6-P4 as shipped now that
+  `docs/Features/Roadmap/mass-precision-study.md` is the final acceptance
+  artifact for particle mass precision policy.
+- Closed the feature lifecycle as completed so parent epic E2 can close cleanly.

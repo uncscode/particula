@@ -58,6 +58,52 @@ schedule.
 - Improve links between examples, feature guides, theory pages, and API
   reference material.
 
+## Epic Status
+
+The data-oriented and GPU work is tracked as a single ordered epic sequence
+with explicit exit bars in the
+[Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md#epic-sequence-and-status).
+Each epic targets roughly 5-10 features of 5-15 phases each; when an epic
+meets its exit bar, the next pending epic in the sequence becomes active.
+
+### Shipped
+
+- [Epic A: Data-Model and Numerical Foundations](data-oriented-gpu.md#epic-a-data-model-and-numerical-foundations)
+  (ADW plan E2) — container schemas, `EnvironmentData`, CPU↔GPU transfer
+  boundary, precision baseline, and stiffness recommendation. Shipped
+  artifacts:
+    - [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+      — shipped guide for the current container, transfer-helper, and support
+      boundary baseline
+    - [Data Containers example](../../Examples/Data_Containers/index.md) —
+      canonical runnable entrypoint linked from the roadmap handoff notes
+    - [Mass Precision Recommendation Report](mass-precision-study.md) —
+      canonical reference for downstream dtype/schema decisions
+    - [Condensation stiffness study baseline](condensation-stiffness-study.md)
+      — recorded timestep grid, particle-only GPU contract, inclusive
+      threshold semantics, and accepted `(n_boxes,)` environment inputs
+- [Epic B: Non-Isothermal Condensation Public API (CPU)](data-oriented-gpu.md#epic-b-non-isothermal-condensation-public-api-cpu)
+  (ADW plan E1) — public builder/factory access, validation, and
+  documentation for latent-heat condensation on the CPU reference path.
+
+### Next Up
+
+- [Epic C: GPU Kernel Correctness and Low-Level API Hardening](data-oriented-gpu.md#epic-c-gpu-kernel-correctness-and-low-level-api-hardening)
+  — the next epic in the sequence; not yet scheduled as an ADW plan.
+
+### Pending
+
+Listed in execution order; each becomes active when the previous epic ships.
+
+- [Epic D: GPU Condensation Physics Parity](data-oriented-gpu.md#epic-d-gpu-condensation-physics-parity)
+- [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
+- [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
+- [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+- [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
+- [Epic I: Differentiability and Global Optimization](data-oriented-gpu.md#epic-i-differentiability-and-global-optimization)
+  — implementation companion:
+  [Warp autodiff limitations](warp-autodiff-limitations.md)
+
 ## Roadmap Artifacts
 
 This folder can also hold supporting artifacts for planning and examples, such
@@ -65,16 +111,9 @@ as design notes, example outputs, prototype workflows, and milestone-specific
 pages.
 
 - [Data-Oriented Design and GPU Roadmap](data-oriented-gpu.md)
-- [Condensation stiffness study baseline](condensation-stiffness-study.md)
-  - documents the recorded timestep grid, particle-only GPU contract,
-    inclusive threshold semantics, and accepted `(n_boxes,)` environment inputs
-- [Mass Precision Recommendation Report](mass-precision-study.md) — canonical
-  reference for downstream dtype/schema decisions
-- [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
-  — shipped guide for the current container, transfer-helper, and support
-  boundary baseline referenced by the roadmap
-- [Data Containers example](../../Examples/Data_Containers/index.md) —
-  canonical runnable entrypoint linked from the roadmap handoff notes
+
+Reference anchors used by other documentation:
+
 - [Current container schema inventory](data-oriented-gpu.md#current-container-schema-inventory)
 - [Authoritative field ownership decisions](data-oriented-gpu.md#authoritative-field-ownership-decisions)
 - [Canonical shape conventions for container workflows](data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows)
