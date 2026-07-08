@@ -9,8 +9,10 @@
 
 ## Per-Phase Testing Approach
 
-- **P1:** Add the integration fixture and a smoke-level assertion that the CPU
-  latent-heat runnable executes deterministically through `MassCondensation`.
+- **P1:** Add the minimal deterministic single-species integration fixture and a
+  smoke-level assertion that the CPU latent-heat runnable executes
+  deterministically through `MassCondensation`. Add a small multi-species
+  extension only if it remains fast and stable.
 - **P2:** Add full conservation and energy bookkeeping assertions in the same
   integration test file. These assertions are the core acceptance gate.
 - **P3:** Keep documentation validation lightweight; verify the documented test

@@ -5,9 +5,10 @@
   - Depends on: E3-F1 finalized repeated-step RNG semantics and E3-F2 settling
     any sampler changes that would invalidate the benchmark baseline.
   - Goal: Refresh the existing CUDA opt-in coagulation benchmark evidence for
-    representative single-box and multi-box configurations.
-  - Files: `particula/gpu/tests/benchmark_test.py`, benchmark result artifact or
-    documentation note selected by implementer.
+    representative single-box and multi-box configurations, then record the
+    exact command and skip-or-run outcome in one shipped docs location.
+  - Files: `particula/gpu/tests/benchmark_test.py`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`
   - Tests: Run focused fast tests for benchmark helpers; run
     `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s` only on
     CUDA-capable hardware and record skip status otherwise.
@@ -17,8 +18,8 @@
   - Depends on: E3-F3-P1 benchmark matrix and captured environment notes.
   - Goal: Convert benchmark results into a clear measured limit for large
     single-box and many-box coagulation workloads.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, optional benchmark
-    results artifact, `docs/Theory/nvidia-warp/examples/gpu_benchmarks.py`.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Theory/nvidia-warp/examples/gpu_benchmarks.py`
   - Tests: Validate documentation examples or metadata helpers touched by the
     result recording; keep CUDA-dependent benchmark execution optional.
 
@@ -42,8 +43,9 @@
     create a bounded follow-up plan or issue without implementing optimization,
     and update the roadmap/follow-up documentation so the final Epic C decision
     is explicit for future implementers.
-  - Files: roadmap decision section, open questions/follow-up tracker, docs
-    change log.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `.opencode/plans/sections/features/E3-F3/open_questions.md`,
+    `.opencode/plans/sections/features/E3-F3/change_log.md`
   - Tests: Documentation validation only; no production performance work.
   - Deliverable: Update developer-facing roadmap guidance whether the outcome is
     "accepted with boundaries" or "follow-up required," so the closeout phase

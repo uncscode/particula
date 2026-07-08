@@ -44,7 +44,9 @@ Epic C stays within the existing low-level GPU architecture:
 2. Each phase must include self-contained tests
 3. Tests are committed in the same PR as the implementation
 4. Test files use `*_test.py` suffix in module-level `tests/` directories
-5. Minimum 80% coverage (configured in `pyproject.toml`)
+5. Coverage expectations must match repository configuration: run the relevant
+   `pytest`/`pytest --cov=particula` checks when coverage evidence is needed,
+   but do not claim that `pyproject.toml` configures a fixed 80% minimum gate.
 
 ## Track-Level Strategy
 

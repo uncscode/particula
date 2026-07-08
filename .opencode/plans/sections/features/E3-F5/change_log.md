@@ -9,3 +9,9 @@
 - Incorporated workflow context from prior E3 feature drafting and codebase
   research findings for current Warp device fixtures, CUDA skip behavior, and
   stochastic coagulation tolerance patterns.
+
+## 2026-07-08 — Completeness Review
+
+- Expanded success criteria into measurable pass/fail checks, evidence metrics,
+  and a definition of done for marker registration, helper behavior, policy
+  adoption, and CUDA-optional validation guidance.

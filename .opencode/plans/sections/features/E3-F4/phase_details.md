@@ -4,6 +4,10 @@
 
 Size: S
 
+Depends on: E3-F1 finalizing caller-visible persisted `rng_states` guidance and
+maintainer direction that the direct quick-start path should come from
+`particula.gpu.kernels` unless narrowly expanded with explicit export tests.
+
 Decide whether the stable direct-kernel user path remains
 `particula.gpu.kernels` or whether the two step functions should also be
 re-exported from `particula.gpu`. Keep the decision narrow: direct low-level
@@ -31,6 +35,10 @@ Deliverables:
 
 Size: S
 
+Depends on: E3-F4-P1 choosing the supported import surface so regression tests
+lock the exact public path and rejection boundaries before docs examples depend
+on them.
+
 Add dedicated tests, likely `particula/gpu/tests/kernel_exports_test.py`, or
 extend the existing top-level export tests. These tests should assert selected
 imports work when Warp is unavailable and avoid launching kernels unless needed.
@@ -54,6 +62,10 @@ Deliverables:
 ## E3-F4-P3: Create runnable direct-kernel quick-start example with explicit transfer helpers
 
 Size: S
+
+Depends on: E3-F4-P1 and E3-F4-P2 settling the supported import path and export
+guardrails, plus E3-F1 confirming the repeated-call RNG usage that the
+coagulation snippet is allowed to demonstrate.
 
 Create a runnable docs example following the existing examples style. The
 example should build minimal `ParticleData` and `GasData`, gate GPU execution
@@ -83,6 +95,10 @@ Deliverables:
 
 Size: S
 
+Depends on: E3-F4-P3 producing the stable quick-start artifact. Follow any
+shared wording updates from E3-F5 after marker/helper policy lands, but do not
+let that later wording pass block the example itself.
+
 Add user-facing troubleshooting and smoke tests for the quick-start. The final
 phase verifies a new user can run the example on CPU-backed Warp and skip
 cleanly when Warp/CUDA is unavailable.
@@ -104,4 +120,5 @@ Deliverables:
 - Troubleshooting for missing Warp, missing CUDA, device mismatch, mixed
   `environment=` plus scalar inputs, and transfer-boundary mistakes.
 - Example smoke tests using existing docs-example test patterns.
-- Documentation updates linking the quick-start from relevant GPU feature docs.
+- Documentation updates linking the quick-start from relevant GPU feature docs,
+  including developer-facing GPU roadmap/foundation guidance updates.

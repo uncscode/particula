@@ -4,6 +4,9 @@
 
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` with the final E3-F2
   decision: selected hardening design or measured accepted limitation.
+- Keep the mixed-scale rejection-sampling outcome evidence-driven: the roadmap
+  must summarize the benchmark/test artifacts that justify the selected design
+  or accepted limitation instead of treating the choice as predetermined.
 - Include mixed-scale fixture details, acceptance-rate metric definition,
   stochastic tolerance approach, and focused reproduction commands.
 - Cross-reference E3-F1 RNG-state semantics if repeated-step tests or diagnostic

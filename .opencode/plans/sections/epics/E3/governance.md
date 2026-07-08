@@ -36,3 +36,10 @@
 Child tracks may refine implementation details, but they must preserve the epic
 guardrails: no high-level backend selection, no new GPU physics, no hidden
 transfers, and optional CUDA.
+
+## Plan Metadata Decisions
+
+- Confirmed plan owner: Gorkowski.
+- Confirmed plan start date: 2026-07-08.
+- Target dates and phase issue numbers remain `TBD`/unassigned until
+  implementation issues are generated.

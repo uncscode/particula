@@ -2,13 +2,20 @@
 
 ### Phase-Level Validation
 
-- **P1:** Run the example as a plain Python script and verify it exits with code
-  0 and prints non-trivial latent-heat energy diagnostics after a real
-  `MassCondensation.execute()` call.
+- **P1:** Add a runnable-example smoke test in
+  `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
+  or extend an adjacent condensation example test module if one already exists.
+  That test should execute the published example entrypoint, assert it exits
+  cleanly, and verify the reported latent-heat energy diagnostic is finite and
+  non-zero for the chosen condensation setup.
 - **P2:** If a notebook is paired, run Jupytext sync validation and execute the
-  notebook. Check the examples index link resolves.
+  notebook. Check `docs/Examples/Dynamics/index.md` resolves to the paired
+  example path, and keep any example-specific assertions in the same smoke-test
+  module rather than a later follow-up phase.
 - **P3:** Repeat final script/notebook validation and inspect docs for CPU-only
-  language and absence of GPU parity claims.
+  language, absence of GPU parity claims, and stable public builder/factory
+  imports. If the example uncovers a production API gap, ship the matching
+  regression in the same PR under the existing condensation test modules.
 
 ### Commands
 
@@ -33,6 +40,18 @@ pytest particula/dynamics/condensation/tests/condensation_latent_heat_builder_te
 pytest particula/dynamics/condensation/tests/condensation_strategies_test.py -q
 pytest particula/dynamics/tests/condensation_exports_test.py -q
 ```
+
+Prefer the following split when choosing test locations:
+
+- Example execution and output assertions:
+  `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
+- Builder/factory or latent-heat API regressions:
+  `particula/dynamics/condensation/tests/condensation_factories_test.py`
+  and
+  `particula/dynamics/condensation/tests/condensation_latent_heat_builder_test.py`
+- Strategy or runnable behavior fixes discovered during example work:
+  `particula/dynamics/condensation/tests/condensation_strategies_test.py`
+  and `particula/dynamics/tests/condensation_exports_test.py`
 
 ### Evidence Requirements
 

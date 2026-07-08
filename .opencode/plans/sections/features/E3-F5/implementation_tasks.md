@@ -3,9 +3,9 @@
 ## E3-F5-P1: Pytest markers and options
 
 - Inventory current markers in `particula/conftest.py` and `pyproject.toml`.
-- Add selected GPU/Warp marker definitions in both locations, keeping marker
-  names concrete and reviewable (for example `warp`, `cuda`, `gpu_parity`, or a
-  similarly narrow approved set).
+- Add the concrete GPU/Warp marker definitions `warp`, `cuda`, `gpu_parity`, and
+  `stochastic` in both locations so the proposed axes are reviewable and shared
+  across hooks, config, and docs.
 - Decide whether a new option is needed beyond markers. If added, implement it
   in `particula/conftest.py`, document the default behavior, and avoid changing
   benchmark semantics or default collection on CPU-only machines.

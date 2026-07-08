@@ -9,6 +9,9 @@
 - `particula/gpu/kernels/coagulation.py` docstring for `coagulation_step_gpu` --
   document how `rng_seed`, omitted `rng_states`, provided `rng_states`, and any
   explicit initialization option interact.
+- Explicitly document that caller-supplied `rng_states` bypass automatic
+  initialization; callers that want to seed or reset a provided buffer should use
+  the initializer/reset helper or keyword-only initialization path chosen in P1.
 - `particula/gpu/tests/benchmark_test.py` comments or benchmark helper docs --
   remove or explain manual `rng_seed` increments when persistent `rng_states_buf`
   is used.

@@ -12,6 +12,8 @@
   benchmark/performance-marked versus default parity tests.
 - **E3-F4:** Low-level kernel API documentation and examples should use the
   same CUDA-optional validation language.
+  Marker/helper policy work does not need to block on final E3-F4 quick-start
+  wording; plan a follow-up wording pass once that path is finalized.
 
 ## Code Dependencies
 

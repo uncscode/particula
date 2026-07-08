@@ -9,17 +9,12 @@ recommended stable import path is:
 from particula.gpu.kernels import condensation_step_gpu, coagulation_step_gpu
 ```
 
-If maintainers prefer a flatter quick-start, add top-level re-exports only for
-the two step functions:
-
-```python
-from particula.gpu import condensation_step_gpu, coagulation_step_gpu
-```
-
-Do not expose high-level backend selection. Do not imply automatic transfers.
-Avoid documenting raw Warp launch functions such as `apply_*_kernel` or
-`*_mass_transfer_kernel` as stable user APIs unless a separate design decision
-is made.
+Do not add broad top-level `particula.gpu` exports for this quick-start. A later
+separate API decision may choose narrow re-exports, but the plan direction here
+is to use `particula.gpu.kernels` for direct step-function imports and keep raw
+Warp launch functions such as `apply_*_kernel` or `*_mass_transfer_kernel` out
+of broad user-facing exports. Do not expose high-level backend selection or
+imply automatic transfers.
 
 ## Transfer Boundary Design
 
