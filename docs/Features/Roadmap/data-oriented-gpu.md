@@ -87,7 +87,10 @@ The core data-oriented model is implemented.
 For the canonical user-facing CPU support boundary, including the current
 `n_boxes == 1` limitation for audited CPU condensation and CPU coagulation
 container workflows, refer to
-[ParticleData and GasData Migration](../particle-data-migration.md).
+[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+Use
+[ParticleData and GasData Migration](../particle-data-migration.md)
+as the implementation walkthrough companion.
 
 The work is still a migration, not a full replacement. `ParticleRepresentation`
 and `GasSpecies` remain available for compatibility.

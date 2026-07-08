@@ -28,6 +28,18 @@ GUIDE_PATH = (
     / "data_containers_and_gpu_foundations.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
+CPU_ONLY_OUTPUT = [
+    "ParticleData constructed: masses=(1, 2, 2), concentration=(1, 2), charge=(1, 2), density=(2,), volume=(1,)",
+    "GasData constructed: concentration=(1, 2), molar_mass=(2,), partitioning=(2,)",
+    "Warp-backed transfers are optional; CPU container example completed without Warp.",
+]
+WARP_OUTPUT_PREFIX = [
+    "ParticleData constructed: masses=(1, 2, 2), concentration=(1, 2), charge=(1, 2), density=(2,), volume=(1,)",
+    "GasData constructed: concentration=(1, 2), molar_mass=(2,), partitioning=(2,)",
+    "Warp particle round trip: restored_masses=(1, 2, 2), restored_concentration=(1, 2)",
+    "Warp gas round trip: restored_concentration=(1, 2), restored_names=['Water', 'H2SO4']",
+    "Gas restore note: names are caller-supplied on restore and vapor_pressure remains GPU-only helper state.",
+]
 
 
 def _load_module(module_name: str, module_path: Path) -> types.ModuleType:
@@ -70,6 +82,8 @@ def _run_example(*, force_no_warp: bool) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     if force_no_warp:
         env["PARTICULA_EXAMPLE_FORCE_NO_WARP"] = "1"
+    else:
+        env.pop("PARTICULA_EXAMPLE_FORCE_NO_WARP", None)
     return subprocess.run(  # noqa: S603 - repo-local example path and interpreter
         [sys.executable, str(EXAMPLE_PATH)],
         check=True,
@@ -127,10 +141,29 @@ def test_run_example_reports_cpu_only_message_when_warp_disabled(
 
     output = example_module.run_example()
 
-    assert len(output) == 3
-    assert output[0].startswith("ParticleData constructed:")
-    assert output[1].startswith("GasData constructed:")
-    assert "completed without Warp" in output[2]
+    assert output == CPU_ONLY_OUTPUT
+
+
+def test_run_example_falls_back_to_cpu_message_when_warp_transfer_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    example_module: types.ModuleType,
+) -> None:
+    """Test runtime Warp failures still return the documented CPU output."""
+    monkeypatch.setattr(example_module, "WARP_AVAILABLE", True)
+    monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
+
+    def _raise_runtime_error(*args: object, **kwargs: object) -> object:
+        raise RuntimeError("warp backend unavailable")
+
+    monkeypatch.setattr(
+        example_module,
+        "to_warp_particle_data",
+        _raise_runtime_error,
+    )
+
+    output = example_module.run_example()
+
+    assert output == CPU_ONLY_OUTPUT
 
 
 def test_example_main_prints_example_output(
@@ -144,8 +177,7 @@ def test_example_main_prints_example_output(
     example_module.main()
 
     captured = capsys.readouterr()
-    assert "ParticleData constructed:" in captured.out
-    assert "Warp-backed transfers are optional" in captured.out
+    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
 
 
 def test_guide_main_prints_example_output(
@@ -159,8 +191,7 @@ def test_guide_main_prints_example_output(
     guide_module.main()
 
     captured = capsys.readouterr()
-    assert "ParticleData constructed:" in captured.out
-    assert "completed without Warp" in captured.out
+    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
 
 
 def test_example_runs_as_main_entrypoint(
@@ -173,8 +204,7 @@ def test_example_runs_as_main_entrypoint(
     runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
 
     captured = capsys.readouterr()
-    assert "ParticleData constructed:" in captured.out
-    assert "Warp-backed transfers are optional" in captured.out
+    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
 
 
 def test_guide_runs_as_main_entrypoint(
@@ -187,17 +217,14 @@ def test_guide_runs_as_main_entrypoint(
     runpy.run_path(str(GUIDE_PATH), run_name="__main__")
 
     captured = capsys.readouterr()
-    assert "ParticleData constructed:" in captured.out
-    assert "completed without Warp" in captured.out
+    assert captured.out.splitlines() == CPU_ONLY_OUTPUT
 
 
 def test_example_non_warp_path_reports_cpu_success() -> None:
     """Test the published example path completes without Warp transfers."""
     result = _run_example(force_no_warp=True)
 
-    assert "ParticleData constructed:" in result.stdout
-    assert "GasData constructed:" in result.stdout
-    assert "Warp-backed transfers are optional" in result.stdout
+    assert result.stdout.splitlines() == CPU_ONLY_OUTPUT
 
 
 def test_guide_module_re_exports_canonical_run_example(
@@ -209,8 +236,26 @@ def test_guide_module_re_exports_canonical_run_example(
 
     output = guide_module.run_example()
 
-    assert output[0].startswith("ParticleData constructed:")
-    assert "completed without Warp" in output[-1]
+    assert output == CPU_ONLY_OUTPUT
+
+
+def test_guide_module_raises_import_error_when_canonical_example_cannot_load(
+    monkeypatch: pytest.MonkeyPatch,
+    guide_module: types.ModuleType,
+) -> None:
+    """Test guide import fails clearly when the canonical example cannot load."""
+
+    def _missing_spec(*args: object, **kwargs: object) -> None:
+        return None
+
+    monkeypatch.setattr(
+        guide_module.importlib.util,
+        "spec_from_file_location",
+        _missing_spec,
+    )
+
+    with pytest.raises(ImportError, match="Unable to load canonical example"):
+        guide_module._load_canonical_module()
 
 
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
@@ -218,11 +263,11 @@ def test_example_warp_path_reports_round_trip_shapes_and_names() -> None:
     """Test the published example path exercises Warp CPU round trips."""
     result = _run_example(force_no_warp=False)
 
-    assert "Warp particle round trip:" in result.stdout
-    assert "restored_masses=(1, 2, 2)" in result.stdout
-    assert "Warp gas round trip:" in result.stdout
-    assert "restored_concentration=(1, 2)" in result.stdout
-    assert "restored_names=['Water', 'H2SO4']" in result.stdout
+    output_lines = result.stdout.splitlines()
+
+    for expected_line in WARP_OUTPUT_PREFIX:
+        assert expected_line in output_lines
+    assert CPU_ONLY_OUTPUT[-1] not in output_lines
 
 
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
@@ -236,11 +281,4 @@ def test_run_example_warp_path_reports_round_trip_shapes_and_names(
 
     output = example_module.run_example()
 
-    assert any("Warp particle round trip:" in line for line in output)
-    assert any("restored_masses=(1, 2, 2)" in line for line in output)
-    assert any("Warp gas round trip:" in line for line in output)
-    assert any("restored_names=['Water', 'H2SO4']" in line for line in output)
-    assert any(
-        "vapor_pressure remains GPU-only helper state" in line
-        for line in output
-    )
+    assert output == WARP_OUTPUT_PREFIX
