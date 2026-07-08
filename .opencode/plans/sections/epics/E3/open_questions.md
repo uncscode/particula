@@ -1,32 +1,43 @@
 # Open Questions
 
-1. Should caller-supplied `rng_states` always bypass initialization, or should
-   the API provide an explicit initialize/reset helper for users who want repeat
-   sequences?
-2. Is documentation of `particula.gpu.kernels` sufficient, or should selected
-   kernel entry points also be re-exported from `particula.gpu`?
-3. What acceptance-rate or throughput threshold defines mixed-scale rejection
-   sampling as "hardened enough" for Epic C?
-4. Where should the one-thread-per-box decision live: roadmap section,
-   architecture guide, ADR, or all of the above?
-5. Should device-aware pytest policy be documentation-only, or should it add
-   new markers/options in `particula/conftest.py`?
-6. Which latent-heat scenario is the best long-term CPU baseline for future GPU
-   parity: a minimal single-species case, a multi-species case, or both?
+Status: reviewed and answered on 2026-07-08 from repository code, GPU roadmap
+guidance, and maintainer confirmation.
 
-## Proposed Resolution Path
+## Resolved Decisions
 
-- Resolve questions 1, 2, and 5 before or during E3-F1/E3-F4/E3-F5 because
-  they shape API and test contracts.
-- Resolve question 3 during E3-F2 with measured evidence.
-- Resolve question 4 during E3-F3 based on repository documentation norms.
-- Resolve question 6 during E3-F6, then encode it in E3-F7 tests.
+1. Caller-supplied `rng_states` should bypass automatic initialization by
+   default. E3-F1 should add an explicit initializer/reset helper so users who
+   need repeatable sequences can opt into reset behavior without changing the
+   positional `coagulation_step_gpu` call contract.
+2. The public quick-start should import low-level step functions from
+   `particula.gpu.kernels`. Keep raw kernel internals out of top-level
+   `particula.gpu` re-exports unless E3-F4 adds a narrow export contract with
+   tests.
+3. Mixed-scale rejection sampling is "hardened enough" only after E3-F2 records
+   deterministic acceptance diagnostics and either improves acceptance or
+   documents a bounded limitation. The threshold should be evidence-based in
+   E3-F2 rather than fixed before measurements.
+4. The one-thread-per-box decision belongs in the GPU roadmap and, if the
+   measured decision is durable, an architecture/ADR note. The roadmap already
+   owns GPU limitations and performance boundaries.
+5. Device-aware pytest policy should add concrete markers/options in
+   `particula/conftest.py`, not documentation only. Current config has only
+   `slow`, `performance`, and `benchmark`, while Epic C needs explicit Warp,
+   CUDA/parity, and stochastic-test guidance.
+6. The latent-heat CPU baseline should include both a minimal deterministic
+   single-species case and a small multi-species extension if it remains fast.
+   E3-F6 should document the example path, and E3-F7 should encode the stable
+   baseline as integration coverage.
 
-## Completeness Follow-up
+## Scheduling And Ownership
 
-- [ ] Who owns Epic C execution, and what `start_date`/`target_date` values
-  should be recorded for E3 and child plans E3-F1 through E3-F7? (reviewer:
-  plan-review-completeness)
-  - Open: Current metadata leaves `owners`, `start_date`, and `target_date`
-    empty across the in-scope plans, which blocks complete scheduling and
-    accountability review.
+- Owner for E3 and E3-F1 through E3-F7: `Gorkowski`.
+- Start date for E3 and E3-F1 through E3-F7: `2026-07-08`.
+- Target dates remain TBD until implementation issues are generated and sized.
+
+## Residual Issue Placeholders
+
+Phase-level `Issue: TBD` placeholders should remain unassigned until concrete
+implementation issues are generated. The corresponding JSON `issue_number`
+fields remain `null`; this is expected draft-plan state rather than an open
+technical blocker.

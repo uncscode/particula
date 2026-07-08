@@ -1,18 +1,19 @@
 # Open Questions
 
-- [ ] What exact API shape should express explicit initialization for
-  caller-provided `rng_states`?
-  - Options include a keyword-only initialization mode, a boolean flag, or a
-    documented separate initializer call. The decision must preserve existing
-    positional call compatibility.
-- [ ] Should `coagulation_step_gpu` return `rng_states` in addition to existing
-  outputs, or should callers continue retaining the buffer they pass?
-  - Open: Returning it may improve discoverability but could be a broader API
-    change than needed.
-- [ ] How should legacy callers that pass zeroed `rng_states` but expect implicit
-  seeding be migrated?
-  - Open: P1 should decide whether to preserve an explicit opt-in path or update
-    documentation with a migration note.
-- [ ] Should benchmark code switch immediately to seed-once semantics, or remain
-  intentionally varied by `rng_seed` for historical comparability?
-  - Open: Decide during P3/P4 after core tests pass.
+Status: reviewed and answered on 2026-07-08.
+
+## Resolved Decisions
+
+- Add a documented initializer/reset helper for `rng_states` instead of a new
+  positional argument or ambiguous boolean flag on `coagulation_step_gpu`. This
+  preserves existing positional compatibility and makes repeatable-sequence
+  behavior explicit.
+- Do not add `rng_states` to the return tuple. Callers should retain the buffer
+  they pass, matching the current Warp ownership pattern and avoiding a broader
+  API shape change.
+- Treat legacy zeroed `rng_states` as invalid unless callers explicitly run the
+  initializer/reset helper. Add a migration note explaining that caller-owned
+  state buffers are no longer implicitly reseeded on every step.
+- Benchmark code should switch to seed-once semantics for correctness-focused
+  runs. Historical comparability can be preserved by recording `rng_seed` and
+  reset behavior explicitly in benchmark metadata.
