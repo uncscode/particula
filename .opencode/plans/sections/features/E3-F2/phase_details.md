@@ -1,16 +1,21 @@
 # E3-F2 Phase Details
 
-- [ ] **E3-F2-P1:** Add mixed NPF/droplet fixture and acceptance-rate diagnostics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F2-P1:** Add mixed NPF/droplet fixture and acceptance-rate diagnostics with unit tests
+  - Issue: #1241 | Size: S | Status: Shipped 2026-07-09
   - Depends on: E3-F1 stabilizing persisted `rng_states` usage enough that the
     fixture and seeded diagnostics do not encode a soon-to-change repeated-step
     contract.
   - Goal: Build reproducible mixed-scale coverage and expose measured sampler
-    acceptance for test/debug analysis.
-  - Files: `particula/gpu/kernels/tests/coagulation_test.py`, optional
-    test-only helpers near `particula/gpu/kernels/coagulation.py` if needed.
-  - Tests: Mixed NPF/droplet fixture construction, acceptance metric sanity,
-    Warp CPU and CUDA-if-available execution.
+    acceptance for test/debug analysis without changing public APIs.
+  - Files: `particula/gpu/kernels/tests/coagulation_test.py` only.
+  - Shipped details: added `_make_mixed_npf_droplet_particle_data()`,
+    `_brownian_coagulation_attempt_diagnostic_kernel(...)`, and
+    `_collect_test_local_attempt_diagnostics(...)` as test-local helpers.
+  - Tests: `test_mixed_npf_droplet_fixture_returns_float64_particle_data()`,
+    `test_mixed_npf_droplet_fixture_converts_on_supported_warp_devices(device)`,
+    `test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(device)`,
+    `test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(device)`,
+    and `test_mixed_scale_sparse_box_returns_zero_accepted_collisions(device)`.
 
 - [ ] **E3-F2-P2:** Prototype bounded mixed-scale sampling hardening with conservation tests
   - Issue: TBD | Size: S | Status: Not Started

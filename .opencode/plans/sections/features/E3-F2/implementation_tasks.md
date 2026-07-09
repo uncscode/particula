@@ -2,18 +2,17 @@
 
 ## P1 Tasks
 
-- Create a mixed NPF/droplet `ParticleData` fixture in
+- [x] Create a mixed NPF/droplet `ParticleData` fixture in
   `particula/gpu/kernels/tests/coagulation_test.py` with explicit `np.float64`
   masses/radii spanning nanometer to droplet scales.
-- Add a test-local acceptance metric helper in
+- [x] Add a test-local acceptance metric helper in
   `particula/gpu/kernels/tests/coagulation_test.py` that reads attempted-pair
   and accepted-pair counts from the existing call path without changing the
   public kernel API or adding hidden CPU transfers.
-- Cover the helper with a focused test such as
-  `test_coagulation_mixed_scale_acceptance_metric_is_finite` and keep the
-  helper/test edit bounded to roughly one support function plus one assertion
-  block.
-- Assert that the baseline metric is finite, positive, and stable enough for
+- [x] Cover the helper with focused tests for attempted/accepted count parity,
+  finite non-negative acceptance fractions, and sparse-box zero-collision
+  behavior.
+- [x] Assert that the baseline metric is finite, positive, and stable enough for
   seeded stochastic checks on Warp CPU; reuse the same fixture under CUDA when
   available instead of creating a second mixed-scale dataset.
 

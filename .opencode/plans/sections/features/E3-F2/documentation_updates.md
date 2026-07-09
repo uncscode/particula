@@ -12,6 +12,14 @@
 - Cross-reference E3-F1 RNG-state semantics if repeated-step tests or diagnostic
   commands depend on persisted `rng_states`.
 
+## P1 Shipped State
+
+- Issue #1241 did not change user-facing documentation because the shipped work
+  was limited to test-local fixture/diagnostic coverage.
+- No public API or production transfer-boundary language changed in this phase,
+  so roadmap/documentation updates remain deferred to E3-F2-P4 unless later
+  phases promote the characterization into a documented product decision.
+
 ## Optional Updates
 
 - Add a focused `docs/Features/` note if the selected design needs more space

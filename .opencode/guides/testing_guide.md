@@ -149,6 +149,12 @@ GPU code must match Python/NumPy reference implementations. Use lightweight test
 kernels around `@wp.func` functions and compare against NumPy with tight
 tolerances.
 
+For GPU Brownian coagulation acceptance work, keep attempted-vs-accepted
+collision instrumentation private to
+`particula/gpu/kernels/tests/coagulation_test.py`. The shipped
+`coagulation_step_gpu(...)` API and production synchronization behavior should
+stay unchanged when the work is diagnostic-only.
+
 For the GPU condensation suite, keep shared helpers in support modules only when
 discoverable `*_test.py` wrappers expose the runnable cases. The current entry
 points are:
@@ -198,6 +204,18 @@ pytest particula/gpu/tests/mass_precision_cases_test.py -q
 Keep those tests warning-clean under `-Werror`, assert canonical
 `(n_boxes, n_particles, n_species)` shapes where relevant, and document any
 baseline assumptions in the matching roadmap page.
+
+For the mixed NPF/droplet coagulation diagnostic coverage added in
+`particula/gpu/kernels/tests/coagulation_test.py`, use focused local runs such
+as:
+
+```bash
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate" -Werror
+```
+
+These checks are intended for seeded regression and warning-clean acceptance
+sanity, not for exact CPU/CUDA equality or user-facing feature documentation.
 
 ## Test Quality
 

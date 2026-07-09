@@ -19,6 +19,16 @@ bounded limitation with reproducible diagnostics.
 - Keeps E3's GPU correctness track focused on low-level behavior rather than
   introducing new coagulation physics.
 
+## Shipped So Far
+
+- Phase E3-F2-P1 shipped in issue #1241 as test-only characterization work in
+  `particula/gpu/kernels/tests/coagulation_test.py`.
+- The landed baseline adds a deterministic mixed NPF/droplet fixture, a
+  mirrored test-local attempt/accept diagnostic path, and focused mixed-scale
+  Warp CPU/CUDA regression coverage.
+- No public `coagulation_step_gpu(...)` API, exported helper surface, or
+  production synchronization behavior changed in this phase.
+
 ## User Stories
 
 - As a GPU-kernel maintainer, I want a mixed-scale fixture and diagnostics so

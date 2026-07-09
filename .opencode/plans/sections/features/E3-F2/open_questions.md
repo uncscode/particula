@@ -7,6 +7,10 @@ Status: reviewed and answered on 2026-07-08.
 - Implement acceptance diagnostics as test-only helpers first. Only promote
   diagnostics to private optional buffers if tests show helper kernels cannot
   observe the needed acceptance behavior without distorting production kernels.
+- Outcome: resolved in issue #1241 by keeping the mirrored attempt-count kernel
+  and seeded comparison helper entirely inside
+  `particula/gpu/kernels/tests/coagulation_test.py`; no production API or
+  private exported diagnostic buffer was needed.
 - Use the existing mass-precision scale anchors for mixed fixtures: NPF-scale
   particles near `1.5e-9 m` and droplet-scale particles near `8e-6 m` to
   `1.5e-5 m`. Keep particle counts small enough for deterministic fast tests,

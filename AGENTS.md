@@ -346,9 +346,20 @@ for _ in range(n_steps):
   `rng_states` before capture or before entering the loop.
 - Coagulation `rng_states` are Warp-resident sidecar state, not fields on
   `ParticleData`, `GasData`, `EnvironmentData`, or their Warp mirrors.
+- Mixed NPF/droplet Brownian acceptance diagnostics live only in
+  `particula/gpu/kernels/tests/coagulation_test.py`; keep attempted-count
+  instrumentation test-local and leave the public `coagulation_step_gpu(...)`
+  API unchanged for debug-only coverage.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
   and graph-capture guidance.
+
+Focused diagnostic runs:
+
+```bash
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate" -Werror
+```
 
 ### GPU mass-precision baseline study
 
