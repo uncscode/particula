@@ -803,6 +803,28 @@ def test_allocation_helpers_compute_sizes_and_delegate_preflight(
     assert seen == [((5, 6), "buffer", 4)]
 
 
+def test_byte_sizing_helpers_cover_numpy_and_warp_paths(
+    benchmark_module,
+) -> None:
+    """Byte-size helpers report stable dense-array allocation sizes."""
+    assert (
+        benchmark_module._warp_dtype_nbytes(benchmark_module.WARP_FLOAT64) == 8
+    )
+    assert benchmark_module._warp_dtype_nbytes(benchmark_module.WARP_INT32) == 4
+    assert benchmark_module._array_nbytes((2, 3, 4), 8) == 192
+    assert benchmark_module._numpy_nbytes((2, 3), np.float32) == 24
+    assert (
+        benchmark_module._warp_nbytes((2, 3), benchmark_module.WARP_UINT32)
+        == 24
+    )
+
+
+def test_warp_dtype_nbytes_rejects_unsupported_dtype(benchmark_module) -> None:
+    """Unsupported Warp dtypes fail with a clear sizing error."""
+    with pytest.raises(ValueError, match="Unsupported Warp dtype"):
+        benchmark_module._warp_dtype_nbytes(object())
+
+
 def test_warp_profiled_yields_when_no_capture_or_profiler_available(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,

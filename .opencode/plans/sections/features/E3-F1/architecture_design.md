@@ -41,7 +41,7 @@ coagulation_step_gpu(..., rng_states=rng_states)
   `particula/gpu/kernels/tests/coagulation_test.py` enforce omitted-buffer
   behavior, caller-owned reuse without implicit reset, explicit reset,
   wrong-shape/device validation, and no-mutation-on-failure. Broader benchmark
-  and documentation follow-up stays deferred.
+  and benchmark-contract coverage now ship alongside the implementation.
 
 ## Validation and Mutation Order
 

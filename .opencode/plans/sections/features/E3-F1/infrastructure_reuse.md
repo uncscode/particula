@@ -14,9 +14,13 @@
 - `particula/gpu/kernels/coagulation.py:544` -- `coagulation_step_gpu` is the
   public low-level API surface. Any new initialization control must remain
   keyword-only and source-compatible with existing positional callers.
-- `particula/gpu/kernels/coagulation.py:641` -- current RNG setup allocates or
-  validates `rng_states`, then unconditionally launches `_initialize_rng_states`.
-  This is the primary defect site.
+- `particula/gpu/kernels/coagulation.py:603` --
+  `initialize_coagulation_rng_states(...)` is the public seed-once helper used
+  by benchmarks and callers that own persistent RNG state buffers.
+- `particula/gpu/kernels/coagulation.py:691` -- `coagulation_step_gpu` now
+  validates caller buffers before internal allocation, preserves advanced RNG
+  state on fractional-trial early returns, and reuses caller-owned state unless
+  explicit reset is requested.
 - `particula/gpu/kernels/tests/coagulation_test.py:78` -- `device` fixture uses
   `warp_devices(wp)` so new tests automatically cover CPU and CUDA when Warp can
   access CUDA.
@@ -29,10 +33,10 @@
 - `particula/gpu/kernels/tests/coagulation_test.py:1127` -- preallocated buffer
   reuse test can be extended or mirrored for `rng_states` persistence.
 - `particula/gpu/tests/benchmark_test.py:1434` -- benchmark code preallocates
-  `rng_states_buf` but increments `rng_seed`; update or document after the API
-  contract is settled.
+  `rng_states_buf` and now seeds it once via the public helper before repeated
+  calls run with `initialize_rng=False`.
 - `docs/Features/Roadmap/data-oriented-gpu.md:756` -- roadmap text already names
-  this defect and the graph-capture motivation.
+  the graph-capture motivation that the shipped implementation now supports.
 
 ## Patterns to Follow
 
