@@ -1,4 +1,10 @@
-"""End-to-end tests for GPU coagulation kernels."""
+"""End-to-end tests for GPU coagulation kernels.
+
+This module covers Brownian coagulation execution, contract validation, and
+test-local mixed nanometer-particle-formation/droplet diagnostics used to
+measure attempted versus accepted collision counts without changing the public
+GPU API.
+"""
 
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
@@ -193,7 +199,13 @@ def _accumulate_collision_counts(
 
 
 def _make_mixed_npf_droplet_particle_data() -> ParticleData:
-    """Build a deterministic mixed nanometer/droplet particle fixture."""
+    """Build deterministic mixed NPF and droplet particle data.
+
+    Returns:
+        Particle data with one box containing nanometer-scale and droplet-scale
+        particles, explicit ``np.float64`` masses, and concentrations chosen to
+        exercise mixed-scale coagulation diagnostics.
+    """
     density = np.array([1000.0], dtype=np.float64)
     radii = np.array([[1.5e-9, 2.0e-9, 1.0e-5, 1.5e-5]], dtype=np.float64)
     total_volume = (4.0 / 3.0) * np.pi * radii**3
@@ -233,7 +245,12 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     rng_states: Any,
     collision_capacity: Any,
 ) -> None:
-    """Mirror the production sampler and expose rounded attempt counts."""
+    """Mirror the production sampler and expose rounded attempt counts.
+
+    This test-local kernel reproduces the production Brownian rejection
+    sampler's rounded ``expected_trials`` logic and accepted-collision
+    bookkeeping while storing per-box attempted trial counts for diagnostics.
+    """
     box_idx = wp.tid()
     n_particles = masses.shape[1]
     n_species = masses.shape[2]
@@ -433,7 +450,23 @@ def _collect_test_local_attempt_diagnostics(
     pressure: float = 101325.0,
     volume: float | np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Run the mirrored sampler once and compare against production counts."""
+    """Collect attempted and accepted collision diagnostics for one seeded run.
+
+    Args:
+        particles: CPU particle fixture to convert for the requested device.
+        device: Warp device name used for the mirrored and production launches.
+        time_step: Coagulation step size in seconds.
+        max_collisions: Requested per-box collision capacity.
+        rng_seed: Seed used for both the mirrored and production sampler.
+        temperature: Gas temperature in K.
+        pressure: Gas pressure in Pa.
+        volume: Optional box volume override in m^3.
+
+    Returns:
+        A tuple of ``(attempted_counts, accepted_counts, production_counts)``
+        as ``np.int64`` arrays so tests can compare the private diagnostic path
+        against the public ``coagulation_step_gpu`` collision counts.
+    """
     n_boxes, n_particles, _ = particles.masses.shape
     collision_capacity = _resolve_collision_capacity(
         max_collisions=max_collisions,
@@ -585,7 +618,7 @@ def test_coagulation_step_gpu_omitted_rng_states_keeps_legacy_behavior(
 
 
 def test_mixed_npf_droplet_fixture_returns_float64_particle_data() -> None:
-    """The mixed-scale fixture exposes canonical float64 particle data."""
+    """The mixed-scale fixture keeps canonical float64 shapes and scales."""
     particles = _make_mixed_npf_droplet_particle_data()
 
     assert particles.masses.shape == (1, 4, 1)
@@ -613,7 +646,7 @@ def test_mixed_npf_droplet_fixture_returns_float64_particle_data() -> None:
 def test_mixed_npf_droplet_fixture_converts_on_supported_warp_devices(
     device: str,
 ) -> None:
-    """The mixed-scale fixture converts cleanly on supported Warp devices."""
+    """The mixed-scale fixture round-trips cleanly on supported Warp devices."""
     particles = _make_mixed_npf_droplet_particle_data()
 
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -1606,7 +1639,12 @@ def test_coagulation_step_gpu_nonuniform_arrays_keep_single_active_box_idle(
 def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
     device: str,
 ) -> None:
-    """Mixed-scale diagnostics expose rounded attempts and accepted counts."""
+    """Mixed-scale diagnostics report rounded attempts and accepted counts.
+
+    The private mirrored sampler should expose finite integer-like attempted
+    trial counts, preserve the invariant ``attempted >= accepted``, and match
+    the production accepted-collision totals for the same seeded run.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     attempted_counts, accepted_counts, production_counts = (
         _collect_test_local_attempt_diagnostics(
@@ -1634,7 +1672,11 @@ def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
 def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
     device: str,
 ) -> None:
-    """Mixed-scale acceptance fractions stay finite for seeded diagnostics."""
+    """Mixed-scale acceptance fractions stay finite and non-negative.
+
+    The seeded mixed NPF/droplet scenario should produce at least one attempted
+    trial so the derived acceptance fraction remains finite on CPU and CUDA.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     attempted_counts, accepted_counts, _ = (
         _collect_test_local_attempt_diagnostics(
@@ -1662,7 +1704,12 @@ def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
 def test_mixed_scale_sparse_box_returns_zero_accepted_collisions(
     device: str,
 ) -> None:
-    """Sparse mixed-scale boxes keep diagnostics finite and accepted counts zero."""
+    """Sparse mixed-scale boxes keep diagnostics finite with zero acceptance.
+
+    When fewer than two particles remain active, both the mirrored diagnostic
+    path and the production path should report zero accepted collisions without
+    producing non-finite attempt-derived metrics.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     particles.concentration[0, 1:] = 0.0
     attempted_counts, accepted_counts, production_counts = (

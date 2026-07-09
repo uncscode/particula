@@ -24,6 +24,19 @@ inside the box thread and accepted by comparing a random draw with
 3. Keep all physics unchanged: Brownian pair rates remain the source of truth,
    and changes affect only proposal efficiency/characterization.
 
+## Landed Phase-E3-F2-P1 Design
+
+- The shipped implementation kept all instrumentation inside
+  `particula/gpu/kernels/tests/coagulation_test.py`.
+- P1 added a private mixed-scale `ParticleData` fixture and a private mirrored
+  Warp kernel that records rounded attempted counts plus accepted counts for the
+  existing sampler logic.
+- Production `particula/gpu/kernels/coagulation.py` was left unchanged; the
+  diagnostic helper compares its accepted counts against
+  `coagulation_step_gpu(...)` from the same seeded setup.
+- This preserves the E3-F1 caller-owned RNG-state contract and keeps
+  `.numpy()`/`wp.synchronize()` at explicit test boundaries only.
+
 ## Boundary and API Constraints
 
 - No implicit `.numpy()` calls, host readbacks, or hidden synchronization in

@@ -2,9 +2,9 @@
 
 ## Pass / Fail Criteria
 
-- [ ] A deterministic mixed NPF/droplet fixture lands in the GPU coagulation
+- [x] A deterministic mixed NPF/droplet fixture lands in the GPU coagulation
   test surface and reproduces the low-acceptance scenario that motivated E3-F2.
-- [ ] Acceptance-rate evidence is captured through explicit test/debug plumbing
+- [x] Acceptance-rate evidence is captured through explicit test/debug plumbing
   without introducing hidden production CPU↔GPU transfers.
 - [ ] The chosen outcome is measurable: either the hardened path improves
   acceptance on the mixed-scale fixture, or the final docs record a quantified
