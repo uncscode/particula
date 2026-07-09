@@ -1193,7 +1193,12 @@ def test_coagulation_step_gpu_reuses_preallocated_buffers(
 def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid_calls(
     device: str,
 ) -> None:
-    """Caller-owned RNG state advances across repeated valid calls."""
+    """Repeated valid calls advance persisted caller-owned RNG state.
+
+    Reusing the same ``rng_seed`` with the same caller-owned ``rng_states``
+    buffer must not restore the original seed-derived state between valid
+    calls.
+    """
     particles = _make_particle_data(n_boxes=1, n_particles=6, n_species=1)
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
     rng_seed = 37
@@ -1847,7 +1852,11 @@ def test_coagulation_step_gpu_invalid_time_step_fails_before_mutation(
 def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
     device: str,
 ) -> None:
-    """Invalid follow-up calls leave advanced caller-owned RNG state unchanged."""
+    """Invalid follow-up calls preserve already-advanced caller RNG state.
+
+    After one valid call advances a caller-owned ``rng_states`` buffer, a
+    later invalid call must fail before mutating that persisted buffer.
+    """
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     first_gpu_particles = to_warp_particle_data(particles, device=device)
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)

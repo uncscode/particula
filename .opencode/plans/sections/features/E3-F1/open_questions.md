@@ -14,6 +14,9 @@ Status: reviewed and answered on 2026-07-08; updated after P1 shipped.
 - Treat caller-provided `rng_states` as caller-owned state: validation happens
   first, no implicit reset occurs when `initialize_rng=False`, and explicit
   reset uses `initialize_rng=True` with `rng_seed`.
+- Keep P2 as a test-only regression phase. The shipped follow-up for issue
+  #1237 clarified the persisted-buffer contract through test names, docstrings,
+  and assertions rather than changing runtime semantics again.
 - Benchmark code should switch to seed-once semantics for correctness-focused
   runs in a later phase. Historical comparability can be preserved by recording
   `rng_seed` and reset behavior explicitly in benchmark metadata.

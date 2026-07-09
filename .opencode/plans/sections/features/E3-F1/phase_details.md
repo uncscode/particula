@@ -17,16 +17,23 @@
     reuse without implicit reset, explicit reset via `initialize_rng=True`,
     wrong-shape/wrong-device validation, and no mutation on failure.
 
-- [ ] **E3-F1-P2:** Add persisted rng_states regression tests for repeated coagulation steps
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F1-P2:** Add persisted rng_states regression tests for repeated coagulation steps
+  - Issue: #1237 | Size: S | Status: Shipped on 2026-07-08
   - Depends on: E3-F1-P1 defining the supported seed-once contract so the
     regression encodes the intended caller-visible behavior rather than a
     provisional assumption.
-  - Goal: Extend beyond the shipped compatibility contract to prove full
-    persisted repeated-call semantics across longer timestep sequences.
+  - Goal: Make the shipped caller-visible repeated-step contract explicit with
+    focused regressions, while keeping the phase test-only.
   - Files: `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Warp CPU and CUDA-if-available tests for non-overwrite, repeated-call
-    state advancement, and no manual `rng_seed` increment requirement.
+  - Shipped details: renamed the repeated valid-call regression to
+    `test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid_calls`
+    so the persisted caller-owned buffer contract is explicit, and added
+    `test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states`
+    to prove an already-advanced buffer is preserved when a follow-up call fails
+    early on `time_step` validation.
+  - Tests: Warp CPU and CUDA-if-available tests now cover repeated valid-call
+    state advancement, preservation of the original caller-owned buffer across
+    reused `rng_seed` calls, and valid-then-invalid no-mutation behavior.
 
 - [ ] **E3-F1-P3:** Implement seed-once persisted RNG semantics in coagulation_step_gpu
   - Issue: TBD | Size: S | Status: Not Started

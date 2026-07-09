@@ -1,11 +1,13 @@
 # Scope
 
 This feature delivers seed-once GPU RNG semantics in phases. The shipped work
-for issue #1236 is limited to the compatibility contract layer: it defines the
-backwards-compatible interaction between `rng_seed`, optional `rng_states`, and
-keyword-only `initialize_rng`, updates host-side orchestration in
-`coagulation_step_gpu`, and adds compatibility coverage. Broader docs and
-benchmark guidance remain follow-up work.
+for issues #1236 and #1237 now covers the compatibility contract layer plus
+targeted regression coverage: P1 defined the backwards-compatible interaction
+between `rng_seed`, optional `rng_states`, and keyword-only `initialize_rng`,
+and P2 added test-only coverage proving repeated valid calls advance a
+caller-owned buffer while invalid follow-up calls preserve the already-advanced
+state. Broader runtime expansion, docs, and benchmark guidance remain follow-up
+work.
 
 ## In Scope
 
@@ -20,7 +22,9 @@ benchmark guidance remain follow-up work.
 - Preserve validation-before-mutation behavior for invalid environment, volume,
   shape, and device inputs.
 - Add co-located tests in `particula/gpu/kernels/tests/coagulation_test.py` for
-  Warp CPU and CUDA-if-available device parametrization.
+  Warp CPU and CUDA-if-available device parametrization, including repeated
+  valid-call persisted-buffer regressions and valid-then-invalid preservation
+  checks.
 - Document the local `coagulation_step_gpu` API contract in the function
   docstring.
 
@@ -29,8 +33,8 @@ benchmark guidance remain follow-up work.
 - Replacing Warp RNG primitives or changing the stochastic coagulation algorithm.
 - Guaranteeing identical random sequences across CPU, Warp CPU, and CUDA devices.
 - Changing particle data container schemas or CPU/GPU transfer helpers.
-- Adding a standalone testing-only phase; all implementation phases include
-  their own co-located tests.
+- Production semantic changes in the P2 regression phase; that issue shipped as
+  tests only.
 - Broader RNG policy for non-coagulation GPU kernels unless needed for shared
   documentation consistency.
 - Broader GPU docs, graph-capture guidance, and benchmark comment refreshes in
