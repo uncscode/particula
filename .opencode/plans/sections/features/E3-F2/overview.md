@@ -30,11 +30,18 @@ bounded limitation with reproducible diagnostics.
   rank-selection path inside `particula/gpu/kernels/coagulation.py` while
   preserving the existing global-majorant Brownian physics, collision buffer
   contract, and caller-owned RNG-state semantics.
+- Phase E3-F2-P3 shipped in issue #1243 as evidence-focused follow-through in
+  `particula/gpu/kernels/tests/coagulation_test.py` plus a concise roadmap note
+  in `docs/Features/Roadmap/data-oriented-gpu.md`.
 - The same bounded selector was mirrored in
   `particula/gpu/kernels/tests/coagulation_test.py`, and the mixed-scale test
   surface now covers selector validity, sparse/degenerate active sets,
   exactly-two-active fallback behavior, accepted-count bounds, and total-mass
   conservation.
+- The shipped mixed-scale evidence now also covers repeated seeded Brownian-rate
+  checks against expected mean/sigma tolerances, repeated-run conservation even
+  when some trials accept zero collisions, and caller-owned `rng_states`
+  reuse/reset semantics for the same fixture.
 - No public `coagulation_step_gpu(...)` API, exported helper surface, or
   production synchronization behavior changed in this phase.
 

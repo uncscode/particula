@@ -14,7 +14,7 @@
 - [x] The production and diagnostic kernels use the same bounded active-particle
   selector and keep accepted counts bounded by `collision_pairs.shape[1]`,
   `max_collisions`, and `n_particles // 2`.
-- [ ] Aggregate stochastic checks stay within the documented tolerance policy and
+- [x] Aggregate stochastic checks stay within the documented tolerance policy and
   use the finalized E3-F1 repeated-step RNG contract.
 - [ ] Final documentation records the selected design, measured evidence,
   acceptance interpretation, and focused reproduction commands.
@@ -25,6 +25,6 @@
 | --- | --- | --- |
 | Mixed-scale fixture coverage | At least one dedicated fixture/test path exists for the NPF-plus-droplet case | `particula/gpu/kernels/tests/coagulation_test.py` |
 | Acceptance visibility | Baseline and chosen-path acceptance behavior can be inspected or asserted without hidden sync | Test-only diagnostics or bounded helper coverage from P1/P2 |
-| Brownian correctness | Aggregate collision-rate checks remain within documented stochastic tolerance | P3 stochastic comparison tests |
-| Conservation | Mixed-scale runs conserve total mass within the chosen stable tolerance | P2/P3 conservation assertions |
+| Brownian correctness | Aggregate collision-rate checks remain within documented stochastic tolerance | `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)` |
+| Conservation | Mixed-scale runs conserve total mass within the chosen stable tolerance, including zero-acceptance seeded trials | P2 conservation plus `test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acceptance_trials(device)` |
 | Decision traceability | Docs state either the improvement achieved or the accepted limitation with commands to reproduce it | `docs/Features/Roadmap/data-oriented-gpu.md` or focused feature note |

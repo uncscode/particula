@@ -51,6 +51,22 @@
   `numpy.testing.assert_allclose(..., rtol=1.0e-12)` after applying accepted
   collisions.
 
+## Shipped P3 Coverage
+
+- `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`
+  runs fixed seeds `101-200` against the shipped `E3-F2-P2` bounded selector
+  path and asserts the observed total stays within an explicit 3-sigma
+  tolerance around the Brownian expected mean.
+- `test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acceptance_trials(device)`
+  verifies repeated seeded runs conserve total mass across the same mixed-scale
+  setup, including seeds that produce zero accepted collisions.
+- `test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(device)`
+  confirms reused mixed-scale `rng_states` advance across repeated calls rather
+  than being silently reset.
+- `test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(device)`
+  confirms explicit `initialize_rng=True` reproduces the same seeded RNG state,
+  collision counts/pairs, and resulting particle fields.
+
 ## Device Coverage
 
 - Run on Warp CPU by default.
@@ -61,7 +77,7 @@
 
 ```bash
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or initialize_rng or rng_states or conservation" -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 ```

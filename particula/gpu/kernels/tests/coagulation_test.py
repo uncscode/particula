@@ -272,7 +272,24 @@ def _accumulate_collision_counts(
     environment: Any | None = None,
     volume: float | Any | None = None,
 ) -> np.ndarray:
-    """Accumulate per-box collision counts across a small fixed seed set."""
+    """Accumulate per-box collision counts across a fixed seed set.
+
+    Args:
+        particles: CPU particle fixture to convert for each seeded run.
+        device: Warp device used for the repeated coagulation launches.
+        seeds: Deterministic seed range used to replay fresh runs.
+        time_step: Coagulation step size in seconds.
+        max_collisions: Requested per-box collision capacity.
+        temperature: Scalar or Warp-array temperature input passed through to
+            ``coagulation_step_gpu``.
+        pressure: Scalar or Warp-array pressure input passed through to
+            ``coagulation_step_gpu``.
+        environment: Optional explicit environment input for the launches.
+        volume: Optional scalar or device volume override in m^3.
+
+    Returns:
+        Per-box summed collision counts accumulated across all requested seeds.
+    """
     total_counts = np.zeros(particles.masses.shape[0], dtype=np.int64)
 
     for seed in seeds:
@@ -306,7 +323,24 @@ def _run_seeded_coagulation_step(
     rng_states: Any | None = None,
     initialize_rng: bool = False,
 ) -> _CoagulationStepResult:
-    """Run one coagulation step from a fresh particle fixture."""
+    """Run one seeded coagulation step from a fresh particle fixture.
+
+    Args:
+        particles: CPU particle fixture to convert for the requested device.
+        device: Warp device used for the seeded launch.
+        time_step: Coagulation step size in seconds.
+        max_collisions: Requested per-box collision capacity.
+        rng_seed: Seed supplied to ``coagulation_step_gpu``.
+        temperature: Gas temperature in K.
+        pressure: Gas pressure in Pa.
+        volume: Optional scalar or array box volume override in m^3.
+        rng_states: Optional caller-owned RNG state buffer to reuse or reset.
+        initialize_rng: Whether to reseed a provided ``rng_states`` buffer.
+
+    Returns:
+        Collision counts, accepted pairs, restored particle state, and an
+        optional snapshot of caller-owned RNG state after the launch.
+    """
     gpu_particles = to_warp_particle_data(particles, device=device)
     n_boxes, n_particles, _ = particles.masses.shape
     collision_capacity = _resolve_collision_capacity(
@@ -357,7 +391,20 @@ def _get_expected_collision_statistics(
     pressure: float = 101325.0,
     volume: float | None = None,
 ) -> tuple[float, float]:
-    """Return Brownian expected mean and sigma for seeded repeated runs."""
+    """Return Brownian expected mean and sigma for seeded repeated runs.
+
+    Args:
+        particles: CPU particle fixture used to derive radii and masses.
+        time_step: Coagulation step size in seconds.
+        n_trials: Number of independent seeded fresh runs being summarized.
+        temperature: Gas temperature in K.
+        pressure: Gas pressure in Pa.
+        volume: Optional scalar box volume override in m^3.
+
+    Returns:
+        Tuple of Brownian expected total-collision mean and Poisson-style sigma
+        for the requested repeated-run setup.
+    """
     density_value = float(np.asarray(particles.density).ravel().item(0))
     masses_slice = np.ravel(np.asarray(particles.masses[0], dtype=np.float64))
     radii = np.cbrt(3.0 * masses_slice / (4.0 * np.pi * density_value))
@@ -2013,7 +2060,11 @@ def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
 def test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(  # noqa: E501
     device: str,
 ) -> None:
-    """Shipped E3-F2-P2 bounded selector totals stay within Brownian sigma."""
+    """Mixed-scale bounded-selector totals stay within Brownian sigma.
+
+    This checks the shipped E3-F2-P2 bounded selector path against the CPU
+    Brownian expected mean across repeated fresh seeded runs.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     seed_range = range(101, 201)
     trial_count = len(seed_range)
@@ -2391,7 +2442,11 @@ def test_mixed_scale_coagulation_conserves_total_mass(device: str) -> None:
 def test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acceptance_trials(  # noqa: E501
     device: str,
 ) -> None:
-    """Repeated mixed-scale seeded runs conserve total mass across outcomes."""
+    """Repeated mixed-scale seeded runs conserve total mass.
+
+    Zero-acceptance trials remain valid outcomes and must preserve the same
+    total mass as trials that accept one or more collisions.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     initial_mass = float(np.sum(particles.masses))
     seed_range = range(101, 201)
@@ -2686,7 +2741,11 @@ def test_coagulation_step_gpu_initialize_rng_true_resets_caller_owned_state(
 def test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(
     device: str,
 ) -> None:
-    """Mixed-scale caller-owned RNG state advances across repeated reuse."""
+    """Mixed-scale caller-owned RNG state advances across repeated reuse.
+
+    Reusing the same ``rng_seed`` with a persistent mixed-scale ``rng_states``
+    buffer must advance the stream instead of silently reseeding it.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     rng_seed = 41
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
@@ -2725,7 +2784,12 @@ def test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(
 def test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(
     device: str,
 ) -> None:
-    """Mixed-scale explicit RNG reset reproduces seeded state and outcomes."""
+    """Mixed-scale explicit RNG reset reproduces seeded state and outcomes.
+
+    Separate caller-owned buffers should converge to the same post-reset state,
+    accepted pairs, and particle outcomes when ``initialize_rng=True`` is used
+    with the same seed.
+    """
     particles = _make_mixed_npf_droplet_particle_data()
     rng_seed = 41
     rng_states_a = wp.zeros((1,), dtype=wp.uint32, device=device)

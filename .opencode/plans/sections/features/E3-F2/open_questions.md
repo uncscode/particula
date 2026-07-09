@@ -1,6 +1,6 @@
 # E3-F2 Open Questions
 
-Status: reviewed and answered on 2026-07-08.
+Status: reviewed on 2026-07-09; no blocking open questions remain for P3.
 
 ## Resolved Decisions
 
@@ -25,10 +25,16 @@ Status: reviewed and answered on 2026-07-08.
 - Define the final acceptance-rate threshold from E3-F2 measurements. The exit
   bar is either a measured improvement with conservation/statistical parity or
   an explicitly documented mixed-scale limitation with a caution boundary.
-- Status: still open for P3/P4. Issue #1242 added selector-validity,
-  sparse/degenerate, exactly-two-active, bounds, and conservation coverage, but
-  it did not yet establish the final mixed-scale acceptance threshold or final
-  user-facing limitation language.
+- Outcome: issue #1243 established the shipped P3 comparison point for the
+  bounded selector path: 139 accepted collisions across fixed seeds `101-200`,
+  versus a Brownian expected mean of 143.846 with sigma 11.994 on Warp CPU,
+  which passed the explicit 3-sigma tolerance check.
+- Remaining follow-up: P4 may still tighten the final user-facing wording if
+  Epic C wants a broader design decision statement, but the statistical
+  correctness question for the shipped path is now answered.
 - Documentation should include statistical/conservation test evidence plus a
   short benchmark-style summary when CUDA benchmark data is available. Full
   benchmark execution remains opt-in.
+- Outcome: issue #1243 added the required statistical/conservation evidence note
+  and exact pytest reproduction command to
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
