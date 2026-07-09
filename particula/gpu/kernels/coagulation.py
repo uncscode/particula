@@ -443,6 +443,8 @@ def _validate_collision_pairs(
             f"collision_pairs shape {collision_pairs.shape} does not match "
             f"expected {expected_shape}"
         )
+    if collision_pairs.dtype != wp.int32:
+        raise ValueError("collision_pairs buffer must use dtype int32")
     _validate_device_match(
         "collision_pairs buffer", collision_pairs, expected_device
     )
@@ -468,6 +470,8 @@ def _validate_collision_counts(
             f"n_collisions shape {n_collisions.shape} does not match expected "
             f"{expected_shape}"
         )
+    if n_collisions.dtype != wp.int32:
+        raise ValueError("n_collisions buffer must use dtype int32")
     _validate_device_match("n_collisions buffer", n_collisions, expected_device)
 
 
@@ -491,7 +495,35 @@ def _validate_rng_states(
             f"rng_states shape {rng_states.shape} does not match expected "
             f"{expected_shape}"
         )
+    if rng_states.dtype != wp.uint32:
+        raise ValueError("rng_states buffer must use dtype uint32")
     _validate_device_match("rng_states buffer", rng_states, expected_device)
+
+
+def _validate_time_step(time_step: float) -> float:
+    """Validate the coagulation time step before any mutation.
+
+    Args:
+        time_step: Proposed coagulation time step in seconds.
+
+    Returns:
+        The validated time step as a Python ``float``.
+
+    Raises:
+        ValueError: If ``time_step`` is not a finite nonnegative real value.
+    """
+    if isinstance(time_step, bool):
+        raise ValueError("time_step must be finite and nonnegative")
+
+    try:
+        time_step_value = float(time_step)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("time_step must be finite and nonnegative") from exc
+
+    if not np.isfinite(time_step_value) or time_step_value < 0.0:
+        raise ValueError("time_step must be finite and nonnegative")
+
+    return time_step_value
 
 
 def _ensure_volume_array(
@@ -560,8 +592,8 @@ def coagulation_step_gpu(
 
     Direct temperature and pressure inputs are validated and normalized before
     volume setup, RNG initialization, or any Warp kernel launch. Caller-owned
-    RNG buffers are reused as-is unless ``initialize_rng=True`` requests an
-    explicit reset from ``rng_seed``.
+    RNG buffers are only reset when ``initialize_rng=True`` explicitly opts in
+    to reinitialization.
 
     Args:
         particles: GPU-resident particle data.
@@ -579,12 +611,15 @@ def coagulation_step_gpu(
         rng_states: Optional preallocated RNG state buffer. When omitted, this
             function allocates an internal ``(n_boxes,)`` buffer and
             initializes it from ``rng_seed`` for the current call. When
-            provided, the caller owns the buffer state and it is treated as
-            already initialized unless ``initialize_rng=True`` is passed.
-        initialize_rng: Whether to explicitly reset a caller-provided
-            ``rng_states`` buffer from ``rng_seed`` after validation. This flag
-            does not affect omitted ``rng_states`` convenience allocation,
-            which always initializes the internal buffer for the current call.
+            provided, the caller owns the buffer and it is reused as-is unless
+            ``initialize_rng=True`` explicitly requests a reset from
+            ``rng_seed``.
+        initialize_rng: Explicit reset flag for caller-provided
+            ``rng_states``. The default ``False`` path validates the buffer and
+            reuses it without reseeding. Set ``True`` to launch
+            ``_initialize_rng_states`` after validation. This argument does not
+            affect omitted ``rng_states`` convenience allocation, which always
+            initializes the internal buffer for the current call.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``.
             This mode is supported when both direct inputs are ``None``.
@@ -612,18 +647,19 @@ def coagulation_step_gpu(
         positional scalar callers stay source-compatible.
 
         Validation runs before volume normalization, RNG setup, and kernel
-        launches so invalid shape or device combinations fail without mutating
-        particle state or allocating downstream launch work. The normalized
-        environment arrays are forwarded directly into the launch path.
+        launches so invalid ``time_step``, shape, dtype, or device
+        combinations fail without mutating particle state or allocating
+        downstream launch work. The normalized environment arrays are
+        forwarded directly into the launch path.
 
         Supported RNG setup cases are:
 
         - Omitted ``rng_states``: allocate an internal buffer and initialize it
           from ``rng_seed`` for this call.
         - Provided ``rng_states`` with ``initialize_rng=False``: validate the
-          caller-owned buffer and use it without resetting.
+          caller-owned buffer and reuse it without resetting.
         - Provided ``rng_states`` with ``initialize_rng=True``: validate the
-          caller-owned buffer, then explicitly reset it from ``rng_seed``.
+          caller-owned buffer, then reset it from ``rng_seed``.
         - Validation failure: raise before RNG initialization or other Warp
           launches mutate state.
     """
@@ -632,6 +668,7 @@ def coagulation_step_gpu(
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
+    time_step_value = _validate_time_step(time_step)
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
         pressure=pressure,
@@ -665,13 +702,13 @@ def coagulation_step_gpu(
     else:
         _validate_collision_counts(n_collisions, expected_counts_shape, device)
 
-    should_initialize_rng = rng_states is None
     if rng_states is None:
         rng_states = wp.zeros(
             expected_counts_shape,
             dtype=wp.uint32,
             device=device,
         )
+        should_initialize_rng = True
     else:
         _validate_rng_states(rng_states, expected_counts_shape, device)
         should_initialize_rng = initialize_rng
@@ -710,7 +747,7 @@ def coagulation_step_gpu(
             wp.float64(constants.REF_VISCOSITY_AIR_STP),
             wp.float64(constants.REF_TEMPERATURE_STP),
             wp.float64(constants.SUTHERLAND_CONSTANT),
-            wp.float64(time_step),
+            wp.float64(time_step_value),
             radii,
             diffusivities,
             g_terms,
