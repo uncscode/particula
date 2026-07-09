@@ -1,5 +1,10 @@
 """Builder for the CondensationIsothermal strategy."""
 
+from typing import cast
+
+import numpy as np
+from numpy.typing import NDArray
+
 from particula.abc_builder import BuilderABC
 from particula.builder_mixin import BuilderMolarMassMixin
 from particula.dynamics.condensation.condensation_strategies import (
@@ -50,9 +55,10 @@ class CondensationIsothermalBuilder(
             raise ValueError("diffusion_coefficient must be set")
         if self.accommodation_coefficient is None:
             raise ValueError("accommodation_coefficient must be set")
+        molar_mass = cast(float | NDArray[np.float64], self.molar_mass)
 
         return CondensationIsothermal(
-            molar_mass=self.molar_mass,
+            molar_mass=molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,
             accommodation_coefficient=self.accommodation_coefficient,
             update_gases=self.update_gases,

@@ -31,7 +31,7 @@ class BuilderDensityMixin:
 
     def __init__(self) -> None:
         """Initialize density mixin."""
-        self.density = None
+        self.density: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"density": "positive"})
     def set_density(
@@ -68,7 +68,7 @@ class BuilderSurfaceTensionMixin:
 
     def __init__(self) -> None:
         """Initialize surface tension mixin."""
-        self.surface_tension = None
+        self.surface_tension: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"surface_tension": "positive"})
     def set_surface_tension(
@@ -107,7 +107,7 @@ class BuilderSurfaceTensionTableMixin:
 
     def __init__(self) -> None:
         """Initialize surface tension table mixin."""
-        self.surface_tension_table = None
+        self.surface_tension_table: Optional[NDArray[np.float64]] = None
 
     @validate_inputs({"surface_tension_table": "positive"})
     def set_surface_tension_table(
@@ -146,7 +146,7 @@ class BuilderMolarMassMixin:
 
     def __init__(self) -> None:
         """Initialize molar mass mixin."""
-        self.molar_mass = None
+        self.molar_mass: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"molar_mass": "positive"})
     def set_molar_mass(
@@ -223,7 +223,7 @@ class BuilderChargeMixin:
 
     def __init__(self) -> None:
         """Initialize charge mixin."""
-        self.charge = None
+        self.charge: Optional[Union[float, NDArray[np.float64]]] = None
 
     def set_charge(
         self,
@@ -254,7 +254,7 @@ class BuilderPhaseIndexMixin:
 
     def __init__(self) -> None:
         """Initialize phase index mixin."""
-        self.phase_index = None
+        self.phase_index: Optional[NDArray[np.int_]] = None
 
     def set_phase_index(
         self,
@@ -285,7 +285,7 @@ class BuilderMassMixin:
 
     def __init__(self):
         """Initialize mass mixin."""
-        self.mass = None
+        self.mass: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"mass": "nonnegative"})
     def set_mass(
@@ -318,7 +318,7 @@ class BuilderVolumeMixin:
 
     def __init__(self):
         """Initialize volume mixin."""
-        self.volume = None
+        self.volume: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"volume": "nonnegative"})
     def set_volume(
@@ -351,7 +351,7 @@ class BuilderRadiusMixin:
 
     def __init__(self):
         """Initialize radius mixin."""
-        self.radius = None
+        self.radius: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"radius": "nonnegative"})
     def set_radius(
@@ -384,7 +384,7 @@ class BuilderTemperatureMixin:
 
     def __init__(self):
         """Initialize temperature mixin."""
-        self.temperature = None
+        self.temperature: Optional[float] = None
 
     @validate_inputs({"temperature": "finite"})
     def set_temperature(self, temperature: float, temperature_units: str = "K"):
@@ -404,8 +404,8 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
             return self
-        self.temperature = get_unit_conversion(
-            temperature_units, "K", temperature
+        self.temperature = cast(
+            float, get_unit_conversion(temperature_units, "K", temperature)
         )
         return self
 
@@ -419,7 +419,7 @@ class BuilderTemperatureTableMixin:
 
     def __init__(self):
         """Initialize temperature table mixin."""
-        self.temperature_table = None
+        self.temperature_table: Optional[NDArray[np.float64]] = None
 
     @validate_inputs({"temperature_table": "finite"})
     def set_temperature_table(
@@ -458,7 +458,7 @@ class BuilderPressureMixin:
 
     def __init__(self):
         """Initialize pressure mixin."""
-        self.pressure = None
+        self.pressure: Optional[Union[float, NDArray[np.float64]]] = None
 
     @validate_inputs({"pressure": "nonnegative"})
     def set_pressure(
@@ -493,9 +493,11 @@ class BuilderLognormalMixin:
 
     def __init__(self):
         """Initialize lognormal distribution mixin."""
-        self.mode = None
-        self.number_concentration = None
-        self.geometric_standard_deviation = None
+        self.mode: Optional[NDArray[np.float64]] = None
+        self.number_concentration: Optional[NDArray[np.float64]] = None
+        self.geometric_standard_deviation: Optional[
+            NDArray[np.float64]
+        ] = None
 
     @validate_inputs({"mode": "positive"})
     def set_mode(
@@ -573,7 +575,7 @@ class BuilderParticleResolvedCountMixin:
 
     def __init__(self):
         """Initialize particle-resolved count mixin."""
-        self.particle_resolved_count = None
+        self.particle_resolved_count: Optional[int] = None
 
     @validate_inputs({"particle_resolved_count": "positive"})
     def set_particle_resolved_count(

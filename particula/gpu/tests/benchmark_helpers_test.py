@@ -9,6 +9,7 @@ import warnings
 from builtins import __import__ as builtins_import
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import numpy.testing as npt
@@ -736,25 +737,20 @@ def test_seed_coagulation_rng_states_once_launches_and_synchronizes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """RNG seeding helper launches exactly once and synchronizes afterward."""
-    events: list[tuple[str, object]] = []
-
-    class _FakeWarp:
-        @staticmethod
-        def uint32(value):
-            return ("uint32", value)
-
-        @staticmethod
-        def launch(kernel, dim, inputs=None, device=None):
-            events.append(("launch", kernel, dim, tuple(inputs or ()), device))
-
-        @staticmethod
-        def synchronize():
-            events.append(("sync", None))
-
-    fake_kernel = object()
+    calls: list[tuple[int, object, str]] = []
     fake_buffer = object()
-    monkeypatch.setattr(benchmark_module, "wp", _FakeWarp())
-    monkeypatch.setattr(benchmark_module, "_initialize_rng_states", fake_kernel)
+
+    def fake_initialize_coagulation_rng_states(**kwargs: Any) -> object:
+        calls.append(
+            (kwargs["rng_seed"], kwargs["rng_states"], kwargs["device"])
+        )
+        return types.SimpleNamespace(shape=(3,))
+
+    monkeypatch.setattr(
+        benchmark_module,
+        "initialize_coagulation_rng_states",
+        fake_initialize_coagulation_rng_states,
+    )
 
     benchmark_module._seed_coagulation_rng_states_once(
         rng_seed=42,
@@ -763,10 +759,7 @@ def test_seed_coagulation_rng_states_once_launches_and_synchronizes(
         device="cuda",
     )
 
-    assert events == [
-        ("launch", fake_kernel, 3, (("uint32", 42), fake_buffer), "cuda"),
-        ("sync", None),
-    ]
+    assert calls == [(42, fake_buffer, "cuda")]
 
 
 def test_benchmark_module_imports_without_warp_when_opted_in(
@@ -1265,6 +1258,7 @@ def test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift(
     assert all(
         kwargs["rng_states"] is rng_state_buffer for kwargs in gpu_kwargs
     )
+    assert all(kwargs.get("initialize_rng") is False for kwargs in gpu_kwargs)
 
 
 def test_wp_func_benchmarks_records_summary_without_cuda(

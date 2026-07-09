@@ -18,7 +18,7 @@ References:
 """
 
 import logging
-from typing import Optional
+from typing import Optional, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -510,7 +510,8 @@ class TableVaporPressureBuilder(
     def build(self) -> TableVaporPressureStrategy:
         """Validate and construct a TableVaporPressureStrategy."""
         self.pre_build_check()
+        temperature_table = cast(NDArray[np.float64], self.temperature_table)
         return TableVaporPressureStrategy(
             vapor_pressures=self.vapor_pressure_table,  # type: ignore
-            temperatures=self.temperature_table,
+            temperatures=temperature_table,
         )

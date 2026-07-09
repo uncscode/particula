@@ -42,6 +42,7 @@ from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
 from particula.gpu.kernels.coagulation import (  # noqa: E402
     _ensure_volume_array,
     _initialize_rng_states,
+    _resolve_collision_capacity,
     _validate_collision_counts,
     _validate_collision_pairs,
     _validate_device_arrays,
@@ -53,6 +54,7 @@ from particula.gpu.kernels.coagulation import (  # noqa: E402
     apply_coagulation_kernel,
     brownian_coagulation_kernel,
     coagulation_step_gpu,
+    initialize_coagulation_rng_states,
 )
 from particula.gpu.properties.gas_properties import (  # noqa: E402
     dynamic_viscosity_wp,
@@ -185,6 +187,14 @@ def _accumulate_collision_counts(
         total_counts += np.asarray(collision_counts.numpy(), dtype=np.int64)
 
     return total_counts
+
+
+@wp.kernel
+def _draw_single_random_kernel(rng_states: Any, draws: Any) -> None:
+    """Draw one random float from each RNG state for deterministic probing."""
+    box_idx = wp.tid()
+    state = rng_states[box_idx]
+    draws[box_idx] = wp.float64(wp.randf(state))
 
 
 def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> (
@@ -1271,6 +1281,27 @@ def test_coagulation_step_gpu_reuses_preallocated_buffers(
     assert np.all(np.asarray(n_collisions.numpy()) >= 0)
 
 
+def test_coagulation_step_gpu_clamps_auto_allocated_collision_capacity(
+    device: str,
+) -> None:
+    """Auto-allocated collision buffers clamp to the useful per-box limit."""
+    particles = _make_particle_data(n_boxes=1, n_particles=6, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    _, collision_pairs, collision_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        rng_seed=11,
+        max_collisions=256,
+    )
+    wp.synchronize()
+
+    assert collision_pairs.shape == (1, 3, 2)
+    assert collision_counts.shape == (1,)
+
+
 def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid_calls(
     device: str,
 ) -> None:
@@ -1962,6 +1993,31 @@ def test_coagulation_step_gpu_rejects_rng_state_shape_before_mutation(
     npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
 
 
+def test_coagulation_step_gpu_validates_caller_rng_state_before_allocation(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Invalid caller RNG state fails before any internal buffer allocation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=6, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    rng_states = wp.array([7, 11], dtype=wp.uint32, device=device)
+
+    def _unexpected_zeros(*args: Any, **kwargs: Any) -> Any:
+        raise AssertionError("wp.zeros should not run before rng validation")
+
+    monkeypatch.setattr(coagulation_module.wp, "zeros", _unexpected_zeros)
+
+    with pytest.raises(ValueError, match="rng_states shape"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            max_collisions=np.iinfo(np.int32).max,
+            rng_states=rng_states,
+        )
+
+
 @pytest.mark.parametrize(
     ("buffer_name", "message"),
     [
@@ -2307,6 +2363,82 @@ def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
     npt.assert_array_equal(np.asarray(rng_states.numpy()), advanced_state)
 
 
+def test_coagulation_step_gpu_fractional_skip_advances_rng_state(
+    device: str,
+) -> None:
+    """Fractional-trial early returns still persist the advanced RNG state."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    temperature = 298.15
+    pressure = 101325.0
+    rng_seed = 43
+
+    probe_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    initialize_coagulation_rng_states(rng_seed, probe_states, device=device)
+    probe_draws = wp.zeros((1,), dtype=wp.float64, device=device)
+    wp.launch(
+        _draw_single_random_kernel,
+        dim=1,
+        inputs=[probe_states, probe_draws],
+        device=device,
+    )
+    wp.synchronize()
+    first_draw = float(np.asarray(probe_draws.numpy())[0])
+    assert 0.0 < first_draw < 1.0
+
+    particle_masses = particles.masses[0, :, 0]
+    density = particles.density[0]
+    particle_radii = ((3.0 * (particle_masses / density)) / (4.0 * np.pi)) ** (
+        1.0 / 3.0
+    )
+    kernel_matrix = get_brownian_kernel_via_system_state(
+        particle_radius=particle_radii,
+        particle_mass=particle_masses,
+        temperature=temperature,
+        pressure=pressure,
+    )
+    kernel_value = float(kernel_matrix[0, 1])
+    volume = kernel_value / (first_draw * 0.5)
+
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    initialize_coagulation_rng_states(rng_seed, rng_states, device=device)
+    initial_state = np.asarray(rng_states.numpy()).copy()
+
+    first_particles = to_warp_particle_data(particles, device=device)
+    _, _, first_counts = coagulation_step_gpu(
+        first_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=1.0,
+        volume=volume,
+        max_collisions=4,
+        rng_seed=rng_seed,
+        rng_states=rng_states,
+    )
+    wp.synchronize()
+    first_state = np.asarray(rng_states.numpy()).copy()
+    first_collision_counts = np.asarray(first_counts.numpy())
+
+    second_particles = to_warp_particle_data(particles, device=device)
+    _, _, second_counts = coagulation_step_gpu(
+        second_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=1.0,
+        volume=volume,
+        max_collisions=4,
+        rng_seed=rng_seed,
+        rng_states=rng_states,
+    )
+    wp.synchronize()
+    second_state = np.asarray(rng_states.numpy()).copy()
+    second_collision_counts = np.asarray(second_counts.numpy())
+
+    npt.assert_array_equal(first_collision_counts, np.array([0], dtype=np.int32))
+    npt.assert_array_equal(second_collision_counts, np.array([0], dtype=np.int32))
+    assert not np.array_equal(first_state, initial_state)
+    assert not np.array_equal(second_state, first_state)
+
+
 def test_coagulation_validation_rejects_device_mismatch(device: str) -> None:
     """Validation helpers reject device mismatches."""
     wrong_device = "cpu" if device == "cuda" else "cuda"
@@ -2549,6 +2681,22 @@ def test_validate_max_collisions_rejects_invalid_values(
     """Collision-limit helper rejects unsupported values before allocation."""
     with pytest.raises(ValueError, match="positive integer"):
         _validate_max_collisions(max_collisions)
+
+
+def test_resolve_collision_capacity_clamps_to_physical_limit() -> None:
+    """Collision capacity is bounded by the useful per-box particle limit."""
+    assert _resolve_collision_capacity(256, n_boxes=1, n_particles=6) == 3
+    assert _resolve_collision_capacity(2, n_boxes=1, n_particles=6) == 2
+
+
+def test_initialize_coagulation_rng_states_changes_output(device: str) -> None:
+    """Public RNG initialization helper writes nonzero state in place."""
+    rng_states = wp.zeros((4,), dtype=wp.uint32, device=device)
+    returned = initialize_coagulation_rng_states(123, rng_states, device=device)
+
+    assert returned is rng_states
+    rng_values = np.asarray(rng_states.numpy())
+    assert np.any(rng_values != 0)
 
 
 def test_initialize_rng_states_changes_output(device: str) -> None:
