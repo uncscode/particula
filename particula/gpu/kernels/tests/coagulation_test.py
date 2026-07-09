@@ -50,11 +50,14 @@ from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
     particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels.coagulation import (  # noqa: E402
+    MAX_SCHEDULED_TRIALS_PER_BOX,
     _bound_scheduled_trials,
     _ensure_volume_array,
     _initialize_rng_states,
+    _remove_active_pair_by_rank_swap_pop,
     _resolve_active_pair_by_rank,
     _resolve_collision_capacity,
+    _select_active_pair_by_rank,
     _validate_collision_counts,
     _validate_collision_pairs,
     _validate_device_arrays,
@@ -91,7 +94,6 @@ from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.util import constants  # noqa: E402
 
 _INT32_MAX = np.iinfo(np.int32).max
-_DIAGNOSTIC_MAX_SCHEDULED_TRIALS = float(_INT32_MAX)
 
 
 @dataclass(frozen=True)
@@ -133,18 +135,16 @@ class _ExpectedCollisionStatistics:
 
 @wp.kernel
 def _selector_guard_regression_kernel(
-    active_flags: Any,
+    active_indices: Any,
     resolved_pairs: Any,
     unresolved_attempts: Any,
 ) -> None:
     """Verify unresolved rank selection does not truncate later attempts."""
     box_idx = wp.tid()
-    n_particles = active_flags.shape[1]
-
     invalid_pair = _resolve_active_pair_by_rank(
-        active_flags,
+        active_indices,
         box_idx,
-        n_particles,
+        active_indices.shape[1],
         wp.int32(0),
         wp.int32(5),
     )
@@ -152,9 +152,9 @@ def _selector_guard_regression_kernel(
         unresolved_attempts[box_idx] = wp.int32(1)
 
     valid_pair = _resolve_active_pair_by_rank(
-        active_flags,
+        active_indices,
         box_idx,
-        n_particles,
+        active_indices.shape[1],
         wp.int32(0),
         wp.int32(2),
     )
@@ -190,6 +190,48 @@ def _resolve_active_pair_probe_kernel(
     )
     resolved_pairs[box_idx, 0] = pair[0]
     resolved_pairs[box_idx, 1] = pair[1]
+
+
+@wp.kernel
+def _select_active_pair_probe_kernel(
+    active_indices: Any,
+    resolved_pairs: Any,
+    rank_i: Any,
+    adjusted_rank_j: Any,
+) -> None:
+    """Probe direct active-pair lookup from a compact active-index buffer."""
+    box_idx = wp.tid()
+    pair = _select_active_pair_by_rank(
+        active_indices,
+        box_idx,
+        rank_i,
+        adjusted_rank_j,
+    )
+    resolved_pairs[box_idx, 0] = pair[0]
+    resolved_pairs[box_idx, 1] = pair[1]
+
+
+@wp.kernel
+def _remove_active_pair_probe_kernel(
+    active_indices: Any,
+    updated_counts: Any,
+    rank_i: Any,
+    adjusted_rank_j: Any,
+) -> None:
+    """Probe swap-pop active-pair removal for deterministic checks."""
+    box_idx = wp.tid()
+    active_count = wp.int32(0)
+    for particle_idx in range(active_indices.shape[1]):
+        if active_indices[box_idx, particle_idx] >= wp.int32(0):
+            active_count += wp.int32(1)
+
+    updated_counts[box_idx] = _remove_active_pair_by_rank_swap_pop(
+        active_indices,
+        box_idx,
+        active_count,
+        rank_i,
+        adjusted_rank_j,
+    )
 
 
 @pytest.fixture(params=warp_devices(wp))
@@ -513,7 +555,7 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     diffusivities: Any,
     g_terms: Any,
     speeds: Any,
-    active_flags: Any,
+    active_indices: Any,
     collision_pairs: Any,
     n_collisions: Any,
     scheduled_trial_counts: Any,
@@ -554,7 +596,7 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     executed_trial_counts[box_idx] = wp.int32(0)
     for particle_idx in range(n_particles):
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
-            active_flags[box_idx, particle_idx] = wp.int32(0)
+            active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
             diffusivities[box_idx, particle_idx] = wp.float64(0.0)
             g_terms[box_idx, particle_idx] = wp.float64(0.0)
@@ -569,7 +611,7 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             total_volume += species_mass / density[species_idx]
 
         if total_volume <= wp.float64(0.0) or total_mass <= wp.float64(0.0):
-            active_flags[box_idx, particle_idx] = wp.int32(0)
+            active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
             diffusivities[box_idx, particle_idx] = wp.float64(0.0)
             g_terms[box_idx, particle_idx] = wp.float64(0.0)
@@ -589,7 +631,7 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
         g_term = g_collection_term_wp(particle_mean_free_path, radius)
 
-        active_flags[box_idx, particle_idx] = wp.int32(1)
+        active_indices[box_idx, active_count] = wp.int32(particle_idx)
         radii[box_idx, particle_idx] = radius
         diffusivities[box_idx, particle_idx] = diffusivity
         g_terms[box_idx, particle_idx] = g_term
@@ -604,9 +646,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     r_max = wp.float64(0.0)
     idx_min = wp.int32(-1)
     idx_max = wp.int32(-1)
-    for p_idx in range(n_particles):
-        if active_flags[box_idx, p_idx] == wp.int32(0):
-            continue
+    for active_rank in range(active_count):
+        p_idx = wp.int32(active_indices[box_idx, active_rank])
         r_p = radii[box_idx, p_idx]
         if r_p < r_min:
             r_min = r_p
@@ -618,12 +659,10 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     k_max = wp.float64(0.0)
     if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
         if idx_min == idx_max:
-            for p_idx in range(n_particles):
-                if (
-                    active_flags[box_idx, p_idx] == wp.int32(1)
-                    and wp.int32(p_idx) != idx_min
-                ):
-                    idx_max = wp.int32(p_idx)
+            for active_rank in range(active_count):
+                candidate_idx = wp.int32(active_indices[box_idx, active_rank])
+                if candidate_idx != idx_min:
+                    idx_max = candidate_idx
                     break
         k_max = brownian_kernel_pair_wp(
             radii[box_idx, idx_min],
@@ -679,10 +718,9 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         if adjusted_rank_j >= rank_i:
             adjusted_rank_j += wp.int32(1)
 
-        selected_pair = _resolve_active_pair_by_rank(
-            active_flags,
+        selected_pair = _select_active_pair_by_rank(
+            active_indices,
             box_idx,
-            n_particles,
             rank_i,
             adjusted_rank_j,
         )
@@ -715,9 +753,13 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             collision_pairs[box_idx, collision_count, 0] = selected_i
             collision_pairs[box_idx, collision_count, 1] = selected_j
             collision_count += wp.int32(1)
-            active_flags[box_idx, selected_i] = wp.int32(0)
-            active_flags[box_idx, selected_j] = wp.int32(0)
-            active_count -= wp.int32(2)
+            active_count = _remove_active_pair_by_rank_swap_pop(
+                active_indices,
+                box_idx,
+                active_count,
+                rank_i,
+                adjusted_rank_j,
+            )
 
     n_collisions[box_idx] = collision_count
     rng_states[box_idx] = state
@@ -834,7 +876,7 @@ def _collect_test_local_attempt_diagnostics(
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
-    active_flags = wp.zeros(
+    active_indices = wp.zeros(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
     collision_pairs = wp.zeros(
@@ -869,7 +911,7 @@ def _collect_test_local_attempt_diagnostics(
             diffusivities,
             g_terms,
             speeds,
-            active_flags,
+            active_indices,
             collision_pairs,
             n_collisions,
             scheduled_trial_counts,
@@ -2382,10 +2424,10 @@ def test_mixed_scale_two_active_particles_accept_the_only_valid_pair(
     assert np.all(acceptance_fraction >= 0.0)
 
 
-def test_mixed_scale_diagnostic_clamps_scheduled_trials_to_int32_limit(
+def test_mixed_scale_diagnostic_caps_scheduled_trials_to_operational_budget(
     device: str,
 ) -> None:
-    """Diagnostic scheduled trials are bounded before int32 conversion."""
+    """Diagnostic scheduled trials are capped at the shared budget."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     diagnostics = _collect_test_local_attempt_diagnostics(
         particles,
@@ -2396,7 +2438,7 @@ def test_mixed_scale_diagnostic_clamps_scheduled_trials_to_int32_limit(
         volume=1.0e-300,
     )
 
-    assert diagnostics.scheduled_trial_counts[0] == _INT32_MAX
+    assert diagnostics.scheduled_trial_counts[0] == MAX_SCHEDULED_TRIALS_PER_BOX
     assert diagnostics.executed_trial_counts[0] == 1
     npt.assert_array_equal(
         diagnostics.accepted_counts,
@@ -4137,6 +4179,11 @@ def test_resolve_collision_capacity_clamps_to_physical_limit() -> None:
     assert _resolve_collision_capacity(2, n_boxes=1, n_particles=6) == 2
 
 
+def test_resolve_collision_capacity_clamps_to_buffer_budget() -> None:
+    """Collision capacity is bounded by the shared byte-budget ceiling."""
+    assert _resolve_collision_capacity(512, n_boxes=70_000_000, n_particles=1024) == 1
+
+
 def test_bound_scheduled_trials_preserves_values_below_int32_limit(
     device: str,
 ) -> None:
@@ -4160,12 +4207,35 @@ def test_bound_scheduled_trials_preserves_values_below_int32_limit(
     )
 
 
-def test_bound_scheduled_trials_clamps_values_above_int32_limit(
+def test_bound_scheduled_trials_returns_zero_for_nan_and_nonpositive_inputs(
     device: str,
 ) -> None:
-    """Bounded-trial helper clamps large schedules before int32 conversion."""
+    """Bounded-trial helper fails closed for NaN and nonpositive values."""
     expected_trials = wp.array(
-        [float(_INT32_MAX) * 2.0],
+        [float("nan"), -3.0, 0.0], dtype=wp.float64, device=device
+    )
+    bounded_trials = wp.zeros((3,), dtype=wp.float64, device=device)
+
+    wp.launch(
+        _bound_scheduled_trials_probe_kernel,
+        dim=3,
+        inputs=[expected_trials, bounded_trials],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_allclose(
+        np.asarray(bounded_trials.numpy()),
+        np.array([0.0, 0.0, 0.0], dtype=np.float64),
+    )
+
+
+def test_bound_scheduled_trials_caps_values_above_operational_budget(
+    device: str,
+) -> None:
+    """Bounded-trial helper caps large schedules before int32 conversion."""
+    expected_trials = wp.array(
+        [float(MAX_SCHEDULED_TRIALS_PER_BOX) * 2.0],
         dtype=wp.float64,
         device=device,
     )
@@ -4181,7 +4251,7 @@ def test_bound_scheduled_trials_clamps_values_above_int32_limit(
 
     npt.assert_allclose(
         np.asarray(bounded_trials.numpy()),
-        np.array([float(_INT32_MAX)], dtype=np.float64),
+        np.array([float(MAX_SCHEDULED_TRIALS_PER_BOX)], dtype=np.float64),
     )
 
 
@@ -4211,6 +4281,62 @@ def test_resolve_active_pair_by_rank_maps_sparse_active_ranks(
     )
 
 
+def test_select_active_pair_by_rank_reads_compact_active_indices(
+    device: str,
+) -> None:
+    """Direct active-pair lookup returns the compact-buffer entries by rank."""
+    active_indices = wp.array([[4, 1, 3, -1, -1]], dtype=wp.int32, device=device)
+    resolved_pairs = wp.zeros((1, 2), dtype=wp.int32, device=device)
+
+    wp.launch(
+        _select_active_pair_probe_kernel,
+        dim=1,
+        inputs=[
+            active_indices,
+            resolved_pairs,
+            wp.int32(1),
+            wp.int32(2),
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        np.asarray(resolved_pairs.numpy()),
+        np.array([[1, 3]], dtype=np.int32),
+    )
+
+
+def test_remove_active_pair_by_rank_swap_pop_removes_both_selected_ranks(
+    device: str,
+) -> None:
+    """Swap-pop removal deletes both selected ranks and compacts survivors."""
+    active_indices = wp.array([[4, 1, 3, 2, -1]], dtype=wp.int32, device=device)
+    updated_counts = wp.zeros((1,), dtype=wp.int32, device=device)
+
+    wp.launch(
+        _remove_active_pair_probe_kernel,
+        dim=1,
+        inputs=[
+            active_indices,
+            updated_counts,
+            wp.int32(1),
+            wp.int32(2),
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        np.asarray(updated_counts.numpy()),
+        np.array([2], dtype=np.int32),
+    )
+    npt.assert_array_equal(
+        np.asarray(active_indices.numpy()),
+        np.array([[4, 2, -1, -1, -1]], dtype=np.int32),
+    )
+
+
 def test_initialize_coagulation_rng_states_changes_output(device: str) -> None:
     """Public RNG initialization helper writes nonzero state in place."""
     rng_states = wp.zeros((4,), dtype=wp.uint32, device=device)
@@ -4219,6 +4345,19 @@ def test_initialize_coagulation_rng_states_changes_output(device: str) -> None:
     assert returned is rng_states
     rng_values = np.asarray(rng_states.numpy())
     assert np.any(rng_values != 0)
+
+
+def test_initialize_coagulation_rng_states_rejects_invalid_buffers(
+    device: str,
+) -> None:
+    """Public RNG initialization helper rejects invalid shape and dtype."""
+    wrong_shape = wp.zeros((2, 1), dtype=wp.uint32, device=device)
+    wrong_dtype = wp.zeros((2,), dtype=wp.int32, device=device)
+
+    with pytest.raises(ValueError, match=r"shape \(n_boxes,\)"):
+        initialize_coagulation_rng_states(123, wrong_shape, device=device)
+    with pytest.raises(ValueError, match="dtype uint32"):
+        initialize_coagulation_rng_states(123, wrong_dtype, device=device)
 
 
 def test_initialize_rng_states_changes_output(device: str) -> None:

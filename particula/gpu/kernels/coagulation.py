@@ -60,23 +60,69 @@ from particula.gpu.properties.particle_properties import (
 )
 
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
-MAX_SCHEDULED_TRIALS_INT32 = np.iinfo(np.int32).max
+MAX_SCHEDULED_TRIALS_PER_BOX = 65_536
 
 
 @no_type_check
 @wp.func
 def _bound_scheduled_trials(expected_trials: Any) -> Any:
     """Clamp scheduled-trial counts before any int32 conversion."""
+    if not (expected_trials > wp.float64(0.0)):
+        return wp.float64(0.0)
+
     bounded_trials = expected_trials
-    if bounded_trials > wp.float64(MAX_SCHEDULED_TRIALS_INT32):
-        bounded_trials = wp.float64(MAX_SCHEDULED_TRIALS_INT32)
+    if bounded_trials > wp.float64(MAX_SCHEDULED_TRIALS_PER_BOX):
+        bounded_trials = wp.float64(MAX_SCHEDULED_TRIALS_PER_BOX)
     return bounded_trials
 
 
 @no_type_check
 @wp.func
+def _select_active_pair_by_rank(
+    active_indices: Any,
+    box_idx: Any,
+    rank_i: Any,
+    adjusted_rank_j: Any,
+) -> Any:
+    """Resolve two active-set ranks from a compact active-index buffer."""
+    return wp.vec2i(
+        wp.int32(active_indices[box_idx, rank_i]),
+        wp.int32(active_indices[box_idx, adjusted_rank_j]),
+    )
+
+
+@no_type_check
+@wp.func
+def _remove_active_pair_by_rank_swap_pop(
+    active_indices: Any,
+    box_idx: Any,
+    active_count: Any,
+    rank_i: Any,
+    adjusted_rank_j: Any,
+) -> Any:
+    """Remove two active ranks from a compact active-index buffer."""
+    larger_rank = adjusted_rank_j
+    smaller_rank = rank_i
+    if rank_i > adjusted_rank_j:
+        larger_rank = rank_i
+        smaller_rank = adjusted_rank_j
+
+    last_rank = active_count - wp.int32(1)
+    active_indices[box_idx, larger_rank] = active_indices[box_idx, last_rank]
+    active_indices[box_idx, last_rank] = wp.int32(-1)
+    active_count -= wp.int32(1)
+
+    last_rank = active_count - wp.int32(1)
+    active_indices[box_idx, smaller_rank] = active_indices[box_idx, last_rank]
+    active_indices[box_idx, last_rank] = wp.int32(-1)
+    active_count -= wp.int32(1)
+    return active_count
+
+
+@no_type_check
+@wp.func
 def _resolve_active_pair_by_rank(
-    active_flags: Any,
+    active_indices: Any,
     box_idx: Any,
     n_particles: Any,
     rank_i: Any,
@@ -88,7 +134,7 @@ def _resolve_active_pair_by_rank(
     active_rank = wp.int32(0)
 
     for p_idx in range(n_particles):
-        if active_flags[box_idx, p_idx] == wp.int32(0):
+        if active_indices[box_idx, p_idx] == wp.int32(0):
             continue
 
         if active_rank == rank_i:
@@ -138,7 +184,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     diffusivities: Any,
     g_terms: Any,
     speeds: Any,
-    active_flags: Any,
+    active_indices: Any,
     collision_pairs: Any,
     n_collisions: Any,
     rng_states: Any,
@@ -168,7 +214,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         diffusivities: Output diffusivities ``(n_boxes, n_particles)``.
         g_terms: Output collection terms ``(n_boxes, n_particles)``.
         speeds: Output mean thermal speeds ``(n_boxes, n_particles)``.
-        active_flags: Output active flags ``(n_boxes, n_particles)``.
+        active_indices: Output compact active indices
+            ``(n_boxes, n_particles)``.
         collision_pairs: Output collision indices
             ``(n_boxes, max_collisions, 2)``.
         n_collisions: Output collision counts ``(n_boxes,)``.
@@ -204,7 +251,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     active_count = wp.int32(0)
     for particle_idx in range(n_particles):
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
-            active_flags[box_idx, particle_idx] = wp.int32(0)
+            active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
             diffusivities[box_idx, particle_idx] = wp.float64(0.0)
             g_terms[box_idx, particle_idx] = wp.float64(0.0)
@@ -219,7 +266,7 @@ def brownian_coagulation_kernel(  # noqa: C901
             total_volume += species_mass / density[species_idx]
 
         if total_volume <= wp.float64(0.0) or total_mass <= wp.float64(0.0):
-            active_flags[box_idx, particle_idx] = wp.int32(0)
+            active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
             diffusivities[box_idx, particle_idx] = wp.float64(0.0)
             g_terms[box_idx, particle_idx] = wp.float64(0.0)
@@ -239,7 +286,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
         g_term = g_collection_term_wp(particle_mean_free_path, radius)
 
-        active_flags[box_idx, particle_idx] = wp.int32(1)
+        active_indices[box_idx, active_count] = wp.int32(particle_idx)
         radii[box_idx, particle_idx] = radius
         diffusivities[box_idx, particle_idx] = diffusivity
         g_terms[box_idx, particle_idx] = g_term
@@ -259,9 +306,8 @@ def brownian_coagulation_kernel(  # noqa: C901
     r_max = wp.float64(0.0)
     idx_min = wp.int32(-1)
     idx_max = wp.int32(-1)
-    for p_idx in range(n_particles):
-        if active_flags[box_idx, p_idx] == wp.int32(0):
-            continue
+    for active_rank in range(active_count):
+        p_idx = wp.int32(active_indices[box_idx, active_rank])
         r_p = radii[box_idx, p_idx]
         if r_p < r_min:
             r_min = r_p
@@ -275,12 +321,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         if idx_min == idx_max:
             # All active particles have the same radius; use self-pair
             # kernel which is symmetric, so pick any two active indices.
-            for p_idx in range(n_particles):
-                if (
-                    active_flags[box_idx, p_idx] == wp.int32(1)
-                    and wp.int32(p_idx) != idx_min
-                ):
-                    idx_max = wp.int32(p_idx)
+            for active_rank in range(active_count):
+                candidate_idx = wp.int32(active_indices[box_idx, active_rank])
+                if candidate_idx != idx_min:
+                    idx_max = candidate_idx
                     break
         k_max = brownian_kernel_pair_wp(
             radii[box_idx, idx_min],
@@ -304,7 +348,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         / (wp.float64(2.0))
     )
     expected_trials = k_max * possible_pairs * time_step / volume[box_idx]
-    if expected_trials <= wp.float64(0.0):
+    if not (expected_trials > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
@@ -334,10 +378,9 @@ def brownian_coagulation_kernel(  # noqa: C901
             # one of the remaining active particles.
             adjusted_rank_j += wp.int32(1)
 
-        selected_pair = _resolve_active_pair_by_rank(
-            active_flags,
+        selected_pair = _select_active_pair_by_rank(
+            active_indices,
             box_idx,
-            n_particles,
             rank_i,
             adjusted_rank_j,
         )
@@ -372,9 +415,13 @@ def brownian_coagulation_kernel(  # noqa: C901
             collision_pairs[box_idx, collision_count, 0] = selected_i
             collision_pairs[box_idx, collision_count, 1] = selected_j
             collision_count += wp.int32(1)
-            active_flags[box_idx, selected_i] = wp.int32(0)
-            active_flags[box_idx, selected_j] = wp.int32(0)
-            active_count -= wp.int32(2)
+            active_count = _remove_active_pair_by_rank_swap_pop(
+                active_indices,
+                box_idx,
+                active_count,
+                rank_i,
+                adjusted_rank_j,
+            )
 
     n_collisions[box_idx] = collision_count
     rng_states[box_idx] = state
@@ -919,7 +966,7 @@ def coagulation_step_gpu(  # noqa: C901
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
-    active_flags = wp.zeros(
+    active_indices = wp.zeros(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
 
@@ -951,7 +998,7 @@ def coagulation_step_gpu(  # noqa: C901
             diffusivities,
             g_terms,
             speeds,
-            active_flags,
+            active_indices,
             collision_pairs,
             n_collisions,
             rng_states,

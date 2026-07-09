@@ -15,7 +15,8 @@
     `test_mixed_npf_droplet_fixture_converts_on_supported_warp_devices(device)`,
     `test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(device)`,
     `test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(device)`,
-    and `test_mixed_scale_sparse_box_returns_zero_accepted_collisions(device)`.
+    and
+    `test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(device, active_indices)`.
 
 - [x] **E3-F2-P2:** Prototype bounded mixed-scale sampling hardening with conservation tests
   - Issue: #1242 | Size: S | Status: Shipped 2026-07-09
