@@ -15310,9 +15310,9 @@ high-level dynamics workflows.</p>
 <p>Known GPU kernel defects and design limits (see
 <a href="#known-kernel-issues">Known Kernel Issues</a>):</p>
 <ul>
-<li><code>coagulation_step_gpu</code> re-initializes RNG states on every call, so identical
-  seeds across timesteps produce correlated draws unless the caller manually
-  varies the seed.</li>
+<li><code>coagulation_step_gpu</code> supports a convenience allocate-and-seed path when
+  <code>rng_states</code> are omitted, while caller-owned <code>rng_states</code> persist across
+  repeated calls until explicitly reset with <code>initialize_rng=True</code>.</li>
 <li>The Brownian coagulation kernel launches one thread per box with sequential
   pair selection inside the thread, which limits single-box scaling at large
   particle counts.</li>
@@ -16360,21 +16360,18 @@ them.</p>
 </ol>
 <p><strong>Exit bar:</strong> A new user can run both kernels from the docs on a CUDA device
 and on Warp CPU without reading source, repeated coagulation steps draw
-uncorrelated samples without manual re-seeding, the device-aware test policy
-plus parity tolerances are recorded, and the deferred E1 latent-heat example
-and integration-conservation case have landed.</p>
+uncorrelated samples from a caller-initialized persistent RNG buffer, the
+device-aware test policy plus parity tolerances are recorded, and the deferred
+E1 latent-heat example and integration-conservation case have landed.</p>
 <h3 id="known-kernel-issues">Known Kernel Issues<a class="headerlink" href="#known-kernel-issues" title="Permanent link">&para;</a></h3>
 <p>Concrete defects and design limits in the existing kernels that should be
 fixed or explicitly accepted during this epic.</p>
 <ul>
-<li><strong>RNG re-initialization per call.</strong> <code>coagulation_step_gpu</code> re-launches the
-  RNG initialization kernel on every call, overwriting persisted state.
-  Identical seeds across timesteps produce correlated draws, and callers must
-  manually increment seeds per step. Fix by seeding once and persisting
-  per-box RNG state in a reusable buffer across timesteps (see
-  <a href="#random-number-strategy">Random Number Strategy</a>); this also matters for
-  graph capture, where re-seeding inside a captured graph would freeze the
-  seed.</li>
+<li><strong>RNG state ownership.</strong> <code>coagulation_step_gpu</code> seeds once and reuses a
+  caller-owned per-box RNG buffer across timesteps. Repeated calls should keep
+  the seed fixed unless an explicit reset is requested, and graph-captured
+  loops should initialize or reset the buffer before capture or before the
+  repeated-step loop (see <a href="#random-number-strategy">Random Number Strategy</a>).</li>
 <li><strong>Rejection-sampling acceptance collapse.</strong> The Brownian kernel bounds
   acceptance with a single <code>k_max</code> computed from the min/max radius pair. With
   NPF clusters and droplets in the same box, <code>k_max</code> far exceeds typical pair
@@ -16622,14 +16619,13 @@ separate epic.</p>
 <h3 id="random-number-strategy">Random Number Strategy<a class="headerlink" href="#random-number-strategy" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Define deterministic RNG seeding for stochastic coagulation on GPU. The
-  per-call re-initialization defect itself is fixed in
-  <a href="#epic-c-gpu-kernel-correctness-and-low-level-api-hardening">Epic C</a> (see
-  <a href="#known-kernel-issues">Known Kernel Issues</a>); this epic builds the
-  loop-level RNG strategy on that fix.</li>
+  shipped baseline is seed-once initialization for caller-owned persistent
+  <code>rng_states</code>, while omitted <code>rng_states</code> still use a convenience
+  allocate-and-seed path per call.</li>
 <li>Support per-box RNG streams so independent boxes remain reproducible when the
   number of boxes changes or when selected boxes are disabled.</li>
-<li>Track RNG state on the GPU between timesteps and include it in graph-captured
-  execution tests.</li>
+<li>Track caller-owned RNG state on the GPU between timesteps and include it in
+  graph-captured execution tests.</li>
 <li>Document expected reproducibility limits across CPU, Warp CPU, and CUDA.</li>
 </ul>
 <p><strong>Exit bar:</strong> At least one condensation and one coagulation workflow run on
@@ -16682,11 +16678,14 @@ scaling numbers across box counts plus a recorded memory-budget model.</p>
 <li>Separate graph-capturable kernels from setup work such as allocation,
   validation, and host-side scheduling.</li>
 <li>Reuse preallocated buffers for mass transfer, collision pairs, wall-loss
-  rates, dilution factors, diagnostics, and RNG state before capture begins.</li>
+  rates, dilution factors, diagnostics, and RNG state before capture begins.
+  For coagulation, seed or explicitly reset persistent <code>rng_states</code> before the
+  repeated-step loop or before graph capture, not through hidden reseeding
+  inside the captured path.</li>
 <li>Add tests that compare captured-graph execution against uncaptured GPU
   execution and CPU reference results.</li>
 <li>Document graph-capture limitations, including shape changes, dynamic process
-  selection, stochastic coagulation state, and device availability.</li>
+  selection, stochastic coagulation state ownership, and device availability.</li>
 <li>Require fixed array shapes during graph capture. Changing <code>n_boxes</code>,
   <code>n_particles</code>, or <code>n_species</code> should invalidate the captured graph and require
   a new setup/capture step.</li>
@@ -16697,6 +16696,12 @@ scaling numbers across box counts plus a recorded memory-budget model.</p>
 <li>Keep graph-captured loops focused on repeated timesteps with stable process
   order, stable buffer shapes, and stable communication maps.</li>
 </ul>
+<p>For shipped coagulation behavior, <code>rng_states</code> are Warp-resident sidecar state
+owned by the caller when persistence is needed across timesteps. Passing a
+fixed <code>rng_seed</code> with a reused <code>rng_states</code> buffer does not trigger hidden
+re-seeding; explicit initialization happens only during omitted-buffer
+convenience allocation or when <code>initialize_rng=True</code> is requested before the
+captured loop or repeated-step run.</p>
 <p>For graph capture, particle count changes should be represented as changes in
 active slots, not changes in array shape. If a simulation would create more
 particles than the fixed slots allow, the GPU loop should trigger a documented
@@ -16876,9 +16881,9 @@ coagulation and state-representation decisions are recorded.</p>
 <td>Record as deliberate multi-box tradeoff or add parallel-within-box variant</td>
 </tr>
 <tr>
-<td>RNG state re-initialized every coagulation step</td>
-<td>Correlated draws across steps; frozen seed under graph capture</td>
-<td>Seed once, persist per-box RNG state between timesteps</td>
+<td>Caller must seed or explicitly reset persistent coagulation RNG state before repeated loops or graph capture</td>
+<td>Reused buffers continue their stream unless intentionally reset, which can surprise callers expecting hidden reseeding</td>
+<td>Keep the shipped seed-once contract, document caller-owned sidecar setup, and reset only via explicit initialization before the loop or capture</td>
 </tr>
 <tr>
 <td>Autodiff through stochastic coagulation</td>

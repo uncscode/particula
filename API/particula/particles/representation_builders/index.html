@@ -15379,7 +15379,9 @@ interface compatibility.</p>
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span>
-<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a mass-based particle representation.</span>
 
 <span class="sd">    Returns:</span>
@@ -15392,12 +15394,14 @@ interface compatibility.</p>
     <span class="p">)</span>
     <span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ActivityStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_strategy</span><span class="p">)</span>
     <span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">SurfaceStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface_strategy</span><span class="p">)</span>
+    <span class="n">mass</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ParticleRepresentation</span><span class="p">(</span>
         <span class="n">strategy</span><span class="o">=</span><span class="n">distribution_strategy</span><span class="p">,</span>
         <span class="n">activity</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
         <span class="n">surface</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
-        <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
-        <span class="n">density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="n">distribution</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
+        <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
         <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
     <span class="p">)</span>
@@ -15446,9 +15450,7 @@ interface compatibility.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
@@ -15464,7 +15466,9 @@ interface compatibility.</p>
 <span class="normal">282</span>
 <span class="normal">283</span>
 <span class="normal">284</span>
-<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize required fields for radius-based representations.&quot;&quot;&quot;</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;distribution_strategy&quot;</span><span class="p">,</span>
@@ -15543,9 +15547,7 @@ interface compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">289</span>
 <span class="normal">290</span>
 <span class="normal">291</span>
 <span class="normal">292</span>
@@ -15565,7 +15567,11 @@ interface compatibility.</p>
 <span class="normal">306</span>
 <span class="normal">307</span>
 <span class="normal">308</span>
-<span class="normal">309</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a radius-based particle representation.</span>
 
 <span class="sd">    Returns:</span>
@@ -15579,12 +15585,14 @@ interface compatibility.</p>
     <span class="p">)</span>
     <span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ActivityStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_strategy</span><span class="p">)</span>
     <span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">SurfaceStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface_strategy</span><span class="p">)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ParticleRepresentation</span><span class="p">(</span>
         <span class="n">strategy</span><span class="o">=</span><span class="n">distribution_strategy</span><span class="p">,</span>
         <span class="n">activity</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
         <span class="n">surface</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
-        <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
-        <span class="n">density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="n">distribution</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+        <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
         <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
     <span class="p">)</span>
@@ -15633,11 +15641,7 @@ interface compatibility.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">329</span>
 <span class="normal">330</span>
 <span class="normal">331</span>
 <span class="normal">332</span>
@@ -15662,7 +15666,11 @@ interface compatibility.</p>
 <span class="normal">351</span>
 <span class="normal">352</span>
 <span class="normal">353</span>
-<span class="normal">354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize defaults for preset radius-bin representations.&quot;&quot;&quot;</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;mode&quot;</span><span class="p">,</span>
@@ -15757,11 +15765,7 @@ interface compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">417</span>
 <span class="normal">418</span>
 <span class="normal">419</span>
 <span class="normal">420</span>
@@ -15800,7 +15804,12 @@ interface compatibility.</p>
 <span class="normal">453</span>
 <span class="normal">454</span>
 <span class="normal">455</span>
-<span class="normal">456</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a radius-bin representation from preset lognormal inputs.</span>
 
 <span class="sd">    Returns:</span>
@@ -15835,12 +15844,13 @@ interface compatibility.</p>
     <span class="p">)</span>
     <span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ActivityStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_strategy</span><span class="p">)</span>
     <span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">SurfaceStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface_strategy</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ParticleRepresentation</span><span class="p">(</span>
         <span class="n">strategy</span><span class="o">=</span><span class="n">distribution_strategy</span><span class="p">,</span>
         <span class="n">activity</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
         <span class="n">surface</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
         <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_bins</span><span class="p">,</span>
-        <span class="n">density</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
         <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
     <span class="p">)</span>
@@ -15916,11 +15926,7 @@ interface compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">390</span>
 <span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
@@ -15941,7 +15947,11 @@ interface compatibility.</p>
 <span class="normal">408</span>
 <span class="normal">409</span>
 <span class="normal">410</span>
-<span class="normal">411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_distribution_type</span><span class="p">(</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_distribution_type</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">distribution_type_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -16038,11 +16048,7 @@ interface compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">360</span>
 <span class="normal">361</span>
 <span class="normal">362</span>
 <span class="normal">363</span>
@@ -16066,7 +16072,11 @@ interface compatibility.</p>
 <span class="normal">381</span>
 <span class="normal">382</span>
 <span class="normal">383</span>
-<span class="normal">384</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius_bins&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius_bins&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_radius_bins</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">radius_bins</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -16140,15 +16150,7 @@ interface compatibility.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">542</span>
 <span class="normal">543</span>
 <span class="normal">544</span>
 <span class="normal">545</span>
@@ -16171,7 +16173,15 @@ interface compatibility.</p>
 <span class="normal">562</span>
 <span class="normal">563</span>
 <span class="normal">564</span>
-<span class="normal">565</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize defaults for preset particle-resolved representations.&quot;&quot;&quot;</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;mode&quot;</span><span class="p">,</span>
@@ -16256,15 +16266,7 @@ interface compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">567</span>
-<span class="normal">568</span>
-<span class="normal">569</span>
-<span class="normal">570</span>
-<span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
-<span class="normal">575</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">575</span>
 <span class="normal">576</span>
 <span class="normal">577</span>
 <span class="normal">578</span>
@@ -16306,22 +16308,53 @@ interface compatibility.</p>
 <span class="normal">614</span>
 <span class="normal">615</span>
 <span class="normal">616</span>
-<span class="normal">617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a preset particle-resolved representation.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation whose per-particle masses are sampled</span>
 <span class="sd">        from the configured lognormal distribution.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+    <span class="n">geometric_standard_deviation</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometric_standard_deviation</span>
+    <span class="p">)</span>
+    <span class="n">number_concentration_input</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_concentration</span>
+    <span class="p">)</span>
+    <span class="n">particle_resolved_count</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_count</span><span class="p">)</span>
+    <span class="n">density_input</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">)</span>
+
     <span class="n">resolved_radii</span> <span class="o">=</span> <span class="n">get_lognormal_sample_distribution</span><span class="p">(</span>
-        <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-        <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">geometric_standard_deviation</span><span class="p">,</span>
-        <span class="n">number_of_particles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_concentration</span><span class="p">,</span>
-        <span class="n">number_of_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_count</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">geometric_standard_deviation</span><span class="p">,</span>
+        <span class="n">number_of_particles</span><span class="o">=</span><span class="n">number_concentration_input</span><span class="p">,</span>
+        <span class="n">number_of_samples</span><span class="o">=</span><span class="n">particle_resolved_count</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># convert radii to masses</span>
     <span class="n">resolved_masses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-        <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">resolved_radii</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+        <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">resolved_radii</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density_input</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">number_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
@@ -16330,7 +16363,7 @@ interface compatibility.</p>
     <span class="p">)</span>
 
     <span class="n">density</span> <span class="o">=</span> <span class="n">_normalize_resolved_density_input</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span> <span class="n">resolved_masses</span>
+        <span class="n">density_input</span><span class="p">,</span> <span class="n">resolved_masses</span>
     <span class="p">)</span>
     <span class="n">charge</span> <span class="o">=</span> <span class="n">_normalize_resolved_charge_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">resolved_masses</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
@@ -16341,7 +16374,6 @@ interface compatibility.</p>
     <span class="p">):</span>
         <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">number_concentration</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
     <span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">DistributionStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_strategy</span>
     <span class="p">)</span>
@@ -16355,7 +16387,7 @@ interface compatibility.</p>
         <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
         <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span>
-        <span class="n">volume</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -16402,12 +16434,7 @@ interface compatibility.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span>
-<span class="normal">476</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">476</span>
 <span class="normal">477</span>
 <span class="normal">478</span>
 <span class="normal">479</span>
@@ -16420,7 +16447,12 @@ interface compatibility.</p>
 <span class="normal">486</span>
 <span class="normal">487</span>
 <span class="normal">488</span>
-<span class="normal">489</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize required fields for resolved-mass representations.&quot;&quot;&quot;</span>
     <span class="n">required_parameters</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;distribution_strategy&quot;</span><span class="p">,</span>
@@ -16492,12 +16524,7 @@ interface compatibility.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/particles/representation_builders.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">491</span>
-<span class="normal">492</span>
-<span class="normal">493</span>
-<span class="normal">494</span>
-<span class="normal">495</span>
-<span class="normal">496</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">496</span>
 <span class="normal">497</span>
 <span class="normal">498</span>
 <span class="normal">499</span>
@@ -16519,19 +16546,30 @@ interface compatibility.</p>
 <span class="normal">515</span>
 <span class="normal">516</span>
 <span class="normal">517</span>
-<span class="normal">518</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a particle-resolved representation from resolved masses.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A particle representation configured with per-particle masses,</span>
 <span class="sd">        normalized density and charge inputs, and the stored strategies.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">number_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-
-    <span class="n">density</span> <span class="o">=</span> <span class="n">_normalize_resolved_density_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
-    <span class="n">charge</span> <span class="o">=</span> <span class="n">_normalize_resolved_charge_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
-
     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
+    <span class="n">mass</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+    <span class="n">density_input</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">)</span>
+    <span class="n">number_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">mass</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">density</span> <span class="o">=</span> <span class="n">_normalize_resolved_density_input</span><span class="p">(</span><span class="n">density_input</span><span class="p">,</span> <span class="n">mass</span><span class="p">)</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="n">_normalize_resolved_charge_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">mass</span><span class="p">)</span>
+
     <span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
         <span class="n">DistributionStrategy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_strategy</span>
     <span class="p">)</span>
@@ -16541,11 +16579,11 @@ interface compatibility.</p>
         <span class="n">strategy</span><span class="o">=</span><span class="n">distribution_strategy</span><span class="p">,</span>
         <span class="n">activity</span><span class="o">=</span><span class="n">activity_strategy</span><span class="p">,</span>
         <span class="n">surface</span><span class="o">=</span><span class="n">surface_strategy</span><span class="p">,</span>
-        <span class="n">distribution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span>
+        <span class="n">distribution</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
         <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
         <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span>
-        <span class="n">volume</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+        <span class="n">volume</span><span class="o">=</span><span class="n">volume</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

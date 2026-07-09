@@ -14909,6 +14909,9 @@ than storage support.</p>
   <code>pressure</code>, and <code>saturation_ratio</code>.</li>
 <li><code>WarpGasData.vapor_pressure</code> is helper state only and has no CPU <code>GasData</code>
   field.</li>
+<li>Coagulation <code>rng_states</code> are caller-owned Warp-resident sidecar state only;
+  they are not fields on <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>, or any
+  Warp container schema.</li>
 <li>No hidden CPU↔GPU synchronization occurs inside kernels or runnables.</li>
 </ul>
 <h2 id="guidance-for-current-users">Guidance for current users<a class="headerlink" href="#guidance-for-current-users" title="Permanent link">&para;</a></h2>

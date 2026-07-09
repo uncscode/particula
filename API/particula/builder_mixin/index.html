@@ -15999,6 +15999,7 @@ geometry and stores the value in meters.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderChargeMixin.charge">charge</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Assigned charge in elemental charge units (dimensionless).</p>
@@ -16019,9 +16020,9 @@ geometry and stores the value in meters.</p>
                     <summary>Source code in <code>particula/builder_mixin.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">224</span>
 <span class="normal">225</span>
-<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize charge mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -16348,6 +16349,7 @@ in arbitrary units and normalize them to kilograms per cubic meter.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderDensityMixin.density">density</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Particle density in kg/m^3 after conversion.</p>
@@ -16368,9 +16370,9 @@ in arbitrary units and normalize them to kilograms per cubic meter.</p>
                     <summary>Source code in <code>particula/builder_mixin.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
 <span class="normal">33</span>
-<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">34</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize density mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">density</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">density</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -16691,6 +16693,7 @@ Defaults to "discrete" and validates against supported types.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderLognormalMixin.mode">mode</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
             <p>Mode radii in meters.</p>
@@ -16698,6 +16701,7 @@ Defaults to "discrete" and validates against supported types.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderLognormalMixin.number_concentration">number_concentration</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
             <p>Number concentration in 1/m^3.</p>
@@ -16705,6 +16709,7 @@ Defaults to "discrete" and validates against supported types.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderLognormalMixin.geometric_standard_deviation">geometric_standard_deviation</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
             <p>Geometric standard deviation values.</p>
@@ -16729,9 +16734,9 @@ Defaults to "discrete" and validates against supported types.</p>
 <span class="normal">497</span>
 <span class="normal">498</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize lognormal distribution mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">number_concentration</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">geometric_standard_deviation</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">number_concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">geometric_standard_deviation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17074,6 +17079,7 @@ be <code>"1/m^3"</code> or <code>"m^-3"</code> for direct storage.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderMassMixin.mass">mass</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Particle mass in kg after conversion.</p>
@@ -17096,7 +17102,7 @@ be <code>"1/m^3"</code> or <code>"m^-3"</code> for direct storage.</p>
 <span class="normal">287</span>
 <span class="normal">288</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize mass mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17241,6 +17247,7 @@ in arbitrary units and normalize them to kilograms per mole.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderMolarMassMixin.molar_mass">molar_mass</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Stored molar mass in kg/mol.</p>
@@ -17261,9 +17268,9 @@ in arbitrary units and normalize them to kilograms per mole.</p>
                     <summary>Source code in <code>particula/builder_mixin.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">147</span>
 <span class="normal">148</span>
-<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">149</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize molar mass mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17413,6 +17420,7 @@ in arbitrary units and normalize them to kilograms per mole.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderParticleResolvedCountMixin.particle_resolved_count">particle_resolved_count</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="int">int</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Number of particles to resolve.</p>
@@ -17435,7 +17443,7 @@ in arbitrary units and normalize them to kilograms per mole.</p>
 <span class="normal">575</span>
 <span class="normal">576</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize particle-resolved count mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_count</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">particle_resolved_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17581,6 +17589,7 @@ ignored.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderPhaseIndexMixin.phase_index">phase_index</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.int_">int_</span>]]</code>)
           –
           <div class="doc-md-description">
             <p>Array mapping each species to a phase identifier.</p>
@@ -17601,9 +17610,9 @@ ignored.</p>
                     <summary>Source code in <code>particula/builder_mixin.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
 <span class="normal">256</span>
-<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize phase index mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">phase_index</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">phase_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17744,6 +17753,7 @@ ignored.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderPressureMixin.pressure">pressure</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Total pressure in Pa after conversion.</p>
@@ -17766,7 +17776,7 @@ ignored.</p>
 <span class="normal">460</span>
 <span class="normal">461</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize pressure mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">pressure</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pressure</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -17909,6 +17919,7 @@ ignored.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderRadiusMixin.radius">radius</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Particle radius in meters after conversion.</p>
@@ -17931,7 +17942,7 @@ ignored.</p>
 <span class="normal">353</span>
 <span class="normal">354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize radius mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -18076,6 +18087,7 @@ tension inputs in arbitrary units and persist them in newtons per meter.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderSurfaceTensionMixin.surface_tension">surface_tension</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Surface tension in N/m after conversion.</p>
@@ -18096,9 +18108,9 @@ tension inputs in arbitrary units and persist them in newtons per meter.</p>
                     <summary>Source code in <code>particula/builder_mixin.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
 <span class="normal">70</span>
-<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize surface tension mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -18250,6 +18262,7 @@ arrays of surface tension values to newtons per meter and retain them.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderSurfaceTensionTableMixin.surface_tension_table">surface_tension_table</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
             <p>Array of surface tension values in N/m.</p>
@@ -18270,9 +18283,9 @@ arrays of surface tension values to newtons per meter and retain them.</p>
                     <summary>Source code in <code>particula/builder_mixin.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
 <span class="normal">109</span>
-<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize surface tension table mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension_table</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">surface_tension_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -18424,6 +18437,7 @@ arrays of surface tension values to newtons per meter and retain them.</p>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderTemperatureMixin.temperature">temperature</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>)
           –
           <div class="doc-md-description">
             <p>Temperature in Kelvin after conversion.</p>
@@ -18446,7 +18460,7 @@ arrays of surface tension values to newtons per meter and retain them.</p>
 <span class="normal">386</span>
 <span class="normal">387</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize temperature mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -18567,8 +18581,8 @@ Accepts <code>"degC"</code>, <code>"degF"</code>, <code>"degR"</code>, or <code>
     <span class="k">if</span> <span class="n">temperature_units</span> <span class="o">==</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
         <span class="k">return</span> <span class="bp">self</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">get_unit_conversion</span><span class="p">(</span>
-        <span class="n">temperature_units</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="n">temperature</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="nb">float</span><span class="p">,</span> <span class="n">get_unit_conversion</span><span class="p">(</span><span class="n">temperature_units</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
@@ -18608,6 +18622,7 @@ Accepts <code>"degC"</code>, <code>"degF"</code>, <code>"degR"</code>, or <code>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderTemperatureTableMixin.temperature_table">temperature_table</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>)
           –
           <div class="doc-md-description">
             <p>Array of temperatures in Kelvin after conversion.</p>
@@ -18630,7 +18645,7 @@ Accepts <code>"degC"</code>, <code>"degF"</code>, <code>"degR"</code>, or <code>
 <span class="normal">421</span>
 <span class="normal">422</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize temperature table mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">temperature_table</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperature_table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -18787,6 +18802,7 @@ Accepts <code>"degC"</code>, <code>"degF"</code>, <code>"degR"</code>, or <code>
     <ul>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.builder_mixin.BuilderVolumeMixin.volume">volume</span></code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="float">float</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]]</code>)
           –
           <div class="doc-md-description">
             <p>Particle volume in m^3 after conversion.</p>
@@ -18809,7 +18825,7 @@ Accepts <code>"degC"</code>, <code>"degF"</code>, <code>"degR"</code>, or <code>
 <span class="normal">320</span>
 <span class="normal">321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize volume mixin.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">volume</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
