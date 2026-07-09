@@ -30,9 +30,9 @@
 - `test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(device)`
   checks positive attempted counts plus finite, non-negative acceptance
   fractions for the mixed-scale case.
-- `test_mixed_scale_sparse_box_returns_zero_accepted_collisions(device)` covers
-  the fewer-than-two-active-particles edge case without warning-producing
-  divide-by-zero paths.
+- `test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(device, active_indices)`
+  covers the fewer-than-two-active-particles edge case without
+  warning-producing divide-by-zero paths.
 
 ## Shipped P2 Coverage
 
