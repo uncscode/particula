@@ -46,13 +46,25 @@
   `particula/gpu/kernels/tests/coagulation_test.py`, where repeated seeded
   Brownian-rate, conservation, and caller-owned `rng_states` reuse/reset
   coverage now lives.
-- Broader roadmap cleanup or final product-positioning language is still
-  deferred to E3-F2-P4 if needed.
+
+## P4 Shipped State
+
+- Issue #1244 completed the user-facing documentation pass in
+  `docs/Features/Roadmap/data-oriented-gpu.md` without creating a second
+  feature note.
+- The shipped wording now makes the outcome explicit: `E3-F2-P2` landed a
+  bounded selector hardening improvement inside the existing sampler,
+  `E3-F2-P3` supplied the statistical and conservation evidence, and the
+  remaining mixed-scale limitation is still the global `k_max` plus
+  one-thread-per-box acceptance boundary.
+- The roadmap note now names the private fixture/diagnostic helpers and key
+  tests, keeps the exact reproduction commands copy/paste ready, and continues
+  to avoid implying any new public API or implicit CPU/GPU synchronization.
 
 ## Optional Updates
 
-- Add a focused `docs/Features/` note if the selected design needs more space
-  than the roadmap entry allows.
+- Add a focused `docs/Features/` note only if future mixed-scale work outgrows
+  the roadmap entry; issue #1244 fit within the roadmap note.
 - Update `docs/Features/data-containers-and-gpu-foundations.md` only if a public
   diagnostic API is introduced; otherwise preserve existing transfer-boundary
   language.
