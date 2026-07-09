@@ -280,18 +280,28 @@ def brownian_coagulation_kernel(  # noqa: C901
         if collision_count >= collision_capacity or active_count < wp.int32(2):
             break
 
+        rank_i = wp.randi(state, wp.int32(0), active_count)
+        rank_j = wp.randi(state, wp.int32(0), active_count - wp.int32(1))
+        adjusted_rank_j = rank_j
+        if adjusted_rank_j >= rank_i:
+            adjusted_rank_j += wp.int32(1)
+
         selected_i = wp.int32(-1)
         selected_j = wp.int32(-1)
-        for _ in range(n_particles * 2):
-            idx_i = wp.randi(state, wp.int32(0), wp.int32(n_particles))
-            idx_j = wp.randi(state, wp.int32(0), wp.int32(n_particles))
-            if idx_i == idx_j:
+        active_rank = wp.int32(0)
+        # Resolve both active-set ranks in one pass so each scheduled trial does
+        # at most one active scan while still excluding the first selected rank.
+        for p_idx in range(n_particles):
+            if active_flags[box_idx, p_idx] == wp.int32(0):
                 continue
-            if active_flags[box_idx, idx_i] == wp.int32(1) and active_flags[
-                box_idx, idx_j
-            ] == wp.int32(1):
-                selected_i = idx_i
-                selected_j = idx_j
+
+            if active_rank == rank_i:
+                selected_i = wp.int32(p_idx)
+            if active_rank == adjusted_rank_j:
+                selected_j = wp.int32(p_idx)
+
+            active_rank += wp.int32(1)
+            if selected_i >= wp.int32(0) and selected_j >= wp.int32(0):
                 break
 
         if selected_i < wp.int32(0) or selected_j < wp.int32(0):
