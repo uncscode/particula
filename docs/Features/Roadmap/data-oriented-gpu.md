@@ -758,19 +758,58 @@ fixed or explicitly accepted during this epic.
   the seed fixed unless an explicit reset is requested, and graph-captured
   loops should initialize or reset the buffer before capture or before the
   repeated-step loop (see [Random Number Strategy](#random-number-strategy)).
-- **Rejection-sampling acceptance collapse.** The Brownian kernel bounds
-  acceptance with a single `k_max` computed from the min/max radius pair. With
-  NPF clusters and droplets in the same box, `k_max` far exceeds typical pair
-  kernels, acceptance rates collapse, and trial counts explode. Evaluate
-  size-binned majorant kernels or stratified pair sampling for wide size
-  distributions.
+- **Rejection-sampling acceptance collapse.** The Brownian kernel still bounds
+  acceptance with a single global `k_max` computed from the min/max radius
+  pair, and the sampler still executes inside the existing one-thread-per-box
+  kernel. That remaining limit means wide mixed NPF/droplet size distributions
+  can still suffer low acceptance and high trial counts. This issue #1244 note
+  records that shipped `E3-F2-P2` outcome as a bounded selector hardening
+  improvement inside the existing sampler rather than as a new public API, a
+  transfer-path change, or a full mixed-scale acceptance-rate fix.
 
-  Mixed-scale evidence note (issue #1243):
-  `pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale`
-  checks the shipped `E3-F2-P2` bounded selector path on Warp CPU; the seeded
-  101-200 fresh-run characterization measured 139 accepted collisions versus a
-  Brownian expected mean of 143.846 with sigma 11.994 (3-sigma tolerance
-  35.981).
+  The shipped mixed-scale evidence comes from the private test-only fixture and
+  diagnostics in `particula/gpu/kernels/tests/coagulation_test.py`:
+  `_make_mixed_npf_droplet_particle_data()`,
+  `_brownian_coagulation_attempt_diagnostic_kernel(...)`, and
+  `_collect_test_local_attempt_diagnostics(...)`. These helpers stay test-local
+  and do not imply implicit CPU/GPU synchronization or runtime-integrated
+  diagnostics in production paths. The diagnostic interpretation follows the
+  test terminology directly: scheduled trials are the bounded integer-like
+  trials requested by the mirrored sampler, executed trials are the trials that
+  actually run before early exit, accepted collisions are the realized
+  coagulation events, and the Brownian reference uses only active upper-triangle
+  particle pairs to compute `active_pair_count`, expected mean, and the
+  Poisson-style sigma `sqrt(expected_mean)`.
+
+  The main evidence tests are
+  `test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(device)`,
+  `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`,
+  `test_mixed_scale_expected_collision_statistics_use_active_pairs_only()`,
+  `test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(device, active_indices)`,
+  `test_mixed_scale_two_active_particles_accept_the_only_valid_pair(device)`,
+  `test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acceptance_trials(device)`,
+  and
+  `test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(device)`.
+  Across fresh Warp CPU seeds `101-200`, the shipped bounded-selector path
+  produced 139 accepted collisions versus a Brownian expected mean of `143.846`
+  with sigma `11.994` and a 3-sigma tolerance of `35.981`. The same test-local
+  coverage also verifies the active-pairs-only reference calculation, finite
+  zero-acceptance-trial handling, repeated-run total-mass conservation, and
+  caller-owned `rng_states` reuse/reset semantics. Treat this as bounded
+  evidence that the hardening preserved expected Brownian behavior within
+  stochastic tolerance, not as proof that the global-majorant acceptance
+  collapse is solved for every mixed-scale distribution.
+
+  Reproduce the seeded checks with:
+
+  ```bash
+  pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
+  pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
+  ```
+
+  Documentation validation for this note is limited to markdown/path readback
+  plus those focused `pytest` checks; no separate repo-specific docs formatter
+  or link checker is claimed here.
 - **One-thread-per-box coagulation.** The kernel launches one GPU thread per
   box with sequential pair selection inside the thread. This matches the
   multi-box scaling priority but serializes large single-box workloads. Record
