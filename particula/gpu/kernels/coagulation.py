@@ -526,6 +526,42 @@ def _validate_time_step(time_step: float) -> float:
     return time_step_value
 
 
+def _validate_max_collisions(max_collisions: int) -> int:
+    """Validate the supported collision-buffer length before allocation.
+
+    Args:
+        max_collisions: Proposed maximum accepted collisions per box.
+
+    Returns:
+        The validated collision limit as a Python ``int``.
+
+    Raises:
+        ValueError: If ``max_collisions`` is not a supported positive integer.
+    """
+    if isinstance(max_collisions, bool):
+        raise ValueError(
+            "max_collisions must be a positive integer <= 2147483647"
+        )
+
+    try:
+        max_collisions_value = int(max_collisions)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "max_collisions must be a positive integer <= 2147483647"
+        ) from exc
+
+    if (
+        max_collisions_value <= 0
+        or max_collisions_value > np.iinfo(np.int32).max
+        or max_collisions_value != max_collisions
+    ):
+        raise ValueError(
+            "max_collisions must be a positive integer <= 2147483647"
+        )
+
+    return max_collisions_value
+
+
 def _ensure_volume_array(
     volume: float | Any,
     n_boxes: int,
@@ -669,6 +705,7 @@ def coagulation_step_gpu(
     device = particles.masses.device
     _validate_device_arrays(particles, device)
     time_step_value = _validate_time_step(time_step)
+    max_collisions_value = _validate_max_collisions(max_collisions)
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
         pressure=pressure,
@@ -682,7 +719,7 @@ def coagulation_step_gpu(
         volume = particles.volume
     volume_array = _ensure_volume_array(volume, n_boxes, device)
 
-    expected_pairs_shape = (n_boxes, max_collisions, 2)
+    expected_pairs_shape = (n_boxes, max_collisions_value, 2)
     if collision_pairs is None:
         collision_pairs = wp.zeros(
             expected_pairs_shape,
@@ -762,7 +799,7 @@ def coagulation_step_gpu(
 
     wp.launch(
         apply_coagulation_kernel,
-        dim=(n_boxes, max_collisions),
+        dim=(n_boxes, max_collisions_value),
         inputs=[
             particles.masses,
             particles.concentration,

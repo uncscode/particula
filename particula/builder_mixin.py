@@ -29,7 +29,7 @@ class BuilderDensityMixin:
         density: Particle density in kg/m^3 after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize density mixin."""
         self.density = None
 
@@ -66,7 +66,7 @@ class BuilderSurfaceTensionMixin:
         surface_tension: Surface tension in N/m after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize surface tension mixin."""
         self.surface_tension = None
 
@@ -105,7 +105,7 @@ class BuilderSurfaceTensionTableMixin:
         surface_tension_table: Array of surface tension values in N/m.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize surface tension table mixin."""
         self.surface_tension_table = None
 
@@ -144,7 +144,7 @@ class BuilderMolarMassMixin:
         molar_mass: Stored molar mass in kg/mol.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize molar mass mixin."""
         self.molar_mass = None
 
@@ -221,7 +221,7 @@ class BuilderChargeMixin:
         charge: Assigned charge in elemental charge units (dimensionless).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize charge mixin."""
         self.charge = None
 
@@ -252,7 +252,7 @@ class BuilderPhaseIndexMixin:
         phase_index: Array mapping each species to a phase identifier.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize phase index mixin."""
         self.phase_index = None
 

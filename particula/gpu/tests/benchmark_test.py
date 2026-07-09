@@ -112,7 +112,10 @@ if wp is not None:
         mass_transfer_rate_wp,
         particle_radius_from_volume_wp,
     )
-    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+    from particula.gpu.kernels.coagulation import (
+        _initialize_rng_states,
+        coagulation_step_gpu,
+    )
     from particula.gpu.kernels.condensation import condensation_step_gpu
 
 pytestmark = [pytest.mark.slow, pytest.mark.performance, pytest.mark.benchmark]
@@ -464,6 +467,23 @@ def _wp_zeros_with_guard(
         return wp.zeros(shape, dtype=dtype, device=device)
     except (MemoryError, RuntimeError, ValueError) as exc:
         pytest.skip(f"Skipping {label} allocation on {device}: {exc}")
+
+
+def _seed_coagulation_rng_states_once(
+    *,
+    rng_seed: int,
+    rng_states: Any,
+    n_boxes: int,
+    device: str,
+) -> None:
+    """Seed a caller-owned coagulation RNG buffer exactly once."""
+    wp.launch(
+        _initialize_rng_states,
+        dim=n_boxes,
+        inputs=[wp.uint32(rng_seed), rng_states],
+        device=device,
+    )
+    wp.synchronize()
 
 
 @contextmanager
@@ -1437,6 +1457,12 @@ def test_coagulation_scaling(
         device="cuda",
         label=f"{tag} RNG state",
         itemsize=4,
+    )
+    _seed_coagulation_rng_states_once(
+        rng_seed=42,
+        rng_states=rng_states_buf,
+        n_boxes=n_boxes,
+        device="cuda",
     )
 
     def gpu_step() -> None:
