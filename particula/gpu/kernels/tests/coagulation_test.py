@@ -122,6 +122,15 @@ class _CoagulationStepResult:
     rng_states: np.ndarray | None
 
 
+@dataclass(frozen=True)
+class _ExpectedCollisionStatistics:
+    """Brownian repeated-run reference statistics for active particle pairs."""
+
+    expected_mean: float
+    expected_sigma: float
+    active_pair_count: int
+
+
 @wp.kernel
 def _selector_guard_regression_kernel(
     active_flags: Any,
@@ -390,7 +399,7 @@ def _get_expected_collision_statistics(
     temperature: float = 298.15,
     pressure: float = 101325.0,
     volume: float | None = None,
-) -> tuple[float, float]:
+    ) -> _ExpectedCollisionStatistics:
     """Return Brownian expected mean and sigma for seeded repeated runs.
 
     Args:
@@ -401,12 +410,20 @@ def _get_expected_collision_statistics(
         pressure: Gas pressure in Pa.
         volume: Optional scalar box volume override in m^3.
 
+    The reference assumes repeated fresh runs from the same initial particle
+    state, so every trial uses the same active-particle mask and the same
+    unique upper-triangle Brownian pairs.
+
     Returns:
-        Tuple of Brownian expected total-collision mean and Poisson-style sigma
-        for the requested repeated-run setup.
+        Expected total-collision mean, Poisson-style sigma, and the active
+        upper-triangle pair count used by the repeated-run reference.
     """
     density_value = float(np.asarray(particles.density).ravel().item(0))
     masses_slice = np.ravel(np.asarray(particles.masses[0], dtype=np.float64))
+    concentration_slice = np.ravel(
+        np.asarray(particles.concentration[0], dtype=np.float64)
+    )
+    active_mask = concentration_slice > 0.0
     radii = np.cbrt(3.0 * masses_slice / (4.0 * np.pi * density_value))
     kernel_matrix = get_brownian_kernel_via_system_state(
         particle_radius=radii,
@@ -414,9 +431,13 @@ def _get_expected_collision_statistics(
         temperature=temperature,
         pressure=pressure,
     )
-    kernel_values = np.asarray(kernel_matrix, dtype=np.float64)[
-        np.triu_indices(len(radii), k=1)
+    active_kernel_matrix = np.asarray(kernel_matrix, dtype=np.float64)[
+        np.ix_(active_mask, active_mask)
     ]
+    kernel_values = active_kernel_matrix[
+        np.triu_indices(active_kernel_matrix.shape[0], k=1)
+    ]
+    active_pair_count = int(kernel_values.size)
     volume_value = (
         float(np.asarray(particles.volume).ravel().item(0))
         if volume is None
@@ -426,7 +447,30 @@ def _get_expected_collision_statistics(
         np.sum(kernel_values) * time_step * n_trials / volume_value
     )
     expected_sigma = float(np.sqrt(expected_mean))
-    return expected_mean, expected_sigma
+    return _ExpectedCollisionStatistics(
+        expected_mean=expected_mean,
+        expected_sigma=expected_sigma,
+        active_pair_count=active_pair_count,
+    )
+
+
+def _coagulation_outcomes_match(
+    left: _CoagulationStepResult,
+    right: _CoagulationStepResult,
+) -> bool:
+    """Return ``True`` when two seeded coagulation outcomes are identical."""
+    return (
+        np.array_equal(left.collision_counts, right.collision_counts)
+        and np.array_equal(left.collision_pairs, right.collision_pairs)
+        and np.allclose(
+            left.result_particles.masses,
+            right.result_particles.masses,
+        )
+        and np.allclose(
+            left.result_particles.concentration,
+            right.result_particles.concentration,
+        )
+    )
 
 
 def _make_mixed_npf_droplet_particle_data() -> ParticleData:
@@ -2084,25 +2128,70 @@ def test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_
         volume=volume,
     )
     observed_total = int(collision_totals.sum())
-    expected_mean, expected_sigma = _get_expected_collision_statistics(
+    statistics = _get_expected_collision_statistics(
         particles,
         time_step=time_step,
         n_trials=trial_count,
         volume=volume,
     )
     sigma_multiplier = 3.0
-    tolerance = sigma_multiplier * expected_sigma
+    tolerance = sigma_multiplier * statistics.expected_sigma
     message = (
         f"{evaluated_path}: observed_total={observed_total}, "
-        f"expected_mean={expected_mean:.6f}, sigma={expected_sigma:.6f}, "
-        f"tolerance={tolerance:.6f}, trials={trial_count}"
+        f"expected_mean={statistics.expected_mean:.6f}, "
+        f"sigma={statistics.expected_sigma:.6f}, "
+        f"tolerance={tolerance:.6f}, trials={trial_count}, "
+        f"active_pairs={statistics.active_pair_count}"
     )
 
     assert np.isfinite(observed_total), message
     assert observed_total >= 0, message
-    assert observed_total == pytest.approx(expected_mean, abs=tolerance), (
+    assert observed_total == pytest.approx(
+        statistics.expected_mean,
+        abs=tolerance,
+    ), (
         message
     )
+
+
+def test_mixed_scale_expected_collision_statistics_use_active_pairs_only() -> None:
+    """Mixed-scale Brownian reference excludes inactive particles."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    particles.concentration[0, -1] = 0.0
+    time_step = 0.5
+    trial_count = 100
+    volume = 1.0e-10
+
+    statistics = _get_expected_collision_statistics(
+        particles,
+        time_step=time_step,
+        n_trials=trial_count,
+        volume=volume,
+    )
+
+    density_value = float(np.asarray(particles.density).ravel().item(0))
+    masses_slice = np.ravel(np.asarray(particles.masses[0], dtype=np.float64))
+    active_masses = masses_slice[:3]
+    active_radii = np.cbrt(3.0 * active_masses / (4.0 * np.pi * density_value))
+    active_kernel = np.asarray(
+        get_brownian_kernel_via_system_state(
+            particle_radius=active_radii,
+            particle_mass=active_masses,
+            temperature=298.15,
+            pressure=101325.0,
+        ),
+        dtype=np.float64,
+    )
+    expected_mean = float(
+        np.sum(active_kernel[np.triu_indices(len(active_radii), k=1)])
+        * time_step
+        * trial_count
+        / volume
+    )
+
+    assert statistics.active_pair_count == 3
+    assert statistics.expected_mean == pytest.approx(expected_mean)
+    assert statistics.expected_sigma == pytest.approx(np.sqrt(expected_mean))
 
 
 def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
@@ -2451,6 +2540,7 @@ def test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acc
     initial_mass = float(np.sum(particles.masses))
     seed_range = range(101, 201)
     zero_acceptance_trials = 0
+    accepted_collision_trials = 0
 
     for seed in seed_range:
         run_result = _run_seeded_coagulation_step(
@@ -2465,10 +2555,25 @@ def test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acc
         )
         final_mass = float(np.sum(run_result.result_particles.masses))
         npt.assert_allclose(final_mass, initial_mass, rtol=1.0e-12)
-        if int(run_result.collision_counts.sum()) == 0:
+        total_collisions = int(run_result.collision_counts.sum())
+        assert total_collisions >= 0
+        if total_collisions == 0:
             zero_acceptance_trials += 1
+            npt.assert_allclose(
+                run_result.result_particles.masses,
+                particles.masses,
+                rtol=1.0e-12,
+            )
+            npt.assert_allclose(
+                run_result.result_particles.concentration,
+                particles.concentration,
+                rtol=1.0e-12,
+            )
+        else:
+            accepted_collision_trials += 1
 
     assert zero_acceptance_trials > 0
+    assert accepted_collision_trials > 0
 
 
 def test_coagulation_step_gpu_reuses_preallocated_buffers(
@@ -2748,6 +2853,7 @@ def test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(
     """
     particles = _make_mixed_npf_droplet_particle_data()
     rng_seed = 41
+    replay_volume = 1.0e-14
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
     initialize_coagulation_rng_states(rng_seed, rng_states, device=device)
     initial_rng_state = np.asarray(rng_states.numpy(), dtype=np.uint32).copy()
@@ -2758,7 +2864,7 @@ def test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(
         temperature=298.15,
         pressure=101325.0,
         time_step=0.5,
-        volume=1.0e-10,
+        volume=replay_volume,
         max_collisions=8,
         rng_seed=rng_seed,
         rng_states=rng_states,
@@ -2769,16 +2875,30 @@ def test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(
         temperature=298.15,
         pressure=101325.0,
         time_step=0.5,
-        volume=1.0e-10,
+        volume=replay_volume,
         max_collisions=8,
         rng_seed=rng_seed,
         rng_states=rng_states,
+    )
+    replay_result = _run_seeded_coagulation_step(
+        particles,
+        device,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.5,
+        volume=replay_volume,
+        max_collisions=8,
+        rng_seed=rng_seed,
+        rng_states=wp.zeros((1,), dtype=wp.uint32, device=device),
+        initialize_rng=True,
     )
 
     assert first_result.rng_states is not None
     assert second_result.rng_states is not None
     assert not np.array_equal(first_result.rng_states, initial_rng_state)
     assert not np.array_equal(second_result.rng_states, first_result.rng_states)
+    assert _coagulation_outcomes_match(first_result, replay_result)
+    assert not _coagulation_outcomes_match(second_result, replay_result)
 
 
 def test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(
@@ -2797,6 +2917,8 @@ def test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(
 
     initialize_coagulation_rng_states(5, rng_states_a, device=device)
     initialize_coagulation_rng_states(9, rng_states_b, device=device)
+    pre_reset_state_a = np.asarray(rng_states_a.numpy(), dtype=np.uint32).copy()
+    pre_reset_state_b = np.asarray(rng_states_b.numpy(), dtype=np.uint32).copy()
 
     first_result = _run_seeded_coagulation_step(
         particles,
@@ -2825,6 +2947,9 @@ def test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(
 
     assert first_result.rng_states is not None
     assert second_result.rng_states is not None
+    assert not np.array_equal(pre_reset_state_a, pre_reset_state_b)
+    assert not np.array_equal(first_result.rng_states, pre_reset_state_a)
+    assert not np.array_equal(second_result.rng_states, pre_reset_state_b)
     npt.assert_array_equal(first_result.rng_states, second_result.rng_states)
     npt.assert_array_equal(
         first_result.collision_counts,
