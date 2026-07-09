@@ -2,7 +2,7 @@
   "id": "E3-F1",
   "type": "feature",
   "title": "Persist coagulation RNG state across repeated coagulation_step_gpu calls",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -73,11 +73,11 @@
     {
       "id": "E3-F1-P4",
       "title": "Update GPU RNG documentation and graph-capture usage guidance",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-09",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -85,5 +85,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
