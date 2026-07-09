@@ -273,6 +273,9 @@ Additional shipped boundaries:
   `pressure`, and `saturation_ratio`.
 - `WarpGasData.vapor_pressure` is helper state only and has no CPU `GasData`
   field.
+- Coagulation `rng_states` are caller-owned Warp-resident sidecar state only;
+  they are not fields on `ParticleData`, `GasData`, `EnvironmentData`, or any
+  Warp container schema.
 - No hidden CPU↔GPU synchronization occurs inside kernels or runnables.
 
 ## Guidance for current users
