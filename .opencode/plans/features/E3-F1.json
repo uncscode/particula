@@ -11,7 +11,7 @@
   "start_date": "2026-07-08",
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-08",
+  "last_updated": "2026-07-09",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E3-F1/architecture_design.md",
@@ -60,11 +60,11 @@
     {
       "id": "E3-F1-P3",
       "title": "Implement seed-once persisted RNG semantics in coagulation_step_gpu",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-09",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
