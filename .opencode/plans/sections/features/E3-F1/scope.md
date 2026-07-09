@@ -1,10 +1,11 @@
 # Scope
 
-This feature delivers seed-once, persisted RNG semantics for repeated
-`coagulation_step_gpu` calls. It defines a backwards-compatible initialization
-contract for `rng_seed` and optional `rng_states`, adds regression tests proving
-caller-provided RNG buffers are not overwritten every timestep, implements the
-host-side orchestration change, and documents the graph-capture caveat.
+This feature delivers seed-once GPU RNG semantics in phases. The shipped work
+for issue #1236 is limited to the compatibility contract layer: it defines the
+backwards-compatible interaction between `rng_seed`, optional `rng_states`, and
+keyword-only `initialize_rng`, updates host-side orchestration in
+`coagulation_step_gpu`, and adds compatibility coverage. Broader docs and
+benchmark guidance remain follow-up work.
 
 ## In Scope
 
@@ -20,10 +21,8 @@ host-side orchestration change, and documents the graph-capture caveat.
   shape, and device inputs.
 - Add co-located tests in `particula/gpu/kernels/tests/coagulation_test.py` for
   Warp CPU and CUDA-if-available device parametrization.
-- Update benchmark or documentation examples that currently increment
-  `rng_seed` manually when a persistent `rng_states` buffer is available.
-- Document graph-capture guidance: initialize and allocate RNG buffers before
-  capture, then capture only repeated calls that advance existing state.
+- Document the local `coagulation_step_gpu` API contract in the function
+  docstring.
 
 ## Out of Scope
 
@@ -34,3 +33,5 @@ host-side orchestration change, and documents the graph-capture caveat.
   their own co-located tests.
 - Broader RNG policy for non-coagulation GPU kernels unless needed for shared
   documentation consistency.
+- Broader GPU docs, graph-capture guidance, and benchmark comment refreshes in
+  this issue.

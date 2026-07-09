@@ -558,6 +558,11 @@ def coagulation_step_gpu(
 ) -> tuple[Any, Any, Any]:
     """Execute one Brownian coagulation timestep on the GPU.
 
+    Direct temperature and pressure inputs are validated and normalized before
+    volume setup, RNG initialization, or any Warp kernel launch. Caller-owned
+    RNG buffers are reused as-is unless ``initialize_rng=True`` requests an
+    explicit reset from ``rng_seed``.
+
     Args:
         particles: GPU-resident particle data.
         temperature: Direct gas temperature as either a scalar or a Warp array
@@ -585,7 +590,9 @@ def coagulation_step_gpu(
             This mode is supported when both direct inputs are ``None``.
 
     Returns:
-        Tuple of updated particle data, collision pairs, and collision counts.
+        Tuple containing ``particles`` after in-place coagulation, the
+        ``collision_pairs`` buffer for the step, and the ``n_collisions``
+        buffer with per-box accepted collision counts.
 
     Raises:
         ValueError: If array shapes or devices mismatch expectations.

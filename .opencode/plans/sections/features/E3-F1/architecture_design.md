@@ -26,21 +26,22 @@ coagulation_step_gpu(..., rng_states=rng_states)
 
 - **Data Model:** No persistent schema change. RNG state remains a Warp array of
   shape `(n_boxes,)`, dtype `wp.uint32`, on the same device as particle buffers.
-- **API Surface:** `coagulation_step_gpu` keeps existing positional parameters.
-  If a new control is needed, add it as keyword-only after existing keyword-only
-  parameters. The contract must distinguish these cases:
+- **API Surface:** `coagulation_step_gpu` keeps existing positional parameters
+  and now adds keyword-only `initialize_rng: bool = False`. The contract now
+  distinguishes these shipped cases:
   - no `rng_states`: allocate and seed internal state for source-compatible
     single-call behavior;
   - provided `rng_states`: validate and preserve the caller-owned state across
     repeated calls unless explicit initialization is requested;
-  - explicit seed-once setup: expose an initializer/reset helper or equivalent
-    keyword-only initialization path so callers can initialize outside a repeated
-    timestep loop without hidden host inspection of buffer contents;
+  - explicit reset path: callers can pass `initialize_rng=True` with provided
+    `rng_states` to launch `_initialize_rng_states` after validation;
   - caller-supplied `rng_states`: continue to bypass automatic initialization
     unless the caller explicitly invokes the initializer/reset path.
-- **Workflow Hooks:** Tests and documentation become the enforcement mechanism.
-  Benchmarks that currently increment `rng_seed` every step should either adopt
-  seed-once setup or explicitly document why they still vary seeds.
+- **Workflow Hooks:** Compatibility tests in
+  `particula/gpu/kernels/tests/coagulation_test.py` enforce omitted-buffer
+  behavior, caller-owned reuse without implicit reset, explicit reset,
+  wrong-shape/device validation, and no-mutation-on-failure. Broader benchmark
+  and documentation follow-up stays deferred.
 
 ## Validation and Mutation Order
 

@@ -5,10 +5,10 @@ use the existing `*_test.py` convention and must not lower coverage thresholds.
 
 ## Per-Phase Testing Approach
 
-- **P1:** Add compatibility tests around current and chosen API behavior in
-  `particula/gpu/kernels/tests/coagulation_test.py`. Cover omitted
-  `rng_states`, provided `rng_states`, explicit initialization behavior, and
-  invalid inputs that must not mutate RNG buffers.
+- **P1:** Shipped in `particula/gpu/kernels/tests/coagulation_test.py`. Covers
+  omitted `rng_states`, caller-provided `rng_states` reuse without implicit
+  reset, explicit initialization via `initialize_rng=True`, wrong shape/device
+  validation, and invalid inputs that must not mutate RNG buffers.
 - **P2:** Add regression tests proving persistent RNG state advances across
   repeated `coagulation_step_gpu` calls. Tests should compare state snapshots
   after first and second valid calls and verify the second call does not reset to
@@ -25,7 +25,7 @@ use the existing `*_test.py` convention and must not lower coverage thresholds.
 
 - Primary: `particula/gpu/kernels/tests/coagulation_test.py`
 - Supporting device fixture: `particula/gpu/tests/cuda_availability.py`
-- Optional benchmark consistency: `particula/gpu/tests/benchmark_test.py`
+- Deferred follow-up only: `particula/gpu/tests/benchmark_test.py`
 
 ## Coverage and Device Matrix
 

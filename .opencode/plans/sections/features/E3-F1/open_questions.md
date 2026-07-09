@@ -1,19 +1,19 @@
 # Open Questions
 
-Status: reviewed and answered on 2026-07-08.
+Status: reviewed and answered on 2026-07-08; updated after P1 shipped.
 
 ## Resolved Decisions
 
-- Add a documented initializer/reset helper for `rng_states` instead of a new
-  positional argument or ambiguous boolean flag on `coagulation_step_gpu`. This
-  preserves existing positional compatibility and makes repeatable-sequence
-  behavior explicit.
+- Add a keyword-only `initialize_rng: bool = False` flag on
+  `coagulation_step_gpu` rather than a new positional argument or standalone
+  public helper. This preserves positional compatibility while making reset
+  behavior explicit at the entrypoint that owns the launch.
 - Do not add `rng_states` to the return tuple. Callers should retain the buffer
   they pass, matching the current Warp ownership pattern and avoiding a broader
   API shape change.
-- Treat legacy zeroed `rng_states` as invalid unless callers explicitly run the
-  initializer/reset helper. Add a migration note explaining that caller-owned
-  state buffers are no longer implicitly reseeded on every step.
+- Treat caller-provided `rng_states` as caller-owned state: validation happens
+  first, no implicit reset occurs when `initialize_rng=False`, and explicit
+  reset uses `initialize_rng=True` with `rng_seed`.
 - Benchmark code should switch to seed-once semantics for correctness-focused
-  runs. Historical comparability can be preserved by recording `rng_seed` and
-  reset behavior explicitly in benchmark metadata.
+  runs in a later phase. Historical comparability can be preserved by recording
+  `rng_seed` and reset behavior explicitly in benchmark metadata.
