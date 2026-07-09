@@ -35,18 +35,26 @@
     state advancement, preservation of the original caller-owned buffer across
     reused `rng_seed` calls, and valid-then-invalid no-mutation behavior.
 
-- [ ] **E3-F1-P3:** Implement seed-once persisted RNG semantics in coagulation_step_gpu
-  - Issue: TBD | Size: S | Status: Not Started
-  - Depends on: E3-F1-P1 and E3-F1-P2. Implementation should satisfy the locked
-    compatibility contract and the failing repeated-step regressions before any
-    documentation is refreshed.
+- [x] **E3-F1-P3:** Implement seed-once persisted RNG semantics in coagulation_step_gpu
+  - Issue: #1238 | Size: S | Status: Shipped on 2026-07-08
+  - Depends on: E3-F1-P1 and E3-F1-P2. Runtime behavior now matches the locked
+    compatibility contract and the repeated-step regressions shipped earlier.
   - Goal: Broaden the shipped P1 contract into full feature semantics while
     keeping internal allocation-and-seed convenience for callers that omit
     `rng_states`.
-  - Files: `particula/gpu/kernels/coagulation.py`, optional consistency update in
-    `particula/gpu/tests/benchmark_test.py`
-  - Tests: Co-located regression and compatibility tests from P1/P2 pass on Warp
-    CPU and CUDA-if-available.
+  - Files: `particula/gpu/kernels/coagulation.py`,
+    `particula/gpu/tests/benchmark_test.py`,
+    `particula/gpu/tests/benchmark_helpers_test.py`
+  - Shipped details: `coagulation_step_gpu` now initializes RNG state only when
+    `rng_states` is omitted or `initialize_rng=True` is explicitly requested;
+    valid caller-owned buffers persist and advance across repeated valid calls
+    without hidden reseeding; validation-before-mutation ordering was preserved;
+    and the coagulation benchmark helper now reuses a persistent RNG buffer with
+    a constant `rng_seed=42` rather than incrementing the seed across steps.
+  - Tests: Existing P1/P2 kernel regressions remain the runtime acceptance
+    signal, and helper coverage now includes
+    `test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift`
+    to lock the constant-seed persistent-buffer benchmark path.
 
 - [ ] **E3-F1-P4:** Update GPU RNG documentation and graph-capture usage guidance
   - Issue: TBD | Size: XS | Status: Not Started

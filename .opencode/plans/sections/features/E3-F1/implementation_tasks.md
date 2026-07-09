@@ -17,8 +17,8 @@
   without implicit reset unless `initialize_rng=True` is passed.
 - [x] Treat caller-provided `rng_states` as the bypass for automatic
   initialization unless the caller explicitly invokes the initializer/reset path.
-- [ ] Review `particula/gpu/tests/benchmark_test.py` for manual `rng_seed`
-  increments and update to seed-once semantics if the benchmark passes a
+- [x] Review `particula/gpu/tests/benchmark_test.py` for manual `rng_seed`
+  increments and update to seed-once semantics when the benchmark passes a
   persistent `rng_states_buf`.
 
 ## Tooling / Tests

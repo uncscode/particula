@@ -1,6 +1,6 @@
 # Open Questions
 
-Status: reviewed and answered on 2026-07-08; updated after P1 shipped.
+Status: reviewed and answered on 2026-07-08; updated through P3 shipment.
 
 ## Resolved Decisions
 
@@ -17,6 +17,7 @@ Status: reviewed and answered on 2026-07-08; updated after P1 shipped.
 - Keep P2 as a test-only regression phase. The shipped follow-up for issue
   #1237 clarified the persisted-buffer contract through test names, docstrings,
   and assertions rather than changing runtime semantics again.
-- Benchmark code should switch to seed-once semantics for correctness-focused
-  runs in a later phase. Historical comparability can be preserved by recording
-  `rng_seed` and reset behavior explicitly in benchmark metadata.
+- Benchmark code now reuses a persistent `rng_states_buf` with a constant
+  `rng_seed` across repeated coagulation steps. Helper regression coverage locks
+  this path so per-step seed incrementation is not silently reintroduced while
+  the same buffer is reused.
