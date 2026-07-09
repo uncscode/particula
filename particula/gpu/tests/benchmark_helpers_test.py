@@ -91,6 +91,67 @@ def test_benchmark_enabled_detects_opt_in_flag(
     assert module._benchmark_enabled() is True
 
 
+def test_parse_positive_int_env_uses_default_without_override(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Positive-int env helper falls back to the provided default."""
+    monkeypatch.delenv("BENCHMARK_MAX_BYTES", raising=False)
+
+    assert (
+        benchmark_module._parse_positive_int_env("BENCHMARK_MAX_BYTES", 9) == 9
+    )
+
+
+@pytest.mark.parametrize("raw_value", ["0", "-1", "not-an-int"])
+def test_parse_positive_int_env_rejects_invalid_overrides(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+    raw_value: str,
+) -> None:
+    """Positive-int env helper rejects invalid overrides clearly."""
+    monkeypatch.setenv("BENCHMARK_MAX_BYTES", raw_value)
+
+    with pytest.raises(ValueError, match="BENCHMARK_MAX_BYTES"):
+        benchmark_module._parse_positive_int_env("BENCHMARK_MAX_BYTES", 9)
+
+
+def test_sanitize_benchmark_output_name_keeps_filename_only(
+    benchmark_module,
+) -> None:
+    """Benchmark output names are normalized to artifact-safe filenames."""
+    assert (
+        benchmark_module._sanitize_benchmark_output_name(
+            " nested/results.json "
+        )
+        == "results.json"
+    )
+
+
+@pytest.mark.parametrize("raw_value", ["", "   ", ".", ".."])
+def test_sanitize_benchmark_output_name_rejects_empty_candidates(
+    benchmark_module,
+    raw_value: str,
+) -> None:
+    """Benchmark output names must resolve to non-empty filenames."""
+    with pytest.raises(ValueError, match="non-empty filename"):
+        benchmark_module._sanitize_benchmark_output_name(raw_value)
+
+
+def test_get_benchmark_output_path_stays_within_artifact_directory(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Output path resolution keeps overrides rooted in the artifact folder."""
+    monkeypatch.setenv("BENCHMARK_OUTPUT", "../custom.json")
+
+    output_path = benchmark_module._get_benchmark_output_path()
+
+    assert (
+        output_path == benchmark_module.BENCHMARK_ARTIFACT_DIR / "custom.json"
+    )
+
+
 def test_save_results_writes_json_snapshot(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,
@@ -269,6 +330,37 @@ def test_compute_speedup_returns_ratio_and_skips_invalid_data(
 
     with pytest.raises(pytest.skip.Exception, match="Invalid timing data"):
         benchmark_module._compute_speedup(0.0, 2.0)
+
+
+def test_benchmark_budget_helpers_estimate_and_gate_large_cases(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Budget helpers estimate bytes and skip only when limits are exceeded."""
+    condensation_budget = benchmark_module._estimate_condensation_budget(
+        "cond", 2, 3, 4, True
+    )
+    coagulation_budget = benchmark_module._estimate_coagulation_budget(
+        "coag", 2, 3, 4, False
+    )
+
+    assert condensation_budget.label == "cond"
+    assert coagulation_budget.label == "coag"
+    assert condensation_budget.total_bytes > condensation_budget.gpu_bytes > 0
+    assert coagulation_budget.total_bytes > coagulation_budget.cpu_bytes > 0
+
+    monkeypatch.setenv(
+        "BENCHMARK_MAX_BYTES", str(condensation_budget.total_bytes - 1)
+    )
+    with pytest.raises(
+        pytest.skip.Exception, match="exceeding BENCHMARK_MAX_BYTES"
+    ):
+        benchmark_module._validate_benchmark_budget(condensation_budget)
+
+    monkeypatch.setenv(
+        "BENCHMARK_MAX_BYTES", str(condensation_budget.total_bytes)
+    )
+    benchmark_module._validate_benchmark_budget(condensation_budget)
 
 
 def test_benchmark_data_builders_return_expected_shapes(
@@ -639,6 +731,44 @@ def test_wp_zeros_with_guard_skips_allocation_failures(
         )
 
 
+def test_seed_coagulation_rng_states_once_launches_and_synchronizes(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """RNG seeding helper launches exactly once and synchronizes afterward."""
+    events: list[tuple[str, object]] = []
+
+    class _FakeWarp:
+        @staticmethod
+        def uint32(value):
+            return ("uint32", value)
+
+        @staticmethod
+        def launch(kernel, dim, inputs=None, device=None):
+            events.append(("launch", kernel, dim, tuple(inputs or ()), device))
+
+        @staticmethod
+        def synchronize():
+            events.append(("sync", None))
+
+    fake_kernel = object()
+    fake_buffer = object()
+    monkeypatch.setattr(benchmark_module, "wp", _FakeWarp())
+    monkeypatch.setattr(benchmark_module, "_initialize_rng_states", fake_kernel)
+
+    benchmark_module._seed_coagulation_rng_states_once(
+        rng_seed=42,
+        rng_states=fake_buffer,
+        n_boxes=3,
+        device="cuda",
+    )
+
+    assert events == [
+        ("launch", fake_kernel, 3, (("uint32", 42), fake_buffer), "cuda"),
+        ("sync", None),
+    ]
+
+
 def test_benchmark_module_imports_without_warp_when_opted_in(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -975,7 +1105,20 @@ def test_coagulation_scaling_records_cpu_and_gpu_paths(
         ),
     )
     gpu_seeds: list[int] = []
+    seed_calls: list[tuple[int, object, int, str]] = []
     cpu_calls: list[str] = []
+    monkeypatch.setattr(
+        benchmark_module,
+        "_seed_coagulation_rng_states_once",
+        lambda **kwargs: seed_calls.append(
+            (
+                kwargs["rng_seed"],
+                kwargs["rng_states"],
+                kwargs["n_boxes"],
+                kwargs["device"],
+            )
+        ),
+    )
     monkeypatch.setattr(
         benchmark_module,
         "coagulation_step_gpu",
@@ -1020,6 +1163,10 @@ def test_coagulation_scaling_records_cpu_and_gpu_paths(
     benchmark_module.test_coagulation_scaling("case-b", 1, 2, 1, False)
 
     assert gpu_seeds == [42, 42]
+    assert len(seed_calls) == 2
+    assert [call[0] for call in seed_calls] == [42, 42]
+    assert [call[2] for call in seed_calls] == [1, 1]
+    assert [call[3] for call in seed_calls] == ["cuda", "cuda"]
     assert cpu_calls == ["cpu"]
     cpu_entry = benchmark_module._benchmark_results["benchmarks"][
         "coagulation_case-a"
@@ -1072,6 +1219,19 @@ def test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift(
         ),
     )
     gpu_kwargs: list[dict[str, object]] = []
+    seed_calls: list[tuple[int, object, int, str]] = []
+    monkeypatch.setattr(
+        benchmark_module,
+        "_seed_coagulation_rng_states_once",
+        lambda **kwargs: seed_calls.append(
+            (
+                kwargs["rng_seed"],
+                kwargs["rng_states"],
+                kwargs["n_boxes"],
+                kwargs["device"],
+            )
+        ),
+    )
     monkeypatch.setattr(
         benchmark_module,
         "coagulation_step_gpu",
@@ -1101,6 +1261,7 @@ def test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift(
 
     assert len(gpu_kwargs) == 3
     assert [kwargs["rng_seed"] for kwargs in gpu_kwargs] == [42, 42, 42]
+    assert seed_calls == [(42, rng_state_buffer, 1, "cuda")]
     assert all(
         kwargs["rng_states"] is rng_state_buffer for kwargs in gpu_kwargs
     )
