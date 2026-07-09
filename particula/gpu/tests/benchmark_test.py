@@ -113,8 +113,8 @@ if wp is not None:
         particle_radius_from_volume_wp,
     )
     from particula.gpu.kernels.coagulation import (
-        _initialize_rng_states,
         coagulation_step_gpu,
+        initialize_coagulation_rng_states,
     )
     from particula.gpu.kernels.condensation import condensation_step_gpu
 
@@ -477,13 +477,13 @@ def _seed_coagulation_rng_states_once(
     device: str,
 ) -> None:
     """Seed a caller-owned coagulation RNG buffer exactly once."""
-    wp.launch(
-        _initialize_rng_states,
-        dim=n_boxes,
-        inputs=[wp.uint32(rng_seed), rng_states],
+    initialized_states = initialize_coagulation_rng_states(
+        rng_seed=rng_seed,
+        rng_states=rng_states,
         device=device,
     )
-    wp.synchronize()
+    if getattr(initialized_states, "shape", None) != (n_boxes,):
+        raise ValueError("rng_states must keep shape (n_boxes,) after seeding")
 
 
 @contextmanager
@@ -1478,6 +1478,7 @@ def test_coagulation_scaling(
             collision_pairs=collision_pairs_buf,
             n_collisions=n_collisions_buf,
             rng_states=rng_states_buf,
+            initialize_rng=False,
         )
 
     print(

@@ -241,12 +241,14 @@ class ParticleMassRepresentationBuilder(
         )
         activity_strategy = cast(ActivityStrategy, self.activity_strategy)
         surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
+        mass = cast(float | NDArray[np.float64], self.mass)
+        density = cast(float | NDArray[np.float64], self.density)
         return ParticleRepresentation(
             strategy=distribution_strategy,
             activity=activity_strategy,
             surface=surface_strategy,
-            distribution=self.mass,
-            density=self.density,
+            distribution=mass,
+            density=density,
             concentration=self.concentration,  # type: ignore[arg-type]
             charge=self.charge,
         )
@@ -298,12 +300,14 @@ class ParticleRadiusRepresentationBuilder(
         )
         activity_strategy = cast(ActivityStrategy, self.activity_strategy)
         surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
+        radius = cast(float | NDArray[np.float64], self.radius)
+        density = cast(float | NDArray[np.float64], self.density)
         return ParticleRepresentation(
             strategy=distribution_strategy,
             activity=activity_strategy,
             surface=surface_strategy,
-            distribution=self.radius,
-            density=self.density,
+            distribution=radius,
+            density=density,
             concentration=self.concentration,  # type: ignore[arg-type]
             charge=self.charge,
         )
@@ -445,12 +449,13 @@ class PresetParticleRadiusBuilder(
         )
         activity_strategy = cast(ActivityStrategy, self.activity_strategy)
         surface_strategy = cast(SurfaceStrategy, self.surface_strategy)
+        density = cast(float | NDArray[np.float64], self.density)
         return ParticleRepresentation(
             strategy=distribution_strategy,
             activity=activity_strategy,
             surface=surface_strategy,
             distribution=self.radius_bins,
-            density=self.density,
+            density=density,
             concentration=number_concentration,
             charge=self.charge,
         )
@@ -495,12 +500,15 @@ class ResolvedParticleMassRepresentationBuilder(
             A particle representation configured with per-particle masses,
             normalized density and charge inputs, and the stored strategies.
         """
-        number_concentration = np.ones(self.mass.shape[0], dtype=np.float64)
-
-        density = _normalize_resolved_density_input(self.density, self.mass)
-        charge = _normalize_resolved_charge_input(self.charge, self.mass)
-
         self.pre_build_check()
+        mass = cast(NDArray[np.float64], self.mass)
+        density_input = cast(float | NDArray[np.float64], self.density)
+        volume = cast(float, self.volume)
+        number_concentration = np.ones(mass.shape[0], dtype=np.float64)
+
+        density = _normalize_resolved_density_input(density_input, mass)
+        charge = _normalize_resolved_charge_input(self.charge, mass)
+
         distribution_strategy = cast(
             DistributionStrategy, self.distribution_strategy
         )
@@ -510,11 +518,11 @@ class ResolvedParticleMassRepresentationBuilder(
             strategy=distribution_strategy,
             activity=activity_strategy,
             surface=surface_strategy,
-            distribution=self.mass,
+            distribution=mass,
             density=density,
             concentration=number_concentration,
             charge=charge,
-            volume=self.volume,
+            volume=volume,
         )
 
 
@@ -571,15 +579,27 @@ class PresetResolvedParticleMassBuilder(
             A particle representation whose per-particle masses are sampled
             from the configured lognormal distribution.
         """
+        self.pre_build_check()
+        mode = cast(NDArray[np.float64], self.mode)
+        geometric_standard_deviation = cast(
+            NDArray[np.float64], self.geometric_standard_deviation
+        )
+        number_concentration_input = cast(
+            NDArray[np.float64], self.number_concentration
+        )
+        particle_resolved_count = cast(int, self.particle_resolved_count)
+        density_input = cast(float | NDArray[np.float64], self.density)
+        volume = cast(float, self.volume)
+
         resolved_radii = get_lognormal_sample_distribution(
-            mode=self.mode,
-            geometric_standard_deviation=self.geometric_standard_deviation,
-            number_of_particles=self.number_concentration,
-            number_of_samples=self.particle_resolved_count,
+            mode=mode,
+            geometric_standard_deviation=geometric_standard_deviation,
+            number_of_particles=number_concentration_input,
+            number_of_samples=particle_resolved_count,
         )
         # convert radii to masses
         resolved_masses = np.asarray(
-            4 / 3 * np.pi * resolved_radii**3 * self.density,
+            4 / 3 * np.pi * resolved_radii**3 * density_input,
             dtype=np.float64,
         )
         number_concentration = np.ones(
@@ -588,7 +608,7 @@ class PresetResolvedParticleMassBuilder(
         )
 
         density = _normalize_resolved_density_input(
-            self.density, resolved_masses
+            density_input, resolved_masses
         )
         charge = _normalize_resolved_charge_input(self.charge, resolved_masses)
         if (
@@ -599,7 +619,6 @@ class PresetResolvedParticleMassBuilder(
         ):
             charge = np.zeros(number_concentration.size, dtype=np.float64)
 
-        self.pre_build_check()
         distribution_strategy = cast(
             DistributionStrategy, self.distribution_strategy
         )
@@ -613,5 +632,5 @@ class PresetResolvedParticleMassBuilder(
             density=density,
             concentration=number_concentration,
             charge=charge,
-            volume=self.volume,
+            volume=volume,
         )

@@ -15,7 +15,7 @@ masses in-place.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from typing import TYPE_CHECKING, Any, no_type_check
+from typing import TYPE_CHECKING, Any, cast, no_type_check
 
 import numpy as np
 
@@ -60,6 +60,9 @@ from particula.gpu.properties.particle_properties import (
 )
 
 
+MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
+
+
 @no_type_check
 @wp.kernel
 # type: ignore[misc]
@@ -99,6 +102,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     collision_pairs: Any,
     n_collisions: Any,
     rng_states: Any,
+    collision_capacity: Any,
 ) -> None:
     """Select stochastic coagulation pairs for each box.
 
@@ -127,6 +131,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         rng_states: Per-box RNG states ``(n_boxes,)`` mutated in place during
             pair selection. Reusing this buffer across calls preserves
             caller-owned persistent state unless it is reset before launch.
+        collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
 
@@ -259,7 +264,6 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    max_collisions = collision_pairs.shape[1]
     collision_count = wp.int32(0)
     state = rng_states[box_idx]
 
@@ -267,13 +271,14 @@ def brownian_coagulation_kernel(  # noqa: C901
     remainder = expected_trials - wp.float64(tests)
     if wp.randf(state) < remainder:
         tests += wp.int32(1)
+    rng_states[box_idx] = state
 
     if tests <= wp.int32(0):
         n_collisions[box_idx] = wp.int32(0)
         return
 
     for _ in range(tests):
-        if collision_count >= max_collisions or active_count < wp.int32(2):
+        if collision_count >= collision_capacity or active_count < wp.int32(2):
             break
 
         selected_i = wp.int32(-1)
@@ -502,7 +507,7 @@ def _validate_rng_states(
     _validate_device_match("rng_states buffer", rng_states, expected_device)
 
 
-def _validate_time_step(time_step: float) -> float:
+def _validate_time_step(time_step: object) -> float:
     """Validate the coagulation time step before any mutation.
 
     Args:
@@ -518,7 +523,7 @@ def _validate_time_step(time_step: float) -> float:
         raise ValueError("time_step must be finite and nonnegative")
 
     try:
-        time_step_value = float(time_step)
+        time_step_value = float(cast(Any, time_step))
     except (TypeError, ValueError) as exc:
         raise ValueError("time_step must be finite and nonnegative") from exc
 
@@ -528,7 +533,7 @@ def _validate_time_step(time_step: float) -> float:
     return time_step_value
 
 
-def _validate_max_collisions(max_collisions: int) -> int:
+def _validate_max_collisions(max_collisions: object) -> int:
     """Validate the supported collision-buffer length before allocation.
 
     Args:
@@ -546,7 +551,7 @@ def _validate_max_collisions(max_collisions: int) -> int:
         )
 
     try:
-        max_collisions_value = int(max_collisions)
+        max_collisions_value = int(cast(Any, max_collisions))
     except (TypeError, ValueError) as exc:
         raise ValueError(
             "max_collisions must be a positive integer <= 2147483647"
@@ -562,6 +567,78 @@ def _validate_max_collisions(max_collisions: int) -> int:
         )
 
     return max_collisions_value
+
+
+def _resolve_collision_capacity(
+    max_collisions: object,
+    n_boxes: int,
+    n_particles: int,
+) -> int:
+    """Resolve a bounded accepted-collision capacity for one call.
+
+    Args:
+        max_collisions: Requested maximum collisions per box.
+        n_boxes: Number of boxes in the current launch.
+        n_particles: Number of particles per box.
+
+    Returns:
+        Effective accepted-collision capacity per box.
+
+    Notes:
+        Accepted collisions cannot exceed ``n_particles // 2`` because each
+        accepted collision removes two active particles from the candidate set.
+        Allocation is also bounded by an explicit buffer-byte budget so invalid
+        requests cannot trigger unbounded internal allocation.
+    """
+    requested_capacity = _validate_max_collisions(max_collisions)
+    physical_capacity = max(1, n_particles // 2)
+    bytes_per_box_collision = 2 * np.dtype(np.int32).itemsize
+    budget_capacity = max(
+        1,
+        MAX_COLLISION_PAIR_BUFFER_BYTES // max(1, n_boxes * bytes_per_box_collision),
+    )
+    return min(requested_capacity, physical_capacity, budget_capacity)
+
+
+def initialize_coagulation_rng_states(
+    rng_seed: int,
+    rng_states: Any,
+    *,
+    device: Any | None = None,
+) -> Any:
+    """Initialize a caller-owned coagulation RNG state buffer from a seed.
+
+    Args:
+        rng_seed: Seed used to initialize the per-box Warp RNG state.
+        rng_states: Caller-owned ``(n_boxes,)`` buffer with dtype ``wp.uint32``.
+        device: Optional Warp device override. When omitted, uses
+            ``rng_states.device``.
+
+    Returns:
+        The same ``rng_states`` buffer after in-place initialization.
+
+    Raises:
+        ValueError: If ``rng_states`` is not a one-dimensional ``wp.uint32``
+            buffer or if the provided device mismatches the buffer device.
+    """
+    if len(rng_states.shape) != 1:
+        raise ValueError("rng_states must have shape (n_boxes,)")
+    if rng_states.dtype != wp.uint32:
+        raise ValueError("rng_states buffer must use dtype uint32")
+
+    resolved_device = getattr(rng_states, "device", None)
+    if device is None:
+        device = resolved_device
+    _validate_device_match("rng_states buffer", rng_states, device)
+
+    wp.launch(
+        _initialize_rng_states,
+        dim=rng_states.shape[0],
+        inputs=[wp.uint32(rng_seed), rng_states],
+        device=device,
+    )
+    wp.synchronize()
+    return rng_states
 
 
 def _ensure_volume_array(
@@ -615,9 +692,9 @@ def coagulation_step_gpu(
     particles: Any,
     temperature: float | Any | None,
     pressure: float | Any | None,
-    time_step: float,
+    time_step: object,
     volume: float | Any | None = None,
-    max_collisions: int = 256,
+    max_collisions: object = 256,
     rng_seed: int = 0,
     collision_pairs: Any | None = None,
     n_collisions: Any | None = None,
@@ -719,7 +796,6 @@ def coagulation_step_gpu(
     device = particles.masses.device
     _validate_device_arrays(particles, device)
     time_step_value = _validate_time_step(time_step)
-    max_collisions_value = _validate_max_collisions(max_collisions)
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
         pressure=pressure,
@@ -733,36 +809,55 @@ def coagulation_step_gpu(
         volume = particles.volume
     volume_array = _ensure_volume_array(volume, n_boxes, device)
 
+    max_collisions_value = _resolve_collision_capacity(
+        max_collisions=max_collisions,
+        n_boxes=n_boxes,
+        n_particles=n_particles,
+    )
+
     expected_pairs_shape = (n_boxes, max_collisions_value, 2)
+    if collision_pairs is not None:
+        if collision_pairs.shape[0] != n_boxes or collision_pairs.shape[2] != 2:
+            raise ValueError(
+                "collision_pairs shape must match (n_boxes, *, 2)"
+            )
+        if collision_pairs.shape[1] < max_collisions_value:
+            raise ValueError(
+                "collision_pairs capacity is smaller than the effective "
+                "max_collisions bound"
+            )
+        if collision_pairs.dtype != wp.int32:
+            raise ValueError("collision_pairs buffer must use dtype int32")
+        _validate_device_match("collision_pairs buffer", collision_pairs, device)
+
+    expected_counts_shape = (n_boxes,)
+    if n_collisions is not None:
+        _validate_collision_counts(n_collisions, expected_counts_shape, device)
+
+    initialize_rng_states_for_call = rng_states is None
+    if rng_states is not None:
+        _validate_rng_states(rng_states, expected_counts_shape, device)
+        initialize_rng_states_for_call = initialize_rng
+
     if collision_pairs is None:
         collision_pairs = wp.zeros(
             expected_pairs_shape,
             dtype=wp.int32,
             device=device,
         )
-    else:
-        _validate_collision_pairs(collision_pairs, expected_pairs_shape, device)
-
-    expected_counts_shape = (n_boxes,)
     if n_collisions is None:
         n_collisions = wp.zeros(
             expected_counts_shape,
             dtype=wp.int32,
             device=device,
         )
-    else:
-        _validate_collision_counts(n_collisions, expected_counts_shape, device)
 
-    initialize_rng_states_for_call = rng_states is None
     if rng_states is None:
         rng_states = wp.zeros(
             expected_counts_shape,
             dtype=wp.uint32,
             device=device,
         )
-    else:
-        _validate_rng_states(rng_states, expected_counts_shape, device)
-        initialize_rng_states_for_call = initialize_rng
 
     radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     diffusivities = wp.zeros(
@@ -775,10 +870,9 @@ def coagulation_step_gpu(
     )
 
     if initialize_rng_states_for_call:
-        wp.launch(
-            _initialize_rng_states,
-            dim=n_boxes,
-            inputs=[wp.uint32(rng_seed), rng_states],
+        initialize_coagulation_rng_states(
+            rng_seed=rng_seed,
+            rng_states=rng_states,
             device=device,
         )
 
@@ -807,6 +901,7 @@ def coagulation_step_gpu(
             collision_pairs,
             n_collisions,
             rng_states,
+            wp.int32(max_collisions_value),
         ],
         device=device,
     )

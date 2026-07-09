@@ -4,6 +4,7 @@ from particula.gpu.kernels.coagulation import (
     apply_coagulation_kernel,
     brownian_coagulation_kernel,
     coagulation_step_gpu,
+    initialize_coagulation_rng_states,
 )
 from particula.gpu.kernels.condensation import (
     apply_mass_transfer_kernel,
@@ -18,4 +19,5 @@ __all__ = [
     "coagulation_step_gpu",
     "condensation_mass_transfer_kernel",
     "condensation_step_gpu",
+    "initialize_coagulation_rng_states",
 ]
