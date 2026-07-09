@@ -39,6 +39,9 @@ from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
     g_collection_term_wp,
     particle_mean_free_path_wp,
 )
+from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
+    particle_radius_from_volume_wp,
+)
 from particula.gpu.kernels.coagulation import (  # noqa: E402
     _ensure_volume_array,
     _initialize_rng_states,
@@ -189,6 +192,336 @@ def _accumulate_collision_counts(
     return total_counts
 
 
+def _make_mixed_npf_droplet_particle_data() -> ParticleData:
+    """Build a deterministic mixed nanometer/droplet particle fixture."""
+    density = np.array([1000.0], dtype=np.float64)
+    radii = np.array([[1.5e-9, 2.0e-9, 1.0e-5, 1.5e-5]], dtype=np.float64)
+    total_volume = (4.0 / 3.0) * np.pi * radii**3
+    masses = (total_volume * density[0])[..., np.newaxis]
+    return ParticleData(
+        masses=masses,
+        concentration=np.array([[150.0, 200.0, 1.0, 0.8]], dtype=np.float64),
+        charge=np.array([[0.0, 0.0, 1.0, -1.0]], dtype=np.float64),
+        density=density,
+        volume=np.array([2.0e-6], dtype=np.float64),
+    )
+
+
+@wp.kernel
+def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    volume: Any,
+    temperature: Any,
+    pressure: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    time_step: Any,
+    radii: Any,
+    diffusivities: Any,
+    g_terms: Any,
+    speeds: Any,
+    active_flags: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    attempted_counts: Any,
+    rng_states: Any,
+    collision_capacity: Any,
+) -> None:
+    """Mirror the production sampler and expose rounded attempt counts."""
+    box_idx = wp.tid()
+    n_particles = masses.shape[1]
+    n_species = masses.shape[2]
+
+    temperature_value = temperature[box_idx]
+    pressure_value = pressure[box_idx]
+
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature_value,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    mean_free_path = molecule_mean_free_path_wp(
+        molecular_weight_air,
+        temperature_value,
+        pressure_value,
+        dynamic_viscosity,
+        gas_constant,
+    )
+
+    active_count = wp.int32(0)
+    attempted_counts[box_idx] = wp.int32(0)
+    for particle_idx in range(n_particles):
+        if concentration[box_idx, particle_idx] <= wp.float64(0.0):
+            active_flags[box_idx, particle_idx] = wp.int32(0)
+            radii[box_idx, particle_idx] = wp.float64(0.0)
+            diffusivities[box_idx, particle_idx] = wp.float64(0.0)
+            g_terms[box_idx, particle_idx] = wp.float64(0.0)
+            speeds[box_idx, particle_idx] = wp.float64(0.0)
+            continue
+
+        total_mass = wp.float64(0.0)
+        total_volume = wp.float64(0.0)
+        for species_idx in range(n_species):
+            species_mass = masses[box_idx, particle_idx, species_idx]
+            total_mass += species_mass
+            total_volume += species_mass / density[species_idx]
+
+        if total_volume <= wp.float64(0.0) or total_mass <= wp.float64(0.0):
+            active_flags[box_idx, particle_idx] = wp.int32(0)
+            radii[box_idx, particle_idx] = wp.float64(0.0)
+            diffusivities[box_idx, particle_idx] = wp.float64(0.0)
+            g_terms[box_idx, particle_idx] = wp.float64(0.0)
+            speeds[box_idx, particle_idx] = wp.float64(0.0)
+            continue
+
+        radius = particle_radius_from_volume_wp(total_volume)
+        knudsen = knudsen_number_wp(mean_free_path, radius)
+        slip = cunningham_slip_correction_wp(knudsen)
+        mobility = aerodynamic_mobility_wp(radius, slip, dynamic_viscosity)
+        diffusivity = brownian_diffusivity_wp(
+            temperature_value, mobility, boltzmann_constant
+        )
+        speed = mean_thermal_speed_wp(
+            total_mass, temperature_value, boltzmann_constant
+        )
+        particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
+        g_term = g_collection_term_wp(particle_mean_free_path, radius)
+
+        active_flags[box_idx, particle_idx] = wp.int32(1)
+        radii[box_idx, particle_idx] = radius
+        diffusivities[box_idx, particle_idx] = diffusivity
+        g_terms[box_idx, particle_idx] = g_term
+        speeds[box_idx, particle_idx] = speed
+        active_count += wp.int32(1)
+
+    if active_count < wp.int32(2):
+        n_collisions[box_idx] = wp.int32(0)
+        return
+
+    r_min = wp.float64(1.0e30)
+    r_max = wp.float64(0.0)
+    idx_min = wp.int32(-1)
+    idx_max = wp.int32(-1)
+    for p_idx in range(n_particles):
+        if active_flags[box_idx, p_idx] == wp.int32(0):
+            continue
+        r_p = radii[box_idx, p_idx]
+        if r_p < r_min:
+            r_min = r_p
+            idx_min = wp.int32(p_idx)
+        if r_p > r_max:
+            r_max = r_p
+            idx_max = wp.int32(p_idx)
+
+    k_max = wp.float64(0.0)
+    if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
+        if idx_min == idx_max:
+            for p_idx in range(n_particles):
+                if (
+                    active_flags[box_idx, p_idx] == wp.int32(1)
+                    and wp.int32(p_idx) != idx_min
+                ):
+                    idx_max = wp.int32(p_idx)
+                    break
+        k_max = brownian_kernel_pair_wp(
+            radii[box_idx, idx_min],
+            radii[box_idx, idx_max],
+            diffusivities[box_idx, idx_min],
+            diffusivities[box_idx, idx_max],
+            g_terms[box_idx, idx_min],
+            g_terms[box_idx, idx_max],
+            speeds[box_idx, idx_min],
+            speeds[box_idx, idx_max],
+            wp.float64(1.0),
+        )
+
+    if k_max <= wp.float64(0.0):
+        n_collisions[box_idx] = wp.int32(0)
+        return
+
+    possible_pairs = (
+        wp.float64(active_count)
+        * wp.float64(active_count - 1)
+        / wp.float64(2.0)
+    )
+    expected_trials = k_max * possible_pairs * time_step / volume[box_idx]
+    if expected_trials <= wp.float64(0.0):
+        n_collisions[box_idx] = wp.int32(0)
+        return
+
+    collision_count = wp.int32(0)
+    state = rng_states[box_idx]
+
+    tests = wp.int32(expected_trials)
+    remainder = expected_trials - wp.float64(tests)
+    if wp.randf(state) < remainder:
+        tests += wp.int32(1)
+    attempted_counts[box_idx] = tests
+    rng_states[box_idx] = state
+
+    if tests <= wp.int32(0):
+        n_collisions[box_idx] = wp.int32(0)
+        return
+
+    for _ in range(tests):
+        if collision_count >= collision_capacity or active_count < wp.int32(2):
+            break
+
+        selected_i = wp.int32(-1)
+        selected_j = wp.int32(-1)
+        for _ in range(n_particles * 2):
+            idx_i = wp.randi(state, wp.int32(0), wp.int32(n_particles))
+            idx_j = wp.randi(state, wp.int32(0), wp.int32(n_particles))
+            if idx_i == idx_j:
+                continue
+            if active_flags[box_idx, idx_i] == wp.int32(1) and active_flags[
+                box_idx, idx_j
+            ] == wp.int32(1):
+                selected_i = idx_i
+                selected_j = idx_j
+                break
+
+        if selected_i < wp.int32(0) or selected_j < wp.int32(0):
+            break
+
+        if selected_j < selected_i:
+            temp_idx = selected_i
+            selected_i = selected_j
+            selected_j = temp_idx
+
+        kernel_value = brownian_kernel_pair_wp(
+            radii[box_idx, selected_i],
+            radii[box_idx, selected_j],
+            diffusivities[box_idx, selected_i],
+            diffusivities[box_idx, selected_j],
+            g_terms[box_idx, selected_i],
+            g_terms[box_idx, selected_j],
+            speeds[box_idx, selected_i],
+            speeds[box_idx, selected_j],
+            wp.float64(1.0),
+        )
+        if kernel_value <= wp.float64(0.0):
+            continue
+
+        if wp.randf(state) < kernel_value / k_max:
+            collision_pairs[box_idx, collision_count, 0] = selected_i
+            collision_pairs[box_idx, collision_count, 1] = selected_j
+            collision_count += wp.int32(1)
+            active_flags[box_idx, selected_i] = wp.int32(0)
+            active_flags[box_idx, selected_j] = wp.int32(0)
+            active_count -= wp.int32(2)
+
+    n_collisions[box_idx] = collision_count
+    rng_states[box_idx] = state
+
+
+def _collect_test_local_attempt_diagnostics(
+    particles: ParticleData,
+    device: str,
+    *,
+    time_step: float,
+    max_collisions: int,
+    rng_seed: int,
+    temperature: float = 298.15,
+    pressure: float = 101325.0,
+    volume: float | np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Run the mirrored sampler once and compare against production counts."""
+    n_boxes, n_particles, _ = particles.masses.shape
+    collision_capacity = _resolve_collision_capacity(
+        max_collisions=max_collisions,
+        n_boxes=n_boxes,
+        n_particles=n_particles,
+    )
+
+    diagnostic_particles = to_warp_particle_data(particles, device=device)
+    temperature_array = wp.array(
+        np.full((n_boxes,), temperature, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    pressure_array = wp.array(
+        np.full((n_boxes,), pressure, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    volume_source = particles.volume if volume is None else volume
+    volume_array = _ensure_volume_array(volume_source, n_boxes, device)
+    radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    diffusivities = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.float64, device=device
+    )
+    g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    active_flags = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.int32, device=device
+    )
+    collision_pairs = wp.zeros(
+        (n_boxes, collision_capacity, 2), dtype=wp.int32, device=device
+    )
+    n_collisions = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
+    attempted_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
+    rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
+    initialize_coagulation_rng_states(rng_seed, rng_states, device=device)
+
+    wp.launch(
+        _brownian_coagulation_attempt_diagnostic_kernel,
+        dim=(n_boxes,),
+        inputs=[
+            diagnostic_particles.masses,
+            diagnostic_particles.concentration,
+            diagnostic_particles.density,
+            volume_array,
+            temperature_array,
+            pressure_array,
+            wp.float64(constants.GAS_CONSTANT),
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+            wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+            wp.float64(constants.REF_VISCOSITY_AIR_STP),
+            wp.float64(constants.REF_TEMPERATURE_STP),
+            wp.float64(constants.SUTHERLAND_CONSTANT),
+            wp.float64(time_step),
+            radii,
+            diffusivities,
+            g_terms,
+            speeds,
+            active_flags,
+            collision_pairs,
+            n_collisions,
+            attempted_counts,
+            rng_states,
+            wp.int32(collision_capacity),
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    production_particles = to_warp_particle_data(particles, device=device)
+    _, _, production_counts = coagulation_step_gpu(
+        production_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=time_step,
+        volume=volume_source,
+        max_collisions=max_collisions,
+        rng_seed=rng_seed,
+    )
+    wp.synchronize()
+
+    return (
+        np.asarray(attempted_counts.numpy(), dtype=np.int64),
+        np.asarray(n_collisions.numpy(), dtype=np.int64),
+        np.asarray(production_counts.numpy(), dtype=np.int64),
+    )
+
+
 @wp.kernel
 def _draw_single_random_kernel(rng_states: Any, draws: Any) -> None:
     """Draw one random float from each RNG state for deterministic probing."""
@@ -249,6 +582,48 @@ def test_coagulation_step_gpu_omitted_rng_states_keeps_legacy_behavior(
     assert collision_pairs.shape == (1, 2, 2)
     assert collision_counts.shape == (1,)
     assert np.all(np.asarray(collision_counts.numpy()) >= 0)
+
+
+def test_mixed_npf_droplet_fixture_returns_float64_particle_data() -> None:
+    """The mixed-scale fixture exposes canonical float64 particle data."""
+    particles = _make_mixed_npf_droplet_particle_data()
+
+    assert particles.masses.shape == (1, 4, 1)
+    assert particles.concentration.shape == (1, 4)
+    assert particles.charge.shape == (1, 4)
+    assert particles.density.shape == (1,)
+    assert particles.volume.shape == (1,)
+    assert particles.masses.dtype == np.float64
+    assert particles.concentration.dtype == np.float64
+    assert particles.charge.dtype == np.float64
+    assert particles.density.dtype == np.float64
+    assert particles.volume.dtype == np.float64
+
+    density_value = float(particles.density[0])
+    radii = np.cbrt(
+        3.0 * particles.masses[:, :, 0] / (4.0 * np.pi * density_value)
+    )
+    assert np.min(radii) < 1.0e-8
+    assert np.max(radii) > 1.0e-6
+    assert np.min(particles.masses[:, :, 0]) < 1.0e-20
+    assert np.max(particles.masses[:, :, 0]) > 1.0e-12
+
+
+@pytest.mark.parametrize("device", warp_devices(wp))
+def test_mixed_npf_droplet_fixture_converts_on_supported_warp_devices(
+    device: str,
+) -> None:
+    """The mixed-scale fixture converts cleanly on supported Warp devices."""
+    particles = _make_mixed_npf_droplet_particle_data()
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    restored = from_warp_particle_data(gpu_particles, sync=True)
+
+    npt.assert_allclose(restored.masses, particles.masses)
+    npt.assert_allclose(restored.concentration, particles.concentration)
+    npt.assert_allclose(restored.charge, particles.charge)
+    npt.assert_allclose(restored.density, particles.density)
+    npt.assert_allclose(restored.volume, particles.volume)
 
 
 @pytest.mark.parametrize(
@@ -1226,6 +1601,92 @@ def test_coagulation_step_gpu_nonuniform_arrays_keep_single_active_box_idle(
 
     assert result.shape == (2,)
     assert result[1] == 0
+
+
+def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
+    device: str,
+) -> None:
+    """Mixed-scale diagnostics expose rounded attempts and accepted counts."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    attempted_counts, accepted_counts, production_counts = (
+        _collect_test_local_attempt_diagnostics(
+            particles,
+            device,
+            time_step=0.5,
+            max_collisions=8,
+            rng_seed=41,
+            volume=1.0e-14,
+        )
+    )
+
+    assert attempted_counts.shape == (1,)
+    assert accepted_counts.shape == (1,)
+    assert production_counts.shape == (1,)
+    assert np.issubdtype(attempted_counts.dtype, np.integer)
+    assert np.issubdtype(accepted_counts.dtype, np.integer)
+    assert np.all(np.isfinite(attempted_counts))
+    assert np.all(np.isfinite(accepted_counts))
+    assert np.all(attempted_counts >= 0)
+    assert np.all(attempted_counts >= accepted_counts)
+    npt.assert_array_equal(accepted_counts, production_counts)
+
+
+def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
+    device: str,
+) -> None:
+    """Mixed-scale acceptance fractions stay finite for seeded diagnostics."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    attempted_counts, accepted_counts, _ = (
+        _collect_test_local_attempt_diagnostics(
+            particles,
+            device,
+            time_step=0.5,
+            max_collisions=8,
+            rng_seed=41,
+            volume=1.0e-14,
+        )
+    )
+
+    acceptance_fraction = np.divide(
+        accepted_counts,
+        attempted_counts,
+        out=np.zeros_like(accepted_counts, dtype=np.float64),
+        where=attempted_counts > 0,
+    )
+
+    assert np.all(attempted_counts > 0)
+    assert np.all(np.isfinite(acceptance_fraction))
+    assert np.all(acceptance_fraction >= 0.0)
+
+
+def test_mixed_scale_sparse_box_returns_zero_accepted_collisions(
+    device: str,
+) -> None:
+    """Sparse mixed-scale boxes keep diagnostics finite and accepted counts zero."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    particles.concentration[0, 1:] = 0.0
+    attempted_counts, accepted_counts, production_counts = (
+        _collect_test_local_attempt_diagnostics(
+            particles,
+            device,
+            time_step=0.5,
+            max_collisions=8,
+            rng_seed=41,
+            volume=1.0e-14,
+        )
+    )
+    acceptance_fraction = np.divide(
+        accepted_counts,
+        attempted_counts,
+        out=np.zeros_like(accepted_counts, dtype=np.float64),
+        where=attempted_counts > 0,
+    )
+
+    npt.assert_array_equal(accepted_counts, np.array([0], dtype=np.int64))
+    npt.assert_array_equal(production_counts, np.array([0], dtype=np.int64))
+    assert np.all(np.isfinite(attempted_counts))
+    assert np.all(attempted_counts >= 0)
+    assert np.all(np.isfinite(acceptance_fraction))
 
 
 def test_coagulation_mass_conservation(device: str) -> None:
