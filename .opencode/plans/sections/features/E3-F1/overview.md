@@ -11,20 +11,20 @@ re-seeding inside a captured step can freeze the RNG sequence.
 
 ## Value Proposition
 
-This feature makes GPU coagulation RNG behavior match caller expectations:
-callers can seed once, retain `rng_states`, and let repeated
-`coagulation_step_gpu` calls advance per-box RNG state without host-managed seed
-increments. It improves stochastic correctness, simplifies benchmark and
-simulation loops, and prepares the coagulation kernel path for graph-capture
-friendly execution.
+This feature hardens the GPU coagulation RNG API in stages. The shipped first
+phase locks the compatibility contract so callers can distinguish between
+legacy omitted-`rng_states` behavior, caller-owned reusable buffers, and an
+explicit reset path via `initialize_rng=True`. That removes ambiguity before
+later phases broaden repeated-step semantics, benchmark updates, and GPU docs.
 
 ## User Stories
 
-- As a simulation author, I want to initialize coagulation RNG state once so
-  repeated GPU timesteps produce uncorrelated stochastic draws without manual
-  seed bookkeeping.
+- As a simulation author, I want caller-provided `rng_states` to avoid implicit
+  reset unless I explicitly request it, so repeated GPU timesteps keep a stable
+  low-level ownership contract.
 - As a benchmark maintainer, I want reusable `rng_states` buffers to persist and
-  advance so timing loops exercise realistic timestep behavior.
+  avoid implicit reset so compatibility tests can protect current behavior
+  before any broader benchmark guidance changes.
 - As a GPU workflow developer, I want initialization separated from repeated
   timestep execution so graph-captured loops do not re-seed inside the graph.
 
