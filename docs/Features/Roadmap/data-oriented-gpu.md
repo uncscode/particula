@@ -744,23 +744,20 @@ Planned features:
 
 **Exit bar:** A new user can run both kernels from the docs on a CUDA device
 and on Warp CPU without reading source, repeated coagulation steps draw
-uncorrelated samples without manual re-seeding, the device-aware test policy
-plus parity tolerances are recorded, and the deferred E1 latent-heat example
-and integration-conservation case have landed.
+uncorrelated samples from a caller-initialized persistent RNG buffer, the
+device-aware test policy plus parity tolerances are recorded, and the deferred
+E1 latent-heat example and integration-conservation case have landed.
 
 ### Known Kernel Issues
 
 Concrete defects and design limits in the existing kernels that should be
 fixed or explicitly accepted during this epic.
 
-- **RNG re-initialization per call.** `coagulation_step_gpu` re-launches the
-  RNG initialization kernel on every call, overwriting persisted state.
-  Identical seeds across timesteps produce correlated draws, and callers must
-  manually increment seeds per step. Fix by seeding once and persisting
-  per-box RNG state in a reusable buffer across timesteps (see
-  [Random Number Strategy](#random-number-strategy)); this also matters for
-  graph capture, where re-seeding inside a captured graph would freeze the
-  seed.
+- **RNG state ownership.** `coagulation_step_gpu` seeds once and reuses a
+  caller-owned per-box RNG buffer across timesteps. Repeated calls should keep
+  the seed fixed unless an explicit reset is requested, and graph-captured
+  loops should initialize or reset the buffer before capture or before the
+  repeated-step loop (see [Random Number Strategy](#random-number-strategy)).
 - **Rejection-sampling acceptance collapse.** The Brownian kernel bounds
   acceptance with a single `k_max` computed from the min/max radius pair. With
   NPF clusters and droplets in the same box, `k_max` far exceeds typical pair
