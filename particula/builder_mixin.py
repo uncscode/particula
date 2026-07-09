@@ -495,9 +495,7 @@ class BuilderLognormalMixin:
         """Initialize lognormal distribution mixin."""
         self.mode: Optional[NDArray[np.float64]] = None
         self.number_concentration: Optional[NDArray[np.float64]] = None
-        self.geometric_standard_deviation: Optional[
-            NDArray[np.float64]
-        ] = None
+        self.geometric_standard_deviation: Optional[NDArray[np.float64]] = None
 
     @validate_inputs({"mode": "positive"})
     def set_mode(

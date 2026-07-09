@@ -225,7 +225,7 @@ def test_coagulation_step_gpu_scalar_positional_call_remains_valid(
     )
     wp.synchronize()
 
-    assert collision_pairs.shape == (1, 4, 2)
+    assert collision_pairs.shape == (1, 1, 2)
     assert collision_counts.shape == (1,)
 
 
@@ -246,7 +246,7 @@ def test_coagulation_step_gpu_omitted_rng_states_keeps_legacy_behavior(
     )
     wp.synchronize()
 
-    assert collision_pairs.shape == (1, 4, 2)
+    assert collision_pairs.shape == (1, 2, 2)
     assert collision_counts.shape == (1,)
     assert np.all(np.asarray(collision_counts.numpy()) >= 0)
 
@@ -598,7 +598,7 @@ def test_coagulation_step_gpu_accepts_direct_environment_arrays(
         rng_seed=3,
     )
 
-    assert collision_pairs.shape == (2, 4, 2)
+    assert collision_pairs.shape == (2, 1, 2)
     assert collision_counts.shape == (2,)
 
 
@@ -632,7 +632,7 @@ def test_coagulation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
         rng_seed=3,
     )
 
-    assert collision_pairs.shape == (2, 4, 2)
+    assert collision_pairs.shape == (2, 1, 2)
     assert collision_counts.shape == (2,)
 
 
@@ -1759,6 +1759,7 @@ def test_brownian_coagulation_kernel_inactive_particles(
             collision_pairs,
             n_collisions,
             rng_states,
+            wp.int32(4),
         ],
         device=device,
     )
@@ -1900,6 +1901,7 @@ def test_kernels_init_exports() -> None:
     assert kernels.brownian_coagulation_kernel is not None
     assert kernels.apply_coagulation_kernel is not None
     assert kernels.coagulation_step_gpu is not None
+    assert kernels.initialize_coagulation_rng_states is not None
 
 
 def test_coagulation_validation_rejects_bad_shapes(device: str) -> None:
@@ -2244,7 +2246,7 @@ def test_coagulation_step_gpu_invalid_max_collisions_fails_before_mutation(
     device: str,
     max_collisions: object,
 ) -> None:
-    """Invalid collision limits fail before allocation, launch, or mutation."""
+    """Invalid collision limits fail before launch or caller-buffer mutation."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     initial_particles = from_warp_particle_data(gpu_particles, sync=True)
@@ -2268,19 +2270,10 @@ def test_coagulation_step_gpu_invalid_max_collisions_fails_before_mutation(
     initial_rng_states = np.asarray(rng_states.numpy()).copy()
     calls: list[str] = []
 
-    def _unexpected_ensure_volume_array(*args: Any, **kwargs: Any) -> Any:
-        calls.append("ensure_volume_array")
-        raise AssertionError("_ensure_volume_array should not be called")
-
     def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
-    monkeypatch.setattr(
-        coagulation_module,
-        "_ensure_volume_array",
-        _unexpected_ensure_volume_array,
-    )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(
@@ -2396,7 +2389,7 @@ def test_coagulation_step_gpu_fractional_skip_advances_rng_state(
         temperature=temperature,
         pressure=pressure,
     )
-    kernel_value = float(kernel_matrix[0, 1])
+    kernel_value = float(np.asarray(kernel_matrix)[0, 1])
     volume = kernel_value / (first_draw * 0.5)
 
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
@@ -2433,8 +2426,12 @@ def test_coagulation_step_gpu_fractional_skip_advances_rng_state(
     second_state = np.asarray(rng_states.numpy()).copy()
     second_collision_counts = np.asarray(second_counts.numpy())
 
-    npt.assert_array_equal(first_collision_counts, np.array([0], dtype=np.int32))
-    npt.assert_array_equal(second_collision_counts, np.array([0], dtype=np.int32))
+    npt.assert_array_equal(
+        first_collision_counts, np.array([0], dtype=np.int32)
+    )
+    npt.assert_array_equal(
+        second_collision_counts, np.array([0], dtype=np.int32)
+    )
     assert not np.array_equal(first_state, initial_state)
     assert not np.array_equal(second_state, first_state)
 

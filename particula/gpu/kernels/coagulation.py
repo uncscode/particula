@@ -59,7 +59,6 @@ from particula.gpu.properties.particle_properties import (
     mean_thermal_speed_wp,
 )
 
-
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 
 
@@ -595,7 +594,8 @@ def _resolve_collision_capacity(
     bytes_per_box_collision = 2 * np.dtype(np.int32).itemsize
     budget_capacity = max(
         1,
-        MAX_COLLISION_PAIR_BUFFER_BYTES // max(1, n_boxes * bytes_per_box_collision),
+        MAX_COLLISION_PAIR_BUFFER_BYTES
+        // max(1, n_boxes * bytes_per_box_collision),
     )
     return min(requested_capacity, physical_capacity, budget_capacity)
 
@@ -629,6 +629,8 @@ def initialize_coagulation_rng_states(
     resolved_device = getattr(rng_states, "device", None)
     if device is None:
         device = resolved_device
+    elif isinstance(device, str):
+        device = wp.get_device(device)
     _validate_device_match("rng_states buffer", rng_states, device)
 
     wp.launch(
@@ -688,7 +690,7 @@ def _ensure_volume_array(
     return _broadcast_scalar_array(volume_scalar, n_boxes, device)
 
 
-def coagulation_step_gpu(
+def coagulation_step_gpu(  # noqa: C901
     particles: Any,
     temperature: float | Any | None,
     pressure: float | Any | None,
@@ -818,9 +820,7 @@ def coagulation_step_gpu(
     expected_pairs_shape = (n_boxes, max_collisions_value, 2)
     if collision_pairs is not None:
         if collision_pairs.shape[0] != n_boxes or collision_pairs.shape[2] != 2:
-            raise ValueError(
-                "collision_pairs shape must match (n_boxes, *, 2)"
-            )
+            raise ValueError("collision_pairs shape must match (n_boxes, *, 2)")
         if collision_pairs.shape[1] < max_collisions_value:
             raise ValueError(
                 "collision_pairs capacity is smaller than the effective "
@@ -828,7 +828,9 @@ def coagulation_step_gpu(
             )
         if collision_pairs.dtype != wp.int32:
             raise ValueError("collision_pairs buffer must use dtype int32")
-        _validate_device_match("collision_pairs buffer", collision_pairs, device)
+        _validate_device_match(
+            "collision_pairs buffer", collision_pairs, device
+        )
 
     expected_counts_shape = (n_boxes,)
     if n_collisions is not None:
