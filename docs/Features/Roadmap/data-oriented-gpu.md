@@ -767,9 +767,10 @@ fixed or explicitly accepted during this epic.
 
   Mixed-scale evidence note (issue #1243):
   `pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale`
-  measured 139 accepted collisions across fixed seeds 101-200 for the shipped
-  `E3-F2-P2` bounded selector path, versus a Brownian expected mean of 143.846
-  with sigma 11.994 (3-sigma tolerance 35.981) on the Warp CPU path.
+  checks the shipped `E3-F2-P2` bounded selector path on Warp CPU; the seeded
+  101-200 fresh-run characterization measured 139 accepted collisions versus a
+  Brownian expected mean of 143.846 with sigma 11.994 (3-sigma tolerance
+  35.981).
 - **One-thread-per-box coagulation.** The kernel launches one GPU thread per
   box with sequential pair selection inside the thread. This matches the
   multi-box scaling priority but serializes large single-box workloads. Record
