@@ -1034,6 +1034,78 @@ def test_coagulation_scaling_records_cpu_and_gpu_paths(
     assert "cpu_time_s" not in gpu_only_entry
 
 
+def test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Coagulation benchmark keeps a constant seed across repeated GPU steps."""
+    monkeypatch.setattr(benchmark_module, "_skip_if_no_cuda", lambda: None)
+    monkeypatch.setattr(
+        benchmark_module,
+        "_preflight_coagulation_case_allocations",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "to_warp_particle_data",
+        lambda particles, device: particles,
+    )
+
+    rng_state_buffer = object()
+
+    def _zeros_with_guard(shape, **kwargs):
+        if kwargs.get("dtype") is benchmark_module.wp.uint32:
+            return rng_state_buffer
+        return np.zeros(shape, dtype=np.int32)
+
+    monkeypatch.setattr(
+        benchmark_module,
+        "_wp_zeros_with_guard",
+        _zeros_with_guard,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "wp",
+        types.SimpleNamespace(
+            int32=np.int32,
+            uint32=np.uint32,
+        ),
+    )
+    gpu_kwargs: list[dict[str, object]] = []
+    monkeypatch.setattr(
+        benchmark_module,
+        "coagulation_step_gpu",
+        lambda *args, **kwargs: gpu_kwargs.append(kwargs),
+    )
+
+    @contextmanager
+    def _profile(_tag: str):
+        yield
+
+    monkeypatch.setattr(benchmark_module, "_warp_profiled", _profile)
+
+    def _run_gpu(step_fn, steps, warmup):
+        for _ in range(3):
+            step_fn()
+        return 0.25
+
+    monkeypatch.setattr(benchmark_module, "_time_gpu_loop", _run_gpu)
+    monkeypatch.setattr(benchmark_module, "_save_results", lambda: None)
+    monkeypatch.setattr(
+        benchmark_module,
+        "_benchmark_results",
+        {"started_at": "2026-01-01T00:00:00+00:00", "benchmarks": {}},
+    )
+
+    benchmark_module.test_coagulation_scaling("case-a", 1, 2, 1, False)
+
+    assert len(gpu_kwargs) == 3
+    assert [kwargs["rng_seed"] for kwargs in gpu_kwargs] == [42, 42, 42]
+    assert all(
+        kwargs["rng_states"] is rng_state_buffer for kwargs in gpu_kwargs
+    )
+
+
 def test_wp_func_benchmarks_records_summary_without_cuda(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,

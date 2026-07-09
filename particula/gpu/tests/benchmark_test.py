@@ -1438,7 +1438,6 @@ def test_coagulation_scaling(
         label=f"{tag} RNG state",
         itemsize=4,
     )
-    step_counter = {"idx": 0}
 
     def gpu_step() -> None:
         coagulation_step_gpu(
@@ -1446,13 +1445,12 @@ def test_coagulation_scaling(
             temperature=DEFAULT_TEMPERATURE,
             pressure=DEFAULT_PRESSURE,
             time_step=DEFAULT_TIME_STEP,
-            rng_seed=42 + step_counter["idx"],
+            rng_seed=42,
             max_collisions=MAX_COLLISIONS,
             collision_pairs=collision_pairs_buf,
             n_collisions=n_collisions_buf,
             rng_states=rng_states_buf,
         )
-        step_counter["idx"] += 1
 
     print(
         f"  [{tag}] Running GPU: {DEFAULT_WARMUP} warmup + "
