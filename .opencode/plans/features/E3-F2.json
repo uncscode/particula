@@ -73,11 +73,11 @@
     {
       "id": "E3-F2-P4",
       "title": "Document selected design or accepted mixed-scale limitation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-09",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
