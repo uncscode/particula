@@ -702,16 +702,16 @@ def coagulation_step_gpu(
     else:
         _validate_collision_counts(n_collisions, expected_counts_shape, device)
 
+    initialize_rng_states_for_call = rng_states is None
     if rng_states is None:
         rng_states = wp.zeros(
             expected_counts_shape,
             dtype=wp.uint32,
             device=device,
         )
-        should_initialize_rng = True
     else:
         _validate_rng_states(rng_states, expected_counts_shape, device)
-        should_initialize_rng = initialize_rng
+        initialize_rng_states_for_call = initialize_rng
 
     radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     diffusivities = wp.zeros(
@@ -723,7 +723,7 @@ def coagulation_step_gpu(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
 
-    if should_initialize_rng:
+    if initialize_rng_states_for_call:
         wp.launch(
             _initialize_rng_states,
             dim=n_boxes,

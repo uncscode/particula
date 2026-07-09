@@ -1247,7 +1247,6 @@ def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid
     assert not np.array_equal(state_after_second_call, initial_state)
 
 
-
 def test_coagulation_step_gpu_initialize_rng_false_reuses_caller_owned_state(
     device: str,
 ) -> None:
