@@ -1250,7 +1250,7 @@ def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid
 def test_coagulation_step_gpu_initialize_rng_false_reuses_caller_owned_state(
     device: str,
 ) -> None:
-    """Caller-owned state is reused only through the explicit opt-in path."""
+    """Default ``initialize_rng=False`` reuses caller-owned RNG state."""
     particles = _make_particle_data(n_boxes=1, n_particles=6, n_species=1)
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
 

@@ -1445,6 +1445,8 @@ def test_coagulation_scaling(
             temperature=DEFAULT_TEMPERATURE,
             pressure=DEFAULT_PRESSURE,
             time_step=DEFAULT_TIME_STEP,
+            # Keep the seed fixed when reusing caller-owned RNG state so the
+            # benchmark matches persisted-state runtime semantics.
             rng_seed=42,
             max_collisions=MAX_COLLISIONS,
             collision_pairs=collision_pairs_buf,

@@ -17,19 +17,24 @@ use the existing `*_test.py` convention and must not lower coverage thresholds.
   `test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states`,
   which proves early `time_step` validation preserves an already-advanced
   caller-owned buffer.
-- **P3:** Run the P1/P2 tests against the implementation and extend coverage for
-  any edge cases introduced by the chosen initialization mode. Preserve existing
-  stochastic collision-rate tests and update them only if needed to remove manual
-  seed increments.
-- **P4:** Validate documentation links and any updated executable examples. If
-  benchmark helper behavior changes, keep benchmark tests passing without
-  requiring CUDA in normal CI.
+- **P3:** Shipped in `particula/gpu/kernels/coagulation.py`,
+  `particula/gpu/tests/benchmark_test.py`, and
+  `particula/gpu/tests/benchmark_helpers_test.py`. Runtime validation continues
+  to rely on the existing P1/P2 kernel regressions for omitted `rng_states`,
+  caller-owned reuse, explicit reset, and invalid-follow-up preservation.
+  Benchmark helper coverage now also includes
+  `test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift`,
+  which asserts repeated benchmark GPU steps keep a constant `rng_seed` while
+  reusing the same persistent `rng_states` buffer.
+- **P4:** Validate documentation links and any updated executable examples for
+  broader GPU RNG guidance.
 
 ## Test Locations
 
 - Primary: `particula/gpu/kernels/tests/coagulation_test.py`
 - Supporting device fixture: `particula/gpu/tests/cuda_availability.py`
-- Deferred follow-up only: `particula/gpu/tests/benchmark_test.py`
+- Supporting benchmark coverage: `particula/gpu/tests/benchmark_helpers_test.py`
+- Runtime benchmark path: `particula/gpu/tests/benchmark_test.py`
 
 ## Coverage and Device Matrix
 

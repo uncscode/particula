@@ -19,6 +19,9 @@
   `time_step` validation.
 - [x] The shipped regression coverage uses the existing Warp CPU / CUDA-if-
   available device fixture in `coagulation_test.py`.
+- [x] The coagulation benchmark path no longer increments `rng_seed` while
+  reusing a persistent `rng_states` buffer, and helper regression coverage
+  fails if that seed drift returns.
 - [ ] Documentation explains broader seed-once usage and graph-capture setup
   caveats in follow-up docs work.
 
@@ -30,4 +33,5 @@
 | Implicit reset of caller-provided `rng_states` with repeated seed | Present | No implicit reset when `initialize_rng=False`, including repeated valid-call regression coverage | Repeated-call RNG tests |
 | Invalid-input RNG mutation | Must be none | None preserved after valid-then-invalid follow-up | Existing and new validation tests |
 | Warp device coverage | CPU plus optional CUDA fixture exists | Shipped repeated-call regressions use same fixture | `coagulation_test.py` |
+| Benchmark persistent-buffer seed drift | Present in helper path | Constant `rng_seed` while reusing persistent `rng_states_buf` | `benchmark_helpers_test.py` |
 | Documentation of graph-capture caveat | Roadmap defect note only | Deferred to P4 | Docs diff |

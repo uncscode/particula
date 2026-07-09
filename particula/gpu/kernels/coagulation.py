@@ -609,7 +609,7 @@ def coagulation_step_gpu(
         collision_pairs: Optional preallocated collision buffer.
         n_collisions: Optional preallocated collision count buffer.
         rng_states: Optional preallocated RNG state buffer. When omitted, this
-            function allocates an internal ``(n_boxes,)`` buffer and
+            function allocates a call-local ``(n_boxes,)`` buffer and
             initializes it from ``rng_seed`` for the current call. When
             provided, the caller owns the buffer and it is reused as-is unless
             ``initialize_rng=True`` explicitly requests a reset from
@@ -654,8 +654,8 @@ def coagulation_step_gpu(
 
         Supported RNG setup cases are:
 
-        - Omitted ``rng_states``: allocate an internal buffer and initialize it
-          from ``rng_seed`` for this call.
+        - Omitted ``rng_states``: allocate a call-local internal buffer and
+          initialize it from ``rng_seed`` for this call.
         - Provided ``rng_states`` with ``initialize_rng=False``: validate the
           caller-owned buffer and reuse it without resetting.
         - Provided ``rng_states`` with ``initialize_rng=True``: validate the

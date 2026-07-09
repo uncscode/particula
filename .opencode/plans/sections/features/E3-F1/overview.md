@@ -2,22 +2,25 @@
 
 ## Problem Statement
 
-`coagulation_step_gpu` currently reinitializes Warp RNG state on every call,
-including when callers pass a reusable `rng_states` buffer. Repeated timesteps
-with the same `rng_seed` therefore replay correlated random draws unless callers
-manually increment the seed. This is surprising for a low-level GPU timestep API,
-prevents natural seed-once usage, and is unsafe for graph-capture workflows where
+Before P3 shipped, `coagulation_step_gpu` reinitialized Warp RNG state on every
+call, including when callers passed a reusable `rng_states` buffer. That prior
+behavior replayed correlated random draws unless callers manually incremented
+the seed. P3 corrected the runtime behavior: caller-provided `rng_states` now
+persist unless `initialize_rng=True` is explicitly requested, while omitted
+`rng_states` still use the convenience allocation-and-seed path. This remains
+important for low-level timestep APIs and graph-capture workflows where hidden
 re-seeding inside a captured step can freeze the RNG sequence.
 
 ## Value Proposition
 
 This feature hardens the GPU coagulation RNG API in stages. The shipped work now
-covers two steps: P1 locked the compatibility contract so callers can
+covers three steps: P1 locked the compatibility contract so callers can
 distinguish between legacy omitted-`rng_states` behavior, caller-owned reusable
-buffers, and an explicit reset path via `initialize_rng=True`; P2 then shipped
-test-only regressions that make the persisted caller-owned buffer contract
-explicit for repeated valid calls and invalid follow-up failures. Later phases
-remain focused on any runtime expansion, benchmark updates, and GPU docs.
+buffers, and an explicit reset path via `initialize_rng=True`; P2 shipped
+regressions that make the persisted caller-owned buffer contract explicit for
+repeated valid calls and invalid follow-up failures; P3 aligned the runtime
+control flow and coagulation benchmark path with that contract. The remaining
+follow-up is broader GPU documentation in P4.
 
 ## User Stories
 
@@ -25,8 +28,8 @@ remain focused on any runtime expansion, benchmark updates, and GPU docs.
   reset unless I explicitly request it, so repeated GPU timesteps keep a stable
   low-level ownership contract.
 - As a benchmark maintainer, I want reusable `rng_states` buffers to persist and
-  avoid implicit reset so compatibility tests can protect current behavior
-  before any broader benchmark guidance changes.
+  avoid implicit reset so repeated benchmark steps can reuse one buffer without
+  external seed drift.
 - As a GPU workflow developer, I want initialization separated from repeated
   timestep execution so graph-captured loops do not re-seed inside the graph.
 
