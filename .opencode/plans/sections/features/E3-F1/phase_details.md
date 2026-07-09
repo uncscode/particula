@@ -56,15 +56,23 @@
     `test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift`
     to lock the constant-seed persistent-buffer benchmark path.
 
-- [ ] **E3-F1-P4:** Update GPU RNG documentation and graph-capture usage guidance
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E3-F1-P4:** Update GPU RNG documentation and graph-capture usage guidance
+  - Issue: #1239 | Size: XS | Status: Shipped on 2026-07-09
   - Depends on: E3-F1-P3 shipping the final runtime behavior so the docs record
     the exact reset-helper, buffer-ownership, and repeated-step guidance that
     tests already protect.
-  - Goal: Document the final feature behavior once P2/P3 runtime scope is fully
-    shipped.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
-    `docs/Features/data-containers-and-gpu-foundations.md`, optional examples or
-    benchmark comments that show repeated timestep loops.
-  - Tests: Documentation link/format validation and any updated example tests if
-    executable snippets change.
+  - Goal: Publish the final docs-only description of the shipped feature
+    behavior without changing runtime semantics.
+  - Files: `particula/gpu/kernels/coagulation.py`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Features/data-containers-and-gpu-foundations.md`
+  - Shipped details: the `coagulation_step_gpu` docstring now clarifies
+    `rng_seed` consumption, omitted-buffer convenience allocation,
+    caller-owned persistent `rng_states` reuse, and
+    `initialize_rng=True` reset semantics; the roadmap now explains seed-once
+    repeated-call usage and pre-capture initialization expectations; and the
+    container-boundary guide now records that `rng_states` are Warp-resident
+    caller-owned sidecar state outside the CPU/GPU container schemas.
+  - Tests: Documentation terminology/readback review plus focused smoke
+    validation against the shipped runtime contract; no production behavior
+    changes were introduced.

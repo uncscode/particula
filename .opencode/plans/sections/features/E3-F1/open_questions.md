@@ -1,6 +1,6 @@
 # Open Questions
 
-Status: reviewed and answered on 2026-07-08; updated through P3 shipment.
+Status: reviewed and answered on 2026-07-09; updated through P4 shipment.
 
 ## Resolved Decisions
 
@@ -21,3 +21,6 @@ Status: reviewed and answered on 2026-07-08; updated through P3 shipment.
   `rng_seed` across repeated coagulation steps. Helper regression coverage locks
   this path so per-step seed incrementation is not silently reintroduced while
   the same buffer is reused.
+- Documentation now explicitly places coagulation `rng_states` outside the
+  CPU/GPU container schemas. Persistent RNG state is caller-owned Warp-resident
+  sidecar state, not a `ParticleData`, `GasData`, or `EnvironmentData` field.

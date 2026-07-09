@@ -22,8 +22,9 @@
 - [x] The coagulation benchmark path no longer increments `rng_seed` while
   reusing a persistent `rng_states` buffer, and helper regression coverage
   fails if that seed drift returns.
-- [ ] Documentation explains broader seed-once usage and graph-capture setup
-  caveats in follow-up docs work.
+- [x] Documentation explains broader seed-once usage and graph-capture setup
+  caveats in the shipped roadmap, container-boundary guide, and public
+  docstring.
 
 ## Metrics
 
@@ -34,4 +35,4 @@
 | Invalid-input RNG mutation | Must be none | None preserved after valid-then-invalid follow-up | Existing and new validation tests |
 | Warp device coverage | CPU plus optional CUDA fixture exists | Shipped repeated-call regressions use same fixture | `coagulation_test.py` |
 | Benchmark persistent-buffer seed drift | Present in helper path | Constant `rng_seed` while reusing persistent `rng_states_buf` | `benchmark_helpers_test.py` |
-| Documentation of graph-capture caveat | Roadmap defect note only | Deferred to P4 | Docs diff |
+| Documentation of graph-capture caveat | Roadmap defect note only | Shipped seed-once and pre-capture initialization guidance | Docs diff |

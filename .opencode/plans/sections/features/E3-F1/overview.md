@@ -14,13 +14,16 @@ re-seeding inside a captured step can freeze the RNG sequence.
 ## Value Proposition
 
 This feature hardens the GPU coagulation RNG API in stages. The shipped work now
-covers three steps: P1 locked the compatibility contract so callers can
+covers all four steps: P1 locked the compatibility contract so callers can
 distinguish between legacy omitted-`rng_states` behavior, caller-owned reusable
 buffers, and an explicit reset path via `initialize_rng=True`; P2 shipped
 regressions that make the persisted caller-owned buffer contract explicit for
 repeated valid calls and invalid follow-up failures; P3 aligned the runtime
-control flow and coagulation benchmark path with that contract. The remaining
-follow-up is broader GPU documentation in P4.
+control flow and coagulation benchmark path with that contract; and P4 shipped
+the final docstring and roadmap/container-boundary guidance for seed-once
+repeated-call usage, caller-owned persistent `rng_states`, and graph-capture
+setup expectations. The final phase was documentation-only and did not change
+runtime behavior.
 
 ## User Stories
 

@@ -161,14 +161,16 @@ print(result)
   wall loss strategies with builders, factory, and runnable integration.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
-  explicit CPU↔GPU transfer helpers, leading-axis shape conventions, and the
-  current shipped CPU/GPU support boundary.
+  explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
+  current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
+  such as coagulation `rng_states`.
 - [ParticleData and GasData migration guide](Features/particle-data-migration.md)
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.
 - [Data-oriented design and GPU roadmap](Features/Roadmap/data-oriented-gpu.md)
   — current schema inventory,
   [authoritative CPU/GPU field ownership policy](Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions),
+  shipped coagulation RNG ownership and graph-capture setup guidance,
   and the [final downstream handoff map for sibling E2
   features](Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features).
 - [Mass Precision Recommendation Report](Features/Roadmap/mass-precision-study.md)

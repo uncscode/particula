@@ -1,13 +1,10 @@
 # Scope
 
 This feature delivers seed-once GPU RNG semantics in phases. The shipped work
-for issues #1236 and #1237 now covers the compatibility contract layer plus
-targeted regression coverage: P1 defined the backwards-compatible interaction
-between `rng_seed`, optional `rng_states`, and keyword-only `initialize_rng`,
-and P2 added test-only coverage proving repeated valid calls advance a
-caller-owned buffer while invalid follow-up calls preserve the already-advanced
-state. Broader runtime expansion, docs, and benchmark guidance remain follow-up
-work.
+for issues #1236, #1237, #1238, and #1239 now covers the compatibility
+contract, repeated-call regressions, runtime semantics, and final documentation
+handoff. The last phase was docs-only: it clarified the shipped behavior in the
+public docstring and GPU guides without changing runtime logic.
 
 ## In Scope
 
@@ -37,5 +34,4 @@ work.
   tests only.
 - Broader RNG policy for non-coagulation GPU kernels unless needed for shared
   documentation consistency.
-- Broader GPU docs, graph-capture guidance, and benchmark comment refreshes in
-  this issue.
+- Further runtime changes beyond the shipped docs-only clarification phase.
