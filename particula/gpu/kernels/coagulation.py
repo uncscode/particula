@@ -553,6 +553,7 @@ def coagulation_step_gpu(
     n_collisions: Any | None = None,
     rng_states: Any | None = None,
     *,
+    initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> tuple[Any, Any, Any]:
     """Execute one Brownian coagulation timestep on the GPU.
@@ -567,10 +568,18 @@ def coagulation_step_gpu(
         time_step: Coagulation time step in seconds.
         volume: Per-box volume [m^3]. If None, uses ``particles.volume``.
         max_collisions: Maximum number of collisions per box.
-        rng_seed: Seed for initializing the Warp RNG states.
+        rng_seed: Seed used whenever this call initializes Warp RNG states.
         collision_pairs: Optional preallocated collision buffer.
         n_collisions: Optional preallocated collision count buffer.
-        rng_states: Optional preallocated RNG state buffer.
+        rng_states: Optional preallocated RNG state buffer. When omitted, this
+            function allocates an internal ``(n_boxes,)`` buffer and
+            initializes it from ``rng_seed`` for the current call. When
+            provided, the caller owns the buffer state and it is treated as
+            already initialized unless ``initialize_rng=True`` is passed.
+        initialize_rng: Whether to explicitly reset a caller-provided
+            ``rng_states`` buffer from ``rng_seed`` after validation. This flag
+            does not affect omitted ``rng_states`` convenience allocation,
+            which always initializes the internal buffer for the current call.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``.
             This mode is supported when both direct inputs are ``None``.
@@ -592,13 +601,24 @@ def coagulation_step_gpu(
         ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
         inputs, or keyword-only ``environment=...`` execution.
 
-        ``environment`` remains keyword-only so existing positional scalar
-        callers stay source-compatible.
+        ``initialize_rng`` and ``environment`` remain keyword-only so existing
+        positional scalar callers stay source-compatible.
 
         Validation runs before volume normalization, RNG setup, and kernel
         launches so invalid shape or device combinations fail without mutating
         particle state or allocating downstream launch work. The normalized
         environment arrays are forwarded directly into the launch path.
+
+        Supported RNG setup cases are:
+
+        - Omitted ``rng_states``: allocate an internal buffer and initialize it
+          from ``rng_seed`` for this call.
+        - Provided ``rng_states`` with ``initialize_rng=False``: validate the
+          caller-owned buffer and use it without resetting.
+        - Provided ``rng_states`` with ``initialize_rng=True``: validate the
+          caller-owned buffer, then explicitly reset it from ``rng_seed``.
+        - Validation failure: raise before RNG initialization or other Warp
+          launches mutate state.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
@@ -638,6 +658,7 @@ def coagulation_step_gpu(
     else:
         _validate_collision_counts(n_collisions, expected_counts_shape, device)
 
+    should_initialize_rng = rng_states is None
     if rng_states is None:
         rng_states = wp.zeros(
             expected_counts_shape,
@@ -646,6 +667,7 @@ def coagulation_step_gpu(
         )
     else:
         _validate_rng_states(rng_states, expected_counts_shape, device)
+        should_initialize_rng = initialize_rng
 
     radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     diffusivities = wp.zeros(
@@ -657,12 +679,13 @@ def coagulation_step_gpu(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
 
-    wp.launch(
-        _initialize_rng_states,
-        dim=n_boxes,
-        inputs=[wp.uint32(rng_seed), rng_states],
-        device=device,
-    )
+    if should_initialize_rng:
+        wp.launch(
+            _initialize_rng_states,
+            dim=n_boxes,
+            inputs=[wp.uint32(rng_seed), rng_states],
+            device=device,
+        )
 
     wp.launch(
         brownian_coagulation_kernel,
