@@ -48,7 +48,6 @@ from particula.gpu.kernels.coagulation import (  # noqa: E402
     _validate_device_match,
     _validate_particle_arrays,
     _validate_rng_states,
-    _validate_time_step,
     apply_coagulation_kernel,
     brownian_coagulation_kernel,
     coagulation_step_gpu,
@@ -1358,6 +1357,46 @@ def test_coagulation_step_gpu_initialize_rng_true_resets_caller_owned_state(
     npt.assert_array_equal(post_reset_state_a, post_reset_state_b)
 
 
+def test_coagulation_step_gpu_omitted_rng_states_repeat_seed_replays_results(
+    device: str,
+) -> None:
+    """Omitted RNG state allocation is reseeded independently per call."""
+    particles = _make_particle_data(n_boxes=1, n_particles=6, n_species=1)
+
+    first_particles = to_warp_particle_data(particles, device=device)
+    _, first_pairs, first_counts = coagulation_step_gpu(
+        first_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        volume=1.0e-18,
+        rng_seed=37,
+        max_collisions=8,
+    )
+    wp.synchronize()
+
+    second_particles = to_warp_particle_data(particles, device=device)
+    _, second_pairs, second_counts = coagulation_step_gpu(
+        second_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        volume=1.0e-18,
+        rng_seed=37,
+        max_collisions=8,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        np.asarray(first_pairs.numpy()),
+        second_pairs.numpy(),
+    )
+    npt.assert_array_equal(
+        np.asarray(first_counts.numpy()),
+        second_counts.numpy(),
+    )
+
+
 def test_coagulation_marks_inactive_particles(device: str) -> None:
     """Merged particles are marked inactive and mass is transferred."""
     temperature = 298.15
@@ -1849,6 +1888,66 @@ def test_coagulation_step_gpu_invalid_time_step_fails_before_mutation(
     _assert_particles_unchanged(gpu_particles, initial_particles)
 
 
+def test_coagulation_step_gpu_invalid_volume_fails_before_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Invalid volumes fail before RNG init, launch, or particle mutation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    collision_pairs = wp.array(
+        np.arange(8, dtype=np.int32).reshape(1, 4, 2),
+        dtype=wp.int32,
+        device=device,
+    )
+    n_collisions = wp.array(
+        np.array([2], dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    rng_states = wp.array(
+        np.array([19], dtype=np.uint32),
+        dtype=wp.uint32,
+        device=device,
+    )
+    initial_collision_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_n_collisions = np.asarray(n_collisions.numpy()).copy()
+    initial_rng_states = np.asarray(rng_states.numpy()).copy()
+    calls: list[str] = []
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        calls.append("launch")
+        raise AssertionError("wp.launch should not be called")
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
+
+    with pytest.raises(ValueError, match="volume must be finite and > 0"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            volume=-1.0,
+            max_collisions=4,
+            collision_pairs=collision_pairs,
+            n_collisions=n_collisions,
+            rng_states=rng_states,
+        )
+
+    assert calls == []
+    npt.assert_array_equal(
+        np.asarray(collision_pairs.numpy()),
+        initial_collision_pairs,
+    )
+    npt.assert_array_equal(
+        np.asarray(n_collisions.numpy()),
+        initial_n_collisions,
+    )
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+
+
 def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
     device: str,
 ) -> None:
@@ -1886,40 +1985,19 @@ def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
     assert not np.array_equal(advanced_state, initialized_state)
 
     second_gpu_particles = to_warp_particle_data(particles, device=device)
-    with pytest.raises(
-        ValueError,
-        match="time_step must be finite and nonnegative",
-    ):
+    with pytest.raises(ValueError, match="volume must be finite and > 0"):
         coagulation_step_gpu(
             second_gpu_particles,
             temperature=298.15,
             pressure=101325.0,
-            time_step=-0.1,
-            volume=1.0e-18,
+            time_step=1.0,
+            volume=-1.0,
             rng_seed=41,
             max_collisions=8,
             rng_states=rng_states,
         )
 
     npt.assert_array_equal(np.asarray(rng_states.numpy()), advanced_state)
-
-
-def test_validate_time_step_accepts_valid_float_like_inputs() -> None:
-    """Time-step helper returns normalized finite nonnegative floats."""
-    assert _validate_time_step(0.0) == 0.0
-    assert _validate_time_step(np.float64(0.25)) == pytest.approx(0.25)
-
-
-@pytest.mark.parametrize("time_step", [True, "invalid", object()])
-def test_validate_time_step_rejects_bool_and_nonnumeric_inputs(
-    time_step: Any,
-) -> None:
-    """Time-step helper rejects bool and unsupported nonnumeric values."""
-    with pytest.raises(
-        ValueError,
-        match="time_step must be finite and nonnegative",
-    ):
-        _validate_time_step(time_step)
 
 
 def test_coagulation_validation_rejects_device_mismatch(device: str) -> None:
