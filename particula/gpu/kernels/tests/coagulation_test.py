@@ -422,18 +422,28 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
 
         executed_trial_counts[box_idx] += wp.int32(1)
 
+        rank_i = wp.randi(state, wp.int32(0), active_count)
+        rank_j = wp.randi(state, wp.int32(0), active_count - wp.int32(1))
+        adjusted_rank_j = rank_j
+        if adjusted_rank_j >= rank_i:
+            adjusted_rank_j += wp.int32(1)
+
         selected_i = wp.int32(-1)
         selected_j = wp.int32(-1)
-        for _ in range(n_particles * 2):
-            idx_i = wp.randi(state, wp.int32(0), wp.int32(n_particles))
-            idx_j = wp.randi(state, wp.int32(0), wp.int32(n_particles))
-            if idx_i == idx_j:
+        active_rank = wp.int32(0)
+        # Mirror the production kernel's one-pass active-rank resolution so the
+        # diagnostic path stays parity-checked without retry-based proposals.
+        for p_idx in range(n_particles):
+            if active_flags[box_idx, p_idx] == wp.int32(0):
                 continue
-            if active_flags[box_idx, idx_i] == wp.int32(1) and active_flags[
-                box_idx, idx_j
-            ] == wp.int32(1):
-                selected_i = idx_i
-                selected_j = idx_j
+
+            if active_rank == rank_i:
+                selected_i = wp.int32(p_idx)
+            if active_rank == adjusted_rank_j:
+                selected_j = wp.int32(p_idx)
+
+            active_rank += wp.int32(1)
+            if selected_i >= wp.int32(0) and selected_j >= wp.int32(0):
                 break
 
         if selected_i < wp.int32(0) or selected_j < wp.int32(0):
@@ -1817,6 +1827,13 @@ def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
     assert np.all(
         diagnostics.executed_trial_counts >= diagnostics.accepted_counts
     )
+    for count_buffer, pair_buffer in (
+        (diagnostics.accepted_counts, diagnostics.diagnostic_pairs),
+        (diagnostics.production_counts, diagnostics.production_pairs),
+    ):
+        assert np.all(count_buffer <= pair_buffer.shape[1])
+        assert np.all(count_buffer <= 8)
+        assert np.all(count_buffer <= particles.masses.shape[1] // 2)
     npt.assert_array_equal(
         diagnostics.accepted_counts,
         diagnostics.production_counts,
@@ -1871,17 +1888,56 @@ def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
     assert np.all(acceptance_fraction >= 0.0)
 
 
-def test_mixed_scale_sparse_box_returns_zero_accepted_collisions(
+def test_mixed_scale_selector_only_emits_sorted_active_in_bounds_pairs(
     device: str,
 ) -> None:
-    """Sparse mixed-scale boxes keep diagnostics finite with zero acceptance.
-
-    When fewer than two particles remain active, both the mirrored diagnostic
-    path and the production path should report zero accepted collisions without
-    producing non-finite attempt-derived metrics.
-    """
+    """Accepted mixed-scale pairs stay sorted, in bounds, and initially active."""
     particles = _make_mixed_npf_droplet_particle_data()
-    particles.concentration[0, 1:] = 0.0
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=0.5,
+        max_collisions=8,
+        rng_seed=41,
+        volume=1.0e-14,
+    )
+    initially_active = particles.concentration[0] > 0.0
+    n_particles = particles.masses.shape[1]
+
+    for pair_buffer, count_buffer in (
+        (diagnostics.diagnostic_pairs, diagnostics.accepted_counts),
+        (diagnostics.production_pairs, diagnostics.production_counts),
+    ):
+        count = int(count_buffer[0])
+        accepted_pairs = pair_buffer[0, :count, :]
+
+        assert np.all(accepted_pairs[:, 0] >= 0)
+        assert np.all(accepted_pairs[:, 1] >= 0)
+        assert np.all(accepted_pairs[:, 0] < accepted_pairs[:, 1])
+        assert np.all(accepted_pairs[:, 1] < n_particles)
+        assert np.all(initially_active[accepted_pairs[:, 0]])
+        assert np.all(initially_active[accepted_pairs[:, 1]])
+
+
+@pytest.mark.parametrize(
+    ("active_indices",),
+    [
+        ([],),
+        ([0],),
+    ],
+)
+def test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(
+    device: str,
+    active_indices: list[int],
+) -> None:
+    """Zero- and one-active mixed-scale boxes keep diagnostics finite."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    particles.concentration[0, :] = 0.0
+    if active_indices:
+        particles.concentration[0, active_indices] = np.array(
+            [150.0] * len(active_indices),
+            dtype=np.float64,
+        )
     diagnostics = _collect_test_local_attempt_diagnostics(
         particles,
         device,
@@ -1905,9 +1961,12 @@ def test_mixed_scale_sparse_box_returns_zero_accepted_collisions(
         diagnostics.production_counts,
         np.array([0], dtype=np.int64),
     )
+    assert np.all(np.isfinite(diagnostics.scheduled_trial_counts))
+    assert np.all(diagnostics.scheduled_trial_counts >= 0)
     assert np.all(np.isfinite(diagnostics.executed_trial_counts))
     assert np.all(diagnostics.executed_trial_counts >= 0)
     assert np.all(np.isfinite(acceptance_fraction))
+    assert np.all(acceptance_fraction >= 0.0)
 
 
 def test_mixed_scale_diagnostic_tracks_executed_trials_under_early_exit(
@@ -1928,6 +1987,63 @@ def test_mixed_scale_diagnostic_tracks_executed_trials_under_early_exit(
     assert diagnostics.executed_trial_counts[0] == 1
     assert diagnostics.accepted_counts[0] == 1
     assert diagnostics.production_counts[0] == 1
+
+
+def test_mixed_scale_two_active_particles_accept_the_only_valid_pair(
+    device: str,
+) -> None:
+    """Exactly two non-adjacent active particles accept their only valid pair."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    particles.concentration[0, :] = 0.0
+    surviving_indices = np.array([0, 3], dtype=np.int64)
+    particles.concentration[0, surviving_indices] = np.array(
+        [150.0, 0.8],
+        dtype=np.float64,
+    )
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=0.5,
+        max_collisions=8,
+        rng_seed=41,
+        volume=1.0e-14,
+    )
+    expected_pair = surviving_indices.reshape(1, 2)
+
+    npt.assert_array_equal(
+        diagnostics.accepted_counts,
+        np.array([1], dtype=np.int64),
+    )
+    npt.assert_array_equal(
+        diagnostics.production_counts,
+        np.array([1], dtype=np.int64),
+    )
+    npt.assert_array_equal(
+        diagnostics.diagnostic_pairs[0, :1, :],
+        expected_pair,
+    )
+    npt.assert_array_equal(
+        diagnostics.production_pairs[0, :1, :],
+        expected_pair,
+    )
+    assert np.all(diagnostics.diagnostic_pairs[0, 0, 0] >= 0)
+    assert (
+        diagnostics.diagnostic_pairs[0, 0, 0]
+        < diagnostics.diagnostic_pairs[0, 0, 1]
+    )
+    assert diagnostics.diagnostic_pairs[0, 0, 1] < particles.masses.shape[1]
+    assert np.all(np.isfinite(diagnostics.scheduled_trial_counts))
+    assert np.all(np.isfinite(diagnostics.executed_trial_counts))
+    assert np.all(diagnostics.scheduled_trial_counts >= 0)
+    assert np.all(diagnostics.executed_trial_counts >= 0)
+    acceptance_fraction = np.divide(
+        diagnostics.accepted_counts,
+        diagnostics.executed_trial_counts,
+        out=np.zeros_like(diagnostics.accepted_counts, dtype=np.float64),
+        where=diagnostics.executed_trial_counts > 0,
+    )
+    assert np.all(np.isfinite(acceptance_fraction))
+    assert np.all(acceptance_fraction >= 0.0)
 
 
 def test_mixed_scale_diagnostic_clamps_scheduled_trials_to_int32_limit(
@@ -2000,6 +2116,27 @@ def test_coagulation_mass_conservation(device: str) -> None:
         time_step=time_step,
         rng_seed=7,
         max_collisions=8,
+    )
+    result = from_warp_particle_data(gpu_particles, sync=True)
+
+    final_mass = np.sum(result.masses)
+    npt.assert_allclose(final_mass, initial_mass, rtol=1.0e-12)
+
+
+def test_mixed_scale_coagulation_conserves_total_mass(device: str) -> None:
+    """Mixed-scale coagulation preserves total mass."""
+    particles = _make_mixed_npf_droplet_particle_data()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    initial_mass = np.sum(particles.masses)
+
+    coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.5,
+        rng_seed=41,
+        max_collisions=8,
+        volume=1.0e-14,
     )
     result = from_warp_particle_data(gpu_particles, sync=True)
 
