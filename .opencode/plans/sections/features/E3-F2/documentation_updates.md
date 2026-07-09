@@ -20,6 +20,20 @@
   so roadmap/documentation updates remain deferred to E3-F2-P4 unless later
   phases promote the characterization into a documented product decision.
 
+## P2 Shipped State
+
+- Issue #1242 updated production kernel internals in
+  `particula/gpu/kernels/coagulation.py`, but the shipped change remained an
+  internal selector hardening with no public API, transfer-boundary, or
+  user-facing workflow change.
+- The landed evidence lives in
+  `particula/gpu/kernels/tests/coagulation_test.py` through selector-validity,
+  sparse/degenerate, exactly-two-active fallback, accepted-count bounds, and
+  mixed-scale conservation regressions.
+- User-facing roadmap or feature-doc updates are still deferred to E3-F2-P4,
+  when P3/P4 decide whether the final story is a measured improvement or a
+  documented bounded limitation.
+
 ## Optional Updates
 
 - Add a focused `docs/Features/` note if the selected design needs more space

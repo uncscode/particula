@@ -350,6 +350,11 @@ for _ in range(n_steps):
   `particula/gpu/kernels/tests/coagulation_test.py`; keep attempted-count
   instrumentation test-local and leave the public `coagulation_step_gpu(...)`
   API unchanged for debug-only coverage.
+- The bounded Brownian selector hardening is regression-covered only through
+  test-local diagnostics: accepted pairs must remain sorted, in bounds, and
+  drawn from originally active slots; zero/one-active inputs must early-return;
+  exactly-two-active inputs must collapse to the sole valid pair; and accepted
+  collisions must conserve total mass.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
   and graph-capture guidance.
@@ -358,7 +363,7 @@ Focused diagnostic runs:
 
 ```bash
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
 ```
 
 ### GPU mass-precision baseline study

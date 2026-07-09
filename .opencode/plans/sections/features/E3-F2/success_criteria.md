@@ -9,8 +9,11 @@
 - [ ] The chosen outcome is measurable: either the hardened path improves
   acceptance on the mixed-scale fixture, or the final docs record a quantified
   limitation and the accepted boundary for Epic C.
-- [ ] Mixed-scale collision application preserves mass and avoids invalid pair
+- [x] Mixed-scale collision application preserves mass and avoids invalid pair
   generation on Warp CPU, with CUDA-if-available following the same assertions.
+- [x] The production and diagnostic kernels use the same bounded active-particle
+  selector and keep accepted counts bounded by `collision_pairs.shape[1]`,
+  `max_collisions`, and `n_particles // 2`.
 - [ ] Aggregate stochastic checks stay within the documented tolerance policy and
   use the finalized E3-F1 repeated-step RNG contract.
 - [ ] Final documentation records the selected design, measured evidence,
