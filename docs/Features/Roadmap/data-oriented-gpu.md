@@ -1017,14 +1017,13 @@ Fixed-slot particle management for these loops is defined in
 ### Random Number Strategy
 
 - Define deterministic RNG seeding for stochastic coagulation on GPU. The
-  per-call re-initialization defect itself is fixed in
-  [Epic C](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) (see
-  [Known Kernel Issues](#known-kernel-issues)); this epic builds the
-  loop-level RNG strategy on that fix.
+  shipped baseline is seed-once initialization for caller-owned persistent
+  `rng_states`, while omitted `rng_states` still use a convenience
+  allocate-and-seed path per call.
 - Support per-box RNG streams so independent boxes remain reproducible when the
   number of boxes changes or when selected boxes are disabled.
-- Track RNG state on the GPU between timesteps and include it in graph-captured
-  execution tests.
+- Track caller-owned RNG state on the GPU between timesteps and include it in
+  graph-captured execution tests.
 - Document expected reproducibility limits across CPU, Warp CPU, and CUDA.
 
 **Exit bar:** At least one condensation and one coagulation workflow run on
@@ -1079,10 +1078,13 @@ scaling numbers across box counts plus a recorded memory-budget model.
   validation, and host-side scheduling.
 - Reuse preallocated buffers for mass transfer, collision pairs, wall-loss
   rates, dilution factors, diagnostics, and RNG state before capture begins.
+  For coagulation, seed or explicitly reset persistent `rng_states` before the
+  repeated-step loop or before graph capture, not through hidden reseeding
+  inside the captured path.
 - Add tests that compare captured-graph execution against uncaptured GPU
   execution and CPU reference results.
 - Document graph-capture limitations, including shape changes, dynamic process
-  selection, stochastic coagulation state, and device availability.
+  selection, stochastic coagulation state ownership, and device availability.
 - Require fixed array shapes during graph capture. Changing `n_boxes`,
   `n_particles`, or `n_species` should invalidate the captured graph and require
   a new setup/capture step.
@@ -1092,6 +1094,13 @@ scaling numbers across box counts plus a recorded memory-budget model.
   particle slots.
 - Keep graph-captured loops focused on repeated timesteps with stable process
   order, stable buffer shapes, and stable communication maps.
+
+For shipped coagulation behavior, `rng_states` are Warp-resident sidecar state
+owned by the caller when persistence is needed across timesteps. Passing a
+fixed `rng_seed` with a reused `rng_states` buffer does not trigger hidden
+re-seeding; explicit initialization happens only during omitted-buffer
+convenience allocation or when `initialize_rng=True` is requested before the
+captured loop or repeated-step run.
 
 For graph capture, particle count changes should be represented as changes in
 active slots, not changes in array shape. If a simulation would create more

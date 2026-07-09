@@ -642,19 +642,25 @@ def coagulation_step_gpu(
         volume: Per-box volume [m^3]. If None, uses ``particles.volume``.
         max_collisions: Maximum number of collisions per box.
         rng_seed: Seed used whenever this call initializes Warp RNG states.
+            This always applies to the omitted-``rng_states`` convenience path.
+            For caller-owned persistent buffers, the seed is only consumed when
+            ``initialize_rng=True`` explicitly requests a reset.
         collision_pairs: Optional preallocated collision buffer.
         n_collisions: Optional preallocated collision count buffer.
         rng_states: Optional preallocated RNG state buffer. When omitted, this
-            function allocates a call-local ``(n_boxes,)`` buffer and
-            initializes it from ``rng_seed`` for the current call. When
-            provided, the caller owns the buffer and it is reused as-is unless
+            function allocates a call-local ``(n_boxes,)`` buffer, seeds it
+            from ``rng_seed``, and uses it only for the current call. When
+            provided, the caller owns the persistent GPU-resident buffer and it
+            is reused as-is across repeated calls unless
             ``initialize_rng=True`` explicitly requests a reset from
             ``rng_seed``.
         initialize_rng: Explicit reset flag for caller-provided
             ``rng_states``. The default ``False`` path validates the buffer and
-            reuses it without reseeding. Set ``True`` to launch
-            ``_initialize_rng_states`` after validation. This argument does not
-            affect omitted ``rng_states`` convenience allocation, which always
+            reuses its existing state without reseeding, even if ``rng_seed``
+            matches an earlier call. Set ``True`` to launch
+            ``_initialize_rng_states`` after validation and reset the
+            persistent buffer from ``rng_seed``. This argument does not affect
+            omitted ``rng_states`` convenience allocation, which always
             initializes the internal buffer for the current call.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``.
@@ -693,11 +699,17 @@ def coagulation_step_gpu(
         - Omitted ``rng_states``: allocate a call-local internal buffer and
           initialize it from ``rng_seed`` for this call.
         - Provided ``rng_states`` with ``initialize_rng=False``: validate the
-          caller-owned buffer and reuse it without resetting.
+          caller-owned persistent buffer and reuse it without resetting.
         - Provided ``rng_states`` with ``initialize_rng=True``: validate the
-          caller-owned buffer, then reset it from ``rng_seed``.
+          caller-owned persistent buffer, then reset it from ``rng_seed``.
         - Validation failure: raise before RNG initialization or other Warp
           launches mutate state.
+
+        Reusing the same ``rng_seed`` alongside a persistent ``rng_states``
+        buffer does not reseed that buffer on later calls unless
+        ``initialize_rng=True`` is passed. For repeated timesteps or graph
+        capture setup, initialize caller-owned buffers once before the loop or
+        before capture, then reuse them without hidden per-step resets.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
