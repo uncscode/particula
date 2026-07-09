@@ -13,14 +13,9 @@ inside the box thread and accepted by comparing a random draw with
 
 1. Add test/debug diagnostics that make acceptance behavior measurable without
    changing the production CPU/GPU transfer boundary.
-2. Evaluate a small, fixed-size stratification design suitable for Warp:
-   - derive radius bins from device-local data or existing min/max summaries;
-   - compute conservative per-bin-pair majorants with
-     `brownian_kernel_pair_wp(...)`;
-   - sample candidate pairs from selected bin pairs while preserving the same
-     collision-pair output contract;
-   - fall back to the existing global-majorant path when bins are sparse or the
-     hardening path cannot be made conservative.
+2. Harden the proposal step inside the existing global-majorant sampler by
+   selecting uniformly over currently active particles instead of retrying raw
+   particle indices until two active slots are found.
 3. Keep all physics unchanged: Brownian pair rates remain the source of truth,
    and changes affect only proposal efficiency/characterization.
 
@@ -36,6 +31,25 @@ inside the box thread and accepted by comparing a random draw with
   `coagulation_step_gpu(...)` from the same seeded setup.
 - This preserves the E3-F1 caller-owned RNG-state contract and keeps
   `.numpy()`/`wp.synchronize()` at explicit test boundaries only.
+
+## Landed Phase-E3-F2-P2 Design
+
+- `particula/gpu/kernels/coagulation.py` now replaces the retry-based
+  raw-index proposal loop with bounded active-particle rank selection.
+- Each scheduled trial draws two distinct active ranks, resolves both indices in
+  a single pass over `active_flags`, and exits the scan early once both active
+  particle indices are found.
+- Accepted-pair behavior stays unchanged after selection: production code still
+  uses `brownian_kernel_pair_wp(...) / k_max`, writes sorted accepted pairs into
+  `collision_pairs`, clears both active flags, decrements `active_count` by 2,
+  and preserves the existing collision-capacity exit conditions.
+- The mirrored diagnostic kernel in
+  `particula/gpu/kernels/tests/coagulation_test.py` implements the same bounded
+  selector so seeded parity checks continue comparing accepted counts, pair
+  prefixes, post-apply masses, concentrations, and RNG-state behavior.
+- No fixed-bin or alternate-majorant structure shipped in P2; the hardening was
+  intentionally limited to bounded candidate selection within the existing
+  global-majorant architecture.
 
 ## Boundary and API Constraints
 

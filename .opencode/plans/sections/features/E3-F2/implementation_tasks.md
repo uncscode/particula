@@ -18,17 +18,21 @@
 
 ## P2 Tasks
 
-- Prototype fixed-bin majorant or stratified pair-selection logic in
-  `particula/gpu/kernels/coagulation.py` using `brownian_kernel_pair_wp(...)`.
-- Keep the change inside the pair-selection portion of
+- [x] Ship bounded active-particle rank selection in
+  `particula/gpu/kernels/coagulation.py` using `brownian_kernel_pair_wp(...)`
+  as the unchanged Brownian acceptance source of truth.
+- [x] Keep the change inside the pair-selection portion of
   `coagulation_step_gpu(...)`; do not rewrite collision application, particle
   transfer helpers, or unrelated Warp launch structure in the same phase.
-- Preserve collision-pair buffer shapes, `n_collisions` semantics, and
+- [x] Preserve collision-pair buffer shapes, `n_collisions` semantics, and
   `max_collisions` handling, with before/after assertions in
   `particula/gpu/kernels/tests/coagulation_test.py` for the mixed-scale fixture.
-- Add co-located tests for invalid/self-pair rejection, sparse-bin fallback,
-  and mass conservation, ideally as three focused tests rather than one large
-  scenario to keep each phase near the 100-LOC review target.
+- [x] Mirror the bounded selector in
+  `particula/gpu/kernels/tests/coagulation_test.py` so seeded diagnostics stay
+  in parity with production accepted counts and accepted-pair prefixes.
+- [x] Add co-located tests for selector validity, sparse/degenerate active-set
+  handling, exactly-two-active fallback, accepted-count bounds, and mixed-scale
+  mass conservation.
 
 ## P3 Tasks
 

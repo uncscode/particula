@@ -34,6 +34,23 @@
   the fewer-than-two-active-particles edge case without warning-producing
   divide-by-zero paths.
 
+## Shipped P2 Coverage
+
+- `particula/gpu/kernels/tests/coagulation_test.py` now includes mixed-scale
+  selector-validity coverage that asserts both diagnostic and production
+  accepted-pair prefixes satisfy `0 <= i < j < n_particles` and only reference
+  input slots that were active before the step.
+- Sparse and degenerate regressions now cover zero-active and one-active
+  particle setups with zero accepted collisions plus finite, non-negative
+  diagnostics.
+- Exactly-two-active fallback coverage confirms the bounded selector accepts the
+  only valid non-adjacent pair when two active particles remain.
+- Mixed-scale bounds assertions verify accepted counts remain within
+  `collision_pairs.shape[1]`, `max_collisions`, and `n_particles // 2`.
+- Mixed-scale conservation coverage now checks total pre/post mass with
+  `numpy.testing.assert_allclose(..., rtol=1.0e-12)` after applying accepted
+  collisions.
+
 ## Device Coverage
 
 - Run on Warp CPU by default.
@@ -44,7 +61,7 @@
 
 ```bash
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 ```

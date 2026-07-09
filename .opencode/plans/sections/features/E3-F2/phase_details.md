@@ -17,17 +17,22 @@
     `test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(device)`,
     and `test_mixed_scale_sparse_box_returns_zero_accepted_collisions(device)`.
 
-- [ ] **E3-F2-P2:** Prototype bounded mixed-scale sampling hardening with conservation tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F2-P2:** Prototype bounded mixed-scale sampling hardening with conservation tests
+  - Issue: #1242 | Size: S | Status: Shipped 2026-07-09
   - Depends on: E3-F2-P1 establishing the fixture and acceptance diagnostics so
     any hardening attempt is measured against a captured baseline instead of a
     guessed failure mode.
-  - Goal: Evaluate a minimal fixed-bin majorant or stratified pair-selection
-    path that improves or bounds acceptance without changing physics.
+  - Goal: Ship a minimal bounded pair-selection hardening path that improves or
+    bounds proposal behavior without changing Brownian physics.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`.
-  - Tests: Unit coverage for no self-pairs/duplicate invalid pairs, collision
-    buffer bounds, and mass conservation on the mixed-scale fixture.
+  - Shipped details: replaced retry-based raw-index proposals with bounded
+    active-particle rank selection in production, mirrored the same selector in
+    the test-local diagnostic kernel, and preserved collision-capacity,
+    collision-pair buffer, and caller-owned RNG-state contracts.
+  - Tests: selector-validity coverage for both diagnostic and production pair
+    prefixes, zero/one-active sparse regressions, exactly-two-active fallback,
+    accepted-count bounds, and mixed-scale total-mass conservation.
 
 - [ ] **E3-F2-P3:** Compare statistical correctness against current Brownian behavior
   - Issue: TBD | Size: S | Status: Not Started

@@ -105,6 +105,10 @@ def brownian_coagulation_kernel(  # noqa: C901
 ) -> None:
     """Select stochastic coagulation pairs for each box.
 
+    Candidate pairs are drawn by rank within the current active set so each
+    scheduled trial proposes two distinct active particles without retrying on
+    inactive slots.
+
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
         concentration: Particle concentrations ``(n_boxes, n_particles)``.
@@ -284,6 +288,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         rank_j = wp.randi(state, wp.int32(0), active_count - wp.int32(1))
         adjusted_rank_j = rank_j
         if adjusted_rank_j >= rank_i:
+            # Skip the first chosen active rank so the second proposal maps to
+            # one of the remaining active particles.
             adjusted_rank_j += wp.int32(1)
 
         selected_i = wp.int32(-1)

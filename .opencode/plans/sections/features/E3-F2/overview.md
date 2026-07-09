@@ -26,6 +26,15 @@ bounded limitation with reproducible diagnostics.
 - The landed baseline adds a deterministic mixed NPF/droplet fixture, a
   mirrored test-local attempt/accept diagnostic path, and focused mixed-scale
   Warp CPU/CUDA regression coverage.
+- Phase E3-F2-P2 shipped in issue #1242 with a bounded active-particle
+  rank-selection path inside `particula/gpu/kernels/coagulation.py` while
+  preserving the existing global-majorant Brownian physics, collision buffer
+  contract, and caller-owned RNG-state semantics.
+- The same bounded selector was mirrored in
+  `particula/gpu/kernels/tests/coagulation_test.py`, and the mixed-scale test
+  surface now covers selector validity, sparse/degenerate active sets,
+  exactly-two-active fallback behavior, accepted-count bounds, and total-mass
+  conservation.
 - No public `coagulation_step_gpu(...)` API, exported helper surface, or
   production synchronization behavior changed in this phase.
 

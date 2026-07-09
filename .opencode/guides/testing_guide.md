@@ -206,12 +206,16 @@ Keep those tests warning-clean under `-Werror`, assert canonical
 baseline assumptions in the matching roadmap page.
 
 For the mixed NPF/droplet coagulation diagnostic coverage added in
-`particula/gpu/kernels/tests/coagulation_test.py`, use focused local runs such
-as:
+`particula/gpu/kernels/tests/coagulation_test.py`, keep selector-validity and
+low-active regressions focused on seeded invariants: accepted pairs stay
+sorted, in bounds, and limited to originally active slots; zero/one-active
+inputs early-return cleanly; exactly-two-active inputs fall back to the only
+valid pair; and accepted collisions conserve total mass. Use focused local runs
+such as:
 
 ```bash
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
 ```
 
 These checks are intended for seeded regression and warning-clean acceptance
