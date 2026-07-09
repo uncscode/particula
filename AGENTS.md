@@ -319,6 +319,37 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   `docs/Features/particle-data-migration.md` for migration walkthroughs, and
   `particula/gpu/tests/conversion_test.py` for the regression-backed contract.
 
+### GPU coagulation RNG state ownership
+
+```python
+import warp as wp
+
+rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
+
+# Seed once before a repeated-step loop or before graph capture.
+coagulation_step_gpu(..., rng_seed=41, rng_states=rng_states,
+                     initialize_rng=True)
+
+for _ in range(n_steps):
+    coagulation_step_gpu(..., rng_seed=41, rng_states=rng_states)
+```
+
+**Key points:**
+
+- Shipped baseline: caller-owned persistent `rng_states` are seeded once and
+  then reused across repeated calls.
+- Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
+- Reusing a fixed `rng_seed` with a persistent `rng_states` buffer does not
+  trigger hidden reseeding; call with `initialize_rng=True` only when you
+  intentionally want to reset the stream.
+- For graph capture or repeated-step loops, initialize or reset persistent
+  `rng_states` before capture or before entering the loop.
+- Coagulation `rng_states` are Warp-resident sidecar state, not fields on
+  `ParticleData`, `GasData`, `EnvironmentData`, or their Warp mirrors.
+- See `docs/Features/data-containers-and-gpu-foundations.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
+  and graph-capture guidance.
+
 ### GPU mass-precision baseline study
 
 ```bash

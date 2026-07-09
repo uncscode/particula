@@ -64,11 +64,11 @@ from particula.gpu.properties.particle_properties import (
 @wp.kernel
 # type: ignore[misc]
 def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
-    """Initialize per-box RNG states.
+    """Initialize or reset per-box RNG states from a seed.
 
     Args:
         seed: RNG seed value.
-        rng_states: Output RNG state buffer ``(n_boxes,)``.
+        rng_states: RNG state buffer ``(n_boxes,)`` written in place.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
     rng_states[box_idx] = wp.rand_init(wp.int32(seed), wp.int32(box_idx))
@@ -124,7 +124,9 @@ def brownian_coagulation_kernel(  # noqa: C901
         collision_pairs: Output collision indices
             ``(n_boxes, max_collisions, 2)``.
         n_collisions: Output collision counts ``(n_boxes,)``.
-        rng_states: RNG states ``(n_boxes,)``.
+        rng_states: Per-box RNG states ``(n_boxes,)`` mutated in place during
+            pair selection. Reusing this buffer across calls preserves
+            caller-owned persistent state unless it is reset before launch.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
 
@@ -650,8 +652,8 @@ def coagulation_step_gpu(
         rng_states: Optional preallocated RNG state buffer. When omitted, this
             function allocates a call-local ``(n_boxes,)`` buffer, seeds it
             from ``rng_seed``, and uses it only for the current call. When
-            provided, the caller owns the persistent GPU-resident buffer and it
-            is reused as-is across repeated calls unless
+            provided, the caller owns the persistent GPU-resident sidecar
+            buffer and it is reused as-is across repeated calls unless
             ``initialize_rng=True`` explicitly requests a reset from
             ``rng_seed``.
         initialize_rng: Explicit reset flag for caller-provided

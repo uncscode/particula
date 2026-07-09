@@ -26,8 +26,15 @@ use the existing `*_test.py` convention and must not lower coverage thresholds.
   `test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift`,
   which asserts repeated benchmark GPU steps keep a constant `rng_seed` while
   reusing the same persistent `rng_states` buffer.
-- **P4:** Validate documentation links and any updated executable examples for
-  broader GPU RNG guidance.
+- **P4:** Shipped as a docs-only validation phase. Readback and terminology
+  checks now verify that `particula/gpu/kernels/coagulation.py`,
+  `docs/Features/Roadmap/data-oriented-gpu.md`, and
+  `docs/Features/data-containers-and-gpu-foundations.md` all describe the same
+  seed-once contract: omitted `rng_states` allocate and seed per call,
+  caller-owned persistent buffers are reused as-is, and explicit reset occurs
+  only through `initialize_rng=True`. Focused runtime smoke validation remains
+  `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` with no
+  new production behavior tests required.
 
 ## Test Locations
 
