@@ -34,6 +34,21 @@
   when P3/P4 decide whether the final story is a measured improvement or a
   documented bounded limitation.
 
+## P3 Shipped State
+
+- Issue #1243 updated `docs/Features/Roadmap/data-oriented-gpu.md` with a
+  concise mixed-scale evidence note rather than waiting for a larger P4 rewrite.
+- The shipped note records the exact reproduction command
+  `pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale`
+  and the measured Warp CPU evidence for the shipped `E3-F2-P2` bounded
+  selector path.
+- The supporting evidence remains grounded in
+  `particula/gpu/kernels/tests/coagulation_test.py`, where repeated seeded
+  Brownian-rate, conservation, and caller-owned `rng_states` reuse/reset
+  coverage now lives.
+- Broader roadmap cleanup or final product-positioning language is still
+  deferred to E3-F2-P4 if needed.
+
 ## Optional Updates
 
 - Add a focused `docs/Features/` note if the selected design needs more space

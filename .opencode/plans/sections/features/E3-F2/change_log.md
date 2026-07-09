@@ -25,3 +25,11 @@
   mixed-scale Warp CPU/CUDA regression tests.
 - Noted that no public `coagulation_step_gpu(...)` API or production
   synchronization behavior changed in this phase.
+- Updated the plan after issue #1243 shipped E3-F2-P3.
+- Marked the statistical-comparison phase complete with repeated seeded
+  Brownian-rate checks, repeated-run conservation coverage including
+  zero-acceptance trials, and mixed-scale caller-owned `rng_states` reuse/reset
+  tests.
+- Recorded that `docs/Features/Roadmap/data-oriented-gpu.md` now includes the
+  exact mixed-scale pytest reproduction command and measured evidence note for
+  the shipped `E3-F2-P2` bounded selector path.

@@ -34,23 +34,39 @@
     prefixes, zero/one-active sparse regressions, exactly-two-active fallback,
     accepted-count bounds, and mixed-scale total-mass conservation.
 
-- [ ] **E3-F2-P3:** Compare statistical correctness against current Brownian behavior
-  - Issue: TBD | Size: S | Status: Not Started
-  - Depends on: E3-F2-P1 and E3-F2-P2. Statistical comparison should run only
-    after the fixture exists and the candidate hardening path, if any, is stable
-    enough to compare against the current Brownian baseline.
+- [x] **E3-F2-P3:** Compare statistical correctness against current Brownian behavior
+  - Issue: #1243 | Size: S | Status: Shipped 2026-07-09
+  - Depends on: E3-F2-P1 and E3-F2-P2. The shipped comparison reused the
+    canonical mixed-scale fixture and bounded-selector implementation from the
+    earlier phases instead of introducing a new kernel path.
   - Goal: Demonstrate that selected behavior preserves expected Brownian rates
-    within stochastic tolerances or document the bounded limitation.
-  - Files: `particula/gpu/kernels/tests/coagulation_test.py`, optional
-    benchmark or metric helper in `particula/gpu/tests/benchmark_test.py`.
-  - Tests: Aggregate stochastic collision-rate checks, conservation checks,
-    deterministic seeded/reused-RNG behavior aligned with E3-F1.
+    within stochastic tolerances and record the measured outcome with an exact
+    reproduction command.
+  - Files: `particula/gpu/kernels/tests/coagulation_test.py`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`.
+  - Shipped details: added repeated seeded mixed-scale Brownian statistical
+    checks for fixed seeds `101-200`, repeated-run total-mass conservation
+    coverage that explicitly tolerates zero-acceptance trials, and mixed-scale
+    caller-owned `rng_states` reuse/reset tests aligned with E3-F1 semantics.
+  - Evidence recorded: the roadmap note captures the exact command
+    `pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale`
+    plus the measured Warp CPU result of 139 accepted collisions versus a
+    Brownian expected mean of 143.846 with sigma 11.994.
+  - Tests:
+    `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`,
+    `test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acceptance_trials(device)`,
+    `test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(device)`,
+    and
+    `test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(device)`.
 
 - [ ] **E3-F2-P4:** Document selected design or accepted mixed-scale limitation
   - Issue: TBD | Size: XS | Status: Not Started
   - Depends on: E3-F2-P3 producing the evidence-backed outcome so the roadmap
-    records measured acceptance bounds, preserved behavior, or an explicitly
-    accepted limitation instead of an interim prototype state.
+  records measured acceptance bounds, preserved behavior, or an explicitly
+  accepted limitation instead of an interim prototype state.
+  - Current state: issue #1243 already landed the minimal roadmap evidence note;
+    P4 remains for any broader final decision framing beyond that concise
+    shipped update.
   - Goal: Update roadmap or feature documentation with reproduction commands,
     observed acceptance bounds, and the chosen implementation decision.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, optional focused
