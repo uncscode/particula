@@ -1190,21 +1190,25 @@ def test_coagulation_step_gpu_reuses_preallocated_buffers(
     assert np.all(np.asarray(n_collisions.numpy()) >= 0)
 
 
-def test_coagulation_step_gpu_provided_rng_states_reuse_without_reset_by_default(
+def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid_calls(
     device: str,
 ) -> None:
-    """Caller-owned RNG state is reused unless explicit reset is requested."""
+    """Caller-owned RNG state advances across repeated valid calls."""
     particles = _make_particle_data(n_boxes=1, n_particles=6, n_species=1)
     rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    rng_seed = 37
+    repeated_rng_states = rng_states
 
     wp.launch(
         _initialize_rng_states,
         dim=1,
-        inputs=[wp.uint32(5), rng_states],
+        inputs=[wp.uint32(rng_seed), rng_states],
         device=device,
     )
     wp.synchronize()
     initial_state = np.asarray(rng_states.numpy()).copy()
+
+    assert repeated_rng_states is rng_states
 
     first_particles = to_warp_particle_data(particles, device=device)
     coagulation_step_gpu(
@@ -1213,9 +1217,9 @@ def test_coagulation_step_gpu_provided_rng_states_reuse_without_reset_by_default
         pressure=101325.0,
         time_step=1.0,
         volume=1.0e-18,
-        rng_seed=37,
+        rng_seed=rng_seed,
         max_collisions=8,
-        rng_states=rng_states,
+        rng_states=repeated_rng_states,
     )
     wp.synchronize()
     state_after_first_call = np.asarray(rng_states.numpy()).copy()
@@ -1227,15 +1231,16 @@ def test_coagulation_step_gpu_provided_rng_states_reuse_without_reset_by_default
         pressure=101325.0,
         time_step=1.0,
         volume=1.0e-18,
-        rng_seed=37,
+        rng_seed=rng_seed,
         max_collisions=8,
-        rng_states=rng_states,
+        rng_states=repeated_rng_states,
     )
     wp.synchronize()
     state_after_second_call = np.asarray(rng_states.numpy()).copy()
 
     assert not np.array_equal(state_after_first_call, initial_state)
     assert not np.array_equal(state_after_second_call, state_after_first_call)
+    assert not np.array_equal(state_after_second_call, initial_state)
 
 
 
@@ -1837,6 +1842,57 @@ def test_coagulation_step_gpu_invalid_time_step_fails_before_mutation(
     )
     npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
     _assert_particles_unchanged(gpu_particles, initial_particles)
+
+
+def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
+    device: str,
+) -> None:
+    """Invalid follow-up calls leave advanced caller-owned RNG state unchanged."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    first_gpu_particles = to_warp_particle_data(particles, device=device)
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    wp.launch(
+        _initialize_rng_states,
+        dim=1,
+        inputs=[wp.uint32(41), rng_states],
+        device=device,
+    )
+    wp.synchronize()
+    initialized_state = np.asarray(rng_states.numpy()).copy()
+
+    coagulation_step_gpu(
+        first_gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        volume=1.0e-18,
+        rng_seed=41,
+        max_collisions=8,
+        rng_states=rng_states,
+    )
+    wp.synchronize()
+    advanced_state = np.asarray(rng_states.numpy()).copy()
+
+    assert not np.array_equal(advanced_state, initialized_state)
+
+    second_gpu_particles = to_warp_particle_data(particles, device=device)
+    with pytest.raises(
+        ValueError,
+        match="time_step must be finite and nonnegative",
+    ):
+        coagulation_step_gpu(
+            second_gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=-0.1,
+            volume=1.0e-18,
+            rng_seed=41,
+            max_collisions=8,
+            rng_states=rng_states,
+        )
+
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), advanced_state)
 
 
 def test_validate_time_step_accepts_valid_float_like_inputs() -> None:
