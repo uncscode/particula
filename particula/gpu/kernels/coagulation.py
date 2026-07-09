@@ -60,6 +60,47 @@ from particula.gpu.properties.particle_properties import (
 )
 
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
+MAX_SCHEDULED_TRIALS_INT32 = np.iinfo(np.int32).max
+
+
+@no_type_check
+@wp.func
+def _bound_scheduled_trials(expected_trials: Any) -> Any:
+    """Clamp scheduled-trial counts before any int32 conversion."""
+    bounded_trials = expected_trials
+    if bounded_trials > wp.float64(MAX_SCHEDULED_TRIALS_INT32):
+        bounded_trials = wp.float64(MAX_SCHEDULED_TRIALS_INT32)
+    return bounded_trials
+
+
+@no_type_check
+@wp.func
+def _resolve_active_pair_by_rank(
+    active_flags: Any,
+    box_idx: Any,
+    n_particles: Any,
+    rank_i: Any,
+    adjusted_rank_j: Any,
+) -> Any:
+    """Resolve two active-set ranks to particle indices in one scan."""
+    selected_i = wp.int32(-1)
+    selected_j = wp.int32(-1)
+    active_rank = wp.int32(0)
+
+    for p_idx in range(n_particles):
+        if active_flags[box_idx, p_idx] == wp.int32(0):
+            continue
+
+        if active_rank == rank_i:
+            selected_i = wp.int32(p_idx)
+        if active_rank == adjusted_rank_j:
+            selected_j = wp.int32(p_idx)
+
+        active_rank += wp.int32(1)
+        if selected_i >= wp.int32(0) and selected_j >= wp.int32(0):
+            break
+
+    return wp.vec2i(selected_i, selected_j)
 
 
 @no_type_check
@@ -270,8 +311,9 @@ def brownian_coagulation_kernel(  # noqa: C901
     collision_count = wp.int32(0)
     state = rng_states[box_idx]
 
-    tests = wp.int32(expected_trials)
-    remainder = expected_trials - wp.float64(tests)
+    bounded_trials = _bound_scheduled_trials(expected_trials)
+    tests = wp.int32(bounded_trials)
+    remainder = bounded_trials - wp.float64(tests)
     if wp.randf(state) < remainder:
         tests += wp.int32(1)
     rng_states[box_idx] = state
@@ -292,26 +334,20 @@ def brownian_coagulation_kernel(  # noqa: C901
             # one of the remaining active particles.
             adjusted_rank_j += wp.int32(1)
 
-        selected_i = wp.int32(-1)
-        selected_j = wp.int32(-1)
-        active_rank = wp.int32(0)
-        # Resolve both active-set ranks in one pass so each scheduled trial does
-        # at most one active scan while still excluding the first selected rank.
-        for p_idx in range(n_particles):
-            if active_flags[box_idx, p_idx] == wp.int32(0):
-                continue
-
-            if active_rank == rank_i:
-                selected_i = wp.int32(p_idx)
-            if active_rank == adjusted_rank_j:
-                selected_j = wp.int32(p_idx)
-
-            active_rank += wp.int32(1)
-            if selected_i >= wp.int32(0) and selected_j >= wp.int32(0):
-                break
+        selected_pair = _resolve_active_pair_by_rank(
+            active_flags,
+            box_idx,
+            n_particles,
+            rank_i,
+            adjusted_rank_j,
+        )
+        selected_i = selected_pair[0]
+        selected_j = selected_pair[1]
 
         if selected_i < wp.int32(0) or selected_j < wp.int32(0):
-            break
+            # Guard an unexpected active-rank mismatch without silently
+            # truncating the remaining scheduled pass.
+            continue
 
         if selected_j < selected_i:
             temp_idx = selected_i

@@ -50,8 +50,10 @@ from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
     particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels.coagulation import (  # noqa: E402
+    _bound_scheduled_trials,
     _ensure_volume_array,
     _initialize_rng_states,
+    _resolve_active_pair_by_rank,
     _resolve_collision_capacity,
     _validate_collision_counts,
     _validate_collision_pairs,
@@ -108,6 +110,67 @@ class _AttemptDiagnostics:
     production_concentration: np.ndarray
     diagnostic_rng_states: np.ndarray
     production_rng_states: np.ndarray
+
+
+@wp.kernel
+def _selector_guard_regression_kernel(
+    active_flags: Any,
+    resolved_pairs: Any,
+    unresolved_attempts: Any,
+) -> None:
+    """Verify unresolved rank selection does not truncate later attempts."""
+    box_idx = wp.tid()
+    n_particles = active_flags.shape[1]
+
+    invalid_pair = _resolve_active_pair_by_rank(
+        active_flags,
+        box_idx,
+        n_particles,
+        wp.int32(0),
+        wp.int32(5),
+    )
+    if invalid_pair[0] < wp.int32(0) or invalid_pair[1] < wp.int32(0):
+        unresolved_attempts[box_idx] = wp.int32(1)
+
+    valid_pair = _resolve_active_pair_by_rank(
+        active_flags,
+        box_idx,
+        n_particles,
+        wp.int32(0),
+        wp.int32(2),
+    )
+    resolved_pairs[box_idx, 0] = valid_pair[0]
+    resolved_pairs[box_idx, 1] = valid_pair[1]
+
+
+@wp.kernel
+def _bound_scheduled_trials_probe_kernel(
+    expected_trials: Any,
+    bounded_trials: Any,
+) -> None:
+    """Probe the scheduled-trial clamp helper from a Warp kernel."""
+    box_idx = wp.tid()
+    bounded_trials[box_idx] = _bound_scheduled_trials(expected_trials[box_idx])
+
+
+@wp.kernel
+def _resolve_active_pair_probe_kernel(
+    active_flags: Any,
+    resolved_pairs: Any,
+    rank_i: Any,
+    adjusted_rank_j: Any,
+) -> None:
+    """Probe active-rank resolution for one-box deterministic checks."""
+    box_idx = wp.tid()
+    pair = _resolve_active_pair_by_rank(
+        active_flags,
+        box_idx,
+        active_flags.shape[1],
+        rank_i,
+        adjusted_rank_j,
+    )
+    resolved_pairs[box_idx, 0] = pair[0]
+    resolved_pairs[box_idx, 1] = pair[1]
 
 
 @pytest.fixture(params=warp_devices(wp))
@@ -401,9 +464,7 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     collision_count = wp.int32(0)
     state = rng_states[box_idx]
 
-    bounded_trials = expected_trials
-    if bounded_trials > wp.float64(_DIAGNOSTIC_MAX_SCHEDULED_TRIALS):
-        bounded_trials = wp.float64(_DIAGNOSTIC_MAX_SCHEDULED_TRIALS)
+    bounded_trials = _bound_scheduled_trials(expected_trials)
 
     tests = wp.int32(bounded_trials)
     remainder = bounded_trials - wp.float64(tests)
@@ -428,26 +489,18 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         if adjusted_rank_j >= rank_i:
             adjusted_rank_j += wp.int32(1)
 
-        selected_i = wp.int32(-1)
-        selected_j = wp.int32(-1)
-        active_rank = wp.int32(0)
-        # Mirror the production kernel's one-pass active-rank resolution so the
-        # diagnostic path stays parity-checked without retry-based proposals.
-        for p_idx in range(n_particles):
-            if active_flags[box_idx, p_idx] == wp.int32(0):
-                continue
-
-            if active_rank == rank_i:
-                selected_i = wp.int32(p_idx)
-            if active_rank == adjusted_rank_j:
-                selected_j = wp.int32(p_idx)
-
-            active_rank += wp.int32(1)
-            if selected_i >= wp.int32(0) and selected_j >= wp.int32(0):
-                break
+        selected_pair = _resolve_active_pair_by_rank(
+            active_flags,
+            box_idx,
+            n_particles,
+            rank_i,
+            adjusted_rank_j,
+        )
+        selected_i = selected_pair[0]
+        selected_j = selected_pair[1]
 
         if selected_i < wp.int32(0) or selected_j < wp.int32(0):
-            break
+            continue
 
         if selected_j < selected_i:
             temp_idx = selected_i
@@ -2062,6 +2115,54 @@ def test_mixed_scale_diagnostic_clamps_scheduled_trials_to_int32_limit(
 
     assert diagnostics.scheduled_trial_counts[0] == _INT32_MAX
     assert diagnostics.executed_trial_counts[0] == 1
+    npt.assert_array_equal(
+        diagnostics.accepted_counts,
+        diagnostics.production_counts,
+    )
+    _assert_trimmed_collision_pairs_equal(
+        diagnostics.diagnostic_pairs,
+        diagnostics.accepted_counts,
+        diagnostics.production_pairs,
+        diagnostics.production_counts,
+    )
+    npt.assert_allclose(
+        diagnostics.diagnostic_masses,
+        diagnostics.production_masses,
+    )
+    npt.assert_allclose(
+        diagnostics.diagnostic_concentration,
+        diagnostics.production_concentration,
+    )
+    npt.assert_array_equal(
+        diagnostics.diagnostic_rng_states,
+        diagnostics.production_rng_states,
+    )
+
+
+def test_selector_guard_keeps_rank_resolution_available_for_later_attempts(
+    device: str,
+) -> None:
+    """Unresolved rank selection does not truncate later valid resolutions."""
+    active_flags = wp.array([[1, 0, 1, 1]], dtype=wp.int32, device=device)
+    resolved_pairs = wp.zeros((1, 2), dtype=wp.int32, device=device)
+    unresolved_attempts = wp.zeros((1,), dtype=wp.int32, device=device)
+
+    wp.launch(
+        _selector_guard_regression_kernel,
+        dim=(1,),
+        inputs=[active_flags, resolved_pairs, unresolved_attempts],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        np.asarray(unresolved_attempts.numpy()),
+        np.array([1], dtype=np.int32),
+    )
+    npt.assert_array_equal(
+        np.asarray(resolved_pairs.numpy()),
+        np.array([[0, 3]], dtype=np.int32),
+    )
 
 
 @pytest.mark.parametrize(
@@ -3577,6 +3678,80 @@ def test_resolve_collision_capacity_clamps_to_physical_limit() -> None:
     """Collision capacity is bounded by the useful per-box particle limit."""
     assert _resolve_collision_capacity(256, n_boxes=1, n_particles=6) == 3
     assert _resolve_collision_capacity(2, n_boxes=1, n_particles=6) == 2
+
+
+def test_bound_scheduled_trials_preserves_values_below_int32_limit(
+    device: str,
+) -> None:
+    """Bounded-trial helper leaves finite in-range schedules unchanged."""
+    expected_trials = wp.array(
+        [0.0, 1.25, 42.0], dtype=wp.float64, device=device
+    )
+    bounded_trials = wp.zeros((3,), dtype=wp.float64, device=device)
+
+    wp.launch(
+        _bound_scheduled_trials_probe_kernel,
+        dim=3,
+        inputs=[expected_trials, bounded_trials],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_allclose(
+        np.asarray(bounded_trials.numpy()),
+        np.array([0.0, 1.25, 42.0], dtype=np.float64),
+    )
+
+
+def test_bound_scheduled_trials_clamps_values_above_int32_limit(
+    device: str,
+) -> None:
+    """Bounded-trial helper clamps large schedules before int32 conversion."""
+    expected_trials = wp.array(
+        [float(_INT32_MAX) * 2.0],
+        dtype=wp.float64,
+        device=device,
+    )
+    bounded_trials = wp.zeros((1,), dtype=wp.float64, device=device)
+
+    wp.launch(
+        _bound_scheduled_trials_probe_kernel,
+        dim=1,
+        inputs=[expected_trials, bounded_trials],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_allclose(
+        np.asarray(bounded_trials.numpy()),
+        np.array([float(_INT32_MAX)], dtype=np.float64),
+    )
+
+
+def test_resolve_active_pair_by_rank_maps_sparse_active_ranks(
+    device: str,
+) -> None:
+    """Active-rank resolution skips inactive slots and preserves rank order."""
+    active_flags = wp.array([[0, 1, 0, 1, 1]], dtype=wp.int32, device=device)
+    resolved_pairs = wp.zeros((1, 2), dtype=wp.int32, device=device)
+
+    wp.launch(
+        _resolve_active_pair_probe_kernel,
+        dim=1,
+        inputs=[
+            active_flags,
+            resolved_pairs,
+            wp.int32(1),
+            wp.int32(2),
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        np.asarray(resolved_pairs.numpy()),
+        np.array([[3, 4]], dtype=np.int32),
+    )
 
 
 def test_initialize_coagulation_rng_states_changes_output(device: str) -> None:
