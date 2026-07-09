@@ -25,8 +25,12 @@
 
 - [x] Add or update compatibility tests proving omitted `rng_states` still works
   for existing callers.
-- [x] Add `test_coagulation_step_gpu_does_not_reinitialize_persisted_rng_states`
-  covering two repeated calls with the same seed and persistent buffer.
+- [x] Rename the repeated valid-call regression to
+  `test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid_calls`
+  so the persisted caller-owned buffer contract is explicit.
+- [x] Add a valid-then-invalid regression proving an already-advanced
+  caller-owned `rng_states` buffer is preserved when a follow-up call fails
+  early on `time_step` validation.
 - [x] Add invalid-input assertions that wrong environment, volume, shape, or
   device combinations leave `rng_states` unchanged.
 - [x] Cover explicit reset via `initialize_rng=True` and wrong-shape /
