@@ -781,25 +781,44 @@ fixed or explicitly accepted during this epic.
   particle pairs to compute `active_pair_count`, expected mean, and the
   Poisson-style sigma `sqrt(expected_mean)`.
 
-  The main evidence tests are
+  The measured evidence recorded in E3-F2-P3 is 139 accepted collisions across
+  the fixed seeded replay range `range(101, 201)`, compared with the Brownian
+  expected mean `143.846`, Poisson-style sigma `11.994`, and documented
+  `3-sigma` tolerance `35.981`. That tolerance is based on repeated fresh
+  seeded runs against the same mixed-scale fixture, with the expected mean
+  computed from active upper-triangle Brownian pairs only and sigma taken as
+  `sqrt(expected_mean)`.
+
+  The shipped mixed-scale test surface currently includes
   `test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(device)`,
   `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`,
   `test_mixed_scale_expected_collision_statistics_use_active_pairs_only()`,
+  `test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(device)`,
+  `test_mixed_scale_selector_only_emits_sorted_active_in_bounds_pairs(device)`,
   `test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(device, active_indices)`,
+  `test_mixed_scale_diagnostic_tracks_executed_trials_under_early_exit(device)`,
   `test_mixed_scale_two_active_particles_accept_the_only_valid_pair(device)`,
+  `test_mixed_scale_diagnostic_clamps_scheduled_trials_to_int32_limit(device)`,
+  `test_mixed_scale_coagulation_conserves_total_mass(device)`,
   `test_mixed_scale_repeated_seeded_runs_conserve_total_mass_even_with_zero_acceptance_trials(device)`,
+  `test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(device)`,
   and
-  `test_mixed_scale_caller_owned_rng_states_advance_without_hidden_reseed(device)`.
-  Across fresh Warp CPU seeds `101-200`, the shipped bounded-selector path
-  produced 139 accepted collisions versus a Brownian expected mean of `143.846`
-  with sigma `11.994` and a 3-sigma tolerance of `35.981`. The same test-local
-  coverage also verifies the active-pairs-only reference calculation, finite
-  zero-acceptance-trial handling, repeated-run total-mass conservation, and
-  caller-owned `rng_states` reuse/reset semantics. Treat this as bounded
-  evidence that the selector hardening preserved expected Brownian behavior
-  within stochastic tolerance inside the existing sampler, not as proof that
-  the global-majorant acceptance collapse is solved for every mixed-scale
-  distribution.
+  `test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(device)`.
+  The Brownian repeated-run evidence is the seeded `range(101, 201)` check in
+  `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`:
+  the shipped bounded-selector path is accepted only when the observed accepted
+  collision total stays within a `3 * sigma` tolerance of the active-pairs-only
+  Brownian expected mean computed by
+  `_get_expected_collision_statistics(...)` for the documented `time_step=0.5`,
+  `max_collisions=8`, and `volume=1.0e-10` replay setup. The same test-local
+  coverage also verifies active-pairs-only reference statistics, sorted
+  in-bounds accepted pairs, finite zero-acceptance behavior, early-exit
+  accounting for executed versus scheduled trials, bounded trial clamping,
+  total-mass conservation, and caller-owned `rng_states` reuse/reset semantics.
+  Treat this as bounded evidence that the selector hardening preserved expected
+  Brownian behavior within stochastic tolerance inside the existing sampler,
+  not as proof that the global-majorant acceptance collapse is solved for every
+  mixed-scale distribution.
 
   Reproduce the seeded checks with:
 
