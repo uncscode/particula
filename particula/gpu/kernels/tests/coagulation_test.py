@@ -15,6 +15,7 @@ GPU API.
 from __future__ import annotations
 
 import inspect
+from dataclasses import dataclass
 
 # pyright: reportArgumentType=false
 # pyright: reportAssignmentType=false
@@ -86,6 +87,27 @@ from particula.gpu.tests.cuda_availability import (  # noqa: E402
 # pyright: reportAssignmentType=false
 from particula.particles.particle_data import ParticleData  # noqa: E402
 from particula.util import constants  # noqa: E402
+
+_INT32_MAX = np.iinfo(np.int32).max
+_DIAGNOSTIC_MAX_SCHEDULED_TRIALS = float(_INT32_MAX)
+
+
+@dataclass(frozen=True)
+class _AttemptDiagnostics:
+    """Seeded mirrored-versus-production coagulation diagnostics."""
+
+    scheduled_trial_counts: np.ndarray
+    executed_trial_counts: np.ndarray
+    accepted_counts: np.ndarray
+    production_counts: np.ndarray
+    diagnostic_pairs: np.ndarray
+    production_pairs: np.ndarray
+    diagnostic_masses: np.ndarray
+    production_masses: np.ndarray
+    diagnostic_concentration: np.ndarray
+    production_concentration: np.ndarray
+    diagnostic_rng_states: np.ndarray
+    production_rng_states: np.ndarray
 
 
 @pytest.fixture(params=warp_devices(wp))
@@ -241,15 +263,17 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     active_flags: Any,
     collision_pairs: Any,
     n_collisions: Any,
-    attempted_counts: Any,
+    scheduled_trial_counts: Any,
+    executed_trial_counts: Any,
     rng_states: Any,
     collision_capacity: Any,
 ) -> None:
-    """Mirror the production sampler and expose rounded attempt counts.
+    """Mirror the production sampler and expose bounded trial diagnostics.
 
     This test-local kernel reproduces the production Brownian rejection
     sampler's rounded ``expected_trials`` logic and accepted-collision
-    bookkeeping while storing per-box attempted trial counts for diagnostics.
+    bookkeeping while storing both bounded scheduled trials and true executed
+    trials for diagnostics.
     """
     box_idx = wp.tid()
     n_particles = masses.shape[1]
@@ -273,7 +297,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     )
 
     active_count = wp.int32(0)
-    attempted_counts[box_idx] = wp.int32(0)
+    scheduled_trial_counts[box_idx] = wp.int32(0)
+    executed_trial_counts[box_idx] = wp.int32(0)
     for particle_idx in range(n_particles):
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
             active_flags[box_idx, particle_idx] = wp.int32(0)
@@ -369,18 +394,22 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         / wp.float64(2.0)
     )
     expected_trials = k_max * possible_pairs * time_step / volume[box_idx]
-    if expected_trials <= wp.float64(0.0):
+    if not (expected_trials > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
     collision_count = wp.int32(0)
     state = rng_states[box_idx]
 
-    tests = wp.int32(expected_trials)
-    remainder = expected_trials - wp.float64(tests)
+    bounded_trials = expected_trials
+    if bounded_trials > wp.float64(_DIAGNOSTIC_MAX_SCHEDULED_TRIALS):
+        bounded_trials = wp.float64(_DIAGNOSTIC_MAX_SCHEDULED_TRIALS)
+
+    tests = wp.int32(bounded_trials)
+    remainder = bounded_trials - wp.float64(tests)
     if wp.randf(state) < remainder:
         tests += wp.int32(1)
-    attempted_counts[box_idx] = tests
+    scheduled_trial_counts[box_idx] = tests
     rng_states[box_idx] = state
 
     if tests <= wp.int32(0):
@@ -390,6 +419,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     for _ in range(tests):
         if collision_count >= collision_capacity or active_count < wp.int32(2):
             break
+
+        executed_trial_counts[box_idx] += wp.int32(1)
 
         selected_i = wp.int32(-1)
         selected_j = wp.int32(-1)
@@ -439,6 +470,59 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     rng_states[box_idx] = state
 
 
+def _validate_test_local_diagnostic_inputs(
+    *,
+    time_step: float,
+    temperature: float,
+    pressure: float,
+) -> tuple[float, float, float]:
+    """Validate local mirrored-diagnostic scalar inputs before launch."""
+    time_step_value = _validate_time_step(time_step)
+
+    if not np.isfinite(temperature) or temperature <= 0.0:
+        raise ValueError("temperature must be finite and > 0")
+    if not np.isfinite(pressure) or pressure <= 0.0:
+        raise ValueError("pressure must be finite and > 0")
+
+    return time_step_value, float(temperature), float(pressure)
+
+
+def _trim_collision_pairs(
+    collision_pairs: np.ndarray,
+    collision_counts: np.ndarray,
+) -> list[np.ndarray]:
+    """Trim padded collision-pair buffers down to accepted pairs only."""
+    trimmed_pairs: list[np.ndarray] = []
+    for box_idx, count in enumerate(collision_counts.tolist()):
+        trimmed_pairs.append(collision_pairs[box_idx, :count, :].copy())
+    return trimmed_pairs
+
+
+def _assert_trimmed_collision_pairs_equal(
+    diagnostic_pairs: np.ndarray,
+    diagnostic_counts: np.ndarray,
+    production_pairs: np.ndarray,
+    production_counts: np.ndarray,
+) -> None:
+    """Assert accepted collision-pair prefixes match box by box."""
+    diagnostic_trimmed = _trim_collision_pairs(
+        diagnostic_pairs,
+        diagnostic_counts,
+    )
+    production_trimmed = _trim_collision_pairs(
+        production_pairs,
+        production_counts,
+    )
+
+    assert len(diagnostic_trimmed) == len(production_trimmed)
+    for diagnostic_box_pairs, production_box_pairs in zip(
+        diagnostic_trimmed,
+        production_trimmed,
+        strict=True,
+    ):
+        npt.assert_array_equal(diagnostic_box_pairs, production_box_pairs)
+
+
 def _collect_test_local_attempt_diagnostics(
     particles: ParticleData,
     device: str,
@@ -449,8 +533,8 @@ def _collect_test_local_attempt_diagnostics(
     temperature: float = 298.15,
     pressure: float = 101325.0,
     volume: float | np.ndarray | None = None,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Collect attempted and accepted collision diagnostics for one seeded run.
+) -> _AttemptDiagnostics:
+    """Collect mirrored and production diagnostics for one seeded run.
 
     Args:
         particles: CPU particle fixture to convert for the requested device.
@@ -463,10 +547,14 @@ def _collect_test_local_attempt_diagnostics(
         volume: Optional box volume override in m^3.
 
     Returns:
-        A tuple of ``(attempted_counts, accepted_counts, production_counts)``
-        as ``np.int64`` arrays so tests can compare the private diagnostic path
-        against the public ``coagulation_step_gpu`` collision counts.
+        Mirrored and production trial-count, pair, particle-state, and RNG-state
+        diagnostics for seeded parity assertions.
     """
+    time_step, temperature, pressure = _validate_test_local_diagnostic_inputs(
+        time_step=time_step,
+        temperature=temperature,
+        pressure=pressure,
+    )
     n_boxes, n_particles, _ = particles.masses.shape
     collision_capacity = _resolve_collision_capacity(
         max_collisions=max_collisions,
@@ -500,9 +588,12 @@ def _collect_test_local_attempt_diagnostics(
         (n_boxes, collision_capacity, 2), dtype=wp.int32, device=device
     )
     n_collisions = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
-    attempted_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
-    rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
-    initialize_coagulation_rng_states(rng_seed, rng_states, device=device)
+    scheduled_trial_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
+    executed_trial_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
+    diagnostic_rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
+    initialize_coagulation_rng_states(
+        rng_seed, diagnostic_rng_states, device=device
+    )
 
     wp.launch(
         _brownian_coagulation_attempt_diagnostic_kernel,
@@ -528,15 +619,36 @@ def _collect_test_local_attempt_diagnostics(
             active_flags,
             collision_pairs,
             n_collisions,
-            attempted_counts,
-            rng_states,
+            scheduled_trial_counts,
+            executed_trial_counts,
+            diagnostic_rng_states,
             wp.int32(collision_capacity),
         ],
         device=device,
     )
+    wp.launch(
+        apply_coagulation_kernel,
+        dim=(n_boxes, collision_capacity),
+        inputs=[
+            diagnostic_particles.masses,
+            diagnostic_particles.concentration,
+            collision_pairs,
+            n_collisions,
+        ],
+        device=device,
+    )
     wp.synchronize()
+    diagnostic_result = from_warp_particle_data(diagnostic_particles, sync=True)
 
     production_particles = to_warp_particle_data(particles, device=device)
+    production_collision_pairs = wp.zeros(
+        (n_boxes, collision_capacity, 2), dtype=wp.int32, device=device
+    )
+    production_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
+    production_rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
+    initialize_coagulation_rng_states(
+        rng_seed, production_rng_states, device=device
+    )
     _, _, production_counts = coagulation_step_gpu(
         production_particles,
         temperature=temperature,
@@ -545,13 +657,44 @@ def _collect_test_local_attempt_diagnostics(
         volume=volume_source,
         max_collisions=max_collisions,
         rng_seed=rng_seed,
+        collision_pairs=production_collision_pairs,
+        n_collisions=production_counts,
+        rng_states=production_rng_states,
     )
     wp.synchronize()
+    production_result = from_warp_particle_data(production_particles, sync=True)
 
-    return (
-        np.asarray(attempted_counts.numpy(), dtype=np.int64),
-        np.asarray(n_collisions.numpy(), dtype=np.int64),
-        np.asarray(production_counts.numpy(), dtype=np.int64),
+    return _AttemptDiagnostics(
+        scheduled_trial_counts=np.asarray(
+            scheduled_trial_counts.numpy(), dtype=np.int64
+        ),
+        executed_trial_counts=np.asarray(
+            executed_trial_counts.numpy(), dtype=np.int64
+        ),
+        accepted_counts=np.asarray(n_collisions.numpy(), dtype=np.int64),
+        production_counts=np.asarray(production_counts.numpy(), dtype=np.int64),
+        diagnostic_pairs=np.asarray(collision_pairs.numpy(), dtype=np.int64),
+        production_pairs=np.asarray(
+            production_collision_pairs.numpy(), dtype=np.int64
+        ),
+        diagnostic_masses=np.asarray(
+            diagnostic_result.masses, dtype=np.float64
+        ),
+        production_masses=np.asarray(
+            production_result.masses, dtype=np.float64
+        ),
+        diagnostic_concentration=np.asarray(
+            diagnostic_result.concentration, dtype=np.float64
+        ),
+        production_concentration=np.asarray(
+            production_result.concentration, dtype=np.float64
+        ),
+        diagnostic_rng_states=np.asarray(
+            diagnostic_rng_states.numpy(), dtype=np.uint32
+        ),
+        production_rng_states=np.asarray(
+            production_rng_states.numpy(), dtype=np.uint32
+        ),
     )
 
 
@@ -1639,34 +1782,63 @@ def test_coagulation_step_gpu_nonuniform_arrays_keep_single_active_box_idle(
 def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
     device: str,
 ) -> None:
-    """Mixed-scale diagnostics report rounded attempts and accepted counts.
+    """Mixed-scale diagnostics report bounded scheduled and executed trials.
 
     The private mirrored sampler should expose finite integer-like attempted
-    trial counts, preserve the invariant ``attempted >= accepted``, and match
-    the production accepted-collision totals for the same seeded run.
+    trial counts, preserve the invariant ``scheduled >= executed >= accepted``,
+    and stay in lockstep with production-observable results for the same seeded
+    run.
     """
     particles = _make_mixed_npf_droplet_particle_data()
-    attempted_counts, accepted_counts, production_counts = (
-        _collect_test_local_attempt_diagnostics(
-            particles,
-            device,
-            time_step=0.5,
-            max_collisions=8,
-            rng_seed=41,
-            volume=1.0e-14,
-        )
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=0.5,
+        max_collisions=8,
+        rng_seed=41,
+        volume=1.0e-14,
     )
 
-    assert attempted_counts.shape == (1,)
-    assert accepted_counts.shape == (1,)
-    assert production_counts.shape == (1,)
-    assert np.issubdtype(attempted_counts.dtype, np.integer)
-    assert np.issubdtype(accepted_counts.dtype, np.integer)
-    assert np.all(np.isfinite(attempted_counts))
-    assert np.all(np.isfinite(accepted_counts))
-    assert np.all(attempted_counts >= 0)
-    assert np.all(attempted_counts >= accepted_counts)
-    npt.assert_array_equal(accepted_counts, production_counts)
+    assert diagnostics.scheduled_trial_counts.shape == (1,)
+    assert diagnostics.executed_trial_counts.shape == (1,)
+    assert diagnostics.accepted_counts.shape == (1,)
+    assert diagnostics.production_counts.shape == (1,)
+    assert np.issubdtype(diagnostics.scheduled_trial_counts.dtype, np.integer)
+    assert np.issubdtype(diagnostics.executed_trial_counts.dtype, np.integer)
+    assert np.issubdtype(diagnostics.accepted_counts.dtype, np.integer)
+    assert np.all(np.isfinite(diagnostics.scheduled_trial_counts))
+    assert np.all(np.isfinite(diagnostics.executed_trial_counts))
+    assert np.all(np.isfinite(diagnostics.accepted_counts))
+    assert np.all(diagnostics.scheduled_trial_counts >= 0)
+    assert np.all(diagnostics.executed_trial_counts >= 0)
+    assert np.all(
+        diagnostics.scheduled_trial_counts >= diagnostics.executed_trial_counts
+    )
+    assert np.all(
+        diagnostics.executed_trial_counts >= diagnostics.accepted_counts
+    )
+    npt.assert_array_equal(
+        diagnostics.accepted_counts,
+        diagnostics.production_counts,
+    )
+    _assert_trimmed_collision_pairs_equal(
+        diagnostics.diagnostic_pairs,
+        diagnostics.accepted_counts,
+        diagnostics.production_pairs,
+        diagnostics.production_counts,
+    )
+    npt.assert_allclose(
+        diagnostics.diagnostic_masses,
+        diagnostics.production_masses,
+    )
+    npt.assert_allclose(
+        diagnostics.diagnostic_concentration,
+        diagnostics.production_concentration,
+    )
+    npt.assert_array_equal(
+        diagnostics.diagnostic_rng_states,
+        diagnostics.production_rng_states,
+    )
 
 
 def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
@@ -1678,25 +1850,23 @@ def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
     trial so the derived acceptance fraction remains finite on CPU and CUDA.
     """
     particles = _make_mixed_npf_droplet_particle_data()
-    attempted_counts, accepted_counts, _ = (
-        _collect_test_local_attempt_diagnostics(
-            particles,
-            device,
-            time_step=0.5,
-            max_collisions=8,
-            rng_seed=41,
-            volume=1.0e-14,
-        )
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=0.5,
+        max_collisions=8,
+        rng_seed=41,
+        volume=1.0e-14,
     )
 
     acceptance_fraction = np.divide(
-        accepted_counts,
-        attempted_counts,
-        out=np.zeros_like(accepted_counts, dtype=np.float64),
-        where=attempted_counts > 0,
+        diagnostics.accepted_counts,
+        diagnostics.executed_trial_counts,
+        out=np.zeros_like(diagnostics.accepted_counts, dtype=np.float64),
+        where=diagnostics.executed_trial_counts > 0,
     )
 
-    assert np.all(attempted_counts > 0)
+    assert np.all(diagnostics.executed_trial_counts > 0)
     assert np.all(np.isfinite(acceptance_fraction))
     assert np.all(acceptance_fraction >= 0.0)
 
@@ -1712,28 +1882,106 @@ def test_mixed_scale_sparse_box_returns_zero_accepted_collisions(
     """
     particles = _make_mixed_npf_droplet_particle_data()
     particles.concentration[0, 1:] = 0.0
-    attempted_counts, accepted_counts, production_counts = (
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=0.5,
+        max_collisions=8,
+        rng_seed=41,
+        volume=1.0e-14,
+    )
+    acceptance_fraction = np.divide(
+        diagnostics.accepted_counts,
+        diagnostics.executed_trial_counts,
+        out=np.zeros_like(diagnostics.accepted_counts, dtype=np.float64),
+        where=diagnostics.executed_trial_counts > 0,
+    )
+
+    npt.assert_array_equal(
+        diagnostics.accepted_counts,
+        np.array([0], dtype=np.int64),
+    )
+    npt.assert_array_equal(
+        diagnostics.production_counts,
+        np.array([0], dtype=np.int64),
+    )
+    assert np.all(np.isfinite(diagnostics.executed_trial_counts))
+    assert np.all(diagnostics.executed_trial_counts >= 0)
+    assert np.all(np.isfinite(acceptance_fraction))
+
+
+def test_mixed_scale_diagnostic_tracks_executed_trials_under_early_exit(
+    device: str,
+) -> None:
+    """Executed trials stop at the real early-exit point, not the schedule."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=1.0,
+        max_collisions=8,
+        rng_seed=7,
+        volume=1.0e-18,
+    )
+
+    assert diagnostics.scheduled_trial_counts[0] > 1
+    assert diagnostics.executed_trial_counts[0] == 1
+    assert diagnostics.accepted_counts[0] == 1
+    assert diagnostics.production_counts[0] == 1
+
+
+def test_mixed_scale_diagnostic_clamps_scheduled_trials_to_int32_limit(
+    device: str,
+) -> None:
+    """Diagnostic scheduled trials are bounded before int32 conversion."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    diagnostics = _collect_test_local_attempt_diagnostics(
+        particles,
+        device,
+        time_step=1.0,
+        max_collisions=8,
+        rng_seed=7,
+        volume=1.0e-300,
+    )
+
+    assert diagnostics.scheduled_trial_counts[0] == _INT32_MAX
+    assert diagnostics.executed_trial_counts[0] == 1
+
+
+@pytest.mark.parametrize(
+    ("temperature", "pressure", "time_step", "message"),
+    [
+        (0.0, 101325.0, 0.5, "temperature must be finite and > 0"),
+        (298.15, 0.0, 0.5, "pressure must be finite and > 0"),
+        (
+            298.15,
+            101325.0,
+            float("nan"),
+            "time_step must be finite and nonnegative",
+        ),
+    ],
+)
+def test_mixed_scale_diagnostic_rejects_invalid_physical_inputs(
+    device: str,
+    temperature: float,
+    pressure: float,
+    time_step: float,
+    message: str,
+) -> None:
+    """Private mixed-scale diagnostics fail clearly on invalid inputs."""
+    particles = _make_mixed_npf_droplet_particle_data()
+
+    with pytest.raises(ValueError, match=message):
         _collect_test_local_attempt_diagnostics(
             particles,
             device,
-            time_step=0.5,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=time_step,
             max_collisions=8,
             rng_seed=41,
             volume=1.0e-14,
         )
-    )
-    acceptance_fraction = np.divide(
-        accepted_counts,
-        attempted_counts,
-        out=np.zeros_like(accepted_counts, dtype=np.float64),
-        where=attempted_counts > 0,
-    )
-
-    npt.assert_array_equal(accepted_counts, np.array([0], dtype=np.int64))
-    npt.assert_array_equal(production_counts, np.array([0], dtype=np.int64))
-    assert np.all(np.isfinite(attempted_counts))
-    assert np.all(attempted_counts >= 0)
-    assert np.all(np.isfinite(acceptance_fraction))
 
 
 def test_coagulation_mass_conservation(device: str) -> None:
