@@ -441,7 +441,7 @@ def _get_expected_collision_statistics(
     temperature: float = 298.15,
     pressure: float = 101325.0,
     volume: float | None = None,
-    ) -> _ExpectedCollisionStatistics:
+) -> _ExpectedCollisionStatistics:
     """Return Brownian expected mean and sigma for seeded repeated runs.
 
     Args:
@@ -2191,12 +2191,12 @@ def test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_
     assert observed_total == pytest.approx(
         statistics.expected_mean,
         abs=tolerance,
-    ), (
-        message
-    )
+    ), message
 
 
-def test_mixed_scale_expected_collision_statistics_use_active_pairs_only() -> None:
+def test_mixed_scale_expected_collision_statistics_use_active_pairs_only() -> (
+    None
+):
     """Mixed-scale Brownian reference excludes inactive particles."""
     particles = _make_mixed_npf_droplet_particle_data()
     particles.concentration[0, -1] = 0.0
@@ -4181,7 +4181,10 @@ def test_resolve_collision_capacity_clamps_to_physical_limit() -> None:
 
 def test_resolve_collision_capacity_clamps_to_buffer_budget() -> None:
     """Collision capacity is bounded by the shared byte-budget ceiling."""
-    assert _resolve_collision_capacity(512, n_boxes=70_000_000, n_particles=1024) == 1
+    assert (
+        _resolve_collision_capacity(512, n_boxes=70_000_000, n_particles=1024)
+        == 1
+    )
 
 
 def test_bound_scheduled_trials_preserves_values_below_int32_limit(
@@ -4285,7 +4288,9 @@ def test_select_active_pair_by_rank_reads_compact_active_indices(
     device: str,
 ) -> None:
     """Direct active-pair lookup returns the compact-buffer entries by rank."""
-    active_indices = wp.array([[4, 1, 3, -1, -1]], dtype=wp.int32, device=device)
+    active_indices = wp.array(
+        [[4, 1, 3, -1, -1]], dtype=wp.int32, device=device
+    )
     resolved_pairs = wp.zeros((1, 2), dtype=wp.int32, device=device)
 
     wp.launch(
