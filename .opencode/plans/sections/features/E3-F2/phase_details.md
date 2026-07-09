@@ -59,17 +59,26 @@
     and
     `test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(device)`.
 
-- [ ] **E3-F2-P4:** Document selected design or accepted mixed-scale limitation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E3-F2-P4:** Document selected design or accepted mixed-scale limitation
+  - Issue: #1244 | Size: XS | Status: Shipped 2026-07-09
   - Depends on: E3-F2-P3 producing the evidence-backed outcome so the roadmap
-  records measured acceptance bounds, preserved behavior, or an explicitly
-  accepted limitation instead of an interim prototype state.
-  - Current state: issue #1243 already landed the minimal roadmap evidence note;
-    P4 remains for any broader final decision framing beyond that concise
-    shipped update.
+    records measured acceptance bounds, preserved behavior, or an explicitly
+    accepted limitation instead of an interim prototype state.
   - Goal: Update roadmap or feature documentation with reproduction commands,
     observed acceptance bounds, and the chosen implementation decision.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, optional focused
-    feature note under `docs/Features/`.
-  - Tests: Documentation link/format validation plus any focused reproduction
-    commands recorded in the document.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md` only.
+  - Shipped details: expanded the roadmap's mixed-scale known-issue note into a
+    final decision record that says `E3-F2-P2` shipped bounded active-particle
+    selector hardening inside the existing sampler, `E3-F2-P3` supplied the
+    statistical/conservation evidence, and the remaining limitation is still the
+    global-`k_max` plus one-thread-per-box acceptance boundary rather than an
+    unresolved question about what design landed.
+  - Documentation outcome: the note now names the private test-only fixture,
+    diagnostic helpers, and key validation tests; preserves the exact measured
+    139 versus 143.846 collision evidence with sigma 11.994 and 3-sigma
+    tolerance 35.981; and keeps the reproduction commands explicit without
+    implying any new production API or transfer-path behavior.
+  - Tests: documentation readback plus the recorded focused commands
+    `pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale`
+    and `pytest particula/gpu/kernels/tests/coagulation_test.py -q -k
+    "mixed_scale or sparse or degenerate or conservation" -Werror`.

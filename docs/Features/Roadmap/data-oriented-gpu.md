@@ -758,14 +758,14 @@ fixed or explicitly accepted during this epic.
   the seed fixed unless an explicit reset is requested, and graph-captured
   loops should initialize or reset the buffer before capture or before the
   repeated-step loop (see [Random Number Strategy](#random-number-strategy)).
-- **Rejection-sampling acceptance collapse.** The Brownian kernel still bounds
-  acceptance with a single global `k_max` computed from the min/max radius
-  pair, and the sampler still executes inside the existing one-thread-per-box
-  kernel. That remaining limit means wide mixed NPF/droplet size distributions
-  can still suffer low acceptance and high trial counts. This issue #1244 note
-  records that shipped `E3-F2-P2` outcome as a bounded selector hardening
-  improvement inside the existing sampler rather than as a new public API, a
-  transfer-path change, or a full mixed-scale acceptance-rate fix.
+- **Rejection-sampling acceptance collapse.** The shipped `E3-F2-P2` outcome
+  was a bounded selector hardening improvement inside the existing Brownian
+  sampler, not a new public API, not a container or transfer-path change, and
+  not a full mixed-scale acceptance-rate fix. The remaining limitation is still
+  the same kernel shape: one global `k_max` computed from the min/max radius
+  pair plus one-thread-per-box execution inside the existing sampler. Wide
+  mixed NPF/droplet size distributions can therefore still suffer low
+  acceptance and high trial counts even after the selector hardening landed.
 
   The shipped mixed-scale evidence comes from the private test-only fixture and
   diagnostics in `particula/gpu/kernels/tests/coagulation_test.py`:
@@ -796,9 +796,10 @@ fixed or explicitly accepted during this epic.
   coverage also verifies the active-pairs-only reference calculation, finite
   zero-acceptance-trial handling, repeated-run total-mass conservation, and
   caller-owned `rng_states` reuse/reset semantics. Treat this as bounded
-  evidence that the hardening preserved expected Brownian behavior within
-  stochastic tolerance, not as proof that the global-majorant acceptance
-  collapse is solved for every mixed-scale distribution.
+  evidence that the selector hardening preserved expected Brownian behavior
+  within stochastic tolerance inside the existing sampler, not as proof that
+  the global-majorant acceptance collapse is solved for every mixed-scale
+  distribution.
 
   Reproduce the seeded checks with:
 

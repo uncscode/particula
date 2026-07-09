@@ -47,11 +47,13 @@
 
 ## P4 Tasks
 
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` with the final design
+- [x] Update `docs/Features/Roadmap/data-oriented-gpu.md` with the final design
   decision, measured acceptance bounds, and focused reproduction commands such
   as the exact `coagulation_test.py -k mixed_scale` invocation used during
   validation.
-- If diagnostic helpers remain test-only, say so explicitly and document that
-  production GPU helpers still require caller-owned explicit transfer steps.
-- Confirm docs remain consistent with the landed test names and with any new
-  mixed-scale fixture/helper names introduced in `coagulation_test.py`.
+- [x] If diagnostic helpers remain test-only, say so explicitly and document
+  that production GPU helpers still require caller-owned explicit transfer
+  steps.
+- [x] Confirm docs remain consistent with the landed test names and with any
+  new mixed-scale fixture/helper names introduced in
+  `coagulation_test.py`.

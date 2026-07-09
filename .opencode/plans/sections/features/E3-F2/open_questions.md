@@ -1,6 +1,7 @@
 # E3-F2 Open Questions
 
-Status: reviewed on 2026-07-09; no blocking open questions remain for P3.
+Status: reviewed on 2026-07-09; no blocking open questions remain and P4 is
+documented as shipped.
 
 ## Resolved Decisions
 
@@ -29,12 +30,16 @@ Status: reviewed on 2026-07-09; no blocking open questions remain for P3.
   bounded selector path: 139 accepted collisions across fixed seeds `101-200`,
   versus a Brownian expected mean of 143.846 with sigma 11.994 on Warp CPU,
   which passed the explicit 3-sigma tolerance check.
-- Remaining follow-up: P4 may still tighten the final user-facing wording if
-  Epic C wants a broader design decision statement, but the statistical
-  correctness question for the shipped path is now answered.
+- Outcome: issue #1244 completed the remaining wording follow-up by turning the
+  roadmap note into an explicit final decision record: bounded selector
+  hardening shipped in `E3-F2-P2`, the statistical evidence was recorded in
+  `E3-F2-P3`, and the accepted remaining limitation is the existing global
+  `k_max` plus one-thread-per-box acceptance boundary rather than an unchosen
+  design direction.
 - Documentation should include statistical/conservation test evidence plus a
   short benchmark-style summary when CUDA benchmark data is available. Full
   benchmark execution remains opt-in.
-- Outcome: issue #1243 added the required statistical/conservation evidence note
-  and exact pytest reproduction command to
+- Outcome: issues #1243 and #1244 together now leave the roadmap with the
+  required statistical/conservation evidence, exact pytest reproduction
+  commands, and the final limitation framing in
   `docs/Features/Roadmap/data-oriented-gpu.md`.
