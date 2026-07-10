@@ -737,7 +737,7 @@ Planned features:
    Keep top-level `particula.gpu` focused on Warp availability, transfer
    helpers, and context helpers rather than direct kernel-step imports. Raw
    helper kernels remain intentionally outside the documented package-level
-   public surface.
+   public surface; import them from their concrete modules when needed.
 5. Formalize device-aware pytest execution as project policy (a pytest
    flag/config plus marker): parity tests always run on Warp CPU and add
    CUDA automatically when a device is present; document that CUDA-device

@@ -8,7 +8,8 @@ The GPU module enables:
 - GPU-resident particle, gas, and environment data via Warp structs
 - Efficient multi-box CFD simulations with batch dimensions
 - Manual transfer control between CPU and GPU (to_warp/from_warp)
-- GPU kernels for condensation and coagulation (future phases)
+- Top-level availability and transfer helpers, while direct GPU step imports
+  live under ``particula.gpu.kernels``
 
 Example:
     >>> import warp as wp
