@@ -18,7 +18,11 @@ context helpers such as `WARP_AVAILABLE`, `to_warp_particle_data`,
 path for the two direct step functions, kept `particula.gpu` intentionally
 non-reexporting, excluded lower-level helper kernels from the package-level
 public surface, and added focused regression coverage in
-`particula/gpu/tests/kernel_exports_test.py`.
+`particula/gpu/tests/kernel_exports_test.py`. Phase `E3-F4-P2` then
+centralized the package-surface contract in that same test module, locked the
+exact `particula.gpu.kernels.__all__` surface, added representative negative
+checks for internal helper names, and removed duplicate package-export
+assertions from `particula/gpu/kernels/tests/coagulation_test.py`.
 
 ## Goals
 
