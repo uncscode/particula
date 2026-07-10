@@ -6,7 +6,8 @@ title: Data Containers and GPU Foundations
 
 This page is the canonical reference for Particula's shipped data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
-and current CPU/GPU support boundaries.
+the direct-kernel troubleshooting contract, and current CPU/GPU support
+boundaries.
 
 For a runnable walkthrough of the shipped single-box container construction and
 optional Warp CPU-backend round trips, see the
@@ -15,6 +16,12 @@ optional Warp CPU-backend round trips, see the
 ```bash
 python docs/Examples/data_containers_and_gpu_foundations.py
 ```
+
+For the low-level direct-kernel path, use the canonical quick-start at
+[`docs/Examples/gpu_direct_kernels_quick_start.py`](../Examples/gpu_direct_kernels_quick_start.py).
+That example imports step entry points from `particula.gpu.kernels` while
+keeping top-level `particula.gpu` focused on `WARP_AVAILABLE` and the
+`to_warp_*` / `from_warp_*` transfer helpers.
 
 Use this guide when you need the current contract for:
 
@@ -171,6 +178,14 @@ Available public helpers:
 
 Optional Warp availability can be checked with `WARP_AVAILABLE`.
 
+For the direct-kernel example path, keep the import split explicit:
+
+- Import direct step functions from `particula.gpu.kernels`.
+- Import `WARP_AVAILABLE`, `to_warp_*`, and `from_warp_*` helpers from
+  `particula.gpu`.
+- Do not expect top-level `particula.gpu` to re-export
+  `condensation_step_gpu` or `coagulation_step_gpu`.
+
 ### Particle transfer boundary
 
 `WarpParticleData` is the explicit Warp mirror for `ParticleData`. Use the
@@ -308,6 +323,46 @@ Additional shipped boundaries:
   be assumed to apply unchanged to Warp `cpu` or other hardware.
 - Treat roadmap pages as future-work references, not as evidence that broader
   runtime support has already shipped.
+
+## Direct-kernel troubleshooting
+
+Use
+[`docs/Examples/gpu_direct_kernels_quick_start.py`](../Examples/gpu_direct_kernels_quick_start.py)
+as the canonical runnable reference when troubleshooting the low-level GPU
+path.
+
+- **Warp missing (`WARP_AVAILABLE == False`)**
+  - The direct-kernel path is unavailable until Warp is installed.
+  - The canonical quick-start keeps `particula.gpu.kernels` imports deferred
+    and completes in a CPU-only documentation mode without pretending kernels
+    ran.
+- **CUDA unavailable**
+  - CUDA is optional.
+  - The default supported runnable path is Warp `device="cpu"`; only opt into
+    `device="cuda"` when a CUDA device is actually available.
+- **Explicit CPU↔GPU transfer boundary**
+  - Kernels operate on Warp-backed container mirrors, not CPU `ParticleData`,
+    `GasData`, or `EnvironmentData` objects directly.
+  - Move state across the boundary explicitly with `to_warp_*` and
+    `from_warp_*`; kernels and runnables do not perform hidden transfers or
+    hidden synchronization.
+- **Device mismatch across particle, gas, environment, and sidecar buffers**
+  - Keep Warp arrays and sidecar buffers such as `rng_states` on the same
+    device as the particle/gas/environment inputs used by the kernel call.
+  - Treat device-mismatch `ValueError` failures as input validation, not as a
+    signal that Particula will migrate arrays automatically.
+- **Mixed `environment=` plus scalar `temperature`/`pressure` inputs**
+  - Pass either `environment=` or direct temperature/pressure inputs.
+  - Do not mix scalar or Warp-array `temperature` / `pressure` values with
+    `environment=`; current kernels reject that combination explicitly.
+- **Gas/environment restore expectations**
+  - `from_warp_gas_data()` restores ordered species names only when you supply
+    them; otherwise it generates placeholder names such as `species_0`.
+  - GPU-only helper state such as `vapor_pressure` is not restored onto CPU
+    `GasData`.
+  - `from_warp_environment_data(..., sync=False)` is an explicit expert path;
+    manual synchronization remains the caller's responsibility before NumPy
+    access.
 
 ## Related references
 
