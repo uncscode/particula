@@ -238,6 +238,60 @@ def _get_benchmark_output_path() -> Path:
     return BENCHMARK_ARTIFACT_DIR / file_name
 
 
+def _summarize_warp_device(device: Any) -> dict[str, Any]:
+    """Return a bounded JSON-safe summary for a Warp device object."""
+    summary: dict[str, Any] = {}
+    for attr in (
+        "alias",
+        "name",
+        "ordinal",
+        "arch",
+        "is_cuda",
+        "is_cpu",
+        "is_uva",
+    ):
+        value = getattr(device, attr, None)
+        if isinstance(value, str | int | bool):
+            summary[attr] = value
+
+    total_memory = getattr(device, "total_memory", None)
+    if isinstance(total_memory, int | float):
+        summary["total_memory_bytes"] = int(total_memory)
+    return summary
+
+
+def _build_benchmark_metadata() -> dict[str, Any]:
+    """Capture traceable command and runtime context for benchmark output."""
+    metadata: dict[str, Any] = {
+        "command": " ".join(sys.argv),
+        "artifact_path": str(BENCHMARK_OUTPUT),
+    }
+    warp_version = getattr(wp, "__version__", None)
+    if warp_version is not None:
+        metadata["warp_version"] = str(warp_version)
+
+    if wp is None:
+        metadata["warp_available"] = False
+        return metadata
+
+    metadata["warp_available"] = True
+    try:
+        cuda_ready = cuda_available(wp)
+    except Exception as exc:  # pragma: no cover - defensive metadata path
+        metadata["cuda_probe_error"] = str(exc)
+        return metadata
+
+    metadata["cuda_available"] = cuda_ready
+    if not cuda_ready:
+        return metadata
+
+    try:
+        metadata["device"] = _summarize_warp_device(wp.get_device("cuda"))
+    except Exception as exc:  # pragma: no cover - defensive metadata path
+        metadata["device_probe_error"] = str(exc)
+    return metadata
+
+
 BENCHMARK_OUTPUT = _get_benchmark_output_path()
 WARP_FLOAT64: Any
 WARP_FLOAT32: Any
@@ -383,6 +437,7 @@ def _validate_benchmark_budget(budget: BenchmarkMemoryBudget) -> None:
 
 _benchmark_results: dict[str, Any] = {
     "started_at": datetime.now(timezone.utc).isoformat(),
+    "benchmark_metadata": _build_benchmark_metadata(),
     "benchmarks": {},
 }
 _MASS_PRECISION_BENCHMARK_CONFIGS: list[tuple[str, int, str]] = [

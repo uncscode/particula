@@ -158,6 +158,120 @@ def test_get_benchmark_output_path_stays_within_artifact_directory(
     )
 
 
+def test_summarize_warp_device_keeps_bounded_json_safe_fields(
+    benchmark_module,
+) -> None:
+    """Device metadata stays limited to traceable scalar fields."""
+
+    class _Device:
+        alias = "cuda:0"
+        name = "Test GPU"
+        ordinal = 0
+        arch = "sm_test"
+        is_cuda = True
+        is_cpu = False
+        is_uva = True
+        total_memory = 1024
+        ignored = object()
+
+    summary = benchmark_module._summarize_warp_device(_Device())
+
+    assert summary == {
+        "alias": "cuda:0",
+        "name": "Test GPU",
+        "ordinal": 0,
+        "arch": "sm_test",
+        "is_cuda": True,
+        "is_cpu": False,
+        "is_uva": True,
+        "total_memory_bytes": 1024,
+    }
+
+
+def test_build_benchmark_metadata_records_command_and_device_context(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Benchmark metadata captures command, artifact path, and device info."""
+    monkeypatch.setattr(sys, "argv", ["pytest", "bench.py", "--benchmark"])
+    monkeypatch.setattr(benchmark_module, "BENCHMARK_OUTPUT", Path("out.json"))
+    monkeypatch.setattr(benchmark_module, "cuda_available", lambda _wp: True)
+    monkeypatch.setattr(
+        benchmark_module,
+        "wp",
+        types.SimpleNamespace(
+            __version__="1.2.3",
+            get_device=lambda name: types.SimpleNamespace(
+                alias="cuda:0",
+                name="Trace GPU",
+                ordinal=0,
+                total_memory=2048,
+            ),
+        ),
+    )
+
+    metadata = benchmark_module._build_benchmark_metadata()
+
+    assert metadata["command"] == "pytest bench.py --benchmark"
+    assert metadata["artifact_path"] == "out.json"
+    assert metadata["warp_version"] == "1.2.3"
+    assert metadata["warp_available"] is True
+    assert metadata["cuda_available"] is True
+    assert metadata["device"] == {
+        "alias": "cuda:0",
+        "name": "Trace GPU",
+        "ordinal": 0,
+        "total_memory_bytes": 2048,
+    }
+
+
+def test_build_benchmark_metadata_reports_warp_unavailable(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Benchmark metadata reports the no-Warp path without CUDA probing."""
+    monkeypatch.setattr(sys, "argv", ["pytest", "bench.py", "--benchmark"])
+    monkeypatch.setattr(benchmark_module, "BENCHMARK_OUTPUT", Path("out.json"))
+    monkeypatch.setattr(benchmark_module, "wp", None)
+
+    metadata = benchmark_module._build_benchmark_metadata()
+
+    assert metadata == {
+        "command": "pytest bench.py --benchmark",
+        "artifact_path": "out.json",
+        "warp_available": False,
+    }
+
+
+def test_build_benchmark_metadata_records_cuda_probe_error(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Benchmark metadata keeps probe failures as traceable error text."""
+    monkeypatch.setattr(sys, "argv", ["pytest", "bench.py", "--benchmark"])
+    monkeypatch.setattr(benchmark_module, "BENCHMARK_OUTPUT", Path("out.json"))
+    monkeypatch.setattr(
+        benchmark_module,
+        "wp",
+        types.SimpleNamespace(__version__="1.2.3"),
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "cuda_available",
+        lambda _wp: (_ for _ in ()).throw(RuntimeError("probe failed")),
+    )
+
+    metadata = benchmark_module._build_benchmark_metadata()
+
+    assert metadata == {
+        "command": "pytest bench.py --benchmark",
+        "artifact_path": "out.json",
+        "warp_version": "1.2.3",
+        "warp_available": True,
+        "cuda_probe_error": "probe failed",
+    }
+
+
 def test_save_results_writes_json_snapshot(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,
@@ -169,13 +283,18 @@ def test_save_results_writes_json_snapshot(
     monkeypatch.setattr(
         benchmark_module,
         "_benchmark_results",
-        {"started_at": "2026-01-01T00:00:00+00:00", "benchmarks": {}},
+        {
+            "started_at": "2026-01-01T00:00:00+00:00",
+            "benchmark_metadata": {"command": "pytest --benchmark"},
+            "benchmarks": {},
+        },
     )
 
     benchmark_module._save_results()
 
     written = output_path.read_text()
     assert '"started_at": "2026-01-01T00:00:00+00:00"' in written
+    assert '"command": "pytest --benchmark"' in written
     assert '"updated_at":' in written
 
 
@@ -190,7 +309,11 @@ def test_save_results_creates_parent_directories(
     monkeypatch.setattr(
         benchmark_module,
         "_benchmark_results",
-        {"started_at": "2026-01-01T00:00:00+00:00", "benchmarks": {}},
+        {
+            "started_at": "2026-01-01T00:00:00+00:00",
+            "benchmark_metadata": {"command": "pytest --benchmark"},
+            "benchmarks": {},
+        },
     )
 
     benchmark_module._save_results()
@@ -1232,9 +1355,20 @@ def test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture
 
     radii = first.radii
     assert radii.shape == (n_boxes, n_particles)
+    assert np.all(np.diff(radii[0]) > 0.0)
     assert np.min(radii) < 1.0e-8
     assert np.max(radii) > 1.0e-6
     assert np.max(radii) / np.min(radii) > 1.0e3
+    assert np.any(radii < 5.0e-8)
+    assert np.any(radii > 1.0e-6)
+
+    small_concentration = np.max(
+        first.concentration[:, : max(1, n_particles // 2)]
+    )
+    large_concentration = np.min(
+        first.concentration[:, max(1, n_particles // 2) :]
+    )
+    assert small_concentration > large_concentration
 
     npt.assert_allclose(first.masses, second.masses)
     npt.assert_allclose(first.concentration, second.concentration)

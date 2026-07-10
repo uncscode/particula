@@ -1196,20 +1196,29 @@ resampling or volume-scaling policy before slot exhaustion.
 
 #### Shipped coagulation benchmark evidence (2026-07-10 UTC)
 
-- Command: `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s`
-- Hardware/context: Warp 1.15.0 on `cuda:0` (`NVIDIA GeForce RTX 5060`, 8 GiB;
-  CUDA Toolkit 12.9, Driver 13.2)
+- Command evidence: `.artifacts/benchmarks/gpu_benchmark_results.json`
+  now records the exact executed command in
+  `benchmark_metadata.command`. The 2026-07-10 UTC capture was produced by
+  `/home/kyle/Code/particula/.venv/bin/pytest -v --tb=short --cov`
+  `--cov-report=term-missing particula/gpu/tests/benchmark_test.py`
+  `--benchmark -v -s`, with the user-facing opt-in portion preserved as
+  `particula/gpu/tests/benchmark_test.py --benchmark -v -s`.
+- Hardware/context: the same artifact records `warp_version=1.15.0` and
+  `device.alias=cuda:0`, `device.name=NVIDIA GeForce RTX 5060`,
+  `device.total_memory_bytes=8082096128` (about 8.08 GiB), with
+  `started_at=2026-07-10T01:59:34.215800+00:00` and
+  `updated_at=2026-07-10T02:00:43.918911+00:00`.
 - Artifact output: `.artifacts/benchmarks/gpu_benchmark_results.json`
 - Mixed-scale fixture note: the coagulation benchmark path now uses a dedicated
   deterministic mixed NPF/droplet fixture aligned with the shipped E3-F2
   baseline, while condensation benchmarks keep the generic helper.
 - Timing summary: single-box coagulation remains the limiting case for the
-  one-thread-per-box kernel (`1x500` GPU `0.0359s`, `1x2k` `0.1365s`, `1x5k`
-  `0.3393s`, `1x10k` `0.6813s`, `1x20k` `1.3752s`, `1x50k` `3.4163s`), while
+  one-thread-per-box kernel (`1x500` GPU `0.0361s`, `1x2k` `0.1366s`, `1x5k`
+  `0.3411s`, `1x10k` `0.6809s`, `1x20k` `1.3689s`, `1x50k` `3.3984s`), while
   equivalent or larger total-particle multi-box runs scale much better across
-  independent boxes (`10x500` `0.0358s`, `10x1k` `0.0699s`, `50x1k` `0.0720s`,
-  `10x5k` `0.3456s`, `50x5k` `0.3547s`, `100x1k` `0.0773s`, `10x10k`
-  `0.6963s`).
+  independent boxes (`10x500` `0.0359s`, `10x1k` `0.0699s`, `50x1k` `0.0714s`,
+  `10x5k` `0.3437s`, `50x5k` `0.3528s`, `100x1k` `0.0766s`, `10x10k`
+  `0.6938s`).
 - Interpretation boundary: record this as current benchmark evidence for the
   existing one-thread-per-box design, not as a final acceptance decision on the
   long-term scaling strategy.
