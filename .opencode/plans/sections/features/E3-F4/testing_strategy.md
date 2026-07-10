@@ -27,8 +27,12 @@ testing-only phase.
 
 ## Quick-Start Smoke Tests
 
-- Follow the pattern in `particula/gpu/tests/data_containers_example_test.py`.
-- Verify the example has a clean no-Warp path.
+- Shipped smoke coverage lives in
+  `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
+- Verify the example has a clean no-Warp path and that module import plus
+  CPU-only execution defer `particula.gpu.kernels` loading.
+- Verify `main()`, `__main__`, and subprocess execution all exercise the
+  canonical `docs/Examples/gpu_direct_kernels_quick_start.py` path.
 - Verify the example runs with Warp on `device="cpu"` when `WARP_AVAILABLE` is
   true.
 - Use optional CUDA checks only when CUDA is available; otherwise skip without
@@ -38,16 +42,20 @@ testing-only phase.
 
 - Tests should ensure example code calls explicit `to_warp_*` and
   `from_warp_*` helpers rather than relying on hidden transfer behavior.
+- Stubbed quick-start tests should assert condensation uses direct scalar
+  `temperature` / `pressure` inputs and does not pass `environment=`.
 - Kernel tests should continue to validate that direct environment inputs and
   explicit `environment=` are not mixed.
 - Device mismatch troubleshooting should be backed by existing validation tests
   or new focused tests if the docs introduce new behavior.
+- Failure-path smoke coverage should assert that an injected kernel exception
+  prevents any completed-success summary from printing.
 
 ## Suggested Commands
 
 ```bash
 pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
-pytest particula/gpu/tests/data_containers_example_test.py -q
+pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q
 pytest particula/gpu/kernels/tests/coagulation_test.py -q
 ```

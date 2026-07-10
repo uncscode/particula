@@ -11,18 +11,20 @@ The current codebase already exposes direct step functions from
 - `condensation_step_gpu`
 - `coagulation_step_gpu`
 
-Top-level `particula.gpu` remains focused on availability, data transfer, and
-context helpers such as `WARP_AVAILABLE`, `to_warp_particle_data`,
-`to_warp_gas_data`, `to_warp_environment_data`, and `gpu_context`. Phase
-`E3-F4-P1` finalized `particula.gpu.kernels` as the supported public import
-path for the two direct step functions, kept `particula.gpu` intentionally
-non-reexporting, excluded lower-level helper kernels from the package-level
-public surface, and added focused regression coverage in
-`particula/gpu/tests/kernel_exports_test.py`. Phase `E3-F4-P2` then
-centralized the package-surface contract in that same test module, locked the
-exact `particula.gpu.kernels.__all__` surface, added representative negative
-checks for internal helper names, and removed duplicate package-export
-assertions from `particula/gpu/kernels/tests/coagulation_test.py`.
+Top-level `particula.gpu` remains focused on availability and transfer helpers
+such as `WARP_AVAILABLE`, `to_warp_particle_data`, `to_warp_gas_data`, and
+`to_warp_environment_data`. Phase `E3-F4-P1` finalized
+`particula.gpu.kernels` as the supported public import path for the two direct
+step functions, kept `particula.gpu` intentionally non-reexporting, excluded
+lower-level helper kernels from the package-level public surface, and added
+focused regression coverage in `particula/gpu/tests/kernel_exports_test.py`.
+Phase `E3-F4-P2` then centralized the package-surface contract in that same
+test module, locked the exact `particula.gpu.kernels.__all__` surface, added
+representative negative checks for internal helper names, and removed duplicate
+package-export assertions from `particula/gpu/kernels/tests/coagulation_test.py`.
+Phase `E3-F4-P3` is now shipped with the canonical runnable example at
+`docs/Examples/gpu_direct_kernels_quick_start.py` and adjacent smoke coverage
+in `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
 
 ## Goals
 
@@ -31,7 +33,7 @@ assertions from `particula/gpu/kernels/tests/coagulation_test.py`.
 - Document the direct-kernel import contract without implying a broader
   top-level quick-start API than the shipped code supports.
 - Demonstrate explicit transfer boundaries with `ParticleData`, `GasData`,
-  transfer helpers, `gpu_context`, and `WARP_AVAILABLE`.
+  `to_warp_*` / `from_warp_*` helpers, and `WARP_AVAILABLE`.
 - Add troubleshooting guidance for missing Warp, missing CUDA, device mismatch,
   and invalid environment input combinations.
 
@@ -41,4 +43,8 @@ Epic `E3` is hardening the data-oriented GPU path. Earlier feature tracks cover
 RNG persistence and coagulation sampling/performance evidence. This feature
 turns the low-level API into an explicit, tested, documented user path while
 preserving the current design principle: users opt into GPU-resident data and
-explicitly transfer data at the boundary.
+explicitly transfer data at the boundary. The shipped quick-start keeps kernel
+imports deferred until the Warp-enabled execution branch, defaults to
+`device="cpu"`, uses scalar thermodynamic inputs rather than `environment=`,
+and demonstrates caller-owned coagulation `rng_states` without introducing
+hidden backend selection or transfer behavior.

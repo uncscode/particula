@@ -81,28 +81,42 @@ Depends on: E3-F4-P1 and E3-F4-P2 settling the supported import path and export
 guardrails, plus E3-F1 confirming the repeated-call RNG usage that the
 coagulation snippet is allowed to demonstrate.
 
-Create a runnable docs example following the existing examples style. The
-example should build minimal `ParticleData` and `GasData`, gate GPU execution
-with `WARP_AVAILABLE`, transfer explicitly, call both low-level kernels, and
-transfer results back explicitly at the end. Use `gpu_context` where it clarifies
-particle transfer, while keeping gas/environment transfer explicit.
+Shipped outcome: the canonical runnable example now lives at
+`docs/Examples/gpu_direct_kernels_quick_start.py`. It builds deterministic
+single-box `ParticleData` and `GasData`, supplies explicit vapor pressure for
+condensation, gates the Warp branch with `WARP_AVAILABLE`, lazily imports
+`warp` plus `particula.gpu.kernels`, defaults to `device="cpu"`, performs one
+`condensation_step_gpu(...)` call and one `coagulation_step_gpu(...)` call, and
+round-trips gas and particle results explicitly with the published transfer
+helpers. The shipped example does not use `gpu_context` or `environment=`; it
+keeps scalar `temperature` / `pressure` inputs explicit and demonstrates
+caller-owned `rng_states` with `initialize_rng=True` and `rng_seed=41` for the
+single coagulation call.
 
 Test coverage in this phase:
 
-- Add or extend `particula/gpu/tests/data_containers_example_test.py` with a
-  smoke test that imports the example module, verifies the no-Warp path exits
-  cleanly, and exercises `device="cpu"` when Warp is available.
-- Assert the example uses explicit `to_warp_*` and `from_warp_*` helper calls so
-  the documented transfer boundary stays visible to reviewers.
-- If the example introduces helper functions, keep them covered in the same test
-  module rather than a later follow-up phase.
+- `particula/gpu/tests/gpu_direct_kernels_example_test.py` covers deterministic
+  helper builders, the no-Warp message path, import deferral for
+  `particula.gpu.kernels`, `main()` / `__main__` execution, subprocess smoke
+  coverage for the canonical path, a failure-path assertion that avoids a false
+  success summary, and the real Warp CPU path when Warp is available.
+- The same test module stubs the lazy kernel branch to assert one condensation
+  call uses scalar `temperature` / `pressure` without `environment=`, while one
+  coagulation call uses caller-owned `rng_states`, `initialize_rng=True`, and
+  `rng_seed=41`.
+- Output assertions pin the explicit transfer-helper messaging and canonical
+  example path.
 
 Deliverables:
 
-- New or updated quick-start example under `docs/Examples/`.
-- Demonstrated condensation direct call.
-- Demonstrated coagulation direct call using explicit buffers/RNG state once
-  compatible with `E3-F1` persistence.
+- Canonical quick-start example at
+  `docs/Examples/gpu_direct_kernels_quick_start.py`.
+- Adjacent smoke coverage at
+  `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
+- Demonstrated condensation direct call with explicit gas transfer and vapor
+  pressure input.
+- Demonstrated coagulation direct call with caller-owned `rng_states` allocated
+  in the example and seeded via `initialize_rng=True`, `rng_seed=41`.
 - No hidden transfer or backend-selection helpers.
 
 ## E3-F4-P4: Document troubleshooting and validate docs quick-start behavior
@@ -120,7 +134,7 @@ cleanly when Warp/CUDA is unavailable.
 Test coverage in this phase:
 
 - Re-run `particula/gpu/tests/kernel_exports_test.py` and
-  `particula/gpu/tests/data_containers_example_test.py` after documentation
+  `particula/gpu/tests/gpu_direct_kernels_example_test.py` after documentation
   updates so the documented import path and runnable example stay aligned.
 - Run focused kernel regression checks in
   `particula/gpu/kernels/tests/condensation_test.py` and

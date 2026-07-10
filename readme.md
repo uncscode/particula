@@ -40,6 +40,11 @@ aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
 
 For the canonical container, shape, and CPU↔GPU transfer contract, see the
 [Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md).
+For a runnable low-level walkthrough, run `python
+docs/Examples/gpu_direct_kernels_quick_start.py` to see explicit
+`to_warp_*` / `from_warp_*` boundaries, lazy kernel imports from
+`particula.gpu.kernels`, one condensation step, one coagulation step, and
+caller-owned `rng_states` on Warp's CPU backend by default.
 For migration details and updated API mappings, see the
 [ParticleData and GasData Migration Guide](./docs/Features/particle-data-migration.md).
 Legacy facades remain available, with deprecation planned for v0.3.0.

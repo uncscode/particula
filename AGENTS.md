@@ -265,6 +265,10 @@ restored = from_warp_environment_data(gpu_environment)
   `to_warp_environment_data`, and `from_warp_environment_data`.
 - Import direct GPU step entry points from `particula.gpu.kernels`, not from
   top-level `particula.gpu`.
+- The canonical runnable example for the supported low-level path is
+  `docs/Examples/gpu_direct_kernels_quick_start.py`; it keeps CPU↔Warp
+  transfers explicit, defaults to Warp `device="cpu"`, and defers
+  `particula.gpu.kernels` imports until the Warp-enabled execution branch.
 - Environment transfers are explicit helper calls; kernels and runnables do
   not perform hidden CPU↔GPU synchronization for environment state.
 - `condensation_step_gpu(..., environment=...)` and

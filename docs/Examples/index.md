@@ -156,6 +156,14 @@ Jump in by selecting any card below and follow along in your browser or local en
     docs/Examples/data_containers_and_gpu_foundations.py` for the documented
     CPU-only and optional Warp CPU-backend flow.
 
+    Key examples:
+    - [Data containers and GPU foundations](Data_Containers/index.md) —
+      `ParticleData` / `GasData` shapes plus explicit transfer helpers
+    - [Direct GPU kernels quick-start source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
+      — the single canonical low-level Warp kernel example with explicit
+      CPU↔Warp transfers, lazy `particula.gpu.kernels` imports, one
+      condensation call, one coagulation call, and caller-owned `rng_states`
+
     [:octicons-arrow-right-24: Guide](Data_Containers/index.md)
 
 -   __[Particle Phase](Particle_Phase/index.md)__
