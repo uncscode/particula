@@ -35,7 +35,7 @@ repository = "https://github.com/uncscode/particula"
 
 [project.optional-dependencies]
 dev = [
-    "pytest", "pytest-cov", "jupyterlab",
+    "pytest", "pytest-cov", "jupyterlab", "nbclient", "nbconvert",
     "build", "jupyter-book", "ghp-import",
     "mkdocs", "mkdocs-material[imaging]", "mkdocs-jupyter", "mkdocstrings[python]",
     "mkdocs-gen-files", "mkdocs-literate-nav",
