@@ -1,4 +1,4 @@
-"""GPU benchmark suite for condensation and coagulation kernels.
+"""Opt-in GPU benchmarks for condensation and coagulation kernels.
 
 Run with:
     pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s
@@ -6,6 +6,11 @@ Run with:
 Set ``WARP_PROFILE=1`` to enable Warp capture hooks for Nsight/warp
 profiling. When enabled, run Nsight Systems/Compute while the benchmark
 executes to inspect memory access patterns and kernel launch metrics.
+
+Condensation benchmarks use a generic deterministic particle fixture.
+Coagulation benchmarks use a dedicated mixed-scale fixture so the timed
+path reflects the shipped NPF/droplet regression baseline without
+changing condensation setup.
 """
 
 # pyright: reportGeneralTypeIssues=false
@@ -678,6 +683,10 @@ def _make_coagulation_particle_data(
     n_species: int,
 ) -> ParticleData:
     """Create deterministic mixed-scale particle data for coagulation.
+
+    The fixture intentionally combines nanometer-scale and droplet-scale
+    particles so opt-in coagulation timings exercise the same broad mass
+    spread covered by the mixed-scale regression tests.
 
     Args:
         n_boxes: Number of spatial boxes to populate.
@@ -1472,7 +1481,7 @@ def test_coagulation_scaling(
     n_species: int,
     run_cpu: bool,
 ) -> None:
-    """Parametrized coagulation benchmark across particle counts."""
+    """Benchmark coagulation scaling with the mixed-scale fixture path."""
     _skip_if_no_cuda()
     tag = f"coag-{label}"
     print(

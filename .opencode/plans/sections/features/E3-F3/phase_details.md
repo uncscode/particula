@@ -1,17 +1,29 @@
 # Phase Details
 
-- [ ] **E3-F3-P1:** Reproduce single-box and multi-box coagulation benchmark matrix
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F3-P1:** Reproduce single-box and multi-box coagulation benchmark matrix
+  - Issue: #1246 | Size: S | Status: Shipped
   - Depends on: E3-F1 finalized repeated-step RNG semantics and E3-F2 settling
     any sampler changes that would invalidate the benchmark baseline.
   - Goal: Refresh the existing CUDA opt-in coagulation benchmark evidence for
     representative single-box and multi-box configurations, then record the
-    exact command and skip-or-run outcome in one shipped docs location.
+    exact command and run outcome in one shipped docs location.
   - Files: `particula/gpu/tests/benchmark_test.py`,
+    `particula/gpu/tests/benchmark_helpers_test.py`,
     `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Tests: Run focused fast tests for benchmark helpers; run
-    `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s` only on
-    CUDA-capable hardware and record skip status otherwise.
+  - Tests: Shipped focused helper coverage in
+    `pytest particula/gpu/tests/benchmark_helpers_test.py -q`, including the
+    deterministic coagulation-only mixed-scale fixture contract, helper-routing
+    isolation, benchmark result recording, and persistent RNG-state reuse.
+    Captured benchmark evidence with
+    `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s` on CUDA
+    hardware and recorded the artifact path plus single-box vs multi-box timing
+    summary in the roadmap.
+  - Delivered: `benchmark_test.py` now routes coagulation through
+    `_make_coagulation_particle_data(...)` while leaving condensation on the
+    generic helper; `benchmark_helpers_test.py` adds bounded regression
+    coverage for the mixed-scale fixture and helper split; the roadmap note now
+    records the 2026-07-10 UTC benchmark command, hardware context, artifact
+    path, and timing summary.
 
 - [ ] **E3-F3-P2:** Record measured one-thread-per-box scaling limit and decision evidence
   - Issue: TBD | Size: S | Status: Not Started
