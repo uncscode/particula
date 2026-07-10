@@ -5,12 +5,16 @@ testing-only phase.
 
 ## Import and Export Tests
 
-- Add tests for the chosen direct-kernel import path.
-- If top-level exports are added, assert both step functions are present in
-  `particula.gpu.__all__`.
-- If `.kernels` remains the only public kernel module, assert the documented
-  path imports successfully and remains stable.
-- Keep tests independent of CUDA availability.
+- Phase `E3-F4-P1` shipped focused regression coverage in
+  `particula/gpu/tests/kernel_exports_test.py`.
+- Assert `particula.gpu.kernels` imports
+  `condensation_step_gpu` and `coagulation_step_gpu` without launching kernels.
+- Assert top-level `particula.gpu` does not expose those step functions and does
+  not list them in `__all__`.
+- Assert `particula.gpu.kernels.__all__` contains exactly the two supported
+  step functions.
+- Keep the positive `particula.gpu.kernels` checks independent of CUDA
+  availability and guarded with `pytest.importorskip("warp")`.
 
 ## Quick-Start Smoke Tests
 
@@ -33,7 +37,7 @@ testing-only phase.
 ## Suggested Commands
 
 ```bash
-pytest particula/gpu/tests/kernel_exports_test.py -q
+pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
 pytest particula/gpu/tests/data_containers_example_test.py -q
 pytest particula/gpu/kernels/tests/condensation_test.py -q
 pytest particula/gpu/kernels/tests/coagulation_test.py -q

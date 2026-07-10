@@ -25,6 +25,17 @@ kernel-entry responsibilities.
 - Condensation and coagulation should reuse this boundary rather than
   re-implementing environment validation independently.
 
+### GPU package export boundary
+
+- `particula.gpu` remains the public home for Warp availability, context, and
+  explicit CPU↔GPU transfer helpers.
+- Direct GPU step entry points should be imported from
+  `particula.gpu.kernels`, not re-exported from top-level `particula.gpu`.
+- Lower-level kernel helpers should stay module-local to
+  `particula.gpu.kernels.condensation` and
+  `particula.gpu.kernels.coagulation` unless a broader public contract is
+  intentionally documented.
+
 ## Design Intent
 
 - Keep CPU↔GPU transfers explicit.
@@ -32,3 +43,5 @@ kernel-entry responsibilities.
 - Keep cross-entry-point normalization private to `particula/gpu/kernels/`.
 - Share validation at kernel boundaries when multiple GPU entry points consume
   the same environment contract.
+- Keep GPU exports deliberate: top-level helpers in `particula.gpu`, direct
+  step entry points in `particula.gpu.kernels`.

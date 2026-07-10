@@ -12,12 +12,14 @@ The current codebase already exposes direct step functions from
 - `condensation_step_gpu`
 - `coagulation_step_gpu`
 
-Top-level `particula.gpu` currently focuses on availability, data transfer, and
+Top-level `particula.gpu` remains focused on availability, data transfer, and
 context helpers such as `WARP_AVAILABLE`, `to_warp_particle_data`,
-`to_warp_gas_data`, `to_warp_environment_data`, and `gpu_context`. This plan
-decides whether the stable public quick-start should keep the explicit
-`particula.gpu.kernels` path or add narrow top-level re-exports for the two
-step functions only.
+`to_warp_gas_data`, `to_warp_environment_data`, and `gpu_context`. Phase
+`E3-F4-P1` finalized `particula.gpu.kernels` as the supported public import
+path for the two direct step functions, kept `particula.gpu` intentionally
+non-reexporting, narrowed package-level kernel exports to those two names only,
+and added focused regression coverage in
+`particula/gpu/tests/kernel_exports_test.py`.
 
 ## Goals
 

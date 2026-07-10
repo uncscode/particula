@@ -2,13 +2,13 @@
 
 ## In Scope
 
-- Decide the public import path for direct low-level kernel step functions:
-  - Preferred baseline: `from particula.gpu.kernels import ...`.
-  - Optional narrow flattening: re-export only `condensation_step_gpu` and
-    `coagulation_step_gpu` from `particula.gpu` if maintainers choose top-level
-    discoverability.
-- Add import/export regression tests for the selected path and `__all__`
-  behavior where applicable.
+- Finalize the public import path for direct low-level kernel step functions as
+  `from particula.gpu.kernels import condensation_step_gpu,
+  coagulation_step_gpu`.
+- Keep `particula.gpu` limited to availability, transfer, and context helpers;
+  do not re-export the two step functions from the package top level.
+- Narrow `particula.gpu.kernels` package-level exports to the two supported
+  step functions and add regression tests covering that `__all__` contract.
 - Create a runnable quick-start example showing both condensation and
   coagulation low-level calls.
 - Use existing CPU data containers and explicit helpers:
