@@ -39,6 +39,7 @@
 # %%
 import json
 from pathlib import Path
+from typing import Any
 
 import matplotlib.pyplot as plt
 
@@ -50,21 +51,67 @@ BENCHMARK_FILENAME = "gpu_benchmark_results.json"
 BENCHMARK_ARTIFACT_PATH = Path(".artifacts/benchmarks") / BENCHMARK_FILENAME
 
 
+def _load_benchmark_payload(path: Path) -> dict[str, Any]:
+    """Load a benchmark JSON payload from disk."""
+    with path.open(encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise ValueError("benchmark payload must be a JSON object")
+    benchmarks = payload.get("benchmarks")
+    if not isinstance(benchmarks, dict):
+        raise ValueError("benchmark payload must include a dict benchmarks map")
+    return payload
+
+
+def _validate_benchmark_candidate(path: Path) -> None:
+    """Validate that a candidate file matches the controlled benchmark schema."""
+    payload = _load_benchmark_payload(path)
+    metadata = payload.get("benchmark_metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError("benchmark payload must include benchmark_metadata")
+    artifact_path = metadata.get("artifact_path")
+    if artifact_path != str(BENCHMARK_ARTIFACT_PATH):
+        raise ValueError(
+            "benchmark payload artifact_path does not match the controlled path"
+        )
+
+
 def _find_benchmark_results() -> Path:
     """Find benchmark JSON, preferring the controlled artifact path."""
     current = Path.cwd().resolve()
+    rejected_candidates: list[str] = []
+
     for parent in [current, *current.parents]:
         artifact_candidate = parent / BENCHMARK_ARTIFACT_PATH
         if artifact_candidate.exists():
-            return artifact_candidate
+            try:
+                _validate_benchmark_candidate(artifact_candidate)
+            except (OSError, json.JSONDecodeError, ValueError) as exc:
+                rejected_candidates.append(
+                    f"{artifact_candidate}: {type(exc).__name__}: {exc}"
+                )
+            else:
+                return artifact_candidate
 
+        if (parent / "pyproject.toml").exists():
+            break
+
+    for parent in [current, *current.parents]:
         export_candidate = parent / BENCHMARK_FILENAME
         if export_candidate.exists():
-            return export_candidate
+            try:
+                _validate_benchmark_candidate(export_candidate)
+            except (OSError, json.JSONDecodeError, ValueError) as exc:
+                rejected_candidates.append(
+                    f"{export_candidate}: {type(exc).__name__}: {exc}"
+                )
+            else:
+                return export_candidate
 
         # Stop at the repo root (contains pyproject.toml)
         if (parent / "pyproject.toml").exists():
             break
+
     msg = (
         "Could not find benchmark results at either "
         f"{BENCHMARK_ARTIFACT_PATH} or {BENCHMARK_FILENAME}. "
@@ -73,6 +120,8 @@ def _find_benchmark_results() -> Path:
         "--benchmark -v -s\n"
         "or copy/export the recorded artifact into the working directory."
     )
+    if rejected_candidates:
+        msg += "\nRejected candidates:\n- " + "\n- ".join(rejected_candidates)
     raise FileNotFoundError(msg)
 
 
