@@ -30,8 +30,11 @@
 # pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s
 # ```
 #
-# The test suite writes results to `gpu_benchmark_results.json` in the
-# repository root.
+# The benchmark helper records the controlled artifact at
+# `.artifacts/benchmarks/gpu_benchmark_results.json`. This notebook reads a
+# local `gpu_benchmark_results.json` export for visualization, so keep the
+# recorded artifact path in mind when tracing the original benchmark command and
+# runtime metadata.
 
 # %%
 import json
@@ -279,21 +282,30 @@ plt.show()
 #   sequential acceptance-rejection pair selection loop. This means
 #   single-box performance is limited by the per-particle work within
 #   that one thread.
-# * **Multi-box configurations** show **25--30x** speedups because the
-#   GPU parallelizes across boxes.
-# * Single-box speedups are modest (**1.5--3x**) because the GPU thread
-#   does essentially the same sequential work as the CPU, just with
-#   faster per-operation throughput.
+# * **Multi-box configurations** remain the effective region for the current
+#   kernel because the GPU parallelizes across independent boxes. The recorded
+#   many-box cases (`10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`, `100x1k`,
+#   `10x10k`) stay near the smaller timings seen at lower box counts.
+# * Single-box speedups are modest (**1.5--3x**) because the GPU thread does
+#   essentially the same sequential work as the CPU, just with faster
+#   per-operation throughput.
+# * Treat the recorded `1x10k` to `1x50k` range as a **single-box caution
+#   band** for the shipped one-thread-per-box path: the measured GPU step time
+#   rises from **0.6809 s** to **3.3984 s**, so large single-box workloads are
+#   no longer a strong GPU recommendation in this benchmark capture.
 # * The `k_max` computation uses an O(n) min/max radius bound (matching
 #   the CPU's bin-pair strategy) rather than the original O(n^2)
 #   all-pairs scan. This reduced single-box GPU time from **29s to
 #   0.28s** at 2k particles.
+# * These conclusions are **machine-bounded** to the 2026-07-10 capture on the
+#   recorded Warp/device context, not universal guarantees for every GPU or
+#   future kernel variant.
 #
 # ### When to use GPU acceleration
 #
 # | Scenario | Recommendation |
 # |---|---|
 # | Condensation, any size | Always use GPU -- massive speedup |
-# | Coagulation, many boxes | Use GPU -- ~25x speedup |
+# | Coagulation, many boxes | Use GPU -- current effective region |
 # | Coagulation, single box, <5k particles | Either -- modest GPU advantage |
-# | Coagulation, single box, >10k particles | GPU preferred for throughput |
+# | Coagulation, single box, 10k--50k particles | Caution -- not a strong GPU recommendation in this capture |

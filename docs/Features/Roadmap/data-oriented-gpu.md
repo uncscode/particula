@@ -1197,31 +1197,45 @@ resampling or volume-scaling policy before slot exhaustion.
 #### Shipped coagulation benchmark evidence (2026-07-10 UTC)
 
 - Command evidence: `.artifacts/benchmarks/gpu_benchmark_results.json`
-  now records the exact executed command in
-  `benchmark_metadata.command`. The 2026-07-10 UTC capture was produced by
+  records the exact executed command in `benchmark_metadata.command`.
+  The 2026-07-10 UTC capture was produced by
   `/home/kyle/Code/particula/.venv/bin/pytest -v --tb=short --cov`
   `--cov-report=term-missing particula/gpu/tests/benchmark_test.py`
   `--benchmark -v -s`, with the user-facing opt-in portion preserved as
   `particula/gpu/tests/benchmark_test.py --benchmark -v -s`.
-- Hardware/context: the same artifact records `warp_version=1.15.0` and
-  `device.alias=cuda:0`, `device.name=NVIDIA GeForce RTX 5060`,
+- Hardware/context: the same artifact records `warp_version=1.15.0`,
+  `device.alias=cuda:0`, `device.name=NVIDIA GeForce RTX 5060`, and
   `device.total_memory_bytes=8082096128` (about 8.08 GiB), with
   `started_at=2026-07-10T01:59:34.215800+00:00` and
   `updated_at=2026-07-10T02:00:43.918911+00:00`.
 - Artifact output: `.artifacts/benchmarks/gpu_benchmark_results.json`
-- Mixed-scale fixture note: the coagulation benchmark path now uses a dedicated
-  deterministic mixed NPF/droplet fixture aligned with the shipped E3-F2
-  baseline, while condensation benchmarks keep the generic helper.
-- Timing summary: single-box coagulation remains the limiting case for the
-  one-thread-per-box kernel (`1x500` GPU `0.0361s`, `1x2k` `0.1366s`, `1x5k`
-  `0.3411s`, `1x10k` `0.6809s`, `1x20k` `1.3689s`, `1x50k` `3.3984s`), while
-  equivalent or larger total-particle multi-box runs scale much better across
-  independent boxes (`10x500` `0.0359s`, `10x1k` `0.0699s`, `50x1k` `0.0714s`,
-  `10x5k` `0.3437s`, `50x5k` `0.3528s`, `100x1k` `0.0766s`, `10x10k`
-  `0.6938s`).
-- Interpretation boundary: record this as current benchmark evidence for the
-  existing one-thread-per-box design, not as a final acceptance decision on the
-  long-term scaling strategy.
+- Mixed-scale fixture note: the coagulation benchmark path uses a
+  dedicated deterministic mixed NPF/droplet fixture aligned with the
+  shipped E3-F2 baseline, while condensation benchmarks keep the generic
+  helper.
+
+##### Measured decision record for the current one-thread-per-box path
+
+- **Single-box caution band:** treat the recorded `1x10k` to `1x50k`
+  range as the current caution band for large single-box workloads on the
+  shipped one-thread-per-box kernel. The measured GPU time per step rises
+  from `0.6809s` at `1x10k` to `1.3689s` at `1x20k` and `3.3984s` at
+  `1x50k`, so this path is no longer a strong recommendation for large
+  single-box work in that band. Smaller `1x500` to `1x5k` cases
+  (`0.0361s`, `0.1366s`, `0.3411s`) remain a modest-throughput regime,
+  not a decisive GPU win.
+- **Multi-box effective region:** independent-box parallelism remains
+  effective in the recorded many-box cases, where equivalent or larger
+  total-particle workloads stay near the smaller timings seen at lower box
+  counts: `10x500` `0.0359s`, `10x1k` `0.0699s`, `50x1k` `0.0714s`,
+  `10x5k` `0.3437s`, `50x5k` `0.3528s`, `100x1k` `0.0766s`, and
+  `10x10k` `0.6938s`. Record this as the region where the current GPU path
+  still benefits from many independent boxes keeping threads busy.
+- **Machine-bounded caveat:** this is measured evidence from the
+  2026-07-10 capture on the recorded Warp/device context above, not a
+  universal cutoff for every GPU or every future kernel variant. Treat it
+  as the current decision record for the shipped one-thread-per-box design,
+  not as a final acceptance decision on the long-term scaling strategy.
 
 ## Epic I: Differentiability and Global Optimization
 
