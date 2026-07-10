@@ -10,6 +10,7 @@ SUPPORTED_STEP_SYMBOLS = (
 )
 
 INTERNAL_HELPER_SYMBOLS = (
+    "brownian_coagulation_kernel",
     "apply_coagulation_kernel",
     "apply_mass_transfer_kernel",
     "condensation_mass_transfer_kernel",
@@ -75,11 +76,17 @@ def test_concrete_kernel_modules_still_expose_supported_and_internal_symbols() -
 
     import particula.gpu.kernels as kernels
     from particula.gpu.kernels.coagulation import (
+        brownian_coagulation_kernel,
         coagulation_step_gpu,
         initialize_coagulation_rng_states,
     )
-    from particula.gpu.kernels.condensation import condensation_step_gpu
+    from particula.gpu.kernels.condensation import (
+        apply_mass_transfer_kernel,
+        condensation_step_gpu,
+    )
 
     assert kernels.coagulation_step_gpu is coagulation_step_gpu
     assert kernels.condensation_step_gpu is condensation_step_gpu
+    assert brownian_coagulation_kernel is not None
     assert initialize_coagulation_rng_states is not None
+    assert apply_mass_transfer_kernel is not None
