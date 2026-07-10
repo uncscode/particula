@@ -2,7 +2,7 @@
   "id": "E3-F3",
   "type": "feature",
   "title": "Record one-thread-per-box coagulation design decision and scaling limits",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -10,7 +10,7 @@
   ],
   "start_date": "2026-07-08",
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-10",
   "last_updated": "2026-07-10",
   "dependencies": [],
   "section_files": {
@@ -36,7 +36,7 @@
       "title": "Reproduce single-box and multi-box coagulation benchmark matrix",
       "status": "Shipped",
       "size": "S",
-      "issue_number": null,
+      "issue_number": 1246,
       "start_date": null,
       "completion_date": "2026-07-10",
       "estimates": null,
@@ -49,7 +49,7 @@
       "title": "Record measured one-thread-per-box scaling limit and decision evidence",
       "status": "Shipped",
       "size": "S",
-      "issue_number": null,
+      "issue_number": 1247,
       "start_date": null,
       "completion_date": "2026-07-10",
       "estimates": null,
@@ -62,7 +62,7 @@
       "title": "Document accepted GPU coagulation usage boundaries for Epic C",
       "status": "Shipped",
       "size": "S",
-      "issue_number": null,
+      "issue_number": 1248,
       "start_date": null,
       "completion_date": "2026-07-10",
       "estimates": null,
@@ -73,11 +73,11 @@
     {
       "id": "E3-F3-P4",
       "title": "Scope parallel-within-box follow-up if scaling evidence requires it",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
-      "issue_number": null,
+      "issue_number": 1249,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-10",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -85,5 +85,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "complete"
 }

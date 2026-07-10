@@ -1,6 +1,6 @@
 # Open Questions
 
-Status: reviewed after shipped issue #1248 docs updates.
+Status: reviewed after shipped issue #1249 closeout updates.
 
 ## Resolved Decisions
 
@@ -24,15 +24,20 @@ Status: reviewed after shipped issue #1248 docs updates.
 - The delivered roadmap decision record also names the measured many-box
   effective region explicitly: `10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`,
   `100x1k`, and `10x10k` remain the evidence-backed independent-box cases.
-- The notebook-backed theory/example text is now aligned to the same controlled
-  artifact path and machine-bounded wording, so roadmap and example guidance no
-  longer diverge on where the benchmark evidence lives or how broadly it should
-  be interpreted.
+- The notebook-backed theory/example text now keeps the controlled artifact path
+  as the preferred source of record and accepts fallback exports only when they
+  carry matching benchmark provenance, so roadmap and example guidance no longer
+  diverge on where the benchmark evidence lives or how broadly it should be
+  interpreted.
 - Issue #1248 resolved the remaining public-docs ambiguity without changing the
   kernel: the roadmap now marks the current one-thread-per-box path as accepted
   with caveat for Epic C, and the foundations guide now tells users when to use
   it and when not to.
-- No follow-up was scoped by this issue. If later evidence requires one, start
+- Issue #1249 closed the follow-up decision without opening a new track; the
+  remaining closeout work in this branch is limited to benchmark helper,
+  example-artifact, and plan-record consistency fixes.
+- No parallel-within-box follow-up is currently scoped. If later evidence
+  requires one, start
   with a staged design investigation that compares pair-selection parallelism,
   collision-application parallelism, and graph capture before committing to a
   kernel rewrite.

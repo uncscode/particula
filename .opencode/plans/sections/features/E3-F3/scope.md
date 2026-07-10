@@ -25,8 +25,8 @@ accepted-with-caveat boundary for many-box and low-level direct-kernel use.
 - Rewriting the coagulation kernel for parallel pair selection within a box.
 - Re-running or broadening benchmark code when the docs change can be anchored
   to the existing measured decision record.
-- Editing notebook-backed benchmark sources when the public guidance can be
-  updated in roadmap/foundations docs alone.
+- Broadening notebook-backed benchmark analysis beyond deterministic artifact
+  lookup and source-of-record alignment.
 - Changing CPU/GPU container transfer contracts or hidden synchronization
   behavior.
 - Replacing E3-F1 RNG work or E3-F2 mixed-scale sampling decisions.
