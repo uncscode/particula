@@ -672,6 +672,62 @@ def _make_particle_data(
     )
 
 
+def _make_coagulation_particle_data(
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+) -> ParticleData:
+    """Create deterministic mixed-scale particle data for coagulation.
+
+    Args:
+        n_boxes: Number of spatial boxes to populate.
+        n_particles: Number of particles per box.
+        n_species: Number of species carried by each particle.
+
+    Returns:
+        ParticleData with mixed NPF/droplet radii, active concentrations, and
+        deterministic ``np.float64`` masses for coagulation benchmarks only.
+    """
+    density = np.linspace(950.0, 1250.0, n_species, dtype=np.float64)
+    species_fractions = np.linspace(1.0, 2.0, n_species, dtype=np.float64)
+    species_fractions /= np.sum(species_fractions)
+
+    small_count = max(1, n_particles // 2)
+    large_count = max(1, n_particles - small_count)
+
+    small_radii = np.geomspace(1.5e-9, 2.5e-8, small_count, dtype=np.float64)
+    large_radii = np.geomspace(1.0e-6, 1.5e-5, large_count, dtype=np.float64)
+    base_radii = np.concatenate((small_radii, large_radii))[:n_particles]
+
+    box_scale = 1.0 + 0.01 * np.arange(n_boxes, dtype=np.float64)
+    radii = box_scale[:, np.newaxis] * base_radii[np.newaxis, :]
+    total_volume = (4.0 / 3.0) * np.pi * radii**3
+    masses = (
+        total_volume[..., np.newaxis]
+        * density[np.newaxis, np.newaxis, :]
+        * species_fractions[np.newaxis, np.newaxis, :]
+    )
+
+    base_concentration = np.concatenate(
+        (
+            np.linspace(150.0, 220.0, small_count, dtype=np.float64),
+            np.linspace(0.8, 1.6, large_count, dtype=np.float64),
+        )
+    )[:n_particles]
+    concentration = (
+        1.0 + 0.02 * np.arange(n_boxes, dtype=np.float64)[:, np.newaxis]
+    ) * base_concentration[np.newaxis, :]
+    charge = np.zeros((n_boxes, n_particles), dtype=np.float64)
+    volume = np.full((n_boxes,), 2.0e-6, dtype=np.float64)
+    return ParticleData(
+        masses=masses,
+        concentration=concentration,
+        charge=charge,
+        density=density,
+        volume=volume,
+    )
+
+
 def _make_gas_data(n_boxes: int, n_species: int) -> GasData:
     """Create deterministic gas data for benchmarks.
 
@@ -1434,7 +1490,7 @@ def test_coagulation_scaling(
             label, n_boxes, n_particles, n_species, run_cpu
         )
     )
-    particles = _make_particle_data(n_boxes, n_particles, n_species)
+    particles = _make_coagulation_particle_data(n_boxes, n_particles, n_species)
 
     gpu_particles = to_warp_particle_data(particles, device="cuda")
     collision_pairs_buf = _wp_zeros_with_guard(
