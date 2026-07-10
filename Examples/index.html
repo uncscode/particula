@@ -14323,6 +14323,13 @@ processes.</p>
 canonical local example command <code>python
 docs/Examples/data_containers_and_gpu_foundations.py</code> for the documented
 CPU-only and optional Warp CPU-backend flow.</p>
+<p>Key examples:
+- <a href="Data_Containers/">Data containers and GPU foundations</a> —
+  <code>ParticleData</code> / <code>GasData</code> shapes plus explicit transfer helpers
+- <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py">Direct GPU kernels quick-start source</a>
+  — the single canonical low-level Warp kernel example with explicit
+  CPU↔Warp transfers, lazy <code>particula.gpu.kernels</code> imports, one
+  condensation call, one coagulation call, and caller-owned <code>rng_states</code></p>
 <p><a href="Data_Containers/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Guide</a></p>
 </li>
 <li>

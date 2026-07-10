@@ -1006,6 +1006,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particula.gpu.__getattr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;__getattr__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.gpu.from_warp_environment_data" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14416,6 +14427,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particula.gpu.__getattr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;__getattr__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particula.gpu.from_warp_environment_data" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14655,7 +14677,8 @@ simulations.</p>
 - GPU-resident particle, gas, and environment data via Warp structs
 - Efficient multi-box CFD simulations with batch dimensions
 - Manual transfer control between CPU and GPU (to_warp/from_warp)
-- GPU kernels for condensation and coagulation (future phases)</p>
+- Top-level availability and transfer helpers, while direct GPU step imports
+  live under <code>particula.gpu.kernels</code></p>
 
 
 <details class="example" open>
@@ -14697,6 +14720,61 @@ data.masses = wp.zeros((2, 100, 3), dtype=wp.float64)</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="particula.gpu.__getattr__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">__getattr__</span>
+
+
+<a href="#particula.gpu.__getattr__" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Lazily resolve optional Warp-backed container types.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/gpu/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lazily resolve optional Warp-backed container types.&quot;&quot;&quot;</span>
+    <span class="n">warp_type_names</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;WarpParticleData&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;WarpGasData&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;WarpEnvironmentData&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">warp_type_names</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">WARP_AVAILABLE</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">_warp_unavailable_error</span><span class="p">()</span> <span class="kn">from</span><span class="w"> </span><span class="nn">_WARP_IMPORT_ERROR</span>
+
+    <span class="n">warp_types</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;particula.gpu.warp_types&quot;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">warp_types</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">value</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 

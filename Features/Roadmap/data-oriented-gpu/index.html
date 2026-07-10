@@ -16408,21 +16408,53 @@ them.</p>
    <a href="#measured-decision-record-for-the-current-one-thread-per-box-path">measured decision record for the current one-thread-per-box path</a>
    rather than broadening it into a universal production guarantee or a
    parallel-within-box implementation claim.</li>
-<li>Resolve kernel entry-point exports: decide whether <code>condensation_step_gpu</code>
-   and <code>coagulation_step_gpu</code> are exported from top-level <code>particula.gpu</code> or
-   documented under <code>particula.gpu.kernels</code> (today they are only importable
-   from <code>particula.gpu.kernels</code>).</li>
-<li>Formalize device-aware pytest execution as project policy (a pytest
+<li>Direct GPU kernel step entry points are supported from
+   <code>particula.gpu.kernels</code>:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">coagulation_step_gpu</span><span class="p">,</span>
+    <span class="n">condensation_step_gpu</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Keep top-level <code>particula.gpu</code> focused on Warp availability, transfer
+   helpers, and context helpers rather than direct kernel-step imports. Raw
+   helper kernels remain intentionally outside the documented package-level
+   public surface; import them from their concrete modules when needed.
+5. Formalize device-aware pytest execution as project policy (a pytest
    flag/config plus marker): parity tests always run on Warp CPU and add
    CUDA automatically when a device is present; document that CUDA-device
-   validation is currently local/manual before releases.</li>
-<li>Record acceptable parity tolerances for stochastic coagulation and
-   floating-point differences across CPU, Warp CPU, and CUDA devices.</li>
-<li>Publish a GPU quick-start example for direct kernel use with
-   <code>ParticleData</code>, <code>GasData</code>, the Warp transfer helpers, <code>gpu_context</code>, and
-   <code>WARP_AVAILABLE</code>, plus troubleshooting notes for missing Warp, missing
-   CUDA, and device-mismatch errors, and installation/environment
-   expectations for <code>warp-lang</code>.</li>
+   validation is currently local/manual before releases.
+6. Record acceptable parity tolerances for stochastic coagulation and
+   floating-point differences across CPU, Warp CPU, and CUDA devices.
+7. The shipped canonical direct-kernel quick-start is
+   <a href="../../../Examples/gpu_direct_kernels_quick_start/"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>.
+   It demonstrates the supported <code>ParticleData</code>/<code>GasData</code> path, explicit
+   <code>to_warp_*</code> and <code>from_warp_*</code> transfer helpers, the <code>WARP_AVAILABLE</code>
+   guard, and deferred <code>particula.gpu.kernels</code> imports so the CPU↔Warp
+   boundary stays explicit. Treat those direct kernels as low-level APIs,
+   not as top-level <code>particula.gpu</code> convenience imports.
+   Keep the supported public import path fixed at:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">coagulation_step_gpu</span><span class="p">,</span>
+    <span class="n">condensation_step_gpu</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Top-level <code>particula.gpu</code> remains the home for availability checks and
+   transfer helpers, not direct kernel-step re-exports. Troubleshooting notes
+   should stay aligned with the shipped example and regression tests:</p>
+<ul>
+<li>missing Warp means the quick-start stays in its CPU-only documentation
+     path behind <code>WARP_AVAILABLE</code>, with deferred <code>particula.gpu.kernels</code>
+     imports and no pretend kernel execution</li>
+<li>CUDA is optional and Warp <code>device="cpu"</code> is the default runnable path</li>
+<li>particle, gas, environment, and sidecar buffers such as <code>rng_states</code>
+     must stay on compatible devices</li>
+<li><code>environment=</code> must not be mixed with scalar or Warp-array direct
+     <code>temperature</code> / <code>pressure</code> inputs</li>
+<li>CPU↔GPU movement remains explicit through <code>to_warp_*</code> and <code>from_warp_*</code>
+     helpers, including lossy gas restore for names and helper-only state</li>
+<li>no hidden transfers, hidden synchronization, or automatic top-level
+     fallback imports should be implied by roadmap prose</li>
 <li>Add a runnable <code>docs/Examples/</code> entry for a <code>CondensationLatentHeat</code>
    workflow (deferred from E1; current tutorials only set <code>latent_heat</code> as a
    vapor property), following the paired <code>.py</code>/<code>.ipynb</code> example conventions.</li>
@@ -16430,7 +16462,7 @@ them.</p>
    (deferred from E1; today the conservation and energy regressions are
    unit-level only), establishing the CPU integration baseline that the
    Epic D latent-heat parity tests will reuse.</li>
-</ol>
+</ul>
 <p><strong>Exit bar:</strong> A new user can run both kernels from the docs on a CUDA device
 and on Warp CPU without reading source, repeated coagulation steps draw
 uncorrelated samples from a caller-initialized persistent RNG buffer, the

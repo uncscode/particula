@@ -11432,6 +11432,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#direct-kernel-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-kernel troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#related-references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14473,6 +14484,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#direct-kernel-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-kernel troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#related-references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14509,12 +14531,18 @@
 <h1 id="data-containers-and-gpu-foundations">Data Containers and GPU Foundations<a class="headerlink" href="#data-containers-and-gpu-foundations" title="Permanent link">&para;</a></h1>
 <p>This page is the canonical reference for Particula's shipped data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
-and current CPU/GPU support boundaries.</p>
+the direct-kernel troubleshooting contract, and current CPU/GPU support
+boundaries.</p>
 <p>For a runnable walkthrough of the shipped single-box container construction and
 optional Warp CPU-backend round trips, see the
 <a href="../../Examples/Data_Containers/">Data Containers example</a> and run:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/data_containers_and_gpu_foundations.py
 </code></pre></div>
+<p>For the low-level direct-kernel path, use the canonical quick-start at
+<a href="../../Examples/gpu_direct_kernels_quick_start/"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>.
+That example imports step entry points from <code>particula.gpu.kernels</code> while
+keeping top-level <code>particula.gpu</code> focused on <code>WARP_AVAILABLE</code> and the
+<code>to_warp_*</code> / <code>from_warp_*</code> transfer helpers.</p>
 <p>Use this guide when you need the current contract for:</p>
 <ul>
 <li><code>ParticleData</code>, <code>GasData</code>, and <code>EnvironmentData</code></li>
@@ -14725,6 +14753,14 @@ transfers.</p>
 <li><code>from_warp_environment_data()</code></li>
 </ul>
 <p>Optional Warp availability can be checked with <code>WARP_AVAILABLE</code>.</p>
+<p>For the direct-kernel example path, keep the import split explicit:</p>
+<ul>
+<li>Import direct step functions from <code>particula.gpu.kernels</code>.</li>
+<li>Import <code>WARP_AVAILABLE</code>, <code>to_warp_*</code>, and <code>from_warp_*</code> helpers from
+  <code>particula.gpu</code>.</li>
+<li>Do not expect top-level <code>particula.gpu</code> to re-export
+  <code>condensation_step_gpu</code> or <code>coagulation_step_gpu</code>.</li>
+</ul>
 <h3 id="particle-transfer-boundary">Particle transfer boundary<a class="headerlink" href="#particle-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p><code>WarpParticleData</code> is the explicit Warp mirror for <code>ParticleData</code>. Use the
 helper boundary when particle-resident arrays must move between CPU-owned
@@ -14948,6 +14984,46 @@ than storage support.</p>
   be assumed to apply unchanged to Warp <code>cpu</code> or other hardware.</li>
 <li>Treat roadmap pages as future-work references, not as evidence that broader
   runtime support has already shipped.</li>
+</ul>
+<h2 id="direct-kernel-troubleshooting">Direct-kernel troubleshooting<a class="headerlink" href="#direct-kernel-troubleshooting" title="Permanent link">&para;</a></h2>
+<p>Use
+<a href="../../Examples/gpu_direct_kernels_quick_start/"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>
+as the canonical runnable reference when troubleshooting the low-level GPU
+path.</p>
+<ul>
+<li><strong>Warp missing (<code>WARP_AVAILABLE == False</code>)</strong></li>
+<li>The direct-kernel path is unavailable until Warp is installed.</li>
+<li>The canonical quick-start keeps <code>particula.gpu.kernels</code> imports deferred
+    and completes in a CPU-only documentation mode without importing kernel
+    steps or pretending kernels ran.</li>
+<li><strong>CUDA unavailable</strong></li>
+<li>CUDA is optional.</li>
+<li>The default supported runnable path is Warp <code>device="cpu"</code>; only opt into
+    <code>device="cuda"</code> when a CUDA device is actually available.</li>
+<li><strong>Explicit CPU↔GPU transfer boundary</strong></li>
+<li>Kernels operate on Warp-backed container mirrors, not CPU <code>ParticleData</code>,
+    <code>GasData</code>, or <code>EnvironmentData</code> objects directly.</li>
+<li>Move state across the boundary explicitly with <code>to_warp_*</code> and
+    <code>from_warp_*</code>; kernels and runnables do not perform hidden transfers,
+    hidden synchronization, or top-level fallback imports.</li>
+<li><strong>Device mismatch across particle, gas, environment, and sidecar buffers</strong></li>
+<li>Keep Warp arrays and sidecar buffers such as <code>rng_states</code> on the same
+    device as the particle/gas/environment inputs used by the kernel call.</li>
+<li>Treat device-mismatch <code>ValueError</code> failures as input validation, not as a
+    signal that Particula will migrate arrays automatically.</li>
+<li><strong>Mixed <code>environment=</code> plus scalar <code>temperature</code>/<code>pressure</code> inputs</strong></li>
+<li>Pass either <code>environment=</code> or direct temperature/pressure inputs.</li>
+<li>Do not mix scalar or Warp-array <code>temperature</code> / <code>pressure</code> values with
+    <code>environment=</code>; current kernels reject that combination explicitly.</li>
+<li><strong>Gas/environment restore expectations</strong></li>
+<li><code>from_warp_gas_data()</code> is intentionally lossy across the helper boundary:
+    it restores ordered species names only when you supply them; otherwise it
+    generates placeholder names such as <code>species_0</code>.</li>
+<li>GPU-only helper state such as <code>vapor_pressure</code> is not restored onto CPU
+    <code>GasData</code>.</li>
+<li><code>from_warp_environment_data(..., sync=False)</code> is an explicit expert path;
+    manual synchronization remains the caller's responsibility before NumPy
+    access.</li>
 </ul>
 <h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
 <ul>
