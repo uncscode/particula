@@ -54,3 +54,12 @@
   that shipped with it.
 - Recorded that notebook-backed benchmark sources were intentionally left
   unchanged in this phase.
+
+## 2026-07-10 — Issue #1249
+
+- Updated E3-F3 plan sections to reflect shipped E3-F3-P4 closeout work.
+- Recorded that the shipped P2/P3 evidence still stands, so this phase closed
+  without opening a new parallel-within-box follow-up track.
+- Recorded that roadmap wording and `open_questions.md` already matched the
+  accepted-with-caveat outcome, so the closeout stayed limited to plan-state
+  updates instead of adding new roadmap or kernel-scope changes.
