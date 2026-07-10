@@ -724,10 +724,13 @@ Planned features:
    [measured decision record for the current one-thread-per-box path](#measured-decision-record-for-the-current-one-thread-per-box-path)
    rather than broadening it into a universal production guarantee or a
    parallel-within-box implementation claim.
-4. Resolve kernel entry-point exports: decide whether `condensation_step_gpu`
-   and `coagulation_step_gpu` are exported from top-level `particula.gpu` or
-   documented under `particula.gpu.kernels` (today they are only importable
-   from `particula.gpu.kernels`).
+4. Direct GPU kernel step entry points are supported from
+   `particula.gpu.kernels`:
+   `from particula.gpu.kernels import condensation_step_gpu,`
+   `coagulation_step_gpu`. Keep top-level `particula.gpu` focused on Warp
+   availability, transfer helpers, and context helpers rather than direct
+   kernel-step imports, and keep raw internal helper kernels out of the
+   documented package-level public surface.
 5. Formalize device-aware pytest execution as project policy (a pytest
    flag/config plus marker): parity tests always run on Warp CPU and add
    CUDA automatically when a device is present; document that CUDA-device

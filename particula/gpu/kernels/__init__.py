@@ -1,23 +1,17 @@
-"""Warp GPU kernel implementations."""
+"""Public GPU kernel step entry points.
 
-from particula.gpu.kernels.coagulation import (
-    apply_coagulation_kernel,
-    brownian_coagulation_kernel,
-    coagulation_step_gpu,
-    initialize_coagulation_rng_states,
-)
-from particula.gpu.kernels.condensation import (
-    apply_mass_transfer_kernel,
-    condensation_mass_transfer_kernel,
-    condensation_step_gpu,
-)
+Import direct low-level kernel steps from this package:
 
-__all__ = [
-    "apply_coagulation_kernel",
-    "apply_mass_transfer_kernel",
-    "brownian_coagulation_kernel",
-    "coagulation_step_gpu",
-    "condensation_mass_transfer_kernel",
-    "condensation_step_gpu",
-    "initialize_coagulation_rng_states",
-]
+    from particula.gpu.kernels import (
+        coagulation_step_gpu,
+        condensation_step_gpu,
+    )
+
+Raw helper kernels remain available from their concrete modules rather than the
+package-level public surface.
+"""
+
+from particula.gpu.kernels.coagulation import coagulation_step_gpu
+from particula.gpu.kernels.condensation import condensation_step_gpu
+
+__all__ = ["coagulation_step_gpu", "condensation_step_gpu"]
