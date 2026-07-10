@@ -21,7 +21,9 @@ Status: reviewed and answered on 2026-07-10.
    `coagulation_step_gpu(...)`, and initialize them with
    `initialize_rng=True`, `rng_seed=41` for the example call. Repeated-call
    reuse remains documented elsewhere as the broader `E3-F1` contract.
-6. Troubleshooting should live in both the runnable example comments and the
-   feature documentation. The example should cover immediate failure modes;
-   the docs should explain broader CUDA/Warp availability and transfer-boundary
-   issues.
+6. Troubleshooting now lives in both the runnable example and the shipped GPU
+   docs: `docs/Features/data-containers-and-gpu-foundations.md` and
+   `docs/Features/Roadmap/data-oriented-gpu.md`. The example covers immediate
+   runnable-path behavior, while the docs explain optional CUDA, Warp-CPU
+   fallback, device mismatch, mixed `environment=` plus direct inputs, and
+   explicit transfer-boundary / lossy-restore expectations.

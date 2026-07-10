@@ -20,12 +20,16 @@ script and shows:
 
 ## Feature Documentation
 
-Broader guide updates are intentionally separate from this phase, but the
-shipped example docstring and output now make the canonical path and explicit
-transfer contract discoverable in-repo. Follow-on docs work should update
-`docs/Features/data-containers-and-gpu-foundations.md` or an adjacent GPU
-feature page to link the quick-start and clarify that direct kernels are
-low-level APIs with explicit transfer boundaries.
+Phase `E3-F4-P4` shipped the broader guide alignment in:
+
+- `docs/Features/data-containers-and-gpu-foundations.md`
+- `docs/Features/Roadmap/data-oriented-gpu.md`
+
+Those updates now explicitly link the canonical quick-start at
+`docs/Examples/gpu_direct_kernels_quick_start.py`, restate that supported
+direct-step imports come from `particula.gpu.kernels`, and keep top-level
+`particula.gpu` scoped to `WARP_AVAILABLE` plus transfer helpers such as
+`to_warp_*` / `from_warp_*`.
 
 ## Roadmap Documentation
 
@@ -51,12 +55,12 @@ documented package-level surface.
 - Adjacent example smoke coverage is shipped at
   `particula/gpu/tests/gpu_direct_kernels_example_test.py`, including no-Warp,
   import-deferral, `__main__` / subprocess, Warp CPU, and failure-path checks.
-- Broader troubleshooting and cross-document link updates remain for later
-  `E3-F4` phases.
+- Broader troubleshooting and cross-document link updates are now shipped in
+  the foundation guide and GPU roadmap.
 
 ## Troubleshooting Content
 
-Add user-facing notes for:
+Shipped user-facing troubleshooting now covers:
 
 - `WARP_AVAILABLE` is false: install/configure `warp-lang`, or run CPU-only
   non-GPU examples.
@@ -67,3 +71,6 @@ Add user-facing notes for:
   `environment=`.
 - Explicit transfer boundaries: kernels operate on Warp data and do not move
   CPU containers automatically.
+- Transfer-helper restores are intentionally lossy in specific cases: callers
+  must preserve gas species names explicitly, helper-only GPU state is not
+  restored onto CPU `GasData`, and no hidden synchronization is implied.

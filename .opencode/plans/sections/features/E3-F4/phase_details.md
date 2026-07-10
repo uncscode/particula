@@ -127,15 +127,26 @@ Depends on: E3-F4-P3 producing the stable quick-start artifact. Follow any
 shared wording updates from E3-F5 after marker/helper policy lands, but do not
 let that later wording pass block the example itself.
 
-Add user-facing troubleshooting and smoke tests for the quick-start. The final
-phase verifies a new user can run the example on CPU-backed Warp and skip
-cleanly when Warp/CUDA is unavailable.
+Shipped outcome: the final troubleshooting contract is now aligned across the
+canonical quick-start, `docs/Features/data-containers-and-gpu-foundations.md`,
+and `docs/Features/Roadmap/data-oriented-gpu.md`. The published guidance now
+points users to `docs/Examples/gpu_direct_kernels_quick_start.py`, states that
+supported direct-step imports come from `particula.gpu.kernels`, keeps
+top-level `particula.gpu` limited to `WARP_AVAILABLE` and transfer helpers,
+documents Warp CPU as the default runnable path with optional CUDA, and makes
+the explicit transfer-boundary / lossy-restore expectations user visible. The
+phase verifies a new user can follow the CPU-backed Warp path and understand
+how missing Warp, device mismatch, mixed `environment=` plus direct inputs, and
+manual data ownership boundaries behave.
 
 Test coverage in this phase:
 
 - Re-run `particula/gpu/tests/kernel_exports_test.py` and
   `particula/gpu/tests/gpu_direct_kernels_example_test.py` after documentation
   updates so the documented import path and runnable example stay aligned.
+- Keep the transfer-boundary and restore-behavior guidance aligned with the
+  existing helper coverage in `particula/gpu/tests/conversion_test.py`,
+  including caller-owned gas-name metadata and dropped helper-only GPU state.
 - Run focused kernel regression checks in
   `particula/gpu/kernels/tests/condensation_test.py` and
   `particula/gpu/kernels/tests/coagulation_test.py` when troubleshooting text
@@ -150,3 +161,6 @@ Deliverables:
 - Example smoke tests using existing docs-example test patterns.
 - Documentation updates linking the quick-start from relevant GPU feature docs,
   including developer-facing GPU roadmap/foundation guidance updates.
+- Documentation that explicitly distinguishes `particula.gpu.kernels` imports
+  from the top-level `particula.gpu` helper surface and documents lossy restore
+  expectations for transfer helpers.
