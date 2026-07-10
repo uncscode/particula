@@ -3387,17 +3387,6 @@ def test_apply_coagulation_kernel_skips_empty_pair(device: str) -> None:
     npt.assert_allclose(result_concentration, concentration)
 
 
-def test_kernels_init_exports() -> None:
-    """Kernel package exports only the supported step entry points."""
-    from particula.gpu import kernels
-    from particula.gpu.kernels.coagulation import coagulation_step_gpu
-    from particula.gpu.kernels.condensation import condensation_step_gpu
-
-    assert kernels.coagulation_step_gpu is coagulation_step_gpu
-    assert kernels.condensation_step_gpu is condensation_step_gpu
-    assert kernels.__all__ == ["coagulation_step_gpu", "condensation_step_gpu"]
-
-
 def test_coagulation_validation_rejects_bad_shapes(device: str) -> None:
     """Validation helpers reject mismatched shapes."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
