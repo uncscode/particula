@@ -745,13 +745,36 @@ Planned features:
 6. Record acceptable parity tolerances for stochastic coagulation and
    floating-point differences across CPU, Warp CPU, and CUDA devices.
 7. The shipped canonical direct-kernel quick-start is
-   `docs/Examples/gpu_direct_kernels_quick_start.py`. It demonstrates the
-   supported `ParticleData`/`GasData` path, explicit `to_warp_*` and
-   `from_warp_*` transfer helpers, the `WARP_AVAILABLE` guard, and deferred
-   `particula.gpu.kernels` imports so the CPU↔Warp boundary stays explicit.
-   Keep troubleshooting notes focused on missing Warp, missing CUDA, and
-   device-mismatch errors rather than implying hidden synchronization or
-   top-level direct-kernel imports.
+   [`docs/Examples/gpu_direct_kernels_quick_start.py`](../../Examples/gpu_direct_kernels_quick_start.py).
+   It demonstrates the supported `ParticleData`/`GasData` path, explicit
+   `to_warp_*` and `from_warp_*` transfer helpers, the `WARP_AVAILABLE`
+   guard, and deferred `particula.gpu.kernels` imports so the CPU↔Warp
+   boundary stays explicit. Treat those direct kernels as low-level APIs,
+   not as top-level `particula.gpu` convenience imports.
+   Keep the supported public import path fixed at:
+
+   ```python
+   from particula.gpu.kernels import (
+       coagulation_step_gpu,
+       condensation_step_gpu,
+   )
+   ```
+
+   Top-level `particula.gpu` remains the home for availability checks and
+   transfer helpers, not direct kernel-step re-exports. Troubleshooting notes
+   should stay aligned with the shipped example and regression tests:
+
+   - missing Warp means the quick-start stays in its no-kernel documentation
+     path behind `WARP_AVAILABLE`
+   - CUDA is optional and Warp `device="cpu"` is the default runnable path
+   - particle, gas, environment, and sidecar buffers must stay on compatible
+     devices
+   - `environment=` must not be mixed with scalar or Warp-array direct
+     `temperature` / `pressure` inputs
+   - CPU↔GPU movement remains explicit through `to_warp_*` and `from_warp_*`
+     helpers, including lossy gas restore for names and helper-only state
+   - no hidden synchronization or automatic top-level fallback imports should
+     be implied by roadmap prose
 8. Add a runnable `docs/Examples/` entry for a `CondensationLatentHeat`
    workflow (deferred from E1; current tutorials only set `latent_heat` as a
    vapor property), following the paired `.py`/`.ipynb` example conventions.
