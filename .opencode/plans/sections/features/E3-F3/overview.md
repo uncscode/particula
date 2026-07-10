@@ -12,12 +12,12 @@ this path as an accepted Epic C GPU capability.
 ## Value Proposition
 
 This feature turns the known one-thread-per-box limitation into an explicit,
-measured contract. The shipped P1 work refreshed the opt-in coagulation-only
-benchmark path with a dedicated mixed-scale NPF/droplet fixture, added fast
-helper coverage proving the coagulation path stayed isolated from condensation,
-and recorded one compact benchmark-evidence block in the roadmap. Users and
-maintainers will know which benchmark evidence supports current guidance and
-whether a future parallel-within-box variant is needed.
+measured contract. The shipped P1/P2 work refreshed the benchmark evidence and
+recorded the measured caution band versus many-box effective region. The
+shipped P3 work then kept the implementation docs-only: it updated the Epic C
+roadmap and the GPU foundations guide so users can see that the current path is
+accepted with caveats for many-box and low-level direct-kernel use, while large
+single-box workloads remain caveated.
 
 ## User Stories
 
@@ -28,7 +28,7 @@ whether a future parallel-within-box variant is needed.
   coagulation path is appropriate so that I do not mistake it for an optimized
   large-single-box production path.
 - As a future implementer, I want any parallel-within-box follow-up scoped
-  separately so that this documentation feature does not grow into production
+  separately so that this documentation update does not grow into production
   graph-capture or performance optimization work.
 
 ## Parent Epic Context

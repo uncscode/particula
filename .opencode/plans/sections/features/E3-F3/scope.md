@@ -1,30 +1,32 @@
 # E3-F3 Scope
 
-E3-F3 reproduces or refreshes coagulation GPU benchmark evidence, records the
-measured scaling limit of the current one-thread-per-box implementation, and
-updates documentation to state whether this design is accepted for Epic C or
-requires a follow-up parallel-within-box variant.
+E3-F3 records the measured scaling limit of the current one-thread-per-box
+implementation and updates docs to state that the shipped Epic C outcome is an
+accepted-with-caveat boundary for many-box and low-level direct-kernel use.
 
 ## In Scope
 
-- Run or refresh the existing opt-in coagulation benchmark matrix for
-  single-box and multi-box configurations where CUDA hardware is available.
-- Preserve CUDA optionality by keeping benchmark tests skipped when CUDA or the
-  `--benchmark` flag is unavailable.
-- Record measured single-box and multi-box scaling limits in roadmap or benchmark
-  documentation.
-- Document that the current low-level coagulation GPU path is best suited to
-  many independent boxes and direct experimental use unless measurements justify
-  broader claims.
-- Decide whether one-thread-per-box is accepted for Epic C or whether a future
-  parallel-within-box track should be created.
-- Add fast regression coverage for any benchmark metadata or documentation
-  helper changes.
+- Record the accepted-with-caveat Epic C decision in
+  `docs/Features/Roadmap/data-oriented-gpu.md` with a cross-reference to the
+  shipped measured decision record.
+- Update `docs/Features/data-containers-and-gpu-foundations.md` so the user-
+  facing support table and guidance bullets state when the current low-level GPU
+  coagulation path is appropriate and when it is caveated.
+- Preserve CUDA and Warp optionality wording and the explicit CPU↔GPU transfer
+  contract already documented in the public guides.
+- Keep the shipped guidance bounded to many independent boxes, Warp-backed
+  direct-kernel workflows, and CUDA-backed benchmark/study use.
+- Document that large single-box production workloads remain caveated and do not
+  become implied production recommendations.
 
 ## Out of Scope
 
 - Production graph capture implementation or optimization.
 - Rewriting the coagulation kernel for parallel pair selection within a box.
+- Re-running or broadening benchmark code when the docs change can be anchored
+  to the existing measured decision record.
+- Editing notebook-backed benchmark sources when the public guidance can be
+  updated in roadmap/foundations docs alone.
 - Changing CPU/GPU container transfer contracts or hidden synchronization
   behavior.
 - Replacing E3-F1 RNG work or E3-F2 mixed-scale sampling decisions.
