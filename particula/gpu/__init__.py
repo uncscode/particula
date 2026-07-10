@@ -27,6 +27,25 @@ References:
 # flake8: noqa
 # pyright: basic
 
+from __future__ import annotations
+
+from importlib import import_module
+from typing import Any
+
+
+_WARP_IMPORT_ERROR: Exception | None = None
+
+
+def _warp_unavailable_error() -> RuntimeError:
+    """Build a helpful deferred error for Warp-backed symbol access."""
+    message = (
+        "Warp-backed GPU support is unavailable because importing 'warp' "
+        "failed during particula.gpu initialization."
+    )
+    if _WARP_IMPORT_ERROR is None:
+        return RuntimeError(message)
+    return RuntimeError(f"{message} Original error: {_WARP_IMPORT_ERROR!r}")
+
 
 def _check_warp_available() -> bool:
     """Check if Warp is available for GPU operations.
@@ -34,11 +53,15 @@ def _check_warp_available() -> bool:
     Returns:
         True if warp can be imported, False otherwise.
     """
+    global _WARP_IMPORT_ERROR
+
     try:
         import warp as wp  # noqa: F401
 
+        _WARP_IMPORT_ERROR = None
         return True
-    except ImportError:
+    except Exception as exc:
+        _WARP_IMPORT_ERROR = exc
         return False
 
 
@@ -65,14 +88,7 @@ __all__ = [
     "gpu_context",
 ]
 
-# Lazy import for optional dependency handling.
 if WARP_AVAILABLE:
-    from particula.gpu.warp_types import (
-        WarpEnvironmentData,
-        WarpGasData,
-        WarpParticleData,
-    )
-
     __all__.extend(
         [
             "WarpParticleData",
@@ -80,3 +96,21 @@ if WARP_AVAILABLE:
             "WarpEnvironmentData",
         ]
     )
+
+
+def __getattr__(name: str) -> Any:
+    """Lazily resolve optional Warp-backed container types."""
+    warp_type_names = {
+        "WarpParticleData",
+        "WarpGasData",
+        "WarpEnvironmentData",
+    }
+    if name not in warp_type_names:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    if not WARP_AVAILABLE:
+        raise _warp_unavailable_error() from _WARP_IMPORT_ERROR
+
+    warp_types = import_module("particula.gpu.warp_types")
+    value = getattr(warp_types, name)
+    globals()[name] = value
+    return value

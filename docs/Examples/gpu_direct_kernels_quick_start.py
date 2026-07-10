@@ -147,7 +147,9 @@ def run_example(device: str = "cpu") -> list[str]:
     )
     restored_gas_data = from_warp_gas_data(gpu_gas_data, name=gas_data.name)
 
-    rng_states = wp.zeros((particle_data.n_boxes,), dtype=wp.uint32, device=device)
+    rng_states = wp.zeros(
+        (particle_data.n_boxes,), dtype=wp.uint32, device=device
+    )
     _, _, collision_counts = coagulation_step_gpu(
         gpu_particle_data,
         temperature=298.15,
@@ -188,7 +190,10 @@ def run_example(device: str = "cpu") -> list[str]:
                 "restored_concentration="
                 f"{restored_particle_data.concentration.shape}"
             ),
-            "Direct GPU kernel quick-start complete on the Warp CPU path.",
+            (
+                "Direct GPU kernel quick-start complete on the Warp "
+                f"{device} path."
+            ),
         ]
     )
     return output

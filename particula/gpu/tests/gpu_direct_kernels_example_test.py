@@ -37,8 +37,10 @@ WARP_OUTPUT = [
     "Gas round trip: restored_concentration=(1, 1), restored_names=['Water']",
     "Coagulation kernel complete: device=cpu, rng_states=caller-owned, initialize_rng=True, rng_seed=41, collision_counts_shape=(1,)",
     "Particle round trip: restored_masses=(1, 2, 1), restored_concentration=(1, 2)",
-    "Direct GPU kernel quick-start complete on the Warp CPU path.",
+    "Direct GPU kernel quick-start complete on the Warp cpu path.",
 ]
+
+EXAMPLE_TIMEOUT_SECONDS = 10
 
 
 def _load_module(module_name: str, module_path: Path) -> types.ModuleType:
@@ -70,13 +72,32 @@ def _run_example(*, force_no_warp: bool) -> subprocess.CompletedProcess[str]:
         env["PARTICULA_EXAMPLE_FORCE_NO_WARP"] = "1"
     else:
         env.pop("PARTICULA_EXAMPLE_FORCE_NO_WARP", None)
-    return subprocess.run(  # noqa: S603
-        [sys.executable, str(EXAMPLE_PATH)],
-        check=True,
-        capture_output=True,
-        text=True,
-        env=env,
-    )
+    command = [sys.executable, str(EXAMPLE_PATH)]
+    try:
+        return subprocess.run(  # noqa: S603
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=EXAMPLE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        pytest.fail(
+            "Example subprocess timed out after "
+            f"{EXAMPLE_TIMEOUT_SECONDS} seconds: {command!r}\n"
+            f"stdout:\n{stdout!r}\n"
+            f"stderr:\n{stderr!r}"
+        )
+    except subprocess.CalledProcessError as exc:
+        pytest.fail(
+            "Example subprocess failed: "
+            f"{command!r}\n"
+            f"stdout:\n{exc.stdout!r}\n"
+            f"stderr:\n{exc.stderr!r}"
+        )
 
 
 def test_build_particle_data_returns_documented_shapes(
@@ -232,6 +253,44 @@ def test_example_non_warp_path_reports_cpu_success() -> None:
     assert result.stdout.splitlines() == CPU_ONLY_OUTPUT
 
 
+def test_run_example_surfaces_subprocess_failure_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test subprocess failures include captured stdout and stderr."""
+
+    def _raise_called_process_error(*args: object, **kwargs: object) -> object:
+        raise subprocess.CalledProcessError(
+            2,
+            [sys.executable, str(EXAMPLE_PATH)],
+            output="partial stdout",
+            stderr="partial stderr",
+        )
+
+    monkeypatch.setattr(subprocess, "run", _raise_called_process_error)
+
+    with pytest.raises(pytest.fail.Exception, match="partial stdout"):
+        _run_example(force_no_warp=True)
+
+
+def test_run_example_surfaces_subprocess_timeout_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test subprocess timeouts include captured stdout and stderr."""
+
+    def _raise_timeout(*args: object, **kwargs: object) -> object:
+        raise subprocess.TimeoutExpired(
+            [sys.executable, str(EXAMPLE_PATH)],
+            EXAMPLE_TIMEOUT_SECONDS,
+            output="slow stdout",
+            stderr="slow stderr",
+        )
+
+    monkeypatch.setattr(subprocess, "run", _raise_timeout)
+
+    with pytest.raises(pytest.fail.Exception, match="slow stderr"):
+        _run_example(force_no_warp=True)
+
+
 def test_run_example_failure_does_not_print_success_summary(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -326,12 +385,16 @@ def test_run_example_uses_scalar_condensation_inputs_and_caller_owned_rng(
     class _FakeGasGPU:
         pass
 
-    def _fake_condensation(*args: object, **kwargs: object) -> tuple[object, _FakeArray]:
+    def _fake_condensation(
+        *args: object, **kwargs: object
+    ) -> tuple[object, _FakeArray]:
         calls["condensation_args"] = args
         calls["condensation_kwargs"] = kwargs
         return args[0], _FakeArray((1, 2, 1))
 
-    def _fake_coagulation(*args: object, **kwargs: object) -> tuple[object, _FakeArray, _FakeArray]:
+    def _fake_coagulation(
+        *args: object, **kwargs: object
+    ) -> tuple[object, _FakeArray, _FakeArray]:
         calls["coagulation_args"] = args
         calls["coagulation_kwargs"] = kwargs
         return args[0], _FakeArray((1, 4, 2)), _FakeArray((1,))
@@ -370,12 +433,14 @@ def test_run_example_uses_scalar_condensation_inputs_and_caller_owned_rng(
     assert calls["rng_shape"] == (1,)
     assert calls["rng_device"] == "cpu"
     condensation_kwargs = calls["condensation_kwargs"]
+    coagulation_kwargs = calls["coagulation_kwargs"]
+    assert isinstance(condensation_kwargs, dict)
+    assert isinstance(coagulation_kwargs, dict)
     assert condensation_kwargs == {
         "temperature": 298.15,
         "pressure": 101325.0,
         "time_step": 0.1,
     }
-    coagulation_kwargs = calls["coagulation_kwargs"]
     assert coagulation_kwargs["temperature"] == 298.15
     assert coagulation_kwargs["pressure"] == 101325.0
     assert coagulation_kwargs["time_step"] == 0.1
