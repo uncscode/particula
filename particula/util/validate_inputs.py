@@ -140,14 +140,10 @@ def validate_inputs(dict_args):  # noqa: C901
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Map argument names to values using cached signature
-            bound = sig.bind_partial(*args, **kwargs)
+            # Let Python enforce the wrapped call signature before validation.
+            bound = sig.bind(*args, **kwargs)
             bound.apply_defaults()
             for name, comp in dict_args.items():
-                if name not in bound.arguments:
-                    raise TypeError(
-                        f"Argument '{name}' is not provided and has no default."
-                    )
                 if bound.arguments[name] is None:
                     continue
                 value = np.asarray(bound.arguments[name])
