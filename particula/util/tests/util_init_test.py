@@ -21,6 +21,7 @@ EXPECTED_EXPORTS = {
     "get_chemical_surface_tension",
     "get_chemical_vapor_pressure",
     "get_chemical_stp_properties",
+    "validate_inputs",
 }
 
 
@@ -34,4 +35,9 @@ def test_all_matches_attributes_when_defined():
     """If __all__ is defined, ensure it aligns with documented exports."""
     exported = set(getattr(util, "__all__", ()))
     if exported:
-        assert EXPECTED_EXPORTS.issubset(exported)
+        assert exported == EXPECTED_EXPORTS
+
+
+def test_validate_inputs_is_reexported_from_util_package():
+    """validate_inputs should be importable from the public util package."""
+    assert util.validate_inputs is not None
