@@ -464,6 +464,36 @@ class TestWarpDataFieldAccess:
 class TestWarpAvailability:
     """Tests for WARP_AVAILABLE sentinel in module."""
 
+    @staticmethod
+    def _load_gpu_package_with_mocked_warp_import(
+        monkeypatch: pytest.MonkeyPatch,
+        exception: Exception,
+    ):
+        """Load particula.gpu under a synthetic module name with a mocked import."""
+        import builtins
+        import importlib.util
+        import sys
+        from pathlib import Path
+
+        module_path = Path(__file__).resolve().parents[1] / "__init__.py"
+        module_name = "_particula_gpu_test_module"
+        original_import = builtins.__import__
+
+        def _mock_import(name, *args, **kwargs):
+            if name == "warp":
+                raise exception
+            return original_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", _mock_import)
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        assert spec is not None
+        assert spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        sys.modules.pop(module_name, None)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        return module
+
     def test_check_warp_available_returns_true_when_warp_imports(self) -> None:
         """Verify the package helper reports True when Warp imports."""
         from particula import gpu as gpu_package
@@ -486,6 +516,52 @@ class TestWarpAvailability:
 
         with patch.object(builtins, "__import__", side_effect=mock_import):
             assert gpu_package._check_warp_available() is False
+
+    def test_check_warp_available_returns_false_on_non_import_exception(
+        self,
+    ) -> None:
+        """Verify non-ImportError Warp failures degrade to unavailable."""
+        import builtins
+        from unittest.mock import patch
+
+        from particula import gpu as gpu_package
+
+        original_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "warp":
+                raise RuntimeError("Warp runtime initialization failed")
+            return original_import(name, *args, **kwargs)
+
+        with patch.object(builtins, "__import__", side_effect=mock_import):
+            assert gpu_package._check_warp_available() is False
+
+    def test_import_particula_gpu_degrades_gracefully_on_non_import_error(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Synthetic import should succeed even if importing Warp crashes."""
+        module = self._load_gpu_package_with_mocked_warp_import(
+            monkeypatch,
+            RuntimeError("Warp runtime initialization failed"),
+        )
+
+        assert module.WARP_AVAILABLE is False
+
+    def test_deferred_warp_type_access_reports_original_import_failure(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Deferred Warp-backed symbol access should retain the original error."""
+        module = self._load_gpu_package_with_mocked_warp_import(
+            monkeypatch,
+            RuntimeError("Warp runtime initialization failed"),
+        )
+
+        with pytest.raises(
+            RuntimeError, match="Warp runtime initialization failed"
+        ):
+            _ = module.WarpParticleData
 
     def test_warp_available_sentinel(self) -> None:
         """Verify WARP_AVAILABLE is True when warp is imported."""

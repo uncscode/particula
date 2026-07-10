@@ -744,11 +744,14 @@ Planned features:
    validation is currently local/manual before releases.
 6. Record acceptable parity tolerances for stochastic coagulation and
    floating-point differences across CPU, Warp CPU, and CUDA devices.
-7. Publish a GPU quick-start example for direct kernel use with
-   `ParticleData`, `GasData`, the Warp transfer helpers, `gpu_context`, and
-   `WARP_AVAILABLE`, plus troubleshooting notes for missing Warp, missing
-   CUDA, and device-mismatch errors, and installation/environment
-   expectations for `warp-lang`.
+7. The shipped canonical direct-kernel quick-start is
+   `docs/Examples/gpu_direct_kernels_quick_start.py`. It demonstrates the
+   supported `ParticleData`/`GasData` path, explicit `to_warp_*` and
+   `from_warp_*` transfer helpers, the `WARP_AVAILABLE` guard, and deferred
+   `particula.gpu.kernels` imports so the CPU↔Warp boundary stays explicit.
+   Keep troubleshooting notes focused on missing Warp, missing CUDA, and
+   device-mismatch errors rather than implying hidden synchronization or
+   top-level direct-kernel imports.
 8. Add a runnable `docs/Examples/` entry for a `CondensationLatentHeat`
    workflow (deferred from E1; current tutorials only set `latent_heat` as a
    vapor property), following the paired `.py`/`.ipynb` example conventions.

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 SUPPORTED_STEP_SYMBOLS = (
@@ -90,3 +92,48 @@ def test_concrete_kernel_modules_still_expose_supported_and_internal_symbols() -
     assert brownian_coagulation_kernel is not None
     assert initialize_coagulation_rng_states is not None
     assert apply_mass_transfer_kernel is not None
+
+
+def test_kernels_package_lazily_imports_only_requested_symbol(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Accessing one public symbol should not import the unrelated module."""
+    import particula.gpu.kernels as kernels
+
+    imported: list[str] = []
+    fake_symbol = object()
+
+    def _fake_import_module(name: str) -> object:
+        imported.append(name)
+        if name == "particula.gpu.kernels.coagulation":
+            return SimpleNamespace(coagulation_step_gpu=fake_symbol)
+        raise AssertionError(f"Unexpected import: {name}")
+
+    monkeypatch.delattr(kernels, "coagulation_step_gpu", raising=False)
+    monkeypatch.delattr(kernels, "condensation_step_gpu", raising=False)
+    monkeypatch.setattr(kernels, "import_module", _fake_import_module)
+
+    assert kernels.coagulation_step_gpu is fake_symbol
+    assert imported == ["particula.gpu.kernels.coagulation"]
+
+
+def test_kernels_package_keeps_unrelated_broken_module_from_blocking_symbol(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A broken unrelated kernel module should not block selected symbol access."""
+    import particula.gpu.kernels as kernels
+
+    fake_symbol = object()
+
+    def _fake_import_module(name: str) -> object:
+        if name == "particula.gpu.kernels.coagulation":
+            return SimpleNamespace(coagulation_step_gpu=fake_symbol)
+        if name == "particula.gpu.kernels.condensation":
+            raise RuntimeError("broken condensation import")
+        raise AssertionError(f"Unexpected import: {name}")
+
+    monkeypatch.delattr(kernels, "coagulation_step_gpu", raising=False)
+    monkeypatch.delattr(kernels, "condensation_step_gpu", raising=False)
+    monkeypatch.setattr(kernels, "import_module", _fake_import_module)
+
+    assert kernels.coagulation_step_gpu is fake_symbol
