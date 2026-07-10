@@ -1181,8 +1181,10 @@ resampling or volume-scaling policy before slot exhaustion.
   1, 10, 100, and 1000 boxes), varying particles per box at each box count.
 - Establish secondary benchmark targets for GPU-resident simulations at 1k,
   10k, 100k, and larger particle counts per box.
-- Record the single-box scaling limit of the one-thread-per-box coagulation
-  kernel and decide whether a parallel-within-box variant is needed (see
+- Record the single-box scaling limit of the shipped one-thread-per-box
+  coagulation kernel as part of the accepted-with-caveat Epic C decision,
+  using the measured decision record below to bound when large single-box use
+  stops being a strong recommendation (see
   [Known Kernel Issues](#known-kernel-issues)).
 - Minimize CPU/GPU round trips in example workflows and high-level APIs.
 - Reuse temporary buffers for repeated timesteps to avoid repeated allocation.
@@ -1370,7 +1372,7 @@ coagulation and state-representation decisions are recorded.
 | Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Build later GPU condensation integration from the shipped `fixed_count_substeps_4` recommendation while keeping gas-coupled production support gated |
 | No fully integrated GPU-ready per-box thermodynamic runtime path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, build on the shipped `WarpEnvironmentData` CPU↔GPU round-trip helpers, and add integration work |
 | Rejection-sampling acceptance collapse for wide size ranges | Coagulation trial counts explode in mixed NPF/droplet boxes | Evaluate binned majorant kernels or stratified pair sampling |
-| One-thread-per-box coagulation | Serializes large single-box workloads | Record as deliberate multi-box tradeoff or add parallel-within-box variant |
+| One-thread-per-box coagulation | Serializes large single-box workloads | Record as the current measured multi-box tradeoff for the shipped path; any parallel-within-box follow-up would require a new evidence-backed proposal |
 | Caller must seed or explicitly reset persistent coagulation RNG state before repeated loops or graph capture | Reused buffers continue their stream unless intentionally reset, which can surprise callers expecting hidden reseeding | Keep the shipped seed-once contract, document caller-owned sidecar setup, and reset only via explicit initialization before the loop or capture |
 | Autodiff through stochastic coagulation | Blocks global optimization if coag must be fit | Open decision; start with deterministic condensation, defer coag choice |
 | In-place kernels break gradients | Autodiff path unusable | Author differentiable-friendly kernel variants for the optimization path |
