@@ -717,8 +717,13 @@ Planned features:
 2. Improve rejection sampling for wide size ranges: evaluate size-binned
    majorant kernels or stratified pair sampling so mixed NPF/droplet boxes do
    not collapse acceptance rates.
-3. Record the one-thread-per-box coagulation design decision with a measured
-   single-box scaling limit, or scope a parallel-within-box variant.
+3. Accept the current one-thread-per-box coagulation path for Epic C as an
+   accepted-with-caveat, measured many-box and direct-kernel baseline,
+   especially for box-level parallel throughput, while keeping caveats for
+   large single-box workloads; keep the evidence anchored in the
+   [measured decision record for the current one-thread-per-box path](#measured-decision-record-for-the-current-one-thread-per-box-path)
+   rather than broadening it into a universal production guarantee or a
+   parallel-within-box implementation claim.
 4. Resolve kernel entry-point exports: decide whether `condensation_step_gpu`
    and `coagulation_step_gpu` are exported from top-level `particula.gpu` or
    documented under `particula.gpu.kernels` (today they are only importable
@@ -1215,6 +1220,13 @@ resampling or volume-scaling policy before slot exhaustion.
   helper.
 
 ##### Measured decision record for the current one-thread-per-box path
+
+Epic C accepts the shipped one-thread-per-box coagulation design with
+caveats: it is the current documented baseline for many independent boxes,
+especially when CUDA can deliver box-level parallel throughput, and for
+low-level direct-kernel workflows, but large single-box use remains bounded
+by the caution band below and does not imply a broader long-term scaling
+decision.
 
 - **Single-box caution band:** treat the recorded `1x10k` to `1x50k`
   range as the current caution band for large single-box workloads on the
