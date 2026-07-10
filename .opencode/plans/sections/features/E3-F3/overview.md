@@ -12,9 +12,12 @@ this path as an accepted Epic C GPU capability.
 ## Value Proposition
 
 This feature turns the known one-thread-per-box limitation into an explicit,
-measured contract. Users and maintainers will know when the current GPU
-coagulation path is appropriate, which benchmark evidence supports that
-guidance, and whether a future parallel-within-box variant is needed.
+measured contract. The shipped P1 work refreshed the opt-in coagulation-only
+benchmark path with a dedicated mixed-scale NPF/droplet fixture, added fast
+helper coverage proving the coagulation path stayed isolated from condensation,
+and recorded one compact benchmark-evidence block in the roadmap. Users and
+maintainers will know which benchmark evidence supports current guidance and
+whether a future parallel-within-box variant is needed.
 
 ## User Stories
 

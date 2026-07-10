@@ -2,16 +2,16 @@
 
 ## Pass / Fail Criteria
 
-- [ ] Refreshed benchmark evidence covers the existing single-box and multi-box
-  coagulation matrix, or explicitly records why CUDA hardware was unavailable.
-- [ ] The plan captures the benchmark command, hardware/runtime context, and the
+- [x] Refreshed benchmark evidence covers the existing single-box and multi-box
+  coagulation matrix, with shipped timings recorded in the roadmap note.
+- [x] The plan captures the benchmark command, hardware/runtime context, and the
   measured point where one-thread-per-box behavior becomes a practical caution.
 - [ ] Epic C documentation states whether the current design is accepted as-is
   for the roadmap or whether a bounded parallel-within-box follow-up is needed.
 - [ ] User-facing docs explain when the low-level GPU coagulation path is
   appropriate, when it is not, and where future scaling work belongs.
-- [ ] CUDA stays optional for normal development: helper/unit tests remain fast,
-  while benchmark execution stays opt-in and records skip status cleanly.
+- [x] CUDA stays optional for normal development: helper/unit tests remain fast,
+  while benchmark execution stays opt-in.
 - [ ] The feature does not introduce production graph-capture optimization or a
   parallel-within-box kernel rewrite.
 

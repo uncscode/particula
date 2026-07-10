@@ -1,4 +1,9 @@
-"""Fast tests for benchmark-study helper behavior."""
+"""Fast tests for GPU benchmark helper behavior.
+
+These tests keep opt-in benchmark coverage focused on fixture building,
+result recording, and routing between condensation and coagulation setup
+paths without requiring CUDA benchmark execution during default test runs.
+"""
 
 from __future__ import annotations
 
@@ -1206,7 +1211,7 @@ def test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture
     n_particles: int,
     n_species: int,
 ) -> None:
-    """Coagulation fixture helper builds deterministic mixed-scale data."""
+    """Coagulation helper builds deterministic mixed-scale benchmark data."""
     first = benchmark_module._make_coagulation_particle_data(
         n_boxes,
         n_particles,
@@ -1240,7 +1245,7 @@ def test_coagulation_scaling_uses_coagulation_only_helper(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Coagulation uses its dedicated helper while condensation keeps generic setup."""
+    """Coagulation uses its helper while condensation keeps generic setup."""
     monkeypatch.setattr(benchmark_module, "_skip_if_no_cuda", lambda: None)
     monkeypatch.setattr(
         benchmark_module,

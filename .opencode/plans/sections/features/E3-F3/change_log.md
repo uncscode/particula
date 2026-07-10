@@ -17,3 +17,17 @@
   acceptance guidance.
 - Clarified the final phase so it always leaves explicit developer-facing
   roadmap/follow-up documentation, even when the outcome is a scoped follow-up.
+
+## 2026-07-10
+
+- Updated E3-F3 plan sections to reflect shipped E3-F3-P1 work for issue
+  #1246.
+- Recorded that `particula/gpu/tests/benchmark_test.py` now uses a dedicated
+  coagulation-only mixed-scale fixture while condensation continues to use the
+  generic helper.
+- Recorded focused helper coverage in
+  `particula/gpu/tests/benchmark_helpers_test.py` for the deterministic
+  mixed-scale fixture, helper-routing split, benchmark result recording, and
+  persistent RNG-state reuse.
+- Recorded that `docs/Features/Roadmap/data-oriented-gpu.md` now carries the
+  compact shipped benchmark-evidence note and artifact path.
