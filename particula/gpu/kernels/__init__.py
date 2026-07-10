@@ -1,14 +1,13 @@
-"""Public GPU kernel step entry points.
+"""Public GPU kernel entry points.
 
-Import direct low-level kernel steps from this package:
+Import direct low-level step functions from this package:
 
     from particula.gpu.kernels import (
         coagulation_step_gpu,
         condensation_step_gpu,
     )
 
-Raw helper kernels remain available from their concrete modules rather than the
-package-level public surface.
+Lower-level helper kernels remain importable from their concrete modules.
 """
 
 from particula.gpu.kernels.coagulation import coagulation_step_gpu

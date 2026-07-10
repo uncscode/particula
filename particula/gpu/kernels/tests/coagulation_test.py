@@ -3395,10 +3395,7 @@ def test_kernels_init_exports() -> None:
 
     assert kernels.coagulation_step_gpu is coagulation_step_gpu
     assert kernels.condensation_step_gpu is condensation_step_gpu
-    assert kernels.__all__ == [
-        "coagulation_step_gpu",
-        "condensation_step_gpu",
-    ]
+    assert kernels.__all__ == ["coagulation_step_gpu", "condensation_step_gpu"]
 
 
 def test_coagulation_validation_rejects_bad_shapes(device: str) -> None:

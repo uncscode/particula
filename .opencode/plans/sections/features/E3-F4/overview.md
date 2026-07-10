@@ -1,10 +1,9 @@
 # Overview
 
-Feature `E3-F4` resolves the public low-level GPU kernel import path and
-publishes a runnable quick-start for direct condensation and coagulation kernel
-usage. The feature is part of parent epic `E3` and feature `E3-F4`: make the
-existing GPU kernel surface discoverable without introducing high-level backend
-selection or hidden CPU/GPU transfer behavior.
+Feature `E3-F4` resolves the public low-level GPU kernel import path for direct
+condensation and coagulation step usage. The feature is part of parent epic
+`E3` and focuses on making the existing GPU kernel surface discoverable without
+introducing high-level backend selection or hidden CPU/GPU transfer behavior.
 
 The current codebase already exposes direct step functions from
 `particula.gpu.kernels`:
@@ -17,16 +16,16 @@ context helpers such as `WARP_AVAILABLE`, `to_warp_particle_data`,
 `to_warp_gas_data`, `to_warp_environment_data`, and `gpu_context`. Phase
 `E3-F4-P1` finalized `particula.gpu.kernels` as the supported public import
 path for the two direct step functions, kept `particula.gpu` intentionally
-non-reexporting, narrowed package-level kernel exports to those two names only,
-and added focused regression coverage in
+non-reexporting, excluded lower-level helper kernels from the package-level
+public surface, and added focused regression coverage in
 `particula/gpu/tests/kernel_exports_test.py`.
 
 ## Goals
 
 - Select and document the stable import path for direct low-level GPU kernels.
 - Add regression tests so the chosen import/export path cannot drift silently.
-- Create a direct-kernel quick-start that a new user can run without reading
-  source code.
+- Document the direct-kernel import contract without implying a broader
+  top-level quick-start API than the shipped code supports.
 - Demonstrate explicit transfer boundaries with `ParticleData`, `GasData`,
   transfer helpers, `gpu_context`, and `WARP_AVAILABLE`.
 - Add troubleshooting guidance for missing Warp, missing CUDA, device mismatch,
