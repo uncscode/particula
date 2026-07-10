@@ -7,7 +7,11 @@ import {
   restoreSubprocessMocks,
   setDollarText,
 } from "./helpers/mock-subprocess";
-import { loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
+import {
+  getCapturedToolDefinition,
+  loadToolExecute,
+  resetCapturedToolDefinition,
+} from "./helpers/tool_harness";
 
 describe("git_stage wrapper", () => {
   beforeEach(() => {
@@ -25,6 +29,15 @@ describe("git_stage wrapper", () => {
     const execute = await loadToolExecute("../../git_stage.ts");
     const result = await execute({ command: "add" });
     assertContains(String(result), "requires either 'stage_all' or 'files'");
+  });
+
+  it("documents the narrow wrapper boundary distinctly from native protected git", async () => {
+    await loadToolExecute("../../git_stage.ts");
+
+    const description = getCapturedToolDefinition().description ?? "";
+    expect(description).toContain("OpenCode git staging wrapper");
+    expect(description).toContain("Native TUI/runtime protected-git confirmation is a separate flow");
+    expect(description).toContain("does not broaden into arbitrary git verbs, shell execution, or background git");
   });
 
   it("rejects add stage_all plus files ambiguity", async () => {

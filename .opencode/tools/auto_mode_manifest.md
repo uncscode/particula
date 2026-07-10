@@ -73,6 +73,26 @@ Keep these fields direct:
 
 - Use bare tokens such as `options: "force"`, `options: "json"`, or
   `options: "resume force"`.
+- Cleanup lifecycle note for accumulate mode:
+  - `status` and `cleanup_status` are different surfaces. `status=completed`
+    means issue accumulation is done; retained cleanup visibility lives in
+    `cleanup_status` (`not_started`, `awaiting_final_pr`, `awaiting_merge`, `ready`,
+    `running`, `failed_retryable`, `blocked_operator_action`, `complete`,
+    `safe_skipped`).
+  - New or just-completed accumulate manifests default to
+    `cleanup_status=not_started` until persisted final-PR or cleanup evidence
+    advances them.
+  - `completed` records issue completion/branch accumulation state; later hourly
+    cleanup may reconcile a merged final PR into retained `ready`, then proceed
+    through branch/worktree/local cleanup before pruning.
+  - `reset` is the operator recovery path when retained cleanup state is
+    blocked and manual intervention is required before another pass.
+  - Only terminal cleanup states `complete` or `safe_skipped` are pruneable;
+    retained states such as `awaiting_final_pr`, `awaiting_merge`, `ready`,
+    `running`, `failed_retryable`, and `blocked_operator_action` remain visible
+    until cleanup progresses or an operator intervenes.
+  - See `docs/Examples/operations/auto-mode-runbook.md` for full cadence,
+    prerequisites, visible failure states, and recovery guidance.
 - `complete` defaults `branch_merged` to true and completes running or fixing
   issues by default; use `force` for other states.
 - Removed direct booleans such as `force: true`, `json: true`, and

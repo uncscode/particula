@@ -188,7 +188,7 @@ describe("find_files wrapper", () => {
     try {
       const result = await execute({ pattern: "**/*.ts", options: "max-results=2 compact-output" });
       expect(String(result)).toBe(`.opencode/tools/__tests__/fixtures/search_scope/newest.ts\n.opencode/tools/__tests__/fixtures/search_scope/middle.ts\n\n${
-        "[WARNING: Results truncated to 2 files (3 total found). Use maxResults parameter to increase limit.]"
+        '[WARNING: Results truncated to 2 files (3 total found). Use options: "max-results=<n>" to increase limit.]'
       }`);
     } finally {
       fs.promises.stat = originalStat;

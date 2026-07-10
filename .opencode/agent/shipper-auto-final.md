@@ -2,8 +2,9 @@
 
 description: >-
   Use this agent for accumulate-mode finalization summary handoff. It gathers
-  cumulative branch diff and checkpoint context, then persists deterministic
-  final-PR summary fields for downstream PR creation.
+  cumulative branch diff and checkpoint context, persists deterministic final-PR
+  summary fields for downstream PR creation, marks matching plan phases shipped,
+  and commits final metadata changes when present.
 mode: primary
 permission:
   "*": deny
@@ -17,7 +18,7 @@ permission:
   move: deny
   todoread: allow
   todowrite: allow
-  task: deny
+  task: allow
   adw: deny
   adw_spec: deny
   adw_spec_read: allow
@@ -41,7 +42,8 @@ permission:
 # Shipper Auto Final Agent
 
 Prepare the final accumulated implementation summary for downstream PR handoff.
-This phase writes summary context only and does not open pull requests.
+This phase writes summary context, updates plan metadata, commits metadata changes
+when present, and does not open pull requests.
 
 ## Core Process Contract
 
@@ -60,11 +62,13 @@ This phase writes summary context only and does not open pull requests.
    - `final_pr_title`
    - `final_pr_summary_markdown`
    - `final_pr_summary_metadata`
-7. Handoff ownership to runtime: dispatcher/scheduler mirrors those state fields into
+7. Delegate to `plan-update-short` so any matching plan phase is marked shipped.
+8. Delegate to `adw-commit` so final metadata changes are committed and pushed.
+9. Handoff ownership to runtime: dispatcher/scheduler mirrors those state fields into
    the manifest-backed final handoff record, then calls
    `open_final_pr(..., title=final_pr_title, body=final_pr_summary_markdown)`.
    Runtime contract shorthand: `open_final_pr(..., body=final_pr_summary_markdown)`.
-8. Runtime finalization contract (post-PR): scheduler posts the deterministic
+10. Runtime finalization contract (post-PR): scheduler posts the deterministic
    `## Final Handoff — Branch Accumulation Complete` comment with bounded
    duplicate prevention checks and explicit guardrails:
    - `Auto-merge is NOT enabled`
@@ -75,10 +79,11 @@ This phase writes summary context only and does not open pull requests.
 
 - Do not create pull requests in this phase.
 - Do not call `create_pull_request()`.
-- Do not delegate subagents in this phase.
+- Do not delegate subagents except `plan-update-short` and `adw-commit` for the
+  bounded final metadata update/commit steps.
 - Do not post final handoff PR comments from this phase.
 
-This agent prepares handoff context only.
+This agent prepares handoff context only; runtime owns final PR creation.
 
 ## Execution Guidance
 
@@ -88,6 +93,28 @@ This agent prepares handoff context only.
 - Keep generated summary deterministic and idempotent across retries.
 - Persist state via `adw_spec_write` explicit field writes only. Runtime owns mirroring
   those fields into the manifest record after the workflow completes.
+- After persisting summary fields, delegate to `plan-update-short`:
+  ```python
+  task({
+    "description": "Mark plan phase shipped",
+    "prompt": f"Mark matching plan phase as shipped.\n\nArguments: adw_id={adw_id}",
+    "subagent_type": "plan-update-short"
+  })
+  ```
+- Treat `PLAN_UPDATE_SHORT_COMPLETE` as success and continue. Treat
+  `PLAN_UPDATE_SHORT_FAILED` as non-blocking: log the failure with `feedback_log`
+  and continue so final PR handoff is not blocked by plan metadata.
+- Then delegate to `adw-commit`:
+  ```python
+  task({
+    "description": "Commit and push final metadata",
+    "prompt": f"Commit changes and push to remote.\n\nArguments: adw_id={adw_id}",
+    "subagent_type": "adw-commit"
+  })
+  ```
+- Treat `ADW_COMMIT_SUCCESS` and `ADW_COMMIT_SKIPPED` as success. Treat
+  `ADW_COMMIT_FAILED` as `SHIPPER_AUTO_FINAL_FAILED` because uncommitted final
+  metadata would leave the handoff branch inconsistent.
 - P1 scope is summary handoff only; final PR creation and idempotency remains a
   downstream runtime responsibility in dispatcher/scheduler.
 - Runtime scheduler helpers own final handoff comment posting and blocked
