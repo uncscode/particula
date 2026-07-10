@@ -30,11 +30,11 @@
 # pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s
 # ```
 #
-# The benchmark helper records the controlled artifact at
+# The benchmark helper records the source-of-record artifact at
 # `.artifacts/benchmarks/gpu_benchmark_results.json`. This notebook reads a
-# local `gpu_benchmark_results.json` export for visualization, so keep the
-# recorded artifact path in mind when tracing the original benchmark command and
-# runtime metadata.
+# local `gpu_benchmark_results.json` copy/export for visualization, so treat the
+# controlled artifact path as the traceable benchmark record for the original
+# command and runtime metadata.
 
 # %%
 import json
@@ -285,7 +285,8 @@ plt.show()
 # * **Multi-box configurations** remain the effective region for the current
 #   kernel because the GPU parallelizes across independent boxes. The recorded
 #   many-box cases (`10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`, `100x1k`,
-#   `10x10k`) stay near the smaller timings seen at lower box counts.
+#   `10x10k`) stay near the smaller timings seen at lower box counts on this
+#   benchmark machine.
 # * Single-box speedups are modest (**1.5--3x**) because the GPU thread does
 #   essentially the same sequential work as the CPU, just with faster
 #   per-operation throughput.
@@ -306,6 +307,6 @@ plt.show()
 # | Scenario | Recommendation |
 # |---|---|
 # | Condensation, any size | Always use GPU -- massive speedup |
-# | Coagulation, many boxes | Use GPU -- current effective region |
+# | Coagulation, many boxes | Use GPU for the recorded multi-box cases on this machine |
 # | Coagulation, single box, <5k particles | Either -- modest GPU advantage |
-# | Coagulation, single box, 10k--50k particles | Caution -- not a strong GPU recommendation in this capture |
+# | Coagulation, single box, 10k--50k particles | Caution band -- not a strong GPU recommendation in this machine-bounded capture |
