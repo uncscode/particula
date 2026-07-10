@@ -187,40 +187,53 @@ for r in cond_rows:
 # ### Condensation GPU scaling plot
 
 # %%
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+cond_plot_rows = [
+    r for r in cond_rows if r["total"] > 0 and r["gpu_per_step"] > 0
+]
+if not cond_plot_rows:
+    print("No condensation benchmark entries found; skipping plot.")
+else:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-# Left: GPU time vs total particles
-totals = [r["total"] for r in cond_rows]
-gpu_times = [r["gpu_per_step"] * 1000 for r in cond_rows]  # ms
-ax1.scatter(totals, gpu_times, s=50, zorder=5)
-ax1.set_xscale("log")
-ax1.set_yscale("log")
-ax1.set_xlabel("Total particles (boxes x particles)")
-ax1.set_ylabel("GPU time per step (ms)")
-ax1.set_title("Condensation: GPU scaling")
-ax1.grid(True, alpha=0.3)
+    # Left: GPU time vs total particles
+    totals = [r["total"] for r in cond_plot_rows]
+    gpu_times = [r["gpu_per_step"] * 1000 for r in cond_plot_rows]  # ms
+    ax1.scatter(totals, gpu_times, s=50, zorder=5)
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1.set_xlabel("Total particles (boxes x particles)")
+    ax1.set_ylabel("GPU time per step (ms)")
+    ax1.set_title("Condensation: GPU scaling")
+    ax1.grid(True, alpha=0.3)
 
-# Right: Speedup (where CPU data exists)
-cpu_rows = [r for r in cond_rows if r["speedup"] is not None]
-if cpu_rows:
-    labels = [r["label"] for r in cpu_rows]
-    speedups = [r["speedup"] for r in cpu_rows]
-    bars = ax2.barh(labels, speedups, color="steelblue")
-    ax2.set_xlabel("GPU speedup vs CPU (x)")
-    ax2.set_title("Condensation: GPU vs CPU speedup")
-    ax2.set_xscale("log")
-    for bar, spd in zip(bars, speedups, strict=True):
-        ax2.text(
-            bar.get_width() * 1.1,
-            bar.get_y() + bar.get_height() / 2,
-            f"{spd:.0f}x",
-            va="center",
-            fontsize=9,
-        )
-    ax2.grid(True, alpha=0.3, axis="x")
+    # Right: Speedup (where positive CPU comparison data exists)
+    cpu_rows = [
+        r
+        for r in cond_plot_rows
+        if r["speedup"] is not None and r["speedup"] > 0
+    ]
+    if cpu_rows:
+        labels = [r["label"] for r in cpu_rows]
+        speedups = [r["speedup"] for r in cpu_rows]
+        bars = ax2.barh(labels, speedups, color="steelblue")
+        ax2.set_xlabel("GPU speedup vs CPU (x)")
+        ax2.set_title("Condensation: GPU vs CPU speedup")
+        ax2.set_xscale("log")
+        for bar, spd in zip(bars, speedups, strict=True):
+            ax2.text(
+                bar.get_width() * 1.1,
+                bar.get_y() + bar.get_height() / 2,
+                f"{spd:.0f}x",
+                va="center",
+                fontsize=9,
+            )
+        ax2.grid(True, alpha=0.3, axis="x")
+    else:
+        ax2.axis("off")
+        ax2.set_title("Condensation: no CPU speedup data")
 
-fig.tight_layout()
-plt.show()
+    fig.tight_layout()
+    plt.show()
 
 # %% [markdown]
 # ## Coagulation scaling
@@ -273,53 +286,63 @@ for r in coag_rows:
 # ### Coagulation GPU scaling plot
 
 # %%
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+coag_plot_rows = [
+    r for r in coag_rows if r["n_particles"] > 0 and r["gpu_per_step"] > 0
+]
+if not coag_plot_rows:
+    print("No coagulation benchmark entries found; skipping plot.")
+else:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-# Separate single-box vs multi-box for color coding
-single_box = [r for r in coag_rows if r["n_boxes"] == 1]
-multi_box = [r for r in coag_rows if r["n_boxes"] > 1]
+    # Separate single-box vs multi-box for color coding
+    single_box = [r for r in coag_plot_rows if r["n_boxes"] == 1]
+    multi_box = [r for r in coag_plot_rows if r["n_boxes"] > 1]
 
-# Left: GPU time vs particles per box (colored by n_boxes)
-for rows, color, label in [
-    (single_box, "tab:blue", "1 box"),
-    (multi_box, "tab:orange", "multi-box"),
-]:
-    if rows:
-        x = [r["n_particles"] for r in rows]
-        y = [r["gpu_per_step"] * 1000 for r in rows]
-        ax1.scatter(x, y, s=50, color=color, label=label, zorder=5)
+    # Left: GPU time vs particles per box (colored by n_boxes)
+    for rows, color, label in [
+        (single_box, "tab:blue", "1 box"),
+        (multi_box, "tab:orange", "multi-box"),
+    ]:
+        if rows:
+            x = [r["n_particles"] for r in rows]
+            y = [r["gpu_per_step"] * 1000 for r in rows]
+            ax1.scatter(x, y, s=50, color=color, label=label, zorder=5)
 
-ax1.set_xscale("log")
-ax1.set_yscale("log")
-ax1.set_xlabel("Particles per box")
-ax1.set_ylabel("GPU time per step (ms)")
-ax1.set_title("Coagulation: GPU scaling")
-ax1.legend()
-ax1.grid(True, alpha=0.3)
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1.set_xlabel("Particles per box")
+    ax1.set_ylabel("GPU time per step (ms)")
+    ax1.set_title("Coagulation: GPU scaling")
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
 
-# Right: Speedup (where CPU data exists)
-cpu_rows = [r for r in coag_rows if r["speedup"] is not None]
-if cpu_rows:
-    labels = [r["label"] for r in cpu_rows]
-    speedups = [r["speedup"] for r in cpu_rows]
-    colors = [
-        "tab:blue" if r["n_boxes"] == 1 else "tab:orange" for r in cpu_rows
-    ]
-    bars = ax2.barh(labels, speedups, color=colors)
-    ax2.set_xlabel("GPU speedup vs CPU (x)")
-    ax2.set_title("Coagulation: GPU vs CPU speedup")
-    for bar, spd in zip(bars, speedups, strict=True):
-        ax2.text(
-            bar.get_width() + 0.5,
-            bar.get_y() + bar.get_height() / 2,
-            f"{spd:.1f}x",
-            va="center",
-            fontsize=9,
-        )
-    ax2.grid(True, alpha=0.3, axis="x")
+    # Right: Speedup (where CPU data exists)
+    cpu_rows = [r for r in coag_plot_rows if r["speedup"] is not None]
+    if cpu_rows:
+        labels = [r["label"] for r in cpu_rows]
+        speedups = [r["speedup"] for r in cpu_rows]
+        colors = [
+            "tab:blue" if r["n_boxes"] == 1 else "tab:orange"
+            for r in cpu_rows
+        ]
+        bars = ax2.barh(labels, speedups, color=colors)
+        ax2.set_xlabel("GPU speedup vs CPU (x)")
+        ax2.set_title("Coagulation: GPU vs CPU speedup")
+        for bar, spd in zip(bars, speedups, strict=True):
+            ax2.text(
+                bar.get_width() + 0.5,
+                bar.get_y() + bar.get_height() / 2,
+                f"{spd:.1f}x",
+                va="center",
+                fontsize=9,
+            )
+        ax2.grid(True, alpha=0.3, axis="x")
+    else:
+        ax2.axis("off")
+        ax2.set_title("Coagulation: no CPU speedup data")
 
-fig.tight_layout()
-plt.show()
+    fig.tight_layout()
+    plt.show()
 
 # %% [markdown]
 # ## Key observations
