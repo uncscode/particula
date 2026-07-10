@@ -31,10 +31,10 @@
 # ```
 #
 # The benchmark helper records the source-of-record artifact at
-# `.artifacts/benchmarks/gpu_benchmark_results.json`. This notebook reads a
-# local `gpu_benchmark_results.json` copy/export for visualization, so treat the
-# controlled artifact path as the traceable benchmark record for the original
-# command and runtime metadata.
+# `.artifacts/benchmarks/gpu_benchmark_results.json`, and this notebook looks
+# for that controlled path first. A local `gpu_benchmark_results.json` export is
+# still accepted as a fallback, but the artifact path remains the traceable
+# record for the original command and runtime metadata.
 
 # %%
 import json
@@ -47,23 +47,31 @@ import matplotlib.pyplot as plt
 
 # %%
 BENCHMARK_FILENAME = "gpu_benchmark_results.json"
+BENCHMARK_ARTIFACT_PATH = Path(".artifacts/benchmarks") / BENCHMARK_FILENAME
 
 
 def _find_benchmark_results() -> Path:
-    """Walk up from cwd to find the benchmark JSON at the repo root."""
+    """Find benchmark JSON, preferring the controlled artifact path."""
     current = Path.cwd().resolve()
     for parent in [current, *current.parents]:
-        candidate = parent / BENCHMARK_FILENAME
-        if candidate.exists():
-            return candidate
+        artifact_candidate = parent / BENCHMARK_ARTIFACT_PATH
+        if artifact_candidate.exists():
+            return artifact_candidate
+
+        export_candidate = parent / BENCHMARK_FILENAME
+        if export_candidate.exists():
+            return export_candidate
+
         # Stop at the repo root (contains pyproject.toml)
         if (parent / "pyproject.toml").exists():
             break
     msg = (
-        f"Could not find {BENCHMARK_FILENAME}. "
+        "Could not find benchmark results at either "
+        f"{BENCHMARK_ARTIFACT_PATH} or {BENCHMARK_FILENAME}. "
         "Run the benchmarks first:\n"
         "  pytest particula/gpu/tests/benchmark_test.py "
-        "--benchmark -v -s"
+        "--benchmark -v -s\n"
+        "or copy/export the recorded artifact into the working directory."
     )
     raise FileNotFoundError(msg)
 

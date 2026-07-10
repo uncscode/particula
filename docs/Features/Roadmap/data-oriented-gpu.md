@@ -1196,13 +1196,13 @@ resampling or volume-scaling policy before slot exhaustion.
 
 #### Shipped coagulation benchmark evidence (2026-07-10 UTC)
 
-- Command evidence: `.artifacts/benchmarks/gpu_benchmark_results.json`
-  records the exact executed command in `benchmark_metadata.command`.
-  The 2026-07-10 UTC capture was produced by
-  `/home/kyle/Code/particula/.venv/bin/pytest -v --tb=short --cov`
-  `--cov-report=term-missing particula/gpu/tests/benchmark_test.py`
-  `--benchmark -v -s`, with the user-facing opt-in portion preserved as
-  `particula/gpu/tests/benchmark_test.py --benchmark -v -s`.
+- Command evidence: run
+  `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s`.
+  The recorded source-of-record artifact at
+  `.artifacts/benchmarks/gpu_benchmark_results.json` preserves the exact
+  executed local command in `benchmark_metadata.command`; the 2026-07-10 UTC
+  capture came from a local coverage-wrapped invocation of that same benchmark
+  target, but the plain user-facing reproduction command remains the one above.
 - Hardware/context: the same artifact records `warp_version=1.15.0`,
   `device.alias=cuda:0`, `device.name=NVIDIA GeForce RTX 5060`, and
   `device.total_memory_bytes=8082096128` (about 8.08 GiB), with
