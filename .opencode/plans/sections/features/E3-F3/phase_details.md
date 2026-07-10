@@ -43,22 +43,28 @@
     path `.artifacts/benchmarks/gpu_benchmark_results.json` and to the same
     machine-bounded recommendation wording.
 
-- [ ] **E3-F3-P3:** Document accepted GPU coagulation usage boundaries for Epic C
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F3-P3:** Document accepted GPU coagulation usage boundaries for Epic C
+  - Issue: #1248 | Size: S | Status: Shipped
   - Depends on: E3-F3-P2 decision evidence so the usage boundary cites measured
     limits rather than inferred expectations.
   - Goal: State whether one-thread-per-box is accepted for Epic C and explain
     when the current low-level coagulation path should be used.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
-    `docs/Features/data-containers-and-gpu-foundations.md`, benchmark example
-    docs as needed.
-  - Tests: Markdown/link validation and any paired notebook/source validation
-    required by edited docs.
+    `docs/Features/data-containers-and-gpu-foundations.md`
+  - Tests: Read back the touched roadmap/foundations sections and validate the
+    updated links, paths, and cross-references; notebook/source validation was
+    intentionally skipped because the notebook-backed benchmark source was not
+    edited.
+  - Delivered: The roadmap now records the Epic C outcome as accepted with
+    caveat and points readers to the measured decision record, while the
+    foundations guide now states the appropriate many-box/direct-kernel uses,
+    the large-single-box caveat, and the existing explicit-transfer/Warp-
+    optionality boundaries.
 
 - [ ] **E3-F3-P4:** Scope parallel-within-box follow-up if scaling evidence requires it
   - Issue: TBD | Size: XS | Status: Not Started
-  - Depends on: E3-F3-P3 concluding that documentation alone is insufficient for
-    Epic C acceptance.
+  - Depends on: future evidence showing that the accepted-with-caveat boundary is
+    no longer sufficient.
   - Goal: If measurements show the current design is not acceptable for Epic C,
     create a bounded follow-up plan or issue without implementing optimization,
     and update the roadmap/follow-up documentation so the final Epic C decision

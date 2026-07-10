@@ -42,3 +42,15 @@
 - Recorded that the notebook-backed theory/example source text was aligned to
   the controlled benchmark artifact path and machine-bounded interpretation used
   in the roadmap.
+
+## 2026-07-10 — Issue #1248
+
+- Updated E3-F3 plan sections to reflect shipped E3-F3-P3 docs-only work.
+- Recorded that public documentation changes were limited to
+  `docs/Features/Roadmap/data-oriented-gpu.md` and
+  `docs/Features/data-containers-and-gpu-foundations.md`.
+- Recorded the accepted-with-caveat Epic C outcome for the current low-level
+  one-thread-per-box coagulation path and the user-facing guidance boundaries
+  that shipped with it.
+- Recorded that notebook-backed benchmark sources were intentionally left
+  unchanged in this phase.

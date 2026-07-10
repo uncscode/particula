@@ -1,6 +1,6 @@
 # Architecture and Design
 
-## Current Design Under Review
+## Current Design Boundary
 
 The current low-level coagulation kernel maps one Warp thread to one simulation
 box. Inside that thread, the kernel computes active-particle bounds, estimates
@@ -9,19 +9,19 @@ pair selection sequentially. This deliberately avoids cross-thread races around
 collision-pair writes and keeps the API compatible with independent-box GPU
 workloads.
 
-## Decision Shape
+## Shipped Decision
 
-E3-F3 does not change the production architecture. It records an architecture
-decision based on refreshed measurements:
+E3-F3 does not change the production architecture. The shipped outcome is the
+accepted-with-caveat option documented from the existing measurements:
 
-1. **Accepted for Epic C:** one-thread-per-box remains the supported low-level
-   coagulation design for many-box and experimental CUDA workflows, with
-   documented single-box limits.
-2. **Accepted with caveat:** the current path remains available, but docs label
-   large single-box workloads as a known limitation and point to future work.
-3. **Follow-up required:** a separate parallel-within-box feature is scoped for
-   implementation after Epic C blockers, without merging optimization work into
-   this feature.
+1. **Accepted with caveat:** one-thread-per-box remains the documented low-level
+   coagulation baseline for many-box workloads, Warp-backed direct-kernel use,
+   and CUDA-backed benchmark/study workflows.
+2. **Large single-box caveat stays explicit:** roadmap and foundations docs now
+   point back to the measured decision record instead of implying a universal
+   production recommendation.
+3. **No implementation follow-up was started here:** any future parallel-within-
+   box work remains a separate track rather than part of this docs-only issue.
 
 ## Boundary Conditions
 

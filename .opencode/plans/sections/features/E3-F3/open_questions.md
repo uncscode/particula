@@ -1,6 +1,6 @@
 # Open Questions
 
-Status: reviewed and updated on 2026-07-10.
+Status: reviewed after shipped issue #1248 docs updates.
 
 ## Resolved Decisions
 
@@ -28,6 +28,11 @@ Status: reviewed and updated on 2026-07-10.
   artifact path and machine-bounded wording, so roadmap and example guidance no
   longer diverge on where the benchmark evidence lives or how broadly it should
   be interpreted.
-- If a follow-up is needed, start with a staged design investigation. Compare
-  pair-selection parallelism, collision-application parallelism, and graph
-  capture before committing to a kernel rewrite.
+- Issue #1248 resolved the remaining public-docs ambiguity without changing the
+  kernel: the roadmap now marks the current one-thread-per-box path as accepted
+  with caveat for Epic C, and the foundations guide now tells users when to use
+  it and when not to.
+- No follow-up was scoped by this issue. If later evidence requires one, start
+  with a staged design investigation that compares pair-selection parallelism,
+  collision-application parallelism, and graph capture before committing to a
+  kernel rewrite.
