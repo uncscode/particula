@@ -2,7 +2,7 @@
   "id": "E3-F4",
   "type": "feature",
   "title": "Resolve low-level kernel export paths and publish direct GPU kernel quick-start",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -73,11 +73,11 @@
     {
       "id": "E3-F4-P4",
       "title": "Document troubleshooting and validate docs quick-start behavior",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-10",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -85,5 +85,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
