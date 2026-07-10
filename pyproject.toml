@@ -103,6 +103,10 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "performance: marks tests as performance-intensive (deselect with '-m \"not performance\"')",
     "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
+    "warp: marks tests as Warp-dependent or Warp-targeted",
+    "cuda: marks tests as CUDA-specific or CUDA-if-available",
+    "gpu_parity: marks tests as CPU/Warp/CUDA parity validation",
+    "stochastic: marks tests as stochastic tolerance-band validation",
 ]
 
 # Configuration for pylint

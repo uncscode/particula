@@ -73,25 +73,14 @@ def test_benchmark_option_is_registered() -> None:
 
 
 def test_benchmark_related_markers_are_registered() -> None:
-    """Pytest registers slow, performance, and benchmark markers."""
+    """Pytest registers the shared marker vocabulary."""
     config = _FakeConfigureConfig()
 
     particula_conftest.pytest_configure(cast(Any, config))
 
     assert config.marker_lines == [
-        (
-            "markers",
-            "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-        ),
-        (
-            "markers",
-            "performance: marks tests as performance-intensive "
-            "(deselect with '-m \"not performance\"')",
-        ),
-        (
-            "markers",
-            "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
-        ),
+        ("markers", marker_line)
+        for marker_line in particula_conftest.PYTEST_MARKER_LINES
     ]
 
 

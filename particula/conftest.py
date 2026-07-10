@@ -9,6 +9,17 @@ from __future__ import annotations
 
 import pytest
 
+PYTEST_MARKER_LINES = (
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "performance: marks tests as performance-intensive "
+    "(deselect with '-m \"not performance\"')",
+    "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
+    "warp: marks tests as Warp-dependent or Warp-targeted",
+    "cuda: marks tests as CUDA-specific or CUDA-if-available",
+    "gpu_parity: marks tests as CPU/Warp/CUDA parity validation",
+    "stochastic: marks tests as stochastic tolerance-band validation",
+)
+
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     """Register custom command-line options."""
@@ -22,19 +33,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 def pytest_configure(config: pytest.Config) -> None:
     """Register custom markers for the test suite."""
-    config.addinivalue_line(
-        "markers",
-        "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    )
-    config.addinivalue_line(
-        "markers",
-        "performance: marks tests as performance-intensive "
-        "(deselect with '-m \"not performance\"')",
-    )
-    config.addinivalue_line(
-        "markers",
-        "benchmark: marks tests as GPU benchmarks (enable with '--benchmark')",
-    )
+    for marker_line in PYTEST_MARKER_LINES:
+        config.addinivalue_line("markers", marker_line)
 
 
 def pytest_collection_modifyitems(
