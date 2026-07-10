@@ -52,3 +52,14 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
     assert "test_condensation_step_gpu_matches_cpu_single_box" in (
         EXPORTED_CONDENSATION_TESTS
     )
+    assert "test_condensation_step_gpu_rejects_mixed_environment_inputs" in (
+        EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_step_gpu_environment_device_mismatch_raises_value_error"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_step_gpu_direct_pressure_device_mismatch_raises"
+        in EXPORTED_CONDENSATION_TESTS
+    )

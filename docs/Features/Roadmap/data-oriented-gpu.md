@@ -764,17 +764,18 @@ Planned features:
    transfer helpers, not direct kernel-step re-exports. Troubleshooting notes
    should stay aligned with the shipped example and regression tests:
 
-   - missing Warp means the quick-start stays in its no-kernel documentation
-     path behind `WARP_AVAILABLE`
+   - missing Warp means the quick-start stays in its CPU-only documentation
+     path behind `WARP_AVAILABLE`, with deferred `particula.gpu.kernels`
+     imports and no pretend kernel execution
    - CUDA is optional and Warp `device="cpu"` is the default runnable path
-   - particle, gas, environment, and sidecar buffers must stay on compatible
-     devices
+   - particle, gas, environment, and sidecar buffers such as `rng_states`
+     must stay on compatible devices
    - `environment=` must not be mixed with scalar or Warp-array direct
      `temperature` / `pressure` inputs
    - CPU↔GPU movement remains explicit through `to_warp_*` and `from_warp_*`
      helpers, including lossy gas restore for names and helper-only state
-   - no hidden synchronization or automatic top-level fallback imports should
-     be implied by roadmap prose
+   - no hidden transfers, hidden synchronization, or automatic top-level
+     fallback imports should be implied by roadmap prose
 8. Add a runnable `docs/Examples/` entry for a `CondensationLatentHeat`
    workflow (deferred from E1; current tutorials only set `latent_heat` as a
    vapor property), following the paired `.py`/`.ipynb` example conventions.

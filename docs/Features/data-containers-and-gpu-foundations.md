@@ -334,8 +334,8 @@ path.
 - **Warp missing (`WARP_AVAILABLE == False`)**
   - The direct-kernel path is unavailable until Warp is installed.
   - The canonical quick-start keeps `particula.gpu.kernels` imports deferred
-    and completes in a CPU-only documentation mode without pretending kernels
-    ran.
+    and completes in a CPU-only documentation mode without importing kernel
+    steps or pretending kernels ran.
 - **CUDA unavailable**
   - CUDA is optional.
   - The default supported runnable path is Warp `device="cpu"`; only opt into
@@ -344,8 +344,8 @@ path.
   - Kernels operate on Warp-backed container mirrors, not CPU `ParticleData`,
     `GasData`, or `EnvironmentData` objects directly.
   - Move state across the boundary explicitly with `to_warp_*` and
-    `from_warp_*`; kernels and runnables do not perform hidden transfers or
-    hidden synchronization.
+    `from_warp_*`; kernels and runnables do not perform hidden transfers,
+    hidden synchronization, or top-level fallback imports.
 - **Device mismatch across particle, gas, environment, and sidecar buffers**
   - Keep Warp arrays and sidecar buffers such as `rng_states` on the same
     device as the particle/gas/environment inputs used by the kernel call.
@@ -356,8 +356,9 @@ path.
   - Do not mix scalar or Warp-array `temperature` / `pressure` values with
     `environment=`; current kernels reject that combination explicitly.
 - **Gas/environment restore expectations**
-  - `from_warp_gas_data()` restores ordered species names only when you supply
-    them; otherwise it generates placeholder names such as `species_0`.
+  - `from_warp_gas_data()` is intentionally lossy across the helper boundary:
+    it restores ordered species names only when you supply them; otherwise it
+    generates placeholder names such as `species_0`.
   - GPU-only helper state such as `vapor_pressure` is not restored onto CPU
     `GasData`.
   - `from_warp_environment_data(..., sync=False)` is an explicit expert path;
