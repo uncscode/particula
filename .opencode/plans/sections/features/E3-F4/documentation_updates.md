@@ -30,7 +30,14 @@ documented package-level surface.
 ## Current Phase Status
 
 - Import-path decision documentation is shipped.
-- Focused export regression coverage is shipped.
+- Focused export regression coverage is shipped and centralized in
+  `particula/gpu/tests/kernel_exports_test.py`, including the exact
+  `particula.gpu.kernels.__all__` contract, negative package-export checks for
+  representative internal helpers, and top-level `particula.gpu`
+  non-reexport assertions.
+- Duplicate package-export checks were removed from
+  `particula/gpu/kernels/tests/coagulation_test.py` as part of the shipped test
+  consolidation.
 - Runnable quick-start and troubleshooting expansions remain for later `E3-F4`
   phases.
 

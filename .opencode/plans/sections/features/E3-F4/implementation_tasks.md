@@ -21,16 +21,18 @@
 
 ## Phase E3-F4-P2
 
-- Add `particula/gpu/tests/kernel_exports_test.py` or extend one existing
-  export-focused test module as the single home for direct-kernel import checks.
-- Assert `condensation_step_gpu` and `coagulation_step_gpu` import from the
-  selected public module.
-- Assert `__all__` coverage for selected public exports and a negative case for
-  any raw internal symbol intentionally excluded from the public API.
-- Ensure tests do not require CUDA, do not launch kernels, and still pass when
-  Warp is unavailable by checking import surface only; keep this phase to one
-  small test module rather than scattering import assertions across unrelated
-  GPU tests.
+- Extended `particula/gpu/tests/kernel_exports_test.py` as the single home for
+  direct-kernel import checks.
+- Added parametrized assertions that `condensation_step_gpu` and
+  `coagulation_step_gpu` resolve from `particula.gpu.kernels`.
+- Locked the exact `particula.gpu.kernels.__all__` surface and added negative
+  package-export checks for representative internal helpers.
+- Kept the top-level `particula.gpu` negative contract Warp-independent while
+  guarding only the Warp-backed `.kernels` imports with
+  `pytest.importorskip("warp")`.
+- Removed duplicate package-export coverage from
+  `particula/gpu/kernels/tests/coagulation_test.py` so the API contract lives in
+  one focused regression module.
 
 ## Phase E3-F4-P3
 

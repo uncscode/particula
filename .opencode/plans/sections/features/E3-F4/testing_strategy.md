@@ -7,12 +7,21 @@ testing-only phase.
 
 - Phase `E3-F4-P1` shipped focused regression coverage in
   `particula/gpu/tests/kernel_exports_test.py`.
+- Phase `E3-F4-P2` made that file the single canonical home for package-surface
+  checks and removed duplicate export assertions from
+  `particula/gpu/kernels/tests/coagulation_test.py`.
 - Assert `particula.gpu.kernels` imports
-  `condensation_step_gpu` and `coagulation_step_gpu` without launching kernels.
+  `condensation_step_gpu` and `coagulation_step_gpu` via parametrized checks
+  without launching kernels.
 - Assert top-level `particula.gpu` does not expose those step functions and does
   not list them in `__all__`.
 - Assert `particula.gpu.kernels.__all__` contains exactly the two supported
   step functions.
+- Assert representative internal helpers
+  (`apply_coagulation_kernel`, `apply_mass_transfer_kernel`,
+  `condensation_mass_transfer_kernel`, and
+  `initialize_coagulation_rng_states`) are absent from the package surface while
+  a representative helper still resolves from its concrete module.
 - Keep the positive `particula.gpu.kernels` checks independent of CUDA
   availability and guarded with `pytest.importorskip("warp")`.
 

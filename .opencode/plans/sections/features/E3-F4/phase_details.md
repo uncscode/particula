@@ -41,25 +41,37 @@ Depends on: E3-F4-P1 choosing the supported import surface so regression tests
 lock the exact public path and rejection boundaries before docs examples depend
 on them.
 
-Extend the shipped `particula/gpu/tests/kernel_exports_test.py` only if later
-phases need broader import-surface coverage. Tests should continue to avoid
-kernel launches and remain CPU-only friendly.
+Shipped outcome: `particula/gpu/tests/kernel_exports_test.py` is now the single
+canonical contract file for this import surface. The phase added parametrized
+positive checks for `coagulation_step_gpu` and `condensation_step_gpu`, locked
+the exact `particula.gpu.kernels.__all__` value, added representative negative
+package-export assertions for `apply_coagulation_kernel`,
+`apply_mass_transfer_kernel`, `condensation_mass_transfer_kernel`, and
+`initialize_coagulation_rng_states`, and preserved one concrete-module import
+check proving those internal helpers remain importable from their owning
+modules. Duplicate package-export coverage was removed from
+`particula/gpu/kernels/tests/coagulation_test.py`.
 
 Test coverage in this phase:
 
-- Add parametrized import tests for both `condensation_step_gpu` and
-  `coagulation_step_gpu` in `particula/gpu/tests/kernel_exports_test.py`.
-- Cover the supported module path plus rejected/raw internal symbol imports when
-  the API decision excludes them.
-- Keep the test module warning-clean under `pytest -Werror` and runnable on
-  CPU-only environments.
+- `particula/gpu/tests/kernel_exports_test.py` parametrizes the supported
+  imports for both `condensation_step_gpu` and `coagulation_step_gpu`.
+- The same file asserts the exact package `__all__` surface and negative
+  package-export coverage for representative raw helper names.
+- The top-level `particula.gpu` negative contract remains Warp-independent,
+  while the Warp-backed `.kernels` imports stay guarded with
+  `pytest.importorskip("warp")` for CPU-only friendliness.
 
 Deliverables:
 
-- Regression tests for direct condensation and coagulation imports.
-- `__all__` assertions for any chosen public module.
-- Negative/guard assertions preventing accidental dependence on raw internal
-  kernel symbols where the API decision excludes them.
+- Centralized regression tests for direct condensation and coagulation imports
+  in `particula/gpu/tests/kernel_exports_test.py`.
+- Exact `particula.gpu.kernels.__all__` assertions for the shipped public
+  module surface.
+- Negative assertions preventing accidental package-level exposure of raw
+  internal kernel helpers.
+- Removal of duplicate package-export policy checks from
+  `particula/gpu/kernels/tests/coagulation_test.py`.
 
 ## E3-F4-P3: Create runnable direct-kernel quick-start example with explicit transfer helpers
 

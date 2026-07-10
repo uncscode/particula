@@ -46,11 +46,14 @@ Legacy facades remain available, with deprecation planned for v0.3.0.
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.
-GPU kernel entry points `condensation_step_gpu` and `coagulation_step_gpu`
-now accept scalar `temperature` / `pressure` inputs, per-box Warp arrays with
-shape `(n_boxes,)`, hybrid scalar-plus-Warp-array direct inputs when
-`environment` is omitted, or a `WarpEnvironmentData` via the keyword-only
-`environment=` parameter.
+Import GPU kernel entry points `condensation_step_gpu` and
+`coagulation_step_gpu` from `particula.gpu.kernels`. Top-level
+`particula.gpu` remains the transfer/context-helper surface and does not
+re-export those direct kernel step functions. The kernel entry points accept
+scalar `temperature` / `pressure` inputs, per-box Warp arrays with shape
+`(n_boxes,)`, hybrid scalar-plus-Warp-array direct inputs when `environment`
+is omitted, or a `WarpEnvironmentData` via the keyword-only `environment=`
+parameter.
 Mixed scalar-plus-environment calls still fail early by design. Explicit
 environment inputs must match the particle/gas device and use `(n_boxes,)`
 temperature and pressure arrays. All accepted temperature, pressure, and
