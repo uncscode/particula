@@ -127,6 +127,36 @@ def test_missing_required_argument_preserves_signature_error():
         sample_function(1, -1, 0, 0)
 
 
+def test_unknown_validator_target_raises_clear_error():
+    """Unknown validator targets should fail with a descriptive error."""
+
+    @validate_inputs({"missing_arg": "positive"})
+    def sample_function_unknown_target(x):
+        """Function with a validator targeting a missing argument."""
+        return x
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Invalid validation target 'missing_arg' for function "
+            "'sample_function_unknown_target'."
+        ),
+    ):
+        sample_function_unknown_target(1)
+
+
+def test_unknown_validator_target_preserves_signature_type_error_first():
+    """Signature TypeError should take precedence over target validation."""
+
+    @validate_inputs({"missing_arg": "positive"})
+    def sample_function_missing_required(x):
+        """Function with a missing required argument and invalid target."""
+        return x
+
+    with pytest.raises(TypeError, match="missing.*required"):
+        sample_function_missing_required()
+
+
 def test_default_argument_is_validated_when_not_explicitly_passed():
     """Defaulted arguments should still participate in validation."""
 

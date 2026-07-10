@@ -144,6 +144,11 @@ def validate_inputs(dict_args):  # noqa: C901
             bound = sig.bind(*args, **kwargs)
             bound.apply_defaults()
             for name, comp in dict_args.items():
+                if name not in bound.arguments:
+                    raise ValueError(
+                        "Invalid validation target "
+                        f"'{name}' for function '{func.__name__}'."
+                    )
                 if bound.arguments[name] is None:
                     continue
                 value = np.asarray(bound.arguments[name])
