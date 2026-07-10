@@ -26,8 +26,8 @@
 | --- | --- | --- |
 | Import-path stability | Supported path resolves and unsupported path behavior is intentional | `particula/gpu/tests/kernel_exports_test.py` |
 | Public-surface narrowness | `particula.gpu` stays non-reexporting and `particula.gpu.kernels.__all__` is limited to the two step functions | Export assertions in `kernel_exports_test.py` |
-| Runnable quick-start | Example executes on Warp CPU and exits cleanly when Warp is absent | `particula/gpu/tests/data_containers_example_test.py` or equivalent |
-| Transfer-boundary clarity | Example shows explicit transfer helpers for particle, gas, and any environment data | Reviewed docs/example diff plus smoke-test assertions |
+| Runnable quick-start | Example executes on Warp CPU and exits cleanly when Warp is absent | `particula/gpu/tests/gpu_direct_kernels_example_test.py` |
+| Transfer-boundary clarity | Example shows explicit transfer helpers for particle and gas data, with direct scalar thermodynamic inputs | Reviewed docs/example diff plus smoke-test assertions |
 | Troubleshooting coverage | Device mismatch and optional CUDA guidance ship with the example/docs | `docs/Examples/` plus roadmap/foundation docs |
 
 ## Definition of Done

@@ -29,7 +29,11 @@ _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
 
 
 def _build_particle_data() -> ParticleData:
-    """Create deterministic particle data for the quick-start example."""
+    """Create deterministic particle data for the quick-start example.
+
+    Returns:
+        Single-box particle data with two particles and one species.
+    """
     return ParticleData(
         masses=np.array([[[1.0e-18], [1.2e-18]]], dtype=np.float64),
         concentration=np.array([[1.0, 1.0]], dtype=np.float64),
@@ -40,7 +44,11 @@ def _build_particle_data() -> ParticleData:
 
 
 def _build_gas_data() -> GasData:
-    """Create deterministic gas data for the quick-start example."""
+    """Create deterministic gas data for the quick-start example.
+
+    Returns:
+        Single-box gas data for one condensable species.
+    """
     return GasData(
         name=["Water"],
         molar_mass=np.array([0.018], dtype=np.float64),
@@ -50,17 +58,31 @@ def _build_gas_data() -> GasData:
 
 
 def _build_vapor_pressure() -> np.ndarray:
-    """Create deterministic vapor pressure input for condensation."""
+    """Create deterministic vapor pressure input for condensation.
+
+    Returns:
+        Vapor pressure array shaped ``(n_boxes, n_species)``.
+    """
     return np.array([[2330.0]], dtype=np.float64)
 
 
 def _warp_enabled() -> bool:
-    """Return whether the optional Warp execution branch should run."""
+    """Return whether the optional Warp execution branch should run.
+
+    Returns:
+        ``True`` when Warp is available and the example is not forced into the
+        CPU-only path.
+    """
     return WARP_AVAILABLE and os.getenv(_FORCE_NO_WARP_ENV) != "1"
 
 
 def _load_gpu_runtime() -> tuple[Any, Any, Any]:
-    """Load Warp and the supported direct kernel entry points lazily."""
+    """Load Warp and the supported direct kernel entry points lazily.
+
+    Returns:
+        Tuple of the imported ``warp`` module plus the supported condensation
+        and coagulation direct-kernel callables.
+    """
     wp = importlib.import_module("warp")
     kernels = importlib.import_module("particula.gpu.kernels")
     return wp, kernels.condensation_step_gpu, kernels.coagulation_step_gpu
@@ -75,6 +97,9 @@ def run_example(device: str = "cpu") -> list[str]:
 
     Returns:
         Human-readable output lines describing the example execution.
+
+    Raises:
+        RuntimeError: Propagated if a direct kernel call fails.
     """
     particle_data = _build_particle_data()
     gas_data = _build_gas_data()
@@ -170,7 +195,11 @@ def run_example(device: str = "cpu") -> list[str]:
 
 
 def main() -> None:
-    """Print the example output lines for manual validation."""
+    """Print the example output lines for manual validation.
+
+    Raises:
+        RuntimeError: Propagated if ``run_example()`` fails in the Warp path.
+    """
     for line in run_example():
         print(line)
 

@@ -1,6 +1,6 @@
 # Open Questions
 
-Status: reviewed and answered on 2026-07-08.
+Status: reviewed and answered on 2026-07-10.
 
 ## Resolved Decisions
 
@@ -13,12 +13,14 @@ Status: reviewed and answered on 2026-07-08.
 3. Raw lower-level symbols such as `apply_coagulation_kernel` stay out of the
    package-level public surface; `particula.gpu.kernels.__all__` is narrowed to
    the two supported step functions only.
-4. Put the quick-start beside the existing data-container/GPU foundation
-   examples unless implementation reveals a stronger need for a separate direct
-   kernels path.
-5. After E3-F1, the minimum coagulation snippet should show a caller-owned
-   `rng_states` buffer initialized once, passed into repeated
-   `coagulation_step_gpu` calls, and retained by the caller between steps.
+4. The canonical direct-kernel quick-start now has its own stable path at
+   `docs/Examples/gpu_direct_kernels_quick_start.py`, with smoke coverage in
+   `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
+5. The shipped quick-start demonstrates the minimum caller-owned coagulation
+   state explicitly: allocate `rng_states`, pass them into
+   `coagulation_step_gpu(...)`, and initialize them with
+   `initialize_rng=True`, `rng_seed=41` for the example call. Repeated-call
+   reuse remains documented elsewhere as the broader `E3-F1` contract.
 6. Troubleshooting should live in both the runnable example comments and the
    feature documentation. The example should cover immediate failure modes;
    the docs should explain broader CUDA/Warp availability and transfer-boundary

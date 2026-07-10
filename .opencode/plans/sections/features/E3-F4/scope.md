@@ -5,8 +5,8 @@
 - Finalize the public import path for direct low-level kernel step functions as
   `from particula.gpu.kernels import condensation_step_gpu,
   coagulation_step_gpu`.
-- Keep `particula.gpu` limited to availability, transfer, and context helpers;
-  do not re-export the two step functions from the package top level.
+- Keep `particula.gpu` limited to availability and transfer helpers; do not
+  re-export the two step functions from the package top level.
 - Narrow `particula.gpu.kernels` package-level exports to the two supported
   step functions and add regression tests covering that `__all__` contract.
 - Create a runnable quick-start example showing both condensation and
@@ -16,11 +16,12 @@
   - `GasData`
   - `to_warp_particle_data` / `from_warp_particle_data`
   - `to_warp_gas_data` / `from_warp_gas_data`
-  - `to_warp_environment_data` where environment examples are needed
-  - `gpu_context`
   - `WARP_AVAILABLE`
-- Add docs/tests proving the example degrades cleanly when Warp or CUDA is not
-  available.
+- Keep the canonical runnable path at
+  `docs/Examples/gpu_direct_kernels_quick_start.py` with adjacent smoke
+  coverage in `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
+- Add docs/tests proving the example degrades cleanly when Warp is not
+  available and runs on Warp CPU by default when it is.
 - Add troubleshooting guidance for Warp/CUDA/device mismatch and mixed
   environment inputs.
 
