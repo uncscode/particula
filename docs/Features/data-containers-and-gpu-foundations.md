@@ -263,7 +263,7 @@ than storage support.
 | CPU coagulation with data containers | `n_boxes == 1` only | Multi-box CPU execution is not yet a built-in runtime path. |
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp parity tests always cover Warp `cpu`; `cuda` runs only when available. |
-| Low-level GPU coagulation direct-kernel path | Accepted with caveats | Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs; caveated for large single-box production workloads and does not imply hidden transfer or synchronization behavior. |
+| Low-level GPU coagulation direct-kernel path | Accepted with caveats | Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs tied to the roadmap's measured decision record; not a broad production recommendation for large single-box workloads and does not imply hidden transfer or synchronization behavior. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:
@@ -296,6 +296,10 @@ Additional shipped boundaries:
 - Do not treat the current one-thread-per-box coagulation path as the
   recommended production path for large single-box workloads; the shipped
   caution band is documented in the roadmap's measured decision record.
+- Do not read the current low-level GPU coagulation support row as a general
+  claim that Particula has broad GPU production support beyond the explicit
+  helper boundary, optional Warp/CUDA availability, and measured many-box use
+  cases documented here and in the roadmap.
 - Do not expect kernels or runnables to perform hidden CPU↔GPU transfers or
   hidden synchronization for particle, gas, or environment state; use the
   explicit helper calls when state must cross the device boundary.
