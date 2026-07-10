@@ -14895,6 +14895,11 @@ than storage support.</p>
 <td>Warp parity tests always cover Warp <code>cpu</code>; <code>cuda</code> runs only when available.</td>
 </tr>
 <tr>
+<td>Low-level GPU coagulation direct-kernel path</td>
+<td>Accepted with caveats</td>
+<td>Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs tied to the roadmap's measured decision record; not a broad production recommendation for large single-box workloads and does not imply hidden transfer or synchronization behavior.</td>
+</tr>
+<tr>
 <td>Fixed-shape GPU/runtime roadmap work</td>
 <td>Not current runtime behavior</td>
 <td>Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior.</td>
@@ -14923,6 +14928,24 @@ than storage support.</p>
   gas round trip.</li>
 <li>Preserve or recompute vapor pressure separately on the CPU side after GPU
   restore.</li>
+<li>Use the current low-level GPU coagulation path when you want throughput from
+  many independent boxes, especially on CUDA where box-level parallelism can
+  stay busy, a documented direct-kernel workflow on a Warp-supported device,
+  or a CUDA-backed benchmark/study run tied to the measured evidence in the
+  roadmap.</li>
+<li>Do not treat the current one-thread-per-box coagulation path as the
+  recommended production path for large single-box workloads; the shipped
+  caution band is documented in the roadmap's measured decision record.</li>
+<li>Do not read the current low-level GPU coagulation support row as a general
+  claim that Particula has broad GPU production support beyond the explicit
+  helper boundary, optional Warp/CUDA availability, and measured many-box use
+  cases documented here and in the roadmap.</li>
+<li>Do not expect kernels or runnables to perform hidden CPU↔GPU transfers or
+  hidden synchronization for particle, gas, or environment state; use the
+  explicit helper calls when state must cross the device boundary.</li>
+<li>Treat Warp and CUDA as optional runtime capabilities: without Warp, this
+  low-level GPU path is unavailable, and CUDA benchmark conclusions should not
+  be assumed to apply unchanged to Warp <code>cpu</code> or other hardware.</li>
 <li>Treat roadmap pages as future-work references, not as evidence that broader
   runtime support has already shipped.</li>
 </ul>

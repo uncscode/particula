@@ -11894,6 +11894,40 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Performance and Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shipped-coagulation-benchmark-evidence-2026-07-10-utc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shipped coagulation benchmark evidence (2026-07-10 UTC)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shipped coagulation benchmark evidence (2026-07-10 UTC)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#measured-decision-record-for-the-current-one-thread-per-box-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured decision record for the current one-thread-per-box path
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -15034,6 +15068,40 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Performance and Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shipped-coagulation-benchmark-evidence-2026-07-10-utc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shipped coagulation benchmark evidence (2026-07-10 UTC)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shipped coagulation benchmark evidence (2026-07-10 UTC)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#measured-decision-record-for-the-current-one-thread-per-box-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured decision record for the current one-thread-per-box path
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -16333,8 +16401,13 @@ them.</p>
 <li>Improve rejection sampling for wide size ranges: evaluate size-binned
    majorant kernels or stratified pair sampling so mixed NPF/droplet boxes do
    not collapse acceptance rates.</li>
-<li>Record the one-thread-per-box coagulation design decision with a measured
-   single-box scaling limit, or scope a parallel-within-box variant.</li>
+<li>Accept the current one-thread-per-box coagulation path for Epic C as an
+   accepted-with-caveat, measured many-box and direct-kernel baseline,
+   especially for box-level parallel throughput, while keeping caveats for
+   large single-box workloads; keep the evidence anchored in the
+   <a href="#measured-decision-record-for-the-current-one-thread-per-box-path">measured decision record for the current one-thread-per-box path</a>
+   rather than broadening it into a universal production guarantee or a
+   parallel-within-box implementation claim.</li>
 <li>Resolve kernel entry-point exports: decide whether <code>condensation_step_gpu</code>
    and <code>coagulation_step_gpu</code> are exported from top-level <code>particula.gpu</code> or
    documented under <code>particula.gpu.kernels</code> (today they are only importable
@@ -16771,8 +16844,10 @@ resampling or volume-scaling policy before slot exhaustion.</p>
   1, 10, 100, and 1000 boxes), varying particles per box at each box count.</li>
 <li>Establish secondary benchmark targets for GPU-resident simulations at 1k,
   10k, 100k, and larger particle counts per box.</li>
-<li>Record the single-box scaling limit of the one-thread-per-box coagulation
-  kernel and decide whether a parallel-within-box variant is needed (see
+<li>Record the single-box scaling limit of the shipped one-thread-per-box
+  coagulation kernel as part of the accepted-with-caveat Epic C decision,
+  using the measured decision record below to bound when large single-box use
+  stops being a strong recommendation (see
   <a href="#known-kernel-issues">Known Kernel Issues</a>).</li>
 <li>Minimize CPU/GPU round trips in example workflows and high-level APIs.</li>
 <li>Reuse temporary buffers for repeated timesteps to avoid repeated allocation.</li>
@@ -16788,6 +16863,55 @@ resampling or volume-scaling policy before slot exhaustion.</p>
   (see <a href="#epic-i-differentiability-and-global-optimization">Epic I</a>).</li>
 <li>Include benchmark cases that vary boxes, particles per box, species count,
   active-slot fraction, and process combinations.</li>
+</ul>
+<h4 id="shipped-coagulation-benchmark-evidence-2026-07-10-utc">Shipped coagulation benchmark evidence (2026-07-10 UTC)<a class="headerlink" href="#shipped-coagulation-benchmark-evidence-2026-07-10-utc" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Command evidence: run
+  <code>pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s</code>.
+  The recorded source-of-record artifact at
+  <code>.artifacts/benchmarks/gpu_benchmark_results.json</code> preserves the exact
+  executed local command in <code>benchmark_metadata.command</code>; the 2026-07-10 UTC
+  capture came from a local coverage-wrapped invocation of that same benchmark
+  target, but the plain user-facing reproduction command remains the one above.</li>
+<li>Hardware/context: the same artifact records <code>warp_version=1.15.0</code>,
+  <code>device.alias=cuda:0</code>, <code>device.name=NVIDIA GeForce RTX 5060</code>, and
+  <code>device.total_memory_bytes=8082096128</code> (about 8.08 GiB), with
+  <code>started_at=2026-07-10T01:59:34.215800+00:00</code> and
+  <code>updated_at=2026-07-10T02:00:43.918911+00:00</code>.</li>
+<li>Artifact output: <code>.artifacts/benchmarks/gpu_benchmark_results.json</code></li>
+<li>Mixed-scale fixture note: the coagulation benchmark path uses a
+  dedicated deterministic mixed NPF/droplet fixture aligned with the
+  shipped E3-F2 baseline, while condensation benchmarks keep the generic
+  helper.</li>
+</ul>
+<h5 id="measured-decision-record-for-the-current-one-thread-per-box-path">Measured decision record for the current one-thread-per-box path<a class="headerlink" href="#measured-decision-record-for-the-current-one-thread-per-box-path" title="Permanent link">&para;</a></h5>
+<p>Epic C accepts the shipped one-thread-per-box coagulation design with
+caveats: it is the current documented baseline for many independent boxes,
+especially when CUDA can deliver box-level parallel throughput, and for
+low-level direct-kernel workflows, but large single-box use remains bounded
+by the caution band below and does not imply a broader long-term scaling
+decision.</p>
+<ul>
+<li><strong>Single-box caution band:</strong> treat the recorded <code>1x10k</code> to <code>1x50k</code>
+  range as the current caution band for large single-box workloads on the
+  shipped one-thread-per-box kernel. The measured GPU time per step rises
+  from <code>0.6809s</code> at <code>1x10k</code> to <code>1.3689s</code> at <code>1x20k</code> and <code>3.3984s</code> at
+  <code>1x50k</code>, so this path is no longer a strong recommendation for large
+  single-box work in that band. Smaller <code>1x500</code> to <code>1x5k</code> cases
+  (<code>0.0361s</code>, <code>0.1366s</code>, <code>0.3411s</code>) remain a modest-throughput regime,
+  not a decisive GPU win.</li>
+<li><strong>Multi-box effective region:</strong> independent-box parallelism remains
+  effective in the recorded many-box cases, where equivalent or larger
+  total-particle workloads stay near the smaller timings seen at lower box
+  counts: <code>10x500</code> <code>0.0359s</code>, <code>10x1k</code> <code>0.0699s</code>, <code>50x1k</code> <code>0.0714s</code>,
+  <code>10x5k</code> <code>0.3437s</code>, <code>50x5k</code> <code>0.3528s</code>, <code>100x1k</code> <code>0.0766s</code>, and
+  <code>10x10k</code> <code>0.6938s</code>. Record this as the region where the current GPU path
+  still benefits from many independent boxes keeping threads busy.</li>
+<li><strong>Machine-bounded caveat:</strong> this is measured evidence from the
+  2026-07-10 capture on the recorded Warp/device context above, not a
+  universal cutoff for every GPU or every future kernel variant. Treat it
+  as the current decision record for the shipped one-thread-per-box design,
+  not as a final acceptance decision on the long-term scaling strategy.</li>
 </ul>
 <h2 id="epic-i-differentiability-and-global-optimization">Epic I: Differentiability and Global Optimization<a class="headerlink" href="#epic-i-differentiability-and-global-optimization" title="Permanent link">&para;</a></h2>
 <p>A longer-term goal is gradient-based global optimization: using Warp automatic
@@ -16937,7 +17061,7 @@ coagulation and state-representation decisions are recorded.</p>
 <tr>
 <td>One-thread-per-box coagulation</td>
 <td>Serializes large single-box workloads</td>
-<td>Record as deliberate multi-box tradeoff or add parallel-within-box variant</td>
+<td>Record as the current measured multi-box tradeoff for the shipped path; any parallel-within-box follow-up would require a new evidence-backed proposal</td>
 </tr>
 <tr>
 <td>Caller must seed or explicitly reset persistent coagulation RNG state before repeated loops or graph capture</td>

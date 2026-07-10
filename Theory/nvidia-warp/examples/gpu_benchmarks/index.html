@@ -15208,7 +15208,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3d2dbabd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e53cae87">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15226,13 +15226,16 @@ parallel, O(n) work).</li>
 <p>Run the benchmarks first:</p>
 <div class="highlight"><pre><span></span>pytest<span class="w"> </span>particula/gpu/tests/benchmark_test.py<span class="w"> </span>--benchmark<span class="w"> </span>-v<span class="w"> </span>-s
 </pre></div>
-<p>The test suite writes results to <code>gpu_benchmark_results.json</code> in the
-repository root.</p>
+<p>The benchmark helper records the source-of-record artifact at
+<code>.artifacts/benchmarks/gpu_benchmark_results.json</code>, and this notebook looks
+for that controlled path first. A local <code>gpu_benchmark_results.json</code> export is
+still accepted as a fallback, but the artifact path remains the traceable
+record for the original command and runtime metadata.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=64ec6f78">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=023ca770">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15252,11 +15255,13 @@ repository root.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import json
 from pathlib import Path
+from typing import Any
 
 import matplotlib.pyplot as plt</div>
 </div>
@@ -15265,7 +15270,7 @@ import matplotlib.pyplot as plt</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5001ee21">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c446a923">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15276,7 +15281,7 @@ import matplotlib.pyplot as plt</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3a70030d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a986e90d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15295,24 +15300,80 @@ import matplotlib.pyplot as plt</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">BENCHMARK_FILENAME</span> <span class="o">=</span> <span class="s2">"gpu_benchmark_results.json"</span>
+<span class="n">BENCHMARK_ARTIFACT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">".artifacts/benchmarks"</span><span class="p">)</span> <span class="o">/</span> <span class="n">BENCHMARK_FILENAME</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_benchmark_payload</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Load a benchmark JSON payload from disk."""</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"benchmark payload must be a JSON object"</span><span class="p">)</span>
+    <span class="n">benchmarks</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"benchmarks"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"benchmark payload must include a dict benchmarks map"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">payload</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_benchmark_candidate</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validate that a candidate file matches the controlled benchmark schema."""</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">_load_benchmark_payload</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"benchmark_metadata"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"benchmark payload must include benchmark_metadata"</span><span class="p">)</span>
+    <span class="n">artifact_path</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"artifact_path"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">artifact_path</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">BENCHMARK_ARTIFACT_PATH</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"benchmark payload artifact_path does not match the controlled path"</span>
+        <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_find_benchmark_results</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Walk up from cwd to find the benchmark JSON at the repo root."""</span>
+<span class="w">    </span><span class="sd">"""Find benchmark JSON, preferring the controlled artifact path."""</span>
     <span class="n">current</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">rejected_candidates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
     <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="p">[</span><span class="n">current</span><span class="p">,</span> <span class="o">*</span><span class="n">current</span><span class="o">.</span><span class="n">parents</span><span class="p">]:</span>
-        <span class="n">candidate</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">/</span> <span class="n">BENCHMARK_FILENAME</span>
-        <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">candidate</span>
+        <span class="n">artifact_candidate</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">/</span> <span class="n">BENCHMARK_ARTIFACT_PATH</span>
+        <span class="k">if</span> <span class="n">artifact_candidate</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_validate_benchmark_candidate</span><span class="p">(</span><span class="n">artifact_candidate</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">rejected_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">artifact_candidate</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">artifact_candidate</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"pyproject.toml"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">break</span>
+
+    <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="p">[</span><span class="n">current</span><span class="p">,</span> <span class="o">*</span><span class="n">current</span><span class="o">.</span><span class="n">parents</span><span class="p">]:</span>
+        <span class="n">export_candidate</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">/</span> <span class="n">BENCHMARK_FILENAME</span>
+        <span class="k">if</span> <span class="n">export_candidate</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_validate_benchmark_candidate</span><span class="p">(</span><span class="n">export_candidate</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">rejected_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">export_candidate</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">export_candidate</span>
+
         <span class="c1"># Stop at the repo root (contains pyproject.toml)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"pyproject.toml"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">break</span>
+
     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"Could not find </span><span class="si">{</span><span class="n">BENCHMARK_FILENAME</span><span class="si">}</span><span class="s2">. "</span>
+        <span class="s2">"Could not find benchmark results at either "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">BENCHMARK_ARTIFACT_PATH</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">BENCHMARK_FILENAME</span><span class="si">}</span><span class="s2">. "</span>
         <span class="s2">"Run the benchmarks first:</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"  pytest particula/gpu/tests/benchmark_test.py "</span>
-        <span class="s2">"--benchmark -v -s"</span>
+        <span class="s2">"--benchmark -v -s</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"or copy/export the recorded artifact into the working directory."</span>
     <span class="p">)</span>
+    <span class="k">if</span> <span class="n">rejected_candidates</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">Rejected candidates:</span><span class="se">\n</span><span class="s2">- "</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">- "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rejected_candidates</span><span class="p">)</span>
     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 
@@ -15326,24 +15387,80 @@ import matplotlib.pyplot as plt</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Run started: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'started_at'</span><span class="p">,</span><span class="w"> </span><span class="s1">'unknown'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">BENCHMARK_FILENAME = "gpu_benchmark_results.json"
+BENCHMARK_ARTIFACT_PATH = Path(".artifacts/benchmarks") / BENCHMARK_FILENAME
+
+
+def _load_benchmark_payload(path: Path) -&gt; dict[str, Any]:
+    """Load a benchmark JSON payload from disk."""
+    with path.open(encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise ValueError("benchmark payload must be a JSON object")
+    benchmarks = payload.get("benchmarks")
+    if not isinstance(benchmarks, dict):
+        raise ValueError("benchmark payload must include a dict benchmarks map")
+    return payload
+
+
+def _validate_benchmark_candidate(path: Path) -&gt; None:
+    """Validate that a candidate file matches the controlled benchmark schema."""
+    payload = _load_benchmark_payload(path)
+    metadata = payload.get("benchmark_metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError("benchmark payload must include benchmark_metadata")
+    artifact_path = metadata.get("artifact_path")
+    if artifact_path != str(BENCHMARK_ARTIFACT_PATH):
+        raise ValueError(
+            "benchmark payload artifact_path does not match the controlled path"
+        )
 
 
 def _find_benchmark_results() -&gt; Path:
-    """Walk up from cwd to find the benchmark JSON at the repo root."""
+    """Find benchmark JSON, preferring the controlled artifact path."""
     current = Path.cwd().resolve()
+    rejected_candidates: list[str] = []
+
     for parent in [current, *current.parents]:
-        candidate = parent / BENCHMARK_FILENAME
-        if candidate.exists():
-            return candidate
+        artifact_candidate = parent / BENCHMARK_ARTIFACT_PATH
+        if artifact_candidate.exists():
+            try:
+                _validate_benchmark_candidate(artifact_candidate)
+            except (OSError, json.JSONDecodeError, ValueError) as exc:
+                rejected_candidates.append(
+                    f"{artifact_candidate}: {type(exc).__name__}: {exc}"
+                )
+            else:
+                return artifact_candidate
+
+        if (parent / "pyproject.toml").exists():
+            break
+
+    for parent in [current, *current.parents]:
+        export_candidate = parent / BENCHMARK_FILENAME
+        if export_candidate.exists():
+            try:
+                _validate_benchmark_candidate(export_candidate)
+            except (OSError, json.JSONDecodeError, ValueError) as exc:
+                rejected_candidates.append(
+                    f"{export_candidate}: {type(exc).__name__}: {exc}"
+                )
+            else:
+                return export_candidate
+
         # Stop at the repo root (contains pyproject.toml)
         if (parent / "pyproject.toml").exists():
             break
+
     msg = (
-        f"Could not find {BENCHMARK_FILENAME}. "
+        "Could not find benchmark results at either "
+        f"{BENCHMARK_ARTIFACT_PATH} or {BENCHMARK_FILENAME}. "
         "Run the benchmarks first:\n"
         "  pytest particula/gpu/tests/benchmark_test.py "
-        "--benchmark -v -s"
+        "--benchmark -v -s\n"
+        "or copy/export the recorded artifact into the working directory."
     )
+    if rejected_candidates:
+        msg += "\nRejected candidates:\n- " + "\n- ".join(rejected_candidates)
     raise FileNotFoundError(msg)
 
 
@@ -15361,7 +15478,7 @@ print(f"Run started: {data.get('started_at', 'unknown')}")</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=654886b4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d581167b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15372,7 +15489,7 @@ print(f"Run started: {data.get('started_at', 'unknown')}")</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=52ae850a">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a63ae3dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15485,7 +15602,7 @@ for r in cond_rows:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=98197e56">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c4631e59">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15496,7 +15613,7 @@ for r in cond_rows:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=63371cca">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1e54874a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15514,82 +15631,108 @@ for r in cond_rows:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">cond_plot_rows</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="s2">"gpu_per_step"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="p">]</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">cond_plot_rows</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"No condensation benchmark entries found; skipping plot."</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-<span class="c1"># Left: GPU time vs total particles</span>
-<span class="n">totals</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_rows</span><span class="p">]</span>
-<span class="n">gpu_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"gpu_per_step"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_rows</span><span class="p">]</span>  <span class="c1"># ms</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">totals</span><span class="p">,</span> <span class="n">gpu_times</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Total particles (boxes x particles)"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"GPU time per step (ms)"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Condensation: GPU scaling"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="c1"># Left: GPU time vs total particles</span>
+    <span class="n">totals</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_plot_rows</span><span class="p">]</span>
+    <span class="n">gpu_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"gpu_per_step"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_plot_rows</span><span class="p">]</span>  <span class="c1"># ms</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">totals</span><span class="p">,</span> <span class="n">gpu_times</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Total particles (boxes x particles)"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"GPU time per step (ms)"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Condensation: GPU scaling"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 
-<span class="c1"># Right: Speedup (where CPU data exists)</span>
-<span class="n">cpu_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
-<span class="k">if</span> <span class="n">cpu_rows</span><span class="p">:</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
-    <span class="n">speedups</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
-    <span class="n">bars</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"GPU speedup vs CPU (x)"</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Condensation: GPU vs CPU speedup"</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">spd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span>
-            <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spd</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">x"</span><span class="p">,</span>
-            <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-            <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>
+    <span class="c1"># Right: Speedup (where positive CPU comparison data exists)</span>
+    <span class="n">cpu_rows</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">r</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cond_plot_rows</span>
+        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">cpu_rows</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
+        <span class="n">speedups</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
+        <span class="n">bars</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"GPU speedup vs CPU (x)"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Condensation: GPU vs CPU speedup"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">spd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spd</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">x"</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Condensation: no CPU speedup data"</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+<div class="clipboard-copy-txt" id="cell-4">cond_plot_rows = [
+    r for r in cond_rows if r["total"] &gt; 0 and r["gpu_per_step"] &gt; 0
+]
+if not cond_plot_rows:
+    print("No condensation benchmark entries found; skipping plot.")
+else:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-# Left: GPU time vs total particles
-totals = [r["total"] for r in cond_rows]
-gpu_times = [r["gpu_per_step"] * 1000 for r in cond_rows]  # ms
-ax1.scatter(totals, gpu_times, s=50, zorder=5)
-ax1.set_xscale("log")
-ax1.set_yscale("log")
-ax1.set_xlabel("Total particles (boxes x particles)")
-ax1.set_ylabel("GPU time per step (ms)")
-ax1.set_title("Condensation: GPU scaling")
-ax1.grid(True, alpha=0.3)
+    # Left: GPU time vs total particles
+    totals = [r["total"] for r in cond_plot_rows]
+    gpu_times = [r["gpu_per_step"] * 1000 for r in cond_plot_rows]  # ms
+    ax1.scatter(totals, gpu_times, s=50, zorder=5)
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1.set_xlabel("Total particles (boxes x particles)")
+    ax1.set_ylabel("GPU time per step (ms)")
+    ax1.set_title("Condensation: GPU scaling")
+    ax1.grid(True, alpha=0.3)
 
-# Right: Speedup (where CPU data exists)
-cpu_rows = [r for r in cond_rows if r["speedup"] is not None]
-if cpu_rows:
-    labels = [r["label"] for r in cpu_rows]
-    speedups = [r["speedup"] for r in cpu_rows]
-    bars = ax2.barh(labels, speedups, color="steelblue")
-    ax2.set_xlabel("GPU speedup vs CPU (x)")
-    ax2.set_title("Condensation: GPU vs CPU speedup")
-    ax2.set_xscale("log")
-    for bar, spd in zip(bars, speedups, strict=True):
-        ax2.text(
-            bar.get_width() * 1.1,
-            bar.get_y() + bar.get_height() / 2,
-            f"{spd:.0f}x",
-            va="center",
-            fontsize=9,
-        )
-    ax2.grid(True, alpha=0.3, axis="x")
+    # Right: Speedup (where positive CPU comparison data exists)
+    cpu_rows = [
+        r
+        for r in cond_plot_rows
+        if r["speedup"] is not None and r["speedup"] &gt; 0
+    ]
+    if cpu_rows:
+        labels = [r["label"] for r in cpu_rows]
+        speedups = [r["speedup"] for r in cpu_rows]
+        bars = ax2.barh(labels, speedups, color="steelblue")
+        ax2.set_xlabel("GPU speedup vs CPU (x)")
+        ax2.set_title("Condensation: GPU vs CPU speedup")
+        ax2.set_xscale("log")
+        for bar, spd in zip(bars, speedups, strict=True):
+            ax2.text(
+                bar.get_width() * 1.1,
+                bar.get_y() + bar.get_height() / 2,
+                f"{spd:.0f}x",
+                va="center",
+                fontsize=9,
+            )
+        ax2.grid(True, alpha=0.3, axis="x")
+    else:
+        ax2.axis("off")
+        ax2.set_title("Condensation: no CPU speedup data")
 
-fig.tight_layout()
-plt.show()</div>
+    fig.tight_layout()
+    plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=80a1dbca">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7b339fa2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15600,7 +15743,7 @@ plt.show()</div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c9167263">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9b484b44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15709,7 +15852,7 @@ for r in coag_rows:
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=03a1f8ed">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5491a2e0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15720,7 +15863,7 @@ for r in coag_rows:
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e8282734">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c108b61f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15738,108 +15881,128 @@ for r in coag_rows:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coag_plot_rows</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_particles"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="s2">"gpu_per_step"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="p">]</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">coag_plot_rows</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"No coagulation benchmark entries found; skipping plot."</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-<span class="c1"># Separate single-box vs multi-box for color coding</span>
-<span class="n">single_box</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_boxes"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
-<span class="n">multi_box</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_boxes"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Separate single-box vs multi-box for color coding</span>
+    <span class="n">single_box</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_plot_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_boxes"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">multi_box</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_plot_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_boxes"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
 
-<span class="c1"># Left: GPU time vs particles per box (colored by n_boxes)</span>
-<span class="k">for</span> <span class="n">rows</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[</span>
-    <span class="p">(</span><span class="n">single_box</span><span class="p">,</span> <span class="s2">"tab:blue"</span><span class="p">,</span> <span class="s2">"1 box"</span><span class="p">),</span>
-    <span class="p">(</span><span class="n">multi_box</span><span class="p">,</span> <span class="s2">"tab:orange"</span><span class="p">,</span> <span class="s2">"multi-box"</span><span class="p">),</span>
-<span class="p">]:</span>
-    <span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"n_particles"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"gpu_per_step"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
-        <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="c1"># Left: GPU time vs particles per box (colored by n_boxes)</span>
+    <span class="k">for</span> <span class="n">rows</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">single_box</span><span class="p">,</span> <span class="s2">"tab:blue"</span><span class="p">,</span> <span class="s2">"1 box"</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">multi_box</span><span class="p">,</span> <span class="s2">"tab:orange"</span><span class="p">,</span> <span class="s2">"multi-box"</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"n_particles"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"gpu_per_step"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particles per box"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"GPU time per step (ms)"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation: GPU scaling"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particles per box"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"GPU time per step (ms)"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation: GPU scaling"</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 
-<span class="c1"># Right: Speedup (where CPU data exists)</span>
-<span class="n">cpu_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
-<span class="k">if</span> <span class="n">cpu_rows</span><span class="p">:</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
-    <span class="n">speedups</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
-    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"tab:blue"</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_boxes"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">"tab:orange"</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span>
-    <span class="p">]</span>
-    <span class="n">bars</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"GPU speedup vs CPU (x)"</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation: GPU vs CPU speedup"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">spd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
-            <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spd</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x"</span><span class="p">,</span>
-            <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
-            <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>
+    <span class="c1"># Right: Speedup (where CPU data exists)</span>
+    <span class="n">cpu_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">coag_plot_rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cpu_rows</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
+        <span class="n">speedups</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"speedup"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span><span class="p">]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"tab:blue"</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"n_boxes"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">"tab:orange"</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">cpu_rows</span>
+        <span class="p">]</span>
+        <span class="n">bars</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"GPU speedup vs CPU (x)"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation: GPU vs CPU speedup"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">spd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">speedups</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">get_y</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spd</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x"</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation: no CPU speedup data"</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+<div class="clipboard-copy-txt" id="cell-6">coag_plot_rows = [
+    r for r in coag_rows if r["n_particles"] &gt; 0 and r["gpu_per_step"] &gt; 0
+]
+if not coag_plot_rows:
+    print("No coagulation benchmark entries found; skipping plot.")
+else:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-# Separate single-box vs multi-box for color coding
-single_box = [r for r in coag_rows if r["n_boxes"] == 1]
-multi_box = [r for r in coag_rows if r["n_boxes"] &gt; 1]
+    # Separate single-box vs multi-box for color coding
+    single_box = [r for r in coag_plot_rows if r["n_boxes"] == 1]
+    multi_box = [r for r in coag_plot_rows if r["n_boxes"] &gt; 1]
 
-# Left: GPU time vs particles per box (colored by n_boxes)
-for rows, color, label in [
-    (single_box, "tab:blue", "1 box"),
-    (multi_box, "tab:orange", "multi-box"),
-]:
-    if rows:
-        x = [r["n_particles"] for r in rows]
-        y = [r["gpu_per_step"] * 1000 for r in rows]
-        ax1.scatter(x, y, s=50, color=color, label=label, zorder=5)
+    # Left: GPU time vs particles per box (colored by n_boxes)
+    for rows, color, label in [
+        (single_box, "tab:blue", "1 box"),
+        (multi_box, "tab:orange", "multi-box"),
+    ]:
+        if rows:
+            x = [r["n_particles"] for r in rows]
+            y = [r["gpu_per_step"] * 1000 for r in rows]
+            ax1.scatter(x, y, s=50, color=color, label=label, zorder=5)
 
-ax1.set_xscale("log")
-ax1.set_yscale("log")
-ax1.set_xlabel("Particles per box")
-ax1.set_ylabel("GPU time per step (ms)")
-ax1.set_title("Coagulation: GPU scaling")
-ax1.legend()
-ax1.grid(True, alpha=0.3)
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1.set_xlabel("Particles per box")
+    ax1.set_ylabel("GPU time per step (ms)")
+    ax1.set_title("Coagulation: GPU scaling")
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
 
-# Right: Speedup (where CPU data exists)
-cpu_rows = [r for r in coag_rows if r["speedup"] is not None]
-if cpu_rows:
-    labels = [r["label"] for r in cpu_rows]
-    speedups = [r["speedup"] for r in cpu_rows]
-    colors = [
-        "tab:blue" if r["n_boxes"] == 1 else "tab:orange" for r in cpu_rows
-    ]
-    bars = ax2.barh(labels, speedups, color=colors)
-    ax2.set_xlabel("GPU speedup vs CPU (x)")
-    ax2.set_title("Coagulation: GPU vs CPU speedup")
-    for bar, spd in zip(bars, speedups, strict=True):
-        ax2.text(
-            bar.get_width() + 0.5,
-            bar.get_y() + bar.get_height() / 2,
-            f"{spd:.1f}x",
-            va="center",
-            fontsize=9,
-        )
-    ax2.grid(True, alpha=0.3, axis="x")
+    # Right: Speedup (where CPU data exists)
+    cpu_rows = [r for r in coag_plot_rows if r["speedup"] is not None]
+    if cpu_rows:
+        labels = [r["label"] for r in cpu_rows]
+        speedups = [r["speedup"] for r in cpu_rows]
+        colors = [
+            "tab:blue" if r["n_boxes"] == 1 else "tab:orange"
+            for r in cpu_rows
+        ]
+        bars = ax2.barh(labels, speedups, color=colors)
+        ax2.set_xlabel("GPU speedup vs CPU (x)")
+        ax2.set_title("Coagulation: GPU vs CPU speedup")
+        for bar, spd in zip(bars, speedups, strict=True):
+            ax2.text(
+                bar.get_width() + 0.5,
+                bar.get_y() + bar.get_height() / 2,
+                f"{spd:.1f}x",
+                va="center",
+                fontsize=9,
+            )
+        ax2.grid(True, alpha=0.3, axis="x")
+    else:
+        ax2.axis("off")
+        ax2.set_title("Coagulation: no CPU speedup data")
 
-fig.tight_layout()
-plt.show()</div>
+    fig.tight_layout()
+    plt.show()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70c14257">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a772ddbc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -15858,15 +16021,25 @@ particles per box, demonstrating excellent GPU utilization.</li>
 sequential acceptance-rejection pair selection loop. This means
 single-box performance is limited by the per-particle work within
 that one thread.</li>
-<li><strong>Multi-box configurations</strong> show <strong>25--30x</strong> speedups because the
-GPU parallelizes across boxes.</li>
-<li>Single-box speedups are modest (<strong>1.5--3x</strong>) because the GPU thread
-does essentially the same sequential work as the CPU, just with
-faster per-operation throughput.</li>
+<li><strong>Multi-box configurations</strong> remain the effective region for the current
+kernel because the GPU parallelizes across independent boxes. The recorded
+many-box cases (<code>10x500</code>, <code>10x1k</code>, <code>50x1k</code>, <code>10x5k</code>, <code>50x5k</code>, <code>100x1k</code>,
+<code>10x10k</code>) stay near the smaller timings seen at lower box counts on this
+benchmark machine.</li>
+<li>Single-box speedups are modest (<strong>1.5--3x</strong>) because the GPU thread does
+essentially the same sequential work as the CPU, just with faster
+per-operation throughput.</li>
+<li>Treat the recorded <code>1x10k</code> to <code>1x50k</code> range as a <strong>single-box caution
+band</strong> for the shipped one-thread-per-box path: the measured GPU step time
+rises from <strong>0.6809 s</strong> to <strong>3.3984 s</strong>, so large single-box workloads are
+no longer a strong GPU recommendation in this benchmark capture.</li>
 <li>The <code>k_max</code> computation uses an O(n) min/max radius bound (matching
 the CPU's bin-pair strategy) rather than the original O(n^2)
 all-pairs scan. This reduced single-box GPU time from <strong>29s to
 0.28s</strong> at 2k particles.</li>
+<li>These conclusions are <strong>machine-bounded</strong> to the 2026-07-10 capture on the
+recorded Warp/device context, not universal guarantees for every GPU or
+future kernel variant.</li>
 </ul>
 <h3 id="when-to-use-gpu-acceleration">When to use GPU acceleration<a class="anchor-link" href="#when-to-use-gpu-acceleration">¶</a></h3><table>
 <thead>
@@ -15882,15 +16055,15 @@ all-pairs scan. This reduced single-box GPU time from <strong>29s to
 </tr>
 <tr>
 <td>Coagulation, many boxes</td>
-<td>Use GPU -- ~25x speedup</td>
+<td>Use GPU for the recorded multi-box cases on this machine</td>
 </tr>
 <tr>
 <td>Coagulation, single box, &lt;5k particles</td>
 <td>Either -- modest GPU advantage</td>
 </tr>
 <tr>
-<td>Coagulation, single box, &gt;10k particles</td>
-<td>GPU preferred for throughput</td>
+<td>Coagulation, single box, 10k--50k particles</td>
+<td>Caution band -- not a strong GPU recommendation in this machine-bounded capture</td>
 </tr>
 </tbody>
 </table>
