@@ -61,18 +61,19 @@
     the large-single-box caveat, and the existing explicit-transfer/Warp-
     optionality boundaries.
 
-- [ ] **E3-F3-P4:** Scope parallel-within-box follow-up if scaling evidence requires it
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Depends on: future evidence showing that the accepted-with-caveat boundary is
-    no longer sufficient.
-  - Goal: If measurements show the current design is not acceptable for Epic C,
-    create a bounded follow-up plan or issue without implementing optimization,
-    and update the roadmap/follow-up documentation so the final Epic C decision
-    is explicit for future implementers.
+- [x] **E3-F3-P4:** Scope parallel-within-box follow-up if scaling evidence requires it
+  - Issue: #1249 | Size: XS | Status: Shipped
+  - Depends on: confirming whether future evidence has shown the
+    accepted-with-caveat boundary is no longer sufficient.
+  - Goal: Close the follow-up decision for Epic C by recording whether the
+    shipped evidence requires a bounded future investigation, without
+    implementing optimization work.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `.opencode/plans/sections/features/E3-F3/open_questions.md`,
     `.opencode/plans/sections/features/E3-F3/change_log.md`
   - Tests: Documentation validation only; no production performance work.
-  - Deliverable: Update developer-facing roadmap guidance whether the outcome is
-    "accepted with boundaries" or "follow-up required," so the closeout phase
-    leaves explicit documentation behind.
+  - Delivered: The shipped P2/P3 evidence was re-read and still supports the
+    accepted-with-caveat Epic C decision, so P4 closed with no new
+    parallel-within-box follow-up track. The roadmap and `open_questions.md`
+    already stated that bounded outcome, so this phase updated the plan-state
+    record via `change_log.md` and `phase_details.md` only.
