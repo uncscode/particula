@@ -3,8 +3,7 @@
 ## Pass / Fail Criteria
 
 - [ ] One documented import surface is selected and locked by regression tests:
-  `particula.gpu.kernels` by default, or a narrowly approved
-  `particula.gpu` re-export limited to `condensation_step_gpu` and
+  `particula.gpu.kernels` for `condensation_step_gpu` and
   `coagulation_step_gpu`.
 - [ ] Supported direct imports succeed without launching kernels, and rejected
   raw/internal-symbol imports are guarded by explicit negative assertions when
@@ -26,7 +25,7 @@
 | Metric | Completion Signal | Evidence Source |
 | --- | --- | --- |
 | Import-path stability | Supported path resolves and unsupported path behavior is intentional | `particula/gpu/tests/kernel_exports_test.py` |
-| Public-surface narrowness | Any `particula.gpu.__all__` change is limited to the two step functions | Export assertions in `kernel_exports_test.py` |
+| Public-surface narrowness | `particula.gpu` stays non-reexporting and `particula.gpu.kernels.__all__` is limited to the two step functions | Export assertions in `kernel_exports_test.py` |
 | Runnable quick-start | Example executes on Warp CPU and exits cleanly when Warp is absent | `particula/gpu/tests/data_containers_example_test.py` or equivalent |
 | Transfer-boundary clarity | Example shows explicit transfer helpers for particle, gas, and any environment data | Reviewed docs/example diff plus smoke-test assertions |
 | Troubleshooting coverage | Device mismatch and optional CUDA guidance ship with the example/docs | `docs/Examples/` plus roadmap/foundation docs |

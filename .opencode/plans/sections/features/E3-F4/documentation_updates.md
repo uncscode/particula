@@ -21,8 +21,18 @@ low-level APIs with explicit transfer boundaries.
 
 ## Roadmap Documentation
 
-Update `docs/Features/Roadmap/data-oriented-gpu.md` to mark the E3-F4 direct-kernel
-quick-start as planned or complete once implementation lands.
+`docs/Features/Roadmap/data-oriented-gpu.md` now records the shipped import-path
+decision for phase `E3-F4-P1`: import direct step functions from
+`particula.gpu.kernels`, keep top-level `particula.gpu` focused on Warp
+availability and transfer helpers, and leave raw helper kernels out of the
+documented package-level surface.
+
+## Current Phase Status
+
+- Import-path decision documentation is shipped.
+- Focused export regression coverage is shipped.
+- Runnable quick-start and troubleshooting expansions remain for later `E3-F4`
+  phases.
 
 ## Troubleshooting Content
 

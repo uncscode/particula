@@ -4,32 +4,34 @@
 
 Size: S
 
-Depends on: E3-F1 finalizing caller-visible persisted `rng_states` guidance and
-maintainer direction that the direct quick-start path should come from
-`particula.gpu.kernels` unless narrowly expanded with explicit export tests.
+Depends on: maintainer direction that the direct quick-start path should come
+from `particula.gpu.kernels`, plus alignment with `E3-F1` for later
+quick-start guidance that mentions persisted `rng_states`.
 
-Decide whether the stable direct-kernel user path remains
-`particula.gpu.kernels` or whether the two step functions should also be
-re-exported from `particula.gpu`. Keep the decision narrow: direct low-level
-kernels only, no backend selector and no broad exposure of internal Warp launch
-functions. Add an initial regression test capturing the selected path.
+Shipped outcome: the stable direct-kernel user path is
+`particula.gpu.kernels`, the two step functions were not re-exported from
+`particula.gpu`, package-level kernel exports were narrowed to those two names,
+and focused regression coverage was added to capture the selected path. The
+decision stays narrow: direct low-level kernels only, no backend selector, and
+no broad exposure of internal Warp launch functions.
 
 Test coverage in this phase:
 
-- Add or extend `particula/gpu/tests/kernel_exports_test.py` to assert the
-  selected import path resolves without launching Warp kernels.
-- If top-level exports are chosen, assert `particula.gpu.__all__` exposes only
-  `condensation_step_gpu` and `coagulation_step_gpu` from this decision.
-- If `.kernels` remains the supported path, add a negative regression assertion
-  that undocumented top-level imports are absent so the public surface does not
-  drift silently.
+- `particula/gpu/tests/kernel_exports_test.py` asserts the selected import path
+  resolves without launching Warp kernels.
+- Negative regression assertions verify `particula.gpu` does not expose
+  `condensation_step_gpu` or `coagulation_step_gpu` and does not list them in
+  `__all__`.
+- Exact `__all__` assertions verify `particula.gpu.kernels` exposes only the
+  two supported step functions.
 
 Deliverables:
 
-- Documented import-path decision in the implementation PR and plan updates.
+- Documented import-path decision in implementation docs and plan updates.
 - Test coverage proving the selected import path resolves.
-- If top-level exports are chosen, update `particula/gpu/__init__.py` and
-  `__all__` for only `condensation_step_gpu` and `coagulation_step_gpu`.
+- `particula/gpu/kernels/__init__.py` narrowed to the two supported step
+  functions only, while `particula/gpu/__init__.py` remained unchanged for
+  kernel-step exports.
 
 ## E3-F4-P2: Add stable import/export tests for direct condensation and coagulation kernels
 
@@ -39,9 +41,9 @@ Depends on: E3-F4-P1 choosing the supported import surface so regression tests
 lock the exact public path and rejection boundaries before docs examples depend
 on them.
 
-Add dedicated tests, likely `particula/gpu/tests/kernel_exports_test.py`, or
-extend the existing top-level export tests. These tests should assert selected
-imports work when Warp is unavailable and avoid launching kernels unless needed.
+Extend the shipped `particula/gpu/tests/kernel_exports_test.py` only if later
+phases need broader import-surface coverage. Tests should continue to avoid
+kernel launches and remain CPU-only friendly.
 
 Test coverage in this phase:
 

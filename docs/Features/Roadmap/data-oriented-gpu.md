@@ -726,11 +726,18 @@ Planned features:
    parallel-within-box implementation claim.
 4. Direct GPU kernel step entry points are supported from
    `particula.gpu.kernels`:
-   `from particula.gpu.kernels import condensation_step_gpu,`
-   `coagulation_step_gpu`. Keep top-level `particula.gpu` focused on Warp
-   availability, transfer helpers, and context helpers rather than direct
-   kernel-step imports, and keep raw internal helper kernels out of the
-   documented package-level public surface.
+
+   ```python
+   from particula.gpu.kernels import (
+       coagulation_step_gpu,
+       condensation_step_gpu,
+   )
+   ```
+
+   Keep top-level `particula.gpu` focused on Warp availability, transfer
+   helpers, and context helpers rather than direct kernel-step imports. Raw
+   helper kernels remain intentionally outside the documented package-level
+   public surface.
 5. Formalize device-aware pytest execution as project policy (a pytest
    flag/config plus marker): parity tests always run on Warp CPU and add
    CUDA automatically when a device is present; document that CUDA-device

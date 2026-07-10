@@ -263,6 +263,8 @@ restored = from_warp_environment_data(gpu_environment)
 
 - `particula.gpu` now exports `WarpEnvironmentData`,
   `to_warp_environment_data`, and `from_warp_environment_data`.
+- Import direct GPU step entry points from `particula.gpu.kernels`, not from
+  top-level `particula.gpu`.
 - Environment transfers are explicit helper calls; kernels and runnables do
   not perform hidden CPU↔GPU synchronization for environment state.
 - `condensation_step_gpu(..., environment=...)` and

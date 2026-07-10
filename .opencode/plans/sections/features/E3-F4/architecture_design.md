@@ -2,18 +2,18 @@
 
 ## Public API Shape
 
-The low-level direct-kernel API should remain explicit and module-scoped. The
-recommended stable import path is:
+The low-level direct-kernel API remains explicit and module-scoped. The shipped
+stable import path is:
 
 ```python
 from particula.gpu.kernels import condensation_step_gpu, coagulation_step_gpu
 ```
 
-Do not add broad top-level `particula.gpu` exports for this quick-start. A later
-separate API decision may choose narrow re-exports, but the plan direction here
-is to use `particula.gpu.kernels` for direct step-function imports and keep raw
-Warp launch functions such as `apply_*_kernel` or `*_mass_transfer_kernel` out
-of broad user-facing exports. Do not expose high-level backend selection or
+`particula.gpu` intentionally stays non-reexporting for these step functions.
+`particula.gpu.kernels.__all__` is narrowed to exactly
+`coagulation_step_gpu` and `condensation_step_gpu`, while raw Warp launch
+functions such as `apply_*_kernel` or `*_mass_transfer_kernel` stay available
+only from their concrete modules. Do not expose high-level backend selection or
 imply automatic transfers.
 
 ## Transfer Boundary Design
