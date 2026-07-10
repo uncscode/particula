@@ -17,9 +17,17 @@ Status: reviewed and updated on 2026-07-10.
   NPF/droplet helper and focused regression coverage confirms condensation did
   not inherit that fixture.
 - The shipped timing note now makes the current caution boundary explicit:
-  single-box runtimes continue to climb across `1x500` through `1x50k`, while
-  equivalent or larger total-particle multi-box cases scale much better across
-  independent boxes.
+  treat the recorded `1x10k` to `1x50k` range as the measured large single-box
+  caution band for the current one-thread-per-box path, while smaller
+  `1x500` to `1x5k` runs are only a modest-throughput regime rather than a
+  strong GPU win.
+- The delivered roadmap decision record also names the measured many-box
+  effective region explicitly: `10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`,
+  `100x1k`, and `10x10k` remain the evidence-backed independent-box cases.
+- The notebook-backed theory/example text is now aligned to the same controlled
+  artifact path and machine-bounded wording, so roadmap and example guidance no
+  longer diverge on where the benchmark evidence lives or how broadly it should
+  be interpreted.
 - If a follow-up is needed, start with a staged design investigation. Compare
   pair-selection parallelism, collision-application parallelism, and graph
   capture before committing to a kernel rewrite.

@@ -31,3 +31,14 @@
   persistent RNG-state reuse.
 - Recorded that `docs/Features/Roadmap/data-oriented-gpu.md` now carries the
   compact shipped benchmark-evidence note and artifact path.
+
+## 2026-07-10 — Issue #1247
+
+- Updated E3-F3 plan sections to reflect shipped E3-F3-P2 documentation work.
+- Recorded the measured single-box caution band (`1x10k` to `1x50k`) and the
+  measured many-box effective region
+  (`10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`, `100x1k`, `10x10k`) as the
+  current decision record for the one-thread-per-box coagulation path.
+- Recorded that the notebook-backed theory/example source text was aligned to
+  the controlled benchmark artifact path and machine-bounded interpretation used
+  in the roadmap.

@@ -25,15 +25,23 @@
     records the 2026-07-10 UTC benchmark command, hardware context, artifact
     path, and timing summary.
 
-- [ ] **E3-F3-P2:** Record measured one-thread-per-box scaling limit and decision evidence
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F3-P2:** Record measured one-thread-per-box scaling limit and decision evidence
+  - Issue: #1247 | Size: S | Status: Shipped
   - Depends on: E3-F3-P1 benchmark matrix and captured environment notes.
   - Goal: Convert benchmark results into a clear measured limit for large
     single-box and many-box coagulation workloads.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Theory/nvidia-warp/examples/gpu_benchmarks.py`
-  - Tests: Validate documentation examples or metadata helpers touched by the
-    result recording; keep CUDA-dependent benchmark execution optional.
+  - Tests: Read back the roadmap decision-record subsection and aligned
+    notebook-backed example text; no benchmark rerun or kernel changes were
+    required for this documentation-only issue.
+  - Delivered: The roadmap evidence block now names the measured single-box
+    caution band for the current one-thread-per-box path (`1x10k` to `1x50k`)
+    and separately names the measured many-box effective region
+    (`10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`, `100x1k`, `10x10k`). The
+    notebook-backed theory/example text was aligned to the controlled artifact
+    path `.artifacts/benchmarks/gpu_benchmark_results.json` and to the same
+    machine-bounded recommendation wording.
 
 - [ ] **E3-F3-P3:** Document accepted GPU coagulation usage boundaries for Epic C
   - Issue: TBD | Size: S | Status: Not Started

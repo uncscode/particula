@@ -3,19 +3,22 @@
 ## Required Updates
 
 - `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Added a shipped coagulation benchmark evidence block under
-    `### Performance and Memory` with the exact pytest command, benchmark date,
-    CUDA/Warp/device context, artifact path, and compact single-box vs
-    multi-box timing summary.
-  - Explicitly notes that the coagulation benchmark path now uses a dedicated
-    deterministic mixed NPF/droplet fixture aligned with the shipped E3-F2
-    baseline, while condensation benchmarks keep the generic helper.
-  - Keeps the interpretation bounded to current evidence for the existing
-    one-thread-per-box design rather than claiming the final long-term scaling
-    decision is complete.
+  - The shipped benchmark evidence now reads as a measured decision record,
+    preserving the exact pytest command, benchmark date, CUDA/Warp/device
+    context, controlled artifact path, and representative timing values.
+  - The interpretation now explicitly separates the recorded large single-box
+    caution band (`1x10k` to `1x50k`) from the measured many-box effective
+    region (`10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`, `100x1k`, `10x10k`).
+  - The wording stays machine-bounded to the recorded 2026-07-10 capture for
+    the current one-thread-per-box design rather than presenting a universal GPU
+    cutoff.
 
-- Reference E3-F2 mixed-scale evidence when interpreting the refreshed
-  coagulation benchmark fixture and timing note.
+- `docs/Theory/nvidia-warp/examples/gpu_benchmarks.py`
+  - Aligned the notebook-backed source text to the controlled artifact path
+    `.artifacts/benchmarks/gpu_benchmark_results.json`.
+  - Updated the theory/example observations and recommendation wording to match
+    the roadmap's measured single-box caution band, many-box effective region,
+    and machine-bounded caveat.
 
 ## Optional Updates
 
