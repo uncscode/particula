@@ -1196,6 +1196,178 @@ def test_coagulation_scaling_records_cpu_and_gpu_paths(
     assert "cpu_time_s" not in gpu_only_entry
 
 
+@pytest.mark.parametrize(
+    "n_boxes,n_particles,n_species",
+    [(1, 4, 1), (10, 500, 2)],
+)
+def test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture(
+    benchmark_module,
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+) -> None:
+    """Coagulation fixture helper builds deterministic mixed-scale data."""
+    first = benchmark_module._make_coagulation_particle_data(
+        n_boxes,
+        n_particles,
+        n_species,
+    )
+    second = benchmark_module._make_coagulation_particle_data(
+        n_boxes,
+        n_particles,
+        n_species,
+    )
+
+    assert first.masses.shape == (n_boxes, n_particles, n_species)
+    assert first.concentration.shape == (n_boxes, n_particles)
+    assert first.charge.shape == (n_boxes, n_particles)
+    assert first.density.shape == (n_species,)
+    assert first.volume.shape == (n_boxes,)
+    assert np.all(first.concentration > 0.0)
+
+    radii = first.radii
+    assert radii.shape == (n_boxes, n_particles)
+    assert np.min(radii) < 1.0e-8
+    assert np.max(radii) > 1.0e-6
+    assert np.max(radii) / np.min(radii) > 1.0e3
+
+    npt.assert_allclose(first.masses, second.masses)
+    npt.assert_allclose(first.concentration, second.concentration)
+    npt.assert_allclose(first.radii, second.radii)
+
+
+def test_coagulation_scaling_uses_coagulation_only_helper(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Coagulation uses its dedicated helper while condensation keeps generic setup."""
+    monkeypatch.setattr(benchmark_module, "_skip_if_no_cuda", lambda: None)
+    monkeypatch.setattr(
+        benchmark_module,
+        "_preflight_condensation_case_allocations",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_preflight_coagulation_case_allocations",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_validate_benchmark_budget",
+        lambda *args, **kwargs: None,
+    )
+
+    generic_calls: list[tuple[int, int, int]] = []
+    coag_calls: list[tuple[int, int, int]] = []
+
+    generic_particles = benchmark_module._make_particle_data(1, 2, 1)
+    coag_particles = benchmark_module._make_coagulation_particle_data(1, 2, 1)
+
+    def _record_generic_call(
+        n_boxes: int, n_particles: int, n_species: int
+    ) -> object:
+        generic_calls.append((n_boxes, n_particles, n_species))
+        return generic_particles
+
+    def _record_coag_call(
+        n_boxes: int, n_particles: int, n_species: int
+    ) -> object:
+        coag_calls.append((n_boxes, n_particles, n_species))
+        return coag_particles
+
+    monkeypatch.setattr(
+        benchmark_module,
+        "_make_particle_data",
+        _record_generic_call,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_make_coagulation_particle_data",
+        _record_coag_call,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_make_gas_data",
+        lambda n_boxes, n_species: object(),
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_make_vapor_pressure",
+        lambda n_boxes, n_species: np.ones(
+            (n_boxes, n_species), dtype=np.float64
+        ),
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "to_warp_particle_data",
+        lambda particles, device: particles,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "to_warp_gas_data",
+        lambda gas, device, vapor_pressure: gas,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_wp_zeros_with_guard",
+        lambda shape, **kwargs: np.zeros(shape, dtype=np.float64),
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "wp",
+        types.SimpleNamespace(
+            float64=np.float64,
+            int32=np.int32,
+            uint32=np.uint32,
+            array=lambda values, **kwargs: values,
+        ),
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "condensation_step_gpu",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "coagulation_step_gpu",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        benchmark_module,
+        "_seed_coagulation_rng_states_once",
+        lambda **kwargs: None,
+    )
+
+    @contextmanager
+    def _profile(_tag: str):
+        yield
+
+    monkeypatch.setattr(benchmark_module, "_warp_profiled", _profile)
+    monkeypatch.setattr(
+        benchmark_module,
+        "_time_gpu_loop",
+        lambda step_fn, steps, warmup: (step_fn() or 0.25),
+    )
+    monkeypatch.setattr(benchmark_module, "_save_results", lambda: None)
+    monkeypatch.setattr(benchmark_module, "_print_timing", lambda *args: None)
+    monkeypatch.setattr(
+        benchmark_module,
+        "_benchmark_results",
+        {"started_at": "2026-01-01T00:00:00+00:00", "benchmarks": {}},
+    )
+
+    benchmark_module.test_condensation_scaling("cond", 1, 2, 1, False)
+
+    assert generic_calls == [(1, 2, 1)]
+    assert coag_calls == []
+
+    benchmark_module.test_coagulation_scaling("coag", 1, 2, 1, False)
+
+    assert generic_calls == [(1, 2, 1)]
+    assert coag_calls == [(1, 2, 1)]
+
+
 def test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,

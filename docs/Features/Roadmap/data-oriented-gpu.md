@@ -1194,6 +1194,26 @@ resampling or volume-scaling policy before slot exhaustion.
 - Include benchmark cases that vary boxes, particles per box, species count,
   active-slot fraction, and process combinations.
 
+#### Shipped coagulation benchmark evidence (2026-07-10 UTC)
+
+- Command: `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s`
+- Hardware/context: Warp 1.15.0 on `cuda:0` (`NVIDIA GeForce RTX 5060`, 8 GiB;
+  CUDA Toolkit 12.9, Driver 13.2)
+- Artifact output: `.artifacts/benchmarks/gpu_benchmark_results.json`
+- Mixed-scale fixture note: the coagulation benchmark path now uses a dedicated
+  deterministic mixed NPF/droplet fixture aligned with the shipped E3-F2
+  baseline, while condensation benchmarks keep the generic helper.
+- Timing summary: single-box coagulation remains the limiting case for the
+  one-thread-per-box kernel (`1x500` GPU `0.0359s`, `1x2k` `0.1365s`, `1x5k`
+  `0.3393s`, `1x10k` `0.6813s`, `1x20k` `1.3752s`, `1x50k` `3.4163s`), while
+  equivalent or larger total-particle multi-box runs scale much better across
+  independent boxes (`10x500` `0.0358s`, `10x1k` `0.0699s`, `50x1k` `0.0720s`,
+  `10x5k` `0.3456s`, `50x5k` `0.3547s`, `100x1k` `0.0773s`, `10x10k`
+  `0.6963s`).
+- Interpretation boundary: record this as current benchmark evidence for the
+  existing one-thread-per-box design, not as a final acceptance decision on the
+  long-term scaling strategy.
+
 ## Epic I: Differentiability and Global Optimization
 
 A longer-term goal is gradient-based global optimization: using Warp automatic
