@@ -9,7 +9,11 @@ import {
   setDollarText,
   setSpawnResponse,
 } from "./helpers/mock-subprocess";
-import { loadToolExecute, resetCapturedToolDefinition } from "./helpers/tool_harness";
+import {
+  getCapturedToolDefinition,
+  loadToolExecute,
+  resetCapturedToolDefinition,
+} from "./helpers/tool_harness";
 
 describe("git_commit wrapper", () => {
   beforeEach(() => {
@@ -26,6 +30,15 @@ describe("git_commit wrapper", () => {
     const execute = await loadToolExecute("../../git_commit.ts");
     const result = await execute({ summary: "   " });
     assertContains(String(result), "requires non-empty 'summary'");
+  });
+
+  it("documents the narrow wrapper boundary distinctly from native protected git", async () => {
+    await loadToolExecute("../../git_commit.ts");
+
+    const description = getCapturedToolDefinition().description ?? "";
+    expect(description).toContain("narrow OpenCode adw git commit path");
+    expect(description).toContain("distinct from the native TUI/runtime protected-git");
+    expect(description).toContain("does not imply arbitrary git verbs, shell execution, auto-push, or");
   });
 
   it("validates max_retries", async () => {

@@ -190,7 +190,7 @@ export function buildTruncationWarning(
   options?: { approximateTotal?: boolean },
 ): string {
   const qualifier = options?.approximateTotal ? `at least ${total}` : `${total}`;
-  return `[WARNING: Results truncated to ${limit} ${unit} (${qualifier} total found). Use maxResults parameter to increase limit.]`;
+  return `[WARNING: Results truncated to ${limit} ${unit} (${qualifier} total found). Use options: "max-results=<n>" to increase limit.]`;
 }
 
 export async function executeRipgrepSearch(params: SearchParams): Promise<SearchResult> {

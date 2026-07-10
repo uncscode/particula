@@ -111,9 +111,9 @@ Expected machine-readable payload fields:
   "ship_strategy": "accumulate",
   "created_issue_numbers": [2001, 2002, 2003],
   "dependency_map": {
-    "1": [],
-    "2": ["1"],
-    "3": ["2"]
+    "2001": [],
+    "2002": ["2001"],
+    "2003": ["2002"]
   },
   "execution_order": [2001, 2002, 2003]
 }
@@ -142,6 +142,24 @@ If both sources exist, compare at minimum:
 - `created_issue_numbers`
 
 If they disagree, stop with `FORGE_AUTO_MANIFEST_FAILED`. Do not guess.
+
+# Manifest Dependency Contract
+
+Auto-mode manifest dependencies must be GitHub issue numbers only, and every
+dependency endpoint must be included in the manifest issue list.
+
+Before invoking `adw-auto-mode-manifest`, normalize dependency metadata:
+
+- Batch index tokens like `"1"` or `"2"` may be converted to their generated
+  GitHub issue numbers.
+- Created issue numbers may be used directly.
+- Plan IDs, phase IDs, feature IDs, epic IDs, or symbolic identifiers such as
+  `E2-F1`, `E2-F8-P1`, `P1`, or `phase_1` must not be passed to manifest init.
+- External plan dependencies must not be passed unless that external issue is
+  also part of the manifest issue list.
+- If a dependency token cannot be resolved to one of the created issue numbers,
+  drop it from the manifest dependency map and report it as an external
+  prerequisite in the final summary.
 
 # Supported Targets
 
@@ -274,6 +292,16 @@ If both message and parsed sources exist, compare the fields listed in the
 meta-check rule above. If they disagree on any field, stop with
 `FORGE_AUTO_MANIFEST_FAILED: message and parsed metadata disagree`.
 
+Normalize dependencies before manifest build:
+
+- Resolve batch-index dependencies to created GitHub issue numbers.
+- Keep only dependencies where both source and target are created issues in the
+  current batch.
+- Do not pass unresolved symbolic plan dependencies to the manifest subagent.
+- Do not pass external issue dependencies to the manifest subagent.
+- Include dropped external/symbolic dependencies in the final report as
+  `External prerequisites`, not as manifest dependencies.
+
 Fail closed if:
 - plan type is `epic` (rejected)
 - plan type is ambiguous or unrecognized
@@ -322,9 +350,12 @@ Invoke the `adw-auto-mode-manifest` subagent to initialize and validate:
 task({
   "description": "Build auto-mode manifest",
   "prompt": (
-    "Build auto-mode manifest from the completed batch and deterministic "
-    "bootstrap metadata.\n\n"
+    "Build auto-mode manifest from explicit normalized inputs. Do not use "
+    "raw batch dependency tokens if they include symbolic plan IDs or "
+    "external prerequisites.\n\n"
     "Arguments: adw_id=<adw_id> "
+    "--issues <created_issue_numbers comma-separated> "
+    "--depends <child:parent pairs where both are created issue numbers> "
     "--source-branch accumulate/<plan-id> "
     "--target-branch main "
     "--branch-type <feature|maintenance> "
@@ -337,12 +368,13 @@ task({
 Require `MANIFEST_BUILD_COMPLETE`. Halt on `MANIFEST_BUILD_FAILED`.
 
 Dependency contract note:
-- Bootstrap accepts dependency tokens in three forms and resolves deterministically:
-  issue number token -> batch index token -> identifier token (`phase_id`/`plan_id`/`id`).
-- Ambiguous identifier tokens fail closed.
-- Duplicate issue-number diagnostics identify both colliding batch indices and the value.
-- Oversized batches and long unresolved-dependency aggregates fail closed with bounded,
-  deterministic messages.
+
+- Raw batch dependencies may contain batch indices, issue numbers, or symbolic
+  plan identifiers.
+- Manifest dependencies must be normalized to issue-number pairs before init.
+- Only created implementation issues in this manifest may be dependency endpoints.
+- Symbolic plan identifiers and external prerequisites are reporting context,
+  not manifest dependencies.
 
 ## Step 8: Apply Labels
 
@@ -350,7 +382,7 @@ After manifest validation succeeds, add `auto:enabled` to each created
 implementation issue:
 
 ```python
-platform_operations({
+platform_label_write({
   "command": "add-labels",
   "issue_number": "<created_issue_number>",
   "labels": "auto:enabled"
@@ -373,6 +405,8 @@ Source branch: accumulate/<plan-id>
 Target branch: main
 Ship strategy: accumulate
 Created issues: #2001, #2002, #2003
+External prerequisites: <none|E2-F1 dropped from manifest dependencies>
+Manifest dependencies: #2002 -> #2001, #2003 -> #2002
 Manifest: initialized and validated
 Labels applied: auto:enabled (N/N successful)
 ```
@@ -406,6 +440,8 @@ Source branch: accumulate/E17-F2
 Target branch: main
 Ship strategy: accumulate
 Created issues: #2001, #2002, #2003
+External prerequisites: none
+Manifest dependencies: #2002 -> #2001, #2003 -> #2002
 Manifest: initialized and validated
 Labels applied: auto:enabled (3/3 successful)
 ```

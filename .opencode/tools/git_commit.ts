@@ -244,7 +244,7 @@ const buildCommitError = (error: any, worktreePath?: string): string => {
 };
 
 export default tool({
-  description: `Execute adw git commit with deterministic validation and diagnostics.
+  description: `Execute the narrow OpenCode adw git commit path with deterministic validation and diagnostics.
 
 SIMPLE EXAMPLES (copy these patterns):
 
@@ -258,6 +258,10 @@ RULES:
 - summary is required and must be non-empty after trim.
 - no_verify must be boolean when provided.
 - max_retries must be an integer between 0 and 10 (default 3).
+- This wrapper is distinct from the native TUI/runtime protected-git
+  confirmation flow and covers only the narrow OpenCode commit path.
+- It does not imply arbitrary git verbs, shell execution, auto-push, or
+  background git behavior.
 - Uses deterministic error envelope compatible with git commit wrapper parsing.`,
 
   args: {

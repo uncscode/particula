@@ -207,7 +207,7 @@ const normalizeFiles = (
 };
 
 export default tool({
-  description: `Atomic git staging wrapper for add/restore flows.
+  description: `OpenCode git staging wrapper for narrow adw add/restore flows.
 
 SIMPLE EXAMPLES (copy these patterns):
 
@@ -221,6 +221,9 @@ RULES:
 - Supports only staging commands: add, restore.
 - add requires exactly one target mode: stage_all OR files.
 - restore requires files and/or staged: true.
+- This wrapper is the narrow OpenCode path for adw git staging only.
+- Native TUI/runtime protected-git confirmation is a separate flow; this wrapper
+  does not broaden into arbitrary git verbs, shell execution, or background git.
 - worktree_path values starting with '-' are rejected.
 - Set help: true to view command help.`,
 

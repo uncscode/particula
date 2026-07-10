@@ -11,6 +11,22 @@ const loadHelper = async () => {
 };
 
 describe("ripgrep_shared helper", () => {
+  it("normalizes numeric params and validates non-negative integers", async () => {
+    const { normalizeNumericParam, validateNonNegativeInt } = await loadHelper();
+
+    expect(normalizeNumericParam(undefined)).toBeUndefined();
+    expect(normalizeNumericParam(0)).toBeUndefined();
+    expect(normalizeNumericParam(3)).toBe(3);
+    expect(normalizeNumericParam(1.5)).toBeUndefined();
+
+    expect(validateNonNegativeInt(undefined, "maxResults")).toBeUndefined();
+    expect(validateNonNegativeInt("0", "maxResults")).toBeUndefined();
+    expect(validateNonNegativeInt("7", "maxResults")).toBeUndefined();
+    expect(validateNonNegativeInt("-1", "maxResults")).toBe(
+      "ERROR: Invalid maxResults value. It must be a non-negative integer.",
+    );
+  });
+
   it("classifies file and directory targets", async () => {
     const { resolveValidatedSearchPath } = await loadHelper();
     const cwd = path.resolve(import.meta.dir, "../..");
@@ -51,5 +67,16 @@ describe("ripgrep_shared helper", () => {
       fs.promises.stat = originalStat;
       fs.promises.realpath = originalRealpath;
     }
+  });
+
+  it("formats truncation warnings with exact and approximate totals", async () => {
+    const { buildTruncationWarning } = await loadHelper();
+
+    expect(buildTruncationWarning(2, 3, "files")).toBe(
+      '[WARNING: Results truncated to 2 files (3 total found). Use options: "max-results=<n>" to increase limit.]',
+    );
+    expect(buildTruncationWarning(10, 12, "lines", { approximateTotal: true })).toBe(
+      '[WARNING: Results truncated to 10 lines (at least 12 total found). Use options: "max-results=<n>" to increase limit.]',
+    );
   });
 });
