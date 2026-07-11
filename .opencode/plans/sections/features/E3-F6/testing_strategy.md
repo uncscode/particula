@@ -2,20 +2,18 @@
 
 ### Phase-Level Validation
 
-- **P1:** Add a runnable-example smoke test in
+- **P1 shipped:**
   `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
-  or extend an adjacent condensation example test module if one already exists.
-  That test should execute the published example entrypoint, assert it exits
-  cleanly, and verify the reported latent-heat energy diagnostic is finite and
-  non-zero for the chosen condensation setup.
-- **P2:** If a notebook is paired, run Jupytext sync validation and execute the
-  notebook. Check `docs/Examples/Dynamics/index.md` resolves to the paired
-  example path, and keep any example-specific assertions in the same smoke-test
-  module rather than a later follow-up phase.
-- **P3:** Repeat final script/notebook validation and inspect docs for CPU-only
-  language, absence of GPU parity claims, and stable public builder/factory
-  imports. If the example uncovers a production API gap, ship the matching
-  regression in the same PR under the existing condensation test modules.
+  now covers the published example path with smoke and invariant assertions.
+  Validation is centered on running the example as `__main__`, checking the
+  helper payload, and confirming finite bookkeeping diagnostics for the chosen
+  CPU condensation setup.
+- **P2 deferred:** No notebook was paired and no Dynamics index entry was added
+  in issue #1263, so notebook sync/execution and discoverability-link
+  validation were intentionally not part of the shipped work.
+- **P3 shipped for the `.py` artifact only:** final validation scope was the
+  runnable example source and its focused tests, plus review for CPU-only
+  language and absence of GPU parity claims.
 
 ### Commands
 
@@ -23,11 +21,11 @@
 python docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
 ruff check docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py --fix
 ruff format docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
-python3 .opencode/tools/validate_notebook.py docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb --sync
-python3 .opencode/tools/run_notebook.py docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb
+pytest particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py -q -Werror
 ```
 
-Run notebook commands only when the paired `.ipynb` exists.
+Notebook commands remain deferred because no paired `.ipynb` shipped in this
+issue.
 
 ### Regression Tests if Production Code Changes
 
@@ -57,6 +55,8 @@ Prefer the following split when choosing test locations:
 
 - The example must demonstrate energy from actual mass transfer, not only show
   construction of a latent heat vapor property.
+- The shipped test module should cover both entrypoint execution and helper
+  invariants so the docs example stays runnable and reviewable.
 - A zero-energy result is acceptable only if explicitly explained by a no-transfer
   setup; the preferred example should choose conditions that produce a visible
   non-zero diagnostic.

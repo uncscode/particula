@@ -3,16 +3,14 @@
 ### New Documentation
 
 - `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py` with
-  markdown cells and runnable code.
-- Optional paired notebook:
-  `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb`.
+  runnable CPU-only code and printed latent-heat bookkeeping diagnostics.
 
 ### Updated Documentation
 
-- `docs/Examples/Dynamics/index.md` to link the new condensation latent-heat
-  example.
-- Optional targeted link in `docs/Features/condensation_strategy_system.md` from
-  the latent-heat section to the full runnable example.
+- No docs index wiring or feature-doc cross-link shipped with issue #1263.
+- User-facing validation coverage was added in
+  `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
+  to keep the published example executable.
 
 ### Required Wording
 
@@ -26,5 +24,6 @@
 ### Documentation Validation
 
 - Lint and execute the `.py` source.
-- Sync and execute the notebook if paired.
-- Validate changed markdown links where practical.
+- Run the focused example test module.
+- Notebook sync/execution and markdown-link validation were not applicable to
+  the shipped change because no notebook or index wiring was added.
