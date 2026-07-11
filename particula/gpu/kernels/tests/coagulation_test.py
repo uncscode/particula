@@ -97,10 +97,10 @@ if wp is not None:
         warp_devices,
     )
 
-# pyright: reportGeneralTypeIssues=false
-# pyright: reportOperatorIssue=false
-# pyright: reportArgumentType=false
-# pyright: reportAssignmentType=false
+    # pyright: reportGeneralTypeIssues=false
+    # pyright: reportOperatorIssue=false
+    # pyright: reportArgumentType=false
+    # pyright: reportAssignmentType=false
     from particula.particles.particle_data import ParticleData  # noqa: E402
     from particula.util import constants  # noqa: E402
 
@@ -117,6 +117,7 @@ def _available_warp_devices() -> list[str]:
     if wp is None:
         return ["cpu"]
     return warp_devices(wp)
+
 
 _INT32_MAX = np.iinfo(np.int32).max
 
