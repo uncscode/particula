@@ -15,7 +15,8 @@ modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.
 - [Condensation: Latent Heat Bookkeeping](Condensation/Condensation_Latent_Heat.ipynb)
   – Published CPU-only latent-heat bookkeeping walkthrough using
   `MassCondensation` with public factory/builder APIs. The reported
-  energy is diagnostic only and does not feed back into temperature.
+  energy density is diagnostic only and does not feed back into
+  temperature.
 - [Staggered Condensation](Condensation/Staggered_Condensation_Example.ipynb) – Demonstrates staggered ODE stepping for improved stability and mass conservation.
 
 ## Coagulation

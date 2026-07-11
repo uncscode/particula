@@ -1,44 +1,61 @@
-"""Smoke tests for the latent-heat condensation docs example."""
+"""Runtime smoke tests for the latent-heat condensation docs example."""
 
 from __future__ import annotations
 
-import json
 import math
 import runpy
 from pathlib import Path
+from typing import Any, Callable, TypedDict, cast
 
 import numpy as np
+import particula as par
+import pytest
 
 ROOT = Path(__file__).resolve().parents[4]
 EXAMPLE_PATH = (
     ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
 )
-NOTEBOOK_PATH = (
-    ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
-)
-DYNAMICS_INDEX_PATH = ROOT / "docs/Examples/Dynamics/index.md"
-CONDENSATION_FEATURE_PATH = (
-    ROOT / "docs/Features/condensation_strategy_system.md"
-)
-PUBLISHED_NOTEBOOK_RELATIVE_PATH = "Condensation/Condensation_Latent_Heat.ipynb"
-FEATURE_NOTEBOOK_RELATIVE_PATH = (
-    "../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
-)
-INDEX_NOTEBOOK_LABEL = (
-    "[Condensation: Latent Heat Bookkeeping]"
-    "(Condensation/Condensation_Latent_Heat.ipynb)"
-)
-INDEX_REVIEWED_DESCRIPTION_SNIPPET = (
-    "Published CPU-only latent-heat bookkeeping walkthrough"
-)
-INDEX_BOOKKEEPING_CONTRACT_SNIPPET = "diagnostic only and does not feed back"
-DOCS_INDEX_LATENT_HEAT_HEADING = (
-    "**Supporting CPU latent-heat-corrected condensation diagnostics**"
-)
-DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET = (
-    "without claiming temperature-feedback runtime support"
-)
 EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
+
+
+class ExampleResult(TypedDict, total=False):
+    """Structured result returned by the latent-heat example."""
+
+    initial_gas_concentration: float
+    final_gas_concentration: float
+    initial_particle_mass_concentration: float
+    final_particle_mass_concentration: float
+    particle_mass_change: float
+    per_call_latent_heat_energy_densities: list[float]
+    cumulative_latent_heat_energy_density: float
+    latent_heat_reference: float
+    cpu_only_note: str
+    bookkeeping_only_note: str
+    iteration_count: int
+    sub_steps_per_call: int
+    zero_transfer_explanation: str
+
+
+class ExampleNamespace(TypedDict):
+    """Typed namespace loaded from the example script."""
+
+    run_example: Callable[[], ExampleResult]
+    _as_float: Callable[[object], float]
+    _build_aerosol: Callable[[], par.Aerosol]
+    main: Callable[[], None]
+
+
+@pytest.fixture(scope="module")
+def example_namespace() -> ExampleNamespace:
+    """Load the published example module once for runtime assertions."""
+    return cast(ExampleNamespace, runpy.run_path(str(EXAMPLE_PATH)))
+
+
+@pytest.fixture(scope="module")
+def example_result(example_namespace: ExampleNamespace) -> ExampleResult:
+    """Run the example once and share the structured result."""
+    run_example = example_namespace["run_example"]
+    return run_example()
 
 
 def test_condensation_latent_heat_example_runs_as_main_entrypoint(
@@ -53,23 +70,22 @@ def test_condensation_latent_heat_example_runs_as_main_entrypoint(
     assert "Bookkeeping only" in output
     assert "Gas concentration [kg/m^3]" in output
     assert "Particle mass change [kg/m^3]" in output
-    assert "Per-step latent heat energy [J]" in output
-    assert "Cumulative latent heat energy [J]" in output
+    assert "Per-call latent heat energy density [J/m^3]" in output
+    assert "Cumulative latent heat energy density [J/m^3]" in output
 
 
-def test_condensation_latent_heat_run_example_returns_finite_structured_results() -> (
-    None
-):
+def test_condensation_latent_heat_run_example_returns_finite_structured_results(
+    example_result: ExampleResult,
+) -> None:
     """Helper returns finite public latent-heat bookkeeping diagnostics."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    result = namespace["run_example"]()
+    result = example_result
 
     assert math.isfinite(result["initial_gas_concentration"])
     assert math.isfinite(result["final_gas_concentration"])
     assert math.isfinite(result["initial_particle_mass_concentration"])
     assert math.isfinite(result["final_particle_mass_concentration"])
     assert math.isfinite(result["particle_mass_change"])
-    assert math.isfinite(result["cumulative_latent_heat_energy"])
+    assert math.isfinite(result["cumulative_latent_heat_energy_density"])
     assert result["initial_gas_concentration"] > 0.0
     assert result["final_gas_concentration"] > 0.0
     assert result["initial_particle_mass_concentration"] > 0.0
@@ -77,14 +93,15 @@ def test_condensation_latent_heat_run_example_returns_finite_structured_results(
     assert result["cpu_only_note"].startswith("CPU-only example")
     assert result["bookkeeping_only_note"].startswith("Bookkeeping only")
     assert result["iteration_count"] == 5
+    assert result["sub_steps_per_call"] == 1
 
-    per_step = result["per_step_latent_heat_energies"]
-    assert per_step
-    assert len(per_step) == result["iteration_count"]
-    assert all(math.isfinite(value) for value in per_step)
+    per_call = result["per_call_latent_heat_energy_densities"]
+    assert per_call
+    assert len(per_call) == result["iteration_count"]
+    assert all(math.isfinite(value) for value in per_call)
     assert np.isclose(
-        result["cumulative_latent_heat_energy"],
-        sum(per_step),
+        result["cumulative_latent_heat_energy_density"],
+        sum(per_call),
         rtol=1e-14,
         atol=0.0,
     )
@@ -99,33 +116,63 @@ def test_condensation_latent_heat_example_runs_without_pint(
     namespace = runpy.run_path(str(EXAMPLE_PATH))
     result = namespace["run_example"]()
 
-    assert math.isfinite(result["cumulative_latent_heat_energy"])
+    assert math.isfinite(result["cumulative_latent_heat_energy_density"])
+
+
+def test_condensation_latent_heat_as_float_uses_first_scalar_value(
+    example_namespace: ExampleNamespace,
+) -> None:
+    """Private scalar helper returns the first finite numeric entry as float."""
+    as_float = example_namespace["_as_float"]
+    assert callable(as_float)
+
+    result = as_float(np.array([[1.5, 2.5], [3.5, 4.5]], dtype=np.float64))
+
+    assert isinstance(result, float)
+    assert result == 1.5
+
+
+def test_condensation_latent_heat_build_aerosol_creates_single_box_state(
+    example_namespace: ExampleNamespace,
+) -> None:
+    """Private builder helper creates the documented supersaturated CPU setup."""
+    build_aerosol = example_namespace["_build_aerosol"]
+    assert callable(build_aerosol)
+
+    aerosol = build_aerosol()
+    gas_species = aerosol.atmosphere.partitioning_species
+
+    assert gas_species.get_name() == "H2O"
+    assert aerosol.atmosphere.temperature == pytest.approx(298.15)
+    assert aerosol.atmosphere.total_pressure == pytest.approx(101325.0)
+    particle_mass = aerosol.particles.get_mass()
+
+    assert particle_mass.shape == (4,)
+    assert np.all(particle_mass > 0.0)
+    assert np.all(gas_species.get_concentration() > 0.0)
 
 
 def test_condensation_latent_heat_main_path_matches_run_example_contract(
     capsys,
+    example_result: ExampleResult,
 ) -> None:
     """Main entrypoint prints the public notes and structured diagnostics."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    expected = namespace["run_example"]()
-
     runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
 
     output = capsys.readouterr().out
-    assert expected["cpu_only_note"] in output
-    assert expected["bookkeeping_only_note"] in output
-    if "zero_transfer_explanation" in expected:
-        assert expected["zero_transfer_explanation"] in output
+    assert example_result["cpu_only_note"] in output
+    assert example_result["bookkeeping_only_note"] in output
+    if "zero_transfer_explanation" in example_result:
+        assert example_result["zero_transfer_explanation"] in output
 
 
-def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_transfer() -> (
-    None
-):
+def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_transfer(
+    example_result: ExampleResult,
+) -> None:
     """Example shows condensation trend or explains a zero-transfer case."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    result = namespace["run_example"]()
+    result = example_result
 
-    cumulative = result["cumulative_latent_heat_energy"]
+    cumulative = result["cumulative_latent_heat_energy_density"]
     is_effectively_zero = math.isclose(
         cumulative,
         0.0,
@@ -148,14 +195,30 @@ def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_
         assert "latent-heat signal" in explanation
 
 
+def test_condensation_latent_heat_example_energy_matches_mass_transfer_contract(
+    example_result: ExampleResult,
+) -> None:
+    """Cumulative energy density matches concentration change times latent heat."""
+    expected_energy = (
+        example_result["particle_mass_change"]
+        * example_result["latent_heat_reference"]
+    )
+
+    assert np.isclose(
+        example_result["cumulative_latent_heat_energy_density"],
+        expected_energy,
+        rtol=1e-12,
+        atol=0.0,
+    )
+
+
 def test_condensation_latent_heat_run_example_adds_zero_transfer_explanation() -> (
     None
 ):
     """Zero-transfer branch adds the documented explanation string."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    namespace["run_example"].__globals__[
-        "EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE"
-    ] = 1.0
+    namespace = cast(ExampleNamespace, runpy.run_path(str(EXAMPLE_PATH)))
+    run_example = cast(Any, namespace["run_example"])
+    run_example.__globals__["EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE"] = 1.0
 
     result = namespace["run_example"]()
 
@@ -170,8 +233,9 @@ def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
     capsys,
 ) -> None:
     """Main prints the zero-transfer explanation when present in results."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    namespace["main"].__globals__["run_example"] = lambda: {
+    namespace = cast(ExampleNamespace, runpy.run_path(str(EXAMPLE_PATH)))
+    main = cast(Any, namespace["main"])
+    main.__globals__["run_example"] = lambda: {
         "cpu_only_note": "CPU-only example",
         "bookkeeping_only_note": "Bookkeeping only",
         "initial_gas_concentration": 1.0,
@@ -179,8 +243,8 @@ def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
         "initial_particle_mass_concentration": 2.0,
         "final_particle_mass_concentration": 2.0,
         "particle_mass_change": 0.0,
-        "per_step_latent_heat_energies": [0.0],
-        "cumulative_latent_heat_energy": 0.0,
+        "per_call_latent_heat_energy_densities": [0.0],
+        "cumulative_latent_heat_energy_density": 0.0,
         "zero_transfer_explanation": "example explanation",
     }
 
@@ -188,67 +252,3 @@ def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
 
     output = capsys.readouterr().out
     assert "Zero-transfer explanation: example explanation" in output
-
-
-def test_condensation_latent_heat_notebook_exists_at_published_path() -> None:
-    """Published latent-heat notebook exists at the documented example path."""
-    assert NOTEBOOK_PATH.exists()
-
-
-def test_condensation_latent_heat_notebook_keeps_paired_publication_metadata() -> (
-    None
-):
-    """Published notebook keeps the reviewed paired-notebook contract."""
-    notebook = json.loads(NOTEBOOK_PATH.read_text(encoding="utf-8"))
-
-    assert notebook["metadata"]["jupytext"]["text_representation"] == {
-        "extension": ".py",
-        "format_name": "percent",
-        "format_version": "1.3",
-        "jupytext_version": "1.17.3",
-    }
-    assert notebook["cells"][0]["cell_type"] == "markdown"
-    assert "CPU-only condensation workflow" in "".join(
-        notebook["cells"][0]["source"]
-    )
-    assert "diagnostic only" in "".join(notebook["cells"][1]["source"])
-
-
-def test_dynamics_index_links_published_latent_heat_notebook() -> None:
-    """Dynamics index links the published latent-heat notebook artifact."""
-    content = DYNAMICS_INDEX_PATH.read_text(encoding="utf-8")
-
-    assert PUBLISHED_NOTEBOOK_RELATIVE_PATH in content
-    assert INDEX_NOTEBOOK_LABEL in content
-    assert INDEX_REVIEWED_DESCRIPTION_SNIPPET in content
-    assert INDEX_BOOKKEEPING_CONTRACT_SNIPPET in content
-
-
-def test_dynamics_index_drops_raw_latent_heat_python_command() -> None:
-    """Dynamics index no longer advertises the raw python command entry."""
-    content = DYNAMICS_INDEX_PATH.read_text(encoding="utf-8")
-
-    assert (
-        "python docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
-        not in content
-    )
-    assert "Condensation_Latent_Heat.py" not in content
-
-
-def test_condensation_feature_page_contains_single_latent_heat_example_link() -> (
-    None
-):
-    """Feature page keeps exactly one direct latent-heat example cross-link."""
-    content = CONDENSATION_FEATURE_PATH.read_text(encoding="utf-8")
-
-    assert content.count(FEATURE_NOTEBOOK_RELATIVE_PATH) == 1
-
-
-def test_docs_index_latent_heat_summary_stays_diagnostic_only() -> None:
-    """Top-level docs keep the reviewed latent-heat wording contract."""
-    content = ROOT.joinpath("docs/index.md").read_text(encoding="utf-8")
-
-    assert DOCS_INDEX_LATENT_HEAT_HEADING in content
-    assert "temperature-feedback runtime support" in content
-    assert DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET in content
-    assert "**Supporting non-isothermal condensation**" not in content

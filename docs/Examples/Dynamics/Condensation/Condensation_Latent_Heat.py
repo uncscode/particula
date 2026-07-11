@@ -29,8 +29,11 @@
 #
 # After each runnable call we read
 # `condensation_strategy.last_latent_heat_energy`, which stores only the most
-# recent latent-heat bookkeeping value. The cumulative signal is therefore
-# accumulated explicitly in this example loop.
+# recent latent-heat bookkeeping value. This example therefore uses
+# `sub_steps=1` so each stored value matches the full runnable call, then
+# accumulates the cumulative signal explicitly in the outer loop. The
+# bookkeeping quantity reported by the strategy follows the gas/particle mass
+# concentration contract in this example, so it is labeled as an energy density.
 
 # %%
 """CPU-only latent-heat condensation example.
@@ -50,11 +53,16 @@ CPU_ONLY_NOTE = (
     "CPU-only example: this workflow uses public CPU condensation APIs only."
 )
 BOOKKEEPING_ONLY_NOTE = (
-    "Bookkeeping only: latent-heat energy is diagnostic only, not thermal "
-    "feedback. Positive values indicate condensation and negative values "
-    "indicate evaporation."
+    "Bookkeeping only: latent-heat energy density is diagnostic only, not "
+    "thermal feedback. Positive values indicate condensation and negative "
+    "values indicate evaporation."
 )
 EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
+LATENT_HEAT_REFERENCE = 2.26e6  # J/kg
+BOX_VOLUME = 1.0e-6  # m^3
+RUN_TIME_STEP = 0.05
+RUN_SUB_STEPS = 1
+RUN_ITERATION_COUNT = 5
 
 
 def _as_float(value: float | np.ndarray) -> float:
@@ -125,16 +133,18 @@ def run_example() -> dict[str, float | list[float] | str | int]:
     """Run the latent-heat example and return bookkeeping diagnostics.
 
     The example executes several short CPU condensation steps, records
-    the per-step latent-heat bookkeeping reported by the strategy, and
-    accumulates the cumulative energy explicitly. Positive latent-heat
-    values indicate condensation, while negative values indicate
-    evaporation.
+    the per-call latent-heat bookkeeping reported by the strategy, and
+    accumulates the cumulative energy density explicitly. The example uses
+    ``sub_steps=1`` so each stored value corresponds to the full runnable
+    call. Positive latent-heat values indicate condensation, while
+    negative values indicate evaporation.
 
     Returns:
         Dictionary containing initial and final gas concentrations,
         initial and final particle mass concentrations, particle mass
-        change, per-step latent-heat energies, cumulative latent-heat
-        energy, user-facing note strings, and the iteration count. A
+        change, per-call latent-heat energy densities, cumulative
+        latent-heat energy density, user-facing note strings, and the
+        iteration count. A
         ``zero_transfer_explanation`` entry is added when the cumulative
         energy is effectively zero within a small bookkeeping tolerance.
     """
@@ -142,7 +152,7 @@ def run_example() -> dict[str, float | list[float] | str | int]:
     latent_heat_strategy = par.gas.LatentHeatFactory().get_strategy(
         strategy_type="constant",
         parameters={
-            "latent_heat_ref": 2.26e6,
+            "latent_heat_ref": LATENT_HEAT_REFERENCE,
             "latent_heat_ref_units": "J/kg",
         },
     )
@@ -172,15 +182,14 @@ def run_example() -> dict[str, float | list[float] | str | int]:
         current.particles.get_mass_concentration()
     )
 
-    per_step_latent_heat_energies: list[float] = []
-    time_step = 0.05
-    sub_steps = 2
-    n_steps = 5
-    for _ in range(n_steps):
+    per_call_latent_heat_energy_densities: list[float] = []
+    for _ in range(RUN_ITERATION_COUNT):
         current = condensation.execute(
-            current, time_step=time_step, sub_steps=sub_steps
+            current,
+            time_step=RUN_TIME_STEP,
+            sub_steps=RUN_SUB_STEPS,
         )
-        per_step_latent_heat_energies.append(
+        per_call_latent_heat_energy_densities.append(
             float(condensation_strategy.last_latent_heat_energy)
         )
 
@@ -190,7 +199,9 @@ def run_example() -> dict[str, float | list[float] | str | int]:
     final_particle_mass_concentration = _as_float(
         current.particles.get_mass_concentration()
     )
-    cumulative_latent_heat_energy = float(sum(per_step_latent_heat_energies))
+    cumulative_latent_heat_energy_density = float(
+        sum(per_call_latent_heat_energy_densities)
+    )
 
     result: dict[str, float | list[float] | str | int] = {
         "initial_gas_concentration": initial_gas_concentration,
@@ -203,21 +214,27 @@ def run_example() -> dict[str, float | list[float] | str | int]:
             final_particle_mass_concentration
             - initial_particle_mass_concentration
         ),
-        "per_step_latent_heat_energies": per_step_latent_heat_energies,
-        "cumulative_latent_heat_energy": cumulative_latent_heat_energy,
+        "per_call_latent_heat_energy_densities": (
+            per_call_latent_heat_energy_densities
+        ),
+        "cumulative_latent_heat_energy_density": (
+            cumulative_latent_heat_energy_density
+        ),
+        "latent_heat_reference": LATENT_HEAT_REFERENCE,
         "cpu_only_note": CPU_ONLY_NOTE,
         "bookkeeping_only_note": BOOKKEEPING_ONLY_NOTE,
-        "iteration_count": n_steps,
+        "iteration_count": RUN_ITERATION_COUNT,
+        "sub_steps_per_call": RUN_SUB_STEPS,
     }
     if np.isclose(
-        cumulative_latent_heat_energy,
+        cumulative_latent_heat_energy_density,
         0.0,
         rtol=0.0,
         atol=EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE,
     ):
         result["zero_transfer_explanation"] = (
             "No net latent-heat signal was produced because the chosen setup "
-            "did not transfer measurable vapor mass."
+            "did not transfer measurable vapor mass concentration."
         )
     return result
 
@@ -245,13 +262,13 @@ def main() -> None:
         f"Particle mass change [kg/m^3]: {result['particle_mass_change']:.6e}"
     )
     print(
-        "Per-step latent heat energy [J] "
+        "Per-call latent heat energy density [J/m^3] "
         "(each entry is the last value reported after one runnable call): "
-        f"{result['per_step_latent_heat_energies']}"
+        f"{result['per_call_latent_heat_energy_densities']}"
     )
     print(
-        "Cumulative latent heat energy [J]: "
-        f"{result['cumulative_latent_heat_energy']:.6e}"
+        "Cumulative latent heat energy density [J/m^3]: "
+        f"{result['cumulative_latent_heat_energy_density']:.6e}"
     )
     if "zero_transfer_explanation" in result:
         print(
