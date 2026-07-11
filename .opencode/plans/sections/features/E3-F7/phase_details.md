@@ -39,8 +39,8 @@
   - Scope guardrail confirmed: no production code or user-facing docs changed in
     this slice.
 
-- [ ] **E3-F7-P3:** Document Epic D CPU latent-heat baseline and validation guidance
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E3-F7-P3:** Document Epic D CPU latent-heat baseline and validation guidance
+  - Issue: #1269 | Size: XS | Status: Implemented
   - Depends on: E3-F7-P2 proving the executable baseline and, if E3-F6 has
     landed, using that final example path for documentation cross-links without
     blocking the CPU integration baseline on docs-example timing.
@@ -48,7 +48,16 @@
     for future Epic D GPU parity work.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/condensation_strategy_system.md`.
-  - Tests: Documentation changes are reviewed for accurate CPU-only wording and
-    the default integration test remains the executable validation artifact.
-  - Deliverable: Update developer-facing roadmap or feature docs so the final
-    phase leaves explicit CPU-reference guidance for later GPU parity work.
+  - Implementation: Updated `docs/Features/Roadmap/data-oriented-gpu.md` and
+    `docs/Features/condensation_strategy_system.md` so both pages point readers
+    to `particula/integration_tests/condensation_latent_heat_conservation_test.py`
+    as the shipped CPU latent-heat baseline for future Epic D parity work,
+    summarize the conserved particle/gas water bookkeeping plus
+    `last_latent_heat_energy` agreement, and keep wording CPU-only and
+    diagnostic/reference only.
+  - Tests: Documentation wording is cross-checked against the executable CPU
+    baseline and the focused docs regression
+    `particula/tests/condensation_latent_heat_docs_test.py`.
+  - Deliverable: Shipped roadmap and condensation feature-page guidance that
+    identifies the executable CPU baseline without implying completed GPU
+    latent-heat parity.
