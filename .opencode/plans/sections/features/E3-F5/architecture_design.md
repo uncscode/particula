@@ -21,9 +21,17 @@
 - `stochastic`: tests where pass/fail is based on aggregate statistical behavior
   or tolerance bands rather than exact deterministic equality.
 
-Final names can be adjusted during implementation, but they must be registered
-in both `particula/conftest.py` and `pyproject.toml` and documented in the
-testing guide.
+E3-F5-P1 shipped these exact names. The implementation centralizes the strings
+in `particula/conftest.py::PYTEST_MARKER_LINES` and mirrors them verbatim in
+`pyproject.toml`, with regression tests asserting parity between the two.
+
+## Option Surface
+
+- `--benchmark` remains the only registered pytest option.
+- No CUDA-selection or device-policy CLI option was added in P1.
+- Default collection behavior remains registration-only for `warp`, `cuda`,
+  `gpu_parity`, and `stochastic`; benchmark gating is still the only hook that
+  modifies collected items.
 
 ## Helper Structure
 

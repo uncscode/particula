@@ -1,17 +1,23 @@
 # Phase Details
 
-- [ ] **E3-F5-P1:** Define Warp pytest markers and device options with hook tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F5-P1:** Define Warp pytest markers and device options with hook tests
+  - Issue: #1257 | Size: S | Status: Shipped
   - Depends on: No earlier E3-F5 phase. This policy foundation can start once
     Epic C keeps the marker axes as `warp`, `cuda`, `gpu_parity`, and
     `stochastic`, without waiting for E3-F4 documentation wording.
   - Goal: Register the project-level marker/option contract for Warp, CUDA, GPU
     parity, and stochastic parity without changing default skip behavior.
   - Files: `particula/conftest.py`, `pyproject.toml`,
-    `particula/tests/pytest_marker_policy_test.py` or
+    `particula/tests/pytest_marker_policy_test.py`,
     `particula/tests/benchmark_option_test.py`
-  - Tests: Add pytest hook regression tests that verify marker registration and
-    any new collection behavior; existing benchmark option tests remain green.
+  - Shipped behavior: Added `PYTEST_MARKER_LINES` with `warp`, `cuda`,
+    `gpu_parity`, and `stochastic`; mirrored the same marker strings in
+    `pyproject.toml`; preserved `--benchmark` as the only pytest option and only
+    collection-affecting hook behavior.
+  - Tests: Added regression coverage for marker registration, hook/config parity,
+    default collection boundaries, mixed benchmark-plus-Warp items, benchmark
+    option exclusivity, and benchmark help text while keeping existing benchmark
+    option tests green.
 
 - [ ] **E3-F5-P2:** Standardize Warp device fixtures and CUDA skip helpers with tests
   - Issue: TBD | Size: S | Status: Not Started

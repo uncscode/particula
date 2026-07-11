@@ -21,6 +21,18 @@
 - [ ] Existing benchmark gating through `--benchmark` remains intact and is not
   conflated with default validation.
 
+## Current Shipped Evidence (E3-F5-P1)
+
+- `particula/conftest.py` and `pyproject.toml` now declare the same seven-marker
+  vocabulary, including `warp`, `cuda`, `gpu_parity`, and `stochastic`.
+- `particula/tests/pytest_marker_policy_test.py` proves marker parity, default
+  non-benchmark collection behavior, mixed benchmark-plus-Warp handling, and the
+  benchmark-only option/help-text surface.
+- `particula/tests/benchmark_option_test.py` still covers the original
+  `--benchmark` registration and benchmark gating path.
+- Remaining unchecked criteria belong to later phases for helper
+  standardization, GPU test adoption, and documentation rollout.
+
 ## Evidence Metrics
 
 | Metric | Completion Signal | Evidence Source |

@@ -2,15 +2,22 @@
 
 ## Fast Unit and Hook Tests
 
-- Add tests for pytest marker/option registration and collection behavior using
-  the same style as existing benchmark option tests.
-- Add helper unit tests for device enumeration and CUDA skip behavior using fake
-  Warp objects; do not require real CUDA for these tests.
-- Verify missing CUDA produces deterministic skips rather than failures.
+- Shipped coverage in `particula/tests/pytest_marker_policy_test.py` verifies:
+  - hook registration of `warp`, `cuda`, `gpu_parity`, and `stochastic`
+  - exact parity between `PYTEST_MARKER_LINES` and `pyproject.toml`
+  - default collection leaves non-benchmark GPU-policy markers unmodified
+  - mixed `benchmark` + GPU-policy items receive only benchmark skipping
+  - `--benchmark` remains the only registered pytest option with unchanged help
+    text
+- `particula/tests/benchmark_option_test.py` remains as focused regression
+  coverage for benchmark option registration and benchmark-only collection
+  gating.
+- All shipped P1 tests are fake/stub-driven and do not require Warp or CUDA.
 
 ## Warp CPU Validation
 
-- Run focused GPU tests on Warp CPU when Warp is installed, for example:
+- Later phases should run focused GPU tests on Warp CPU when Warp is installed,
+  for example:
   - `pytest particula/gpu/tests/cuda_availability_test.py -q`
   - `pytest particula/gpu/kernels/tests/coagulation_test.py -q`
   - `pytest particula/gpu/kernels/tests/condensation_test.py -q`
@@ -20,10 +27,8 @@
 
 ## CUDA-if-available Validation
 
-- On machines with CUDA available to Warp, the same device-parametrized tests
-  should include `device='cuda'` automatically.
-- On machines without CUDA, CUDA-specific branches should call the standardized
-  skip helper and report clear skip reasons.
+- This validation path was not changed in P1 because no device helper or CUDA
+  option surface shipped yet.
 - CUDA remains optional/local/manual for release validation until dedicated CUDA
   CI is available.
 
@@ -43,3 +48,6 @@
   CPU-only environments.
 - Ensure benchmark tests remain gated by `--benchmark` and are not accidentally
   pulled into default parity runs.
+- Ensure marker-vocabulary drift between `particula/conftest.py` and
+  `pyproject.toml` fails through regression coverage before unknown-marker
+  warnings reach downstream GPU test phases.

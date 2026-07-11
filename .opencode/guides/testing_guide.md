@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-05
+**Last Updated:** 2026-07-10
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -71,6 +71,26 @@ pytest particula/activity/tests/activity_coefficients_test.py::test_function_nam
 # Match CI warning behavior
 pytest -Werror
 ```
+
+## Marker Policy
+
+Repository-wide pytest marker registration lives in `particula/conftest.py` and
+`pyproject.toml`.
+
+- Registered markers include `slow`, `performance`, `benchmark`, `warp`,
+  `cuda`, `gpu_parity`, and `stochastic`.
+- Marker registration is descriptive by default. Plain `pytest` runs keep the
+  CPU-only collection behavior unless a test module opts into its own
+  `pytest.importorskip("warp")` or similar runtime guard.
+- `--benchmark` remains the only collection-affecting pytest option in the
+  repository. Benchmark-marked tests are skipped unless you pass that flag.
+
+Use the GPU-oriented markers to describe intent clearly:
+
+- `@pytest.mark.warp`: Warp-dependent or Warp-targeted coverage.
+- `@pytest.mark.cuda`: CUDA-specific or CUDA-if-available coverage.
+- `@pytest.mark.gpu_parity`: CPU/Warp/CUDA parity validation.
+- `@pytest.mark.stochastic`: stochastic or tolerance-band regression coverage.
 
 ## Warnings
 

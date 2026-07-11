@@ -7,10 +7,10 @@ Status: reviewed and answered on 2026-07-08.
 - Use explicit marker names for the distinct policy axes: `warp`, `cuda`,
   `gpu_parity`, and `stochastic`. They are more actionable than one broad GPU
   marker and align with optional CUDA plus always-available Warp CPU coverage.
-- Add marker registration and helper behavior in `particula/conftest.py`. A new
-  CUDA-selection option is optional; start with CUDA-if-available
-  parametrization and add an option only if E3-F5 implementation needs forced
-  CUDA selection.
+- Add marker registration in `particula/conftest.py` and keep helper behavior
+  for later phases. P1 confirmed that no new CUDA-selection option is needed;
+  `--benchmark` remains the only pytest option and the only collection-affecting
+  hook surface.
 - Keep tolerance policy in documentation plus explicit per-test assertions. Add
   local helper constants only where repeated tests need the same tolerance.
 - `.opencode/guides/testing_guide.md` should own the release/manual validation
