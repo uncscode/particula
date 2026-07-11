@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import warnings
 
+import pytest
+
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
@@ -28,6 +30,19 @@ class _WarningWarp:
         return self.available
 
 
+class _UnexpectedWarningWarp:
+    """Warp-like object that emits a non-targeted deprecation warning."""
+
+    def is_cuda_available(self) -> bool:
+        """Raise an unrelated warning that should remain visible."""
+        warnings.warn(
+            "unexpected warp deprecation",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return True
+
+
 def test_cuda_available_ignores_warp_pack_warning() -> None:
     """CUDA helper suppresses the known Warp ctypes warning."""
     assert cuda_available(_WarningWarp(True))
@@ -40,6 +55,18 @@ def test_cuda_available_is_warning_clean_for_targeted_pack_warning() -> None:
         assert cuda_available(_WarningWarp(True)) is True
 
     assert caught == []
+
+
+def test_cuda_available_preserves_unrelated_deprecation_warnings() -> None:
+    """Only the targeted Warp _pack_ warning is suppressed."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        try:
+            cuda_available(_UnexpectedWarningWarp())
+        except DeprecationWarning as exc:
+            assert "unexpected warp deprecation" in str(exc)
+        else:
+            pytest.fail("Expected unrelated DeprecationWarning to propagate")
 
 
 def test_warp_devices_returns_cpu_only_without_cuda() -> None:

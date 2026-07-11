@@ -32,6 +32,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from particula.conftest import benchmark_option_enabled_from_env
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
@@ -42,9 +43,9 @@ from particula.gpu.tests.mass_precision_study_support import (
 )
 
 
-def _benchmark_enabled(argv: list[str] | None = None) -> bool:
-    """Check if --benchmark flag was passed to pytest."""
-    return "--benchmark" in (sys.argv if argv is None else argv)
+def _benchmark_enabled() -> bool:
+    """Check whether pytest resolved benchmark mode for this process."""
+    return benchmark_option_enabled_from_env()
 
 
 if not _benchmark_enabled():
