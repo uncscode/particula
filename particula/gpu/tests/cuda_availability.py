@@ -22,10 +22,7 @@ def cuda_available(wp: Any) -> bool:
             message="Due to '_pack_'.*",
             category=DeprecationWarning,
         )
-        try:
-            return bool(wp.is_cuda_available())
-        except Exception:
-            return False
+        return bool(wp.is_cuda_available())
 
 
 def warp_devices(wp: Any) -> list[str]:

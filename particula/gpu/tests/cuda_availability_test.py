@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import warnings
 
+import pytest
+
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
@@ -64,10 +66,11 @@ def test_cuda_available_is_warning_clean_for_targeted_pack_warning() -> None:
 
 
 def test_cuda_available_preserves_unrelated_deprecation_warnings() -> None:
-    """Unexpected warning-to-error probe failures degrade to unavailable."""
+    """Unexpected warning-to-error probe failures remain visible."""
     with warnings.catch_warnings():
         warnings.simplefilter("error", DeprecationWarning)
-        assert cuda_available(_UnexpectedWarningWarp()) is False
+        with pytest.raises(DeprecationWarning, match="unexpected warp"):
+            cuda_available(_UnexpectedWarningWarp())
 
 
 def test_warp_devices_returns_cpu_only_without_cuda() -> None:
@@ -81,13 +84,15 @@ def test_warp_devices_returns_cpu_and_cuda_when_available() -> None:
 
 
 def test_cuda_available_returns_false_when_probe_raises() -> None:
-    """Unexpected CUDA probe errors degrade to the CPU-only path."""
-    assert cuda_available(_ProbeErrorWarp()) is False
+    """Unexpected CUDA probe errors surface instead of silently skipping."""
+    with pytest.raises(RuntimeError, match="probe failed"):
+        cuda_available(_ProbeErrorWarp())
 
 
 def test_warp_devices_remains_cpu_only_when_probe_raises() -> None:
-    """Device enumeration should stay collection-safe when probing fails."""
-    assert warp_devices(_ProbeErrorWarp()) == ["cpu"]
+    """Device enumeration surfaces unexpected probe failures too."""
+    with pytest.raises(RuntimeError, match="probe failed"):
+        warp_devices(_ProbeErrorWarp())
 
 
 def test_cuda_skip_reason_matches_shared_contract() -> None:

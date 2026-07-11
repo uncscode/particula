@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Generator, cast
 
 import pytest
+from particula import _pytest_support as pytest_support
 from particula import conftest as particula_conftest
 
 _BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
@@ -15,12 +16,17 @@ _BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
 @pytest.fixture(autouse=True)
 def _restore_benchmark_option_env() -> Generator[None, None, None]:
     """Restore benchmark opt-in env state after each test."""
-    previous = os.environ.get(particula_conftest.BENCHMARK_OPTION_ENV_VAR)
+    previous = os.environ.get(pytest_support.BENCHMARK_OPTION_ENV_VAR)
+    previous_owner = os.environ.get(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR)
     yield
     if previous is None:
-        os.environ.pop(particula_conftest.BENCHMARK_OPTION_ENV_VAR, None)
+        os.environ.pop(pytest_support.BENCHMARK_OPTION_ENV_VAR, None)
+    else:
+        os.environ[pytest_support.BENCHMARK_OPTION_ENV_VAR] = previous
+    if previous_owner is None:
+        os.environ.pop(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, None)
         return
-    os.environ[particula_conftest.BENCHMARK_OPTION_ENV_VAR] = previous
+    os.environ[pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR] = previous_owner
 
 
 @dataclass
@@ -104,26 +110,37 @@ def test_set_benchmark_option_state_round_trips_through_env(
 ) -> None:
     """Resolved benchmark state is shared through the dedicated env var."""
     monkeypatch.delenv(
-        particula_conftest.BENCHMARK_OPTION_ENV_VAR, raising=False
+        pytest_support.BENCHMARK_OPTION_ENV_VAR, raising=False
     )
+    monkeypatch.delenv(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, raising=False)
 
-    particula_conftest.set_benchmark_option_state(True)
-    assert particula_conftest.benchmark_option_enabled_from_env() is True
+    pytest_support.set_benchmark_option_state(True)
+    assert pytest_support.benchmark_option_enabled_from_env() is True
 
-    particula_conftest.set_benchmark_option_state(False)
-    assert particula_conftest.benchmark_option_enabled_from_env() is False
+    pytest_support.set_benchmark_option_state(False)
+    assert pytest_support.benchmark_option_enabled_from_env() is False
+
+
+def test_benchmark_option_enabled_from_env_ignores_inherited_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Inherited benchmark env state from another PID does not opt in locally."""
+    monkeypatch.setenv(pytest_support.BENCHMARK_OPTION_ENV_VAR, "1")
+    monkeypatch.setenv(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, "999999")
+
+    assert pytest_support.benchmark_option_enabled_from_env() is False
 
 
 def test_benchmark_option_enabled_reads_config_like_getoption() -> None:
     """Config-like objects expose the resolved benchmark option state."""
     assert (
-        particula_conftest._benchmark_option_enabled(
+        pytest_support.benchmark_option_enabled(
             _FakeConfig(benchmark_enabled=True)
         )
         is True
     )
     assert (
-        particula_conftest._benchmark_option_enabled(
+        pytest_support.benchmark_option_enabled(
             _FakeConfig(benchmark_enabled=False)
         )
         is False
@@ -141,9 +158,9 @@ def test_benchmark_option_enabled_returns_false_without_callable_getoption() -> 
     class _NonCallableGetOption:
         getoption = True
 
-    assert particula_conftest._benchmark_option_enabled(_NoGetOption()) is False
+    assert pytest_support.benchmark_option_enabled(_NoGetOption()) is False
     assert (
-        particula_conftest._benchmark_option_enabled(_NonCallableGetOption())
+        pytest_support.benchmark_option_enabled(_NonCallableGetOption())
         is False
     )
 
@@ -162,13 +179,14 @@ def test_pytest_configure_persists_resolved_benchmark_option_state(
             return self.benchmark_enabled
 
     monkeypatch.delenv(
-        particula_conftest.BENCHMARK_OPTION_ENV_VAR, raising=False
+        pytest_support.BENCHMARK_OPTION_ENV_VAR, raising=False
     )
+    monkeypatch.delenv(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, raising=False)
     config = _FakeConfigureWithOption(benchmark_enabled=True)
 
     particula_conftest.pytest_configure(cast(Any, config))
 
-    assert particula_conftest.benchmark_option_enabled_from_env() is True
+    assert pytest_support.benchmark_option_enabled_from_env() is True
 
 
 def test_pytest_configure_resets_benchmark_option_state_when_disabled(
@@ -184,12 +202,16 @@ def test_pytest_configure_resets_benchmark_option_state_when_disabled(
             assert name == "--benchmark"
             return self.benchmark_enabled
 
-    monkeypatch.setenv(particula_conftest.BENCHMARK_OPTION_ENV_VAR, "1")
+    monkeypatch.setenv(pytest_support.BENCHMARK_OPTION_ENV_VAR, "1")
+    monkeypatch.setenv(
+        pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR,
+        str(os.getpid()),
+    )
     config = _FakeConfigureWithOption(benchmark_enabled=False)
 
     particula_conftest.pytest_configure(cast(Any, config))
 
-    assert particula_conftest.benchmark_option_enabled_from_env() is False
+    assert pytest_support.benchmark_option_enabled_from_env() is False
 
 
 def test_benchmark_collection_hook_skips_benchmark_tests_by_default() -> None:

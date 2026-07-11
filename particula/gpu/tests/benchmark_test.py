@@ -32,7 +32,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from particula.conftest import benchmark_option_enabled_from_env
+from particula._pytest_support import benchmark_option_enabled_from_env
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
@@ -279,12 +279,7 @@ def _build_benchmark_metadata() -> dict[str, Any]:
         return metadata
 
     metadata["warp_available"] = True
-    try:
-        cuda_ready = cuda_available(wp)
-    except Exception as exc:  # pragma: no cover - defensive metadata path
-        metadata["cuda_probe_error"] = str(exc)
-        return metadata
-
+    cuda_ready = cuda_available(wp)
     metadata["cuda_available"] = cuda_ready
     if not cuda_ready:
         return metadata
