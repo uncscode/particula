@@ -171,6 +171,31 @@ and local/manual when a CUDA-capable device is available; standard CI must skip
 cleanly when CUDA is unavailable. Use the existing markers exactly as
 registered: `warp`, `cuda`, `gpu_parity`, and `stochastic`.
 
+### Release-validation command sets
+
+Use focused Warp CPU runs for the default supported validation path:
+
+```bash
+pytest particula/gpu/tests/cuda_availability_test.py -q
+pytest particula/gpu/kernels/tests/environment_test.py -q
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and gpu_parity"
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochastic"
+```
+
+Use CUDA-targeted runs only for optional local/manual validation when a
+CUDA-capable device is available:
+
+```bash
+pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"
+```
+
+These commands match the shipped marker and helper contract:
+
+- Warp CPU is the baseline parity backend when Warp is installed.
+- CUDA validation is additional local/manual evidence until dedicated CI exists.
+- Missing Warp or missing CUDA should produce expected skips, not release
+  failures, when a command reaches a guarded suite.
+
 ### Device-aware tolerance policy
 
 Keep GPU assertions in three separate classes. Deterministic parity,
@@ -300,3 +325,14 @@ sanity, not for exact CPU/CUDA equality or user-facing feature documentation.
 - If imports fail, install the package in development mode with `pip install -e .[dev]`.
 - If coverage looks wrong, run `pytest --cov=particula --cov-report=term`.
 - If CI fails but local tests pass, rerun locally with `pytest -Werror`.
+- If Warp is not installed, Warp-marked suites may skip through
+  `pytest.importorskip("warp")`; treat that as the expected missing-Warp path,
+  not a regression.
+- If CUDA is unavailable, CUDA-targeted coverage should skip cleanly with the
+  shared `Warp/CUDA not available` contract instead of failing CPU-only or CI
+  validation.
+- Use marker selection such as `-m "warp and gpu_parity"`,
+  `-m "warp and stochastic"`, or `-m "warp and cuda"` for targeted local GPU
+  validation, and keep `pytest particula/gpu/tests/benchmark_test.py
+  --benchmark -v -s` separate as opt-in benchmark evidence rather than default
+  release validation.
