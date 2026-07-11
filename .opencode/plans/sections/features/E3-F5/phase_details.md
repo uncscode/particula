@@ -56,8 +56,8 @@
   - Tests: Manual documentation consistency validation only; no production code
     or Python test-module changes.
 
-- [ ] **E3-F5-P4:** Apply device policy markers and helpers to GPU kernel tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F5-P4:** Apply device policy markers and helpers to GPU kernel tests
+  - Issue: #1260 | Size: S | Status: Shipped
   - Depends on: E3-F5-P1 and E3-F5-P2 establishing the reusable policy surface,
     with E3-F1 and E3-F2 stable enough that migrated stochastic tests are not
     immediately invalidated by pending RNG or sampler changes.
@@ -65,10 +65,19 @@
     preserving current Warp CPU and CUDA-if-available coverage.
   - Files: `particula/gpu/kernels/tests/coagulation_test.py`,
     `particula/gpu/kernels/tests/_condensation_test_support.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`,
+    `particula/gpu/kernels/tests/condensation_stiffness_test.py`,
     `particula/gpu/kernels/tests/environment_test.py`,
     `particula/gpu/tests/conversion_test.py`
-  - Tests: Focused pytest runs for GPU kernel tests on Warp CPU; CUDA tests skip
-    cleanly or run when local CUDA exists.
+  - Shipped behavior: Added module-level `pytest.mark.warp` to directly
+    discoverable Warp suites, kept `pytest.importorskip("warp")` intact, kept
+    CPU-first `warp_devices(wp)` enumeration, preserved wrapper exports through
+    `support.device`, and applied targeted `gpu_parity`, `stochastic`, and
+    `cuda` marks to representative tests without changing production GPU code.
+  - Tests: Focused marker-selection and module runs now target real migrated
+    tests such as parity coverage in coagulation/condensation/conversion,
+    stochastic coagulation coverage, and CUDA-only environment/readback checks
+    while continuing to skip cleanly when CUDA is unavailable.
 
 - [ ] **E3-F5-P5:** Update release validation documentation for CUDA-optional workflows
   - Issue: TBD | Size: XS | Status: Not Started

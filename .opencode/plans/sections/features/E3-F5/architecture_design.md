@@ -35,17 +35,18 @@ in `particula/conftest.py::PYTEST_MARKER_LINES` and mirrors them verbatim in
 
 ## Helper Structure
 
-Extend `particula/gpu/tests/cuda_availability.py` or introduce
-`particula/gpu/tests/device_policy.py` with lightweight helpers such as:
+The shipped helper structure stayed intentionally small. `E3-F5-P4` reused the
+existing `particula/gpu/tests/cuda_availability.py` surface rather than adding a
+new policy module:
 
 - `warp_devices(wp) -> list[str]`: existing behavior, still returns `['cpu']`
   plus CUDA when available.
-- `skip_if_cuda_unavailable(wp, reason: str) -> None`: standardized CUDA-only
-  skip message.
-- `warp_device_params(wp)`: optional pytest parameter wrapper if markers/ids are
-  easier to apply at parametrization time.
-- Named tolerance constants or helper functions for stochastic coagulation bands
-  only if they reduce duplication without obscuring assertions.
+- `CUDA_SKIP_REASON`: standardized CUDA-only skip message reused by migrated
+  suites and helper coverage.
+- No `device_policy.py`, parameter-wrapper helper, or new tolerance helper was
+  introduced; the implementation kept local fixtures where that preserved test
+  readability and wrapper export behavior while still standardizing on
+  `warp_devices(wp)`.
 
 ## Tolerance Model
 
@@ -62,3 +63,20 @@ Extend `particula/gpu/tests/cuda_availability.py` or introduce
 E3-F5 should consume E3-F1 seed-once RNG expectations and E3-F2 mixed-scale
 sampling evidence. It should not re-implement those algorithms; it should make
 their validation pattern reusable and reviewable.
+
+## Shipped P4 Test-surface Design
+
+- Directly discoverable Warp suites now declare `pytestmark = pytest.mark.warp`
+  at module scope in `coagulation_test.py`, `environment_test.py`,
+  `conversion_test.py`, `condensation_test.py`, and
+  `condensation_stiffness_test.py`, with `_condensation_test_support.py` also
+  marked for support-module readability.
+- Wrapper/export structure was preserved for condensation coverage by keeping
+  wrapper-level Warp marks and `support.device` re-exports, so support-backed
+  tests still collect through the discoverable wrapper modules.
+- Deterministic cross-device comparisons are now marked with `gpu_parity` in
+  representative coagulation, condensation-support, and conversion tests.
+- Aggregate/statistical coagulation checks are now marked with `stochastic`
+  instead of being inferred indirectly from file names or comments.
+- CUDA-only readback or wrong-device checks are marked narrowly with `cuda`
+  so Warp CPU remains the default runnable path for mixed suites.

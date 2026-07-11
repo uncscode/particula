@@ -48,3 +48,18 @@
   `rtol`/`atol`, tight conservation checks, aggregate stochastic expectations,
   Warp CPU as the default parity backend, and optional/local/manual CUDA
   coverage.
+
+## 2026-07-10 — P4 test-surface migration update
+
+- Recorded shipped `E3-F5-P4` work from issue `#1260`.
+- Noted test-only marker adoption in
+  `particula/gpu/kernels/tests/coagulation_test.py`,
+  `particula/gpu/kernels/tests/_condensation_test_support.py`,
+  `particula/gpu/kernels/tests/condensation_test.py`,
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`,
+  `particula/gpu/kernels/tests/environment_test.py`, and
+  `particula/gpu/tests/conversion_test.py`.
+- Captured that the implementation added module-level Warp marks, preserved
+  `pytest.importorskip("warp")`, kept CPU-first `warp_devices(wp)` behavior,
+  and added targeted `gpu_parity`, `stochastic`, and `cuda` marks without
+  changing production kernels or making CUDA mandatory.

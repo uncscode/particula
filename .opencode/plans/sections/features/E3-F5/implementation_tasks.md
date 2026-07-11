@@ -31,25 +31,25 @@
 
 ## E3-F5-P3: Tolerance documentation
 
-- Add a device-aware Warp pytest policy subsection under the existing NVIDIA
+- [x] Add a device-aware Warp pytest policy subsection under the existing NVIDIA
   Warp tests section of `.opencode/guides/testing_guide.md`.
-- Document stochastic parity examples from coagulation tests: aggregate over
+- [x] Document stochastic parity examples from coagulation tests: aggregate over
   fixed seed ranges, use tolerance bands, and do not assert exact per-seed
   equality.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` to record the E3-F5 policy
+- [x] Update `docs/Features/Roadmap/data-oriented-gpu.md` to record the E3-F5 policy
   outcome, the required Warp CPU validation path, and CUDA's local/manual-only
   status.
 
 ## E3-F5-P4: Apply to GPU kernel tests
 
-- Add markers to coagulation, condensation, environment, conversion, and other
+- [x] Add markers to coagulation, condensation, environment, conversion, and other
   relevant GPU tests.
-- Replace duplicated device fixtures with standardized helper usage where safe,
+- [x] Replace duplicated device fixtures with standardized helper usage where safe,
   starting with `particula/gpu/kernels/tests/coagulation_test.py`,
   `_condensation_test_support.py`, and `environment_test.py` before touching
   lower-value cleanup.
-- Preserve module-level `pytest.importorskip("warp")` for Warp-dependent tests.
-- Run focused Warp CPU tests and confirm CUDA paths either run or skip cleanly,
+- [x] Preserve module-level `pytest.importorskip("warp")` for Warp-dependent tests.
+- [x] Run focused Warp CPU tests and confirm CUDA paths either run or skip cleanly,
   recording any marker-selection command changes in the roadmap/testing docs.
 
 ## E3-F5-P5: Release validation docs

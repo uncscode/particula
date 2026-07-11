@@ -22,9 +22,20 @@
   marker parity in `pyproject.toml`, and hook regression tests in
   `particula/tests/pytest_marker_policy_test.py` plus
   `particula/tests/benchmark_option_test.py`.
-- Explicitly not shipped in `E3-F5-P1`: new CUDA/device-selection options,
-  device-helper refactors, GPU test-module marker migrations, or external
-  testing-guide/roadmap documentation edits.
+- Shipped in `E3-F5-P2` and `E3-F5-P3`: the shared `CUDA_SKIP_REASON` helper
+  contract plus the published Warp CPU / CUDA-optional / stochastic-tolerance
+  documentation policy.
+- Shipped in `E3-F5-P4`: test-only marker adoption in
+  `particula/gpu/kernels/tests/coagulation_test.py`,
+  `particula/gpu/kernels/tests/_condensation_test_support.py`,
+  `particula/gpu/kernels/tests/condensation_test.py`,
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py`,
+  `particula/gpu/kernels/tests/environment_test.py`, and
+  `particula/gpu/tests/conversion_test.py`.
+- The shipped P4 migration preserved `pytest.importorskip("warp")`, kept
+  CPU-first `warp_devices(wp)` parametrization, avoided module-level `cuda`
+  over-marking, and limited scope to test-surface policy adoption rather than
+  helper API or production-kernel changes.
 
 ## Out of Scope
 
