@@ -1,17 +1,23 @@
 # Documentation Updates
 
-## Required Updates
+## Current Slice Status
+
+- No documentation files changed in issue #1267 / E3-F7-P1.
+- This slice intentionally stayed limited to
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+
+## Deferred Updates
 
 - `docs/Features/Roadmap/data-oriented-gpu.md`
-- Mark or describe E3-F7 as the CPU integration-level latent-heat
-    conservation baseline for future Epic D GPU parity work.
+  - Mark or describe E3-F7 as the CPU integration-level latent-heat baseline
+    for future Epic D GPU parity work.
   - State explicitly that the feature does not claim GPU latent-heat parity.
 
 - `docs/Features/condensation_strategy_system.md`
   - Add a short note that latent-heat condensation now has an integration-level
-    CPU conservation baseline under `particula/integration_tests/`.
-  - Summarize the invariants: particle/gas mass conservation and latent-heat
-    energy bookkeeping.
+    CPU baseline under `particula/integration_tests/`.
+  - Summarize the later-phase invariants: particle/gas mass conservation and
+    latent-heat energy bookkeeping.
 
 ## Optional Cross-References
 

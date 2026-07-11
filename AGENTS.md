@@ -88,7 +88,7 @@ def function(
 
 **Framework:** pytest  
 **Coverage:** pytest-cov  
-**Minimum tests:** 500 (current: 711)  
+**Minimum tests:** 500 (current: 713)  
 **Test pattern:** `*_test.py`
 
 **Registered markers:** `slow`, `performance`, `benchmark`, `warp`, `cuda`,
@@ -525,6 +525,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-05  
+**Last Updated:** 2026-07-11  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

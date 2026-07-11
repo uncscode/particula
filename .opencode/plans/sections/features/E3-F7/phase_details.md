@@ -1,20 +1,23 @@
 # Phase Details
 
-- [ ] **E3-F7-P1:** Adapt particle-resolved latent-heat fixture as an integration test
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F7-P1:** Adapt particle-resolved latent-heat fixture as an integration test
+  - Issue: #1267 | Size: S | Status: Implemented
   - Depends on: Existing CPU latent-heat APIs staying stable and, when
     available, E3-F6 providing the finalized example path for later cross-links;
     the integration fixture itself does not need to wait for E3-F6 to merge.
   - Goal: Create a minimal deterministic single-species CPU integration fixture
     based on the existing particle-resolved condensation style, but using
     `CondensationLatentHeat`.
-  - Files: `particula/integration_tests/condensation_latent_heat_conservation_test.py`,
-    optionally shared local helpers within the same test module.
-  - Tests: New integration test constructs an aerosol, partitioning gas species,
-    constant latent-heat strategy, and `MassCondensation` runnable through CPU
-    public APIs.
-  - Extension: Add a small multi-species variant only if it remains fast,
-    deterministic, and stable under the default integration suite.
+  - Files: `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+  - Implementation: Added a CPU-only baseline that builds a supersaturated
+    single-species water aerosol through public `particula as par` APIs,
+    configures a constant latent-heat strategy, and executes
+    `MassCondensation.execute()` over a short fixed loop.
+  - Assertions shipped in P1: supersaturation precondition, gas concentration
+    decreases, particle mass concentration increases, and
+    `last_latent_heat_energy` remains finite.
+  - Scope guardrail confirmed: no production code or user-facing docs changed in
+    this slice.
 
 - [ ] **E3-F7-P2:** Assert CPU mass conservation and latent-heat energy bookkeeping
   - Issue: TBD | Size: S | Status: Not Started

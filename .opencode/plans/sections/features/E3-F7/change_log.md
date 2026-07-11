@@ -14,3 +14,13 @@
 - Expanded success criteria into measurable pass/fail checks, evidence metrics,
   and a definition of done centered on a deterministic single-species CPU
   baseline, conservation assertions, and CPU-only reference documentation.
+
+## 2026-07-11
+
+- Updated the plan sections to reflect shipped issue #1267 / E3-F7-P1 work.
+- Recorded that
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`
+  now provides the CPU-only integration baseline via public `particula` APIs,
+  a constant latent-heat strategy, and `MassCondensation.execute()`.
+- Noted that P1 shipped only lightweight execution/bookkeeping assertions and
+  did not change production code or user-facing documentation.
