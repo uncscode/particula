@@ -2,16 +2,18 @@
 
 ## E3-F5-P1: Pytest markers and options
 
-- Inventory current markers in `particula/conftest.py` and `pyproject.toml`.
-- Add the concrete GPU/Warp marker definitions `warp`, `cuda`, `gpu_parity`, and
-  `stochastic` in both locations so the proposed axes are reviewable and shared
-  across hooks, config, and docs.
-- Decide whether a new option is needed beyond markers. If added, implement it
-  in `particula/conftest.py`, document the default behavior, and avoid changing
-  benchmark semantics or default collection on CPU-only machines.
-- Add hook regression tests for marker registration and option behavior in an
-  adjacent pytest-focused test module rather than embedding the checks only in
-  manual validation notes.
+- [x] Inventory current markers in `particula/conftest.py` and
+  `pyproject.toml`.
+- [x] Add the concrete GPU/Warp marker definitions `warp`, `cuda`,
+  `gpu_parity`, and `stochastic` in both locations so the proposed axes are now
+  shared across hooks and static pytest config.
+- [x] Decide whether a new option is needed beyond markers. P1 shipped with no
+  new option; `--benchmark` remains the only registered pytest option and the
+  only collection-affecting hook input.
+- [x] Add hook regression tests for marker registration and option behavior in
+  `particula/tests/pytest_marker_policy_test.py`, while keeping
+  `particula/tests/benchmark_option_test.py` as the focused benchmark-policy
+  regression file.
 
 ## E3-F5-P2: Device helper standardization
 

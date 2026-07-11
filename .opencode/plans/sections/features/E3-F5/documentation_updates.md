@@ -12,6 +12,14 @@
   - Record CUDA local/manual validation expectations and parity tolerance
     classes.
 
+## P1 Shipped Status
+
+- No external documentation files changed in `E3-F5-P1`.
+- The shipped implementation limited documentation work to inline module
+  docstrings/comments in `particula/conftest.py` describing shared marker
+  registration and benchmark-only collection gating.
+- Testing guide and roadmap updates remain queued for `E3-F5-P3` and `E3-F5-P5`.
+
 ## Conditional Updates
 
 - `docs/Features/data-containers-and-gpu-foundations.md`

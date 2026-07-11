@@ -16,6 +16,16 @@
 - Apply the policy to GPU kernel tests, especially coagulation and condensation
   tests that currently define local device fixtures.
 
+## Current Implementation Status
+
+- Shipped in `E3-F5-P1`: marker registration in `particula/conftest.py`, static
+  marker parity in `pyproject.toml`, and hook regression tests in
+  `particula/tests/pytest_marker_policy_test.py` plus
+  `particula/tests/benchmark_option_test.py`.
+- Explicitly not shipped in `E3-F5-P1`: new CUDA/device-selection options,
+  device-helper refactors, GPU test-module marker migrations, or external
+  testing-guide/roadmap documentation edits.
+
 ## Out of Scope
 
 - Rewriting GPU kernels or changing production simulation behavior.

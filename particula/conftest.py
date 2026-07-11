@@ -1,8 +1,8 @@
-"""Pytest configuration for particula test suite.
+"""Pytest hooks for shared marker registration and benchmark gating.
 
-This file registers custom markers and configures pytest options.
-Having markers here ensures they are registered even in environments
-where pyproject.toml configuration may not be read (e.g., conda-build).
+This module keeps the repository marker vocabulary available even when
+``pyproject.toml`` metadata is not loaded and preserves ``--benchmark`` as the
+only collection-affecting pytest option.
 """
 
 from __future__ import annotations
@@ -22,7 +22,11 @@ PYTEST_MARKER_LINES = (
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
-    """Register custom command-line options."""
+    """Register repository-specific pytest command-line options.
+
+    Args:
+        parser: Pytest parser receiving option registrations.
+    """
     parser.addoption(
         "--benchmark",
         action="store_true",
@@ -32,7 +36,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    """Register custom markers for the test suite."""
+    """Register the shared pytest marker vocabulary.
+
+    Args:
+        config: Pytest configuration object receiving marker declarations.
+    """
     for marker_line in PYTEST_MARKER_LINES:
         config.addinivalue_line("markers", marker_line)
 
@@ -41,7 +49,12 @@ def pytest_collection_modifyitems(
     config: pytest.Config,
     items: list[pytest.Item],
 ) -> None:
-    """Skip benchmark-marked tests unless the registered option enables them."""
+    """Skip benchmark-marked tests unless ``--benchmark`` is enabled.
+
+    Args:
+        config: Pytest configuration used to read option state.
+        items: Collected pytest items that may receive skip markers.
+    """
     if config.getoption("--benchmark"):
         return
 

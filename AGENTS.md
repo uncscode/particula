@@ -91,6 +91,11 @@ def function(
 **Minimum tests:** 500 (current: 711)  
 **Test pattern:** `*_test.py`
 
+**Registered markers:** `slow`, `performance`, `benchmark`, `warp`, `cuda`,
+`gpu_parity`, `stochastic`  
+**Collection policy:** plain `pytest` stays CPU-default; `--benchmark` is the
+only collection-affecting option.
+
 **Test structure:**
 ```
 particula/
