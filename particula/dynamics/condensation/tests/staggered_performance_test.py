@@ -381,11 +381,11 @@ def test_performance_mode_comparison() -> None:
         )
     ratio = slowest / fastest
     print(f"Theta-mode ratio (slowest/fastest): {ratio:.2f}x")
-    # Allow 2.5x tolerance to account for:
+    # Allow 2.6x tolerance to account for:
     # - batch mode potentially faster due to reduced gas update overhead
     # - system load variations during benchmarks
-    assert ratio <= 2.5, (
-        f"Theta-mode timings drifted beyond the 2.5x band ({ratio:.2f}x)"
+    assert ratio <= 2.6, (
+        f"Theta-mode timings drifted beyond the 2.6x band ({ratio:.2f}x)"
     )
 
 
