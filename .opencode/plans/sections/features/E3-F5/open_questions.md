@@ -11,6 +11,11 @@ Status: reviewed and answered on 2026-07-08.
   for later phases. P1 confirmed that no new CUDA-selection option is needed;
   `--benchmark` remains the only pytest option and the only collection-affecting
   hook surface.
+- Keep `cuda_available()` and `warp_devices()` stable while standardizing one
+  shared CUDA-only skip string. P2 resolved this by exporting
+  `CUDA_SKIP_REASON = "Warp/CUDA not available"` from
+  `particula/gpu/tests/cuda_availability.py` and reusing it in benchmark skip
+  helper coverage.
 - Keep tolerance policy in documentation plus explicit per-test assertions. Add
   local helper constants only where repeated tests need the same tolerance.
 - `.opencode/guides/testing_guide.md` should own the release/manual validation
