@@ -2,7 +2,7 @@
   "id": "E3-F5",
   "type": "feature",
   "title": "Formalize device-aware pytest policy and stochastic tolerance expectations",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -86,11 +86,11 @@
     {
       "id": "E3-F5-P5",
       "title": "Update release validation documentation for CUDA-optional workflows",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-11",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -98,5 +98,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
