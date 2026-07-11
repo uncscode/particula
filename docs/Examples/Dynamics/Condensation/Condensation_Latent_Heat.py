@@ -54,6 +54,7 @@ BOOKKEEPING_ONLY_NOTE = (
     "feedback. Positive values indicate condensation and negative values "
     "indicate evaporation."
 )
+EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
 
 
 def _as_float(value: float | np.ndarray) -> float:
@@ -133,7 +134,7 @@ def run_example() -> dict[str, float | list[float] | str | int]:
         change, per-step latent-heat energies, cumulative latent-heat
         energy, user-facing note strings, and the iteration count. A
         ``zero_transfer_explanation`` entry is added when the cumulative
-        energy is exactly zero.
+        energy is effectively zero within a small bookkeeping tolerance.
     """
     aerosol = _build_aerosol()
     latent_heat_strategy = par.gas.LatentHeatFactory().get_strategy(
@@ -206,7 +207,12 @@ def run_example() -> dict[str, float | list[float] | str | int]:
         "bookkeeping_only_note": BOOKKEEPING_ONLY_NOTE,
         "iteration_count": n_steps,
     }
-    if cumulative_latent_heat_energy == 0.0:
+    if np.isclose(
+        cumulative_latent_heat_energy,
+        0.0,
+        rtol=0.0,
+        atol=EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE,
+    ):
         result["zero_transfer_explanation"] = (
             "No net latent-heat signal was produced because the chosen setup "
             "did not transfer measurable vapor mass."

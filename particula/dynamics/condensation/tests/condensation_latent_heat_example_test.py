@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[4]
 EXAMPLE_PATH = (
     ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
 )
+EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
 
 
 def test_condensation_latent_heat_example_runs_as_main_entrypoint(
@@ -30,39 +31,10 @@ def test_condensation_latent_heat_example_runs_as_main_entrypoint(
     assert "Cumulative latent heat energy [J]" in output
 
 
-def test_condensation_latent_heat_as_float_returns_scalar_for_scalars_and_arrays() -> (
-    None
-):
-    """Private scalar helper normalizes scalar-like numeric inputs."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    as_float = namespace["_as_float"]
-
-    assert as_float(1.25) == 1.25
-    assert as_float(np.array([[2.5]], dtype=np.float64)) == 2.5
-
-
-def test_condensation_latent_heat_build_aerosol_returns_positive_state() -> (
-    None
-):
-    """Private aerosol builder returns a finite supersaturated test state."""
-    namespace = runpy.run_path(str(EXAMPLE_PATH))
-    aerosol = namespace["_build_aerosol"]()
-
-    gas_concentration = (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    )
-    particle_mass_concentration = aerosol.particles.get_mass_concentration()
-
-    assert np.isfinite(gas_concentration).all()
-    assert np.isfinite(particle_mass_concentration).all()
-    assert np.all(gas_concentration > 0.0)
-    assert np.all(particle_mass_concentration > 0.0)
-
-
 def test_condensation_latent_heat_run_example_returns_finite_structured_results() -> (
     None
 ):
-    """Helper returns finite latent-heat bookkeeping diagnostics."""
+    """Helper returns finite public latent-heat bookkeeping diagnostics."""
     namespace = runpy.run_path(str(EXAMPLE_PATH))
     result = namespace["run_example"]()
 
@@ -70,12 +42,19 @@ def test_condensation_latent_heat_run_example_returns_finite_structured_results(
     assert math.isfinite(result["final_gas_concentration"])
     assert math.isfinite(result["initial_particle_mass_concentration"])
     assert math.isfinite(result["final_particle_mass_concentration"])
+    assert math.isfinite(result["particle_mass_change"])
     assert math.isfinite(result["cumulative_latent_heat_energy"])
+    assert result["initial_gas_concentration"] > 0.0
+    assert result["final_gas_concentration"] > 0.0
+    assert result["initial_particle_mass_concentration"] > 0.0
+    assert result["final_particle_mass_concentration"] > 0.0
     assert result["cpu_only_note"].startswith("CPU-only example")
     assert result["bookkeeping_only_note"].startswith("Bookkeeping only")
+    assert result["iteration_count"] == 5
 
     per_step = result["per_step_latent_heat_energies"]
     assert per_step
+    assert len(per_step) == result["iteration_count"]
     assert all(math.isfinite(value) for value in per_step)
     assert np.isclose(
         result["cumulative_latent_heat_energy"],
@@ -83,6 +62,22 @@ def test_condensation_latent_heat_run_example_returns_finite_structured_results(
         rtol=1e-14,
         atol=0.0,
     )
+
+
+def test_condensation_latent_heat_main_path_matches_run_example_contract(
+    capsys,
+) -> None:
+    """Main entrypoint prints the public notes and structured diagnostics."""
+    namespace = runpy.run_path(str(EXAMPLE_PATH))
+    expected = namespace["run_example"]()
+
+    runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
+
+    output = capsys.readouterr().out
+    assert expected["cpu_only_note"] in output
+    assert expected["bookkeeping_only_note"] in output
+    if "zero_transfer_explanation" in expected:
+        assert expected["zero_transfer_explanation"] in output
 
 
 def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_transfer() -> (
@@ -93,7 +88,13 @@ def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_
     result = namespace["run_example"]()
 
     cumulative = result["cumulative_latent_heat_energy"]
-    if cumulative != 0.0:
+    is_effectively_zero = math.isclose(
+        cumulative,
+        0.0,
+        rel_tol=0.0,
+        abs_tol=EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE,
+    )
+    if not is_effectively_zero:
         assert cumulative > 0.0
         assert (
             result["final_gas_concentration"]
@@ -107,3 +108,45 @@ def test_condensation_latent_heat_example_reports_condensation_or_explicit_zero_
         explanation = result.get("zero_transfer_explanation", "")
         assert explanation
         assert "latent-heat signal" in explanation
+
+
+def test_condensation_latent_heat_run_example_adds_zero_transfer_explanation() -> (
+    None
+):
+    """Zero-transfer branch adds the documented explanation string."""
+    namespace = runpy.run_path(str(EXAMPLE_PATH))
+    namespace["run_example"].__globals__[
+        "EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE"
+    ] = 1.0
+
+    result = namespace["run_example"]()
+
+    assert "zero_transfer_explanation" in result
+    assert (
+        "did not transfer measurable vapor mass"
+        in result["zero_transfer_explanation"]
+    )
+
+
+def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
+    capsys,
+) -> None:
+    """Main prints the zero-transfer explanation when present in results."""
+    namespace = runpy.run_path(str(EXAMPLE_PATH))
+    namespace["main"].__globals__["run_example"] = lambda: {
+        "cpu_only_note": "CPU-only example",
+        "bookkeeping_only_note": "Bookkeeping only",
+        "initial_gas_concentration": 1.0,
+        "final_gas_concentration": 1.0,
+        "initial_particle_mass_concentration": 2.0,
+        "final_particle_mass_concentration": 2.0,
+        "particle_mass_change": 0.0,
+        "per_step_latent_heat_energies": [0.0],
+        "cumulative_latent_heat_energy": 0.0,
+        "zero_transfer_explanation": "example explanation",
+    }
+
+    namespace["main"]()
+
+    output = capsys.readouterr().out
+    assert "Zero-transfer explanation: example explanation" in output
