@@ -28,11 +28,12 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 - **Providing a Python-based API** for reproducible and modular simulations.
 - **Building gas-phase properties** with builder/factory patterns (vapor
   pressure and latent heat) that support unit-aware setters and exports.
-- **Supporting non-isothermal condensation** with thermal resistance,
-  latent-heat mass transfer rate utilities, latent-heat energy release
-  bookkeeping, and the `CondensationLatentHeat` strategy with
-  latent-heat-corrected `mass_transfer_rate()`/`rate()` and an implemented
-  `step()` that tracks per-step latent heat energy.
+- **Supporting CPU latent-heat-corrected condensation diagnostics** with
+  thermal resistance, latent-heat mass transfer rate utilities,
+  latent-heat energy-release bookkeeping, and the
+  `CondensationLatentHeat` strategy with latent-heat-corrected
+  `mass_transfer_rate()`/`rate()` plus a `step()` that tracks per-step
+  latent heat energy without claiming temperature-feedback runtime support.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 
