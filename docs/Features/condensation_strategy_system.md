@@ -15,7 +15,7 @@ fractions, batch partitioning, and gas-field updates for stability.
 CondensationLatentHeat mirrors the isothermal workflow for particle-resolved
 runs while adding latent-heat-aware mass transfer and per-step energy
 diagnostics. The step now supports a `dynamic_viscosity` override and records
-`last_latent_heat_energy` for parity with the isothermal API plus energy
+`last_latent_heat_energy` for consistency with the isothermal API plus energy
 tracking.
 
 This feature is built around user-facing APIs exposed via
