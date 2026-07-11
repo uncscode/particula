@@ -12,8 +12,8 @@ epic.
 
 Sizing convention: each epic targets roughly 5-10 features, each feature
 roughly 5-15 phases, and each phase roughly 100 lines of new source code plus
-its tests and documentation (canonical rules:
-`.opencode/guides/phase-sizing-rules.md`).
+its tests and documentation under the repository's canonical planning and
+documentation conventions.
 
 ## Epic Sequence and Status
 
@@ -148,10 +148,12 @@ The lower-level Warp backend is implemented and covered by targeted tests.
 - GPU benchmark scaffolding exists for CUDA-enabled environments.
 - Parity validation always includes Warp CPU when Warp is installed and may add
   Warp CUDA when a device is available locally. Deterministic parity uses
-  explicit `rtol`/`atol`, the matching pytest markers remain `warp`, `cuda`,
-  `gpu_parity`, and `stochastic`, CUDA coverage is optional/local/manual rather
-  than a CI requirement, and this documentation records the explicit helper
-  surface rather than implying automatic GPU runtime integration.
+  explicit `numpy.testing.assert_allclose(..., rtol=..., atol=...)` bounds,
+  conservation checks stay separately tight, the matching pytest markers remain
+  `warp`, `cuda`, `gpu_parity`, and `stochastic`, CUDA coverage is
+  optional/local/manual rather than a CI requirement, and this documentation
+  records the explicit helper surface rather than implying automatic GPU
+  runtime integration.
 
 The GPU backend is currently a directly callable lower-level API. It is not yet
 integrated as an automatic backend in the main `Aerosol`, `Runnable`, or
@@ -457,7 +459,10 @@ Shared-across-box fields:
     workflows. CPU condensation explicitly enforces `n_boxes == 1`, and CPU
     coagulation support for `ParticleData` is also documented and validated as
     `n_boxes == 1` only. For the canonical user-facing support contract, see
-    [ParticleData and GasData Migration](../particle-data-migration.md).
+    [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+    Use
+    [ParticleData and GasData Migration](../particle-data-migration.md)
+    as the implementation walkthrough companion.
 
 #### Rationale for issue-critical ownership decisions
 
@@ -745,8 +750,9 @@ Planned features:
    `warp`, `cuda`, `gpu_parity`, and `stochastic`; CUDA validation is
    optional/local/manual and must skip cleanly when CUDA is unavailable.
 6. Tolerance policy stays split into three classes: deterministic parity uses
-   explicit `rtol`/`atol`, conservation checks keep tight drift tolerances,
-   and stochastic validation uses aggregate expectations such as tolerance
+   explicit `numpy.testing.assert_allclose(..., rtol=..., atol=...)`
+   bounds, conservation checks keep separately tight drift tolerances, and
+   stochastic validation uses bounded aggregate expectations such as tolerance
    bands or `3-sigma` behavior rather than exact per-seed equality.
 7. The shipped canonical direct-kernel quick-start is
    [`docs/Examples/gpu_direct_kernels_quick_start.py`](../../Examples/gpu_direct_kernels_quick_start.py).
@@ -862,15 +868,17 @@ fixed or explicitly accepted during this epic.
   accounting for executed versus scheduled trials, bounded trial clamping,
   total-mass conservation, and caller-owned `rng_states` reuse/reset semantics.
   This roadmap follows the same validation policy as the testing guide:
-  deterministic parity uses explicit `rtol`/`atol`, conservation assertions
-  stay tight, Warp CPU always participates in parity validation when Warp is
-  installed, optional CUDA runs apply the same policy when available locally,
-  and stochastic acceptance coverage is judged by aggregate expectations such
-  as tolerance bands or `3-sigma` behavior rather than exact per-seed equality.
-  Treat this as bounded evidence that the selector hardening preserved expected
-  Brownian behavior within stochastic tolerance inside the existing sampler,
-  not as proof that the global-majorant acceptance collapse is solved for every
-  mixed-scale distribution.
+  deterministic parity uses explicit
+  `numpy.testing.assert_allclose(..., rtol=..., atol=...)` bounds,
+  conservation assertions stay separately tight, Warp CPU always participates
+  in parity validation when Warp is installed, optional CUDA runs apply the
+  same policy when available locally, and stochastic acceptance coverage is
+  judged by bounded aggregate expectations such as tolerance bands or
+  `3-sigma` behavior rather than exact per-seed equality. Treat this as
+  bounded evidence that the selector hardening preserved expected Brownian
+  behavior within stochastic tolerance inside the existing sampler, not as
+  deterministic replay evidence and not as proof that the global-majorant
+  acceptance collapse is solved for every mixed-scale distribution.
 
   Reproduce the seeded checks with:
 

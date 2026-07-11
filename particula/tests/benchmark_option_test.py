@@ -8,9 +8,7 @@ from typing import Any, cast
 import pytest
 from particula import conftest as particula_conftest
 
-_BENCHMARK_SKIP_REASON = (
-    "GPU benchmarks skipped (pass --benchmark to enable)"
-)
+_BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
 
 
 @dataclass
@@ -93,7 +91,9 @@ def test_set_benchmark_option_state_round_trips_through_env(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Resolved benchmark state is shared through the dedicated env var."""
-    monkeypatch.delenv(particula_conftest.BENCHMARK_OPTION_ENV_VAR, raising=False)
+    monkeypatch.delenv(
+        particula_conftest.BENCHMARK_OPTION_ENV_VAR, raising=False
+    )
 
     particula_conftest.set_benchmark_option_state(True)
     assert particula_conftest.benchmark_option_enabled_from_env() is True
@@ -104,12 +104,18 @@ def test_set_benchmark_option_state_round_trips_through_env(
 
 def test_benchmark_option_enabled_reads_config_like_getoption() -> None:
     """Config-like objects expose the resolved benchmark option state."""
-    assert particula_conftest._benchmark_option_enabled(
-        _FakeConfig(benchmark_enabled=True)
-    ) is True
-    assert particula_conftest._benchmark_option_enabled(
-        _FakeConfig(benchmark_enabled=False)
-    ) is False
+    assert (
+        particula_conftest._benchmark_option_enabled(
+            _FakeConfig(benchmark_enabled=True)
+        )
+        is True
+    )
+    assert (
+        particula_conftest._benchmark_option_enabled(
+            _FakeConfig(benchmark_enabled=False)
+        )
+        is False
+    )
 
 
 def test_benchmark_option_enabled_returns_false_without_callable_getoption() -> (
@@ -143,7 +149,9 @@ def test_pytest_configure_persists_resolved_benchmark_option_state(
             assert name == "--benchmark"
             return self.benchmark_enabled
 
-    monkeypatch.delenv(particula_conftest.BENCHMARK_OPTION_ENV_VAR, raising=False)
+    monkeypatch.delenv(
+        particula_conftest.BENCHMARK_OPTION_ENV_VAR, raising=False
+    )
     config = _FakeConfigureWithOption(benchmark_enabled=True)
 
     particula_conftest.pytest_configure(cast(Any, config))
