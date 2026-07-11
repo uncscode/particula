@@ -6,6 +6,7 @@ deterministic, supersaturated, single-species water aerosol.
 
 import numpy as np
 import particula as par
+import pytest
 
 LATENT_HEAT_WATER = 2.26e6  # J/kg
 CONSERVATION_RTOL = 1e-12
@@ -16,12 +17,22 @@ def _as_float(value: float | np.ndarray) -> float:
     """Convert a scalar-like value to ``float`` for deterministic assertions.
 
     Args:
-        value: Scalar or array-like value to collapse to a Python float.
+        value: Scalar or size-1 array-like value to convert to a Python float.
 
     Returns:
-        The first value from ``value`` as a Python float.
+        The scalar value from ``value`` as a Python float.
+
+    Raises:
+        AssertionError: If ``value`` has more than one element.
     """
-    return float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
+    array_value = np.asarray(value, dtype=np.float64)
+    if array_value.ndim == 0:
+        return float(array_value)
+    if array_value.size != 1:
+        raise AssertionError(
+            f"Expected scalar or size-1 input, got shape {array_value.shape}."
+        )
+    return float(array_value.reshape(()))
 
 
 def _particle_water_inventory(aerosol: par.Aerosol) -> float:
@@ -32,10 +43,27 @@ def _particle_water_inventory(aerosol: par.Aerosol) -> float:
 
     Returns:
         Total particle-phase water inventory as a scalar in kg/m^3.
+
+    Raises:
+        AssertionError: If the particle mass layout is not a valid
+            single-species shape.
     """
-    species_mass = aerosol.particles.get_species_mass()
+    species_mass = np.asarray(
+        aerosol.particles.get_species_mass(), dtype=np.float64
+    )
     concentration = aerosol.particles.get_concentration()
-    return float(np.sum(species_mass[:, 0] * concentration, dtype=np.float64))
+
+    if species_mass.ndim == 1:
+        water_mass = species_mass
+    elif species_mass.ndim == 2 and species_mass.shape[1] == 1:
+        water_mass = species_mass[:, 0]
+    else:
+        raise AssertionError(
+            "Expected single-species particle mass with shape "
+            f"(n_particles,) or (n_particles, 1), got {species_mass.shape}."
+        )
+
+    return float(np.sum(water_mass * concentration, dtype=np.float64))
 
 
 def _build_test_aerosol() -> tuple[par.Aerosol, float]:
@@ -136,6 +164,68 @@ def test_condensation_latent_heat_fixture_starts_supersaturated() -> None:
     assert np.isfinite(saturation_concentration)
     assert np.isfinite(gas_concentration)
     assert gas_concentration > saturation_concentration
+
+
+def test_as_float_rejects_multi_element_inputs() -> None:
+    """Regression: helper rejects multi-element fixture/API drift."""
+    with pytest.raises(AssertionError, match="Expected scalar or size-1 input"):
+        _as_float(np.array([1.0, 2.0], dtype=np.float64))
+
+
+@pytest.mark.parametrize(
+    "mass_shape",
+    [
+        (4,),
+        (4, 1),
+    ],
+)
+def test_particle_water_inventory_accepts_valid_single_species_shapes(
+    mass_shape: tuple[int, ...],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: helper accepts valid single-species mass layouts."""
+    aerosol, _ = _build_test_aerosol()
+    species_mass = np.asarray(
+        aerosol.particles.get_species_mass(), dtype=np.float64
+    )
+    reshaped_mass = species_mass.reshape(mass_shape)
+    monkeypatch.setattr(
+        aerosol.particles,
+        "get_species_mass",
+        lambda: reshaped_mass,
+    )
+
+    expected = float(
+        np.sum(
+            species_mass.reshape(-1) * aerosol.particles.get_concentration(),
+            dtype=np.float64,
+        )
+    )
+
+    np.testing.assert_allclose(_particle_water_inventory(aerosol), expected)
+
+
+def test_particle_water_inventory_rejects_multi_species_shapes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: helper fails loudly for unexpected multi-species mass."""
+    aerosol, _ = _build_test_aerosol()
+    species_mass = np.asarray(
+        aerosol.particles.get_species_mass(), dtype=np.float64
+    )
+    monkeypatch.setattr(
+        aerosol.particles,
+        "get_species_mass",
+        lambda: np.column_stack(
+            [species_mass.reshape(-1), species_mass.reshape(-1)]
+        ),
+    )
+
+    with pytest.raises(
+        AssertionError,
+        match="Expected single-species particle mass",
+    ):
+        _particle_water_inventory(aerosol)
 
 
 def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
