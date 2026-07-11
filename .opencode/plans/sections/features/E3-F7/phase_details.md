@@ -19,18 +19,25 @@
   - Scope guardrail confirmed: no production code or user-facing docs changed in
     this slice.
 
-- [ ] **E3-F7-P2:** Assert CPU mass conservation and latent-heat energy bookkeeping
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F7-P2:** Assert CPU mass conservation and latent-heat energy bookkeeping
+  - Issue: #1268 | Size: S | Status: Implemented
   - Depends on: E3-F7-P1 establishing the deterministic fixture so conservation
     and latent-heat assertions target a stable baseline instead of evolving setup
     code.
   - Goal: Add robust assertions proving particle/gas water inventory conservation
     and latent-heat energy consistency for the CPU reference path.
-  - Files: `particula/integration_tests/condensation_latent_heat_conservation_test.py`,
-    with minimal updates to condensation helpers only if required for clarity.
-  - Tests: Assert particle water increases, gas water decreases, total water mass
-    is conserved within stable tolerance, `last_latent_heat_energy` is finite and
-    positive, and energy equals transferred mass times constant latent heat.
+  - Files: `particula/integration_tests/condensation_latent_heat_conservation_test.py` only.
+  - Implementation: Added explicit latent-heat and conservation tolerance
+    constants, a private particle-water inventory helper, initial/pre-final/final
+    water bookkeeping captures, and stronger integration assertions over the
+    existing five-step CPU execution path.
+  - Assertions shipped in P2: initial/final particle water inventory,
+    initial/final gas water inventory, whole-run total water conservation,
+    final-step particle gain versus gas loss, finite positive
+    `last_latent_heat_energy`, and final-step latent-heat energy equality using
+    the exact fixture constant.
+  - Scope guardrail confirmed: no production code or user-facing docs changed in
+    this slice.
 
 - [ ] **E3-F7-P3:** Document Epic D CPU latent-heat baseline and validation guidance
   - Issue: TBD | Size: XS | Status: Not Started

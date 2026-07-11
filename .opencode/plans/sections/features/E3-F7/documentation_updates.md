@@ -3,7 +3,8 @@
 ## Current Slice Status
 
 - No documentation files changed in issue #1267 / E3-F7-P1.
-- This slice intentionally stayed limited to
+- No documentation files changed in issue #1268 / E3-F7-P2.
+- Both shipped slices intentionally stayed limited to
   `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
 
 ## Deferred Updates
