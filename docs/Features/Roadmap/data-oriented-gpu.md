@@ -935,7 +935,15 @@ Planned features:
    and per-step latent heat energy bookkeeping (see the
    [condensation equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat)),
    with per-box temperature feedback through the
-   [EnvironmentData Container](#environmentdata-container).
+   [EnvironmentData Container](#environmentdata-container). The current
+   executable reference for this work is the CPU integration baseline in
+   `particula/integration_tests/condensation_latent_heat_conservation_test.py`:
+   it verifies particle water increases, gas water decreases, total water
+   inventory is conserved, and
+   `last_latent_heat_energy` matches the constant-latent-heat bookkeeping
+   path on the final CPU step. This is baseline evidence for future Epic D
+   GPU parity work, not evidence that GPU latent-heat parity is already
+   implemented.
 3. Fixed-count sub-stepping integration: build GPU condensation on the
    `fixed_count_substeps_4` recommendation from the
    [condensation stiffness study](condensation-stiffness-study.md), keeping
