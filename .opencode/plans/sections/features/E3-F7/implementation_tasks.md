@@ -20,20 +20,24 @@
 
 ## E3-F7-P2: Conservation and Energy Assertions
 
-- Capture initial particle water inventory and gas water concentration.
-- Capture final particle water inventory and gas water concentration.
-- Assert particle water increased and gas water decreased.
-- Assert total water inventory is conserved within a stable deterministic
-  tolerance, using the existing integration test's tolerance as the starting
-  point.
-- Assert `last_latent_heat_energy` is finite and positive.
-- Compute expected latent heat from transferred mass and the exact constant
-  latent-heat value passed into the factory or strategy setup, then compare with
-  `last_latent_heat_energy` using tight but stable tolerances.
-- Run the focused integration test and then the default integration-test command
-  used by the repository.
-- Keep the assertion edit to one integration test module with a small number of
-  named assertions or helper functions, not a new shared testing utility.
+- [x] Captured initial/final particle water inventory and initial/final gas water
+  concentration on the shipped single-species CPU fixture.
+- [x] Added explicit `LATENT_HEAT_WATER`, `CONSERVATION_RTOL`, and
+  `CONSERVATION_ATOL` module constants for deterministic bookkeeping checks.
+- [x] Added a private `_particle_water_inventory(...)` helper local to
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+- [x] Split the execution flow so the test records the penultimate state before
+  the fifth/final `MassCondensation.execute()` call.
+- [x] Asserted whole-run directional transfer: particle water increases and gas
+  water decreases.
+- [x] Asserted whole-run total water inventory conservation with explicit tight
+  deterministic tolerances.
+- [x] Asserted `last_latent_heat_energy` is finite and positive.
+- [x] Asserted final-step particle gain matches final-step gas loss and that the
+  recorded latent-heat energy equals final-step transferred mass times the exact
+  latent-heat constant used by the fixture.
+- [x] Kept the implementation scoped to the existing integration test module
+  only, with no production-code or documentation changes in issue #1268.
 
 ## E3-F7-P3: Documentation
 

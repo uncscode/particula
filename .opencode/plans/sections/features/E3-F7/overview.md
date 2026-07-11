@@ -13,16 +13,17 @@ assertions for follow-up work.
 
 ## Value Proposition
 
-E3-F7 now has a shipped P1 baseline in
+E3-F7 now has shipped P1 and P2 coverage in
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-The implemented slice uses only public `particula` APIs, a constant latent-heat
-strategy, and `MassCondensation.execute()` to prove that a deterministic,
-supersaturated single-species water fixture transfers mass through the CPU
-runnable path and leaves `last_latent_heat_energy` finite.
+The implemented slice still uses only public `particula` APIs, a constant
+latent-heat strategy, and `MassCondensation.execute()`, but now also proves the
+CPU reference fixture conserves whole-run water inventory and that
+`last_latent_heat_energy` matches the final-step transferred water mass times
+the explicit latent-heat constant.
 
-This gives later phases a stable executable fixture for strict conservation and
-energy-equality assertions while preserving the constraint that no GPU
-latent-heat production parity is claimed in this feature.
+This leaves the feature with a stronger executable CPU reference baseline for
+future GPU parity work while preserving the constraint that no GPU latent-heat
+production parity is claimed in this feature.
 
 ## User Stories
 
@@ -31,9 +32,9 @@ latent-heat production parity is claimed in this feature.
 - As a maintainer, I want the baseline to run in the default integration suite
   so that public CPU latent-heat runnable regressions are caught before Epic D
   work begins.
-- As a follow-up implementer, I want P1 to stay intentionally lightweight so P2
-  can add strict conservation and energy-equality checks on top of a reviewed
-  fixture.
+- As a follow-up implementer, I want the reviewed fixture to support strict
+  conservation and energy-equality checks without changing production code or
+  widening scope beyond the CPU integration test.
 
 ## Parent Epic Context
 
