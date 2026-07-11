@@ -6,45 +6,68 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
-
-from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
-    _brownian_diffusivity,
-    _g_collection_term,
-    _mean_free_path_l,
-    get_brownian_kernel,
-    get_brownian_kernel_via_system_state,
-)
-from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
-    brownian_diffusivity_wp,
-    brownian_kernel_pair_wp,
-    g_collection_term_wp,
-    particle_mean_free_path_wp,
-)
-from particula.gpu.properties.gas_properties import (  # noqa: E402
-    dynamic_viscosity_wp,
-    molecule_mean_free_path_wp,
-)
-from particula.gpu.properties.particle_properties import (  # noqa: E402
-    aerodynamic_mobility_wp,
-    cunningham_slip_correction_wp,
-    knudsen_number_wp,
-    mean_thermal_speed_wp,
-)
-from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
-from particula.util.constants import (  # noqa: E402
-    BOLTZMANN_CONSTANT,
-    GAS_CONSTANT,
-    MOLECULAR_WEIGHT_AIR,
-    REF_TEMPERATURE_STP,
-    REF_VISCOSITY_AIR_STP,
-    SUTHERLAND_CONSTANT,
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
 )
 
+if wp is not None:
+    from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
+        _brownian_diffusivity,
+        _g_collection_term,
+        _mean_free_path_l,
+        get_brownian_kernel,
+        get_brownian_kernel_via_system_state,
+    )
+    from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
+        brownian_diffusivity_wp,
+        brownian_kernel_pair_wp,
+        g_collection_term_wp,
+        particle_mean_free_path_wp,
+    )
+    from particula.gpu.properties.gas_properties import (  # noqa: E402
+        dynamic_viscosity_wp,
+        molecule_mean_free_path_wp,
+    )
+    from particula.gpu.properties.particle_properties import (  # noqa: E402
+        aerodynamic_mobility_wp,
+        cunningham_slip_correction_wp,
+        knudsen_number_wp,
+        mean_thermal_speed_wp,
+    )
+    from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
+    from particula.util.constants import (  # noqa: E402
+        BOLTZMANN_CONSTANT,
+        GAS_CONSTANT,
+        MOLECULAR_WEIGHT_AIR,
+        REF_TEMPERATURE_STP,
+        REF_VISCOSITY_AIR_STP,
+        SUTHERLAND_CONSTANT,
+    )
 
-@wp.kernel
+
+def _warp_kernel(function):
+    """Decorate kernels only when Warp is available."""
+    if wp is None:
+        return function
+    return wp.kernel(function)
+
+
+def _available_warp_devices() -> list[str]:
+    """Return collection-safe Warp device params."""
+    if wp is None:
+        return ["cpu"]
+    return warp_devices(wp)
+
+
+@_warp_kernel
 def _brownian_diffusivity_kernel(
     temperatures: Any,
     aerodynamic_mobilities: Any,
@@ -67,7 +90,7 @@ def _brownian_diffusivity_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _particle_mean_free_path_kernel(
     diffusivities: Any,
     mean_thermal_speeds: Any,
@@ -87,7 +110,7 @@ def _particle_mean_free_path_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _g_collection_term_kernel(
     mean_free_paths: Any,
     particle_radii: Any,
@@ -107,7 +130,7 @@ def _g_collection_term_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _brownian_kernel_pair_kernel(
     radii_i: Any,  # wp.array(dtype=wp.float64)
     radii_j: Any,  # wp.array(dtype=wp.float64)
@@ -148,7 +171,7 @@ def _brownian_kernel_pair_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _brownian_chain_kernel(
     temperatures: Any,  # wp.array(dtype=wp.float64)
     pressures: Any,  # wp.array(dtype=wp.float64)
@@ -248,7 +271,7 @@ def _brownian_chain_kernel(
     )
 
 
-@pytest.fixture(params=warp_devices(wp))
+@pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param

@@ -118,7 +118,7 @@ git push -u origin issue123-fix-simulation
 
 **Step 7 – Discuss & iterate**
 
-* GitHub Actions runs tests (`pytest -Werror`), linters (`flake8`, `pylint`), and docs build automatically.  
+* GitHub Actions runs tests (`pytest -Werror`), Ruff validation, type checks, and docs build automatically.  
 * Push additional commits to the same branch—CI re‑runs and the PR updates.
 
 
@@ -137,7 +137,7 @@ Your contribution is now part of **Particula**—thank you!
 | **Style** | Detailed rules: [Code Specifications](Code_Specifications/index.md). |
 | **Docstrings** | Follow the templates in [Function docstring format](../contribute/Code_Specifications/Details/Function_docstring_format.md) and [Class docstring format](../contribute/Code_Specifications/Details/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
 | **Typing** | Use `typing` annotations. Omit types in docstrings. |
-| **Tests** | Every public function/class must have at least one `pytest` test. Aim for coverage ≥ 90 %.  See [Add Unit Tests](../contribute/Feature_Workflow/Details/Add_Unit_Test.md). |
+| **Tests** | Every public function/class must have at least one `pytest` test. Add regression coverage for fixes and keep change-scope coverage strong. See [Add Unit Tests](../contribute/Feature_Workflow/Details/Add_Unit_Test.md) and the [testing guide](../../.opencode/guides/testing_guide.md). |
 | **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
 | **Large changes** | Open a **discussion** first and discuss design before implementation. |
 
@@ -150,14 +150,17 @@ Your contribution is now part of **Particula**—thank you!
 | Purpose | Command |
 |---------|---------|
 | **Quick unit tests** | `pytest -q -Werror` |
-| **Run tests in parallel** | `pytest -Werror` |
-| **Static type‑checking (pytype, Mac/Linux)** | `pytype particula` |
-| **Black auto‑format (79 cols)** | `black . --line-length 79` |
-| **Flake8 lint** | `flake8 . --config .github/.flake8` |
-| **Pylint lint** | `pylint particula` |
+| **Coverage check** | `pytest --cov=particula --cov-report=term-missing` |
+| **Ruff auto-fix lint** | `ruff check particula/ --fix` |
+| **Ruff format** | `ruff format particula/` |
+| **Final Ruff check** | `ruff check particula/` |
+| **Static type-checking** | `mypy particula/ --ignore-missing-imports` |
 
 > **CI note:** Every pull request triggers **GitHub Actions** (Ubuntu / macOS / Windows).  
-> The workflow runs `pytest -n auto -Werror`, `flake8`, `pylint`, `pytype`, builds the docs, and checks coverage.  
+> The local validation path should mirror the current repository workflow: run
+> `ruff check particula/ --fix`, `ruff format particula/`,
+> `ruff check particula/`, `mypy particula/ --ignore-missing-imports`, and the
+> relevant `pytest` command for your change scope (plus coverage when needed).  
 > Any warning promoted to an error (via `-Werror`) or other failure marks the PR ❌. Click **“Details →”** beside the failing job to view logs, fix locally, push again, and the checks will re‑run automatically.
 >
 > **GPU validation note:** Use the testing guide and GPU roadmap as the

@@ -10,34 +10,57 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
-
-from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
-    get_dynamic_viscosity,
-)
-from particula.gas.properties.mean_free_path import (  # noqa: E402
-    get_molecule_mean_free_path,
-)
-from particula.gas.properties.pressure_function import (  # noqa: E402
-    get_partial_pressure,
-)
-from particula.gpu.properties.gas_properties import (  # noqa: E402
-    dynamic_viscosity_wp,
-    molecule_mean_free_path_wp,
-    partial_pressure_wp,
-)
-from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
-from particula.util.constants import (  # noqa: E402
-    GAS_CONSTANT,
-    REF_TEMPERATURE_STP,
-    REF_VISCOSITY_AIR_STP,
-    SUTHERLAND_CONSTANT,
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
 )
 
+if wp is not None:
+    from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
+        get_dynamic_viscosity,
+    )
+    from particula.gas.properties.mean_free_path import (  # noqa: E402
+        get_molecule_mean_free_path,
+    )
+    from particula.gas.properties.pressure_function import (  # noqa: E402
+        get_partial_pressure,
+    )
+    from particula.gpu.properties.gas_properties import (  # noqa: E402
+        dynamic_viscosity_wp,
+        molecule_mean_free_path_wp,
+        partial_pressure_wp,
+    )
+    from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
+    from particula.util.constants import (  # noqa: E402
+        GAS_CONSTANT,
+        REF_TEMPERATURE_STP,
+        REF_VISCOSITY_AIR_STP,
+        SUTHERLAND_CONSTANT,
+    )
 
-@wp.kernel
+
+def _warp_kernel(function):
+    """Decorate kernels only when Warp is available."""
+    if wp is None:
+        return function
+    return wp.kernel(function)
+
+
+def _available_warp_devices() -> list[str]:
+    """Return collection-safe Warp device params."""
+    if wp is None:
+        return ["cpu"]
+    return warp_devices(wp)
+
+
+@_warp_kernel
 def _dynamic_viscosity_kernel(
     temperatures: Any,
     ref_viscosity: Any,
@@ -63,7 +86,7 @@ def _dynamic_viscosity_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _mean_free_path_kernel(
     molar_masses: Any,
     temperatures: Any,
@@ -92,7 +115,7 @@ def _mean_free_path_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _partial_pressure_kernel(
     concentrations: Any,
     molar_masses: Any,
@@ -118,7 +141,7 @@ def _partial_pressure_kernel(
     )
 
 
-@pytest.fixture(params=warp_devices(wp))
+@pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param

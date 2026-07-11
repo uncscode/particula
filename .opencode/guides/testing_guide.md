@@ -173,7 +173,8 @@ registered: `warp`, `cuda`, `gpu_parity`, and `stochastic`.
 
 ### Release-validation command sets
 
-Use focused Warp CPU runs for the default supported validation path:
+Use focused Warp CPU runs for the default supported validation path. These are
+the shipped release-validation commands whenever Warp is installed:
 
 ```bash
 pytest particula/gpu/tests/cuda_availability_test.py -q
@@ -183,7 +184,9 @@ pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochasti
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a
-CUDA-capable device is available:
+CUDA-capable device is available. CUDA is additive evidence, not the default
+path, and the same Warp-marked modules should continue to collect safely when
+CUDA is absent:
 
 ```bash
 pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"
@@ -195,6 +198,9 @@ These commands match the shipped marker and helper contract:
 - CUDA validation is additional local/manual evidence until dedicated CI exists.
 - Missing Warp or missing CUDA should produce expected skips, not release
   failures, when a command reaches a guarded suite.
+- Warp-marked tests should avoid eager module-level `pytest.importorskip("warp")`
+  patterns so marker deselection does not force a collection-time Warp
+  dependency.
 - Benchmark coverage stays opt-in behind `--benchmark` and remains separate
   from the default release-validation path above.
 

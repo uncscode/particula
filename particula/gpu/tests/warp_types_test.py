@@ -5,18 +5,29 @@ single-box and multi-box scenarios for WarpParticleData,
 WarpGasData, and WarpEnvironmentData.
 """
 
+from typing import Any
+
 import numpy as np
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
-
-from particula.gpu.warp_types import (  # noqa: E402
-    WarpEnvironmentData,
-    WarpGasData,
-    WarpParticleData,
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
 )
+
+if wp is not None:
+    from particula.gpu.warp_types import (  # noqa: E402
+        WarpEnvironmentData,
+        WarpGasData,
+        WarpParticleData,
+    )
 
 
 class TestWarpParticleDataCreation:
