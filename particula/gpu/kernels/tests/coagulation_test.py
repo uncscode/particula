@@ -27,73 +27,96 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
+)
 
-import particula.gpu.kernels.coagulation as coagulation_module  # noqa: E402
-from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
-    get_brownian_kernel_via_system_state,
-)
-from particula.gas.environment_data import EnvironmentData  # noqa: E402
-from particula.gas.gas_data import GasData  # noqa: E402
-from particula.gpu.conversion import (  # noqa: E402
-    from_warp_particle_data,
-    to_warp_environment_data,
-    to_warp_particle_data,
-)
-from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
-    brownian_diffusivity_wp,
-    brownian_kernel_pair_wp,
-    g_collection_term_wp,
-    particle_mean_free_path_wp,
-)
-from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
-    particle_radius_from_volume_wp,
-)
-from particula.gpu.kernels.coagulation import (  # noqa: E402
-    MAX_SCHEDULED_TRIALS_PER_BOX,
-    _bound_scheduled_trials,
-    _ensure_volume_array,
-    _initialize_rng_states,
-    _remove_active_pair_by_rank_swap_pop,
-    _resolve_active_pair_by_rank,
-    _resolve_collision_capacity,
-    _select_active_pair_by_rank,
-    _validate_collision_counts,
-    _validate_collision_pairs,
-    _validate_device_arrays,
-    _validate_device_match,
-    _validate_max_collisions,
-    _validate_particle_arrays,
-    _validate_rng_states,
-    _validate_time_step,
-    apply_coagulation_kernel,
-    brownian_coagulation_kernel,
-    coagulation_step_gpu,
-    initialize_coagulation_rng_states,
-)
-from particula.gpu.properties.gas_properties import (  # noqa: E402
-    dynamic_viscosity_wp,
-    molecule_mean_free_path_wp,
-)
-from particula.gpu.properties.particle_properties import (  # noqa: E402
-    aerodynamic_mobility_wp,
-    cunningham_slip_correction_wp,
-    knudsen_number_wp,
-    mean_thermal_speed_wp,
-)
-from particula.gpu.tests.cuda_availability import (  # noqa: E402
-    cuda_available,
-    warp_devices,
-)
+if wp is not None:
+    import particula.gpu.kernels.coagulation as coagulation_module  # noqa: E402
+    from particula.dynamics.coagulation.brownian_kernel import (  # noqa: E402
+        get_brownian_kernel_via_system_state,
+    )
+    from particula.gas.environment_data import EnvironmentData  # noqa: E402
+    from particula.gas.gas_data import GasData  # noqa: E402
+    from particula.gpu.conversion import (  # noqa: E402
+        from_warp_particle_data,
+        to_warp_environment_data,
+        to_warp_particle_data,
+    )
+    from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
+        brownian_diffusivity_wp,
+        brownian_kernel_pair_wp,
+        g_collection_term_wp,
+        particle_mean_free_path_wp,
+    )
+    from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
+        particle_radius_from_volume_wp,
+    )
+    from particula.gpu.kernels.coagulation import (  # noqa: E402
+        MAX_SCHEDULED_TRIALS_PER_BOX,
+        _bound_scheduled_trials,
+        _ensure_volume_array,
+        _initialize_rng_states,
+        _remove_active_pair_by_rank_swap_pop,
+        _resolve_active_pair_by_rank,
+        _resolve_collision_capacity,
+        _select_active_pair_by_rank,
+        _validate_collision_counts,
+        _validate_collision_pairs,
+        _validate_device_arrays,
+        _validate_device_match,
+        _validate_max_collisions,
+        _validate_particle_arrays,
+        _validate_rng_states,
+        _validate_time_step,
+        apply_coagulation_kernel,
+        brownian_coagulation_kernel,
+        coagulation_step_gpu,
+        initialize_coagulation_rng_states,
+    )
+    from particula.gpu.properties.gas_properties import (  # noqa: E402
+        dynamic_viscosity_wp,
+        molecule_mean_free_path_wp,
+    )
+    from particula.gpu.properties.particle_properties import (  # noqa: E402
+        aerodynamic_mobility_wp,
+        cunningham_slip_correction_wp,
+        knudsen_number_wp,
+        mean_thermal_speed_wp,
+    )
+    from particula.gpu.tests.cuda_availability import (  # noqa: E402
+        cuda_available,
+        warp_devices,
+    )
 
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 # pyright: reportArgumentType=false
 # pyright: reportAssignmentType=false
-from particula.particles.particle_data import ParticleData  # noqa: E402
-from particula.util import constants  # noqa: E402
+    from particula.particles.particle_data import ParticleData  # noqa: E402
+    from particula.util import constants  # noqa: E402
+
+
+def _warp_kernel(function):
+    """Decorate kernels only when Warp is available."""
+    if wp is None:
+        return function
+    return wp.kernel(function)
+
+
+def _available_warp_devices() -> list[str]:
+    """Return collection-safe Warp device params."""
+    if wp is None:
+        return ["cpu"]
+    return warp_devices(wp)
 
 _INT32_MAX = np.iinfo(np.int32).max
 
@@ -135,7 +158,7 @@ class _ExpectedCollisionStatistics:
     active_pair_count: int
 
 
-@wp.kernel
+@_warp_kernel
 def _selector_guard_regression_kernel(
     active_indices: Any,
     resolved_pairs: Any,
@@ -164,7 +187,7 @@ def _selector_guard_regression_kernel(
     resolved_pairs[box_idx, 1] = valid_pair[1]
 
 
-@wp.kernel
+@_warp_kernel
 def _bound_scheduled_trials_probe_kernel(
     expected_trials: Any,
     bounded_trials: Any,
@@ -174,7 +197,7 @@ def _bound_scheduled_trials_probe_kernel(
     bounded_trials[box_idx] = _bound_scheduled_trials(expected_trials[box_idx])
 
 
-@wp.kernel
+@_warp_kernel
 def _resolve_active_pair_probe_kernel(
     active_flags: Any,
     resolved_pairs: Any,
@@ -194,7 +217,7 @@ def _resolve_active_pair_probe_kernel(
     resolved_pairs[box_idx, 1] = pair[1]
 
 
-@wp.kernel
+@_warp_kernel
 def _select_active_pair_probe_kernel(
     active_indices: Any,
     resolved_pairs: Any,
@@ -213,7 +236,7 @@ def _select_active_pair_probe_kernel(
     resolved_pairs[box_idx, 1] = pair[1]
 
 
-@wp.kernel
+@_warp_kernel
 def _remove_active_pair_probe_kernel(
     active_indices: Any,
     updated_counts: Any,
@@ -236,7 +259,7 @@ def _remove_active_pair_probe_kernel(
     )
 
 
-@pytest.fixture(params=warp_devices(wp))
+@pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
@@ -538,7 +561,7 @@ def _make_mixed_npf_droplet_particle_data() -> ParticleData:
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
@@ -995,7 +1018,7 @@ def _collect_test_local_attempt_diagnostics(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _draw_single_random_kernel(rng_states: Any, draws: Any) -> None:
     """Draw one random float from each RNG state for deterministic probing."""
     box_idx = wp.tid()
@@ -1082,7 +1105,7 @@ def test_mixed_npf_droplet_fixture_returns_float64_particle_data() -> None:
     assert np.max(particles.masses[:, :, 0]) > 1.0e-12
 
 
-@pytest.mark.parametrize("device", warp_devices(wp))
+@pytest.mark.parametrize("device", _available_warp_devices())
 def test_mixed_npf_droplet_fixture_converts_on_supported_warp_devices(
     device: str,
 ) -> None:
@@ -1775,7 +1798,7 @@ def test_coagulation_step_gpu_missing_scalar_inputs_short_circuit_before_mutatio
     )
 
 
-@wp.kernel
+@_warp_kernel
 # type: ignore[misc]
 def _brownian_kernel_matrix_kernel(
     radii: Any,

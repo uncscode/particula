@@ -23,6 +23,15 @@ _WARP_MARKED_GPU_TESTS = (
     Path("particula/gpu/properties/tests/particle_properties_test.py"),
 )
 
+_COLLECTION_SAFE_WARP_TESTS = (
+    Path("particula/gpu/tests/conversion_test.py"),
+    Path("particula/gpu/tests/warp_types_test.py"),
+    Path("particula/gpu/dynamics/tests/coagulation_funcs_test.py"),
+    Path("particula/gpu/properties/tests/gas_properties_test.py"),
+    Path("particula/gpu/kernels/tests/environment_test.py"),
+    Path("particula/gpu/kernels/tests/coagulation_test.py"),
+)
+
 
 @pytest.fixture(autouse=True)
 def _restore_benchmark_option_env() -> Generator[None, None, None]:
@@ -218,4 +227,15 @@ def test_remaining_warp_only_suites_are_explicitly_warp_marked() -> None:
 
     for relative_path in _WARP_MARKED_GPU_TESTS:
         contents = (repo_root / relative_path).read_text(encoding="utf-8")
-        assert "pytestmark = pytest.mark.warp" in contents, relative_path.as_posix()
+        assert "pytest.mark.warp" in contents, relative_path.as_posix()
+
+
+def test_warp_marked_suites_avoid_module_level_importorskip() -> None:
+    """Warp-marked suites should not rely on eager module-level importorskip."""
+    repo_root = Path(__file__).resolve().parents[2]
+
+    for relative_path in _COLLECTION_SAFE_WARP_TESTS:
+        contents = (repo_root / relative_path).read_text(encoding="utf-8")
+        assert 'pytest.importorskip("warp")' not in contents, (
+            relative_path.as_posix()
+        )

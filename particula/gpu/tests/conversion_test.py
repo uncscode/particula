@@ -8,27 +8,44 @@ device selection, multi-box scenarios, and error handling.
 import builtins
 import importlib
 import sys
+from typing import Any
 
 import numpy as np
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
-
-from particula.gpu.conversion import (  # noqa: E402
-    _from_numpy_zero_copy,
-    _restore_partitioning_bool,
-    _validate_device,
-    from_warp_environment_data,
-    from_warp_gas_data,
-    from_warp_particle_data,
-    gpu_context,
-    to_warp_environment_data,
-    to_warp_gas_data,
-    to_warp_particle_data,
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
 )
-from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
+
+if wp is not None:
+    from particula.gpu.conversion import (  # noqa: E402
+        _from_numpy_zero_copy,
+        _restore_partitioning_bool,
+        _validate_device,
+        from_warp_environment_data,
+        from_warp_gas_data,
+        from_warp_particle_data,
+        gpu_context,
+        to_warp_environment_data,
+        to_warp_gas_data,
+        to_warp_particle_data,
+    )
+    from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
+
+
+def _available_warp_devices() -> list[str]:
+    """Return collection-safe Warp device params."""
+    if wp is None:
+        return ["cpu"]
+    return warp_devices(wp)
 
 
 def _assert_environment_gpu_mirror_matches(source, gpu_data) -> None:
@@ -1585,7 +1602,7 @@ class TestFromWarpEnvironmentData:
         )
 
     @pytest.mark.gpu_parity
-    @pytest.mark.parametrize("device", warp_devices(wp))
+    @pytest.mark.parametrize("device", _available_warp_devices())
     def test_environment_data_round_trip_available_warp_devices(
         self,
         sample_environment_data_multi_box,

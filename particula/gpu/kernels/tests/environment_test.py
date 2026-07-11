@@ -7,25 +7,51 @@ from typing import Any
 import numpy as np
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
-
-from particula.gas.environment_data import EnvironmentData  # noqa: E402
-from particula.gpu.conversion import to_warp_environment_data  # noqa: E402
-from particula.gpu.kernels.environment import (  # noqa: E402
-    _broadcast_scalar_array,
-    _ensure_environment_arrays,
-    _is_warp_array_like,
-    _validate_box_array,
-)
-from particula.gpu.tests.cuda_availability import (  # noqa: E402
-    cuda_available,
-    warp_devices,
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
 )
 
+if wp is not None:
+    from particula.gas.environment_data import EnvironmentData  # noqa: E402
+    from particula.gpu.conversion import to_warp_environment_data  # noqa: E402
+    from particula.gpu.kernels.environment import (  # noqa: E402
+        _broadcast_scalar_array,
+        _ensure_environment_arrays,
+        _is_warp_array_like,
+        _validate_box_array,
+    )
+    from particula.gpu.tests.cuda_availability import (  # noqa: E402
+        cuda_available,
+        warp_devices,
+    )
 
-@pytest.fixture(params=warp_devices(wp))
+
+def _available_warp_devices() -> list[str]:
+    """Return collection-safe Warp device params."""
+    if wp is None:
+        return ["cpu"]
+    return warp_devices(wp)
+
+
+def _make_direct_input(
+    value: float | list[float], *, device: str
+) -> float | Any:
+    """Build scalar or Warp-array test inputs lazily."""
+    if isinstance(value, list):
+        assert wp is not None
+        return wp.array(value, dtype=wp.float64, device=device)
+    return value
+
+
+@pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
@@ -101,14 +127,8 @@ def test_environment_helper_returns_environment_arrays_unchanged(
 @pytest.mark.parametrize(
     ("temperature", "pressure"),
     [
-        (
-            298.15,
-            wp.array([101325.0, 101000.0], dtype=wp.float64, device="cpu"),
-        ),
-        (
-            wp.array([298.15, 299.15], dtype=wp.float64, device="cpu"),
-            101325.0,
-        ),
+        (298.15, [101325.0, 101000.0]),
+        ([298.15, 299.15], 101325.0),
     ],
 )
 def test_environment_helper_accepts_hybrid_scalar_and_array_inputs(
@@ -117,21 +137,8 @@ def test_environment_helper_accepts_hybrid_scalar_and_array_inputs(
     pressure: float | Any,
 ) -> None:
     """Hybrid direct inputs broadcast only the scalar side."""
-    temperature_value: Any = temperature
-    pressure_value: Any = pressure
-    if device != "cpu":
-        if hasattr(temperature_value, "device"):
-            temperature_value = wp.array(
-                temperature_value.numpy(),
-                dtype=wp.float64,
-                device=device,
-            )
-        if hasattr(pressure_value, "device"):
-            pressure_value = wp.array(
-                pressure_value.numpy(),
-                dtype=wp.float64,
-                device=device,
-            )
+    temperature_value = _make_direct_input(temperature, device=device)
+    pressure_value = _make_direct_input(pressure, device=device)
 
     returned_temperature, returned_pressure = _ensure_environment_arrays(
         temperature=temperature_value,
