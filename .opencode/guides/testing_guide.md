@@ -165,9 +165,26 @@ particle-resolved inputs, and parity with helper functions.
 
 ## NVIDIA Warp Tests
 
-GPU code must match Python/NumPy reference implementations. Use lightweight test
-kernels around `@wp.func` functions and compare against NumPy with tight
-tolerances.
+GPU code must match Python/NumPy reference implementations. Warp CPU is the
+default parity backend whenever Warp is installed. CUDA coverage is optional
+and local/manual when a CUDA-capable device is available; standard CI must skip
+cleanly when CUDA is unavailable. Use the existing markers exactly as
+registered: `warp`, `cuda`, `gpu_parity`, and `stochastic`.
+
+### Device-aware tolerance policy
+
+Keep GPU assertions in three separate classes so stochastic expectations do not
+leak into deterministic parity or conservation checks:
+
+1. **Deterministic parity:** use explicit
+   `numpy.testing.assert_allclose(..., rtol=..., atol=...)` bounds for CPU vs
+   Warp CPU comparisons and for optional CUDA comparisons when run locally.
+2. **Conservation checks:** keep mass or count drift tolerances tight and do
+   not relax them just because the surrounding kernel or replay uses stochastic
+   sampling.
+3. **Stochastic validation:** compare aggregate behavior across repeated seeds
+   or time steps with documented tolerance bands or sigma-based bounds; do not
+   require exact per-seed equality across CPU, Warp CPU, or CUDA.
 
 For GPU Brownian coagulation acceptance work, keep attempted-vs-accepted
 collision instrumentation private to
@@ -194,8 +211,14 @@ def test_gpu_matches_numpy():
     """Warp computation matches the NumPy reference."""
     expected = numpy_reference(...)
     result = warp_result(...)
-    npt.assert_allclose(result, expected, rtol=1e-10)
+    npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
 ```
+
+For stochastic kernels, assert aggregate behavior instead of replaying exact
+accepted-collision sequences or per-seed trajectories. A seeded range can be
+used to gather repeated evidence, but the pass condition should be a documented
+aggregate bound such as a tolerance interval or `3-sigma` window around the
+expected mean.
 
 Use constants from `particula.util.constants`; do not hardcode physical
 constants in kernels.
