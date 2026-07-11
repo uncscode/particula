@@ -13,6 +13,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 import particula.gpu.kernels.condensation as condensation_module  # noqa: E402
@@ -2632,6 +2634,7 @@ def test_condensation_step_gpu_prepares_box_properties_once_per_call(
     assert launch_names.count("_prepare_environment_properties_kernel") == 1
 
 
+@pytest.mark.gpu_parity
 def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
     """GPU condensation matches CPU for a single box."""
     temperature = 298.15
@@ -2679,6 +2682,7 @@ def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
     npt.assert_allclose(gpu_result.masses, expected_masses, rtol=1.0e-10)
 
 
+@pytest.mark.gpu_parity
 def test_condensation_step_gpu_multi_box_matches_cpu(device: str) -> None:
     """GPU condensation matches CPU for multiple boxes."""
     temperature = 300.0
@@ -2784,6 +2788,7 @@ def test_condensation_skips_inactive_particles(device: str) -> None:
     assert gpu_result.masses[0, 1, 0] == pytest.approx(initial_mass)
 
 
+@pytest.mark.gpu_parity
 def test_condensation_multi_species_parity(device: str) -> None:
     """Multi-species GPU condensation matches CPU."""
     temperature = 295.0
@@ -3149,6 +3154,8 @@ def test_condensation_stiffness_recorded_grid_cache_matches_uncached_execution(
         )
 
 
+@pytest.mark.gpu_parity
+@pytest.mark.cuda
 def test_condensation_stiffness_recorded_grid_cuda_contract_parity(
     device: str,
 ) -> None:
@@ -3766,6 +3773,7 @@ def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
         )
 
 
+@pytest.mark.gpu_parity
 def test_particle_radius_from_volume_wp_matches_numpy(device: str) -> None:
     """Warp helper for radius matches NumPy calculation."""
     volumes = np.array([1.0e-18, 8.0e-18], dtype=np.float64)
