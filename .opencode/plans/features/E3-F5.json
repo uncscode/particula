@@ -11,7 +11,7 @@
   "start_date": "2026-07-08",
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-08",
+  "last_updated": "2026-07-11",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E3-F5/architecture_design.md",
@@ -34,11 +34,11 @@
     {
       "id": "E3-F5-P1",
       "title": "Define Warp pytest markers and device options with hook tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-11",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
