@@ -9188,6 +9188,8 @@
       
         
       
+        
+      
     
     
     
@@ -9304,6 +9306,34 @@
     
   
     Condensation Tutorial: Particle Resolved
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CPU latent-heat condensation bookkeeping
   
 
     
@@ -15075,7 +15105,7 @@ fractions, batch partitioning, and gas-field updates for stability.</p>
 <p>CondensationLatentHeat mirrors the isothermal workflow for particle-resolved
 runs while adding latent-heat-aware mass transfer and per-step energy
 diagnostics. The step now supports a <code>dynamic_viscosity</code> override and records
-<code>last_latent_heat_energy</code> for parity with the isothermal API plus energy
+<code>last_latent_heat_energy</code> for consistency with the isothermal API plus energy
 tracking.</p>
 <p>This feature is built around user-facing APIs exposed via
 <code>particula.dynamics</code> and <code>particula.dynamics.condensation</code>:</p>
@@ -15225,8 +15255,10 @@ override for particle-resolved workflows.</p>
 <p>When neither a <code>latent_heat_strategy</code> nor a positive scalar <code>latent_heat</code>
 fallback is configured, the step follows the isothermal path and reports
 <code>last_latent_heat_energy = 0.0</code>.</p>
-<p><code>last_latent_heat_energy</code> records the total latent heat released per step
-(sum of dm × L), not an energy density.</p>
+<p><code>last_latent_heat_energy</code> records per-step latent-heat bookkeeping from the
+step mass-transfer quantity. For the current single-box public example path,
+that diagnostic aligns with the mass-concentration contract and should be
+reported as an energy density.</p>
 <h3 id="condensationisothermalstaggered-two-pass-gauss-seidel">CondensationIsothermalStaggered (two-pass Gauss-Seidel)<a class="headerlink" href="#condensationisothermalstaggered-two-pass-gauss-seidel" title="Permanent link">&para;</a></h3>
 <p><code>CondensationIsothermalStaggered</code> splits each timestep into two passes. Theta
 controls the first-pass fraction; batches are clipped to the particle count and
@@ -15662,6 +15694,7 @@ condensing species.</p>
 <ul>
 <li><strong>Dynamics overview</strong>: <a href="../wall_loss_strategy_system/">Wall loss strategy system</a></li>
 <li><strong>Examples</strong>: <a href="../../Examples/Simulations/">docs/Examples/Simulations/index.md</a></li>
+<li><strong>Latent-heat example</strong>: <a href="../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/">CPU latent-heat condensation bookkeeping</a></li>
 <li><strong>Theory</strong>: <a href="../../Theory/">docs/Theory/index.md</a></li>
 </ul>
 <h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>

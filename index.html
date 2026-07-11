@@ -9502,6 +9502,8 @@
       
         
       
+        
+      
     
     
     
@@ -9618,6 +9620,34 @@
     
   
     Condensation Tutorial: Particle Resolved
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Examples/Dynamics/Condensation/Condensation_Latent_Heat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CPU latent-heat condensation bookkeeping
   
 
     
@@ -14585,11 +14615,13 @@
 <li><strong>Providing a Python-based API</strong> for reproducible and modular simulations.</li>
 <li><strong>Building gas-phase properties</strong> with builder/factory patterns (vapor
   pressure and latent heat) that support unit-aware setters and exports.</li>
-<li><strong>Supporting non-isothermal condensation</strong> with thermal resistance,
-  latent-heat mass transfer rate utilities, latent-heat energy release
-  bookkeeping, and the <code>CondensationLatentHeat</code> strategy with
-  latent-heat-corrected <code>mass_transfer_rate()</code>/<code>rate()</code> and an implemented
-  <code>step()</code> that tracks per-step latent heat energy.</li>
+<li><strong>Supporting CPU latent-heat-corrected condensation diagnostics</strong> with
+  thermal resistance, latent-heat mass transfer rate utilities,
+  latent-heat energy-density bookkeeping, and the
+  <code>CondensationLatentHeat</code> strategy with latent-heat-corrected
+  <code>mass_transfer_rate()</code>/<code>rate()</code> plus a <code>step()</code> that tracks per-step
+  latent heat diagnostics without claiming temperature-feedback runtime
+  support.</li>
 <li><strong>Interrogating your experimental data</strong> to validate and expand your impact.</li>
 <li><strong>Fostering open-source collaboration</strong> to share ideas and build on each other’s work.</li>
 </ul>

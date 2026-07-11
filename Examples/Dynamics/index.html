@@ -9210,6 +9210,8 @@
       
         
       
+        
+      
     
     
     
@@ -9326,6 +9328,34 @@
     
   
     Condensation Tutorial: Particle Resolved
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Condensation/Condensation_Latent_Heat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CPU latent-heat condensation bookkeeping
   
 
     
@@ -14240,11 +14270,17 @@
 <p>Here we collect tutorials on the dynamic processes that can affect aerosol populations, 
 including condensation, coagulation, and special customizations.</p>
 <h2 id="condensation">Condensation<a class="headerlink" href="#condensation" title="Permanent link">&para;</a></h2>
-<p>These notebooks demonstrate bin-based and fully resolved approaches to modeling condensation.</p>
+<p>These examples demonstrate bin-based and fully resolved approaches to
+modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.</p>
 <ul>
 <li><a href="Condensation/Condensation_1_Bin/">Condensation 1: Bins</a></li>
 <li><a href="Condensation/Condensation_2_MassBin/">Condensation 2: Masses Binned</a></li>
 <li><a href="Condensation/Condensation_3_MassResolved/">Condensation 3: Masses Resolved</a></li>
+<li><a href="Condensation/Condensation_Latent_Heat/">Condensation: Latent Heat Bookkeeping</a>
+  – Published CPU-only latent-heat bookkeeping walkthrough using
+  <code>MassCondensation</code> with public factory/builder APIs. The reported
+  energy density is diagnostic only and does not feed back into
+  temperature.</li>
 <li><a href="Condensation/Staggered_Condensation_Example/">Staggered Condensation</a> – Demonstrates staggered ODE stepping for improved stability and mass conservation.</li>
 </ul>
 <h2 id="coagulation">Coagulation<a class="headerlink" href="#coagulation" title="Permanent link">&para;</a></h2>
