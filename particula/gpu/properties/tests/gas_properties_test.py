@@ -10,6 +10,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 from particula.gas.properties.dynamic_viscosity import (  # noqa: E402

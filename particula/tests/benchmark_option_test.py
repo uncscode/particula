@@ -2,13 +2,25 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
-from typing import Any, cast
+from typing import Any, Generator, cast
 
 import pytest
 from particula import conftest as particula_conftest
 
 _BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
+
+
+@pytest.fixture(autouse=True)
+def _restore_benchmark_option_env() -> Generator[None, None, None]:
+    """Restore benchmark opt-in env state after each test."""
+    previous = os.environ.get(particula_conftest.BENCHMARK_OPTION_ENV_VAR)
+    yield
+    if previous is None:
+        os.environ.pop(particula_conftest.BENCHMARK_OPTION_ENV_VAR, None)
+        return
+    os.environ[particula_conftest.BENCHMARK_OPTION_ENV_VAR] = previous
 
 
 @dataclass
@@ -157,6 +169,27 @@ def test_pytest_configure_persists_resolved_benchmark_option_state(
     particula_conftest.pytest_configure(cast(Any, config))
 
     assert particula_conftest.benchmark_option_enabled_from_env() is True
+
+
+def test_pytest_configure_resets_benchmark_option_state_when_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pytest configure resets a preexisting opt-in when benchmark is off."""
+
+    @dataclass
+    class _FakeConfigureWithOption(_FakeConfigureConfig):
+        benchmark_enabled: bool = False
+
+        def getoption(self, name: str) -> bool:
+            assert name == "--benchmark"
+            return self.benchmark_enabled
+
+    monkeypatch.setenv(particula_conftest.BENCHMARK_OPTION_ENV_VAR, "1")
+    config = _FakeConfigureWithOption(benchmark_enabled=False)
+
+    particula_conftest.pytest_configure(cast(Any, config))
+
+    assert particula_conftest.benchmark_option_enabled_from_env() is False
 
 
 def test_benchmark_collection_hook_skips_benchmark_tests_by_default() -> None:

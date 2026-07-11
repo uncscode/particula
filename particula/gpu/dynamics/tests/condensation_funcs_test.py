@@ -6,6 +6,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 from particula.dynamics.condensation.mass_transfer import (  # noqa: E402

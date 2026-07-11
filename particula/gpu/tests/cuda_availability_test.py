@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import warnings
 
-import pytest
-
 from particula.gpu.tests.cuda_availability import (
     CUDA_SKIP_REASON,
     cuda_available,
@@ -43,6 +41,14 @@ class _UnexpectedWarningWarp:
         return True
 
 
+class _ProbeErrorWarp:
+    """Warp-like object whose CUDA probe raises unexpectedly."""
+
+    def is_cuda_available(self) -> bool:
+        """Simulate a Warp probe crash during collection-time probing."""
+        raise RuntimeError("probe failed")
+
+
 def test_cuda_available_ignores_warp_pack_warning() -> None:
     """CUDA helper suppresses the known Warp ctypes warning."""
     assert cuda_available(_WarningWarp(True))
@@ -58,15 +64,10 @@ def test_cuda_available_is_warning_clean_for_targeted_pack_warning() -> None:
 
 
 def test_cuda_available_preserves_unrelated_deprecation_warnings() -> None:
-    """Only the targeted Warp _pack_ warning is suppressed."""
+    """Unexpected warning-to-error probe failures degrade to unavailable."""
     with warnings.catch_warnings():
         warnings.simplefilter("error", DeprecationWarning)
-        try:
-            cuda_available(_UnexpectedWarningWarp())
-        except DeprecationWarning as exc:
-            assert "unexpected warp deprecation" in str(exc)
-        else:
-            pytest.fail("Expected unrelated DeprecationWarning to propagate")
+        assert cuda_available(_UnexpectedWarningWarp()) is False
 
 
 def test_warp_devices_returns_cpu_only_without_cuda() -> None:
@@ -77,6 +78,16 @@ def test_warp_devices_returns_cpu_only_without_cuda() -> None:
 def test_warp_devices_returns_cpu_and_cuda_when_available() -> None:
     """Device list appends CUDA when Warp reports it available."""
     assert warp_devices(_WarningWarp(True)) == ["cpu", "cuda"]
+
+
+def test_cuda_available_returns_false_when_probe_raises() -> None:
+    """Unexpected CUDA probe errors degrade to the CPU-only path."""
+    assert cuda_available(_ProbeErrorWarp()) is False
+
+
+def test_warp_devices_remains_cpu_only_when_probe_raises() -> None:
+    """Device enumeration should stay collection-safe when probing fails."""
+    assert warp_devices(_ProbeErrorWarp()) == ["cpu"]
 
 
 def test_cuda_skip_reason_matches_shared_contract() -> None:

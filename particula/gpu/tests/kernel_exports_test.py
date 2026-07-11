@@ -6,6 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 
+pytestmark = pytest.mark.warp
+
 SUPPORTED_STEP_SYMBOLS = (
     "coagulation_step_gpu",
     "condensation_step_gpu",
