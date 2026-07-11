@@ -12,11 +12,15 @@ mass transfer.
 
 ### Value Proposition
 
-This feature adds a CPU-only example under `docs/Examples/Dynamics/Condensation/`
-that builds a latent-heat strategy through documented public factories/builders,
-advances an aerosol with `par.dynamics.MassCondensation`, and reports
-per-step/cumulative latent heat energy. The example gives users a copyable
-workflow for energy bookkeeping while avoiding unsupported GPU parity claims.
+Issue #1263 shipped the first runnable CPU-only example under
+`docs/Examples/Dynamics/Condensation/` plus focused smoke/invariant coverage in
+`particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
+The example builds a latent-heat strategy through documented public
+factories/builders, advances an aerosol with
+`par.dynamics.MassCondensation`, and reports per-step/cumulative latent heat
+energy. The shipped work gives users a copyable workflow for energy
+bookkeeping while avoiding unsupported GPU parity claims and intentionally
+leaves notebook/index wiring for later follow-up.
 
 ### User Stories
 

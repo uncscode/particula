@@ -20,8 +20,27 @@
 # `par.dynamics.MassCondensation`, and reports latent-heat bookkeeping from real
 # mass transfer. The reported energy is diagnostic only: it does not feed back
 # into the temperature state in this example.
+#
+# The setup is intentionally narrow:
+#
+# - one condensable species (`H2O`)
+# - one well-mixed CPU aerosol box
+# - a few short `MassCondensation.execute(...)` calls
+#
+# After each runnable call we read
+# `condensation_strategy.last_latent_heat_energy`, which stores only the most
+# recent latent-heat bookkeeping value. The cumulative signal is therefore
+# accumulated explicitly in this example loop.
 
 # %%
+"""CPU-only latent-heat condensation example.
+
+This runnable example demonstrates latent-heat bookkeeping from real
+condensation mass transfer using public CPU condensation APIs. The
+reported energy is diagnostic only and does not feed back into the
+temperature state.
+"""
+
 import copy
 
 import numpy as np
@@ -38,12 +57,24 @@ BOOKKEEPING_ONLY_NOTE = (
 
 
 def _as_float(value: float | np.ndarray) -> float:
-    """Return a scalar float from scalar-like numeric values."""
+    """Return the first scalar value from a scalar-like numeric input.
+
+    Args:
+        value: Scalar or array-like numeric value to coerce to ``float``.
+
+    Returns:
+        The first value from ``value`` as a Python ``float``.
+    """
     return float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
 
 
 def _build_aerosol() -> par.Aerosol:
-    """Build a small supersaturated single-species aerosol state."""
+    """Build a small supersaturated single-species aerosol state.
+
+    Returns:
+        Aerosol configured to produce a measurable condensation signal in
+        a single CPU box.
+    """
     molar_mass_water = 18.015e-3  # kg/mol
     temperature = 298.15  # K
     vapor_pressure_water = par.gas.VaporPressureFactory().get_strategy(
@@ -90,7 +121,20 @@ def _build_aerosol() -> par.Aerosol:
 
 
 def run_example() -> dict[str, float | list[float] | str | int]:
-    """Run the latent-heat condensation example and return diagnostics."""
+    """Run the latent-heat example and return bookkeeping diagnostics.
+
+    The example executes several short CPU condensation steps, records
+    the per-step latent-heat bookkeeping reported by the strategy, and
+    accumulates the cumulative energy explicitly.
+
+    Returns:
+        Dictionary containing initial and final gas concentrations,
+        initial and final particle mass concentrations, particle mass
+        change, per-step latent-heat energies, cumulative latent-heat
+        energy, user-facing note strings, and the iteration count. A
+        ``zero_transfer_explanation`` entry is added when the cumulative
+        energy is exactly zero.
+    """
     aerosol = _build_aerosol()
     latent_heat_strategy = par.gas.LatentHeatFactory().get_strategy(
         strategy_type="constant",
@@ -171,7 +215,11 @@ def run_example() -> dict[str, float | list[float] | str | int]:
 
 
 def main() -> None:
-    """Run the example and print concise user-facing diagnostics."""
+    """Run the example and print concise user-facing diagnostics.
+
+    Returns:
+        None.
+    """
     result = run_example()
     print(result["cpu_only_note"])
     print(result["bookkeeping_only_note"])
@@ -181,10 +229,16 @@ def main() -> None:
         f"{result['final_gas_concentration']:.6e}"
     )
     print(
+        "Particle mass concentration [kg/m^3]: "
+        f"{result['initial_particle_mass_concentration']:.6e} -> "
+        f"{result['final_particle_mass_concentration']:.6e}"
+    )
+    print(
         f"Particle mass change [kg/m^3]: {result['particle_mass_change']:.6e}"
     )
     print(
-        "Per-step latent heat energy [J]: "
+        "Per-step latent heat energy [J] "
+        "(each entry is the last value reported after one runnable call): "
         f"{result['per_step_latent_heat_energies']}"
     )
     print(

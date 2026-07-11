@@ -6,11 +6,15 @@ including condensation, coagulation, and special customizations.
 
 ## Condensation
 
-These notebooks demonstrate bin-based and fully resolved approaches to modeling condensation.
+These examples demonstrate bin-based and fully resolved approaches to
+modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.
 
 - [Condensation 1: Bins](Condensation/Condensation_1_Bin.ipynb)
 - [Condensation 2: Masses Binned](Condensation/Condensation_2_MassBin.ipynb)
 - [Condensation 3: Masses Resolved](Condensation/Condensation_3_MassResolved.ipynb)
+- `python docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py`
+  – CPU-only runnable source that demonstrates latent-heat bookkeeping
+  diagnostics from `MassCondensation` using public factory/builder APIs.
 - [Staggered Condensation](Condensation/Staggered_Condensation_Example.ipynb) – Demonstrates staggered ODE stepping for improved stability and mass conservation.
 
 ## Coagulation
