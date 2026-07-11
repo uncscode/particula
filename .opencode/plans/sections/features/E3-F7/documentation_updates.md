@@ -4,28 +4,40 @@
 
 - No documentation files changed in issue #1267 / E3-F7-P1.
 - No documentation files changed in issue #1268 / E3-F7-P2.
-- Both shipped slices intentionally stayed limited to
-  `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+- Issue #1269 / E3-F7-P3 shipped the planned docs-only follow-up in:
+  - `docs/Features/Roadmap/data-oriented-gpu.md`
+  - `docs/Features/condensation_strategy_system.md`
 
-## Deferred Updates
+## Implemented Updates
 
 - `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Mark or describe E3-F7 as the CPU integration-level latent-heat baseline
+  - Documents E3-F7 as the current CPU integration-level latent-heat baseline
     for future Epic D GPU parity work.
-  - State explicitly that the feature does not claim GPU latent-heat parity.
+  - Points readers to
+    `particula/integration_tests/condensation_latent_heat_conservation_test.py`
+    as the executable reference test.
+  - Summarizes the baseline invariants conservatively: finite nonzero
+    condensation transfer, particle water gain, gas water loss, total water
+    conservation, and final-step `last_latent_heat_energy` agreement with the
+    constant-latent-heat bookkeeping path.
+  - Keeps wording future-facing and explicitly avoids any claim of shipped GPU
+    latent-heat parity or temperature-feedback runtime support.
 
 - `docs/Features/condensation_strategy_system.md`
-  - Add a short note that latent-heat condensation now has an integration-level
-    CPU baseline under `particula/integration_tests/`.
-  - Summarize the later-phase invariants: particle/gas mass conservation and
-    latent-heat energy bookkeeping.
+  - Adds the same executable CPU baseline reference in the
+    `CondensationLatentHeat` section.
+  - Keeps the public support boundary explicit: CPU-only and
+    diagnostic/reference only.
+  - Includes the existing E3-F6 latent-heat example cross-link in related
+    documentation alongside the integration baseline path.
 
-## Optional Cross-References
+## Validation Notes
 
-- Link to the E3-F6 runnable CPU latent-heat example if it exists at
-  implementation time.
-- Mention the focused test command for maintainers who need to reproduce the
-  baseline quickly.
+- The shipped docs changes stay limited to the two planned documentation files.
+- The executable baseline remains
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+- Feature-page wording continues to avoid implying completed GPU latent-heat
+  parity.
 
 ## Wording Guardrails
 

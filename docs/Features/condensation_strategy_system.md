@@ -191,15 +191,15 @@ step mass-transfer quantity. For the current single-box public example path,
 that diagnostic aligns with the mass-concentration contract and should be
 reported as an energy density.
 
-For the current shipped support boundary, the executable baseline is the
-CPU integration test
+For the current shipped support boundary, E3-F7 is the executable CPU
+integration-level latent-heat baseline for future Epic D GPU parity work:
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-It verifies a finite nonzero condensation transfer, particle water gain,
-gas water loss, total water conservation, and final-step
+It verifies only a finite nonzero condensation transfer, particle water
+gain, gas water loss, total water conservation, and final-step
 `last_latent_heat_energy` agreement with the constant-latent-heat
-bookkeeping path. This baseline is CPU-only and diagnostic only; it does not
-claim completed GPU latent-heat parity or temperature-feedback runtime
-support.
+bookkeeping path. This baseline is CPU-only and diagnostic/reference only;
+it does not claim shipped GPU latent-heat parity or temperature-feedback
+runtime support.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 

@@ -13,6 +13,7 @@ Status: reviewed and answered on 2026-07-08.
 - Use the existing integration tolerance of `1e-9` as the initial water
   inventory tolerance, then tighten with `np.testing.assert_allclose` only after
   fixture tuning proves stable energy behavior.
-- Cross-link to the E3-F6 example when it exists. Until then, record the link as
-  a follow-up in E3-F7 documentation updates rather than blocking the baseline
-  test.
+- Cross-link to the E3-F6 example when it exists. This is now resolved in the
+  shipped P3 docs update: `docs/Features/condensation_strategy_system.md`
+  keeps the existing latent-heat example link and also points readers to the
+  executable CPU integration baseline.

@@ -19,8 +19,12 @@
   pre-final, and final particle/gas water bookkeeping; asserts whole-run water
   conservation; and checks that final-step particle gain, gas loss, and
   `last_latent_heat_energy` all close against the explicit constant latent heat.
-- **P3:** Keep documentation validation lightweight; verify the documented test
-  path and CPU-only constraints match the implemented baseline.
+- **P3 (implemented):** Documentation validation stayed lightweight and focused
+  on the shipped wording contract. The updated roadmap and condensation feature
+  docs now reference
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`,
+  keep the baseline CPU-only/diagnostic-only, and avoid any claim of completed
+  GPU latent-heat parity.
 
 ## Current Assertions
 
@@ -45,5 +49,6 @@ not require `slow`, `performance`, GPU, CUDA, or Warp markers.
 
 ```bash
 pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q -Werror
+pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror
 pytest particula/integration_tests -q
 ```

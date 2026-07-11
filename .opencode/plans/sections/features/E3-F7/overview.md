@@ -14,12 +14,16 @@ assertions for follow-up work.
 ## Value Proposition
 
 E3-F7 now has shipped P1 and P2 coverage in
-`particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-The implemented slice still uses only public `particula` APIs, a constant
-latent-heat strategy, and `MassCondensation.execute()`, but now also proves the
-CPU reference fixture conserves whole-run water inventory and that
-`last_latent_heat_energy` matches the final-step transferred water mass times
-the explicit latent-heat constant.
+`particula/integration_tests/condensation_latent_heat_conservation_test.py`,
+and shipped P3 documentation updates in
+`docs/Features/Roadmap/data-oriented-gpu.md` and
+`docs/Features/condensation_strategy_system.md`. The implemented slice still
+uses only public `particula` APIs, a constant latent-heat strategy, and
+`MassCondensation.execute()`, but now also proves the CPU reference fixture
+conserves whole-run water inventory, that `last_latent_heat_energy` matches
+the final-step transferred water mass times the explicit latent-heat constant,
+and that the roadmap/feature docs point future Epic D work to this CPU-only
+diagnostic baseline without implying shipped GPU parity.
 
 This leaves the feature with a stronger executable CPU reference baseline for
 future GPU parity work while preserving the constraint that no GPU latent-heat

@@ -26,6 +26,7 @@ including at minimum:
 
 ```bash
 pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q
+pytest particula/tests/condensation_latent_heat_docs_test.py -q
 pytest particula/integration_tests -q
 ```
 
