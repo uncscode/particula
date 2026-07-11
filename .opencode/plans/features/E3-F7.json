@@ -47,11 +47,11 @@
     {
       "id": "E3-F7-P2",
       "title": "Assert CPU mass conservation and latent-heat energy bookkeeping",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-11",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
