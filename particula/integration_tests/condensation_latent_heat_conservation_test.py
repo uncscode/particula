@@ -126,7 +126,8 @@ def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
     """Verify MassCondensation transfers water through the CPU path.
 
     The test confirms that the public latent-heat runnable produces a finite,
-    nonzero gas-to-particle transfer over a short fixed loop.
+    nonzero gas-to-particle transfer and positive latent-heat bookkeeping over
+    a short fixed loop.
     """
     aerosol, _ = _build_test_aerosol()
     condensation, condensation_strategy = _build_condensation()
@@ -154,6 +155,7 @@ def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
     assert np.isfinite(initial_particle_mass_concentration)
     assert np.isfinite(final_particle_mass_concentration)
     assert np.isfinite(condensation_strategy.last_latent_heat_energy)
+    assert condensation_strategy.last_latent_heat_energy > 0.0
 
     assert (
         final_particle_mass_concentration > initial_particle_mass_concentration
