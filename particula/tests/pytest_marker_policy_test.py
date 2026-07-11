@@ -7,7 +7,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
 from particula import conftest as particula_conftest
+
+_BENCHMARK_SKIP_REASON = (
+    "GPU benchmarks skipped (pass --benchmark to enable)"
+)
 
 
 @dataclass
@@ -49,9 +54,9 @@ class _FakeItem:
     """Minimal pytest item stub for collection-hook tests."""
 
     keywords: set[str]
-    markers: list[object] = field(default_factory=list)
+    markers: list[pytest.MarkDecorator] = field(default_factory=list)
 
-    def add_marker(self, marker: object) -> None:
+    def add_marker(self, marker: pytest.MarkDecorator) -> None:
         """Record markers applied by the collection hook."""
         self.markers.append(marker)
 
@@ -120,6 +125,9 @@ def test_default_collection_only_skips_benchmark_items_even_with_warp() -> None:
     )
 
     assert len(benchmark_item.markers) == 1
+    marker = benchmark_item.markers[0]
+    assert marker.mark.name == "skip"
+    assert marker.mark.kwargs == {"reason": _BENCHMARK_SKIP_REASON}
     assert non_benchmark_item.markers == []
 
 
