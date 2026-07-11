@@ -146,14 +146,20 @@ The lower-level Warp backend is implemented and covered by targeted tests.
 - GPU condensation kernels provide a tested `condensation_step_gpu` API.
 - GPU Brownian coagulation kernels provide a tested `coagulation_step_gpu` API.
 - GPU benchmark scaffolding exists for CUDA-enabled environments.
-- Parity validation always includes Warp CPU when Warp is installed and may add
-  Warp CUDA when a device is available locally. Deterministic parity uses
-  explicit `numpy.testing.assert_allclose(..., rtol=..., atol=...)` bounds,
+- Warp CPU is the baseline validation backend whenever Warp is installed, while
+  CUDA validation remains optional/local/manual rather than a CI requirement.
+  Deterministic parity uses explicit
+  `numpy.testing.assert_allclose(..., rtol=..., atol=...)` bounds,
   conservation checks stay separately tight, the matching pytest markers remain
-  `warp`, `cuda`, `gpu_parity`, and `stochastic`, CUDA coverage is
-  optional/local/manual rather than a CI requirement, and this documentation
-  records the explicit helper surface rather than implying automatic GPU
-  runtime integration.
+  `warp`, `cuda`, `gpu_parity`, and `stochastic`, and CPU-only or standard CI
+  environments are expected to skip CUDA-specific coverage cleanly instead of
+  treating it as a regression. Focused examples include
+  `pytest particula/gpu/kernels/tests/environment_test.py -q` for the Warp CPU
+  baseline path and
+  `pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"`
+  for optional CUDA-if-available validation. This documentation records the
+  explicit helper surface rather than implying automatic GPU runtime
+  integration.
 
 The GPU backend is currently a directly callable lower-level API. It is not yet
 integrated as an automatic backend in the main `Aerosol`, `Runnable`, or
@@ -744,11 +750,12 @@ Planned features:
    helpers, and context helpers rather than direct kernel-step imports. Raw
    helper kernels remain intentionally outside the documented package-level
    public surface; import them from their concrete modules when needed.
-5. Device-aware pytest policy is part of the shipped guidance: parity
-   validation always runs on Warp CPU when Warp is installed and may add CUDA
-   when a device is present locally; the matching pytest markers remain
-   `warp`, `cuda`, `gpu_parity`, and `stochastic`; CUDA validation is
-   optional/local/manual and must skip cleanly when CUDA is unavailable.
+5. Device-aware pytest policy is part of the shipped guidance: Warp CPU is the
+   default parity backend when Warp is installed, CUDA runs are optional
+   local/manual additions when a device is present locally, the matching pytest
+   markers remain `warp`, `cuda`, `gpu_parity`, and `stochastic`, and CPU-only
+   or standard CI environments must skip CUDA coverage cleanly when it is not
+   available.
 6. Tolerance policy stays split into three classes: deterministic parity uses
    explicit `numpy.testing.assert_allclose(..., rtol=..., atol=...)`
    bounds, conservation checks keep separately tight drift tolerances, and
@@ -776,8 +783,11 @@ Planned features:
 
    - missing Warp means the quick-start stays in its CPU-only documentation
      path behind `WARP_AVAILABLE`, with deferred `particula.gpu.kernels`
-     imports and no pretend kernel execution
-   - CUDA is optional and Warp `device="cpu"` is the default runnable path
+     imports and no pretend kernel execution; guarded test suites may also skip
+     through `pytest.importorskip("warp")`, which is expected
+   - CUDA is optional/local/manual, Warp `device="cpu"` is the default
+     runnable validation path, and CPU-only or CI environments should skip
+     CUDA-targeted coverage cleanly rather than fail
    - particle, gas, environment, and sidecar buffers such as `rng_states`
      must stay on compatible devices
    - `environment=` must not be mixed with scalar or Warp-array direct
@@ -786,6 +796,10 @@ Planned features:
      helpers, including lossy gas restore for names and helper-only state
    - no hidden transfers, hidden synchronization, or automatic top-level
      fallback imports should be implied by roadmap prose
+   - focused local validation can use
+     `pytest particula/gpu/tests/cuda_availability_test.py -q` for the shared
+     skip contract and `pytest particula/gpu/kernels/tests/environment_test.py
+     -q -m "warp and cuda"` for optional CUDA-if-available coverage
 8. Add a runnable `docs/Examples/` entry for a `CondensationLatentHeat`
    workflow (deferred from E1; current tutorials only set `latent_heat` as a
    vapor property), following the paired `.py`/`.ipynb` example conventions.
@@ -1260,6 +1274,8 @@ resampling or volume-scaling policy before slot exhaustion.
 
 - Command evidence: run
   `pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s`.
+  This remains opt-in benchmark evidence for local CUDA-capable environments,
+  not part of the standard Warp CPU release-validation command set.
   The recorded source-of-record artifact at
   `.artifacts/benchmarks/gpu_benchmark_results.json` preserves the exact
   executed local command in `benchmark_metadata.command`; the 2026-07-10 UTC

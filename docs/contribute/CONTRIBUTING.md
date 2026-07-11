@@ -159,6 +159,13 @@ Your contribution is now part of **Particula**—thank you!
 > **CI note:** Every pull request triggers **GitHub Actions** (Ubuntu / macOS / Windows).  
 > The workflow runs `pytest -n auto -Werror`, `flake8`, `pylint`, `pytype`, builds the docs, and checks coverage.  
 > Any warning promoted to an error (via `-Werror`) or other failure marks the PR ❌. Click **“Details →”** beside the failing job to view logs, fix locally, push again, and the checks will re‑run automatically.
+>
+> **GPU validation note:** Use the testing guide and GPU roadmap as the
+> canonical policy for Warp-targeted validation. Focused Warp CPU runs are the
+> default supported path, CUDA runs are optional/local/manual only, and
+> missing-Warp or missing-CUDA cases should surface as expected skips rather
+> than CI failures. For targeted local runs, use marker selection such as
+> `-m "warp and gpu_parity"` or `-m "warp and cuda"`.
 
 ---
 
