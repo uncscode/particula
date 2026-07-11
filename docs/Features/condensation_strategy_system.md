@@ -192,14 +192,14 @@ that diagnostic aligns with the mass-concentration contract and should be
 reported as an energy density.
 
 For the current shipped support boundary, E3-F7 is the executable CPU
-integration-level latent-heat baseline for future Epic D GPU parity work:
+integration baseline for future Epic D GPU parity work:
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
 It verifies only a finite nonzero condensation transfer, particle water
 gain, gas water loss, total water conservation, and final-step
 `last_latent_heat_energy` agreement with the constant-latent-heat
 bookkeeping path. This baseline is CPU-only and diagnostic/reference only;
-it does not claim shipped GPU latent-heat parity or temperature-feedback
-runtime support.
+temperature-feedback runtime support and GPU latent-heat parity remain
+future work.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
@@ -636,7 +636,7 @@ aerosol, gas = selective.step(
 
 - **Dynamics overview**: [Wall loss strategy system](./wall_loss_strategy_system.md)
 - **Examples**: [docs/Examples/Simulations/index.md](../Examples/Simulations/index.md)
-- **Latent-heat example**: [CPU latent-heat condensation bookkeeping](../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+- **Latent-heat example (E3-F6)**: [CPU latent-heat condensation bookkeeping](../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
 - **CPU integration baseline**: `particula/integration_tests/condensation_latent_heat_conservation_test.py`
 - **Theory**: [docs/Theory/index.md](../Theory/index.md)
 

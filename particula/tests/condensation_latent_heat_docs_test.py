@@ -14,9 +14,13 @@ CONDENSATION_FEATURE_PATH = (
     ROOT / "docs/Features/condensation_strategy_system.md"
 )
 DOCS_INDEX_PATH = ROOT / "docs/index.md"
+ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 PUBLISHED_NOTEBOOK_RELATIVE_PATH = "Condensation/Condensation_Latent_Heat.ipynb"
 FEATURE_NOTEBOOK_RELATIVE_PATH = (
     "../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
+)
+CPU_BASELINE_TEST_PATH = (
+    "particula/integration_tests/condensation_latent_heat_conservation_test.py"
 )
 INDEX_NOTEBOOK_LABEL = (
     "[Condensation: Latent Heat Bookkeeping]"
@@ -26,11 +30,23 @@ INDEX_REVIEWED_DESCRIPTION_SNIPPET = (
     "Published CPU-only latent-heat bookkeeping walkthrough"
 )
 INDEX_BOOKKEEPING_CONTRACT_SNIPPET = "diagnostic only and does not feed back"
+INDEX_CPU_BASELINE_SNIPPET = "The executable CPU integration baseline remains"
 DOCS_INDEX_LATENT_HEAT_HEADING = (
     "**Supporting CPU latent-heat-corrected condensation diagnostics**"
 )
 DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET = (
-    "without claiming temperature-feedback runtime"
+    "does not claim GPU latent-heat parity or temperature-feedback runtime"
+)
+FEATURE_CPU_BASELINE_SNIPPET = (
+    "This baseline is CPU-only and diagnostic/reference only"
+)
+FEATURE_FUTURE_WORK_SNIPPET = (
+    "temperature-feedback runtime support and GPU latent-heat parity remain"
+)
+ROADMAP_CPU_BASELINE_SNIPPET = "current executable CPU integration baseline"
+ROADMAP_FUTURE_WORK_SNIPPETS = (
+    "Temperature-feedback runtime support",
+    "latent-heat parity remain future Epic D goals",
 )
 
 
@@ -73,6 +89,8 @@ def test_dynamics_index_links_published_latent_heat_notebook() -> None:
     assert INDEX_NOTEBOOK_LABEL in content
     assert INDEX_REVIEWED_DESCRIPTION_SNIPPET in content
     assert INDEX_BOOKKEEPING_CONTRACT_SNIPPET in content
+    assert INDEX_CPU_BASELINE_SNIPPET in content
+    assert CPU_BASELINE_TEST_PATH in content
 
 
 def test_dynamics_index_drops_raw_latent_heat_python_command() -> None:
@@ -100,7 +118,27 @@ def test_docs_index_latent_heat_summary_stays_diagnostic_only() -> None:
     content = DOCS_INDEX_PATH.read_text(encoding="utf-8")
 
     assert DOCS_INDEX_LATENT_HEAT_HEADING in content
-    assert "temperature-feedback runtime" in content
-    assert "support." in content
     assert DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET in content
     assert "**Supporting non-isothermal condensation**" not in content
+
+
+def test_condensation_feature_page_keeps_cpu_only_latent_heat_boundary() -> (
+    None
+):
+    """Feature page keeps the reviewed CPU-only latent-heat contract."""
+    content = CONDENSATION_FEATURE_PATH.read_text(encoding="utf-8")
+
+    assert CPU_BASELINE_TEST_PATH in content
+    assert FEATURE_CPU_BASELINE_SNIPPET in content
+    assert FEATURE_FUTURE_WORK_SNIPPET in content
+
+
+def test_roadmap_latent_heat_note_stays_future_facing() -> None:
+    """Roadmap page keeps GPU latent-heat support as future work."""
+    content = ROADMAP_PATH.read_text(encoding="utf-8")
+
+    assert ROADMAP_CPU_BASELINE_SNIPPET in content
+    assert CPU_BASELINE_TEST_PATH in content
+    for snippet in ROADMAP_FUTURE_WORK_SNIPPETS:
+        assert snippet in content
+    assert "with per-box temperature feedback through the" not in content
