@@ -17,9 +17,14 @@ Status: reviewed and answered on 2026-07-08.
   `particula/gpu/tests/cuda_availability.py` and reusing it in benchmark skip
   helper coverage.
 - Keep tolerance policy in documentation plus explicit per-test assertions. Add
-  local helper constants only where repeated tests need the same tolerance.
+  local helper constants only where repeated tests need the same tolerance. P3
+  resolved the documentation side by publishing the shared policy in
+  `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
 - `.opencode/guides/testing_guide.md` should own the release/manual validation
-  checklist, with roadmap links for Epic C context.
+  checklist, with roadmap links for Epic C context. P3 now establishes the
+  shared tolerance wording there; any later release-command expansion belongs to
+  follow-up documentation work rather than unresolved policy semantics.
 - Fold in helper patterns from E3-F1 and E3-F2 after those features ship.
 - E3-F5-P5 does not need to block on E3-F4. Marker/helper policy may land first
   if release-validation wording includes a follow-up pass after E3-F4 finalizes

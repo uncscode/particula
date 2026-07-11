@@ -23,8 +23,8 @@
 
 ## Warp CPU Validation
 
-- Later phases should run focused GPU tests on Warp CPU when Warp is installed,
-  for example:
+- The shipped documentation policy now states that focused GPU parity tests run
+  on Warp CPU by default when Warp is installed, for example:
   - `pytest particula/gpu/tests/cuda_availability_test.py -q`
   - `pytest particula/gpu/kernels/tests/coagulation_test.py -q`
   - `pytest particula/gpu/kernels/tests/condensation_test.py -q`
@@ -34,10 +34,10 @@
 
 ## CUDA-if-available Validation
 
-- P2 standardized the shared CUDA-only skip message but did not add a new CUDA
-  pytest option or change the optional/local/manual status of CUDA validation.
+- P2 standardized the shared CUDA-only skip message and P3 documented the same
+  optional/local/manual CUDA policy in both canonical docs.
 - CUDA remains optional/local/manual for release validation until dedicated CUDA
-  CI is available.
+  CI is available, and standard CI must skip cleanly when CUDA is unavailable.
 
 ## Tolerance Validation
 
@@ -48,6 +48,16 @@
 - Stochastic coagulation tests should aggregate over seeds/steps, compare to
   expected rates using `3 sigma` or established tolerance bands, and avoid exact
   per-seed equality across CPU, Warp CPU, and CUDA.
+
+## Documentation Validation
+
+- `E3-F5-P3` was documentation-only, so validation is a manual doc consistency
+  check rather than a new Python test module.
+- Re-opened `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md` should agree on marker names,
+  Warp CPU default coverage, CUDA optionality, explicit deterministic
+  `rtol`/`atol`, tight conservation checks, and aggregate stochastic
+  expectations.
 
 ## Regression Guardrails
 

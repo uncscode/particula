@@ -186,6 +186,9 @@ leak into deterministic parity or conservation checks:
    or time steps with documented tolerance bands or sigma-based bounds; do not
    require exact per-seed equality across CPU, Warp CPU, or CUDA.
 
+Document the chosen tolerances in the test body or nearby comments when they
+are not already obvious from the physics or baseline study.
+
 For GPU Brownian coagulation acceptance work, keep attempted-vs-accepted
 collision instrumentation private to
 `particula/gpu/kernels/tests/coagulation_test.py`. The shipped
@@ -212,6 +215,16 @@ def test_gpu_matches_numpy():
     expected = numpy_reference(...)
     result = warp_result(...)
     npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
+```
+
+For conservation checks, keep the assertion separate and tight:
+
+```python
+def test_total_mass_is_conserved():
+    """Accepted collisions conserve total mass."""
+    initial_total = np.sum(initial_mass)
+    final_total = np.sum(final_mass)
+    npt.assert_allclose(final_total, initial_total, rtol=1e-12, atol=0.0)
 ```
 
 For stochastic kernels, assert aggregate behavior instead of replaying exact
