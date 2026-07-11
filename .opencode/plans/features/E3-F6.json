@@ -2,7 +2,7 @@
   "id": "E3-F6",
   "type": "feature",
   "title": "Add runnable CondensationLatentHeat documentation example",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -60,11 +60,11 @@
     {
       "id": "E3-F6-P3",
       "title": "Validate example execution, notebook sync, and CPU-only guidance",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-11",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -72,5 +72,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
