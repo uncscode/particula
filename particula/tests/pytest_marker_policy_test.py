@@ -37,7 +37,9 @@ _COLLECTION_SAFE_WARP_TESTS = (
 def _restore_benchmark_option_env() -> Generator[None, None, None]:
     """Restore benchmark opt-in env state after each test."""
     previous = os.environ.get(pytest_support.BENCHMARK_OPTION_ENV_VAR)
-    previous_owner = os.environ.get(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR)
+    previous_owner = os.environ.get(
+        pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR
+    )
     yield
     if previous is None:
         os.environ.pop(pytest_support.BENCHMARK_OPTION_ENV_VAR, None)
@@ -46,7 +48,9 @@ def _restore_benchmark_option_env() -> Generator[None, None, None]:
     if previous_owner is None:
         os.environ.pop(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, None)
         return
-    os.environ[pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR] = previous_owner
+    os.environ[pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR] = (
+        previous_owner
+    )
 
 
 @dataclass
