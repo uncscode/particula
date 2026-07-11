@@ -2,26 +2,26 @@
 
 ## Pass / Fail Criteria
 
-- [ ] The marker vocabulary is explicit and consistent across code, config, and
+- [x] The marker vocabulary is explicit and consistent across code, config, and
   docs: `warp`, `cuda`, `gpu_parity`, and `stochastic` are registered without
   unknown-marker warnings.
-- [ ] Warp CPU remains the required baseline for GPU-test development, while
+- [x] Warp CPU remains the required baseline for GPU-test development, while
   CUDA runs only when available and otherwise skips cleanly with reusable
   helper behavior.
-- [ ] Device-selection helpers and skip utilities are covered by focused tests
+- [x] Device-selection helpers and skip utilities are covered by focused tests
   that use fakes or monkeypatching rather than requiring real CUDA hardware.
-- [ ] Representative GPU kernel tests adopt the standardized markers/helpers
+- [x] Representative GPU kernel tests adopt the standardized markers/helpers
   without weakening existing coverage for condensation, coagulation,
   environment, or conversion paths.
-- [ ] The stochastic tolerance policy documents deterministic equality,
+- [x] The stochastic tolerance policy documents deterministic equality,
   conservation, and aggregate-probabilistic checks with concrete guidance such
   as `3 sigma`-style bands where appropriate.
-- [ ] Manual/release validation commands document CUDA-optional workflows and do
+- [x] Manual/release validation commands document CUDA-optional workflows and do
   not turn CUDA into a required CI gate.
-- [ ] Existing benchmark gating through `--benchmark` remains intact and is not
+- [x] Existing benchmark gating through `--benchmark` remains intact and is not
   conflated with default validation.
 
-## Current Shipped Evidence (E3-F5-P1 to P3)
+## Current Shipped Evidence (E3-F5-P1 to P5)
 
 - `particula/conftest.py` and `pyproject.toml` now declare the same seven-marker
   vocabulary, including `warp`, `cuda`, `gpu_parity`, and `stochastic`.
@@ -36,6 +36,13 @@
   aggregate stochastic expectations.
 - `docs/Features/Roadmap/data-oriented-gpu.md` now mirrors the same shipped
   tolerance semantics and ties them to the mixed-scale stochastic evidence.
+- Those two canonical docs now also carry the final release-validation wording:
+  Warp CPU is the baseline validation backend when Warp is installed, CUDA
+  validation is optional/local/manual until dedicated CI exists, missing Warp
+  and missing CUDA are expected skip paths, and benchmark validation remains
+  opt-in rather than part of the standard release gate.
+- `docs/contribute/CONTRIBUTING.md` was intentionally not updated so the testing
+  guide and roadmap remain the authoritative policy homes.
 
 ## Additional Shipped Evidence (E3-F5-P4)
 
@@ -56,8 +63,8 @@
 - Representative CUDA-only checks in coagulation, condensation support, and
   environment coverage are now selectable with `cuda` while CPU-first Warp
   coverage remains the default path.
-- Remaining unchecked criteria belong only to the final release-command rollout
-  in `E3-F5-P5`.
+- `E3-F5-P5` completed the final release-command rollout as a docs-only change,
+  with no code or test-behavior changes.
 
 ## Evidence Metrics
 
