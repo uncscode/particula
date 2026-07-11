@@ -624,6 +624,7 @@ aerosol, gas = selective.step(
 
 - **Dynamics overview**: [Wall loss strategy system](./wall_loss_strategy_system.md)
 - **Examples**: [docs/Examples/Simulations/index.md](../Examples/Simulations/index.md)
+- **Latent-heat example**: [CPU latent-heat condensation bookkeeping](../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
 - **Theory**: [docs/Theory/index.md](../Theory/index.md)
 
 ## FAQ
