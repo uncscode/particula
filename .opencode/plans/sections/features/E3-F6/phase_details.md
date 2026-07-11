@@ -36,14 +36,19 @@
     cross-linking in the existing example test module.
 
 - [x] **E3-F6-P3:** Validate example execution, notebook sync, and CPU-only guidance
-  - Issue: #1264 follow-up validation scope | Size: XS | Status: Shipped for the published docs surface
+  - Issue: #1265 | Size: XS | Status: Shipped as the final validation pass for the published docs surface
   - Depends on: E3-F6-P1 and E3-F6-P2 producing the final runnable example and
     paired notebook artifact.
-  - Goal: Keep the runnable `.py` artifact, published notebook path, and linked
-    docs surface aligned while preserving CPU-only wording and no GPU parity
-    claims.
-  - Files: Validation-sensitive docs surfaces in the notebook, Dynamics index,
-    feature page, and example test module.
+  - Goal: Re-validate the shipped example/notebook/docs surface, preserve
+    CPU-only and no-temperature-feedback wording, and keep any fix limited to
+    minimal wording or link alignment.
+  - Files:
+    `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py`,
+    `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb`,
+    `docs/Examples/Dynamics/index.md`,
+    `docs/Features/condensation_strategy_system.md`, and
+    `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
   - Tests: Re-run
     `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
-    and keep docs-surface assertions limited to notebook/path/link alignment.
+    as the primary docs-surface regression harness; execute notebook sync/run
+    commands only to keep the published pair aligned.

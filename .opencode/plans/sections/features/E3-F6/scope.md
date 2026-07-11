@@ -2,40 +2,34 @@
 
 ### In Scope
 
-- Create a runnable CPU `CondensationLatentHeat` example in
-  `docs/Examples/Dynamics/Condensation/`.
-- Use documented public APIs, preferably `par.gas.LatentHeatFactory()` plus
-  `par.dynamics.CondensationFactory().get_strategy("latent_heat", ...)` or the
-  latent-heat builder path.
-- Wrap the strategy in `par.dynamics.MassCondensation` and call
-  `execute(aerosol, time_step=..., sub_steps=...)` on a real aerosol.
-- Print or plot diagnostics for gas concentration, particle mass change,
-  `condensation_strategy.last_latent_heat_energy`, and cumulative latent heat
-  energy.
-- Publish the paired notebook artifact at
-  `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb` from the
-  `.py` source of truth.
-- Make the example discoverable from `docs/Examples/Dynamics/index.md`.
-- Add at most one targeted feature-doc cross-link when it improves latent-heat
-  example discoverability.
-- Add focused example coverage in
-  `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
-- Validate that the example runs from the docs tree and that the published docs
-  surface points at the paired notebook path.
+- Re-run the shipped CPU latent-heat example and paired notebook as validation
+  artifacts.
+- Confirm the published example source and paired notebook remain the docs
+  source-of-truth pair under
+  `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.{py,ipynb}`.
+- Confirm `docs/Examples/Dynamics/index.md` still links the latent-heat
+  notebook.
+- Confirm `docs/Features/condensation_strategy_system.md` keeps the single
+  targeted latent-heat example cross-link.
+- Keep focused smoke coverage in
+  `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
+  aligned with example execution and docs-surface assertions.
+- Apply only minimal wording, sync, or link-alignment edits if validation finds
+  drift.
 
 ### Out of Scope
 
 - No GPU or Warp latent-heat example.
 - No claim that GPU condensation has latent-heat parity.
-- No production changes to condensation numerics unless a tiny bug blocks the
-  example; any such change must include co-located tests.
-- No standalone testing-only phase. Validation is attached to each phase and
-  consolidated in the final documentation/validation phase.
-- No broad rewrite of the condensation strategy documentation beyond one
-  targeted latent-heat cross-link.
+- No new example authoring, docs-surface expansion, or additional discoverability
+  work beyond the already shipped notebook/index/feature-page surfaces.
+- No production changes to condensation numerics unless a tiny bug blocks
+  validation; any such change must include co-located tests.
+- No broad rewrite of condensation documentation beyond small alignment edits.
 
 ### Acceptance Boundary
 
-The feature is complete when a user can run the documented CPU example, find it
-from the published Dynamics docs surface, and see latent-heat energy produced
-by the condensation strategy after executing a real mass-condensation step.
+The feature is complete when the shipped CPU example and paired notebook remain
+executable, the Dynamics index and condensation feature page still point readers
+to the published notebook surface, and validation confirms only minimal
+alignment edits were needed.

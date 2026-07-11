@@ -126,7 +126,9 @@ def run_example() -> dict[str, float | list[float] | str | int]:
 
     The example executes several short CPU condensation steps, records
     the per-step latent-heat bookkeeping reported by the strategy, and
-    accumulates the cumulative energy explicitly.
+    accumulates the cumulative energy explicitly. Positive latent-heat
+    values indicate condensation, while negative values indicate
+    evaporation.
 
     Returns:
         Dictionary containing initial and final gas concentrations,

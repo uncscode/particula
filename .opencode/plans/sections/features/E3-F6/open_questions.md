@@ -18,11 +18,15 @@ Status: reviewed and answered on 2026-07-11.
   notebook path exists, the Dynamics index points to the notebook, the old raw
   command entry stays absent, and the feature page keeps exactly one direct
   latent-heat example link.
+- For issue #1265, keep the phase validation-only unless a real docs-surface
+  mismatch is discovered; do not reopen example-authoring or broader docs work.
 
 ## Implementation Assumptions
 
 - Treat production code as stable; add tests only if a bug is found while making
   the example runnable.
+- Treat the current worktree as a final validation pass with minimal alignment
+  edits only; no new discoverability surfaces are expected.
 - E3-F7 should consume the final example path for cross-linking when available.
 - The editable source of truth remains
   `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py`; the
