@@ -79,8 +79,8 @@ Repository-wide pytest marker registration lives in `particula/conftest.py` and
 
 - Registered markers include `slow`, `performance`, `benchmark`, `warp`,
   `cuda`, `gpu_parity`, and `stochastic`.
-- Marker registration is descriptive by default. Plain `pytest` runs keep the
-  CPU-only collection behavior unless a test module opts into its own
+- Marker registration is descriptive by default. Plain `pytest` preserves
+  normal collection behavior unless a test module opts into its own
   `pytest.importorskip("warp")` or similar runtime guard.
 - `--benchmark` remains the only collection-affecting pytest option in the
   repository. Benchmark-marked tests are skipped unless you pass that flag.

@@ -5,7 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, cast
 
+import pytest
 from particula import conftest as particula_conftest
+
+_BENCHMARK_SKIP_REASON = (
+    "GPU benchmarks skipped (pass --benchmark to enable)"
+)
 
 
 @dataclass
@@ -47,9 +52,9 @@ class _FakeItem:
     """Minimal pytest item stub for benchmark hook tests."""
 
     keywords: set[str]
-    markers: list[object] = field(default_factory=list)
+    markers: list[pytest.MarkDecorator] = field(default_factory=list)
 
-    def add_marker(self, marker: object) -> None:
+    def add_marker(self, marker: pytest.MarkDecorator) -> None:
         """Record markers applied by the collection hook."""
         self.markers.append(marker)
 
@@ -92,6 +97,11 @@ def test_benchmark_collection_hook_skips_benchmark_tests_by_default() -> None:
         [cast(Any, item)],
     )
     assert len(item.markers) == 1
+
+    marker = item.markers[0]
+    assert isinstance(marker, pytest.MarkDecorator)
+    assert marker.mark.name == "skip"
+    assert marker.mark.kwargs == {"reason": _BENCHMARK_SKIP_REASON}
 
 
 def test_benchmark_collection_hook_leaves_benchmark_tests_enabled() -> None:
