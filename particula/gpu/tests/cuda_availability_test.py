@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import warnings
 
-from particula.gpu.tests.cuda_availability import cuda_available, warp_devices
+from particula.gpu.tests.cuda_availability import (
+    CUDA_SKIP_REASON,
+    cuda_available,
+    warp_devices,
+)
 
 
 class _WarningWarp:
@@ -29,7 +33,25 @@ def test_cuda_available_ignores_warp_pack_warning() -> None:
     assert cuda_available(_WarningWarp(True))
 
 
-def test_warp_devices_uses_cuda_availability() -> None:
-    """Device list includes CUDA only when Warp reports it available."""
-    assert warp_devices(_WarningWarp(True)) == ["cpu", "cuda"]
+def test_cuda_available_is_warning_clean_for_targeted_pack_warning() -> None:
+    """Targeted Warp warning remains suppressed under warning capture."""
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("error", DeprecationWarning)
+        assert cuda_available(_WarningWarp(True)) is True
+
+    assert caught == []
+
+
+def test_warp_devices_returns_cpu_only_without_cuda() -> None:
+    """Device list keeps Warp CPU when CUDA is unavailable."""
     assert warp_devices(_WarningWarp(False)) == ["cpu"]
+
+
+def test_warp_devices_returns_cpu_and_cuda_when_available() -> None:
+    """Device list appends CUDA when Warp reports it available."""
+    assert warp_devices(_WarningWarp(True)) == ["cpu", "cuda"]
+
+
+def test_cuda_skip_reason_matches_shared_contract() -> None:
+    """Shared CUDA skip reason stays deterministic for downstream tests."""
+    assert CUDA_SKIP_REASON == "Warp/CUDA not available"
