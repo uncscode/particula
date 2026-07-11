@@ -47,11 +47,11 @@
     {
       "id": "E3-F5-P2",
       "title": "Standardize Warp device fixtures and CUDA skip helpers with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-11",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
