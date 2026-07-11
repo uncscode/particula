@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Generator, cast
 
 import pytest
+from particula import _pytest_support as pytest_support
 from particula import conftest as particula_conftest
 
 _BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
@@ -26,12 +27,17 @@ _WARP_MARKED_GPU_TESTS = (
 @pytest.fixture(autouse=True)
 def _restore_benchmark_option_env() -> Generator[None, None, None]:
     """Restore benchmark opt-in env state after each test."""
-    previous = os.environ.get(particula_conftest.BENCHMARK_OPTION_ENV_VAR)
+    previous = os.environ.get(pytest_support.BENCHMARK_OPTION_ENV_VAR)
+    previous_owner = os.environ.get(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR)
     yield
     if previous is None:
-        os.environ.pop(particula_conftest.BENCHMARK_OPTION_ENV_VAR, None)
+        os.environ.pop(pytest_support.BENCHMARK_OPTION_ENV_VAR, None)
+    else:
+        os.environ[pytest_support.BENCHMARK_OPTION_ENV_VAR] = previous
+    if previous_owner is None:
+        os.environ.pop(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, None)
         return
-    os.environ[particula_conftest.BENCHMARK_OPTION_ENV_VAR] = previous
+    os.environ[pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR] = previous_owner
 
 
 @dataclass
@@ -194,12 +200,16 @@ def test_pytest_configure_resets_benchmark_env_when_option_is_disabled(
             assert name == "--benchmark"
             return self.benchmark_enabled
 
-    monkeypatch.setenv(particula_conftest.BENCHMARK_OPTION_ENV_VAR, "1")
+    monkeypatch.setenv(pytest_support.BENCHMARK_OPTION_ENV_VAR, "1")
+    monkeypatch.setenv(
+        pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR,
+        str(os.getpid()),
+    )
     config = _FakeConfigureWithOption(benchmark_enabled=False)
 
     particula_conftest.pytest_configure(cast(Any, config))
 
-    assert particula_conftest.benchmark_option_enabled_from_env() is False
+    assert pytest_support.benchmark_option_enabled_from_env() is False
 
 
 def test_remaining_warp_only_suites_are_explicitly_warp_marked() -> None:

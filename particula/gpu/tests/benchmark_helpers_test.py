@@ -21,7 +21,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from particula import conftest as particula_conftest
+from particula import _pytest_support as pytest_support
 from particula.gpu.tests.cuda_availability import CUDA_SKIP_REASON
 from particula.gpu.tests.mass_precision_study_support import (
     _build_mass_precision_cases,
@@ -36,12 +36,17 @@ _benchmark_module_counter = 0
 @pytest.fixture(autouse=True)
 def _restore_benchmark_option_env() -> Generator[None, None, None]:
     """Restore benchmark opt-in env state after each test."""
-    previous = os.environ.get(particula_conftest.BENCHMARK_OPTION_ENV_VAR)
+    previous = os.environ.get(pytest_support.BENCHMARK_OPTION_ENV_VAR)
+    previous_owner = os.environ.get(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR)
     yield
     if previous is None:
-        os.environ.pop(particula_conftest.BENCHMARK_OPTION_ENV_VAR, None)
+        os.environ.pop(pytest_support.BENCHMARK_OPTION_ENV_VAR, None)
+    else:
+        os.environ[pytest_support.BENCHMARK_OPTION_ENV_VAR] = previous
+    if previous_owner is None:
+        os.environ.pop(pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR, None)
         return
-    os.environ[particula_conftest.BENCHMARK_OPTION_ENV_VAR] = previous
+    os.environ[pytest_support.BENCHMARK_OPTION_OWNER_PID_ENV_VAR] = previous_owner
 
 
 def _load_benchmark_module(
@@ -53,9 +58,9 @@ def _load_benchmark_module(
     global _benchmark_module_counter
     _benchmark_module_counter += 1
     module_name = f"{_BENCHMARK_MODULE_PREFIX}{_benchmark_module_counter}"
-    particula_conftest.set_benchmark_option_state(benchmark_enabled)
+    pytest_support.set_benchmark_option_state(benchmark_enabled)
     monkeypatch.setenv(
-        particula_conftest.BENCHMARK_OPTION_ENV_VAR,
+        pytest_support.BENCHMARK_OPTION_ENV_VAR,
         "1" if benchmark_enabled else "0",
     )
 
@@ -294,7 +299,7 @@ def test_build_benchmark_metadata_records_cuda_probe_error(
     benchmark_module,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Benchmark metadata keeps probe failures as traceable error text."""
+    """Unexpected CUDA probe errors surface instead of being downgraded."""
     monkeypatch.setattr(sys, "argv", ["pytest", "bench.py", "--benchmark"])
     monkeypatch.setattr(benchmark_module, "BENCHMARK_OUTPUT", Path("out.json"))
     monkeypatch.setattr(
@@ -308,15 +313,8 @@ def test_build_benchmark_metadata_records_cuda_probe_error(
         lambda _wp: (_ for _ in ()).throw(RuntimeError("probe failed")),
     )
 
-    metadata = benchmark_module._build_benchmark_metadata()
-
-    assert metadata == {
-        "command": "pytest bench.py --benchmark",
-        "artifact_path": "out.json",
-        "warp_version": "1.2.3",
-        "warp_available": True,
-        "cuda_probe_error": "probe failed",
-    }
+    with pytest.raises(RuntimeError, match="probe failed"):
+        benchmark_module._build_benchmark_metadata()
 
 
 def test_save_results_writes_json_snapshot(
@@ -418,6 +416,23 @@ def test_skip_if_no_cuda_returns_when_cuda_is_available(
     monkeypatch.setattr(benchmark_module, "cuda_available", lambda _wp: True)
 
     benchmark_module._skip_if_no_cuda()
+
+
+def test_skip_if_no_cuda_surfaces_unexpected_probe_errors(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Unexpected CUDA probe errors fail fast instead of silently skipping."""
+    fake_wp = object()
+    monkeypatch.setattr(benchmark_module, "wp", fake_wp)
+    monkeypatch.setattr(
+        benchmark_module,
+        "cuda_available",
+        lambda _wp: (_ for _ in ()).throw(RuntimeError("probe failed")),
+    )
+
+    with pytest.raises(RuntimeError, match="probe failed"):
+        benchmark_module._skip_if_no_cuda()
 
 
 def test_skip_if_no_cuda_uses_shared_reason_when_warp_is_missing(

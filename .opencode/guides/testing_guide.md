@@ -330,9 +330,10 @@ sanity, not for exact CPU/CUDA equality or user-facing feature documentation.
 - If Warp is not installed, Warp-marked suites may skip through
   `pytest.importorskip("warp")`; treat that as the expected missing-Warp path,
   not a regression.
-- If CUDA is unavailable, CUDA-targeted coverage should skip cleanly with the
-  shared `Warp/CUDA not available` contract instead of failing CPU-only or CI
-  validation.
+- If CUDA is unavailable, CUDA-targeted coverage should skip cleanly instead of
+  failing CPU-only or CI validation. Some guarded paths use the shared
+  `Warp/CUDA not available` message, while others keep more specific skip
+  reasons when that context is more useful.
 - Use marker selection such as `-m "warp and gpu_parity"`,
   `-m "warp and stochastic"`, or `-m "warp and cuda"` for targeted local GPU
   validation, and keep `pytest particula/gpu/tests/benchmark_test.py
