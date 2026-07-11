@@ -1,16 +1,32 @@
-"""Integration baseline for CPU latent-heat condensation."""
+"""Integration baseline for CPU latent-heat condensation.
+
+This module exercises the public ``particula as par`` runnable path for a
+deterministic, supersaturated, single-species water aerosol.
+"""
 
 import numpy as np
 import particula as par
 
 
 def _as_float(value: float | np.ndarray) -> float:
-    """Convert scalar-like values to float for deterministic assertions."""
+    """Convert a scalar-like value to ``float`` for deterministic assertions.
+
+    Args:
+        value: Scalar or array-like value to collapse to a Python float.
+
+    Returns:
+        The first value from ``value`` as a Python float.
+    """
     return float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
 
 
 def _build_test_aerosol() -> tuple[par.Aerosol, float]:
-    """Build a supersaturated single-species water aerosol state."""
+    """Build a supersaturated single-species water aerosol state.
+
+    Returns:
+        A tuple containing the configured aerosol and the corresponding water
+        saturation concentration in kg/m^3.
+    """
     molar_mass_water = 18.015e-3  # kg/mol
     temperature = 298.15  # K
     vapor_pressure_water = par.gas.VaporPressureFactory().get_strategy(
@@ -61,7 +77,12 @@ def _build_condensation() -> tuple[
     par.dynamics.MassCondensation,
     par.dynamics.CondensationLatentHeat,
 ]:
-    """Build the public latent-heat condensation runnable and strategy."""
+    """Build the public latent-heat condensation runnable and strategy.
+
+    Returns:
+        A tuple containing the public ``MassCondensation`` runnable and its
+        ``CondensationLatentHeat`` strategy.
+    """
     latent_heat_strategy = par.gas.LatentHeatFactory().get_strategy(
         "constant",
         {
@@ -83,7 +104,11 @@ def _build_condensation() -> tuple[
 
 
 def test_condensation_latent_heat_fixture_starts_supersaturated() -> None:
-    """The CPU fixture starts above saturation to avoid a no-op baseline."""
+    """Verify the CPU fixture starts above saturation.
+
+    The precondition prevents this integration baseline from silently becoming
+    a no-op transfer case.
+    """
     aerosol, saturation_concentration = _build_test_aerosol()
 
     gas_concentration = _as_float(
@@ -98,7 +123,11 @@ def test_condensation_latent_heat_fixture_starts_supersaturated() -> None:
 def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
     None
 ):
-    """MassCondensation transfers water through the CPU latent-heat path."""
+    """Verify MassCondensation transfers water through the CPU path.
+
+    The test confirms that the public latent-heat runnable produces a finite,
+    nonzero gas-to-particle transfer over a short fixed loop.
+    """
     aerosol, _ = _build_test_aerosol()
     condensation, condensation_strategy = _build_condensation()
 

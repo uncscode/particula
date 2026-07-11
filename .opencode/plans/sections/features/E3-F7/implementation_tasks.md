@@ -2,17 +2,21 @@
 
 ## E3-F7-P1: Fixture Adaptation
 
-- Review `particula/integration_tests/condensation_particle_resolved_test.py` and
-  mirror its deterministic setup style.
-- Create `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-- Build a supersaturated CPU water condensation scenario with partitioning gas
-  and particle-resolved water mass, keeping any test-local fixture builders in
-  the same module as private helpers such as `_build_test_aerosol()`.
-- Instantiate `CondensationLatentHeat` through public imports with a
-  `ConstantLatentHeat` strategy produced by `par.gas.LatentHeatFactory()`.
-- Execute a short fixed loop using `MassCondensation.execute()` and keep the new
-  setup plus first assertion block close enough to review in one pass rather
-  than splitting core fixture logic across multiple support files.
+- [x] Reviewed
+  `particula/integration_tests/condensation_particle_resolved_test.py` and
+  mirrored its deterministic setup style.
+- [x] Created
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+- [x] Built a supersaturated CPU water condensation scenario with partitioning
+  gas and particle-resolved water mass, keeping test-local fixture builders in
+  the same module as private helpers.
+- [x] Instantiated `CondensationLatentHeat` through public imports with a
+  constant latent-heat strategy produced by `par.gas.LatentHeatFactory()`.
+- [x] Executed a short fixed loop using `MassCondensation.execute()`.
+- [x] Kept the shipped P1 assertions intentionally lightweight: supersaturation
+  precondition, gas decrease, particle mass increase, and finite
+  `last_latent_heat_energy`.
+- [x] Kept the diff scoped to the new integration test module only.
 
 ## E3-F7-P2: Conservation and Energy Assertions
 
