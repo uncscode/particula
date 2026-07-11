@@ -102,6 +102,10 @@ particula/
 
 - [**Aerosol Tutorial**](./docs/Examples/Aerosol/Aerosol_Tutorial.ipynb) — Learn how to build gas species, atmospheres, particle distributions, and combine them into an `Aerosol` object.
 
+- [**CPU Latent-Heat Condensation Bookkeeping**](./docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+  — CPU-only walkthrough showing diagnostic latent-heat bookkeeping from real
+  condensation mass transfer with no temperature feedback.
+
 - [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
 
 - [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)

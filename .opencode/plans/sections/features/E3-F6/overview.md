@@ -2,28 +2,25 @@
 
 ### Problem Statement
 
-`CondensationLatentHeat` now exposes a real per-step latent-heat energy
-bookkeeping path, but users do not have a runnable documentation example that
-shows the strategy inside the normal CPU condensation workflow. Existing docs
-describe the API and vapor-property latent heat configuration, yet a reader can
-miss the distinction between merely setting a latent heat property and running
-`MassCondensation.execute()` to obtain `last_latent_heat_energy` from actual
-mass transfer.
+`CondensationLatentHeat` now has a shipped runnable example and published docs
+surface, so the remaining problem is keeping that surface validated and aligned.
+This phase is no longer about authoring a new example; it is a final pass to
+confirm the paired `.py`/`.ipynb`, Dynamics index link, feature-page cross-link,
+and smoke-test coverage still reflect the intended CPU-only latent-heat
+bookkeeping workflow.
 
 ### Value Proposition
 
-Issue #1263 shipped the first runnable CPU-only example under
-`docs/Examples/Dynamics/Condensation/`, and issue #1264 completed the
-published docs surface around it. The feature now includes the paired
-`Condensation_Latent_Heat.ipynb` artifact, a Dynamics index link to that
-notebook, one targeted cross-link from
+Issue #1263 shipped the runnable CPU-only example, issue #1264 completed the
+published docs surface, and issue #1265 serves as the validation-first cleanup
+pass. The feature now includes the paired `Condensation_Latent_Heat.ipynb`
+artifact, a Dynamics index link to that notebook, one targeted cross-link from
 `docs/Features/condensation_strategy_system.md`, and focused docs-surface
 assertions in
 `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
-The example still builds a latent-heat strategy through documented public
-factories/builders, advances an aerosol with
-`par.dynamics.MassCondensation`, and reports per-step/cumulative latent heat
-energy while avoiding unsupported GPU parity claims.
+The current implementation scope is intentionally narrow: validate the shipped
+example/notebook/docs links, preserve CPU-only and no-temperature-feedback
+messaging, and make only minimal wording or alignment edits if drift appears.
 
 ### User Stories
 
@@ -32,8 +29,8 @@ energy while avoiding unsupported GPU parity claims.
 - As a scientific developer, I want the example to show energy released from
   actual particle mass transfer so that I can validate diagnostics against my
   own simulations.
-- As a maintainer, I want CPU-only guidance and validation commands so that the
-  deferred Epic B/E1 documentation gap is closed without expanding GPU scope.
+- As a maintainer, I want the published latent-heat docs surface to stay
+  executable and aligned without expanding scope beyond focused validation.
 
 ### Parent Epic Context
 
