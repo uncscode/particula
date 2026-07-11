@@ -18,29 +18,32 @@
     results. Lint/format and direct script execution remain the core validation
     path.
 
-- [ ] **E3-F6-P2:** Pair notebook and index documentation for the latent-heat example
-  - Issue: follow-up TBD | Size: S | Status: Deferred; not shipped in issue #1263
+- [x] **E3-F6-P2:** Pair notebook and index documentation for the latent-heat example
+  - Issue: #1264 | Size: S | Status: Shipped
   - Depends on: E3-F6-P1 landing the final example path and narrative so notebook
     sync and index links do not target a moving artifact.
-  - Goal: Sync the example to a notebook if following the existing docs pattern
-    and make it discoverable from the Dynamics examples index.
+  - Goal: Publish the paired notebook artifact, make it discoverable from the
+    Dynamics examples index, and add one bounded feature-doc cross-link when
+    helpful.
   - Files:
     `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb`,
-    `docs/Examples/Dynamics/index.md`, and optional targeted cross-link in
-    `docs/Features/condensation_strategy_system.md`.
-  - Tests: Still pending because no `.ipynb` artifact or index wiring was added
-    in the shipped implementation.
+    `docs/Examples/Dynamics/index.md`,
+    `docs/Features/condensation_strategy_system.md`, and focused docs-surface
+    assertions in
+    `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
+  - Tests: The shipped work now asserts notebook existence, exact Dynamics
+    index notebook-link presence, raw-command removal, and singular feature-doc
+    cross-linking in the existing example test module.
 
-- [ ] **E3-F6-P3:** Validate example execution, notebook sync, and CPU-only guidance
-  - Issue: follow-up TBD | Size: XS | Status: Partially satisfied for `.py` validation only
+- [x] **E3-F6-P3:** Validate example execution, notebook sync, and CPU-only guidance
+  - Issue: #1264 follow-up validation scope | Size: XS | Status: Shipped for the published docs surface
   - Depends on: E3-F6-P1 and E3-F6-P2 producing the final runnable example and
-    any paired notebook artifacts.
-  - Goal: Run final documentation validation and confirm the example demonstrates
-    real CPU latent-heat bookkeeping without GPU parity claims. For issue #1263,
-    this was satisfied only for the runnable `.py` artifact and focused tests.
-  - Files: Validation notes in docs or plan updates as needed.
+    paired notebook artifact.
+  - Goal: Keep the runnable `.py` artifact, published notebook path, and linked
+    docs surface aligned while preserving CPU-only wording and no GPU parity
+    claims.
+  - Files: Validation-sensitive docs surfaces in the notebook, Dynamics index,
+    feature page, and example test module.
   - Tests: Re-run
-    `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`,
-    run the example, and `ruff check`/`ruff format` on the example. Notebook
-    execution remains deferred until a paired artifact exists. No additional
-    production regression module was required by the shipped implementation.
+    `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`
+    and keep docs-surface assertions limited to notebook/path/link alignment.

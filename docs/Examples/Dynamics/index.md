@@ -13,8 +13,10 @@ modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.
 - [Condensation 2: Masses Binned](Condensation/Condensation_2_MassBin.ipynb)
 - [Condensation 3: Masses Resolved](Condensation/Condensation_3_MassResolved.ipynb)
 - [Condensation: Latent Heat Bookkeeping](Condensation/Condensation_Latent_Heat.ipynb)
-  – CPU-only runnable notebook that demonstrates latent-heat bookkeeping
-  diagnostics from `MassCondensation` using public factory/builder APIs.
+  – CPU-only runnable paired notebook artifact for the latent-heat
+  bookkeeping walkthrough, using `MassCondensation` with public
+  factory/builder APIs. Source of truth:
+  [Condensation_Latent_Heat.py](Condensation/Condensation_Latent_Heat.py).
 - [Staggered Condensation](Condensation/Staggered_Condensation_Example.ipynb) – Demonstrates staggered ODE stepping for improved stability and mass conservation.
 
 ## Coagulation
