@@ -97,8 +97,8 @@ def _build_aerosol() -> par.Aerosol:
     atmosphere = (
         par.gas.AtmosphereBuilder()
         .set_more_partitioning_species(gas_species)
-        .set_temperature(25.0, temperature_units="degC")
-        .set_pressure(1.0, pressure_units="atm")
+        .set_temperature(temperature)
+        .set_pressure(101325.0, pressure_units="Pa")
         .build()
     )
 
@@ -115,7 +115,7 @@ def _build_aerosol() -> par.Aerosol:
         .set_mass(particle_mass.reshape(-1, 1), "kg")
         .set_density(np.array([density], dtype=np.float64), "kg/m^3")
         .set_charge(np.zeros_like(particle_radii, dtype=np.float64))
-        .set_volume(1.0, "cm^3")
+        .set_volume(1.0e-6, "m^3")
         .build()
     )
     return par.Aerosol(atmosphere=atmosphere, particles=particles)
