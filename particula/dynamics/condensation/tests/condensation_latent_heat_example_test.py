@@ -32,6 +32,12 @@ INDEX_REVIEWED_DESCRIPTION_SNIPPET = (
     "Published CPU-only latent-heat bookkeeping walkthrough"
 )
 INDEX_BOOKKEEPING_CONTRACT_SNIPPET = "diagnostic only and does not feed back"
+DOCS_INDEX_LATENT_HEAT_HEADING = (
+    "**Supporting CPU latent-heat-corrected condensation diagnostics**"
+)
+DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET = (
+    "without claiming temperature-feedback runtime support"
+)
 EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
 
 
@@ -224,3 +230,13 @@ def test_condensation_feature_page_contains_single_latent_heat_example_link() ->
     content = CONDENSATION_FEATURE_PATH.read_text(encoding="utf-8")
 
     assert content.count(FEATURE_NOTEBOOK_RELATIVE_PATH) == 1
+
+
+def test_docs_index_latent_heat_summary_stays_diagnostic_only() -> None:
+    """Top-level docs keep the reviewed latent-heat wording contract."""
+    content = ROOT.joinpath("docs/index.md").read_text(encoding="utf-8")
+
+    assert DOCS_INDEX_LATENT_HEAT_HEADING in content
+    assert "temperature-feedback runtime support" in content
+    assert DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET in content
+    assert "**Supporting non-isothermal condensation**" not in content
