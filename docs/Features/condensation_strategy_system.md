@@ -186,8 +186,10 @@ When neither a `latent_heat_strategy` nor a positive scalar `latent_heat`
 fallback is configured, the step follows the isothermal path and reports
 `last_latent_heat_energy = 0.0`.
 
-`last_latent_heat_energy` records the total latent heat released per step
-(sum of dm × L), not an energy density.
+`last_latent_heat_energy` records per-step latent-heat bookkeeping from the
+step mass-transfer quantity. For the current single-box public example path,
+that diagnostic aligns with the mass-concentration contract and should be
+reported as an energy density.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
