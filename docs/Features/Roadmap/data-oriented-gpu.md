@@ -147,10 +147,12 @@ The lower-level Warp backend is implemented and covered by targeted tests.
 - GPU Brownian coagulation kernels provide a tested `coagulation_step_gpu` API.
 - GPU benchmark scaffolding exists for CUDA-enabled environments.
 - Parity tests parametrize over available Warp devices, always running on Warp
-  CPU and additionally on Warp CUDA when a device is present. CUDA is optional,
-  not a hard runtime or test requirement, and that parity coverage documents
-  the explicit helper surface rather than a shipped automatic GPU runtime
-  integration.
+  CPU and additionally on Warp CUDA when a device is present. Deterministic
+  parity checks use explicit `rtol`/`atol`, the matching pytest markers remain
+  `warp`, `cuda`, `gpu_parity`, and `stochastic`, CUDA is optional and
+  local/manual, not a hard runtime or CI requirement, and that parity coverage
+  documents the explicit helper surface rather than a shipped automatic GPU
+  runtime integration.
 
 The GPU backend is currently a directly callable lower-level API. It is not yet
 integrated as an automatic backend in the main `Aerosol`, `Runnable`, or
@@ -738,12 +740,15 @@ Planned features:
    helpers, and context helpers rather than direct kernel-step imports. Raw
    helper kernels remain intentionally outside the documented package-level
    public surface; import them from their concrete modules when needed.
-5. Formalize device-aware pytest execution as project policy (a pytest
-   flag/config plus marker): parity tests always run on Warp CPU and add
-   CUDA automatically when a device is present; document that CUDA-device
-   validation is currently local/manual before releases.
-6. Record acceptable parity tolerances for stochastic coagulation and
-   floating-point differences across CPU, Warp CPU, and CUDA devices.
+5. Device-aware pytest execution is now project policy: parity tests always
+   run on Warp CPU and add CUDA automatically when a device is present;
+   the matching pytest markers remain `warp`, `cuda`, `gpu_parity`, and
+   `stochastic`; CUDA-device validation remains local/manual before releases
+   and must skip cleanly when CUDA is unavailable.
+6. Tolerance policy is documented in three classes: deterministic parity uses
+   explicit `rtol`/`atol`, conservation checks keep tight drift tolerances,
+   and stochastic validation uses aggregate expectations rather than exact
+   per-seed equality across CPU, Warp CPU, and CUDA.
 7. The shipped canonical direct-kernel quick-start is
    [`docs/Examples/gpu_direct_kernels_quick_start.py`](../../Examples/gpu_direct_kernels_quick_start.py).
    It demonstrates the supported `ParticleData`/`GasData` path, explicit
@@ -857,6 +862,12 @@ fixed or explicitly accepted during this epic.
   in-bounds accepted pairs, finite zero-acceptance behavior, early-exit
   accounting for executed versus scheduled trials, bounded trial clamping,
   total-mass conservation, and caller-owned `rng_states` reuse/reset semantics.
+  This is the shared validation model for stochastic GPU checks: deterministic
+  parity still uses explicit `rtol`/`atol`, conservation assertions remain
+  tight, Warp CPU is the default parity backend, optional CUDA runs extend the
+  same policy when available locally, and stochastic acceptance coverage judges
+  aggregate statistics such as tolerance bands or `3-sigma` behavior rather
+  than exact per-seed equality.
   Treat this as bounded evidence that the selector hardening preserved expected
   Brownian behavior within stochastic tolerance inside the existing sampler,
   not as proof that the global-majorant acceptance collapse is solved for every
