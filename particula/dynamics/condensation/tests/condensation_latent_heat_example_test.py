@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 import runpy
 from pathlib import Path
@@ -23,6 +24,14 @@ PUBLISHED_NOTEBOOK_RELATIVE_PATH = "Condensation/Condensation_Latent_Heat.ipynb"
 FEATURE_NOTEBOOK_RELATIVE_PATH = (
     "../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
 )
+INDEX_NOTEBOOK_LABEL = (
+    "[Condensation: Latent Heat Bookkeeping]"
+    "(Condensation/Condensation_Latent_Heat.ipynb)"
+)
+INDEX_REVIEWED_DESCRIPTION_SNIPPET = (
+    "Published CPU-only latent-heat bookkeeping walkthrough"
+)
+INDEX_BOOKKEEPING_CONTRACT_SNIPPET = "diagnostic only and does not feed back"
 EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
 
 
@@ -168,11 +177,33 @@ def test_condensation_latent_heat_notebook_exists_at_published_path() -> None:
     assert NOTEBOOK_PATH.exists()
 
 
+def test_condensation_latent_heat_notebook_keeps_paired_publication_metadata() -> (
+    None
+):
+    """Published notebook keeps the reviewed paired-notebook contract."""
+    notebook = json.loads(NOTEBOOK_PATH.read_text(encoding="utf-8"))
+
+    assert notebook["metadata"]["jupytext"]["text_representation"] == {
+        "extension": ".py",
+        "format_name": "percent",
+        "format_version": "1.3",
+        "jupytext_version": "1.17.3",
+    }
+    assert notebook["cells"][0]["cell_type"] == "markdown"
+    assert "CPU-only condensation workflow" in "".join(
+        notebook["cells"][0]["source"]
+    )
+    assert "diagnostic only" in "".join(notebook["cells"][1]["source"])
+
+
 def test_dynamics_index_links_published_latent_heat_notebook() -> None:
     """Dynamics index links the published latent-heat notebook artifact."""
     content = DYNAMICS_INDEX_PATH.read_text(encoding="utf-8")
 
     assert PUBLISHED_NOTEBOOK_RELATIVE_PATH in content
+    assert INDEX_NOTEBOOK_LABEL in content
+    assert INDEX_REVIEWED_DESCRIPTION_SNIPPET in content
+    assert INDEX_BOOKKEEPING_CONTRACT_SNIPPET in content
 
 
 def test_dynamics_index_drops_raw_latent_heat_python_command() -> None:
@@ -183,6 +214,7 @@ def test_dynamics_index_drops_raw_latent_heat_python_command() -> None:
         "python docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
         not in content
     )
+    assert "Condensation_Latent_Heat.py" not in content
 
 
 def test_condensation_feature_page_contains_single_latent_heat_example_link() -> (
