@@ -12,6 +12,17 @@ ROOT = Path(__file__).resolve().parents[4]
 EXAMPLE_PATH = (
     ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
 )
+NOTEBOOK_PATH = (
+    ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
+)
+DYNAMICS_INDEX_PATH = ROOT / "docs/Examples/Dynamics/index.md"
+CONDENSATION_FEATURE_PATH = (
+    ROOT / "docs/Features/condensation_strategy_system.md"
+)
+PUBLISHED_NOTEBOOK_RELATIVE_PATH = "Condensation/Condensation_Latent_Heat.ipynb"
+FEATURE_NOTEBOOK_RELATIVE_PATH = (
+    "../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
+)
 EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
 
 
@@ -150,3 +161,34 @@ def test_condensation_latent_heat_main_prints_zero_transfer_explanation(
 
     output = capsys.readouterr().out
     assert "Zero-transfer explanation: example explanation" in output
+
+
+def test_condensation_latent_heat_notebook_exists_at_published_path() -> None:
+    """Published latent-heat notebook exists at the documented example path."""
+    assert NOTEBOOK_PATH.exists()
+
+
+def test_dynamics_index_links_published_latent_heat_notebook() -> None:
+    """Dynamics index links the published latent-heat notebook artifact."""
+    content = DYNAMICS_INDEX_PATH.read_text(encoding="utf-8")
+
+    assert PUBLISHED_NOTEBOOK_RELATIVE_PATH in content
+
+
+def test_dynamics_index_drops_raw_latent_heat_python_command() -> None:
+    """Dynamics index no longer advertises the raw python command entry."""
+    content = DYNAMICS_INDEX_PATH.read_text(encoding="utf-8")
+
+    assert (
+        "python docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
+        not in content
+    )
+
+
+def test_condensation_feature_page_contains_single_latent_heat_example_link() -> (
+    None
+):
+    """Feature page keeps exactly one direct latent-heat example cross-link."""
+    content = CONDENSATION_FEATURE_PATH.read_text(encoding="utf-8")
+
+    assert content.count(FEATURE_NOTEBOOK_RELATIVE_PATH) == 1
