@@ -7,6 +7,8 @@ from typing import Any
 import numpy as np
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 from particula.gas.environment_data import EnvironmentData  # noqa: E402
@@ -283,6 +285,7 @@ def test_environment_helper_cached_scalar_broadcasts_do_not_leak_stale_values(
     np.testing.assert_allclose(second.numpy(), [299.15, 299.15])
 
 
+@pytest.mark.cuda
 def test_environment_helper_skips_host_readback_for_cuda_arrays(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -483,6 +486,7 @@ def test_environment_helper_rejects_environment_wrong_n_boxes(
         )
 
 
+@pytest.mark.cuda
 def test_environment_helper_rejects_wrong_device(device: str) -> None:
     """Direct arrays on the wrong Warp device raise a stable error."""
     wrong_device = "cpu" if device == "cuda" else "cuda"

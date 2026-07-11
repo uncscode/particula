@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import pytest
+
 from particula.gpu.kernels.tests import _condensation_test_support as support
+
+pytestmark = pytest.mark.warp
 
 device = support.device
 

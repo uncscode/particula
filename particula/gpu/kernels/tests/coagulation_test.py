@@ -27,6 +27,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 import particula.gpu.kernels.coagulation as coagulation_module  # noqa: E402
@@ -1854,6 +1856,7 @@ def _brownian_kernel_matrix_kernel(
     )
 
 
+@pytest.mark.gpu_parity
 def test_brownian_kernel_matrix_parity_gpu_cpu(device: str) -> None:
     """GPU Brownian kernel matrix matches CPU reference."""
     temperature = 298.15
@@ -1897,6 +1900,7 @@ def test_brownian_kernel_matrix_parity_gpu_cpu(device: str) -> None:
     npt.assert_allclose(kernel_wp.numpy(), expected, rtol=1.0e-7)
 
 
+@pytest.mark.stochastic
 def test_coagulation_statistical_collision_rate(device: str) -> None:
     """Collision counts follow expected Brownian rate statistics."""
     temperature = 298.15
@@ -1975,6 +1979,7 @@ def test_coagulation_multi_box_independence(device: str) -> None:
     assert result.reshape(-1)[0] >= result.reshape(-1)[2]
 
 
+@pytest.mark.stochastic
 def test_coagulation_step_gpu_nonuniform_environment_changes_collision_trend(
     device: str,
 ) -> None:
@@ -2143,6 +2148,7 @@ def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
     )
 
 
+@pytest.mark.stochastic
 def test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(  # noqa: E501
     device: str,
 ) -> None:
@@ -2236,6 +2242,7 @@ def test_mixed_scale_expected_collision_statistics_use_active_pairs_only() -> (
     assert statistics.expected_sigma == pytest.approx(np.sqrt(expected_mean))
 
 
+@pytest.mark.stochastic
 def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
     device: str,
 ) -> None:
@@ -2266,6 +2273,7 @@ def test_mixed_scale_acceptance_fraction_is_finite_and_nonnegative(
     assert np.all(acceptance_fraction >= 0.0)
 
 
+@pytest.mark.stochastic
 def test_mixed_scale_selector_only_emits_sorted_active_in_bounds_pairs(
     device: str,
 ) -> None:
@@ -2304,6 +2312,7 @@ def test_mixed_scale_selector_only_emits_sorted_active_in_bounds_pairs(
         ([0],),
     ],
 )
+@pytest.mark.stochastic
 def test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(
     device: str,
     active_indices: list[int],
@@ -4074,6 +4083,7 @@ def test_coagulation_ensure_volume_array_rejects_integer_dtype_array(
         _ensure_volume_array(volume, n_boxes=1, device=volume.device)
 
 
+@pytest.mark.cuda
 def test_coagulation_ensure_volume_array_skips_cuda_host_readback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

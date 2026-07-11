@@ -12,6 +12,8 @@ import sys
 import numpy as np
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 from particula.gpu.conversion import (  # noqa: E402
@@ -1582,6 +1584,7 @@ class TestFromWarpEnvironmentData:
             result,
         )
 
+    @pytest.mark.gpu_parity
     @pytest.mark.parametrize("device", warp_devices(wp))
     def test_environment_data_round_trip_available_warp_devices(
         self,
