@@ -15165,8 +15165,8 @@ into each epic's feature list rather than running as a separate parallel
 epic.</p>
 <p>Sizing convention: each epic targets roughly 5-10 features, each feature
 roughly 5-15 phases, and each phase roughly 100 lines of new source code plus
-its tests and documentation (canonical rules:
-<code>.opencode/guides/phase-sizing-rules.md</code>).</p>
+its tests and documentation under the repository's canonical planning and
+documentation conventions.</p>
 <h2 id="epic-sequence-and-status">Epic Sequence and Status<a class="headerlink" href="#epic-sequence-and-status" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -15341,10 +15341,20 @@ and <code>GasSpecies</code> remain available for compatibility.</p>
 <li>GPU condensation kernels provide a tested <code>condensation_step_gpu</code> API.</li>
 <li>GPU Brownian coagulation kernels provide a tested <code>coagulation_step_gpu</code> API.</li>
 <li>GPU benchmark scaffolding exists for CUDA-enabled environments.</li>
-<li>Parity tests parametrize over available Warp devices, always running on Warp
-  CPU and additionally on Warp CUDA when a device is present. CUDA is optional,
-  not a hard runtime or test requirement, and that parity coverage documents
-  the explicit helper surface rather than a shipped automatic GPU runtime
+<li>Warp CPU is the baseline validation backend whenever Warp is installed, while
+  CUDA validation remains optional/local/manual rather than a CI requirement.
+  Missing Warp and missing CUDA are expected skip paths for guarded coverage,
+  not release failures. Deterministic parity uses explicit
+  <code>numpy.testing.assert_allclose(..., rtol=..., atol=...)</code> bounds,
+  conservation checks stay separately tight, the matching pytest markers remain
+  <code>warp</code>, <code>cuda</code>, <code>gpu_parity</code>, and <code>stochastic</code>, and CPU-only or standard CI
+  environments are expected to skip CUDA-specific coverage cleanly instead of
+  treating it as a regression. Focused examples include
+  <code>pytest particula/gpu/kernels/tests/environment_test.py -q</code> for the Warp CPU
+  baseline path and
+  <code>pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"</code>
+  for optional CUDA-if-available validation. This documentation records the
+  explicit helper surface rather than implying automatic GPU runtime
   integration.</li>
 </ul>
 <p>The GPU backend is currently a directly callable lower-level API. It is not yet
@@ -16148,7 +16158,10 @@ remains single-box for the currently audited condensation and coagulation
 workflows. CPU condensation explicitly enforces <code>n_boxes == 1</code>, and CPU
 coagulation support for <code>ParticleData</code> is also documented and validated as
 <code>n_boxes == 1</code> only. For the canonical user-facing support contract, see
-<a href="../../particle-data-migration/">ParticleData and GasData Migration</a>.</p>
+<a href="../../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>.
+Use
+<a href="../../particle-data-migration/">ParticleData and GasData Migration</a>
+as the implementation walkthrough companion.</p>
 </div>
 <h4 id="rationale-for-issue-critical-ownership-decisions">Rationale for issue-critical ownership decisions<a class="headerlink" href="#rationale-for-issue-critical-ownership-decisions" title="Permanent link">&para;</a></h4>
 <ul>
@@ -16420,12 +16433,18 @@ them.</p>
    helpers, and context helpers rather than direct kernel-step imports. Raw
    helper kernels remain intentionally outside the documented package-level
    public surface; import them from their concrete modules when needed.
-5. Formalize device-aware pytest execution as project policy (a pytest
-   flag/config plus marker): parity tests always run on Warp CPU and add
-   CUDA automatically when a device is present; document that CUDA-device
-   validation is currently local/manual before releases.
-6. Record acceptable parity tolerances for stochastic coagulation and
-   floating-point differences across CPU, Warp CPU, and CUDA devices.
+5. Device-aware pytest policy is part of the shipped guidance: Warp CPU is the
+   default parity backend when Warp is installed, CUDA runs are optional
+   local/manual additions when a device is present locally, the matching pytest
+   markers remain <code>warp</code>, <code>cuda</code>, <code>gpu_parity</code>, and <code>stochastic</code>, and guarded
+   suites should surface missing Warp or missing CUDA as expected skips rather
+   than failures. CPU-only or standard CI environments must skip CUDA coverage
+   cleanly when it is not available.
+6. Tolerance policy stays split into three classes: deterministic parity uses
+   explicit <code>numpy.testing.assert_allclose(..., rtol=..., atol=...)</code>
+   bounds, conservation checks keep separately tight drift tolerances, and
+   stochastic validation uses bounded aggregate expectations such as tolerance
+   bands or <code>3-sigma</code> behavior rather than exact per-seed equality.
 7. The shipped canonical direct-kernel quick-start is
    <a href="../../../Examples/gpu_direct_kernels_quick_start/"><code>docs/Examples/gpu_direct_kernels_quick_start.py</code></a>.
    It demonstrates the supported <code>ParticleData</code>/<code>GasData</code> path, explicit
@@ -16442,19 +16461,29 @@ them.</p>
 <p>Top-level <code>particula.gpu</code> remains the home for availability checks and
    transfer helpers, not direct kernel-step re-exports. Troubleshooting notes
    should stay aligned with the shipped example and regression tests:</p>
-<ul>
-<li>missing Warp means the quick-start stays in its CPU-only documentation
-     path behind <code>WARP_AVAILABLE</code>, with deferred <code>particula.gpu.kernels</code>
-     imports and no pretend kernel execution</li>
-<li>CUDA is optional and Warp <code>device="cpu"</code> is the default runnable path</li>
-<li>particle, gas, environment, and sidecar buffers such as <code>rng_states</code>
-     must stay on compatible devices</li>
-<li><code>environment=</code> must not be mixed with scalar or Warp-array direct
-     <code>temperature</code> / <code>pressure</code> inputs</li>
-<li>CPU↔GPU movement remains explicit through <code>to_warp_*</code> and <code>from_warp_*</code>
-     helpers, including lossy gas restore for names and helper-only state</li>
-<li>no hidden transfers, hidden synchronization, or automatic top-level
-     fallback imports should be implied by roadmap prose</li>
+<div class="highlight"><pre><span></span><code>- missing Warp means the quick-start stays in its CPU-only documentation
+  path behind `WARP_AVAILABLE`, with deferred `particula.gpu.kernels`
+  imports and no pretend kernel execution; guarded test suites may also skip
+  through `pytest.importorskip(&quot;warp&quot;)`, which is expected and should not
+  be treated as a validation failure
+- CUDA is optional/local/manual, Warp `device=&quot;cpu&quot;` is the default
+  runnable validation path, and CPU-only or CI environments should skip
+  CUDA-targeted coverage cleanly with the shared `Warp/CUDA not available`
+  contract rather than fail
+- particle, gas, environment, and sidecar buffers such as `rng_states`
+  must stay on compatible devices
+- `environment=` must not be mixed with scalar or Warp-array direct
+  `temperature` / `pressure` inputs
+- CPU↔GPU movement remains explicit through `to_warp_*` and `from_warp_*`
+  helpers, including lossy gas restore for names and helper-only state
+- no hidden transfers, hidden synchronization, or automatic top-level
+  fallback imports should be implied by roadmap prose
+- focused local validation can use
+  `pytest particula/gpu/tests/cuda_availability_test.py -q` for the shared
+  skip contract and `pytest particula/gpu/kernels/tests/environment_test.py
+  -q -m &quot;warp and cuda&quot;` for optional CUDA-if-available coverage
+</code></pre></div>
+<ol>
 <li>Add a runnable <code>docs/Examples/</code> entry for a <code>CondensationLatentHeat</code>
    workflow (deferred from E1; current tutorials only set <code>latent_heat</code> as a
    vapor property), following the paired <code>.py</code>/<code>.ipynb</code> example conventions.</li>
@@ -16462,7 +16491,7 @@ them.</p>
    (deferred from E1; today the conservation and energy regressions are
    unit-level only), establishing the CPU integration baseline that the
    Epic D latent-heat parity tests will reuse.</li>
-</ul>
+</ol>
 <p><strong>Exit bar:</strong> A new user can run both kernels from the docs on a CUDA device
 and on Warp CPU without reading source, repeated coagulation steps draw
 uncorrelated samples from a caller-initialized persistent RNG buffer, the
@@ -16506,7 +16535,7 @@ fixed or explicitly accepted during this epic.</p>
   seeded runs against the same mixed-scale fixture, with the expected mean
   computed from active upper-triangle Brownian pairs only and sigma taken as
   <code>sqrt(expected_mean)</code>.</p>
-<p>The shipped mixed-scale test surface currently includes
+<p>The documented mixed-scale evidence currently cites
   <code>test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(device)</code>,
   <code>test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)</code>,
   <code>test_mixed_scale_expected_collision_statistics_use_active_pairs_only()</code>,
@@ -16523,19 +16552,27 @@ fixed or explicitly accepted during this epic.</p>
   <code>test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(device)</code>.
   The Brownian repeated-run evidence is the seeded <code>range(101, 201)</code> check in
   <code>test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)</code>:
-  the shipped bounded-selector path is accepted only when the observed accepted
-  collision total stays within a <code>3 * sigma</code> tolerance of the active-pairs-only
-  Brownian expected mean computed by
+  the documented bounded-selector path is accepted only when the observed
+  accepted collision total stays within a <code>3 * sigma</code> tolerance of the
+  active-pairs-only Brownian expected mean computed by
   <code>_get_expected_collision_statistics(...)</code> for the documented <code>time_step=0.5</code>,
-  <code>max_collisions=8</code>, and <code>volume=1.0e-10</code> replay setup. The same test-local
-  coverage also verifies active-pairs-only reference statistics, sorted
-  in-bounds accepted pairs, finite zero-acceptance behavior, early-exit
+  <code>max_collisions=8</code>, and <code>volume=1.0e-10</code> replay setup. The same documented
+  test-local evidence also verifies active-pairs-only reference statistics,
+  sorted in-bounds accepted pairs, finite zero-acceptance behavior, early-exit
   accounting for executed versus scheduled trials, bounded trial clamping,
   total-mass conservation, and caller-owned <code>rng_states</code> reuse/reset semantics.
-  Treat this as bounded evidence that the selector hardening preserved expected
-  Brownian behavior within stochastic tolerance inside the existing sampler,
-  not as proof that the global-majorant acceptance collapse is solved for every
-  mixed-scale distribution.</p>
+  This roadmap follows the same validation policy as the testing guide:
+  deterministic parity uses explicit
+  <code>numpy.testing.assert_allclose(..., rtol=..., atol=...)</code> bounds,
+  conservation assertions stay separately tight, Warp CPU always participates
+  in parity validation when Warp is installed, optional CUDA runs apply the
+  same policy when available locally, and stochastic acceptance coverage is
+  judged by bounded aggregate expectations such as tolerance bands or
+  <code>3-sigma</code> behavior rather than exact per-seed equality. Treat this as
+  bounded evidence that the selector hardening preserved expected Brownian
+  behavior within stochastic tolerance inside the existing sampler, not as
+  deterministic replay evidence and not as proof that the global-majorant
+  acceptance collapse is solved for every mixed-scale distribution.</p>
 <p>Reproduce the seeded checks with:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-k<span class="w"> </span>mixed_scale
 pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;mixed_scale or sparse or degenerate or conservation&quot;</span><span class="w"> </span>-Werror
@@ -16900,6 +16937,8 @@ resampling or volume-scaling policy before slot exhaustion.</p>
 <ul>
 <li>Command evidence: run
   <code>pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s</code>.
+  This remains opt-in benchmark evidence for local CUDA-capable environments,
+  not part of the standard Warp CPU release-validation command set.
   The recorded source-of-record artifact at
   <code>.artifacts/benchmarks/gpu_benchmark_results.json</code> preserves the exact
   executed local command in <code>benchmark_metadata.command</code>; the 2026-07-10 UTC

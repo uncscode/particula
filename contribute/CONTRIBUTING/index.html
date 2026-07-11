@@ -14577,7 +14577,7 @@ git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span
 </ul>
 <p><strong>Step 7 – Discuss &amp; iterate</strong></p>
 <ul>
-<li>GitHub Actions runs tests (<code>pytest -Werror</code>), linters (<code>flake8</code>, <code>pylint</code>), and docs build automatically.  </li>
+<li>GitHub Actions runs tests (<code>pytest -Werror</code>), Ruff validation, type checks, and docs build automatically.  </li>
 <li>Push additional commits to the same branch—CI re‑runs and the PR updates.</li>
 </ul>
 <p><strong>Step 8 – Rebase</strong><br />
@@ -14608,7 +14608,7 @@ Your contribution is now part of <strong>Particula</strong>—thank you!</p>
 </tr>
 <tr>
 <td><strong>Tests</strong></td>
-<td>Every public function/class must have at least one <code>pytest</code> test. Aim for coverage ≥ 90 %.  See <a href="../Feature_Workflow/Details/Add_Unit_Test/">Add Unit Tests</a>.</td>
+<td>Every public function/class must have at least one <code>pytest</code> test. Add regression coverage for fixes and keep change-scope coverage strong. See <a href="../Feature_Workflow/Details/Add_Unit_Test/">Add Unit Tests</a> and the <a href="../../.opencode/guides/testing_guide.md">testing guide</a>.</td>
 </tr>
 <tr>
 <td><strong>Commit messages</strong></td>
@@ -14636,31 +14636,40 @@ Your contribution is now part of <strong>Particula</strong>—thank you!</p>
 <td><code>pytest -q -Werror</code></td>
 </tr>
 <tr>
-<td><strong>Run tests in parallel</strong></td>
-<td><code>pytest -Werror</code></td>
+<td><strong>Coverage check</strong></td>
+<td><code>pytest --cov=particula --cov-report=term-missing</code></td>
 </tr>
 <tr>
-<td><strong>Static type‑checking (pytype, Mac/Linux)</strong></td>
-<td><code>pytype particula</code></td>
+<td><strong>Ruff auto-fix lint</strong></td>
+<td><code>ruff check particula/ --fix</code></td>
 </tr>
 <tr>
-<td><strong>Black auto‑format (79 cols)</strong></td>
-<td><code>black . --line-length 79</code></td>
+<td><strong>Ruff format</strong></td>
+<td><code>ruff format particula/</code></td>
 </tr>
 <tr>
-<td><strong>Flake8 lint</strong></td>
-<td><code>flake8 . --config .github/.flake8</code></td>
+<td><strong>Final Ruff check</strong></td>
+<td><code>ruff check particula/</code></td>
 </tr>
 <tr>
-<td><strong>Pylint lint</strong></td>
-<td><code>pylint particula</code></td>
+<td><strong>Static type-checking</strong></td>
+<td><code>mypy particula/ --ignore-missing-imports</code></td>
 </tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong>CI note:</strong> Every pull request triggers <strong>GitHub Actions</strong> (Ubuntu / macOS / Windows).<br />
-The workflow runs <code>pytest -n auto -Werror</code>, <code>flake8</code>, <code>pylint</code>, <code>pytype</code>, builds the docs, and checks coverage.<br />
+The local validation path should mirror the current repository workflow: run
+<code>ruff check particula/ --fix</code>, <code>ruff format particula/</code>,
+<code>ruff check particula/</code>, <code>mypy particula/ --ignore-missing-imports</code>, and the
+relevant <code>pytest</code> command for your change scope (plus coverage when needed).<br />
 Any warning promoted to an error (via <code>-Werror</code>) or other failure marks the PR ❌. Click <strong>“Details →”</strong> beside the failing job to view logs, fix locally, push again, and the checks will re‑run automatically.</p>
+<p><strong>GPU validation note:</strong> Use the testing guide and GPU roadmap as the
+canonical policy for Warp-targeted validation. Focused Warp CPU runs are the
+default supported path, CUDA runs are optional/local/manual only, and
+missing-Warp or missing-CUDA cases should surface as expected skips rather
+than CI failures. For targeted local runs, use marker selection such as
+<code>-m "warp and gpu_parity"</code> or <code>-m "warp and cuda"</code>.</p>
 </blockquote>
 <hr />
 <h3 id="6-need-help">6. Need Help?<a class="headerlink" href="#6-need-help" title="Permanent link">&para;</a></h3>
