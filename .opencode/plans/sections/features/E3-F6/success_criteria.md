@@ -10,11 +10,12 @@
 - [x] At least one execution step reports non-zero, finite
   `CondensationLatentHeat.last_latent_heat_energy` so the example demonstrates
   actual bookkeeping rather than configuration only.
-- [ ] The example is discoverable from the Dynamics examples index and any new
-  notebook remains generated from the `.py` source, synced, and executable.
+- [x] The example is discoverable from the Dynamics examples index and the
+  paired notebook now exists at
+  `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb`.
 - [x] Validation commands for linting, script execution, and focused pytest are
-  recorded for the implementation flow; notebook sync/execution remains
-  deferred because no notebook shipped.
+  recorded for the implementation flow, and the focused test module now guards
+  notebook/link alignment for the published docs surface.
 - [x] No touched documentation claims GPU latent-heat production support or
   parity, and any required production-code fix is covered by focused tests.
 
@@ -24,13 +25,13 @@
 | --- | --- | --- |
 | Runnable example | Example executes end-to-end on CPU with a real aerosol setup | `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py` |
 | Energy bookkeeping | Output shows finite, non-zero latent-heat energy after condensation | Example output plus `condensation_latent_heat_example_test.py` |
-| Discoverability | Deferred; no Dynamics examples index link shipped in issue #1263 | Follow-up documentation phase |
-| Notebook hygiene | Deferred; no paired notebook shipped in issue #1263 | Follow-up documentation phase |
+| Discoverability | Dynamics examples index links the published latent-heat notebook | `docs/Examples/Dynamics/index.md` plus `condensation_latent_heat_example_test.py` |
+| Notebook hygiene | Paired notebook exists at the published path and remains sourced from the `.py` workflow | `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb` plus focused docs-surface assertions |
 | Scope control | Docs remain CPU-only and avoid GPU parity claims | Reviewed docs diff and focused grep |
 
 ### Definition of Done
 
-Issue #1263 satisfies the runnable-example slice of the feature: reviewers can
-confirm that the shipped `.py` example demonstrates real CPU latent-heat
-mass-transfer bookkeeping rather than only configuring latent heat properties.
-Notebook pairing and docs-index discoverability remain deferred follow-up work.
+Issues #1263 and #1264 together satisfy the feature: reviewers can confirm that
+the shipped `.py` example demonstrates real CPU latent-heat mass-transfer
+bookkeeping, that the paired notebook is published, and that the docs surface
+points readers to the notebook without introducing GPU parity claims.

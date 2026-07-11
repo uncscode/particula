@@ -25,3 +25,12 @@
   `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
 - Marked notebook artifact generation and Dynamics docs index wiring as
   intentionally deferred from the shipped issue scope.
+
+### 2026-07-11 — Issue #1264 docs-surface update
+
+- Recorded publication of
+  `docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb`.
+- Recorded the Dynamics index notebook link and one targeted feature-doc
+  latent-heat example cross-link.
+- Recorded focused docs-surface assertions in
+  `particula/dynamics/condensation/tests/condensation_latent_heat_example_test.py`.
