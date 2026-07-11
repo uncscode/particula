@@ -7,6 +7,10 @@ deterministic, supersaturated, single-species water aerosol.
 import numpy as np
 import particula as par
 
+LATENT_HEAT_WATER = 2.26e6  # J/kg
+CONSERVATION_RTOL = 1e-12
+CONSERVATION_ATOL = 1e-18
+
 
 def _as_float(value: float | np.ndarray) -> float:
     """Convert a scalar-like value to ``float`` for deterministic assertions.
@@ -18,6 +22,20 @@ def _as_float(value: float | np.ndarray) -> float:
         The first value from ``value`` as a Python float.
     """
     return float(np.asarray(value, dtype=np.float64).reshape(-1)[0])
+
+
+def _particle_water_inventory(aerosol: par.Aerosol) -> float:
+    """Return the total particle-phase water inventory for the fixture.
+
+    Args:
+        aerosol: Single-species aerosol state under test.
+
+    Returns:
+        Total particle-phase water inventory as a scalar in kg/m^3.
+    """
+    species_mass = aerosol.particles.get_species_mass()
+    concentration = aerosol.particles.get_concentration()
+    return float(np.sum(species_mass[:, 0] * concentration, dtype=np.float64))
 
 
 def _build_test_aerosol() -> tuple[par.Aerosol, float]:
@@ -86,7 +104,7 @@ def _build_condensation() -> tuple[
     latent_heat_strategy = par.gas.LatentHeatFactory().get_strategy(
         "constant",
         {
-            "latent_heat_ref": 2.26e6,
+            "latent_heat_ref": LATENT_HEAT_WATER,
             "latent_heat_ref_units": "J/kg",
         },
     )
@@ -126,43 +144,66 @@ def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
     """Verify MassCondensation transfers water through the CPU path.
 
     The test confirms that the public latent-heat runnable produces a finite,
-    nonzero gas-to-particle transfer and positive latent-heat bookkeeping over
-    a short fixed loop.
+    nonzero gas-to-particle transfer, conserves total water inventory, and
+    records the final-step latent-heat bookkeeping over a short fixed loop.
     """
     aerosol, _ = _build_test_aerosol()
     condensation, condensation_strategy = _build_condensation()
 
-    initial_gas_concentration = _as_float(
+    initial_particle_water = _particle_water_inventory(aerosol)
+    initial_gas_water = _as_float(
         aerosol.atmosphere.partitioning_species.get_concentration()
     )
-    initial_particle_mass_concentration = _as_float(
-        aerosol.particles.get_mass_concentration()
-    )
+    initial_total_water = initial_particle_water + initial_gas_water
 
     current = aerosol
-    for _ in range(5):
+    for _ in range(4):
         current = condensation.execute(current, time_step=0.1, sub_steps=1)
 
-    final_gas_concentration = _as_float(
+    pre_final_particle_water = _particle_water_inventory(current)
+    pre_final_gas_water = _as_float(
         current.atmosphere.partitioning_species.get_concentration()
     )
-    final_particle_mass_concentration = _as_float(
-        current.particles.get_mass_concentration()
-    )
+    current = condensation.execute(current, time_step=0.1, sub_steps=1)
 
-    assert np.isfinite(initial_gas_concentration)
-    assert np.isfinite(final_gas_concentration)
-    assert np.isfinite(initial_particle_mass_concentration)
-    assert np.isfinite(final_particle_mass_concentration)
+    final_particle_water = _particle_water_inventory(current)
+    final_gas_water = _as_float(
+        current.atmosphere.partitioning_species.get_concentration()
+    )
+    final_total_water = final_particle_water + final_gas_water
+    final_step_particle_gain = final_particle_water - pre_final_particle_water
+    final_step_gas_loss = pre_final_gas_water - final_gas_water
+    expected_final_step_energy = final_step_particle_gain * LATENT_HEAT_WATER
+
+    assert np.isfinite(initial_particle_water)
+    assert np.isfinite(initial_gas_water)
+    assert np.isfinite(pre_final_particle_water)
+    assert np.isfinite(pre_final_gas_water)
+    assert np.isfinite(final_particle_water)
+    assert np.isfinite(final_gas_water)
     assert np.isfinite(condensation_strategy.last_latent_heat_energy)
     assert condensation_strategy.last_latent_heat_energy > 0.0
 
-    assert (
-        final_particle_mass_concentration > initial_particle_mass_concentration
+    assert final_particle_water > initial_particle_water
+    assert final_gas_water < initial_gas_water
+
+    np.testing.assert_allclose(
+        initial_total_water,
+        final_total_water,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
     )
-    assert final_gas_concentration < initial_gas_concentration
-    assert (
-        final_particle_mass_concentration - initial_particle_mass_concentration
-        > 0.0
+
+    assert final_step_particle_gain > 0.0
+    np.testing.assert_allclose(
+        final_step_particle_gain,
+        final_step_gas_loss,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
     )
-    assert initial_gas_concentration - final_gas_concentration > 0.0
+    np.testing.assert_allclose(
+        condensation_strategy.last_latent_heat_energy,
+        expected_final_step_energy,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
