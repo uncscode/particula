@@ -32,7 +32,10 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from particula.gpu.tests.cuda_availability import cuda_available
+from particula.gpu.tests.cuda_availability import (
+    CUDA_SKIP_REASON,
+    cuda_available,
+)
 from particula.gpu.tests.mass_precision_study_support import (
     _build_mass_precision_cases,
     _project_candidate,
@@ -473,7 +476,7 @@ def _skip_if_no_cuda() -> None:
         pytest.SkipTest: When a CUDA device is not present.
     """
     if wp is None or not cuda_available(wp):
-        pytest.skip("Warp/CUDA not available")
+        pytest.skip(CUDA_SKIP_REASON)
 
 
 def _allocation_itemsize(itemsize: int | None, dtype: Any) -> int:

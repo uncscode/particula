@@ -7,7 +7,7 @@ paths without requiring CUDA benchmark execution during default test runs.
 
 from __future__ import annotations
 
-import importlib.util
+import importlib
 import sys
 import types
 import warnings
@@ -20,6 +20,7 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+from particula.gpu.tests.cuda_availability import CUDA_SKIP_REASON
 from particula.gpu.tests.mass_precision_study_support import (
     _build_mass_precision_cases,
     _project_candidate,
@@ -32,21 +33,14 @@ def _load_benchmark_module(
     benchmark_enabled: bool = True,
 ):
     """Load the benchmark module without running its opt-in skip gates."""
-    module_path = Path(__file__).with_name("benchmark_test.py")
-    module_name = "particula_gpu_benchmark_test_fast_import"
+    module_name = "particula.gpu.tests.benchmark_test"
     argv = ["pytest"]
     if benchmark_enabled:
         argv.append("--benchmark")
     monkeypatch.setattr(sys, "argv", argv)
 
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    assert spec is not None
-    assert spec.loader is not None
-
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
+    sys.modules.pop(module_name, None)
+    return importlib.import_module(module_name)
 
 
 @pytest.fixture
@@ -346,7 +340,7 @@ def test_skip_if_no_cuda_skips_when_cuda_unavailable(
     """Benchmark helpers skip cleanly when CUDA is unavailable."""
     monkeypatch.setattr(benchmark_module, "cuda_available", lambda _wp: False)
 
-    with pytest.raises(pytest.skip.Exception, match="Warp/CUDA not available"):
+    with pytest.raises(pytest.skip.Exception, match=CUDA_SKIP_REASON):
         benchmark_module._skip_if_no_cuda()
 
 
@@ -357,8 +351,48 @@ def test_skip_if_no_cuda_skips_when_warp_is_missing(
     """CPU-only helper coverage remains importable without Warp."""
     monkeypatch.setattr(benchmark_module, "wp", None)
 
-    with pytest.raises(pytest.skip.Exception, match="Warp/CUDA not available"):
+    with pytest.raises(pytest.skip.Exception, match=CUDA_SKIP_REASON):
         benchmark_module._skip_if_no_cuda()
+
+
+def test_skip_if_no_cuda_returns_when_cuda_is_available(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Benchmark helper continues when Warp reports CUDA availability."""
+    fake_wp = object()
+    monkeypatch.setattr(benchmark_module, "wp", fake_wp)
+    monkeypatch.setattr(benchmark_module, "cuda_available", lambda _wp: True)
+
+    benchmark_module._skip_if_no_cuda()
+
+
+def test_skip_if_no_cuda_uses_shared_reason_when_warp_is_missing(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Missing-Warp branch reuses the exported CUDA skip reason."""
+    monkeypatch.setattr(benchmark_module, "wp", None)
+
+    with pytest.raises(pytest.skip.Exception) as exc_info:
+        benchmark_module._skip_if_no_cuda()
+
+    assert exc_info.value.args[0] == CUDA_SKIP_REASON
+
+
+def test_skip_if_no_cuda_uses_shared_reason_when_cuda_is_unavailable(
+    benchmark_module,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """CUDA-unavailable branch reuses the exported CUDA skip reason."""
+    fake_wp = object()
+    monkeypatch.setattr(benchmark_module, "wp", fake_wp)
+    monkeypatch.setattr(benchmark_module, "cuda_available", lambda _wp: False)
+
+    with pytest.raises(pytest.skip.Exception) as exc_info:
+        benchmark_module._skip_if_no_cuda()
+
+    assert exc_info.value.args[0] == CUDA_SKIP_REASON
 
 
 def test_warp_profiled_without_profile_env_is_passthrough(
