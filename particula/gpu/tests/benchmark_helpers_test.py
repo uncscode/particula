@@ -7,7 +7,7 @@ paths without requiring CUDA benchmark execution during default test runs.
 
 from __future__ import annotations
 
-import importlib
+import importlib.util
 import sys
 import types
 import warnings
@@ -20,11 +20,16 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+from particula import conftest as particula_conftest
 from particula.gpu.tests.cuda_availability import CUDA_SKIP_REASON
 from particula.gpu.tests.mass_precision_study_support import (
     _build_mass_precision_cases,
     _project_candidate,
 )
+
+_BENCHMARK_MODULE_PATH = Path(__file__).with_name("benchmark_test.py")
+_BENCHMARK_MODULE_PREFIX = "particula.gpu.tests._benchmark_test_isolated_"
+_benchmark_module_counter = 0
 
 
 def _load_benchmark_module(
@@ -32,15 +37,29 @@ def _load_benchmark_module(
     *,
     benchmark_enabled: bool = True,
 ):
-    """Load the benchmark module without running its opt-in skip gates."""
-    module_name = "particula.gpu.tests.benchmark_test"
-    argv = ["pytest"]
-    if benchmark_enabled:
-        argv.append("--benchmark")
-    monkeypatch.setattr(sys, "argv", argv)
+    """Load the benchmark module in isolation without mutating canonical imports."""
+    global _benchmark_module_counter
+    _benchmark_module_counter += 1
+    module_name = f"{_BENCHMARK_MODULE_PREFIX}{_benchmark_module_counter}"
+    particula_conftest.set_benchmark_option_state(benchmark_enabled)
+    monkeypatch.setenv(
+        particula_conftest.BENCHMARK_OPTION_ENV_VAR,
+        "1" if benchmark_enabled else "0",
+    )
 
-    sys.modules.pop(module_name, None)
-    return importlib.import_module(module_name)
+    spec = importlib.util.spec_from_file_location(
+        module_name,
+        _BENCHMARK_MODULE_PATH,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Could not create benchmark module spec")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    try:
+        spec.loader.exec_module(module)
+        return module
+    finally:
+        sys.modules.pop(module_name, None)
 
 
 @pytest.fixture
@@ -84,11 +103,33 @@ def test_benchmark_module_skips_before_warp_import_without_opt_in(
 def test_benchmark_enabled_detects_opt_in_flag(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Benchmark helper reports whether the opt-in flag is present."""
-    monkeypatch.setattr(sys, "argv", ["pytest", "--benchmark"])
+    """Benchmark helper reports the resolved pytest benchmark option state."""
     module = _load_benchmark_module(monkeypatch)
 
     assert module._benchmark_enabled() is True
+
+
+def test_benchmark_enabled_reads_shared_resolved_option_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Benchmark helper uses shared resolved-option state instead of raw argv."""
+    monkeypatch.setattr(sys, "argv", ["pytest"])
+    module = _load_benchmark_module(monkeypatch, benchmark_enabled=True)
+
+    assert module._benchmark_enabled() is True
+
+
+def test_benchmark_loader_preserves_canonical_module_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Isolated benchmark loading leaves the canonical module untouched."""
+    module_name = "particula.gpu.tests.benchmark_test"
+    sentinel = object()
+    monkeypatch.setitem(sys.modules, module_name, sentinel)
+
+    _load_benchmark_module(monkeypatch, benchmark_enabled=True)
+
+    assert sys.modules[module_name] is sentinel
 
 
 def test_parse_positive_int_env_uses_default_without_override(
