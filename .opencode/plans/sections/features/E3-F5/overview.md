@@ -14,11 +14,13 @@ statistical agreement.
 ## Value Proposition
 
 This feature formalizes project-wide test semantics for GPU kernel validation.
-E3-F5-P1 has now shipped the policy foundation: shared pytest marker
-registration for `warp`, `cuda`, `gpu_parity`, and `stochastic`; matching
-static marker declarations in `pyproject.toml`; and regression tests proving
-that `--benchmark` remains the only collection-affecting option. Later phases
-still own reusable device helpers, tolerance documentation, and broad marker
+E3-F5-P1 and E3-F5-P2 have now shipped the policy foundation: shared pytest
+marker registration for `warp`, `cuda`, `gpu_parity`, and `stochastic`;
+matching static marker declarations in `pyproject.toml`; a reusable
+`CUDA_SKIP_REASON` contract in `particula/gpu/tests/cuda_availability.py`; and
+regression tests proving that `--benchmark` remains the only
+collection-affecting option while CUDA-only benchmark skips reuse the shared
+helper message. Later phases still own tolerance documentation and broad marker
 adoption across GPU test modules.
 
 ## User Stories
@@ -50,3 +52,7 @@ adoption across GPU test modules.
   `particula/tests/pytest_marker_policy_test.py`, with existing
   `particula/tests/benchmark_option_test.py` kept green for the benchmark
   option path.
+- Issue `#1258` / `E3-F5-P2` kept `cuda_available()` and `warp_devices()`
+  behavior stable, added shared `CUDA_SKIP_REASON = "Warp/CUDA not available"`,
+  and updated benchmark skip helper coverage to assert that shared contract
+  instead of duplicated literals.

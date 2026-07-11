@@ -19,16 +19,25 @@
     option exclusivity, and benchmark help text while keeping existing benchmark
     option tests green.
 
-- [ ] **E3-F5-P2:** Standardize Warp device fixtures and CUDA skip helpers with tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E3-F5-P2:** Standardize Warp device fixtures and CUDA skip helpers with tests
+  - Issue: #1258 | Size: S | Status: Shipped
   - Depends on: E3-F5-P1 defining the marker and option contract so helper names,
     fixture scope, and skip semantics align with the registered policy.
   - Goal: Provide a reusable helper/fixture contract for Warp CPU plus
     CUDA-if-available parametrization and CUDA-only skip behavior.
-  - Files: `particula/gpu/tests/cuda_availability.py` or a new adjacent helper,
-    `particula/gpu/tests/cuda_availability_test.py`.
-  - Tests: Unit tests for CPU-only, CUDA-available, and warning-suppressed helper
-    behavior using monkeypatch/fakes; no real CUDA requirement.
+  - Files: `particula/gpu/tests/cuda_availability.py`,
+    `particula/gpu/tests/cuda_availability_test.py`,
+    `particula/gpu/tests/benchmark_test.py`,
+    `particula/gpu/tests/benchmark_helpers_test.py`.
+  - Shipped behavior: Added shared `CUDA_SKIP_REASON = "Warp/CUDA not
+    available"`; kept `cuda_available()` warning suppression and
+    `warp_devices()` CPU/CUDA enumeration stable; and switched the benchmark
+    CUDA skip helper/tests to consume the shared constant rather than duplicated
+    strings.
+  - Tests: Fake-driven helper tests now cover warning suppression, CPU-only and
+    CUDA-available device enumeration, constant export, benchmark skips for
+    missing Warp and unavailable CUDA, and the non-skipping CUDA-available
+    branch with no real CUDA requirement.
 
 - [ ] **E3-F5-P3:** Document stochastic parity and floating tolerance policy
   - Issue: TBD | Size: XS | Status: Not Started

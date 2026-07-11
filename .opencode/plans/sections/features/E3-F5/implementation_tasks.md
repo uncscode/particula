@@ -17,13 +17,17 @@
 
 ## E3-F5-P2: Device helper standardization
 
-- Refactor `cuda_available()` and `warp_devices()` in
-  `particula/gpu/tests/cuda_availability.py` only as needed to support the
-  policy; keep backward-compatible names unless there is a strong reason not to.
-- Add helper tests in `particula/gpu/tests/cuda_availability_test.py` with fake
-  Warp objects for CPU-only and CUDA-available cases.
-- Standardize CUDA skip messages and avoid real-CUDA requirements in unit
-  tests; monkeypatch helper return values instead of probing hardware.
+- [x] Keep `cuda_available()` and `warp_devices()` backward-compatible in
+  `particula/gpu/tests/cuda_availability.py` while adding the shared
+  `CUDA_SKIP_REASON` export.
+- [x] Expand `particula/gpu/tests/cuda_availability_test.py` with fake-Warp
+  coverage for warning suppression, CPU-only enumeration, CUDA enumeration, and
+  the exact shared constant value.
+- [x] Standardize the benchmark CUDA skip path to reuse `CUDA_SKIP_REASON` in
+  `particula/gpu/tests/benchmark_test.py` and update
+  `particula/gpu/tests/benchmark_helpers_test.py` to assert the shared message
+  for missing-Warp, CUDA-unavailable, and non-skipping branches without probing
+  real hardware.
 
 ## E3-F5-P3: Tolerance documentation
 

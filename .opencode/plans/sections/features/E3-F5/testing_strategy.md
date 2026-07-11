@@ -13,6 +13,13 @@
   coverage for benchmark option registration and benchmark-only collection
   gating.
 - All shipped P1 tests are fake/stub-driven and do not require Warp or CUDA.
+- Shipped P2 coverage in `particula/gpu/tests/cuda_availability_test.py`
+  verifies targeted `_pack_` warning suppression, stable `warp_devices()`
+  enumeration for CPU-only vs CUDA-available fake Warp objects, and exact
+  `CUDA_SKIP_REASON` export.
+- `particula/gpu/tests/benchmark_helpers_test.py` now verifies that
+  `_skip_if_no_cuda()` reuses `CUDA_SKIP_REASON` when Warp is missing or CUDA is
+  unavailable and returns normally when CUDA is reported available.
 
 ## Warp CPU Validation
 
@@ -27,8 +34,8 @@
 
 ## CUDA-if-available Validation
 
-- This validation path was not changed in P1 because no device helper or CUDA
-  option surface shipped yet.
+- P2 standardized the shared CUDA-only skip message but did not add a new CUDA
+  pytest option or change the optional/local/manual status of CUDA validation.
 - CUDA remains optional/local/manual for release validation until dedicated CUDA
   CI is available.
 
@@ -48,6 +55,9 @@
   CPU-only environments.
 - Ensure benchmark tests remain gated by `--benchmark` and are not accidentally
   pulled into default parity runs.
+- Ensure shared CUDA skip messaging stays centralized in
+  `particula/gpu/tests/cuda_availability.py` so downstream GPU tests do not
+  drift back to duplicated literals.
 - Ensure marker-vocabulary drift between `particula/conftest.py` and
   `pyproject.toml` fails through regression coverage before unknown-marker
   warnings reach downstream GPU test phases.

@@ -26,3 +26,14 @@
 - Recorded that `pyproject.toml` mirrors the same marker strings and that new
   regression coverage lives in `particula/tests/pytest_marker_policy_test.py`
   alongside the existing benchmark option tests.
+
+## 2026-07-10 — P2 implementation update
+
+- Recorded shipped `E3-F5-P2` work from issue `#1258`.
+- Noted that `particula/gpu/tests/cuda_availability.py` now exports shared
+  `CUDA_SKIP_REASON` while preserving `cuda_available()` and `warp_devices()`
+  behavior.
+- Recorded benchmark skip-helper adoption in
+  `particula/gpu/tests/benchmark_test.py` and shared-message regression
+  assertions in `particula/gpu/tests/benchmark_helpers_test.py` and
+  `particula/gpu/tests/cuda_availability_test.py`.

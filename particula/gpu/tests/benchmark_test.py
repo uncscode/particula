@@ -473,7 +473,8 @@ def _skip_if_no_cuda() -> None:
     """Skip benchmarks when CUDA is unavailable.
 
     Raises:
-        pytest.SkipTest: When a CUDA device is not present.
+        pytest.SkipTest: With the shared ``CUDA_SKIP_REASON`` message when Warp
+            is missing or no CUDA device is present.
     """
     if wp is None or not cuda_available(wp):
         pytest.skip(CUDA_SKIP_REASON)
