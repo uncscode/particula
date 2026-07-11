@@ -90,7 +90,9 @@ def test_condensation_latent_heat_run_example_returns_finite_structured_results(
     )
 
 
-def test_condensation_latent_heat_example_runs_without_pint(monkeypatch) -> None:
+def test_condensation_latent_heat_example_runs_without_pint(
+    monkeypatch,
+) -> None:
     """Already-SI example inputs do not require the optional Pint package."""
     monkeypatch.setattr("particula.util.convert_units.unit_registry", None)
 
