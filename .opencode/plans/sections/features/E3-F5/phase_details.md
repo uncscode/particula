@@ -79,17 +79,24 @@
     stochastic coagulation coverage, and CUDA-only environment/readback checks
     while continuing to skip cleanly when CUDA is unavailable.
 
-- [ ] **E3-F5-P5:** Update release validation documentation for CUDA-optional workflows
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E3-F5-P5:** Update release validation documentation for CUDA-optional workflows
+  - Issue: #1261 | Size: XS | Status: Shipped
   - Depends on: E3-F5-P3 and E3-F5-P4 for the shipped policy and applied helper
-    examples. Do not block on E3-F4 quick-start wording; perform any final
-    import-path wording sync as a follow-up pass once E3-F4 closes.
+  examples. Do not block on E3-F4 quick-start wording; perform any final
+  import-path wording sync as a follow-up pass once E3-F4 closes.
   - Goal: Record local/manual CUDA validation commands and acceptance language so
-    release checks are clear without requiring CUDA in standard CI.
+  release checks are clear without requiring CUDA in standard CI.
   - Files: `.opencode/guides/testing_guide.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, optionally release notes or
-    contributor docs.
-  - Tests: Run documentation validation if configured; verify example commands
-    are syntactically correct.
+    `docs/Features/Roadmap/data-oriented-gpu.md`.
+  - Shipped behavior: Updated only the two canonical documentation files to add
+    focused Warp CPU release-validation commands, optional CUDA-if-available
+    commands, explicit missing-Warp/missing-CUDA skip guidance, unchanged marker
+    names (`warp`, `cuda`, `gpu_parity`, `stochastic`), and an explicit boundary
+    that benchmark validation remains opt-in and separate from standard release
+    validation. `docs/contribute/CONTRIBUTING.md` was intentionally left
+    unchanged.
+  - Tests: Manual documentation consistency validation only; no production code,
+    test-behavior, or new Python test-module changes.
   - Deliverable: Update developer-facing testing and roadmap guidance so the
-    final phase leaves one canonical CUDA-optional validation policy.
+    final phase leaves one canonical CUDA-optional validation policy without
+    broadening into contributor-doc churn.

@@ -62,13 +62,19 @@
 
 ## Documentation Validation
 
-- `E3-F5-P3` was documentation-only, so validation is a manual doc consistency
-  check rather than a new Python test module.
+- `E3-F5-P3` and `E3-F5-P5` were documentation-only, so validation is a manual
+  doc consistency check rather than a new Python test module.
 - Re-opened `.opencode/guides/testing_guide.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` should agree on marker names,
   Warp CPU default coverage, CUDA optionality, explicit deterministic
   `rtol`/`atol`, tight conservation checks, and aggregate stochastic
   expectations.
+- Confirm the final release-validation wording matches what shipped: Warp CPU is
+  the baseline backend when Warp is installed, CUDA validation is optional/
+  local/manual only, missing Warp and missing CUDA are expected skip outcomes,
+  and benchmark validation remains opt-in behind `--benchmark`.
+- Confirm `docs/contribute/CONTRIBUTING.md` remains unchanged by intent so the
+  testing guide and roadmap stay the canonical policy sources.
 
 ## Regression Guardrails
 

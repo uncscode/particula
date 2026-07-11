@@ -195,6 +195,8 @@ These commands match the shipped marker and helper contract:
 - CUDA validation is additional local/manual evidence until dedicated CI exists.
 - Missing Warp or missing CUDA should produce expected skips, not release
   failures, when a command reaches a guarded suite.
+- Benchmark coverage stays opt-in behind `--benchmark` and remains separate
+  from the default release-validation path above.
 
 ### Device-aware tolerance policy
 

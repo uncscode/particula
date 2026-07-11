@@ -54,12 +54,14 @@
 
 ## E3-F5-P5: Release validation docs
 
-- Add focused commands for Warp CPU validation and optional CUDA validation in
+- [x] Add focused commands for Warp CPU validation and optional CUDA validation in
   `.opencode/guides/testing_guide.md` and the GPU roadmap docs.
-- Note CUDA remains local/manual before releases until CI gains CUDA capacity.
-- Include troubleshooting notes for missing Warp, missing CUDA, and marker-based
+- [x] Note CUDA remains local/manual before releases until CI gains CUDA capacity.
+- [x] Include troubleshooting notes for missing Warp, missing CUDA, and marker-based
   test selection so release validation steps stay deterministic for CPU-only
   contributors.
+- [x] Leave `docs/contribute/CONTRIBUTING.md` unchanged because the testing guide
+  and roadmap remain the canonical GPU policy homes for this docs-only phase.
 
 ## Review Checklist
 

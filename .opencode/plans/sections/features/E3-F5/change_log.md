@@ -63,3 +63,18 @@
   `pytest.importorskip("warp")`, kept CPU-first `warp_devices(wp)` behavior,
   and added targeted `gpu_parity`, `stochastic`, and `cuda` marks without
   changing production kernels or making CUDA mandatory.
+
+## 2026-07-10 — P5 release-validation docs update
+
+- Recorded shipped `E3-F5-P5` work from issue `#1261`.
+- Noted that the implementation was documentation-only and updated exactly two
+  canonical files: `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Captured the final shipped release-validation policy wording: Warp CPU is the
+  baseline backend when Warp is installed, CUDA validation remains optional/
+  local/manual until dedicated CI exists, missing Warp and missing CUDA are
+  expected skip paths, marker names remain `warp`, `cuda`, `gpu_parity`, and
+  `stochastic`, and benchmark validation stays opt-in and separate from standard
+  release validation.
+- Recorded that `docs/contribute/CONTRIBUTING.md` was intentionally left
+  unchanged so the testing guide and roadmap remain the canonical policy homes.

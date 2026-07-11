@@ -68,3 +68,14 @@ parity backend, and CUDA coverage remains optional/local/manual.
   `warp_devices(wp)` enumeration, and added targeted `gpu_parity`,
   `stochastic`, and `cuda` marks to representative coagulation, condensation,
   environment, and conversion tests without changing production kernels.
+- Issue `#1261` / `E3-F5-P5` completed the release-validation documentation pass
+  without changing code or test behavior. The shipped canonical policy homes are
+  `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`, which now explicitly state that
+  Warp CPU is the baseline validation backend when Warp is installed, CUDA
+  validation remains optional/local/manual until dedicated CI exists, missing
+  Warp and missing CUDA are expected skip paths, marker names remain `warp`,
+  `cuda`, `gpu_parity`, and `stochastic`, and benchmark validation stays opt-in
+  and separate from standard release validation. `docs/contribute/CONTRIBUTING.md`
+  was intentionally left unchanged so those two docs remain the canonical policy
+  homes.

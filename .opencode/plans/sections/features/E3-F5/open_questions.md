@@ -30,6 +30,11 @@ Status: reviewed and answered on 2026-07-08.
   checklist, with roadmap links for Epic C context. P3 now establishes the
   shared tolerance wording there; any later release-command expansion belongs to
   follow-up documentation work rather than unresolved policy semantics.
+- P5 resolved the remaining release-command question by keeping the canonical
+  policy in `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md` only. `docs/contribute/`
+  `CONTRIBUTING.md` stays unchanged because a broader contributor-doc refresh was
+  out of scope for this docs-only closeout.
 - Fold in helper patterns from E3-F1 and E3-F2 after those features ship.
 - E3-F5-P5 does not need to block on E3-F4. Marker/helper policy may land first
   if release-validation wording includes a follow-up pass after E3-F4 finalizes

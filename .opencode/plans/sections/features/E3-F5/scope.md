@@ -32,6 +32,10 @@
   `particula/gpu/kernels/tests/condensation_stiffness_test.py`,
   `particula/gpu/kernels/tests/environment_test.py`, and
   `particula/gpu/tests/conversion_test.py`.
+- Shipped in `E3-F5-P5`: final release-validation documentation wording in
+  `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`, with `docs/contribute/`
+  `CONTRIBUTING.md` intentionally left unchanged.
 - The shipped P4 migration preserved `pytest.importorskip("warp")`, kept
   CPU-first `warp_devices(wp)` parametrization, avoided module-level `cuda`
   over-marking, and limited scope to test-surface policy adoption rather than
