@@ -173,18 +173,23 @@ registered: `warp`, `cuda`, `gpu_parity`, and `stochastic`.
 
 ### Device-aware tolerance policy
 
-Keep GPU assertions in three separate classes so stochastic expectations do not
-leak into deterministic parity or conservation checks:
+Keep GPU assertions in three separate classes. Deterministic parity,
+conservation checks, and stochastic validation each need their own pass
+criteria so stochastic expectations never relax conservation assertions or
+imply exact replay requirements.
 
 1. **Deterministic parity:** use explicit
    `numpy.testing.assert_allclose(..., rtol=..., atol=...)` bounds for CPU vs
    Warp CPU comparisons and for optional CUDA comparisons when run locally.
-2. **Conservation checks:** keep mass or count drift tolerances tight and do
-   not relax them just because the surrounding kernel or replay uses stochastic
-   sampling.
+   This is the parity rule for deterministic reference agreement.
+2. **Conservation checks:** keep mass or count drift tolerances tight and
+   assert them separately from parity checks. Do not relax conservation bounds
+   just because the surrounding kernel, seeded replay, or diagnostic fixture
+   uses stochastic sampling.
 3. **Stochastic validation:** compare aggregate behavior across repeated seeds
-   or time steps with documented tolerance bands or sigma-based bounds; do not
-   require exact per-seed equality across CPU, Warp CPU, or CUDA.
+   or time steps with documented tolerance bands or sigma-based bounds. Use
+   those bounded aggregate expectations instead of exact per-seed equality
+   across CPU, Warp CPU, or CUDA.
 
 Document the chosen tolerances in the test body or nearby comments when they
 are not already obvious from the physics or baseline study.
@@ -227,11 +232,11 @@ def test_total_mass_is_conserved():
     npt.assert_allclose(final_total, initial_total, rtol=1e-12, atol=0.0)
 ```
 
-For stochastic kernels, assert aggregate behavior instead of replaying exact
-accepted-collision sequences or per-seed trajectories. A seeded range can be
-used to gather repeated evidence, but the pass condition should be a documented
-aggregate bound such as a tolerance interval or `3-sigma` window around the
-expected mean.
+For stochastic kernels, assert bounded aggregate behavior instead of replaying
+exact accepted-collision sequences or per-seed trajectories. A seeded range can
+be used to gather repeated evidence, but the pass condition should be a
+documented aggregate bound such as a tolerance interval or `3-sigma` window
+around the expected mean rather than exact seed-by-seed replay.
 
 Use constants from `particula.util.constants`; do not hardcode physical
 constants in kernels.

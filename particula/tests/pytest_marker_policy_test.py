@@ -10,9 +10,7 @@ from typing import Any, cast
 import pytest
 from particula import conftest as particula_conftest
 
-_BENCHMARK_SKIP_REASON = (
-    "GPU benchmarks skipped (pass --benchmark to enable)"
-)
+_BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
 
 
 @dataclass
@@ -66,7 +64,9 @@ def _load_pyproject_markers() -> list[str]:
     pyproject_path = Path(__file__).resolve().parents[2] / "pyproject.toml"
     with pyproject_path.open("rb") as file:
         pyproject = tomllib.load(file)
-    return cast(list[str], pyproject["tool"]["pytest"]["ini_options"]["markers"])
+    return cast(
+        list[str], pyproject["tool"]["pytest"]["ini_options"]["markers"]
+    )
 
 
 def test_pytest_configure_registers_expected_gpu_policy_markers() -> None:
@@ -94,7 +94,9 @@ def test_pytest_configure_registers_expected_gpu_policy_markers() -> None:
 
 def test_pyproject_marker_list_matches_hook_marker_vocabulary() -> None:
     """Static pytest marker config stays aligned with the hook vocabulary."""
-    assert _load_pyproject_markers() == list(particula_conftest.PYTEST_MARKER_LINES)
+    assert _load_pyproject_markers() == list(
+        particula_conftest.PYTEST_MARKER_LINES
+    )
 
 
 def test_default_collection_leaves_gpu_policy_items_unmodified() -> None:
