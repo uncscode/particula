@@ -25,6 +25,10 @@
   `docs/Features/Roadmap/data-oriented-gpu.md`.
 - The shipped wording now explicitly rejects exact per-seed equality for
   stochastic GPU validation while keeping conservation tolerances tight.
+- `E3-F5-P4` was test-only and did not add new external documentation files.
+  Its documentation effect is that the policy from P3 is now reflected in the
+  actual GPU test surface through module-level Warp marks plus targeted
+  `gpu_parity`, `stochastic`, and `cuda` annotations.
 
 ## Conditional Updates
 

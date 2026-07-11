@@ -14,15 +14,17 @@ statistical agreement.
 ## Value Proposition
 
 This feature formalizes project-wide test semantics for GPU kernel validation.
-E3-F5-P1 through E3-F5-P3 now ship the policy foundation: shared pytest marker
-registration for `warp`, `cuda`, `gpu_parity`, and `stochastic`; matching
-static marker declarations in `pyproject.toml`; a reusable
-`CUDA_SKIP_REASON` contract in `particula/gpu/tests/cuda_availability.py`; and
-documentation that defines the shared tolerance classes. The shipped docs now
-state that deterministic parity uses explicit `rtol`/`atol`, conservation
-checks stay tight, stochastic validation uses aggregate expectations rather
-than exact per-seed equality, Warp CPU is the default parity backend, and CUDA
-coverage remains optional/local/manual.
+E3-F5-P1 through E3-F5-P4 now ship the policy foundation and first broad test
+adoption pass: shared pytest marker registration for `warp`, `cuda`,
+`gpu_parity`, and `stochastic`; matching static marker declarations in
+`pyproject.toml`; a reusable `CUDA_SKIP_REASON` contract in
+`particula/gpu/tests/cuda_availability.py`; documentation that defines the
+shared tolerance classes; and targeted marker/helper rollout across the main
+Warp-backed kernel suites. The shipped docs and migrated tests now state in both
+policy and implementation that deterministic parity uses explicit `rtol`/`atol`,
+conservation checks stay tight, stochastic validation uses aggregate
+expectations rather than exact per-seed equality, Warp CPU is the default
+parity backend, and CUDA coverage remains optional/local/manual.
 
 ## User Stories
 
@@ -60,3 +62,9 @@ coverage remains optional/local/manual.
 - Issue `#1259` / `E3-F5-P3` updated only `.opencode/guides/testing_guide.md`
   and `docs/Features/Roadmap/data-oriented-gpu.md` to publish the shared GPU
   testing tolerance policy without changing production code or test modules.
+- Issue `#1260` / `E3-F5-P4` applied that shared policy to the primary GPU test
+  surface: module-level `pytest.mark.warp` on directly discoverable Warp suites,
+  preserved `pytest.importorskip("warp")` guards, retained CPU-first
+  `warp_devices(wp)` enumeration, and added targeted `gpu_parity`,
+  `stochastic`, and `cuda` marks to representative coagulation, condensation,
+  environment, and conversion tests without changing production kernels.

@@ -21,6 +21,11 @@ Status: reviewed and answered on 2026-07-08.
   resolved the documentation side by publishing the shared policy in
   `.opencode/guides/testing_guide.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Apply the shared policy to real GPU suites without changing production code or
+  making CUDA mandatory. P4 resolved this by adding module-level Warp marks,
+  preserving `pytest.importorskip("warp")`, and applying targeted
+  `gpu_parity`, `stochastic`, and `cuda` marks only to representative tests in
+  coagulation, condensation, environment, and conversion coverage.
 - `.opencode/guides/testing_guide.md` should own the release/manual validation
   checklist, with roadmap links for Epic C context. P3 now establishes the
   shared tolerance wording there; any later release-command expansion belongs to

@@ -31,6 +31,9 @@
   - `pytest particula/gpu/kernels/tests/environment_test.py -q`
 - If Warp is not installed, Warp-marked modules should skip by
   `pytest.importorskip('warp')` rather than fail at import time.
+- `E3-F5-P4` implemented that policy directly in the test modules by adding
+  module-level `pytest.mark.warp` to the main discoverable GPU suites while
+  preserving existing `pytest.importorskip("warp")` guards.
 
 ## CUDA-if-available Validation
 
@@ -38,6 +41,10 @@
   optional/local/manual CUDA policy in both canonical docs.
 - CUDA remains optional/local/manual for release validation until dedicated CUDA
   CI is available, and standard CI must skip cleanly when CUDA is unavailable.
+- P4 kept CUDA selection targeted: representative CUDA-only tests in
+  `coagulation_test.py`, `_condensation_test_support.py`, and
+  `environment_test.py` now carry `@pytest.mark.cuda`, but whole mixed CPU/CUDA
+  modules were not promoted to CUDA-only.
 
 ## Tolerance Validation
 
@@ -48,6 +55,10 @@
 - Stochastic coagulation tests should aggregate over seeds/steps, compare to
   expected rates using `3 sigma` or established tolerance bands, and avoid exact
   per-seed equality across CPU, Warp CPU, and CUDA.
+- P4 now makes those intent classes selectable in the test surface itself:
+  representative deterministic cross-device checks are marked `gpu_parity`,
+  while aggregate mixed-scale and rate-based coagulation checks are marked
+  `stochastic`.
 
 ## Documentation Validation
 
@@ -71,3 +82,9 @@
 - Ensure marker-vocabulary drift between `particula/conftest.py` and
   `pyproject.toml` fails through regression coverage before unknown-marker
   warnings reach downstream GPU test phases.
+- Ensure wrapper-backed condensation tests remain discoverable after support-file
+  marker changes by keeping explicit wrapper-level Warp coverage in
+  `condensation_test.py` and `condensation_stiffness_test.py`.
+- Ensure representative selection commands now work on real migrated tests, for
+  example `-m "warp and gpu_parity"`, `-m "warp and stochastic"`, and
+  `-m "warp and cuda"` over the touched suites.

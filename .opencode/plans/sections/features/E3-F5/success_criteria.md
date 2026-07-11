@@ -36,8 +36,28 @@
   aggregate stochastic expectations.
 - `docs/Features/Roadmap/data-oriented-gpu.md` now mirrors the same shipped
   tolerance semantics and ties them to the mixed-scale stochastic evidence.
-- Remaining unchecked criteria belong to later phases for broader GPU test
-  adoption and any follow-on release-command rollout.
+
+## Additional Shipped Evidence (E3-F5-P4)
+
+- `particula/gpu/kernels/tests/coagulation_test.py`,
+  `particula/gpu/kernels/tests/environment_test.py`,
+  `particula/gpu/tests/conversion_test.py`, `particula/gpu/kernels/tests/`
+  `condensation_test.py`, and `particula/gpu/kernels/tests/`
+  `condensation_stiffness_test.py` now declare module-level `pytest.mark.warp`
+  while preserving `pytest.importorskip("warp")` on the suites that import
+  Warp directly.
+- `particula/gpu/kernels/tests/_condensation_test_support.py` now carries the
+  same Warp-policy readability marker while wrapper modules keep explicit Warp
+  coverage and `support.device` re-export behavior.
+- Representative deterministic cross-device tests are now selectable with
+  `gpu_parity` in coagulation, condensation support, and conversion coverage.
+- Representative aggregate/statistical coagulation checks are now selectable
+  with `stochastic`.
+- Representative CUDA-only checks in coagulation, condensation support, and
+  environment coverage are now selectable with `cuda` while CPU-first Warp
+  coverage remains the default path.
+- Remaining unchecked criteria belong only to the final release-command rollout
+  in `E3-F5-P5`.
 
 ## Evidence Metrics
 
