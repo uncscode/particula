@@ -90,6 +90,16 @@ def test_condensation_latent_heat_run_example_returns_finite_structured_results(
     )
 
 
+def test_condensation_latent_heat_example_runs_without_pint(monkeypatch) -> None:
+    """Already-SI example inputs do not require the optional Pint package."""
+    monkeypatch.setattr("particula.util.convert_units.unit_registry", None)
+
+    namespace = runpy.run_path(str(EXAMPLE_PATH))
+    result = namespace["run_example"]()
+
+    assert math.isfinite(result["cumulative_latent_heat_energy"])
+
+
 def test_condensation_latent_heat_main_path_matches_run_example_contract(
     capsys,
 ) -> None:
