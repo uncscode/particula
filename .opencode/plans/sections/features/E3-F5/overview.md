@@ -14,14 +14,15 @@ statistical agreement.
 ## Value Proposition
 
 This feature formalizes project-wide test semantics for GPU kernel validation.
-E3-F5-P1 and E3-F5-P2 have now shipped the policy foundation: shared pytest
-marker registration for `warp`, `cuda`, `gpu_parity`, and `stochastic`;
-matching static marker declarations in `pyproject.toml`; a reusable
+E3-F5-P1 through E3-F5-P3 now ship the policy foundation: shared pytest marker
+registration for `warp`, `cuda`, `gpu_parity`, and `stochastic`; matching
+static marker declarations in `pyproject.toml`; a reusable
 `CUDA_SKIP_REASON` contract in `particula/gpu/tests/cuda_availability.py`; and
-regression tests proving that `--benchmark` remains the only
-collection-affecting option while CUDA-only benchmark skips reuse the shared
-helper message. Later phases still own tolerance documentation and broad marker
-adoption across GPU test modules.
+documentation that defines the shared tolerance classes. The shipped docs now
+state that deterministic parity uses explicit `rtol`/`atol`, conservation
+checks stay tight, stochastic validation uses aggregate expectations rather
+than exact per-seed equality, Warp CPU is the default parity backend, and CUDA
+coverage remains optional/local/manual.
 
 ## User Stories
 
@@ -56,3 +57,6 @@ adoption across GPU test modules.
   behavior stable, added shared `CUDA_SKIP_REASON = "Warp/CUDA not available"`,
   and updated benchmark skip helper coverage to assert that shared contract
   instead of duplicated literals.
+- Issue `#1259` / `E3-F5-P3` updated only `.opencode/guides/testing_guide.md`
+  and `docs/Features/Roadmap/data-oriented-gpu.md` to publish the shared GPU
+  testing tolerance policy without changing production code or test modules.

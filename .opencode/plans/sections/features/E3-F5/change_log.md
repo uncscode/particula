@@ -37,3 +37,14 @@
   `particula/gpu/tests/benchmark_test.py` and shared-message regression
   assertions in `particula/gpu/tests/benchmark_helpers_test.py` and
   `particula/gpu/tests/cuda_availability_test.py`.
+
+## 2026-07-10 — P3 documentation update
+
+- Recorded shipped `E3-F5-P3` work from issue `#1259`.
+- Noted that the implementation was documentation-only and limited to
+  `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- Captured the shipped shared GPU testing policy: explicit deterministic
+  `rtol`/`atol`, tight conservation checks, aggregate stochastic expectations,
+  Warp CPU as the default parity backend, and optional/local/manual CUDA
+  coverage.

@@ -3,22 +3,28 @@
 ## Required Updates
 
 - `.opencode/guides/testing_guide.md`
-  - Add a device-aware Warp pytest policy under the NVIDIA Warp Tests section.
-  - List marker names, default behavior, CUDA-if-available semantics, and skip
+  - Added the shipped device-aware Warp pytest policy under the NVIDIA Warp
+    Tests section.
+  - Records the exact marker names, Warp CPU default behavior,
+    CUDA-local/manual semantics, and clean-skip expectations.
+  - Records the three validation classes: explicit deterministic
+    `rtol`/`atol`, tight conservation checks, and aggregate stochastic
     expectations.
-  - Record stochastic parity tolerance guidance and examples.
 - `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Mark E3-F5 policy as defined once implementation lands.
-  - Record CUDA local/manual validation expectations and parity tolerance
-    classes.
+  - Now records E3-F5 policy as shipped rather than pending.
+  - Repeats CUDA local/manual validation expectations and the same three
+    parity/conservation/stochastic tolerance classes used in the testing guide.
 
-## P1 Shipped Status
+## Shipped Status
 
-- No external documentation files changed in `E3-F5-P1`.
-- The shipped implementation limited documentation work to inline module
-  docstrings/comments in `particula/conftest.py` describing shared marker
-  registration and benchmark-only collection gating.
-- Testing guide and roadmap updates remain queued for `E3-F5-P3` and `E3-F5-P5`.
+- `E3-F5-P1` did not change external documentation files.
+- `E3-F5-P2` standardized helper wording through shared skip-message coverage,
+  but did not update plan-facing docs.
+- `E3-F5-P3` shipped the intended documentation-only diff in exactly two files:
+  `.opencode/guides/testing_guide.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- The shipped wording now explicitly rejects exact per-seed equality for
+  stochastic GPU validation while keeping conservation tolerances tight.
 
 ## Conditional Updates
 
@@ -34,4 +40,4 @@
 - State that Warp CPU is the default parity backend when Warp is installed.
 - State that stochastic tests use aggregate statistical expectations, not exact
   per-seed equality.
-- Include focused commands for Warp CPU and CUDA-if-available validation.
+- Keep deterministic parity guidance explicit with `rtol`/`atol` examples.

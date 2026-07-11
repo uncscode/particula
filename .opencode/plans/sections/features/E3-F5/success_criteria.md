@@ -21,7 +21,7 @@
 - [ ] Existing benchmark gating through `--benchmark` remains intact and is not
   conflated with default validation.
 
-## Current Shipped Evidence (E3-F5-P1)
+## Current Shipped Evidence (E3-F5-P1 to P3)
 
 - `particula/conftest.py` and `pyproject.toml` now declare the same seven-marker
   vocabulary, including `warp`, `cuda`, `gpu_parity`, and `stochastic`.
@@ -30,8 +30,14 @@
   benchmark-only option/help-text surface.
 - `particula/tests/benchmark_option_test.py` still covers the original
   `--benchmark` registration and benchmark gating path.
-- Remaining unchecked criteria belong to later phases for helper
-  standardization, GPU test adoption, and documentation rollout.
+- `.opencode/guides/testing_guide.md` now records the shared device-aware GPU
+  testing policy: Warp CPU default parity, optional/local/manual CUDA coverage,
+  explicit deterministic `rtol`/`atol`, tight conservation checks, and
+  aggregate stochastic expectations.
+- `docs/Features/Roadmap/data-oriented-gpu.md` now mirrors the same shipped
+  tolerance semantics and ties them to the mixed-scale stochastic evidence.
+- Remaining unchecked criteria belong to later phases for broader GPU test
+  adoption and any follow-on release-command rollout.
 
 ## Evidence Metrics
 

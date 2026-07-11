@@ -96,6 +96,12 @@ def function(
 **Collection policy:** plain `pytest` preserves normal collection;
 `--benchmark` is the only collection-affecting option.
 
+**GPU policy:** Warp CPU is the default parity backend when Warp is installed.
+CUDA coverage is optional local/manual validation and must skip cleanly when
+unavailable. Deterministic parity uses explicit `rtol`/`atol`, conservation
+checks stay tight, and stochastic checks use aggregate statistics or
+sigma-based bounds rather than exact per-seed equality.
+
 **Test structure:**
 ```
 particula/

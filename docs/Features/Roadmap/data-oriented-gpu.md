@@ -146,13 +146,12 @@ The lower-level Warp backend is implemented and covered by targeted tests.
 - GPU condensation kernels provide a tested `condensation_step_gpu` API.
 - GPU Brownian coagulation kernels provide a tested `coagulation_step_gpu` API.
 - GPU benchmark scaffolding exists for CUDA-enabled environments.
-- Parity tests parametrize over available Warp devices, always running on Warp
-  CPU and additionally on Warp CUDA when a device is present. Deterministic
-  parity checks use explicit `rtol`/`atol`, the matching pytest markers remain
-  `warp`, `cuda`, `gpu_parity`, and `stochastic`, CUDA is optional and
-  local/manual, not a hard runtime or CI requirement, and that parity coverage
-  documents the explicit helper surface rather than a shipped automatic GPU
-  runtime integration.
+- Parity validation always includes Warp CPU when Warp is installed and may add
+  Warp CUDA when a device is available locally. Deterministic parity uses
+  explicit `rtol`/`atol`, the matching pytest markers remain `warp`, `cuda`,
+  `gpu_parity`, and `stochastic`, CUDA coverage is optional/local/manual rather
+  than a CI requirement, and this documentation records the explicit helper
+  surface rather than implying automatic GPU runtime integration.
 
 The GPU backend is currently a directly callable lower-level API. It is not yet
 integrated as an automatic backend in the main `Aerosol`, `Runnable`, or
@@ -740,15 +739,15 @@ Planned features:
    helpers, and context helpers rather than direct kernel-step imports. Raw
    helper kernels remain intentionally outside the documented package-level
    public surface; import them from their concrete modules when needed.
-5. Device-aware pytest execution is now project policy: parity tests always
-   run on Warp CPU and add CUDA automatically when a device is present;
-   the matching pytest markers remain `warp`, `cuda`, `gpu_parity`, and
-   `stochastic`; CUDA-device validation remains local/manual before releases
-   and must skip cleanly when CUDA is unavailable.
-6. Tolerance policy is documented in three classes: deterministic parity uses
+5. Device-aware pytest policy is part of the shipped guidance: parity
+   validation always runs on Warp CPU when Warp is installed and may add CUDA
+   when a device is present locally; the matching pytest markers remain
+   `warp`, `cuda`, `gpu_parity`, and `stochastic`; CUDA validation is
+   optional/local/manual and must skip cleanly when CUDA is unavailable.
+6. Tolerance policy stays split into three classes: deterministic parity uses
    explicit `rtol`/`atol`, conservation checks keep tight drift tolerances,
-   and stochastic validation uses aggregate expectations rather than exact
-   per-seed equality across CPU, Warp CPU, and CUDA.
+   and stochastic validation uses aggregate expectations such as tolerance
+   bands or `3-sigma` behavior rather than exact per-seed equality.
 7. The shipped canonical direct-kernel quick-start is
    [`docs/Examples/gpu_direct_kernels_quick_start.py`](../../Examples/gpu_direct_kernels_quick_start.py).
    It demonstrates the supported `ParticleData`/`GasData` path, explicit
@@ -836,7 +835,7 @@ fixed or explicitly accepted during this epic.
   computed from active upper-triangle Brownian pairs only and sigma taken as
   `sqrt(expected_mean)`.
 
-  The shipped mixed-scale test surface currently includes
+  The documented mixed-scale evidence currently cites
   `test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(device)`,
   `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`,
   `test_mixed_scale_expected_collision_statistics_use_active_pairs_only()`,
@@ -853,21 +852,21 @@ fixed or explicitly accepted during this epic.
   `test_mixed_scale_initialize_rng_true_replays_seeded_state_and_outcome(device)`.
   The Brownian repeated-run evidence is the seeded `range(101, 201)` check in
   `test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_tolerance(device)`:
-  the shipped bounded-selector path is accepted only when the observed accepted
-  collision total stays within a `3 * sigma` tolerance of the active-pairs-only
-  Brownian expected mean computed by
+  the documented bounded-selector path is accepted only when the observed
+  accepted collision total stays within a `3 * sigma` tolerance of the
+  active-pairs-only Brownian expected mean computed by
   `_get_expected_collision_statistics(...)` for the documented `time_step=0.5`,
-  `max_collisions=8`, and `volume=1.0e-10` replay setup. The same test-local
-  coverage also verifies active-pairs-only reference statistics, sorted
-  in-bounds accepted pairs, finite zero-acceptance behavior, early-exit
+  `max_collisions=8`, and `volume=1.0e-10` replay setup. The same documented
+  test-local evidence also verifies active-pairs-only reference statistics,
+  sorted in-bounds accepted pairs, finite zero-acceptance behavior, early-exit
   accounting for executed versus scheduled trials, bounded trial clamping,
   total-mass conservation, and caller-owned `rng_states` reuse/reset semantics.
-  This is the shared validation model for stochastic GPU checks: deterministic
-  parity still uses explicit `rtol`/`atol`, conservation assertions remain
-  tight, Warp CPU is the default parity backend, optional CUDA runs extend the
-  same policy when available locally, and stochastic acceptance coverage judges
-  aggregate statistics such as tolerance bands or `3-sigma` behavior rather
-  than exact per-seed equality.
+  This roadmap follows the same validation policy as the testing guide:
+  deterministic parity uses explicit `rtol`/`atol`, conservation assertions
+  stay tight, Warp CPU always participates in parity validation when Warp is
+  installed, optional CUDA runs apply the same policy when available locally,
+  and stochastic acceptance coverage is judged by aggregate expectations such
+  as tolerance bands or `3-sigma` behavior rather than exact per-seed equality.
   Treat this as bounded evidence that the selector hardening preserved expected
   Brownian behavior within stochastic tolerance inside the existing sampler,
   not as proof that the global-majorant acceptance collapse is solved for every

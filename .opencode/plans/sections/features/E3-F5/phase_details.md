@@ -39,8 +39,8 @@
     missing Warp and unavailable CUDA, and the non-skipping CUDA-available
     branch with no real CUDA requirement.
 
-- [ ] **E3-F5-P3:** Document stochastic parity and floating tolerance policy
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E3-F5-P3:** Document stochastic parity and floating tolerance policy
+  - Issue: #1259 | Size: XS | Status: Shipped
   - Depends on: E3-F1 and E3-F2 providing the final RNG and mixed-scale behavior
     assumptions that the tolerance classes must describe, plus E3-F5-P1 naming
     the marker taxonomy used by the policy prose.
@@ -48,8 +48,13 @@
     tolerance classes as the standard for CPU, Warp CPU, and CUDA validation.
   - Files: `.opencode/guides/testing_guide.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`.
-  - Tests: Documentation-link or markdown validation where available; no
-    production code changes.
+  - Shipped behavior: Updated only the two planned documentation files to state
+    that deterministic parity uses explicit `rtol`/`atol`, conservation checks
+    stay tight, stochastic validation uses aggregate expectations rather than
+    exact per-seed equality, Warp CPU is the default parity backend, and CUDA
+    coverage remains optional/local/manual.
+  - Tests: Manual documentation consistency validation only; no production code
+    or Python test-module changes.
 
 - [ ] **E3-F5-P4:** Apply device policy markers and helpers to GPU kernel tests
   - Issue: TBD | Size: S | Status: Not Started
