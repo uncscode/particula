@@ -8,13 +8,14 @@ paths without requiring CUDA benchmark execution during default test runs.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 import types
 import warnings
 from builtins import __import__ as builtins_import
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 
 import numpy as np
 import numpy.testing as npt
@@ -30,6 +31,17 @@ from particula.gpu.tests.mass_precision_study_support import (
 _BENCHMARK_MODULE_PATH = Path(__file__).with_name("benchmark_test.py")
 _BENCHMARK_MODULE_PREFIX = "particula.gpu.tests._benchmark_test_isolated_"
 _benchmark_module_counter = 0
+
+
+@pytest.fixture(autouse=True)
+def _restore_benchmark_option_env() -> Generator[None, None, None]:
+    """Restore benchmark opt-in env state after each test."""
+    previous = os.environ.get(particula_conftest.BENCHMARK_OPTION_ENV_VAR)
+    yield
+    if previous is None:
+        os.environ.pop(particula_conftest.BENCHMARK_OPTION_ENV_VAR, None)
+        return
+    os.environ[particula_conftest.BENCHMARK_OPTION_ENV_VAR] = previous
 
 
 def _load_benchmark_module(

@@ -8,6 +8,8 @@ WarpGasData, and WarpEnvironmentData.
 import numpy as np
 import pytest
 
+pytestmark = pytest.mark.warp
+
 wp = pytest.importorskip("warp")
 
 from particula.gpu.warp_types import (  # noqa: E402

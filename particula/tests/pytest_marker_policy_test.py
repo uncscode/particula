@@ -2,15 +2,36 @@
 
 from __future__ import annotations
 
+import os
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Generator, cast
 
 import pytest
 from particula import conftest as particula_conftest
 
 _BENCHMARK_SKIP_REASON = "GPU benchmarks skipped (pass --benchmark to enable)"
+
+_WARP_MARKED_GPU_TESTS = (
+    Path("particula/gpu/tests/kernel_exports_test.py"),
+    Path("particula/gpu/tests/warp_types_test.py"),
+    Path("particula/gpu/dynamics/tests/coagulation_funcs_test.py"),
+    Path("particula/gpu/dynamics/tests/condensation_funcs_test.py"),
+    Path("particula/gpu/properties/tests/gas_properties_test.py"),
+    Path("particula/gpu/properties/tests/particle_properties_test.py"),
+)
+
+
+@pytest.fixture(autouse=True)
+def _restore_benchmark_option_env() -> Generator[None, None, None]:
+    """Restore benchmark opt-in env state after each test."""
+    previous = os.environ.get(particula_conftest.BENCHMARK_OPTION_ENV_VAR)
+    yield
+    if previous is None:
+        os.environ.pop(particula_conftest.BENCHMARK_OPTION_ENV_VAR, None)
+        return
+    os.environ[particula_conftest.BENCHMARK_OPTION_ENV_VAR] = previous
 
 
 @dataclass
@@ -158,3 +179,33 @@ def test_registered_option_help_text_matches_expected_policy_surface() -> None:
             },
         )
     ]
+
+
+def test_pytest_configure_resets_benchmark_env_when_option_is_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Configure should overwrite a stale enabled env state with disabled."""
+
+    @dataclass
+    class _FakeConfigureWithOption(_FakeConfigureConfig):
+        benchmark_enabled: bool = False
+
+        def getoption(self, name: str) -> bool:
+            assert name == "--benchmark"
+            return self.benchmark_enabled
+
+    monkeypatch.setenv(particula_conftest.BENCHMARK_OPTION_ENV_VAR, "1")
+    config = _FakeConfigureWithOption(benchmark_enabled=False)
+
+    particula_conftest.pytest_configure(cast(Any, config))
+
+    assert particula_conftest.benchmark_option_enabled_from_env() is False
+
+
+def test_remaining_warp_only_suites_are_explicitly_warp_marked() -> None:
+    """Remaining Warp-only suites stay targetable through ``-m warp``."""
+    repo_root = Path(__file__).resolve().parents[2]
+
+    for relative_path in _WARP_MARKED_GPU_TESTS:
+        contents = (repo_root / relative_path).read_text(encoding="utf-8")
+        assert "pytestmark = pytest.mark.warp" in contents, relative_path.as_posix()
