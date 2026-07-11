@@ -696,9 +696,9 @@ Shipped scope (tracked in plan E1):
   parity (fixed-shape state, explicit environment inputs, no hidden CPU↔GPU
   movement).
 
-Two follow-ups were deferred out of E1 (a runnable latent-heat example and
-an integration-level conservation case); they are scheduled as features 8
-and 9 in
+Two follow-ups were deferred out of E1: the runnable latent-heat example
+(E3-F6) and the integration-level conservation case (E3-F7). They are
+scheduled as features 8 and 9 in
 [Epic C](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening).
 
 **Exit bar (met):** Latent-heat condensation is a documented, builder/factory
@@ -930,22 +930,21 @@ Planned features:
    vapor pressures recomputed on the GPU each timestep for parcel,
    expansion, and latent-heat workflows; today `vapor_pressure` is set once
    at transfer time and defaults to zeros.
-2. Warp-backed latent-heat condensation kernel matching CPU
-   `CondensationLatentHeat`, including latent-heat-corrected mass transfer
-   and per-step latent heat energy bookkeeping (see the
-   [condensation equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat)),
-   with per-box temperature feedback through the
-   [EnvironmentData Container](#environmentdata-container). E3-F7 provides
-   the current CPU integration-level latent-heat baseline for this future
-   Epic D work through the executable reference test
+2. Warp-backed latent-heat condensation kernel matching the shipped CPU
+   `CondensationLatentHeat` bookkeeping path, including latent-heat-
+   corrected mass transfer and per-step latent heat energy bookkeeping
+   (see the [condensation
+   equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat)).
+   E3-F7 provides the current executable CPU integration baseline for this
+   future Epic D work through
    `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
    That CPU-only diagnostic/reference baseline verifies only a finite
    nonzero condensation transfer, particle water gain, gas water loss,
    total water conservation, and final-step
    `last_latent_heat_energy` agreement with the constant-latent-heat
-   bookkeeping path. It is baseline evidence for future Epic D GPU parity
-   work only; it does not claim shipped GPU latent-heat parity or
-   temperature-feedback runtime support.
+   bookkeeping path. Temperature-feedback runtime support and GPU
+   latent-heat parity remain future Epic D goals rather than shipped
+   behavior.
 3. Fixed-count sub-stepping integration: build GPU condensation on the
    `fixed_count_substeps_4` recommendation from the
    [condensation stiffness study](condensation-stiffness-study.md), keeping

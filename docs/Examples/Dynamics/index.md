@@ -7,7 +7,8 @@ including condensation, coagulation, and special customizations.
 ## Condensation
 
 These examples demonstrate bin-based and fully resolved approaches to
-modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.
+modeling condensation, plus a CPU-only latent-heat diagnostic/reference
+walkthrough.
 
 - [Condensation 1: Bins](Condensation/Condensation_1_Bin.ipynb)
 - [Condensation 2: Masses Binned](Condensation/Condensation_2_MassBin.ipynb)
@@ -16,7 +17,8 @@ modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.
   – Published CPU-only latent-heat bookkeeping walkthrough using
   `MassCondensation` with public factory/builder APIs. The reported
   energy density is diagnostic only and does not feed back into
-  temperature.
+  temperature. The executable CPU integration baseline remains
+  `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
 - [Staggered Condensation](Condensation/Staggered_Condensation_Example.ipynb) – Demonstrates staggered ODE stepping for improved stability and mass conservation.
 
 ## Coagulation
