@@ -237,6 +237,84 @@ describe("auto_mode_manifest wrapper", () => {
     ]);
   });
 
+  it("routes delete and prune with bounded non-interactive options", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const deleteResult = await execute({
+      command: "delete",
+      branch: "epic/e14-auto",
+      options: "dry-run",
+    });
+    const pruneResult = await execute({
+      command: "prune",
+      completed: true,
+      options: "force",
+    });
+
+    expect(deleteResult).toBe("ok");
+    expect(pruneResult).toBe("ok");
+    expect(getInvocations()[0]?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "auto-mode",
+      "delete",
+      "--branch",
+      "epic/e14-auto",
+      "--dry-run",
+    ]);
+    expect(getInvocations()[1]?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "auto-mode",
+      "prune",
+      "--completed",
+      "--force",
+    ]);
+  });
+
+  it("routes delete --force and prune --dry-run symmetrically", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const deleteResult = await execute({
+      command: "delete",
+      branch: "epic/e14-auto",
+      options: "force",
+    });
+    const pruneResult = await execute({
+      command: "prune",
+      completed: true,
+      options: "dry-run",
+    });
+
+    expect(deleteResult).toBe("ok");
+    expect(pruneResult).toBe("ok");
+    expect(getInvocations()[0]?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "auto-mode",
+      "delete",
+      "--branch",
+      "epic/e14-auto",
+      "--force",
+    ]);
+    expect(getInvocations()[1]?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "auto-mode",
+      "prune",
+      "--completed",
+      "--dry-run",
+    ]);
+  });
+
   it("documents workflow-context requirements for manual completion", async () => {
     await loadToolExecute("../../auto_mode_manifest.ts");
 
@@ -323,6 +401,54 @@ describe("auto_mode_manifest wrapper", () => {
     expect(getInvocations()).toHaveLength(0);
   });
 
+  it("rejects delete and prune when required selectors are missing or invalid before spawn", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    expect(String(await execute({ command: "delete", options: "force" }))).toContain(
+      "'branch' is required for delete",
+    );
+    expect(
+      String(await execute({ command: "delete", branch: "--bad", options: "force" })),
+    ).toContain("Invalid branch name");
+    expect(String(await execute({ command: "prune", options: "force" }))).toContain(
+      "'completed: true' is required for prune",
+    );
+    expect(
+      String(await execute({ command: "prune", completed: false, options: "dry-run" })),
+    ).toContain("'completed: true' is required for prune");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects interactive delete and prune invocations without dry-run or force", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const deleteResult = await execute({ command: "delete", branch: "feature/a" });
+    const pruneResult = await execute({ command: "prune", completed: true });
+
+    expect(String(deleteResult)).toContain("Interactive 'delete' calls are not allowed via wrapper");
+    expect(String(pruneResult)).toContain("Interactive 'prune' calls are not allowed via wrapper");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects command-disallowed tokens for delete and prune before spawn", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const deleteResult = await execute({
+      command: "delete",
+      branch: "feature/a",
+      options: "resume",
+    });
+    const pruneResult = await execute({
+      command: "prune",
+      completed: true,
+      options: "json",
+    });
+
+    expect(String(deleteResult)).toContain("token is not allowed for command 'delete'");
+    expect(String(pruneResult)).toContain("token is not allowed for command 'prune'");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
   it("rejects invalid options tokens before spawn", async () => {
     const execute = await loadToolExecute("../../auto_mode_manifest.ts");
 
@@ -362,6 +488,21 @@ describe("auto_mode_manifest wrapper", () => {
 
     expect(String(statusResult)).toContain("ERROR: Invalid branch name: --json");
     expect(String(initResult)).toContain("ERROR: Invalid branch name: --force");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects whitespace-only branch values before spawn", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const deleteResult = await execute({
+      command: "delete",
+      branch: "   ",
+      options: "force",
+    });
+    const statusResult = await execute({ command: "status", branch: "\t" });
+
+    expect(String(deleteResult)).toContain("Branch name cannot be blank or whitespace-only");
+    expect(String(statusResult)).toContain("Branch name cannot be blank or whitespace-only");
     expect(getInvocations()).toHaveLength(0);
   });
 

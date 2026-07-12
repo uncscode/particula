@@ -2,7 +2,7 @@
   "id": "E3-F2",
   "type": "feature",
   "title": "Harden or characterize coagulation rejection sampling for mixed NPF/droplet ranges",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -10,8 +10,8 @@
   ],
   "start_date": "2026-07-08",
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-09",
+  "completion_date": "2026-07-12",
+  "last_updated": "2026-07-12",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E3-F2/architecture_design.md",
@@ -34,11 +34,11 @@
     {
       "id": "E3-F2-P1",
       "title": "Add mixed NPF/droplet fixture and acceptance-rate diagnostics with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-12",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -47,11 +47,11 @@
     {
       "id": "E3-F2-P2",
       "title": "Prototype bounded mixed-scale sampling hardening with conservation tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-12",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -85,5 +85,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

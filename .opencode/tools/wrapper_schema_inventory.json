@@ -406,13 +406,14 @@
         "ship_strategy",
         "issue",
         "branch",
+        "completed",
         "completed_at",
         "detail"
       ],
       "exempt_fields": [
         "options"
       ],
-      "current_count": 13,
+      "current_count": 14,
       "diagnostic": null,
       "classification": "split-needed",
       "target_shape": "split-wrapper-family",
