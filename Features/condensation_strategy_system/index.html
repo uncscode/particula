@@ -15259,6 +15259,15 @@ fallback is configured, the step follows the isothermal path and reports
 step mass-transfer quantity. For the current single-box public example path,
 that diagnostic aligns with the mass-concentration contract and should be
 reported as an energy density.</p>
+<p>For the current shipped support boundary, E3-F7 is the executable CPU
+integration baseline for future Epic D GPU parity work:
+<code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>.
+It verifies only a finite nonzero condensation transfer, particle water
+gain, gas water loss, total water conservation, and final-step
+<code>last_latent_heat_energy</code> agreement with the constant-latent-heat
+bookkeeping path. This baseline is CPU-only and diagnostic/reference only;
+temperature-feedback runtime support and GPU latent-heat parity remain
+future work.</p>
 <h3 id="condensationisothermalstaggered-two-pass-gauss-seidel">CondensationIsothermalStaggered (two-pass Gauss-Seidel)<a class="headerlink" href="#condensationisothermalstaggered-two-pass-gauss-seidel" title="Permanent link">&para;</a></h3>
 <p><code>CondensationIsothermalStaggered</code> splits each timestep into two passes. Theta
 controls the first-pass fraction; batches are clipped to the particle count and
@@ -15694,7 +15703,8 @@ condensing species.</p>
 <ul>
 <li><strong>Dynamics overview</strong>: <a href="../wall_loss_strategy_system/">Wall loss strategy system</a></li>
 <li><strong>Examples</strong>: <a href="../../Examples/Simulations/">docs/Examples/Simulations/index.md</a></li>
-<li><strong>Latent-heat example</strong>: <a href="../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/">CPU latent-heat condensation bookkeeping</a></li>
+<li><strong>Latent-heat example (E3-F6)</strong>: <a href="../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/">CPU latent-heat condensation bookkeeping</a></li>
+<li><strong>CPU integration baseline</strong>: <code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code></li>
 <li><strong>Theory</strong>: <a href="../../Theory/">docs/Theory/index.md</a></li>
 </ul>
 <h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>

@@ -14271,7 +14271,8 @@
 including condensation, coagulation, and special customizations.</p>
 <h2 id="condensation">Condensation<a class="headerlink" href="#condensation" title="Permanent link">&para;</a></h2>
 <p>These examples demonstrate bin-based and fully resolved approaches to
-modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.</p>
+modeling condensation, plus a CPU-only latent-heat diagnostic/reference
+walkthrough.</p>
 <ul>
 <li><a href="Condensation/Condensation_1_Bin/">Condensation 1: Bins</a></li>
 <li><a href="Condensation/Condensation_2_MassBin/">Condensation 2: Masses Binned</a></li>
@@ -14280,7 +14281,8 @@ modeling condensation, plus a CPU-only latent-heat bookkeeping walkthrough.</p>
   – Published CPU-only latent-heat bookkeeping walkthrough using
   <code>MassCondensation</code> with public factory/builder APIs. The reported
   energy density is diagnostic only and does not feed back into
-  temperature.</li>
+  temperature. The executable CPU integration baseline remains
+  <code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>.</li>
 <li><a href="Condensation/Staggered_Condensation_Example/">Staggered Condensation</a> – Demonstrates staggered ODE stepping for improved stability and mass conservation.</li>
 </ul>
 <h2 id="coagulation">Coagulation<a class="headerlink" href="#coagulation" title="Permanent link">&para;</a></h2>
