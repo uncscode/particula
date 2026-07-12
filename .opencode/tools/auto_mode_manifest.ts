@@ -16,7 +16,16 @@ function normalizeAdwId(value: unknown): string | null {
   return trimmed.toLowerCase();
 }
 
-const COMMANDS = ["init-from-batch", "init", "status", "validate", "reset", "complete"] as const;
+const COMMANDS = [
+  "init-from-batch",
+  "init",
+  "status",
+  "validate",
+  "delete",
+  "prune",
+  "reset",
+  "complete",
+] as const;
 const MAX_ISSUES = 500;
 const MAX_DEPENDS = 500;
 const MAX_BRANCH_LEN = 255;
@@ -29,6 +38,8 @@ const COMMAND_OPTION_TOKENS = {
   init: ["force"],
   status: ["json"],
   validate: [],
+  delete: ["dry-run", "force"],
+  prune: ["dry-run", "force"],
   reset: ["resume", "force"],
   complete: ["force", "dry-run", "branch-merged", "no-branch-merged"],
 } as const satisfies Record<AutoModeCommand, readonly string[]>;
@@ -38,6 +49,8 @@ const USAGE_EXAMPLE = `Example usage:
   auto_mode_manifest({ command: "init", issues: "42,43", depends: "43:42", ship_strategy: "pr", options: "force" })
   auto_mode_manifest({ command: "status", branch: "epic/e14-auto", options: "json" })
   auto_mode_manifest({ command: "validate", branch: "epic/e14-auto" })
+  auto_mode_manifest({ command: "delete", branch: "epic/e14-auto", options: "dry-run" })
+  auto_mode_manifest({ command: "prune", completed: true, options: "force" })
   auto_mode_manifest({ command: "reset", issue: "42", branch: "epic/e14-auto", options: "resume force" })
   auto_mode_manifest({ command: "complete", issue: "42", adw_id: "abc12345", branch: "epic/e14-auto", completed_at: "2026-06-27T23:59:59Z", detail: "Issue completed (branch accumulation).", options: "branch-merged dry-run" })`;
 
@@ -53,6 +66,14 @@ const COMMAND_DESCRIPTIONS = `AVAILABLE COMMANDS:
 
 • validate: Validate current manifest state
   Usage: { command: "validate", branch?: "epic/e14-auto" }
+
+• delete: Remove one manifest registry entry by exact branch
+  Usage: { command: "delete", branch: "epic/e14-auto", options: "dry-run" }
+  Note: one of options: "dry-run" or options: "force" is required.
+
+• prune: Remove all completed manifest registry entries
+  Usage: { command: "prune", completed: true, options: "force" }
+  Note: one of options: "dry-run" or options: "force" is required.
 
 • reset: Reset manifest issue state
   Usage: { command: "reset", issue: "42", branch?: "epic/e14-auto", options?: "resume force" }
@@ -133,7 +154,10 @@ function validateBranchRef(branchName: string): string | null {
   return null;
 }
 
-function normalizeBranchInput(value: string | undefined): {
+function normalizeBranchInput(
+  value: string | undefined,
+  options?: { rejectBlankProvided?: boolean },
+): {
   normalized: string | null;
   error?: string;
 } {
@@ -142,6 +166,9 @@ function normalizeBranchInput(value: string | undefined): {
   }
   const trimmed = value.trim();
   if (!trimmed) {
+    if (options?.rejectBlankProvided) {
+      return { normalized: null, error: "Branch name cannot be blank or whitespace-only." };
+    }
     return { normalized: null };
   }
   const error = validateBranchRef(trimmed);
@@ -351,7 +378,7 @@ function appendBranchMetadata(
 }
 
 function appendBranchFilter(cmdParts: (string | number)[], branch?: string): string | null {
-  const normalizedBranch = normalizeBranchInput(branch);
+  const normalizedBranch = normalizeBranchInput(branch, { rejectBlankProvided: true });
   if (normalizedBranch.error) {
     return normalizedBranch.error;
   }
@@ -537,6 +564,64 @@ function buildResetCommand(
   return null;
 }
 
+function requireNonInteractiveMutationOptions(
+  command: "delete" | "prune",
+  options: ParsedCommandOptions,
+): string | null {
+  if (options["dry-run"] || options.force) {
+    return null;
+  }
+  return `Interactive '${command}' calls are not allowed via wrapper; include options: \"dry-run\" or options: \"force\".`;
+}
+
+function buildDeleteCommand(
+  cmdParts: (string | number)[],
+  args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
+): string | null {
+  const interactionError = requireNonInteractiveMutationOptions("delete", options);
+  if (interactionError) {
+    return interactionError;
+  }
+  if (!args.branch) {
+    return "'branch' is required for delete.";
+  }
+  cmdParts.push("delete");
+  const branchError = appendBranchFilter(cmdParts, args.branch);
+  if (branchError) {
+    return branchError;
+  }
+  if (options["dry-run"]) {
+    cmdParts.push("--dry-run");
+  }
+  if (options.force) {
+    cmdParts.push("--force");
+  }
+  return null;
+}
+
+function buildPruneCommand(
+  cmdParts: (string | number)[],
+  args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
+): string | null {
+  const interactionError = requireNonInteractiveMutationOptions("prune", options);
+  if (interactionError) {
+    return interactionError;
+  }
+  if (args.completed !== true) {
+    return "'completed: true' is required for prune.";
+  }
+  cmdParts.push("prune", "--completed");
+  if (options["dry-run"]) {
+    cmdParts.push("--dry-run");
+  }
+  if (options.force) {
+    cmdParts.push("--force");
+  }
+  return null;
+}
+
 function buildCompleteCommand(
   cmdParts: (string | number)[],
   args: AutoModeManifestArgs,
@@ -592,6 +677,8 @@ export default tool({
 
 This tool wraps the auto-mode CLI commands with validation to provide agents
 safe access to manifest creation, inspection, resets, and manual completion.
+It remains the active compatibility wrapper for this surface; keep using this
+wrapper until the split replacement path is shipped.
 
 ${COMMAND_DESCRIPTIONS}
 
@@ -616,6 +703,8 @@ REQUIRED PARAMETERS BY COMMAND:
 • init: issues
 • status: none
 • validate: none
+• delete: branch, options with one of dry-run/force
+• prune: completed=true, options with one of dry-run/force
 • reset: issue
 • complete: issue, adw_id`),
 
@@ -665,6 +754,8 @@ SUPPORTED TOKENS:
 • init: force
 • status: json
 • reset: resume, force
+• delete: dry-run, force (one required)
+• prune: dry-run, force (one required)
 • complete: force, dry-run, branch-merged, no-branch-merged
 
 Use space-separated bare tokens and keep payload-bearing fields explicit.
@@ -724,8 +815,17 @@ ALLOWED: pr, accumulate`),
       .optional()
       .describe(`Branch name filter for manifest operations.
 
-APPLIES TO: status, validate, reset, complete
+APPLIES TO: status, validate, delete, reset, complete
+Whitespace-only values are rejected.
 MAPS TO: --branch`),
+
+    completed: tool.schema
+      .boolean()
+      .optional()
+      .describe(`Completed-manifest selector.
+
+REQUIRED FOR: prune
+Set to true to map to --completed. False or omitted values are rejected.`),
 
     completed_at: tool.schema
       .string()
@@ -779,6 +879,16 @@ MAPS TO: --detail`),
 
       case "validate": {
         buildErrorMessage = buildValidateCommand(cmdParts, args);
+        break;
+      }
+
+      case "delete": {
+        buildErrorMessage = buildDeleteCommand(cmdParts, args, optionValues);
+        break;
+      }
+
+      case "prune": {
+        buildErrorMessage = buildPruneCommand(cmdParts, args, optionValues);
         break;
       }
 
@@ -839,6 +949,7 @@ interface AutoModeManifestArgs {
   ship_strategy?: string;
   issue?: string;
   branch?: string;
+  completed?: boolean;
   completed_at?: string;
   detail?: string;
 }

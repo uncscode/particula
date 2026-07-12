@@ -10,14 +10,16 @@ Structured wrapper for auto-mode manifest operations.
 | `init` | `issues` | Build a manifest from explicit issue numbers |
 | `status` | — | Show manifest state |
 | `validate` | — | Validate manifest state |
+| `delete` | `branch` | Remove one manifest registry entry by exact source branch |
+| `prune` | `completed=true` | Remove all registry entries whose top-level status is `completed` |
 | `reset` | `issue` | Reset one issue's manifest state |
 | `complete` | `issue`, `adw_id` | Mark one issue completed for accumulate-mode handoff |
 
 ## Preferred Usage
 
-This is the active wrapper for auto-mode manifest operations. Optional toggles
-now use bounded command-scoped `options` tokens, while payload-bearing fields
-stay direct.
+This is the active compatibility wrapper for auto-mode manifest operations until
+the narrower split replacement path ships. Optional toggles now use bounded
+command-scoped `options` tokens, while payload-bearing fields stay direct.
 
 ## Examples
 
@@ -34,6 +36,12 @@ stay direct.
 // Validate a branch-scoped manifest
 { "command": "validate", "branch": "feature/F42" }
 
+// Preview deleting exactly one manifest registry entry
+{ "command": "delete", "branch": "feature/F42", "options": "dry-run" }
+
+// Force-prune all manifests whose top-level status is completed
+{ "command": "prune", "completed": true, "options": "force" }
+
 // Reset an issue and resume downstream work
 { "command": "reset", "issue": "42", "branch": "feature/F42", "options": "resume force" }
 
@@ -49,6 +57,8 @@ stay direct.
 | `init` | `force` |
 | `status` | `json` |
 | `validate` | none |
+| `delete` | `dry-run`, `force` |
+| `prune` | `dry-run`, `force` |
 | `reset` | `resume`, `force` |
 | `complete` | `force`, `dry-run`, `branch-merged`, `no-branch-merged` |
 
@@ -66,6 +76,7 @@ Keep these fields direct:
 - `segment_size`
 - `ship_strategy`
 - `branch`
+- `completed`
 - `completed_at`
 - `detail`
 
@@ -73,6 +84,18 @@ Keep these fields direct:
 
 - Use bare tokens such as `options: "force"`, `options: "json"`, or
   `options: "resume force"`.
+- Wrapper-routed `delete` and `prune` calls must stay non-interactive: include
+  `options: "dry-run"`, `options: "force"`, or both. Calls that omit both are
+  rejected before spawn so agents never hang on a confirmation prompt.
+- Wrapper-routed `branch` inputs for `status`, `validate`, `delete`, `reset`,
+  and `complete` must be non-blank after trimming; whitespace-only values are
+  rejected before spawn.
+- `delete` and `prune` remove manifest registry entries only. They do **not**
+  delete Git branches, remotes, or worktrees; mutate platform issue state; or
+  touch per-workflow ADW state.
+- `prune` selects only manifests whose top-level `status == "completed"`.
+  This is intentionally different from cron-owned cleanup lifecycle pruning,
+  which also considers retained `cleanup_status` state.
 - Cleanup lifecycle note for accumulate mode:
   - `status` and `cleanup_status` are different surfaces. `status=completed`
     means issue accumulation is done; retained cleanup visibility lives in

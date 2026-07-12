@@ -2,7 +2,7 @@
   "id": "E3",
   "type": "epic",
   "title": "Epic C: GPU Kernel Correctness and Low-Level API Hardening",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [
@@ -10,8 +10,8 @@
   ],
   "start_date": "2026-07-08",
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-08",
+  "completion_date": "2026-07-12",
+  "last_updated": "2026-07-12",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E3/appendix.md",
@@ -33,5 +33,5 @@
   "milestones": [],
   "governance_log": [],
   "risk_register": [],
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

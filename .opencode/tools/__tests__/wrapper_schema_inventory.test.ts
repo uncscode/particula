@@ -120,7 +120,7 @@ describe("wrapper schema inventory", () => {
     expect(row.status).toBe("ok");
     expect(row.exempt_fields).toContain("options");
     expect(row.counted_fields).not.toContain("options");
-    expect(row.current_count).toBe(13);
+    expect(row.current_count).toBe(14);
     expect(row.classification).toBe("split-needed");
   });
 
