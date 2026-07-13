@@ -155,10 +155,10 @@ The lower-level Warp backend is implemented and covered by targeted tests.
   `warp`, `cuda`, `gpu_parity`, and `stochastic`, and CPU-only or standard CI
   environments are expected to skip CUDA-specific coverage cleanly instead of
   treating it as a regression. Focused examples include
-  `pytest particula/gpu/kernels/tests/environment_test.py -q` for the Warp CPU
-  baseline path and
-  `pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"`
-  for optional CUDA-if-available validation. This documentation records the
+   `pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and gpu_parity and not cuda"`
+   for the required Warp CPU parity path and
+   `pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda"`
+   for optional CUDA-if-available evidence. This documentation records the
   explicit helper surface rather than implying automatic GPU runtime
   integration.
 
@@ -181,10 +181,12 @@ Known GPU physics gaps remain:
 - Wall loss, dilution, and other dynamics processes are CPU-only today. They
   need GPU implementations before a full simulation can remain GPU-resident for
   every timestep.
-- GPU condensation ignores activity and surface strategies. The kernel uses a
-  hardcoded surface-tension default (0.072 N/m) with raw Kelvin and vapor
-  pressure terms, so composition-dependent water uptake, kappa-hygroscopicity,
-  and activity effects are not represented on the GPU.
+- Direct GPU condensation supports ideal/kappa water activity and
+  static/composition-weighted surface tension through fixed-shape,
+  caller-owned `wp.float64` sidecars. This is direct-kernel support only, not
+  high-level GPU `Aerosol` or `Runnable` support. BAT and every other deferred
+  activity or surface strategy remain CPU-only and are rejected with
+  `ValueError`; they are never silently approximated or transferred.
 - Gas vapor pressure is a GPU-only derived field:
   `WarpGasData.vapor_pressure` defaults to zeros when not supplied and is
   dropped when converting back to `GasData`. Every successful supported direct

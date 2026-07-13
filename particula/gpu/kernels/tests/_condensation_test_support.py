@@ -1,95 +1,124 @@
 """End-to-end tests for GPU condensation kernels."""
 
-# ruff: noqa: S101
+# ruff: noqa: F821, S101
 
 from __future__ import annotations
 
 import dataclasses
+import importlib
 import inspect
 from dataclasses import dataclass
 from functools import lru_cache
+from types import SimpleNamespace
 from typing import Any, Literal, cast, overload
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 
-pytestmark = pytest.mark.warp
-
-wp = pytest.importorskip("warp")
-
-import particula.gpu.kernels.condensation as condensation_module  # noqa: E402
-from particula.dynamics.condensation.mass_transfer import (  # noqa: E402
+from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
 )
-from particula.gas.environment_data import EnvironmentData  # noqa: E402
-from particula.gas.gas_data import GasData  # noqa: E402
-from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
+from particula.gas.environment_data import EnvironmentData
+from particula.gas.gas_data import GasData
+from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
 )
-from particula.gas.properties.mean_free_path import (  # noqa: E402
+from particula.gas.properties.mean_free_path import (
     get_molecule_mean_free_path,
 )
-from particula.gas.properties.pressure_function import (  # noqa: E402
+from particula.gas.properties.pressure_function import (
     get_partial_pressure,
 )
-from particula.gpu.conversion import (  # noqa: E402
-    from_warp_gas_data,
-    from_warp_particle_data,
-    to_warp_environment_data,
-    to_warp_gas_data,
-    to_warp_particle_data,
-)
-from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
-    particle_radius_from_volume_wp,
-)
-from particula.gpu.kernels.condensation import (  # noqa: E402
-    ACTIVITY_MODE_IDEAL,
-    ACTIVITY_MODE_KAPPA,
-    SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED,
-    SURFACE_TENSION_MODE_STATIC,
-    CondensationActivitySurfaceConfig,
-    _validate_mass_transfer_buffer,
-    _validate_species_array,
-    validate_condensation_activity_surface_config,
-)
-from particula.gpu.kernels.condensation import (  # noqa: E402
-    condensation_step_gpu as _condensation_step_gpu,
-)
-from particula.gpu.kernels.thermodynamics import (  # noqa: E402
-    THERMODYNAMICS_MODE_BUCK,
-    THERMODYNAMICS_MODE_CONSTANT,
-    ThermodynamicsConfig,
-)
-from particula.gpu.tests.cuda_availability import (  # noqa: E402
-    cuda_available,
-    warp_devices,
-)
-from particula.particles.particle_data import ParticleData  # noqa: E402
-from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
+from particula.particles.particle_data import ParticleData
+from particula.particles.properties.aerodynamic_mobility_module import (
     get_aerodynamic_mobility,
 )
-from particula.particles.properties.diffusion_coefficient import (  # noqa: E402
+from particula.particles.properties.diffusion_coefficient import (
     get_diffusion_coefficient,
 )
-from particula.particles.properties.kelvin_effect_module import (  # noqa: E402
+from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,
 )
-from particula.particles.properties.knudsen_number_module import (  # noqa: E402
+from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
 )
-from particula.particles.properties.partial_pressure_module import (  # noqa: E402
+from particula.particles.properties.partial_pressure_module import (
     get_partial_pressure_delta,
 )
-from particula.particles.properties.slip_correction_module import (  # noqa: E402
+from particula.particles.properties.slip_correction_module import (
     get_cunningham_slip_correction,
 )
-from particula.particles.properties.vapor_correction_module import (  # noqa: E402
+from particula.particles.properties.vapor_correction_module import (
     get_vapor_transition_correction,
 )
-from particula.util import constants  # noqa: E402
+from particula.util import constants
+
+pytestmark = pytest.mark.warp
+
+# Import-safe selector values are overwritten with the production Warp values
+# by ``_load_warp_runtime`` before a selected test executes.
+ACTIVITY_MODE_IDEAL = 0
+ACTIVITY_MODE_KAPPA = 1
+SURFACE_TENSION_MODE_STATIC = 0
+SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = 1
+THERMODYNAMICS_MODE_CONSTANT = 0
+THERMODYNAMICS_MODE_BUCK = 1
+
+
+@lru_cache(maxsize=1)
+def _load_warp_runtime() -> SimpleNamespace:
+    """Import Warp-only dependencies when a selected test needs them."""
+    runtime = SimpleNamespace()
+    runtime.wp = pytest.importorskip("warp")
+    runtime.condensation_module = importlib.import_module(
+        "particula.gpu.kernels.condensation"
+    )
+    conversion = importlib.import_module("particula.gpu.conversion")
+    thermodynamics = importlib.import_module(
+        "particula.gpu.kernels.thermodynamics"
+    )
+    cuda = importlib.import_module("particula.gpu.tests.cuda_availability")
+    runtime.__dict__.update(
+        condensation_module=runtime.condensation_module,
+        from_warp_gas_data=conversion.from_warp_gas_data,
+        from_warp_particle_data=conversion.from_warp_particle_data,
+        to_warp_environment_data=conversion.to_warp_environment_data,
+        to_warp_gas_data=conversion.to_warp_gas_data,
+        to_warp_particle_data=conversion.to_warp_particle_data,
+        ACTIVITY_MODE_IDEAL=runtime.condensation_module.ACTIVITY_MODE_IDEAL,
+        ACTIVITY_MODE_KAPPA=runtime.condensation_module.ACTIVITY_MODE_KAPPA,
+        SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED=(
+            runtime.condensation_module.SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
+        ),
+        SURFACE_TENSION_MODE_STATIC=(
+            runtime.condensation_module.SURFACE_TENSION_MODE_STATIC
+        ),
+        CondensationActivitySurfaceConfig=(
+            runtime.condensation_module.CondensationActivitySurfaceConfig
+        ),
+        _validate_mass_transfer_buffer=(
+            runtime.condensation_module._validate_mass_transfer_buffer
+        ),
+        _validate_species_array=runtime.condensation_module._validate_species_array,
+        validate_condensation_activity_surface_config=(
+            runtime.condensation_module.validate_condensation_activity_surface_config
+        ),
+        _condensation_step_gpu=runtime.condensation_module.condensation_step_gpu,
+        particle_radius_from_volume_wp=(
+            runtime.condensation_module.particle_radius_from_volume_wp
+        ),
+        THERMODYNAMICS_MODE_BUCK=thermodynamics.THERMODYNAMICS_MODE_BUCK,
+        THERMODYNAMICS_MODE_CONSTANT=thermodynamics.THERMODYNAMICS_MODE_CONSTANT,
+        ThermodynamicsConfig=thermodynamics.ThermodynamicsConfig,
+        cuda_available=cuda.cuda_available,
+        CUDA_SKIP_REASON=cuda.CUDA_SKIP_REASON,
+    )
+    globals().update(runtime.__dict__)
+    return runtime
+
 
 _ENVIRONMENT_ARRAY_RTOL = 1.0e-7
 
@@ -213,10 +242,32 @@ def _evaluate_vapor_pressure_config(
     return vapor_pressure
 
 
-@pytest.fixture(params=warp_devices(wp))
-def device(request) -> str:
-    """Provide available Warp devices for testing."""
-    return request.param
+@pytest.fixture
+def warp_cpu_device() -> str:
+    """Provide the required Warp CPU parity backend lazily."""
+    _load_warp_runtime()
+    return "cpu"
+
+
+@pytest.fixture(autouse=True)
+def _selected_warp_test_runtime() -> None:
+    """Load Warp only while executing a selected support-backed test."""
+    _load_warp_runtime()
+
+
+@pytest.fixture
+def cuda_device() -> str:
+    """Provide CUDA only for separately selected, availability-guarded tests."""
+    runtime = _load_warp_runtime()
+    if not runtime.cuda_available(runtime.wp):
+        pytest.skip(runtime.CUDA_SKIP_REASON)
+    return "cuda"
+
+
+@pytest.fixture
+def device(warp_cpu_device: str) -> str:
+    """Retain the legacy fixture name while keeping CPU as the baseline."""
+    return warp_cpu_device
 
 
 def _make_particle_data(
@@ -713,13 +764,7 @@ def _cpu_mass_transfer(  # noqa: C901
     pressure_array = np.full((n_boxes,), pressure, dtype=np.float64)
     if isinstance(pressure, np.ndarray):
         pressure_array = np.asarray(pressure, dtype=np.float64)
-    if thermodynamics is None:
-        vapor_pressure = np.full(
-            (n_boxes, n_species),
-            800.0,
-            dtype=np.float64,
-        )
-    else:
+    if thermodynamics is not None:
         vapor_pressure = _evaluate_vapor_pressure_config(
             thermodynamics,
             temperature_array,
@@ -911,6 +956,308 @@ def _apply_particle_only_mass_transfer(
     """Apply a particle-only mass-transfer update with a non-negative clamp."""
     bounded_transfer = np.maximum(mass_transfer, -particle_masses)
     return particle_masses + bounded_transfer
+
+
+# Parity tolerances cover independent fp64 equation evaluation.  Ownership
+# invariants are deliberately tighter because they compare one kernel's buffers.
+P4_PARITY_RTOL = 2.0e-10
+P4_PARITY_ATOL = 1.0e-30
+P4_INVARIANT_RTOL = 1.0e-12
+P4_INVARIANT_ATOL = 1.0e-30
+
+
+@dataclass(frozen=True)
+class P4CondensationCase:
+    """Immutable NumPy-only descriptor for a direct-kernel parity fixture."""
+
+    name: str
+    masses: np.ndarray
+    gas_concentration: np.ndarray
+    temperature: np.ndarray
+    pressure: np.ndarray
+    clamp_index: tuple[int, int, int]
+
+    def build_particle_data(self) -> ParticleData:
+        """Build detached particle data for one execution."""
+        n_boxes, n_particles, n_species = self.masses.shape
+        return ParticleData(
+            masses=self.masses.copy(),
+            concentration=np.ones((n_boxes, n_particles), dtype=np.float64),
+            charge=np.zeros((n_boxes, n_particles), dtype=np.float64),
+            density=np.array([1000.0, 1450.0], dtype=np.float64),
+            volume=np.full(n_boxes, 1.0e-6, dtype=np.float64),
+        )
+
+    def build_gas_data(self) -> GasData:
+        """Build detached gas data for one execution."""
+        return GasData(
+            name=["water", "solute"],
+            molar_mass=np.array([0.018, 0.098], dtype=np.float64),
+            concentration=self.gas_concentration.copy(),
+            partitioning=np.array([True, True]),
+        )
+
+
+@dataclass(frozen=True)
+class P4ThermodynamicsMetadata:
+    """NumPy-owned sidecar metadata used by the independent reference."""
+
+    modes: np.ndarray
+    parameters: np.ndarray
+    water_species_index: int
+    kappas: np.ndarray
+    molar_mass_reference: np.ndarray
+    surface_tension: np.ndarray
+
+
+P4_THERMODYNAMICS = P4ThermodynamicsMetadata(
+    modes=np.array([1, 0], dtype=np.int32),
+    parameters=np.array([[0.0, 0.0, 0.0, 0.0], [1400.0, 0.0, 0.0, 0.0]]),
+    water_species_index=0,
+    kappas=np.array([0.0, 0.55], dtype=np.float64),
+    molar_mass_reference=np.array([0.018, 0.098], dtype=np.float64),
+    surface_tension=np.array([0.035, 0.094], dtype=np.float64),
+)
+
+
+P4_CASES: tuple[P4CondensationCase, ...] = (
+    P4CondensationCase(
+        name="one_box",
+        masses=np.array([[[1.0e-18, 0.0], [1.0e-18, 9.0e-18]]]),
+        gas_concentration=np.array([[1.0e-12, 2.0e-12]], dtype=np.float64),
+        temperature=np.array([298.15], dtype=np.float64),
+        pressure=np.array([101325.0], dtype=np.float64),
+        clamp_index=(0, 0, 0),
+    ),
+    P4CondensationCase(
+        name="multi_box",
+        masses=np.array(
+            [
+                [[1.0e-18, 0.0], [2.0e-18, 8.0e-18]],
+                [[3.0e-18, 0.0], [7.0e-18, 3.0e-18]],
+            ],
+            dtype=np.float64,
+        ),
+        gas_concentration=np.array(
+            [[1.0e-12, 2.0e-12], [2.0e-12, 3.0e-12]], dtype=np.float64
+        ),
+        temperature=np.array([268.15, 278.15], dtype=np.float64),
+        pressure=np.array([101325.0, 99000.0], dtype=np.float64),
+        clamp_index=(0, 0, 0),
+    ),
+)
+
+
+def _p4_vapor_pressure(temperature: np.ndarray) -> np.ndarray:
+    """Evaluate constant and Buck vapor pressure from NumPy-only metadata."""
+    temperatures = np.asarray(temperature, dtype=np.float64)
+    output = np.empty((temperatures.size, 2), dtype=np.float64)
+    celsius = temperatures - 273.15
+    ice = celsius < 0.0
+    output[ice, 0] = 611.15 * np.exp(
+        (23.036 - celsius[ice] / 333.7) * celsius[ice] / (279.82 + celsius[ice])
+    )
+    output[~ice, 0] = 611.21 * np.exp(
+        (18.678 - celsius[~ice] / 234.5)
+        * celsius[~ice]
+        / (257.14 + celsius[~ice])
+    )
+    output[:, 1] = P4_THERMODYNAMICS.parameters[1, 0]
+    return output
+
+
+def _p4_reference(
+    case: P4CondensationCase, activity_mode: int, surface_mode: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Return independent fp64 final mass, transfer, vapor, and gas state."""
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    vapor_pressure = _p4_vapor_pressure(case.temperature)
+    raw_transfer = _cpu_mass_transfer(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension=P4_THERMODYNAMICS.surface_tension,
+        mass_accommodation=np.ones(2, dtype=np.float64),
+        diffusion_coefficient_vapor=np.full(2, 2.0e-5, dtype=np.float64),
+        temperature=case.temperature,
+        pressure=case.pressure,
+        time_step=1000.0,
+        activity_mode=activity_mode,
+        surface_tension_mode=surface_mode,
+        water_species_index=P4_THERMODYNAMICS.water_species_index,
+        kappas=P4_THERMODYNAMICS.kappas,
+    )
+    return (
+        np.maximum(particles.masses + raw_transfer, 0.0),
+        raw_transfer,
+        vapor_pressure,
+        gas.concentration.copy(),
+    )
+
+
+def _p4_sidecars(device: str) -> tuple[Any, Any, Any]:
+    """Build fresh Warp sidecars from copied NumPy metadata."""
+    runtime = _load_warp_runtime()
+    wp = runtime.wp
+    thermodynamics = runtime.ThermodynamicsConfig(
+        modes=wp.array(
+            P4_THERMODYNAMICS.modes.copy(), dtype=wp.int32, device=device
+        ),
+        parameters=wp.array(
+            P4_THERMODYNAMICS.parameters.copy(), dtype=wp.float64, device=device
+        ),
+        molar_mass_reference=wp.array(
+            P4_THERMODYNAMICS.molar_mass_reference.copy(),
+            dtype=wp.float64,
+            device=device,
+        ),
+    )
+    activity_surface = runtime.CondensationActivitySurfaceConfig(
+        activity_mode=0,
+        surface_tension_mode=0,
+        water_species_index=P4_THERMODYNAMICS.water_species_index,
+        kappas=wp.array(
+            P4_THERMODYNAMICS.kappas.copy(), dtype=wp.float64, device=device
+        ),
+        molar_mass_reference=wp.array(
+            P4_THERMODYNAMICS.molar_mass_reference.copy(),
+            dtype=wp.float64,
+            device=device,
+        ),
+    )
+    tension = wp.array(
+        P4_THERMODYNAMICS.surface_tension.copy(),
+        dtype=wp.float64,
+        device=device,
+    )
+    return thermodynamics, activity_surface, tension
+
+
+P4_MODE_PAIRS = (
+    (0, 0),
+    (0, 1),
+    (1, 0),
+    (1, 1),
+)
+
+
+def _assert_p4_gpu_matches_reference(
+    case: P4CondensationCase,
+    activity_mode: int,
+    surface_mode: int,
+    device: str,
+) -> None:
+    """Execute one P4 matrix element and assert parity plus ownership rules."""
+    runtime = _load_warp_runtime()
+    wp = runtime.wp
+    expected_final, expected_raw, expected_vapor, expected_gas = _p4_reference(
+        case, activity_mode, surface_mode
+    )
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    initial_mass = particles.masses.copy()
+    initial_molar_mass = gas.molar_mass.copy()
+    initial_partitioning = gas.partitioning.copy()
+    gpu_particles = runtime.to_warp_particle_data(particles, device=device)
+    gpu_gas = runtime.to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.zeros_like(expected_vapor),
+    )
+    thermodynamics, activity_surface, tension = _p4_sidecars(device)
+    activity_surface = dataclasses.replace(
+        activity_surface,
+        activity_mode=activity_mode,
+        surface_tension_mode=surface_mode,
+    )
+    _, raw_transfer = runtime._condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=wp.array(case.temperature, dtype=wp.float64, device=device),
+        pressure=wp.array(case.pressure, dtype=wp.float64, device=device),
+        time_step=1000.0,
+        surface_tension=tension,
+        thermodynamics=thermodynamics,
+        activity_surface=activity_surface,
+    )
+    final_mass = runtime.from_warp_particle_data(
+        gpu_particles, sync=True
+    ).masses
+    raw = raw_transfer.numpy().copy()
+    gas_concentration = gpu_gas.concentration.numpy().copy()
+    vapor_pressure = gpu_gas.vapor_pressure.numpy().copy()
+    molar_mass = gpu_gas.molar_mass.numpy().copy()
+    partitioning = gpu_gas.partitioning.numpy().copy()
+
+    npt.assert_allclose(
+        raw, expected_raw, rtol=P4_PARITY_RTOL, atol=P4_PARITY_ATOL
+    )
+    npt.assert_allclose(
+        final_mass, expected_final, rtol=P4_PARITY_RTOL, atol=P4_PARITY_ATOL
+    )
+    npt.assert_allclose(
+        vapor_pressure, expected_vapor, rtol=P4_PARITY_RTOL, atol=P4_PARITY_ATOL
+    )
+    npt.assert_allclose(
+        gas_concentration,
+        expected_gas,
+        rtol=P4_PARITY_RTOL,
+        atol=P4_PARITY_ATOL,
+    )
+    npt.assert_array_equal(molar_mass, initial_molar_mass)
+    npt.assert_array_equal(partitioning, initial_partitioning.astype(np.int32))
+
+    assert np.all(np.isfinite(final_mass)) and np.all(final_mass >= 0.0)
+    assert np.all(np.isfinite(raw)) and np.all(np.isfinite(vapor_pressure))
+    npt.assert_allclose(
+        final_mass,
+        np.maximum(initial_mass + raw, 0.0),
+        rtol=P4_INVARIANT_RTOL,
+        atol=P4_INVARIANT_ATOL,
+    )
+    npt.assert_allclose(
+        gas_concentration,
+        expected_gas,
+        rtol=P4_INVARIANT_RTOL,
+        atol=P4_INVARIANT_ATOL,
+    )
+    clamp_index = case.clamp_index
+    assert raw[clamp_index] < -initial_mass[clamp_index]
+    assert final_mass[clamp_index] == 0.0
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("case", P4_CASES, ids=lambda case: case.name)
+@pytest.mark.parametrize(("activity_mode", "surface_mode"), P4_MODE_PAIRS)
+def test_condensation_activity_surface_warp_cpu_matches_numpy_reference(
+    warp_cpu_device: str,
+    case: P4CondensationCase,
+    activity_mode: int,
+    surface_mode: int,
+) -> None:
+    """Warp CPU matches the independent P4 NumPy reference matrix."""
+    _assert_p4_gpu_matches_reference(
+        case, activity_mode, surface_mode, warp_cpu_device
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("case", P4_CASES, ids=lambda case: case.name)
+@pytest.mark.parametrize(("activity_mode", "surface_mode"), P4_MODE_PAIRS)
+def test_condensation_activity_surface_cuda_matches_numpy_reference(
+    cuda_device: str,
+    case: P4CondensationCase,
+    activity_mode: int,
+    surface_mode: int,
+) -> None:
+    """Optional CUDA matches the independent P4 NumPy reference matrix."""
+    _assert_p4_gpu_matches_reference(
+        case, activity_mode, surface_mode, cuda_device
+    )
 
 
 @lru_cache(maxsize=None)
@@ -2747,7 +3094,9 @@ def test_condensation_step_gpu_accepts_direct_environment_arrays(
     expected = _cpu_mass_transfer(
         particles,
         gas,
-        vapor_pressure,
+        # The wrapper's default constant thermodynamics sidecar refreshes both
+        # boxes to 800 Pa before the direct-environment transfer calculation.
+        np.full_like(vapor_pressure, 800.0),
         np.array([0.072], dtype=np.float64),
         np.array([1.0], dtype=np.float64),
         np.array([2.0e-5], dtype=np.float64),
@@ -2909,7 +3258,7 @@ def test_condensation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
     expected = _cpu_mass_transfer(
         particles,
         gas,
-        vapor_pressure,
+        np.full_like(vapor_pressure, 800.0),
         np.array([0.072], dtype=np.float64),
         np.array([1.0], dtype=np.float64),
         np.array([2.0e-5], dtype=np.float64),
@@ -2993,7 +3342,7 @@ def test_condensation_step_gpu_non_uniform_environment_matches_cpu(
     expected = _cpu_mass_transfer(
         particles,
         gas,
-        vapor_pressure,
+        np.full_like(vapor_pressure, 800.0),
         np.array([0.072], dtype=np.float64),
         np.array([1.0], dtype=np.float64),
         np.array([2.0e-5], dtype=np.float64),

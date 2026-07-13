@@ -6,9 +6,17 @@ import pytest
 
 from particula.gpu.kernels.tests import _condensation_test_support as support
 
-pytestmark = pytest.mark.warp
-
 device = support.device
+warp_cpu_device = support.warp_cpu_device
+cuda_device = support.cuda_device
+
+
+@pytest.fixture(autouse=True)
+def _selected_warp_test_runtime(request: pytest.FixtureRequest) -> None:
+    """Load Warp only while executing a selected Warp-backed export."""
+    if request.node.get_closest_marker("warp") is not None:
+        support._load_warp_runtime()
+
 
 EXCLUDED_CONDENSATION_TEST_PREFIXES = (
     "test_fractional_mass_change",
@@ -38,7 +46,10 @@ EXPORTED_CONDENSATION_TESTS = tuple(
     )
 )
 globals().update(
-    {name: getattr(support, name) for name in EXPORTED_CONDENSATION_TESTS}
+    {
+        name: pytest.mark.warp(getattr(support, name))
+        for name in EXPORTED_CONDENSATION_TESTS
+    }
 )
 
 
@@ -73,5 +84,13 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
     )
     assert (
         "test_condensation_activity_surface_invalid_sidecar_is_atomic"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_activity_surface_warp_cpu_matches_numpy_reference"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_activity_surface_cuda_matches_numpy_reference"
         in EXPORTED_CONDENSATION_TESTS
     )
