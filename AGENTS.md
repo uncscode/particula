@@ -336,6 +336,19 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   `docs/Features/particle-data-migration.md` for migration walkthroughs, and
   `particula/gpu/tests/conversion_test.py` for the regression-backed contract.
 
+### GPU vapor-pressure refresh
+
+- `refresh_vapor_pressure_gpu` is a concrete-module API: import it from
+  `particula.gpu.kernels.thermodynamics`, not `particula.gpu.kernels`.
+- It explicitly overwrites device-resident `WarpGasData.vapor_pressure` with
+  shape `(n_boxes, n_species)` from a validated `ThermodynamicsConfig` and a
+  device-local `wp.float64` temperature array in K with shape `(n_boxes,)`.
+- Constant mode reads `parameters[:, 0]` as vapor pressure in Pa. Canonical
+  Buck mode uses fixed water/ice equations; its four parameter slots are
+  reserved and ignored.
+- This primitive is not integrated with `condensation_step_gpu(...)`; callers
+  invoke it explicitly when a refresh is required.
+
 ### GPU coagulation RNG state ownership
 
 ```python
