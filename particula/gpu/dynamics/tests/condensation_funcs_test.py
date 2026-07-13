@@ -690,13 +690,23 @@ def test_water_activity_ideal_matches_independent_reference(
         (
             np.array(
                 [
-                    [18.0, 55.0, 87.0],
+                    [18.0, 55.0, 110.0],
                     [18.0, 0.0, 0.0],
                     [0.0, 55.0, 87.0],
                     [18.0, 55.0, 87.0],
                 ],
                 dtype=np.float64,
             ),
+            np.array([99.0, 0.35, 0.75], dtype=np.float64),
+            0,
+        ),
+        (
+            np.array([[18.0, 0.0, 0.0]], dtype=np.float64),
+            np.array([99.0, 0.0, 0.0], dtype=np.float64),
+            0,
+        ),
+        (
+            np.array([[0.0, 55.0, 87.0]], dtype=np.float64),
             np.array([99.0, 0.35, 0.75], dtype=np.float64),
             0,
         ),
@@ -712,7 +722,9 @@ def test_water_activity_ideal_matches_independent_reference(
         ),
     ],
     ids=[
-        "water-first-species",
+        "wet-multi-solute-distinct-kappas",
+        "pure-water-zero-solute",
+        "dry-no-water",
         "wet-zero-kappa-solutes",
         "water-nonzero-species-index",
     ],
