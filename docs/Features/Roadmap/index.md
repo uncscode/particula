@@ -85,17 +85,27 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 - [Epic B: Non-Isothermal Condensation Public API (CPU)](data-oriented-gpu.md#epic-b-non-isothermal-condensation-public-api-cpu)
   (ADW plan E1) — public builder/factory access, validation, and
   documentation for latent-heat condensation on the CPU reference path.
+- [Epic C: GPU Kernel Correctness and Low-Level API Hardening](data-oriented-gpu.md#epic-c-gpu-kernel-correctness-and-low-level-api-hardening)
+  (ADW plan E3) — persistent coagulation RNG state, bounded mixed-scale
+  selector hardening, measured one-thread-per-box limits, documented direct
+  kernel entry points, device-aware test policy, and the completed Epic B
+  latent-heat example and integration baseline. Shipped artifacts:
+    - [Direct GPU kernels quick-start](../../Examples/gpu_direct_kernels_quick_start.py)
+      — explicit transfer and low-level condensation/coagulation kernel path
+    - [CPU latent-heat condensation example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+      — runnable bookkeeping reference for future GPU parity
+    - [Measured coagulation decision record](data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path)
+      — accepted many-box baseline and large single-box caution band
 
 ### Next Up
 
-- [Epic C: GPU Kernel Correctness and Low-Level API Hardening](data-oriented-gpu.md#epic-c-gpu-kernel-correctness-and-low-level-api-hardening)
+- [Epic D: GPU Condensation Physics Parity](data-oriented-gpu.md#epic-d-gpu-condensation-physics-parity)
   — the next epic in the sequence; not yet scheduled as an ADW plan.
 
 ### Pending
 
 Listed in execution order; each becomes active when the previous epic ships.
 
-- [Epic D: GPU Condensation Physics Parity](data-oriented-gpu.md#epic-d-gpu-condensation-physics-parity)
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
 - [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
 - [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
