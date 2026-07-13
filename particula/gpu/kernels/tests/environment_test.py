@@ -119,16 +119,13 @@ def test_environment_preflight_validates_arrays_without_scalar_broadcast(
         "particula.gpu.kernels.environment._broadcast_scalar_array",
         _unexpected_broadcast,
     )
-    assert (
-        validate_environment_inputs(
-            temperature=temperature,
-            pressure=pressure,
-            environment=None,
-            n_boxes=2,
-            device=temperature.device,
-            caller_name="test_caller",
-        )
-        is None
+    validate_environment_inputs(
+        temperature=temperature,
+        pressure=pressure,
+        environment=None,
+        n_boxes=2,
+        device=temperature.device,
+        caller_name="test_caller",
     )
 
 

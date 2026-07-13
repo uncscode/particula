@@ -317,13 +317,14 @@ def condensation_mass_transfer_kernel(  # noqa: C901
             activity_enabled == wp.int32(1)
             and species_idx == water_species_index
         ):
+            water_species_index_int = int(water_species_index)
             if activity_mode == ACTIVITY_MODE_IDEAL:
                 activity_factor = water_activity_ideal_wp(
                     masses,
                     molar_mass_reference,
                     box_idx,
                     particle_idx,
-                    water_species_index,
+                    water_species_index_int,
                 )
             else:
                 activity_factor = water_activity_kappa_wp(
@@ -332,7 +333,7 @@ def condensation_mass_transfer_kernel(  # noqa: C901
                     kappas,
                     box_idx,
                     particle_idx,
-                    water_species_index,
+                    water_species_index_int,
                 )
         pressure_delta = partial_pressure_delta_wp(
             partial_pressure_gas,
