@@ -15223,13 +15223,13 @@ documentation conventions.</p>
 <tr>
 <td>3</td>
 <td><a href="#epic-c-gpu-kernel-correctness-and-low-level-api-hardening">Epic C: GPU Kernel Correctness and Low-Level API Hardening</a></td>
-<td>Next up</td>
-<td>not scheduled</td>
+<td>Shipped</td>
+<td>E3</td>
 </tr>
 <tr>
 <td>4</td>
 <td><a href="#epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity</a></td>
-<td>Pending</td>
+<td>Next up</td>
 <td>not scheduled</td>
 </tr>
 <tr>
@@ -16415,19 +16415,22 @@ builder-accessible CPU reference to match.</p>
   parity (fixed-shape state, explicit environment inputs, no hidden CPU↔GPU
   movement).</li>
 </ul>
-<p>Two follow-ups were deferred out of E1: the runnable latent-heat example
-(E3-F6) and the integration-level conservation case (E3-F7). They are
-scheduled as features 8 and 9 in
-<a href="#epic-c-gpu-kernel-correctness-and-low-level-api-hardening">Epic C</a>.</p>
+<p>Two follow-ups were deferred out of E1 and subsequently shipped in Epic C/E3:
+the runnable
+<a href="../../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/">CPU latent-heat example</a>
+(E3-F6) and the integration-level conservation case in
+<code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>
+(E3-F7). Together they provide the executable CPU reference handed to Epic D.</p>
 <p><strong>Exit bar (met):</strong> Latent-heat condensation is a documented, builder/factory
 accessible CPU workflow with validation coverage, and its API decisions are
 recorded as the reference contract for GPU latent-heat parity in Epic D.</p>
 <h2 id="epic-c-gpu-kernel-correctness-and-low-level-api-hardening">Epic C: GPU Kernel Correctness and Low-Level API Hardening<a class="headerlink" href="#epic-c-gpu-kernel-correctness-and-low-level-api-hardening" title="Permanent link">&para;</a></h2>
-<p>Make the existing low-level GPU kernels correct, reproducible, and usable
-from documentation alone before adding new physics. This epic absorbs the
-former "documented low-level GPU API" milestone, the cross-cutting
-validation-infrastructure work, and the two documentation/validation
-follow-ups deferred from Epic B (plan E1).</p>
+<p>Status: shipped as ADW plan E3 on 2026-07-12. All seven child feature tracks
+and their phases are marked shipped. The implementation made the existing
+low-level GPU kernels reproducible and usable from documentation alone before
+new physics is added. This epic absorbed the former "documented low-level GPU
+API" milestone, the cross-cutting validation-infrastructure work, and the two
+documentation/validation follow-ups deferred from Epic B (plan E1).</p>
 <p>For the current shipped baseline on explicit CPU↔GPU transfer helpers,
 <code>EnvironmentData</code> ownership, current CPU/GPU support boundaries, and the
 canonical runnable entrypoint, start from the
@@ -16436,7 +16439,7 @@ guide and the
 <a href="../../../Examples/Data_Containers/">Data Containers example</a>; this
 epic and every later epic extend those contracts rather than redefining
 them.</p>
-<p>Planned features:</p>
+<p>Shipped scope:</p>
 <ol>
 <li>Persist coagulation RNG state: seed once at loop setup and keep per-box
    RNG state between <code>coagulation_step_gpu</code> calls instead of re-launching the
@@ -16514,22 +16517,23 @@ them.</p>
   -q -m &quot;warp and cuda&quot;` for optional CUDA-if-available coverage
 </code></pre></div>
 <ol>
-<li>Add a runnable <code>docs/Examples/</code> entry for a <code>CondensationLatentHeat</code>
-   workflow (deferred from E1; current tutorials only set <code>latent_heat</code> as a
-   vapor property), following the paired <code>.py</code>/<code>.ipynb</code> example conventions.</li>
-<li>Add a <code>particula/integration_tests/</code> latent-heat conservation case
-   (deferred from E1; today the conservation and energy regressions are
-   unit-level only), establishing the CPU integration baseline that the
-   Epic D latent-heat parity tests will reuse.</li>
+<li>The paired
+   <a href="../../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/"><code>CondensationLatentHeat</code> example</a>
+   now provides a runnable CPU-only bookkeeping workflow (E3-F6), completing
+   the documentation follow-up deferred from E1.</li>
+<li><code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>
+   now establishes the CPU mass-conservation and latent-heat bookkeeping
+   baseline that Epic D parity tests can reuse (E3-F7).</li>
 </ol>
-<p><strong>Exit bar:</strong> A new user can run both kernels from the docs on a CUDA device
-and on Warp CPU without reading source, repeated coagulation steps draw
+<p><strong>Exit bar (met):</strong> A new user can run both kernels from the docs on a CUDA
+device and on Warp CPU without reading source, repeated coagulation steps draw
 uncorrelated samples from a caller-initialized persistent RNG buffer, the
 device-aware test policy plus parity tolerances are recorded, and the deferred
 E1 latent-heat example and integration-conservation case have landed.</p>
 <h3 id="known-kernel-issues">Known Kernel Issues<a class="headerlink" href="#known-kernel-issues" title="Permanent link">&para;</a></h3>
-<p>Concrete defects and design limits in the existing kernels that should be
-fixed or explicitly accepted during this epic.</p>
+<p>Concrete defects and design limits reviewed during Epic C. The RNG defect was
+fixed; the mixed-scale global-majorant and one-thread-per-box limits were
+explicitly accepted with evidence and remain bounded follow-up concerns.</p>
 <ul>
 <li><strong>RNG state ownership.</strong> <code>coagulation_step_gpu</code> seeds once and reuses a
   caller-owned per-box RNG buffer across timesteps. Repeated calls should keep
@@ -16612,10 +16616,19 @@ pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<sp
   or link checker is claimed here.
 - <strong>One-thread-per-box coagulation.</strong> The kernel launches one GPU thread per
   box with sequential pair selection inside the thread. This matches the
-  multi-box scaling priority but serializes large single-box workloads. Record
-  this as a deliberate design decision with its measured single-box limit, or
-  plan a parallel-within-box variant.</p>
+  multi-box scaling priority but serializes large single-box workloads. Epic C
+  accepted this as the current measured baseline with the single-box caution
+  band in the
+  <a href="#measured-decision-record-for-the-current-one-thread-per-box-path">decision record</a>.
+  A parallel-within-box variant requires a separate evidence-backed proposal.</p>
 <h2 id="epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity<a class="headerlink" href="#epic-d-gpu-condensation-physics-parity" title="Permanent link">&para;</a></h2>
+<p>Status: next up; not yet scheduled as an ADW plan. Epic C has no unfinished
+exit-bar deliverables to roll forward. Epic D inherits the supported
+<code>particula.gpu.kernels</code> entry points, explicit transfer boundary, and
+device-aware validation policy from E3, plus the E3-F7 CPU latent-heat
+integration baseline. The accepted mixed-scale coagulation and
+parallel-within-box limitations are not condensation parity work; they remain
+documented constraints for Epic E or a separate evidence-backed proposal.</p>
 <p>Bring GPU condensation to parity with the CPU reference paths from Epics A
 and B: latent-heat physics, on-device thermodynamics, and the activity and
 surface-tension support required by the later optimization targets in
