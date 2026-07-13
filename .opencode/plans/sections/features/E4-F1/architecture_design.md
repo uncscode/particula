@@ -7,35 +7,33 @@ CPU model selection and numeric parameters
   -> fixed-shape Warp thermodynamic configuration (species indexed)
   -> condensation_step_gpu(...)
        -> normalize current temperature with _ensure_environment_arrays()
-       -> validate configuration against gas species count and active device
-       -> launch vapor-pressure refresh
-            temperature[n_boxes] + mode/parameters[n_species]
-            -> gas.vapor_pressure[n_boxes, n_species]
-       -> launch existing condensation mass-transfer kernel
+        -> validate configuration against gas species count and active device
+        -> validate sidecar schema and ordered gas molar-mass fingerprint
+        -> continue existing condensation mass-transfer path
 ```
 
 The configuration is process configuration, not gas state, and uses a typed,
-keyword-only operation sidecar. Mode values are
-compact `int32`; parameters and output are `float64`. Species position is the
-identity mapping and must align with gas molar-mass ordering.
+keyword-only operation sidecar. Mode values are compact `int32`; parameters and
+the molar-mass reference are `float64`. Species position is the identity mapping
+and must align with gas molar-mass ordering.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Add numeric model mode and fixed-shape parameter storage. Do
-  not extend CPU `GasData`; retain `WarpGasData.vapor_pressure` as derived,
-  mutable helper state.
+- **Data model:** `ThermodynamicsConfig` is a frozen Python dataclass holding
+  caller-owned Warp buffers; no CPU or Warp container schema changed.
 - **API surface:** Extend `condensation_step_gpu()` with keyword-only
   thermodynamic configuration to preserve existing positional calls. Raw Warp
   helpers remain module-internal unless separately approved.
-- **Formula dispatch:** Constant mode reads a nonnegative pressure parameter.
-  Buck mode converts Kelvin to Celsius and applies the CPU reference's ice/water
-  piecewise expression at 273.15 K.
-- **Mutation order:** Complete host-side metadata validation before launch;
-  refresh pressure before mass transfer. E4-F3 will invoke this primitive before
-  each future substep.
+- **Mode contract:** Concrete-module constants reserve constant parameter zero
+  for pressure in Pa and Buck parameters for reference pressure plus three
+  coefficients. P1 validates only schema, supported codes, and finite
+  non-negative values; it does not evaluate their semantics.
+- **Ordering:** After active-device context is established, metadata checks occur
+  before one readback each of sidecar fields and gas molar mass. Validation
+  precedes defaults, caller mass-transfer access, allocation, and launch.
 - **Compatibility:** Omitted required configuration fails before allocation,
-  launch, or mutation. It must never silently reuse stale or zero vapor
-  pressure; legacy/static behavior requires an explicit configuration mode.
+  launch, or mutation. P1 intentionally preserves the existing vapor-pressure
+  state rather than selecting a compatibility behavior or refreshing it.
 
 ## Security & Compliance
 

@@ -3,11 +3,14 @@
 Phase issue creation is intentionally deferred until E4 implementation issues
 are generated and scheduled; `TBD` is not an unresolved design decision.
 
-- [ ] **E4-F1-P1:** Define thermodynamic model configuration and validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Establish fixed-shape numeric mode/parameter arrays and fail-early validation.
-  - Files: focused GPU thermodynamics module, `particula/gpu/kernels/condensation.py`
-  - Tests: valid mixed models; invalid modes, values, shapes, species counts, dtypes, and devices.
+- [x] **E4-F1-P1:** Define thermodynamic model configuration and validation with unit tests
+  - Issue: #1281 | Size: S | Status: Shipped
+  - Delivered: validation-only fixed-shape sidecar and fail-early required
+    condensation boundary; no formula, refresh, schema change, or formula launch.
+  - Files: `particula/gpu/kernels/thermodynamics.py`, condensation boundary and
+    support/tests, benchmark, and GPU direct-kernels quick-start.
+  - Tests: valid/mutable mixed models; metadata/value/device/order failures;
+    readback limits; and no-launch/no-mutation boundary regressions.
 
 - [ ] **E4-F1-P2:** Implement constant and Buck Warp vapor-pressure refresh with parity tests
   - Issue: TBD | Size: S | Status: Not Started

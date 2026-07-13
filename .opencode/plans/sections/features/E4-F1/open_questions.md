@@ -11,10 +11,10 @@
     typed fields hold validated parallel Warp arrays. Keep process configuration
     out of `WarpGasData` and preserve positional compatibility.
 - [x] What fixed parameter width should be reserved for future models?
-  - Resolved 2026-07-13: reserve one `float64` parameter per species. Constant
-    mode consumes the pressure value; Buck consumes no species parameter. Add a
-    versioned field or new sidecar contract if a future approved model needs
-    more parameters rather than reserving speculative width now.
+  - Resolved 2026-07-13: reserve four `float64` parameters per species.
+    Constant reserves parameter zero for pressure; Buck reserves reference
+    pressure and three coefficients. P1 validates the shared width only and
+    does not evaluate either mode.
 - [x] Is four-substep orchestration part of E4-F1?
   - Resolved 2026-07-12: No. E4-F1 provides refresh integration for the current
     step; E4-F3 owns production four-substep scheduling and must call refresh at

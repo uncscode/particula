@@ -423,8 +423,9 @@ def condensation_step_gpu(
             temperature and pressure arrays on the same device as ``particles``
             and ``gas``. This mode is supported when both direct inputs are
             ``None``.
-        thermodynamics: Required caller-owned thermodynamic sidecar with model
-            arrays matching the ordered gas species.
+        thermodynamics: Required caller-owned, device-local thermodynamic
+            sidecar with model arrays matching the ordered gas species. It is
+            validated only and is not consumed by the condensation kernels.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -461,8 +462,10 @@ def condensation_step_gpu(
         per-particle kernel launch.
 
         Thermodynamic validation may synchronously read caller-owned device
-        arrays, including on CUDA. This P1 boundary does not calculate vapor
-        pressure or refresh ``gas.vapor_pressure``.
+        arrays, including on CUDA, without allocating, replacing, or mutating
+        those buffers. This P1 boundary does not evaluate thermodynamic
+        parameters, calculate vapor pressure, or refresh
+        ``gas.vapor_pressure``.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)

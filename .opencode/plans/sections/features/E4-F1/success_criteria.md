@@ -1,8 +1,8 @@
 # Success Criteria
 
-- [ ] Constant and Buck are the only initially supported explicit models, with
-  stable numeric mode definitions and documented parameters/units.
-- [ ] Configuration is numeric, fixed-shape, species-indexed, and validated for
+- [x] Constant and Buck have stable numeric mode definitions and fixed parameter
+  reservations; P1 validates them but does not calculate either model.
+- [x] Configuration is numeric, fixed-shape, species-indexed, and validated for
   modes, parameters, shape, dtype, ordering contract, species count, and device.
 - [ ] Warp constant and Buck formulas match CPU references below, at, and above
   freezing within explicit test tolerances.
@@ -12,9 +12,10 @@
   the primitive is suitable for E4-F3 to call before every future substep.
 - [ ] Changing GPU temperature between calls updates vapor pressure and the next
   calculation without CPU transfer or host recomputation.
-- [ ] Missing/invalid configuration fails early under the selected compatibility
+- [x] Missing/invalid configuration fails early under the selected compatibility
   contract and does not mutate pressure, gas concentration, or particle mass.
-- [ ] Existing positional API calls remain source-compatible.
+- [x] Existing positional arguments remain source-compatible; the required new
+  sidecar is keyword-only and omission raises `ValueError`.
 - [ ] Warp CPU tests pass; CUDA parity passes when CUDA is available and otherwise
   skips cleanly.
 

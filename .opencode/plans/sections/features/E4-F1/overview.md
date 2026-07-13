@@ -2,25 +2,24 @@
 
 ## Problem Statement
 
-GPU condensation currently consumes `WarpGasData.vapor_pressure` as state
-fixed during CPU-to-GPU transfer; omitted values are zero-filled. When the
-per-box temperature changes, the pressure can therefore be stale or physically
-invalid. Issue #1272 requires current thermodynamics to drive condensation
-without a host round trip.
+Before issue #1281, GPU condensation had no explicit, validated thermodynamic
+configuration boundary. Callers could provide vapor-pressure state without a
+device-local schema tying thermodynamic inputs to the ordered gas species.
 
 ## Value Proposition
 
-E4-F1 defines a numeric, fixed-shape GPU configuration for explicitly supported
-vapor-pressure models and refreshes the `(n_boxes, n_species)` pressure buffer
-on-device from current temperature. Constant and Buck models will match CPU
-references, preserve species ordering, and fail before mutation on invalid
-configuration. This foundation gates sibling features E4-F2 and E4-F3.
+Issue #1281 shipped E4-F1-P1: a caller-owned, fixed-shape GPU sidecar and
+validator required at the `condensation_step_gpu()` boundary. It validates
+species ordering, field metadata, device locality, supported mode codes, and
+finite non-negative numeric inputs before later-step allocation or launch.
+This phase deliberately does not evaluate vapor-pressure formulas, refresh
+`gas.vapor_pressure`, or change GPU/CPU data schemas; those remain future work.
 
 ## User Stories
 
-- As a simulation developer, I want vapor pressure recomputed from current GPU
-  temperature so repeated condensation steps do not consume stale host data.
+- As a simulation developer, I want a required, caller-owned thermodynamic
+  sidecar so future thermodynamic behavior has an explicit GPU boundary.
 - As a model author, I want explicit model modes and parameter validation so an
   unsupported thermodynamic strategy fails predictably.
-- As a GPU user, I want Warp CPU/CUDA-compatible formulas so execution remains
-  device-resident and numerically traceable to CPU physics.
+- As a GPU user, I want invalid sidecars rejected before condensation allocates
+  scratch state, accesses caller mass-transfer storage, or launches a kernel.
