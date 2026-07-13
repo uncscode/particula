@@ -34,6 +34,7 @@ if wp is not None:
     )
     from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
         diffusion_coefficient_wp,
+        effective_surface_tension_wp,
         first_order_mass_transport_k_wp,
         mass_transfer_rate_wp,
         water_activity_ideal_wp,
@@ -310,6 +311,119 @@ def _water_activity_kappa_kernel(
         0,
         water_index,
     )
+
+
+@_warp_kernel
+def _effective_surface_tension_kernel(
+    masses: Any,
+    densities: Any,
+    surface_tensions: Any,
+    requested_indices: Any,
+    composition_weighted: Any,
+    result: Any,
+) -> None:
+    """Calculate effective surface tension for one particle per case."""
+    case_idx = wp.tid()
+    result[case_idx] = effective_surface_tension_wp(
+        masses,
+        densities,
+        surface_tensions,
+        case_idx,
+        0,
+        requested_indices[case_idx],
+        composition_weighted[case_idx] != 0,
+    )
+
+
+@_warp_kernel
+def _effective_tension_kelvin_kernel(
+    masses: Any,
+    densities: Any,
+    surface_tensions: Any,
+    requested_indices: Any,
+    composition_weighted: Any,
+    particle_radii: Any,
+    effective_densities: Any,
+    molar_masses: Any,
+    temperatures: Any,
+    gas_constant: Any,
+    kelvin_radii: Any,
+    kelvin_terms: Any,
+) -> None:
+    """Feed effective surface tension into Kelvin property helpers."""
+    case_idx = wp.tid()
+    effective_tension = effective_surface_tension_wp(
+        masses,
+        densities,
+        surface_tensions,
+        case_idx,
+        0,
+        requested_indices[case_idx],
+        composition_weighted[case_idx] != 0,
+    )
+    kelvin_radius = kelvin_radius_wp(
+        effective_tension,
+        effective_densities[case_idx],
+        molar_masses[case_idx],
+        temperatures[case_idx],
+        gas_constant,
+    )
+    kelvin_radii[case_idx] = kelvin_radius
+    kelvin_terms[case_idx] = kelvin_term_wp(
+        particle_radii[case_idx], kelvin_radius
+    )
+
+
+def _effective_surface_tension_reference(
+    masses: np.ndarray,
+    densities: np.ndarray,
+    surface_tensions: np.ndarray,
+    requested_indices: np.ndarray,
+    composition_weighted: np.ndarray,
+) -> np.ndarray:
+    """Calculate independent static or volume-weighted tension references."""
+    expected = np.empty(masses.shape[0], dtype=np.float64)
+    for case_idx, case_masses in enumerate(masses[:, 0, :]):
+        if not composition_weighted[case_idx]:
+            expected[case_idx] = surface_tensions[requested_indices[case_idx]]
+            continue
+        volumes = case_masses / densities
+        total_volume = np.sum(volumes, dtype=np.float64)
+        if total_volume == np.float64(0.0):
+            expected[case_idx] = np.mean(surface_tensions, dtype=np.float64)
+        else:
+            expected[case_idx] = (
+                np.sum(surface_tensions * volumes, dtype=np.float64)
+                / total_volume
+            )
+    return expected
+
+
+def _launch_effective_surface_tension(
+    device: str,
+    masses: np.ndarray,
+    densities: np.ndarray,
+    surface_tensions: np.ndarray,
+    requested_indices: np.ndarray,
+    composition_weighted: np.ndarray,
+) -> np.ndarray:
+    """Launch the batched effective-surface-tension kernel."""
+    result_wp = wp.zeros(masses.shape[0], dtype=wp.float64, device=device)
+    wp.launch(
+        _effective_surface_tension_kernel,
+        dim=masses.shape[0],
+        inputs=[
+            wp.array(masses, dtype=wp.float64, device=device),
+            wp.array(densities, dtype=wp.float64, device=device),
+            wp.array(surface_tensions, dtype=wp.float64, device=device),
+            wp.array(requested_indices, dtype=wp.int32, device=device),
+            wp.array(composition_weighted, dtype=wp.int32, device=device),
+        ],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+    return result_wp.numpy()
 
 
 def _ideal_water_activity_reference(
@@ -759,3 +873,173 @@ def test_water_activity_kappa_matches_independent_reference(
     assert result.shape == (masses.shape[0],)
     assert np.all(np.isfinite(result))
     npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
+
+
+def test_effective_surface_tension_static_selects_requested_species(
+    device: str,
+) -> None:
+    """Ensure static tension selection ignores particle composition."""
+    surface_tensions = np.array([0.031, 0.057, 0.089], dtype=np.float64)
+    densities = np.array([900.0, 1100.0, 1400.0], dtype=np.float64)
+    masses = np.array(
+        [
+            [[0.0, 0.0, 0.0]],
+            [[1.0, 2.0, 3.0]],
+            [[4.0, 0.0, 6.0]],
+            [[0.0, 5.0, 0.0]],
+        ],
+        dtype=np.float64,
+    )
+    requested_indices = np.array([0, 1, 2, 1], dtype=np.int32)
+    composition_weighted = np.zeros(masses.shape[0], dtype=np.int32)
+    expected = np.array([0.031, 0.057, 0.089, 0.057], dtype=np.float64)
+
+    result = _launch_effective_surface_tension(
+        device,
+        masses,
+        densities,
+        surface_tensions,
+        requested_indices,
+        composition_weighted,
+    )
+
+    assert result.shape == (masses.shape[0],)
+    assert np.all(np.isfinite(result))
+    npt.assert_array_equal(result, expected)
+
+
+def test_effective_surface_tension_weighted_matches_volume_reference(
+    device: str,
+) -> None:
+    """Ensure weighted tension matches its independent volume reference."""
+    surface_tensions = np.array([0.031, 0.057, 0.089], dtype=np.float64)
+    densities = np.array([900.0, 1100.0, 1400.0], dtype=np.float64)
+    masses = np.array(
+        [
+            [[2.0, 0.0, 0.0]],
+            [[0.0, 2.2, 0.0]],
+            [[0.9, 2.2, 4.2]],
+            [[0.9, 2.2, 4.2]],
+        ],
+        dtype=np.float64,
+    )
+    requested_indices = np.array([2, 0, 0, 2], dtype=np.int32)
+    composition_weighted = np.ones(masses.shape[0], dtype=np.int32)
+    expected = _effective_surface_tension_reference(
+        masses,
+        densities,
+        surface_tensions,
+        requested_indices,
+        composition_weighted,
+    )
+
+    result = _launch_effective_surface_tension(
+        device,
+        masses,
+        densities,
+        surface_tensions,
+        requested_indices,
+        composition_weighted,
+    )
+
+    assert result.shape == (masses.shape[0],)
+    assert np.all(np.isfinite(result))
+    npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
+    npt.assert_array_equal(result[2:], np.repeat(result[2], 2))
+
+
+def test_effective_surface_tension_weighted_zero_volume_returns_mean(
+    device: str,
+) -> None:
+    """Ensure zero-volume weighted cases use the finite tension mean."""
+    surface_tensions = np.array([0.031, 0.057, 0.089], dtype=np.float64)
+    densities = np.array([900.0, 1100.0, 1400.0], dtype=np.float64)
+    masses = np.zeros((3, 1, 3), dtype=np.float64)
+    requested_indices = np.array([0, 1, 2], dtype=np.int32)
+    composition_weighted = np.ones(masses.shape[0], dtype=np.int32)
+    expected = np.full(3, np.mean(surface_tensions), dtype=np.float64)
+
+    result = _launch_effective_surface_tension(
+        device,
+        masses,
+        densities,
+        surface_tensions,
+        requested_indices,
+        composition_weighted,
+    )
+
+    assert result.shape == (masses.shape[0],)
+    assert np.all(np.isfinite(result))
+    npt.assert_array_equal(result, expected)
+
+
+def test_effective_surface_tension_feeds_kelvin_properties(device: str) -> None:
+    """Ensure effective tensions produce Kelvin values matching CPU physics."""
+    surface_tensions = np.array([0.031, 0.057, 0.089], dtype=np.float64)
+    densities = np.array([900.0, 1100.0, 1400.0], dtype=np.float64)
+    masses = np.array([[[1.0, 0.0, 0.0]], [[0.9, 2.2, 4.2]]], dtype=np.float64)
+    requested_indices = np.array([0, 2], dtype=np.int32)
+    composition_weighted = np.array([0, 1], dtype=np.int32)
+    particle_radii = np.array([1.0e-7, 2.0e-7], dtype=np.float64)
+    effective_densities = np.array([1000.0, 1250.0], dtype=np.float64)
+    molar_masses = np.array([0.018, 0.044], dtype=np.float64)
+    temperatures = np.array([298.15, 310.0], dtype=np.float64)
+    expected_tensions = _effective_surface_tension_reference(
+        masses,
+        densities,
+        surface_tensions,
+        requested_indices,
+        composition_weighted,
+    )
+    expected_radii = np.array(
+        [
+            get_kelvin_radius(tension, density, molar_mass, temperature)
+            for tension, density, molar_mass, temperature in zip(
+                expected_tensions,
+                effective_densities,
+                molar_masses,
+                temperatures,
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    expected_terms = np.array(
+        [
+            get_kelvin_term(radius, kelvin_radius)
+            for radius, kelvin_radius in zip(
+                particle_radii, expected_radii, strict=True
+            )
+        ],
+        dtype=np.float64,
+    )
+    kelvin_radii_wp = wp.zeros(2, dtype=wp.float64, device=device)
+    kelvin_terms_wp = wp.zeros(2, dtype=wp.float64, device=device)
+    wp.launch(
+        _effective_tension_kelvin_kernel,
+        dim=2,
+        inputs=[
+            wp.array(masses, dtype=wp.float64, device=device),
+            wp.array(densities, dtype=wp.float64, device=device),
+            wp.array(surface_tensions, dtype=wp.float64, device=device),
+            wp.array(requested_indices, dtype=wp.int32, device=device),
+            wp.array(composition_weighted, dtype=wp.int32, device=device),
+            wp.array(particle_radii, dtype=wp.float64, device=device),
+            wp.array(effective_densities, dtype=wp.float64, device=device),
+            wp.array(molar_masses, dtype=wp.float64, device=device),
+            wp.array(temperatures, dtype=wp.float64, device=device),
+            wp.float64(GAS_CONSTANT),
+        ],
+        outputs=[kelvin_radii_wp, kelvin_terms_wp],
+        device=device,
+    )
+    wp.synchronize()
+
+    kelvin_radii = kelvin_radii_wp.numpy()
+    kelvin_terms = kelvin_terms_wp.numpy()
+    assert kelvin_radii.shape == (2,)
+    assert kelvin_terms.shape == (2,)
+    assert np.all(np.isfinite(kelvin_radii))
+    assert np.all(np.isfinite(kelvin_terms))
+    npt.assert_allclose(kelvin_radii, expected_radii, rtol=1e-10, atol=0.0)
+    npt.assert_allclose(kelvin_terms, expected_terms, rtol=1e-10, atol=0.0)
