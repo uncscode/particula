@@ -1,0 +1,12 @@
+# Success Metrics
+
+- [ ] All seven feature tracks ship in dependency order; E4-F2/E4-F3 are the only parallel branch.
+- [ ] Supported vapor-pressure modes refresh on-device before each of four substeps.
+- [ ] Ideal and kappa activity and selected effective surface physics match CPU fixtures within documented tolerances.
+- [ ] Zero latent heat reproduces the isothermal path; signed energy satisfies `Q = delta_mass * L`.
+- [ ] Gas plus particle mass is conserved per box/species under condensation and evaporation, including inventory limits and partitioning-off cases.
+- [ ] Caller-owned scratch can be reused without allocation-, alias-, or stale-state regressions.
+- [ ] Warp CPU parity passes whenever Warp is installed; CUDA parity passes when CUDA is available and otherwise skips cleanly.
+- [ ] Graph-readiness checks confirm fixed launch structure and stable buffer shapes.
+- [ ] Every implementation track lands self-contained tests with no coverage-threshold reduction and at least 80% project coverage.
+- [ ] Support matrix, runnable example, troubleshooting, and focused reproduction commands accurately describe supported and unsupported behavior.
