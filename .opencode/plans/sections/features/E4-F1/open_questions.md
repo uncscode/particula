@@ -16,8 +16,10 @@
     are reserved and ignored because its evaluator uses fixed canonical water
     and ice equations.
 - [x] Should P2 refresh vapor pressure as part of condensation?
-  - Resolved 2026-07-13: No. #1282 ships a standalone concrete-module refresh
-    primitive only; P3 owns invocation before condensation mass transfer.
+  - Resolved 2026-07-13: #1282 shipped the standalone concrete-module primitive;
+    #1283 integrates it in `condensation_step_gpu()` once, after validation and
+    any device-local temperature cast, and before environment preparation and
+    mass transfer.
 - [x] Is four-substep orchestration part of E4-F1?
   - Resolved 2026-07-12: No. E4-F1 provides refresh integration for the current
     step; E4-F3 owns production four-substep scheduling and must call refresh at

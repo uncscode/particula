@@ -65,6 +65,16 @@ temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
 
+`condensation_step_gpu` additionally requires a keyword-only
+`ThermodynamicsConfig` through `thermodynamics=`. After all inputs and optional
+buffers validate, each successful call refreshes the caller-owned,
+device-resident `WarpGasData.vapor_pressure` from the current normalized
+per-box temperature before condensation mass transfer. This overwrite makes a
+previous vapor-pressure buffer stale by design. Scalar temperatures, direct
+Warp temperature arrays, and `WarpEnvironmentData` are supported; non-float64
+temperature arrays are cast on-device for the refresh without a host
+vapor-pressure transfer.
+
 ## Code Structure
 
 ```

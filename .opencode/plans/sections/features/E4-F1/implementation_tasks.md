@@ -16,6 +16,10 @@
   mass-transfer access, allocation, or launch.
 - [x] Ensure all validation failures occur before `gas.vapor_pressure`, gas
   concentration, or particle mass can mutate.
+- [x] Refresh `gas.vapor_pressure` exactly once after all successful step-input
+  validation and before environment-property preparation and mass transfer.
+- [x] Preserve direct `wp.float32` temperature support with a device-local
+  float32-to-float64 copy for the refresh API boundary.
 
 ## Tooling / Tests
 
@@ -25,6 +29,9 @@
 - [x] Add mixed-model, multi-box, freezing-boundary, species-order, API, and
   no-mutation refresh tests.
 - [x] Add invalid/missing configuration and failure-before-mutation tests.
+- [x] Add condensation integration tests for launch ordering, scalar/direct/
+  environment temperature sources, repeated calls, float32 support, signature
+  compatibility, and pre-refresh failure atomicity.
 - [x] Migrate benchmark and quick-start executable calls to pass the sidecar.
 
 ## Documentation

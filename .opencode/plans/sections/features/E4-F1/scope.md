@@ -33,6 +33,9 @@ and a standalone, validated on-device vapor-pressure refresh primitive.
 - Porting CPU vapor-pressure strategies other than constant and Buck.
 - Moving vapor pressure into CPU `GasData` or storing Python strategy objects,
   strings, or species names in Warp data.
-- Integrating the refresh primitive into `condensation_step_gpu()`; P3 owns
-  pre-step and future per-substep refresh orchestration.
+- Pre-step integration in `condensation_step_gpu()`: after successful input and
+  sidecar validation, it refreshes caller-owned `gas.vapor_pressure` exactly
+  once from normalized current per-box device temperature before environment
+  preparation and mass transfer. Direct `wp.float32` temperature is copied into
+  a device-local `wp.float64` buffer for the refresh boundary.
 - User-facing thermodynamics documentation or migration-guide updates.

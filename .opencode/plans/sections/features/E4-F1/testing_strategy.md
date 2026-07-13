@@ -17,7 +17,14 @@ not lowered. Test files retain the `*_test.py` suffix, primarily under
   multiple boxes, mixed species/models, reserved Buck parameters, complete
   overwrite, concrete-module-only export, and API validation failures that leave
   seeded vapor-pressure buffers unchanged.
-- **P3:** Deferred; #1282 added no condensation integration.
+- **P3 (shipped in #1283):** `condensation_test.py` and its shared support
+  cover refresh launch ordering; stale-buffer overwrite and CPU parity for
+  scalar, direct `wp.float64`, and `WarpEnvironmentData` temperatures; repeated
+  temperature changes with reused gas/configuration; direct `wp.float32`
+  temperature casting; and legacy positional/signature compatibility. Parameterized
+  pre-refresh failure regressions assert malformed thermodynamics, invalid
+  physical inputs, invalid optional mass-transfer buffers, and device mismatch
+  raise before a refresh launch or gas/particle mutation.
 - **Condensation boundary (shipped in #1281):** Regression tests require the
   keyword-only sidecar and prove invalid/missing configurations fail before
   launch, helper/scratch allocation, mass-transfer access, or mutation of
@@ -32,5 +39,6 @@ not lowered. Test files retain the `*_test.py` suffix, primarily under
 - Use explicit `float64` dtype/shape, `assert_allclose` tolerances for formula
   parity, and exact buffer snapshots for failure-before-mutation assertions.
 - Focused verification covers `thermodynamics_test.py`, condensation and
-  stiffness tests, and the opt-in benchmark; CUDA validation remains optional.
+  stiffness tests, including `-k "refresh or temperature or pre_refresh"`, and
+  the opt-in benchmark; CUDA validation remains optional.
 - Maintain at least 80% changed-code coverage and never lower repository gates.

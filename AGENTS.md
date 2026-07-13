@@ -294,6 +294,16 @@ restored = from_warp_environment_data(gpu_environment)
 - Accepted direct/environment `temperature` and `pressure` inputs, plus direct
   coagulation `volume` inputs, are validated as positive finite physical
   values before launch.
+- `condensation_step_gpu(...)` requires keyword-only
+  `thermodynamics=ThermodynamicsConfig`. After its environment, thermodynamics,
+  optional-buffer, and mass-transfer inputs validate, every successful call
+  overwrites caller-owned `WarpGasData.vapor_pressure` using the normalized
+  current per-box temperature before mass transfer. The vapor-pressure buffer
+  is therefore derived step state, not a caller-supplied physics source.
+- Scalar temperatures, direct Warp temperature arrays, and
+  `WarpEnvironmentData` all drive this refresh. Non-`wp.float64` temperature
+  arrays are cast into a device-local float64 buffer; no host vapor-pressure
+  evaluation or host-to-device vapor-pressure transfer occurs in the step.
 - `EnvironmentData.temperature` and `pressure` use `(n_boxes,)`;
   `saturation_ratio` uses `(n_boxes, n_species)` on both CPU and Warp mirrors.
 - Round trips preserve `temperature`, `pressure`, and `saturation_ratio` for
@@ -346,8 +356,10 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 - Constant mode reads `parameters[:, 0]` as vapor pressure in Pa. Canonical
   Buck mode uses fixed water/ice equations; its four parameter slots are
   reserved and ignored.
-- This primitive is not integrated with `condensation_step_gpu(...)`; callers
-  invoke it explicitly when a refresh is required.
+- `condensation_step_gpu(..., thermodynamics=config)` invokes this primitive
+  after successful entry-point validation and before condensation mass
+  transfer. Call it directly only when vapor pressure must be refreshed outside
+  a condensation step.
 
 ### GPU coagulation RNG state ownership
 
@@ -538,6 +550,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-11  
+**Last Updated:** 2026-07-13  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

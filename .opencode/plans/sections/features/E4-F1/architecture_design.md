@@ -10,8 +10,12 @@ CPU model selection and numeric parameters
        -> one `(n_boxes, n_species)` Warp launch
        -> overwrite `gas.vapor_pressure`
 
-`condensation_step_gpu(...)` retains the P1 sidecar validation boundary;
-refresh integration is deferred to P3.
+`condensation_step_gpu(..., thermodynamics=...)`
+  -> normalize and validate all entry-point inputs and optional buffers
+  -> use normalized `float64` temperature, or device-copy `float32` to `float64`
+  -> refresh_vapor_pressure_gpu(thermodynamics, gas, refresh_temperature)
+  -> prepare environment properties
+  -> transfer and apply condensation mass
 ```
 
 The configuration is process configuration, not gas state, and uses a typed,
@@ -36,8 +40,16 @@ and must align with gas molar-mass ordering.
 - **Ordering:** After active-device context is established, metadata checks occur
   before one readback each of sidecar fields and gas molar mass. Validation
   precedes defaults, caller mass-transfer access, allocation, and launch.
-- **Compatibility:** The standalone primitive mutates only caller-owned vapor
-  pressure. Condensation does not invoke it until P3.
+- **Integration ordering:** `condensation_step_gpu()` completes environment,
+  thermodynamics, optional-buffer, and mass-transfer validation before refresh.
+  It invokes exactly one refresh after any device-local float32-to-float64 cast
+  and before environment-property preparation and mass transfer. Thus failed
+  calls leave vapor pressure and particle state untouched.
+- **Compatibility:** Existing positional arguments through `mass_transfer`
+  remain unchanged; `environment` and the required `thermodynamics` sidecars
+  remain keyword-only. Scalar, direct Warp-array, and explicit-environment
+  inputs all select the current normalized per-box temperature without host
+  formula evaluation or pressure transfer.
 
 ## Security & Compliance
 
