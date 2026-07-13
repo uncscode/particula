@@ -89,13 +89,19 @@ def _make_thermodynamics_config(gpu_gas: Any, device: str = "cpu") -> Any:
 def _snapshot(
     gpu_particles: Any, gpu_gas: Any, mass_transfer: Any
 ) -> tuple[np.ndarray, ...]:
-    """Copy every caller-owned output that must be atomic on failure."""
-    snapshots = (
-        gpu_gas.vapor_pressure.numpy().copy(),
-        gpu_gas.concentration.numpy().copy(),
-        gpu_particles.masses.numpy().copy(),
-        mass_transfer.numpy().copy(),
+    """Copy CPU-backed caller-owned outputs that must be atomic on failure."""
+    caller_owned_arrays = (
+        gpu_gas.vapor_pressure,
+        gpu_gas.concentration,
+        gpu_particles.masses,
+        mass_transfer,
     )
+    assert all(
+        getattr(array.device, "is_cpu", False)
+        or str(array.device).startswith("cpu")
+        for array in caller_owned_arrays
+    )
+    snapshots = (*(array.numpy().copy() for array in caller_owned_arrays),)
     n_particles = gpu_particles.masses.shape[1]
     assert snapshots[0].shape == (_N_BOXES, _N_SPECIES)
     assert snapshots[1].shape == (_N_BOXES, _N_SPECIES)
@@ -184,7 +190,7 @@ def test_condensation_step_gpu_reuses_thermodynamics_and_transfer_buffer() -> (
         config,
     )
     assert first_transfer is transfer
-    first_transfer_values = transfer.numpy().copy()
+    first_transfer_values = transfer.numpy()
     first_vapor_pressure = gpu_gas.vapor_pressure.numpy().copy()
     assert first_transfer_values.shape == (_N_BOXES, n_particles, _N_SPECIES)
     assert np.all(np.isfinite(first_transfer_values))
@@ -202,6 +208,22 @@ def test_condensation_step_gpu_reuses_thermodynamics_and_transfer_buffer() -> (
         rtol=1e-12,
         atol=0.0,
     )
+    wp.copy(
+        transfer,
+        wp.full(
+            (_N_BOXES, n_particles, _N_SPECIES),
+            _TRANSFER_SENTINEL,
+            dtype=wp.float64,
+            device="cpu",
+        ),
+    )
+    npt.assert_array_equal(
+        transfer.numpy(),
+        np.full(
+            (_N_BOXES, n_particles, _N_SPECIES),
+            _TRANSFER_SENTINEL,
+        ),
+    )
 
     _, second_transfer = _call_step(
         gpu_particles,
@@ -216,7 +238,6 @@ def test_condensation_step_gpu_reuses_thermodynamics_and_transfer_buffer() -> (
     assert np.all(np.isfinite(second_transfer.numpy()))
     assert np.all(second_transfer.numpy() != _TRANSFER_SENTINEL)
     assert np.any(second_transfer.numpy() != 0.0)
-    assert not np.array_equal(second_transfer.numpy(), first_transfer_values)
     npt.assert_allclose(
         second_vapor_pressure[:, 0],
         _expected_vapor_pressure(second_temperatures)[:, 0],
