@@ -8,7 +8,7 @@ import dataclasses
 import inspect
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Literal, overload
+from typing import Any, Literal, cast, overload
 
 import numpy as np
 import numpy.testing as npt
@@ -1410,7 +1410,7 @@ def test_condensation_activity_surface_validation_is_frozen_and_atomic(
         gpu_gas, int(ACTIVITY_MODE_IDEAL), int(SURFACE_TENSION_MODE_STATIC)
     )
     with pytest.raises(dataclasses.FrozenInstanceError):
-        sidecar.activity_mode = 1
+        cast(Any, sidecar).activity_mode = 1
     with pytest.raises(ValueError, match="activity_surface"):
         validate_condensation_activity_surface_config(
             object(),
