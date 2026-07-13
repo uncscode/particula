@@ -305,6 +305,42 @@ failed preflight leaves the vapor-pressure output buffer unchanged. Import the
 standalone `refresh_vapor_pressure_gpu` only from
 `particula.gpu.kernels.thermodynamics`, never `particula.gpu.kernels`.
 
+### Condensation activity and surface sidecars
+
+The optional `CondensationActivitySurfaceConfig` is a direct-kernel-only,
+caller-owned configuration sidecar for `condensation_step_gpu()`. Activity mode
+`0` is ideal and mode `1` is kappa; surface-tension mode `0` is static and mode
+`1` is composition-weighted. Activity applies only to `water_species_index`;
+all non-water species use unit activity. Static tension uses the current
+species' supplied value, while composition-weighted tension computes one
+particle-wide value from the per-species tensions.
+
+`kappas` and `molar_mass_reference` must be same-device `wp.float64` arrays of
+shape `(n_species,)`. Kappas must be finite and nonnegative, and ordered molar
+masses must exactly match `gas.molar_mass`; this preserves the positional
+ordered-molar-mass compatibility contract. The frozen dataclass prevents field
+rebinding, not mutation of its arrays. Callers retain those arrays and must not
+mutate them concurrently with a launch.
+
+Successful direct calls mutate particle masses in place, overwrite the derived
+GPU-only vapor-pressure buffer, and return raw transfer before particle clamping.
+They do **not** couple or update gas concentration. Validation is atomic:
+unsupported sidecars fail with `ValueError` before mutation. Unsupported
+activity or surface strategies are not silently copied or approximated; passing
+`activity_surface=None` retains legacy unit activity and static tension.
+
+Use `to_warp_*` and `from_warp_*` as the sole CPU↔Warp boundary. There is no
+hidden transfer and no high-level `Aerosol` or `Runnable` GPU path. Deterministic
+fp64 tests compare an independent NumPy reference with explicit parity
+`rtol`/`atol`, then apply tighter separate ownership invariants. Warp `cpu` is
+required whenever Warp is installed; CUDA is optional, availability-guarded,
+and separately marked:
+
+```bash
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and gpu_parity and not cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+```
+
 ## Current shipped support boundaries
 
 The containers are multi-box capable, but current execution support is narrower
