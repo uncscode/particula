@@ -113,19 +113,22 @@ def water_activity_ideal_wp(
     particle_idx: int,
     water_index: int,
 ) -> wp.float64:
-    """Calculate ideal water activity from particle species masses.
+    """Calculate ideal water activity for one particle from its mole fraction.
 
-    This mirrors ``get_ideal_activity_molar`` for one particle.
+    This Warp helper mirrors
+    ``particula.particles.properties.activity_module.get_ideal_activity_molar``.
+    It returns zero when the selected particle has zero total moles.
 
     Args:
-        masses: Particle species masses [kg].
+        masses: Species masses [kg], shaped
+            ``(n_boxes, n_particles, n_species)``.
         molar_masses: Species molar masses [kg/mol].
-        box_idx: Particle-box index.
+        box_idx: Index of the particle box (dimensionless).
         particle_idx: Particle index in the box.
-        water_index: Water species index.
+        water_index: Index of the water species (dimensionless).
 
     Returns:
-        Dimensionless water mole fraction.
+        Dimensionless water mole fraction, or zero for zero total moles.
     """
     total_moles = wp.float64(0.0)
     for species_idx in range(masses.shape[2]):  # type: ignore[attr-defined]
@@ -153,21 +156,30 @@ def water_activity_kappa_wp(
     particle_idx: int,
     water_index: int,
 ) -> wp.float64:
-    """Calculate κ-model water activity from particle species masses.
+    """Calculate κ-model water activity for one particle.
 
-    This mirrors ``get_kappa_activity`` for one particle using the κ-model of
-    Petters and Kreidenweis (2007).
+    This Warp helper mirrors
+    ``particula.particles.properties.activity_module.get_kappa_activity``.
+    It returns zero when water volume is zero and one when solute volume is
+    zero.
 
     Args:
-        masses: Particle species masses [kg].
+        masses: Species masses [kg], shaped
+            ``(n_boxes, n_particles, n_species)``.
         densities: Species densities [kg/m³].
         kappas: Species hygroscopicity parameters (dimensionless).
-        box_idx: Particle-box index.
+        box_idx: Index of the particle box (dimensionless).
         particle_idx: Particle index in the box.
-        water_index: Water species index.
+        water_index: Index of the water species (dimensionless).
 
     Returns:
         Dimensionless water activity.
+
+    References:
+        Petters, M. D., & Kreidenweis, S. M. (2007). A single parameter
+        representation of hygroscopic growth and cloud condensation nucleus
+        activity. Atmospheric Chemistry and Physics, 7(8), 1961-1971.
+        https://doi.org/10.5194/acp-7-1961-2007
     """
     water_volume = wp.float64(0.0)
     solute_volume = wp.float64(0.0)

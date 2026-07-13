@@ -7,6 +7,10 @@ and integrate them into GPU condensation's particle-side Kelvin pressure.
 - Numeric modes for ideal molar activity and kappa water activity.
 - Kappa wet, dry, zero-solute, and multi-solute guards with an explicit water
   species index.
+- **Delivered in P1 / issue #1287:** internal fp64 Warp ideal-molar and kappa
+  helpers plus co-located independent NumPy parity coverage, including zero
+  branches and nonzero water-species indices. Warp-absent collection now skips
+  safely without eagerly importing Warp-dependent test symbols.
 - Legacy static `(n_species,)` surface tension and one explicitly selected
   composition-weighted effective surface mode aligned with CPU fixtures.
 - `activity * refreshed_pure_vapor_pressure * kelvin_term` in the condensation

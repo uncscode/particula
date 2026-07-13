@@ -3,13 +3,17 @@
 Phase issue creation is intentionally deferred until E4 implementation issues
 are generated and scheduled; `TBD` is not an unresolved design decision.
 
-- [ ] **E4-F2-P1:** Ideal and kappa activity Warp helpers with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Implement ideal molar and kappa water activity with guarded fp64 formulas.
-   - Files: `particula/gpu/dynamics/condensation_funcs.py` (new
-     `water_activity_ideal_wp()` and `water_activity_kappa_wp()` helpers),
-     `particula/gpu/dynamics/tests/condensation_funcs_test.py`
-  - Tests: Pure/mixed, wet/dry, zero-solute, multi-solute CPU formula parity.
+- [x] **E4-F2-P1:** Ideal and kappa activity Warp helpers with unit tests
+  - Issue: #1287 | Size: S | Status: Implemented
+  - Delivered: guarded fp64 ideal-molar and kappa water-activity device
+    formulas as internal concrete-module helpers; no configuration, export,
+    condensation-kernel, or transfer changes.
+  - Files: `particula/gpu/dynamics/condensation_funcs.py` (new
+      `water_activity_ideal_wp()` and `water_activity_kappa_wp()` helpers),
+      `particula/gpu/dynamics/tests/condensation_funcs_test.py`
+  - Tests: collection-safe Warp imports and independent NumPy parity for
+    ideal pure/mixed/zero-total/water-free/nonzero-index cases and kappa
+    wet/pure-water/dry/multi-solute/zero-kappa/nonzero-index cases.
 - [ ] **E4-F2-P2:** Static and composition-weighted surface physics with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Preserve static input and add the selected composition-weighted mode.

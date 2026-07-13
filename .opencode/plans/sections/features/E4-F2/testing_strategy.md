@@ -1,10 +1,14 @@
 # Testing Strategy
 
-- **P1:** In
-  `particula/gpu/dynamics/tests/condensation_funcs_test.py`, parametrized
-  property tests compare ideal molar and kappa activity to independent
-  CPU/NumPy references for pure/mixed, wet/dry, zero-solute, and multi-solute
-  particles.
+- **P1 (implemented, issue #1287):** In
+  `particula/gpu/dynamics/tests/condensation_funcs_test.py`, collection-safe
+  Warp imports and parametrized wrappers compare the helpers with independent
+  NumPy references. Ideal cases cover pure/mixed, zero-total, water-free, and
+  nonzero-water-index compositions. Kappa cases cover wet, pure-water,
+  dry/no-water, multi-solute, zero-kappa, and nonzero-water-index compositions;
+  the multi-solute fixture verifies water is excluded from kappa weighting.
+  The references explicitly mirror zero branches and do not call CPU activity
+  functions or the Warp helpers.
 - **P2:** In
   `particula/gpu/dynamics/tests/condensation_funcs_test.py`, parametrized
   tests cover static compatibility, selected composition weighting, zero

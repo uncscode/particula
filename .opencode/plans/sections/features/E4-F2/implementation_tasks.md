@@ -1,9 +1,12 @@
 # Implementation Tasks
 
 ## Physics and Kernels
-- [ ] Add `water_activity_ideal_wp()` and `water_activity_kappa_wp()` to
-  `particula/gpu/dynamics/condensation_funcs.py`, with CPU-equivalent dry
-  guards, and cover each helper in `gpu/dynamics/tests/condensation_funcs_test.py`.
+- [x] **E4-F2-P1 / issue #1287:** Added internal
+  `water_activity_ideal_wp()` and `water_activity_kappa_wp()` in
+  `particula/gpu/dynamics/condensation_funcs.py`. The fp64 helpers use the
+  existing `(n_boxes, n_particles, n_species)` mass layout and explicit
+  zero-total, zero-water, and zero-solute branches; no export or launch-path
+  change was made.
 - [ ] Add `effective_surface_tension_wp()` beside those helpers; accept static
   per-species input and the selected composition-weighted mode, and define the
   zero-weight return explicitly in its focused test.
@@ -17,7 +20,11 @@
 - [ ] Retain fp64/fixed-shape storage and avoid host recomputation or transfer.
 
 ## Tooling / Tests
-- [ ] Add co-located formula tests for every supported mode and edge guard.
+- [x] **E4-F2-P1 / issue #1287:** Repaired collection-safe Warp imports in
+  `particula/gpu/dynamics/tests/condensation_funcs_test.py` and added
+  independent NumPy parity tests. Coverage includes ideal pure, mixed,
+  zero-total, water-free, and nonzero-water-index cases, plus kappa wet,
+  pure-water, dry, multi-solute, zero-kappa, and nonzero-water-index cases.
 - [ ] Extend independent NumPy reference fixtures for coupled pressure parity.
 - [ ] Add one/multi-box kernel tests and static-input compatibility regression.
 - [ ] Snapshot state around every expected validation failure.
