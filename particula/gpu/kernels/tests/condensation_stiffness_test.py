@@ -9,6 +9,14 @@ from particula.gpu.kernels.tests import _condensation_test_support as support
 pytestmark = pytest.mark.warp
 
 device = support.device
+warp_cpu_device = support.warp_cpu_device
+
+
+@pytest.fixture(autouse=True)
+def _selected_warp_test_runtime(request: pytest.FixtureRequest) -> None:
+    """Load Warp only while executing a selected Warp-backed export."""
+    if request.node.get_closest_marker("warp") is not None:
+        support._load_warp_runtime()
 
 
 def _export_stiffness_tests() -> tuple[str, ...]:
