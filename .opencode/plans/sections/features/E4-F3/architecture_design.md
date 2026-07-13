@@ -25,8 +25,9 @@ design remains compatible with E4-F2 physics when E4-F4 combines the tracks.
   `WarpEnvironmentData`. Scratch arrays are explicit operation sidecars with
   stable `(n_boxes, n_particles, n_species)` or `(n_boxes,)` shapes.
 - **API surface:** Extend `condensation_step_gpu()` with optional reusable
-  scratch inputs while preserving existing keyword/positional compatibility.
-  Keep the lazy export in `particula.gpu.kernels` unchanged.
+  scratch through typed, keyword-only operation sidecars while preserving
+  existing positional compatibility. Keep the lazy export in
+  `particula.gpu.kernels` unchanged.
 - **Return semantics:** The transfer buffer records the sum of applied transfer
   across the full call, not only the fourth substep.
 - **Workflow hooks:** E4-F1 is a hard gate. E4-F2 may proceed in parallel;
