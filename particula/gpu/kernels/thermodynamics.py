@@ -219,8 +219,8 @@ def validate_thermodynamics_config(
 
 @wp.func
 def _constant_vapor_pressure(
-    parameters: wp.array2d(dtype=wp.float64),
-    species_idx: wp.int32,
+    parameters: Any,
+    species_idx: Any,
 ) -> wp.float64:
     """Return the constant-mode vapor pressure in Pa."""
     return parameters[species_idx, 0]
@@ -254,8 +254,8 @@ def _buck_vapor_pressure(temperature: wp.float64) -> wp.float64:
 @wp.func
 def _evaluate_vapor_pressure(
     mode: wp.int32,
-    parameters: wp.array2d(dtype=wp.float64),
-    species_idx: wp.int32,
+    parameters: Any,
+    species_idx: Any,
     temperature: wp.float64,
 ) -> wp.float64:
     """Evaluate one validated per-species vapor-pressure model."""
@@ -266,13 +266,13 @@ def _evaluate_vapor_pressure(
 
 @wp.kernel
 def _refresh_vapor_pressure_kernel(
-    modes: wp.array(dtype=wp.int32),
-    parameters: wp.array2d(dtype=wp.float64),
-    temperature: wp.array(dtype=wp.float64),
-    vapor_pressure: wp.array2d(dtype=wp.float64),
+    modes: Any,
+    parameters: Any,
+    temperature: Any,
+    vapor_pressure: Any,
 ) -> None:
     """Refresh all per-box, per-species vapor-pressure values."""
-    box_idx, species_idx = wp.tid()
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
     vapor_pressure[box_idx, species_idx] = _evaluate_vapor_pressure(
         modes[species_idx],
         parameters,
@@ -284,7 +284,7 @@ def _refresh_vapor_pressure_kernel(
 def _validate_refresh_gas(gas: Any, caller_name: str) -> tuple[int, int, Any]:
     """Validate gas refresh buffers and return their shape and device."""
     vapor_pressure = getattr(gas, "vapor_pressure", None)
-    if not _is_warp_array_like(vapor_pressure):
+    if vapor_pressure is None or not _is_warp_array_like(vapor_pressure):
         raise ValueError(
             f"gas.vapor_pressure must be a Warp array in {caller_name}."
         )
