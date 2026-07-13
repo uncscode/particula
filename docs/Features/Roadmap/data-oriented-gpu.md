@@ -943,6 +943,10 @@ parity, activity, surface tension, latent heat, gas coupling, substep
 orchestration, or a final support contract. Staggered (Gauss-Seidel)
 condensation stays CPU-only (see [Non-Goals](#non-goals)).
 
+The current executable CPU integration baseline remains
+`particula/integration_tests/condensation_latent_heat_conservation_test.py`.
+Temperature-feedback runtime support remains future work. GPU latent-heat parity remain future Epic D goals.
+
 Remaining feature ownership:
 
 1. E4-F2: activity and effective surface-tension physics.
