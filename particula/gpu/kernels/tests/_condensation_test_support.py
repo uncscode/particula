@@ -46,7 +46,12 @@ from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
 from particula.gpu.kernels.condensation import (  # noqa: E402
     _validate_mass_transfer_buffer,
     _validate_species_array,
-    condensation_step_gpu,
+)
+from particula.gpu.kernels.condensation import (  # noqa: E402
+    condensation_step_gpu as _condensation_step_gpu,
+)
+from particula.gpu.kernels.thermodynamics import (  # noqa: E402
+    ThermodynamicsConfig,
 )
 from particula.gpu.tests.cuda_availability import (  # noqa: E402
     cuda_available,
@@ -78,6 +83,31 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
 from particula.util import constants  # noqa: E402
 
 _ENVIRONMENT_ARRAY_RTOL = 1.0e-7
+
+
+def _make_thermodynamics_config(gpu_gas: Any) -> ThermodynamicsConfig:
+    """Build the valid validation-only sidecar for an existing GPU gas input."""
+    n_species = gpu_gas.molar_mass.shape[0]
+    return ThermodynamicsConfig(
+        modes=wp.zeros(
+            n_species, dtype=wp.int32, device=gpu_gas.molar_mass.device
+        ),
+        parameters=wp.zeros(
+            (n_species, 4), dtype=wp.float64, device=gpu_gas.molar_mass.device
+        ),
+        molar_mass_reference=wp.array(
+            gpu_gas.molar_mass.numpy(),
+            dtype=wp.float64,
+            device=gpu_gas.molar_mass.device,
+        ),
+    )
+
+
+def condensation_step_gpu(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
+    """Call the public step with the standard valid test sidecar by default."""
+    if "thermodynamics" not in kwargs:
+        kwargs["thermodynamics"] = _make_thermodynamics_config(args[1])
+    return _condensation_step_gpu(*args, **kwargs)
 
 
 @pytest.fixture(params=warp_devices(wp))
@@ -1105,15 +1135,13 @@ def _record_condensation_stiffness_trials_uncached(
     return records
 
 
-def test_condensation_step_gpu_signature_keeps_environment_keyword_only() -> (
-    None
-):
-    """The explicit environment input stays keyword-only."""
-    parameter = inspect.signature(condensation_step_gpu).parameters[
-        "environment"
-    ]
+def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
+    """The explicit environment and thermodynamics inputs stay keyword-only."""
+    parameters = inspect.signature(_condensation_step_gpu).parameters
+    parameter = parameters["environment"]
 
     assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["thermodynamics"].kind is inspect.Parameter.KEYWORD_ONLY
 
 
 def test_condensation_step_gpu_scalar_positional_call_remains_valid(
@@ -1140,6 +1168,29 @@ def test_condensation_step_gpu_scalar_positional_call_remains_valid(
     wp.synchronize()
 
     assert mass_transfer.shape == (1, 2, 1)
+
+
+def test_condensation_step_gpu_requires_thermodynamics_sidecar(
+    device: str,
+) -> None:
+    """The public boundary rejects an omitted thermodynamic sidecar."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=_make_vapor_pressure(1, 1),
+    )
+
+    with pytest.raises(ValueError, match="thermodynamics"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+        )
 
 
 @pytest.mark.parametrize(
