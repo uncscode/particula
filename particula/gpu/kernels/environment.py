@@ -4,7 +4,9 @@ This module validates direct temperature and pressure inputs for GPU kernel
 entry points and normalizes them into canonical Warp arrays with shape
 ``(n_boxes,)`` on the caller's device. Supported entry-point contracts accept
 scalars, device-local Warp arrays, or a ``WarpEnvironmentData`` container
-without performing hidden device transfers.
+without hidden device transfers. ``validate_environment_inputs`` is the
+read-only preflight phase: it completes before scalar broadcasting and does
+not mutate caller-owned environment arrays.
 """
 
 from __future__ import annotations
@@ -94,9 +96,8 @@ def _validate_positive_finite_array(
     """Validate a per-box physical input domain before kernel launch.
 
     Notes:
-        CPU-resident Warp arrays are checked elementwise. Device-resident Warp
-        arrays are validated with reduction helpers, avoiding full-array host
-        conversion via ``.numpy()``.
+        The check reads values without modifying or replacing the supplied Warp
+        array. It is used by the preflight and normalization phases.
     """
     if not _is_cpu_device(values.device):
         values_np = np.asarray(type(values).numpy(values), dtype=np.float64)
@@ -398,9 +399,23 @@ def validate_environment_inputs(
 ) -> None:
     """Validate an environment source without broadcasting scalar inputs.
 
-    This is the allocation-free half of :func:`_ensure_environment_arrays`.
-    Entry points use it to complete aggregate preflight before they allocate
-    scalar broadcast buffers or mutate any caller-owned output.
+    Args:
+        temperature: Direct scalar or ``(n_boxes,)`` Warp temperature [K].
+        pressure: Direct scalar or ``(n_boxes,)`` Warp pressure [Pa].
+        environment: Optional container providing both Warp arrays.
+        n_boxes: Expected number of spatial boxes.
+        device: Expected Warp device for direct or container arrays.
+        caller_name: Entry-point name used in validation errors.
+
+    Raises:
+        ValueError: If sources are mixed or missing, or if an input has an
+            invalid scalar domain, Warp-array schema, device, or shape.
+
+    Notes:
+        This is the read-only preflight half of
+        :func:`_ensure_environment_arrays`. It validates all input domains
+        before scalar broadcasting and does not mutate or replace caller-owned
+        arrays or environment fields.
     """
     if environment is not None:
         if temperature is not None or pressure is not None:

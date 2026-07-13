@@ -1,6 +1,8 @@
 # Success Criteria
 
-- [ ] Supported modes are explicitly selected and match issue #1272 CPU fixtures.
+- [x] **P3 / issue #1289:** Supported ideal/kappa activity and static/weighted
+  surface modes are explicitly selected through a frozen numeric sidecar and
+  match independent coupled references.
 - [x] **P1 / issue #1287:** Ideal molar activity and kappa water activity
   include guarded zero branches, dry/zero-solute and multi-solute behavior,
   and nonzero water-index cases matching independent NumPy references.
@@ -9,12 +11,13 @@
   zero total volume, and supplies Kelvin radius/term parity tests.
 - [x] **P2 / issue #1288:** Existing `(n_species,)` surface input remains
   compatible through exact requested-species static selection.
-- [ ] Particle pressure is `activity * refreshed_pure_pressure * kelvin_term`.
-- [ ] Unsupported modes fail early or are explicitly documented CPU-only,
-  including BAT.
-- [ ] Fixed-shape fp64 arrays, species order, explicit transfer boundaries, and
-  direct `particula.gpu.kernels` imports are preserved.
-- [ ] Invalid configuration fails before particle, gas, or environment mutation.
+- [x] Particle pressure is `activity * refreshed_pure_pressure * kelvin_term`.
+- [x] Unsupported selectors and malformed supplied inputs fail before launch;
+  BAT remains out of scope and CPU-only.
+- [x] Fixed-shape fp64 arrays, species order, explicit transfer boundaries, and
+  concrete `particula.gpu.kernels.condensation` import ownership are preserved.
+- [x] Invalid configuration fails before particle, gas, environment, or supplied
+  output-buffer mutation.
 - [ ] Warp CPU parity passes when Warp is installed; CUDA passes when available
   and otherwise skips cleanly.
 - [ ] No high-level runnable support, schema change, or hidden host computation

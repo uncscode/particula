@@ -16,10 +16,15 @@
   composition-volume weighting (`rtol=1e-10`, `atol=0`), zero-volume arithmetic
   mean fallback under `-Werror`, weighted-mode index independence, and Kelvin
   radius/term parity using the effective scalar.
-- **P3:** `particula/gpu/kernels/tests/condensation_test.py` and
-  `_condensation_test_support.py` cover one/multi-box coupling, refreshed E4-F1
-  pressure, direct imports, and invalid mode/index/shape/dtype/device/value
-  failures. State snapshots prove failure occurs before mutation.
+- **P3 (implemented, issue #1289):**
+  `particula/gpu/kernels/tests/_condensation_test_support.py` and
+  `particula/gpu/kernels/tests/condensation_test.py` provide deterministic fp64
+  sidecars and independent NumPy pressure/transfer references. One-box tests
+  cover all ideal/kappa × static/weighted combinations and prove non-water unit
+  activity; multi-box tests cover temperature refresh and current composition.
+  Frozen-config, legacy positional, inactive-composition, and invalid aggregate
+  preflight cases are co-located. Invalid cases snapshot caller state and
+  monkeypatch `wp.launch` to prove no launch or mutation.
 - **P4:** End-to-end fixtures compare GPU results with an independent CPU
   sequence using recorded `rtol`/`atol`; Warp CPU runs whenever Warp is
   installed, while CUDA runs when available and otherwise skips cleanly.
