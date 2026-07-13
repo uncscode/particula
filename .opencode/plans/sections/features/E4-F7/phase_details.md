@@ -1,5 +1,8 @@
 # Phase Details
 
+Phase issue creation is intentionally deferred until E4 implementation issues
+are generated and scheduled; `TBD` is not an unresolved design decision.
+
 - [ ] **E4-F7-P1:** Publish canonical GPU condensation support contract and guardrails
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Document only the modes, devices, shapes, precision, substeps, buffers, diagnostics, mutation semantics, and unsupported boundaries verified by E4-F1 through E4-F6.

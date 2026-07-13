@@ -1,5 +1,8 @@
 # Phase Details
 
+Phase issue creation is intentionally deferred until E4 implementation issues
+are generated and scheduled; `TBD` is not an unresolved design decision.
+
 - [ ] **E4-F5-P1:** Partitioning gates and gas-coupling validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Validate gas coupling inputs before mutation and strictly zero disabled species.

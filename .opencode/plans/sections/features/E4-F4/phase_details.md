@@ -1,5 +1,8 @@
 # Phase Details
 
+Phase issue creation is intentionally deferred until E4 implementation issues
+are generated and scheduled; `TBD` is not an unresolved design decision.
+
 - [ ] **E4-F4-P1:** Warp thermal-resistance helpers and validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Port conductivity/resistance and validate latent sidecars before work.
