@@ -386,3 +386,52 @@ def _ensure_environment_arrays(
         )
 
     return temperature_array, pressure_array
+
+
+def validate_environment_inputs(
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    environment: Any | None,
+    n_boxes: int,
+    device: Any,
+    caller_name: str,
+) -> None:
+    """Validate an environment source without broadcasting scalar inputs.
+
+    This is the allocation-free half of :func:`_ensure_environment_arrays`.
+    Entry points use it to complete aggregate preflight before they allocate
+    scalar broadcast buffers or mutate any caller-owned output.
+    """
+    if environment is not None:
+        if temperature is not None or pressure is not None:
+            raise ValueError(
+                "Cannot mix direct temperature/pressure inputs with "
+                f"environment in {caller_name}."
+            )
+        for field_name in ("temperature", "pressure"):
+            values = _validate_box_array(
+                f"environment.{field_name}",
+                _get_environment_array(environment, field_name, caller_name),
+                n_boxes,
+                device,
+                caller_name,
+            )
+            _validate_positive_finite_array(
+                f"environment.{field_name}", values, caller_name
+            )
+        return
+
+    if temperature is None or pressure is None:
+        raise ValueError(
+            "temperature and pressure must both be provided when environment "
+            f"is omitted in {caller_name}."
+        )
+    for name, value in (("temperature", temperature), ("pressure", pressure)):
+        if _is_warp_array_like(value):
+            values = _validate_box_array(
+                name, value, n_boxes, device, caller_name
+            )
+            _validate_positive_finite_array(name, values, caller_name)
+        else:
+            scalar = _coerce_direct_scalar(name, value, caller_name)
+            _validate_positive_finite_scalar(name, scalar, caller_name)

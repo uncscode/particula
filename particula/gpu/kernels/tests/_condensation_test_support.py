@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import inspect
 from dataclasses import dataclass
 from functools import lru_cache
@@ -44,8 +45,14 @@ from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
     particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels.condensation import (  # noqa: E402
+    ACTIVITY_MODE_IDEAL,
+    ACTIVITY_MODE_KAPPA,
+    SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED,
+    SURFACE_TENSION_MODE_STATIC,
+    CondensationActivitySurfaceConfig,
     _validate_mass_transfer_buffer,
     _validate_species_array,
+    validate_condensation_activity_surface_config,
 )
 from particula.gpu.kernels.condensation import (  # noqa: E402
     condensation_step_gpu as _condensation_step_gpu,
@@ -126,6 +133,30 @@ def _make_mixed_thermodynamics_config(gpu_gas: Any) -> ThermodynamicsConfig:
         modes=wp.array(modes, dtype=wp.int32, device=gpu_gas.molar_mass.device),
         parameters=wp.array(
             parameters,
+            dtype=wp.float64,
+            device=gpu_gas.molar_mass.device,
+        ),
+        molar_mass_reference=wp.array(
+            gpu_gas.molar_mass.numpy(),
+            dtype=wp.float64,
+            device=gpu_gas.molar_mass.device,
+        ),
+    )
+
+
+def _make_activity_surface_config(
+    gpu_gas: Any,
+    activity_mode: int,
+    surface_mode: int,
+) -> CondensationActivitySurfaceConfig:
+    """Build a deterministic two-or-more-species activity sidecar."""
+    n_species = gpu_gas.molar_mass.shape[0]
+    return CondensationActivitySurfaceConfig(
+        activity_mode=activity_mode,
+        surface_tension_mode=surface_mode,
+        water_species_index=0,
+        kappas=wp.array(
+            np.linspace(0.0, 0.5, n_species, dtype=np.float64),
             dtype=wp.float64,
             device=gpu_gas.molar_mass.device,
         ),
@@ -668,6 +699,10 @@ def _cpu_mass_transfer(  # noqa: C901
     pressure: float | np.ndarray,
     time_step: float,
     thermodynamics: ThermodynamicsConfig | None = None,
+    activity_mode: int | None = None,
+    surface_tension_mode: int | None = None,
+    water_species_index: int = 0,
+    kappas: np.ndarray | None = None,
 ) -> np.ndarray:
     """Compute CPU mass transfer matching refreshed GPU kernel physics."""
     n_boxes, n_particles, n_species = particles.masses.shape
@@ -746,8 +781,21 @@ def _cpu_mass_transfer(  # noqa: C901
                     vapor_transition=transition,
                     diffusion_coefficient=diffusion_value,
                 )
+                tension = surface_tension[species_idx]
+                if surface_tension_mode == int(
+                    SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
+                ):
+                    volumes = particles.masses[box_idx, particle_idx, :] / (
+                        particles.density
+                    )
+                    total_particle_volume = np.sum(volumes)
+                    tension = (
+                        np.dot(surface_tension, volumes) / total_particle_volume
+                        if total_particle_volume > 0.0
+                        else np.mean(surface_tension)
+                    )
                 kelvin_radius = get_kelvin_radius(
-                    effective_surface_tension=surface_tension[species_idx],
+                    effective_surface_tension=tension,
                     effective_density=effective_density,
                     molar_mass=gas.molar_mass[species_idx],
                     temperature=box_temperature,
@@ -758,11 +806,47 @@ def _cpu_mass_transfer(  # noqa: C901
                     molar_mass=gas.molar_mass[species_idx],
                     temperature=box_temperature,
                 )
+                activity_factor = 1.0
+                if (
+                    species_idx == water_species_index
+                    and activity_mode is not None
+                ):
+                    if activity_mode == int(ACTIVITY_MODE_IDEAL):
+                        moles = (
+                            particles.masses[box_idx, particle_idx, :]
+                            / gas.molar_mass
+                        )
+                        activity_factor = (
+                            moles[water_species_index] / np.sum(moles)
+                            if np.sum(moles) > 0.0
+                            else 0.0
+                        )
+                    else:
+                        assert kappas is not None
+                        volumes = (
+                            particles.masses[box_idx, particle_idx, :]
+                            / particles.density
+                        )
+                        water_volume = volumes[water_species_index]
+                        solute_mask = (
+                            np.arange(n_species) != water_species_index
+                        )
+                        solute_volume = np.sum(volumes[solute_mask])
+                        if water_volume == 0.0:
+                            activity_factor = 0.0
+                        elif solute_volume > 0.0:
+                            activity_factor = 1.0 / (
+                                1.0
+                                + np.sum(
+                                    kappas[solute_mask] * volumes[solute_mask]
+                                )
+                                / water_volume
+                            )
                 pressure_delta = get_partial_pressure_delta(
                     partial_pressure_gas=partial_pressure_gas,
-                    partial_pressure_particle=vapor_pressure[
-                        box_idx, species_idx
-                    ],
+                    partial_pressure_particle=(
+                        activity_factor * vapor_pressure[box_idx, species_idx]
+                    ),
                     kelvin_term=kelvin_term,
                 )
                 mass_rate = get_mass_transfer_rate(
@@ -1012,6 +1096,7 @@ def _run_gpu_step(
     mass_transfer: Any | None = None,
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | None = None,
+    activity_surface: CondensationActivitySurfaceConfig | None = None,
     return_gas_state: Literal[False] = False,
 ) -> tuple[ParticleData, Any]: ...
 
@@ -1031,6 +1116,7 @@ def _run_gpu_step(
     mass_transfer: Any | None = None,
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | None = None,
+    activity_surface: CondensationActivitySurfaceConfig | None = None,
     return_gas_state: Literal[True] = True,
 ) -> tuple[ParticleData, Any, GasData]: ...
 
@@ -1049,6 +1135,7 @@ def _run_gpu_step(
     mass_transfer: Any | None = None,
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | None = None,
+    activity_surface: CondensationActivitySurfaceConfig | None = None,
     return_gas_state: bool = False,
 ) -> tuple[ParticleData, Any] | tuple[ParticleData, Any, GasData]:
     """Run GPU condensation step and return CPU particle data.
@@ -1093,6 +1180,7 @@ def _run_gpu_step(
         mass_transfer=mass_transfer,
         environment=environment,
         thermodynamics=thermodynamics,
+        activity_surface=activity_surface,
     )
     cpu_particles = from_warp_particle_data(gpu_particles, sync=True)
     if not return_gas_state:
@@ -1233,6 +1321,366 @@ def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
 
     assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["thermodynamics"].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["activity_surface"].kind is inspect.Parameter.KEYWORD_ONLY
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("activity_mode", "surface_mode"),
+    [
+        (int(ACTIVITY_MODE_IDEAL), int(SURFACE_TENSION_MODE_STATIC)),
+        (
+            int(ACTIVITY_MODE_IDEAL),
+            int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        ),
+        (int(ACTIVITY_MODE_KAPPA), int(SURFACE_TENSION_MODE_STATIC)),
+        (
+            int(ACTIVITY_MODE_KAPPA),
+            int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        ),
+    ],
+)
+def test_condensation_activity_surface_modes_are_finite_and_water_only(
+    device: str,
+    activity_mode: int,
+    surface_mode: int,
+) -> None:
+    """Configured modes affect water only and retain finite clamped masses."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    tension = wp.array([0.04, 0.09], dtype=wp.float64, device=device)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    activity_surface = _make_activity_surface_config(
+        gpu_gas, activity_mode, surface_mode
+    )
+    _, configured_transfer = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        surface_tension=tension,
+        activity_surface=activity_surface,
+    )
+    configured = configured_transfer.numpy()
+    final_masses = from_warp_particle_data(gpu_particles, sync=True).masses
+    assert np.all(np.isfinite(configured))
+    assert np.all(final_masses >= 0.0)
+
+    # The non-water transfer is exactly the static legacy result when the
+    # surface mode is static, proving activity never applies to that vapor.
+    if surface_mode == int(SURFACE_TENSION_MODE_STATIC):
+        legacy_particles = to_warp_particle_data(particles, device=device)
+        legacy_gas = to_warp_gas_data(
+            gas, device=device, vapor_pressure=vapor_pressure
+        )
+        _, legacy_transfer = condensation_step_gpu(
+            legacy_particles,
+            legacy_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            surface_tension=wp.array(
+                [0.04, 0.09], dtype=wp.float64, device=device
+            ),
+        )
+        npt.assert_allclose(
+            configured[:, :, 1],
+            legacy_transfer.numpy()[:, :, 1],
+            rtol=1e-12,
+            atol=0.0,
+        )
+
+
+def test_condensation_activity_surface_validation_is_frozen_and_atomic(
+    device: str,
+) -> None:
+    """Malformed sidecars fail before launch and valid bindings are frozen."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    sidecar = _make_activity_surface_config(
+        gpu_gas, int(ACTIVITY_MODE_IDEAL), int(SURFACE_TENSION_MODE_STATIC)
+    )
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        sidecar.activity_mode = 1
+    with pytest.raises(ValueError, match="activity_surface"):
+        validate_condensation_activity_surface_config(
+            object(),
+            2,
+            gpu_particles.masses.device,
+            gpu_gas.molar_mass,
+            "test",
+        )
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("activity_mode", "surface_mode"),
+    [
+        (int(ACTIVITY_MODE_IDEAL), int(SURFACE_TENSION_MODE_STATIC)),
+        (
+            int(ACTIVITY_MODE_IDEAL),
+            int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        ),
+        (int(ACTIVITY_MODE_KAPPA), int(SURFACE_TENSION_MODE_STATIC)),
+        (
+            int(ACTIVITY_MODE_KAPPA),
+            int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        ),
+    ],
+)
+def test_condensation_activity_surface_matches_independent_reference(
+    device: str,
+    activity_mode: int,
+    surface_mode: int,
+) -> None:
+    """Each activity/tension mode matches the independent NumPy transfer."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=2)
+    particles.masses[0, 0, :] = [1.0e-18, 9.0e-18]
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    tension_values = np.array([0.035, 0.095], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    sidecar = _make_activity_surface_config(
+        gpu_gas, activity_mode, surface_mode
+    )
+    tension = wp.array(tension_values, dtype=wp.float64, device=device)
+
+    _, transfer = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        surface_tension=tension,
+        thermodynamics=thermodynamics,
+        activity_surface=sidecar,
+    )
+    expected = _cpu_mass_transfer(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension=tension_values,
+        mass_accommodation=np.ones(2, dtype=np.float64),
+        diffusion_coefficient_vapor=np.full(2, 2.0e-5, dtype=np.float64),
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=thermodynamics,
+        activity_mode=activity_mode,
+        surface_tension_mode=surface_mode,
+        water_species_index=0,
+        kappas=sidecar.kappas.numpy(),
+    )
+
+    npt.assert_allclose(transfer.numpy(), expected, rtol=1.0e-10, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+def test_condensation_activity_surface_multibox_uses_current_composition(
+    device: str,
+) -> None:
+    """Weighted kappa transfer uses each box's temperature and composition."""
+    particles = _make_particle_data(n_boxes=2, n_particles=1, n_species=2)
+    particles.masses[:, 0, :] = [[1.0e-18, 9.0e-18], [8.0e-18, 2.0e-18]]
+    gas = _make_gas_data(n_boxes=2, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=2)
+    temperatures = np.array([268.15, 303.15], dtype=np.float64)
+    pressures = np.array([101325.0, 99500.0], dtype=np.float64)
+    tension_values = np.array([0.035, 0.095], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    thermodynamics = _make_mixed_thermodynamics_config(gpu_gas)
+    sidecar = _make_activity_surface_config(
+        gpu_gas,
+        int(ACTIVITY_MODE_KAPPA),
+        int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+    )
+
+    _, transfer = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=wp.array(temperatures, dtype=wp.float64, device=device),
+        pressure=wp.array(pressures, dtype=wp.float64, device=device),
+        time_step=0.1,
+        surface_tension=wp.array(
+            tension_values, dtype=wp.float64, device=device
+        ),
+        thermodynamics=thermodynamics,
+        activity_surface=sidecar,
+    )
+    expected = _cpu_mass_transfer(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension=tension_values,
+        mass_accommodation=np.ones(2, dtype=np.float64),
+        diffusion_coefficient_vapor=np.full(2, 2.0e-5, dtype=np.float64),
+        temperature=temperatures,
+        pressure=pressures,
+        time_step=0.1,
+        thermodynamics=thermodynamics,
+        activity_mode=int(ACTIVITY_MODE_KAPPA),
+        surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        kappas=sidecar.kappas.numpy(),
+    )
+
+    npt.assert_allclose(transfer.numpy(), expected, rtol=1.0e-10, atol=0.0)
+    npt.assert_allclose(
+        gpu_gas.vapor_pressure.numpy(),
+        _evaluate_vapor_pressure_config(thermodynamics, temperatures),
+        rtol=1.0e-12,
+        atol=0.0,
+    )
+    assert not np.array_equal(transfer.numpy()[0], transfer.numpy()[1])
+
+
+def test_condensation_activity_surface_invalid_sidecar_is_atomic(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Invalid sidecars preserve caller buffers and never launch a kernel."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=2)
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=np.full((1, 2), 17.0)
+    )
+    sidecar = _make_activity_surface_config(
+        gpu_gas, int(ACTIVITY_MODE_IDEAL), int(SURFACE_TENSION_MODE_STATIC)
+    )
+    sidecar = dataclasses.replace(
+        sidecar,
+        kappas=wp.array([-1.0, 0.5], dtype=wp.float64, device=device),
+    )
+    tension = wp.array([0.04, 0.09], dtype=wp.float64, device=device)
+    transfer = wp.full((1, 1, 2), 13.0, dtype=wp.float64, device=device)
+    snapshots = tuple(
+        values.numpy().copy()
+        for values in (
+            gpu_particles.masses,
+            gpu_gas.vapor_pressure,
+            sidecar.kappas,
+            sidecar.molar_mass_reference,
+            tension,
+            transfer,
+        )
+    )
+
+    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("invalid sidecar launched a kernel")
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
+    with pytest.raises(ValueError, match="kappas"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            surface_tension=tension,
+            mass_transfer=transfer,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            activity_surface=sidecar,
+        )
+    for values, expected in zip(
+        (
+            gpu_particles.masses,
+            gpu_gas.vapor_pressure,
+            sidecar.kappas,
+            sidecar.molar_mass_reference,
+            tension,
+            transfer,
+        ),
+        snapshots,
+        strict=True,
+    ):
+        npt.assert_array_equal(values.numpy(), expected)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "surface_mode",
+    [
+        int(SURFACE_TENSION_MODE_STATIC),
+        int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+    ],
+)
+@pytest.mark.parametrize("particle_case", ["zero_total_mass", "no_water"])
+def test_condensation_activity_surface_handles_inactive_composition_edges(
+    device: str,
+    surface_mode: int,
+    particle_case: str,
+) -> None:
+    """Configured modes retain finite, clamped edge-case mass transfers."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=2)
+    if particle_case == "zero_total_mass":
+        particles.masses[0, 0, :] = 0.0
+    else:
+        particles.masses[0, 0, :] = [0.0, 9.0e-18]
+    gas = _make_gas_data(n_boxes=1, n_species=2)
+    vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
+    tension_values = np.array([0.035, 0.095], dtype=np.float64)
+    transfers: dict[int, np.ndarray] = {}
+    final_masses: dict[int, np.ndarray] = {}
+    for activity_mode in (int(ACTIVITY_MODE_IDEAL), int(ACTIVITY_MODE_KAPPA)):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        gpu_gas = to_warp_gas_data(
+            gas, device=device, vapor_pressure=vapor_pressure
+        )
+        sidecar = _make_activity_surface_config(
+            gpu_gas, activity_mode, surface_mode
+        )
+        _, transfer = _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            surface_tension=wp.array(
+                tension_values, dtype=wp.float64, device=device
+            ),
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            activity_surface=sidecar,
+        )
+        transfers[activity_mode] = transfer.numpy()
+        final_masses[activity_mode] = from_warp_particle_data(
+            gpu_particles, sync=True
+        ).masses
+
+    for activity_mode in transfers:
+        assert np.all(np.isfinite(transfers[activity_mode]))
+        assert np.all(final_masses[activity_mode] >= 0.0)
+    if particle_case == "zero_total_mass":
+        npt.assert_array_equal(
+            transfers[int(ACTIVITY_MODE_IDEAL)],
+            np.zeros_like(transfers[int(ACTIVITY_MODE_IDEAL)]),
+        )
+        npt.assert_array_equal(
+            final_masses[int(ACTIVITY_MODE_KAPPA)],
+            np.zeros_like(final_masses[int(ACTIVITY_MODE_KAPPA)]),
+        )
+    else:
+        npt.assert_allclose(
+            transfers[int(ACTIVITY_MODE_IDEAL)][:, :, 1],
+            transfers[int(ACTIVITY_MODE_KAPPA)][:, :, 1],
+            rtol=1.0e-12,
+            atol=0.0,
+        )
 
 
 def test_condensation_step_gpu_scalar_positional_call_remains_valid(

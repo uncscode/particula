@@ -18,7 +18,10 @@ operate on GPU-resident Warp arrays and update particle masses in-place.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
+from dataclasses import dataclass
 from typing import Any
+
+import numpy as np
 
 import particula.util.constants as constants
 
@@ -32,13 +35,21 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
 
 from particula.gpu.dynamics.condensation_funcs import (
     diffusion_coefficient_wp,
+    effective_surface_tension_wp,
     first_order_mass_transport_k_wp,
     mass_transfer_rate_wp,
     particle_radius_from_volume_wp,
+    water_activity_ideal_wp,
+    water_activity_kappa_wp,
 )
-from particula.gpu.kernels.environment import _ensure_environment_arrays
+from particula.gpu.kernels.environment import (
+    _ensure_environment_arrays,
+    _is_warp_array_like,
+    validate_environment_inputs,
+)
 from particula.gpu.kernels.thermodynamics import (
     ThermodynamicsConfig,
+    _validate_array_metadata,
     refresh_vapor_pressure_gpu,
     validate_thermodynamics_config,
 )
@@ -62,10 +73,132 @@ _DEFAULT_SURFACE_TENSION = 0.072
 _DEFAULT_MASS_ACCOMMODATION = 1.0
 _DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
 
+ACTIVITY_MODE_IDEAL = wp.int32(0)
+ACTIVITY_MODE_KAPPA = wp.int32(1)
+SURFACE_TENSION_MODE_STATIC = wp.int32(0)
+SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
+
+
+@dataclass(frozen=True)
+class CondensationActivitySurfaceConfig:
+    """Store caller-owned activity and surface-tension inputs.
+
+    Frozen bindings do not make the contained Warp arrays immutable. Activity
+    applies only to ``water_species_index``; static tension uses each currently
+    condensing species while weighted tension is particle-wide.
+    """
+
+    activity_mode: Any
+    surface_tension_mode: Any
+    water_species_index: Any
+    kappas: Any
+    molar_mass_reference: Any
+
+
+def _validate_int32_selector(
+    name: str, value: Any, allowed: tuple[int, ...]
+) -> int:
+    """Validate a non-boolean integer selector before Warp int32 conversion."""
+    if isinstance(value, (bool, np.bool_)) or not isinstance(
+        value, (int, np.integer)
+    ):
+        raise ValueError(f"activity_surface.{name} must be an integer.")
+    result = int(value)
+    if result < np.iinfo(np.int32).min or result > np.iinfo(np.int32).max:
+        raise ValueError(f"activity_surface.{name} is outside int32 range.")
+    if result not in allowed:
+        raise ValueError(
+            f"activity_surface.{name} contains an unsupported mode."
+        )
+    return result
+
+
+def _read_float64_array(values: Any) -> np.ndarray:
+    """Read a validated Warp array for validation-only domain checks."""
+    return np.asarray(values.numpy(), dtype=np.float64)
+
+
+def validate_condensation_activity_surface_config(
+    activity_surface: CondensationActivitySurfaceConfig | Any,
+    n_species: int,
+    device: Any,
+    gas_molar_mass: Any,
+    caller_name: str,
+) -> CondensationActivitySurfaceConfig:
+    """Validate and return the identical activity/surface sidecar.
+
+    Validation precedes allocation and launch, so malformed configurations leave
+    all caller-owned particle, gas, and output buffers unchanged.
+    """
+    if type(activity_surface) is not CondensationActivitySurfaceConfig:
+        raise ValueError(
+            "activity_surface must be a CondensationActivitySurfaceConfig "
+            f"in {caller_name}."
+        )
+    _validate_int32_selector(
+        "activity_mode", activity_surface.activity_mode, (0, 1)
+    )
+    _validate_int32_selector(
+        "surface_tension_mode", activity_surface.surface_tension_mode, (0, 1)
+    )
+    water_index = _validate_int32_selector(
+        "water_species_index",
+        activity_surface.water_species_index,
+        tuple(range(n_species)),
+    )
+    if water_index >= n_species:
+        raise ValueError(
+            "activity_surface.water_species_index is out of range."
+        )
+    _validate_array_metadata(
+        "kappas",
+        activity_surface.kappas,
+        (n_species,),
+        wp.float64,
+        device,
+        caller_name,
+        "activity_surface",
+    )
+    _validate_array_metadata(
+        "molar_mass_reference",
+        activity_surface.molar_mass_reference,
+        (n_species,),
+        wp.float64,
+        device,
+        caller_name,
+        "activity_surface",
+    )
+    _validate_array_metadata(
+        "gas.molar_mass",
+        gas_molar_mass,
+        (n_species,),
+        wp.float64,
+        device,
+        caller_name,
+        "",
+    )
+    kappas = _read_float64_array(activity_surface.kappas)
+    references = _read_float64_array(activity_surface.molar_mass_reference)
+    gas_masses = _read_float64_array(gas_molar_mass)
+    if not np.all(np.isfinite(kappas)) or np.any(kappas < 0.0):
+        raise ValueError(
+            "activity_surface.kappas must be finite and non-negative."
+        )
+    if not np.all(np.isfinite(references)) or np.any(references <= 0.0):
+        raise ValueError(
+            "activity_surface.molar_mass_reference must be finite and positive."
+        )
+    if not np.array_equal(references, gas_masses):
+        raise ValueError(
+            "activity_surface.molar_mass_reference must exactly match "
+            "gas.molar_mass."
+        )
+    return activity_surface
+
 
 @wp.kernel
 # type: ignore[misc]
-def condensation_mass_transfer_kernel(
+def condensation_mass_transfer_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
     density: Any,
@@ -73,6 +206,13 @@ def condensation_mass_transfer_kernel(
     vapor_pressure: Any,
     molar_mass: Any,
     surface_tension: Any,
+    kappas: Any,
+    molar_mass_reference: Any,
+    effective_surface_tension: Any,
+    activity_enabled: wp.int32,
+    activity_mode: wp.int32,
+    surface_tension_mode: wp.int32,
+    water_species_index: wp.int32,
     mass_accommodation: Any,
     diffusion_coefficient_vapor: Any,
     dynamic_viscosity: Any,
@@ -155,8 +295,11 @@ def condensation_mass_transfer_kernel(
             transition,
             diffusion_value,
         )
+        tension = surface_tension[species_idx]
+        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
+            tension = effective_surface_tension[box_idx, particle_idx]
         kelvin_radius = kelvin_radius_wp(
-            surface_tension[species_idx],
+            tension,
             effective_density,
             molar_mass[species_idx],
             temperature_value,
@@ -169,9 +312,31 @@ def condensation_mass_transfer_kernel(
             temperature_value,
             gas_constant,
         )
+        activity_factor = wp.float64(1.0)
+        if (
+            activity_enabled == wp.int32(1)
+            and species_idx == water_species_index
+        ):
+            if activity_mode == ACTIVITY_MODE_IDEAL:
+                activity_factor = water_activity_ideal_wp(
+                    masses,
+                    molar_mass_reference,
+                    box_idx,
+                    particle_idx,
+                    water_species_index,
+                )
+            else:
+                activity_factor = water_activity_kappa_wp(
+                    masses,
+                    density,
+                    kappas,
+                    box_idx,
+                    particle_idx,
+                    water_species_index,
+                )
         pressure_delta = partial_pressure_delta_wp(
             partial_pressure_gas,
-            vapor_pressure[box_idx, species_idx],
+            activity_factor * vapor_pressure[box_idx, species_idx],
             kelvin_term,
         )
         mass_rate = mass_transfer_rate_wp(
@@ -184,6 +349,20 @@ def condensation_mass_transfer_kernel(
         mass_transfer[box_idx, particle_idx, species_idx] = (
             mass_rate * time_step
         )
+
+
+@wp.kernel
+def _effective_surface_tension_kernel(
+    masses: Any,
+    density: Any,
+    surface_tension: Any,
+    output: Any,
+) -> None:
+    """Compute one composition-weighted tension per particle."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    output[box_idx, particle_idx] = effective_surface_tension_wp(
+        masses, density, surface_tension, box_idx, particle_idx, 0, True
+    )
 
 
 @wp.kernel
@@ -305,6 +484,27 @@ def _validate_species_array(
         raise ValueError(f"{name} device does not match particle device")
 
 
+def _validate_float64_species_array(
+    name: str,
+    array: Any,
+    n_species: int,
+    expected_device: Any,
+    *,
+    nonnegative: bool = False,
+) -> None:
+    """Validate a caller-owned finite float64 per-species Warp array."""
+    if not _is_warp_array_like(array):
+        raise ValueError(f"{name} must be a Warp array")
+    _validate_species_array(name, array, n_species, expected_device)
+    if array.dtype != wp.float64:
+        raise ValueError(f"{name} must use dtype {wp.float64}")
+    values = _read_float64_array(array)
+    if not np.all(np.isfinite(values)) or (
+        nonnegative and np.any(values < 0.0)
+    ):
+        raise ValueError(f"{name} must be finite and non-negative")
+
+
 def _validate_mass_transfer_buffer(
     mass_transfer: Any,
     expected_shape: tuple[int, int, int],
@@ -330,6 +530,11 @@ def _validate_mass_transfer_buffer(
         raise ValueError(
             "mass_transfer buffer device does not match particle device"
         )
+    if (
+        not _is_warp_array_like(mass_transfer)
+        or mass_transfer.dtype != wp.float64
+    ):
+        raise ValueError(f"mass_transfer must use dtype {wp.float64}")
 
 
 def _validate_particle_arrays(
@@ -422,7 +627,7 @@ def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
     _validate_device_match("gas vapor pressure", gas.vapor_pressure, device)
 
 
-def condensation_step_gpu(
+def condensation_step_gpu(  # noqa: C901
     particles: Any,
     gas: Any,
     temperature: float | Any | None,
@@ -435,6 +640,7 @@ def condensation_step_gpu(
     *,
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | Any | None = None,
+    activity_surface: CondensationActivitySurfaceConfig | Any | None = None,
 ) -> tuple[Any, Any]:
     """Execute one condensation timestep on the GPU.
 
@@ -459,6 +665,10 @@ def condensation_step_gpu(
             ``None``.
         thermodynamics: Required caller-owned, device-local thermodynamic
             sidecar with model arrays matching the ordered gas species.
+        activity_surface: Optional frozen caller-owned sidecar. It enables
+            water-only ideal or kappa activity and static or composition-
+            weighted tension. ``None`` retains legacy unit activity and
+            species-indexed static tension.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -488,10 +698,11 @@ def condensation_step_gpu(
         ``environment`` remains keyword-only so existing positional scalar
         callers stay source-compatible.
 
-        Thermodynamic and optional-buffer validation completes before any
-        refresh or particle mutation. Successful calls overwrite
-        ``gas.vapor_pressure`` from the normalized current temperature before
-        preparing box-level properties and calculating mass transfer. Float32
+        Aggregate configuration and optional-buffer validation completes before
+        allocation, launch, refresh, or particle mutation. Successful calls
+        overwrite ``gas.vapor_pressure`` from the normalized current
+        temperature before preparing box-level properties and calculating mass
+        transfer. Float32
         temperature arrays are cast device-side to float64 for the refresh.
 
         Thermodynamic validation may synchronously read caller-owned device
@@ -505,7 +716,7 @@ def condensation_step_gpu(
 
     device = particles.masses.device
     _validate_device_arrays(particles, gas, device)
-    temperature_array, pressure_array = _ensure_environment_arrays(
+    validate_environment_inputs(
         temperature=temperature,
         pressure=pressure,
         environment=environment,
@@ -521,19 +732,58 @@ def condensation_step_gpu(
         "condensation_step_gpu",
     )
 
+    if activity_surface is not None:
+        activity_surface = validate_condensation_activity_surface_config(
+            activity_surface,
+            n_species,
+            device,
+            gas.molar_mass,
+            "condensation_step_gpu",
+        )
+
+    if surface_tension is not None:
+        _validate_float64_species_array(
+            "surface_tension",
+            surface_tension,
+            n_species,
+            device,
+            nonnegative=True,
+        )
+    if mass_accommodation is not None:
+        _validate_float64_species_array(
+            "mass_accommodation",
+            mass_accommodation,
+            n_species,
+            device,
+            nonnegative=True,
+        )
+    if diffusion_coefficient_vapor is not None:
+        _validate_float64_species_array(
+            "diffusion_coefficient_vapor",
+            diffusion_coefficient_vapor,
+            n_species,
+            device,
+            nonnegative=True,
+        )
+    expected_shape = (n_boxes, n_particles, n_species)
+    if mass_transfer is not None:
+        _validate_mass_transfer_buffer(mass_transfer, expected_shape, device)
+
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature=temperature,
+        pressure=pressure,
+        environment=environment,
+        n_boxes=n_boxes,
+        device=device,
+        caller_name="condensation_step_gpu",
+    )
+
     if surface_tension is None:
         surface_tension = wp.full(
             n_species,
             wp.float64(_DEFAULT_SURFACE_TENSION),
             dtype=wp.float64,
             device=device,
-        )
-    else:
-        _validate_species_array(
-            "surface_tension",
-            surface_tension,
-            n_species,
-            device,
         )
 
     if mass_accommodation is None:
@@ -543,13 +793,6 @@ def condensation_step_gpu(
             dtype=wp.float64,
             device=device,
         )
-    else:
-        _validate_species_array(
-            "mass_accommodation",
-            mass_accommodation,
-            n_species,
-            device,
-        )
 
     if diffusion_coefficient_vapor is None:
         diffusion_coefficient_vapor = wp.full(
@@ -558,26 +801,43 @@ def condensation_step_gpu(
             dtype=wp.float64,
             device=device,
         )
-    else:
-        _validate_species_array(
-            "diffusion_coefficient_vapor",
-            diffusion_coefficient_vapor,
-            n_species,
-            device,
-        )
 
-    expected_shape = (n_boxes, n_particles, n_species)
     if mass_transfer is None:
         mass_transfer = wp.zeros(
             expected_shape,
             dtype=wp.float64,
             device=device,
         )
-    else:
-        _validate_mass_transfer_buffer(mass_transfer, expected_shape, device)
-
     dynamic_viscosity = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
     mean_free_path = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    kappas = wp.zeros(n_species, dtype=wp.float64, device=device)
+    molar_mass_reference = gas.molar_mass
+    activity_enabled = wp.int32(0)
+    activity_mode = ACTIVITY_MODE_IDEAL
+    surface_tension_mode = SURFACE_TENSION_MODE_STATIC
+    water_species_index = wp.int32(0)
+    if activity_surface is not None:
+        kappas = activity_surface.kappas
+        molar_mass_reference = activity_surface.molar_mass_reference
+        activity_enabled = wp.int32(1)
+        activity_mode = wp.int32(activity_surface.activity_mode)
+        surface_tension_mode = wp.int32(activity_surface.surface_tension_mode)
+        water_species_index = wp.int32(activity_surface.water_species_index)
+    effective_surface_tension = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.float64, device=device
+    )
+    if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
+        wp.launch(
+            _effective_surface_tension_kernel,
+            dim=(n_boxes, n_particles),
+            inputs=[
+                particles.masses,
+                particles.density,
+                surface_tension,
+                effective_surface_tension,
+            ],
+            device=device,
+        )
 
     refresh_temperature = temperature_array
     if temperature_array.dtype != wp.float64:
@@ -632,6 +892,13 @@ def condensation_step_gpu(
             gas.vapor_pressure,
             gas.molar_mass,
             surface_tension,
+            kappas,
+            molar_mass_reference,
+            effective_surface_tension,
+            activity_enabled,
+            activity_mode,
+            surface_tension_mode,
+            water_species_index,
             mass_accommodation,
             diffusion_coefficient_vapor,
             dynamic_viscosity,
