@@ -1,5 +1,6 @@
 """End-to-end tests for GPU condensation kernels."""
 
+# mypy: ignore-errors
 # ruff: noqa: F821, S101
 
 from __future__ import annotations
@@ -10,7 +11,7 @@ import inspect
 from dataclasses import dataclass
 from functools import lru_cache
 from types import SimpleNamespace
-from typing import Any, Literal, cast, overload
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 import numpy as np
 import numpy.testing as npt
@@ -55,6 +56,33 @@ from particula.particles.properties.vapor_correction_module import (
     get_vapor_transition_correction,
 )
 from particula.util import constants
+
+if TYPE_CHECKING:
+    import warp as wp
+
+    from particula.gas.environment_data import EnvironmentData
+    from particula.gas.gas_data import GasData
+    from particula.gpu.conversion import (
+        from_warp_gas_data,
+        from_warp_particle_data,
+        to_warp_environment_data,
+        to_warp_gas_data,
+        to_warp_particle_data,
+    )
+    from particula.gpu.kernels.condensation import (
+        CondensationActivitySurfaceConfig,
+        ThermodynamicsConfig,
+        _condensation_step_gpu,
+        _validate_mass_transfer_buffer,
+        _validate_species_array,
+        condensation_step_gpu,
+        particle_radius_from_volume_wp,
+        validate_condensation_activity_surface_config,
+    )
+    from particula.gpu.tests.cuda_availability import (
+        cuda_available,
+    )
+    from particula.particles.particle_data import ParticleData
 
 pytestmark = pytest.mark.warp
 
