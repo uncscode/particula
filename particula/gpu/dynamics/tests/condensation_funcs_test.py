@@ -6,75 +6,100 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-pytestmark = pytest.mark.warp
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
 
-wp = pytest.importorskip("warp")
-
-from particula.dynamics.condensation.mass_transfer import (  # noqa: E402
-    get_first_order_mass_transport_k,
-    get_mass_transfer_rate,
-)
-from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
-    get_dynamic_viscosity,
-)
-from particula.gas.properties.mean_free_path import (  # noqa: E402
-    get_molecule_mean_free_path,
-)
-from particula.gas.properties.pressure_function import (  # noqa: E402
-    get_partial_pressure,
-)
-from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
-    diffusion_coefficient_wp,
-    first_order_mass_transport_k_wp,
-    mass_transfer_rate_wp,
-)
-from particula.gpu.properties.gas_properties import (  # noqa: E402
-    dynamic_viscosity_wp,
-    molecule_mean_free_path_wp,
-    partial_pressure_wp,
-)
-from particula.gpu.properties.particle_properties import (  # noqa: E402
-    aerodynamic_mobility_wp,
-    cunningham_slip_correction_wp,
-    kelvin_radius_wp,
-    kelvin_term_wp,
-    knudsen_number_wp,
-    partial_pressure_delta_wp,
-    vapor_transition_correction_wp,
-)
-from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
-from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
-    get_aerodynamic_mobility,
-)
-from particula.particles.properties.diffusion_coefficient import (  # noqa: E402
-    get_diffusion_coefficient,
-)
-from particula.particles.properties.kelvin_effect_module import (  # noqa: E402
-    get_kelvin_radius,
-    get_kelvin_term,
-)
-from particula.particles.properties.knudsen_number_module import (  # noqa: E402
-    get_knudsen_number,
-)
-from particula.particles.properties.partial_pressure_module import (  # noqa: E402
-    get_partial_pressure_delta,
-)
-from particula.particles.properties.slip_correction_module import (  # noqa: E402
-    get_cunningham_slip_correction,
-)
-from particula.particles.properties.vapor_correction_module import (  # noqa: E402
-    get_vapor_transition_correction,
-)
-from particula.util.constants import (  # noqa: E402
-    BOLTZMANN_CONSTANT,
-    GAS_CONSTANT,
-    REF_TEMPERATURE_STP,
-    REF_VISCOSITY_AIR_STP,
-    SUTHERLAND_CONSTANT,
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
 )
 
+if wp is not None:
+    from particula.dynamics.condensation.mass_transfer import (  # noqa: E402
+        get_first_order_mass_transport_k,
+        get_mass_transfer_rate,
+    )
+    from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
+        get_dynamic_viscosity,
+    )
+    from particula.gas.properties.mean_free_path import (  # noqa: E402
+        get_molecule_mean_free_path,
+    )
+    from particula.gas.properties.pressure_function import (  # noqa: E402
+        get_partial_pressure,
+    )
+    from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
+        diffusion_coefficient_wp,
+        first_order_mass_transport_k_wp,
+        mass_transfer_rate_wp,
+        water_activity_ideal_wp,
+        water_activity_kappa_wp,
+    )
+    from particula.gpu.properties.gas_properties import (  # noqa: E402
+        dynamic_viscosity_wp,
+        molecule_mean_free_path_wp,
+        partial_pressure_wp,
+    )
+    from particula.gpu.properties.particle_properties import (  # noqa: E402
+        aerodynamic_mobility_wp,
+        cunningham_slip_correction_wp,
+        kelvin_radius_wp,
+        kelvin_term_wp,
+        knudsen_number_wp,
+        partial_pressure_delta_wp,
+        vapor_transition_correction_wp,
+    )
+    from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
+    from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
+        get_aerodynamic_mobility,
+    )
+    from particula.particles.properties.diffusion_coefficient import (  # noqa: E402
+        get_diffusion_coefficient,
+    )
+    from particula.particles.properties.kelvin_effect_module import (  # noqa: E402
+        get_kelvin_radius,
+        get_kelvin_term,
+    )
+    from particula.particles.properties.knudsen_number_module import (  # noqa: E402
+        get_knudsen_number,
+    )
+    from particula.particles.properties.partial_pressure_module import (  # noqa: E402
+        get_partial_pressure_delta,
+    )
+    from particula.particles.properties.slip_correction_module import (  # noqa: E402
+        get_cunningham_slip_correction,
+    )
+    from particula.particles.properties.vapor_correction_module import (  # noqa: E402
+        get_vapor_transition_correction,
+    )
+    from particula.util.constants import (  # noqa: E402
+        BOLTZMANN_CONSTANT,
+        GAS_CONSTANT,
+        REF_TEMPERATURE_STP,
+        REF_VISCOSITY_AIR_STP,
+        SUTHERLAND_CONSTANT,
+    )
 
-@wp.kernel
+
+def _warp_kernel(function):
+    """Decorate kernels only when Warp is available."""
+    if wp is None:
+        return function
+    return wp.kernel(function)
+
+
+def _available_warp_devices() -> list[str]:
+    """Return collection-safe Warp device params."""
+    if wp is None:
+        return ["cpu"]
+    return warp_devices(wp)
+
+
+@_warp_kernel
 def _diffusion_coefficient_kernel(
     temperatures: Any,
     aerodynamic_mobilities: Any,
@@ -97,7 +122,7 @@ def _diffusion_coefficient_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _first_order_mass_transport_kernel(
     particle_radii: Any,
     vapor_transitions: Any,
@@ -120,7 +145,7 @@ def _first_order_mass_transport_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _mass_transfer_rate_kernel(
     pressure_deltas: Any,
     first_order_mass_transports: Any,
@@ -149,7 +174,7 @@ def _mass_transfer_rate_kernel(
     )
 
 
-@wp.kernel
+@_warp_kernel
 def _condensation_chain_kernel(
     temperatures: Any,
     pressures: Any,
@@ -249,7 +274,93 @@ def _condensation_chain_kernel(
     )
 
 
-@pytest.fixture(params=warp_devices(wp))
+@_warp_kernel
+def _water_activity_ideal_kernel(
+    masses: Any,
+    molar_masses: Any,
+    water_index: int,
+    result: Any,
+) -> None:
+    """Compute ideal water activity for each particle box."""
+    case_idx = wp.tid()
+    result[case_idx] = water_activity_ideal_wp(
+        masses,
+        molar_masses,
+        case_idx,
+        0,
+        water_index,
+    )
+
+
+@_warp_kernel
+def _water_activity_kappa_kernel(
+    masses: Any,
+    densities: Any,
+    kappas: Any,
+    water_index: int,
+    result: Any,
+) -> None:
+    """Compute κ-model water activity for each particle box."""
+    case_idx = wp.tid()
+    result[case_idx] = water_activity_kappa_wp(
+        masses,
+        densities,
+        kappas,
+        case_idx,
+        0,
+        water_index,
+    )
+
+
+def _ideal_water_activity_reference(
+    masses: np.ndarray,
+    molar_masses: np.ndarray,
+    water_index: int,
+) -> np.ndarray:
+    """Calculate direct mole-fraction water activity references."""
+    expected = []
+    for case_masses in masses:
+        total_moles = np.sum(case_masses / molar_masses)
+        if total_moles == np.float64(0.0):
+            expected.append(np.float64(0.0))
+        else:
+            expected.append(
+                case_masses[water_index]
+                / molar_masses[water_index]
+                / total_moles
+            )
+    return np.asarray(expected, dtype=np.float64)
+
+
+def _kappa_water_activity_reference(
+    masses: np.ndarray,
+    densities: np.ndarray,
+    kappas: np.ndarray,
+    water_index: int,
+) -> np.ndarray:
+    """Calculate direct volume-based κ-model water activity references."""
+    expected = []
+    for case_masses in masses:
+        volumes = case_masses / densities
+        water_volume = volumes[water_index]
+        solute_volume = np.sum(volumes) - water_volume
+        if water_volume == np.float64(0.0):
+            expected.append(np.float64(0.0))
+        elif solute_volume == np.float64(0.0):
+            expected.append(np.float64(1.0))
+        else:
+            kappa_volume = np.float64(0.0)
+            for species_idx, species_volume in enumerate(volumes):
+                if species_idx != water_index:
+                    kappa_volume += kappas[species_idx] * species_volume
+            expected.append(
+                np.float64(1.0)
+                / (np.float64(1.0) + kappa_volume / water_volume)
+            )
+    return np.asarray(expected, dtype=np.float64)
+
+
+@pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
@@ -519,3 +630,120 @@ def test_condensation_chain_matches_numpy(device: str) -> None:
         rtol=1e-10,
         atol=1e-20,
     )
+
+
+@pytest.mark.parametrize(
+    ("case_masses", "water_index"),
+    [
+        (
+            np.array(
+                [
+                    [18.0, 0.0, 0.0],
+                    [18.0, 44.0, 58.0],
+                    [0.0, 0.0, 0.0],
+                    [0.0, 44.0, 58.0],
+                ],
+                dtype=np.float64,
+            ),
+            0,
+        ),
+        (np.array([[44.0, 18.0, 58.0]], dtype=np.float64), 1),
+    ],
+    ids=[
+        "water-first-species",
+        "water-nonzero-species-index",
+    ],
+)
+def test_water_activity_ideal_matches_independent_reference(
+    device: str,
+    case_masses: np.ndarray,
+    water_index: int,
+) -> None:
+    """Ensure ideal water activity matches a direct NumPy mole sum."""
+    molar_masses = np.array([18.0, 44.0, 58.0], dtype=np.float64)
+    masses = case_masses[:, np.newaxis, :]
+    expected = _ideal_water_activity_reference(
+        masses[:, 0, :], molar_masses, water_index
+    )
+
+    masses_wp = wp.array(masses, dtype=wp.float64, device=device)
+    molar_masses_wp = wp.array(molar_masses, dtype=wp.float64, device=device)
+    result_wp = wp.zeros(masses.shape[0], dtype=wp.float64, device=device)
+    wp.launch(
+        _water_activity_ideal_kernel,
+        dim=masses.shape[0],
+        inputs=[masses_wp, molar_masses_wp, water_index],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+
+    result = result_wp.numpy()
+    assert result.shape == (masses.shape[0],)
+    assert np.all(np.isfinite(result))
+    npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
+
+
+@pytest.mark.parametrize(
+    ("case_masses", "kappas", "water_index"),
+    [
+        (
+            np.array(
+                [
+                    [18.0, 55.0, 87.0],
+                    [18.0, 0.0, 0.0],
+                    [0.0, 55.0, 87.0],
+                    [18.0, 55.0, 87.0],
+                ],
+                dtype=np.float64,
+            ),
+            np.array([99.0, 0.35, 0.75], dtype=np.float64),
+            0,
+        ),
+        (
+            np.array([[18.0, 55.0, 87.0]], dtype=np.float64),
+            np.array([99.0, 0.0, 0.0], dtype=np.float64),
+            0,
+        ),
+        (
+            np.array([[55.0, 18.0, 87.0]], dtype=np.float64),
+            np.array([0.35, 99.0, 0.75], dtype=np.float64),
+            1,
+        ),
+    ],
+    ids=[
+        "water-first-species",
+        "wet-zero-kappa-solutes",
+        "water-nonzero-species-index",
+    ],
+)
+def test_water_activity_kappa_matches_independent_reference(
+    device: str,
+    case_masses: np.ndarray,
+    kappas: np.ndarray,
+    water_index: int,
+) -> None:
+    """Ensure κ water activity matches a direct NumPy volume sum."""
+    densities = np.array([1000.0, 1100.0, 1450.0], dtype=np.float64)
+    masses = case_masses[:, np.newaxis, :]
+    expected = _kappa_water_activity_reference(
+        masses[:, 0, :], densities, kappas, water_index
+    )
+
+    masses_wp = wp.array(masses, dtype=wp.float64, device=device)
+    densities_wp = wp.array(densities, dtype=wp.float64, device=device)
+    kappas_wp = wp.array(kappas, dtype=wp.float64, device=device)
+    result_wp = wp.zeros(masses.shape[0], dtype=wp.float64, device=device)
+    wp.launch(
+        _water_activity_kappa_kernel,
+        dim=masses.shape[0],
+        inputs=[masses_wp, densities_wp, kappas_wp, water_index],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+
+    result = result_wp.numpy()
+    assert result.shape == (masses.shape[0],)
+    assert np.all(np.isfinite(result))
+    npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
