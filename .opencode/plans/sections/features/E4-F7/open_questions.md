@@ -1,16 +1,31 @@
 # Open Questions
 
-- [ ] What are the final public numeric mode values, argument names, scratch-buffer names, return fields, and diagnostic units after E4-F1 through E4-F6?
-  - Resolve from merged implementation and tests before P1 wording is finalized; do not infer from pre-E4 code.
-- [ ] Which exact physics, conservation, and energy tolerances did E4-F6 approve for Warp CPU and optional CUDA?
-  - Publish each category separately and cite its focused test.
-- [ ] Does E4-F6 define stable `warp`, `gpu_parity`, and `cuda` marker combinations for focused commands?
-  - If not, publish direct file commands and describe optional CUDA through the repository's actual skip policy.
-- [ ] Should the parity walkthrough remain inside the canonical feature page or become a separate runnable example?
-  - Prefer extending the canonical script unless clarity or runtime justifies a second maintained artifact.
-- [ ] Does on-device vapor-pressure refresh replace the current `WarpGasData.vapor_pressure` caller guidance or retain it as explicit scratch/helper state?
-  - Preserve CPU container ownership and document the final operational distinction from E4-F1.
-- [ ] Which graph-capture and autodiff boundaries from E4-F6 are stable enough for the support matrix?
-  - Include only evidence-backed behavior and explicit clamp/in-place limitations; otherwise label it experimental or unsupported.
+- [x] What names, values, fields, and units does E4-F7 publish?
+  - Resolved 2026-07-13: copy final public names and integer constants from the
+    merged E4-F1 through E4-F6 APIs/tests; do not freeze speculative spellings.
+    Document mass transfer in kg and whole-call energy in J with all array
+    shapes and ownership.
+- [x] Which tolerances does E4-F7 publish?
+  - Resolved 2026-07-13: publish formula parity, coupled-physics parity,
+    conservation, and energy identity as separate categories, including any
+    F6-approved device/case exceptions and a focused test reference for each.
+- [x] Which focused marker commands are stable?
+  - Resolved 2026-07-13: use registered `warp`, `gpu_parity`, and `cuda`
+    markers. Publish `-m "warp and gpu_parity"` for baseline parity and
+    `-m "warp and gpu_parity and cuda"` for optional CUDA, plus direct-file
+    commands where clearer.
+- [x] Where does the parity walkthrough live?
+  - Resolved 2026-07-13: extend the canonical
+    `docs/Examples/gpu_direct_kernels_quick_start.py`; add another artifact only
+    if measured runtime or clarity makes the canonical example unsuitable.
+- [x] How does on-device refresh affect `WarpGasData.vapor_pressure` guidance?
+  - Resolved 2026-07-13: retain it as derived mutable GPU helper/scratch state.
+    Supported E4 models refresh it on device; explicit caller values are only
+    for a named static/legacy mode. CPU ownership remains unchanged.
+- [x] Which graph-capture and autodiff boundaries are published?
+  - Resolved 2026-07-13: publish graph capture only for named Warp/CUDA versions
+    with successful F6 capture/replay evidence. Label autodiff experimental and
+    smooth-interior-only; clamps, inventory gates, and in-place mutation remain
+    unsupported.
 - [x] Should E4-F7 add new runtime diagnostics?
   - Resolved 2026-07-12: No. Diagnostics requested for this track are none; document only upstream-supported outputs.

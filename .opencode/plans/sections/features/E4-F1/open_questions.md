@@ -1,15 +1,20 @@
 # Open Questions
 
-- [ ] When thermodynamic configuration is omitted, should
-  `condensation_step_gpu()` fail immediately (the issue #1272 preference) or
-  require an explicit named legacy/static-pressure mode for compatibility?
-  Silent reuse of stale/zero-filled pressure is not acceptable.
-- [ ] Should configuration be a dedicated Warp dataclass or keyword-only mode
-  and parameter arrays? Decide in P1 based on existing typed-container patterns;
-  do not extend `WarpGasData` with process configuration.
-- [ ] What fixed parameter width should be reserved for future models? Keep P1
-  limited to the minimum needed by constant and Buck while preserving a stable
-  shape contract.
+- [x] When thermodynamic configuration is omitted, should
+  `condensation_step_gpu()` fail immediately or select a compatibility mode?
+  - Resolved 2026-07-13: fail before mutation. Compatibility, if later needed,
+    must use an explicitly named static-pressure mode; stale or zero-filled
+    vapor pressure is never selected implicitly.
+- [x] Should configuration be a dedicated Warp dataclass or keyword-only mode
+  and parameter arrays?
+  - Resolved 2026-07-13: expose one keyword-only `thermodynamics` sidecar whose
+    typed fields hold validated parallel Warp arrays. Keep process configuration
+    out of `WarpGasData` and preserve positional compatibility.
+- [x] What fixed parameter width should be reserved for future models?
+  - Resolved 2026-07-13: reserve one `float64` parameter per species. Constant
+    mode consumes the pressure value; Buck consumes no species parameter. Add a
+    versioned field or new sidecar contract if a future approved model needs
+    more parameters rather than reserving speculative width now.
 - [x] Is four-substep orchestration part of E4-F1?
   - Resolved 2026-07-12: No. E4-F1 provides refresh integration for the current
     step; E4-F3 owns production four-substep scheduling and must call refresh at

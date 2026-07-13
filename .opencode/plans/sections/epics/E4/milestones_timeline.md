@@ -1,7 +1,9 @@
 # Milestones and Timeline
 
-Dates are assigned when child issues are scheduled; dependency gates, not
-calendar assumptions, determine readiness.
+Dates and child phase issue IDs are intentionally deferred until implementation
+issues are created and scheduled. Dependency gates, not calendar assumptions,
+determine readiness. M/L labels estimate aggregate milestone workstreams;
+XS/S labels in child plans estimate individual implementation phases.
 
 | Milestone | Planned Date | Actual Date | Status | Notes |
 |---|---|---|---|---|

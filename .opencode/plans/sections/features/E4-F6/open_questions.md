@@ -1,17 +1,32 @@
 # Open Questions
 
-- [ ] What final explicit `rtol`/`atol` applies to each combined-physics parity
-  case after E4-F1 through E4-F5 land? The stiffness-study `5e-2` bound is not
-  automatically acceptable for production qualification.
-- [ ] Does the final E4-F3/E4-F5 API expose every scratch array needed to avoid
-  allocation during graph capture, and how is completeness validated?
-- [ ] Which Warp versions/devices support condensation graph capture in CI, and
-  what precise skip reason is acceptable elsewhere?
-- [ ] Which smooth-interior kernel slice can be differentiated without crossing
-  inventory/mass clamps or unsupported in-place accesses?
-- [ ] Should strict conservation use only `rtol=1e-12`, or pair it with a
-  scale-derived `atol` for near-zero species inventories?
-- [ ] Which issue 1272 document is canonical for the final evidence matrix?
+- [x] What `rtol`/`atol` applies to combined-physics parity?
+  - Resolved 2026-07-13: target `rtol=1e-10` with a scale-derived `atol` for
+    fp64 Warp CPU and CUDA. F6 records any empirically justified case/device
+    relaxation; the stiffness-study `5e-2` bound is not accepted for production
+    qualification.
+- [x] How is complete scratch for graph capture validated?
+  - Resolved 2026-07-13: enumerate every sidecar buffer, warm compilation, then
+    assert subsequent calls allocate and synchronize zero times while retaining
+    all identities and shapes. Missing or partial complete-scratch fields fail
+    before mutation.
+- [x] Which devices support graph capture and what skip policy applies?
+  - Resolved 2026-07-13: require capture/replay only on CUDA when the tested Warp
+    APIs and CUDA device are available. Warp CPU remains the required parity
+    baseline, not graph proof. Use the stable skip reason `Warp/CUDA not
+    available` elsewhere and record the tested Warp version with evidence.
+- [x] Which smooth-interior slice is differentiated?
+  - Resolved 2026-07-13: use the out-of-place mass-transfer-rate kernel or one
+    out-of-place substep with positive inventories and inactive clamps/gates.
+    Verify `wp.Tape`/gradcheck access; do not claim gradients through final
+    in-place state updates.
+- [x] Does strict conservation require an absolute tolerance?
+  - Resolved 2026-07-13: yes. Use `rtol=1e-12` with
+    `atol=max(1e-18, scale * eps)` so near-zero inventories remain meaningful.
+- [x] Which issue #1272 document is canonical for the final evidence matrix?
+  - Resolved 2026-07-13: `docs/Features/Roadmap/data-oriented-gpu.md` owns the
+    final support/evidence matrix. `condensation-stiffness-study.md` remains the
+    historical integration decision record.
 
 Diagnostics are intentionally **none**; questions must not introduce a public
 diagnostics surface merely to make tests convenient.

@@ -1,5 +1,8 @@
 # Phase Details
 
+Phase issue creation is intentionally deferred until E4 implementation issues
+are generated and scheduled; `TBD` is not an unresolved design decision.
+
 - [ ] **E4-F3-P1:** Reusable stable-shape scratch buffers and pre-mutation validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Add optional caller-owned scratch inputs and validate shape, dtype,

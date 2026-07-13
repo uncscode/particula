@@ -1,5 +1,8 @@
 # Phase Details
 
+Phase issue creation is intentionally deferred until E4 implementation issues
+are generated and scheduled; `TBD` is not an unresolved design decision.
+
 - [ ] **E4-F2-P1:** Ideal and kappa activity Warp helpers with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Implement ideal molar and kappa water activity with guarded fp64 formulas.

@@ -9,8 +9,12 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": null,
-  "dependencies": [],
+  "last_updated": "2026-07-13",
+  "dependencies": [
+    "E1",
+    "E2",
+    "E3"
+  ],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E4/appendix.md",
     "change_log": ".opencode/plans/sections/epics/E4/change_log.md",
@@ -27,7 +31,36 @@
     "vision_problem": ".opencode/plans/sections/epics/E4/vision_problem.md"
   },
   "schema_version": "1.0",
-  "child_plans": [],
+  "child_plans": [
+    {
+      "id": "E4-F1",
+      "type": "feature"
+    },
+    {
+      "id": "E4-F2",
+      "type": "feature"
+    },
+    {
+      "id": "E4-F3",
+      "type": "feature"
+    },
+    {
+      "id": "E4-F4",
+      "type": "feature"
+    },
+    {
+      "id": "E4-F5",
+      "type": "feature"
+    },
+    {
+      "id": "E4-F6",
+      "type": "feature"
+    },
+    {
+      "id": "E4-F7",
+      "type": "feature"
+    }
+  ],
   "milestones": [],
   "governance_log": [],
   "risk_register": [],

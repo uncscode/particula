@@ -1,5 +1,8 @@
 # Phase Details
 
+Phase issue creation is intentionally deferred until E4 implementation issues
+are generated and scheduled; `TBD` is not an unresolved design decision.
+
 - [ ] **E4-F6-P1:** Add device-aware condensation parity matrix with independent CPU references
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Compare combined E4 physics per box and species on Warp CPU and optional CUDA.
