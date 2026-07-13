@@ -967,8 +967,7 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -W
 
 The current executable CPU integration baseline remains
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-Temperature-feedback runtime support and GPU latent-heat parity remain future
-Epic D goals.
+Temperature-feedback runtime support and latent-heat parity remain future Epic D goals.
 
 Remaining feature ownership:
 
