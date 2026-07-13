@@ -13,6 +13,11 @@ and integrate them into GPU condensation's particle-side Kelvin pressure.
   safely without eagerly importing Warp-dependent test symbols.
 - Legacy static `(n_species,)` surface tension and one explicitly selected
   composition-weighted effective surface mode aligned with CPU fixtures.
+- **Delivered in P2 / issue #1288:** internal fp64 Warp effective surface
+  tension with static requested-species selection and global single-phase
+  composition-volume weighting. The defined zero-volume result is the
+  arithmetic mean of supplied species tensions; no public API or launch-path
+  change was made.
 - `activity * refreshed_pure_vapor_pressure * kelvin_term` in the condensation
   pressure difference, consuming E4-F1's current-temperature pressure buffer.
 - Fixed-shape fp64 arrays, int32 modes, validation before mutation, Warp CPU

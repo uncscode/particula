@@ -16,3 +16,8 @@
 - Issue #1287 added internal formula helpers and co-located tests only. No
   public API or user documentation changed; supported-mode documentation remains
   deferred to the integration and documentation phases.
+
+## P2 Status
+- Issue #1288 added an internal device helper and co-located tests only. No
+  public API or user documentation changed; supported-mode documentation remains
+  deferred to the integration and documentation phases.

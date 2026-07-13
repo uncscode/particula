@@ -4,8 +4,11 @@
 - [x] **P1 / issue #1287:** Ideal molar activity and kappa water activity
   include guarded zero branches, dry/zero-solute and multi-solute behavior,
   and nonzero water-index cases matching independent NumPy references.
-- [ ] Composition-dependent effective surface tension affects Kelvin pressure.
-- [ ] Existing per-species surface input remains compatible as static mode.
+- [x] **P2 / issue #1288:** Composition-dependent effective surface tension is
+  volume-weighted from `mass / density`, returns a finite arithmetic mean for
+  zero total volume, and supplies Kelvin radius/term parity tests.
+- [x] **P2 / issue #1288:** Existing `(n_species,)` surface input remains
+  compatible through exact requested-species static selection.
 - [ ] Particle pressure is `activity * refreshed_pure_pressure * kelvin_term`.
 - [ ] Unsupported modes fail early or are explicitly documented CPU-only,
   including BAT.

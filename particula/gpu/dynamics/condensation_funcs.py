@@ -115,22 +115,26 @@ def effective_surface_tension_wp(
     requested_species_idx: int,
     composition_weighted: bool,
 ) -> wp.float64:
-    """Calculate static or composition-weighted surface tension.
+    """Return static or composition-weighted surface tension for one particle.
 
-    Static mode returns the requested species surface tension [N/m] without
-    reading particle composition. Composition-weighted mode calculates the
-    single-phase volume-weighted tension from fixed-shape species masses [kg]
-    and densities [kg/m³]. Zero total volume returns the arithmetic mean of
-    the supplied species surface tensions.
+    In static mode, immediately return the requested species tension [N/m]
+    without reading ``masses`` or ``densities``. In composition-weighted mode,
+    ignore ``requested_species_idx`` and calculate the single-phase value as
+    ``sum(surface_tension * mass / density) / sum(mass / density)`` across the
+    fixed ``n_species`` axis. If the total volume is zero, return the
+    unweighted arithmetic mean of all supplied species tensions instead.
 
     Args:
-        masses: Species masses shaped ``(n_boxes, n_particles, n_species)``.
-        densities: Species densities [kg/m³].
-        surface_tensions: Species surface tensions [N/m].
-        box_idx: Particle-box index.
-        particle_idx: Particle index within the box.
-        requested_species_idx: Selected species index for static mode.
-        composition_weighted: Whether to calculate a volume-weighted tension.
+        masses: Species masses [kg] with fixed shape
+            ``(n_boxes, n_particles, n_species)``.
+        densities: Species densities [kg/m³] with fixed shape ``(n_species,)``.
+        surface_tensions: Species surface tensions [N/m] with fixed shape
+            ``(n_species,)``.
+        box_idx: Index of the particle box.
+        particle_idx: Index of the particle within ``box_idx``.
+        requested_species_idx: Species index used only in static mode.
+        composition_weighted: Selects composition-weighted mode when true;
+            otherwise selects static mode.
 
     Returns:
         Effective surface tension [N/m].
