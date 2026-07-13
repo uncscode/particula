@@ -9,10 +9,13 @@
   the multi-solute fixture verifies water is excluded from kappa weighting.
   The references explicitly mirror zero branches and do not call CPU activity
   functions or the Warp helpers.
-- **P2:** In
-  `particula/gpu/dynamics/tests/condensation_funcs_test.py`, parametrized
-  tests cover static compatibility, selected composition weighting, zero
-  weights, and effective surface input to Kelvin formulas.
+- **P2 (implemented, issue #1288):** In
+  `particula/gpu/dynamics/tests/condensation_funcs_test.py`, Warp test kernels
+  and independent NumPy fp64 references cover static requested-species
+  selection with zero/mixed composition, one-species/pure/mixed
+  composition-volume weighting (`rtol=1e-10`, `atol=0`), zero-volume arithmetic
+  mean fallback under `-Werror`, weighted-mode index independence, and Kelvin
+  radius/term parity using the effective scalar.
 - **P3:** `particula/gpu/kernels/tests/condensation_test.py` and
   `_condensation_test_support.py` cover one/multi-box coupling, refreshed E4-F1
   pressure, direct imports, and invalid mode/index/shape/dtype/device/value

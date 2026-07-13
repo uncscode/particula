@@ -14,13 +14,17 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Tests: collection-safe Warp imports and independent NumPy parity for
     ideal pure/mixed/zero-total/water-free/nonzero-index cases and kappa
     wet/pure-water/dry/multi-solute/zero-kappa/nonzero-index cases.
-- [ ] **E4-F2-P2:** Static and composition-weighted surface physics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Preserve static input and add the selected composition-weighted mode.
-   - Files: `particula/gpu/dynamics/condensation_funcs.py` (new
-     `effective_surface_tension_wp()` helper),
-     `particula/gpu/dynamics/tests/condensation_funcs_test.py`
-  - Tests: Static compatibility, mixtures, zero weights, Kelvin inputs.
+- [x] **E4-F2-P2:** Static and composition-weighted surface physics with unit tests
+  - Issue: #1288 | Size: S | Status: Shipped
+  - Delivered: internal fp64 `effective_surface_tension_wp()` with exact static
+    requested-species selection and a global single-phase composition-volume
+    weighted scalar. Weighted mode ignores the requested index and uses the
+    arithmetic mean of supplied tensions for zero total volume.
+  - Files: `particula/gpu/dynamics/condensation_funcs.py`,
+    `particula/gpu/dynamics/tests/condensation_funcs_test.py`
+  - Tests: static selection/composition independence, independent NumPy parity
+    for one-species/pure/mixed weighted cases, zero-volume mean fallback and
+    weighted index independence, plus Kelvin radius/term consumption parity.
 - [ ] **E4-F2-P3:** Activity-adjusted Kelvin integration and validation tests
   - Issue: TBD | Size: S | Status: Not Started
    - Goal: Pass numeric configuration through `condensation_step_gpu()` and
