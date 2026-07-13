@@ -24,11 +24,19 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     multi-box overwrite, API export contract, and invalid-input no-mutation;
     Warp CPU parity with optional CUDA coverage.
 
-- [ ] **E4-F1-P3:** Integrate pre-step refresh into GPU condensation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Refresh from normalized current temperature immediately before mass transfer.
-  - Files: `particula/gpu/kernels/condensation.py`, condensation tests/support.
-  - Tests: direct and environment inputs, temperature changes, positional compatibility, no host refresh.
+- [x] **E4-F1-P3:** Integrate pre-step refresh into GPU condensation with unit tests
+  - Issue: #1283 | Size: S | Status: Shipped
+  - Delivered: required keyword-only `ThermodynamicsConfig` now drives one
+    pre-transfer refresh on every successful condensation call. The step
+    validates all inputs first, casts direct `wp.float32` temperature into a
+    device-local `wp.float64` buffer when required, refreshes caller-owned
+    vapor pressure, then prepares environment properties and transfers mass.
+  - Files: `particula/gpu/kernels/condensation.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`, and
+    `particula/gpu/kernels/tests/condensation_test.py`.
+  - Tests: launch ordering; scalar, direct, and explicit-environment inputs;
+    repeated temperatures; float32 compatibility; signature compatibility; and
+    pre-refresh failures with no refresh launch or gas/particle mutation.
 
 - [ ] **E4-F1-P4:** Harden repeated-call and device contracts with integration tests
   - Issue: TBD | Size: S | Status: Not Started

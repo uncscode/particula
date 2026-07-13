@@ -24,5 +24,8 @@ and leaving condensation integration to P3.
   unsupported thermodynamic strategy fails predictably.
 - As a GPU user, I want an explicit on-device refresh API with no host formula
   calculation or implicit transfer.
+- As a simulation developer, I want every successful condensation step to
+  derive its caller-owned vapor-pressure buffer from the selected current
+  per-box temperature before mass transfer.
 - As a model author, I want constant and Buck output that preserves species
   ordering and matches CPU references at the freezing boundary.

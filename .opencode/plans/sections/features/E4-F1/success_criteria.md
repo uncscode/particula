@@ -9,9 +9,10 @@
   freezing within explicit test tolerances.
 - [x] Refresh writes a complete `(n_boxes, n_species)` `float64` pressure buffer
   on-device from current `(n_boxes,)` temperature.
-- [ ] `condensation_step_gpu()` refreshes pressure before its mass-transfer step;
-  the primitive is suitable for E4-F3 to call before every future substep.
-- [ ] Changing GPU temperature between calls updates vapor pressure and the next
+- [x] `condensation_step_gpu()` refreshes pressure exactly once after validation
+  and before environment preparation and its mass-transfer step; the primitive
+  remains suitable for E4-F3 to call before every future substep.
+- [x] Changing GPU temperature between calls updates vapor pressure and the next
   calculation without CPU transfer or host recomputation.
 - [x] Missing/invalid configuration fails early under the selected compatibility
   contract and does not mutate pressure, gas concentration, or particle mass.
@@ -19,6 +20,9 @@
   sidecar is keyword-only and omission raises `ValueError`.
 - [x] Co-located Warp CPU parity/API/no-mutation tests cover the refresh boundary;
   CUDA parity remains optional and skips cleanly when unavailable.
+- [x] Scalar, direct Warp-array, and explicit environment inputs select the
+  current normalized per-box temperature; direct `wp.float32` is supported by a
+  device-local float64 cast.
 
 ## Metrics
 

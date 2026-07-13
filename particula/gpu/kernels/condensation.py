@@ -5,8 +5,11 @@ end-to-end kernels and provides a high-level ``condensation_step_gpu``
 orchestration API. Entry-point validation accepts scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Those sources are normalized into per-box Warp arrays before any buffer setup
-or Warp launch. Kernel launches operate on GPU-resident Warp arrays and update
-particle masses in-place.
+or Warp launch. A required keyword-only ``ThermodynamicsConfig`` refreshes the
+caller-owned vapor-pressure buffer from the current normalized temperature
+after validation and setup, then before mass transfer. Float32 temperatures
+are cast to a device-local float64 buffer for that refresh. Kernel launches
+operate on GPU-resident Warp arrays and update particle masses in-place.
 """
 
 # pyright: basic
@@ -189,7 +192,15 @@ def _copy_temperature_to_float64_kernel(
     temperature: Any,
     output: Any,
 ) -> None:
-    """Copy normalized temperatures into a float64 device buffer."""
+    """Copy normalized temperatures to a float64 device buffer.
+
+    This device-only helper prepares non-float64 normalized temperatures for
+    thermodynamic vapor-pressure refresh without changing the input buffer.
+
+    Args:
+        temperature: Normalized per-box temperature array ``(n_boxes,)`` [K].
+        output: Float64 per-box output array ``(n_boxes,)`` [K].
+    """
     box_idx = wp.tid()  # type: ignore[misc]
     output[box_idx] = wp.float64(temperature[box_idx])
 
@@ -480,7 +491,8 @@ def condensation_step_gpu(
         Thermodynamic and optional-buffer validation completes before any
         refresh or particle mutation. Successful calls overwrite
         ``gas.vapor_pressure`` from the normalized current temperature before
-        preparing box-level properties and calculating mass transfer.
+        preparing box-level properties and calculating mass transfer. Float32
+        temperature arrays are cast device-side to float64 for the refresh.
 
         Thermodynamic validation may synchronously read caller-owned device
         arrays, including on CUDA, without allocating, replacing, or mutating
