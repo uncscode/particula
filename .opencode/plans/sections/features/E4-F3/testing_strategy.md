@@ -1,0 +1,33 @@
+# Testing Strategy
+
+Every implementation phase ships with co-located `*_test.py` coverage. Existing
+coverage thresholds remain unchanged and changed code must retain at least 80%
+coverage.
+
+## Per-Phase Coverage
+
+- **P1:** In `particula/gpu/kernels/tests/condensation_test.py`, verify supplied
+  buffers are returned/reused by identity, have stable shapes, and reject wrong
+  shape, fp64 dtype, or device before particles or any caller buffer changes.
+  Instrument the all-scratch path to detect required allocations.
+- **P2:** Verify four unconditional equal substeps, updated-state reads, E4-F1
+  refresh on every iteration, per-step clamping, total transfer accumulation,
+  deterministic repeatability, finite values, and nonnegative particle mass.
+- **P3:** In `condensation_stiffness_test.py`, run nanometer,
+  accumulation-mode, and two-box droplet-like recorded grids against production.
+  Preserve the candidate `rtol=5e-2` comparison and maximum relative-error
+  bound, unchanged gas, stable zero-mass handling, nonzero transfer, and scratch
+  identity. Warp CPU is required; CUDA is optional and skips cleanly.
+- **P4:** Validate Markdown links, focused pytest commands, and consistency
+  between roadmap claims and executable test names.
+
+## Regression Boundaries
+
+- Retain scalar, direct Warp-array, hybrid, and explicit environment coverage.
+- Retain E4-F1 parameter, shape, species-order, device, positivity, and finite
+  validation signals with failure before mutation.
+- Distinguish the recorded stiffness evidence (`5e-2`) from tight conservation
+  or deterministic equality tolerances.
+- Do not treat gas conservation as E4-F3 acceptance; gas remains unchanged.
+
+Focused command: `pytest particula/gpu/kernels/tests/condensation_test.py particula/gpu/kernels/tests/condensation_stiffness_test.py -q`.
