@@ -19,15 +19,20 @@ preflight validation, and launch order remain in
 modes are int32 and physical parameters/results are fp64 fixed-shape arrays.
 
 ## Data / API / Workflow Changes
-- **Data model:** No CPU or Warp container schema changes. Configuration remains
-  caller-owned typed operation-sidecar data; E4-F1 owns the refreshed
+- **Data model:** No CPU or Warp container schema changes. A frozen,
+  caller-owned `CondensationActivitySurfaceConfig` operation sidecar carries
+  int32-compatible activity/surface selectors, water index, `kappas`, and an
+  ordered molar-mass reference; E4-F1 owns the refreshed
   vapor-pressure buffer. Supported surface-tension modes are static
   per-species values and one global, single-phase volume-weighted value;
   phase-aware weighting is deferred.
-- **API surface:** Preserve positional per-species `surface_tension`; add
-  keyword-only typed activity/surface operation sidecars. Unsupported mode
-  values, invalid water indices, shape/dtype/device mismatches, and non-finite
-  or negative physical parameters fail before allocation, launch, or mutation.
+- **API surface:** Positional per-species `surface_tension` remains the legacy
+  source. `activity_surface=` is keyword-only and validated as a transaction
+  before environment normalization, defaults, vapor-pressure refresh, output
+  allocation, or launch. A configured static call uses the condensing-species
+  tension; weighted mode precomputes one scalar tension per active particle.
+  Unsupported selectors and invalid sidecar, environment, optional, or output
+  inputs fail without caller-state mutation.
 - **Workflow hooks:** The primitive remains directly importable through
   `particula.gpu.kernels`, callable repeatedly by E4-F3, and feeds E4-F4.
 

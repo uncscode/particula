@@ -21,3 +21,8 @@
 - Issue #1288 added an internal device helper and co-located tests only. No
   public API or user documentation changed; supported-mode documentation remains
   deferred to the integration and documentation phases.
+
+## P3 Status
+- Issue #1289 added the concrete-kernel `CondensationActivitySurfaceConfig`
+  API documentation and co-located test coverage. Feature documentation remains
+  intentionally out of scope; no user-facing documentation was changed.

@@ -12,14 +12,17 @@
   selects the requested species without reading composition; weighted mode
   makes one species-axis pass over `mass / density`, ignores the requested
   index, and returns the arithmetic tension mean when total volume is zero.
-- [ ] Extend `condensation_step_gpu()` with keyword-only numeric mode and
-  parameter inputs while preserving legacy per-species surface input.
-- [ ] Validate mode, water index, shape, dtype, device, order, positivity, and
-  finiteness before mutation.
-- [ ] In the `condensation_step_gpu()` transfer launch, compute particle pressure
-  in the fixed order activity -> E4-F1 pure pressure -> Kelvin; keep this
-  orchestration change bounded to roughly 100 production LOC.
-- [ ] Retain fp64/fixed-shape storage and avoid host recomputation or transfer.
+- [x] **E4-F2-P3 / issue #1289:** Added frozen keyword-only
+  `CondensationActivitySurfaceConfig` and `activity_surface=` to
+  `particula/gpu/kernels/condensation.py`, preserving the legacy positional
+  per-species surface-tension API.
+- [x] Validated the sidecar and all supplied aggregate inputs before environment
+  normalization, allocations, vapor-pressure refresh, launch, or mutation.
+- [x] Composed water-only ideal/kappa activity, E4-F1 pure pressure, and Kelvin
+  tension in the transfer path; weighted tension is precomputed once per active
+  particle in a step-owned fp64 buffer.
+- [x] Retained fp64/fixed-shape storage and avoided host recomputation or
+  transfers.
 
 ## Tooling / Tests
 - [x] **E4-F2-P1 / issue #1287:** Repaired collection-safe Warp imports in
@@ -31,8 +34,9 @@
   NumPy fp64 references for static requested-species selection,
   composition-volume-weighted one-species/pure/mixed cases, zero-volume mean
   fallback, ignored weighted-mode indices, and Kelvin radius/term consumption.
-- [ ] Extend independent NumPy reference fixtures for coupled pressure parity.
-- [ ] Add one/multi-box kernel tests and static-input compatibility regression.
-- [ ] Snapshot state around every expected validation failure.
-- [ ] Run focused Warp CPU tests; parameterize CUDA with policy-compliant skips.
-- [ ] Record `rtol`/`atol` and update supported/CPU-only physics documentation.
+- [x] **E4-F2-P3 / issue #1289:** Added independent coupled references, all four
+  mode-pair tests, multi-box and legacy regressions, frozen-sidecar coverage,
+  edge cases, and no-launch/no-mutation validation snapshots in the co-located
+  condensation kernel test support and test modules.
+- [ ] **P4:** Record final CPU/CUDA parity evidence and user-facing
+  supported/CPU-only physics documentation.

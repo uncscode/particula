@@ -1,15 +1,15 @@
 """GPU condensation kernels and orchestration utilities.
 
-This module composes the condensation ``@wp.func`` building blocks into
-end-to-end kernels and provides a high-level ``condensation_step_gpu``
-orchestration API. Entry-point validation accepts scalar direct inputs,
-explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
-Those sources are normalized into per-box Warp arrays before any buffer setup
-or Warp launch. A required keyword-only ``ThermodynamicsConfig`` refreshes the
-caller-owned vapor-pressure buffer from the current normalized temperature
-after validation and setup, then before mass transfer. Float32 temperatures
-are cast to a device-local float64 buffer for that refresh. Kernel launches
-operate on GPU-resident Warp arrays and update particle masses in-place.
+This module composes condensation ``@wp.func`` building blocks into end-to-end
+kernels and provides the high-level ``condensation_step_gpu`` API. Entry-point
+validation accepts scalar direct inputs, explicit ``(n_boxes,)`` Warp arrays,
+or a ``WarpEnvironmentData`` container. Aggregate preflight completes before
+buffer allocation, Warp launch, vapor-pressure refresh, or mutation of any
+caller-owned buffer. A required keyword-only ``ThermodynamicsConfig`` then
+refreshes the caller-owned pure-vapor-pressure buffer from the current
+normalized temperature before mass transfer. Float32 temperatures are cast to
+a step-owned float64 device buffer for that refresh. Kernel launches operate
+on GPU-resident Warp arrays and update particle masses in-place.
 """
 
 # pyright: basic
@@ -81,11 +81,24 @@ SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
 
 @dataclass(frozen=True)
 class CondensationActivitySurfaceConfig:
-    """Store caller-owned activity and surface-tension inputs.
+    """Configure caller-owned activity and surface-tension sidecar inputs.
 
-    Frozen bindings do not make the contained Warp arrays immutable. Activity
-    applies only to ``water_species_index``; static tension uses each currently
-    condensing species while weighted tension is particle-wide.
+    The frozen dataclass prevents rebinding fields, but does not make its Warp
+    arrays immutable. ``kappas`` and ``molar_mass_reference`` therefore remain
+    caller-owned mutable ``wp.float64`` arrays with shape ``(n_species,)``;
+    callers must retain their lifetime and must not modify them concurrently
+    with a launch. Activity is evaluated only for ``water_species_index``;
+    every non-water vapor uses unit activity. Static tension uses the current
+    condensing-species index, while composition-weighted tension computes one
+    particle-wide value for every condensing species.
+
+    Attributes:
+        activity_mode: Integer mode selecting ideal or kappa water activity.
+        surface_tension_mode: Integer mode selecting static or
+            composition-weighted surface tension.
+        water_species_index: Index of the sole species receiving activity.
+        kappas: Per-species non-negative kappa parameters.
+        molar_mass_reference: Per-species molar masses ordered exactly as gas.
     """
 
     activity_mode: Any
@@ -127,8 +140,24 @@ def validate_condensation_activity_surface_config(
 ) -> CondensationActivitySurfaceConfig:
     """Validate and return the identical activity/surface sidecar.
 
-    Validation precedes allocation and launch, so malformed configurations leave
-    all caller-owned particle, gas, and output buffers unchanged.
+    Args:
+        activity_surface: Candidate frozen sidecar to validate.
+        n_species: Number of ordered gas and particle species.
+        device: Active Warp device for all sidecar arrays.
+        gas_molar_mass: Ordered caller-owned gas molar-mass array.
+        caller_name: Entry-point name used in validation errors.
+
+    Returns:
+        The original validated ``CondensationActivitySurfaceConfig`` object.
+
+    Raises:
+        ValueError: If the sidecar identity, selectors, arrays, domains, or
+            ordered molar-mass reference violates the contract.
+
+    Notes:
+        This read-only preflight runs before allocation and launch. A malformed
+        sidecar therefore leaves particle, gas, environment, and supplied
+        output buffers unchanged; it never falls back to legacy physics.
     """
     if type(activity_surface) is not CondensationActivitySurfaceConfig:
         raise ValueError(
@@ -225,6 +254,10 @@ def condensation_mass_transfer_kernel(  # noqa: C901
 ) -> None:
     """Compute condensation mass transfer for each particle species.
 
+    Water activity is applied only when enabled and the current species equals
+    ``water_species_index``. In configured weighted-tension mode, the supplied
+    per-particle tension is shared by all condensing species.
+
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
         concentration: Particle number concentration array.
@@ -233,6 +266,13 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         vapor_pressure: Gas-phase vapor pressure array.
         molar_mass: Gas-phase molar mass array.
         surface_tension: Per-species surface tension array.
+        kappas: Per-species kappa activity parameters.
+        molar_mass_reference: Per-species activity reference molar masses.
+        effective_surface_tension: Per-particle weighted tension buffer.
+        activity_enabled: Flag enabling configured water activity.
+        activity_mode: Selector for ideal or kappa water activity.
+        surface_tension_mode: Selector for static or weighted tension.
+        water_species_index: Index of the sole activity-adjusted species.
         mass_accommodation: Per-species mass accommodation coefficients.
         diffusion_coefficient_vapor: Per-species vapor diffusion coefficients.
         dynamic_viscosity: Per-box gas dynamic viscosity [Pa·s].
@@ -359,7 +399,11 @@ def _effective_surface_tension_kernel(
     surface_tension: Any,
     output: Any,
 ) -> None:
-    """Compute one composition-weighted tension per particle."""
+    """Compute one composition-weighted surface tension per particle.
+
+    The output is step-owned and subsequently reused for every condensing
+    species of that particle, avoiding a full composition reduction per species.
+    """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     output[box_idx, particle_idx] = effective_surface_tension_wp(
         masses, density, surface_tension, box_idx, particle_idx, 0, True
@@ -391,7 +435,12 @@ def _copy_pressure_to_float64_kernel(
     pressure: Any,
     output: Any,
 ) -> None:
-    """Copy normalized pressures into a float64 device buffer."""
+    """Copy normalized pressures into a float64 device buffer.
+
+    Args:
+        pressure: Normalized per-box pressure array ``(n_boxes,)`` [Pa].
+        output: Float64 per-box output array ``(n_boxes,)`` [Pa].
+    """
     box_idx = wp.tid()  # type: ignore[misc]
     output[box_idx] = wp.float64(pressure[box_idx])
 
@@ -666,10 +715,12 @@ def condensation_step_gpu(  # noqa: C901
             ``None``.
         thermodynamics: Required caller-owned, device-local thermodynamic
             sidecar with model arrays matching the ordered gas species.
-        activity_surface: Optional frozen caller-owned sidecar. It enables
-            water-only ideal or kappa activity and static or composition-
-            weighted tension. ``None`` retains legacy unit activity and
-            species-indexed static tension.
+        activity_surface: Optional frozen caller-owned sidecar with device-local
+            ``wp.float64`` per-species arrays. It enables ideal or kappa
+            activity only for ``water_species_index``; non-water species retain
+            unit activity. Static tension uses the current condensing-species
+            index, while weighted tension uses one particle-wide value. ``None``
+            retains legacy unit activity and species-indexed static tension.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -686,6 +737,8 @@ def condensation_step_gpu(  # noqa: C901
             pressure inputs are provided.
         ValueError: If ``thermodynamics`` is absent or does not match the gas
             species, active device, or required fixed schema.
+        ValueError: If ``activity_surface`` violates its frozen-sidecar,
+            selector, device-array, domain, or molar-mass ordering contract.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -700,11 +753,13 @@ def condensation_step_gpu(  # noqa: C901
         callers stay source-compatible.
 
         Aggregate configuration and optional-buffer validation completes before
-        allocation, launch, refresh, or particle mutation. Successful calls
-        overwrite ``gas.vapor_pressure`` from the normalized current
-        temperature before preparing box-level properties and calculating mass
-        transfer. Float32
-        temperature arrays are cast device-side to float64 for the refresh.
+        allocation, launch, refresh, or mutation. Thus a validation failure
+        leaves caller-owned particle, gas, environment, sidecar, and supplied
+        output buffers unchanged and is retryable with corrected inputs.
+        Successful calls overwrite ``gas.vapor_pressure`` from the normalized
+        current temperature before preparing box-level properties and
+        calculating mass transfer. Float32 temperature arrays are cast
+        device-side to float64 for the refresh.
 
         Thermodynamic validation may synchronously read caller-owned device
         arrays, including on CUDA, without allocating, replacing, or mutating

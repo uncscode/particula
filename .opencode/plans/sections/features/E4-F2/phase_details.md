@@ -25,14 +25,21 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Tests: static selection/composition independence, independent NumPy parity
     for one-species/pure/mixed weighted cases, zero-volume mean fallback and
     weighted index independence, plus Kelvin radius/term consumption parity.
-- [ ] **E4-F2-P3:** Activity-adjusted Kelvin integration and validation tests
-  - Issue: TBD | Size: S | Status: Not Started
-   - Goal: Pass numeric configuration through `condensation_step_gpu()` and
-     compose activity, E4-F1 pure pressure, and Kelvin pressure in its transfer
-     launch (keep this production-path delta to roughly 100 LOC).
-   - Files: `particula/gpu/kernels/condensation.py`,
-     `particula/gpu/kernels/tests/condensation_test.py`
-  - Tests: Launch integration, invalid configuration, failure-before-mutation.
+- [x] **E4-F2-P3:** Activity-adjusted Kelvin integration and validation tests
+  - Issue: #1289 | Size: S | Status: Shipped
+  - Delivered: `CondensationActivitySurfaceConfig` and keyword-only
+    `activity_surface=` integrate ideal/kappa water-only activity and
+    static/composition-weighted tension into GPU condensation. Aggregate
+    validation is atomic and precedes all normalization, allocation, refresh,
+    launch, and caller-state mutation; weighted mode uses one per-active-particle
+    reduction buffer.
+  - Files: `particula/gpu/kernels/condensation.py`,
+    `particula/gpu/kernels/environment.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`
+  - Tests: independent all-mode references, multi-box refresh/composition,
+    legacy regression, frozen sidecar, edge cases, and monkeypatched no-launch
+    atomic-failure snapshots.
 - [ ] **E4-F2-P4:** CPU and optional CUDA parity fixtures plus documentation
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Verify coupled physics and document supported/deferred behavior.
