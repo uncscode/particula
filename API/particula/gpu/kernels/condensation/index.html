@@ -5202,6 +5202,8 @@
       
         
       
+        
+      
     
     
     
@@ -5421,6 +5423,34 @@
     
   
     particula.gpu.kernels.environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../thermodynamics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.thermodynamics
   
 
     
@@ -14353,8 +14383,11 @@ end-to-end kernels and provides a high-level <code>condensation_step_gpu</code>
 orchestration API. Entry-point validation accepts scalar direct inputs,
 explicit <code>(n_boxes,)</code> Warp arrays, or a <code>WarpEnvironmentData</code> container.
 Those sources are normalized into per-box Warp arrays before any buffer setup
-or Warp launch. Kernel launches operate on GPU-resident Warp arrays and update
-particle masses in-place.</p>
+or Warp launch. A required keyword-only <code>ThermodynamicsConfig</code> refreshes the
+caller-owned vapor-pressure buffer from the current normalized temperature
+after validation and setup, then before mass transfer. Float32 temperatures
+are cast to a device-local float64 buffer for that refresh. Kernel launches
+operate on GPU-resident Warp arrays and update particle masses in-place.</p>
 
 
 
@@ -14415,28 +14448,28 @@ particle masses in-place.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_transfer_kernel</span><span class="p">(</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -14615,15 +14648,7 @@ particle masses in-place.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 66</span>
 <span class="normal"> 67</span>
 <span class="normal"> 68</span>
 <span class="normal"> 69</span>
@@ -14735,7 +14760,15 @@ particle masses in-place.</p>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
-<span class="normal">178</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">condensation_mass_transfer_kernel</span><span class="p">(</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -14870,7 +14903,7 @@ particle masses in-place.</p>
 
 
 <a href="#particula.gpu.kernels.condensation.condensation_step_gpu" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">condensation_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">surface_tension</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mass_accommodation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diffusion_coefficient_vapor</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mass_transfer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">condensation_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">surface_tension</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mass_accommodation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diffusion_coefficient_vapor</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mass_transfer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">thermodynamics</span><span class="p">:</span> <span class="n">ThermodynamicsConfig</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -14978,6 +15011,22 @@ and <code>gas</code>. This mode is supported when both direct inputs are
 <code>None</code>.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+            <b><code>thermodynamics</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            ThermodynamicsConfig
+
+
+  
+      dataclass
+   (particula.gpu.kernels.thermodynamics.ThermodynamicsConfig)" href="../thermodynamics/#particula.gpu.kernels.thermodynamics.ThermodynamicsConfig">ThermodynamicsConfig</a> | <span title="typing.Any">Any</span> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Required caller-owned, device-local thermodynamic
+sidecar with model arrays matching the ordered gas species.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -15034,6 +15083,14 @@ caller device.</p>
 pressure inputs are provided.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>thermodynamics</code> is absent or does not match the gas
+species, active device, or required fixed schema.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -15047,54 +15104,20 @@ Python lists, and other non-Warp direct array-likes are rejected.</p>
 rollback should copy masses before invoking this function.</p>
 <p><code>environment</code> remains keyword-only so existing positional scalar
 callers stay source-compatible.</p>
-<p>Validation runs before optional buffer setup or Warp launches so
-invalid shape or device combinations fail without mutating particle
-state. Box-level gas properties are prepared once per call from the
-normalized temperature and pressure arrays, then reused during the
-per-particle kernel launch.</p>
+<p>Thermodynamic and optional-buffer validation completes before any
+refresh or particle mutation. Successful calls overwrite
+<code>gas.vapor_pressure</code> from the normalized current temperature before
+preparing box-level properties and calculating mass transfer. Float32
+temperature arrays are cast device-side to float64 for the refresh.</p>
+<p>Thermodynamic validation may synchronously read caller-owned device
+arrays, including on CUDA, without allocating, replacing, or mutating
+those buffers. Refresh evaluation and all production calculations stay
+device-resident.</p>
 </details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
@@ -15239,7 +15262,92 @@ per-particle kernel launch.</p>
 <span class="normal">567</span>
 <span class="normal">568</span>
 <span class="normal">569</span>
-<span class="normal">570</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">condensation_step_gpu</span><span class="p">(</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">condensation_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -15251,6 +15359,7 @@ per-particle kernel launch.</p>
     <span class="n">mass_transfer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">thermodynamics</span><span class="p">:</span> <span class="n">ThermodynamicsConfig</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one condensation timestep on the GPU.</span>
 
@@ -15273,6 +15382,8 @@ per-particle kernel launch.</p>
 <span class="sd">            temperature and pressure arrays on the same device as ``particles``</span>
 <span class="sd">            and ``gas``. This mode is supported when both direct inputs are</span>
 <span class="sd">            ``None``.</span>
+<span class="sd">        thermodynamics: Required caller-owned, device-local thermodynamic</span>
+<span class="sd">            sidecar with model arrays matching the ordered gas species.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of updated particle data and the mass transfer buffer.</span>
@@ -15287,6 +15398,8 @@ per-particle kernel launch.</p>
 <span class="sd">            caller device.</span>
 <span class="sd">        ValueError: If direct non-scalar, non-Warp-array temperature or</span>
 <span class="sd">            pressure inputs are provided.</span>
+<span class="sd">        ValueError: If ``thermodynamics`` is absent or does not match the gas</span>
+<span class="sd">            species, active device, or required fixed schema.</span>
 
 <span class="sd">    Notes:</span>
 <span class="sd">        Accepted environment sources are scalar direct inputs, direct</span>
@@ -15300,11 +15413,16 @@ per-particle kernel launch.</p>
 <span class="sd">        ``environment`` remains keyword-only so existing positional scalar</span>
 <span class="sd">        callers stay source-compatible.</span>
 
-<span class="sd">        Validation runs before optional buffer setup or Warp launches so</span>
-<span class="sd">        invalid shape or device combinations fail without mutating particle</span>
-<span class="sd">        state. Box-level gas properties are prepared once per call from the</span>
-<span class="sd">        normalized temperature and pressure arrays, then reused during the</span>
-<span class="sd">        per-particle kernel launch.</span>
+<span class="sd">        Thermodynamic and optional-buffer validation completes before any</span>
+<span class="sd">        refresh or particle mutation. Successful calls overwrite</span>
+<span class="sd">        ``gas.vapor_pressure`` from the normalized current temperature before</span>
+<span class="sd">        preparing box-level properties and calculating mass transfer. Float32</span>
+<span class="sd">        temperature arrays are cast device-side to float64 for the refresh.</span>
+
+<span class="sd">        Thermodynamic validation may synchronously read caller-owned device</span>
+<span class="sd">        arrays, including on CUDA, without allocating, replacing, or mutating</span>
+<span class="sd">        those buffers. Refresh evaluation and all production calculations stay</span>
+<span class="sd">        device-resident.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">,</span> <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">_validate_gas_arrays</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_species</span><span class="p">)</span>
@@ -15319,6 +15437,13 @@ per-particle kernel launch.</p>
         <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
         <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">thermodynamics</span> <span class="o">=</span> <span class="n">validate_thermodynamics_config</span><span class="p">(</span>
+        <span class="n">thermodynamics</span><span class="p">,</span>
+        <span class="n">n_species</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">,</span>
+        <span class="n">gas</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">surface_tension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -15379,12 +15504,42 @@ per-particle kernel launch.</p>
     <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_boxes</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="n">mean_free_path</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_boxes</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
+    <span class="n">refresh_temperature</span> <span class="o">=</span> <span class="n">temperature_array</span>
+    <span class="k">if</span> <span class="n">temperature_array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+        <span class="n">refresh_temperature</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">_copy_temperature_to_float64_kernel</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">temperature_array</span><span class="p">,</span> <span class="n">refresh_temperature</span><span class="p">],</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">kernel_pressure</span> <span class="o">=</span> <span class="n">pressure_array</span>
+    <span class="k">if</span> <span class="n">pressure_array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+        <span class="n">kernel_pressure</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">n_boxes</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">_copy_pressure_to_float64_kernel</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">pressure_array</span><span class="p">,</span> <span class="n">kernel_pressure</span><span class="p">],</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">refresh_vapor_pressure_gpu</span><span class="p">(</span><span class="n">thermodynamics</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">refresh_temperature</span><span class="p">)</span>
+
     <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
         <span class="n">_prepare_environment_properties_kernel</span><span class="p">,</span>
         <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">temperature_array</span><span class="p">,</span>
-            <span class="n">pressure_array</span><span class="p">,</span>
+            <span class="n">refresh_temperature</span><span class="p">,</span>
+            <span class="n">kernel_pressure</span><span class="p">,</span>
             <span class="n">dynamic_viscosity</span><span class="p">,</span>
             <span class="n">mean_free_path</span><span class="p">,</span>
         <span class="p">],</span>
@@ -15408,7 +15563,7 @@ per-particle kernel launch.</p>
             <span class="n">mean_free_path</span><span class="p">,</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">GAS_CONSTANT</span><span class="p">),</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">BOLTZMANN_CONSTANT</span><span class="p">),</span>
-            <span class="n">temperature_array</span><span class="p">,</span>
+            <span class="n">refresh_temperature</span><span class="p">,</span>
             <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">time_step</span><span class="p">),</span>
             <span class="n">mass_transfer</span><span class="p">,</span>
         <span class="p">],</span>

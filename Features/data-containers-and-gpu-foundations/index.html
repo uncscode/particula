@@ -5188,6 +5188,8 @@
       
         
       
+        
+      
     
     
     
@@ -5304,6 +5306,34 @@
     
   
     particula.gpu.kernels.environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/thermodynamics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.thermodynamics
   
 
     
@@ -11434,6 +11464,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#gpu-thermodynamics-and-condensation-refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU thermodynamics and condensation refresh
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14486,6 +14527,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#gpu-thermodynamics-and-condensation-refresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU thermodynamics and condensation refresh
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14923,6 +14975,67 @@ ordered names and any vapor-pressure sidecar state outside <code>WarpGasData</co
 <span class="p">)</span>
 <span class="n">restored_gas</span> <span class="o">=</span> <span class="n">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_gas</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">gas_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
+<h3 id="gpu-thermodynamics-and-condensation-refresh">GPU thermodynamics and condensation refresh<a class="headerlink" href="#gpu-thermodynamics-and-condensation-refresh" title="Permanent link">&para;</a></h3>
+<p><code>ThermodynamicsConfig</code> is caller-owned, device-local process configuration.
+Its Warp arrays have no species names: species identity is positional, and
+<code>molar_mass_reference</code> must exactly equal ordered <code>gas.molar_mass</code> on the
+active device. <code>WarpGasData.vapor_pressure</code>, in contrast, is a mutable,
+derived GPU helper buffer rather than authoritative <code>GasData</code> state. It is
+omitted by <code>from_warp_gas_data()</code>.</p>
+<p>The fixed configuration and refresh contracts are:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required Warp dtype and shape</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>modes</code></td>
+<td><code>wp.int32</code>, <code>(n_species,)</code></td>
+<td>Per-species model code.</td>
+</tr>
+<tr>
+<td><code>parameters</code></td>
+<td><code>wp.float64</code>, <code>(n_species, 4)</code></td>
+<td>Per-species model parameters.</td>
+</tr>
+<tr>
+<td><code>molar_mass_reference</code></td>
+<td><code>wp.float64</code>, <code>(n_species,)</code></td>
+<td>Ordered compatibility fingerprint for <code>gas.molar_mass</code>.</td>
+</tr>
+<tr>
+<td>Refresh temperature</td>
+<td><code>wp.float64</code>, <code>(n_boxes,)</code></td>
+<td>Device-local temperature at the standalone refresh boundary.</td>
+</tr>
+<tr>
+<td><code>vapor_pressure</code> output</td>
+<td><code>wp.float64</code>, <code>(n_boxes, n_species)</code></td>
+<td>Derived pressure matrix in Pa.</td>
+</tr>
+</tbody>
+</table>
+<p>Only two model codes are shipped: constant <code>wp.int32(0)</code>, which reads
+<code>parameters[:, 0]</code> in Pa, and canonical Buck <code>wp.int32(1)</code>, which evaluates
+the water/ice equations and ignores all four reserved parameter slots.</p>
+<p><code>condensation_step_gpu()</code> requires keyword-only <code>thermodynamics=</code> while
+preserving the positional <code>mass_transfer</code> slot. Its accepted temperature
+sources are a direct scalar, a direct same-device Warp array with shape
+<code>(n_boxes,)</code>, hybrid direct scalar/Warp-array inputs, or keyword-only
+<code>environment=</code> when both direct values are <code>None</code>. NumPy arrays and Python
+lists are not accepted as direct arrays, and the step does not perform hidden
+transfers.</p>
+<p>On every successful condensation call, the step validates all inputs and
+optional buffers first. It then casts a non-<code>wp.float64</code> direct or environment
+temperature array into a device-local float64 buffer when needed, overwrites
+<code>vapor_pressure</code>, prepares environment properties, and transfers mass. A
+failed preflight leaves the vapor-pressure output buffer unchanged. Import the
+standalone <code>refresh_vapor_pressure_gpu</code> only from
+<code>particula.gpu.kernels.thermodynamics</code>, never <code>particula.gpu.kernels</code>.</p>
 <h2 id="current-shipped-support-boundaries">Current shipped support boundaries<a class="headerlink" href="#current-shipped-support-boundaries" title="Permanent link">&para;</a></h2>
 <p>The containers are multi-box capable, but current execution support is narrower
 than storage support.</p>
