@@ -49,8 +49,11 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     `mass_transfer` compatibility; exact no-mutation snapshots for omitted
     configuration; and CUDA-only cross-device-sidecar atomicity.
 
-- [ ] **E4-F1-P5:** Document supported thermodynamic models and refresh ownership
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document modes, units, ownership, ordering, compatibility, and sibling boundaries.
+- [x] **E4-F1-P5:** Document supported thermodynamic models and refresh ownership
+  - Issue: #1285 | Size: XS | Status: Shipped
+  - Delivered: documentation-only canonical contract for modes, units,
+    ownership, ordering, compatibility, and sibling boundaries; no production
+    code or supported-model expansion.
   - Files: GPU feature/roadmap docs and plan status sections.
-  - Tests: documentation link/reference validation.
+  - Tests: documentation readback and focused thermodynamics/condensation
+    regression validation.

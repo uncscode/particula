@@ -41,4 +41,9 @@
 
 - [x] Document the validation-only and standalone refresh contracts in code and
   API docstrings.
-- [ ] Cross-reference E4-F2 through E4-F7 deferred responsibilities.
+- [x] Cross-reference E4-F2 through E4-F7 deferred responsibilities:
+  activity/effective surface tension (E4-F2), fixed four-substep orchestration
+  (E4-F3), latent-heat correction and energy diagnostics (E4-F4), gas-coupled
+  inventory/partitioning and conservation (E4-F5), independent Warp/CUDA
+  parity, conservation, and readiness evidence (E4-F6), and the final support
+  contract, examples, troubleshooting, and support matrix (E4-F7).
