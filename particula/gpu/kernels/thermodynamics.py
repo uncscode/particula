@@ -1,8 +1,8 @@
-"""Validate caller-owned thermodynamic sidecars for GPU kernels.
+"""Validate thermodynamic sidecars and refresh GPU vapor pressures.
 
 This Python-side sidecar supplies a fixed device-local schema for future
-vapor-pressure models. Validation does not evaluate a model, launch a Warp
-kernel, calculate vapor pressure, or refresh gas container state.
+vapor-pressure models. The concrete-module refresh API validates these
+caller-owned buffers before launching the device-resident evaluator.
 """
 
 from __future__ import annotations
@@ -20,12 +20,17 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
         "Install with: pip install warp-lang"
     ) from exc
 
-from particula.gpu.kernels.environment import _is_warp_array_like
+from particula.gpu.kernels.environment import (
+    _is_warp_array_like,
+    _validate_positive_finite_array,
+)
 
 __all__ = [
     "THERMODYNAMICS_MODE_BUCK",
     "THERMODYNAMICS_MODE_CONSTANT",
     "ThermodynamicsConfig",
+    "refresh_vapor_pressure_gpu",
+    "validate_thermodynamics_config",
 ]
 
 
@@ -33,7 +38,7 @@ THERMODYNAMICS_MODE_CONSTANT = wp.int32(0)
 """Constant vapor-pressure mode; parameter zero is pressure in Pa."""
 
 THERMODYNAMICS_MODE_BUCK = wp.int32(1)
-"""Buck mode: reference pressure plus three coefficients."""
+"""Canonical Buck water/ice mode; all four parameter slots are unused."""
 
 
 @dataclass(frozen=True)
@@ -42,7 +47,9 @@ class ThermodynamicsConfig:
 
     The frozen dataclass preserves field bindings, but its caller-owned Warp
     buffers remain mutable. It is a validation-only sidecar and does not
-    calculate vapor pressure or update ``gas.vapor_pressure``.
+    calculate vapor pressure or update ``gas.vapor_pressure``. Constant-mode
+    parameter zero is vapor pressure in Pa. Buck-mode parameter slots are
+    reserved by the fixed schema and are ignored by the canonical evaluator.
 
     Attributes:
         modes: Per-species ``wp.int32`` model codes with shape ``(n_species,)``.
@@ -64,6 +71,7 @@ def _validate_array_metadata(
     expected_dtype: Any,
     device: Any,
     caller_name: str,
+    field_prefix: str = "thermodynamics",
 ) -> None:
     """Validate one sidecar field's metadata without reading its contents.
 
@@ -74,28 +82,27 @@ def _validate_array_metadata(
         expected_dtype: Required Warp scalar dtype.
         device: Required active Warp device.
         caller_name: Public entry point used in error messages.
+        field_prefix: Namespace prepended to ``name`` in validation errors.
 
     Raises:
         ValueError: If the field is not a Warp array or has incompatible dtype,
             shape, or device.
     """
+    field_name = f"{field_prefix}.{name}" if field_prefix else name
     if not _is_warp_array_like(values):
-        raise ValueError(
-            f"thermodynamics.{name} must be a Warp array in {caller_name}."
-        )
+        raise ValueError(f"{field_name} must be a Warp array in {caller_name}.")
     if values.dtype != expected_dtype:
         raise ValueError(
-            f"thermodynamics.{name} must use dtype {expected_dtype} in "
-            f"{caller_name}."
+            f"{field_name} must use dtype {expected_dtype} in {caller_name}."
         )
     if values.shape != expected_shape:
         raise ValueError(
-            f"thermodynamics.{name} shape {values.shape} does not match "
+            f"{field_name} shape {values.shape} does not match "
             f"expected {expected_shape} in {caller_name}."
         )
     if str(values.device) != str(device):
         raise ValueError(
-            f"thermodynamics.{name} device does not match expected device in "
+            f"{field_name} device does not match expected device in "
             f"{caller_name}."
         )
 
@@ -208,3 +215,149 @@ def validate_thermodynamics_config(
             f"gas.molar_mass in {caller_name}."
         )
     return thermodynamics
+
+
+@wp.func
+def _constant_vapor_pressure(
+    parameters: wp.array2d(dtype=wp.float64),
+    species_idx: wp.int32,
+) -> wp.float64:
+    """Return the constant-mode vapor pressure in Pa."""
+    return parameters[species_idx, 0]
+
+
+@wp.func
+def _buck_vapor_pressure(temperature: wp.float64) -> wp.float64:
+    """Return canonical Buck water/ice vapor pressure in Pa."""
+    temperature_celsius = temperature - wp.float64(273.15)
+    if temperature_celsius < wp.float64(0.0):
+        return (
+            wp.float64(6.1115)
+            * wp.exp(
+                (wp.float64(23.036) - temperature_celsius / wp.float64(333.7))
+                * temperature_celsius
+                / (wp.float64(279.82) + temperature_celsius)
+            )
+            * wp.float64(100.0)
+        )
+    return (
+        wp.float64(6.1121)
+        * wp.exp(
+            (wp.float64(18.678) - temperature_celsius / wp.float64(234.5))
+            * temperature_celsius
+            / (wp.float64(257.14) + temperature_celsius)
+        )
+        * wp.float64(100.0)
+    )
+
+
+@wp.func
+def _evaluate_vapor_pressure(
+    mode: wp.int32,
+    parameters: wp.array2d(dtype=wp.float64),
+    species_idx: wp.int32,
+    temperature: wp.float64,
+) -> wp.float64:
+    """Evaluate one validated per-species vapor-pressure model."""
+    if mode == THERMODYNAMICS_MODE_CONSTANT:
+        return _constant_vapor_pressure(parameters, species_idx)
+    return _buck_vapor_pressure(temperature)
+
+
+@wp.kernel
+def _refresh_vapor_pressure_kernel(
+    modes: wp.array(dtype=wp.int32),
+    parameters: wp.array2d(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    vapor_pressure: wp.array2d(dtype=wp.float64),
+) -> None:
+    """Refresh all per-box, per-species vapor-pressure values."""
+    box_idx, species_idx = wp.tid()
+    vapor_pressure[box_idx, species_idx] = _evaluate_vapor_pressure(
+        modes[species_idx],
+        parameters,
+        species_idx,
+        temperature[box_idx],
+    )
+
+
+def _validate_refresh_gas(gas: Any, caller_name: str) -> tuple[int, int, Any]:
+    """Validate gas refresh buffers and return their shape and device."""
+    vapor_pressure = getattr(gas, "vapor_pressure", None)
+    if not _is_warp_array_like(vapor_pressure):
+        raise ValueError(
+            f"gas.vapor_pressure must be a Warp array in {caller_name}."
+        )
+    if vapor_pressure.dtype != wp.float64:
+        raise ValueError(
+            f"gas.vapor_pressure must use dtype {wp.float64} in {caller_name}."
+        )
+    if len(vapor_pressure.shape) != 2:
+        raise ValueError(
+            "gas.vapor_pressure must have shape (n_boxes, n_species) in "
+            f"{caller_name}."
+        )
+    n_boxes, n_species = vapor_pressure.shape
+    device = vapor_pressure.device
+    _validate_array_metadata(
+        "molar_mass",
+        getattr(gas, "molar_mass", None),
+        (n_species,),
+        wp.float64,
+        device,
+        caller_name,
+        "gas",
+    )
+    return n_boxes, n_species, device
+
+
+def refresh_vapor_pressure_gpu(
+    thermodynamics: ThermodynamicsConfig,
+    gas: Any,
+    temperature: Any,
+) -> None:
+    """Refresh vapor pressure from device-local thermodynamic models.
+
+    Import this concrete-module API from
+    ``particula.gpu.kernels.thermodynamics``; it is intentionally not exported
+    from ``particula.gpu.kernels``.
+
+    Args:
+        thermodynamics: Validated device-local per-species model sidecar.
+        gas: Caller-owned ``WarpGasData`` whose vapor pressure is overwritten.
+        temperature: Device-local ``wp.float64`` temperatures in K with shape
+            ``(n_boxes,)``.
+
+    Raises:
+        ValueError: If any input violates the device-array contract.
+    """
+    caller_name = "refresh_vapor_pressure_gpu"
+    n_boxes, n_species, device = _validate_refresh_gas(gas, caller_name)
+    _validate_array_metadata(
+        "temperature",
+        temperature,
+        (n_boxes,),
+        wp.float64,
+        device,
+        caller_name,
+        "",
+    )
+    _validate_positive_finite_array("temperature", temperature, caller_name)
+    validate_thermodynamics_config(
+        thermodynamics,
+        n_species,
+        device,
+        gas.molar_mass,
+        caller_name,
+    )
+    wp.launch(
+        _refresh_vapor_pressure_kernel,
+        dim=(n_boxes, n_species),
+        inputs=[
+            thermodynamics.modes,
+            thermodynamics.parameters,
+            temperature,
+            gas.vapor_pressure,
+        ],
+        device=device,
+    )
