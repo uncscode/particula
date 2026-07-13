@@ -106,6 +106,58 @@ def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
 
 
 @wp.func
+def effective_surface_tension_wp(
+    masses: wp.array3d[wp.float64],
+    densities: wp.array[wp.float64],
+    surface_tensions: wp.array[wp.float64],
+    box_idx: int,
+    particle_idx: int,
+    requested_species_idx: int,
+    composition_weighted: bool,
+) -> wp.float64:
+    """Calculate static or composition-weighted surface tension.
+
+    Static mode returns the requested species surface tension [N/m] without
+    reading particle composition. Composition-weighted mode calculates the
+    single-phase volume-weighted tension from fixed-shape species masses [kg]
+    and densities [kg/m³]. Zero total volume returns the arithmetic mean of
+    the supplied species surface tensions.
+
+    Args:
+        masses: Species masses shaped ``(n_boxes, n_particles, n_species)``.
+        densities: Species densities [kg/m³].
+        surface_tensions: Species surface tensions [N/m].
+        box_idx: Particle-box index.
+        particle_idx: Particle index within the box.
+        requested_species_idx: Selected species index for static mode.
+        composition_weighted: Whether to calculate a volume-weighted tension.
+
+    Returns:
+        Effective surface tension [N/m].
+    """
+    if not composition_weighted:
+        return surface_tensions[requested_species_idx]
+
+    total_volume = wp.float64(0.0)
+    tension_volume_sum = wp.float64(0.0)
+    tension_sum = wp.float64(0.0)
+    for species_idx in range(masses.shape[2]):  # type: ignore[attr-defined]
+        species_volume = (
+            masses[box_idx, particle_idx, species_idx]  # type: ignore[index]
+            / densities[species_idx]
+        )
+        total_volume += species_volume
+        tension_volume_sum += surface_tensions[species_idx] * species_volume
+        tension_sum += surface_tensions[species_idx]
+
+    if total_volume == wp.float64(0.0):
+        return tension_sum / wp.float64(
+            masses.shape[2]  # type: ignore[attr-defined]
+        )
+    return tension_volume_sum / total_volume
+
+
+@wp.func
 def water_activity_ideal_wp(
     masses: wp.array3d[wp.float64],
     molar_masses: wp.array[wp.float64],
