@@ -13,7 +13,7 @@ E4-F1..F5 production condensation step
   -> conservation assertions (strict, separate)
   -> mutation and reusable-buffer assertions
   -> fixed-four-loop capture/replay evidence
-  -> bounded smooth-interior autodiff experiment
+  -> bounded out-of-place smooth-interior autodiff experiment
              |
              v
 documented evidence matrix and limitations
@@ -37,8 +37,8 @@ reference for each box, avoiding circular validation of vectorized indexing.
 
 Exactly four substeps are retained. Capture setup occurs outside capture;
 replay performs no hidden host transfer or adaptive allocation. Autodiff
-evidence is limited to supported smooth interiors and explicitly excludes
-claims at nonnegative inventory/mass clamps.
+evidence is limited to an out-of-place smooth-interior slice and explicitly
+excludes clamps, inventory gates, and in-place mutation.
 
 ## Security & Compliance
 

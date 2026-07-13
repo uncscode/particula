@@ -5,9 +5,15 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
 
 - [ ] **E4-F4-P1:** Warp thermal-resistance helpers and validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Port conductivity/resistance and validate latent sidecars before work.
-  - Files: `particula/gpu/dynamics/condensation_funcs.py`, `particula/gpu/kernels/condensation.py`
-  - Tests: CPU formula parity; value, shape, dtype, and device validation.
+  - Goal: Port the fp64 equations from `get_thermal_resistance_factor()` and
+    `get_mass_transfer_rate_latent_heat()` before the E4-F3 calculate launch.
+  - Files: `particula/gpu/dynamics/condensation_funcs.py` (new private Warp
+    thermal-factor/rate helpers, roughly 60--100 production LOC) and
+    `particula/gpu/kernels/condensation.py` (keyword-only latent-sidecar
+    preflight, roughly 20--40 production LOC).
+  - Tests: `particula/gpu/dynamics/tests/condensation_funcs_test.py` CPU-formula
+    parity plus `particula/gpu/kernels/tests/condensation_test.py` value, shape,
+    dtype, device, and pre-mutation rejection coverage.
 
 - [ ] **E4-F4-P2:** Per-substep latent-heat correction with parity tests
   - Issue: TBD | Size: S | Status: Not Started

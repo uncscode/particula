@@ -1,14 +1,19 @@
 # Testing Strategy
 
-Tests ship with each phase in GPU condensation `*_test.py` modules; coverage
-thresholds are never lowered.
+Tests ship with each implementation phase in
+`particula/gpu/dynamics/tests/condensation_funcs_test.py` or
+`particula/gpu/kernels/tests/condensation_test.py`; coverage thresholds are
+never lowered.
 
-- **P1:** Compare fp64 Warp conductivity/resistance with CPU references. Cover
-  finite/nonnegative, shape, dtype, device, and no-mutation failures.
-- **P2:** Compare corrected rates with CPU, verify rate reduction, exact
-  zero-latent fallback, four refreshes, determinism, and scratch identity.
-- **P3:** Verify positive/negative/zero energy and whole-call per-box/species
-  `Q = sum(bounded Δm * L)`, including clamped and isolated cases.
+- **P1:** In `condensation_funcs_test.py` and `condensation_test.py`, compare
+  fp64 Warp conductivity/resistance with CPU references. Cover finite,
+  nonnegative, shape, dtype, device, and no-mutation failures.
+- **P2:** In `condensation_test.py`, compare corrected rates with CPU, verify
+  rate reduction, exact zero-latent fallback, four refreshes, determinism, and
+  scratch identity.
+- **P3:** In `condensation_test.py`, verify positive/negative/zero energy and
+  whole-call per-box/species `Q = sum(bounded Δm * L)`, including clamped and
+  isolated cases.
 - **P4:** Compose E4-F1/F2/F3 on mandatory Warp CPU and optional CUDA with
   clean skips; retain scalar/environment API regressions.
 

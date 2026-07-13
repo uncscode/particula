@@ -34,5 +34,7 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
 
 - [ ] **E4-F5-P5:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document gas ownership, limits, partitioning, and production-gate status.
-  - Files: GPU roadmap and feature documentation
+   - Goal: Document gas ownership, limits, partitioning, and production-gate status.
+   - Files: GPU roadmap and feature documentation
+   - Tests: Documentation link and command/reference checks only; this is a
+     docs-only exception to production-code test coverage.

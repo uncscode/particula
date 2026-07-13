@@ -20,13 +20,21 @@
 
 ## Graph and Autodiff Readiness
 
-- [ ] Build capture inputs and complete reusable scratch before capture.
-- [ ] Capture/replay the fixed four-substep path and compare normal-launch and
-  replay outputs plus strict invariants.
-- [ ] Assert stable scratch object identity and shape across repeated calls.
-- [ ] Add a bounded deterministic tape/gradcheck probe where Warp supports it.
-- [ ] Enable array-access verification in an isolated test and document any
-  expected in-place or clamp limitation rather than weakening assertions.
+- [ ] In `particula/gpu/kernels/tests/condensation_test.py` or a new discoverable
+  `condensation_graph_test.py`, construct complete E4-F3 caller-owned scratch
+  and fixed fp64 inputs before entering capture; do not allocate or transfer
+  inside the captured region.
+- [ ] Capture and replay the public `condensation_step_gpu()` four-substep path,
+  then compare normal-launch and replay particle, gas, transfer, and energy
+  outputs with separate parity and conservation assertions.
+- [ ] Assert stable identity, shape, dtype, and active-device placement for every
+  supplied scratch sidecar across repeated normal and replay calls.
+- [ ] Add a deterministic, out-of-place smooth-interior tape/gradcheck probe in
+  a focused `*_test.py` module only where Warp supports it; cap the test helper
+  at a small one-box/one-species fixture rather than expanding production code.
+- [ ] Enable array-access verification in that isolated probe and assert explicit
+  expected limitations for clamps, inventory gates, and in-place mutation rather
+  than weakening the supported-interior assertions.
 
 ## Documentation / Validation
 

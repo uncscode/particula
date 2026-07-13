@@ -20,11 +20,14 @@ modes are int32 and physical parameters/results are fp64 fixed-shape arrays.
 
 ## Data / API / Workflow Changes
 - **Data model:** No CPU or Warp container schema changes. Configuration remains
-  caller-owned sidecar data; E4-F1 owns the refreshed vapor-pressure buffer.
+  caller-owned typed operation-sidecar data; E4-F1 owns the refreshed
+  vapor-pressure buffer. Supported surface-tension modes are static
+  per-species values and one global, single-phase volume-weighted value;
+  phase-aware weighting is deferred.
 - **API surface:** Preserve positional per-species `surface_tension`; add
-  keyword-only numeric activity/surface configuration. Unsupported mode values,
-  invalid water indices, shape/dtype/device mismatches, and non-finite or
-  negative physical parameters fail before allocation, launch, or mutation.
+  keyword-only typed activity/surface operation sidecars. Unsupported mode
+  values, invalid water indices, shape/dtype/device mismatches, and non-finite
+  or negative physical parameters fail before allocation, launch, or mutation.
 - **Workflow hooks:** The primitive remains directly importable through
   `particula.gpu.kernels`, callable repeatedly by E4-F3, and feeds E4-F4.
 

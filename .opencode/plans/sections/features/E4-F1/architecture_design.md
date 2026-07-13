@@ -14,8 +14,8 @@ CPU model selection and numeric parameters
        -> launch existing condensation mass-transfer kernel
 ```
 
-The configuration is process configuration, not gas state, and should use a
-dedicated typed container or explicit keyword-only arrays. Mode values are
+The configuration is process configuration, not gas state, and uses a typed,
+keyword-only operation sidecar. Mode values are
 compact `int32`; parameters and output are `float64`. Species position is the
 identity mapping and must align with gas molar-mass ordering.
 
@@ -33,9 +33,9 @@ identity mapping and must align with gas molar-mass ordering.
 - **Mutation order:** Complete host-side metadata validation before launch;
   refresh pressure before mass transfer. E4-F3 will invoke this primitive before
   each future substep.
-- **Compatibility:** An omitted configuration must have one documented behavior:
-  fail early per issue #1272 or use an explicit legacy/static mode. Silent stale
-  state is forbidden.
+- **Compatibility:** Omitted required configuration fails before allocation,
+  launch, or mutation. It must never silently reuse stale or zero vapor
+  pressure; legacy/static behavior requires an explicit configuration mode.
 
 ## Security & Compliance
 
