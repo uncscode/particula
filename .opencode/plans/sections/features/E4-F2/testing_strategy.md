@@ -25,9 +25,18 @@
   Frozen-config, legacy positional, inactive-composition, and invalid aggregate
   preflight cases are co-located. Invalid cases snapshot caller state and
   monkeypatch `wp.launch` to prove no launch or mutation.
-- **P4:** End-to-end fixtures compare GPU results with an independent CPU
-  sequence using recorded `rtol`/`atol`; Warp CPU runs whenever Warp is
-  installed, while CUDA runs when available and otherwise skips cleanly.
+- **P4 (completed, issue #1290):**
+  `particula/gpu/kernels/tests/_condensation_test_support.py` and
+  `particula/gpu/kernels/tests/condensation_test.py` provide deterministic fp64
+  independent NumPy end-to-end references for each ideal/kappa ×
+  static/composition-weighted pair over named one-box and multi-box fixtures.
+  The cases collectively exercise constant and Buck vapor pressure (including
+  ice and liquid Buck branches), pure and mixed composition, nonuniform static
+  tension, and a designated evaporation clamp. Named parity tolerances compare
+  raw transfer, final mass, refreshed vapor pressure, and unchanged gas;
+  tighter invariants separately verify clamp, finiteness, nonnegativity, and
+  ownership. Warp CPU is required whenever Warp is installed; CUDA is a
+  separately marked availability-guarded test.
 
 Every phase ships implementation and `*_test.py` tests together. Existing test
 coverage thresholds are never lowered and changed code must retain at least

@@ -18,10 +18,17 @@
   concrete `particula.gpu.kernels.condensation` import ownership are preserved.
 - [x] Invalid configuration fails before particle, gas, environment, or supplied
   output-buffer mutation.
-- [ ] Warp CPU parity passes when Warp is installed; CUDA passes when available
-  and otherwise skips cleanly.
-- [ ] No high-level runnable support, schema change, or hidden host computation
-  is introduced; project coverage remains at least 80%.
+- [x] **P4 / issue #1290:** Independent deterministic fp64 NumPy parity covers
+  all four supported mode pairs on one-box and multi-box fixtures, including
+  constant/Buck vapor-pressure refresh and both Buck temperature branches.
+- [x] **P4 / issue #1290:** Raw transfer, final clamp-to-zero mass, refreshed
+  vapor pressure, finite/nonnegative output, unchanged gas concentration, and
+  metadata ownership are asserted independently.
+- [x] Warp CPU parity runs when Warp is installed; separately marked CUDA
+  coverage passes when available and otherwise skips cleanly.
+- [x] No high-level runnable support, schema change, or hidden host computation
+  was introduced; deferred activity/surface strategies remain explicit
+  CPU-only `ValueError` cases.
 
 | Metric | Baseline | Target | Source |
 |---|---|---|---|
