@@ -61,10 +61,14 @@ def _build_gas_data() -> GasData:
 
 
 def _build_vapor_pressure() -> np.ndarray:
-    """Create deterministic vapor pressure input for condensation.
+    """Create the initial derived GPU vapor-pressure buffer.
+
+    Successful condensation calls overwrite this buffer on-device using the
+    current temperature before mass transfer, so these initial values are not
+    a caller-supplied physics source.
 
     Returns:
-        Vapor pressure array shaped ``(n_boxes, n_species)``.
+        Initial vapor-pressure array in Pa, shaped ``(n_boxes, n_species)``.
     """
     return np.array([[2330.0]], dtype=np.float64)
 

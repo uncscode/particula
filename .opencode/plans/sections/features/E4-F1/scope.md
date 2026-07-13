@@ -29,6 +29,15 @@ and a standalone, validated on-device vapor-pressure refresh primitive.
   positional `mass_transfer` compatibility, and atomic missing-configuration
   and CUDA cross-device failures.
 
+## Shipped / Superseded Historical Boundary
+
+- E4-F1-P3 pre-step integration in `condensation_step_gpu()` is shipped, not
+  out of scope: after successful input and sidecar validation, it refreshes
+  caller-owned `gas.vapor_pressure` exactly once from normalized current
+  per-box device temperature before environment preparation and mass transfer.
+  Direct `wp.float32` temperature is copied into a device-local `wp.float64`
+  buffer for the refresh boundary.
+
 ## Out of Scope
 
 - Activity and surface-tension physics (E4-F2).
@@ -38,9 +47,4 @@ and a standalone, validated on-device vapor-pressure refresh primitive.
 - Porting CPU vapor-pressure strategies other than constant and Buck.
 - Moving vapor pressure into CPU `GasData` or storing Python strategy objects,
   strings, or species names in Warp data.
-- Pre-step integration in `condensation_step_gpu()`: after successful input and
-  sidecar validation, it refreshes caller-owned `gas.vapor_pressure` exactly
-  once from normalized current per-box device temperature before environment
-  preparation and mass transfer. Direct `wp.float32` temperature is copied into
-  a device-local `wp.float64` buffer for the refresh boundary.
 - User-facing thermodynamics documentation or migration-guide updates.
