@@ -34,6 +34,10 @@ from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels.environment import _ensure_environment_arrays
+from particula.gpu.kernels.thermodynamics import (
+    ThermodynamicsConfig,
+    validate_thermodynamics_config,
+)
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
     molecule_mean_free_path_wp,
@@ -396,6 +400,7 @@ def condensation_step_gpu(
     mass_transfer: Any | None = None,
     *,
     environment: Any | None = None,
+    thermodynamics: ThermodynamicsConfig | Any | None = None,
 ) -> tuple[Any, Any]:
     """Execute one condensation timestep on the GPU.
 
@@ -418,6 +423,8 @@ def condensation_step_gpu(
             temperature and pressure arrays on the same device as ``particles``
             and ``gas``. This mode is supported when both direct inputs are
             ``None``.
+        thermodynamics: Required caller-owned thermodynamic sidecar with model
+            arrays matching the ordered gas species.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -432,6 +439,8 @@ def condensation_step_gpu(
             caller device.
         ValueError: If direct non-scalar, non-Warp-array temperature or
             pressure inputs are provided.
+        ValueError: If ``thermodynamics`` is absent or does not match the gas
+            species, active device, or required fixed schema.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -450,6 +459,10 @@ def condensation_step_gpu(
         state. Box-level gas properties are prepared once per call from the
         normalized temperature and pressure arrays, then reused during the
         per-particle kernel launch.
+
+        Thermodynamic validation may synchronously read caller-owned device
+        arrays, including on CUDA. This P1 boundary does not calculate vapor
+        pressure or refresh ``gas.vapor_pressure``.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
@@ -464,6 +477,13 @@ def condensation_step_gpu(
         n_boxes=n_boxes,
         device=device,
         caller_name="condensation_step_gpu",
+    )
+    validate_thermodynamics_config(
+        thermodynamics,
+        n_species,
+        device,
+        gas.molar_mass,
+        "condensation_step_gpu",
     )
 
     if surface_tension is None:

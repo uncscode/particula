@@ -46,7 +46,7 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
     """The discoverable wrapper continues to expose real support-backed tests."""
     assert len(EXPORTED_CONDENSATION_TESTS) >= 20
     assert (
-        "test_condensation_step_gpu_signature_keeps_environment_keyword_only"
+        "test_condensation_step_gpu_signature_keeps_keyword_only_inputs"
         in EXPORTED_CONDENSATION_TESTS
     )
     assert (

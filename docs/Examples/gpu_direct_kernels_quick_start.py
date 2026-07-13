@@ -131,6 +131,9 @@ def run_example(device: str = "cpu") -> list[str]:
         return output
 
     wp, condensation_step_gpu, coagulation_step_gpu = _load_gpu_runtime()
+    thermodynamics_module = importlib.import_module(
+        "particula.gpu.kernels.thermodynamics"
+    )
 
     gpu_particle_data = to_warp_particle_data(particle_data, device=device)
     gpu_gas_data = to_warp_gas_data(
@@ -138,12 +141,20 @@ def run_example(device: str = "cpu") -> list[str]:
         device=device,
         vapor_pressure=_build_vapor_pressure(),
     )
+    thermodynamics = thermodynamics_module.ThermodynamicsConfig(
+        modes=wp.zeros((1,), dtype=wp.int32, device=device),
+        parameters=wp.zeros((1, 4), dtype=wp.float64, device=device),
+        molar_mass_reference=wp.array(
+            gas_data.molar_mass, dtype=wp.float64, device=device
+        ),
+    )
     _, mass_transfer = condensation_step_gpu(
         gpu_particle_data,
         gpu_gas_data,
         temperature=298.15,
         pressure=101325.0,
         time_step=0.1,
+        thermodynamics=thermodynamics,
     )
     restored_gas_data = from_warp_gas_data(gpu_gas_data, name=gas_data.name)
 

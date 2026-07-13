@@ -126,6 +126,7 @@ if wp is not None:
         initialize_coagulation_rng_states,
     )
     from particula.gpu.kernels.condensation import condensation_step_gpu
+    from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
 
 pytestmark = [pytest.mark.slow, pytest.mark.performance, pytest.mark.benchmark]
 
@@ -1451,6 +1452,13 @@ def test_condensation_scaling(
     diffusion_vapor_wp: Any = wp.array(
         diffusion_vapor, dtype=wp.float64, device="cuda"
     )
+    thermodynamics = ThermodynamicsConfig(
+        modes=wp.zeros((n_species,), dtype=wp.int32, device="cuda"),
+        parameters=wp.zeros((n_species, 4), dtype=wp.float64, device="cuda"),
+        molar_mass_reference=wp.array(
+            gpu_gas.molar_mass.numpy(), dtype=wp.float64, device="cuda"
+        ),
+    )
 
     def gpu_step() -> None:
         condensation_step_gpu(
@@ -1463,6 +1471,7 @@ def test_condensation_scaling(
             mass_accommodation=mass_accommodation_wp,
             diffusion_coefficient_vapor=diffusion_vapor_wp,
             mass_transfer=mass_transfer_buffer,
+            thermodynamics=thermodynamics,
         )
 
     print(

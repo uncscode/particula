@@ -305,6 +305,8 @@ def test_run_example_failure_does_not_print_success_summary(
 
     class _FakeWP:
         uint32 = object()
+        int32 = object()
+        float64 = object()
 
         @staticmethod
         def zeros(
@@ -314,6 +316,15 @@ def test_run_example_failure_does_not_print_success_summary(
         ) -> _FakeArray:
             del dtype
             return _FakeArray(shape, device)
+
+        @staticmethod
+        def array(
+            values: object,
+            dtype: object,
+            device: str,
+        ) -> _FakeArray:
+            del dtype
+            return _FakeArray(np.asarray(values).shape, device)
 
     class _FakeParticleGPU:
         def __init__(self) -> None:
@@ -366,6 +377,8 @@ def test_run_example_uses_scalar_condensation_inputs_and_caller_owned_rng(
 
     class _FakeWP:
         uint32 = object()
+        int32 = object()
+        float64 = object()
 
         @staticmethod
         def zeros(
@@ -377,6 +390,15 @@ def test_run_example_uses_scalar_condensation_inputs_and_caller_owned_rng(
             calls["rng_dtype"] = dtype
             calls["rng_device"] = device
             return _FakeArray(shape, device)
+
+        @staticmethod
+        def array(
+            values: object,
+            dtype: object,
+            device: str,
+        ) -> _FakeArray:
+            del dtype
+            return _FakeArray(np.asarray(values).shape, device)
 
     class _FakeParticleGPU:
         def __init__(self) -> None:
@@ -436,11 +458,10 @@ def test_run_example_uses_scalar_condensation_inputs_and_caller_owned_rng(
     coagulation_kwargs = calls["coagulation_kwargs"]
     assert isinstance(condensation_kwargs, dict)
     assert isinstance(coagulation_kwargs, dict)
-    assert condensation_kwargs == {
-        "temperature": 298.15,
-        "pressure": 101325.0,
-        "time_step": 0.1,
-    }
+    assert condensation_kwargs["temperature"] == 298.15
+    assert condensation_kwargs["pressure"] == 101325.0
+    assert condensation_kwargs["time_step"] == 0.1
+    assert condensation_kwargs["thermodynamics"].modes.shape == (1,)
     assert coagulation_kwargs["temperature"] == 298.15
     assert coagulation_kwargs["pressure"] == 101325.0
     assert coagulation_kwargs["time_step"] == 0.1
