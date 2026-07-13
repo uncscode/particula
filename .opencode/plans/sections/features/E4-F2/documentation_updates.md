@@ -11,3 +11,8 @@
 - Record parity tolerances, Warp CPU/CUDA policy, and focused reproduction
   commands near the affected GPU feature documentation.
 - Mark E4-F2 phases and these plan sections shipped after implementation.
+
+## P1 Status
+- Issue #1287 added internal formula helpers and co-located tests only. No
+  public API or user documentation changed; supported-mode documentation remains
+  deferred to the integration and documentation phases.

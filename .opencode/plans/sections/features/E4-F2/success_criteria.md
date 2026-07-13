@@ -1,8 +1,9 @@
 # Success Criteria
 
 - [ ] Supported modes are explicitly selected and match issue #1272 CPU fixtures.
-- [ ] Ideal molar activity and kappa water activity include dry, zero-solute,
-  and multi-solute behavior matching independent references.
+- [x] **P1 / issue #1287:** Ideal molar activity and kappa water activity
+  include guarded zero branches, dry/zero-solute and multi-solute behavior,
+  and nonzero water-index cases matching independent NumPy references.
 - [ ] Composition-dependent effective surface tension affects Kelvin pressure.
 - [ ] Existing per-species surface input remains compatible as static mode.
 - [ ] Particle pressure is `activity * refreshed_pure_pressure * kelvin_term`.
