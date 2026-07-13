@@ -27,6 +27,7 @@ if wp is not None:
         _ensure_environment_arrays,
         _is_warp_array_like,
         _validate_box_array,
+        validate_environment_inputs,
     )
     from particula.gpu.tests.cuda_availability import (  # noqa: E402
         cuda_available,
@@ -101,6 +102,34 @@ def test_environment_helper_returns_valid_direct_arrays_unchanged(
 
     assert returned_temperature is temperature
     assert returned_pressure is pressure
+
+
+def test_environment_preflight_validates_arrays_without_scalar_broadcast(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Preflight accepts valid arrays without allocating scalar broadcasts."""
+    temperature = wp.array([298.15, 299.15], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0, 101000.0], dtype=wp.float64, device=device)
+
+    def _unexpected_broadcast(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("preflight broadcast a scalar input")
+
+    monkeypatch.setattr(
+        "particula.gpu.kernels.environment._broadcast_scalar_array",
+        _unexpected_broadcast,
+    )
+    assert (
+        validate_environment_inputs(
+            temperature=temperature,
+            pressure=pressure,
+            environment=None,
+            n_boxes=2,
+            device=temperature.device,
+            caller_name="test_caller",
+        )
+        is None
+    )
 
 
 def test_environment_helper_returns_environment_arrays_unchanged(

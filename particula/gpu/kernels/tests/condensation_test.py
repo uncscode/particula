@@ -67,3 +67,11 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         "test_condensation_step_gpu_direct_pressure_device_mismatch_raises"
         in EXPORTED_CONDENSATION_TESTS
     )
+    assert (
+        "test_condensation_activity_surface_matches_independent_reference"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_activity_surface_invalid_sidecar_is_atomic"
+        in EXPORTED_CONDENSATION_TESTS
+    )
