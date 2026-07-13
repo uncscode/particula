@@ -11,10 +11,13 @@ not lowered. Test files retain the `*_test.py` suffix, primarily under
   missing/non-config inputs, field metadata/device/schema errors, unsupported
   modes, non-finite/negative values, ordered molar-mass mismatch, no structural
   readbacks, one-readback-per-required-buffer, and mutable-buffer revalidation.
-- **P2:** Compare Warp CPU results with `ConstantVaporPressureStrategy` and
-  `get_buck_vapor_pressure()` below, at, and above freezing. Cover one/multiple
-  boxes, one/multiple species, and mixed model ordering.
-- **P3:** Deferred; no formula or vapor-pressure-refresh behavior was added.
+- **P2 (shipped in #1282):** `thermodynamics_test.py` compares constant output
+  with `ConstantVaporPressureStrategy` and canonical Buck output with
+  `get_buck_vapor_pressure()` below, at, and above freezing. It covers one and
+  multiple boxes, mixed species/models, reserved Buck parameters, complete
+  overwrite, concrete-module-only export, and API validation failures that leave
+  seeded vapor-pressure buffers unchanged.
+- **P3:** Deferred; #1282 added no condensation integration.
 - **Condensation boundary (shipped in #1281):** Regression tests require the
   keyword-only sidecar and prove invalid/missing configurations fail before
   launch, helper/scratch allocation, mass-transfer access, or mutation of
@@ -26,8 +29,8 @@ not lowered. Test files retain the `*_test.py` suffix, primarily under
 
 - Warp CPU parity is required when Warp is installed; CUDA is optional and skips
   cleanly when unavailable.
-- Use exact dtype/shape and buffer snapshot assertions. Formula parity and
-  freezing-boundary tests remain deferred with formula implementation.
+- Use explicit `float64` dtype/shape, `assert_allclose` tolerances for formula
+  parity, and exact buffer snapshots for failure-before-mutation assertions.
 - Focused verification covers `thermodynamics_test.py`, condensation and
   stiffness tests, and the opt-in benchmark; CUDA validation remains optional.
 - Maintain at least 80% changed-code coverage and never lower repository gates.

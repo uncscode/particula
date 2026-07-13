@@ -1,8 +1,7 @@
 # Scope
 
-Issue #1281 shipped only the E4-F1-P1 validation boundary. It supplies a
-caller-owned fixed-shape sidecar and validates it before condensation continues
-through its existing path.
+Issues #1281 and #1282 shipped E4-F1-P1/P2: a caller-owned fixed-shape sidecar
+and a standalone, validated on-device vapor-pressure refresh primitive.
 
 ## In Scope
 
@@ -18,6 +17,12 @@ through its existing path.
   `condensation_step_gpu()`; omission raises `ValueError`.
 - Migration of executable GPU benchmark and quick-start calls plus focused
   validator and condensation-boundary regression coverage.
+- `refresh_vapor_pressure_gpu` in
+  `particula/gpu/kernels/thermodynamics.py`, accepting Warp `float64` gas
+  buffers and `(n_boxes,)` temperature on the gas device.
+- One `(n_boxes, n_species)` launch that overwrites the pressure matrix using
+  constant Pa values or canonical Buck water/ice equations.
+- Co-located parity, API-surface, overwrite, and failure-before-mutation tests.
 
 ## Out of Scope
 
@@ -28,6 +33,6 @@ through its existing path.
 - Porting CPU vapor-pressure strategies other than constant and Buck.
 - Moving vapor pressure into CPU `GasData` or storing Python strategy objects,
   strings, or species names in Warp data.
-- Calculating vapor pressure, refreshing `WarpGasData.vapor_pressure`, launching
-  a formula kernel, or modifying particle/gas container schemas.
+- Integrating the refresh primitive into `condensation_step_gpu()`; P3 owns
+  pre-step and future per-substep refresh orchestration.
 - User-facing thermodynamics documentation or migration-guide updates.

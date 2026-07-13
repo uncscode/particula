@@ -1,8 +1,10 @@
-"""Validate thermodynamic sidecars and refresh GPU vapor pressures.
+"""Validate thermodynamic sidecars and refresh GPU vapor pressures in Pa.
 
-This Python-side sidecar supplies a fixed device-local schema for future
-vapor-pressure models. The concrete-module refresh API validates these
-caller-owned buffers before launching the device-resident evaluator.
+This module owns the fixed, device-local thermodynamic sidecar schema and its
+concrete-module-only refresh API. The refresh validates caller-owned Warp
+buffers before one device launch, then overwrites vapor pressure in Pa from
+temperatures in K. Constant models use their first parameter slot; Buck models
+use the canonical water/ice equations and reserve all four parameter slots.
 """
 
 from __future__ import annotations
@@ -46,15 +48,17 @@ class ThermodynamicsConfig:
     """Store caller-owned, device-local thermodynamic model inputs.
 
     The frozen dataclass preserves field bindings, but its caller-owned Warp
-    buffers remain mutable. It is a validation-only sidecar and does not
-    calculate vapor pressure or update ``gas.vapor_pressure``. Constant-mode
-    parameter zero is vapor pressure in Pa. Buck-mode parameter slots are
-    reserved by the fixed schema and are ignored by the canonical evaluator.
+    buffers remain mutable. This validation sidecar does not itself calculate
+    vapor pressure or update ``gas.vapor_pressure``. In constant mode,
+    ``parameters[:, 0]`` is vapor pressure in Pa. In Buck mode, all four
+    parameter slots retain their fixed-schema reservation, but are ignored
+    because the evaluator uses canonical water/ice equations.
 
     Attributes:
         modes: Per-species ``wp.int32`` model codes with shape ``(n_species,)``.
-        parameters: Per-species ``wp.float64`` model parameters with shape
-            ``(n_species, 4)``.
+        parameters: Per-species ``wp.float64`` parameters with shape
+            ``(n_species, 4)``. Slot zero is constant-mode pressure in Pa;
+            all four slots are reserved and unused for Buck mode.
         molar_mass_reference: Ordered ``wp.float64`` compatibility fingerprint
             with shape ``(n_species,)``.
     """
@@ -316,20 +320,30 @@ def refresh_vapor_pressure_gpu(
     gas: Any,
     temperature: Any,
 ) -> None:
-    """Refresh vapor pressure from device-local thermodynamic models.
+    """Refresh caller-owned GPU vapor pressure from thermodynamic models.
 
     Import this concrete-module API from
     ``particula.gpu.kernels.thermodynamics``; it is intentionally not exported
-    from ``particula.gpu.kernels``.
+    from ``particula.gpu.kernels``. After validating every input, this function
+    makes one ``(n_boxes, n_species)`` device launch and overwrites every value
+    in ``gas.vapor_pressure`` in Pa. Invalid calls raise before mutating that
+    output buffer. Constant models read ``parameters[:, 0]`` in Pa; Buck models
+    ignore all four reserved parameter slots and use canonical water/ice
+    equations.
 
     Args:
-        thermodynamics: Validated device-local per-species model sidecar.
-        gas: Caller-owned ``WarpGasData`` whose vapor pressure is overwritten.
+        thermodynamics: Device-local per-species model sidecar.
+        gas: Caller-owned ``WarpGasData`` whose vapor pressure is overwritten
+            in Pa.
         temperature: Device-local ``wp.float64`` temperatures in K with shape
             ``(n_boxes,)``.
 
+    Returns:
+        ``None``. The function mutates only ``gas.vapor_pressure``.
+
     Raises:
-        ValueError: If any input violates the device-array contract.
+        ValueError: If an input violates the device-array contract or the
+            configuration is invalid. ``gas.vapor_pressure`` is unchanged.
     """
     caller_name = "refresh_vapor_pressure_gpu"
     n_boxes, n_species, device = _validate_refresh_gas(gas, caller_name)

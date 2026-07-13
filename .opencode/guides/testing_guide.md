@@ -179,6 +179,7 @@ the shipped release-validation commands whenever Warp is installed:
 ```bash
 pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
+pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and gpu_parity"
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochastic"
 ```
@@ -203,6 +204,14 @@ These commands match the shipped marker and helper contract:
   dependency.
 - Benchmark coverage stays opt-in behind `--benchmark` and remains separate
   from the default release-validation path above.
+
+GPU thermodynamics refresh coverage belongs in
+`particula/gpu/kernels/tests/thermodynamics_test.py`. Test explicit
+device-resident refresh behavior against CPU vapor-pressure references, cover
+constant and canonical Buck modes across the freezing boundary, and verify
+invalid inputs leave the caller-owned vapor-pressure buffer unchanged. The
+refresh primitive remains a concrete-module API and is not condensation
+integration coverage.
 
 ### Device-aware tolerance policy
 

@@ -12,11 +12,17 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Tests: valid/mutable mixed models; metadata/value/device/order failures;
     readback limits; and no-launch/no-mutation boundary regressions.
 
-- [ ] **E4-F1-P2:** Implement constant and Buck Warp vapor-pressure refresh with parity tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Fill `(n_boxes, n_species)` on-device using constant and piecewise Buck formulas.
-  - Files: focused GPU thermodynamics module and co-located tests.
-  - Tests: below/at/above freezing, multi-box, mixed-species, CPU parity, optional CUDA parity.
+- [x] **E4-F1-P2:** Implement constant and Buck Warp vapor-pressure refresh with parity tests
+  - Issue: #1282 | Size: S | Status: Shipped
+  - Delivered: concrete-module-only `refresh_vapor_pressure_gpu` validates the
+    Warp `float64` boundary, then performs one `(n_boxes, n_species)` launch to
+    overwrite pressure using constant Pa values or canonical Buck water/ice
+    equations; Buck parameter slots are reserved/unused.
+  - Files: `particula/gpu/kernels/thermodynamics.py` and
+    `particula/gpu/kernels/tests/thermodynamics_test.py`.
+  - Tests: constant/Buck CPU parity below/at/above freezing, mixed models and
+    multi-box overwrite, API export contract, and invalid-input no-mutation;
+    Warp CPU parity with optional CUDA coverage.
 
 - [ ] **E4-F1-P3:** Integrate pre-step refresh into GPU condensation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
