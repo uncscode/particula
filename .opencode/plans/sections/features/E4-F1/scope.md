@@ -1,21 +1,23 @@
 # Scope
 
-E4-F1 supplies the thermodynamic model contract, constant/Buck Warp formulas,
-and the refresh hook used by GPU condensation. It establishes the primitive
-that E4-F3 can invoke before each of its future four substeps.
+Issue #1281 shipped only the E4-F1-P1 validation boundary. It supplies a
+caller-owned fixed-shape sidecar and validates it before condensation continues
+through its existing path.
 
 ## In Scope
 
 - Numeric, fixed-shape, species-indexed model modes and parameters.
 - Validation of mode, parameter bounds, dtype, shape, species count/order, and
   Warp device before launch or output mutation.
-- Constant and Buck vapor-pressure implementations using `wp.float64`.
-- On-device output with shape `(n_boxes, n_species)`.
-- Refresh from normalized current temperature immediately before the existing
-  condensation mass-transfer launch.
-- Repeated-call, direct-temperature, and `WarpEnvironmentData` parity tests.
-- Early failure when required thermodynamic configuration is absent or invalid,
-  subject to the explicit compatibility decision tracked in open questions.
+- `ThermodynamicsConfig` in `particula/gpu/kernels/thermodynamics.py`, with
+  `modes` `(n_species,)` `wp.int32`, `parameters` `(n_species, 4)`
+  `wp.float64`, and ordered `molar_mass_reference` `(n_species,)` `wp.float64`.
+- Validation before optional species defaults, caller `mass_transfer` access,
+  scratch allocation, formula work, or `wp.launch`.
+- A required keyword-only `thermodynamics` argument to
+  `condensation_step_gpu()`; omission raises `ValueError`.
+- Migration of executable GPU benchmark and quick-start calls plus focused
+  validator and condensation-boundary regression coverage.
 
 ## Out of Scope
 
@@ -26,3 +28,6 @@ that E4-F3 can invoke before each of its future four substeps.
 - Porting CPU vapor-pressure strategies other than constant and Buck.
 - Moving vapor pressure into CPU `GasData` or storing Python strategy objects,
   strings, or species names in Warp data.
+- Calculating vapor pressure, refreshing `WarpGasData.vapor_pressure`, launching
+  a formula kernel, or modifying particle/gas container schemas.
+- User-facing thermodynamics documentation or migration-guide updates.

@@ -1,8 +1,8 @@
-"""Caller-owned thermodynamic configuration validation for GPU kernels.
+"""Validate caller-owned thermodynamic sidecars for GPU kernels.
 
-The configuration is deliberately a Python-side sidecar.  It supplies a
-fixed device-local schema for future vapor-pressure models without evaluating
-those models or changing gas container state.
+This Python-side sidecar supplies a fixed device-local schema for future
+vapor-pressure models. Validation does not evaluate a model, launch a Warp
+kernel, calculate vapor pressure, or refresh gas container state.
 """
 
 from __future__ import annotations
@@ -33,12 +33,16 @@ THERMODYNAMICS_MODE_CONSTANT = wp.int32(0)
 """Constant vapor-pressure mode; parameter zero is pressure in Pa."""
 
 THERMODYNAMICS_MODE_BUCK = wp.int32(1)
-"""Buck vapor-pressure mode; parameters are reference pressure and factors."""
+"""Buck mode: reference pressure plus three coefficients."""
 
 
 @dataclass(frozen=True)
 class ThermodynamicsConfig:
     """Store caller-owned, device-local thermodynamic model inputs.
+
+    The frozen dataclass preserves field bindings, but its caller-owned Warp
+    buffers remain mutable. It is a validation-only sidecar and does not
+    calculate vapor pressure or update ``gas.vapor_pressure``.
 
     Attributes:
         modes: Per-species ``wp.int32`` model codes with shape ``(n_species,)``.
@@ -61,7 +65,20 @@ def _validate_array_metadata(
     device: Any,
     caller_name: str,
 ) -> None:
-    """Validate one sidecar field without reading caller-owned data."""
+    """Validate one sidecar field's metadata without reading its contents.
+
+    Args:
+        name: Field name used in validation errors.
+        values: Candidate caller-owned Warp array.
+        expected_shape: Required array shape.
+        expected_dtype: Required Warp scalar dtype.
+        device: Required active Warp device.
+        caller_name: Public entry point used in error messages.
+
+    Raises:
+        ValueError: If the field is not a Warp array or has incompatible dtype,
+            shape, or device.
+    """
     if not _is_warp_array_like(values):
         raise ValueError(
             f"thermodynamics.{name} must be a Warp array in {caller_name}."
@@ -84,7 +101,14 @@ def _validate_array_metadata(
 
 
 def _read_array(values: Any) -> np.ndarray:
-    """Read one validated Warp array exactly once into host memory."""
+    """Read one metadata-validated Warp array once into host memory.
+
+    Args:
+        values: Metadata-validated caller-owned Warp array.
+
+    Returns:
+        Host array containing the field values.
+    """
     return np.asarray(values.numpy())
 
 
@@ -97,14 +121,17 @@ def validate_thermodynamics_config(
 ) -> ThermodynamicsConfig:
     """Validate a thermodynamic sidecar and return its identical object.
 
-    Structural metadata is validated before any device-to-host readback.  Valid
-    caller buffers are never allocated, replaced, or mutated by this function.
+    Structural metadata is validated before any device-to-host readback. Valid
+    caller buffers are never allocated, replaced, or mutated. This
+    validation-only function does not launch kernels, evaluate thermodynamic
+    parameters, calculate vapor pressure, or refresh ``gas.vapor_pressure``.
 
     Args:
         thermodynamics: Candidate caller-owned configuration.
         n_species: Expected species count.
         device: Active particle and gas Warp device.
-        gas_molar_mass: Device-local gas molar masses.
+        gas_molar_mass: Device-local gas molar masses used as the ordered
+            compatibility fingerprint.
         caller_name: Public entry point used in error messages.
 
     Returns:

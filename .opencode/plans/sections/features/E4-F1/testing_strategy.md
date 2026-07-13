@@ -6,27 +6,28 @@ not lowered. Test files retain the `*_test.py` suffix, primarily under
 
 ## Per-Phase Coverage
 
-- **P1:** Validate accepted constant/Buck configurations and reject missing,
-  unsupported, wrong-shape/dtype/device, species-count, negative, NaN, and
-  infinite inputs before mutation.
+- **P1 (shipped in #1281):** `thermodynamics_test.py` covers valid mixed
+  constant/Buck sidecars, identity and buffer preservation, frozen bindings,
+  missing/non-config inputs, field metadata/device/schema errors, unsupported
+  modes, non-finite/negative values, ordered molar-mass mismatch, no structural
+  readbacks, one-readback-per-required-buffer, and mutable-buffer revalidation.
 - **P2:** Compare Warp CPU results with `ConstantVaporPressureStrategy` and
   `get_buck_vapor_pressure()` below, at, and above freezing. Cover one/multiple
   boxes, one/multiple species, and mixed model ordering.
-- **P3:** Exercise scalar, direct Warp-array, and `WarpEnvironmentData`
-  temperature paths. Mutate temperature between calls and prove the next pressure
-  and condensation result changes without a CPU refresh/transfer.
-- **P4:** Test reusable configuration/output arrays, repeated calls, active-device
-  mismatch, absent configuration behavior, positional API compatibility, and
-  snapshots proving gas/particle arrays remain unchanged after early errors.
+- **P3:** Deferred; no formula or vapor-pressure-refresh behavior was added.
+- **Condensation boundary (shipped in #1281):** Regression tests require the
+  keyword-only sidecar and prove invalid/missing configurations fail before
+  launch, helper/scratch allocation, mass-transfer access, or mutation of
+  particle mass, gas concentration, vapor pressure, or caller outputs. Existing
+  single/multi-box parity and stiffness paths pass a valid sidecar unchanged.
 - **P5:** Validate documentation links, mode/units tables, and cross-references.
 
 ## Device and Numerical Policy
 
 - Warp CPU parity is required when Warp is installed; CUDA is optional and skips
   cleanly when unavailable.
-- Use explicit `rtol`/`atol`, `np.float64` reference fixtures, and exact shape
-  assertions. Include the CPU Buck reference value near 298.15 K and branch-edge
-  cases around 273.15 K.
-- Run focused tests first, then normal fast tests. Slow/performance tests are not
-  required because issue #1272 specifies no diagnostics or benchmark target.
+- Use exact dtype/shape and buffer snapshot assertions. Formula parity and
+  freezing-boundary tests remain deferred with formula implementation.
+- Focused verification covers `thermodynamics_test.py`, condensation and
+  stiffness tests, and the opt-in benchmark; CUDA validation remains optional.
 - Maintain at least 80% changed-code coverage and never lower repository gates.
