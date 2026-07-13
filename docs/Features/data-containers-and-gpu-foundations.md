@@ -329,14 +329,27 @@ unsupported sidecars fail with `ValueError` before mutation. Unsupported
 activity or surface strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
 
+The direct condensation parity suite exercises all four activity/surface pairs
+(ideal/static, ideal/composition-weighted, kappa/static, and
+kappa/composition-weighted) against an independent NumPy `float64` reference.
+It uses deterministic one-box and multi-box inputs, including pure and mixed
+particle compositions, a clamp-to-zero evaporation case, and constant plus
+both Buck vapor-pressure branches. Parity checks cover raw transfer, final
+particle mass, refreshed vapor pressure, and unchanged gas concentration;
+tighter ownership invariants separately verify
+`final_mass == maximum(initial_mass + raw_transfer, 0)`. They do not claim
+particle-plus-gas conservation for this uncoupled direct step.
+
 Use `to_warp_*` and `from_warp_*` as the sole CPU↔Warp boundary. There is no
 hidden transfer and no high-level `Aerosol` or `Runnable` GPU path. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
 `rtol`/`atol`, then apply tighter separate ownership invariants. Warp `cpu` is
 required whenever Warp is installed; CUDA is optional, availability-guarded,
-and separately marked:
+and separately marked. Warp-dependent test imports are lazy, so marker-
+deselected collection does not require Warp:
 
 ```bash
+pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q -m "not warp"
 pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and gpu_parity and not cuda" -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
 ```

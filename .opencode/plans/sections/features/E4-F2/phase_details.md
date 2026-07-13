@@ -40,8 +40,18 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Tests: independent all-mode references, multi-box refresh/composition,
     legacy regression, frozen sidecar, edge cases, and monkeypatched no-launch
     atomic-failure snapshots.
-- [ ] **E4-F2-P4:** CPU and optional CUDA parity fixtures plus documentation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Verify coupled physics and document supported/deferred behavior.
-  - Files: GPU condensation tests, `docs/Features/`, plan sections
-  - Tests: Warp CPU required, CUDA optional skip, docs/link validation.
+- [x] **E4-F2-P4:** CPU and optional CUDA parity fixtures plus documentation
+  - Issue: #1290 | Size: S | Status: Completed
+  - Delivered: deterministic fp64 independent NumPy evidence for all four
+    ideal/kappa × static/composition-weighted direct-step combinations over
+    one-box and multi-box fixtures, including raw-transfer clamp semantics,
+    vapor-pressure refresh, and unchanged gas ownership. Documentation now
+    defines the shipped direct-kernel boundary and deferred CPU-only strategies.
+  - Files: `particula/gpu/kernels/tests/_condensation_test_support.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`,
+    `docs/Features/data-containers-and-gpu-foundations.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`
+  - Tests: Warp CPU is required when installed; separately marked CUDA coverage
+    is availability-guarded. Fixtures exercise static and composition-weighted
+    tension, ideal and kappa activity, one-/multi-box inputs, clamp-to-zero,
+    refreshed vapor pressure, and unchanged gas concentration.

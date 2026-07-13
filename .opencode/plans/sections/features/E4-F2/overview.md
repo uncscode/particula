@@ -8,7 +8,14 @@ CPU activity and composition-dependent Kelvin physics required by issue #1272.
 frozen, keyword-only `CondensationActivitySurfaceConfig` sidecar. It applies
 ideal or kappa activity only to the configured water species and combines it
 with refreshed pure vapor pressure and static or composition-weighted Kelvin
-surface tension, while retaining the legacy per-species surface input.
+ surface tension, while retaining the legacy per-species surface input.
+
+**Completed in P4 / issue #1290:** Deterministic fp64 NumPy references now
+cover every ideal/kappa × static/composition-weighted direct-step combination
+on one-box and multi-box fixtures. The evidence verifies raw-transfer clamp
+semantics, refreshed vapor pressure, and unchanged gas concentration; Warp CPU
+is required when installed and CUDA is separately availability-guarded. Feature
+documentation records this direct-kernel-only support and deferred strategies.
 
 **User Stories:**
 - As a modeler, I want GPU particle-side vapor pressure to include supported

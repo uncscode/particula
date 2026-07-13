@@ -38,5 +38,15 @@
   mode-pair tests, multi-box and legacy regressions, frozen-sidecar coverage,
   edge cases, and no-launch/no-mutation validation snapshots in the co-located
   condensation kernel test support and test modules.
-- [ ] **P4:** Record final CPU/CUDA parity evidence and user-facing
-  supported/CPU-only physics documentation.
+- [x] **E4-F2-P4 / issue #1290:** Added deterministic fp64 NumPy end-to-end
+  references and direct GPU parity tests for all ideal/kappa ×
+  static/composition-weighted combinations on one-box and multi-box fixtures.
+- [x] Recorded raw, unclamped transfer separately from final clamped mass;
+  tests prove the designated evaporation clamp, vapor-pressure refresh, finite
+  nonnegative final mass, and unchanged gas concentration.
+- [x] Made Warp CPU the required installed-Warp parity backend and retained
+  separately marked, availability-guarded CUDA evidence.
+- [x] Updated `docs/Features/data-containers-and-gpu-foundations.md` and
+  `docs/Features/Roadmap/data-oriented-gpu.md` with direct-kernel sidecar
+  support, ownership/transfer behavior, tolerance policy, and CPU-only
+  deferred strategy guidance.

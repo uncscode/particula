@@ -93,12 +93,17 @@ class CondensationActivitySurfaceConfig:
     particle-wide value for every condensing species.
 
     Attributes:
-        activity_mode: Integer mode selecting ideal or kappa water activity.
-        surface_tension_mode: Integer mode selecting static or
+        activity_mode: Integer selector: ``0`` for ideal or ``1`` for kappa
+            water activity.
+        surface_tension_mode: Integer selector: ``0`` for static or ``1`` for
             composition-weighted surface tension.
-        water_species_index: Index of the sole species receiving activity.
-        kappas: Per-species non-negative kappa parameters.
-        molar_mass_reference: Per-species molar masses ordered exactly as gas.
+        water_species_index: Index of the sole species receiving activity;
+            all other vapor species use unit activity.
+        kappas: Caller-owned finite, non-negative ``wp.float64`` array of
+            per-species kappa parameters with shape ``(n_species,)``.
+        molar_mass_reference: Caller-owned positive ``wp.float64`` array of
+            per-species molar masses [kg/mol], shaped ``(n_species,)`` and
+            exactly ordered as ``gas.molar_mass``.
     """
 
     activity_mode: Any
@@ -723,7 +728,8 @@ def condensation_step_gpu(  # noqa: C901
             retains legacy unit activity and species-indexed static tension.
 
     Returns:
-        Tuple of updated particle data and the mass transfer buffer.
+        Tuple of the particle data with in-place updated masses and the raw,
+        unclamped mass-transfer buffer [kg]. Gas concentration is unchanged.
 
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
@@ -748,6 +754,13 @@ def condensation_step_gpu(  # noqa: C901
 
         Particle masses are updated in-place on the GPU. Callers that require
         rollback should copy masses before invoking this function.
+
+        The returned transfer buffer records the calculated transfer before
+        mass clamping. Consequently, the final particle mass is
+        ``maximum(initial_mass + mass_transfer, 0)`` and is not necessarily
+        equal to ``initial_mass + mass_transfer`` for evaporation that would
+        otherwise make a mass negative. This direct step does not couple the
+        transfer to ``gas.concentration``.
 
         ``environment`` remains keyword-only so existing positional scalar
         callers stay source-compatible.
