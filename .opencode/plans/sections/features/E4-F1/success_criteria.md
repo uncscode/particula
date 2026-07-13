@@ -21,8 +21,12 @@
 - [x] Co-located Warp CPU parity/API/no-mutation tests cover the refresh boundary;
   CUDA parity remains optional and skips cleanly when unavailable.
 - [x] Scalar, direct Warp-array, and explicit environment inputs select the
-  current normalized per-box temperature; direct `wp.float32` is supported by a
-  device-local float64 cast.
+   current normalized per-box temperature; direct `wp.float32` is supported by a
+   device-local float64 cast.
+- [x] Public Warp integration tests reuse caller-owned thermodynamics,
+  vapor-pressure, and mass-transfer buffers across two calls, prove the legacy
+  positional mass-transfer slot, and snapshot all caller-owned outputs for
+  missing-sidecar and optional CUDA cross-device atomic failures.
 
 ## Metrics
 

@@ -24,7 +24,17 @@ not lowered. Test files retain the `*_test.py` suffix, primarily under
   temperature casting; and legacy positional/signature compatibility. Parameterized
   pre-refresh failure regressions assert malformed thermodynamics, invalid
   physical inputs, invalid optional mass-transfer buffers, and device mismatch
-  raise before a refresh launch or gas/particle mutation.
+   raise before a refresh launch or gas/particle mutation.
+- **P4 (shipped in #1284):**
+  `particula/integration_tests/gpu_thermodynamics_contract_test.py` adds three
+  public-boundary contracts: two-call reuse of one CPU-resident
+  `ThermodynamicsConfig`, vapor-pressure matrix, and mass-transfer buffer;
+  legacy positional `mass_transfer` compatibility with keyword-only
+  `thermodynamics`; and exact snapshot atomicity for omitted sidecars and,
+  when CUDA is available, CUDA-sidecar/CPU-data device mismatch. The reuse case
+  checks constant and Buck vapor pressures against CPU references, overwrites
+  sentinels, and retains caller-buffer identity. Warp is imported at test
+  runtime; only the CUDA mismatch test skips with the shared CUDA reason.
 - **Condensation boundary (shipped in #1281):** Regression tests require the
   keyword-only sidecar and prove invalid/missing configurations fail before
   launch, helper/scratch allocation, mass-transfer access, or mutation of

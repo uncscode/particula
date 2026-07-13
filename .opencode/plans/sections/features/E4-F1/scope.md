@@ -23,6 +23,11 @@ and a standalone, validated on-device vapor-pressure refresh primitive.
 - One `(n_boxes, n_species)` launch that overwrites the pressure matrix using
   constant Pa values or canonical Buck water/ice equations.
 - Co-located parity, API-surface, overwrite, and failure-before-mutation tests.
+- Warp-backed integration coverage in
+  `particula/integration_tests/gpu_thermodynamics_contract_test.py` for
+  caller-owned configuration/vapor-pressure/mass-transfer-buffer reuse,
+  positional `mass_transfer` compatibility, and atomic missing-configuration
+  and CUDA cross-device failures.
 
 ## Out of Scope
 

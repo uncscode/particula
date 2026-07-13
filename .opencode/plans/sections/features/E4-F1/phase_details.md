@@ -38,11 +38,16 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     repeated temperatures; float32 compatibility; signature compatibility; and
     pre-refresh failures with no refresh launch or gas/particle mutation.
 
-- [ ] **E4-F1-P4:** Harden repeated-call and device contracts with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Prove reusable configuration/output behavior and failure-before-mutation guarantees.
-  - Files: GPU thermodynamics/condensation modules and integration tests.
-  - Tests: repeated calls, device mismatch, absent configuration, unchanged gas/particle buffers on error.
+- [x] **E4-F1-P4:** Harden repeated-call and device contracts with integration tests
+  - Issue: #1284 | Size: S | Status: Shipped
+  - Delivered: public-boundary integration coverage only; production code was
+    unchanged because existing preflight ordering satisfied the atomicity
+    contract.
+  - Files: `particula/integration_tests/gpu_thermodynamics_contract_test.py`.
+  - Tests: repeated reuse of one CPU-resident `ThermodynamicsConfig`,
+    vapor-pressure matrix, and mass-transfer buffer; legacy positional
+    `mass_transfer` compatibility; exact no-mutation snapshots for omitted
+    configuration; and CUDA-only cross-device-sidecar atomicity.
 
 - [ ] **E4-F1-P5:** Document supported thermodynamic models and refresh ownership
   - Issue: TBD | Size: XS | Status: Not Started
