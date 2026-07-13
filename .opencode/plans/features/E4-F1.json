@@ -71,11 +71,11 @@
     {
       "id": "E4-F1-P4",
       "title": "Harden repeated-call and device contracts with integration tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-13",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
