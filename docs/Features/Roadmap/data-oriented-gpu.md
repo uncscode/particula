@@ -185,10 +185,13 @@ Known GPU physics gaps remain:
   hardcoded surface-tension default (0.072 N/m) with raw Kelvin and vapor
   pressure terms, so composition-dependent water uptake, kappa-hygroscopicity,
   and activity effects are not represented on the GPU.
-- Gas vapor pressure is a GPU-only field: `WarpGasData.vapor_pressure`
-  defaults to zeros when not supplied and is dropped when converting back to
-  `GasData`. There is no on-device recomputation of temperature-dependent
-  vapor pressures between timesteps.
+- Gas vapor pressure is a GPU-only derived field:
+  `WarpGasData.vapor_pressure` defaults to zeros when not supplied and is
+  dropped when converting back to `GasData`. Every successful supported direct
+  GPU condensation call refreshes it on-device from the current temperature;
+  see the [data containers and GPU foundations
+  guide](../data-containers-and-gpu-foundations.md) for the supported
+  constant/Buck scope and refresh contract.
 - No nucleation/particle-source process exists on CPU or GPU.
 
 Known GPU kernel defects and design limits (see
@@ -930,59 +933,33 @@ integration baseline. The accepted mixed-scale coagulation and
 parallel-within-box limitations are not condensation parity work; they remain
 documented constraints for Epic E or a separate evidence-backed proposal.
 
-Bring GPU condensation to parity with the CPU reference paths from Epics A
-and B: latent-heat physics, on-device thermodynamics, and the activity and
-surface-tension support required by the later optimization targets in
-[Epic I](#epic-i-differentiability-and-global-optimization). Staggered
-(Gauss-Seidel) condensation stays CPU-only (see [Non-Goals](#non-goals)).
-Every kernel in this epic ships with CPU/GPU parity tests under the Epic C
-device-aware test policy.
+Epic D's shipped E4-F1 baseline refreshes the derived GPU vapor-pressure
+matrix on-device during every successful direct condensation call with constant
+or canonical Buck models. The
+[data containers and GPU foundations guide](../data-containers-and-gpu-foundations.md)
+is the canonical source for its schema, units, ordering, device ownership, and
+refresh ordering. This narrow refresh baseline does not provide CPU-strategy
+parity, activity, surface tension, latent heat, gas coupling, substep
+orchestration, or a final support contract. Staggered (Gauss-Seidel)
+condensation stays CPU-only (see [Non-Goals](#non-goals)).
 
-Planned features:
+Remaining feature ownership:
 
-1. On-device vapor pressure recomputation: temperature-dependent saturation
-   vapor pressures recomputed on the GPU each timestep for parcel,
-   expansion, and latent-heat workflows; today `vapor_pressure` is set once
-   at transfer time and defaults to zeros.
-2. Warp-backed latent-heat condensation kernel matching the shipped CPU
-   `CondensationLatentHeat` bookkeeping path, including latent-heat-
-   corrected mass transfer and per-step latent heat energy bookkeeping
-   (see the [condensation
-   equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat)).
-   E3-F7 provides the current executable CPU integration baseline for this
-   future Epic D work through
-   `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-   That CPU-only diagnostic/reference baseline verifies only a finite
-   nonzero condensation transfer, particle water gain, gas water loss,
-   total water conservation, and final-step
-   `last_latent_heat_energy` agreement with the constant-latent-heat
-   bookkeeping path. Temperature-feedback runtime support and GPU
-   latent-heat parity remain future Epic D goals rather than shipped
-   behavior.
-3. Fixed-count sub-stepping integration: build GPU condensation on the
+1. E4-F2: activity and effective surface-tension physics.
+2. E4-F3: fixed four-substep orchestration based on the
    `fixed_count_substeps_4` recommendation from the
-   [condensation stiffness study](condensation-stiffness-study.md), keeping
-   the implementation graph-capture-friendly and autodiff-compatible (fixed
-   iteration counts, stable allocation layouts, no data-dependent loop
-   bounds).
-4. Per-species or per-particle surface tension, replacing the hardcoded
-   0.072 N/m kernel default.
-5. GPU activity support: decide which activity models (water activity,
-   kappa-hygroscopicity) get GPU kernels and implement the selected scope; a
-   prerequisite for the hygroscopicity and mixing-state targets in
-   [Epic I](#epic-i-differentiability-and-global-optimization).
-6. CPU/GPU parity tests for latent-heat condensation, including the stored
-   latent heat energy diagnostic.
-7. Gas-coupled support gating: do not claim gas-coupled GPU production
-   support until the production hook and same-issue conservation regression
-   in `particula/integration_tests/condensation_particle_resolved_test.py`
-   land.
+   [condensation stiffness study](condensation-stiffness-study.md).
+3. E4-F4: latent-heat correction and energy diagnostics, including the CPU
+   reference context in the [condensation
+   equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
+4. E4-F5: gas-coupled inventory, partitioning, and conservation evidence.
+5. E4-F6: independent Warp/CUDA parity, conservation, and readiness evidence.
+6. E4-F7: the final support contract, examples, troubleshooting, and support
+   matrix.
 
-**Exit bar:** GPU isothermal and latent-heat condensation match the CPU
-reference within recorded tolerances on Warp CPU (and CUDA when available),
-with on-device vapor pressure recomputation and configurable surface
-tension, while staying inside the E2 environment-shape contract and
-`float64` evidence envelope.
+Each deferred feature requires its own scoped validation under the Epic C
+device-aware test policy. The automatic E4-F1 refresh alone does not satisfy
+any deferred feature's exit bar.
 
 ## Epic E: GPU Coagulation Physics Coverage
 
@@ -1151,8 +1128,8 @@ Candidate GPU process coverage:
 - Nucleation: particle-source process activating inactive slots, after the CPU
   reference exists.
 - Gas updates: partitioning-related gas concentration changes needed by coupled
-  condensation workflows, plus on-device vapor pressure recomputation when
-  temperature changes.
+  condensation workflows, plus scheduler orchestration that uses the existing
+  on-device vapor-pressure refresh after temperature changes.
 - Environment updates: prescribed or process-driven per-box temperature and
   pressure updates, plus recomputation of derived thermodynamic fields;
   simulation-volume evolution remains owned by `ParticleData.volume`.
@@ -1476,6 +1453,6 @@ coagulation and state-representation decisions are recorded.
 | In-place kernels break gradients | Autodiff path unusable | Author differentiable-friendly kernel variants for the optimization path |
 | Tape memory for multi-step differentiable loops | Gradient runs exhaust GPU memory | Budget tape storage; evaluate gradient checkpointing |
 | RNG reproducibility across CPU/Warp CPU/CUDA | Non-reproducible stochastic results | Per-box RNG streams; document tolerances and reproducibility limits |
-| Caller drops ordered gas metadata or vapor-pressure sidecar across `WarpGasData` restore | Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic | Treat the current field split as the resolved contract, preserve ordered names externally, and recompute or carry `vapor_pressure` sidecar data when needed |
+| Caller drops ordered gas metadata or vapor-pressure sidecar across `WarpGasData` restore | Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic | Preserve ordered names externally. The supported direct condensation path automatically refreshes derived vapor pressure on-device, but CPU restore remains intentionally lossy and this does not add latent-heat, gas-coupled, or broader runtime behavior. |
 | Graph capture fragility (shape/process changes) | Invalid captured graphs | Fixed shapes, inactive slots, documented re-capture triggers |
 | GPU condensation lacks activity/kappa physics | Hygroscopicity and mixing-state targets unfittable | Plan GPU activity/surface-tension support in Epic D before Epic I targets |

@@ -266,6 +266,45 @@ gpu_gas = to_warp_gas_data(
 restored_gas = from_warp_gas_data(gpu_gas, name=gas_data.name)
 ```
 
+### GPU thermodynamics and condensation refresh
+
+`ThermodynamicsConfig` is caller-owned, device-local process configuration.
+Its Warp arrays have no species names: species identity is positional, and
+`molar_mass_reference` must exactly equal ordered `gas.molar_mass` on the
+active device. `WarpGasData.vapor_pressure`, in contrast, is a mutable,
+derived GPU helper buffer rather than authoritative `GasData` state. It is
+omitted by `from_warp_gas_data()`.
+
+The fixed configuration and refresh contracts are:
+
+| Field | Required Warp dtype and shape | Meaning |
+| --- | --- | --- |
+| `modes` | `wp.int32`, `(n_species,)` | Per-species model code. |
+| `parameters` | `wp.float64`, `(n_species, 4)` | Per-species model parameters. |
+| `molar_mass_reference` | `wp.float64`, `(n_species,)` | Ordered compatibility fingerprint for `gas.molar_mass`. |
+| Refresh temperature | `wp.float64`, `(n_boxes,)` | Device-local temperature at the standalone refresh boundary. |
+| `vapor_pressure` output | `wp.float64`, `(n_boxes, n_species)` | Derived pressure matrix in Pa. |
+
+Only two model codes are shipped: constant `wp.int32(0)`, which reads
+`parameters[:, 0]` in Pa, and canonical Buck `wp.int32(1)`, which evaluates
+the water/ice equations and ignores all four reserved parameter slots.
+
+`condensation_step_gpu()` requires keyword-only `thermodynamics=` while
+preserving the positional `mass_transfer` slot. Its accepted temperature
+sources are a direct scalar, a direct same-device Warp array with shape
+`(n_boxes,)`, hybrid direct scalar/Warp-array inputs, or keyword-only
+`environment=` when both direct values are `None`. NumPy arrays and Python
+lists are not accepted as direct arrays, and the step does not perform hidden
+transfers.
+
+On every successful condensation call, the step validates all inputs and
+optional buffers first. It then casts a non-`wp.float64` direct or environment
+temperature array into a device-local float64 buffer when needed, overwrites
+`vapor_pressure`, prepares environment properties, and transfers mass. A
+failed preflight leaves the vapor-pressure output buffer unchanged. Import the
+standalone `refresh_vapor_pressure_gpu` only from
+`particula.gpu.kernels.thermodynamics`, never `particula.gpu.kernels`.
+
 ## Current shipped support boundaries
 
 The containers are multi-box capable, but current execution support is narrower

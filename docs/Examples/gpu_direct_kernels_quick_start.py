@@ -6,8 +6,9 @@ quick-start for the low-level Warp kernel path. It keeps CPU-owned
 published ``to_warp_*`` / ``from_warp_*`` helpers, and imports direct step
 functions only from ``particula.gpu.kernels`` after the optional
 ``WARP_AVAILABLE`` guard passes. The condensation call supplies a
-caller-owned, validation-only thermodynamic sidecar; vapor pressure remains an
-explicit GPU gas input and is not calculated or refreshed by that call.
+caller-owned thermodynamic sidecar and an initial GPU vapor-pressure buffer.
+After validation, the call refreshes that derived buffer on-device from the
+current temperature before mass transfer.
 """
 
 from __future__ import annotations
@@ -93,8 +94,8 @@ def _load_gpu_runtime() -> tuple[Any, Any, Any]:
 def run_example(device: str = "cpu") -> list[str]:
     """Run the canonical direct-kernel quick-start.
 
-    The condensation branch builds caller-owned thermodynamic buffers that are
-    validated without calculating or refreshing vapor pressure.
+    The condensation branch builds caller-owned thermodynamic buffers and
+    refreshes the derived vapor-pressure buffer on-device before mass transfer.
 
     Args:
         device: Warp device for the optional kernel path. Defaults to the Warp
