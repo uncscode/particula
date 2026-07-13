@@ -1453,10 +1453,20 @@ def test_condensation_scaling(
         diffusion_vapor, dtype=wp.float64, device="cuda"
     )
     thermodynamics = ThermodynamicsConfig(
-        modes=wp.zeros((n_species,), dtype=wp.int32, device="cuda"),
-        parameters=wp.zeros((n_species, 4), dtype=wp.float64, device="cuda"),
+        modes=_wp_zeros_with_guard(
+            (n_species,),
+            dtype=wp.int32,
+            device="cuda",
+            label=f"{tag} thermodynamics modes",
+        ),
+        parameters=_wp_zeros_with_guard(
+            (n_species, 4),
+            dtype=wp.float64,
+            device="cuda",
+            label=f"{tag} thermodynamics parameters",
+        ),
         molar_mass_reference=wp.array(
-            gpu_gas.molar_mass.numpy(), dtype=wp.float64, device="cuda"
+            gas.molar_mass, dtype=wp.float64, device="cuda"
         ),
     )
 

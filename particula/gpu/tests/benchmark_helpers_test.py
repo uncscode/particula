@@ -1261,6 +1261,7 @@ def test_condensation_scaling_records_cpu_and_gpu_paths(
         "wp",
         types.SimpleNamespace(
             float64=np.float64,
+            int32=np.int32,
             array=lambda values, **kwargs: np.asarray(values, dtype=np.float64),
         ),
     )
@@ -1534,7 +1535,9 @@ def test_coagulation_scaling_uses_coagulation_only_helper(
     monkeypatch.setattr(
         benchmark_module,
         "_make_gas_data",
-        lambda n_boxes, n_species: object(),
+        lambda n_boxes, n_species: types.SimpleNamespace(
+            molar_mass=np.ones(n_species, dtype=np.float64)
+        ),
     )
     monkeypatch.setattr(
         benchmark_module,
