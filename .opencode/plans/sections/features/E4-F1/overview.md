@@ -16,6 +16,12 @@ boundary, then uses one `(n_boxes, n_species)` launch to overwrite
 canonical Buck water/ice equations, while retaining the fixed sidecar schema
 and leaving condensation integration to P3.
 
+Issue #1284 shipped E4-F1-P4 integration coverage without production changes.
+It verifies that the public condensation boundary safely reuses caller-owned
+thermodynamics, vapor-pressure, and mass-transfer buffers, preserves the legacy
+positional mass-transfer slot, and rejects missing or cross-device sidecars
+atomically.
+
 ## User Stories
 
 - As a simulation developer, I want a required, caller-owned thermodynamic
@@ -29,3 +35,6 @@ and leaving condensation integration to P3.
   per-box temperature before mass transfer.
 - As a model author, I want constant and Buck output that preserves species
   ordering and matches CPU references at the freezing boundary.
+- As a simulation developer, I want repeated public calls to reuse my
+  thermodynamic sidecar and output buffer without stale values or hidden
+  mutation when validation fails.

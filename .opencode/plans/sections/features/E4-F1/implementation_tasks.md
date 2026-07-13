@@ -30,8 +30,11 @@
   no-mutation refresh tests.
 - [x] Add invalid/missing configuration and failure-before-mutation tests.
 - [x] Add condensation integration tests for launch ordering, scalar/direct/
-  environment temperature sources, repeated calls, float32 support, signature
-  compatibility, and pre-refresh failure atomicity.
+   environment temperature sources, repeated calls, float32 support, signature
+   compatibility, and pre-refresh failure atomicity.
+- [x] Add Warp-backed public integration tests for reusable thermodynamics,
+  vapor-pressure, and mass-transfer buffers; legacy positional mass-transfer
+  compatibility; and atomic missing-sidecar and CUDA cross-device failures.
 - [x] Migrate benchmark and quick-start executable calls to pass the sidecar.
 
 ## Documentation

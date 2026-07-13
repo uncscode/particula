@@ -23,5 +23,10 @@
 - Follow lazy high-level export policy in `particula/gpu/kernels/__init__.py`;
   keep raw Warp device/kernel helpers internal unless a separate public API is
   approved.
-- Extend `particula/gpu/kernels/tests/condensation_test.py` and its support
-  module, following Warp CPU-required/CUDA-optional conventions.
+- P4 reuses `to_warp_particle_data`, `to_warp_gas_data`, CPU
+  `get_buck_vapor_pressure()`, and
+  `particula/gpu/tests/cuda_availability.py` in the dedicated public-boundary
+  integration module
+  `particula/integration_tests/gpu_thermodynamics_contract_test.py`; Warp CPU
+  is required when installed and its CUDA-only device-mismatch case skips via
+  the shared availability reason.

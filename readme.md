@@ -75,6 +75,11 @@ Warp temperature arrays, and `WarpEnvironmentData` are supported; non-float64
 temperature arrays are cast on-device for the refresh without a host
 vapor-pressure transfer.
 
+Caller-owned thermodynamics configurations and optional mass-transfer buffers
+may be reused across calls. A failed preflight, including missing or
+device-incompatible thermodynamics, leaves caller-owned simulation and output
+buffers unchanged.
+
 ## Code Structure
 
 ```
