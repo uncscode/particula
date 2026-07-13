@@ -51,6 +51,8 @@ from particula.gpu.kernels.condensation import (  # noqa: E402
     condensation_step_gpu as _condensation_step_gpu,
 )
 from particula.gpu.kernels.thermodynamics import (  # noqa: E402
+    THERMODYNAMICS_MODE_BUCK,
+    THERMODYNAMICS_MODE_CONSTANT,
     ThermodynamicsConfig,
 )
 from particula.gpu.tests.cuda_availability import (  # noqa: E402
@@ -86,14 +88,46 @@ _ENVIRONMENT_ARRAY_RTOL = 1.0e-7
 
 
 def _make_thermodynamics_config(gpu_gas: Any) -> ThermodynamicsConfig:
-    """Build the valid validation-only sidecar for an existing GPU gas input."""
+    """Build a constant-model sidecar with nonzero vapor pressures in Pa."""
     n_species = gpu_gas.molar_mass.shape[0]
     return ThermodynamicsConfig(
         modes=wp.zeros(
             n_species, dtype=wp.int32, device=gpu_gas.molar_mass.device
         ),
-        parameters=wp.zeros(
-            (n_species, 4), dtype=wp.float64, device=gpu_gas.molar_mass.device
+        parameters=wp.array(
+            np.column_stack(
+                (
+                    np.full(n_species, 800.0, dtype=np.float64),
+                    np.zeros((n_species, 3), dtype=np.float64),
+                )
+            ),
+            dtype=wp.float64,
+            device=gpu_gas.molar_mass.device,
+        ),
+        molar_mass_reference=wp.array(
+            gpu_gas.molar_mass.numpy(),
+            dtype=wp.float64,
+            device=gpu_gas.molar_mass.device,
+        ),
+    )
+
+
+def _make_mixed_thermodynamics_config(gpu_gas: Any) -> ThermodynamicsConfig:
+    """Build a two-mode constant/Buck sidecar for refresh integration tests."""
+    n_species = gpu_gas.molar_mass.shape[0]
+    modes = np.full(
+        n_species, int(THERMODYNAMICS_MODE_CONSTANT), dtype=np.int32
+    )
+    if n_species > 1:
+        modes[1] = int(THERMODYNAMICS_MODE_BUCK)
+    parameters = np.zeros((n_species, 4), dtype=np.float64)
+    parameters[:, 0] = np.linspace(725.0, 900.0, n_species)
+    return ThermodynamicsConfig(
+        modes=wp.array(modes, dtype=wp.int32, device=gpu_gas.molar_mass.device),
+        parameters=wp.array(
+            parameters,
+            dtype=wp.float64,
+            device=gpu_gas.molar_mass.device,
         ),
         molar_mass_reference=wp.array(
             gpu_gas.molar_mass.numpy(),
@@ -108,6 +142,44 @@ def condensation_step_gpu(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
     if "thermodynamics" not in kwargs:
         kwargs["thermodynamics"] = _make_thermodynamics_config(args[1])
     return _condensation_step_gpu(*args, **kwargs)
+
+
+def _evaluate_vapor_pressure_config(
+    thermodynamics: ThermodynamicsConfig,
+    temperature: float | np.ndarray,
+) -> np.ndarray:
+    """Evaluate a test thermodynamic sidecar using the production equations."""
+    temperatures = np.atleast_1d(np.asarray(temperature, dtype=np.float64))
+    modes = np.asarray(thermodynamics.modes.numpy(), dtype=np.int32)
+    parameters = np.asarray(thermodynamics.parameters.numpy(), dtype=np.float64)
+    vapor_pressure = np.empty((temperatures.size, modes.size), dtype=np.float64)
+    for species_idx, mode in enumerate(modes):
+        if mode == int(THERMODYNAMICS_MODE_CONSTANT):
+            vapor_pressure[:, species_idx] = parameters[species_idx, 0]
+            continue
+        if mode != int(THERMODYNAMICS_MODE_BUCK):
+            raise ValueError("unsupported test thermodynamics mode")
+        temperature_celsius = temperatures - 273.15
+        ice = temperature_celsius < 0.0
+        vapor_pressure[ice, species_idx] = (
+            6.1115
+            * np.exp(
+                (23.036 - temperature_celsius[ice] / 333.7)
+                * temperature_celsius[ice]
+                / (279.82 + temperature_celsius[ice])
+            )
+            * 100.0
+        )
+        vapor_pressure[~ice, species_idx] = (
+            6.1121
+            * np.exp(
+                (18.678 - temperature_celsius[~ice] / 234.5)
+                * temperature_celsius[~ice]
+                / (257.14 + temperature_celsius[~ice])
+            )
+            * 100.0
+        )
+    return vapor_pressure
 
 
 @pytest.fixture(params=warp_devices(wp))
@@ -585,7 +657,7 @@ def _classify_particle_only_condensation_stiffness(
     )
 
 
-def _cpu_mass_transfer(
+def _cpu_mass_transfer(  # noqa: C901
     particles: ParticleData,
     gas: GasData,
     vapor_pressure: np.ndarray,
@@ -595,8 +667,9 @@ def _cpu_mass_transfer(
     temperature: float | np.ndarray,
     pressure: float | np.ndarray,
     time_step: float,
+    thermodynamics: ThermodynamicsConfig | None = None,
 ) -> np.ndarray:
-    """Compute CPU mass transfer matching GPU kernel physics."""
+    """Compute CPU mass transfer matching refreshed GPU kernel physics."""
     n_boxes, n_particles, n_species = particles.masses.shape
     mass_transfer = np.zeros_like(particles.masses)
     temperature_array = np.full((n_boxes,), temperature, dtype=np.float64)
@@ -605,6 +678,17 @@ def _cpu_mass_transfer(
     pressure_array = np.full((n_boxes,), pressure, dtype=np.float64)
     if isinstance(pressure, np.ndarray):
         pressure_array = np.asarray(pressure, dtype=np.float64)
+    if thermodynamics is None:
+        vapor_pressure = np.full(
+            (n_boxes, n_species),
+            800.0,
+            dtype=np.float64,
+        )
+    else:
+        vapor_pressure = _evaluate_vapor_pressure_config(
+            thermodynamics,
+            temperature_array,
+        )
 
     for box_idx in range(n_boxes):
         box_temperature = float(temperature_array[box_idx])
@@ -927,6 +1011,7 @@ def _run_gpu_step(
     diffusion_coefficient_vapor: np.ndarray | None = None,
     mass_transfer: Any | None = None,
     environment: Any | None = None,
+    thermodynamics: ThermodynamicsConfig | None = None,
     return_gas_state: Literal[False] = False,
 ) -> tuple[ParticleData, Any]: ...
 
@@ -945,6 +1030,7 @@ def _run_gpu_step(
     diffusion_coefficient_vapor: np.ndarray | None = None,
     mass_transfer: Any | None = None,
     environment: Any | None = None,
+    thermodynamics: ThermodynamicsConfig | None = None,
     return_gas_state: Literal[True] = True,
 ) -> tuple[ParticleData, Any, GasData]: ...
 
@@ -962,6 +1048,7 @@ def _run_gpu_step(
     diffusion_coefficient_vapor: np.ndarray | None = None,
     mass_transfer: Any | None = None,
     environment: Any | None = None,
+    thermodynamics: ThermodynamicsConfig | None = None,
     return_gas_state: bool = False,
 ) -> tuple[ParticleData, Any] | tuple[ParticleData, Any, GasData]:
     """Run GPU condensation step and return CPU particle data.
@@ -979,6 +1066,7 @@ def _run_gpu_step(
         diffusion_coefficient_vapor: Optional per-species diffusion array.
         mass_transfer: Optional caller-owned Warp mass-transfer buffer.
         environment: Optional explicit Warp environment container.
+        thermodynamics: Optional supplied config; defaults to constant models.
         return_gas_state: If True, also round-trip the executed Warp gas state.
 
     Returns:
@@ -991,6 +1079,8 @@ def _run_gpu_step(
         device=device,
         vapor_pressure=vapor_pressure,
     )
+    if thermodynamics is None:
+        thermodynamics = _make_thermodynamics_config(gpu_gas)
     _, mass_transfer_buffer = condensation_step_gpu(
         gpu_particles,
         gpu_gas,
@@ -1002,6 +1092,7 @@ def _run_gpu_step(
         diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         mass_transfer=mass_transfer,
         environment=environment,
+        thermodynamics=thermodynamics,
     )
     cpu_particles = from_warp_particle_data(gpu_particles, sync=True)
     if not return_gas_state:
@@ -2885,6 +2976,289 @@ def test_condensation_multi_species_parity(device: str) -> None:
     )
 
     npt.assert_allclose(gpu_result.masses, expected_masses, rtol=1.0e-10)
+
+
+def test_condensation_step_gpu_refreshes_before_mass_transfer(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Refresh runs once after float32 casting and before mass transfer."""
+    particles = _make_particle_data(n_boxes=2, n_particles=1, n_species=2)
+    gas = _make_gas_data(n_boxes=2, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.full((2, 2), 1.0, dtype=np.float64),
+    )
+    thermodynamics = _make_mixed_thermodynamics_config(gpu_gas)
+    temperature = wp.array([273.15, 301.15], dtype=wp.float32, device=device)
+    pressure = wp.array([101325.0, 100800.0], dtype=wp.float32, device=device)
+    launch_names: list[str] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launch_names.append(getattr(kernel, "key", str(kernel)))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    _, transfer = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature,
+        pressure,
+        0.1,
+        thermodynamics=thermodynamics,
+    )
+
+    expected_pressure = _evaluate_vapor_pressure_config(
+        thermodynamics,
+        np.array([273.15, 301.15], dtype=np.float32).astype(np.float64),
+    )
+    npt.assert_allclose(
+        gpu_gas.vapor_pressure.numpy(),
+        expected_pressure,
+        rtol=2.0e-7,
+    )
+    assert np.all(np.isfinite(transfer.numpy()))
+    assert launch_names.count("_refresh_vapor_pressure_kernel") == 1
+    assert launch_names.index("_copy_temperature_to_float64_kernel") < (
+        launch_names.index("_refresh_vapor_pressure_kernel")
+    )
+    assert (
+        launch_names.index("_refresh_vapor_pressure_kernel")
+        < (launch_names.index("_prepare_environment_properties_kernel"))
+        < launch_names.index("condensation_mass_transfer_kernel")
+    )
+
+
+def test_condensation_step_gpu_refreshes_reused_gas_at_new_temperature(
+    device: str,
+) -> None:
+    """A reused gas sidecar is overwritten from each current temperature."""
+    particles = _make_particle_data(n_boxes=2, n_particles=1, n_species=2)
+    gas = _make_gas_data(n_boxes=2, n_species=2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.full((2, 2), 1.0, dtype=np.float64),
+    )
+    thermodynamics = _make_mixed_thermodynamics_config(gpu_gas)
+    pressure = wp.full(2, 101325.0, dtype=wp.float64, device=device)
+    first_temperature = wp.array(
+        [273.15, 280.0], dtype=wp.float64, device=device
+    )
+    second_temperature = wp.array(
+        [290.0, 305.0], dtype=wp.float64, device=device
+    )
+
+    _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        first_temperature,
+        pressure,
+        0.1,
+        thermodynamics=thermodynamics,
+    )
+    first_pressure = gpu_gas.vapor_pressure.numpy().copy()
+    _, second_transfer = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        second_temperature,
+        pressure,
+        0.1,
+        thermodynamics=thermodynamics,
+    )
+    second_pressure = gpu_gas.vapor_pressure.numpy().copy()
+
+    npt.assert_allclose(
+        first_pressure,
+        _evaluate_vapor_pressure_config(
+            thermodynamics, np.array([273.15, 280.0])
+        ),
+    )
+    npt.assert_allclose(
+        second_pressure,
+        _evaluate_vapor_pressure_config(
+            thermodynamics, np.array([290.0, 305.0])
+        ),
+    )
+    assert not np.array_equal(first_pressure, second_pressure)
+    assert np.all(np.isfinite(second_transfer.numpy()))
+
+
+@pytest.mark.parametrize("input_kind", ["scalar", "array", "environment"])
+def test_condensation_step_gpu_refreshes_stale_pressure_for_each_input_kind(
+    input_kind: str,
+    device: str,
+) -> None:
+    """Refresh stale pressure and match CPU transfer for each input contract."""
+    particles = _make_particle_data(n_boxes=2, n_particles=1, n_species=2)
+    gas = _make_gas_data(n_boxes=2, n_species=2)
+    temperature_values = np.array([278.15, 303.15], dtype=np.float64)
+    pressure_values = np.array([101325.0, 100800.0], dtype=np.float64)
+    if input_kind == "scalar":
+        temperature_values.fill(298.15)
+        pressure_values.fill(101325.0)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.full((2, 2), 1.0, dtype=np.float64),
+    )
+    thermodynamics = _make_mixed_thermodynamics_config(gpu_gas)
+    if input_kind == "environment":
+        environment = to_warp_environment_data(
+            EnvironmentData(
+                temperature=temperature_values,
+                pressure=pressure_values,
+                saturation_ratio=np.ones((2, 2), dtype=np.float64),
+            ),
+            device=device,
+        )
+        temperature: float | Any | None = None
+        pressure: float | Any | None = None
+    elif input_kind == "array":
+        environment = None
+        temperature = wp.array(
+            temperature_values, dtype=wp.float64, device=device
+        )
+        pressure = wp.array(pressure_values, dtype=wp.float64, device=device)
+    else:
+        environment = None
+        temperature = float(temperature_values[0])
+        pressure = float(pressure_values[0])
+
+    _, transfer = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature,
+        pressure,
+        0.1,
+        environment=environment,
+        thermodynamics=thermodynamics,
+    )
+    expected_pressure = _evaluate_vapor_pressure_config(
+        thermodynamics,
+        temperature_values,
+    )
+    expected_transfer = _cpu_mass_transfer(
+        particles,
+        gas,
+        np.full((2, 2), 1.0, dtype=np.float64),
+        np.full(2, 0.072, dtype=np.float64),
+        np.full(2, 1.0, dtype=np.float64),
+        np.full(2, 2.0e-5, dtype=np.float64),
+        temperature_values,
+        pressure_values,
+        0.1,
+        thermodynamics=thermodynamics,
+    )
+
+    npt.assert_allclose(gpu_gas.vapor_pressure.numpy(), expected_pressure)
+    npt.assert_allclose(transfer.numpy(), expected_transfer, rtol=1.0e-10)
+
+
+@pytest.mark.parametrize(
+    ("failure_kind", "match"),
+    [
+        ("thermodynamics", "thermodynamics"),
+        ("temperature", "temperature"),
+        ("mass_transfer", "mass_transfer shape"),
+    ],
+)
+def test_condensation_step_gpu_pre_refresh_failures_are_atomic(
+    failure_kind: str,
+    match: str,
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Validation failures launch no refresh and preserve caller-owned state."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.array([[17.0]], dtype=np.float64),
+    )
+    thermodynamics: ThermodynamicsConfig | None = _make_thermodynamics_config(
+        gpu_gas
+    )
+    temperature: float = 298.15
+    mass_transfer: Any | None = None
+    if failure_kind == "thermodynamics":
+        thermodynamics = None
+    elif failure_kind == "temperature":
+        temperature = float("nan")
+    else:
+        mass_transfer = wp.zeros((1, 1, 2), dtype=wp.float64, device=device)
+
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_pressure = gpu_gas.vapor_pressure.numpy().copy()
+    launch_names: list[str] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launch_names.append(getattr(kernel, "key", str(kernel)))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    with pytest.raises(ValueError, match=match):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature,
+            101325.0,
+            0.1,
+            mass_transfer=mass_transfer,
+            thermodynamics=thermodynamics,
+        )
+    assert "_refresh_vapor_pressure_kernel" not in launch_names
+    npt.assert_allclose(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_allclose(gpu_gas.vapor_pressure.numpy(), initial_pressure)
+
+
+def test_condensation_step_gpu_invalid_optional_buffer_does_not_refresh(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Optional-buffer failures leave gas and particle data untouched."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.array([[17.0]], dtype=np.float64),
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    initial_mass = gpu_particles.masses.numpy()
+    initial_pressure = gpu_gas.vapor_pressure.numpy()
+    launch_names: list[str] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launch_names.append(getattr(kernel, "key", str(kernel)))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    invalid_transfer = wp.zeros((1, 1, 2), dtype=wp.float64, device=device)
+    with pytest.raises(ValueError, match="mass_transfer shape"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            mass_transfer=invalid_transfer,
+            thermodynamics=thermodynamics,
+        )
+    assert "_refresh_vapor_pressure_kernel" not in launch_names
+    npt.assert_allclose(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_allclose(gpu_gas.vapor_pressure.numpy(), initial_pressure)
 
 
 @pytest.mark.parametrize("case_name", ["nanometer", "droplet_like"])

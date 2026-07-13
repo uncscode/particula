@@ -36,6 +36,7 @@ from particula.gpu.dynamics.condensation_funcs import (
 from particula.gpu.kernels.environment import _ensure_environment_arrays
 from particula.gpu.kernels.thermodynamics import (
     ThermodynamicsConfig,
+    refresh_vapor_pressure_gpu,
     validate_thermodynamics_config,
 )
 from particula.gpu.properties.gas_properties import (
@@ -180,6 +181,28 @@ def condensation_mass_transfer_kernel(
         mass_transfer[box_idx, particle_idx, species_idx] = (
             mass_rate * time_step
         )
+
+
+@wp.kernel
+# type: ignore[misc]
+def _copy_temperature_to_float64_kernel(
+    temperature: Any,
+    output: Any,
+) -> None:
+    """Copy normalized temperatures into a float64 device buffer."""
+    box_idx = wp.tid()  # type: ignore[misc]
+    output[box_idx] = wp.float64(temperature[box_idx])
+
+
+@wp.kernel
+# type: ignore[misc]
+def _copy_pressure_to_float64_kernel(
+    pressure: Any,
+    output: Any,
+) -> None:
+    """Copy normalized pressures into a float64 device buffer."""
+    box_idx = wp.tid()  # type: ignore[misc]
+    output[box_idx] = wp.float64(pressure[box_idx])
 
 
 @wp.kernel
@@ -424,8 +447,7 @@ def condensation_step_gpu(
             and ``gas``. This mode is supported when both direct inputs are
             ``None``.
         thermodynamics: Required caller-owned, device-local thermodynamic
-            sidecar with model arrays matching the ordered gas species. It is
-            validated only and is not consumed by the condensation kernels.
+            sidecar with model arrays matching the ordered gas species.
 
     Returns:
         Tuple of updated particle data and the mass transfer buffer.
@@ -455,17 +477,15 @@ def condensation_step_gpu(
         ``environment`` remains keyword-only so existing positional scalar
         callers stay source-compatible.
 
-        Validation runs before optional buffer setup or Warp launches so
-        invalid shape or device combinations fail without mutating particle
-        state. Box-level gas properties are prepared once per call from the
-        normalized temperature and pressure arrays, then reused during the
-        per-particle kernel launch.
+        Thermodynamic and optional-buffer validation completes before any
+        refresh or particle mutation. Successful calls overwrite
+        ``gas.vapor_pressure`` from the normalized current temperature before
+        preparing box-level properties and calculating mass transfer.
 
         Thermodynamic validation may synchronously read caller-owned device
         arrays, including on CUDA, without allocating, replacing, or mutating
-        those buffers. This P1 boundary does not evaluate thermodynamic
-        parameters, calculate vapor pressure, or refresh
-        ``gas.vapor_pressure``.
+        those buffers. Refresh evaluation and all production calculations stay
+        device-resident.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
@@ -481,7 +501,7 @@ def condensation_step_gpu(
         device=device,
         caller_name="condensation_step_gpu",
     )
-    validate_thermodynamics_config(
+    thermodynamics = validate_thermodynamics_config(
         thermodynamics,
         n_species,
         device,
@@ -547,12 +567,42 @@ def condensation_step_gpu(
     dynamic_viscosity = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
     mean_free_path = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
 
+    refresh_temperature = temperature_array
+    if temperature_array.dtype != wp.float64:
+        refresh_temperature = wp.zeros(
+            (n_boxes,),
+            dtype=wp.float64,
+            device=device,
+        )
+        wp.launch(
+            _copy_temperature_to_float64_kernel,
+            dim=n_boxes,
+            inputs=[temperature_array, refresh_temperature],
+            device=device,
+        )
+
+    kernel_pressure = pressure_array
+    if pressure_array.dtype != wp.float64:
+        kernel_pressure = wp.zeros(
+            (n_boxes,),
+            dtype=wp.float64,
+            device=device,
+        )
+        wp.launch(
+            _copy_pressure_to_float64_kernel,
+            dim=n_boxes,
+            inputs=[pressure_array, kernel_pressure],
+            device=device,
+        )
+
+    refresh_vapor_pressure_gpu(thermodynamics, gas, refresh_temperature)
+
     wp.launch(
         _prepare_environment_properties_kernel,
         dim=n_boxes,
         inputs=[
-            temperature_array,
-            pressure_array,
+            refresh_temperature,
+            kernel_pressure,
             dynamic_viscosity,
             mean_free_path,
         ],
@@ -576,7 +626,7 @@ def condensation_step_gpu(
             mean_free_path,
             wp.float64(constants.GAS_CONSTANT),
             wp.float64(constants.BOLTZMANN_CONSTANT),
-            temperature_array,
+            refresh_temperature,
             wp.float64(time_step),
             mass_transfer,
         ],
