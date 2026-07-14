@@ -169,8 +169,8 @@ high-level dynamics workflows.
 Known GPU physics gaps remain:
 
 - Bounded direct GPU condensation applies an optional Warp-backed latent-heat
-  rate correction during each fixed substep. It does not provide temperature
-  feedback, gas coupling or conservation, or energy bookkeeping.
+  rate correction during each fixed substep and a signed energy diagnostic. It
+  does not provide temperature feedback, gas coupling, or conservation.
 - Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.
 - The current GPU coagulation path is Brownian-focused; charged, turbulent,
@@ -970,9 +970,10 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -W
 The current executable CPU integration baseline remains
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
 The direct step applies an optional latent-heat rate correction in each of its
-four fixed substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat
-or zero per-species entries retain exact isothermal behavior. Temperature
-feedback, gas coupling, and energy bookkeeping remain deferred.
+four fixed substeps, with CPU-oracle/Warp parity coverage. The shipped source
+rate is `dm_i/dt = isothermal_rate_i / correction_i`, where
+`correction_i = thermal_factor_i / (R_specific_i * T)`. Omitted latent heat or
+zero per-species entries retain exact isothermal behavior.
 
 E4-F3 is shipped. Import its only step entry point with
 `from particula.gpu.kernels import condensation_step_gpu`. When reusable scratch
@@ -992,10 +993,30 @@ work storage. It mutates particle masses in place, leaves `gas.concentration`
 unchanged, and makes no hidden CPU↔Warp transfers. Validation may read device
 metadata or thermodynamic inputs but does not transfer or mutate caller state.
 
+E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
+active-device `wp.float64` `latent_heat`, `(n_species,)`, and
+`energy_transfer`, `(n_boxes, n_species)`, record
+`Q[box, species] = sum_particles(Delta m_applied) * L[species]`. Here
+`Delta m` is kg, `L` is J/kg, and `Q` is J; condensation is positive and
+evaporation negative. Energy output requires valid latent heat, is overwritten
+only after successful preflight, is not a third return item, and has strict
+issue #1272 tolerance `rtol=1e-12, atol=1e-18`. `thermal_work` remains
+validated but deferred/unused. This leaves temperature feedback, gas mutation
+and gas/full-system conservation, adaptive substeps, high-level `Runnable`,
+graph capture/replay, autodiff guarantees, and complete E4-F6 cross-device
+certification outside the supported scope.
+
+Required Warp-CPU and optional CUDA evidence commands are:
+
+```bash
+pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+```
+
 Remaining feature ownership:
 
-1. E4-F4: energy diagnostics and temperature-feedback integration, including
-   the CPU reference context in the [condensation
+1. E4-F4: remaining temperature-feedback integration, including the CPU
+   reference context in the [condensation
    equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
 2. E4-F5: gas-coupled inventory, partitioning, and conservation evidence.
 3. E4-F6: broader independent-device, graph-capture, and autodiff evidence.
@@ -1489,7 +1510,7 @@ coagulation and state-representation decisions are recorded.
 | fp64 throughput on consumer CUDA | Slower GPU, weaker speedups | Keep fp64 as the shipped reference and production baseline; evaluate mixed precision only through a future evidence-backed migration proposal |
 | NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Use the shipped mass-precision report as the baseline; keep per-species absolute mass until a future proposal proves an alternative across the E2 cases |
 | fp64 memory doubling vs large multi-box | Fewer boxes fit in memory | Build a memory-budget model; treat precision and box count together |
-| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Use the shipped four-substep particle-only direct condensation step; retain case-specific evidence in the stiffness study and keep gas coupling, temperature feedback/energy bookkeeping, independent-device, graph, and autodiff work gated |
+| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Use the shipped four-substep particle-only direct condensation step; retain case-specific evidence in the stiffness study and keep gas coupling, temperature feedback, independent-device, graph, and autodiff work gated |
 | No fully integrated GPU-ready per-box thermodynamic runtime path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, build on the shipped `WarpEnvironmentData` CPU↔GPU round-trip helpers, and add integration work |
 | Rejection-sampling acceptance collapse for wide size ranges | Coagulation trial counts explode in mixed NPF/droplet boxes | Evaluate binned majorant kernels or stratified pair sampling |
 | One-thread-per-box coagulation | Serializes large single-box workloads | Record as the current measured multi-box tradeoff for the shipped path; any parallel-within-box follow-up would require a new evidence-backed proposal |

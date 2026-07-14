@@ -204,8 +204,8 @@ optional per-species latent-rate correction in each of its four equal
 substeps, with CPU-oracle/Warp parity coverage. Omitting `latent_heat`, or
 using a zero entry for a species, retains that species' isothermal rate path.
 This does not provide broader temperature feedback, gas coupling or
-conservation, energy bookkeeping, or strategy/runnable-level latent-heat
-support; those remain deferred.
+conservation, or strategy/runnable-level latent-heat support; the separate
+`energy_transfer` bookkeeping diagnostic is described below.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
@@ -658,15 +658,32 @@ only the final raw proposal. Particle masses are mutated in place, while
 CPU↔Warp transfers; validation-only device reads do not transfer or mutate
 caller buffers.
 
-This direct low-level GPU step uses an optional per-species latent-heat rate
-correction in its four fixed substeps, with CPU-oracle/Warp parity. It has no
-temperature feedback, gas coupling or conservation, energy bookkeeping, or
-strategy/`Runnable` integration; nor does it claim adaptive stepping, graph
-capture/replay, or autodiff readiness. For its focused coverage, run:
+This direct low-level GPU step uses an optional keyword-only caller-owned
+active-device `wp.float64` `latent_heat` sidecar with shape `(n_species,)` in
+each fixed substep. Its shipped rate is
+`dm_i/dt = isothermal_rate_i / correction_i`, with
+`correction_i = thermal_factor_i / (R_specific_i * T)` from the source thermal
+resistance expression. Omitting latent heat, or setting a species entry to
+zero, takes that species through the exact isothermal branch.
+
+Issue #1272 also ships optional keyword-only caller-owned active-device
+`wp.float64` `energy_transfer`, shape `(n_boxes, n_species)`, as write-only
+diagnostic output. It requires valid latent heat, is overwritten only after
+successful preflight, and is not a third return item. Its signed whole-call
+identity is `Q[box, species] = sum_particles(Delta m_applied) * L[species]`:
+applied `Delta m` is kg, `L` is J/kg, and `Q` is J, so condensation is positive
+and evaporation negative. The #1272 diagnostic uses strict
+`rtol=1e-12, atol=1e-18` evidence. `thermal_work` is validated but remains
+deferred and unused.
+
+This is diagnostic bookkeeping, not temperature feedback, gas mutation or
+gas/full-system conservation. It adds no strategy/`Runnable` integration,
+adaptive stepping, graph capture/replay, autodiff guarantee, or complete E4-F6
+cross-device certification. For focused coverage, run:
 
 ```bash
-pytest particula/gpu/kernels/tests/condensation_test.py \
-  particula/gpu/kernels/tests/condensation_stiffness_test.py -q
+pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
 ```
 
 Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
@@ -678,8 +695,9 @@ CUDA is unavailable; a skip is not GPU execution.
 - Factory supports `"isothermal"`, `"isothermal_staggered"`, and
   `"latent_heat"` only.
 - Direct low-level GPU latent heat is a per-species rate correction only; it
-  has no temperature feedback, gas coupling or conservation, energy
-  bookkeeping, or strategy/`Runnable` integration.
+  has no temperature feedback, gas coupling or conservation, or
+  strategy/`Runnable` integration. Its signed `energy_transfer` sidecar is
+  diagnostic bookkeeping only.
 - Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.
 

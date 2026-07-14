@@ -323,8 +323,9 @@ rebinding, not mutation of its arrays. Callers retain those arrays and must not
 mutate them concurrently with a launch.
 
 Successful direct calls mutate particle masses in place, overwrite the derived
-GPU-only vapor-pressure buffer, and return raw transfer before particle clamping.
-They do **not** couple or update gas concentration. Validation is atomic:
+GPU-only vapor-pressure buffer, and return accumulated **applied, mass-clamped**
+transfer. Scratch work storage contains only the final raw proposal. They do
+**not** couple or update gas concentration. Validation is atomic:
 unsupported sidecars fail with `ValueError` before mutation. Unsupported
 activity or surface strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
@@ -340,6 +341,31 @@ tighter ownership invariants separately verify
 `final_mass == maximum(initial_mass + raw_transfer, 0)`. They do not claim
 particle-plus-gas conservation for this uncoupled direct step.
 
+### Latent-rate correction and energy diagnostic
+
+The direct step accepts optional keyword-only caller-owned active-device
+`wp.float64` `latent_heat` with shape `(n_species,)`. For species `i`, its
+shipped latent-rate correction is the source implementation's
+`dm_i/dt = isothermal_rate_i / correction_i`, where
+`correction_i = thermal_factor_i / (R_specific_i * T)` and
+`thermal_factor_i` is the thermal-resistance expression evaluated from `D_i`,
+`L_i`, surface vapor pressure, thermal conductivity, `T`, and molar mass. An
+omitted sidecar, or `L_i = 0`, follows the exact isothermal branch.
+
+Optional keyword-only `energy_transfer` is a caller-owned active-device
+`wp.float64`, `(n_boxes, n_species)`, write-only output. It requires valid
+`latent_heat`, is overwritten only after successful preflight, and is not a
+third return value. Its signed whole-call diagnostic, shipped in issue #1272,
+is `Q[box, species] = sum_particles(Delta m_applied) * L[species]`: `Delta m`
+is applied transfer in kg, `L` is latent heat in J/kg, and `Q` is J. Thus
+condensation is positive and evaporation is negative. The strict #1272
+energy-regression tolerance is `rtol=1e-12, atol=1e-18`.
+
+`thermal_work` has the same validated sidecar shape but remains deferred and
+unused. This diagnostic does not evolve temperature, mutate gas concentration,
+establish gas/full-system conservation, or add a `Runnable`, adaptive
+substeps, graph capture/replay, autodiff, or E4-F6 cross-device certification.
+
 Use `to_warp_*` and `from_warp_*` as the sole CPU↔Warp boundary. There is no
 hidden transfer and no high-level `Aerosol` or `Runnable` GPU path. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
@@ -350,7 +376,7 @@ deselected collection does not require Warp:
 
 ```bash
 pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q -m "not warp"
-pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and gpu_parity and not cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
 ```
 

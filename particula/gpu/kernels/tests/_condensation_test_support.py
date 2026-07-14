@@ -2515,6 +2515,137 @@ def test_condensation_latent_heat_matches_four_substep_oracle(
     )
 
 
+def _assert_composed_condensation_route(
+    device: str,
+    *,
+    use_environment: bool,
+) -> None:
+    """Assert one fresh composed latent/activity route against its oracle."""
+    n_boxes, n_particles, n_species = 1, 2, 2
+    temperature = 298.15
+    pressure = 101325.0
+    time_step = 0.1
+    particles = _make_particle_data(n_boxes, n_particles, n_species)
+    gas = _make_gas_data(n_boxes, n_species)
+    vapor_pressure = _make_vapor_pressure(n_boxes, n_species)
+    initial_gas_concentration = gas.concentration.copy()
+    surface_tension = np.array([0.072, 0.09], dtype=np.float64)
+    mass_accommodation = np.array([1.0, 0.8], dtype=np.float64)
+    diffusion = np.array([2.0e-5, 1.5e-5], dtype=np.float64)
+    latent_values = np.array([2.2e6, 0.0], dtype=np.float64)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    thermodynamics = _make_mixed_thermodynamics_config(gpu_gas)
+    activity_surface = _make_activity_surface_config(
+        gpu_gas,
+        int(ACTIVITY_MODE_KAPPA),
+        int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+    )
+    scratch = _make_condensation_scratch_buffers(particles.masses.shape, device)
+    assert scratch.total_mass_transfer is not None
+    transfer_identity = scratch.total_mass_transfer
+    energy_transfer = wp.full(
+        (n_boxes, n_species), wp.float64(17.0), dtype=wp.float64, device=device
+    )
+    energy_identity = energy_transfer
+    expected_masses, expected_total, _ = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+        temperature,
+        pressure,
+        time_step,
+        thermodynamics=thermodynamics,
+        activity_mode=ACTIVITY_MODE_KAPPA,
+        surface_tension_mode=SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED,
+        kappas=np.linspace(0.0, 0.5, n_species, dtype=np.float64),
+        latent_heat=latent_values,
+    )
+    step_kwargs: dict[str, Any] = {
+        "time_step": time_step,
+        "surface_tension": wp.array(
+            surface_tension, dtype=wp.float64, device=device
+        ),
+        "mass_accommodation": wp.array(
+            mass_accommodation, dtype=wp.float64, device=device
+        ),
+        "diffusion_coefficient_vapor": wp.array(
+            diffusion, dtype=wp.float64, device=device
+        ),
+        "thermodynamics": thermodynamics,
+        "activity_surface": activity_surface,
+        "scratch_buffers": scratch,
+        "latent_heat": wp.array(latent_values, dtype=wp.float64, device=device),
+        "energy_transfer": energy_transfer,
+    }
+    if use_environment:
+        environment = to_warp_environment_data(
+            _make_environment_data(n_boxes, n_species, temperature, pressure),
+            device=device,
+        )
+        step_kwargs.update(
+            temperature=None,
+            pressure=None,
+            environment=environment,
+        )
+    else:
+        step_kwargs.update(temperature=temperature, pressure=pressure)
+
+    result = _condensation_step_gpu(gpu_particles, gpu_gas, **step_kwargs)
+
+    assert len(result) == 2
+    assert result[0] is gpu_particles
+    assert result[1] is transfer_identity
+    assert energy_transfer is energy_identity
+    npt.assert_allclose(
+        gpu_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-18
+    )
+    npt.assert_allclose(
+        result[1].numpy(), expected_total, rtol=1e-12, atol=1e-18
+    )
+    expected_energy = expected_total.sum(axis=1) * latent_values[None, :]
+    npt.assert_allclose(
+        energy_transfer.numpy(), expected_energy, rtol=1e-12, atol=1e-18
+    )
+    npt.assert_array_equal(energy_transfer.numpy()[:, 1], 0.0)
+    npt.assert_array_equal(
+        gpu_gas.concentration.numpy(), initial_gas_concentration
+    )
+    assert np.all(np.isfinite(gpu_particles.masses.numpy()))
+    assert np.all(gpu_particles.masses.numpy() >= 0.0)
+
+
+@pytest.mark.gpu_parity
+def test_condensation_composed_scalar_route_matches_four_substep_oracle(
+    warp_cpu_device: str,
+) -> None:
+    """The scalar route preserves composed latent/activity diagnostics."""
+    _assert_composed_condensation_route(warp_cpu_device, use_environment=False)
+
+
+@pytest.mark.gpu_parity
+def test_condensation_composed_environment_route_matches_four_substep_oracle(
+    warp_cpu_device: str,
+) -> None:
+    """The explicit-environment route preserves composed diagnostics."""
+    _assert_composed_condensation_route(warp_cpu_device, use_environment=True)
+
+
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+def test_condensation_composed_cuda_matches_four_substep_oracle(
+    cuda_device: str,
+) -> None:
+    """Optional CUDA matches the composed four-substep CPU oracle."""
+    _assert_composed_condensation_route(cuda_device, use_environment=False)
+
+
 @pytest.mark.gpu_parity
 def test_condensation_step_gpu_energy_transfer_reuses_and_overwrites_output(
     device: str,
@@ -5417,6 +5548,7 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
     )
     assert np.all(np.isfinite(gpu_particles.masses.numpy()))
     assert np.all(gpu_particles.masses.numpy() >= 0.0)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), gas.concentration)
     if scratch is not None:
         assert scratch.work_mass_transfer is not None
         npt.assert_allclose(
