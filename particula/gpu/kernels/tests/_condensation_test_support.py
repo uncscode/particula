@@ -2604,14 +2604,12 @@ def _assert_composed_condensation_route(
     assert result[1] is transfer_identity
     assert energy_transfer is energy_identity
     npt.assert_allclose(
-        gpu_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-18
+        gpu_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=0.0
     )
-    npt.assert_allclose(
-        result[1].numpy(), expected_total, rtol=1e-12, atol=1e-18
-    )
+    npt.assert_allclose(result[1].numpy(), expected_total, rtol=1e-12, atol=0.0)
     expected_energy = expected_total.sum(axis=1) * latent_values[None, :]
     npt.assert_allclose(
-        energy_transfer.numpy(), expected_energy, rtol=1e-12, atol=1e-18
+        energy_transfer.numpy(), expected_energy, rtol=1e-12, atol=0.0
     )
     npt.assert_array_equal(energy_transfer.numpy()[:, 1], 0.0)
     npt.assert_array_equal(
@@ -2740,7 +2738,7 @@ def test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels(
         not in launched_kernels
     )
     assert (
-        condensation_module._reduce_energy_transfer_kernel
+        condensation_module._accumulate_energy_transfer_kernel
         not in launched_kernels
     )
 
@@ -3423,6 +3421,41 @@ def test_invalid_latent_sidecar_fails_before_allocation_or_mutation(
         strict=True,
     ):
         npt.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.parametrize("invalid_time_step", [True, -0.1, np.nan, np.inf])
+def test_invalid_time_step_fails_before_mutating_caller_outputs(
+    device: str,
+    invalid_time_step: float | bool,
+) -> None:
+    """Invalid timesteps leave supplied output and physical state unchanged."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=np.full((1, 2), 17.0)
+    )
+    transfer = wp.full((1, 1, 2), 13.0, dtype=wp.float64, device=device)
+    masses_before = gpu_particles.masses.numpy().copy()
+    vapor_pressure_before = gpu_gas.vapor_pressure.numpy().copy()
+    transfer_before = transfer.numpy().copy()
+
+    with pytest.raises(ValueError, match="time_step"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=invalid_time_step,
+            mass_transfer=transfer,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+        )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), masses_before)
+    npt.assert_array_equal(
+        gpu_gas.vapor_pressure.numpy(), vapor_pressure_before
+    )
+    npt.assert_array_equal(transfer.numpy(), transfer_before)
 
 
 @pytest.mark.cuda

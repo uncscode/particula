@@ -25,6 +25,7 @@ launches operate on GPU-resident Warp arrays and update particle masses
 # pyright: reportOperatorIssue=false
 
 from dataclasses import dataclass
+from numbers import Real
 from typing import Any
 
 import numpy as np
@@ -663,21 +664,21 @@ def _clear_energy_transfer_kernel(
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
-def _reduce_energy_transfer_kernel(
+def _accumulate_energy_transfer_kernel(
     total_mass_transfer: Any,
     latent_heat: Any,
     energy_transfer: Any,
 ) -> None:
-    """Reduce applied transfer into one signed energy value per box/species."""
-    box_idx, species_idx = wp.tid()  # type: ignore[misc]
-    total_transfer = wp.float64(0.0)
-    for particle_idx in range(total_mass_transfer.shape[1]):
-        total_transfer += total_mass_transfer[
-            box_idx, particle_idx, species_idx
-        ]
-    energy_transfer[box_idx, species_idx] = (
-        total_transfer * latent_heat[species_idx]
-    )
+    """Accumulate one particle's signed energy using parallel particle lanes."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    for species_idx in range(total_mass_transfer.shape[2]):
+        wp.atomic_add(
+            energy_transfer,
+            box_idx,
+            species_idx,
+            total_mass_transfer[box_idx, particle_idx, species_idx]
+            * latent_heat[species_idx],
+        )
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -748,6 +749,7 @@ def _validate_float64_species_array(
     expected_device: Any,
     *,
     nonnegative: bool = False,
+    maximum: float | None = None,
 ) -> None:
     """Validate metadata for a caller-owned float64 per-species Warp array.
 
@@ -762,8 +764,10 @@ def _validate_float64_species_array(
         raise ValueError(f"{name} must use dtype {wp.float64}")
     if not getattr(expected_device, "is_cuda", False):
         values = np.asarray(array.numpy(), dtype=np.float64)
-        if not np.all(np.isfinite(values)) or (
-            nonnegative and np.any(values < 0.0)
+        if (
+            not np.all(np.isfinite(values))
+            or (nonnegative and np.any(values < 0.0))
+            or (maximum is not None and np.any(values > maximum))
         ):
             raise ValueError(f"{name} must be finite and non-negative")
         return
@@ -772,7 +776,12 @@ def _validate_float64_species_array(
     wp.launch(
         _validate_species_values_kernel,
         dim=n_species,
-        inputs=[array, wp.int32(nonnegative), invalid],
+        inputs=[
+            array,
+            wp.int32(nonnegative),
+            wp.float64(np.inf if maximum is None else maximum),
+            invalid,
+        ],
         device=expected_device,
     )
     if invalid.numpy()[0] != 0:
@@ -784,12 +793,17 @@ def _validate_float64_species_array(
 def _validate_species_values_kernel(
     values: Any,
     require_nonnegative: wp.int32,
+    maximum: wp.float64,
     invalid: Any,
 ) -> None:
     """Record whether a species sidecar has an invalid numeric value."""
     species_idx = wp.tid()
     value = values[species_idx]
-    if not wp.isfinite(value) or (require_nonnegative != 0 and value < 0.0):
+    if (
+        not wp.isfinite(value)
+        or (require_nonnegative != 0 and value < 0.0)
+        or value > maximum
+    ):
         wp.atomic_add(invalid, 0, 1)
 
 
@@ -849,10 +863,54 @@ def _validate_energy_transfer_buffer(
 
 
 def _warp_array_memory_range(array: Any) -> tuple[int, int]:
-    """Return the contiguous byte range owned by a Warp array."""
+    """Return a contiguous Warp array's byte range.
+
+    Ownership checks reject strided views because a single address range cannot
+    distinguish their gaps from overlapping storage.
+    """
+    dtype_sizes = {
+        wp.float64: np.dtype(np.float64).itemsize,
+        wp.float32: np.dtype(np.float32).itemsize,
+        wp.int32: np.dtype(np.int32).itemsize,
+    }
+    itemsize = dtype_sizes.get(array.dtype)
+    if itemsize is None:
+        raise ValueError("overlap validation does not support this Warp dtype")
+    strides = getattr(array, "strides", None)
+    expected_strides: list[int] = []
+    stride = itemsize
+    for dimension in reversed(array.shape):
+        expected_strides.insert(0, stride)
+        stride *= dimension
+    if strides is not None and tuple(strides) != tuple(expected_strides):
+        raise ValueError(
+            "overlap-checked Warp arrays must be contiguous, non-view arrays"
+        )
     start = int(array.ptr)
     item_count = int(np.prod(array.shape, dtype=np.int64))
-    return start, start + item_count * np.dtype(np.float64).itemsize
+    return start, start + item_count * itemsize
+
+
+def _validate_no_overlap(
+    read_only_arrays: tuple[Any | None, ...],
+    writable_arrays: tuple[Any | None, ...],
+) -> None:
+    """Reject thermal sidecars that alias writable scratch property storage."""
+    for read_only in read_only_arrays:
+        if read_only is None:
+            continue
+        read_start, read_end = _warp_array_memory_range(read_only)
+        for writable in writable_arrays:
+            if writable is None:
+                continue
+            write_start, write_end = _warp_array_memory_range(writable)
+            if read_only is writable or (
+                read_start < write_end and write_start < read_end
+            ):
+                raise ValueError(
+                    "thermal sidecars must not overlap writable scratch "
+                    "property buffers"
+                )
 
 
 def _validate_energy_transfer_ownership(
@@ -1070,7 +1128,8 @@ def condensation_step_gpu(  # noqa: C901
             field.
         ValueError: If ``latent_heat`` or ``thermal_work`` is not a finite,
             non-negative active-device ``wp.float64`` array shaped
-            ``(n_species,)``.
+            ``(n_species,)``. Latent heat above ``1e9`` J/kg is also rejected
+            before launch to prevent non-isothermal arithmetic overflow.
         ValueError: If ``energy_transfer`` is supplied without valid
             ``latent_heat`` or lacks active-device ``wp.float64``
             ``(n_boxes, n_species)`` metadata.
@@ -1111,15 +1170,16 @@ def condensation_step_gpu(  # noqa: C901
         With no scratch transfer fields, legacy ``mass_transfer`` remains the
         returned total by identity.
 
-        Thermodynamic metadata validation and all production calculations stay
-        device-resident; valid latent sidecars never require host readback or
-        synchronization.
+        Thermodynamic metadata and production calculations stay device-resident.
+        CUDA numeric validation of each supplied thermal sidecar reads back one
+        device validation flag before any caller-owned state is mutated.
 
         Supplied latent sidecars are caller-owned. Latent heat is consumed per
         fixed substep without mutation; omitting it or supplying zero for a
         species preserves that species' isothermal arithmetic. Thermal work is
         validated but unused. Invalid metadata or values leave physical state
-        and all caller-owned work state unchanged.
+        and all caller-owned work state unchanged. To make overflow detectable
+        before launch, finite latent heat is limited to ``1e9`` J/kg.
 
         Energy transfer is caller-owned, allocation-stable diagnostic storage.
         It is cleared and overwritten only after successful preflight, is
@@ -1127,6 +1187,16 @@ def condensation_step_gpu(  # noqa: C901
         content-validated because the step only writes it. This write-only
         contract permits stale finite values and NaN/Inf prior to a call.
     """
+    if (
+        isinstance(time_step, bool)
+        or not isinstance(time_step, Real)
+        or not np.isfinite(time_step)
+        or time_step < 0.0
+    ):
+        raise ValueError(
+            "time_step must be a finite, nonnegative real value and not bool"
+        )
+
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
@@ -1156,6 +1226,7 @@ def condensation_step_gpu(  # noqa: C901
             n_species,
             device,
             nonnegative=True,
+            maximum=1.0e9,
         )
     if energy_transfer is not None:
         if latent_heat is None:
@@ -1232,6 +1303,13 @@ def condensation_step_gpu(  # noqa: C901
                 "mass_transfer conflicts with supplied scratch transfer "
                 "buffers in condensation_step_gpu."
             )
+        _validate_no_overlap(
+            (latent_heat, thermal_work),
+            (
+                scratch_buffers.dynamic_viscosity,
+                scratch_buffers.mean_free_path,
+            ),
+        )
 
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
@@ -1475,8 +1553,8 @@ def condensation_step_gpu(  # noqa: C901
 
     if energy_transfer is not None:
         wp.launch(
-            _reduce_energy_transfer_kernel,
-            dim=(n_boxes, n_species),
+            _accumulate_energy_transfer_kernel,
+            dim=(n_boxes, n_particles),
             inputs=[total_mass_transfer, latent_heat, energy_transfer],
             device=device,
         )
