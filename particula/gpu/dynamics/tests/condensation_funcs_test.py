@@ -22,6 +22,8 @@ if wp is not None:
     from particula.dynamics.condensation.mass_transfer import (  # noqa: E402
         get_first_order_mass_transport_k,
         get_mass_transfer_rate,
+        get_mass_transfer_rate_latent_heat,
+        get_thermal_resistance_factor,
     )
     from particula.gas.properties.dynamic_viscosity import (  # noqa: E402
         get_dynamic_viscosity,
@@ -32,7 +34,13 @@ if wp is not None:
     from particula.gas.properties.pressure_function import (  # noqa: E402
         get_partial_pressure,
     )
+    from particula.gas.properties.thermal_conductivity import (  # noqa: E402
+        get_thermal_conductivity,
+    )
     from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
+        _mass_transfer_rate_latent_heat_wp,
+        _thermal_conductivity_wp,
+        _thermal_resistance_factor_wp,
         diffusion_coefficient_wp,
         effective_surface_tension_wp,
         first_order_mass_transport_k_wp,
@@ -171,6 +179,65 @@ def _mass_transfer_rate_kernel(
         first_order_mass_transports[tid],
         temperatures[tid],
         molar_masses[tid],
+        gas_constant,
+    )
+
+
+@_warp_kernel
+def _thermal_conductivity_kernel(temperatures: Any, result: Any) -> None:
+    """Compute air thermal conductivity for each sample."""
+    tid = wp.tid()
+    result[tid] = _thermal_conductivity_wp(temperatures[tid])
+
+
+@_warp_kernel
+def _thermal_resistance_factor_kernel(
+    diffusion_coefficients: Any,
+    latent_heats: Any,
+    vapor_pressures: Any,
+    thermal_conductivities: Any,
+    temperatures: Any,
+    molar_masses: Any,
+    gas_constant: Any,
+    result: Any,
+) -> None:
+    """Compute thermal resistance factors for each sample."""
+    tid = wp.tid()
+    result[tid] = _thermal_resistance_factor_wp(
+        diffusion_coefficients[tid],
+        latent_heats[tid],
+        vapor_pressures[tid],
+        thermal_conductivities[tid],
+        temperatures[tid],
+        molar_masses[tid],
+        gas_constant,
+    )
+
+
+@_warp_kernel
+def _latent_mass_transfer_rate_kernel(
+    pressure_deltas: Any,
+    mass_transports: Any,
+    temperatures: Any,
+    molar_masses: Any,
+    latent_heats: Any,
+    thermal_conductivities: Any,
+    vapor_pressures: Any,
+    diffusion_coefficients: Any,
+    gas_constant: Any,
+    result: Any,
+) -> None:
+    """Compute latent-corrected mass transfer rates for each sample."""
+    tid = wp.tid()
+    result[tid] = _mass_transfer_rate_latent_heat_wp(
+        pressure_deltas[tid],
+        mass_transports[tid],
+        temperatures[tid],
+        molar_masses[tid],
+        latent_heats[tid],
+        thermal_conductivities[tid],
+        vapor_pressures[tid],
+        diffusion_coefficients[tid],
         gas_constant,
     )
 
@@ -598,6 +665,135 @@ def test_mass_transfer_rate_matches_numpy(device: str) -> None:
     wp.synchronize()
 
     npt.assert_allclose(result_wp.numpy(), expected, rtol=1e-10, atol=1e-20)
+
+
+def test_thermal_conductivity_matches_numpy(device: str) -> None:
+    """Ensure the Warp air-conductivity helper matches the CPU relation."""
+    temperatures = np.array([250.0, 298.15, 325.0], dtype=np.float64)
+    expected = get_thermal_conductivity(temperatures)
+    result_wp = wp.zeros(len(temperatures), dtype=wp.float64, device=device)
+    wp.launch(
+        _thermal_conductivity_kernel,
+        dim=len(temperatures),
+        inputs=[wp.array(temperatures, dtype=wp.float64, device=device)],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+    npt.assert_allclose(result_wp.numpy(), expected, rtol=1e-14, atol=0.0)
+
+
+def test_thermal_resistance_and_latent_rate_match_numpy(device: str) -> None:
+    """Ensure Warp latent-heat helpers reproduce the CPU equations."""
+    pressure_deltas = np.array([12.0, -4.0, 8.0], dtype=np.float64)
+    mass_transports = np.array([1e-17, 2e-17, 3e-17], dtype=np.float64)
+    temperatures = np.array([280.0, 298.15, 315.0], dtype=np.float64)
+    molar_masses = np.array([0.018, 0.044, 0.058], dtype=np.float64)
+    latent_heats = np.array([2.2e6, 1.5e6, 8.0e5], dtype=np.float64)
+    vapor_pressures = np.array([700.0, 120.0, 50.0], dtype=np.float64)
+    diffusion_coefficients = np.array([2e-5, 1.3e-5, 9e-6], dtype=np.float64)
+    conductivities = get_thermal_conductivity(temperatures)
+    resistance_expected = get_thermal_resistance_factor(
+        diffusion_coefficients,
+        latent_heats,
+        vapor_pressures,
+        conductivities,
+        temperatures,
+        molar_masses,
+    )
+    rate_expected = get_mass_transfer_rate_latent_heat(
+        pressure_deltas,
+        mass_transports,
+        temperatures,
+        molar_masses,
+        latent_heats,
+        conductivities,
+        vapor_pressures,
+        diffusion_coefficients,
+    )
+    values = [
+        wp.array(value, dtype=wp.float64, device=device)
+        for value in (
+            pressure_deltas,
+            mass_transports,
+            temperatures,
+            molar_masses,
+            latent_heats,
+            conductivities,
+            vapor_pressures,
+            diffusion_coefficients,
+        )
+    ]
+    resistance_wp = wp.zeros(len(temperatures), dtype=wp.float64, device=device)
+    rate_wp = wp.zeros(len(temperatures), dtype=wp.float64, device=device)
+    wp.launch(
+        _thermal_resistance_factor_kernel,
+        dim=len(temperatures),
+        inputs=[
+            values[7],
+            values[4],
+            values[6],
+            values[5],
+            values[2],
+            values[3],
+            wp.float64(GAS_CONSTANT),
+        ],
+        outputs=[resistance_wp],
+        device=device,
+    )
+    wp.launch(
+        _latent_mass_transfer_rate_kernel,
+        dim=len(temperatures),
+        inputs=[*values, wp.float64(GAS_CONSTANT)],
+        outputs=[rate_wp],
+        device=device,
+    )
+    wp.synchronize()
+    npt.assert_allclose(resistance_wp.numpy(), resistance_expected, rtol=1e-12)
+    npt.assert_allclose(rate_wp.numpy(), rate_expected, rtol=1e-12, atol=1e-30)
+
+
+def test_zero_latent_heat_matches_isothermal_rate_exactly(device: str) -> None:
+    """Ensure the zero-latent branch returns the isothermal helper result."""
+    pressure_deltas = np.array([12.0, -4.0], dtype=np.float64)
+    mass_transports = np.array([1e-17, 2e-17], dtype=np.float64)
+    temperatures = np.array([280.0, 315.0], dtype=np.float64)
+    molar_masses = np.array([0.018, 0.044], dtype=np.float64)
+    zeros = np.zeros(2, dtype=np.float64)
+    conductivities = get_thermal_conductivity(temperatures)
+    vapor_pressures = np.array([700.0, 120.0], dtype=np.float64)
+    diffusion_coefficients = np.array([2e-5, 1.3e-5], dtype=np.float64)
+    inputs = [
+        wp.array(value, dtype=wp.float64, device=device)
+        for value in (
+            pressure_deltas,
+            mass_transports,
+            temperatures,
+            molar_masses,
+            zeros,
+            conductivities,
+            vapor_pressures,
+            diffusion_coefficients,
+        )
+    ]
+    latent_wp = wp.zeros(2, dtype=wp.float64, device=device)
+    isothermal_wp = wp.zeros(2, dtype=wp.float64, device=device)
+    wp.launch(
+        _latent_mass_transfer_rate_kernel,
+        dim=2,
+        inputs=[*inputs, wp.float64(GAS_CONSTANT)],
+        outputs=[latent_wp],
+        device=device,
+    )
+    wp.launch(
+        _mass_transfer_rate_kernel,
+        dim=2,
+        inputs=[*inputs[:4], wp.float64(GAS_CONSTANT)],
+        outputs=[isothermal_wp],
+        device=device,
+    )
+    wp.synchronize()
+    npt.assert_array_equal(latent_wp.numpy(), isothermal_wp.numpy())
 
 
 def test_condensation_chain_matches_numpy(device: str) -> None:

@@ -90,6 +90,91 @@ def mass_transfer_rate_wp(
 
 
 @wp.func
+def _thermal_conductivity_wp(temperature: wp.float64) -> wp.float64:
+    """Calculate air thermal conductivity [W/(m·K)].
+
+    Port of Seinfeld and Pandis, Equation 17.54.
+    """
+    return wp.float64(1e-3) * (
+        wp.float64(4.39) + wp.float64(0.071) * temperature
+    )
+
+
+@wp.func
+def _thermal_resistance_factor_wp(
+    diffusion_coefficient: wp.float64,
+    latent_heat: wp.float64,
+    vapor_pressure_surface: wp.float64,
+    thermal_conductivity: wp.float64,
+    temperature: wp.float64,
+    molar_mass: wp.float64,
+    gas_constant: wp.float64,
+) -> wp.float64:
+    """Calculate the latent-heat thermal resistance factor [J/kg].
+
+    Port of Topping and Bane (2022), Equation 2.36.
+    """
+    r_specific = gas_constant / molar_mass
+    diffusion_term = (
+        diffusion_coefficient
+        * latent_heat
+        * vapor_pressure_surface
+        / temperature
+        / thermal_conductivity
+    )
+    correction_term = latent_heat / temperature / r_specific - wp.float64(1.0)
+    return diffusion_term * correction_term + r_specific * temperature
+
+
+@wp.func
+def _mass_transfer_rate_latent_heat_wp(
+    pressure_delta: wp.float64,
+    first_order_mass_transport: wp.float64,
+    temperature: wp.float64,
+    molar_mass: wp.float64,
+    latent_heat: wp.float64,
+    thermal_conductivity: wp.float64,
+    vapor_pressure_surface: wp.float64,
+    diffusion_coefficient: wp.float64,
+    gas_constant: wp.float64,
+) -> wp.float64:
+    """Calculate latent-corrected condensation mass transfer [kg/s].
+
+    Port of Topping and Bane (2022), Equation 2.36. Zero latent heat returns
+    the isothermal helper result exactly.
+    """
+    if latent_heat == wp.float64(0.0):
+        return mass_transfer_rate_wp(
+            pressure_delta,
+            first_order_mass_transport,
+            temperature,
+            molar_mass,
+            gas_constant,
+        )
+    thermal_factor = _thermal_resistance_factor_wp(
+        diffusion_coefficient,
+        latent_heat,
+        vapor_pressure_surface,
+        thermal_conductivity,
+        temperature,
+        molar_mass,
+        gas_constant,
+    )
+    r_specific = gas_constant / molar_mass
+    correction = thermal_factor / (r_specific * temperature)
+    return (
+        mass_transfer_rate_wp(
+            pressure_delta,
+            first_order_mass_transport,
+            temperature,
+            molar_mass,
+            gas_constant,
+        )
+        / correction
+    )
+
+
+@wp.func
 def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
     """Compute particle radius from total volume.
 

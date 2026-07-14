@@ -2311,6 +2311,239 @@ def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
     assert parameters["thermodynamics"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["activity_surface"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["scratch_buffers"].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["latent_heat"].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["thermal_work"].kind is inspect.Parameter.KEYWORD_ONLY
+
+
+@pytest.mark.parametrize("n_species", [1, 2])
+@pytest.mark.parametrize(
+    "sidecar_arguments",
+    ["latent_heat", "thermal_work", "both"],
+)
+def test_latent_sidecars_preserve_isothermal_condensation(
+    device: str,
+    n_species: int,
+    sidecar_arguments: str,
+) -> None:
+    """Valid P1 sidecars preserve the existing isothermal transfer."""
+    particles = _make_particle_data(1, 2, n_species)
+    gas = _make_gas_data(1, n_species)
+    vapor_pressure = _make_vapor_pressure(1, n_species)
+    sidecar_particles = to_warp_particle_data(particles, device=device)
+    sidecar_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    legacy_particles = to_warp_particle_data(particles, device=device)
+    legacy_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    latent_heat = wp.array(
+        np.linspace(0.0, 2.0e6, n_species), dtype=wp.float64, device=device
+    )
+    thermal_work = wp.array(
+        np.linspace(0.0, 10.0, n_species), dtype=wp.float64, device=device
+    )
+    latent_snapshot = latent_heat.numpy().copy()
+    thermal_snapshot = thermal_work.numpy().copy()
+    sidecar_thermodynamics = _make_thermodynamics_config(sidecar_gas)
+    legacy_thermodynamics = _make_thermodynamics_config(legacy_gas)
+    sidecar_kwargs: dict[str, Any] = {}
+    if sidecar_arguments in {"latent_heat", "both"}:
+        sidecar_kwargs["latent_heat"] = latent_heat
+    if sidecar_arguments in {"thermal_work", "both"}:
+        sidecar_kwargs["thermal_work"] = thermal_work
+    _, sidecar_transfer = _condensation_step_gpu(
+        sidecar_particles,
+        sidecar_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=sidecar_thermodynamics,
+        **sidecar_kwargs,
+    )
+    _, legacy_transfer = _condensation_step_gpu(
+        legacy_particles,
+        legacy_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=legacy_thermodynamics,
+    )
+    npt.assert_array_equal(sidecar_transfer.numpy(), legacy_transfer.numpy())
+    npt.assert_array_equal(
+        sidecar_particles.masses.numpy(), legacy_particles.masses.numpy()
+    )
+    npt.assert_array_equal(
+        sidecar_gas.concentration.numpy(), legacy_gas.concentration.numpy()
+    )
+    npt.assert_array_equal(
+        sidecar_gas.vapor_pressure.numpy(), legacy_gas.vapor_pressure.numpy()
+    )
+    npt.assert_array_equal(latent_heat.numpy(), latent_snapshot)
+    npt.assert_array_equal(thermal_work.numpy(), thermal_snapshot)
+
+
+@pytest.mark.parametrize("sidecar_name", ["latent_heat", "thermal_work"])
+@pytest.mark.parametrize(
+    "values",
+    [
+        np.array([np.nan, 1.0]),
+        np.array([np.inf, 1.0]),
+        np.array([-np.inf, 1.0]),
+        np.array([-1.0, 1.0]),
+        np.ones((1, 2)),
+        np.ones(1),
+        np.array([1.0, 2.0], dtype=np.float32),
+        [1.0, 2.0],
+    ],
+    ids=[
+        "nan",
+        "positive-infinity",
+        "negative-infinity",
+        "negative",
+        "rank",
+        "length",
+        "float32",
+        "non-warp",
+    ],
+)
+def test_invalid_latent_sidecar_fails_before_allocation_or_mutation(
+    device: str,
+    sidecar_name: str,
+    values: Any,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Invalid latent metadata fails atomically before fallback work begins."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=np.full((1, 2), 17.0)
+    )
+    if isinstance(values, list):
+        candidate = values
+    else:
+        dtype = wp.float32 if values.dtype == np.float32 else wp.float64
+        candidate = wp.array(values, dtype=dtype, device=device)
+    counterpart = wp.array([0.0, 1.0], dtype=wp.float64, device=device)
+    transfer = wp.full((1, 1, 2), 13.0, dtype=wp.float64, device=device)
+    scratch = _make_condensation_scratch_buffers(
+        (1, 1, 2),
+        device,
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    snapshots = tuple(
+        array.numpy().copy()
+        for array in (
+            gpu_particles.masses,
+            gpu_gas.concentration,
+            gpu_gas.vapor_pressure,
+            counterpart,
+            transfer,
+            scratch.work_mass_transfer,
+            scratch.total_mass_transfer,
+            scratch.dynamic_viscosity,
+            scratch.mean_free_path,
+        )
+    )
+    kwargs = {sidecar_name: candidate}
+    other_name = (
+        "thermal_work" if sidecar_name == "latent_heat" else "latent_heat"
+    )
+    kwargs[other_name] = counterpart
+
+    def fail_before_sidecar_preflight(*args: Any, **kwargs: Any) -> None:
+        """Fail if invalid sidecars reach allocation, normalization, or launch.
+
+        Raises:
+            AssertionError: Always, if atomic sidecar preflight is bypassed.
+        """
+        raise AssertionError("invalid sidecar passed atomic preflight")
+
+    monkeypatch.setattr(
+        condensation_module,
+        "_ensure_environment_arrays",
+        fail_before_sidecar_preflight,
+    )
+    monkeypatch.setattr(
+        condensation_module.wp,
+        "zeros",
+        fail_before_sidecar_preflight,
+    )
+    monkeypatch.setattr(
+        condensation_module.wp,
+        "full",
+        fail_before_sidecar_preflight,
+    )
+    monkeypatch.setattr(
+        condensation_module.wp,
+        "launch",
+        fail_before_sidecar_preflight,
+    )
+    with pytest.raises(ValueError, match=sidecar_name):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            mass_transfer=transfer,
+            thermodynamics=thermodynamics,
+            scratch_buffers=scratch,
+            **kwargs,
+        )
+    for array, expected in zip(
+        (
+            gpu_particles.masses,
+            gpu_gas.concentration,
+            gpu_gas.vapor_pressure,
+            counterpart,
+            transfer,
+            scratch.work_mass_transfer,
+            scratch.total_mass_transfer,
+            scratch.dynamic_viscosity,
+            scratch.mean_free_path,
+        ),
+        snapshots,
+        strict=True,
+    ):
+        npt.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.cuda
+@pytest.mark.parametrize("sidecar_name", ["latent_heat", "thermal_work"])
+def test_latent_sidecar_device_mismatch_raises_value_error(
+    warp_cpu_device: str,
+    cuda_device: str,
+    sidecar_name: str,
+) -> None:
+    """Reject a latent sidecar that is not on the particle device."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=warp_cpu_device,
+        vapor_pressure=_make_vapor_pressure(1, 2),
+    )
+    sidecar = wp.array([0.0, 1.0], dtype=wp.float64, device=cuda_device)
+    counterpart = wp.array([0.0, 1.0], dtype=wp.float64, device=warp_cpu_device)
+    kwargs = {sidecar_name: sidecar}
+    other_name = (
+        "thermal_work" if sidecar_name == "latent_heat" else "latent_heat"
+    )
+    kwargs[other_name] = counterpart
+
+    with pytest.raises(ValueError, match=sidecar_name):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            **kwargs,
+        )
 
 
 @pytest.mark.gpu_parity
