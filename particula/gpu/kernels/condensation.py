@@ -729,6 +729,88 @@ def _apply_and_accumulate_mass_transfer_kernel(
         )
 
 
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _bound_evaporation_candidate_kernel(
+    masses: Any,
+    gated_transfer: Any,
+    candidate: Any,
+) -> None:
+    """Bound each evaporation proposal by the owned particle mass."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    for species_idx in range(masses.shape[2]):
+        transfer = gated_transfer[box_idx, particle_idx, species_idx]
+        mass = masses[box_idx, particle_idx, species_idx]
+        if transfer < -mass:
+            transfer = -mass
+        candidate[box_idx, particle_idx, species_idx] = transfer
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _reduce_inventory_candidates_kernel(
+    candidate: Any,
+    concentration: Any,
+    demand: Any,
+    release: Any,
+) -> None:
+    """Reduce positive demand and negative release in particle-index order."""
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    positive_demand = wp.float64(0.0)
+    negative_release = wp.float64(0.0)
+    for particle_idx in range(candidate.shape[1]):
+        transfer = candidate[box_idx, particle_idx, species_idx]
+        weighted_transfer = transfer * concentration[box_idx, particle_idx]
+        if transfer > wp.float64(0.0):
+            positive_demand += weighted_transfer
+        elif transfer < wp.float64(0.0):
+            negative_release -= weighted_transfer
+    demand[box_idx, species_idx] = positive_demand
+    release[box_idx, species_idx] = negative_release
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _scale_inventory_uptake_kernel(
+    gas_concentration: Any,
+    demand: Any,
+    release: Any,
+    scale: Any,
+) -> None:
+    """Compute the bounded positive-transfer fraction for each box species."""
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    demand_value = demand[box_idx, species_idx]
+    available = (
+        gas_concentration[box_idx, species_idx] + release[box_idx, species_idx]
+    )
+    fraction = wp.float64(1.0)
+    if demand_value > available:
+        fraction = available / demand_value
+        if fraction < wp.float64(0.0):
+            fraction = wp.float64(0.0)
+        elif fraction > wp.float64(1.0):
+            fraction = wp.float64(1.0)
+    scale[box_idx, species_idx] = fraction
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _finalize_and_apply_inventory_transfer_kernel(
+    masses: Any,
+    candidate: Any,
+    scale: Any,
+    finalized: Any,
+) -> None:
+    """Apply bounded evaporation and inventory-scaled uptake."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    for species_idx in range(masses.shape[2]):
+        transfer = candidate[box_idx, particle_idx, species_idx]
+        if transfer > wp.float64(0.0):
+            transfer *= scale[box_idx, species_idx]
+        finalized[box_idx, particle_idx, species_idx] = transfer
+        masses[box_idx, particle_idx, species_idx] += transfer
+
+
 def _validate_species_array(
     name: str,
     array: Any,
@@ -838,6 +920,8 @@ def _validate_mass_transfer_buffer(
     Raises:
         ValueError: If the shape or device does not match expectations.
     """
+    if not _is_warp_array_like(mass_transfer):
+        raise ValueError("mass_transfer must be a Warp array")
     if mass_transfer.shape != expected_shape:
         raise ValueError(
             f"mass_transfer shape {mass_transfer.shape} does not match "
@@ -848,10 +932,7 @@ def _validate_mass_transfer_buffer(
         raise ValueError(
             "mass_transfer buffer device does not match particle device"
         )
-    if (
-        not _is_warp_array_like(mass_transfer)
-        or mass_transfer.dtype != wp.float64
-    ):
+    if mass_transfer.dtype != wp.float64:
         raise ValueError(f"mass_transfer must use dtype {wp.float64}")
 
 
@@ -1112,6 +1193,83 @@ def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
     _validate_device_match("gas concentration", gas.concentration, device)
     _validate_device_match("gas vapor pressure", gas.vapor_pressure, device)
     _validate_device_match("gas partitioning", gas.partitioning, device)
+
+
+def _finalize_inventory_limited_mass_transfer(
+    particles: Any,
+    gas: Any,
+    gated_mass_transfer: Any,
+    scratch_buffers: CondensationScratchBuffers | Any | None = None,
+) -> Any:
+    """Finalize an already gated proposal; public gas coupling is deferred.
+
+    Validation completes before caller-owned state is changed. This direct
+    P2 primitive bounds particle evaporation and limits positive uptake by the
+    gas inventory plus the permitted evaporation release.
+    """
+    masses = particles.masses
+    if not _is_warp_array_like(masses) or len(masses.shape) != 3:
+        raise ValueError("particles.masses must be a 3D Warp array")
+    device = getattr(masses, "device", None)
+    if device is None:
+        raise ValueError("particles.masses must be on a Warp device")
+    if masses.dtype != wp.float64:
+        raise ValueError(f"particles.masses must use dtype {wp.float64}")
+
+    dimensions = tuple(masses.shape)
+    _validate_mass_transfer_buffer(gated_mass_transfer, dimensions, device)
+    n_boxes, n_particles, n_species = dimensions
+    _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
+    _validate_gas_arrays(gas, n_boxes, n_species)
+    _validate_device_arrays(particles, gas, device)
+    if scratch_buffers is not None:
+        validated_scratch = validate_condensation_scratch_buffers(
+            scratch_buffers,
+            dimensions,
+            device,
+            "_finalize_inventory_limited_mass_transfer",
+        )
+    else:
+        validated_scratch = CondensationScratchBuffers()
+
+    reduction_shape = (n_boxes, n_species)
+    demand = validated_scratch.positive_mass_transfer_demand
+    if demand is None:
+        demand = wp.zeros(reduction_shape, dtype=wp.float64, device=device)
+    release = validated_scratch.negative_mass_transfer_release
+    if release is None:
+        release = wp.zeros(reduction_shape, dtype=wp.float64, device=device)
+    scale = validated_scratch.positive_mass_transfer_scale
+    if scale is None:
+        scale = wp.zeros(reduction_shape, dtype=wp.float64, device=device)
+
+    candidate = wp.zeros(dimensions, dtype=wp.float64, device=device)
+    finalized = wp.zeros(dimensions, dtype=wp.float64, device=device)
+    wp.launch(
+        _bound_evaporation_candidate_kernel,
+        dim=(n_boxes, n_particles),
+        inputs=[masses, gated_mass_transfer, candidate],
+        device=device,
+    )
+    wp.launch(
+        _reduce_inventory_candidates_kernel,
+        dim=reduction_shape,
+        inputs=[candidate, particles.concentration, demand, release],
+        device=device,
+    )
+    wp.launch(
+        _scale_inventory_uptake_kernel,
+        dim=reduction_shape,
+        inputs=[gas.concentration, demand, release, scale],
+        device=device,
+    )
+    wp.launch(
+        _finalize_and_apply_inventory_transfer_kernel,
+        dim=(n_boxes, n_particles),
+        inputs=[masses, candidate, scale, finalized],
+        device=device,
+    )
+    return finalized
 
 
 def condensation_step_gpu(  # noqa: C901
